@@ -54,7 +54,6 @@ struct npc_narm_faulkAI : ScriptedAI
             spellHit = true;
         }
     }
-
 };
 
 CreatureAI* GetAI_npc_narm_faulk(Creature* pCreature)
@@ -78,10 +77,7 @@ npc_angusAI::npc_angusAI(Creature* pCreature) : ScriptedAI(pCreature)
     npc_angusAI::Reset();
 }
 
-void npc_angusAI::Reset()
-{
-
-}
+void npc_angusAI::Reset() { }
 
 void npc_angusAI::StartEvent()
 {
@@ -143,19 +139,19 @@ void npc_angusAI::UpdateAI(uint32 const uiDiff)
     {
         switch (m_uiAction)
         {
-        case 0:
-            m_creature->SetFacingTo(2.76f);
-            m_creature->SetOrientation(2.76f);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 1:
-            m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
-        case 2:
-            break;
+            case 0:
+                m_creature->SetFacingTo(2.76f);
+                m_creature->SetOrientation(2.76f);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 1:
+                m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
+            case 2:
+                break;
         }
     }
     else
@@ -183,10 +179,7 @@ npc_rifleman_middlecampAI::npc_rifleman_middlecampAI(Creature* pCreature) : Scri
     npc_rifleman_middlecampAI::Reset();
 }
 
-void npc_rifleman_middlecampAI::Reset()
-{
-
-}
+void npc_rifleman_middlecampAI::Reset() { }
 
 void npc_rifleman_middlecampAI::StartEvent()
 {
@@ -248,177 +241,176 @@ void npc_rifleman_middlecampAI::UpdateAI(uint32 const uiDiff)
     {
         switch (m_uiAction)
         {
-        case 0:
-            m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-            m_creature->MonsterTextEmote(SHOOT1EMOTE1);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 1:
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 2:
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_1);
-            m_creature->MonsterTextEmote(SHOOT1EMOTE2);
-            m_creature->SetSheath(SHEATH_STATE_UNARMED);             
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 3:
-            m_creature->HandleEmote(EMOTE_ONESHOT_QUESTION);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 4:
-            m_creature->MonsterTextEmote(SHOOT2EMOTE1);
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_2);
-            DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_2);
-            m_uiDoTimer = 4000;
-            ++m_uiAction;
-            break;
-        case 5:
-            m_creature->MonsterTextEmote(SHOOT2EMOTE2);
-            m_creature->SetSheath(SHEATH_STATE_UNARMED);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 6:
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 30))
-            {
-                m_creature->SetFacingToObject(pWheeler);
-                m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-                pWheeler->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+            case 0:
+                DoScriptText(SHOOT1EMOTE1, m_creature);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 1:
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 2:
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_1);
+                DoScriptText(SHOOT1EMOTE2, m_creature);
+                m_creature->SetSheath(SHEATH_STATE_UNARMED);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 3:
+                m_creature->HandleEmote(EMOTE_ONESHOT_QUESTION);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 4:
+                DoScriptText(SHOOT2EMOTE1, m_creature);
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_2);
+                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_2);
+                m_uiDoTimer = 4000;
+                ++m_uiAction;
+                break;
+            case 5:
+                DoScriptText(SHOOT2EMOTE2, m_creature);
+                m_creature->SetSheath(SHEATH_STATE_UNARMED);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 6:
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 30))
+                {
+                    m_creature->SetFacingToObject(pWheeler);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
+                    pWheeler->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->HandleEmote(EMOTE_ONESHOT_YES);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->HandleEmote(EMOTE_ONESHOT_YES);
+                }
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                pShorty->HandleEmote(EMOTE_ONESHOT_NO);
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    pShorty->HandleEmote(EMOTE_ONESHOT_NO);
+                }
 
-            m_uiDoTimer = 8000;
-            ++m_uiAction;
-            break;
-        case 7:
-            m_creature->SetFacingTo(2.05f);
-            m_creature->SetOrientation(2.05f);
-            m_uiDoTimer = 10000;
-            ++m_uiAction;
-            break;
-        case 8:
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_4);
-            m_creature->MonsterTextEmote(SHOOT4EMOTE1);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 9:
-            m_creature->MonsterTextEmote(SHOOT1EMOTE2);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 10:
-            m_creature->HandleEmote(EMOTE_ONESHOT_BEG); // roar?
-            m_uiDoTimer = 8000;
-            ++m_uiAction;
-            break;
-        case 11:
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_5);
-            m_creature->MonsterTextEmote(SHOOT5EMOTE1);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 12:
-            m_creature->MonsterTextEmote(SHOOT2EMOTE2);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 13:
-            m_creature->HandleEmote(EMOTE_ONESHOT_CRY);
-            m_uiDoTimer = 14000;
-            ++m_uiAction;
-            break;
-        case 14:
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 30))
-            {
-                m_creature->SetFacingToObject(pWheeler);
-                m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-            }
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 15:
-            m_creature->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            m_uiDoTimer = 4000;
-            ++m_uiAction;
-            break;
-        case 16:
-            m_creature->SetFacingTo(2.05f);
-            m_creature->SetOrientation(2.05f);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 17:
-            DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_5);
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_8);
-            m_creature->MonsterTextEmote(SHOOT8EMOTE1);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 18:
-            DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_5);
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_9);
-            m_creature->MonsterTextEmote(SHOOT9EMOTE1);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 19:
-            DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_5);
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_10);
-            m_creature->MonsterTextEmote(SHOOT10EMOTE1);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 20:
-            m_creature->HandleEmote(EMOTE_ONESHOT_CHEER_NOSHEATHE);
-            DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_1);
-            m_uiDoTimer = 6000;
-            ++m_uiAction;
-            break;
-        case 21:
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 30))
-            {
-                m_creature->SetFacingToObject(pWheeler);
-                pWheeler->SetFacingToObject(m_creature);
-                m_creature->HandleEmote(EMOTE_ONESHOT_BOW);
-                pWheeler->HandleEmote(EMOTE_ONESHOT_APPLAUD);
-            }
+                m_uiDoTimer = 8000;
+                ++m_uiAction;
+                break;
+            case 7:
+                m_creature->SetFacingTo(2.05f);
+                m_creature->SetOrientation(2.05f);
+                m_uiDoTimer = 10000;
+                ++m_uiAction;
+                break;
+            case 8:
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_4);
+                DoScriptText(SHOOT4EMOTE1, m_creature);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 9:
+                DoScriptText(SHOOT1EMOTE2, m_creature);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 10:
+                m_creature->HandleEmote(EMOTE_ONESHOT_BEG); // roar?
+                m_uiDoTimer = 8000;
+                ++m_uiAction;
+                break;
+            case 11:
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_5);
+                DoScriptText(SHOOT5EMOTE1, m_creature);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 12:
+                DoScriptText(SHOOT2EMOTE2, m_creature);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 13:
+                m_creature->HandleEmote(EMOTE_ONESHOT_CRY);
+                m_uiDoTimer = 14000;
+                ++m_uiAction;
+                break;
+            case 14:
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 30))
+                {
+                    m_creature->SetFacingToObject(pWheeler);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
+                }
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 15:
+                m_creature->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                m_uiDoTimer = 4000;
+                ++m_uiAction;
+                break;
+            case 16:
+                m_creature->SetFacingTo(2.05f);
+                m_creature->SetOrientation(2.05f);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 17:
+                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_5);
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_8);
+                DoScriptText(SHOOT8EMOTE1, m_creature);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 18:
+                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_5);
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_9);
+                DoScriptText(SHOOT9EMOTE1, m_creature);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 19:
+                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_5);
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_10);
+                DoScriptText(SHOOT10EMOTE1, m_creature);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 20:
+                m_creature->HandleEmote(EMOTE_ONESHOT_CHEER_NOSHEATHE);
+                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_1);
+                m_uiDoTimer = 6000;
+                ++m_uiAction;
+                break;
+            case 21:
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 30))
+                {
+                    m_creature->SetFacingToObject(pWheeler);
+                    pWheeler->SetFacingToObject(m_creature);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_BOW);
+                    pWheeler->HandleEmote(EMOTE_ONESHOT_APPLAUD);
+                }
 
-            if (auto pArgus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pArgus->HandleEmote(EMOTE_ONESHOT_APPLAUD);
-            }
+                if (auto pArgus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pArgus->HandleEmote(EMOTE_ONESHOT_APPLAUD);
+                }
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                pShorty->HandleEmote(EMOTE_ONESHOT_APPLAUD);
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    pShorty->HandleEmote(EMOTE_ONESHOT_APPLAUD);
+                }
 
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 22:
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                m_creature->SetFacingToObject(pShorty);
-            }
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 22:
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    m_creature->SetFacingToObject(pShorty);
+                }
 
-            ++m_uiAction;
-            break;
+                ++m_uiAction;
+                break;
         }
     }
     else
@@ -446,10 +438,7 @@ npc_rifleman_wheelerAI::npc_rifleman_wheelerAI(Creature* pCreature) : ScriptedAI
     npc_rifleman_wheelerAI::Reset();
 }
 
-void npc_rifleman_wheelerAI::Reset()
-{
-
-}
+void npc_rifleman_wheelerAI::Reset() { }
 
 void npc_rifleman_wheelerAI::StartEvent()
 {
@@ -536,107 +525,105 @@ void npc_rifleman_wheelerAI::UpdateAI(uint32 const uiDiff)
     {
         switch (m_uiAction)
         {
-        case 0:
-            m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-            m_creature->MonsterTextEmote(SHOOT3EMOTE1);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 1:
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_3);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 2:
-            m_creature->MonsterTextEmote(SHOOT3EMOTE2);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 3:
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 30))
-            {
-                m_creature->SetFacingToObject(pMiddlecamp);
-                m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_4);
-            }
+            case 0:
+                DoScriptText(SHOOT3EMOTE1, m_creature);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 1:
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_3);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 2:
+                DoScriptText(SHOOT3EMOTE2, m_creature);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 3:
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 30))
+                {
+                    m_creature->SetFacingToObject(pMiddlecamp);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
+                    DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_4);
+                }
 
-            if (auto pArgus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pArgus->HandleEmote(EMOTE_ONESHOT_APPLAUD);
-            }
+                if (auto pArgus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pArgus->HandleEmote(EMOTE_ONESHOT_APPLAUD);
+                }
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                pShorty->HandleEmote(EMOTE_ONESHOT_APPLAUD);
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    pShorty->HandleEmote(EMOTE_ONESHOT_APPLAUD);
+                }
 
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 4:
-            m_creature->HandleEmote(EMOTE_ONESHOT_FLEX);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 5:
-            m_creature->SetOrientation(2.39f);
-            m_uiDoTimer = 7000;
-            ++m_uiAction;
-            break;
-        case 6:
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 30))
-            {
-                m_creature->SetFacingToObject(pMiddlecamp);
-                m_creature->HandleEmote(EMOTE_ONESHOT_QUESTION);
-                DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_3);
-            }
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 4:
+                m_creature->HandleEmote(EMOTE_ONESHOT_FLEX);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 5:
+                m_creature->SetOrientation(2.39f);
+                m_uiDoTimer = 7000;
+                ++m_uiAction;
+                break;
+            case 6:
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 30))
+                {
+                    m_creature->SetFacingToObject(pMiddlecamp);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_QUESTION);
+                    DoPlaySoundToSet(m_creature, SOUND_RIFLEMAN_3);
+                }
 
-            m_uiDoTimer = 4000;
-            ++m_uiAction;
-            break;
-        case 7:
-            m_creature->SetFacingTo(2.39f);
-            m_creature->SetOrientation(2.39f);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 8:
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_6);
-            m_uiDoTimer = 11000;
-            ++m_uiAction;
-            break;
-        case 9: // 56 s
-            m_creature->MonsterTextEmote(SHOOT6EMOTE1);
-            DoCastSpellIfCan(m_creature, SPELL_SHOOT_7);
-            m_creature->MonsterTextEmote(SHOOT7EMOTE1);
-            m_uiDoTimer = 5000;
-            ++m_uiAction;
-            break;
-        case 10:
-            m_creature->MonsterTextEmote(SHOOT7EMOTE2);
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 30))
-            {
-                m_creature->SetFacingToObject(pMiddlecamp);
-                m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-            }
+                m_uiDoTimer = 4000;
+                ++m_uiAction;
+                break;
+            case 7:
+                m_creature->SetFacingTo(2.39f);
+                m_creature->SetOrientation(2.39f);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 8:
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_6);
+                m_uiDoTimer = 11000;
+                ++m_uiAction;
+                break;
+            case 9: // 56 s
+                DoScriptText(SHOOT6EMOTE1, m_creature);
+                DoCastSpellIfCan(m_creature, SPELL_SHOOT_7);
+                DoScriptText(SHOOT7EMOTE1, m_creature);
+                m_uiDoTimer = 5000;
+                ++m_uiAction;
+                break;
+            case 10:
+                DoScriptText(SHOOT7EMOTE2, m_creature);
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 30))
+                {
+                    m_creature->SetFacingToObject(pMiddlecamp);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
+                }
 
-            m_uiDoTimer = 19000;
-            ++m_uiAction;
-            break;
-        case 11:
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                m_creature->SetFacingToObject(pShorty);
-            }
+                m_uiDoTimer = 19000;
+                ++m_uiAction;
+                break;
+            case 11:
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    m_creature->SetFacingToObject(pShorty);
+                }
 
-            PokeMortarGuys();
-            ++m_uiAction;
-            break;
+                PokeMortarGuys();
+                ++m_uiAction;
+                break;
         }
     }
     else
         m_uiDoTimer -= uiDiff;
-
 }
 
 CreatureAI* GetAI_npc_rifleman_wheeler(Creature* pCreature)
@@ -661,10 +648,7 @@ npc_shortyAI::npc_shortyAI(Creature* pCreature) : ScriptedAI(pCreature)
     npc_shortyAI::Reset();
 }
 
-void npc_shortyAI::Reset()
-{
-
-}
+void npc_shortyAI::Reset() { }
 
 void npc_shortyAI::StartEvent()
 {
@@ -749,206 +733,205 @@ void npc_shortyAI::UpdateAI(uint32 const uiDiff)
     {
         switch (m_uiAction)
         {
-        case 0:
-            m_creature->SetFacingTo(2.82f);
-            m_creature->SetOrientation(2.82f);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 1:
-            DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_5);
-            m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
-        case 2:
-            m_creature->SetFacingTo(4.37f);
-            m_creature->SetOrientation(4.37f);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 3:
-            m_creature->HandleEmote(EMOTE_STATE_USESTANDING);
-            m_uiDoTimer = 4000;
-            ++m_uiAction;
-            break;
-        case 4:
-            m_creature->HandleEmote(EMOTE_STATE_NONE);
-            m_creature->SetFacingTo(2.82f);
-            m_creature->SetOrientation(2.82f);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 5:
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
-            {
-                pMiddlecamp->SetFacingTo(2.99f);
-            }
+            case 0:
+                m_creature->SetFacingTo(2.82f);
+                m_creature->SetOrientation(2.82f);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 1:
+                DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_5);
+                m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
+            case 2:
+                m_creature->SetFacingTo(4.37f);
+                m_creature->SetOrientation(4.37f);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 3:
+                m_creature->HandleEmote(EMOTE_STATE_USESTANDING);
+                m_uiDoTimer = 4000;
+                ++m_uiAction;
+                break;
+            case 4:
+                m_creature->HandleEmote(EMOTE_STATE_NONE);
+                m_creature->SetFacingTo(2.82f);
+                m_creature->SetOrientation(2.82f);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 5:
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
+                {
+                    pMiddlecamp->SetFacingTo(2.99f);
+                }
 
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
-            {
-                pWheeler->SetFacingTo(2.97f);
-            }
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
+                {
+                    pWheeler->SetFacingTo(2.97f);
+                }
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->HandleEmote(EMOTE_ONESHOT_POINT);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->HandleEmote(EMOTE_ONESHOT_POINT);
+                }
 
-            DoCastSpellIfCan(m_creature, SPELL_MORTAR_ANIMATE);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 6:
-            DoCastSpellIfCan(m_creature, SPELL_MORTAR_SHOT);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 7:
-            m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 8:
-            m_creature->SetFacingTo(4.37f);
-            m_creature->SetOrientation(4.37f);            
-            DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_2);
+                DoCastSpellIfCan(m_creature, SPELL_MORTAR_ANIMATE);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 6:
+                DoCastSpellIfCan(m_creature, SPELL_MORTAR_SHOT);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 7:
+                m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 8:
+                m_creature->SetFacingTo(4.37f);
+                m_creature->SetOrientation(4.37f);            
+                DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_2);
 
-            if (auto pKlemmy = m_creature->FindNearestCreature(NPC_SPOTTER_KLEMMY, 80))
-            {
-                if (auto pKlemmyAI = static_cast<npc_spotter_klemmyAI*>(pKlemmy->AI()))
-                    pKlemmyAI->StartSubEvent();
-            }
+                if (auto pKlemmy = m_creature->FindNearestCreature(NPC_SPOTTER_KLEMMY, 80))
+                {
+                    if (auto pKlemmyAI = static_cast<npc_spotter_klemmyAI*>(pKlemmy->AI()))
+                        pKlemmyAI->StartSubEvent();
+                }
 
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 9:
-            m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 10:
-            m_creature->SetFacingTo(2.82f);
-            m_creature->SetOrientation(2.82f);
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
-        case 11:
-            m_creature->SetFacingTo(4.37f);
-            m_creature->SetOrientation(4.37f);
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-            break;
-        case 12:
-            m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
-            DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_3);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 13:
-            //m_creature->HandleEmote(EMOTE_STATE_USESTANDING); // does not work while kneeling; no choice?
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 14:
-            m_creature->HandleEmote(EMOTE_STATE_NONE);
-            m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-            m_creature->SetFacingTo(2.82f);
-            m_creature->SetOrientation(2.82f);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 15:
-            m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-            DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_4);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 16:
-            DoCastSpellIfCan(m_creature, SPELL_MORTAR_ANIMATE);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 17:
-            DoCastSpellIfCan(m_creature, SPELL_MORTAR_SHOT);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-            break;
-        case 18:
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->SetFacingToObject(m_creature);
-                pAngus->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->SetFacingToObject(pAngus);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 9:
+                m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 10:
+                m_creature->SetFacingTo(2.82f);
+                m_creature->SetOrientation(2.82f);
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
+            case 11:
+                m_creature->SetFacingTo(4.37f);
+                m_creature->SetOrientation(4.37f);
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+                break;
+            case 12:
+                m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_3);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 13:
+                //m_creature->HandleEmote(EMOTE_STATE_USESTANDING); // does not work while kneeling; no choice?
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 14:
+                m_creature->HandleEmote(EMOTE_STATE_NONE);
+                m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+                m_creature->SetFacingTo(2.82f);
+                m_creature->SetOrientation(2.82f);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 15:
                 m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-            }
+                DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_4);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 16:
+                DoCastSpellIfCan(m_creature, SPELL_MORTAR_ANIMATE);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 17:
+                DoCastSpellIfCan(m_creature, SPELL_MORTAR_SHOT);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+                break;
+            case 18:
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->SetFacingToObject(m_creature);
+                    pAngus->HandleEmote(EMOTE_ONESHOT_TALK);
+                    m_creature->SetFacingToObject(pAngus);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
+                }
 
-            DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_1);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 19:
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
-            {
-                pMiddlecamp->SetFacingToObject(m_creature);
-                pMiddlecamp->HandleEmote(EMOTE_ONESHOT_APPLAUD);
-            }
+                DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_1);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 19:
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
+                {
+                    pMiddlecamp->SetFacingToObject(m_creature);
+                    pMiddlecamp->HandleEmote(EMOTE_ONESHOT_APPLAUD);
+                }
 
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
-            {
-                pWheeler->SetFacingToObject(m_creature);
-                pWheeler->HandleEmote(EMOTE_ONESHOT_CHEER);
-            }
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
+                {
+                    pWheeler->SetFacingToObject(m_creature);
+                    pWheeler->HandleEmote(EMOTE_ONESHOT_CHEER);
+                }
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->SetFacingTo(2.76f);
-                pAngus->SetOrientation(2.76f);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->SetFacingTo(2.76f);
+                    pAngus->SetOrientation(2.76f);
+                }
 
-            m_creature->SetFacingTo(2.82f);
-            m_creature->SetOrientation(2.82f);
+                m_creature->SetFacingTo(2.82f);
+                m_creature->SetOrientation(2.82f);
 
-            if (auto pKlemmy = m_creature->FindNearestCreature(NPC_SPOTTER_KLEMMY, 80))
-            {
-                if (auto pKlemmyAI = static_cast<npc_spotter_klemmyAI*>(pKlemmy->AI()))
-                    pKlemmyAI->StartSubEvent();
-            }
+                if (auto pKlemmy = m_creature->FindNearestCreature(NPC_SPOTTER_KLEMMY, 80))
+                {
+                    if (auto pKlemmyAI = static_cast<npc_spotter_klemmyAI*>(pKlemmy->AI()))
+                        pKlemmyAI->StartSubEvent();
+                }
 
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
-        case 20:
-            DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_6);
-            DoCastSpellIfCan(m_creature, SPELL_MORTAR_ANIMATE);
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
+            case 20:
+                DoPlaySoundToSet(m_creature, SOUND_MORTAR_TEAM_6);
+                DoCastSpellIfCan(m_creature, SPELL_MORTAR_ANIMATE);
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
+                }
 
-            m_creature->HandleEmote(EMOTE_ONESHOT_ROAR);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 21:
-            DoCastSpellIfCan(m_creature, SPELL_MORTAR_SHOT);
+                m_creature->HandleEmote(EMOTE_ONESHOT_ROAR);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 21:
+                DoCastSpellIfCan(m_creature, SPELL_MORTAR_SHOT);
 
-            if (auto pKlemmy = m_creature->FindNearestCreature(NPC_SPOTTER_KLEMMY, 80))
-            {
-                if (auto pKlemmyAI = static_cast<npc_spotter_klemmyAI*>(pKlemmy->AI()))
-                    pKlemmyAI->StartSubEvent();
-            }
+                if (auto pKlemmy = m_creature->FindNearestCreature(NPC_SPOTTER_KLEMMY, 80))
+                {
+                    if (auto pKlemmyAI = static_cast<npc_spotter_klemmyAI*>(pKlemmy->AI()))
+                        pKlemmyAI->StartSubEvent();
+                }
 
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
         }
     }
     else
         m_uiDoTimer -= uiDiff;
-
 }
 
 CreatureAI* GetAI_npc_shorty(Creature* pCreature)
@@ -974,10 +957,7 @@ npc_spotter_klemmyAI::npc_spotter_klemmyAI(Creature* pCreature) : ScriptedAI(pCr
     npc_spotter_klemmyAI::Reset();
 }
 
-void npc_spotter_klemmyAI::Reset()
-{
-
-}
+void npc_spotter_klemmyAI::Reset() { }
 
 void npc_spotter_klemmyAI::StartEvent()
 {
@@ -1007,118 +987,118 @@ void npc_spotter_klemmyAI::MovementInform(uint32 uiType, uint32 uiPointId)
 
     switch (uiPointId)
     {
-    case 100:
-        if (!m_uiAction)
-        {
-            DoCastSpellIfCan(m_creature, SPELL_TARGET_DUMMY_1);
-            m_bSubMoveProcessed = false;
-            m_uiDoTimer = 3000;
-            ++m_uiAction;            
-        }
-
-        break;
-    case 101:
-        if (m_uiAction == 1)
-        {
-            m_creature->HandleEmote(EMOTE_ONESHOT_WAVE);
-            m_bSubMoveProcessed = false;
-            m_uiDoTimer = 1000;
-            ++m_uiAction;            
-        }
-
-        break;
-    case 102:
-        if (m_uiAction == 3)
-        {
-            DoCastSpellIfCan(m_creature, SPELL_TARGET_DUMMY_2);
-            m_bSubMoveProcessed = false;
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-        }
-
-        break;
-    case 103:
-        if (m_uiAction == 4)
-        {
-            m_creature->HandleEmote(EMOTE_ONESHOT_SALUTE);
-            m_bSubMoveProcessed = false;
-            m_creature->SetWalk(false);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-        }
-
-        break;
-    case 104:
-        if (m_uiAction == 5)
-        {
-            m_creature->SetWalk(true);
-            m_bSubMoveProcessed = false;
-
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
+        case 100:
+            if (!m_uiAction)
             {
-                if (auto pShortyAI = static_cast<npc_shortyAI*>(pShorty->AI()))
-                    pShortyAI->StartSubEvent();
+                DoCastSpellIfCan(m_creature, SPELL_TARGET_DUMMY_1);
+                m_bSubMoveProcessed = false;
+                m_uiDoTimer = 3000;
+                ++m_uiAction;            
             }
 
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-        }
-
-        break;
-    case 105:
-        if (m_uiAction == 6)
-        {
-            m_bSubMoveProcessed = false;
-
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
+            break;
+        case 101:
+            if (m_uiAction == 1)
             {
-                pMiddlecamp->SetFacingToObject(m_creature);
+                m_creature->HandleEmote(EMOTE_ONESHOT_WAVE);
+                m_bSubMoveProcessed = false;
+                m_uiDoTimer = 1000;
+                ++m_uiAction;            
             }
 
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
+            break;
+        case 102:
+            if (m_uiAction == 3)
             {
-                pWheeler->SetFacingToObject(m_creature);
+                DoCastSpellIfCan(m_creature, SPELL_TARGET_DUMMY_2);
+                m_bSubMoveProcessed = false;
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
             }
 
-            DoCastSpellIfCan(m_creature, SPELL_TARGET_DUMMY_3);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-        }
+            break;
+        case 103:
+            if (m_uiAction == 4)
+            {
+                m_creature->HandleEmote(EMOTE_ONESHOT_SALUTE);
+                m_bSubMoveProcessed = false;
+                m_creature->SetWalk(false);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+            }
 
-        break;
-    case 106:
-        if (m_uiAction == 7)
-        {
-            m_bSubMoveProcessed = false;
-            m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-            m_uiDoTimer = 1000;
-            ++m_uiAction;
-        }
+            break;
+        case 104:
+            if (m_uiAction == 5)
+            {
+                m_creature->SetWalk(true);
+                m_bSubMoveProcessed = false;
 
-        break;
-    case 107:
-        if (m_uiAction == 10)
-        {
-            m_creature->GetMotionMaster()->MovePoint(108, KlemmySubMove[4][0], KlemmySubMove[4][1], KlemmySubMove[4][2], MOVE_PATHFINDING);
-        }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
+                {
+                    if (auto pShortyAI = static_cast<npc_shortyAI*>(pShorty->AI()))
+                        pShortyAI->StartSubEvent();
+                }
 
-        break;
-    case 108:
-        if (m_uiAction == 10)
-        {
-            m_creature->GetMotionMaster()->MovePoint(109, KlemmySubMove[5][0], KlemmySubMove[5][1], KlemmySubMove[5][2], MOVE_PATHFINDING);
-        }
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+            }
 
-        break;
-    case 109:
-        if (m_uiAction == 10)
-        {
-            m_bSubMoveProcessed = false;
-            m_uiDoTimer = 2000;
-            ++m_uiAction;
-        }
+            break;
+        case 105:
+            if (m_uiAction == 6)
+            {
+                m_bSubMoveProcessed = false;
 
-        break;
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
+                {
+                    pMiddlecamp->SetFacingToObject(m_creature);
+                }
+
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
+                {
+                    pWheeler->SetFacingToObject(m_creature);
+                }
+
+                DoCastSpellIfCan(m_creature, SPELL_TARGET_DUMMY_3);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+            }
+
+            break;
+        case 106:
+            if (m_uiAction == 7)
+            {
+                m_bSubMoveProcessed = false;
+                m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
+                m_uiDoTimer = 1000;
+                ++m_uiAction;
+            }
+
+            break;
+        case 107:
+            if (m_uiAction == 10)
+            {
+                m_creature->GetMotionMaster()->MovePoint(108, KlemmySubMove[4][0], KlemmySubMove[4][1], KlemmySubMove[4][2], MOVE_PATHFINDING);
+            }
+
+            break;
+        case 108:
+            if (m_uiAction == 10)
+            {
+                m_creature->GetMotionMaster()->MovePoint(109, KlemmySubMove[5][0], KlemmySubMove[5][1], KlemmySubMove[5][2], MOVE_PATHFINDING);
+            }
+
+            break;
+        case 109:
+            if (m_uiAction == 10)
+            {
+                m_bSubMoveProcessed = false;
+                m_uiDoTimer = 2000;
+                ++m_uiAction;
+            }
+
+            break;
     }
 
     if (m_bActionPosReached)
@@ -1163,141 +1143,141 @@ void npc_spotter_klemmyAI::UpdateAI(uint32 const uiDiff)
     {
         switch (m_uiAction)
         {
-        case 0:
-            m_creature->GetMotionMaster()->MovePoint(100, KlemmySubMove[0][0], KlemmySubMove[0][1], KlemmySubMove[0][2], MOVE_PATHFINDING, 0, 6.06f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 1:
-            m_creature->GetMotionMaster()->MovePoint(101, KlemmyMove[EPOS_KLEMMY][0], KlemmyMove[EPOS_KLEMMY][1], KlemmyMove[EPOS_KLEMMY][2], MOVE_PATHFINDING, 0, 5.81f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 2:
-            m_creature->SetOrientation(4.24f);
+            case 0:
+                m_creature->GetMotionMaster()->MovePoint(100, KlemmySubMove[0][0], KlemmySubMove[0][1], KlemmySubMove[0][2], MOVE_PATHFINDING, 0, 6.06f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 1:
+                m_creature->GetMotionMaster()->MovePoint(101, KlemmyMove[EPOS_KLEMMY][0], KlemmyMove[EPOS_KLEMMY][1], KlemmyMove[EPOS_KLEMMY][2], MOVE_PATHFINDING, 0, 5.81f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 2:
+                m_creature->SetOrientation(4.24f);
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
-            {
-                if (auto pShortyAI = static_cast<npc_shortyAI*>(pShorty->AI()))
-                    pShortyAI->StartSubEvent();
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
+                {
+                    if (auto pShortyAI = static_cast<npc_shortyAI*>(pShorty->AI()))
+                        pShortyAI->StartSubEvent();
+                }
 
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
-        case 3:
-            m_creature->GetMotionMaster()->MovePoint(102, KlemmySubMove[0][0], KlemmySubMove[0][1], KlemmySubMove[0][2], MOVE_PATHFINDING, 0, 6.06f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 4:
-            m_creature->GetMotionMaster()->MovePoint(103, KlemmySubMove[1][0], KlemmySubMove[1][1], KlemmySubMove[1][2], MOVE_PATHFINDING, 0, 5.94f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 5:
-            m_creature->GetMotionMaster()->MovePoint(104, KlemmySubMove[2][0], KlemmySubMove[2][1], KlemmySubMove[2][2], MOVE_PATHFINDING, 0, 4.2f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 6:
-            m_creature->GetMotionMaster()->MovePoint(105, KlemmySubMove[0][0], KlemmySubMove[0][1], KlemmySubMove[0][2], MOVE_PATHFINDING, 0, 6.06f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 7:
-            m_creature->GetMotionMaster()->MovePoint(106, KlemmySubMove[1][0], KlemmySubMove[1][1], KlemmySubMove[1][2], MOVE_PATHFINDING, 0, 5.94f);
-            m_bSubMoveProcessed = true;
-            break;
-        case 8:
-            m_creature->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
+            case 3:
+                m_creature->GetMotionMaster()->MovePoint(102, KlemmySubMove[0][0], KlemmySubMove[0][1], KlemmySubMove[0][2], MOVE_PATHFINDING, 0, 6.06f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 4:
+                m_creature->GetMotionMaster()->MovePoint(103, KlemmySubMove[1][0], KlemmySubMove[1][1], KlemmySubMove[1][2], MOVE_PATHFINDING, 0, 5.94f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 5:
+                m_creature->GetMotionMaster()->MovePoint(104, KlemmySubMove[2][0], KlemmySubMove[2][1], KlemmySubMove[2][2], MOVE_PATHFINDING, 0, 4.2f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 6:
+                m_creature->GetMotionMaster()->MovePoint(105, KlemmySubMove[0][0], KlemmySubMove[0][1], KlemmySubMove[0][2], MOVE_PATHFINDING, 0, 6.06f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 7:
+                m_creature->GetMotionMaster()->MovePoint(106, KlemmySubMove[1][0], KlemmySubMove[1][1], KlemmySubMove[1][2], MOVE_PATHFINDING, 0, 5.94f);
+                m_bSubMoveProcessed = true;
+                break;
+            case 8:
+                m_creature->HandleEmote(EMOTE_ONESHOT_LAUGH);
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
-            {
-                if (auto pShortyAI = static_cast<npc_shortyAI*>(pShorty->AI()))
-                    pShortyAI->StartSubEvent();
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
+                {
+                    if (auto pShortyAI = static_cast<npc_shortyAI*>(pShorty->AI()))
+                        pShortyAI->StartSubEvent();
+                }
 
-            m_bSubEventProcessed = false;
-            ++m_uiAction;
-            break;
-        case 9:
-            m_creature->SetWalk(false);
-            m_creature->GetMotionMaster()->MovePoint(107, KlemmySubMove[3][0], KlemmySubMove[3][1], KlemmySubMove[3][2], MOVE_PATHFINDING);
-            m_bSubMoveProcessed = true;
+                m_bSubEventProcessed = false;
+                ++m_uiAction;
+                break;
+            case 9:
+                m_creature->SetWalk(false);
+                m_creature->GetMotionMaster()->MovePoint(107, KlemmySubMove[3][0], KlemmySubMove[3][1], KlemmySubMove[3][2], MOVE_PATHFINDING);
+                m_bSubMoveProcessed = true;
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 80))
-            {
-                pAngus->HandleEmote(EMOTE_ONESHOT_DANCE);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 80))
+                {
+                    pAngus->HandleEmote(EMOTE_ONESHOT_DANCE);
+                }
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
-            {
-                pShorty->HandleEmote(EMOTE_ONESHOT_DANCE);
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 80))
+                {
+                    pShorty->HandleEmote(EMOTE_ONESHOT_DANCE);
+                }
 
-            ++m_uiAction;
-            break;
-        case 10:
-            m_creature->HandleEmote(EMOTE_ONESHOT_RUDE);
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 11:
-            m_creature->HandleEmote(EMOTE_ONESHOT_RUDE);
+                ++m_uiAction;
+                break;
+            case 10:
+                m_creature->HandleEmote(EMOTE_ONESHOT_RUDE);
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 11:
+                m_creature->HandleEmote(EMOTE_ONESHOT_RUDE);
 
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
-            {
-                pMiddlecamp->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
+                {
+                    pMiddlecamp->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
-            {
-                pWheeler->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
+                {
+                    pWheeler->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                pShorty->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    pShorty->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            m_uiDoTimer = 3000;
-            ++m_uiAction;
-            break;
-        case 12:
-            if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
-            {
-                pMiddlecamp->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                m_uiDoTimer = 3000;
+                ++m_uiAction;
+                break;
+            case 12:
+                if (auto pMiddlecamp = m_creature->FindNearestCreature(NPC_RIFLEMAN_MIDDLECAMP, 50))
+                {
+                    pMiddlecamp->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
-            {
-                pWheeler->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pWheeler = m_creature->FindNearestCreature(NPC_RIFLEMAN_WHEELER, 50))
+                {
+                    pWheeler->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
-            {
-                pAngus->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pAngus = m_creature->FindNearestCreature(NPC_ANGUS, 30))
+                {
+                    pAngus->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
-            {
-                pShorty->HandleEmote(EMOTE_ONESHOT_LAUGH);
-            }
+                if (auto pShorty = m_creature->FindNearestCreature(NPC_SHORTY, 30))
+                {
+                    pShorty->HandleEmote(EMOTE_ONESHOT_LAUGH);
+                }
 
-            m_uiDoTimer = 5000;
-            ++m_uiAction;
-            break;
-        case 13:
-            m_bSubEventProcessed = false;
+                m_uiDoTimer = 5000;
+                ++m_uiAction;
+                break;
+            case 13:
+                m_bSubEventProcessed = false;
 
-            if (auto pWatcher = m_creature->FindNearestCreature(NPC_EVENT_WATCHER, 100))
-            {
-                if (auto pWatcherAI = static_cast<npc_mortar_team_watcherAI*>(pWatcher->AI()))
-                    pWatcherAI->PokeAll(false);
-            }
+                if (auto pWatcher = m_creature->FindNearestCreature(NPC_EVENT_WATCHER, 100))
+                {
+                    if (auto pWatcherAI = static_cast<npc_mortar_team_watcherAI*>(pWatcher->AI()))
+                        pWatcherAI->PokeAll(false);
+                }
 
-            ++m_uiAction;
-            break;
+                ++m_uiAction;
+                break;
         }
     }
     else
@@ -1322,10 +1302,7 @@ npc_mortar_team_watcherAI::npc_mortar_team_watcherAI(Creature* pCreature) : Scri
     npc_mortar_team_watcherAI::Reset();
 }
 
-void npc_mortar_team_watcherAI::Reset()
-{
-
-}
+void npc_mortar_team_watcherAI::Reset() { }
 
 void npc_mortar_team_watcherAI::PokeAll(bool start)
 {
@@ -1402,10 +1379,7 @@ CreatureAI* GetAI_npc_mortar_team_watcher(Creature* pCreature)
 
 struct go_mortarAI : GameObjectAI
 {
-    explicit go_mortarAI(GameObject* pGo) : GameObjectAI(pGo)
-    {
-
-    }
+    explicit go_mortarAI(GameObject* pGo) : GameObjectAI(pGo) { }
 
     bool OnUse(Unit* pCaster) override
     {
@@ -1429,10 +1403,7 @@ npc_mortar_team_target_dummyAI::npc_mortar_team_target_dummyAI(Creature* pCreatu
     npc_mortar_team_target_dummyAI::Reset();
 }
 
-void npc_mortar_team_target_dummyAI::Reset()
-{
-
-}
+void npc_mortar_team_target_dummyAI::Reset() { }
 
 void npc_mortar_team_target_dummyAI::SpellHit(Unit*, SpellEntry const* pSpell)
 {
@@ -1442,10 +1413,7 @@ void npc_mortar_team_target_dummyAI::SpellHit(Unit*, SpellEntry const* pSpell)
     }
 }
 
-void npc_mortar_team_target_dummyAI::UpdateAI(uint32 const uiDiff)
-{
-
-}
+void npc_mortar_team_target_dummyAI::UpdateAI(uint32 const uiDiff) { }
 
 CreatureAI* GetAI_npc_mortar_team_target_dummy(Creature* pCreature)
 {

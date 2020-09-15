@@ -15,7 +15,7 @@ EndContentData */
 
 #include "scriptPCH.h"
 
-enum
+enum NightmareCorruptionData
 {
     SPELL_SOUL_CORRUPTION = 25805,
     SPELL_CREATURE_OF_NIGHTMARE = 25806,
@@ -60,6 +60,11 @@ bool AreaTrigger_at_twilight_grove(Player* pPlayer, AreaTriggerEntry const* pAt)
     return false;
 }
 
+enum TwilightCorrupterData
+{
+    AGGRO_TEXT = 11269
+};
+
 struct npc_twilight_corrupterAI : ScriptedAI
 {
     explicit npc_twilight_corrupterAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -92,7 +97,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
     {
         if (!bEngaged)
         {
-            m_creature->MonsterSay("The Nightmare cannot be stopped!");
+            DoScriptText(AGGRO_TEXT, m_creature);
             bEngaged = true;
         }
     }
@@ -195,7 +200,7 @@ CreatureAI* GetAI_npc_twilight_corrupter(Creature* pCreature)
  * Watcher Blomberg (Stitches event support)
  */
 
-enum
+enum WatcherBlombergData
 {
     NPC_WATCHER_DODDS   = 888,
     NPC_WATCHER_PAIGE   = 499
@@ -276,17 +281,13 @@ struct npc_watcher_selkinAI : npc_escortAI
         m_creature->SetWalk(false);
     }
 
-    void WaypointReached(uint32 /*uiPoint*/) override {}
+    void WaypointReached(uint32 /*uiPoint*/) override { }
 };
 
 CreatureAI* GetAI_watcherSelkin(Creature* pCreature)
 {
     return new npc_watcher_selkinAI(pCreature);
 }
-
-/*
- *
- */
 
 struct npc_commander_felstromAI : ScriptedAI
 {
@@ -343,11 +344,11 @@ CreatureAI* GetAI_commanderFelstrom(Creature* pCreature)
 * Lord Ello Ebonlocke
 */
 
-enum
+enum LordElloEbonlockeData
 {
     NPC_STITCHES = 412,
 
-    QUEST_TRANSLATION_TO_ELO = 252,
+    QUEST_TRANSLATION_TO_ELO = 252
 };
 
 struct elloEbonlockeAI : ScriptedAI
@@ -362,7 +363,7 @@ struct elloEbonlockeAI : ScriptedAI
     uint32 m_uiTimer;
     bool m_bCanSummon;
 
-    void Reset() override {}
+    void Reset() override { }
 
     void ResetCreature() override
     {
@@ -377,6 +378,7 @@ struct elloEbonlockeAI : ScriptedAI
     }
 
     bool SummonStitches();
+
     void LaunchStitches(Creature* pStitches) const;
 
     void UpdateAI(uint32 const uiDiff) override
@@ -397,7 +399,7 @@ struct elloEbonlockeAI : ScriptedAI
  * Stitches
  */
 
-enum
+enum StitchesData
 {
     NPC_WATCHER_CORWIN      = 1204,
     NPC_WATCHER_SARYS       = 1203,
@@ -410,14 +412,14 @@ enum
     NPC_WATCHER_SELKIN      = 1100,
     NPC_WATCHER_THAYER      = 1101,
 
-    STITCHES_YELL_1         = -1500000,
-    STITCHES_YELL_2         = -1500001,
-    TOWNCRIER_YELL_1        = -1500002,
-    TOWNCRIER_YELL_2        = -1500003,
-    TOWNCRIER_YELL_3        = -1500004,
-    TOWNCRIER_YELL_4        = -1500005,
-    TOWNCRIER_YELL_5        = -1500006,
-    CUTFORD_YELL            = -1500007,
+    STITCHES_YELL_1         = 277,
+    STITCHES_YELL_2         = 278,
+    TOWNCRIER_YELL_1        = 89,
+    TOWNCRIER_YELL_2        = 90,
+    TOWNCRIER_YELL_3        = 91,
+    TOWNCRIER_YELL_4        = 92,
+    TOWNCRIER_YELL_5        = 93,
+    CUTFORD_YELL            = 276,
 
     SPELL_AURA_OF_ROT       = 3106
 };
@@ -531,39 +533,39 @@ struct npc_stitchesAI : npc_escortAI
 
         switch (pSummoned->GetEntry())
         {
-        case NPC_WATCHER_HUTCHINS:
-            pSummoned->SetWalk(false);
-            pSummoned->GetMotionMaster()->MovePoint(0, -10905.52f, -374.1f, 39.88f, MOVE_PATHFINDING);
-            pSummoned->SetCombatStartPosition(-10905.52f, -374.1f, 39.88f);
-            pSummoned->SetHomePosition(-10905.52f, -374.1f, 39.88f, 0.0f); 
-            break;
-        case NPC_WATCHER_BLOMBERG:
-            pSummoned->SetWalk(false);
-            pSummoned->GetMotionMaster()->MovePoint(0, -10902.211914f, -375.488495f, 40.000954f, MOVE_PATHFINDING);
-            pSummoned->SetCombatStartPosition(-10902.211914f, -375.488495f, 40.000954f);
-            pSummoned->SetHomePosition(-10902.211914f, -375.488495f, 40.000954f, 0.0f);
-            if (auto pSummonedAI = static_cast<npc_watcher_blombergAI*>(pSummoned->AI()))
-            {
-                m_DoddsGuid = pSummonedAI->m_DoddsGuid;
-                m_PaigeGuid = pSummonedAI->m_PaigeGuid;
-            }
-            break;
-        case NPC_WATCHER_CUTFORD:
-            pSummoned->SetWalk(false);
-            if (pSummoned->GetDistance2d(m_creature) > 40.0f)
-            {
-                pSummoned->GetMotionMaster()->MovePoint(0, -10904.632f, -425.087f, 42.189217f, MOVE_PATHFINDING);
-                pSummoned->SetCombatStartPosition(-10904.632f, -425.087f, 42.189217f);
-                pSummoned->SetHomePosition(-10904.632f, -425.087f, 42.189217f, 0.0f);
-            }
-            else
-                pSummoned->AI()->AttackStart(m_creature);
-            pSummoned->MonsterYell(CUTFORD_YELL);
-            break;
-        case NPC_WATCHER_SELKIN:
-            if (auto pSummonedAI = static_cast<npc_watcher_selkinAI*>(pSummoned->AI()))
-                pSummonedAI->Start(true);
-            break;
+            case NPC_WATCHER_HUTCHINS:
+                pSummoned->SetWalk(false);
+                pSummoned->GetMotionMaster()->MovePoint(0, -10905.52f, -374.1f, 39.88f, MOVE_PATHFINDING);
+                pSummoned->SetCombatStartPosition(-10905.52f, -374.1f, 39.88f);
+                pSummoned->SetHomePosition(-10905.52f, -374.1f, 39.88f, 0.0f); 
+                break;
+            case NPC_WATCHER_BLOMBERG:
+                pSummoned->SetWalk(false);
+                pSummoned->GetMotionMaster()->MovePoint(0, -10902.211914f, -375.488495f, 40.000954f, MOVE_PATHFINDING);
+                pSummoned->SetCombatStartPosition(-10902.211914f, -375.488495f, 40.000954f);
+                pSummoned->SetHomePosition(-10902.211914f, -375.488495f, 40.000954f, 0.0f);
+                if (auto pSummonedAI = static_cast<npc_watcher_blombergAI*>(pSummoned->AI()))
+                {
+                    m_DoddsGuid = pSummonedAI->m_DoddsGuid;
+                    m_PaigeGuid = pSummonedAI->m_PaigeGuid;
+                }
+                break;
+            case NPC_WATCHER_CUTFORD:
+                pSummoned->SetWalk(false);
+                if (pSummoned->GetDistance2d(m_creature) > 40.0f)
+                {
+                    pSummoned->GetMotionMaster()->MovePoint(0, -10904.632f, -425.087f, 42.189217f, MOVE_PATHFINDING);
+                    pSummoned->SetCombatStartPosition(-10904.632f, -425.087f, 42.189217f);
+                    pSummoned->SetHomePosition(-10904.632f, -425.087f, 42.189217f, 0.0f);
+                }
+                else
+                    pSummoned->AI()->AttackStart(m_creature);
+                pSummoned->MonsterYell(CUTFORD_YELL);
+                break;
+            case NPC_WATCHER_SELKIN:
+                if (auto pSummonedAI = static_cast<npc_watcher_selkinAI*>(pSummoned->AI()))
+                    pSummonedAI->Start(true);
+                break;
         }
     }
 
@@ -576,32 +578,32 @@ struct npc_stitchesAI : npc_escortAI
     {
         switch (uiPoint)
         {
-        case 10:
-        case 29:
-            m_creature->MonsterYellToZone(STITCHES_YELL_1);
-            break;
-        case 30:
-            {
-                auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->IsAlive())
-                    pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
-            }
-            break;
-        case 31:
-            SummonWatchman(0);
-            SummonWatchman(1);
-            break;
-        case 34:
-            SummonWatchman(2);
-            break;
-        case 35:
+            case 10:
+            case 29:
+                m_creature->MonsterYellToZone(STITCHES_YELL_1);
+                break;
+            case 30:
+                {
+                    auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
+                    if (pTownCrier && pTownCrier->IsAlive())
+                        pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
+                }
+                break;
+            case 31:
+                SummonWatchman(0);
+                SummonWatchman(1);
+                break;
+            case 34:
+                SummonWatchman(2);
+                break;
+            case 35:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
                 if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_2);
             }
             break;
-        case 39:
+            case 39:
             {
                 auto pLeader = SummonWatchman(3);
                 AddToFormation(pLeader, SummonWatchman(4));
@@ -610,7 +612,7 @@ struct npc_stitchesAI : npc_escortAI
                 pLeader->SetWalk(false);             
             }
             break;
-        case 61:
+            case 61:
             {
                 m_creature->MonsterYellToZone(STITCHES_YELL_1);
                 SummonWatchman(7);
@@ -620,11 +622,11 @@ struct npc_stitchesAI : npc_escortAI
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_4);
             }
             break;
-        case 65:
-            m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.64f);
-            Stop();
-            m_creature->GetMotionMaster()->MoveRandom();
-            break;
+            case 65:
+                m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.64f);
+                Stop();
+                m_creature->GetMotionMaster()->MoveRandom();
+                break;
         }
     }
 
@@ -712,7 +714,6 @@ void elloEbonlockeAI::LaunchStitches(Creature* pStitches) const
     else
         sLog.outError("[Duskwood.Stitches] Failed to cast AI.");
 }
-
 
 CreatureAI* GetAI_ElloEbonlocke(Creature* pCreature)
 {

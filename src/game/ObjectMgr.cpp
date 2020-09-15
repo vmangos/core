@@ -4748,8 +4748,8 @@ void ObjectMgr::LoadQuests()
                           "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
     //                      119                       120                       121                       122
                           "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
-    //                      123            124               125         126
-                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney`, `RewXP` "
+    //                      123            124               125         126             127      128
+                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney`, `RewXP`, `RequiredCondition` "
                           " FROM `quest_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
     {
@@ -8347,7 +8347,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string const& name, bool create)
     if (!isValidString(wname, strictMask, false, create))
         return CHAR_NAME_MIXED_LANGUAGES;
 
-    return CHAR_NAME_SUCCESS;
+    return ValidateName(wname);
 }
 
 bool ObjectMgr::IsValidCharterName(std::string const& name)
@@ -8384,6 +8384,16 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string const& name)
     uint32 strictMask = sWorld.getConfig(CONFIG_UINT32_STRICT_PET_NAMES);
     if (!isValidString(wname, strictMask, false))
         return PET_NAME_MIXED_LANGUAGES;
+
+    switch (ValidateName(wname))
+    {
+        case CHAR_NAME_PROFANE:
+            return PET_NAME_PROFANE;
+        case CHAR_NAME_RESERVED:
+            return PET_NAME_RESERVED;
+        default:
+            break;
+    }
 
     return PET_NAME_SUCCESS;
 }
@@ -10717,6 +10727,18 @@ void ObjectMgr::LoadConditions()
         }
     }
 
+    for (auto& itr : m_QuestTemplatesMap) // needs to be checked after loading conditions
+    {
+        Quest* qinfo = itr.second.get();
+
+        if (qinfo->RequiredCondition)
+        {
+            const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(qinfo->RequiredCondition);
+            if (!condition) // condition does not exist for some reason
+                sLog.outErrorDb("Quest %u has `RequiredCondition` = %u but it does not exist.", qinfo->GetQuestId(), qinfo->RequiredCondition);
+        }
+    }
+
     sLog.outString(">> Loaded %u Condition definitions", sConditionStorage.GetRecordCount());
     sLog.outString();
 }
@@ -11103,7 +11125,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         return;
     }
 
-    if (pPlayer->GetLevel() != itr->second.level)
+    if (pPlayer->GetLevel() < itr->second.level)
     {
         pPlayer->GiveLevel(itr->second.level);
         pPlayer->InitTalentForLevel();
@@ -11125,21 +11147,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         {
             ItemPrototype const* pItem = GetItemPrototype(item.itemId);
 
-            // Set required reputation
-            if (pItem->RequiredReputationFaction && pItem->RequiredReputationRank)
-                if (FactionEntry const* pFaction = GetFactionEntry(pItem->RequiredReputationFaction))
-                    if (pPlayer->GetReputationMgr().GetRank(pFaction) < pItem->RequiredReputationRank)
-                        pPlayer->GetReputationMgr().SetReputation(pFaction, pPlayer->GetReputationMgr().GetRepPointsToRank(ReputationRank(pItem->RequiredReputationRank)));
-
-            // Learn required profession
-            if (pItem->RequiredSkill && (!pPlayer->HasSkill(pItem->RequiredSkill) || (pPlayer->GetSkill(pItem->RequiredSkill, false, false) <  pItem->RequiredSkillRank)))
-                pPlayer->SetSkill(pItem->RequiredSkill, pItem->RequiredSkillRank, 300);
-
-            // Learn required proficiency
-            if (uint32 proficiencySpellId = pItem->GetProficiencySpell())
-                if (!pPlayer->HasSpell(proficiencySpellId))
-                    pPlayer->LearnSpell(proficiencySpellId, false, false);
-
+            pPlayer->SatisfyItemRequirements(pItem);
             pPlayer->StoreNewItemInBestSlots(item.itemId, 1, item.enchantId);
         }
     }

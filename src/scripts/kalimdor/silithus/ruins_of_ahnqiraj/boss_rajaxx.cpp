@@ -397,7 +397,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
 {
     boss_rajaxxAQWarAI(Creature* pCreature) : boss_rajaxxAI(pCreature)
     {
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
 
         DoScriptText(SAY_AQ_WAR_START, m_creature);
     }

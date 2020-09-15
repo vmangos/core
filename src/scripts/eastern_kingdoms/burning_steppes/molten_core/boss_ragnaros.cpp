@@ -169,7 +169,7 @@ struct boss_ragnarosAI : ScriptedAI
         if (m_pInstance && m_creature->IsAlive())
         {
             m_pInstance->SetData(TYPE_RAGNAROS, NOT_STARTED);
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         // clean up dummy visual if raid wiped during P2
@@ -185,8 +185,8 @@ struct boss_ragnarosAI : ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_RAGNAROS, IN_PROGRESS);
-            if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE))
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -321,7 +321,7 @@ struct boss_ragnarosAI : ScriptedAI
         if (m_creature->GetUInt32Value(UNIT_FIELD_FLAGS) == UNIT_FLAG_NON_ATTACKABLE)
             return;
 
-        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE))
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
             return;
 
         // For transition back to P1, return during emerge visual cast animation
@@ -561,7 +561,7 @@ struct boss_ragnarosAI : ScriptedAI
     {
         // at first we check for the current player-type target
         Unit* pMainTarget = m_creature->GetVictim();
-        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->IsGameMaster() && 
+        if (pMainTarget && pMainTarget->IsPlayer() && !pMainTarget->ToPlayer()->IsGameMaster() && 
             m_creature->IsWithinMeleeRange(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
         {
             m_bInMelee = true;
@@ -662,7 +662,7 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
     void Reset() override
     {
         m_creature->AddUnitState(UNIT_STAT_ROOT);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetLevel(63);
         m_creature->SetFactionTemplateId(14);

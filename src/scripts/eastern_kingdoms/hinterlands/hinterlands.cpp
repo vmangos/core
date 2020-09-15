@@ -32,15 +32,15 @@ EndContentData */
 ## npc_rinji
 ######*/
 
-enum
+enum RinjiData
 {
-    SAY_RIN_FREE            = -1000403,
-    SAY_RIN_BY_OUTRUNNER    = -1000404,
-    SAY_RIN_HELP_1          = -1000405,
-    SAY_RIN_HELP_2          = -1000406,
-    SAY_RIN_COMPLETE        = -1000407,
-    SAY_RIN_PROGRESS_1      = -1000408,
-    SAY_RIN_PROGRESS_2      = -1000409,
+    SAY_RIN_FREE            = 3787,
+    SAY_RIN_BY_OUTRUNNER    = 3827,
+    SAY_RIN_HELP_1          = 3862,
+    SAY_RIN_HELP_2          = 3861,
+    SAY_RIN_COMPLETE        = 3790,
+    SAY_RIN_PROGRESS_1      = 3817,
+    SAY_RIN_PROGRESS_2      = 3818,
 
     QUEST_RINJI_TRAPPED     = 2742,
     NPC_RANGER              = 2694,
@@ -225,10 +225,11 @@ CreatureAI* GetAI_npc_rinji(Creature* pCreature)
 ## go_lards_picnic_basket
 ######*/
 
-enum
+enum LardsPicnicBasketData
 {
-    NPC_KIDNAPPEUR_VILEBRANCH     = 14748,
+    NPC_KIDNAPPEUR_VILEBRANCH     = 14748
 };
+
 struct go_lards_picnic_basketAI: public GameObjectAI
 {
     go_lards_picnic_basketAI(GameObject* pGo) : GameObjectAI(pGo)
@@ -253,6 +254,7 @@ struct go_lards_picnic_basketAI: public GameObjectAI
                 timer -= uiDiff;
         }
     }
+
     bool CheckCanStartEvent()
     {
         return !state;
@@ -266,10 +268,12 @@ struct go_lards_picnic_basketAI: public GameObjectAI
         timer = 300000;
     }
 };
+
 GameObjectAI* GetAIgo_lards_picnic_basket(GameObject *pGo)
 {
     return new go_lards_picnic_basketAI(pGo);
 }
+
 bool GOHello_go_lards_picnic_basket(Player* pPlayer, GameObject* pGO)
 {
     if (pGO->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
