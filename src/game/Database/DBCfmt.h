@@ -46,6 +46,10 @@ char const DurabilityCostsfmt[]="niiiiiiiiiiiiiiiiiiiiiiiiiiiii";
 char const DurabilityQualityfmt[]="nf";
 char const EmotesEntryfmt[]="nxxiiix";
 char const EmotesTextEntryfmt[]="nxixxxxxxxxxxxxxxxx";
+#ifdef ENABLE_PLAYERBOTS
+char const EmotesTextSoundEntryfmt[] = "niiii";
+char const CharSectionsEntryfmt[] = "diiiiixxxi";
+#endif
 char const GameObjectDisplayInfofmt[]="nsxxxxxxxxxx";
 char const ItemBagFamilyfmt[]="nxxxxxxxxx";
 //char const ItemDisplayTemplateEntryfmt[]="nxxxxxxxxxxixxxxxxxxxxx";

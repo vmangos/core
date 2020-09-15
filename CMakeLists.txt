@@ -33,6 +33,7 @@ option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
+option(PLAYERBOTS "Enable Player Bots" 1)
 
 find_package(PCHSupport)
 
@@ -313,6 +314,12 @@ if(SCRIPTS)
   message(STATUS "Build scripts    : Yes (default)")
 else()
   message(STATUS "Build scripts    : No")
+endif()
+
+if(PLAYERBOTS)
+  message(STATUS "Build Playerbots    : Yes (default)")
+else()
+  message(STATUS "Build Playerbots    : No")
 endif()
 
 if(UNIX)

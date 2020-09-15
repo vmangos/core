@@ -506,6 +506,99 @@ if(USE_ANTICHEAT)
   )
 endif()
 
+if(PLAYERBOTS)
+
+#Base files
+file(GLOB Playerbot_Source ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/*.h)
+source_group("Player Bot" FILES ${Playerbot_Source})
+file(GLOB AHbot_Source ${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot/*.h)
+source_group("AH Bot" FILES ${AHbot_Source})
+
+#set(SRC_GRP_BOTS
+#    ${Playerbot_Source}
+#    ${AHbot_Source}
+#)
+
+list(APPEND game_SRCS
+     ${Playerbot_Source}
+     ${AHbot_Source}
+)
+
+#Strategy files
+file(GLOB Playerbot_Strategy ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/*.h)
+source_group("Player Bot\\Strategies" FILES ${Playerbot_Strategy})
+LIST(APPEND game_SRCS ${Playerbot_Strategy})
+
+#Action files
+file(GLOB Playerbot_Actions ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/actions/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/actions/*.h)
+source_group("Player Bot\\Strategies\\Actions" FILES ${Playerbot_Actions})
+LIST(APPEND game_SRCS ${Playerbot_Actions})
+
+#Generic files
+file(GLOB Playerbot_Generic ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/generic/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/generic/*.h)
+source_group("Player Bot\\Strategies\\Generic" FILES ${Playerbot_Generic})
+LIST(APPEND game_SRCS ${Playerbot_Generic})
+
+#Trigger files
+file(GLOB Playerbot_Triggers ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/triggers/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/triggers/*.h)
+source_group("Player Bot\\Strategies\\Triggers" FILES ${Playerbot_Triggers})
+LIST(APPEND game_SRCS ${Playerbot_Triggers})
+   
+
+#Value files
+file(GLOB Playerbot_Values ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/values/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/values/*.h)
+source_group("Player Bot\\Strategies\\Values" FILES ${Playerbot_Values})
+LIST(APPEND game_SRCS ${Playerbot_Values})
+
+## Class files
+#Druid AI
+file(GLOB Playerbot_Druid ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/druid/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/druid/*.h)
+source_group("Player Bot\\Strategies\\Druid" FILES ${Playerbot_Druid})
+LIST(APPEND game_SRCS ${Playerbot_Druid})
+
+#Hunter AI
+file(GLOB Playerbot_Hunter ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/hunter/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/hunter/*.h)
+source_group("Player Bot\\Strategies\\Hunter" FILES ${Playerbot_Hunter})
+LIST(APPEND game_SRCS ${Playerbot_Hunter})
+
+#Mage AI
+file(GLOB Playerbot_Mage ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/mage/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/mage/*.h)
+source_group("Player Bot\\Strategies\\Mage" FILES ${Playerbot_Mage})
+LIST(APPEND game_SRCS ${Playerbot_Mage})
+
+#Paladin AI
+file(GLOB Playerbot_Paladin ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/paladin/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/paladin/*.h)
+source_group("Player Bot\\Strategies\\Paladin" FILES ${Playerbot_Paladin})
+LIST(APPEND game_SRCS ${Playerbot_Paladin})
+
+#Priest AI
+file(GLOB Playerbot_Priest ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/priest/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/priest/*.h)
+source_group("Player Bot\\Strategies\\Priest" FILES ${Playerbot_Priest})
+LIST(APPEND game_SRCS ${Playerbot_Priest})
+
+#Rogue AI
+file(GLOB Playerbot_Rogue ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/rogue/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/rogue/*.h)
+source_group("Player Bot\\Strategies\\Rogue" FILES ${Playerbot_Rogue})
+LIST(APPEND game_SRCS ${Playerbot_Rogue})
+
+#Shaman AI
+file(GLOB Playerbot_Shaman ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/shaman/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/shaman/*.h)
+source_group("Player Bot\\Strategies\\Shaman" FILES ${Playerbot_Shaman})
+LIST(APPEND game_SRCS ${Playerbot_Shaman})
+
+#Warlock AI
+file(GLOB Playerbot_Warlock ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/warlock/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/warlock/*.h)
+source_group("Player Bot\\Strategies\\Warlock" FILES ${Playerbot_Warlock})
+LIST(APPEND game_SRCS ${Playerbot_Warlock})
+
+#Warrior AI
+file(GLOB Playerbot_Warrior ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/warrior/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/warrior/*.h)
+source_group("Player Bot\\Strategies\\Warrior" FILES ${Playerbot_Warrior})
+LIST(APPEND game_SRCS ${Playerbot_Warrior})
+
+configure_file(${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/aiplayerbot.conf.dist.in ${CMAKE_CURRENT_BINARY_DIR}/aiplayerbot.conf.dist)
+
+endif()
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -554,6 +647,11 @@ include_directories(
   ${ACE_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIRS}
+if(PLAYERBOTS)
+  ${CMAKE_SOURCE_DIR}/src/modules/Bots
+  ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot
+  ${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot
+endif()
 )
 
 if(WIN32)
@@ -616,6 +714,11 @@ add_library(game STATIC
 )
 
 SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
+
+target_compile_definitions(game
+    PUBLIC
+        $<$<BOOL:${PLAYERBOTS}>:ENABLE_PLAYERBOTS>
+)
 
 target_link_libraries(game
   shared

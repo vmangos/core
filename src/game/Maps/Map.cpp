@@ -1188,7 +1188,10 @@ void Map::Remove(Player* player, bool remove)
         if (Player* other = GetPlayer(*it))
             other->m_broadcaster->RemoveListener(player);
 
-    player->ResetMap();
+#ifdef ENABLE_PLAYERBOTS
+    if (!player->GetPlayerbotAI())
+#endif
+        player->ResetMap();
     if (remove)
         DeleteFromWorld(player);
 }

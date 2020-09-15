@@ -115,6 +115,10 @@ class ChatHandler
         bool isValidChatMessage(char const* msg);
         bool HasSentErrorMessage() { return sentErrorMessage;}
 
+#ifdef ENABLE_PLAYERBOTS
+        WorldSession* GetSession() { return m_session; }
+#endif
+
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
         std::string GetNameLink(Player* chr) const;
         std::string GetItemLink(ItemPrototype const* pItem) const;
@@ -280,6 +284,15 @@ class ChatHandler
         bool HandleBattleBotRemoveCommand(char* args);
         bool HandleBattleBotShowPathCommand(char* args);
         bool HandleBattleBotShowAllPathsCommand(char* args);
+
+#ifdef ENABLE_PLAYERBOTS
+        // Playerbots
+        bool HandlePlayerbotCommand(char* args);
+        bool HandleRandomPlayerbotCommand(char* args);
+        bool HandleAhBotCommand(char* args);
+        bool HandleGuildTaskCommand(char* args);
+        bool HandlePerfMonCommand(char* args);
+#endif
 
         // spell_disabled
         bool HandleReloadSpellDisabledCommand(char *args);

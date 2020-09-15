@@ -90,6 +90,12 @@
 #include "MarketerConfig.h"
 #include "MarketerManager.h"
 
+#ifdef ENABLE_PLAYERBOTS
+#include "AhBot.h"
+#include "PlayerbotAIConfig.h"
+#include "RandomPlayerbotMgr.h"
+#endif
+
 INSTANTIATE_SINGLETON_1(World);
 
 volatile bool World::m_stopEvent = false;
@@ -1788,6 +1794,11 @@ void World::SetInitialWorldSettings()
     // EJ robot
     sRobotConfig.StartRobotSystem();
     sRobotManager->InitializeManager();
+
+#ifdef ENABLE_PLAYERBOTS
+    sPlayerbotAIConfig.Initialize();
+    auctionbot.Init();
+#endif
 }
 
 void World::DetectDBCLang()
@@ -1875,9 +1886,17 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_AUCTIONS].Reset();
 
         sAuctionHouseBotMgr.Update();
+#ifdef ENABLE_PLAYERBOTS
+        auctionbot.Update();
+#endif
         ///- Handle expired auctions
         sAuctionMgr.Update();
     }
+
+#ifdef ENABLE_PLAYERBOTS
+    sRandomPlayerbotMgr.UpdateAI(diff);
+    sRandomPlayerbotMgr.UpdateSessions(diff);
+#endif
 
     /// <li> Handle session updates
     uint32 updateSessionsTime = WorldTimer::getMSTime();
@@ -2485,6 +2504,10 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
         m_ShutdownTimer = time;
         ShutdownMsg(true);
     }
+
+#ifdef ENABLE_PLAYERBOTS
+    sRandomPlayerbotMgr.LogoutAllBots();
+#endif
 }
 
 /// Display a shutdown message to the user(s)

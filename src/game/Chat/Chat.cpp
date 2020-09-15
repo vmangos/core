@@ -38,6 +38,12 @@
 #include "PoolManager.h"
 #include "GameEventMgr.h"
 
+#ifdef ENABLE_PLAYERBOTS
+#include "AhBot.h"
+#include "playerbot.h"
+#include "GuildTaskMgr.h"
+#endif
+
 // Supported shift-links (client generated and server side)
 // |color|Harea:area_id|h[name]|h|r
 // |color|Hareatrigger:id|h[name]|h|r
@@ -1130,8 +1136,15 @@ ChatCommand * ChatHandler::getCommandTable()
         { "trigger",        SEC_TICKETMASTER,   false, nullptr,                                        "", triggerCommandTable  },
         { "wp",             SEC_TICKETMASTER,   false, nullptr,                                        "", wpCommandTable       },
         { "service",        SEC_ADMINISTRATOR,  true, nullptr,                                         "", serviceCommandTable  },
+#ifndef ENABLE_PLAYERBOTS
         { "bot",            SEC_ADMINISTRATOR,  true, nullptr,                              "Manage bots", botCommandTable      },
         { "ahbot",          SEC_ADMINISTRATOR,  true, nullptr,                            "Manage AH bot", ahbotCommandTable    },
+#else
+        { "ahbot",            SEC_GAMEMASTER,    true,  &ChatHandler::HandleAhBotCommand,              "", nullptr },
+        { "rndbot",           SEC_GAMEMASTER,    true,  &ChatHandler::HandleRandomPlayerbotCommand,    "", nullptr },
+        { "bot",              SEC_PLAYER,        false, &ChatHandler::HandlePlayerbotCommand,          "", nullptr },
+        { "gtask",            SEC_GAMEMASTER,    true,  &ChatHandler::HandleGuildTaskCommand,          "", nullptr },
+#endif
         { "partybot",       SEC_ADMINISTRATOR,  false, nullptr,                       "Manage party bots", partyBotCommandTable },
         { "battlebot",      SEC_ADMINISTRATOR,  false, nullptr,                      "Manage battle bots", battleBotCommandTable},
         { "world",          SEC_ADMINISTRATOR,  false, nullptr,                                        "", worldCommandTable    },

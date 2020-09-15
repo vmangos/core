@@ -63,6 +63,11 @@ class MapReference;
 // EJ robot 
 class RobotAI;
 
+#ifdef ENABLE_PLAYERBOTS
+class PlayerbotAI;
+class PlayerbotMgr;
+#endif
+
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_EXPLORED_ZONES_SIZE  64
 #define CORPSE_REPOP_TIME (6 * MINUTE * IN_MILLISECONDS)
@@ -1147,6 +1152,16 @@ class Player final: public Unit
         void SendNotifyLootMoneyRemoved() const;
         bool IsAllowedToLoot(Creature const* creature);
 
+#ifdef ENABLE_PLAYERBOTS
+        //EquipmentSets& GetEquipmentSets() { return m_EquipmentSets; }
+        void SetPlayerbotAI(PlayerbotAI* ai) { assert(!m_playerbotAI && !m_playerbotMgr); m_playerbotAI = ai; }
+        PlayerbotAI* GetPlayerbotAI() { return m_playerbotAI; }
+        void SetPlayerbotMgr(PlayerbotMgr* mgr) { assert(!m_playerbotAI && !m_playerbotMgr); m_playerbotMgr = mgr; }
+        PlayerbotMgr* GetPlayerbotMgr() { return m_playerbotMgr; }
+        void SetBotDeathTimer() { m_deathTimer = 0; }
+        //PlayerTalentMap& GetTalentMap(uint8 spec) { return m_talents[spec]; }
+#endif
+
         void ApplyEnchantment(Item* item,EnchantmentSlot slot,bool apply, bool apply_dur = true, bool ignore_condition = false);
         void ApplyEnchantment(Item* item,bool apply);
 
@@ -1326,6 +1341,9 @@ class Player final: public Unit
         uint32 m_atLoginFlags;
     public:
         bool LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder);
+#ifdef ENABLE_PLAYERBOTS
+        bool MinimalLoadFromDB(QueryResult *result, uint32 guid);
+#endif
         void SendPacketsAtRelogin();
         static uint32 GetZoneIdFromDB(ObjectGuid guid);
         static uint32 GetLevelFromDB(ObjectGuid guid);
@@ -1702,6 +1720,11 @@ class Player final: public Unit
         Unit* m_mover;
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;
+
+#ifdef ENABLE_PLAYERBOTS
+        PlayerbotAI* m_playerbotAI;
+        PlayerbotMgr* m_playerbotMgr;
+#endif
 
         uint32 m_lastFallTime;
         float  m_lastFallZ;

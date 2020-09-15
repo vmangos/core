@@ -86,6 +86,10 @@
 // EJ robot 
 #include "RobotAI.h"
 
+#ifdef ENABLE_PLAYERBOTS
+#include "playerbot.h"
+#endif
+
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -423,6 +427,12 @@ Player::Player(WorldSession* session) : Unit(),
     m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_castingSpell(0),
     m_honorMgr(this), m_bNextRelocationsIgnored(0), m_personalXpRate(-1.0f), m_standStateTimer(0), m_newStandState(MAX_UNIT_STAND_STATE), m_foodEmoteTimer(0)
 {
+
+#ifdef ENABLE_PLAYERBOTS
+    m_playerbotAI = 0;
+    m_playerbotMgr = 0;
+#endif
+
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
 
@@ -628,6 +638,21 @@ Player::~Player()
 
     for (const auto& x : m_ItemSetEff)
          delete x;
+
+#ifdef ENABLE_PLAYERBOTS
+    if (m_playerbotAI) {
+        {
+            delete m_playerbotAI;
+        }
+        m_playerbotAI = 0;
+    }
+    if (m_playerbotMgr) {
+        {
+            delete m_playerbotMgr;
+        }
+        m_playerbotMgr = 0;
+    }
+#endif
 
     // clean up player-instance binds, may unload some instance saves
     for (const auto& itr : m_boundInstances)
@@ -1506,6 +1531,17 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             myGroup->UpdateGroupAttackers();
         }
     }
+
+#ifdef ENABLE_PLAYERBOTS
+    if (m_playerbotAI)
+    {
+        m_playerbotAI->UpdateAI(p_time);
+    }
+    if (m_playerbotMgr)
+    {
+        m_playerbotMgr->UpdateAI(p_time);
+    }
+#endif
 }
 
 void Player::OnDisconnected()

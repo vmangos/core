@@ -65,6 +65,11 @@
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
+#ifdef ENABLE_PLAYERBOTS
+#include "playerbot.h"
+#include "GuildTaskMgr.h"
+#endif
+
 #include <math.h>
 #include <stdarg.h>
 
@@ -1256,6 +1261,10 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
         if (pPlayerTap)
             if (BattleGround* bg = pPlayerTap->GetBattleGround())
                 bg->HandleKillUnit(pCreatureVictim, pPlayerTap);
+
+#ifdef ENABLE_PLAYERBOTS
+        sGuildTaskMgr.CheckKillTask(pPlayerTap, pCreatureVictim);
+#endif
     }
     // Nostalrius: interrupt non melee spell casted
     pVictim->InterruptSpellsCastedOnMe(false, true);

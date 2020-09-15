@@ -1,5 +1,7 @@
-# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
-# Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+# MaNGOS is a full featured server for World of Warcraft, supporting
+# the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
+#
+# Copyright (C) 2005-2020 MaNGOS <https://getmangos.eu>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,20 +17,3 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# Needs to link against mangos_worldd.lib
-if(WIN32)
-  include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/include # For Win32
-  )
-endif()
-
-add_subdirectory(shared)
-add_subdirectory(framework)
-add_subdirectory(realmd)
-add_subdirectory(game)
-add_subdirectory(mangosd)
-add_subdirectory(modules)
-
-if(SCRIPTS)
-  add_subdirectory(scripts)
-endif()

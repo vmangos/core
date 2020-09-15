@@ -1861,4 +1861,7 @@ struct WorldLocation
         : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
 };
 
+#define MANGOSBOT_ZERO
+#define VMANGOS
+
 #endif

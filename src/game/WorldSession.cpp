@@ -54,6 +54,10 @@
 // EJ robot
 #include "RobotManager.h"
 
+#ifdef ENABLE_PLAYERBOTS
+#include "playerbot.h"
+#endif
+
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
 {
@@ -157,6 +161,15 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         sRobotManager->HandlePacket(this, eachCopy);
         return;
     }
+
+#ifdef ENABLE_PLAYERBOTS
+    if (GetPlayer()) {
+        if (GetPlayer()->GetPlayerbotAI())
+            GetPlayer()->GetPlayerbotAI()->HandleBotOutgoingPacket(*packet);
+        else if (GetPlayer()->GetPlayerbotMgr())
+            GetPlayer()->GetPlayerbotMgr()->HandleMasterOutgoingPacket(*packet);
+    }
+#endif
 
     if (!m_Socket)
     {
@@ -516,6 +529,11 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                         ExecuteOpcode(opHandle, packet);
 
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
+
+#ifdef ENABLE_PLAYERBOTS
+                    if (_player && _player->GetPlayerbotMgr())
+                        _player->GetPlayerbotMgr()->HandleMasterIncomingPacket(*packet);
+#endif
                     break;
                 case STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT:
                     if (!_player && !m_playerRecentlyLogout)
@@ -597,6 +615,10 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
 
         delete packet;
     }
+#ifdef ENABLE_PLAYERBOTS
+    if (GetPlayer() && GetPlayer()->GetPlayerbotMgr())
+        GetPlayer()->GetPlayerbotMgr()->UpdateSessions(0);
+#endif
 }
 
 
@@ -625,6 +647,19 @@ bool WorldSession::UpdateDisconnected(uint32 diff)
     return true;
 }
 
+#ifdef ENABLE_PLAYERBOTS
+void WorldSession::HandleBotPackets()
+{
+    WorldPacket* packet;
+    while (_recvQueue.next(packet))
+    {
+        OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+        (this->*opHandle.handler)(*packet);
+        delete packet;
+    }
+}
+#endif
+
 /// %Log the player out
 void WorldSession::LogoutPlayer(bool Save)
 {
@@ -641,10 +676,20 @@ void WorldSession::LogoutPlayer(bool Save)
     {
         bool inWorld = _player->IsInWorld() && _player->FindMap();
 
+#ifdef ENABLE_PLAYERBOTS
+        sLog.out(LOG_CHAR, "Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), m_Socket ? GetRemoteAddress().c_str() : "bot", _player->GetName(), _player->GetGUIDLow());
+#else
         sLog.out(LOG_CHAR, "Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
+#endif
         sWorld.LogCharacter(_player, "Logout");
         if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
             DoLootRelease(lootGuid);
+
+#ifdef ENABLE_PLAYERBOTS
+        if (_player->GetPlayerbotMgr())
+            _player->GetPlayerbotMgr()->LogoutAllBots();
+        sRandomPlayerbotMgr.OnPlayerLogout(_player);
+#endif
 
         ///- If the player just died before logging out, make him appear as a ghost
         if (inWorld && _player->GetDeathTimer())
@@ -747,6 +792,7 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- Leave all channels before player delete...
         _player->CleanupChannels();
 
+#ifndef ENABLE_PLAYERBOTS
         ///- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
         _player->UninviteFromGroup();
 
@@ -754,6 +800,7 @@ void WorldSession::LogoutPlayer(bool Save)
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && m_Socket)
             _player->RemoveFromGroup();
+#endif
 
         ///- Send update to group
         if (Group* group = _player->GetGroup())

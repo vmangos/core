@@ -377,6 +377,10 @@ class Group
         BoundInstancesMap& GetBoundInstances() { return m_boundInstances; }
 
         Team GetTeam() const { return m_groupTeam; }
+
+#ifdef ENABLE_PLAYERBOTS
+        ObjectGuid GetTargetIcon(int index) { return m_targetIcons[index]; }
+#endif
     protected:
         bool _addMember(ObjectGuid guid, char const* name, bool isAssistant = false);
         bool _addMember(ObjectGuid guid, char const* name, bool isAssistant, uint8 group);
