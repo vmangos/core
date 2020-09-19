@@ -854,13 +854,25 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount, uint3
 
         if (Item* pItem = EquipNewItem(eDest, titem_id, true))
         {
+            bool needReApplyItemMods = false;
             if (enchantId)
             {
                 pItem->ClearEnchantment(PERM_ENCHANTMENT_SLOT);
                 pItem->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantId, 0, 0);
+                needReApplyItemMods = true;
             }
             if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(titem_id))
+            {
                 pItem->SetItemRandomProperties(randomPropertyId);
+                needReApplyItemMods = true;
+            }
+            // Since the item is enchanted after it is equipped, item mods need to be re-applied.
+            if (needReApplyItemMods)
+            {
+                uint8 slot = eDest & 255;
+                _ApplyItemMods(pItem, slot, false);
+                _ApplyItemMods(pItem, slot, true);
+            }
 
             AutoUnequipOffhandIfNeed();
 
