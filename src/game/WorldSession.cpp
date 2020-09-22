@@ -651,7 +651,7 @@ bool WorldSession::UpdateDisconnected(uint32 diff)
 void WorldSession::HandleBotPackets()
 {
     WorldPacket* packet;
-    while (_recvQueue.next(packet))
+    while (_recvQueue[6].next(packet))
     {
         OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         (this->*opHandle.handler)(*packet);

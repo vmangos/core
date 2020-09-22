@@ -291,6 +291,7 @@ int Master::Run()
     WorldDatabase.AllowAsyncTransactions();
     LoginDatabase.AllowAsyncTransactions();
     LogsDatabase.AllowAsyncTransactions();
+    PlayerbotDatabase.AllowAsyncTransactions();
 
     ///- Catch termination signals
     _HookSignals();
@@ -461,6 +462,7 @@ int Master::Run()
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
+    PlayerbotDatabase.StopServer();
 
     sLog.outString( "Halting process..." );
 
@@ -588,12 +590,14 @@ bool Master::_StartDB()
     if (!StartDB("World", WorldDatabase, MIGRATIONS_WORLD) ||
         !StartDB("Character", CharacterDatabase, MIGRATIONS_CHARACTERS) ||
         !StartDB("Login", LoginDatabase, MIGRATIONS_LOGON) ||
-        !StartDB("Logs", LogsDatabase, MIGRATIONS_LOGS))
+        !StartDB("Logs", LogsDatabase, MIGRATIONS_LOGS) ||
+        !StartDB("Playerbot", PlayerbotDatabase, MIGRATIONS_PLAYERBOT))
     {
         WorldDatabase.HaltDelayThread();
         CharacterDatabase.HaltDelayThread();
         LoginDatabase.HaltDelayThread();
         LogsDatabase.HaltDelayThread();
+        PlayerbotDatabase.HaltDelayThread();
         return false;
     }
 

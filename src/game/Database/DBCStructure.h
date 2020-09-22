@@ -129,6 +129,9 @@ struct CharSectionsEntry
     uint32 BaseSection;
     uint32 VariationIndex;
     uint32 ColorIndex;
+    uint32 Type;
+    uint32 Color;
+    uint32 GenType;
     //char* TexturePath[3];
     uint32 Flags;
     inline bool HasFlag(CharSectionFlags flag) const { return (Flags & flag) != 0; }
@@ -327,6 +330,27 @@ struct EmotesTextEntry
 * \struct EmotesTextSoundEntry
 * \brief Entry repsenting the text sound for given emote.
 */
+
+struct AreaTableEntry
+{
+    uint32  ID;                                             // 0        m_ID - ID of the Area within the DBC.
+    uint32  mapid;                                          // 1        m_ContinentID - ID of the Continent in DBC (0 = Azeroth, 1 = Kalimdor, ...)
+    uint32  zone;                                           // 2        m_ParentAreaID - ID of the parent area.
+    uint32  exploreFlag;                                    // 3        m_AreaBit -
+    uint32  flags;                                          // 4        m_flags -
+    // 5        m_SoundProviderPref
+    // 6        m_SoundProviderPrefUnderwater
+    // 7        m_AmbienceID
+    // 8        m_ZoneMusic
+    // 9        m_IntroSound
+    int32   area_level;                                     // 10       m_ExplorationLevel - Level of Area, used for XP reward calculation.
+    char*   area_name[8];                                   // 11-18    m_AreaName_lang - Area Name, position is relying on locale.
+    // 19 string flags
+    uint32  team;                                           // 20       m_factionGroupMask - Define the faction owning the area (see AreaTeams for values).
+    // 21-23    uknown/unused
+    uint32  LiquidTypeOverride;                             // 24       m_liquidTypeID - Override for water type (only used for Naxxramass ATM).
+};
+
 struct EmotesTextSoundEntry
 {
     uint32 Id;                                              // 0
@@ -335,7 +359,7 @@ struct EmotesTextSoundEntry
     uint32 SexId;                                           // 3, 0 male / 1 female
     uint32 SoundId;                                         // 4
 };
-enum CharSectionFlags
+/*enum CharSectionFlags
 {
     SECTION_FLAG_PLAYER = 0x01
 };
@@ -359,7 +383,7 @@ struct CharSectionsEntry
     uint32 Type;
     uint32 Color;
     uint32 Flags;
-};
+};*/
 #endif
 
 struct FactionEntry

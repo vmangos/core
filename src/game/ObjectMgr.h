@@ -70,6 +70,36 @@ struct AreaTriggerTeleport
     WorldLocation destination;
 };
 
+#ifdef ENABLE_PLAYERBOTS
+/*struct AreaTrigger
+{
+    uint32 condition;
+    uint32 target_mapId;
+    float  target_X;
+    float  target_Y;
+    float  target_Z;
+    float  target_Orientation;
+
+    // Operators
+    bool IsMinimal() const
+    {
+        return condition == 0;
+    }
+
+    bool IsLessOrEqualThan(AreaTrigger const* l) const;
+};
+
+AreaTrigger const* GetAreaTrigger(uint32 trigger) const
+{
+    AreaTriggerMap::const_iterator itr = mAreaTriggers.find(trigger);
+    if (itr != mAreaTriggers.end())
+    {
+        return &itr->second;
+    }
+    return NULL;
+}*/
+#endif
+
 struct BattlegroundEntranceTrigger
 {
     Team   team;

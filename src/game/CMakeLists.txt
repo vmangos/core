@@ -511,18 +511,10 @@ if(PLAYERBOTS)
 #Base files
 file(GLOB Playerbot_Source ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/*.h)
 source_group("Player Bot" FILES ${Playerbot_Source})
+LIST(APPEND game_SRCS ${Playerbot_Source})
 file(GLOB AHbot_Source ${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot/*.h)
 source_group("AH Bot" FILES ${AHbot_Source})
-
-#set(SRC_GRP_BOTS
-#    ${Playerbot_Source}
-#    ${AHbot_Source}
-#)
-
-list(APPEND game_SRCS
-     ${Playerbot_Source}
-     ${AHbot_Source}
-)
+LIST(APPEND game_SRCS ${AHbot_Source})
 
 #Strategy files
 file(GLOB Playerbot_Strategy ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/*.cpp ${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot/strategy/*.h)

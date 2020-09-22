@@ -74,8 +74,9 @@ DBCStorage <EmotesTextEntry> sEmotesTextStore(EmotesTextEntryfmt);
 typedef std::tuple<uint32, uint32, uint32> EmotesTextSoundKey;
 static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoundMap;
 DBCStorage <EmotesTextSoundEntry> sEmotesTextSoundStore(EmotesTextSoundEntryfmt);
-DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
-CharSectionsMap sCharSectionMap;
+//DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
+//CharSectionsMap sCharSectionMap;
+DBCStorage <AreaTableEntry> sAreaStore(AreaTableEntryfmt);
 #endif
 
 DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
@@ -682,7 +683,49 @@ EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uin
     auto itr = sEmotesTextSoundMap.find(EmotesTextSoundKey(emote, race, gender));
     return itr != sEmotesTextSoundMap.end() ? itr->second : nullptr;
 }
-CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
+
+AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
+{
+    return sAreaStore.LookupEntry(area_id);
+}
+
+AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id)
+{
+    // 1.12.1 areatable have duplicates for areaflag
+    AreaTableEntry const* aEntry = NULL;
+    for (uint32 i = 0; i <= sAreaStore.GetNumRows(); i++)
+    {
+        if (area_flag != 0)
+        {
+            if (AreaTableEntry const* AreaEntry = sAreaStore.LookupEntry(i))
+            {
+                if (AreaEntry->exploreFlag == area_flag)
+                {
+                    // area_flag found but it lets test map_id too
+                    if (AreaEntry->mapid == map_id)
+                    {
+                        return AreaEntry; // area_flag and map_id are ok so we can return value
+                    }
+                    // not same map_id so we store this entry and continue searching another better one
+                    aEntry = AreaEntry;
+                }
+            }
+        }
+    }
+
+    if (aEntry)
+    {
+        return aEntry;
+    } // return last entry found if exist (not same map_id but it seem ok in some places)
+
+    if (MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(map_id))
+    {
+        return GetAreaEntryByAreaID(mapEntry->linkedZone);
+    }
+
+    return NULL;
+}
+/*CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
 {
     std::pair<CharSectionsMap::const_iterator, CharSectionsMap::const_iterator> eqr = sCharSectionMap.equal_range(uint32(genType) | uint32(gender << 8) | uint32(race << 16));
     for (CharSectionsMap::const_iterator itr = eqr.first; itr != eqr.second; ++itr)
@@ -692,5 +735,5 @@ CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType
     }
 
     return NULL;
-}
+}*/
 #endif

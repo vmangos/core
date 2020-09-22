@@ -878,6 +878,10 @@ class WorldSession
         void HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data);
         void HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data);
         void HandleSelfResOpcode(WorldPacket& recv_data);
+
+#ifdef ENABLE_PLAYERBOTS
+        void HandleBotPackets();
+#endif
         
     private:
         // private trade methods

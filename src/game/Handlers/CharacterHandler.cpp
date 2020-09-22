@@ -246,7 +246,7 @@ public:
 #endif
         session->HandlePlayerLogin((LoginQueryHolder*)holder);
 #ifdef ENABLE_PLAYERBOTS
-        Player* player = sObjectMgr.GetPlayer(guid, true);
+        Player* player = sObjectMgr.GetPlayer(guid);
         if (player && !player->GetPlayerbotAI())
         {
             player->SetPlayerbotMgr(new PlayerbotMgr(player));

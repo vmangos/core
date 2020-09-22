@@ -29,6 +29,7 @@
 struct AreaTriggerTeleport;
 struct AreaTriggerEntry;
 struct FactionEntry;
+struct MapEntry;
 struct FactionState;
 struct GameTele;
 class SpellEntry;
@@ -115,9 +116,9 @@ class ChatHandler
         bool isValidChatMessage(char const* msg);
         bool HasSentErrorMessage() { return sentErrorMessage;}
 
-#ifdef ENABLE_PLAYERBOTS
+/*#ifdef ENABLE_PLAYERBOTS
         WorldSession* GetSession() { return m_session; }
-#endif
+#endif*/
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
         std::string GetNameLink(Player* chr) const;

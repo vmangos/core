@@ -1863,5 +1863,6 @@ struct WorldLocation
 
 #define MANGOSBOT_ZERO
 #define VMANGOS
+#define MANGOS
 
 #endif

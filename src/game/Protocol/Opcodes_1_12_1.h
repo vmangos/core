@@ -834,7 +834,7 @@ enum OpcodesList
     MSG_MOVE_START_SWIM_CHEAT                       = 0x341,
     MSG_MOVE_STOP_SWIM_CHEAT                        = 0x342,
     // [-ZERO] Last existed in 1.12.1 opcode, maybe some renumbering from other side
-/*
+
     CMSG_CANCEL_MOUNT_AURA                          = 0x375,
     CMSG_CANCEL_TEMP_ENCHANTMENT                    = 0x379,
     CMSG_MAELSTROM_INVALIDATE_CACHE                 = 0x387,
@@ -907,7 +907,7 @@ enum OpcodesList
     SMSG_PROPOSE_LEVEL_GRANT                        = 0x41E,
     CMSG_ACCEPT_LEVEL_GRANT                         = 0x41F,
     SMSG_REFER_A_FRIEND_FAILURE                     = 0x420,
-    SMSG_SUMMON_CANCEL                              = 0x423
-*/
+    SMSG_SUMMON_CANCEL                              = 0x423,
+
     NUM_MSG_TYPES                                   = 0x424
 };

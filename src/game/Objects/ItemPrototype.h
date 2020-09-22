@@ -165,7 +165,7 @@ enum ItemClass
 enum ItemSubclassConsumable
 {
     ITEM_SUBCLASS_CONSUMABLE                    = 0,
-/*  [-ZERO] not used in pre-bc
+//  [-ZERO] not used in pre-bc
     ITEM_SUBCLASS_POTION                        = 1,
     ITEM_SUBCLASS_ELIXIR                        = 2,
     ITEM_SUBCLASS_FLASK                         = 3,
@@ -174,7 +174,7 @@ enum ItemSubclassConsumable
     ITEM_SUBCLASS_ITEM_ENHANCEMENT              = 6,
     ITEM_SUBCLASS_BANDAGE                       = 7,
     ITEM_SUBCLASS_CONSUMABLE_OTHER              = 8
-*/
+
 };
 
 #define MAX_ITEM_SUBCLASS_CONSUMABLE              1
@@ -278,7 +278,7 @@ enum ItemSubclassTradeGoods
     ITEM_SUBCLASS_PARTS                         = 1,
     ITEM_SUBCLASS_EXPLOSIVES                    = 2,
     ITEM_SUBCLASS_DEVICES                       = 3,
-/*  [-ZERO] not used in pre-bc
+//  [-ZERO] not used in pre-bc
     ITEM_SUBCLASS_JEWELCRAFTING                 = 4,
     ITEM_SUBCLASS_CLOTH                         = 5,
     ITEM_SUBCLASS_LEATHER                       = 6,
@@ -288,7 +288,6 @@ enum ItemSubclassTradeGoods
     ITEM_SUBCLASS_ELEMENTAL                     = 10,
     ITEM_SUBCLASS_TRADE_GOODS_OTHER             = 11,
     ITEM_SUBCLASS_ENCHANTING                    = 12
-*/
 };
 
 #define MAX_ITEM_SUBCLASS_TRADE_GOODS             4

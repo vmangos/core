@@ -515,11 +515,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 sRobotManager->HandleChatCommand(GetPlayer(), msg, toPlayer);
 
 #ifdef ENABLE_PLAYERBOTS
-                if (player->GetPlayerbotAI())
+                if (toPlayer->GetPlayerbotAI())
                 {
-                    player->GetPlayerbotAI()->HandleCommand(type, msg, *GetPlayer());
-                    GetPlayer()->m_speakTime = 0;
-                    GetPlayer()->m_speakCount = 0;
+                    toPlayer->GetPlayerbotAI()->HandleCommand(type, msg, *GetPlayer());
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakTime = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakCount = 0;
                 }
 #endif
             }
@@ -557,8 +557,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 if (player && player->GetPlayerbotAI())
                 {
                     player->GetPlayerbotAI()->HandleCommand(type, msg, *GetPlayer());
-                    GetPlayer()->m_speakTime = 0;
-                    GetPlayer()->m_speakCount = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakTime = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakCount = 0;
                 }
             }
 #endif
@@ -626,8 +626,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 if (player && player->GetPlayerbotAI())
                 {
                     player->GetPlayerbotAI()->HandleCommand(type, msg, *GetPlayer());
-                    GetPlayer()->m_speakTime = 0;
-                    GetPlayer()->m_speakCount = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakTime = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakCount = 0;
                 }
             }
 #endif
@@ -661,8 +661,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 if (player && player->GetPlayerbotAI())
                 {
                     player->GetPlayerbotAI()->HandleCommand(type, msg, *GetPlayer());
-                    GetPlayer()->m_speakTime = 0;
-                    GetPlayer()->m_speakCount = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakTime = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakCount = 0;
                 }
             }
 #endif
@@ -707,8 +707,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 if (player && player->GetPlayerbotAI())
                 {
                     player->GetPlayerbotAI()->HandleCommand(type, msg, *GetPlayer());
-                    GetPlayer()->m_speakTime = 0;
-                    GetPlayer()->m_speakCount = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakTime = 0;
+                    GetPlayer()->GetSession()->GetMasterPlayer()->m_speakCount = 0;
                 }
             }
 #endif

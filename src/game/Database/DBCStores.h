@@ -60,12 +60,23 @@ EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uin
 CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color);
 typedef std::multimap<uint32, CharSectionsEntry const*> CharSectionsMap;
 extern CharSectionsMap sCharSectionMap;
+AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id);
+AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id);
+//extern DBCStorage <AreaTableEntry>               sAreaStore;// recommend access using functions
+//extern DBCStorage <AreaTriggerEntry>             sAreaTriggerStore;
 #endif
 
 extern DBCStorage <AuctionHouseEntry>            sAuctionHouseStore;
 extern DBCStorage <BankBagSlotPricesEntry>       sBankBagSlotPricesStore;
 #ifdef ENABLE_PLAYERBOTS
 extern DBCStorage <ChatChannelsEntry>            sChatChannelsStore; //has function for access aswell
+extern DBCStorage <FactionTemplateEntry>         sFactionTemplateStore;
+extern DBCStorage <SkillLineAbilityEntry>        sSkillLineAbilityStore;
+extern DBCStorage <TaxiNodesEntry>               sTaxiNodesStore;
+extern DBCStorage <TaxiPathEntry>                sTaxiPathStore;
+extern DBCStorage <FactionEntry>                 sFactionStore;
+//extern DBCStorage <MapEntry>                     sMapStore;
+extern DBCStorage <AreaTableEntry>               sAreaStore;// recommend access using functions
 #else
 // extern DBCStorage <ChatChannelsEntry>           sChatChannelsStore; -- accessed using function, no usable index
 #endif
