@@ -453,7 +453,7 @@ public:
 	///  @param[in]		ref		A known valid reference for a polygon.
 	///  @param[out]	tile	The tile containing the polygon.
 	///  @param[out]	poly	The polygon.
-	void getTileAndPolyByRefUnsafe(const dtPolyRef ref, const dtMeshTile** tile, const dtPoly** poly) const;
+	bool getTileAndPolyByRefUnsafe(const dtPolyRef ref, const dtMeshTile** tile, const dtPoly** poly) const;
 
 	/// Checks the validity of a polygon reference.
 	///  @param[in]	ref		The polygon reference to check.

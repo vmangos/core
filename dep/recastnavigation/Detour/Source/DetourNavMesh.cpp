@@ -1205,12 +1205,21 @@ dtStatus dtNavMesh::getTileAndPolyByRef(const dtPolyRef ref, const dtMeshTile** 
 /// @warning Only use this function if it is known that the provided polygon
 /// reference is valid. This function is faster than #getTileAndPolyByRef, but
 /// it does not validate the reference.
-void dtNavMesh::getTileAndPolyByRefUnsafe(const dtPolyRef ref, const dtMeshTile** tile, const dtPoly** poly) const
+bool dtNavMesh::getTileAndPolyByRefUnsafe(const dtPolyRef ref, const dtMeshTile** tile, const dtPoly** poly) const
 {
 	unsigned int salt, it, ip;
 	decodePolyId(ref, salt, it, ip);
-	*tile = &m_tiles[it];
-	*poly = &m_tiles[it].polys[ip];
+
+    dtMeshTile* test_tile = &m_tiles[it];
+    dtPoly* test_poly = &m_tiles[it].polys[ip];
+
+    if (!test_tile || !test_poly)
+        return false;
+
+    *tile = test_tile;
+    *poly = test_poly;
+
+    return true;
 }
 
 bool dtNavMesh::isValidPolyRef(dtPolyRef ref) const

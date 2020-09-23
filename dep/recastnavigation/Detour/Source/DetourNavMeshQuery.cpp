@@ -415,6 +415,10 @@ dtStatus dtNavMeshQuery::findRandomPointAroundCircle(dtPolyRef startRef, const f
 			const dtMeshTile* neighbourTile = 0;
 			const dtPoly* neighbourPoly = 0;
 			m_nav->getTileAndPolyByRefUnsafe(neighbourRef, &neighbourTile, &neighbourPoly);
+
+            // Prevent crash on bad map data. This shouldn't happen yet it does.
+            if (!m_nav->getTileAndPolyByRefUnsafe(neighbourRef, &neighbourTile, &neighbourPoly))
+                return DT_FAILURE;
 			
 			// Do not advance if the polygon is excluded by the filter.
 			if (!filter->passFilter(neighbourRef, neighbourTile, neighbourPoly))
