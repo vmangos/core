@@ -76,7 +76,7 @@ static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoun
 DBCStorage <EmotesTextSoundEntry> sEmotesTextSoundStore(EmotesTextSoundEntryfmt);
 //DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
 //CharSectionsMap sCharSectionMap;
-DBCStorage <AreaTableEntry> sAreaStore(AreaTableEntryfmt);
+//DBCStorage <AreaTableEntry> sAreaStore(AreaTableEntryfmt);
 #endif
 
 DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
@@ -684,7 +684,7 @@ EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uin
     return itr != sEmotesTextSoundMap.end() ? itr->second : nullptr;
 }
 
-AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
+/*AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
 {
     return sAreaStore.LookupEntry(area_id);
 }
@@ -724,7 +724,7 @@ AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_
     }
 
     return NULL;
-}
+}*/
 /*CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
 {
     std::pair<CharSectionsMap::const_iterator, CharSectionsMap::const_iterator> eqr = sCharSectionMap.equal_range(uint32(genType) | uint32(gender << 8) | uint32(race << 16));

@@ -331,7 +331,7 @@ struct EmotesTextEntry
 * \brief Entry repsenting the text sound for given emote.
 */
 
-struct AreaTableEntry
+/*struct AreaTableEntry
 {
     uint32  ID;                                             // 0        m_ID - ID of the Area within the DBC.
     uint32  mapid;                                          // 1        m_ContinentID - ID of the Continent in DBC (0 = Azeroth, 1 = Kalimdor, ...)
@@ -350,7 +350,7 @@ struct AreaTableEntry
     // 21-23    uknown/unused
     uint32  LiquidTypeOverride;                             // 24       m_liquidTypeID - Override for water type (only used for Naxxramass ATM).
 };
-
+*/
 struct EmotesTextSoundEntry
 {
     uint32 Id;                                              // 0
@@ -359,6 +359,49 @@ struct EmotesTextSoundEntry
     uint32 SexId;                                           // 3, 0 male / 1 female
     uint32 SoundId;                                         // 4
 };
+
+/**
+* \struct MapEntry
+* \brief Entry representing maps existing within the game.
+*/
+/*struct MapEntry
+{
+    uint32  MapID;                                          // 0        m_ID
+    // char*       internalname;                            // 1        m_Directory
+    uint32  map_type;                                       // 2        m_InstanceType
+    // uint32 isPvP;                                        // 3        m_PVP 0 or 1 for battlegrounds (not arenas)
+    char*   name[8];                                        // 4-11     m_MapName_lang
+    // 12 string flags
+    // 13-15 unused (something PvPZone related - levels?)
+    // 16-18
+    uint32  linked_zone;                                    // 19       m_areaTableID
+    // char*     hordeIntro[8];                             // 20-27    m_MapDescription0_lang
+    // 28 string flags
+    // char*     allianceIntro[8];                          // 29-36    m_MapDescription1_lang
+    // 37 string flags
+    uint32  multimap_id;                                    // 38       m_LoadingScreenID (LoadingScreens.dbc)
+    // 39-40 not used
+    // float   BattlefieldMapIconScale;                     // 41       m_minimapIconScale
+
+    // Helpers
+
+    bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID; }
+    bool IsNonRaidDungeon() const { return map_type == MAP_INSTANCE; }
+    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND; }
+    bool IsRaid() const { return map_type == MAP_RAID; }
+    bool IsBattleGround() const { return map_type == MAP_BATTLEGROUND; }
+
+    bool IsMountAllowed() const
+    {
+        return !IsDungeon() ||
+            MapID == 309 || MapID == 209 || MapID == 509 || MapID == 269;
+    }
+
+    bool IsContinent() const
+    {
+        return MapID == 0 || MapID == 1;
+    }
+};*/
 /*enum CharSectionFlags
 {
     SECTION_FLAG_PLAYER = 0x01

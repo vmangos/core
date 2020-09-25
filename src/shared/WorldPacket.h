@@ -44,11 +44,11 @@ class WorldPacket : public ByteBuffer
         {
         }
 
-        WorldPacket& operator=(WorldPacket&& rhs)
+        WorldPacket& operator=(WorldPacket const& rhs)
         {
             m_opcode = rhs.m_opcode;
             m_recvdTime = rhs.m_recvdTime;
-            ByteBuffer::operator=(std::move(rhs));
+            //ByteBuffer::operator=(std::move(rhs));
             return *this;
         }
 
