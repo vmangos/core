@@ -120,7 +120,7 @@ enum DashelStonefistData
     NPC_OLD_TOWN_THUG = 4969,
     // factions
     FACTION_NEUTRAL = 189,
-    FACTION_FRIENDLY = 84, // original faction taken from DB
+    FACTION_IRONFORGE = 122, // original faction taken from DB
     FACTION_FRIENDLY_TO_ALL = 35,
     // quest phases
     MDQP_NONE = 0, // Dashel returns his spawn point
@@ -206,7 +206,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         // restore some flags
         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         // restore faction
-        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_IRONFORGE);
         // reset player guid
         m_playerGuid.Clear();
     }
