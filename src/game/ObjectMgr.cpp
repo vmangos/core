@@ -11147,21 +11147,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         {
             ItemPrototype const* pItem = GetItemPrototype(item.itemId);
 
-            // Set required reputation
-            if (pItem->RequiredReputationFaction && pItem->RequiredReputationRank)
-                if (FactionEntry const* pFaction = GetFactionEntry(pItem->RequiredReputationFaction))
-                    if (pPlayer->GetReputationMgr().GetRank(pFaction) < pItem->RequiredReputationRank)
-                        pPlayer->GetReputationMgr().SetReputation(pFaction, pPlayer->GetReputationMgr().GetRepPointsToRank(ReputationRank(pItem->RequiredReputationRank)));
-
-            // Learn required profession
-            if (pItem->RequiredSkill && (!pPlayer->HasSkill(pItem->RequiredSkill) || (pPlayer->GetSkill(pItem->RequiredSkill, false, false) <  pItem->RequiredSkillRank)))
-                pPlayer->SetSkill(pItem->RequiredSkill, pItem->RequiredSkillRank, 300);
-
-            // Learn required proficiency
-            if (uint32 proficiencySpellId = pItem->GetProficiencySpell())
-                if (!pPlayer->HasSpell(proficiencySpellId))
-                    pPlayer->LearnSpell(proficiencySpellId, false, false);
-
+            pPlayer->SatisfyItemRequirements(pItem);
             pPlayer->StoreNewItemInBestSlots(item.itemId, 1, item.enchantId);
         }
     }
