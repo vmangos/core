@@ -480,7 +480,7 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (4212, 14933, 4000, 165, 225, 0, 0, 5875);
 
 -- correct recipes to una
-DELETE FROM `npc_trainer` WHERE `entry` = 3009;
+DELETE FROM `npc_trainer` WHERE `entry` = 3007;
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (3007, 2338, 50, 165, 15, 0, 0, 5875),
 (3007, 3782, 75, 165, 25, 0, 0, 5875),
