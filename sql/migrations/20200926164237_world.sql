@@ -440,6 +440,8 @@ UPDATE `quest_template` SET `DetailsEmote1`=1 WHERE `entry`=8982;
 UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1 WHERE `entry`=8983;
 UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3`=1 WHERE `entry`=8984;
 UPDATE `quest_template` SET `DetailsEmote1`=0 WHERE `entry`=1222;
+UPDATE `quest_template` SET `DetailsEmote1`=1 WHERE `entry`=1820;
+UPDATE `quest_template` SET `DetailsEmote3`=1, `DetailsEmoteDelay1`=0 WHERE `entry`=5344;
 
 -- Correct quest offer reward.
 UPDATE `quest_template` SET `OfferRewardText`='Ah!  I can\'t stand us being apart.  I have to see her!!' WHERE `entry`=106;
@@ -1121,6 +1123,11 @@ UPDATE `quest_template` SET `OfferRewardText`='These are wonderful specimens, $N
 UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=2, `OfferRewardText`='My nephew said you aided him with his research in Dustwallow, and that you helped his associate out of a tight spot.  Well, we Sterns stick together and we don\'t ignore our friends!$B$BSo wash your hands, $N, because we\'re about to throw a party in your honor!' WHERE `entry`=1271;
 UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=1, `OfferRewardEmote3`=1 WHERE `entry`=6502;
 UPDATE `quest_template` SET `OfferRewardEmote1`=5 WHERE `entry`=8054;
+UPDATE `quest_template` SET `OfferRewardText`='You have served the Kingdom well, $C.  Thank you for assisting Corporal Keeshan with his escape from those dreaded Blackrock Orcs.  You shall be rewarded for your brave acts this day.' WHERE `entry`=219;
+UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=25, `OfferRewardText`='There is but one more task that I must ask of you, $N.' WHERE `entry`=5343;
+UPDATE `quest_template` SET `OfferRewardEmote1`=0 WHERE `entry`=5344;
+UPDATE `quest_template` SET `OfferRewardEmote2`=1, `OfferRewardEmote3`=1 WHERE `entry`=5382;
+UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=2 WHERE `entry`=8201;
 
 -- Correct quest request items.
 UPDATE `quest_template` SET `CompleteEmote`=0, `RequestItemsText`='You have what??  Maybell is the light of my dull life.  Hurry, let me see her letter!' WHERE `entry`=106;
@@ -1743,6 +1750,9 @@ UPDATE `quest_template` SET `IncompleteEmote`=1, `RequestItemsText`='My research
 UPDATE `quest_template` SET `IncompleteEmote`=1, `RequestItemsText`='I may have been too hasty in my judgement, $c. It seems as if your blind faith in this Light has some value after all.$B$BGive me your brand and I shall amplify its power.' WHERE `entry`=8046;
 UPDATE `quest_template` SET `IncompleteEmote`=5, `CompleteEmote`=5, `RequestItemsText`='Zanza can create the ancient troll enchantments with the right components.$B$BThe first is a primal Hakkari idol that must be taken from the most powerful of the Hakkari lieutenants: Jin\'do and the Bloodlord.$B$BThe second is a punctured voodoo doll. These can be found in the piles of refuse that litter this foul place. Look inside the jinxed hoodoo piles.$B$BBring me these things and I will create a powerful enchantment for you!\n' WHERE `entry`=8185;
 UPDATE `quest_template` SET `IncompleteEmote`=1, `RequestItemsText`='The extremely potent essence mango grows across many of the islands in the South Seas.  A single mango will refresh those who eat it, both physically and mentally.  If you\'ve never had one, you do yourself a disservice!$B$BWe have enough of a supply here on the isle to offer you a handful in exchange for a Zandalar Honor Token.  Speak with Vinchaxa if you need to learn how to get tokens; otherwise, let\'s get to the business at hand!' WHERE `entry`=8196;
+UPDATE `quest_template` SET `IncompleteEmote`=1, `CompleteEmote`=1, `RequestItemsText`='Ensure my future and I shall ensure yours.\n' WHERE `entry`=5343;
+UPDATE `quest_template` SET `IncompleteEmote`=0, `CompleteEmote`=0 WHERE `entry`=5344;
+UPDATE `quest_template` SET `CompleteEmote`=5 WHERE `entry`=5382;
 
 -- Add missing quest greetings.
 INSERT INTO `quest_greeting` (`entry`, `type`, `content_default`, `emote_id`, `emote_delay`) VALUES (1938, 0, 'The Kirin Tor did not heed my warnings!  The Alliance is a sham.  Arugal is a wreckless fool.', 0, 0);
