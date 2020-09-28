@@ -311,7 +311,7 @@ class CreatureEventAI : public CreatureAI
         void GroupMemberJustDied(Creature* unit, bool isLeader) override;
         void SummonedCreatureJustDied(Creature* unit) override;
         void SummonedCreatureDespawn(Creature* unit) override;
-        void MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiData) override;
+        void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override;
 
         static int Permissible(Creature const*);
 

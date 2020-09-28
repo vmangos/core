@@ -9661,12 +9661,29 @@ void ObjectMgr::LoadNpcGossips()
     sLog.outString(">> Loaded %d NpcTextId ", count);
 }
 
-void ObjectMgr::LoadGossipMenu()
+void ObjectMgr::LoadGossipMenus()
+{
+    // Check which script-ids in gossip_scripts are not used
+    std::set<uint32> gossipScriptSet;
+    for (const auto& itr : sGossipScripts)
+        gossipScriptSet.insert(itr.first);
+
+    // Load gossip_menu and gossip_menu_option data
+    sLog.outString("Loading Gossip menus...");
+    LoadGossipMenu(gossipScriptSet);
+    sLog.outString("Loading Gossip menu options...");
+    LoadGossipMenuItems(gossipScriptSet);
+
+    for (const auto itr : gossipScriptSet)
+        sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", itr);
+}
+
+void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
 {
     m_GossipMenusMap.clear();
 
-    //                                                               0        1          2
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_id`, `condition_id` FROM `gossip_menu`"));
+    //                                                               0        1          2            3
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_id`, `script_id`, `condition_id` FROM `gossip_menu`"));
 
     if (!result)
     {
@@ -9690,7 +9707,8 @@ void ObjectMgr::LoadGossipMenu()
 
         gMenu.entry             = fields[0].GetUInt32();
         gMenu.text_id           = fields[1].GetUInt32();
-        gMenu.conditionId       = fields[2].GetUInt16();
+        gMenu.script_id         = fields[2].GetUInt32();
+        gMenu.condition_id      = fields[3].GetUInt32();
 
         if (!GetNpcText(gMenu.text_id))
         {
@@ -9698,13 +9716,25 @@ void ObjectMgr::LoadGossipMenu()
             continue;
         }
 
-        if (gMenu.conditionId)
+        if (gMenu.script_id)
         {
-            ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenu.conditionId);
+            if (sGossipScripts.find(gMenu.script_id) == sGossipScripts.end())
+            {
+                sLog.outErrorDb("Table gossip_menu for menu %u, text-id %u have script_id %u that does not exist in `gossip_scripts`, ignoring", gMenu.entry, gMenu.text_id, gMenu.script_id);
+                continue;
+            }
+
+            // Remove used script id
+            gossipScriptSet.erase(gMenu.script_id);
+        }
+
+        if (gMenu.condition_id)
+        {
+            ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenu.condition_id);
             if (!condition)
             {
-                sLog.outErrorDb("Table gossip_menu for menu %u, text-id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenu.entry, gMenu.text_id, gMenu.conditionId);
-                gMenu.conditionId = 0;
+                sLog.outErrorDb("Table gossip_menu for menu %u, text-id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenu.entry, gMenu.text_id, gMenu.condition_id);
+                gMenu.condition_id = 0;
             }
         }
 
@@ -9730,7 +9760,7 @@ void ObjectMgr::LoadGossipMenu()
                 ERROR_DB_STRICT_LOG("Gameobject (Entry: %u) has gossip_menu_id = %u for nonexistent menu", itr->id, menuid);
 }
 
-void ObjectMgr::LoadGossipMenuItems()
+void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
 {
     m_GossipMenuItemsMap.clear();
 
@@ -9765,13 +9795,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
     // loading
     BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
-
-    std::set<uint32> gossipScriptSet;
-
-    for (const auto& itr : sGossipScripts)
-        gossipScriptSet.insert(itr.first);
 
     // prepare menuid -> CreatureInfo map for fast access
     typedef  std::multimap<uint32, CreatureInfo const*> Menu2CInfoMap;
@@ -9802,7 +9826,7 @@ void ObjectMgr::LoadGossipMenuItems()
         //gMenuItem.box_money             = fields[11].GetUInt32();
         gMenuItem.box_text              = fields[12].GetCppString();
         gMenuItem.box_broadcast_text    = fields[13].GetUInt32();
-        gMenuItem.condition_id          = fields[14].GetUInt16();
+        gMenuItem.condition_id          = fields[14].GetUInt32();
 
         if (gMenuItem.menu_id)                              // == 0 id is special and not have menu_id data
         {
@@ -9920,9 +9944,6 @@ void ObjectMgr::LoadGossipMenuItems()
 
     }
     while (result->NextRow());
-
-    for (const auto itr : gossipScriptSet)
-        sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", itr);
 
     if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
     {

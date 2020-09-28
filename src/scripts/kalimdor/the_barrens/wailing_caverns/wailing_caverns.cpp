@@ -69,8 +69,6 @@ enum
     POINT_LAST_POINT    = 0xFFFFFF
 };
 
-#define GOSSIP_ITEM_BEGIN   "Let the event begin!"
-
 float Position [10][3] =
 {
     {-52.9f, 269.8f, -92.8f},
@@ -589,46 +587,20 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
             DoMeleeAttackIfReady();
         }
     }
-};
 
-bool GossipHello_npc_disciple_of_naralex(Player* pPlayer, Creature* pCreature)
-{
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-    pCreature->CastSpell(pPlayer, SPELL_MARK, false);
-
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    if (m_pInstance && m_pInstance->GetData(TYPE_DISCIPLE) == SPECIAL)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEGIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(699, pCreature->GetGUID());
-    }
-    else if (m_pInstance && m_pInstance->GetData(TYPE_DISCIPLE) != DONE)
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    else pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
-    return true;
-}
+        if (!m_pInstance)
+            return;
 
-bool GossipSelect_npc_disciple_of_naralex(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-    if (!m_pInstance)
-        return false;
-
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        if (npc_disciple_of_naralexAI* pEscortAI = dynamic_cast<npc_disciple_of_naralexAI*>(pCreature->AI()))
+        if (m_pInstance->GetData(TYPE_DISCIPLE) == SPECIAL)
         {
-            pEscortAI->Start(false, /*pPlayer->GetGUID()*/ 0);//we don't want the out of range check.
-            pEscortAI->m_playerGuid = pPlayer->GetObjectGuid();
-            pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            Start(false, /*pInvoker->GetGUID()*/ 0); // we don't want the out of range check.
+            m_playerGuid = pInvoker->GetObjectGuid();
+            m_creature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
         }
-        pPlayer->CLOSE_GOSSIP_MENU();
     }
-    return true;
-}
+};
 
 CreatureAI* GetAI_npc_disciple_of_naralex(Creature* pCreature)
 {
@@ -741,7 +713,5 @@ void AddSC_wailing_caverns()
     newscript = new Script;
     newscript->Name = "npc_disciple_of_naralex";
     newscript->GetAI = &GetAI_npc_disciple_of_naralex;
-    newscript->pGossipHello =  &GossipHello_npc_disciple_of_naralex;
-    newscript->pGossipSelect = &GossipSelect_npc_disciple_of_naralex;
     newscript->RegisterSelf();
 }

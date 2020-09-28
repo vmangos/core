@@ -1082,7 +1082,10 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
 bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading `gossip_menu` Table!");
-    sObjectMgr.LoadGossipMenu();
+    std::set<uint32> gossipScriptSet;
+    for (const auto& itr : sGossipScripts)
+        gossipScriptSet.insert(itr.first);
+    sObjectMgr.LoadGossipMenu(gossipScriptSet);
     SendSysMessage("DB table `gossip_menu` reloaded.");
     return true;
 }
@@ -1090,7 +1093,10 @@ bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 bool ChatHandler::HandleReloadGossipMenuOptionCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading `gossip_menu_option` Table!");
-    sObjectMgr.LoadGossipMenuItems();
+    std::set<uint32> gossipScriptSet;
+    for (const auto& itr : sGossipScripts)
+        gossipScriptSet.insert(itr.first);
+    sObjectMgr.LoadGossipMenuItems(gossipScriptSet);
     SendSysMessage("DB table `gossip_menu_option` reloaded.");
     return true;
 }

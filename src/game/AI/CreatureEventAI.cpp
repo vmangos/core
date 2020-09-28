@@ -881,7 +881,7 @@ void CreatureEventAI::DamageTaken(Unit* /*done_by*/, uint32& damage)
     }
 }
 
-void CreatureEventAI::MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiData)
+void CreatureEventAI::OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker)
 {
     if (m_bEmptyList)
         return;
@@ -889,8 +889,8 @@ void CreatureEventAI::MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiDat
     for (auto& i : m_CreatureEventAIList)
     {
         if (i.Event.event_type == EVENT_T_MAP_SCRIPT_EVENT)
-            if ((i.Event.map_event.eventId == pEvent->m_uiEventId) && (i.Event.map_event.data == uiData))
-                ProcessEvent(i);
+            if ((i.Event.map_event.eventId == uiEvent) && (i.Event.map_event.data == uiData))
+                ProcessEvent(i, ToUnit(pInvoker));
     }
 }
 

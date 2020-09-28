@@ -172,8 +172,8 @@ class CreatureAI
         // Like UpdateAI, but only when the creature is a dead corpse
         virtual void UpdateAI_corpse(uint32 const /*uiDiff*/) {}
 
-        // Called by scripted map events
-        virtual void MapScriptEventHappened(ScriptedEvent* /*pEvent*/, uint32 /*uiData*/) {};
+        // Called by another script
+        virtual void OnScriptEventHappened(uint32 /*uiEvent*/, uint32 /*uiData*/, WorldObject* /*pInvoker*/) {};
 
         ///== State checks =================================
 
