@@ -4067,14 +4067,11 @@ void Spell::_handle_finish_phase()
 
 void Spell::SendSpellCooldown()
 {
-    if (!m_casterUnit)
+    // (SPELL_ATTR_DISABLED_WHILE_ACTIVE) have infinity cooldown, (SPELL_ATTR_PASSIVE) passive cooldown at triggering
+    if (m_spellInfo->HasAttribute(SPELL_ATTR_PASSIVE))
         return;
 
-    // (1) have infinity cooldown but set at aura apply, (2) passive cooldown at triggering
-    if (m_spellInfo->Attributes & (SPELL_ATTR_DISABLED_WHILE_ACTIVE | SPELL_ATTR_PASSIVE))
-        return;
-
-    if (Player* pPlayer = m_casterUnit->ToPlayer())
+    if (Player* pPlayer = m_caster->ToPlayer())
         if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
             return;
 
