@@ -299,7 +299,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (31933, 52, 2926.459961, 615.729004, 95.337196, 100.000000, 0, 0.000000, 0);
 
 -- creature 44909 waypoints
-DELETE FROM `creature_movement` WHERE `id` = 44909
+DELETE FROM `creature_movement` WHERE `id` = 44909;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (44909, 1, 2385.620117, 1323.609985, 33.981098, 100.000000, 0, 0.000000, 0),
 (44909, 2, 2386.399902, 1343.880005, 34.517502, 100.000000, 0, 0.000000, 0),
