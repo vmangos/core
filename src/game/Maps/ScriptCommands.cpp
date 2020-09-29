@@ -1626,7 +1626,8 @@ bool Map::ScriptCommand_AddSpellCooldown(ScriptInfo const& script, WorldObject* 
         return ShouldAbortScript(script);
     }
 
-    pSource->AddSpellCooldown(script.addCooldown.spellId, 0, time(nullptr) + script.addCooldown.cooldown);
+    if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(script.addCooldown.spellId))
+    pSource->AddCooldown(*pSpellEntry, nullptr, false, script.addCooldown.cooldown * IN_MILLISECONDS);
     if (Player* pPlayer = pSource->ToPlayer())
         pPlayer->SendSpellCooldown(script.addCooldown.spellId, script.addCooldown.cooldown * IN_MILLISECONDS, pPlayer->GetObjectGuid());
 
@@ -1647,7 +1648,7 @@ bool Map::ScriptCommand_RemoveSpellCooldown(ScriptInfo const& script, WorldObjec
     if (script.removeCooldown.spellId)
         pSource->RemoveSpellCooldown(script.removeCooldown.spellId, true);
     else
-        pSource->RemoveAllSpellCooldown();
+        pSource->RemoveAllCooldowns();
 
     return false;
 }

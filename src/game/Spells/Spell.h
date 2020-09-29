@@ -495,10 +495,6 @@ class Spell
 
         int32 GetAbsorbedDamage() const { return m_absorbed; }
     protected:
-        bool HasGlobalCooldown() const;
-        void TriggerGlobalCooldown();
-        void CancelGlobalCooldown();
-
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();

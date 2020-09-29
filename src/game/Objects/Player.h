@@ -1403,9 +1403,8 @@ class Player final: public Unit
         float m_auraBaseMod[BASEMOD_END][MOD_END];
         SpellModList m_spellMods[MAX_SPELLMOD];
         uint32 m_lastFromClientCastedSpellID;
-        void _LoadSpellCooldowns(QueryResult* result);
-        void _SaveSpellCooldowns();
-
+        
+        
         bool IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const;
         void SendInitialSpells() const;
         bool AddSpell(uint32 spell_id, bool active, bool learning, bool dependent, bool disabled);
@@ -1415,12 +1414,7 @@ class Player final: public Unit
         TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
         bool IsSpellFitByClassAndRace(uint32 spell_id, uint32* pReqlevel = nullptr) const;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
-        void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
-        void SendClearCooldown(uint32 spell_id, Unit* target) const;
-        void SendClearAllCooldowns(Unit* target) const;
-        void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
         void SendSpellRemoved(uint32 spell_id) const;
-
         void LearnSpell(uint32 spell_id, bool dependent, bool talent = false);
         void RemoveSpell(uint32 spell_id, bool disabled = false, bool learn_low_rank = true);
         void ResetSpells();
@@ -1445,6 +1439,37 @@ class Player final: public Unit
         void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
         void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
         void DropModCharge(SpellModifier* mod, Spell* spell);
+
+        // cooldown system
+        virtual void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false) override;
+        virtual void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) override;
+        virtual void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true) override;
+        virtual void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true) override;
+        virtual void RemoveAllCooldowns(bool sendOnly = false);
+        virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) override;
+        void RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent = nullptr);
+        void SendClearCooldown(uint32 spell_id, Unit* target) const;
+        void SendClearAllCooldowns(Unit* target) const;
+        void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
+        void _LoadSpellCooldowns(QueryResult* result);
+        void _SaveSpellCooldowns();
+
+        template <typename F>
+        void RemoveSomeCooldown(F check)
+        {
+            auto spellCDItr = m_cooldownMap.begin();
+            while (spellCDItr != m_cooldownMap.end())
+            {
+                SpellEntry const* entry = sSpellMgr.GetSpellEntry(spellCDItr->first);
+                if (entry && check(*entry))
+                {
+                    SendClearCooldown(spellCDItr->first, this);
+                    spellCDItr = m_cooldownMap.erase(spellCDItr);
+                }
+                else
+                    ++spellCDItr;
+            }
+        }
 
         std::vector<ItemSetEffect*> m_ItemSetEff;
         uint32 m_castingSpell; // Last spell cast by client, or combo points if player is rogue

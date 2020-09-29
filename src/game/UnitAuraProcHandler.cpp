@@ -1150,7 +1150,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
     if (!target || (target != this && !target->IsAlive()))
         return SPELL_AURA_PROC_FAILED;
 
-    if (cooldown && HasSpellCooldown(triggered_spell_id))
+    if (!IsSpellReady(*triggerEntry))
         return SPELL_AURA_PROC_FAILED;
 
     if (basepoints[EFFECT_INDEX_0] || basepoints[EFFECT_INDEX_1] || basepoints[EFFECT_INDEX_2])
@@ -1163,7 +1163,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
         CastSpell(target, triggered_spell_id, true, castItem, triggeredByAura);
 
     if (cooldown)
-        AddSpellCooldown(triggered_spell_id, 0, time(nullptr) + cooldown);
+        AddCooldown(*triggerEntry, nullptr, false, cooldown * IN_MILLISECONDS);
 
     return SPELL_AURA_PROC_OK;
 }
@@ -1609,7 +1609,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
         }
     }
 
-    if (cooldown && HasSpellCooldown(trigger_spell_id))
+    if (cooldown && !IsSpellReady(*triggerEntry))
         return SPELL_AURA_PROC_FAILED;
 
     // try detect target manually if not set
@@ -1630,7 +1630,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
         CastSpell(target, trigger_spell_id, true, castItem, triggeredByAura, GetObjectGuid(), nullptr, procSpell);
 
     if (cooldown)
-        AddSpellCooldown(trigger_spell_id, 0, time(nullptr) + cooldown);
+        AddCooldown(*triggerEntry, nullptr, false, cooldown * IN_MILLISECONDS);
 
     return SPELL_AURA_PROC_OK;
 }
@@ -1776,13 +1776,13 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit* pVictim, uint3
         return SPELL_AURA_PROC_FAILED;
     }
 
-    if (cooldown && HasSpellCooldown(triggered_spell_id))
+    if (cooldown && !IsSpellReady(*triggerEntry))
         return SPELL_AURA_PROC_FAILED;
 
     CastSpell(pVictim, triggered_spell_id, true, castItem, triggeredByAura);
 
     if (cooldown)
-        AddSpellCooldown(triggered_spell_id, 0, time(nullptr) + cooldown);
+        AddCooldown(*triggerEntry, nullptr, false, cooldown * IN_MILLISECONDS);
 
     return SPELL_AURA_PROC_OK;
 }

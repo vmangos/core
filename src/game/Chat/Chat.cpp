@@ -252,6 +252,14 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
+    static ChatCommand cooldownCommandTable[] =
+    {
+        { "list",            SEC_GAMEMASTER,    false, &ChatHandler::HandleCooldownListCommand,             "", nullptr },
+        { "clear",           SEC_GAMEMASTER,    false, &ChatHandler::HandleCooldownClearCommand,            "", nullptr },
+        { "clearclientside", SEC_GAMEMASTER,    false, &ChatHandler::HandleCooldownClearClientSideCommand,  "", nullptr },
+        { nullptr,             0,               false, nullptr,                                             "", nullptr }
+    };
+
     static ChatCommand debugPlayCommandTable[] =
     {
         { "cinematic",      SEC_TICKETMASTER,   false, &ChatHandler::HandleDebugPlayCinematicCommand,       "", nullptr },
@@ -1164,7 +1172,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "guid",           SEC_MODERATOR,      false, &ChatHandler::HandleGUIDCommand,                "", nullptr },
         { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", nullptr },
         { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", nullptr },
-        { "cooldown",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCooldownCommand,            "", nullptr },
+        { "cooldown",       SEC_GAMEMASTER,     false, nullptr,                                        "", cooldownCommandTable },
         { "unlearn",        SEC_GAMEMASTER,     false, nullptr,                                        "", unlearnCommandTable },
         { "removeriding",   SEC_GAMEMASTER,     false, &ChatHandler::HandleRemoveRidingCommand,        "", nullptr },
         { "distance",       SEC_MODERATOR,      false, &ChatHandler::HandleGetDistanceCommand,         "", nullptr },

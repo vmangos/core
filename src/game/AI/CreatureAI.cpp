@@ -57,7 +57,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, 
         if (m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
             return CAST_FAIL_STATE;
 
-        if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || m_creature->IsSpellProhibited(pSpell)))
+        if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || m_creature->CheckLockout(pSpell->GetSpellSchoolMask())))
             return CAST_FAIL_STATE;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))

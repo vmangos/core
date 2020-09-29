@@ -272,6 +272,8 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         return;
     }
 
+    UpdateCooldowns(sWorld.GetCurrentClockTime());
+
     m_Events.Update(update_diff);
 
     // remove finished spells from current pointers
@@ -727,7 +729,7 @@ void GameObject::FinishRitual()
         // take spell cooldown
         if (GetOwner() && GetOwner()->IsPlayer())
             if (SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(GetSpellId()))
-                GetOwner()->CooldownEvent(createBySpell);
+                GetOwner()->AddCooldown(*createBySpell);
         if (!info->summoningRitual.ritualPersistent)
             SetLootState(GO_JUST_DEACTIVATED);
         // Only ritual of doom deals a second spell

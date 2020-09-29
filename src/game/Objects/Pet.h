@@ -223,7 +223,6 @@ class Pet : public Creature
         void CastPetAuras(bool current);
         void CastPetAura(PetAura const* aura);
 
-        void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();
         void _LoadAuras(uint32 timediff);

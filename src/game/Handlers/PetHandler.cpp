@@ -228,7 +228,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 return;
             }
 
-            if (pCharmedUnit->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+            if (!pCharmedUnit->IsSpellReady(*spellInfo))
                 return;
 
             for (uint32 i : spellInfo->EffectImplicitTargetA)
@@ -304,8 +304,8 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 else
                     pCharmedUnit->SendPetCastFail(spellid, result);
 
-                if (!((Creature*)pCharmedUnit)->HasSpellCooldown(spellid))
-                    GetPlayer()->SendClearCooldown(spellid, pCharmedUnit);
+                if (((Creature*)pCharmedUnit)->IsSpellReady(*spellInfo))
+                    GetPlayer()->SendClearCooldown(spellid, ((Creature*)pCharmedUnit));
 
                 spell->finish(false);
                 spell->Delete();
@@ -684,7 +684,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pet->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+    if (!pet->IsSpellReady(*spellInfo))
         return;
 
     // do not cast not learned spells
@@ -720,7 +720,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     else
     {
         pet->SendPetCastFail(spellid, result);
-        if (!pet->HasSpellCooldown(spellid))
+        if (pet->IsSpellReady(spellid))
             GetPlayer()->SendClearCooldown(spellid, pet);
 
         spell->finish(false);
