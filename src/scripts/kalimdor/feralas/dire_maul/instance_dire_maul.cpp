@@ -176,6 +176,8 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
         case NPC_IMMOL_THAR:
             if (Creature* pTortheldrin = instance->GetCreature(m_uiTortheldrinGUID))
                 pTortheldrin->MonsterYell(SAY_IMMOL_THAR_DEAD);
+            if (GetData(TYPE_IMMOL_THAR) != DONE)
+                SetData(TYPE_IMMOL_THAR, DONE);
             break;
         case NPC_GUARD_MOLDAR:
             SetData(TYPE_MOLDAR, DONE); 
