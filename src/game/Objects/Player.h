@@ -1890,6 +1890,7 @@ class Player final: public Unit
         uint32 GetHomeBindMap() const { return m_homebindMapId; }
         uint16 GetHomeBindAreaId() const { return m_homebindAreaId; }
 
+        void SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zoneId, float x, float y, float z);
         void SetSummonPoint(uint32 mapid, float x, float y, float z)
         {
             m_summon_expire = time(nullptr) + MAX_PLAYER_SUMMON_DELAY;

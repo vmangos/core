@@ -418,6 +418,15 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
+    static ChatCommand groupCommandTable[] =
+    {
+        { "additem",         SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupAddItemCommand,        "", nullptr },
+        { "revive",          SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupReviveCommand,         "", nullptr },
+        { "replenish",       SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupReplenishCommand,      "", nullptr },
+        { "summon",          SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupSummonCommand,         "", nullptr },
+        { nullptr,           0,                 false, nullptr,                                        "", nullptr }
+    };
+
     static ChatCommand honorCommandTable[] =
     {
         { "add",            SEC_BASIC_ADMIN,    false, &ChatHandler::HandleHonorAddCommand,            "", nullptr },
@@ -1157,6 +1166,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "notify",         SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleNotifyCommand,              "", nullptr },
         { "goname",         SEC_TICKETMASTER,   false, &ChatHandler::HandleGonameCommand,              "", nullptr },
         { "namego",         SEC_TICKETMASTER,   false, &ChatHandler::HandleNamegoCommand,              "", nullptr },
+        { "group",          SEC_GAMEMASTER,     true, nullptr,                                         "", groupCommandTable },
         { "groupgo",        SEC_TICKETMASTER,   false, &ChatHandler::HandleGroupgoCommand,             "", nullptr },
         { "gocorpse",       SEC_TICKETMASTER,   false, &ChatHandler::HandleGocorpseCommand,            "", nullptr },
         { "commands",       SEC_PLAYER,         true,  &ChatHandler::HandleCommandsCommand,            "", nullptr },

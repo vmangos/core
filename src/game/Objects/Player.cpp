@@ -19228,6 +19228,17 @@ void Player::UpdateForQuestWorldObjects()
         upd.Send(GetSession());
 }
 
+void Player::SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zoneId, float x, float y, float z)
+{
+    SetSummonPoint(mapId, x, y, z);
+
+    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+    data << summonerGuid;                    // summoner guid
+    data << uint32(zoneId);                  // summoner zone
+    data << uint32(MAX_PLAYER_SUMMON_DELAY * IN_MILLISECONDS); // auto decline after msecs
+    GetSession()->SendPacket(&data);
+}
+
 void Player::SummonIfPossible(bool agree)
 {
     if (!agree)

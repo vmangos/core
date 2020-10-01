@@ -533,6 +533,11 @@ class ChatHandler
         bool HandleGuildDeleteCommand(char* args);
         bool HandleGuildRenameCommand(char* args);
 
+        bool HandleGroupAddItemCommand(char* args);
+        bool HandleGroupReviveCommand(char* args);
+        bool HandleGroupReplenishCommand(char* args);
+        bool HandleGroupSummonCommand(char* args);
+
         bool HandleHonorShow(char* args);
         bool HandleHonorAddCommand(char* args);
         bool HandleHonorAddKillCommand(char* args);
