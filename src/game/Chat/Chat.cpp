@@ -420,10 +420,10 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand groupCommandTable[] =
     {
-        { "additem",         SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupAddItemCommand,        "", nullptr },
-        { "revive",          SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupReviveCommand,         "", nullptr },
-        { "replenish",       SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupReplenishCommand,      "", nullptr },
-        { "summon",          SEC_GAMEMASTER,    true,  &ChatHandler::HandleGroupSummonCommand,         "", nullptr },
+        { "additem",         SEC_GAMEMASTER,    false, &ChatHandler::HandleGroupAddItemCommand,        "", nullptr },
+        { "revive",          SEC_GAMEMASTER,    false, &ChatHandler::HandleGroupReviveCommand,         "", nullptr },
+        { "replenish",       SEC_GAMEMASTER,    false, &ChatHandler::HandleGroupReplenishCommand,      "", nullptr },
+        { "summon",          SEC_GAMEMASTER,    false, &ChatHandler::HandleGroupSummonCommand,         "", nullptr },
         { nullptr,           0,                 false, nullptr,                                        "", nullptr }
     };
 
