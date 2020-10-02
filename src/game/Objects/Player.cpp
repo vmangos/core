@@ -7412,6 +7412,10 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
         else if (chance > 100.0f)
             chance = GetPPMProcChance(WeaponSpeed, 1.0f);   // default to 1 PPM for unknown proc rates
 
+        // Need to check gcd here because the cast is triggered and skips it.
+        if (HasGCD(spellInfo))
+            continue;
+
         if (roll_chance_f(chance))
             CastSpell(Target, spellInfo->Id, true, item);
     }
