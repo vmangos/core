@@ -125,6 +125,9 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (6707, 13232, 33000, 0, 0, 48, 0, 5875),
 (6707, 13233, 50000, 0, 0, 56, 0, 5875);
 
+-- Fix upper case in OfferRewardText for quest 8288 (Only One May Rise) https://github.com/mangoszero/database/commit/fce47a50244afcab58814ba7ab1a68be7b54b43b
+UPDATE quest_template SET OfferRewardText = 'Could you be the first to earn favor among the Bronze Flight in a thousand years?' WHERE entry = 8288;
+
 
 -- End of migration.
 END IF;
