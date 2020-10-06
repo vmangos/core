@@ -1936,7 +1936,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (44942, 7, 1926.709961, 1570.680054, 84.481201, 100.000000, 0, 0.000000, 0),
 (44942, 8, 1925.989990, 1577.430054, 83.438904, 100.000000, 0, 0.000000, 0),
 (44942, 9, 1909.189941, 1585.239990, 85.855003, 100.000000, 0, 0.000000, 0),
-(44942, 10, 1889.449951, 1586.270020, 88.909302, 100.000000, 0, 0.000000, 0);
+(44942, 10, 1889.449951, 1586.270020, 88.909302, 100.000000, 2000, 0.000000, 4494201);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4494201, 0, 22, 634, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mindless Zombie - Set Faction');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4494201, 0, 26, 0, 0, 0, 0, 28711, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mindless Zombie - Start Attack');
 
 -- deathguard phillip waypoints
 DELETE FROM `creature_movement_template` WHERE `entry` = 1739;
@@ -1958,6 +1960,19 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1739, 14, 1817.979980, 1571.380005, 95.766502, 100.000000, 0, 0.000000, 0),
 (1739, 15, 1828.119995, 1565.920044, 95.706299, 100.000000, 0, 0.000000, 0),
 (1739, 16, 1828.119995, 1565.920044, 95.706299, 6.143560, 12000, 0.000000, 0);
+
+-- creature 44961 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 44961;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(44961, 1, 1901.729980, 1550.719971, 88.967400, 100.000000, 28000, 5, 0),
+(44961, 2, 1907.219971, 1549.189941, 88.926003, 100.000000, 0, 0.000000, 0),
+(44961, 3, 1919.839966, 1555.310059, 86.585999, 100.000000, 0, 0.000000, 0),
+(44961, 4, 1934.550049, 1579.829956, 82.452400, 100.000000, 13000, 10, 0),
+(44961, 5, 1929.410034, 1582.859985, 82.770103, 100.000000, 0, 0.000000, 0),
+(44961, 6, 1914.099976, 1587.369995, 84.952301, 100.000000, 0, 0.000000, 0),
+(44961, 7, 1890.880005, 1588.619995, 88.666298, 100.000000, 2000, 0.000000, 4496101);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4496101, 0, 22, 634, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mindless Zombie - Set Faction');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4496101, 0, 26, 0, 0, 0, 0, 28711, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mindless Zombie - Start Attack');
 
 
 -- End of migration.
