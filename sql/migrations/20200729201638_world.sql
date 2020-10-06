@@ -1970,7 +1970,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (44961, 4, 1934.550049, 1579.829956, 82.452400, 100.000000, 13000, 10, 0),
 (44961, 5, 1929.410034, 1582.859985, 82.770103, 100.000000, 0, 0.000000, 0),
 (44961, 6, 1914.099976, 1587.369995, 84.952301, 100.000000, 0, 0.000000, 0),
-(44961, 7, 1890.880005, 1588.619995, 88.666298, 100.000000, 2000, 0.000000, 4496101);
+(44961, 7, 1890.880005, 1588.619995, 88.666298, 100.000000, 1000, 0.000000, 4496101);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4496101, 0, 22, 634, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mindless Zombie - Set Faction');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4496101, 0, 26, 0, 0, 0, 0, 28711, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mindless Zombie - Start Attack');
 
@@ -1980,7 +1980,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (41905, 1, 1969.439941, 1592.829956, 82.408302, 100.000000, 0, 0.000000, 0),
 (41905, 2, 1961.199951, 1584.989990, 81.571800, 100.000000, 0, 0.000000, 0),
 (41905, 3, 1937.949951, 1579.780029, 82.075600, 100.000000, 0, 0.000000, 0),
-(41905, 4, 1914.010010, 1585.699951, 85.023201, 100.000000, 2000, 0.000000, 4190501);
+(41905, 4, 1914.010010, 1585.699951, 85.023201, 100.000000, 1000, 0.000000, 4190501);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4190501, 0, 22, 634, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wretched Zombie - Set Faction');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4190501, 0, 26, 0, 0, 0, 0, 28711, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wretched Zombie - Start Attack');
 
@@ -1989,9 +1989,21 @@ UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 44965;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (44965, 1, 1939.000000, 1579.939941, 81.942596, 100.000000, 0, 0.000000, 0),
 (44965, 2, 1916.030029, 1585.040039, 84.625702, 100.000000, 0, 0.000000, 0),
-(44965, 3, 1892.300049, 1586.680054, 88.442299, 100.000000, 2000, 0.000000, 4496501);
+(44965, 3, 1892.300049, 1586.680054, 88.442299, 100.000000, 1000, 0.000000, 4496501);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4496501, 0, 22, 634, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wretched Zombie - Set Faction');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4496501, 0, 26, 0, 0, 0, 0, 28711, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wretched Zombie - Start Attack');
+
+--creature 44965 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 44958;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(44958, 1, 1905.900024, 1561.900024, 88.127296, 100.000000, 0, 0.000000, 0),
+(44958, 2, 1919.849976, 1568.430054, 86.115997, 100.000000, 0, 0.000000, 0),
+(44958, 3, 1924.920044, 1573.989990, 84.230003, 100.000000, 0, 0.000000, 0),
+(44958, 4, 1922.790039, 1583.670044, 83.584297, 100.000000, 0, 0.000000, 0),
+(44958, 5, 1912.339966, 1588.599976, 85.280197, 100.000000, 0, 0.000000, 0),
+(44958, 6, 1892.930054, 1588.000000, 88.241898, 100.000000, 1000, 0.000000, 4495801);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4495801, 0, 22, 634, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wretched Zombie - Set Faction');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4495801, 0, 26, 0, 0, 0, 0, 28711, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wretched Zombie - Start Attack');
 
 -- creature 45013 waypoints
 DELETE FROM `creature_movement` WHERE `id` = 45013;
