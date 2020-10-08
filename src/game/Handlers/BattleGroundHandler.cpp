@@ -52,7 +52,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recv_data)
         return;
 
     // Stop the npc if moving
-    if (!pCreature->IsStopped())
+    if (!pCreature->IsStopped() && !pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
         pCreature->StopMoving();
 
     BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(pCreature->GetEntry());

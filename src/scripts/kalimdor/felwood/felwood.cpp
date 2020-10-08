@@ -160,67 +160,6 @@ bool GossipSelect_npc_corrupt_saber(Player* pPlayer, Creature* pCreature, uint32
 }
 
 /*######
-## npcs_riverbreeze_and_silversky
-######*/
-
-enum
-{
-    QUEST_CLEANSING_FELWOOD_A = 4101,
-    QUEST_CLEANSING_FELWOOD_H = 4102,
-
-    NPC_ARATHANDIS_SILVERSKY  = 9528,
-    NPC_MAYBESS_RIVERBREEZE   = 9529,
-
-    SPELL_CENARION_BEACON     = 15120
-};
-
-#define GOSSIP_ITEM_BEACON  "Please make me a Cenarion Beacon"
-
-bool GossipHello_npcs_riverbreeze_and_silversky(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    switch (pCreature->GetEntry())
-    {
-        case NPC_ARATHANDIS_SILVERSKY:
-            if (pPlayer->GetQuestRewardStatus(QUEST_CLEANSING_FELWOOD_A))
-            {
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                pPlayer->SEND_GOSSIP_MENU(2848, pCreature->GetGUID());
-            }
-            else if (pPlayer->GetTeam() == HORDE)
-                pPlayer->SEND_GOSSIP_MENU(2845, pCreature->GetGUID());
-            else
-                pPlayer->SEND_GOSSIP_MENU(2844, pCreature->GetGUID());
-            break;
-        case NPC_MAYBESS_RIVERBREEZE:
-            if (pPlayer->GetQuestRewardStatus(QUEST_CLEANSING_FELWOOD_H))
-            {
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                pPlayer->SEND_GOSSIP_MENU(2849, pCreature->GetGUID());
-            }
-            else if (pPlayer->GetTeam() == ALLIANCE)
-                pPlayer->SEND_GOSSIP_MENU(2843, pCreature->GetGUID());
-            else
-                pPlayer->SEND_GOSSIP_MENU(2842, pCreature->GetGUID());
-            break;
-    }
-
-    return true;
-}
-
-bool GossipSelect_npcs_riverbreeze_and_silversky(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, SPELL_CENARION_BEACON, false);
-    }
-    return true;
-}
-
-/*######
 ## npc_niby_the_almighty (summons el pollo grande)
 ######*/
 enum
@@ -949,12 +888,6 @@ void AddSC_felwood()
     newscript->Name = "npc_corrupt_saber";
     newscript->pGossipHello = &GossipHello_npc_corrupt_saber;
     newscript->pGossipSelect = &GossipSelect_npc_corrupt_saber;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npcs_riverbreeze_and_silversky";
-    newscript->pGossipHello = &GossipHello_npcs_riverbreeze_and_silversky;
-    newscript->pGossipSelect = &GossipSelect_npcs_riverbreeze_and_silversky;
     newscript->RegisterSelf();
 
     newscript = new Script;

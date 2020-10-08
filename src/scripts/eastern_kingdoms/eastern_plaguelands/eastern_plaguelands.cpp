@@ -23,43 +23,9 @@ EndScriptData */
 
 /* ContentData
 mobs_ghoul_flayer
-npc_darrowshire_spirit
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_darrowshire_spirit
-######*/
-
-#define SPELL_SPIRIT_SPAWNIN    17321
-
-struct npc_darrowshire_spiritAI : public ScriptedAI
-{
-    npc_darrowshire_spiritAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        DoCastSpellIfCan(m_creature, SPELL_SPIRIT_SPAWNIN);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    }
-};
-
-CreatureAI* GetAI_npc_darrowshire_spirit(Creature* pCreature)
-{
-    return new npc_darrowshire_spiritAI(pCreature);
-}
-
-bool GossipHello_npc_darrowshire_spirit(Player* pPlayer, Creature* pCreature)
-{
-    pPlayer->SEND_GOSSIP_MENU(3873, pCreature->GetGUID());
-    pPlayer->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    return true;
-}
 
 // Eris Havenfire event
 
@@ -1878,12 +1844,6 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
 void AddSC_eastern_plaguelands()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_darrowshire_spirit";
-    newscript->GetAI = &GetAI_npc_darrowshire_spirit;
-    newscript->pGossipHello = &GossipHello_npc_darrowshire_spirit;
-    newscript->RegisterSelf();
 
     // Nostalrius -- Rockette
 

@@ -69,15 +69,15 @@ INSERT INTO `spell_proc_event` (`entry`, `Cooldown`, `build_min`) VALUES
 (27561, 20000, 5302), -- Silence Trigger
 (14178, 8000, 0), -- Sticky Tar
 (12281, 200, 0), -- Sword Specialization (Rank 1)
-(12812, 200, 0), -- Sword Specialization
-(12815, 200, 0), -- Sword Specialization
-(12813, 200, 0), -- Sword Specialization
-(12814, 200, 0), -- Sword Specialization
+-- (12812, 200, 0), -- Sword Specialization
+-- (12815, 200, 0), -- Sword Specialization
+-- (12813, 200, 0), -- Sword Specialization
+-- (12814, 200, 0), -- Sword Specialization
 (13960, 200, 0), -- Sword Specialization (Rank 1)
-(13961, 200, 0), -- Sword Specialization
-(13964, 200, 0), -- Sword Specialization
-(13962, 200, 0), -- Sword Specialization
-(13963, 200, 0), -- Sword Specialization
+-- (13961, 200, 0), -- Sword Specialization
+-- (13964, 200, 0), -- Sword Specialization
+-- (13962, 200, 0), -- Sword Specialization
+-- (13963, 200, 0), -- Sword Specialization
 (18189, 1000, 0), -- TEST Arcane Concentration
 (3582, 10000, 0); -- Torch Burst
 

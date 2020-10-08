@@ -593,6 +593,9 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         if (!m_pInstance)
             return;
 
+        if (!pInvoker || !pInvoker->IsPlayer())
+            return;
+
         if (m_pInstance->GetData(TYPE_DISCIPLE) == SPECIAL)
         {
             Start(false, /*pInvoker->GetGUID()*/ 0); // we don't want the out of range check.
