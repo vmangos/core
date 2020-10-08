@@ -13,7 +13,10 @@ INSERT INTO `migrations` VALUES ('20200928212443');
 UPDATE `creature_template` SET `ai_name` = '' WHERE `entry` = 3026;
 
 -- remove duplicate gossip_menu_option from urtharo
-DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1624 AND `id` = 0;
+DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1624;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (1624, 0, 1, 'I want to browse your goods.', 3370, 3, 4, 0, 0, 0, 0, 0, '', 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (1624, 1, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 414, 0, 0, '', 0, 462);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (1624, 2, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 415, 0, 0, '', 0, 461);
 
 -- add spells to rogue trainer fahrad
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
