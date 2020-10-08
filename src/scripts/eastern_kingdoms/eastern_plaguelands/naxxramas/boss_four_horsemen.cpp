@@ -595,7 +595,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
             switch (eventId)
             {
             case EVENT_AGGRO_TEXT:
-                DoScriptText(irand(SAY_MOG_AGGRO3, SAY_MOG_AGGRO1), m_creature);
+                DoScriptText(urand(SAY_MOG_AGGRO1, SAY_MOG_AGGRO3), m_creature);
                 break;
             }
         }
