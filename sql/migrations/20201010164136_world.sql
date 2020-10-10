@@ -10,6 +10,7 @@ INSERT INTO `migrations` VALUES ('20201010164136');
 
 
 -- add thornling ai
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14362;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1436201, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thornling - Set React State'),
 (1436201, 0, 15, 23973, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thornling - Cast Spell');
