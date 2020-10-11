@@ -35,6 +35,11 @@ UPDATE `spell_proc_event` SET `Cooldown`=1000 WHERE `entry`=23572;
 UPDATE `spell_proc_event` SET `Cooldown`=20000 WHERE `entry`=26341;
 UPDATE `spell_proc_event` SET `Cooldown`=9 WHERE `entry`=29074;
 
+-- ERROR:Spell 12284 listed in `spell_proc_event` not have any useful data
+DELETE FROM `spell_proc_event` WHERE `entry`=12284;
+-- ERROR:Spell 12322 listed in `spell_proc_event` not have any useful data
+DELETE FROM `spell_proc_event` WHERE `entry`=12322;
+
 INSERT INTO `spell_proc_event` (`entry`, `Cooldown`, `build_min`) VALUES 
 (7849, 5000, 0), -- Absorption
 (14796, 8000, 0), -- Burning Tar

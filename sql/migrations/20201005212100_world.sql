@@ -579,6 +579,14 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4108, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7649, 0, 0, 0, 0, 0, 0, 0, 0, 'Majordomo Executus - Say Text');
 UPDATE `creature_template` SET `gossip_menu_id`=4093 WHERE `entry`=12018;
 
+-- Nelson the Nice
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5871, 9, 7636, 1, 0, 0, 0);
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (5871, 7044, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (5871, 0, 0, 'A gnome? How pathetic. Face me, demon!', 9753, 1, 1, -1, 0, 5871, 0, 0, '', 0, 5871);
+DELETE FROM `gossip_scripts` WHERE `id`=5871;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5871, 0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - Start Event');
+UPDATE `creature_template` SET `gossip_menu_id`=5871 WHERE `entry`=14536;
+
 -- Why is this in the world db?
 DROP TABLE `playerbot`;
 

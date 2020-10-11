@@ -326,12 +326,6 @@ enum
     QUEST_STAVE_OF_THE_ANCIENTS     = 7636
 };
 
-#define GOSSIP_ITEM                 "Show me your real face, demon."
-
-/*#####
- ## npc_nelson_the_nice
- ######*/
-
 /*#####
  ## npc_solenor_the_slayer
  ######*/
@@ -574,23 +568,13 @@ struct npc_solenorAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
+    {
+        if (pInvoker && pInvoker->IsPlayer())
+            BeginEvent(pInvoker->GetObjectGuid());
+    }
 };
-
-bool GossipHello_npc_solenor(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_ITEM , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_npc_solenor(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction )
-{
-    pPlayer->CLOSE_GOSSIP_MENU();
-    ((npc_solenorAI*)pCreature->AI())->BeginEvent(pPlayer->GetObjectGuid());
-    return true;
-}
 
 CreatureAI* GetAI_npc_solenor(Creature* pCreature)
 {
@@ -3314,10 +3298,8 @@ void AddSC_silithus()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_solenor"; // npc_solenor_the_slayer
+    pNewScript->Name = "npc_solenor";
     pNewScript->GetAI = &GetAI_npc_solenor;
-    pNewScript->pGossipHello =  &GossipHello_npc_solenor;
-    pNewScript->pGossipSelect = &GossipSelect_npc_solenor;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
