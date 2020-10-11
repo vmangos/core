@@ -182,7 +182,10 @@ struct instance_wailing_caverns : public ScriptedInstance
             sLog.outDebug("Debug:Wailing Caverns encounters done");
             SetData(TYPE_DISCIPLE, SPECIAL);
             if (Creature* pDisciple = instance->GetCreature(m_uiDiscipleGUID))
+            {
+                pDisciple->SetDefaultGossipMenuId(GOSSIP_DISCIPLE_SPECIAL);
                 DoScriptText(YELL_AFTER_GOSSIP, pDisciple);
+            } 
         }
 
         if (uiData == DONE)

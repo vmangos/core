@@ -101,6 +101,10 @@ float World::m_VisibleObjectGreyDistance      = 0;
 float  World::m_relocation_lower_limit_sq     = 10.f * 10.f;
 uint32 World::m_relocation_ai_notify_delay    = 1000u;
 
+uint32 World::m_currentMSTime = 0;
+TimePoint World::m_currentTime = TimePoint();
+uint32 World::m_currentDiff = 0;
+
 void LoadGameObjectModelList();
 
 World& GetSWorld()
@@ -1565,11 +1569,7 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Gossip scripts...");
     sScriptMgr.LoadGossipScripts();                         // must be before gossip menu options
 
-    sLog.outString("Loading Gossip menus...");
-    sObjectMgr.LoadGossipMenu();
-
-    sLog.outString("Loading Gossip menu options...");
-    sObjectMgr.LoadGossipMenuItems();
+    sObjectMgr.LoadGossipMenus();
 
     sLog.outString("Loading Vendors...");
     sObjectMgr.LoadVendorTemplates();                       // must be after load ItemTemplate
@@ -1865,6 +1865,10 @@ public:
 /// Update the World !
 void World::Update(uint32 diff)
 {
+    m_currentMSTime = WorldTimer::getMSTime();
+    m_currentTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::now());
+    m_currentDiff = diff;
+
     ///- Update the different timers
     for (auto& timer : m_timers)
     {

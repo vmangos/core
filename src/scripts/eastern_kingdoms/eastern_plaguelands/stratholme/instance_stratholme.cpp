@@ -410,6 +410,8 @@ struct instance_stratholme : public ScriptedInstance
                             instance->GetGameObject(m_cageYsidaGUID)->SetGoState(GO_STATE_ACTIVE);
                         if (Creature* pYsida = instance->GetCreature(m_uiYsidaGUID))
                         {
+                            pYsida->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            pYsida->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                             pYsida->SetWalk(true);
                             pYsida->GetMotionMaster()->MovePoint(1, 4041.2f, -3339.0f, 115.1f, MOVE_PATHFINDING);
                         }

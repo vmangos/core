@@ -1314,31 +1314,31 @@ void instance_naxxramas::Update(uint32 diff)
                 break;
             }
             case EVENT_4HM_DIALOGUE_1:
-                DoOrSimulateScriptTextForMap(-1533059, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_1, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
                 m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_2, Seconds(7));
                 break;
             case EVENT_4HM_DIALOGUE_2:
-                DoOrSimulateScriptTextForMap(-1533045, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_2, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
                 m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_3, Seconds(7));
                 break;
             case EVENT_4HM_DIALOGUE_3:
-                DoOrSimulateScriptTextForMap(-1533071, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_3, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
                 m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_4, Seconds(7));
                 break;
             case EVENT_4HM_DIALOGUE_4:
-                DoOrSimulateScriptTextForMap(-1533046, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_4, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
                 m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_5, Seconds(7));
                 break;
             case EVENT_4HM_DIALOGUE_5:
-                DoOrSimulateScriptTextForMap(-1533060, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_5, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
                 m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_6, Seconds(6));
                 break;
             case EVENT_4HM_DIALOGUE_6:
-                DoOrSimulateScriptTextForMap(-1533053, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_6, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
                 m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_7, Seconds(7));
                 break;
             case EVENT_4HM_DIALOGUE_7:
-                DoOrSimulateScriptTextForMap(-1533072, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_7, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
                 break;
             case EVENT_DKWING_INTRO_2:
                 DoOrSimulateScriptTextForMap(SAY_ZELI_TAUNT3, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));

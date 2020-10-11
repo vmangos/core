@@ -258,7 +258,15 @@ enum NaxxZoneScriptTexts
     SAY_KORT_TAUNT1         = 13038, // To arms, ye roustabouts! We've got company!
     SAY_ZELI_TAUNT3         = 13103, // Do not continue! Turn back while there's still time!
     SAY_MOG_TAUNT3          = 13060, // Life is meaningless. It is in death that we are truly tested.
-    SAY_BLAU_TAUNT3         = 13016  // The first kill goes to me! Anyone care to wager?
+    SAY_BLAU_TAUNT3         = 13016, // The first kill goes to me! Anyone care to wager?
+
+    SAY_4HM_DIALOGUE_1      = 13101,
+    SAY_4HM_DIALOGUE_2      = 13014,
+    SAY_4HM_DIALOGUE_3      = 13058,
+    SAY_4HM_DIALOGUE_4      = 13015,
+    SAY_4HM_DIALOGUE_5      = 13102,
+    SAY_4HM_DIALOGUE_6      = 13039,
+    SAY_4HM_DIALOGUE_7      = 13059
 };
 
 struct GothTrigger

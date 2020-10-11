@@ -2948,8 +2948,7 @@ bool ChatHandler::HandleAddItemCommand(char* args)
 
     DETAIL_LOG(GetMangosString(LANG_ADDITEM), itemId, count);
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
-    if (!pProto)
+    if (!ObjectMgr::GetItemPrototype(itemId))
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
         SetSentErrorMessage(true);
@@ -5362,5 +5361,133 @@ bool ChatHandler::HandleCombatStopCommand(char* args)
 
     target->CombatStop();
     target->GetHostileRefManager().deleteReferences();
+    return true;
+}
+
+bool ChatHandler::HandleGroupAddItemCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 itemId = 0;
+    if (!ExtractUInt32(&args, itemId))
+        return false;
+
+    if (!ObjectMgr::GetItemPrototype(itemId))
+    {
+        PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 count = 1;
+    ExtractOptUInt32(&args, count, 1);
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (Item* pItem = pMember->StoreNewItemInInventorySlot(itemId, count))
+                pMember->SendNewItem(pItem, count, true, false);
+        }
+    }
+
+    PSendSysMessage("Added item %u to all group members.", itemId);
+    return true;
+}
+
+bool ChatHandler::HandleGroupReviveCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->IsDead())
+            {
+                pMember->ResurrectPlayer(0.5f);
+                pMember->SpawnCorpseBones();
+            }
+        }
+    }
+
+    PSendSysMessage("Revived all dead group members.");
+    return true;
+}
+
+bool ChatHandler::HandleGroupReplenishCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->IsAlive())
+            {
+                pMember->SetHealth(pMember->GetMaxHealth());
+                if (pMember->GetPowerType() == POWER_MANA)
+                    pMember->SetPower(POWER_MANA, pMember->GetMaxPower(POWER_MANA));
+            }
+        }
+    }
+
+    PSendSysMessage("Replenished all group members.");
+    return true;
+}
+
+bool ChatHandler::HandleGroupSummonCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            pMember->SendSummonRequest(pPlayer->GetObjectGuid(), pPlayer->GetMapId(), pPlayer->GetZoneId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+        }
+    }
+
+    PSendSysMessage("Sent summon request to all group members.");
     return true;
 }

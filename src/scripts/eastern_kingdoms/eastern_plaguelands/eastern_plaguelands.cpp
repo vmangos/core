@@ -23,85 +23,9 @@ EndScriptData */
 
 /* ContentData
 mobs_ghoul_flayer
-npc_darrowshire_spirit
-npc_tirion_fordring
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_darrowshire_spirit
-######*/
-
-#define SPELL_SPIRIT_SPAWNIN    17321
-
-struct npc_darrowshire_spiritAI : public ScriptedAI
-{
-    npc_darrowshire_spiritAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        DoCastSpellIfCan(m_creature, SPELL_SPIRIT_SPAWNIN);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    }
-};
-
-CreatureAI* GetAI_npc_darrowshire_spirit(Creature* pCreature)
-{
-    return new npc_darrowshire_spiritAI(pCreature);
-}
-
-bool GossipHello_npc_darrowshire_spirit(Player* pPlayer, Creature* pCreature)
-{
-    pPlayer->SEND_GOSSIP_MENU(3873, pCreature->GetGUID());
-    pPlayer->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    return true;
-}
-
-/*######
-## npc_tirion_fordring
-######*/
-
-bool GossipHello_npc_tirion_fordring(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && pPlayer->GetStandState() == UNIT_STAND_STATE_SIT)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I am ready to hear your tale, Tirion.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_tirion_fordring(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thank you, Tirion.  What of your identity?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(4493, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "That is terrible.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(4494, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I will, Tirion.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->SEND_GOSSIP_MENU(4495, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->AreaExploredOrEventHappens(5742);
-            break;
-    }
-    return true;
-}
 
 // Eris Havenfire event
 
@@ -1920,18 +1844,6 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
 void AddSC_eastern_plaguelands()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_darrowshire_spirit";
-    newscript->GetAI = &GetAI_npc_darrowshire_spirit;
-    newscript->pGossipHello = &GossipHello_npc_darrowshire_spirit;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_tirion_fordring";
-    newscript->pGossipHello =  &GossipHello_npc_tirion_fordring;
-    newscript->pGossipSelect = &GossipSelect_npc_tirion_fordring;
-    newscript->RegisterSelf();
 
     // Nostalrius -- Rockette
 

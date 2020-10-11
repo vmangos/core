@@ -542,33 +542,13 @@ struct npc_andorovAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-};
 
-bool GossipHello_npc_andorov(Player* pPlayer, Creature* pCreature)
-{
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->SEND_GOSSIP_MENU(14442, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_andorov(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        case GOSSIP_ACTION_INFO_DEF + 1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            ((npc_andorovAI*)pCreature->AI())->StartEvent();
-            break;
-        case GOSSIP_ACTION_TRADE:
-            pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-            break;
-        default:
-            break;
+        if (pInvoker && pInvoker->IsPlayer())
+            StartEvent();
     }
-
-    return true;
-}
+};
 
 CreatureAI* GetAI_boss_rajaxx(Creature* pCreature)
 {
@@ -590,8 +570,6 @@ void AddSC_boss_rajaxx()
     newscript = new Script;
     newscript->Name = "npc_andorov";
     newscript->GetAI = &GetAI_npc_andorov;
-    newscript->pGossipHello = &GossipHello_npc_andorov;
-    newscript->pGossipSelect = &GossipSelect_npc_andorov;
     newscript->RegisterSelf();
 
     newscript = new Script;

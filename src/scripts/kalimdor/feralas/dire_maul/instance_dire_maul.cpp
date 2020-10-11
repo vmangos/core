@@ -312,13 +312,12 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
             {
                 if (Creature* tortheldrin = instance->GetCreature(m_uiTortheldrinGUID))
                 {
-                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                    sLog.outString("Tortheldrin (%u) rendu attaquable.", tortheldrin->GetGUIDLow());
+                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                    tortheldrin->SetFactionTemporary(14, TEMPFACTION_RESTORE_RESPAWN);
+                    sLog.outString("Tortheldrin (%u) made attackable.", tortheldrin->GetGUIDLow());
                 }
                 else
-                    sLog.outError("Tortheldrin introuvable !! GUID %u", m_uiTortheldrinGUID);
+                    sLog.outError("Tortheldrin not found!");
             }
             m_auiEncounter[TYPE_IMMOL_THAR] = uiData;
             break;
