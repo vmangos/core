@@ -442,6 +442,11 @@ UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3
 UPDATE `quest_template` SET `DetailsEmote1`=0 WHERE `entry`=1222;
 UPDATE `quest_template` SET `DetailsEmote1`=1 WHERE `entry`=1820;
 UPDATE `quest_template` SET `DetailsEmote3`=1, `DetailsEmoteDelay1`=0 WHERE `entry`=5344;
+UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3`=1, `DetailsEmote4`=5 WHERE `entry`=7481;
+UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=6, `DetailsEmoteDelay2`=1000 WHERE `entry`=8499;
+UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3`=6, `DetailsEmoteDelay2`=1000, `DetailsEmoteDelay3`=1000 WHERE `entry`=8545;
+UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3`=6, `DetailsEmoteDelay2`=1000, `DetailsEmoteDelay3`=1000 WHERE `entry`=8613;
+UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3`=6, `DetailsEmoteDelay2`=1000, `DetailsEmoteDelay3`=1000 WHERE `entry`=8615;
 
 -- Correct quest offer reward.
 UPDATE `quest_template` SET `OfferRewardText`='Ah!  I can\'t stand us being apart.  I have to see her!!' WHERE `entry`=106;
@@ -1128,6 +1133,12 @@ UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=25, `Offe
 UPDATE `quest_template` SET `OfferRewardEmote1`=0 WHERE `entry`=5344;
 UPDATE `quest_template` SET `OfferRewardEmote2`=1, `OfferRewardEmote3`=1 WHERE `entry`=5382;
 UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=2 WHERE `entry`=8201;
+UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=1, `OfferRewardEmoteDelay2`=1000 WHERE `entry`=8532;
+UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=5, `OfferRewardEmoteDelay2`=1000, `OfferRewardText`='Well, I guess that looks like the right number of tin bars. Don\'t try to fool me, $c! Counting makes my skull hurt. Now I go and put these bars on the stack and you go out and bring me back more of the same.' WHERE `entry`=8542;
+UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=1, `OfferRewardEmoteDelay2`=1000, `OfferRewardText`='And so our efforts push us that much closer to war. Thank you for your hard work in gathering this peacebloom $c. I assure you that it will go to good use, and that your contribution has been noted $N. Should you find yourself willing, please return to me again with more of the flowers. Until then, may the Earth Mother guide you.' WHERE `entry`=8549;
+UPDATE `quest_template` SET `OfferRewardEmote1`=4, `OfferRewardEmote2`=1, `OfferRewardEmoteDelay2`=1000, `OfferRewardText`='$C! Pele\'keiki happy for now. Pele\'keiki take all that firebloom and put it in box so it stay fresh. Pele\'keiki be seein\' to it that all the firebloom bein\' made into good stuff for the war. And if you be gettin\' anymore, you come see Pele\'keiki fast. Pele\'keiki prolly be needin\' more.' WHERE `entry`=8580;
+UPDATE `quest_template` SET `OfferRewardEmote1`=1, `OfferRewardEmote2`=1, `OfferRewardEmoteDelay2`=1000, `OfferRewardText`='You have my thanks, $c, and the gratitude of the Horde. If you come across more wool bandages bring them to me here should you wish to further contribute to the war effort. Until then, may your ancestors watch over you!' WHERE `entry`=8604;
+UPDATE `quest_template` SET `OfferRewardEmote1`=4, `OfferRewardEmote2`=1, `OfferRewardEmoteDelay2`=1000, `OfferRewardText`='You are a credit to the Horde, $c. Thank you for your efforts; they are appreciated! I\'ll have to pack these fresh bandages away and take another count to see how far along we are to our goal. If you\'d like you could gather more runecloth bandages and return them to me here.' WHERE `entry`=8609;
 
 -- Correct quest request items.
 UPDATE `quest_template` SET `CompleteEmote`=0, `RequestItemsText`='You have what??  Maybell is the light of my dull life.  Hurry, let me see her letter!' WHERE `entry`=106;
@@ -1753,6 +1764,9 @@ UPDATE `quest_template` SET `IncompleteEmote`=1, `RequestItemsText`='The extreme
 UPDATE `quest_template` SET `IncompleteEmote`=1, `CompleteEmote`=1, `RequestItemsText`='Ensure my future and I shall ensure yours.\n' WHERE `entry`=5343;
 UPDATE `quest_template` SET `IncompleteEmote`=0, `CompleteEmote`=0 WHERE `entry`=5344;
 UPDATE `quest_template` SET `CompleteEmote`=5 WHERE `entry`=5382;
+UPDATE `quest_template` SET `IncompleteEmote`=1, `RequestItemsText`='Pele\'keiki know you come to help. Bring many firebloom and make him very happy. Pele\'keiki might make big bombs with firebloom. Drop them on insects from his bat over Ahn\'Qiraj when war come. But Pele\'keiki need more firebloom, $c!$B$BYou gonna bring Pele\'keiki that firebloom, real quick now. Come back with at least as much as last time, and Pele\'keiki be pleased.' WHERE `entry`=8581;
+UPDATE `quest_template` SET `IncompleteEmote`=1 WHERE `entry`=8847;
+UPDATE `quest_template` SET `IncompleteEmote`=1 WHERE `entry`=8855;
 
 -- Add missing quest greetings.
 INSERT INTO `quest_greeting` (`entry`, `type`, `content_default`, `emote_id`, `emote_delay`) VALUES (1938, 0, 'The Kirin Tor did not heed my warnings!  The Alliance is a sham.  Arugal is a wreckless fool.', 0, 0);
