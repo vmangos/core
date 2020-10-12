@@ -2171,6 +2171,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (28417, 6, 1771.790039, -719.088989, 59.184601, 100.000000, 0, 0.000000, 0),
 (28417, 7, 1784.069946, -720.036987, 59.403599, 100.000000, 0, 0.000000, 0);
 
+-- remove replaced scripts
+DELETE FROM `creature_movement_scripts` WHERE `id` IN (173701, 173901, 173902, 2841205);
+
 
 -- End of migration.
 END IF;
