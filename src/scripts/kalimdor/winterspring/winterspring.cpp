@@ -520,14 +520,11 @@ struct npc_ranshallaAI : public npc_escortAI
                 pPriestess2->GetMotionMaster()->MovePoint(1, 5515.654297f, -4900.294922f, 846.531982f);
                 //m_creature->MonsterSay("The priestesses have been invoked.");//test
             }
-            else
-                m_creature->MonsterSay("Navr�, les pr�tresses n'en font qu'a leur t�te...");
         }
         else
         {
             wpInvoqueAtteint = 0;
             pretressesInvoque = 0;
-            m_creature->MonsterSay("Navr�, les pretresses ne veulent pas pop...");
         }
 
         return invoked;
