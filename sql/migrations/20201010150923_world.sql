@@ -12,7 +12,7 @@ INSERT INTO `migrations` VALUES ('20201010150923');
 -- set correct spellcost for shield slam and mortal strike rank 2
 UPDATE `npc_trainer` SET `spellcost` = 2000 WHERE `spell` IN (21555, 23926);
 
--- sec correct run_speed for defias dockworker
+-- set correct run_speed for defias dockworker
 UPDATE `creature_template` SET `speed_run` = 0.857143 WHERE `entry` = 6927;
 
 
