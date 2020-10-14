@@ -31,6 +31,11 @@ UPDATE `creature_template` SET `spell_list_id`=27840, `ai_name`='EventAI', `scri
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (242501, 2425, 0, 4, 0, 100, 0, 0, 0, 0, 0, 242501, 0, 0, 'Varimathras - Play Sound 5887 on Aggro');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (242501, 0, 16, 5887, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Varimathras - Play Sound 5887 on Aggro');
 
+-- Cairne Bloodhoof 3057
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (305700, 3057, 0, 4, 0, 100, 0, 0, 0, 0, 0, 305700, 0, 0, 'Cairne Bloodhoof - Play Sound 5884 on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (305700, 0, 16, 5884, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cairne Bloodhoof - Play Sound 5884 on Aggro');
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3057;
+
 
 -- End of migration.
 END IF;
