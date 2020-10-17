@@ -18,6 +18,10 @@ UPDATE `creature_template` SET `speed_run` = 0.857143 WHERE `entry` = 6927;
 -- set correct values for Argent Quartermaster Hasana gossip menu option
 UPDATE `gossip_menu_option` SET `action_menu_id` = -1, `action_script_id` = 3421, `condition_id` = 478 WHERE `menu_id` = 3421;
 
+-- remove duplicate Cenarion Hold Infantry
+DELETE FROM `creature` WHERE `guid` IN (42898, 42896);
+DELETE FROM `creature_movement` WHERE `id` IN (42898, 42896);
+
 
 -- End of migration.
 END IF;
