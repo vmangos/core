@@ -22,6 +22,13 @@ UPDATE `gossip_menu_option` SET `action_menu_id` = -1, `action_script_id` = 3421
 DELETE FROM `creature` WHERE `guid` IN (42898, 42896);
 DELETE FROM `creature_movement` WHERE `id` IN (42898, 42896);
 
+-- assign correct event to objects
+INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES 
+(3996169, 9),
+(3996165, 9),
+(3996166, 9),
+(3996168, 9);
+
 
 -- End of migration.
 END IF;
