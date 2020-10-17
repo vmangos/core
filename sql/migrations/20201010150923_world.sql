@@ -30,6 +30,12 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996167, 9),
 (3996168, 9);
 
+-- add correct text to Warden Thelwater
+DELETE FROM `creature_ai_scripts` WHERE `id`=171901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171901, 0, 39, 171901, 171902, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Warden Thelwater - Start Script');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1658, 1659, 1660, 1661, 0, 0, 0, 0, 0, 'Warden Thelwater - Say Text');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1662, 1661, 1660, 1659, 0, 0, 0, 0, 0, 'Warden Thelwater - Say Text');
+
 
 -- End of migration.
 END IF;
