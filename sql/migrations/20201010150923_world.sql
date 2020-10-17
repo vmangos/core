@@ -27,6 +27,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996169, 9),
 (3996165, 9),
 (3996166, 9),
+(3996167, 9),
 (3996168, 9);
 
 
