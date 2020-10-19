@@ -925,7 +925,7 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
 
     void EnterCombat(Unit* enemy) override
     {
-        PlayDistanceSound(5882);
+        me->PlayDistanceSound(5882);
     }
 
     void UpdateAI(uint32 const uiDiff) override
