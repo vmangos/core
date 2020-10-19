@@ -64,7 +64,7 @@ public:
 
     void EnterCombat(Unit* enemy) override
     {
-       PlayDistanceSound(5886);
+        me->PlayDistanceSound(5886);
     }
 
     void UpdateAI(uint32 const uiDiff) override
