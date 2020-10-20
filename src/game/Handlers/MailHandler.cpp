@@ -372,7 +372,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         deliver_delay = 0;
     }
 
-    if (!req->itemGuid && req->COD)
+    if (!item && req->COD)
     {
         req->COD = 0;
         ProcessAnticheatAction("MailCheck", "Attempt to send COD mail without any item", CHEAT_ACTION_LOG);
