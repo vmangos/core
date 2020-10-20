@@ -364,10 +364,15 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         }
     }
 
-    // WoW Classic mail takes one hour to arrive even if the mail is from characters on the same account https://eu.battle.net/support/de/article/98485
+    // default delay for mails is one hour in WoW Classic https://eu.battle.net/support/de/article/98485
     uint32 deliver_delay = sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY);
 
-    if (!item && req->COD)
+    // mails which only contain a text message will arrive instantly
+    if (!req->itemGuid && req->money == 0) {
+        deliver_delay = 0;
+    }
+
+    if (!req->itemGuid && req->COD)
     {
         req->COD = 0;
         ProcessAnticheatAction("MailCheck", "Attempt to send COD mail without any item", CHEAT_ACTION_LOG);
