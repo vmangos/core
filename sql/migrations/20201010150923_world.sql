@@ -45,6 +45,13 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 
 -- dalar dawnweaver should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 17613;
 
+-- Innkeeper Thulfram waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 92923;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(7744, 1, 399.725006, -2119.739990, 131.563004, 100.000000, 2000, 0.000000, 0),
+(7744, 2, 395.723, -2101.68, 131.562, 100.000000, 0, 0.000000, 0),
+(7744, 3, 390.853455, -2081.507812, 131.561996, 100.000000, 2000, 0.000000, 0),
+(7744, 4, 395.723, -2101.68, 131.562, 100.000000, 0, 0.000000, 0);
 
 -- End of migration.
 END IF;
