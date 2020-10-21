@@ -39,6 +39,12 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 -- remove duplicate Cliff Giant and Land Walker spawns
 DELETE FROM `creature` WHERE `guid` IN (51692, 51697);
 
+-- fenwick thatros should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 18259;
+
+-- dalar dawnweaver should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 17613;
+
 
 -- End of migration.
 END IF;
