@@ -2427,6 +2427,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                     for (SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
                     {
+                        if (i_spellST->second.CanNotHitWithSpellEffect(effIndex))
+                            continue;
+
                         // only creature entries supported for this target type
                         if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                             continue;
@@ -2474,6 +2477,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                     for (SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
                     {
+                        if (i_spellST->second.CanNotHitWithSpellEffect(effIndex))
+                            continue;
+
                         // only creature entries supported for this target type
                         if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                             continue;
@@ -2504,27 +2510,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             break;
         }
         case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_SRC_LOC:
-            // Despawn Ice Block (sapphiron)
-            if (m_spellInfo->Id == 30132) 
-            {
-                float x, y, z;
-                m_caster->GetPosition(x, y, z);
-                std::list<GameObject*> tempTargetGOList;
-                // search all GO's with entry, within range of caster
-                MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, 181247/*Ice BLock*/, x , y, z, radius);
-                MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
-                Cell::VisitGridObjects(m_caster, checker, radius);
-                
-                if (!tempTargetGOList.empty())
-                {
-                    for (const auto& iter : tempTargetGOList)
-                        AddGOTarget(iter, effIndex);
-                }
-                break;
-            }
-            //break;
         case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
         {
+            float x, y, z;
+            if (targetMode == TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_SRC_LOC)
+                m_targets.getSource(x, y, z);
+            else
+                m_targets.getDestination(x, y, z);
+
             // It may be possible to fill targets for some spell effects
             // automatically (SPELL_EFFECT_WMO_REPAIR(88) for example) but
             // for some/most spells we clearly need/want to limit with spell_target_script
@@ -2537,10 +2530,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
             for (SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
             {
+                if (i_spellST->second.CanNotHitWithSpellEffect(effIndex))
+                    continue;
+
                 if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                 {
                     // search all GO's with entry, within range of m_destN
-                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, radius);
+                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, x, y, z, radius);
                     MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
                     Cell::VisitGridObjects(m_caster, checker, radius);
                 }
@@ -5884,6 +5880,9 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 for (auto i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
                 {
+                    if (i_spellST->second.CanNotHitWithSpellEffect(SpellEffectIndex(j)))
+                        continue;
+
                     switch (i_spellST->second.type)
                     {
                         case SPELL_TARGET_TYPE_GAMEOBJECT:
@@ -6453,7 +6452,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_ACTIVATE_OBJECT:
             {
-                if (m_spellInfo->Id == 15958)
+                if (m_spellInfo->Id == 15958) // Collect Rookery Egg
                 { 
                     if (!m_UniqueGOTargetInfo.empty())
                     {
@@ -6469,7 +6468,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                     else
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
                 }
-                else if (m_spellInfo->Id == 16447)
+                else if (m_spellInfo->Id == 16447) // Spawn Challenge to Urok
+                {
+                    if (m_UniqueGOTargetInfo.empty())
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                }
+                else if (m_spellInfo->Id == 24973) // Clean Up Stink Bomb
                 {
                     if (m_UniqueGOTargetInfo.empty())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
