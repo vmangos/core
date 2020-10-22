@@ -27,15 +27,15 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 
 UPDATE `creature` SET `orientation` = 4.72669 WHERE `guid` = 38290;
 
 -- remove incorrect deathguard elite
-DELETE FROM `creature` WHERE `guid` = 14369;
+DELETE FROM `creature` WHERE `guid` = 45204;
 
 -- junior apothecary holland - say OOC
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 10665;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1066501, 10665, 0, 1, 0, 100, 1, 10000, 20000, 40000, 60000, 1066501, 0, 0, 'Junior Apothecary Holland - Say OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1066501, 0, 1, 5, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Junior Apothecary Holland - Emote');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1066501, 0, 39, 1066501, 1066502, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Junior Apothecary Holland - Start Script');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1066501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5955, 5956, 5957, 5958, 0, 0, 0, 0, 0, 'Junior Apothecary Holland - Talk');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1066502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5959, 5960, 5961, 5962, 0, 0, 0, 0, 0, 'Junior Apothecary Holland - Talk');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1066501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5955, 5956, 5957, 5958, 0, 0, 0, 0, 0, 'Junior Apothecary Holland - Talk');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1066502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5959, 5960, 5961, 5962, 0, 0, 0, 0, 0, 'Junior Apothecary Holland - Talk');
 
 -- deathguard lundmark waypoints
 DELETE FROM `creature_movement` WHERE `id` = 32028;
