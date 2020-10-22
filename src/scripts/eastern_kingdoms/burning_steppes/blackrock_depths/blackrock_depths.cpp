@@ -1382,7 +1382,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
                 if (pGolem->IsAlive())
                 {
                     pGolem->RemoveAurasDueToSpell(10255);
-                    pGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                    pGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                     if (pWho)
                         pGolem->AI()->AttackStart(pWho);
                 }
@@ -1833,9 +1833,6 @@ enum
     SPELL_WINDSORS_FRENZY       = 15167
 };
 
-#define GOSSIP_DUGHAL           "You\'re free, Dughal! Get out of here!"
-#define GOSSIP_TOBIAS           "Get out of here, Tobias, you\'re free!"
-
 struct npc_dughal_stormwingAI : npc_escortAI
 {
     explicit npc_dughal_stormwingAI(Creature* m_creature) : npc_escortAI(m_creature)
@@ -1884,32 +1881,16 @@ struct npc_dughal_stormwingAI : npc_escortAI
 
         npc_escortAI::UpdateEscortAI(uiDiff);
     }
-};
 
-bool GossipHello_npc_dughal_stormwing(Player* pPlayer, Creature* pCreature)
-{
-    ScriptedInstance * pInstance = static_cast<ScriptedInstance*>(pPlayer->GetInstanceData());
-
-    if (pPlayer->GetQuestStatus(QUEST_JAIL_BREAK) == QUEST_STATUS_INCOMPLETE && pInstance->GetData(TYPE_QUEST_JAIL_BREAK) == IN_PROGRESS)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DUGHAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(2846, pCreature->GetObjectGuid());
-
-    return true;
-}
-
-bool GossipSelect_npc_dughal_stormwing(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-        if (auto pEscortAI = dynamic_cast<npc_dughal_stormwingAI*>(pCreature->AI()))
-            pEscortAI->Start(true, pPlayer->GetObjectGuid());
+        if (pInvoker && pInvoker->IsPlayer())
+        {
+            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            Start(true, pInvoker->GetObjectGuid());
+        }
     }
-    return true;
-}
+};
 
 CreatureAI* GetAI_npc_dughal_stormwing(Creature* pCreature)
 {
@@ -2339,33 +2320,16 @@ struct npc_tobias_seecherAI : npc_escortAI
 
         npc_escortAI::UpdateEscortAI(uiDiff);
     }
-};
 
-bool GossipSelect_npc_tobias_seecher(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-        if (auto pEscortAI = dynamic_cast<npc_tobias_seecherAI*>(pCreature->AI()))
-            pEscortAI->Start(true, pPlayer->GetObjectGuid());
+        if (pInvoker && pInvoker->IsPlayer())
+        {
+            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            Start(true, pInvoker->GetObjectGuid());
+        }
     }
-
-    return true;
-}
-
-bool GossipHello_npc_tobias_seecher(Player* pPlayer, Creature* pCreature)
-{
-    auto pInstance = static_cast<ScriptedInstance*>(pPlayer->GetInstanceData());
-
-    if (pPlayer->GetQuestStatus(QUEST_JAIL_BREAK) == QUEST_STATUS_INCOMPLETE && pInstance->GetData(TYPE_QUEST_JAIL_BREAK) == IN_PROGRESS)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TOBIAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(2847, pCreature->GetObjectGuid());
-
-    return true;
-}
+};
 
 CreatureAI* GetAI_npc_tobias_seecher(Creature* pCreature)
 {
@@ -2497,8 +2461,6 @@ void AddSC_blackrock_depths()
     newscript = new Script;
     newscript->Name = "npc_dughal_stormwing";
     newscript->GetAI = &GetAI_npc_dughal_stormwing;
-    newscript->pGossipHello =  &GossipHello_npc_dughal_stormwing;
-    newscript->pGossipSelect = &GossipSelect_npc_dughal_stormwing;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -2515,8 +2477,6 @@ void AddSC_blackrock_depths()
     newscript = new Script;
     newscript->Name = "npc_tobias_seecher";
     newscript->GetAI = &GetAI_npc_tobias_seecher;
-    newscript->pGossipHello =  &GossipHello_npc_tobias_seecher;
-    newscript->pGossipSelect = &GossipSelect_npc_tobias_seecher;
     newscript->RegisterSelf();
 
     newscript = new Script;

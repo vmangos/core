@@ -2022,7 +2022,7 @@ void SpellMgr::LoadSpellScriptTarget()
 
     uint32 count = 0;
 
-    result.reset(WorldDatabase.PQuery("SELECT `entry`, `type`, `targetEntry`, `conditionId` FROM `spell_script_target` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
+    result.reset(WorldDatabase.PQuery("SELECT `entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask` FROM `spell_script_target` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -2046,6 +2046,7 @@ void SpellMgr::LoadSpellScriptTarget()
         uint32 type        = fields[1].GetUInt32();
         uint32 targetEntry = fields[2].GetUInt32();
         uint32 conditionId = fields[3].GetUInt32();
+        uint32 effectMask  = fields[4].GetUInt32();
 
         SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(spellId);
 
@@ -2141,7 +2142,7 @@ void SpellMgr::LoadSpellScriptTarget()
                 break;
         }
 
-        mSpellScriptTarget.insert(SpellScriptTarget::value_type(spellId, SpellTargetEntry(SpellTargetType(type), targetEntry, conditionId)));
+        mSpellScriptTarget.insert(SpellScriptTarget::value_type(spellId, SpellTargetEntry(SpellTargetType(type), targetEntry, conditionId, effectMask)));
 
         ++count;
     }

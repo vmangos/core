@@ -190,11 +190,11 @@ void PetAI::UpdateAI(uint32 const diff)
             if (!spellInfo)
                 continue;
 
-            if (m_creature->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+            if (m_creature->HasGCD(spellInfo))
                 continue;
 
             // check spell cooldown
-            if (m_creature->HasSpellCooldown(spellInfo->Id))
+            if (!m_creature->IsSpellReady(spellInfo->Id))
                 continue;
 
             if (spellInfo->IsPositiveSpell())

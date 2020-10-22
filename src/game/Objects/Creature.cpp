@@ -1451,7 +1451,7 @@ void Creature::SaveToDB(uint32 mapid)
             displayId = 0;
     }
 
-    // data->guid = guid don't must be update at save
+    // data->guid = guid must not be updated at save
     data.creature_id[0] = GetEntry();
     data.position.mapId = mapid;
     data.display_id = displayId;
@@ -1462,9 +1462,7 @@ void Creature::SaveToDB(uint32 mapid)
     data.position.o = GetOrientation();
     data.spawntimesecsmin = m_respawnDelay;
     data.spawntimesecsmax = m_respawnDelay;
-    // prevent add data integrity problems
     data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_wanderDistance;;
-    // prevent add data integrity problems
     data.movement_type = !m_wanderDistance && GetDefaultMovementType() == RANDOM_MOTION_TYPE
                         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
     data.spawn_flags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
@@ -1474,29 +1472,29 @@ void Creature::SaveToDB(uint32 mapid)
     // updated in DB
     WorldDatabase.BeginTransaction();
 
-    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", GetGUIDLow());
+    WorldDatabase.PExecuteLog("DELETE FROM `creature` WHERE `guid`=%u", GetGUIDLow());
 
     std::ostringstream ss;
-    ss << "INSERT INTO creature VALUES ("
+    ss << "INSERT INTO `creature` VALUES ("
        << GetGUIDLow() << ","
        << data.creature_id[0] << ","
        << data.creature_id[1] << ","
        << data.creature_id[2] << ","
        << data.creature_id[3] << ","
        << mapid << ","
-       << displayId << ","
-       << GetEquipmentId() << ","
-       << GetPositionX() << ","
-       << GetPositionY() << ","
-       << GetPositionZ() << ","
-       << GetOrientation() << ","
-       << data.spawntimesecsmin << ","                     // respawn time minimum
-       << data.spawntimesecsmax << ","                     // respawn time maximum
-       << wander_distance << ","                           // wander distance
-       << data.health_percent << ","                       // health_percent
-       << data.mana_percent << ","                         // mana_percent
-       << GetDefaultMovementType() << ","                  // default movement generator type
-       << m_isActiveObject << ","
+       << data.display_id << ","
+       << data.equipment_id << ","
+       << data.position.x << ","
+       << data.position.y << ","
+       << data.position.z << ","
+       << data.position.o << ","
+       << data.spawntimesecsmin << ","
+       << data.spawntimesecsmax << ","
+       << wander_distance << ","
+       << data.health_percent << ","
+       << data.mana_percent << ","
+       << uint32(data.movement_type) << ","
+       << data.spawn_flags << ","
        << m_visibilityModifier << ","
        << "0,"                                             // patch_min
        << "10)";                                           // patch_max
@@ -2209,7 +2207,7 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
         return false;
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PASSIVE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
         return false;
 
     // skip fighting creature

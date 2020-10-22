@@ -1007,10 +1007,6 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                 case SPELL_AURA_MOD_STUN:                   //have positive and negative spells, we can't sort its correctly at this moment.
                     if (effIndex == EFFECT_INDEX_0 && Effect[EFFECT_INDEX_1] == 0 && Effect[EFFECT_INDEX_2] == 0)
                         return false;                       // but all single stun aura spells is negative
-
-                    // Petrification
-                    if (Id == 17624)
-                        return false;
                     break;
                 case SPELL_AURA_MOD_PACIFY_SILENCE:
                     if (Id == 24740)            // Wisp Costume

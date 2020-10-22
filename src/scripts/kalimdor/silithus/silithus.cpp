@@ -17,12 +17,11 @@
 /* ScriptData
  SDName: Silithus
  SD%Complete: 100
- SDComment: Quest support: 7785, 8304, 8534, 8519.
+ SDComment: Quest support: 8304, 8534, 8519.
  SDCategory: Silithus
  EndScriptData */
 
 /* ContentData
- npc_highlord_demitrian
  npcs_rutgar_and_frankal
  go_pierre_vents
  EndContentData */
@@ -30,109 +29,6 @@
 #include "scriptPCH.h"
 #include "Database/DatabaseEnv.h"
 #include "HardcodedEvents.h"
-
-/*###
- ## npc_highlord_demitrian
- ###*/
-
-#define GOSSIP_ITEM_DEMITRIAN1 "What do you know of it?"
-#define GOSSIP_ITEM_DEMITRIAN2 "I am listening , Demitrian."
-#define GOSSIP_ITEM_DEMITRIAN3 "Continue, please."
-#define GOSSIP_ITEM_DEMITRIAN4 "A battle?"
-#define GOSSIP_ITEM_DEMITRIAN5 "<Nod>"
-#define GOSSIP_ITEM_DEMITRIAN6 "Caught unaware? How?"
-#define GOSSIP_ITEM_DEMITRIAN7 "So what did Ragnaros do next?"
-
-enum
-{
-    QUEST_EXAMINE_THE_VESSEL        =   7785,
-    QUEST_THUNDERAAN_WINDSEEKER     =   7786,
-    QUEST_RISE_THUNDERFURY          =   7787,
-    ITEM_BINDINGS_WINDSEEKER_LEFT   =   18563,
-    ITEM_BINDINGS_WINDSEEKER_RIGHT  =   18564,
-    ITEM_VESSEL_OF_REBIRTH          =   19016,
-    ITEM_DORMANT_BLADE              =   19018,
-    GOSSIP_TEXTID_DEMITRIAN1        =   6842,
-    GOSSIP_TEXTID_DEMITRIAN2        =   6843,
-    GOSSIP_TEXTID_DEMITRIAN3        =   6844,
-    GOSSIP_TEXTID_DEMITRIAN4        =   6867,
-    GOSSIP_TEXTID_DEMITRIAN5        =   6868,
-    GOSSIP_TEXTID_DEMITRIAN6        =   6869,
-    GOSSIP_TEXTID_DEMITRIAN7        =   6870,
-    GOSSIP_TEXTID_DEMITRIAN8        =   6984,
-    BROADCAST_TEXTID_DEMITRIAN      =   9574,
-    NPC_PRINCE_THUNDERAAN           =   14435
-};
-
-bool GossipHello_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(QUEST_EXAMINE_THE_VESSEL) == QUEST_STATUS_NONE &&
-            (pPlayer->HasItemCount(ITEM_BINDINGS_WINDSEEKER_LEFT, 1, false) || pPlayer->HasItemCount(ITEM_BINDINGS_WINDSEEKER_RIGHT, 1, false)))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    if (pPlayer->GetQuestStatus(QUEST_THUNDERAAN_WINDSEEKER) == QUEST_STATUS_COMPLETE && pPlayer->GetQuestStatus(QUEST_RISE_THUNDERFURY) == QUEST_STATUS_NONE &&
-        !pPlayer->HasItemCount(ITEM_DORMANT_BLADE, 1, true))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BROADCAST_TEXTID_DEMITRIAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN1, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN2, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN3, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN4, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN5, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN6, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-        {
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN7, pCreature->GetGUID());
-
-            ItemPosCountVec dest;
-            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_VESSEL_OF_REBIRTH, 1);
-            if (msg == EQUIP_ERR_OK)
-                pPlayer->StoreNewItem(dest, ITEM_VESSEL_OF_REBIRTH, true);
-            break;
-        }
-        case GOSSIP_ACTION_INFO_DEF+7:
-        {
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN8, pCreature->GetGUID());
-
-            if (Creature* pThunderaan = GetClosestCreatureWithEntry(pCreature, NPC_PRINCE_THUNDERAAN, 200.0f))
-                return true;
-
-            pCreature->SummonCreature(NPC_PRINCE_THUNDERAAN, -6255.0f, 1706.59f, 6.137f, 1.323f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
-            break;
-        }
-    }
-    return true;
-}
 
 enum
 {
@@ -430,12 +326,6 @@ enum
     QUEST_STAVE_OF_THE_ANCIENTS     = 7636
 };
 
-#define GOSSIP_ITEM                 "Show me your real face, demon."
-
-/*#####
- ## npc_nelson_the_nice
- ######*/
-
 /*#####
  ## npc_solenor_the_slayer
  ######*/
@@ -678,23 +568,13 @@ struct npc_solenorAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
+    {
+        if (pInvoker && pInvoker->IsPlayer())
+            BeginEvent(pInvoker->GetObjectGuid());
+    }
 };
-
-bool GossipHello_npc_solenor(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_ITEM , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_npc_solenor(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction )
-{
-    pPlayer->CLOSE_GOSSIP_MENU();
-    ((npc_solenorAI*)pCreature->AI())->BeginEvent(pPlayer->GetObjectGuid());
-    return true;
-}
 
 CreatureAI* GetAI_npc_solenor(Creature* pCreature)
 {
@@ -1268,7 +1148,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
     {
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         pCreature->SetVisibility(VISIBILITY_OFF);
 
         OverlordCount = 0;
@@ -1311,7 +1191,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_creature->SetVisibility(VISIBILITY_ON);
         }
     }
@@ -1836,7 +1716,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                     target->AI()->AttackStart(pSummoned);
                 }
 
-                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
                 break;
             case NPC_KALDOREI_INFANTRY:
@@ -2048,7 +1928,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pMerithra->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                                pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
                         m_uiEventTimer = 0;
@@ -2102,7 +1982,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pArygos->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                                pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
                         m_uiEventTimer = 0;
@@ -2159,7 +2039,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pCaelestrasz->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                                pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
                         m_uiEventTimer = 0;
@@ -2362,7 +2242,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         m_creature->SetWalk(true);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                         m_creature->CastSpell(m_creature, SPELL_BRONZE_DRAGON_TRANSFORM, false);
                         m_uiEventTimer = 1000;
                         break;
@@ -3344,12 +3224,6 @@ void AddSC_silithus()
     Script* pNewScript;
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_highlord_demitrian";
-    pNewScript->pGossipHello =  &GossipHello_npc_highlord_demitrian;
-    pNewScript->pGossipSelect = &GossipSelect_npc_highlord_demitrian;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
     pNewScript->Name = "go_pierre_vents";
     pNewScript->pGOGossipSelect =  &GossipSelect_go_pierre_vents;
     pNewScript->GOGetAI = &GetAIgo_pierre_vents;
@@ -3424,10 +3298,8 @@ void AddSC_silithus()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_solenor"; // npc_solenor_the_slayer
+    pNewScript->Name = "npc_solenor";
     pNewScript->GetAI = &GetAI_npc_solenor;
-    pNewScript->pGossipHello =  &GossipHello_npc_solenor;
-    pNewScript->pGossipSelect = &GossipSelect_npc_solenor;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

@@ -17,12 +17,11 @@
 /* ScriptData
 SDName: The_Barrens
 SD%Complete: 90
-SDComment: Quest support: 863, 898, 1719, 2458, 4921, 6981
+SDComment: Quest support: 863, 898, 1719, 2458, 6981
 SDCategory: Barrens
 EndScriptData */
 
 /* ContentData
-npc_beaten_corpse
 npc_gilthares
 npc_twiggy_flathead
 at_twiggy_flathead
@@ -30,84 +29,6 @@ npc_wizzlecrank_shredder
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_beaten_corpse
-######*/
-
-enum
-{
-    QUEST_LOST_IN_BATTLE    = 4921
-};
-
-bool GossipHello_npc_beaten_corpse(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_INCOMPLETE ||
-            pPlayer->GetQuestStatus(QUEST_LOST_IN_BATTLE) == QUEST_STATUS_COMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Examine corpse in detail...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(3557, pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_beaten_corpse(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->SEND_GOSSIP_MENU(3558, pCreature->GetGUID());
-        pPlayer->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-    }
-    return true;
-}
-bool GossipHello_npc_Gizmotronic(Player* pPlayer, Creature* pCreature)
-{
-    if ((pPlayer->GetQuestStatus(2381) == QUEST_STATUS_INCOMPLETE))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                 "Give me what I need stupid machine !",
-                                 GOSSIP_SENDER_MAIN,
-                                 GOSSIP_ACTION_INFO_DEF + 10);
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature),
-                                  pCreature->GetObjectGuid());
-    }
-    return true;
-}
-
-bool GossipSelect_npc_Gizmotronic(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction >= GOSSIP_ACTION_INFO_DEF + 10)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (!pPlayer->HasItemCount(5060, 1, true))
-        {
-            uint32 noSpaceForCount = 0;
-            ItemPosCountVec dest;
-            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT,
-                                                 dest, 5060, 1, &noSpaceForCount);
-
-            if (msg == EQUIP_ERR_OK)
-            {
-                Item* pItem = pPlayer->StoreNewItem(dest, 5060,
-                                                    true, Item::GenerateItemRandomPropertyId(5060));
-                pPlayer->SendNewItem(pItem, 1, true, false);
-            }
-        }
-        if (!pPlayer->HasItemCount(7970, 1, true))
-        {
-            uint32 noSpaceForCount = 0;
-            ItemPosCountVec dest;
-            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT,
-                                                 dest, 7970, 1, &noSpaceForCount);
-            if (msg == EQUIP_ERR_OK)
-            {
-                Item* pItem = pPlayer->StoreNewItem(dest, 7970,
-                                                    true, Item::GenerateItemRandomPropertyId(7970));
-                pPlayer->SendNewItem(pItem, 1, true, false);
-            }
-        }
-    }
-    return true;
-}
 
 struct npc_pollyAI : public ScriptedAI
 {
@@ -1438,21 +1359,9 @@ void AddSC_the_barrens()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "npc_beaten_corpse";
-    newscript->pGossipHello = &GossipHello_npc_beaten_corpse;
-    newscript->pGossipSelect = &GossipSelect_npc_beaten_corpse;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_gilthares";
     newscript->GetAI = &GetAI_npc_gilthares;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_gilthares;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_gizmotronic";
-    newscript->pGossipHello = &GossipHello_npc_Gizmotronic;
-    newscript->pGossipSelect = &GossipSelect_npc_Gizmotronic;
     newscript->RegisterSelf();
 
     newscript = new Script;

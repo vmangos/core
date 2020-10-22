@@ -16,6 +16,7 @@ enum PartyBotSpells
     PB_SPELL_DRINK = 1137,
     PB_SPELL_AUTO_SHOT = 75,
     PB_SPELL_SHOOT_WAND = 5019,
+    PB_SPELL_HONORLESS_TARGET = 2479,
 };
 
 #define PB_UPDATE_INTERVAL 1000
@@ -179,7 +180,11 @@ bool PartyBotAI::DrinkAndEat()
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
         }
-        me->CastSpell(me, PB_SPELL_FOOD, true);
+        if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_FOOD))
+        {
+            me->CastSpell(me, pSpellEntry, true);
+            me->RemoveSpellCooldown(*pSpellEntry);
+        }
         return true;
     }
 
@@ -190,11 +195,46 @@ bool PartyBotAI::DrinkAndEat()
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
         }
-        me->CastSpell(me, PB_SPELL_DRINK, true);
+        if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_DRINK))
+        {
+            me->CastSpell(me, pSpellEntry, true);
+            me->RemoveSpellCooldown(*pSpellEntry);
+        }
         return true;
     }
 
     return needToEat || needToDrink;
+}
+
+bool PartyBotAI::ShouldAutoRevive() const
+{
+    if (me->GetDeathState() == DEAD)
+        return true;
+
+    bool alivePlayerNearby = false;
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == me)
+                continue;
+
+            if (pMember->IsInCombat())
+                return false;
+
+            if (pMember->IsAlive())
+            {
+                if (IsHealerClass(pMember->GetClass()))
+                    return false;
+
+                if (me->IsWithinDistInMap(pMember, 15.0f))
+                    alivePlayerNearby = true;
+            }
+        }
+    }
+
+    return alivePlayerNearby;
 }
 
 bool PartyBotAI::AttackStart(Unit* pVictim)
@@ -459,11 +499,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
         else
         {
-            if (me->GetDeathState() == DEAD)
+            if (ShouldAutoRevive())
             {
                 me->ResurrectPlayer(0.5f);
                 me->SpawnCorpseBones();
-                me->SendCreateUpdateToPlayer(pLeader);
+                me->CastSpell(me, PB_SPELL_HONORLESS_TARGET, true);
             }
         }
         
@@ -727,7 +767,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Paladin()
 
     if (m_isBuffing &&
        (!m_spells.paladin.pBlessingBuff ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.paladin.pBlessingBuff)))
+        !me->HasGCD(m_spells.paladin.pBlessingBuff)))
     {
         m_isBuffing = false;
     }
@@ -1296,7 +1336,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Mage()
 
     if (m_isBuffing &&
        (!m_spells.mage.pArcaneIntellect ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.mage.pArcaneIntellect)))
+        !me->HasGCD(m_spells.mage.pArcaneIntellect)))
     {
         m_isBuffing = false;
     }
@@ -1587,7 +1627,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
 
     if (m_isBuffing &&
        (!m_spells.priest.pPowerWordFortitude ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.priest.pPowerWordFortitude)))
+        !me->HasGCD(m_spells.priest.pPowerWordFortitude)))
     {
         m_isBuffing = false;
     }
@@ -1808,7 +1848,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Warlock()
 
     if (m_isBuffing &&
        (!m_spells.warlock.pDetectInvisibility ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.warlock.pDetectInvisibility)))
+        !me->HasGCD(m_spells.warlock.pDetectInvisibility)))
     {
         m_isBuffing = false;
     }
@@ -2335,7 +2375,7 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                 (me->GetHealthPercent() < 10.0f))
             {
                 if (m_spells.rogue.pPreparation &&
-                    me->HasSpellCooldown(m_spells.rogue.pVanish->Id) &&
+                    !me->IsSpellReady(m_spells.rogue.pVanish->Id) &&
                     CanTryToCastSpell(me, m_spells.rogue.pPreparation))
                 {
                     if (DoCastSpell(me, m_spells.rogue.pPreparation) == SPELL_CAST_OK)
@@ -2566,7 +2606,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
 
     if (m_isBuffing &&
        (!m_spells.druid.pMarkoftheWild ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.druid.pMarkoftheWild)))
+        !me->HasGCD(m_spells.druid.pMarkoftheWild)))
     {
         m_isBuffing = false;
     }

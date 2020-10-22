@@ -1,4 +1,13 @@
-[![Build Status](https://travis-ci.com/vmangos/core.svg?branch=development)](https://travis-ci.com/vmangos/core)
+| gcc/g++           | clang/clang++     | visual studio     |
+|-------------------|-------------------|-------------------|
+| [![Build1][1]][10]| [![Build2][2]][10]| [![Build3][3]][10]|
+
+[1]: https://travis-badge.herokuapp.com/repos/vmangos/core/branches/development/1?use_travis_com=true
+[2]: https://travis-badge.herokuapp.com/repos/vmangos/core/branches/development/2?use_travis_com=true
+[3]: https://travis-badge.herokuapp.com/repos/vmangos/core/branches/development/3?use_travis_com=true
+
+[10]: https://travis-ci.com/github/vmangos/core
+
 
 # Progressive Vanilla
 This project is an independent continuation of the Elysium / LightsHope codebases, focused on delivering the most complete and accurate content progression system possible, including support for the patch appropriate game clients.
@@ -21,6 +30,6 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
-- [Discord](https://discord.gg/rcCKnCw)
+- [Discord](https://discord.gg/x9a2jt7)
 - [Script Editor](https://github.com/brotalnia/scripteditor)
 - [Script Converter](https://github.com/vmangos/ScriptConverter)

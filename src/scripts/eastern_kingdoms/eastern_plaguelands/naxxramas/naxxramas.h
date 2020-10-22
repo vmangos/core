@@ -27,7 +27,7 @@ enum NAXX_ENCOUNTERS_TYPES
     TYPE_SAPPHIRON              = 13,
     TYPE_KELTHUZAD              = 14,
 
-    MAX_ENCOUNTER               = 15,
+    MAX_ENCOUNTER               = 15
 };
 
 enum NaxxNPCs : uint32
@@ -135,8 +135,7 @@ enum NaxxNPCs : uint32
     NPC_PlaguedDeathhound	    = 16448,
 
     NPC_EyeStalk                = 16236,
-    NPC_ArchmageTarsis          = 16381,
-
+    NPC_ArchmageTarsis          = 16381
 };
 
 enum NaxxAreaTriggers : uint32
@@ -153,8 +152,7 @@ enum NaxxAreaTriggers : uint32
 
     AREATRIGGER_THADDIUS_ENTRANCE   = 4113,
 
-    AREATRIGGER_START_DK_WING       = 4117,
-
+    AREATRIGGER_START_DK_WING       = 4117
 };
 
 static const WorldLocation toFrostwyrmTPPos(533, 3498.13f, -5349.6f, 144.967f, 1.48353f);
@@ -226,41 +224,49 @@ enum NaxxGOs : uint32
     GO_KT_WINDOW_4              = 181405,
 
     GO_CONS_NOX_TESLA_FEUGEN    = 181477,
-    GO_CONS_NOX_TESLA_STALAGG   = 181478,
+    GO_CONS_NOX_TESLA_STALAGG   = 181478
 };
 
 enum NaxxZoneScriptTexts
 {
     // Background screams in Instance if Thaddius still alive
-    THADDIUS_SAY_SCREAM1 = -1533036, // todo: add use
-    THADDIUS_SAY_SCREAM2 = -1533037, // todo: add use
-    THADDIUS_SAY_SCREAM3 = -1533038, // todo: add use
-    THADDIUS_SAY_SCREAM4 = -1533039, // todo: add use
+    THADDIUS_SAY_SCREAM1 = 13092, // todo: add use
+    THADDIUS_SAY_SCREAM2 = 13093, // todo: add use
+    THADDIUS_SAY_SCREAM3 = 13094, // todo: add use
+    THADDIUS_SAY_SCREAM4 = 13095, // todo: add use
 
     //when each of the 4 wing bosses dies
-    KELTHUZAD_SAY_TAUNT1 = -1533090,
-    KELTHUZAD_SAY_TAUNT2 = -1533091,
-    KELTHUZAD_SAY_TAUNT3 = -1533092,
-    KELTHUZAD_SAY_TAUNT4 = -1533093,
+    KELTHUZAD_SAY_TAUNT1 = 12984,
+    KELTHUZAD_SAY_TAUNT2 = 12985,
+    KELTHUZAD_SAY_TAUNT3 = 12986,
+    KELTHUZAD_SAY_TAUNT4 = 12987,
 
     // when bigglesworth dies, rip
-    KELTHUZAD_SAY_CAT_DIED = -1533089,
+    KELTHUZAD_SAY_CAT_DIED = 13150,
 
     //when shappiron dies. dialog between kel and lich king (in this order)
-    SAY_SAPP_DIALOG1        = -1533084,
-    SAY_SAPP_DIALOG2_LICH   = -1533085,
-    SAY_SAPP_DIALOG3        = -1533086,
-    SAY_SAPP_DIALOG4_LICH   = -1533087,
-    SAY_SAPP_DIALOG5        = -1533088,
+    SAY_SAPP_DIALOG1        = 12990,
+    SAY_SAPP_DIALOG2_LICH   = 12988,
+    SAY_SAPP_DIALOG3        = 12991,
+    SAY_SAPP_DIALOG4_LICH   = 12989,
+    SAY_SAPP_DIALOG5        = 12992,
 
     // greets used on areatriggers
-    SAY_FAERLINA_GREET      = -1533009,
-    SAY_THADDIUS_GREET      = -1533029,
+    SAY_FAERLINA_GREET      = 12852,
+    SAY_THADDIUS_GREET      = 13091,
 
-    SAY_KORT_TAUNT1         = -1533052, // To arms, ye roustabouts! We've got company!
-    SAY_ZELI_TAUNT3         = -1533061, // Do not continue! Turn back while there's still time!
-    SAY_MOG_TAUNT3          = -1533073, // Life is meaningless. It is in death that we are truly tested.
-    SAY_BLAU_TAUNT3         = -1533047, // The first kill goes to me! Anyone care to wager?
+    SAY_KORT_TAUNT1         = 13038, // To arms, ye roustabouts! We've got company!
+    SAY_ZELI_TAUNT3         = 13103, // Do not continue! Turn back while there's still time!
+    SAY_MOG_TAUNT3          = 13060, // Life is meaningless. It is in death that we are truly tested.
+    SAY_BLAU_TAUNT3         = 13016, // The first kill goes to me! Anyone care to wager?
+
+    SAY_4HM_DIALOGUE_1      = 13101,
+    SAY_4HM_DIALOGUE_2      = 13014,
+    SAY_4HM_DIALOGUE_3      = 13058,
+    SAY_4HM_DIALOGUE_4      = 13015,
+    SAY_4HM_DIALOGUE_5      = 13102,
+    SAY_4HM_DIALOGUE_6      = 13039,
+    SAY_4HM_DIALOGUE_7      = 13059
 };
 
 struct GothTrigger
@@ -298,7 +304,7 @@ class instance_naxxramas : public ScriptedInstance
 {
 public:
     instance_naxxramas(Map* pMap);
-    ~instance_naxxramas() override {}
+    ~instance_naxxramas() override { }
 
     void Initialize() override;
 

@@ -66,7 +66,7 @@ struct mob_yennikuAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit *who) override {}
+    void Aggro(Unit *who) override { }
 
     void UpdateAI(uint32 const diff) override
     {
@@ -89,6 +89,7 @@ struct mob_yennikuAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
+
 CreatureAI* GetAI_mob_yenniku(Creature *_Creature)
 {
     return new mob_yennikuAI(_Creature);
@@ -107,7 +108,6 @@ struct mob_assistant_kryll : public ScriptedAI
     {
         Speach_Timer = 360000;
     }
-
 
     void UpdateAI(uint32 const diff) override
     {
@@ -131,17 +131,15 @@ struct mob_assistant_kryll : public ScriptedAI
             Speach_Timer -= diff;
     }
 };
+
 CreatureAI* GetAI_mob_assistant_kryll(Creature *_Creature)
 {
     return new mob_assistant_kryll(_Creature);
 }
 
-
-
 struct go_transpolyporterAI: public GameObjectAI
 {
-    go_transpolyporterAI(GameObject* pGo) : GameObjectAI(pGo)
-    {}
+    go_transpolyporterAI(GameObject* pGo) : GameObjectAI(pGo) { }
 
     bool OnUse(Unit* user) override
     {
@@ -153,17 +151,17 @@ struct go_transpolyporterAI: public GameObjectAI
         return true;
     }
 };
+
 GameObjectAI* GetAIgo_transpolyporter(GameObject *pGo)
 {
     return new go_transpolyporterAI(pGo);
 }
 
-
 /*######
 ## npc_molthor
 ######*/
 
-enum
+enum MolthorData
 {
     NPC_HEART_OF_HAKKAR                 = 15069,
 
@@ -171,9 +169,9 @@ enum
 
     QUEST_THE_HEART_OF_HAKKAR           = 8183,
 
-    SAY_MOLTHOR_1                       = -1000847,
-    SAY_MOLTHOR_2                       = -1000848,
-    SAY_MOLTHOR_3                       = -1000849
+    SAY_MOLTHOR_1                       = 10473,
+    SAY_MOLTHOR_2                       = 10474,
+    SAY_MOLTHOR_3                       = 10537
 };
 
 static float const heartPosition[4] = { -11818.55f, 1344.4f, 7.93f, 0.0f };
@@ -302,7 +300,7 @@ bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, Quest const
 ## npc_heart_of_hakkar
 ######*/
 
-enum
+enum HeartOfHakkarData
 {
     SPELL_CREATE_HEART_OF_HAKKAR_RIFT           = 24202,
     SPELL_HEART_OF_HAKKAR_BANNING               = 24203,
@@ -401,7 +399,7 @@ CreatureAI* GetAI_npc_heart_of_hakkar(Creature *pCreature)
 ## npc_servant_of_the_hand
 ######*/
 
-enum
+enum ServantOfTheHandData
 {
     SPELL_TELEPORT_SPAWN_OUT = 24221
 };
@@ -451,12 +449,11 @@ CreatureAI* GetAI_npc_servant_of_the_hand(Creature *pCreature)
     return new npc_servant_of_the_handAI(pCreature);
 }
 
-
 /*######
 ## npc_pats_hellfire_guy
 ######*/
 
-enum
+enum PatsHellfireGuyData
 {
     SPELL_HELLFIRE_CAST_VISUAL = 24207
 };
@@ -499,7 +496,7 @@ CreatureAI* GetAI_npc_pats_hellfire_guy(Creature *pCreature)
  * Witch Doctor Unbagwa
  */
 
-enum
+enum WitchDoctorUnbagwaData
 {
     NPC_ENRAGED_SILVERBACK_GORILLA  = 1511,
     NPC_KONDA                       = 1516,
@@ -531,10 +528,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
     bool m_bStartEvent;
     bool m_bResetEvent;
 
-    void Reset() override
-    {
-
-    }
+    void Reset() override { }
 
     void ResetCreature() override
     {
@@ -601,9 +595,9 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
                 {
                     switch (m_uiWaveCount)
                     {
-                    case 1: m_uiAttackersCount = 3; break;
-                    case 2: m_uiAttackersCount = 5; break;
-                    case 3: m_uiAttackersCount = 6; break;
+                        case 1: m_uiAttackersCount = 3; break;
+                        case 2: m_uiAttackersCount = 5; break;
+                        case 3: m_uiAttackersCount = 6; break;
                     }
 
                     uint32 uiAttackersEntry = NPC_ENRAGED_SILVERBACK_GORILLA;
@@ -655,10 +649,6 @@ CreatureAI* GetAI_npc_witch_doctor_unbagwa(Creature* pCreature)
 {
     return new npc_witch_doctor_unbagwaAI(pCreature);
 }
-
-/*
- *
- */
 
 void AddSC_stranglethorn_vale()
 {

@@ -1072,9 +1072,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
     m_bEnded = true;
 
     if (bSuccess && m_uiSuccessScript)
-        m_Map.ScriptsStart(sEventScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
     else if (!bSuccess && m_uiFailureScript)
-        m_Map.ScriptsStart(sEventScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
 
     for (const auto& target : m_vTargets)
     {
@@ -1084,9 +1084,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
             continue;
 
         if (bSuccess && target.uiSuccessScript)
-            m_Map.ScriptsStart(sEventScripts, target.uiSuccessScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, pObject, GetTargetObject());
         else if (!bSuccess && target.uiFailureScript)
-            m_Map.ScriptsStart(sEventScripts, target.uiFailureScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, pObject, GetTargetObject());
     }
 }
 
@@ -1105,11 +1105,11 @@ void ScriptedEvent::SendEventToMainTargets(uint32 uiData)
 {
     if (Creature* pCreatureSource = ToCreature(GetSourceObject()))
         if (pCreatureSource->AI())
-            pCreatureSource->AI()->MapScriptEventHappened(this, uiData);
+            pCreatureSource->AI()->OnScriptEventHappened(m_uiEventId, uiData, nullptr);
 
     if (Creature* pCreatureTarget = ToCreature(GetTargetObject()))
         if (pCreatureTarget->AI())
-            pCreatureTarget->AI()->MapScriptEventHappened(this, uiData);
+            pCreatureTarget->AI()->OnScriptEventHappened(m_uiEventId, uiData, nullptr);
 }
 
 void ScriptedEvent::SendEventToAdditionalTargets(uint32 uiData)
@@ -1118,7 +1118,7 @@ void ScriptedEvent::SendEventToAdditionalTargets(uint32 uiData)
     {
         if (Creature* pCreature = ToCreature(m_Map.GetWorldObject(target.target)))
             if (pCreature->AI())
-                pCreature->AI()->MapScriptEventHappened(this, uiData);
+                pCreature->AI()->OnScriptEventHappened(m_uiEventId, uiData, nullptr);
     }
 
 }

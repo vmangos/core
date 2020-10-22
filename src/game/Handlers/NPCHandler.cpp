@@ -375,7 +375,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recv_data)
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
 
-    if (!pCreature->IsStopped())
+    if (!pCreature->IsStopped() && !pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
         pCreature->StopMoving();
 
     if (pCreature->IsSpiritGuide())
@@ -419,12 +419,14 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             return;
         }
 
-        // Clear possible StopMoving motion
-        if (pCreature->IsStopped())        
-            pCreature->GetMotionMaster()->Clear();
-            
-        pCreature->StopMoving();
-        
+        if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
+        {
+            // Clear possible StopMoving motion
+            if (pCreature->IsStopped())
+                pCreature->GetMotionMaster()->Clear();
+
+            pCreature->StopMoving();
+        }
 
         if (!sScriptMgr.OnGossipSelect(_player, pCreature, sender, action, code.empty() ? nullptr : code.c_str()))
             _player->OnGossipSelect(pCreature, gossipListId);

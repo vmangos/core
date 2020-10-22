@@ -32,7 +32,7 @@ EndContentData */
 ## npc_deathstalker_erland
 #####*/
 
-enum
+enum DeathstalkerErlandData
 {
     SAY_START_1         = 481,
     SAY_START_2         = 482,
@@ -51,7 +51,7 @@ enum
     QUEST_ERLAND        = 435,
     NPC_RANE            = 1950,
     NPC_QUINN           = 1951,
-    FACTION_ESCORTEE    = 232,
+    FACTION_ESCORTEE    = 232
 };
 
 struct npc_deathstalker_erlandAI : public npc_escortAI
@@ -172,7 +172,7 @@ CreatureAI* GetAI_npc_deathstalker_erland(Creature* pCreature)
 ## npc_deathstalker_faerleia
 #####*/
 
-enum
+enum DeathstalkerFaerleiaData
 {
     QUEST_PYREWOOD_AMBUSH    = 452,
 
@@ -222,9 +222,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
         m_bEventStarted = false;
     }
 
-    void Reset() override
-    {
-    }
+    void Reset() override { }
 
     uint64 m_uiPlayerGUID;
     uint32 m_uiWaveTimer;
@@ -377,7 +375,7 @@ CreatureAI* GetAI_npc_deathstalker_faerleia(Creature* pCreature)
  * Pyrewood Council support
  */
 
-enum
+enum CouncilmanData
 {
     NPC_FAERLEIA        = 2058
 };
@@ -389,10 +387,7 @@ struct npc_councilmanAI : ScriptedAI
         npc_councilmanAI::Reset();
     }
 
-    void Reset() override
-    {
-
-    }
+    void Reset() override { }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
@@ -418,11 +413,7 @@ CreatureAI* GetAI_npc_councilman(Creature* pCreature)
     return new npc_councilmanAI(pCreature);
 }
 
-/*
- *
- */
-
-enum
+enum HumanWorgenData
 {
     PYREWOOD_WATCHER       = 1891,
     MOONRAGE_WATCHER       = 1892,
@@ -443,7 +434,7 @@ enum
     SPELL_DISARM           = 6713,
     SPELL_EXPOSE_WEAKNESS  = 7140,
     SPELL_SHOOT_PYREWOOD   = 6660,
-    SPELL_LESSER_HEAL      = 2053,
+    SPELL_LESSER_HEAL      = 2053
 };
 
 //#define DEBUG_WORGEN_TRANSFO

@@ -170,7 +170,7 @@ struct npc_etendardAI : NullCreatureAI
     {
         if (!m_bSpawned)
         {
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
             m_creature->CastSpell(m_creature, SPELL_SPAWN_EFFECT, true);
             m_creature->CastSpell(m_creature, m_bAutoRepeatSpell, true);

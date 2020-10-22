@@ -33,7 +33,7 @@ EndContentData */
 ## npc_bartleby
 ######*/
 
-enum
+enum BartlebyData
 {
     FACTION_ENEMY       = 168,
     QUEST_BEAT          = 1640
@@ -106,21 +106,21 @@ CreatureAI* GetAI_npc_bartleby(Creature* pCreature)
 // Full quest event implementation (Missing Diplomat part 8 id:1447).
 // Author: Kampeador
 //-----------------------------------------------------------------------------
-enum
+enum DashelStonefistData
 {
-    // ids from "script_texts" table
-    SAY_PROGRESS_1_DAS = -1999902, // Now you're gonna get it good, "PlayerName".
-    SAY_PROGRESS_2_DAS = -1999903, // Okay, okay! Enough fighting. No one else needs to get hurt.
-    SAY_PROGRESS_3_DAS = -1999904, // It's okay, boys. Back off. You've done enough. I'll meet up with you later.
-    SAY_PROGRESS_4_THU = -1999905, // All right, boss. You sure though? Just seems like a waste of good practice.
-    SAY_PROGRESS_5_THU = -1999915, // Yeah, okay, boss. No problem.
+    // ids from "broadcast_text" table
+    SAY_PROGRESS_1_DAS = 1961, // Now you're gonna get it good, "PlayerName".
+    SAY_PROGRESS_2_DAS = 1712, // Okay, okay! Enough fighting. No one else needs to get hurt.
+    SAY_PROGRESS_3_DAS = 1713, // It's okay, boys. Back off. You've done enough. I'll meet up with you later.
+    SAY_PROGRESS_4_THU = 1716, // All right, boss. You sure though? Just seems like a waste of good practice.
+    SAY_PROGRESS_5_THU = 1715, // Yeah, okay, boss. No problem.
     // quest id
     QUEST_MISSING_DIPLO_PT8 = 1447,
     // NPCs that helps Dashel
     NPC_OLD_TOWN_THUG = 4969,
     // factions
     FACTION_NEUTRAL = 189,
-    FACTION_FRIENDLY = 84, // original faction taken from DB
+    FACTION_IRONFORGE = 122, // original faction taken from DB
     FACTION_FRIENDLY_TO_ALL = 35,
     // quest phases
     MDQP_NONE = 0, // Dashel returns his spawn point
@@ -206,7 +206,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         // restore some flags
         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         // restore faction
-        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_IRONFORGE);
         // reset player guid
         m_playerGuid.Clear();
     }
@@ -441,13 +441,13 @@ bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, Ques
                 return false;
 
             dashelStonefistAI->m_thugs[0]->AI()->AttackStart(pPlayer);
-            dashelStonefistAI->m_thugs[0]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            dashelStonefistAI->m_thugs[0]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
             // thug 2
             if (dashelStonefistAI->m_thugs[1] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8685.416992f, 443.130829f, 99.526917f, 5.759635f, TEMPSUMMON_DEAD_DESPAWN))
             {
                 dashelStonefistAI->m_thugs[1]->AI()->AttackStart(pPlayer);
-                dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             }
             // start quest fight.
             dashelStonefistAI->startQuestFight();
@@ -488,34 +488,35 @@ enum QuestTheAttack
     MODEL_TYRIANA                   = 6703,
     MODEL_SPYBOT                    = 1159,
 
+    DEFAULT_GOSSIP_TEXT_ID          = 2393,
     GOSSIP_TEXT_ID_EVENT_RUNNING    = 2394,
 
-    SAY_SPYBOT                      = -1700000,
-    SAY_TYRION_1                    = -1700001,
-    SAY_TYRIONA_1                   = -1700002,
-    SAY_ROYAL_GUARD_1               = -1700003,
-    SAY_TYRIONA_2                   = -1700004,
-    SAY_TYRIONA_3                   = -1700005,
-    SAY_GREGOR_1                    = -1700006,
-    SAY_TYRIONA_4                   = -1700007,
-    SAY_GREGOR_2                    = -1700008,
-    SAY_ROYAL_GUARD_2               = -1700009,
-    SAY_GREGOR_3                    = -1700010,
-    SAY_GREGOR_4                    = -1700011,
-    SAY_MARZON_1                    = -1700012,
-    SAY_GREGOR_5                    = -1700013,
-    SAY_MARZON_2                    = -1700014,
-    SAY_TYRION_2                    = -1700015,
-    SAY_GREGOR_6                    = -1700016,
-    SAY_MARZON_3                    = -1700017,
+    SAY_SPYBOT                      = 4593,
+    SAY_TYRION_1                    = 3761,
+    SAY_TYRIONA_1                   = 3781,
+    SAY_ROYAL_GUARD_1               = 3783,
+    SAY_TYRIONA_2                   = 3782,
+    SAY_TYRIONA_3                   = 3762,
+    SAY_GREGOR_1                    = 3784,
+    SAY_TYRIONA_4                   = 3791,
+    SAY_GREGOR_2                    = 322,
+    SAY_ROYAL_GUARD_2               = 3690,
+    SAY_GREGOR_3                    = 3721,
+    SAY_GREGOR_4                    = 323,
+    SAY_MARZON_1                    = 324,
+    SAY_GREGOR_5                    = 326,
+    SAY_MARZON_2                    = 325,
+    SAY_TYRION_2                    = 4613,
+    SAY_GREGOR_6                    = 3934,
+    SAY_MARZON_3                    = 3936,
 
-    SPELL_STEALTH                   = 8874, // for Marzon
+    SPELL_STEALTH                   = 8874 // for Marzon
 };
-
 
 /*######
 ## npc_tyrion
 ######*/
+
 struct npc_tyrionAI : public ScriptedAI
 {
     npc_tyrionAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
@@ -539,14 +540,12 @@ struct npc_tyrionAI : public ScriptedAI
         // m_guidTyrion Spybot
         return GetClosestCreatureWithEntry(m_creature, NPC_TYRIONS_SPYBOT, VISIBLE_RANGE) != nullptr;
     }
-
 };
 
 CreatureAI* GetAI_npc_tyrion(Creature* pCreature)
 {
     return new npc_tyrionAI(pCreature);
 }
-
 
 /*######
 ## npc_lord_gregor_lescovar
@@ -671,7 +670,6 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
             if (npc_tyrionAI* ptyrionAI = dynamic_cast<npc_tyrionAI*>(pTyrion->AI()))
                 ptyrionAI->m_IsEventRunning = false;
         }
-
     }
 
     void WaypointReached(uint32 uiPoint) override
@@ -682,56 +680,56 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
 
         switch (uiPoint)
         {
-        case 13:
-            SetEscortPaused(false);
-            if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-              if (pGuard1->IsAlive())
-                  pGuard1->SetFacingToObject(m_creature);
-            if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
-              if (pGuard2->IsAlive())
-                  pGuard2->SetFacingToObject(m_creature);
-            DoScriptText(SAY_GREGOR_2, m_creature);
-            m_uiEventPhase = 1;
-            m_uiEventTimer = 3500;
-            SetEscortPaused(true);
-            break;
-        case 17:
-            m_uiEventPhase = 4;
-            m_uiEventTimer = 1500;
-            SetEscortPaused(true);
-            break;
-        case 20:
-            m_creature->SetFactionTemplateId(FACTION_NORMAL_LESCOVAR);
-            if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-            {
-                pMarzon->CastSpell(pMarzon, SPELL_STEALTH, true);
-                pMarzon->ForcedDespawn(0);
-            }
-            break;
-        case 21:
-            if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-            {
-                pGuard1->ForcedDespawn(0);
-                pGuard1->Respawn();
-            }
-            if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
-            {
-                pGuard2->ForcedDespawn(0);
-                pGuard2->Respawn();
-            }
-            if (Creature* pPriestress = m_creature->GetMap()->GetCreature(m_guidPriestress))
-                pPriestress->Respawn();
-
-            if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
-            {
-                pTyrion->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                if (npc_tyrionAI* ptyrionAI = dynamic_cast<npc_tyrionAI*>(pTyrion->AI()))
-                    ptyrionAI->m_IsEventRunning = false;
-            }
-
-            if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                if (!pMarzon->IsInCombat())
+            case 13:
+                SetEscortPaused(false);
+                if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
+                  if (pGuard1->IsAlive())
+                      pGuard1->SetFacingToObject(m_creature);
+                if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
+                  if (pGuard2->IsAlive())
+                      pGuard2->SetFacingToObject(m_creature);
+                DoScriptText(SAY_GREGOR_2, m_creature);
+                m_uiEventPhase = 1;
+                m_uiEventTimer = 3500;
+                SetEscortPaused(true);
+                break;
+            case 17:
+                m_uiEventPhase = 4;
+                m_uiEventTimer = 1500;
+                SetEscortPaused(true);
+                break;
+            case 20:
+                m_creature->SetFactionTemplateId(FACTION_NORMAL_LESCOVAR);
+                if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                {
+                    pMarzon->CastSpell(pMarzon, SPELL_STEALTH, true);
                     pMarzon->ForcedDespawn(0);
+                }
+                break;
+            case 21:
+                if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
+                {
+                    pGuard1->ForcedDespawn(0);
+                    pGuard1->Respawn();
+                }
+                if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
+                {
+                    pGuard2->ForcedDespawn(0);
+                    pGuard2->Respawn();
+                }
+                if (Creature* pPriestress = m_creature->GetMap()->GetCreature(m_guidPriestress))
+                    pPriestress->Respawn();
+            
+                if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
+                {
+                    pTyrion->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    if (npc_tyrionAI* ptyrionAI = dynamic_cast<npc_tyrionAI*>(pTyrion->AI()))
+                        ptyrionAI->m_IsEventRunning = false;
+                }
+
+                if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                    if (!pMarzon->IsInCombat())
+                        pMarzon->ForcedDespawn(0);
         }
     }
 
@@ -743,111 +741,111 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
             {
                 switch (m_uiEventPhase)
                 {
-                case 1:
-                    if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-                        if (pGuard1->IsAlive() && !pGuard1->GetVictim())
-                        {
-                            DoScriptText(SAY_ROYAL_GUARD_2, pGuard1);
-                            pGuard1->GetMotionMaster()->MovePoint(0, -8364.07f, 406.775f, 122.274f, MOVE_PATHFINDING);
-                        }
-                    if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
-                        if (pGuard2->IsAlive() && !pGuard2->GetVictim())
-                        {
-                            DoScriptText(SAY_ROYAL_GUARD_2, pGuard2);
-                            pGuard2->GetMotionMaster()->MovePoint(0, -8353.91f, 415.318f, 122.274f, MOVE_PATHFINDING);
-                        }
-                    ++m_uiEventPhase;
-                    m_uiEventTimer = 3000;
-                    break;
-                case 2:
-                    ++m_uiEventPhase;
-                    SetEscortPaused(false);
-                    break;
-                case 4:
-                    if (Creature* pMarzon = m_creature->SummonCreature(NPC_MARZON_THE_SILENT_BLADE, -8407.71f, 482.117f, 123.76f, 4.79f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1 * MINUTE*IN_MILLISECONDS))
-                    {
-                        pMarzon->CastSpell(pMarzon, SPELL_STEALTH, true);
-                        pMarzon->GetMotionMaster()->MovePoint(0, -8406.00f, 470.00f, 123.76f, MOVE_PATHFINDING);
-                        m_guidMarzon = pMarzon->GetObjectGuid();
-                    }
-                    m_uiEventTimer = 10000;
-                    ++m_uiEventPhase;
-                    SetEscortPaused(true);
-                    break;
-                case 5:
-                    DoScriptText(SAY_GREGOR_3, m_creature);
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 6:
-
-                    if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                    {
-                        pMarzon->RemoveAura(SPELL_STEALTH, EFFECT_INDEX_0);
-                        m_creature->SetFacingToObject(pMarzon);
-                    }
-                    DoScriptText(SAY_GREGOR_4, m_creature);
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 7:
-                    if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                        DoScriptText(SAY_MARZON_1, pMarzon);
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 8:
-                    DoScriptText(SAY_GREGOR_5, m_creature);
-                    m_uiEventTimer = 4000;
-                    ++m_uiEventPhase;
-                    break;
-                case 9:
-                    if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                        DoScriptText(SAY_MARZON_2, pMarzon);
-                    m_uiEventTimer = 3000;
-                    ++m_uiEventPhase;
-                    break;
-                case 10:
-                    if (Player* pPlayer = GetPlayerForEscort())
-                        pPlayer->GroupEventHappens(QUEST_THE_ATTACK, m_creature);
-                    if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
-                        DoScriptText(SAY_TYRION_2, pTyrion);
-                    if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                        pMarzon->SetFactionTemplateId(FACTION_ENEMYY);
-                    m_creature->SetFactionTemplateId(FACTION_ENEMYY);
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 11:
-                    if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                    {
-                        if (!m_creature->IsInCombat())
-                            pMarzon->GetMotionMaster()->MovePoint(0, -8419.00f, 486.26f, 123.75f, MOVE_PATHFINDING);
-                        else if (m_creature->GetVictim())
-                            pMarzon->AI()->AttackStart(m_creature->GetVictim());
-                    }
-                    ++m_uiEventPhase;
-                    SetEscortPaused(false);
-                    break;
-                case 12:
-                    if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                      if (pMarzon->IsInCombat() && pMarzon->GetVictim() && !m_creature->IsInCombat())
-                          m_creature->AI()->AttackStart(pMarzon->GetVictim());
-                    break;
-                case 13:
-                    if (Player* pPlayer = GetPlayerForEscort())
-                        if (pPlayer->IsDead())
-                        {
-                            SetEscortPaused(false);
-                            m_creature->SetFactionTemplateId(FACTION_NORMAL_LESCOVAR);
-                            if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                                if (!pMarzon->IsDead() && pMarzon->GetFactionTemplateId() == FACTION_ENEMYY)
-                                    pMarzon->SetFactionTemplateId(FACTION_NORMAL_MARZON);
-                        }
-                    if (!m_creature->IsInCombat())
+                    case 1:
+                        if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
+                            if (pGuard1->IsAlive() && !pGuard1->GetVictim())
+                            {
+                                DoScriptText(SAY_ROYAL_GUARD_2, pGuard1);
+                                pGuard1->GetMotionMaster()->MovePoint(0, -8364.07f, 406.775f, 122.274f, MOVE_PATHFINDING);
+                            }
+                        if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
+                            if (pGuard2->IsAlive() && !pGuard2->GetVictim())
+                            {
+                                DoScriptText(SAY_ROYAL_GUARD_2, pGuard2);
+                                pGuard2->GetMotionMaster()->MovePoint(0, -8353.91f, 415.318f, 122.274f, MOVE_PATHFINDING);
+                            }
+                        ++m_uiEventPhase;
+                        m_uiEventTimer = 3000;
+                        break;
+                    case 2:
+                        ++m_uiEventPhase;
                         SetEscortPaused(false);
-                    break;
-                }
+                        break;
+                    case 4:
+                        if (Creature* pMarzon = m_creature->SummonCreature(NPC_MARZON_THE_SILENT_BLADE, -8407.71f, 482.117f, 123.76f, 4.79f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1 * MINUTE*IN_MILLISECONDS))
+                        {
+                            pMarzon->CastSpell(pMarzon, SPELL_STEALTH, true);
+                            pMarzon->GetMotionMaster()->MovePoint(0, -8406.00f, 470.00f, 123.76f, MOVE_PATHFINDING);
+                            m_guidMarzon = pMarzon->GetObjectGuid();
+                        }
+                        m_uiEventTimer = 10000;
+                        ++m_uiEventPhase;
+                        SetEscortPaused(true);
+                        break;
+                    case 5:
+                        DoScriptText(SAY_GREGOR_3, m_creature);
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 6:
+                    
+                        if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                        {
+                            pMarzon->RemoveAura(SPELL_STEALTH, EFFECT_INDEX_0);
+                            m_creature->SetFacingToObject(pMarzon);
+                        }
+                        DoScriptText(SAY_GREGOR_4, m_creature);
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 7:
+                        if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                            DoScriptText(SAY_MARZON_1, pMarzon);
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 8:
+                        DoScriptText(SAY_GREGOR_5, m_creature);
+                        m_uiEventTimer = 4000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 9:
+                        if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                            DoScriptText(SAY_MARZON_2, pMarzon);
+                        m_uiEventTimer = 3000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 10:
+                        if (Player* pPlayer = GetPlayerForEscort())
+                            pPlayer->GroupEventHappens(QUEST_THE_ATTACK, m_creature);
+                        if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
+                            DoScriptText(SAY_TYRION_2, pTyrion);
+                        if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                            pMarzon->SetFactionTemplateId(FACTION_ENEMYY);
+                        m_creature->SetFactionTemplateId(FACTION_ENEMYY);
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 11:
+                        if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                        {
+                            if (!m_creature->IsInCombat())
+                                pMarzon->GetMotionMaster()->MovePoint(0, -8419.00f, 486.26f, 123.75f, MOVE_PATHFINDING);
+                            else if (m_creature->GetVictim())
+                                pMarzon->AI()->AttackStart(m_creature->GetVictim());
+                        }
+                        ++m_uiEventPhase;
+                        SetEscortPaused(false);
+                        break;
+                    case 12:
+                        if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                          if (pMarzon->IsInCombat() && pMarzon->GetVictim() && !m_creature->IsInCombat())
+                              m_creature->AI()->AttackStart(pMarzon->GetVictim());
+                        break;
+                    case 13:
+                        if (Player* pPlayer = GetPlayerForEscort())
+                            if (pPlayer->IsDead())
+                            {
+                                SetEscortPaused(false);
+                                m_creature->SetFactionTemplateId(FACTION_NORMAL_LESCOVAR);
+                                if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
+                                    if (!pMarzon->IsDead() && pMarzon->GetFactionTemplateId() == FACTION_ENEMYY)
+                                        pMarzon->SetFactionTemplateId(FACTION_NORMAL_MARZON);
+                            }
+                        if (!m_creature->IsInCombat())
+                            SetEscortPaused(false);
+                        break;
+                    }
             }
             else
                 m_uiEventTimer -= uiDiff;
@@ -864,12 +862,10 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
     }
 };
 
-
 CreatureAI* GetAI_npc_lord_gregor_lescovar(Creature* pCreature)
 {
     return new npc_lord_gregor_lescovarAI(pCreature);
 }
-
 
 /*######
 ## npc_tyrion_spybot
@@ -916,8 +912,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pAttacker) override {}
-
+    void Aggro(Unit* pAttacker) override { }
 
     bool AreCreaturesRequiredForQuestPresent(float fMaxSearchRange = 40.0f)
     {
@@ -997,52 +992,52 @@ struct npc_tyrion_spybotAI : public npc_escortAI
 
         switch (uiPoint)
         {
-        case 1:
-            if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
-            {
-                pTyrion->SetFacingToObject(m_creature);
-                pTyrion->HandleEmote(EMOTE_STATE_USESTANDING);
-            }
-            m_fDefaultScaleSize = m_creature->GetFloatValue(OBJECT_FIELD_SCALE_X);
-            m_creature->SetDisplayId(MODEL_TYRIANA);
-            m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.00f);
+            case 1:
+                if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
+                {
+                    pTyrion->SetFacingToObject(m_creature);
+                    pTyrion->HandleEmote(EMOTE_STATE_USESTANDING);
+                }
+                m_fDefaultScaleSize = m_creature->GetFloatValue(OBJECT_FIELD_SCALE_X);
+                m_creature->SetDisplayId(MODEL_TYRIANA);
+                m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.00f);
 
-            SetEscortPaused(true);
-            m_uiEventTimer = 5000;
-            m_uiEventPhase = 1;
-            break;
-        case 2:
-            if (Creature* pPriestress = m_creature->GetMap()->GetCreature(m_guidPriestress))
-                pPriestress->ForcedDespawn(0);
-            if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
-                DoScriptText(SAY_TYRION_1, pTyrion, GetPlayerForEscort());
-            break;
-        case 6:
-            DoScriptText(SAY_TYRIONA_1, m_creature);
-            if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-            {
-                if (pGuard1 && pGuard1->IsAlive() && !pGuard1->GetVictim())
-                    pGuard1->SetFacingToObject(m_creature);
-            }
+                SetEscortPaused(true);
+                m_uiEventTimer = 5000;
+                m_uiEventPhase = 1;
+                break;
+            case 2:
+                if (Creature* pPriestress = m_creature->GetMap()->GetCreature(m_guidPriestress))
+                    pPriestress->ForcedDespawn(0);
+                if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
+                    DoScriptText(SAY_TYRION_1, pTyrion, GetPlayerForEscort());
+                break;
+            case 6:
+                DoScriptText(SAY_TYRIONA_1, m_creature);
+                if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
+                {
+                    if (pGuard1 && pGuard1->IsAlive() && !pGuard1->GetVictim())
+                        pGuard1->SetFacingToObject(m_creature);
+                }
 
-            if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
-            {
-                if (pGuard2 && pGuard2->IsAlive() && !pGuard2->GetVictim())
-                    pGuard2->SetFacingToObject(m_creature);
-            }
+                if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
+                {
+                    if (pGuard2 && pGuard2->IsAlive() && !pGuard2->GetVictim())
+                        pGuard2->SetFacingToObject(m_creature);
+                }
 
-            m_uiEventPhase = 2;
-            m_uiEventTimer = 5000;
-            SetEscortPaused(true);
-            break;
-        case 18:
-            DoScriptText(SAY_TYRIONA_3, m_creature);
-            if (Creature* gregor = m_creature->GetMap()->GetCreature(m_guidLordGregor))
-                gregor->SetFacingToObject(m_creature);
-            m_uiEventPhase = 5;
-            m_uiEventTimer = 5000;
-            SetEscortPaused(true);
-            break;
+                m_uiEventPhase = 2;
+                m_uiEventTimer = 5000;
+                SetEscortPaused(true);
+                break;
+            case 18:
+                DoScriptText(SAY_TYRIONA_3, m_creature);
+                if (Creature* gregor = m_creature->GetMap()->GetCreature(m_guidLordGregor))
+                    gregor->SetFacingToObject(m_creature);
+                m_uiEventPhase = 5;
+                m_uiEventTimer = 5000;
+                SetEscortPaused(true);
+                break;
         }
     }
 
@@ -1055,60 +1050,60 @@ struct npc_tyrion_spybotAI : public npc_escortAI
             {
                 switch (m_uiEventPhase)
                 {
-                case 1:
-                    if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
-                        pTyrion->HandleEmote(EMOTE_ONESHOT_NONE);
-                    SetEscortPaused(false);
-                    break;
-                case 2:
-                    if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-                    {
-                        DoScriptText(SAY_ROYAL_GUARD_1, pGuard1);
-                        m_creature->SetFacingToObject(pGuard1);
-                    }
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 3:
-                    DoScriptText(SAY_TYRIONA_2, m_creature);
-                    if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-                        pGuard1->HandleEmote(EMOTE_ONESHOT_KNEEL);
-                    if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
-                        pGuard2->HandleEmote(EMOTE_ONESHOT_KNEEL);
-                    ++m_uiEventPhase; // 4 = nothing (It's OK)
-                    SetEscortPaused(false);
-                    break;
-                case 5:
-                    if (Creature* gregor = m_creature->GetMap()->GetCreature(m_guidLordGregor))
-                        DoScriptText(SAY_GREGOR_1, gregor);
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 6:
-                    DoScriptText(SAY_TYRIONA_4, m_creature);
-                    m_uiEventTimer = 5000;
-                    ++m_uiEventPhase;
-                    break;
-                case 7:
-                    if (Player* pPlayer = GetPlayerForEscort())
+                    case 1:
+                        if (Creature* pTyrion = m_creature->GetMap()->GetCreature(m_guidTyrion))
+                            pTyrion->HandleEmote(EMOTE_ONESHOT_NONE);
+                        SetEscortPaused(false);
+                        break;
+                    case 2:
+                        if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
+                        {
+                            DoScriptText(SAY_ROYAL_GUARD_1, pGuard1);
+                            m_creature->SetFacingToObject(pGuard1);
+                        }
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 3:
+                        DoScriptText(SAY_TYRIONA_2, m_creature);
+                        if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
+                            pGuard1->HandleEmote(EMOTE_ONESHOT_KNEEL);
+                        if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
+                            pGuard2->HandleEmote(EMOTE_ONESHOT_KNEEL);
+                        ++m_uiEventPhase; // 4 = nothing (It's OK)
+                        SetEscortPaused(false);
+                        break;
+                    case 5:
                         if (Creature* gregor = m_creature->GetMap()->GetCreature(m_guidLordGregor))
-                            if (npc_lord_gregor_lescovarAI* pGregorEscortAI = dynamic_cast<npc_lord_gregor_lescovarAI*>(gregor->AI()))
-                            {
-                                pGregorEscortAI->SetMaxPlayerDistance(200.0f);
-                                pGregorEscortAI->Start(false, pPlayer->GetGUID());
-                                pGregorEscortAI->m_guidGuard1 = m_guidGuard1;
-                                pGregorEscortAI->m_guidGuard2 = m_guidGuard2;
-                                pGregorEscortAI->m_guidTyrion = m_guidTyrion;
-                                pGregorEscortAI->m_guidPriestress = m_guidPriestress;
-                            }
-                    m_creature->SetDisplayId(MODEL_SPYBOT);
-                    m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, m_fDefaultScaleSize);
-                    ++m_uiEventPhase;
-                    m_uiEventTimer = 1000;
-                    break;
-                case 8:
-                    SetEscortPaused(false);
-                    break;
+                            DoScriptText(SAY_GREGOR_1, gregor);
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 6:
+                        DoScriptText(SAY_TYRIONA_4, m_creature);
+                        m_uiEventTimer = 5000;
+                        ++m_uiEventPhase;
+                        break;
+                    case 7:
+                        if (Player* pPlayer = GetPlayerForEscort())
+                            if (Creature* gregor = m_creature->GetMap()->GetCreature(m_guidLordGregor))
+                                if (npc_lord_gregor_lescovarAI* pGregorEscortAI = dynamic_cast<npc_lord_gregor_lescovarAI*>(gregor->AI()))
+                                {
+                                    pGregorEscortAI->SetMaxPlayerDistance(200.0f);
+                                    pGregorEscortAI->Start(false, pPlayer->GetGUID());
+                                    pGregorEscortAI->m_guidGuard1 = m_guidGuard1;
+                                    pGregorEscortAI->m_guidGuard2 = m_guidGuard2;
+                                    pGregorEscortAI->m_guidTyrion = m_guidTyrion;
+                                    pGregorEscortAI->m_guidPriestress = m_guidPriestress;
+                                }
+                        m_creature->SetDisplayId(MODEL_SPYBOT);
+                        m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, m_fDefaultScaleSize);
+                        ++m_uiEventPhase;
+                        m_uiEventTimer = 1000;
+                        break;
+                    case 8:
+                        SetEscortPaused(false);
+                        break;
                 }
             }
             else m_uiEventTimer -= uiDiff;
@@ -1144,12 +1139,11 @@ bool GossipHello_npc_tyrion(Player* pPlayer, Creature* pCreature)
         if (pCreature->IsQuestGiver())
             pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
-        pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+        pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_TEXT_ID, pCreature->GetObjectGuid());
     }
 
     return true;
 }
-
 
 bool QuestAccept_npc_tyrion(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
@@ -1179,11 +1173,11 @@ bool QuestAccept_npc_tyrion(Player* pPlayer, Creature* pCreature, Quest const* p
 ## npc_master_wood
 ######*/
 
-enum
+enum MasterWoodData
 {
-    SAY_RUDE_1 = -1780227,
-    SAY_RUDE_2 = -1780228,
-    SAY_RUDE_3 = -1780229
+    SAY_RUDE_1 = 1403,
+    SAY_RUDE_2 = 1404,
+    SAY_RUDE_3 = 1402
 };
 
 struct npc_master_woodAI : public ScriptedAI

@@ -421,7 +421,7 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
     }
 
     if (script.summonCreature.scriptId)
-        ScriptsStart(sEventScripts, script.summonCreature.scriptId, pCreature, target);
+        ScriptsStart(sGenericScripts, script.summonCreature.scriptId, pCreature, target);
 
     return false;
 }
@@ -902,6 +902,8 @@ bool Map::ScriptCommand_AttackStart(ScriptInfo const& script, WorldObject* sourc
 
     if (pAttacker->AI())
         pAttacker->AI()->AttackStart(pTarget);
+    else
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -1051,6 +1053,8 @@ bool Map::ScriptCommand_Evade(ScriptInfo const& script, WorldObject* source, Wor
 
     if (pSource->AI() && pSource->IsAlive())
         pSource->AI()->EnterEvadeMode();
+    else
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -1233,7 +1237,7 @@ bool Map::ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* sourc
     }
 
     if (chosenId)
-        ScriptsStart(sEventScripts, chosenId, source, target);
+        ScriptsStart(sGenericScripts, chosenId, source, target);
     else
         return ShouldAbortScript(script);
 
@@ -1285,6 +1289,8 @@ bool Map::ScriptCommand_SetMeleeAttack(ScriptInfo const& script, WorldObject* so
 
     if (pSource->AI())
         pSource->AI()->SetMeleeAttack(script.enableMelee.enabled);
+    else
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -1302,6 +1308,8 @@ bool Map::ScriptCommand_SetCombatMovement(ScriptInfo const& script, WorldObject*
 
     if (pSource->AI())
         pSource->AI()->SetCombatMovement(script.combatMovement.enabled);
+    else
+        return ShouldAbortScript(script);
 
     return false;
 }
@@ -1618,7 +1626,8 @@ bool Map::ScriptCommand_AddSpellCooldown(ScriptInfo const& script, WorldObject* 
         return ShouldAbortScript(script);
     }
 
-    pSource->AddSpellCooldown(script.addCooldown.spellId, 0, time(nullptr) + script.addCooldown.cooldown);
+    if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(script.addCooldown.spellId))
+    pSource->AddCooldown(*pSpellEntry, nullptr, false, script.addCooldown.cooldown * IN_MILLISECONDS);
     if (Player* pPlayer = pSource->ToPlayer())
         pPlayer->SendSpellCooldown(script.addCooldown.spellId, script.addCooldown.cooldown * IN_MILLISECONDS, pPlayer->GetObjectGuid());
 
@@ -1639,7 +1648,7 @@ bool Map::ScriptCommand_RemoveSpellCooldown(ScriptInfo const& script, WorldObjec
     if (script.removeCooldown.spellId)
         pSource->RemoveSpellCooldown(script.removeCooldown.spellId, true);
     else
-        pSource->RemoveAllSpellCooldown();
+        pSource->RemoveAllCooldowns();
 
     return false;
 }
@@ -1926,7 +1935,7 @@ bool Map::ScriptCommand_StartScriptForAll(ScriptInfo const& script, WorldObject*
         }
 
         if (!script.startScriptForAll.objectEntry || (pWorldObject->GetEntry() == script.startScriptForAll.objectEntry))
-            ScriptsStart(sEventScripts, script.startScriptForAll.scriptId, pWorldObject, target);
+            ScriptsStart(sGenericScripts, script.startScriptForAll.scriptId, pWorldObject, target);
     }
     
     return false;
@@ -2290,6 +2299,25 @@ bool Map::ScriptCommand_SetGossipMenu(ScriptInfo const& script, WorldObject* sou
     }
 
     pSource->SetDefaultGossipMenuId(script.setGossipMenu.gossipMenuId);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_SEND_SCRIPT_EVENT (85)
+bool Map::ScriptCommand_SendScriptEvent(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_SEND_SCRIPT_EVENT (script id %u) call for a nullptr or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    if (pSource->AI())
+        pSource->AI()->OnScriptEventHappened(script.sendScriptEvent.eventId, script.sendScriptEvent.eventData, target);
+    else
+        return ShouldAbortScript(script);
 
     return false;
 }

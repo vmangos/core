@@ -338,6 +338,10 @@ enum eScriptCommand
                                                             // target = WorldObject (from provided source or target)
     SCRIPT_COMMAND_SET_GOSSIP_MENU          = 84,           // source = Creature
                                                             // datalong = gossip_menu_id
+    SCRIPT_COMMAND_SEND_SCRIPT_EVENT        = 85,           // source = Creature
+                                                            // target = WorldObject
+                                                            // datalong = event_id
+                                                            // datalong2 = event_data
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -1019,6 +1023,12 @@ struct ScriptInfo
             uint32 gossipMenuId;                            // datalong
         } setGossipMenu;
 
+        struct                                              // SCRIPT_COMMAND_SEND_SCRIPT_EVENT (85)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 eventData;                               // datalong2
+        } sendScriptEvent;
+
         struct
         {
             uint32 data[9];
@@ -1077,6 +1087,7 @@ extern ScriptMapMap sSpellScripts;
 extern ScriptMapMap sCreatureSpellScripts;
 extern ScriptMapMap sGameObjectScripts;
 extern ScriptMapMap sEventScripts;
+extern ScriptMapMap sGenericScripts;
 extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sCreatureMovementScripts;
 extern ScriptMapMap sCreatureAIScripts;
@@ -1296,6 +1307,7 @@ class ScriptMgr
         void LoadEventScripts();
         void LoadSpellScripts();
         void LoadCreatureSpellScripts();
+        void LoadGenericScripts();
         void LoadGossipScripts();
         void LoadCreatureMovementScripts();
         void LoadCreatureEventAIScripts();
@@ -1382,6 +1394,7 @@ class ScriptMgr
 
     private:
         void CollectPossibleEventIds(std::set<uint32>& eventIds);
+        void CollectPossibleGenericIds(std::set<uint32>& eventIds);
         void LoadScripts(ScriptMapMap& scripts, char const* tablename);
         void CheckScriptTexts(ScriptMapMap const& scripts);
 

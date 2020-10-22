@@ -22,154 +22,12 @@ SDCategory: Desolace
 EndScriptData */
 
 /* ContentData
-npc_aged_dying_ancient_kodo
 go_hand_of_iruxos_crystal
 
 EndContentData */
 
 #include "scriptPCH.h"
 #include "MoveMapSharedDefines.h"
-
-enum
-{
-    SAY_SMEED_HOME_1                = -1000348,
-    SAY_SMEED_HOME_2                = -1000349,
-    SAY_SMEED_HOME_3                = -1000350,
-
-    QUEST_KODO                      = 5561,
-
-    NPC_SMEED                       = 11596,
-    NPC_AGED_KODO                   = 4700,
-    NPC_DYING_KODO                  = 4701,
-    NPC_ANCIENT_KODO                = 4702,
-    NPC_TAMED_KODO                  = 11627,
-
-    SPELL_KODO_KOMBO_ITEM           = 18153,
-    SPELL_KODO_KOMBO_PLAYER_BUFF    = 18172,
-    SPELL_KODO_KOMBO_DESPAWN_BUFF   = 18377,
-    SPELL_KODO_KOMBO_GOSSIP         = 18362,
-    SPELL_KODO_DESPAWN              = 18269
-
-};
-
-struct npc_aged_dying_ancient_kodoAI : ScriptedAI
-{
-    explicit npc_aged_dying_ancient_kodoAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_aged_dying_ancient_kodoAI::Reset();
-        npc_aged_dying_ancient_kodoAI::ResetCreature();
-    }
-
-    bool m_bUsed;
-    ObjectGuid m_playerGuid;
-
-    void Reset() override
-    {
-
-    }
-
-    void ResetCreature() override
-    {
-        m_bUsed = false;
-        m_playerGuid.Clear();
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (m_bUsed)
-            return;
-
-        if (who->GetEntry() == NPC_SMEED)
-        {
-            if (m_creature->IsWithinDistInMap(who, 10.0f))
-            {
-                switch (urand(0, 2))
-                {
-                case 0:
-                    DoScriptText(SAY_SMEED_HOME_1, who);
-                    break;
-                case 1:
-                    DoScriptText(SAY_SMEED_HOME_2, who);
-                    break;
-                case 2:
-                    DoScriptText(SAY_SMEED_HOME_3, who);
-                    break;
-                }
-
-                //spell have no implemented effect (dummy), so useful to notify spellHit
-                m_creature->CastSpell(m_creature, SPELL_KODO_KOMBO_GOSSIP, true);
-            }
-        }
-    }
-
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
-    {
-        if (pSpell->Id == SPELL_KODO_KOMBO_GOSSIP)
-        {
-            m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            m_creature->ForcedDespawn(MINUTE * IN_MILLISECONDS);
-            m_creature->GetMotionMaster()->Clear();
-            m_creature->GetMotionMaster()->MoveIdle();
-            return;
-        }
-        
-        if (pSpell->Id == SPELL_KODO_KOMBO_ITEM && !m_creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF) && !pCaster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
-        {          
-            pCaster->CombatStop(true);
-            m_creature->CombatStop(true);
-
-            pCaster->CastSpell(pCaster, SPELL_KODO_KOMBO_PLAYER_BUFF, true);
-
-            m_creature->UpdateEntry(NPC_TAMED_KODO);
-            m_creature->CastSpell(m_creature, SPELL_KODO_KOMBO_DESPAWN_BUFF, true);
-
-            m_creature->GetMotionMaster()->Clear();
-            m_creature->GetMotionMaster()->MoveFollow(pCaster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-
-            m_playerGuid = pCaster->ToPlayer()->GetObjectGuid();
-
-            return;
-        }
-
-        if (pSpell->Id == SPELL_KODO_DESPAWN)
-            m_creature->ForcedDespawn();
-    }
-
-    void UpdateAI(uint32 const /*uiDiff*/) override
-    {
-        if (m_creature->GetEntry() == NPC_TAMED_KODO)
-            return;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_aged_dying_ancient_kodo(Creature* pCreature)
-{
-    return new npc_aged_dying_ancient_kodoAI(pCreature);
-}
-
-bool GossipHello_npc_aged_dying_ancient_kodo(Player* pPlayer, Creature* pCreature)
-{
-    auto pKodoAI = static_cast<npc_aged_dying_ancient_kodoAI*>(pCreature->AI());
-
-    if (!pKodoAI || pKodoAI->m_bUsed)
-        return true;
-
-    if (pPlayer->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && pKodoAI->m_playerGuid == pPlayer->GetObjectGuid())
-    {
-        pPlayer->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-        pPlayer->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
-
-        pKodoAI->m_bUsed = true;
-    }
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    return true;
-}
 
 /*######
 ## go_hand_of_iruxos_crystal
@@ -1244,12 +1102,6 @@ bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, Quest
 void AddSC_desolace()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_aged_dying_ancient_kodo";
-    newscript->GetAI = &GetAI_npc_aged_dying_ancient_kodo;
-    newscript->pGossipHello = &GossipHello_npc_aged_dying_ancient_kodo;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_hand_of_iruxos_crystal";

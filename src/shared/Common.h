@@ -85,6 +85,10 @@
 #include <queue>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
+
+typedef std::chrono::system_clock Clock;
+typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> TimePoint;
 
 #include "Errors.h"
 #include "LockedQueue.h"

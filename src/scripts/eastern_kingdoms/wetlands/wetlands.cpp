@@ -35,12 +35,12 @@ EndContentData */
 
 enum
 {
-    // ids from "script_texts" table
-    SAY_PROGRESS_1_TAP = -1999906, // Oh, it's on now! But you thought I'd be alone too, huh?!
-    SAY_PROGRESS_2_FRI = -1999907, // Whoa! This is way more than what I bargained for, you're on your own, Slim!
-    SAY_PROGRESS_3_TAP = -1999908, // Okay, okay! No need to get all violent. I'll talk. I'll talk!
-    SAY_PROGRESS_4_TAP = -1999909, // I have a few notes from the job back at my place. I'll get them and then meet you back in the inn.
-    SAY_PROGRESS_5_MIC = -1999910, // I'm glad the commotions died down some around here. The last thing this place needs is another brawl.
+    // ids from "broadcast_text" table
+    SAY_PROGRESS_1_TAP = 5827, // Oh, it's on now! But you thought I'd be alone too, huh?!
+    SAY_PROGRESS_2_FRI = 5828, // Whoa! This is way more than what I bargained for, you're on your own, Slim!
+    SAY_PROGRESS_3_TAP = 1743, // Okay, okay! No need to get all violent. I'll talk. I'll talk!
+    SAY_PROGRESS_4_TAP = 1744, // I have a few notes from the job back at my place. I'll get them and then meet you back in the inn.
+    SAY_PROGRESS_5_MIC = 4169, // I'm glad the commotions died down some around here. The last thing this place needs is another brawl.
     // quest id
     QUEST_MISSING_DIPLOMAT_PART11 = 1249,
     // factions
@@ -235,21 +235,23 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
     {
         switch (uiPointId)
         {
-        case WAYPOINT_MAILBOX:
-        {
-            SetRun();
-            // change faction, which makes him attackable.
-            m_creature->SetFactionTemplateId(FACTION_NEUTRAL);
-        }break;
-        case WAYPOINT_GATE:
-        {
-            // set quest failed if tapoke slim escaped
-            Player* player = GetPlayerForEscort();
-            if (player)
-                player->GroupEventFailHappens(QUEST_MISSING_DIPLOMAT_PART11);
+            case WAYPOINT_MAILBOX:
+            {
+                SetRun();
+                // change faction, which makes him attackable.
+                m_creature->SetFactionTemplateId(FACTION_NEUTRAL);
+            }
+            break;
+            case WAYPOINT_GATE:
+            {
+                // set quest failed if tapoke slim escaped
+                Player* player = GetPlayerForEscort();
+                if (player)
+                    player->GroupEventFailHappens(QUEST_MISSING_DIPLOMAT_PART11);
 
-            DespawnFriendIfExists();
-        }break;
+                DespawnFriendIfExists();
+            }
+            break;
         }
     }
 
@@ -288,57 +290,61 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             {
                 switch (m_mdDialogPhase)
                 {
-                case 0:
-                {
-                    // Set Tapoke Tapoke Slim Jahn and his friend facing to player character.
-                    // An better option can be to move this to DamageTaken(), but it will not work.
-                    // It's probably because Aggro() is being called after DamageTaken().
-                    Player* player = GetPlayerForEscort();
-                    if (player)
+                    case 0:
                     {
-                        m_creature->SetFacingToObject(player);
-
-                        if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
+                        // Set Tapoke Tapoke Slim Jahn and his friend facing to player character.
+                        // An better option can be to move this to DamageTaken(), but it will not work.
+                        // It's probably because Aggro() is being called after DamageTaken().
+                        Player* player = GetPlayerForEscort();
+                        if (player)
                         {
-                            if (slimsFriend->IsAlive())
-                                slimsFriend->SetFacingToObject(player);
+                            m_creature->SetFacingToObject(player);
+                    
+                            if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
+                            {
+                                if (slimsFriend->IsAlive())
+                                    slimsFriend->SetFacingToObject(player);
+                            }
                         }
+                        m_nextPhaseDelay = 2000;
                     }
-                    m_nextPhaseDelay = 2000;
-                }break;
-                case 1: // Say_0
-                {
-                    // despawn Slims friend
-                    DespawnFriendIfExists();
+                    break;
+                    case 1: // Say_0
+                    {
+                        // despawn Slims friend
+                        DespawnFriendIfExists();
 
-                    m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
-                    DoScriptText(SAY_PROGRESS_3_TAP, m_creature);
-                    m_nextPhaseDelay = 4000;
-                }break;
-                case 2: // Say_1
-                {
-                    m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                    DoScriptText(SAY_PROGRESS_4_TAP, m_creature);
-                    m_nextPhaseDelay = 6000;
-                }break;
-                case 3: // The End
-                {
-                    Player* player = GetPlayerForEscort();
-                    if (player)
-                        player->GroupEventHappens(QUEST_MISSING_DIPLOMAT_PART11, m_creature);
+                        m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
+                        DoScriptText(SAY_PROGRESS_3_TAP, m_creature);
+                        m_nextPhaseDelay = 4000;
+                    }
+                    break;
+                    case 2: // Say_1
+                    {
+                        m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
+                        DoScriptText(SAY_PROGRESS_4_TAP, m_creature);
+                        m_nextPhaseDelay = 6000;
+                    }
+                    break;
+                    case 3: // The End
+                    {
+                        Player* player = GetPlayerForEscort();
+                        if (player)
+                            player->GroupEventHappens(QUEST_MISSING_DIPLOMAT_PART11, m_creature);
 
-                    // make an illusion returning him back to the inn
-                    Stop();
+                        // make an illusion returning him back to the inn
+                        Stop();
 
-                    // despawn and respawn at inn
-                    m_creature->ForcedDespawn(1000);
-                    // respawn in 2 seconds.
-                    m_creature->SetRespawnDelay(2);
+                        // despawn and respawn at inn
+                        m_creature->ForcedDespawn(1000);
+                        // respawn in 2 seconds.
+                        m_creature->SetRespawnDelay(2);
 
-                    m_nextPhaseDelay = 0;
-                    m_mdDialogPhase = 0;
-                    m_isBeaten = false;
-                }break;
+                        m_nextPhaseDelay = 0;
+                        m_mdDialogPhase = 0;
+                        m_isBeaten = false;
+                    }
+                    break;
                 }
                 // move to the next phase
                 ++m_mdDialogPhase;
@@ -387,7 +393,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
                 slimsFriend->CombatStop(true);
                 slimsFriend->RemoveAllAuras();
                 slimsFriend->DeleteThreatList();
-                slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
 
                 DoScriptText(SAY_PROGRESS_2_FRI, slimsFriend);
             }
@@ -414,6 +420,7 @@ CreatureAI* GetAI_npc_tapoke_slim_jahn(Creature* pCreature)
 {
     return new npc_tapoke_slim_jahnAI(pCreature);
 }
+
 //-----------------------------------------------------------------------------
 // Mikhail gossip scripts
 bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
@@ -506,6 +513,7 @@ bool GossipHello_npc_mikhail(Player* pPlayer, Creature* pCreature)
 
     return true;
 }
+
 //-----------------------------------------------------------------------------
 // AddSC
 //-----------------------------------------------------------------------------

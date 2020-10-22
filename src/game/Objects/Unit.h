@@ -181,40 +181,6 @@ extern pAuraProcHandler AuraProcHandler[TOTAL_AURAS];
 
 #define UNIT_SPELL_UPDATE_TIME_BUFFER 60
 
-struct GlobalCooldown
-{
-    explicit GlobalCooldown(uint32 dur = 0, uint32 time = 0) : duration(dur), cast_time(time) {}
-
-    uint32 duration;
-    uint32 cast_time;
-};
-
-typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
-
-class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
-{
-    public:
-        GlobalCooldownMgr() {}
-
-    public:
-        bool HasGlobalCooldown(SpellEntry const* spellInfo) const;
-        void AddGlobalCooldown(SpellEntry const* spellInfo, uint32 gcd);
-        void CancelGlobalCooldown(SpellEntry const* spellInfo);
-
-    private:
-        GlobalCooldownList m_GlobalCooldowns;
-};
-
-struct SpellCooldown
-{
-    time_t end;
-    uint32 cat;
-    time_t categoryEnd;
-    uint16 itemid;
-};
-
-typedef std::map<uint32, SpellCooldown> SpellCooldowns;
-
 struct SpellImmune
 {
     uint32 type;
@@ -568,6 +534,7 @@ class Unit : public WorldObject
         virtual UnitDismountResult Unmount(bool from_aura = false);
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, 2)); }
         void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, 2, form); }
+        bool IsShapeShifted() const; // mirrors clientside logic, moonkin form not counted as shapeshift
         bool IsInFeralForm() const
         {
             ShapeshiftForm form = GetShapeshiftForm();
@@ -682,8 +649,6 @@ class Unit : public WorldObject
         uint32 m_lastManaUseSpellId;
         uint32 m_lastManaUseTimer;
         uint32 m_spellUpdateTimeBuffer;
-        SpellCooldowns m_spellCooldowns;
-        GlobalCooldownMgr m_GlobalCooldownMgr;
 
         void _UpdateSpells(uint32 time);
         void _UpdateAutoRepeatSpell();
@@ -737,6 +702,7 @@ class Unit : public WorldObject
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE) const;
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
         uint32 SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage);
+        void WritePetSpellsCooldown(WorldPacket& data) const;
 
         SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
         SpellAuraHolder* RefreshAura(uint32 spellId, int32 duration);
@@ -883,8 +849,11 @@ class Unit : public WorldObject
         bool IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const* spellProto, WeaponAttackType attackType = BASE_ATTACK) const;
         bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final;
         bool IsEffectResist(SpellEntry const* spell, int eff) const; // SPELL_AURA_MOD_MECHANIC_RESISTANCE
+        
         bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent) const;
-
+        // only to be used in proc handlers - basepoints is expected to be a MAX_EFFECT_INDEX sized array
+        SpellAuraProcResult TriggerProccedSpell(Unit* target, int32* basepoints, uint32 triggeredSpellId, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredByParent = nullptr);
+        SpellAuraProcResult TriggerProccedSpell(Unit* target, int32* basepoints, SpellEntry const* spellInfo, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredByParent = nullptr);
         // Aura proc handlers
         SpellAuraProcResult HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         SpellAuraProcResult HandleHasteAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
@@ -926,37 +895,6 @@ class Unit : public WorldObject
         void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0, uint32 time = 0);/*DEPRECATED METHOD*/
         void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0);/*DEPRECATED METHOD*/
         void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid(), bool success = true);
-
-        // Cooldown management
-        SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
-        static uint32 const infinityCooldownDelay = MONTH;  // used for set "infinity cooldowns" for spells and check
-        static uint32 const infinityCooldownDelayCheck = MONTH / 2;
-
-        bool HasSpellCategoryCooldown(uint32 category) const;
-        bool HasSpellCooldown(uint32 spell_id) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            return itr != m_spellCooldowns.end() && itr->second.end > time(nullptr);
-        }
-        time_t GetSpellCooldownDelay(uint32 spell_id) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            time_t t = time(nullptr);
-            return itr != m_spellCooldowns.end() && itr->second.end > t ? itr->second.end - t : 0;
-        }
-        void CooldownEvent(SpellEntry const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr);
-        void AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
-        void RemoveSpellCooldown(uint32 spell_id, bool update = false);
-        void RemoveAllSpellCooldown();
-        void WritePetSpellsCooldown(WorldPacket& data) const;
-        GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
-        void AddSpellCooldown(uint32 spell_id, uint32 itemid, time_t endTime, time_t categoryEndTime = 0, uint32 cat = 0);
-
-        virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
-        bool IsSpellProhibited(SpellEntry const* pSpell) const;
-    protected:
-        typedef std::list<ProhibitSpellInfo> ProhibitSpellList;
-        ProhibitSpellList m_prohibitSpell;
 
         /*********************************************************/
         /***                  COMBAT SYSTEM                    ***/
@@ -1258,7 +1196,7 @@ class Unit : public WorldObject
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
-        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
+        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC); }
 
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
         ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }

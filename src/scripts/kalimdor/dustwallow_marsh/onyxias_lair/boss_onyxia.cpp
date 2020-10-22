@@ -596,7 +596,7 @@ struct boss_onyxiaAI : public ScriptedAI
                 if (Creature* Cre = m_creature->SummonCreature(NPC_ERUPTION_TRIGGER, GO->GetPositionX(), GO->GetPositionY(), GO->GetPositionZ(), GO->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 2000))
                 {
                     Cre->CastSpell(Cre, SPELL_ERUPTION, true);
-                    Cre->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                    Cre->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     Cre->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     Cre->AI()->EnterEvadeMode();
                 }

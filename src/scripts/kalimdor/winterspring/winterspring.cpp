@@ -520,14 +520,11 @@ struct npc_ranshallaAI : public npc_escortAI
                 pPriestess2->GetMotionMaster()->MovePoint(1, 5515.654297f, -4900.294922f, 846.531982f);
                 //m_creature->MonsterSay("The priestesses have been invoked.");//test
             }
-            else
-                m_creature->MonsterSay("Navr�, les pr�tresses n'en font qu'a leur t�te...");
         }
         else
         {
             wpInvoqueAtteint = 0;
             pretressesInvoque = 0;
-            m_creature->MonsterSay("Navr�, les pretresses ne veulent pas pop...");
         }
 
         return invoked;
@@ -586,7 +583,7 @@ struct npc_ranshallaAI : public npc_escortAI
         switch (i)
         {
             case 0:
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                 if (pretressesRepartent != 0 ||  wpInvoqueAtteint != 0 || guidPriestess1 != 0 || guidPriestess2 != 0 ||  guidMoonkin != 0 ||  guidVoice != 0 || pretressesInvoque != 0)
                     m_creature->MonsterSay("WTF values have not been reset properly !");
                 DoScriptText(RANSHALLA_BEGIN, m_creature, pPlayer);
@@ -763,7 +760,7 @@ struct npc_ranshallaAI : public npc_escortAI
 
     void Reset() override
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {

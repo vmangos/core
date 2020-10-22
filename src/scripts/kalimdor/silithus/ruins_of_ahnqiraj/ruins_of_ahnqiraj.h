@@ -88,6 +88,11 @@ enum
     NPC_KALDOREI_ELITE  =   15473,
     NPC_GENERAL_ANDOROV =   15471,
 
+    // Gossip menu ids
+    ANDOROV_GOSSIP_NOT_STARTED = 6629,
+    ANDOROV_GOSSIP_IN_PROGRESS = 7048,
+    ANDOROV_GOSSIP_DONE        = 7047,
+
     // Crystal Weaknesses
     SPELL_FIRE_WEAKNESS         =   25177,
     SPELL_NATURE_WEAKNESS       =   25180,

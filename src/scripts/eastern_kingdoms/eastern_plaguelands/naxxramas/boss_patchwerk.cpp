@@ -24,15 +24,15 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum PatchwerkData
 {
-    SAY_AGGRO1            = -1533017,
-    SAY_AGGRO2            = -1533018,
-    SAY_SLAY              = -1533019,
-    SAY_DEATH             = -1533020,
+    SAY_AGGRO1            = 13068,
+    SAY_AGGRO2            = 13069,
+    SAY_SLAY              = 13071,
+    SAY_DEATH             = 13070,
 
-    EMOTE_BERSERK         = -1533021,
-    EMOTE_ENRAGE          = -1533022,
+    EMOTE_BERSERK         = 4428,
+    EMOTE_ENRAGE          = 2384,
 
     SPELL_HATEFULSTRIKE   = 28308,
     SPELL_ENRAGE          = 28131, // 5% enrage soft enrage
@@ -161,6 +161,7 @@ struct boss_patchwerkAI : public ScriptedAI
         // If we found no viable target, we choose the maintank
         if (!pTarget)
             pTarget = mainTank;
+
         if (pTarget->GetObjectGuid() != previousTarget)
         {
             m_creature->SetInFront(pTarget);
@@ -187,7 +188,6 @@ struct boss_patchwerkAI : public ScriptedAI
             if (!m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
                 && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
             {
-                
                 if (!m_creature->IsAttackReady(BASE_ATTACK) && m_creature->IsWithinMeleeRange(target)) // he does not have offhand attack
                     return true;
 
@@ -239,31 +239,31 @@ struct boss_patchwerkAI : public ScriptedAI
                 m_bEnraged = true;
             }
         }
-        
+
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
             switch (l_EventId)
             {
-            case EVENT_BERSERK:
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                {
-                    DoScriptText(EMOTE_BERSERK, m_creature);
-                    m_bBerserk = true;
-                }
-                else
-                    m_events.Repeat(100);
-                break;
-            case EVENT_HATEFULSTRIKE:
-                DoHatefulStrike();
-                m_events.Repeat(HATEFUL_CD);
-                break;
-            case EVENT_SLIMEBOLT:
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIMEBOLT) == CAST_OK)
-                    m_events.Repeat(SLIMEBOLT_REPEAT_CD);
-                else
-                    m_events.Repeat(100);
-                break;
+                case EVENT_BERSERK:
+                    if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                    {
+                        DoScriptText(EMOTE_BERSERK, m_creature);
+                        m_bBerserk = true;
+                    }
+                    else
+                        m_events.Repeat(100);
+                    break;
+                case EVENT_HATEFULSTRIKE:
+                    DoHatefulStrike();
+                    m_events.Repeat(HATEFUL_CD);
+                    break;
+                case EVENT_SLIMEBOLT:
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIMEBOLT) == CAST_OK)
+                        m_events.Repeat(SLIMEBOLT_REPEAT_CD);
+                    else
+                        m_events.Repeat(100);
+                    break;
             }
         }
 

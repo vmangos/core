@@ -82,6 +82,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- correct patrol for farmer kent
 UPDATE `creature` SET `position_x` = -841.737, `position_y` = -645.461, `position_z` = 16.2098 WHERE `guid` = 15976;
 DELETE FROM `creature_movement_template` WHERE `entry` = 2436;
+DELETE FROM `creature_movement` WHERE `id` = 15976;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (2436, 1, -841.737, -645.461, 16.2098, 100, 35000, 3, 0),
 (2436, 2, -831.83, -635.259, 14.3345, 100, 0, 0, 0),

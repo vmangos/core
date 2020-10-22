@@ -315,7 +315,7 @@ struct mob_buru_eggAI : public ScriptedAI
     {
         // Empêche les oeufs d'aggro et de tourner
         SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override

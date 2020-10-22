@@ -907,6 +907,10 @@ class World
         **/
         void InvalidatePlayerDataToAllClient(ObjectGuid guid);
 
+        static uint32 GetCurrentMSTime() { return m_currentMSTime; }
+        static TimePoint GetCurrentClockTime() { return m_currentTime; }
+        static uint32 GetCurrentDiff() { return m_currentDiff; }
+
         // Manually override timer update secs to force a faster update
         void SetWorldUpdateTimer(WorldTimers timer, uint32 current);
         time_t GetWorldUpdateTimer(WorldTimers timer);
@@ -1004,6 +1008,10 @@ class World
 
         // Packet broadcaster
         std::unique_ptr<MovementBroadcaster> m_broadcaster;
+
+        static uint32 m_currentMSTime;
+        static TimePoint m_currentTime;
+        static uint32 m_currentDiff;
 };
 
 extern uint32 realmID;

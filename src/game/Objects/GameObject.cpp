@@ -272,6 +272,8 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         return;
     }
 
+    UpdateCooldowns(sWorld.GetCurrentClockTime());
+
     m_Events.Update(update_diff);
 
     // remove finished spells from current pointers
@@ -490,12 +492,15 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         // Some may have have animation and/or are expected to despawn.
                         switch (GetDisplayId())
                         {
-                            case 3073:
-                            case 4392:
-                            case 4472:
-                            case 4491:
-                            case 6785:
-                            case 6747: //sapphiron birth
+                            case 3071: // freezing trap
+                            case 3072: // explosive trap
+                            case 3073: // frost trap, fixed trap
+                            case 3074: // immolation trap
+                            case 4392: // lava fissure
+                            case 4472: // lava fissure
+                            case 4491: // mortar in dun morogh
+                            case 6785: // plague fissure
+                            case 6747: // sapphiron birth
                                 SendGameObjectCustomAnim();
                                 break;
                         }
@@ -517,19 +522,11 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         {
             switch (GetGoType())
             {
-                case GAMEOBJECT_TYPE_DOOR: // Ustaag <Nostalrius>
-                {
-                    if ((m_cooldownTime < time(nullptr)) && (GetGOInfo()->GetAutoCloseTime() != 0))
-                        ResetDoorOrButton();
-                    break;
-                }
+                case GAMEOBJECT_TYPE_DOOR:
                 case GAMEOBJECT_TYPE_BUTTON:
-                {
-                    if ((m_cooldownTime < time(nullptr)) && (GetGOInfo()->GetAutoCloseTime() != 0))  // Ustaag <Nostalrius>
-                        //if (m_respawnDelayTime && (m_cooldownTime < time(nullptr)))
+                    if (GetGOInfo()->GetAutoCloseTime() && (m_cooldownTime < time(nullptr)))
                         ResetDoorOrButton();
                     break;
-                }
                 case GAMEOBJECT_TYPE_GOOBER:
                     if (m_cooldownTime < time(nullptr))
                     {
@@ -732,7 +729,7 @@ void GameObject::FinishRitual()
         // take spell cooldown
         if (GetOwner() && GetOwner()->IsPlayer())
             if (SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(GetSpellId()))
-                GetOwner()->CooldownEvent(createBySpell);
+                GetOwner()->AddCooldown(*createBySpell);
         if (!info->summoningRitual.ritualPersistent)
             SetLootState(GO_JUST_DEACTIVATED);
         // Only ritual of doom deals a second spell

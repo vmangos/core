@@ -414,13 +414,17 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[TYPE_KURINNAXX] = uiData;
             break;
         case TYPE_GENERAL_ANDOROV:
-            /** Delete npc menu while in combat */
+            if (uiData == NOT_STARTED || uiData == FAIL)
+            {
+                if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
+                    pAndorov->SetDefaultGossipMenuId(ANDOROV_GOSSIP_NOT_STARTED);
+            }
             if (uiData == IN_PROGRESS)
             {
                 SetAndorovSquadFaction(1254);
                 if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
                 {
-                    pAndorov->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    pAndorov->SetDefaultGossipMenuId(ANDOROV_GOSSIP_IN_PROGRESS);
                     pAndorov->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
                 }
             }
@@ -441,14 +445,13 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             {
                 if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
                 {
-                    pAndorov->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
                     // World of Warcraft Client Patch 1.10.0 (2006-03-28)
                     // - Lieutenant General Andorov will now offer supplies if kept alive
                     //   through the battle.
                     if (sWorld.GetWowPatch() >= WOW_PATCH_110)
                         pAndorov->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
 
+                    pAndorov->SetDefaultGossipMenuId(ANDOROV_GOSSIP_DONE);
                     pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
                 }
                 ForceAndorovSquadDespawn(120000); // Andorov disapears 2 minutes after end of combat

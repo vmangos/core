@@ -1434,7 +1434,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (!m_finalBattle && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_FINALBATTLE))
         {
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
             m_inSpeech = true;
             m_finalBattle = true;
             m_creature->Mount(10278);
@@ -1465,7 +1465,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
                     sWorld.SendWorldText(WORLD_TEXT_FINAL_BATTLE);
                     m_inSpeech = false;
                     m_movingToGate = true;
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
                     m_creature->SetWalk(false);
                 }
             }

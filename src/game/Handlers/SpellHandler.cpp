@@ -132,7 +132,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     SpellCastResult itemCastCheckResult = SPELL_CAST_OK;
     if (!pItem->IsTargetValidForItemUse(targets.getUnitTarget()))
         itemCastCheckResult = SPELL_FAILED_BAD_TARGETS;
-    else if (pUser->IsInDisallowedItemUseForm())
+    else if (pUser->IsShapeShifted())
     {
         // World of Warcraft Client Patch 1.10.0 (2006-03-28)
         // - All shapeshift forms can now use equipped items.
@@ -166,12 +166,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     pUser->CastItemUseSpell(pItem, targets);
 }
-
-#define OPEN_CHEST 11437
-#define OPEN_SAFE 11535
-#define OPEN_CAGE 11792
-#define OPEN_BOOTY_CHEST 5107
-#define OPEN_STRONGBOX 8517
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {

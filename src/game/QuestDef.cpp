@@ -36,6 +36,7 @@ Quest::Quest(Field* questRecord)
     RequiredRaces = questRecord[7].GetUInt32();
     RequiredSkill = questRecord[8].GetUInt32();
     RequiredSkillValue = questRecord[9].GetUInt32();
+    RequiredCondition = questRecord[128].GetUInt32();
     RepObjectiveFaction = questRecord[10].GetUInt32();
     RepObjectiveValue = questRecord[11].GetInt32();
     RequiredMinRepFaction = questRecord[12].GetUInt32();

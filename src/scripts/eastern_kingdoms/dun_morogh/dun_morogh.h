@@ -1,13 +1,9 @@
-/*
- *
- */
-
 #ifndef DEF_DUNMOROGH_H
 #define DEF_DUNMOROGH_H
 
 #include "scriptPCH.h"
 
-enum
+enum EventData
 {
     NPC_ANGUS               = 10610,
     NPC_SHORTY              = 10611,
@@ -55,22 +51,22 @@ enum
     SOUND_RIFLEMAN_3 = 6248,
     SOUND_RIFLEMAN_4 = 6249,
     SOUND_RIFLEMAN_5 = 6250,
-};
 
-#define SHOOT1EMOTE1 "Rifleman Middlecamp picks the orc target..."
-#define SHOOT1EMOTE2 "Rifleman Middlecamp misses..."
-#define SHOOT2EMOTE1 "Rifleman Middlecamp takes a more careful aim..."
-#define SHOOT2EMOTE2 "Rifleman Middlecamp misses again..."
-#define SHOOT3EMOTE1 "Rifleman Wheeler casually points at the orc target..."
-#define SHOOT3EMOTE2 "Rifleman Wheeler hits!"
-#define SHOOT4EMOTE1 "Rifleman Middlecamp takes aim at the bottles..."
-#define SHOOT5EMOTE1 "Rifleman Middlecamp takes aim at the bottles again..."
-#define SHOOT6EMOTE1 "Rifleman Wheeler quickly shoots the middle target dead center..."
-#define SHOOT7EMOTE1 "Rifleman Wheeler then takes aim at the bottles..."
-#define SHOOT7EMOTE2 "Rifleman Wheeler only hits the side of the box!"
-#define SHOOT8EMOTE1 "Rifleman Middlecamp quickly shoots the orc dummy..."
-#define SHOOT9EMOTE1 "Rifleman Middlecamp turns to the paper target..."
-#define SHOOT10EMOTE1 "Rifleman Middlecamp shoots from the hip at the bottles..."
+    SHOOT1EMOTE1 = 6107,
+    SHOOT1EMOTE2 = 6140,
+    SHOOT2EMOTE1 = 6106,
+    SHOOT2EMOTE2 = 6141,
+    SHOOT3EMOTE1 = 6118,
+    SHOOT3EMOTE2 = 6142,
+    SHOOT4EMOTE1 = 6120,
+    SHOOT5EMOTE1 = 6121,
+    SHOOT6EMOTE1 = 6124,
+    SHOOT7EMOTE1 = 6122,
+    SHOOT7EMOTE2 = 6123,
+    SHOOT8EMOTE1 = 6137,
+    SHOOT9EMOTE1 = 6136,
+    SHOOT10EMOTE1 = 6138
+};
 
 static float const AngusMove[3][3] =
 {

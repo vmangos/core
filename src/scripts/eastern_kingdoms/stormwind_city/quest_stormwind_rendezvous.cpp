@@ -603,7 +603,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
             if (Creature* Onyxia = m_creature->FindNearestCreature(NPC_KATRANA_PRESTOR, 150.0f))
             {
                 Onyxia->UpdateEntry(NPC_LADY_ONYXIA);
-                Onyxia->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                Onyxia->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
             }
             Timer = 1000;
             break;
