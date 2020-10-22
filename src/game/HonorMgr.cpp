@@ -198,21 +198,21 @@ void HonorMaintenancer::SetCityRanks()
 
     for (uint8 i = 1; i < MAX_RACES; ++i)
     {
-        QueryResult *result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM characters WHERE `honorStanding` > 0 and race = '%u' ORDER BY `honorStanding` ASC LIMIT 1", i);
+        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM `characters` WHERE `honorStanding` > 0 and `race` = '%u' ORDER BY `honorStanding` ASC LIMIT 1", i);
 
         if (result)
         {
             do
             {
-                Field *fields = result->Fetch();
+                Field* fields = result->Fetch();
                 uint32 guid = fields[0].GetUInt32();
                 uint32 honorStanding = fields[1].GetUInt32();
 
                 highestStandingInRace[i] = std::make_pair(guid, honorStanding);
             } 
             while (result->NextRow());
+            delete result;
         }
-        delete result;
     }
 
     for (auto& standing : highestStandingInRace)
@@ -220,7 +220,7 @@ void HonorMaintenancer::SetCityRanks()
         uint32 lowGuid = standing.second.first;
 
         if (lowGuid > 0)
-            CharacterDatabase.PExecute("UPDATE `characters` SET extra_flags =  extra_flags | 0x0400 WHERE `guid` = '%u'", standing.second.first);
+            CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = '%u'", standing.second.first);
     }
 }
 

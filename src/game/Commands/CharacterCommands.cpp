@@ -2138,24 +2138,24 @@ bool ChatHandler::HandleCharacterFillFlysCommand(char* args)
 
 bool ChatHandler::HandleCharacterCityTitleCommand(char* args)
 {
-    if (!*args)
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        return false;
+    }
+
+    bool value;
+    if (!ExtractOnOff(&args, value))
     {
         PSendSysMessage("Syntax: .title on | off");
         return false;
     }
 
-    bool value;
-    ExtractOnOff(&args, value);
-
-    Player *target = GetSelectedPlayer();
-
-    if (!target)
-        target = m_session->GetPlayer();
-
     if (value)
-        target->SetCityTitle();
+        pPlayer->SetCityTitle();
     else
-        target->RemoveCityTitle();
+        pPlayer->RemoveCityTitle();
 
     return true;
 }

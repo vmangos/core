@@ -1159,18 +1159,18 @@ void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
         m_detectInvisibilityMask &= ~(1 << 6);
 }
 
-bool Player::IsCityProtector() { return m_ExtraFlags & PLAYER_CITY_PROTECTOR; }
+bool Player::IsCityProtector() { return m_ExtraFlags & PLAYER_EXTRA_CITY_PROTECTOR; }
 
 void Player::SetCityTitle()
 {
     SetByteValue(PLAYER_BYTES_3, 2, GetRace());
-    m_ExtraFlags |= PLAYER_CITY_PROTECTOR;
+    m_ExtraFlags |= PLAYER_EXTRA_CITY_PROTECTOR;
 }
 
 void Player::RemoveCityTitle()
 {
     SetByteValue(PLAYER_BYTES_3, 2, 0);
-    m_ExtraFlags &= ~PLAYER_CITY_PROTECTOR;
+    m_ExtraFlags &= ~PLAYER_EXTRA_CITY_PROTECTOR;
 }
 
 AutoAttackCheckResult Player::CanAutoAttackTarget(Unit const* pVictim) const
@@ -15156,7 +15156,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
         SetWhisperRestriction(true);
 
-    if (extraflags & PLAYER_CITY_PROTECTOR && sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
+    if ((extraflags & PLAYER_EXTRA_CITY_PROTECTOR) && sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
         SetCityTitle();
 
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
