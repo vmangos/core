@@ -1224,6 +1224,20 @@ void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
         m_detectInvisibilityMask &= ~(1 << 6);
 }
 
+bool Player::IsCityProtector() { return m_ExtraFlags & PLAYER_EXTRA_CITY_PROTECTOR; }
+
+void Player::SetCityTitle()
+{
+    SetByteValue(PLAYER_BYTES_3, 2, GetRace());
+    m_ExtraFlags |= PLAYER_EXTRA_CITY_PROTECTOR;
+}
+
+void Player::RemoveCityTitle()
+{
+    SetByteValue(PLAYER_BYTES_3, 2, 0);
+    m_ExtraFlags &= ~PLAYER_EXTRA_CITY_PROTECTOR;
+}
+
 AutoAttackCheckResult Player::CanAutoAttackTarget(Unit const* pVictim) const
 {
     if (!IsValidAttackTarget(pVictim))
@@ -14666,7 +14680,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //"honorRankPoints, honorRighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK,"
     // 45               46     47      48      49      50      51      52      53             54              55      56
     //"watchedFaction,  drunk, health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, actionBars,"
-    // 57                58
+    // 57                
     //"world_phase_mask FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
 
     QueryResult* result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
@@ -15179,6 +15193,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
         SetWhisperRestriction(true);
+
+    if ((extraflags & PLAYER_EXTRA_CITY_PROTECTOR) && sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
+        SetCityTitle();
 
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
     CreatePacketBroadcaster();

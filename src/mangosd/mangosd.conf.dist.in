@@ -382,6 +382,10 @@ Anticrash.Rearm.Timer = 60000
 #    PvP.DishonorableKills
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
+#  
+#    PvP.CityProtector
+#        Whether to assign City Protector titles on honor update or not.
+#        Default: 0
 #
 #    Progression.AccuratePetStatistics
 #        Whether to allow Blizzlike pet statistic (damage, speed, resists) progression.
@@ -434,6 +438,7 @@ PvP.AccuratePurchaseRequirements = 1
 PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
+PvP.CityProtector = 0
 
 Progression.RestoreDeletedItems = 1
 Progression.AccuratePetStatistics = 1

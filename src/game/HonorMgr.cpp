@@ -180,6 +180,50 @@ void HonorMaintenancer::InactiveDecayRankPoints()
     }
 }
 
+void HonorMaintenancer::SetCityRanks()
+{
+    CharacterDatabase.Execute("UPDATE `characters` SET `extra_flags` = `extra_flags` & ~0x0400");
+
+    std::map<uint8, std::pair<uint32, uint32>> highestStandingInRace =
+    {
+        {RACE_HUMAN, {0,0}},
+        {RACE_ORC, {0,0}},
+        {RACE_DWARF, {0,0}},
+        {RACE_NIGHTELF, {0,0}},
+        {RACE_UNDEAD, {0,0}},
+        {RACE_TAUREN, {0,0}},
+        {RACE_GNOME, {0,0}},
+        {RACE_TROLL, {0,0}},
+    };
+
+    for (uint8 i = 1; i < MAX_RACES; ++i)
+    {
+        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM `characters` WHERE `honorStanding` > 0 and `race` = %u ORDER BY `honorStanding` ASC LIMIT 1", i);
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 guid = fields[0].GetUInt32();
+                uint32 honorStanding = fields[1].GetUInt32();
+
+                highestStandingInRace[i] = std::make_pair(guid, honorStanding);
+            } 
+            while (result->NextRow());
+            delete result;
+        }
+    }
+
+    for (auto& standing : highestStandingInRace)
+    {
+        uint32 lowGuid = standing.second.first;
+
+        if (lowGuid > 0)
+            CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = %u", standing.second.first);
+    }
+}
+
 void HonorMaintenancer::FlushRankPoints()
 {
     // Imediatly reset honor standing before flushing
@@ -227,6 +271,13 @@ void HonorMaintenancer::DoMaintenance()
     DistributeRankPoints(HORDE);
     sLog.outHonor("[MAINTENANCE] Decay rank points for inactive players.");
     InactiveDecayRankPoints();
+
+    if (sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
+    {
+        sLog.outHonor("[MAINTENANCE] Assign city titles.");
+        SetCityRanks();
+    }
+
     sLog.outHonor("[MAINTENANCE] Flush rank points.");
     FlushRankPoints();
 

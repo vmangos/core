@@ -345,6 +345,7 @@ class ChatHandler
         bool HandleCharacterChangeRaceCommand(char *args);
         bool HandleCharacterCopySkinCommand(char *args);
         bool HandleCharacterFillFlysCommand(char *args);
+        bool HandleCharacterCityTitleCommand(char *args);
         bool HandleCharacterPremadeGearCommand(char *args);
         bool HandleCharacterPremadeSpecCommand(char *args);
         bool HandleCharacterPremadeSaveGearCommand(char *args);

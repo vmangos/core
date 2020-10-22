@@ -2136,6 +2136,30 @@ bool ChatHandler::HandleCharacterFillFlysCommand(char* args)
     return false;
 }
 
+bool ChatHandler::HandleCharacterCityTitleCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        return false;
+    }
+
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        PSendSysMessage("Syntax: .title on | off");
+        return false;
+    }
+
+    if (value)
+        pPlayer->SetCityTitle();
+    else
+        pPlayer->RemoveCityTitle();
+
+    return true;
+}
+
 bool ChatHandler::HandleHonorShow(char* /*args*/)
 {
     Player* target = GetSelectedPlayer();
@@ -2371,7 +2395,6 @@ bool ChatHandler::HandleHonorSetRPCommand(char *args)
     PSendSysMessage("You have changed rank points of %s to %g.", target->GetName(), value);
     return true;
 }
-
 
 bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
 {
