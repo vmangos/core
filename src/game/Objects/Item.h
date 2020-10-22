@@ -213,7 +213,7 @@ enum ItemDynFlags
     ITEM_DYNFLAG_UNK10                        = 0x00000400,
     ITEM_DYNFLAG_UNK11                        = 0x00000800,
     ITEM_DYNFLAG_UNK12                        = 0x00001000,
-    ITEM_DYNFLAG_UNK13                        = 0x00002000,
+    ITEM_DYNFLAG_UNK13                        = 0x00002000, // guild charter
     ITEM_DYNFLAG_UNK14                        = 0x00004000,
     ITEM_DYNFLAG_UNK15                        = 0x00008000,
     ITEM_DYNFLAG_UNK16                        = 0x00010000, // soulbound pre 1.7

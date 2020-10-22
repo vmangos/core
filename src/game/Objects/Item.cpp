@@ -246,6 +246,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
         return false;
 
     ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK6, itemProto->Flags & ITEM_FLAG_UNK6);
+    ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK13, itemProto->Flags & ITEM_FLAG_CHARTER);
 
     SetUInt32Value(ITEM_FIELD_STACK_COUNT, 1);
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, itemProto->MaxDurability);
