@@ -182,7 +182,7 @@ void HonorMaintenancer::InactiveDecayRankPoints()
 
 void HonorMaintenancer::SetCityRanks()
 {
-    CharacterDatabase.Execute("UPDATE `characters` SET extra_flags = extra_flags & ~0x0400");
+    CharacterDatabase.Execute("UPDATE `characters` SET `extra_flags` = `extra_flags` & ~0x0400");
 
     std::map<uint8, std::pair<uint32, uint32>> highestStandingInRace =
     {
@@ -198,7 +198,7 @@ void HonorMaintenancer::SetCityRanks()
 
     for (uint8 i = 1; i < MAX_RACES; ++i)
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM `characters` WHERE `honorStanding` > 0 and `race` = '%u' ORDER BY `honorStanding` ASC LIMIT 1", i);
+        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM `characters` WHERE `honorStanding` > 0 and `race` = %u ORDER BY `honorStanding` ASC LIMIT 1", i);
 
         if (result)
         {
@@ -220,7 +220,7 @@ void HonorMaintenancer::SetCityRanks()
         uint32 lowGuid = standing.second.first;
 
         if (lowGuid > 0)
-            CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = '%u'", standing.second.first);
+            CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = %u", standing.second.first);
     }
 }
 
