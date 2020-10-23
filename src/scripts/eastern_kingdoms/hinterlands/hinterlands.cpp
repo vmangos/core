@@ -45,7 +45,8 @@ enum RinjiData
     QUEST_RINJI_TRAPPED     = 2742,
     NPC_RANGER              = 2694,
     NPC_OUTRUNNER           = 2691,
-    GO_RINJI_CAGE           = 142036
+    GO_RINJI_CAGE           = 142036,
+    FACTION_ESCORTEE        = 33,
 };
 
 struct Location
@@ -209,6 +210,8 @@ bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, Quest const* pQ
     {
         if (GameObject* pGo = GetClosestGameObjectWithEntry(pCreature, GO_RINJI_CAGE, INTERACTION_DISTANCE))
             pGo->UseDoorOrButton();
+
+        pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
 
         if (npc_rinjiAI* pEscortAI = dynamic_cast<npc_rinjiAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);

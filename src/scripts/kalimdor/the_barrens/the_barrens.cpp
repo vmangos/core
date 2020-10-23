@@ -176,17 +176,23 @@ bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, Quest const
 ## npc_twiggy_flathead
 #####*/
 
-#define SAY_BIG_WILL_READY                  -1000123
-#define SAY_TWIGGY_BEGIN                    -1000124
-#define SAY_TWIGGY_FRAY                     -1000125
-#define SAY_TWIGGY_DOWN                     -1000126
-#define SAY_TWIGGY_OVER                     -1000127
+enum
+{
+    SAY_BIG_WILL_READY = -1000123,
+    SAY_TWIGGY_BEGIN = -1000124,
+    SAY_TWIGGY_FRAY = -1000125,
+    SAY_TWIGGY_DOWN = -1000126,
+    SAY_TWIGGY_OVER = -1000127,
 
-#define NPC_TWIGGY                          6248
-#define NPC_BIG_WILL                        6238
-#define NPC_AFFRAY_CHALLENGER               6240
-#define NPC_AFFRAY_SPECTATOR                6249
-#define QUEST_AFFRAY                        1719
+    NPC_TWIGGY = 6248,
+    NPC_BIG_WILL = 6238,
+    NPC_AFFRAY_CHALLENGER = 6240,
+    NPC_AFFRAY_SPECTATOR = 6249,
+    QUEST_AFFRAY = 1719,
+    FACTION_FRIENDLY = 35,
+    FACTION_MONSTER = 16,
+    FACTION_CREATURE = 7
+};
 
 float AffrayChallengerLoc[6][4] =
 {
@@ -259,7 +265,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                 continue;
             }
 
-            pCreature->SetFactionTemplateId(35);
+            pCreature->SetFactionTemplateId(FACTION_FRIENDLY);
             pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             pCreature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
             AffrayChallenger[i] = pCreature->GetGUID();
@@ -271,7 +277,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         pUnit->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-        pUnit->SetFactionTemplateId(14);
+        pUnit->SetFactionTemplateId(FACTION_MONSTER);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -327,7 +333,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                     if (Unit *temp = m_creature->SummonCreature(NPC_BIG_WILL, -1713.79f, -4342.09f, 6.05f, 6.15f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
                     {
                         BigWillGUID = temp->GetGUID();
-                        temp->SetFactionTemplateId(35);
+                        temp->SetFactionTemplateId(FACTION_FRIENDLY);
                         temp->GetMotionMaster()->MovePoint(0, -1682.31f, -4329.68f, 2.78f);
                     }
                     Event_Timer = 15000;
@@ -336,7 +342,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                 case 3:
                     if (Unit *will = m_creature->GetMap()->GetUnit(BigWillGUID))
                     {
-                        will->SetFactionTemplateId(32);
+                        will->SetFactionTemplateId(FACTION_CREATURE);
                         DoScriptText(SAY_BIG_WILL_READY, will, pPlayer);
                     }
                     Event_Timer = 5000;
