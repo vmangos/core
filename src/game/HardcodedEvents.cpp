@@ -187,7 +187,7 @@ LeprithusEventState Leprithus::GetLeprithusState()
     time_t rawtime;
     time(&rawtime);
 
-    struct tm *timeinfo;
+    struct tm* timeinfo;
     timeinfo = localtime(&rawtime);
 
     if (timeinfo->tm_hour >= 22 || timeinfo->tm_hour <= 9)
@@ -229,7 +229,7 @@ MoonbrookEventState Moonbrook::GetMoonbrookState()
     time_t rawtime;
     time(&rawtime);
 
-    struct tm *timeinfo;
+    struct tm* timeinfo;
     timeinfo = localtime(&rawtime);
 
     if (timeinfo->tm_hour < 21 && timeinfo->tm_hour > 9)
@@ -435,7 +435,7 @@ void DarkmoonFaire::Disable()
 
 }
 
-uint32 DarkmoonFaire::FindMonthFirstMonday(bool& foireAlly, struct tm *timeinfo)
+uint32 DarkmoonFaire::FindMonthFirstMonday(bool& foireAlly, struct tm* timeinfo)
 {
     foireAlly = timeinfo->tm_mon % 2;
     // 36 = 7*5 + 1 (+1 because tm_mday starts with 1)
@@ -450,7 +450,7 @@ DarkmoonState DarkmoonFaire::GetDarkmoonState()
     time_t rawtime;
     time(&rawtime);
 
-    struct tm *timeinfo;
+    struct tm* timeinfo;
     timeinfo = localtime(&rawtime);
 
     auto firstMonday = FindMonthFirstMonday(faireAlly, timeinfo);
