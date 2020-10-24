@@ -45,6 +45,9 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 
 -- dalar dawnweaver should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 17613;
 
+-- remove incorrect Soaring Razorbeak
+DELETE FROM `creature` WHERE `guid` = 92880;
+
 
 -- End of migration.
 END IF;
