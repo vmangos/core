@@ -113,7 +113,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 -- susan tillinghast is not a trainer
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 9098 AND `id` = 3;
 UPDATE `creature_template` SET `npc_flags` = 0 WHERE `entry` = 2802;
-
+DELETE FROM `npc_trainer` WHERE `entry` = 2802;
 
 -- End of migration.
 END IF;
