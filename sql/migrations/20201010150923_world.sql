@@ -46,9 +46,6 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 
 -- dalar dawnweaver should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 17613;
 
--- remove incorrect Soaring Razorbeak
-DELETE FROM `creature` WHERE `guid` = 92880;
-
 -- horde orphan should run
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (651701, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Orphan - Run');
 UPDATE `creature_movement` SET `script_id` = 651701 WHERE `id` = 6517 AND `point` = 1;
