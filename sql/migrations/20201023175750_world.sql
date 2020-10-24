@@ -62,6 +62,7 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=573801;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (573801, 0, 1, 18, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Caged Dwarf Male - Random Emote');
 
 -- make apothecary keever script more blizzlike
+UPDATE `creature_template_addon` SET `bytes1` = 0 WHERE `entry` = 5734;
 UPDATE `creature_equip_template` SET `equipentry1` = 0 WHERE `entry` = 5734;
 DELETE FROM `generic_scripts` WHERE `id`=573402;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (573402, 0, 19, 0, 0, 0, 0, 0, 0, 0, 4, 2199, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Keever - Equip');
