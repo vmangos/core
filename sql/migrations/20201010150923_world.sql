@@ -53,6 +53,16 @@ DELETE FROM `creature` WHERE `guid` = 92880;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (651701, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Orphan - Run');
 UPDATE `creature_movement` SET `script_id` = 651701 WHERE `id` = 6517 AND `point` = 1;
 
+-- keldran waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1722;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(5640, 1, 1781.55, -3997.07, 53.1638, 100.000000, 40000, 0.000000, 0),
+(5640, 2, 1780.69, -3994.17, 53.1638, 100.000000, 0, 0.000000, 0),
+(5640, 3, 1781.67, -3989.77, 53.1638, 100.000000, 0, 0.000000, 0),
+(5640, 4, 1784.59, -3988.64, 53.1638, 100.000000, 0, 0.000000, 0),
+(5640, 5, 1778.71, -3992, 53.1638, 100.000000, 0, 0.000000, 0),
+(5640, 6, 1770.25, -3992.89, 52.9891, 100.000000, 30000, 0.000000, 0);
+
 
 -- End of migration.
 END IF;
