@@ -573,6 +573,14 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
         }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        else if (isType(TYPEMASK_ITEM))
+        {
+            // Force include flags field in create object packet,
+            // because the static flags need to sent in that field.
+            updateMask->SetBit(ITEM_FIELD_FLAGS);
+        }
+#endif
     }
     else                                                    // case UPDATETYPE_VALUES
     {
@@ -833,7 +841,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
             }
         }
     }
-    else                                                    // other objects case (no special index checks)
+    else if (isType(TYPEMASK_CORPSE))
     {
         for (uint16 index = 0; index < m_valuesCount; ++index)
         {
@@ -856,6 +864,40 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                 else
                     // send in current format (float as float, uint32 as uint32)
                     *data << m_uint32Values[index];
+            }
+        }
+    }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+    else if (isType(TYPEMASK_ITEM))
+    {
+        for (uint16 index = 0; index < m_valuesCount; ++index)
+        {
+            if (updateMask->GetBit(index))
+            {
+                // Static item flags are part of that field prior to patch 1.7.
+                if (index == ITEM_FIELD_FLAGS)
+                {
+                    if (ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(GetEntry()))
+                        *data << uint16(pProto->Flags);
+                    else
+                        *data << uint16(0);
+                    *data << uint16(m_uint32Values[index]);
+                }
+                else
+                    // send in current format (float as float, uint32 as uint32)
+                    *data << m_uint32Values[index];
+            }
+        }
+    }
+#endif
+    else                                                    // other objects case (no special index checks)
+    {
+        for (uint16 index = 0; index < m_valuesCount; ++index)
+        {
+            if (updateMask->GetBit(index))
+            {
+                // send in current format (float as float, uint32 as uint32)
+                *data << m_uint32Values[index];
             }
         }
     }

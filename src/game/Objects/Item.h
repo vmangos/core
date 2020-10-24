@@ -200,8 +200,8 @@ enum ItemLootUpdateState
 // masks for ITEM_FIELD_FLAGS field
 enum ItemDynFlags
 {
-    ITEM_DYNFLAG_BINDED                       = 0x00000001, // set in game at binding
-    ITEM_DYNFLAG_UNK1                         = 0x00000002,
+    ITEM_DYNFLAG_BOUND                       = 0x00000001, // set in game at binding
+    ITEM_DYNFLAG_TRANSLATED                   = 0x00000002,
     ITEM_DYNFLAG_UNLOCKED                     = 0x00000004, // have meaning only for item with proto->LockId, if not set show as "Locked, req. lockpicking N"
     ITEM_DYNFLAG_WRAPPED                      = 0x00000008, // mark item as wrapped into wrapper container
     ITEM_DYNFLAG_UNK4                         = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
@@ -213,10 +213,10 @@ enum ItemDynFlags
     ITEM_DYNFLAG_UNK10                        = 0x00000400,
     ITEM_DYNFLAG_UNK11                        = 0x00000800,
     ITEM_DYNFLAG_UNK12                        = 0x00001000,
-    ITEM_DYNFLAG_UNK13                        = 0x00002000, // guild charter
+    ITEM_DYNFLAG_UNK13                        = 0x00002000,
     ITEM_DYNFLAG_UNK14                        = 0x00004000,
     ITEM_DYNFLAG_UNK15                        = 0x00008000,
-    ITEM_DYNFLAG_UNK16                        = 0x00010000, // soulbound pre 1.7
+    ITEM_DYNFLAG_UNK16                        = 0x00010000,
     ITEM_DYNFLAG_UNK17                        = 0x00020000,
 };
 
@@ -258,12 +258,8 @@ class Item : public Object
         void SetOwnerGuid(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner()const;
 
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, val); ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK16, val); }
-#else
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, val); }
-#endif
-        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED); }
+        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND, val); }
+        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND); }
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
         virtual void SaveToDB();

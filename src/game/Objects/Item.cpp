@@ -245,9 +245,6 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
     if (!itemProto)
         return false;
 
-    ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK6, itemProto->Flags & ITEM_FLAG_UNK6);
-    ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK13, itemProto->Flags & ITEM_FLAG_CHARTER);
-
     SetUInt32Value(ITEM_FIELD_STACK_COUNT, 1);
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, itemProto->MaxDurability);
     SetUInt32Value(ITEM_FIELD_DURABILITY, itemProto->MaxDurability);
@@ -477,13 +474,9 @@ bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint3
     // Remove bind flag for items vs NO_BIND set
     if (IsSoulBound() && proto->Bonding == NO_BIND)
     {
-        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, false);
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
-        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK16, false);
-#endif
+        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND, false);
         need_save = true;
     }
-
 
     std::string enchants = fields[6].GetString();
     _LoadIntoDataField(enchants, ITEM_FIELD_ENCHANTMENT, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
