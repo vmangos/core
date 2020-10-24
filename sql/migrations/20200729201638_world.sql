@@ -27,7 +27,7 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 
 UPDATE `creature` SET `orientation` = 4.72669 WHERE `guid` = 38290;
 
 -- remove incorrect deathguard elite
-DELETE FROM `creature` WHERE `guid` = 14369;
+DELETE FROM `creature` WHERE `guid` = 45204;
 
 -- junior apothecary holland - say OOC
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 10665;
