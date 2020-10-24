@@ -45,7 +45,7 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200  WHERE `entry` = 989 A
 -- karakul is not a vendor
 DELETE FROM `npc_vendor` WHERE `entry` = 6930;
 DELETE FROM `gossip_menu_option` WHERE `id` = 4 AND `menu_id` = 1290;
-UPDATE `creature_template` SET `npc_flags` = 131 WHERE `entry` = 6930;
+UPDATE `creature_template` SET `npc_flags` = 131, `vendor_id` = 0 WHERE `entry` = 6930;
 
 
 -- badlands
