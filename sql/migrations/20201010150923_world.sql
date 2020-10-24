@@ -60,6 +60,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5640, 5, 1778.71, -3992, 53.1638, 100.000000, 0, 0.000000, 0),
 (5640, 6, 1770.25, -3992.89, 52.9891, 100.000000, 30000, 0.000000, 0);
 
+-- kon yelloweyes should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 8 WHERE `guid` = 26757;
+
 
 -- End of migration.
 END IF;
