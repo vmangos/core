@@ -200,7 +200,7 @@ enum ItemLootUpdateState
 // masks for ITEM_FIELD_FLAGS field
 enum ItemDynFlags
 {
-    ITEM_DYNFLAG_BOUND                       = 0x00000001, // set in game at binding
+    ITEM_DYNFLAG_BOUND                        = 0x00000001, // set in game at binding
     ITEM_DYNFLAG_TRANSLATED                   = 0x00000002,
     ITEM_DYNFLAG_UNLOCKED                     = 0x00000004, // have meaning only for item with proto->LockId, if not set show as "Locked, req. lockpicking N"
     ITEM_DYNFLAG_WRAPPED                      = 0x00000008, // mark item as wrapped into wrapper container
