@@ -63,6 +63,19 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- kon yelloweyes should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 8 WHERE `guid` = 26757;
 
+-- thunder bluff bonfire should be lit at night
+-- add lit bonfire
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(20557, 178571, 1, -1207.63, -66.4389, 157.49, -3.03687, 0, 0, 0.99863, -0.052336, 900, 900, 100, 0, 0, 0, 0, 10);
+
+-- remove 20556 at night
+INSERT INTO `game_event_creature` VALUES
+(20556, -27);
+
+-- add 20557 at night
+INSERT INTO `game_event_creature` VALUES
+(20557, 27);
+
 
 -- End of migration.
 END IF;
