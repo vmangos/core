@@ -70,11 +70,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- remove 20556 at night
 INSERT INTO `game_event_gameobject` VALUES
-(20556, -27);
+(20556, 27);
 
 -- add 20557 at night
 INSERT INTO `game_event_gameobject` VALUES
-(20557, 27);
+(20557, -27);
 
 
 -- End of migration.
