@@ -69,11 +69,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (20557, 178571, 1, -1207.63, -66.4389, 157.49, -3.03687, 0, 0, 0.99863, -0.052336, 900, 900, 100, 0, 0, 0, 0, 10);
 
 -- remove 20556 at night
-INSERT INTO `game_event_creature` VALUES
+INSERT INTO `game_event_gameobject` VALUES
 (20556, -27);
 
 -- add 20557 at night
-INSERT INTO `game_event_creature` VALUES
+INSERT INTO `game_event_gameobject` VALUES
 (20557, 27);
 
 
