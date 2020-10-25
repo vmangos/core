@@ -76,6 +76,9 @@ INSERT INTO `game_event_gameobject` VALUES
 INSERT INTO `game_event_gameobject` VALUES
 (20557, 27);
 
+-- arch druid fandral staghelm should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 8 WHERE `guid` = 46903;
+
 
 -- End of migration.
 END IF;
