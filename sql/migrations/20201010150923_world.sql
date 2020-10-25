@@ -79,6 +79,29 @@ INSERT INTO `game_event_gameobject` VALUES
 -- arch druid fandral staghelm should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 8 WHERE `guid` = 46903;
 
+-- add missing emotes to ironforge airfield npcs
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190201, 233);
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190211, 66);
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190199, 22);
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190236, 133);
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190237, 133);
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190239, 133);
+INSERT INTO `creature_addon` (`guid`, `emote`) VALUES
+(190240, 133);
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry`= 12047;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1204701, 0, 1, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormpike Mountaineer - Emote');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1204701, 52, 190243, 0, 0, 0, 0);
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1204701, 12047, 1204701, 1, 0, 100, 1, 0, 0, 4000, 4000, 1204701, 0, 0, 'Stormpike Mountaineer - Emote');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (559508, 5595, 559508, 1, 0, 100, 1, 0, 0, 5000, 5000, 559508, 0, 0, 'Ironforge Guard - Emote');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (559508, 52, 190209, 0, 0, 0, 0);
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (559508, 0, 1, 18, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Guard - Emote');
+
 
 -- End of migration.
 END IF;
