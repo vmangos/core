@@ -101,7 +101,8 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (559508, 5595, 559508, 1, 0, 100, 1, 0, 0, 5000, 5000, 559508, 0, 0, 'Ironforge Guard - Emote');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (559508, 52, 190209, 0, 0, 0, 0);
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (559508, 0, 1, 18, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Guard - Emote');
-UPDATE `creature_addon` SET `bytes1` = 1 WHERE `guid` = 190244;
+INSERT INTO `creature_addon` (`guid`, `bytes1`) VALUES
+(190244, 1);
 
 -- End of migration.
 END IF;
