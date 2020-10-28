@@ -104,6 +104,11 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_addon` (`guid`, `bytes1`) VALUES
 (190244, 1);
 
+-- add missing text to addled leper
+DELETE FROM `creature_ai_scripts` WHERE `id`=622103;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (622103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3829, 2425, 2423, 2424, 0, 0, 0, 0, 0, 'Addled Leper - Say Text');
+
+
 -- End of migration.
 END IF;
 END??
