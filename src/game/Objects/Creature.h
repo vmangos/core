@@ -49,18 +49,18 @@ struct GameEventCreatureData;
 
 enum CreatureFlagsExtra
 {
-    CREATURE_FLAG_EXTRA_INSTANCE_BIND                = 0x00000001,       // creature kill bind instance with killer and killer's group
-    CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002,       // not aggro (ignore faction/reputation hostility)
+    CREATURE_FLAG_EXTRA_INSTANCE_BIND                = 0x00000001,       // killing this creature will bind players to the raid
+    CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002,       // creature will not attack nearby hostile targets (ignore faction/reputation hostility)
     CREATURE_FLAG_EXTRA_NO_PARRY                     = 0x00000004,       // creature can't parry
     CREATURE_FLAG_EXTRA_SUMMON_GUARD                 = 0x00000008,       // creature summons a guard if an opposite faction player gets near or attacks
     CREATURE_FLAG_EXTRA_NO_BLOCK                     = 0x00000010,       // creature can't block
     CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020,       // creature can't do crush attacks
-    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL                = 0x00000040,       // creature kill not provide XP
+    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL                = 0x00000040,       // creature kill does not provide XP
     CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080,       // creature is always invisible for player (mostly trigger creatures)
     CREATURE_FLAG_EXTRA_NOT_TAUNTABLE                = 0x00000100,       // creature is immune to taunt auras and effect attack me
     CREATURE_FLAG_EXTRA_AGGRO_ZONE                   = 0x00000200,       // creature sets itself in combat with zone on aggro
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400,       // creature is a guard
-    CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800,
+    CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800,       // creature does not select targets based on threat
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000,       // creature keeps positive auras at reset
     CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000,       // creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
     CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000,       // creature is immune to AoE
@@ -74,6 +74,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00400000,       // CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
     CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00800000,       // CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
     CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000,       // creature will not pause movement when player talks to it
+    CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x02000000,       // creature will use run speed out of combat
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
