@@ -108,6 +108,51 @@ INSERT INTO `creature_addon` (`guid`, `bytes1`) VALUES
 DELETE FROM `creature_ai_scripts` WHERE `id`=622103;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (622103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3829, 2425, 2423, 2424, 0, 0, 0, 0, 0, 'Addled Leper - Say Text');
 
+-- correct waypoints and scripts for curator thorius
+DELETE FROM `creature_movement` WHERE `id` = 1887;
+DELETE FROM `creature_movement_scripts` WHERE `id` IN (188715, 188716);
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(8256, 1, -4654.31, -1281.54, 503.382, 100, 50000, 0, 0),
+(8256, 2, -4635.38, -1262.67, 503.382, 100, 0, 0, 0),
+(8256, 3, -4628.48, -1254.6, 503.382, 100, 0, 0, 0),
+(8256, 4, -4623.31, -1254.38, 503.382, 100, 0, 0, 0),
+(8256, 5, -4622.27, -1258.7, 503.382, 4.12949, 9000, 0, 825601),
+(8256, 6, -4615.69, -1255.44, 503.382, 100, 0, 0, 0),
+(8256, 7, -4611, -1251.59, 503.382, 100, 0, 0, 0),
+(8256, 8, -4603.86, -1251.56, 503.382, 0.331613, 9000, 0, 825602),
+(8256, 9, -4600.12, -1243.45, 503.381, 100, 0, 0, 0),
+(8256, 10, -4592.52, -1232.32, 503.381, 100, 0, 0, 0),
+(8256, 11, -4589.17, -1222.01, 503.382, 5.77903, 9000, 0, 825603),
+(8256, 12, -4590.56, -1215.33, 503.382, 100, 0, 0, 0),
+(8256, 13, -4593.49, -1215.04, 503.382, 100, 0, 0, 0),
+(8256, 14, -4601.52, -1222.18, 503.382, 100, 0, 0, 0),
+(8256, 15, -4609.05, -1232.85, 503.382, 100, 0, 0, 0),
+(8256, 16, -4613.15, -1252.13, 503.382, 100, 0, 0, 0),
+(8256, 17, -4619.33, -1265.1, 503.382, 100, 0, 0, 0),
+(8256, 18, -4632.15, -1275.75, 503.382, 100, 0, 0, 0),
+(8256, 19, -4651.05, -1285.22, 503.382, 100, 0, 0, 0),
+(8256, 20, -4664.39, -1292.38, 503.382, 100, 0, 0, 0),
+(8256, 21, -4675.87, -1295.89, 503.382, 100, 0, 0, 0),
+(8256, 22, -4686.99, -1300.62, 503.382, 100, 0, 0, 0),
+(8256, 23, -4702.68, -1309.54, 503.382, 100, 0, 0, 0),
+(8256, 24, -4711.19, -1322.43, 503.382, 3.66159, 4000, 0, 0),
+(8256, 25, -4699.78, -1325.52, 503.382, 100, 0, 0, 0),
+(8256, 26, -4693.85, -1325.62, 503.382, 100, 0, 0, 0),
+(8256, 27, -4687.15, -1321.02, 503.382, 100, 0, 0, 0),
+(8256, 28, -4684.08, -1315.78, 503.382, 100, 0, 0, 0),
+(8256, 29, -4679.16, -1313.33, 503.382, 100, 0, 0, 0),
+(8256, 30, -4668.37, -1308.36, 503.381, 100, 0, 0, 0),
+(8256, 31, -4663.3, -1301.66, 503.382, 100, 0, 0, 0),
+(8256, 32, -4660.58, -1292.92, 503.382, 100, 0, 0, 0);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825601, 5, 0, 2, 0, 0, 0, 0, 0, 0, 4, 4285, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825601, 5, 28, 8, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Kneel');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825601, 7, 28, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Stand');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825602, 5, 0, 2, 0, 0, 0, 0, 0, 0, 4, 4286, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825602, 5, 1, 69, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Emote');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825602, 8, 1, 30, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Emote');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825603, 5, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4287, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (825603, 5, 1, 36, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Curator Thorius - Emote');
+
 
 -- End of migration.
 END IF;
