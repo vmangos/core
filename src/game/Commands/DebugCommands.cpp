@@ -2582,3 +2582,55 @@ bool ChatHandler::HandleMmapLoad(char* args)
     MMAP::MMapFactory::createOrGetMMapManager()->loadMap(pl->GetMapId(), gx, gy);
     return true;
 }
+
+bool ChatHandler::HandleDebugUnitBytes1Command(char *args)
+{
+    Unit* target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 offset;
+    if (!ExtractUInt32(&args, offset))
+        return false;
+
+    if (offset > 3)
+        return false;
+
+    uint32 value;
+    if (!ExtractUInt32(&args, value))
+        return false;
+
+    target->SetByteValue(UNIT_FIELD_BYTES_1, offset, value);
+
+    return true;
+}
+
+bool ChatHandler::HandleDebugUnitBytes2Command(char *args)
+{
+    Unit* target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 offset;
+    if (!ExtractUInt32(&args, offset))
+        return false;
+
+    if (offset > 3)
+        return false;
+
+    uint32 value;
+    if (!ExtractUInt32(&args, value))
+        return false;
+
+    target->SetByteValue(UNIT_FIELD_BYTES_2, offset, value);
+
+    return true;
+}

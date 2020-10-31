@@ -442,6 +442,8 @@ class ChatHandler
 
         bool HandleDebugAnimCommand(char* args);
         bool HandleDebugBattlegroundCommand(char* args);
+        bool HandleDebugUnitBytes1Command(char* args);
+        bool HandleDebugUnitBytes2Command(char* args);
         bool HandleDebugConditionCommand(char* args);
         bool HandleDebugGetItemStateCommand(char* args);
         bool HandleDebugGetItemValueCommand(char* args);

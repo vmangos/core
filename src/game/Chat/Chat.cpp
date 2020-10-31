@@ -302,6 +302,8 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "anim",           SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugAnimCommand,                "", nullptr },
         { "bg",             SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleDebugBattlegroundCommand,        "", nullptr },
+        { "bytes1",         SEC_DEVELOPPER,     true,  &ChatHandler::HandleDebugUnitBytes1Command,          "", nullptr },
+        { "bytes2",         SEC_DEVELOPPER,     true,  &ChatHandler::HandleDebugUnitBytes2Command,          "", nullptr },
         { "condition",      SEC_TICKETMASTER,   false, &ChatHandler::HandleDebugConditionCommand,           "", nullptr },
         { "getitemstate",   SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugGetItemStateCommand,        "", nullptr },
         { "lrecipient",     SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugGetLootRecipientCommand,    "", nullptr },
