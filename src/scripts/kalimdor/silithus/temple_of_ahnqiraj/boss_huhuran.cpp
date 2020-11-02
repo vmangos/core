@@ -118,7 +118,8 @@ struct boss_huhuranAI : public ScriptedAI
             m_uiFrenzyTimer -= uiDiff;
 
         // No longer cast wyvern string during enrage
-        if (!m_bBerserk) {
+        if (!m_bBerserk)
+        {
             // Wyvern Timer
             if (m_uiWyvernTimer < uiDiff)
             {
