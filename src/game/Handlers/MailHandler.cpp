@@ -365,12 +365,8 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     }
 
     // default delay for mails is one hour in WoW Classic https://eu.battle.net/support/de/article/98485
-    uint32 deliver_delay = sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY);
-
     // mails which only contain a text message will arrive instantly
-    if (!req->itemGuid && req->money == 0) {
-        deliver_delay = 0;
-    }
+    uint32 deliver_delay = (!req->itemGuid && req->money == 0) ? 0 : sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY);
 
     if (!item && req->COD)
     {
