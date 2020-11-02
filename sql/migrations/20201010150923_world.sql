@@ -28,11 +28,12 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996168, 9);
 
 -- add correct text to Warden Thelwater
-DELETE FROM `creature_ai_scripts` WHERE `id`=171901;
-DELETE FROM `generic_scripts` WHERE `id` IN (171901, 171902);
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171901, 0, 39, 171901, 171902, 0, 0, 0, 0, 0, 4, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Warden Thelwater - Start Script');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1658, 1659, 1660, 1661, 0, 0, 0, 0, 0, 'Warden Thelwater - Say Text');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1662, 1661, 1660, 1659, 0, 0, 0, 0, 0, 'Warden Thelwater - Say Text');
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1719;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (171901, 1719, 0, 1, 0, 100, 3, 0, 0, 6000, 43000, 171901, 171903, 0, 'Warden Thelwater - Random Say');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (171902, 1719, 0, 1, 0, 100, 1, 1800000, 1800000, 1800000, 1800000, 171902, 0, 0, 'Warden Thelwater - Start Stockade Jailbreak Event');
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (171901, 171903);
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1658, 1659, 1660, 1661, 0, 0, 0, 0, 0, 'Warden Thelwater - Say Text');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (171903, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1662, 1661, 1660, 1659, 0, 0, 0, 0, 0, 'Warden Thelwater - Say Text');
 
 -- remove duplicate Cliff Giant and Land Walker spawns
 DELETE FROM `creature` WHERE `guid` IN (51692, 51697);
