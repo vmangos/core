@@ -318,8 +318,6 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
 
     loadedPlayer->ModifyMoney(-int32(reqmoney));
 
-    bool needItemDelay = false;
-
     MailDraft draft(req->subject, req->body);
 
     if (!req->COD && (req->money || item))
@@ -357,9 +355,6 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
             CharacterDatabase.CommitTransaction();
 
             draft.AddItem(item);
-
-            // if item send to character at another account, then apply item delivery delay
-            needItemDelay = pl->GetSession()->GetAccountId() != rc_account;
         }
 
         if (req->money > 0 &&  GetSecurity() > SEC_PLAYER && sWorld.getConfig(CONFIG_BOOL_GM_LOG_TRADE))
@@ -369,8 +364,9 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         }
     }
 
-    // If theres is an item, there is a one hour delivery delay if sent to another account's character.
-    uint32 deliver_delay = needItemDelay ? sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY) : 0;
+    // default delay for mails is one hour in WoW Classic https://eu.battle.net/support/de/article/98485
+    // mails which only contain a text message will arrive instantly
+    uint32 deliver_delay = (!req->itemGuid && req->money == 0) ? 0 : sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY);
 
     if (!item && req->COD)
     {
