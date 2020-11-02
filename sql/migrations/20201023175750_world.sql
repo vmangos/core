@@ -116,7 +116,7 @@ DELETE FROM `gossip_menu_option` WHERE `menu_id` = 9098 AND `id` = 3;
 UPDATE `creature_template` SET `npc_flags` = 0 WHERE `entry` = 2802;
 DELETE FROM `npc_trainer` WHERE `entry` = 2802;
 
---add susan tillinghast waypoints (taken from https://github.com/cmangos/tbc-db/commit/087a1bc1afa7c053760cee44c1286a1e06fb30dc)
+-- add susan tillinghast waypoints (taken from https://github.com/cmangos/tbc-db/commit/087a1bc1afa7c053760cee44c1286a1e06fb30dc)
 UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 2802;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (2802, 1, 1378.64, 55.965, -62.2767, 100, 0, 0, 0),
