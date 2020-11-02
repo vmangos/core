@@ -133,7 +133,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/elwynn_forest/elwynn_forest.cpp
     eastern_kingdoms/hillsbrad_foothills/hillsbrad_foothills.cpp
     eastern_kingdoms/hinterlands/hinterlands.cpp
-    eastern_kingdoms/ironforge/ironforge.cpp
     eastern_kingdoms/loch_modan/loch_modan.cpp
     eastern_kingdoms/redridge_mountains/redridge_mountains.cpp
     eastern_kingdoms/searing_gorge/searing_gorge.cpp
