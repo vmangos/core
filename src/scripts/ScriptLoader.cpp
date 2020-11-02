@@ -182,7 +182,6 @@ void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
 void AddSC_hillsbrad_foothills();
 void AddSC_hinterlands();
-void AddSC_ironforge();
 void AddSC_loch_modan();
 void AddSC_redridge_mountains();
 void AddSC_searing_gorge();
@@ -437,7 +436,6 @@ void AddScripts()
     AddSC_elwynn_forest();
     AddSC_hillsbrad_foothills();
     AddSC_hinterlands();
-    AddSC_ironforge();
     AddSC_loch_modan();
     AddSC_redridge_mountains();
     AddSC_searing_gorge();

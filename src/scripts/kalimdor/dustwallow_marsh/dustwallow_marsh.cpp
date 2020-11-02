@@ -923,6 +923,11 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
         m_uiSpecialTimer = 15000;
     }
 
+    void EnterCombat(Unit* enemy) override
+    {
+        me->PlayDistanceSound(5882);
+    }
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted())
