@@ -74,7 +74,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 
 -- add angor patrol (need waypoints, only partial are available in current sniff)
 UPDATE `creature` SET `movement_type` = 0 WHERE `guid` = 7215;
-DELETE FROM creature_movement WHERE id IN (7816, 7215);
+DELETE FROM `creature_movement` WHERE `id` IN (7816, 7215);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (7816, 7215, 4, 15, 11),
 (7816, 7216, 4, 17, 11);
