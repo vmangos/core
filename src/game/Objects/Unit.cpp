@@ -4260,7 +4260,8 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
         SubDamageInfo* subDamage = &damageInfo->subDamage[i];
 
         data << uint32(GetFirstSchoolInMask(subDamage->damageSchoolMask));
-        data << float(subDamage->damage)/ float(damageInfo->totalDamage);        // Float coefficient of sub damage
+        // Float coefficient of sub damage
+        data << ((damageInfo->totalDamage != 0) ? (float(subDamage->damage) / float(damageInfo->totalDamage)) : 0);
         data << uint32(subDamage->damage);
         data << uint32(subDamage->absorb);
         data << int32(subDamage->resist);
