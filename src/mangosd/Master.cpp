@@ -432,12 +432,11 @@ int Master::Run()
     //LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
 
     ///- Remove signal handling before leaving
-    sLog.outString("Unhooking signals...");
     _UnhookSignals();
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
-    sLog.outString("Stopping world thread...");
+    sLog.outString("Waiting for world thread to finish...");
     world_thread.wait();
 
     if(rar_thread)
