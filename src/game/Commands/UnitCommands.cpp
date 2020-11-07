@@ -294,7 +294,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Mount display id: %u", pTarget->GetMountID());
     PSendSysMessage("Stand state: %hhu", pTarget->GetStandState());
     PSendSysMessage("Shapeshift form: %hhu", pTarget->GetShapeshiftForm());
-    PSendSysMessage("Byte flags: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_1, 3));
+    PSendSysMessage("Vis flags: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG));
     PSendSysMessage("Dynamic flags: %u", pTarget->GetUInt32Value(UNIT_DYNAMIC_FLAGS));
     if (auto pSpellEntry = sSpellMgr.GetSpellEntry(pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL)))
         PSendSysMessage("Channel spell: %u - %s", pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL), pSpellEntry->SpellName[0].c_str());
@@ -309,7 +309,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Unit state flags: %u", pTarget->GetUnitState());
     PSendSysMessage("Death state: %hhu", pTarget->GetDeathState());
     PSendSysMessage("Sheath state: %hhu", pTarget->GetSheath());
-    PSendSysMessage("Byte flags 2: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_2, 1));
+    PSendSysMessage("Byte flags 2: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS));
 
     return true;
 }

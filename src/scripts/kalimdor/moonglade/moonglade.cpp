@@ -309,7 +309,6 @@ struct npc_keeper_remulosAI : public npc_escortAI
             case NPC_ERANIKUS_TYRANT:
                 m_uiEranikusGUID = pSummoned->GetObjectGuid();
                 // Make Eranikus unattackable first
-                //pSummoned->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND /*| UNIT_BYTE1_FLAG_UNK_2*/);
                 pSummoned->AddAura(17131); // hover
                 pSummoned->SetFly(true);
                 pSummoned->MonsterMove(aEranikusLocations[0].m_fX, aEranikusLocations[0].m_fY, aEranikusLocations[0].m_fZ);
@@ -575,7 +574,6 @@ struct npc_keeper_remulosAI : public npc_escortAI
                         if (Creature* pEranikus = m_creature->GetMap()->GetCreature(m_uiEranikusGUID))
                         {
                             pEranikus->GetMotionMaster()->MovePoint(POINT_ID_ERANIKUS_COMBAT, aEranikusLocations[2].m_fX, aEranikusLocations[2].m_fY, aEranikusLocations[2].m_fZ);
-                            //pEranikus->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0);
                             pEranikus->RemoveAurasDueToSpell(17131);
                         }
                     }

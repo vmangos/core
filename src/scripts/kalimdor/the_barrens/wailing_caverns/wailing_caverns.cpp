@@ -508,7 +508,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 7:
                             if (m_pInstance->GetData(TYPE_MUTANUS) == DONE)
                             {
-                                Naralex->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SIT);
+                                Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SIT);
                                 DoScriptText(SAY_NARALEX_AWAKEN, Naralex);
                                 Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                                 m_creature->InterruptNonMeleeSpells(false, SPELL_AWAKENING);
@@ -535,7 +535,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 9:
                             DoScriptText(SAY_NARALEX_FINAL1, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            Naralex->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND);
+                            Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND);
                             Event_Timer = 8000;
                             Subevent_Phase = 10;
                             break;

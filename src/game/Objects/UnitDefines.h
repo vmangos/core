@@ -69,6 +69,30 @@ enum MovementChangeType
 #define BASE_MAXDAMAGE 2.0f
 #define BASE_ATTACK_TIME 2000
 
+enum UnitBytes0Offsets : uint8
+{
+    UNIT_BYTES_0_OFFSET_RACE       = 0,
+    UNIT_BYTES_0_OFFSET_CLASS      = 1,
+    UNIT_BYTES_0_OFFSET_GENDER     = 2,
+    UNIT_BYTES_0_OFFSET_POWER_TYPE = 3,
+};
+
+enum UnitBytes1Offsets : uint8
+{
+    UNIT_BYTES_1_OFFSET_STAND_STATE     = 0,
+    UNIT_BYTES_1_OFFSET_PET_LOYALTY     = 1,
+    UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM = 2,
+    UNIT_BYTES_1_OFFSET_VIS_FLAG        = 3,
+};
+
+enum UnitBytes2Offsets : uint8
+{
+    UNIT_BYTES_2_OFFSET_SHEATH_STATE = 0,
+    UNIT_BYTES_2_OFFSET_MISC_FLAGS   = 1,
+    UNIT_BYTES_2_OFFSET_PET_FLAGS    = 2,
+    UNIT_BYTES_2_OFFSET_UNKNOWN      = 3, // shapeshift form in tbc
+};
+
 // byte value (UNIT_FIELD_BYTES_1,0)
 enum UnitStandStateType
 {
@@ -85,17 +109,15 @@ enum UnitStandStateType
 
 #define MAX_UNIT_STAND_STATE             9
 
-/* byte flag value not exist in 1.12, moved/merged in (UNIT_FIELD_BYTES_1,3), in post-1.x it's in (UNIT_FIELD_BYTES_1,2)
-enum UnitStandFlags
-*/
-
 // byte flags value (UNIT_FIELD_BYTES_1,3)
-enum UnitBytes1_Flags
+// These flags seem to be related to visibility
+// In wotlk+ they are moved to UNIT_FIELD_BYTES_1,2
+enum UnitVisFlags
 {
-    UNIT_BYTE1_FLAG_ALWAYS_STAND = 0x01, // Ajoute a la mort. Non affichage du nom des vivants.
-    UNIT_BYTE1_FLAGS_CREEP       = 0x02,
-    UNIT_BYTE1_FLAG_UNTRACKABLE  = 0x04,
-    UNIT_BYTE1_FLAG_ALL          = 0xFF
+    UNIT_VIS_FLAGS_GHOST       = 0x01, // applied by SPELL_AURA_GHOST
+    UNIT_VIS_FLAGS_CREEP       = 0x02, // applied by SPELL_AURA_MOD_STEALTH
+    UNIT_VIS_FLAGS_UNTRACKABLE = 0x04, // applied by SPELL_AURA_UNTRACKABLE
+    UNIT_VIS_FLAGS_ALL         = 0xFF
 };
 
 // byte value (UNIT_FIELD_BYTES_2,0)
