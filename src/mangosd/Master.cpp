@@ -414,6 +414,7 @@ int Master::Run()
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)
     {
+        sLog.outString("Stopping anti freeze thread...");
         freeze_thread->destroy();
         delete freeze_thread;
     }
@@ -421,6 +422,7 @@ int Master::Run()
     ///- Stop soap thread
     if(soap_thread)
     {
+        sLog.outString("Stopping soap thread...");
         soap_thread->wait();
         soap_thread->destroy();
         delete soap_thread;
@@ -430,14 +432,17 @@ int Master::Run()
     //LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
 
     ///- Remove signal handling before leaving
+    sLog.outString("Unhooking signals...");
     _UnhookSignals();
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
+    sLog.outString("Stopping world thread...");
     world_thread.wait();
 
     if(rar_thread)
     {
+        sLog.outString("Stopping remote access thread...");
         rar_thread->wait();
         rar_thread->destroy();
         delete rar_thread;
@@ -445,24 +450,28 @@ int Master::Run()
 
     if (offlinechat_thread)
     {
+        sLog.outString("Stopping offline chat thread...");
         offlinechat_thread->wait();
         offlinechat_thread->destroy();
         delete offlinechat_thread;
     }
 
     ///- Clean account database before leaving
+    sLog.outString("Cleaning character database...");
     clearOnlineAccounts();
 
     // send all still queued mass mails (before DB connections shutdown)
+    sLog.outString("Sending queued mail...");
     sMassMailMgr.Update(true);
 
     ///- Wait for DB delay threads to end
+    sLog.outString("Closing database connections...");
     CharacterDatabase.StopServer();
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
 
-    sLog.outString( "Halting process..." );
+    sLog.outString("Halting process...");
 
     if (cliThread)
     {
