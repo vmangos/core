@@ -414,7 +414,6 @@ int Master::Run()
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)
     {
-        sLog.outString("Stopping anti freeze thread...");
         freeze_thread->destroy();
         delete freeze_thread;
     }
@@ -422,7 +421,6 @@ int Master::Run()
     ///- Stop soap thread
     if(soap_thread)
     {
-        sLog.outString("Stopping soap thread...");
         soap_thread->wait();
         soap_thread->destroy();
         delete soap_thread;
@@ -436,12 +434,10 @@ int Master::Run()
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
-    sLog.outString("Waiting for world thread to finish...");
     world_thread.wait();
 
     if(rar_thread)
     {
-        sLog.outString("Stopping remote access thread...");
         rar_thread->wait();
         rar_thread->destroy();
         delete rar_thread;
@@ -449,7 +445,6 @@ int Master::Run()
 
     if (offlinechat_thread)
     {
-        sLog.outString("Stopping offline chat thread...");
         offlinechat_thread->wait();
         offlinechat_thread->destroy();
         delete offlinechat_thread;

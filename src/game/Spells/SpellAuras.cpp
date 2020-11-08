@@ -2637,7 +2637,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     sLog.outError("Aura::HandleAuraTransform - Unknown creature id (%d) (only need its display_id) for spell %d.", m_modifier.m_miscvalue, GetId());
                 }
                 else
-                    display_id = Creature::ChooseDisplayId(ci, nullptr, nullptr, &displayScale);   // Will use the default display id here
+                    display_id = Creature::ChooseDisplayId(ci, nullptr, nullptr, nullptr, &displayScale);   // Will use the default display id here
 
                 // creature case, need to update equipment
                 if (ci && target->IsCreature())

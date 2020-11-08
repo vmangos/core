@@ -40,9 +40,7 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
 {
     SetMap(cPos.GetMap());
 
-    Team team = owner->GetTypeId() == TYPEID_PLAYER ? ((Player*)owner)->GetTeam() : TEAM_NONE;
-
-    if (!CreateFromProto(guidlow, cinfo, team, cinfo->entry))
+    if (!CreateFromProto(guidlow, cinfo, cinfo->entry))
         return false;
 
     cPos.SelectFinalPoint(this);

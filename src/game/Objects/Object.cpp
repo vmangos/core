@@ -2135,11 +2135,9 @@ Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
 
     TemporarySummon* pCreature = new TemporarySummon();
 
-    Team team = TEAM_NONE;
-
     CreatureCreatePos pos(this, x, y, z, ang);
 
-    if (!pCreature->Create(GenerateLocalLowGuid(HIGHGUID_UNIT), pos, pInf, team, entry))
+    if (!pCreature->Create(GenerateLocalLowGuid(HIGHGUID_UNIT), pos, pInf, entry))
     {
         delete pCreature;
         return nullptr;
@@ -2183,16 +2181,12 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
     TemporarySummon* pCreature = new TemporarySummon(GetObjectGuid());
 
-    Team team = TEAM_NONE;
-    if (GetTypeId() == TYPEID_PLAYER)
-        team = ((Player*)this)->GetTeam();
-
     CreatureCreatePos pos(GetMap(), x, y, z, ang);
 
     if (x == 0.0f && y == 0.0f && z == 0.0f)
         pos = CreatureCreatePos(this, GetOrientation(), CONTACT_DISTANCE, ang);
 
-    if (!pCreature->Create(GetMap()->GenerateLocalLowGuid(cinfo->GetHighGuid()), pos, cinfo, team, id))
+    if (!pCreature->Create(GetMap()->GenerateLocalLowGuid(cinfo->GetHighGuid()), pos, cinfo, id))
     {
         delete pCreature;
         return nullptr;

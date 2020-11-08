@@ -116,7 +116,7 @@ bool EffectDummyCreature_npc_kitten(WorldObject* /*pCaster*/, uint32 uiSpellId, 
         if (CreatureInfo const* pTemp = sObjectMgr.GetCreatureTemplate(NPC_CORRUPT_SABER))
         {
             float scale;
-            uint32 displayId = Creature::ChooseDisplayId(pTemp, nullptr, nullptr, &scale);
+            uint32 displayId = Creature::ChooseDisplayId(pTemp, nullptr, nullptr, nullptr, &scale);
             pCreatureTarget->SetEntry(pTemp->entry);
             pCreatureTarget->SetDisplayId(displayId);
             pCreatureTarget->SetName(pTemp->name);

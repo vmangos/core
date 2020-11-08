@@ -71,8 +71,6 @@ bool ChatHandler::HandleNpcSpawnInfoCommand(char* /*args*/)
     PSendSysMessage("Creature Ids: %s", creatureIds.c_str());
     PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
     PSendSysMessage("Orientation: %g", pData->position.o);
-    PSendSysMessage("Display Id: %u", pData->display_id);
-    PSendSysMessage("Equipment Id: %u", pData->equipment_id);
     PSendSysMessage("Respawn Time Min: %s", secsToTimeString(pData->spawntimesecsmin, true).c_str());
     PSendSysMessage("Respawn Time Max: %s", secsToTimeString(pData->spawntimesecsmax, true).c_str());
     std::string movementType;
@@ -286,10 +284,13 @@ bool ChatHandler::HandleNpcSpawnSetDisplayIdCommand(char* args)
         return false;
     }
 
-    pData->display_id = displayId;
     pCreature->SetDisplayId(displayId);
     pCreature->SetNativeDisplayId(displayId);
-    WorldDatabase.PExecuteLog("UPDATE `creature` SET `display_id`=%u WHERE `guid`=%u", displayId, pCreature->GetDBTableGUIDLow());
+
+    if (pCreature->GetCreatureAddon())
+        WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `display_id`=%u WHERE `guid`=%u", displayId, pCreature->GetDBTableGUIDLow());
+    else
+        WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `display_id`) VALUES (%u, %u)", pCreature->GetDBTableGUIDLow(), displayId);
 
     PSendSysMessage("Display Id for guid %u updated to %u.", pCreature->GetDBTableGUIDLow(), displayId);
     return true;
@@ -732,7 +733,7 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
         return false;
     }
 
-    if (!pCreature->Create(lowguid, pos, cinfo, TEAM_NONE, id))
+    if (!pCreature->Create(lowguid, pos, cinfo, id))
     {
         delete pCreature;
         return false;
@@ -1452,7 +1453,7 @@ inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin 
 
     CreatureCreatePos pos(wpOwner->GetMap(), wpNode->x, wpNode->y, wpNode->z, wpNode->orientation != 100.0f ? wpNode->orientation : 0.0f);
 
-    if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
+    if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, waypointInfo->entry))
     {
         delete wpCreature;
         return nullptr;
@@ -2303,7 +2304,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
         CreatureCreatePos pos{map, wp.fX, wp.fY, wp.fZ, pPlayer->GetOrientation()};
         Creature* wpCreature = new Creature;
 
-        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
+        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, waypointInfo->entry))
         {
             PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
             delete wpCreature;

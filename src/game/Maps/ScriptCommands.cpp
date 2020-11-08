@@ -920,7 +920,7 @@ bool Map::ScriptCommand_UpdateEntry(ScriptInfo const& script, WorldObject* sourc
     }
 
     if (pSource->GetEntry() != script.updateEntry.creatureEntry)
-        pSource->UpdateEntry(script.updateEntry.creatureEntry, script.updateEntry.team ? HORDE : ALLIANCE);
+        pSource->UpdateEntry(script.updateEntry.creatureEntry);
 
     return false;
 }

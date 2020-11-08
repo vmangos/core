@@ -183,6 +183,7 @@ struct boss_razuviousAI : public ScriptedAI
                 if (i == 1)
                     rpBuddy = pAdd->GetObjectGuid();
                 summonedAdds.push_back(pAdd->GetObjectGuid());
+                pAdd->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
             }
         }
     }

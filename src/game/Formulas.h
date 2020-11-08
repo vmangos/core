@@ -106,9 +106,6 @@ namespace MaNGOS
                 (pCreature->GetCreatureInfo()->health_min <= 50)))
                 return 0;
 
-            if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_XP_AT_KILL))
-                return 0;
-
             if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
                 return 0;
 

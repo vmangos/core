@@ -19539,7 +19539,7 @@ bool Player::IsHonorOrXPTarget(Unit* pVictim) const
     {
         if (((Creature*)pVictim)->IsTotem() ||
             ((Creature*)pVictim)->IsPet() ||
-            ((Creature*)pVictim)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
+            ((Creature*)pVictim)->GetCreatureInfo()->xp_multiplier==0 ||
             pVictim->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
             return false;
     }
