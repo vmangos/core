@@ -1006,6 +1006,188 @@ bool ChatHandler::HandlePartyBotAttackStopCommand(char* args)
     return true;
 }
 
+static std::map<std::string, RaidTargetIcon> raidTargetIcons =
+{
+    { "star",     RAID_TARGET_ICON_STAR     },
+    { "circle",   RAID_TARGET_ICON_CIRCLE   },
+    { "diamond",  RAID_TARGET_ICON_DIAMOND  },
+    { "triangle", RAID_TARGET_ICON_TRIANGLE },
+    { "moon",     RAID_TARGET_ICON_MOON     },
+    { "square",   RAID_TARGET_ICON_SQUARE   },
+    { "cross",    RAID_TARGET_ICON_CROSS    },
+    { "skull",    RAID_TARGET_ICON_SKULL    },
+};
+
+bool ChatHandler::HandlePartyBotControlMarkCommand(char* args)
+{
+    std::string mark = args;
+    auto itrMark = raidTargetIcons.find(mark);
+    if (itrMark == raidTargetIcons.end())
+    {
+        SendSysMessage("Unknown target mark. Valid names are: star, circle, diamond, triangle, moon, square, cross, skill");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (pTarget && (pTarget != pPlayer))
+    {
+        if (pTarget->AI())
+        {
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                PSendSysMessage("%s will crowd control %s.", pTarget->GetName(), args);
+                pAI->m_marksToCC.push_back(itrMark->second);
+                return true;
+            }
+        }
+        SendSysMessage("Target is not a party bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    pAI->m_marksToCC.push_back(itrMark->second);
+                }
+            }
+        }
+    }
+
+    PSendSysMessage("All party bots will crowd control %s.", args);
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
+{
+    std::string mark = args;
+    auto itrMark = raidTargetIcons.find(mark);
+    if (itrMark == raidTargetIcons.end())
+    {
+        SendSysMessage("Unknown target mark. Valid names are: star, circle, diamond, triangle, moon, square, cross, skill");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (pTarget && (pTarget != pPlayer))
+    {
+        if (pTarget->AI())
+        {
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                PSendSysMessage("%s will focus %s.", pTarget->GetName(), args);
+                pAI->m_marksToFocus.push_back(itrMark->second);
+                return true;
+            }
+        }
+        SendSysMessage("Target is not a party bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    pAI->m_marksToFocus.push_back(itrMark->second);
+                }
+            }
+        }
+    }
+
+    PSendSysMessage("All party bots will focus %s.", args);
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotClearMarksCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    if (pTarget && (pTarget != pPlayer))
+    {
+        if (pTarget->AI())
+        {
+            if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+            {
+                PSendSysMessage("All mark assignments cleared for %s.", pTarget->GetName());
+                pAI->m_marksToCC.clear();
+                pAI->m_marksToFocus.clear();
+                return true;
+            }
+        }
+        SendSysMessage("Target is not a party bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    pAI->m_marksToCC.clear();
+                    pAI->m_marksToFocus.clear();
+                }
+            }
+        }
+    }
+
+    SendSysMessage("Mark assignments cleared for all bots.");
+    return true;
+}
+
 bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer)
 {
     if (pBot->AI() && pBot->IsAlive() && pBot->IsInMap(pPlayer) && !pBot->HasUnitState(UNIT_STAT_NO_FREE_MOVE))

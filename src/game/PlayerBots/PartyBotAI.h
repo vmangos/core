@@ -42,9 +42,13 @@ public:
     Unit* SelectPartyAttackTarget() const;
     Player* SelectResurrectionTarget() const;
     Player* SelectShieldTarget() const;
+    Unit* GetMarkedTarget(RaidTargetIcon mark) const;
+    bool AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee = true, bool checkSpells = true) const;
+    bool CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const;
     bool DrinkAndEat();
     bool ShouldAutoRevive() const;
     void RunAwayFromTarget(Unit* pTarget);
+    bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
 
     void UpdateInCombatAI() final;
@@ -69,6 +73,8 @@ public:
     void UpdateOutOfCombatAI_Druid() final;
 
     std::vector<LootResponseData> m_lootResponses;
+    std::vector<RaidTargetIcon> m_marksToCC;
+    std::vector<RaidTargetIcon> m_marksToFocus;
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;
     ObjectGuid m_cloneGuid;

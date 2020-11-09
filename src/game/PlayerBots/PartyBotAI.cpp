@@ -237,6 +237,43 @@ bool PartyBotAI::ShouldAutoRevive() const
     return alivePlayerNearby;
 }
 
+bool PartyBotAI::AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee, bool checkSpells) const
+{
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            // Not self.
+            if (pMember == me)
+                continue;
+
+            if (pMember->GetTargetGuid() == guid)
+            {
+                if (checkMelee && pMember->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
+                    return true;
+
+                if (checkSpells && pMember->IsNonMeleeSpellCasted())
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool PartyBotAI::CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const
+{
+    if ((pSpellEntry->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) &&
+        AreOthersOnSameTarget(pTarget->GetObjectGuid()))
+        return false;
+
+    if (!m_marksToCC.empty() && pSpellEntry->HasSingleTargetAura() &&
+        !me->GetSingleCastSpellTargets().empty())
+        return false;
+
+    return true;
+}
+
 bool PartyBotAI::AttackStart(Unit* pVictim)
 {
     m_isBuffing = false;
@@ -260,8 +297,30 @@ bool PartyBotAI::AttackStart(Unit* pVictim)
     return false;
 }
 
+Unit* PartyBotAI::GetMarkedTarget(RaidTargetIcon mark) const
+{
+    ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(mark);
+    if (targetGuid.IsUnit())
+        return me->GetMap()->GetUnit(targetGuid);
+
+    return nullptr;
+}
+
 Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
 {
+    // Stick to marked target in combat.
+    if (me->IsInCombat() || pLeader->GetVictim())
+    {
+        for (auto markId : m_marksToFocus)
+        {
+            ObjectGuid targetGuid = me->GetGroup()->GetTargetWithIcon(markId);
+            if (targetGuid.IsUnit())
+                if (Unit* pVictim = me->GetMap()->GetUnit(targetGuid))
+                    if (IsValidHostileTarget(pVictim))
+                        return pVictim;
+        }
+    }
+
     // Who is the leader attacking.
     if (Unit* pVictim = pLeader->GetVictim())
     {
@@ -344,6 +403,33 @@ Player* PartyBotAI::SelectShieldTarget() const
     }
 
     return nullptr;
+}
+
+bool PartyBotAI::CrowdControlMarkedTargets()
+{
+    SpellEntry const* pSpellEntry = GetCrowdControlSpell();
+    if (!pSpellEntry)
+        return false;
+
+    for (auto mark : m_marksToCC)
+    {
+        if (Unit* pTarget = GetMarkedTarget(mark))
+        {
+            if (!pTarget->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
+                IsValidHostileTarget(pTarget) && !AreOthersOnSameTarget(pTarget->GetObjectGuid()))
+            {
+                if (CanTryToCastSpell(pTarget, pSpellEntry))
+                {
+                    if (DoCastSpell(pTarget, pSpellEntry) == SPELL_CAST_OK)
+                    {
+                        me->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void PartyBotAI::AddToPlayerGroup()
@@ -639,6 +725,9 @@ void PartyBotAI::UpdateOutOfCombatAI()
                 if (DoCastSpell(pTarget, m_resurrectionSpell) == SPELL_CAST_OK)
                     return;
 
+    if (m_role != ROLE_TANK && me->GetVictim() && CrowdControlMarkedTargets())
+        return;
+
     switch (me->GetClass())
     {
         case CLASS_PALADIN:
@@ -700,6 +789,8 @@ void PartyBotAI::UpdateInCombatAI()
             }
         }
     }
+    else if (CrowdControlMarkedTargets())
+        return;
 
     switch (me->GetClass())
     {
@@ -1470,7 +1561,8 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         {
             if (Unit* pTarget = SelectAttackerDifferentFrom(pVictim))
             {
-                if (CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph))
+                if (CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph) && 
+                    CanUseCrowdControl(m_spells.mage.pPolymorph, pTarget))
                 {
                     if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
                         return;
@@ -1663,7 +1755,8 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         {
             Unit* pAttacker = *me->GetAttackers().begin();
             if ((pAttacker->GetHealth() > me->GetHealth()) &&
-                CanTryToCastSpell(pAttacker, m_spells.priest.pShackleUndead))
+                CanTryToCastSpell(pAttacker, m_spells.priest.pShackleUndead) &&
+                CanUseCrowdControl(m_spells.priest.pShackleUndead, pAttacker))
             {
                 if (DoCastSpell(pAttacker, m_spells.priest.pShackleUndead) == SPELL_CAST_OK)
                     return;
@@ -2421,7 +2514,8 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
         {
             if (Unit* pTarget = SelectAttackerDifferentFrom(pVictim))
             {
-                if (CanTryToCastSpell(pTarget, m_spells.rogue.pBlind))
+                if (CanTryToCastSpell(pTarget, m_spells.rogue.pBlind) &&
+                    CanUseCrowdControl(m_spells.rogue.pBlind, pTarget))
                 {
                     if (DoCastSpell(pTarget, m_spells.rogue.pBlind) == SPELL_CAST_OK)
                     {
@@ -2654,7 +2748,8 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             !me->GetAttackers().empty())
         {
             Unit* pAttacker = *me->GetAttackers().begin();
-            if (CanTryToCastSpell(pAttacker, m_spells.druid.pHibernate))
+            if (CanTryToCastSpell(pAttacker, m_spells.druid.pHibernate) &&
+                CanUseCrowdControl(m_spells.druid.pHibernate, pAttacker))
             {
                 if (DoCastSpell(pAttacker, m_spells.druid.pHibernate) == SPELL_CAST_OK)
                     return;
