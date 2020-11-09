@@ -2679,7 +2679,7 @@ struct AV_NpcEventAI : public npc_escortAI
                     checkTroopsStatus(uiDiff, AV_NPC_QUARTERMASTER);
                 break;
             case AV_NPC_QUARTERMASTER_A:
-                if (b_isTroopsSpawned)
+                if (!b_isTroopsSpawned)
                     checkTroopsStatus(uiDiff, AV_NPC_QUARTERMASTER_A);
                 break;
 
