@@ -719,21 +719,26 @@ void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack
         Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack));
 }
 
-void MotionMaster::MoveDistance(Unit* pTarget, float distance)
+bool MotionMaster::MoveDistance(Unit* pTarget, float distance)
 {
     float x, y, z;
     pTarget->GetNearPoint(m_owner, x, y, z, 0, distance, pTarget->GetAngle(m_owner));
     
     if (z > (m_owner->GetPositionZ() + 10.0f))
-        return;
+        return false;
 
     if (!pTarget->IsWithinLOS(x, y, z, true, m_owner->GetCollisionHeight()))
-        return;
+        return false;
+
+    if (m_owner->GetDistanceSqr(x, y, z) == 0.0f)
+        return false;
 
     if (m_owner->IsPlayer())
         Mutate(new DistancingMovementGenerator<Player>(x, y, z));
     else
         Mutate(new DistancingMovementGenerator<Creature>(x, y, z));
+
+    return true;
 }
 
 void MotionMaster::ClearType(MovementGeneratorType moveType)

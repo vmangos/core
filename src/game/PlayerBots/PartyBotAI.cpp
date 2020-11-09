@@ -135,7 +135,7 @@ Player* PartyBotAI::GetPartyLeader() const
     return ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid);
 }
 
-void PartyBotAI::RunAwayFromTarget(Unit* pTarget)
+bool PartyBotAI::RunAwayFromTarget(Unit* pTarget)
 {
     if (Player* pLeader = GetPartyLeader())
     {
@@ -148,12 +148,12 @@ void PartyBotAI::RunAwayFromTarget(Unit* pTarget)
             {
                 me->GetMotionMaster()->MoveIdle();
                 me->MonsterMove(pLeader->GetPositionX(), pLeader->GetPositionY(), pLeader->GetPositionZ());
-                return;
+                return true;
             }
         }
     }
 
-    me->GetMotionMaster()->MoveDistance(pTarget, 15.0f);
+    return me->GetMotionMaster()->MoveDistance(pTarget, 15.0f);
 }
 
 bool PartyBotAI::DrinkAndEat()
@@ -267,9 +267,12 @@ bool PartyBotAI::CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget
         AreOthersOnSameTarget(pTarget->GetObjectGuid()))
         return false;
 
-    if (!m_marksToCC.empty() && pSpellEntry->HasSingleTargetAura() &&
-        !me->GetSingleCastSpellTargets().empty())
-        return false;
+    if (pSpellEntry->HasSingleTargetAura())
+    {
+        auto const& singleAuras = me->GetSingleCastSpellTargets();
+        if (singleAuras.find(pSpellEntry) != singleAuras.end())
+            return false;
+    }
 
     return true;
 }
@@ -1231,6 +1234,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Hunter()
 
         UpdateInCombatAI_Hunter();
     }
+    else
+        SummonPetIfNeeded();
 }
 
 void PartyBotAI::UpdateInCombatAI_Hunter()
@@ -1365,8 +1370,8 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             if (!me->IsStopped())
                 me->StopMoving();
             me->GetMotionMaster()->Clear();
-            RunAwayFromTarget(pVictim);
-            return;
+            if (RunAwayFromTarget(pVictim))
+                return;
         }
 
         if (me->HasSpell(PB_SPELL_AUTO_SHOT) &&
@@ -1497,16 +1502,18 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                         DoCastSpell(me, m_spells.mage.pFrostNova);
                     }
 
-                    RunAwayFromTarget(pVictim);
-
-                    return;
+                    if (RunAwayFromTarget(pVictim))
+                    {
+                        me->SetCasterChaseDistance(25.0f);
+                        return;
+                    }
                 }
             }
         }
 
-        if (me->GetEnemyCountInRadiusAround(me, 10.0f) > 2)
+        if (me->GetEnemyCountInRadiusAround(me, 10.0f) > 1)
         {
-            if (m_spells.mage.pConeofCold &&
+            if (m_spells.mage.pConeofCold && !me->IsMoving() &&
                 CanTryToCastSpell(me, m_spells.mage.pConeofCold))
             {
                 if (DoCastSpell(pVictim, m_spells.mage.pConeofCold) == SPELL_CAST_OK)
@@ -1561,10 +1568,11 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         {
             if (Unit* pTarget = SelectAttackerDifferentFrom(pVictim))
             {
-                if (CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph) && 
+                if (pTarget->GetHealthPercent() > 20.0f &&
+                    CanTryToCastSpell(pTarget, m_spells.mage.pPolymorph) &&
                     CanUseCrowdControl(m_spells.mage.pPolymorph, pTarget))
                 {
-                    if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
+                    if (DoCastSpell(pTarget, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
                         return;
                 }
             }
@@ -2479,8 +2487,8 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
                 {
                     if (DoCastSpell(me, m_spells.rogue.pVanish) == SPELL_CAST_OK)
                     {
-                        RunAwayFromTarget(pVictim);
-                        return;
+                        if (RunAwayFromTarget(pVictim))
+                            return;
                     }
                 }
             }
@@ -3000,8 +3008,8 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                         return;
                 }
                 me->SetCasterChaseDistance(25.0f);
-                RunAwayFromTarget(pVictim);
-                return;
+                if (RunAwayFromTarget(pVictim))
+                    return;
             }
 
             if (m_spells.druid.pFaerieFire &&

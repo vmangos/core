@@ -1017,8 +1017,8 @@ void Creature::MoveAwayFromTarget(Unit* pTarget, float distance)
     if (HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
-    GetMotionMaster()->MoveDistance(pTarget, distance);
-    InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+    if (GetMotionMaster()->MoveDistance(pTarget, distance))
+        InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
 }
 
 bool Creature::AIM_Initialize()
