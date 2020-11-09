@@ -40,6 +40,8 @@
 #include "CellImpl.h"
 #include "Anticheat.h"
 #include "AccountMgr.h"
+#include "PlayerBotMgr.h"
+#include "PlayerBotAI.h"
 
 bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
 {
@@ -437,6 +439,19 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             MasterPlayer* player = ObjectAccessor::FindMasterPlayer(to.c_str());
             uint32 tSecurity = GetSecurity();
             uint32 pSecurity = player ? player->GetSession()->GetSecurity() : SEC_PLAYER;
+
+            if (!player)
+            {
+                if (PlayerBotEntry* pBot = sPlayerBotMgr.GetBotWithName(to))
+                {
+                    if (pBot->ai)
+                    {
+                        pBot->ai->OnWhisper(masterPlr->GetSession()->GetPlayer(), msg);
+                        return;
+                    }
+                }
+            }
+
             if (!player || (tSecurity == SEC_PLAYER && pSecurity > SEC_PLAYER && !player->AcceptsWhispersFrom(masterPlr->GetObjectGuid())))
             {
                 SendPlayerNotFoundNotice(to);

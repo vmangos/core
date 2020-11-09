@@ -50,6 +50,7 @@ public:
     void RunAwayFromTarget(Unit* pTarget);
     bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
+    void OnWhisper(Player* pWho, std::string text) override;
 
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
@@ -78,6 +79,8 @@ public:
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;
     ObjectGuid m_cloneGuid;
+    ObjectGuid m_spamGuid;
+    SpellEntry const* m_spamSpell = 0;
     uint8 m_race = 0;
     uint8 m_class = 0;
     uint8 m_level = 0;
