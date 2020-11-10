@@ -11,8 +11,7 @@ INSERT INTO `migrations` VALUES ('20201109223224');
 
 -- correct gossip for rwag
 UPDATE `creature_template` SET `npc_flags` = 19, `gossip_menu_id` = 141 WHERE `entry` = 3155;
-UPDATE `gossip_menu_option` SET `option_text` = '' WHERE `menu_id` = 141 AND `id` = 0;
-UPDATE `npc_text` SET `BroadcastTextID0` = 2603 WHERE `ID` = 638;
+UPDATE `gossip_menu_option` SET `option_text` = 'I would like training.' WHERE `menu_id` = 141 AND `id` = 0;
 
 
 -- End of migration.
