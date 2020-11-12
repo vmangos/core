@@ -7269,11 +7269,9 @@ SpellCastResult Spell::CheckRange(bool strict)
     max_range += range_mod;
 
     GameObject* go = m_targets.getGOTarget(); // Check range for gobjects (lock picking)
-    if (go)
+    if (go && m_caster->IsPlayer())
     {
-        float const dist = m_caster->GetDistance(go);
-
-        if (dist > max_range)
+        if (!go->IsAtInteractDistance(dynamic_cast<Player*>(m_caster), max_range)) // only player casts these
             return SPELL_FAILED_OUT_OF_RANGE;
     }
 

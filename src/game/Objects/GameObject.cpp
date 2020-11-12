@@ -46,6 +46,25 @@
 #include "ZoneScript.h"
 #include "DynamicTree.h"
 #include "vmap/GameObjectModel.h"
+#include <G3D/Box.h>
+#include <G3D/CoordinateFrame.h>
+#include <G3D/Quat.h>
+
+bool QuaternionData::isUnit() const
+{
+    return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
+}
+
+void QuaternionData::toEulerAnglesZYX(float& Z, float& Y, float& X) const
+{
+    G3D::Matrix3(G3D::Quat(x, y, z, w)).toEulerAnglesZYX(Z, Y, X);
+}
+
+QuaternionData QuaternionData::fromEulerAnglesZYX(float Z, float Y, float X)
+{
+    G3D::Quat quat(G3D::Matrix3::fromEulerAnglesZYX(Z, Y, X));
+    return QuaternionData(quat.x, quat.y, quat.z, quat.w);
+}
 
 GameObject::GameObject() : WorldObject(),
     loot(this),
@@ -2435,4 +2454,86 @@ bool GameObject::IsValidAttackTarget(Unit const* target) const
     }
 
     return true;
+}
+
+bool GameObject::IsAtInteractDistance(Player const* player, uint32 maxRange) const
+{
+    SpellEntry const* spellInfo;
+    if (maxRange || (spellInfo = GetSpellForLock(player)))
+    {
+        if (maxRange == 0.f)
+        {
+            SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
+            maxRange = srange ? srange->maxRange : 0;
+        }
+
+        if (GetGoType() == GAMEOBJECT_TYPE_SPELL_FOCUS)
+            return maxRange * maxRange >= GetDistance3dToCenter(player);
+
+        if (sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
+            return IsAtInteractDistance(player->GetPosition(), maxRange);
+    }
+
+    return IsAtInteractDistance(player->GetPosition(), GetGOInfo()->GetInteractionDistance());
+}
+
+bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
+{
+    if (GameObjectDisplayInfoAddon const* displayInfo = sGameObjectDisplayInfoAddonStorage.LookupEntry<GameObjectDisplayInfoAddon>(GetDisplayId()))
+    {
+        float scale = GetObjectScale();
+
+        float minX = displayInfo->min_x * scale - radius;
+        float minY = displayInfo->min_y * scale - radius;
+        float minZ = displayInfo->min_z * scale - radius;
+        float maxX = displayInfo->max_x * scale + radius;
+        float maxY = displayInfo->max_y * scale + radius;
+        float maxZ = displayInfo->max_z * scale + radius;
+
+        QuaternionData worldRotation = GetLocalRotation();
+        G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
+
+        return G3D::CoordinateFrame{ { worldRotationQuat },{ GetPositionX(), GetPositionY(), GetPositionZ() } }
+            .toWorldSpace(G3D::Box{ { minX, minY, minZ },{ maxX, maxY, maxZ } })
+            .contains({ pos.x, pos.y, pos.z });
+    }
+
+    return GetDistance3dToCenter(pos) <= (radius * radius);
+}
+
+SpellEntry const* GameObject::GetSpellForLock(Player const* player) const
+{
+    if (!player)
+        return nullptr;
+
+    uint32 lockId = GetGOInfo()->GetLockId();
+    if (!lockId)
+        return nullptr;
+
+    LockEntry const* lock = sLockStore.LookupEntry(lockId);
+    if (!lock)
+        return nullptr;
+
+    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
+    {
+        if (!lock->Type[i])
+            continue;
+
+        if (lock->Type[i] != LOCK_KEY_SKILL)
+            break;
+
+        for (auto&& playerSpell : player->GetSpellMap())
+            if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(playerSpell.first))
+                for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                    if (spellInfo->Effect[i] == SPELL_EFFECT_OPEN_LOCK && ((uint32)spellInfo->EffectMiscValue[i]) == lock->Index[i])
+                        if (player->CalculateSpellDamage(nullptr, spellInfo, SpellEffectIndex(i), nullptr) >= int32(lock->Skill[i]))
+                            return spellInfo;
+    }
+
+    return nullptr;
+}
+
+const QuaternionData GameObject::GetLocalRotation() const
+{
+    return QuaternionData(GetFloatValue(GAMEOBJECT_ROTATION), GetFloatValue(GAMEOBJECT_ROTATION + 1), GetFloatValue(GAMEOBJECT_ROTATION + 2), GetFloatValue(GAMEOBJECT_ROTATION + 3));
 }

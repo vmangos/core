@@ -631,6 +631,7 @@ class ObjectMgr
         void LoadGameobjectInfo();
         void CheckGameObjectInfos();
         void AddGameobjectInfo(GameObjectInfo* goinfo);
+        void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();
         GameObjectUseRequirement const* GetGameObjectUseRequirement(ObjectGuid guid) const;
         std::map<uint32, GameObjectUseRequirement> _gobjRequirements;

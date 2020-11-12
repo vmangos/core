@@ -7232,7 +7232,6 @@ void ObjectMgr::CheckGameObjectInfos()
     }
 }
 
-
 void ObjectMgr::LoadGameobjectsRequirements()
 {
     uint32 count = 0;
@@ -7307,6 +7306,14 @@ GameObjectUseRequirement const* ObjectMgr::GetGameObjectUseRequirement(ObjectGui
     if (it != _gobjRequirements.end())
         return &it->second;
     return nullptr;
+}
+
+void ObjectMgr::LoadGameObjectDisplayInfoAddon()
+{
+    sGameObjectDisplayInfoAddonStorage.Load();
+    sLog.outString();
+    sLog.outString(">> Loaded %u GameObject display based info", sGameObjectDisplayInfoAddonStorage.GetRecordCount());
+    sLog.outString();
 }
 
 void ObjectMgr::LoadExplorationBaseXP()

@@ -1429,6 +1429,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Gameobject Requirements...");
     sObjectMgr.LoadGameobjectsRequirements();
 
+    sLog.outString("Loading Gameobject Display Info Addon...");
+    sObjectMgr.LoadGameObjectDisplayInfoAddon();
+
     sLog.outString("Loading CreatureLinking Data...");      // must be after Creatures
     sLog.outString();
     sCreatureLinkingMgr.LoadFromDB();

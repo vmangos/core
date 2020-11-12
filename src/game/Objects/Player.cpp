@@ -2655,27 +2655,11 @@ bool Player::CanInteractWithGameObject(GameObject const* pGo, uint32 gameobject_
 
     if (uint32(pGo->GetGoType()) == gameobject_type || gameobject_type == MAX_GAMEOBJECT_TYPE)
     {
-        float maxdist;
-        switch (pGo->GetGoType())
-        {
-            // TODO: find out how the client calculates the maximal usage distance to spellless working
-            // gameobjects like mailboxes - 10.0 is a just an abitrary choosen number
-            case GAMEOBJECT_TYPE_MAILBOX:
-                maxdist = 10.0f;
-                break;
-            case GAMEOBJECT_TYPE_FISHINGHOLE:
-                maxdist = 20.0f + CONTACT_DISTANCE;     // max spell range
-                break;
-            default:
-                maxdist = INTERACTION_DISTANCE;
-                break;
-        }
-
-        if (pGo->IsWithinDistInMap(this, maxdist) && pGo->isSpawned())
+        if (pGo->IsAtInteractDistance(this) && pGo->isSpawned())
             return true;
 
-        sLog.outError("GetGameObjectIfCanInteractWith: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him (distance=%f, maximal %f is allowed)",
-            pGo->GetGOInfo()->name, pGo->GetGUIDLow(), GetName(), GetGUIDLow(), pGo->GetDistance(this), maxdist);
+        sLog.outError("CanInteractWithGameObject: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him",
+            pGo->GetGOInfo()->name, pGo->GetGUIDLow(), GetName(), GetGUIDLow());
     }
 
     return false;
@@ -7735,7 +7719,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
 
             // not check distance for GO in case owned GO (fishing bobber case, for example)
             // And permit out of range GO with no owner in case fishing hole
-            if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_FAIL) || go->GetOwnerGuid() != GetObjectGuid()) && !go->IsWithinDistInMap(this, INTERACTION_DISTANCE)))
+            if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_FAIL) || go->GetOwnerGuid() != GetObjectGuid()) && !go->IsAtInteractDistance(this)))
             {
                 SendLootRelease(guid);
                 return;

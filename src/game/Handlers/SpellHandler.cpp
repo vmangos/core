@@ -277,6 +277,9 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
     if (obj->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT))
         return;
 
+    if (!obj->IsAtInteractDistance(_player))
+        return;
+
     // Nostalrius
     if (obj->PlayerCanUse(_player))
     {

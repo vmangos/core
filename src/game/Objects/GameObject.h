@@ -536,6 +536,22 @@ struct GameObjectInfo
         }
     }
 
+    float GetInteractionDistance() const
+    {
+        switch (type)
+        {
+            // TODO: find out how the client calculates the maximal usage distance to spellless working
+            // gameobjects like mailboxes - 10.0 is a just an abitrary chosen number
+            case GAMEOBJECT_TYPE_MAILBOX:
+                return 10.0f;
+            case GAMEOBJECT_TYPE_FISHINGHOLE:
+            case GAMEOBJECT_TYPE_FISHINGNODE:
+                return 20.0f + CONTACT_DISTANCE; // max spell range;
+        }
+
+        return INTERACTION_DISTANCE;
+    }
+
     uint32 GetEventScriptId() const
     {
         switch(type)
@@ -591,6 +607,29 @@ struct GameObjectData
     uint32 GetRandomRespawnTime() const { return urand(uint32(spawntimesecsmin), uint32(spawntimesecsmax)); }
 };
 
+struct GameObjectDisplayInfoAddon
+{
+    uint32 display_id;
+    float min_x;
+    float min_y;
+    float min_z;
+    float max_x;
+    float max_y;
+    float max_z;
+};
+
+struct QuaternionData
+{
+    float x, y, z, w;
+
+    QuaternionData() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) { }
+    QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) { }
+
+    bool isUnit() const;
+    void toEulerAnglesZYX(float& Z, float& Y, float& X) const;
+    static QuaternionData fromEulerAnglesZYX(float Z, float Y, float X);
+};
+
 // For containers:  [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY        -> ...
 // For bobber:      [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED-><deleted>
 // For door(closed):[GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY(close) -> ...
@@ -634,6 +673,7 @@ class GameObject : public WorldObject
         uint32 GetDBTableGUIDLow() const { return HasStaticDBSpawnData() ? GetGUIDLow() : 0; }
 
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
+        QuaternionData const GetLocalRotation() const;
 
         // overwrite WorldObject function for proper name localization
         char const* GetNameForLocaleIdx(int32 locale_idx) const override;
@@ -803,6 +843,11 @@ class GameObject : public WorldObject
         uint32 GetFactionTemplateId() const final { return GetGOInfo()->faction; }
         uint32 GetLevel() const final ;
         bool IsValidAttackTarget(Unit const* target) const final ;
+
+        bool IsAtInteractDistance(Position const& pos, float radius) const;
+        bool IsAtInteractDistance(Player const* player, uint32 maxRange = 0) const;
+
+        SpellEntry const* GetSpellForLock(Player const* player) const;
     protected:
         bool        m_visible;
         uint32      m_spellId;

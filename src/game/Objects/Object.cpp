@@ -1401,11 +1401,28 @@ float WorldObject::GetDistance2dToCenter(WorldObject const* target) const
     return (dist > 0 ? dist : 0);
 }
 
+float WorldObject::GetDistance2dToCenter(float x, float y) const
+{
+    float dx = GetPositionX() - x;
+    float dy = GetPositionY() - y;
+    float dist = sqrt((dx * dx) + (dy * dy));
+    return (dist > 0 ? dist : 0);
+}
+
 float WorldObject::GetDistance3dToCenter(WorldObject const* target) const
 {
     float dx = GetPositionX() - target->GetPositionX();
     float dy = GetPositionY() - target->GetPositionY();
     float dz = GetPositionZ() - target->GetPositionZ();
+    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    return (dist > 0 ? dist : 0);
+}
+
+float WorldObject::GetDistance3dToCenter(float x, float y, float z) const
+{
+    float dx = GetPositionX() - x;
+    float dy = GetPositionY() - y;
+    float dz = GetPositionZ() - z;
     float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
     return (dist > 0 ? dist : 0);
 }
@@ -4072,10 +4089,10 @@ uint32 WorldObject::CalcArmorReducedDamage(Unit* pVictim, uint32 const damage) c
     return (newdamage > 1) ? newdamage : 1;
 }
 
-int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* effBasePoints, Spell* spell)
+int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* effBasePoints, Spell* spell) const
 {
-    Unit* pUnit = ToUnit();
-    Player* pPlayer = ToPlayer();
+    Unit const* pUnit = ToUnit();
+    Player const* pPlayer = ToPlayer();
 
     uint8 comboPoints = pPlayer ? pPlayer->GetComboPoints() : 0;
 
