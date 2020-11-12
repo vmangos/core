@@ -581,8 +581,6 @@ UPDATE `creature_template` SET `faction`=35 WHERE `entry`=4277;
 UPDATE `creature_template` SET `faction`=35 WHERE `entry`=10467;
 UPDATE `creature_template` SET `faction`=35 WHERE `entry`=14362;
 UPDATE `creature_template` SET `faction`=35 WHERE `entry`=14421;
-UPDATE `creature_template` SET `faction`=90 WHERE `entry`=14527;
-UPDATE `creature_template` SET `faction`=90 WHERE `entry`=14528;
 UPDATE `creature_template` SET `faction`=777 WHERE `entry`=15846;
 UPDATE `creature_template` SET `faction`=777 WHERE `entry`=15851;
 UPDATE `creature_template` SET `faction`=777 WHERE `entry`=15867;
