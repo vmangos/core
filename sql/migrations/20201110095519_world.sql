@@ -30,6 +30,8 @@ UPDATE `creature` SET `position_x` = 2765.12, `position_y` = -412.961, `position
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (85479, 6086, 0, 0, 0, 1, 0, 0, 6419.39, 490.11, 7.84875, 1.96054, 275, 275, 10, 100, 0, 1, 0, 0, 0, 10);
 
+-- allow Sentinel Glynda to roam
+ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` = 37103;
 
 -- End of migration.
 END IF;
