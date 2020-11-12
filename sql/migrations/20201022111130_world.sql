@@ -9,6 +9,10 @@ INSERT INTO `migrations` VALUES ('20201022111130');
 -- Add your query below.
 
 
+-- Add auras to Wickerman Guardian
+INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES
+(15195, '12187');
+
 -- Add gossip menu for Spoops.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8312, 8, 8312, 0, 0, 0, 0);
 INSERT INTO `gossip_menu` (`entry`, `text_id`,  `condition_id`) VALUES
