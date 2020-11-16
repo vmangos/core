@@ -3435,7 +3435,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
                     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell %u failed for reason 0x%x (target %u)", m_spellInfo->Id, result, pTarget ? pTarget->GetGUIDLow() : 0);
                     if (triggeredByAura && !triggeredByAura->GetHolder()->IsPassive())
                     {
-                        SendChannelUpdate(0);
+                        SendChannelUpdate(0, true);
                         triggeredByAura->GetHolder()->SetAuraDuration(0);
                     }
 
@@ -3582,7 +3582,7 @@ void Spell::cancel()
                 }
             }
 
-            SendChannelUpdate(0);
+            SendChannelUpdate(0, true);
             SendInterrupted(0);
 
             if (m_caster->IsPlayer())
@@ -4211,7 +4211,7 @@ void Spell::update(uint32 difftime)
                 // check if there are alive targets left
                 if (!HasValidUnitPresentInTargetList())
                 {
-                    SendChannelUpdate(0);
+                    SendChannelUpdate(0, true);
                     finish();
                 }
 
@@ -4884,7 +4884,7 @@ void Spell::SendInterrupted(uint8 result)
     m_caster->SendObjectMessageToSet(&data, true);
 }
 
-void Spell::SendChannelUpdate(uint32 time)
+void Spell::SendChannelUpdate(uint32 time, bool interrupted)
 {
     if (!m_channeled || m_spellState == SPELL_STATE_FINISHED)
         return;
@@ -4973,7 +4973,7 @@ void Spell::SendChannelUpdate(uint32 time)
         // Reset of channel values has to be done after a few delay.
         // Else, we have some visual bugs (arcane projectile, last tick)
         ChannelResetEvent* event = new ChannelResetEvent(m_casterUnit);
-        m_casterUnit->m_Events.AddEventAtOffset(event, 1000);
+        m_casterUnit->m_Events.AddEventAtOffset(event, (interrupted ? 1 : 1000));
     }
     else if (Player* pPlayer = m_casterUnit->ToPlayer())
     {
