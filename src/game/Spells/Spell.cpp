@@ -4211,7 +4211,7 @@ void Spell::update(uint32 difftime)
                 // check if there are alive targets left
                 if (!HasValidUnitPresentInTargetList())
                 {
-                    SendChannelUpdate(0, true);
+                    SendChannelUpdate(0);
                     finish();
                 }
 
