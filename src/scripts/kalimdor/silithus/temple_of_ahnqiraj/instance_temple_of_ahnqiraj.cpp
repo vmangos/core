@@ -540,7 +540,8 @@ bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, AreaTriggerEntry const* pAt
 
 void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
 {
-    p->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
+    if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
+        pCthun->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
     playersInStomach.push_back(std::make_pair(p->GetGUID(), StomachTimers()));
 }
 
@@ -738,13 +739,14 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
         }
         else 
         {
-            if (timers.acidDebuff < diff) {
-                player->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
+            if (timers.acidDebuff < diff)
+            {
+                if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
+                    pCthun->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
                 timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
             }
-            else {
+            else
                 timers.acidDebuff -= diff;
-            }
 
             // Crude hack for teleporting players from the stomach if the areatrigger
             // in the air above knockback area in stomach of c'thun did not trigger.
