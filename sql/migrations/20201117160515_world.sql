@@ -105,30 +105,30 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 -- Missing spawns in Dire Maul.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
 (4301, 2, 'Dire Maul - Rich Thorium Vein', 0, 0, 1, 10);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(397161, 4301, 'Rich Thorium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(397160, 4301, 'Rich Thorium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(397161, 4301, 'Rich Thorium Vein', 1);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(397160, 4301, 'Rich Thorium Vein', 1);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (18539, 175404, 429, 246.195, -268.761, -52.933, 5.89921, 0, 0, -0.190808, 0.981627, 604800, 604800, 255, 1, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(18539, 4301, 'Rich Thorium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(18539, 4301, 'Rich Thorium Vein', 1);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (18540, 175404, 429, 288.452, -309.522, -84.566, 4.83456, 0, 0, -0.66262, 0.748956, 604800, 604800, 255, 1, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(18540, 4301, 'Rich Thorium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(18540, 4301, 'Rich Thorium Vein', 1);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (18545, 175404, 429, 276.913, -323.602, -90.5699, 5.42798, 0, 0, -0.414693, 0.909962, 604800, 604800, 255, 1, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(18545, 4301, 'Rich Thorium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(18545, 4301, 'Rich Thorium Vein', 1);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (18546, 175404, 429, 270.596, -286.689, -70.5572, 3.03684, 0, 0, 0.998629, 0.0523532, 604800, 604800, 255, 1, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(18546, 4301, 'Rich Thorium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(18546, 4301, 'Rich Thorium Vein', 1);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (18548, 175404, 429, 263.743, -266.911, -59.9769, 2.94959, 0, 0, 0.995396, 0.0958512, 604800, 604800, 255, 1, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
-(18548, 4301, 'Rich Thorium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`) VALUES
+(18548, 4301, 'Rich Thorium Vein', 1);
 
 -- Missing spawns in Azshara.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES
