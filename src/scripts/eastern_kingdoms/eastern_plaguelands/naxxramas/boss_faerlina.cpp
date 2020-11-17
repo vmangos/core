@@ -296,7 +296,7 @@ struct boss_faerlinaAI : public ScriptedAI
                 if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CanCastResult::CAST_OK)
                 {
                     m_uiEnrageTimer = 60000;
-                    DoScriptText(SAY_ENRAGE3 + urand(0, 2), m_creature);
+                    DoScriptText(urand(SAY_ENRAGE1, SAY_ENRAGE3), m_creature);
                 }
             }
         }

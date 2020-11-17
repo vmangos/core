@@ -164,7 +164,7 @@ struct boss_nothAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_WARRIORS, Seconds(10));
         m_events.ScheduleEvent(EVENT_TP_BALC,  Seconds(90));
 
-        DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
+        DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_NOTH, IN_PROGRESS);

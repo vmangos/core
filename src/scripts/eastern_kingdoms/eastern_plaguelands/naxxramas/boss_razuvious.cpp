@@ -200,7 +200,7 @@ struct boss_razuviousAI : public ScriptedAI
     {
         if (urand(0, 3))
             return;
-        DoScriptText(urand(SAY_SLAY2, SAY_SLAY1), m_creature);
+        DoScriptText(urand(SAY_SLAY1, SAY_SLAY2), m_creature);
     }
 
     void JustDied(Unit* pKiller) override
@@ -213,7 +213,7 @@ struct boss_razuviousAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
+        DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAZUVIOUS, IN_PROGRESS);
@@ -334,7 +334,7 @@ struct boss_razuviousAI : public ScriptedAI
                     events.Repeat(Seconds(25));
                     break;
                 case EVENT_COMMAND:
-                    DoScriptText(urand(SAY_COMMAND4, SAY_COMMAND1), m_creature);
+                    DoScriptText(urand(SAY_COMMAND1, SAY_COMMAND4), m_creature);
                     events.Repeat(Seconds(urand(30,60)));
                     break;
             }

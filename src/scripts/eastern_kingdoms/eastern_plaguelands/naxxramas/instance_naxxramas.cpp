@@ -1263,12 +1263,12 @@ void instance_naxxramas::Update(uint32 diff)
                 if (m_auiEncounter[TYPE_THADDIUS] != DONE)
                 {
                     if (m_auiEncounter[TYPE_THADDIUS] != IN_PROGRESS && m_auiEncounter[TYPE_THADDIUS] != SPECIAL)
-                        DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM4 + urand(0, 3), NPC_THADDIUS);
+                        DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM1 + urand(0, 3), NPC_THADDIUS);
                     m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, Minutes(urand(5,10)));
                 }
                 break;
             case EVENT_WINGBOSS_DEAD:
-                DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_TAUNT1 - GetNumEndbossDead()+1, NPC_KELTHUZAD);
+                DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_TAUNT1 + GetNumEndbossDead()-1, NPC_KELTHUZAD);
                 break;
             case EVENT_KT_LK_DIALOGUE_1:
                 DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG1, NPC_KELTHUZAD);
@@ -1564,7 +1564,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
             if (DoCastSpellIfCan(m_creature, 28995) == CAST_OK)
             {
                 m_creature->CastSpell(m_creature, 28995, true); // Stoneskin
-                DoScriptText(-1531100, m_creature); // %s emits a strange noise.
+                DoScriptText(10755, m_creature); // %s emits a strange noise.
             }
         }
 

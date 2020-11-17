@@ -387,23 +387,7 @@ struct boss_heiganAI : public ScriptedAI
     void EventTaunt()
     {
         // Taunt
-        switch (urand(0, 3))
-        {
-            case 0:
-                DoScriptText(SAY_TAUNT1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_TAUNT2, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_TAUNT3, m_creature);
-                break;
-            case 3:
-                DoScriptText(SAY_TAUNT4, m_creature);
-                break;
-        }
-
-        //DoScriptText(urand(SAY_TAUNT1, SAY_TAUNT4), m_creature);
+        DoScriptText(PickRandomValue(SAY_TAUNT1, SAY_TAUNT2, SAY_TAUNT3, SAY_TAUNT4), m_creature);
         m_events.Repeat(randtime(Seconds(20), Seconds(70)));
     }
 

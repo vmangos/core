@@ -309,7 +309,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             }
         }
 
-        DoScriptText(SAY_AGGRO3 + urand(0, 2), m_creature);
+        DoScriptText(PickRandomValue(SAY_AGGRO1, SAY_AGGRO2, SAY_AGGRO3), m_creature);
     }
 
     void JustDied(Unit* pKiller) override
@@ -585,26 +585,7 @@ struct anub_doorAI : public GameObjectAI
         if (Creature* anubRekhan = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
             if (anubRekhan->IsAlive())
-            {
-                switch (urand(0, 4))
-                {
-                    case 0:
-                        DoScriptText(SAY_GREET, anubRekhan);
-                        break;
-                    case 1:
-                        DoScriptText(SAY_TAUNT1, anubRekhan);
-                        break;
-                    case 2:
-                        DoScriptText(SAY_TAUNT2, anubRekhan);
-                        break;
-                    case 3:
-                        DoScriptText(SAY_TAUNT3, anubRekhan);
-                        break;
-                    case 4:
-                        DoScriptText(SAY_TAUNT4, anubRekhan);
-                        break;
-                }
-            }
+                DoScriptText(PickRandomValue(SAY_GREET, SAY_TAUNT1, SAY_TAUNT2, SAY_TAUNT3, SAY_TAUNT4), anubRekhan);
         }
         me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         return false;
