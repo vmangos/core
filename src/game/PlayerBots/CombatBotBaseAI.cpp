@@ -2054,6 +2054,35 @@ void CombatBotBaseAI::AddAllSpellReagents()
     }
 }
 
+
+bool CombatBotBaseAI::AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee, bool checkSpells) const
+{
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            // Not self.
+            if (pMember == me)
+                continue;
+
+            // Not the target itself.
+            if (pMember->GetObjectGuid() == guid)
+                continue;
+
+            if (pMember->GetTargetGuid() == guid)
+            {
+                if (checkMelee && pMember->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
+                    return true;
+
+                if (checkSpells && pMember->IsNonMeleeSpellCasted())
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent, float groupHealPercent)
 {
     Unit* pTarget = SelectHealTarget(selfHealPercent, groupHealPercent);
@@ -2175,15 +2204,15 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float groupHealPe
                     continue;
 
                 // Avoid all healers picking same target.
-                if (pTarget && !urand(0, 4))
-                    return pTarget;
+                if (pTarget && !IsTankClass(pMember->GetClass()) && AreOthersOnSameTarget(pMember->GetObjectGuid(), false, true))
+                    continue;
 
                 // Check if we should heal party member.
                 if ((IsValidHealTarget(pMember, groupHealPercent) &&
                     healthPercent > pMember->GetHealthPercent()) ||
                     // Or a pet if there are no injured players.
                     (!pTarget && (pMember = pMember->GetPet()) &&
-                        IsValidHealTarget(pMember, groupHealPercent)))
+                      IsValidHealTarget(pMember, groupHealPercent)))
                 {
                     healthPercent = pMember->GetHealthPercent();
                     pTarget = pMember;

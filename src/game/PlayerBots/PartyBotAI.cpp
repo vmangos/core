@@ -237,30 +237,6 @@ bool PartyBotAI::ShouldAutoRevive() const
     return alivePlayerNearby;
 }
 
-bool PartyBotAI::AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee, bool checkSpells) const
-{
-    Group* pGroup = me->GetGroup();
-    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        if (Player* pMember = itr->getSource())
-        {
-            // Not self.
-            if (pMember == me)
-                continue;
-
-            if (pMember->GetTargetGuid() == guid)
-            {
-                if (checkMelee && pMember->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
-                    return true;
-
-                if (checkSpells && pMember->IsNonMeleeSpellCasted())
-                    return true;
-            }
-        }
-    }
-    return false;
-}
-
 bool PartyBotAI::CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const
 {
     if ((pSpellEntry->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) &&
