@@ -2405,18 +2405,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC:
         {
-            SpellTargets targetB = SPELL_TARGETS_AOE_DAMAGE;
-
-            // Select friendly targets for positive effect
-            if (m_spellInfo->IsPositiveEffect(effIndex))
-                targetB = SPELL_TARGETS_FRIENDLY;
-
             UnitList tempTargetUnitMap;
             SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
 
             // fill real target list if no spell script target defined
             FillAreaTargets(bounds.first != bounds.second ? tempTargetUnitMap : targetUnitMap,
-                            radius, PUSH_DEST_CENTER, bounds.first != bounds.second ? SPELL_TARGETS_ALL : targetB);
+                            radius, PUSH_DEST_CENTER, SPELL_TARGETS_ALL);
 
             if (!tempTargetUnitMap.empty())
             {
