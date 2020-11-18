@@ -1113,7 +1113,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     if (!m_originalCaster)
                         return;
-
+                    
                     int32 damage;
                     if (unitTarget->IsPlayer()) // damage from 100 - 500 based on proximity - max range 25
                         damage = 100 + ((25 - std::min(m_originalCaster->GetCombatDistance(unitTarget), 25.f)) / 25.f) * 400;
@@ -1124,6 +1124,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         if (unitTarget->GetVictim())
                             unitTarget->GetThreatManager().modifyThreatPercent(unitTarget->GetVictim(), -100);
                     }
+                    else
+                        return;
+
                     m_originalCaster->CastCustomSpell(unitTarget, 5255, &damage, nullptr, nullptr, true);
                     return;
                 }

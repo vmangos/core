@@ -313,14 +313,11 @@ struct mob_buru_eggAI : public ScriptedAI
 
     void Reset() override
     {
-        // Empêche les oeufs d'aggro et de tourner
-        SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
-        // Aggro de Buru quand on tape un oeuf
+        // Aggro Buru on taking damage
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
         {
             if (!pBuru->IsInCombat())
@@ -334,7 +331,7 @@ struct mob_buru_eggAI : public ScriptedAI
             return;
 
         // Explodes and spawns a creature when it dies
-        m_creature->CastSpell(m_creature, SPELL_EXPLODE, true);
+        m_creature->CastSpell(m_creature, SPELL_EXPLODE, false);
 
         if (Creature* add = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, m_creature->GetPositionX(), m_creature->GetPositionY(),
             m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
