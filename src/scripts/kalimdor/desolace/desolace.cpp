@@ -765,17 +765,29 @@ struct npc_cork_gizeltonAI : npc_escortAI
                 if (Creature* pCreature = m_creature->GetMap()->GetCreature(guid))
                 {
                     if (apply)
-                        pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);
+                    {
+                        pCreature->SetFactionTemporary(FACTION_ESCORT_N_FRIEND_ACTIVE, TEMPFACTION_NONE);
+                        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    }
                     else
+                    {
                         pCreature->ClearTemporaryFaction();
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    }
                 }
             }
         }
 
         if (apply)
-            m_creature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);
+        {
+            m_creature->SetFactionTemporary(FACTION_ESCORT_N_FRIEND_ACTIVE, TEMPFACTION_NONE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
         else
+        {
             m_creature->ClearTemporaryFaction();
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
     }
 
     void SummonAmbusher(uint8 index) const
