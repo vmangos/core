@@ -1022,7 +1022,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!pPlayer)
                         return;
 
-                    uint32 spellId = PickRandomValue(16595, 16593, 16591);
+                    // https://old.reddit.com/r/classicwow/comments/jwycmc/noggenfogger_1000_consumes_593_skellies_210_minis/
+                    uint32 spellId = 16591; // skeleton (60%)
+                    switch (urand(1, 10))
+                    {
+                        case 1:
+                        case 2:
+                            spellId = 16595; // mini (20%)
+                            break;
+                        case 3:
+                        case 4:
+                            spellId = 16593; // slow fall (20%)
+                            break;
+                    }
+
                     pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
                     return;
                 }
