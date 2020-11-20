@@ -17,14 +17,13 @@
 /* ScriptData
 SDName: Felwood
 SD%Complete: 95
-SDComment: Quest support: related to 4101/4102 (To obtain Cenarion Beacon), 4506, 7603 (Summon Pollo Grande)
+SDComment: Quest support: related to 4101/4102 (To obtain Cenarion Beacon), 4506
 SDCategory: Felwood
 EndScriptData */
 
 /* ContentData
 npc_kitten
 npcs_riverbreeze_and_silversky
-npc_niby_the_almighty
 EndContentData */
 
 #include "scriptPCH.h"
@@ -159,119 +158,6 @@ bool GossipSelect_npc_corrupt_saber(Player* pPlayer, Creature* pCreature, uint32
     return true;
 }
 
-/*######
-## npc_niby_the_almighty (summons el pollo grande)
-######*/
-enum
-{
-    QUEST_KROSHIUS     = 7603,
-
-    NPC_IMPSY          = 14470,
-
-    SPELL_SUMMON_POLLO = 23056,
-
-    SAY_NIBY_1         = -1000566,
-    SAY_NIBY_2         = -1000567,
-    EMOTE_IMPSY_1      = -1000568,
-    SAY_IMPSY_1        = -1000569,
-    SAY_NIBY_3         = -1000570
-};
-
-struct npc_niby_the_almightyAI : public ScriptedAI
-{
-    npc_niby_the_almightyAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiSummonTimer;
-    uint8  m_uiSpeech;
-
-    bool m_bEventStarted;
-
-    void Reset() override
-    {
-        m_uiSummonTimer = 500;
-        m_uiSpeech = 0;
-
-        m_bEventStarted = false;
-    }
-
-    void StartEvent()
-    {
-        Reset();
-        m_bEventStarted = true;
-        m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (m_bEventStarted)
-        {
-            if (m_uiSummonTimer <= uiDiff)
-            {
-                switch (m_uiSpeech)
-                {
-                    case 1:
-                        m_creature->GetMotionMaster()->Clear();
-                        m_creature->GetMotionMaster()->MovePoint(0, 5407.19f, -753.00f, 350.82f);
-                        m_uiSummonTimer = 6200;
-                        break;
-                    case 2:
-                        m_creature->SetFacingTo(1.2f);
-                        DoScriptText(SAY_NIBY_1, m_creature);
-                        m_uiSummonTimer = 3000;
-                        break;
-                    case 3:
-                        DoScriptText(SAY_NIBY_2, m_creature);
-                        DoCastSpellIfCan(m_creature, SPELL_SUMMON_POLLO);
-                        m_uiSummonTimer = 2000;
-                        break;
-                    case 4:
-                        if (Creature* pImpsy = GetClosestCreatureWithEntry(m_creature, NPC_IMPSY, 20.0))
-                        {
-                            DoScriptText(EMOTE_IMPSY_1, pImpsy);
-                            DoScriptText(SAY_IMPSY_1, pImpsy);
-                            m_uiSummonTimer = 2500;
-                        }
-                        else
-                        {
-                            //Skip Speech 5
-                            m_uiSummonTimer = 40000;
-                            ++m_uiSpeech;
-                        }
-                        break;
-                    case 5:
-                        DoScriptText(SAY_NIBY_3, m_creature);
-                        m_uiSummonTimer = 40000;
-                        break;
-                    case 6:
-                        m_creature->GetMotionMaster()->MoveTargetedHome();
-                        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        m_bEventStarted = false;
-                }
-                ++m_uiSpeech;
-            }
-            else
-                m_uiSummonTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_niby_the_almighty(Creature* pCreature)
-{
-    return new npc_niby_the_almightyAI(pCreature);
-}
-
-bool QuestRewarded_npc_niby_the_almighty(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_KROSHIUS)
-    {
-        if (npc_niby_the_almightyAI* pNibyAI = dynamic_cast<npc_niby_the_almightyAI*>(pCreature->AI()))
-            pNibyAI->StartEvent();
-    }
-    return true;
-}
 enum
 {
     SPELL_CURSED    = 13483,
@@ -279,9 +165,11 @@ enum
     SPELL_QUEST_CURSED_JAR  = 15698,
     SPELL_QUEST_TAINTED_JAR = 15699
 };
+
 /*###############
 # Cursed Oose
 ################*/
+
 struct npc_cursed_oozeAI : public ScriptedAI
 {
     explicit npc_cursed_oozeAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -312,13 +200,16 @@ struct npc_cursed_oozeAI : public ScriptedAI
         SpellTimer = 3000;
     }
 };
+
 CreatureAI* GetAI_npc_cursed_ooze(Creature* pCreature)
 {
     return new npc_cursed_oozeAI(pCreature);
 }
+
 /*###############
 # Tainted Oose
 ################*/
+
 struct npc_tainted_oozeAI : public ScriptedAI
 {
     explicit npc_tainted_oozeAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -349,6 +240,7 @@ struct npc_tainted_oozeAI : public ScriptedAI
         SpellTimer = 3000;
     }
 };
+
 CreatureAI* GetAI_npc_tainted_ooze(Creature* pCreature)
 {
     return new npc_tainted_oozeAI(pCreature);
@@ -892,12 +784,6 @@ void AddSC_felwood()
     newscript->Name = "npc_corrupt_saber";
     newscript->pGossipHello = &GossipHello_npc_corrupt_saber;
     newscript->pGossipSelect = &GossipSelect_npc_corrupt_saber;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_niby_the_almighty";
-    newscript->GetAI = &GetAI_npc_niby_the_almighty;
-    newscript->pQuestRewardedNPC = &QuestRewarded_npc_niby_the_almighty;
     newscript->RegisterSelf();
 
     newscript = new Script;
