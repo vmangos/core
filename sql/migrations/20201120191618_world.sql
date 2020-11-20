@@ -188,9 +188,6 @@ UPDATE `creature` SET `position_x` = 6723.87, `position_y` = -4708.75, `position
 -- allow Greta Mosshoof to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 39100;
 
--- allow Niby the Almighty and Impsy to roam
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 10 WHERE `guid` IN (39106, 39105);
-
 -- allow Shialune to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` = 39663;
 
