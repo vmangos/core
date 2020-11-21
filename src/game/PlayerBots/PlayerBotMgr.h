@@ -91,6 +91,7 @@ class PlayerBotMgr
         bool IsPermanentBot(uint32 playerGuid);
         bool IsChatBot(uint32 playerGuid);
         bool ForceLogoutDelay() const { return forceLogoutDelay; }
+        PlayerBotEntry* GetBotWithName(std::string name);
 
         uint32 GenBotAccountId() { return ++_maxAccountId; }
         PlayerBotStats& GetStats(){ return m_stats; }
