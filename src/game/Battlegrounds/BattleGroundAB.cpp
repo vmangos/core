@@ -117,10 +117,15 @@ void BattleGroundAB::Update(uint32 diff)
                 if (!m_IsInformedNearVictory && m_TeamScores[team] > BG_AB_WARNING_NEAR_VICTORY_SCORE)
                 {
                     if (team == BG_TEAM_ALLIANCE)
+                    {
                         SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                        PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_ALLIANCE);
+                    }
                     else
+                    {
                         SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-                    PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY);
+                        PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_HORDE);
+                    }
                     m_IsInformedNearVictory = true;
                 }
 
