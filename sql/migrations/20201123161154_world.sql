@@ -60,6 +60,13 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5907, 6, 262.729, -3047.14, 96.5834, 100, 0, 0, 0),
 (5907, 7, 262.779, -3040.37, 96.7544, 100, 0, 0, 0);
 
+-- Taskmaster Fizzule waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `entry` = 7233;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(7233, 1, 1250.2, -2989.1, 92.013, 100, 5000, 0, 0),
+(7233, 2, 1243.54, -2995.17, 91.7152, 100, 0, 0, 0),
+(7233, 3, 1236.79, -2994.62, 91.6789, 4.46804, 15000, 0, 0);
+
 
 -- End of migration.
 END IF;
