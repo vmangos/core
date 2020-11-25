@@ -4220,19 +4220,18 @@ uint32 Aura::CalculateDotDamage() const
             if (spellProto->IsFitToFamilyMask<CF_ROGUE_RUPTURE>())
             {
                 // Dmg/tick = $AP*min(0.01*$cp, 0.03) [Like Rip: only the first three CP increase the contribution from AP]
-                if (caster->GetTypeId() == TYPEID_PLAYER)
+                if (caster->IsPlayer())
                 {
                     uint8 cp = ((Player*)caster)->GetComboPoints();
                     if (cp > 3) cp = 3;
                     damage += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100);
                 }
             }
-#elif SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
             // World of Warcraft Client Patch 1.12.0 (2006-08-22)
             // - Garrote: The damage from this ability has been increased. In
             //   addition, Garrote now increases in potency with greater attack power.
-            if (spellProto->IsFitToFamilyMask<CF_ROGUE_GARROTE>())
-                return damage;
+            else if (spellProto->IsFitToFamilyMask<CF_ROGUE_GARROTE>())
+                damage += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.03f);
 #endif
             break;
         }
