@@ -132,6 +132,47 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1471803, 24, 1, 234, 0, 0, 0, 14431, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Laborer - Emote');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1471803, 24, 1, 234, 0, 0, 0, 14432, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Laborer - Emote');
 
+-- Make Mogg Script More Blizzlike
+UPDATE `creature_equip_template` SET `equipentry1` = 0 WHERE `entry` = 14908;
+DELETE FROM `creature_movement_template` WHERE `entry` = 14908;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(14908, 1, 1022.24, -2235.11, 93.3114, 0, 0, 0, 0),
+(14908, 2, 1023.37, -2238.18, 92.3744, 0, 0, 0, 0),
+(14908, 3, 1024.2, -2243.96, 92.4697, 0, 0, 0, 0),
+(14908, 4, 1022.05, -2244.86, 92.3385, 0, 0, 0, 0),
+(14908, 5, 1020.21, -2242.92, 92.2321, 2.64285, 8000, 0, 1490801),
+(14908, 6, 1034.19, -2250.56, 92.8656, 5.42316, 6000, 0, 1490802),
+(14908, 7, 1033.85, -2258.61, 93.6338, 5.97687, 5000, 0, 1490803),
+(14908, 8, 1037.68, -2262.02, 93.8145, 0, 0, 0, 0),
+(14908, 9, 1036.96, -2269.7, 93.7554, 0, 0, 0, 1490809),
+(14908, 10, 1042, -2273.46, 93.6932, 0, 0, 0, 0),
+(14908, 11, 1042.7, -2275.52, 93.5781, 0, 0, 0, 0),
+(14908, 12, 1046.52, -2274.46, 93.6045, 0, 0, 0, 0),
+(14908, 13, 1050.26, -2270.44, 93.4986, 0, 0, 0, 0),
+(14908, 14, 1049.74, -2266.86, 93.3475, 0, 0, 0, 0),
+(14908, 15, 1048.05, -2263.53, 93.2249, 0, 0, 0, 0),
+(14908, 16, 1041.05, -2258.77, 93.4525, 0, 0, 0, 0),
+(14908, 17, 1039.14, -2253.68, 92.9611, 100, 6000, 0, 1490804),
+(14908, 18, 1032.8, -2253.55, 93.3633, 0, 0, 0, 0),
+(14908, 19, 1025.83, -2258.54, 93.1641, 0, 0, 0, 0),
+(14908, 20, 1021.94, -2266.24, 92.8306, 0, 0, 0, 0),
+(14908, 21, 1022.81, -2272.14, 92.6617, 0, 0, 0, 0),
+(14908, 22, 1027.02, -2277.89, 92.6709, 0, 0, 0, 0),
+(14908, 23, 1036.56, -2280.12, 93.1197, 0, 0, 0, 0),
+(14908, 24, 1046.66, -2275.73, 93.5356, 0, 0, 0, 0),
+(14908, 25, 1049.61, -2269.77, 93.5509, 0, 0, 0, 0),
+(14908, 26, 1045.76, -2261.03, 93.2522, 0, 0, 0, 0),
+(14908, 27, 1038.3, -2254.31, 93.1039, 100, 6000, 0, 1490805),
+(14908, 28, 1028.89, -2245.04, 92.4171, 2.15198, 14000, 0, 1490806),
+(14908, 29, 1020.21, -2242.92, 92.2321, 2.64285, 2000, 0, 1490808),
+(14908, 30, 1016.87, -2225.77, 93.1025, 100, 80000, 0, 1490807);
+DELETE FROM `creature_movement_scripts` WHERE `id`=1490801;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490801, 1, 19, 0, 0, 0, 0, 0, 0, 0, 4, 3350, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg  - Set Equip');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490801, 1, 20, 1, 1, 0, 1, 13980, 0, 9, 2, 0, 0, 0, 0, 5, 0, 0, 0, 0, 'Mogg - Set Random Movement 5 Yards (Pooka)');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490801, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10293, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg - Say Text');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490801, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10294, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg - Say Text');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490808, 0, 19, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg - Set Equip');
+
 
 -- End of migration.
 END IF;
