@@ -109,8 +109,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- Moonglade
 -- add missing Moonglade Warden
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(210707, 11822, 0, 0, 0, 1, 7546.30, -3034.33, 463.46, 1.11689, 300, 300, 0, 100, 100, 0, 0, 0, 0, 10),
-(210708, 11822, 0, 0, 0, 1, 7537.79, -3029.95, 463.46, 1.10166, 300, 300, 0, 100, 100, 0, 0, 0, 0, 10);
+(81, 11822, 0, 0, 0, 1, 7546.30, -3034.33, 463.46, 1.11689, 300, 300, 0, 100, 100, 0, 0, 0, 0, 10),
+(116, 11822, 0, 0, 0, 1, 7537.79, -3029.95, 463.46, 1.10166, 300, 300, 0, 100, 100, 0, 0, 0, 0, 10);
 
 -- allow Bessany Plainswind to roam
 UPDATE `creature` SET `position_x` = 8005.35, `position_y` = -2496.49, `position_z` = 492.126, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 42330;
