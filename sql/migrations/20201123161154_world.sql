@@ -188,6 +188,78 @@ UPDATE `creature_movement_template` SET `script_id` = 1485004 WHERE `entry` = 14
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1485002, 4, 19, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gruk - Set Equip');
 
 
+DELETE FROM `creature_movement_template` WHERE `entry` = 14874;
+DELETE FROM `creature_movement_scripts` WHERE `id` IN (1487401, 1487409, 1487402);
+UPDATE `creature` SET `position_x` = 207.876, `position_y` = -2843.02, `position_z` = 91.4980 WHERE `guid` = 20186;
+UPDATE `creature` SET `position_x` = 224.489, `position_y` = -2842.92, `position_z` = 91.4084 WHERE `guid` = 20181;
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(23, 10685, 0, 0, 0, 1, 207.594, -2850.94, 91.4079, 3.84253, 413, 413, 3, 100, 0, 1, 0, 0, 0, 10),
+(24, 10685, 0, 0, 0, 1, 212.875, -2862.13, 91.6347, 3.84253, 413, 413, 3, 100, 0, 1, 0, 0, 0, 10),
+(80, 10685, 0, 0, 0, 1, 224.453, -2852.23, 91.3600, 3.84253, 413, 413, 3, 100, 0, 1, 0, 0, 0, 10);
+
+
+
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(14874, 1, 240.791, -2901.43, 98.0078, 100, 180000, 5, 0),
+(14874, 2, 240.791, -2901.43, 98.0078, 100, 0, 0, 0),
+(14874, 3, 241.054, -2908.06, 98.0216, 5.8626, 20000, 0, 1487401),
+(14874, 4, 236.939, -2902.39, 98.1296, 100, 0, 0, 0),
+(14874, 5, 231.025, -2900.67, 98.2101, 100, 20000, 0, 1487402),
+(14874, 6, 227.179, -2899.7, 97.374, 100, 0, 0, 0),
+(14874, 7, 221.223, -2893.77, 95.8963, 100, 0, 0, 0),
+(14874, 8, 215.929, -2884.73, 92.9291, 100, 0, 0, 0),
+(14874, 9, 214.699, -2874.8, 92.1099, 100, 10000, 0, 1487403),
+(14874, 10, 208.415, -2870.42, 91.6701, 100, 5000, 0, 1487404),
+(14874, 11, 211.695, -2872.78, 92.09, 100, 0, 0, 0),
+(14874, 12, 217.448, -2866.87, 91.6662, 100, 0, 0, 0),
+(14874, 13, 218.222, -2850.27, 90.6764, 100, 20000, 0, 1487405),
+(14874, 14, 217.239, -2860.9, 91.5709, 100, 0, 0, 0),
+(14874, 15, 214.668, -2880.73, 92.0654, 100, 0, 0, 0),
+(14874, 16, 219.152, -2890.38, 94.8972, 100, 0, 0, 0),
+(14874, 17, 225.141, -2898.63, 97.1942, 100, 0, 0, 0);
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487401, 10, 19, 0, 0, 0, 0, 0, 0, 0, 4, 2196, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Set Equip');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487401, 11, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10251, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487402, 3, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10252, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487402, 9, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10253, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487402, 15, 19, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Set Equip');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487402, 18, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10292, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487403, 6, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10255, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487404, 4, 19, 0, 0, 0, 0, 0, 0, 0, 4, 12744, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Set Equip');
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 3, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10256, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 20, 14, 0, 0, 0, 20186, 0, 9, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 25, 1, 0, 0, 0, 20181, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Swine - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 25, 1, 0, 0, 0, 20186, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Swine - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 20, 14, 0, 0, 0, 80, 0, 9, 2, 0, 0, 0, 0, 2, 0, 0, 8, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 20, 14, 0, 0, 0, 23, 0, 9, 2, 0, 0, 0, 0, 2, 0, 0, 16, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 20, 14, 0, 0, 0, 24, 0, 9, 2, 0, 0, 0, 0, 2, 0, 0, 15, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 20, 14, 0, 0, 0, 20181, 0, 9, 2, 0, 0, 0, 0, 2, 0, 0, 3, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 20, 14, 0, 0, 0, 20186, 0, 9, 2, 0, 0, 0, 0, 2, 0, 0, 20, 0, 'Karu - Move');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 25, 1, 0, 0, 0, 23, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Swine - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 25, 1, 0, 0, 0, 24, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Swine - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 4, 25, 1, 0, 0, 0, 80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Swine - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 5, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Walk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 16, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10257, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 18, 19, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Set Equip');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 23, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 20186, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 80, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 24, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 20181, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
+
+
+
+
+
 -- End of migration.
 END IF;
 END??
