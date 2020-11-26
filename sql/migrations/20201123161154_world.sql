@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20201123161154');
 -- Add your query below.
 
 
--- Okla and Kranal Waypoints and Scripts
--- Okla
+-- okla and kranal waypoints and scripts
+-- okla
 UPDATE `creature` SET `position_x` = 279.679, `position_y` = -3029.64, `position_z` = 97.3706, `movement_type` = 2 WHERE `guid` = 13179;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (14873, 1, 279.679, -3029.64, 97.3706, 100, 360000, 5, 0),
@@ -46,7 +46,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487302, 82, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10280, 0, 0, 0, 0, 0, 0, 0, 0, 'Okla - Talk');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487302, 112, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10281, 0, 0, 0, 0, 0, 0, 0, 0, 'Okla - Talk');
 
--- Kranal
+-- kranal
 UPDATE `creature` SET `position_x` = 265.171, `position_y` = -3037.09, `position_z` = 96.9497, `movement_type` = 2 WHERE `guid` = 13174;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (5907, 1, 265.171, -3037.09, 96.9497, 3.21141, 50000, 0, 0),
@@ -57,15 +57,15 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5907, 6, 262.729, -3047.14, 96.5834, 100, 0, 0, 0),
 (5907, 7, 262.779, -3040.37, 96.7544, 100, 0, 0, 0);
 
--- Taskmaster Fizzule Waypoints
+-- taskmaster fizzule waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `entry` = 7233;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (7233, 1, 1250.2, -2989.1, 92.013, 100, 5000, 0, 0),
 (7233, 2, 1243.54, -2995.17, 91.7152, 100, 0, 0, 0),
 (7233, 3, 1236.79, -2994.62, 91.6789, 4.46804, 15000, 0, 0);
 
--- Peon Farm Waypoints and Scripts
--- Peon 1
+-- peon farm waypoints and scripts
+-- peon 1
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 13759;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (13759, 1, -3.25799, -3652.25, 27.4564, 100, 0, 0, 0),
@@ -78,7 +78,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (13759, 8, -14.5986, -3658.9, 27.5461, 100, 0, 0, 0),
 (13759, 9, -9.02303, -3658.26, 27.4323, 100, 0, 0, 0);
 
--- Peon 2
+-- peon 2
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 13773;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (13773, 1, -15.4464, -3596.94, 29.3809, 100, 180000, 5, 0),
@@ -101,7 +101,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (13773, 18, 2.52405, -3605.41, 27.4355, 100, 0, 0, 0);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1377301, 4, 1, 25, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Peon - Emote');
 
--- add Horde Labourer Script
+-- add horde labourer script
 UPDATE `creature` SET `movement_type` = 0 WHERE `guid` IN (14429, 14430, 14431, 14432);
 DELETE FROM `creature_movement` WHERE `id` IN (14429, 14430, 14431, 14432);
 DELETE FROM `creature_movement_scripts` WHERE `id` IN (1471801, 1471802, 1471803, 1471804);
@@ -132,7 +132,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1471803, 24, 1, 234, 0, 0, 0, 14431, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Laborer - Emote');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1471803, 24, 1, 234, 0, 0, 0, 14432, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Laborer - Emote');
 
--- Make Mogg Script More Blizzlike
+-- make mogg script more blizzlike
 UPDATE `creature_equip_template` SET `equipentry1` = 0 WHERE `entry` = 14908;
 DELETE FROM `creature_movement_template` WHERE `entry` = 14908;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -172,6 +172,20 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490801, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10293, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg - Say Text');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490801, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10294, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg - Say Text');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1490808, 0, 19, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogg - Set Equip');
+
+-- tarban hearthgrain waypoints and scripts
+UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 8307;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(8307, 1, -555.068, -2966.62, 91.6705, 100, 120000, 1.5, 0),
+(8307, 2, -557.7, -2966.81, 91.6677, 100, 0, 0, 0),
+(8307, 3, -557.72, -2967.72, 91.6677, 100, 5000, 0, 830701);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (830701, 2, 28, 8, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarban - Kneel');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (830701, 4, 28, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tarban - Stand');
+
+-- make gruk script more blizzlike
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1485004, 1, 19, 0, 0, 0, 0, 0, 0, 0, 4, 2197, 0, 0, 0, 0, 0, 0, 0, 0, 'Gruk - Set Equip');
+UPDATE `creature_movement_template` SET `script_id` = 1485004 WHERE `entry` = 14850 AND `point` = 21;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1485002, 4, 19, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gruk - Set Equip');
 
 
 -- End of migration.
