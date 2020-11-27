@@ -344,6 +344,9 @@ REPLACE INTO `creature_addon` (`guid`, `equipment_id`) VALUES
 REPLACE INTO `creature_addon` (`guid`, `equipment_id`, `emote_state`) VALUES
 (13776, 3092, 69);
 
+-- allow barrens guard to roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` IN (14071, 14073);
+
 
 -- End of migration.
 END IF;
