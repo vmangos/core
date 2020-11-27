@@ -242,6 +242,55 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 23, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1487405, 25, 20, 1, 0, 0, 1, 24, 0, 9, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Karu - Swine - Set Movement');
 
+-- thorn hill mine
+DELETE FROM `creature_movement` WHERE `id` = 19411;
+UPDATE `creature` SET `position_x` = -624.492, `position_y` = -3246.95, `position_z` = 123.319 WHERE `guid` = 19411;
+
+
+
+
+
+
+
+
+
+
+-- add waypoints to peon
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 13765;
+ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(13765, 1, -637.907, -3183.19, 91.7072, 1.89202, 30000, 0, 0),
+(13765, 2, -636.732, -3174.65, 91.6902, 100, 0, 0, 0),
+(13765, 3, -620.18, -3167.53, 91.6675, 100, 0, 0, 0),
+(13765, 4, -599.111, -3162.18, 93.1155, 100, 0, 0, 0),
+(13765, 5, -574.775, -3153.58, 94.2043, 100, 0, 0, 0),
+(13765, 6, -564.19, -3153.67, 95.0419, 100, 0, 0, 0),
+(13765, 7, -556.996, -3161.58, 94.3286, 100, 0, 0, 0),
+(13765, 8, -546.97, -3162.24, 93.7031, 100, 0, 0, 0),
+(13765, 9, -538.959, -3160.92, 94.4818, 100, 0, 0, 0),
+(13765, 10, -528.785, -3162.16, 95.8867, 100, 0, 0, 0),
+(13765, 11, -522.78, -3156.72, 96.1399, 100, 0, 0, 0),
+(13765, 12, -521.123, -3147.5, 95.7039, 100, 0, 0, 0),
+(13765, 13, -521.724, -3151.82, 95.9453, 100, 0, 0, 0),
+(13765, 14, -524.466, -3161.04, 95.6044, 100, 0, 0, 0),
+(13765, 15, -534.292, -3161.37, 95.3432, 100, 0, 0, 0),
+(13765, 16, -543.029, -3161.37, 93.7978, 100, 0, 0, 0),
+(13765, 17, -554.31, -3162.36, 93.638, 100, 0, 0, 0),
+(13765, 18, -560.826, -3156.8, 95.0231, 100, 0, 0, 0),
+(13765, 19, -570.156, -3152.62, 95.0602, 100, 0, 0, 0),
+(13765, 20, -590.048, -3159.57, 93.1951, 100, 0, 0, 0),
+(13765, 21, -612.051, -3165.42, 92.5788, 100, 0, 0, 0),
+(13765, 22, -628.929, -3170.78, 91.6668, 100, 0, 0, 0),
+(13765, 23, -638.008, -3178.55, 91.6705, 100, 0, 0, 0);
+
+-- correct equipment for mining peons
+UPDATE `creature_equip_template` SET `equipentry1` = 1910 WHERE entry = 14901;
+UPDATE `creature_addon` SET `stand_state` = 0, `equipment_id` = 1078 WHERE `guid` = 13765;
+REPLACE INTO `creature_addon` (`guid`, `equipment_id`) VALUES
+(13772, 3092),
+(13751, 3092);
+REPLACE INTO `creature_addon` (`guid`, `equipment_id`, `emote_state`) VALUES
+(13776, 3092, 69);
+
 
 -- End of migration.
 END IF;
