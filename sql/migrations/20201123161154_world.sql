@@ -337,13 +337,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (13765, 23, -638.008, -3178.55, 91.6705, 100, 0, 0, 0);
 
 -- correct equipment for mining peons
-UPDATE `creature_equip_template` SET `equipentry1` = 1910 WHERE entry = 14901;
 UPDATE `creature_addon` SET `stand_state` = 0, `equipment_id` = 1078 WHERE `guid` = 13765;
-REPLACE INTO `creature_addon` (`guid`, `equipment_id`) VALUES
-(13772, 3092),
-(13751, 3092);
-REPLACE INTO `creature_addon` (`guid`, `equipment_id`, `emote_state`) VALUES
-(13776, 3092, 69);
+UPDATE `creature_addon` SET `equipment_id` = 80 WHERE `guid` IN (13775, 13756, 13752, 13761, 13763, 13753, 13764, 13757, 13762, 13754, 13769);
 
 -- allow barrens guard to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` IN (14071, 14073);
