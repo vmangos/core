@@ -356,6 +356,69 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (319302, 3193, 0, 1, 0, 100, 1, 0, 0, 180000, 180000, 319302, 0, 0, 'Misha Tor\'kren - Emote OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (319302, 0, 1, 18, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Misha Tor\'kren - Emote');
 
+-- correct hecht copperpinch items
+UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 14964;
+
+-- feral blade vrang wildgore
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3682 AND `item` = 4766;
+
+-- stable boots piznukle
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3684 AND `item` = 4788;
+
+-- pattern: blue overalls yonada
+INSERT INTO `npc_vendor` (`entry`, `maxcount`, `incrtime`, `item`)VALUES
+(5944, 1, 7200, 6274);
+
+-- malgin barleybrew should be a vendor
+UPDATE `creature_template` SET `npc_flags` = 6 WHERE `entry` = 5848; 
+INSERT INTO `npc_vendor` (`entry`, `item`)VALUES
+(5848, 2595),
+(5848, 2594),
+(5848, 2593),
+(5848, 2596),
+(5848, 2723);
+
+-- missing items lizzarik
+INSERT INTO `npc_vendor` (`entry`, `maxcount`, `incrtime`, `item`)VALUES
+(3658, 3, 7200, 858),
+(3658, 3, 7200, 2455);
+
+-- silverleaf hula mahi
+UPDATE `npc_vendor` SET `maxcount` = 3 WHERE `entry` = 3490 AND `item` = 765;
+
+-- keen throwing knife and sharp throwing axe barg
+DELETE FROM `npc_vendor` WHERE `entry` = 3481 AND `item` IN (3107, 3135);
+
+-- missing items wrahk
+INSERT INTO `npc_vendor` (`entry`, `maxcount`, `incrtime`, `item`)VALUES
+(3485, 1, 7200, 6270);
+
+-- recipe: rage potion ranik
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3499 AND `item` = 5640;
+
+-- missing items ranik
+INSERT INTO `npc_vendor` (`entry`, `maxcount`, `incrtime`, `item`)VALUES
+(3499, 1, 7200, 2675);
+
+-- small throwing knife and crude throwing axe jazzik
+DELETE FROM `npc_vendor` WHERE `entry` = 3498 AND `item` IN (2947, 3111);
+
+-- strong fishing pole - kilxx
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 3497 AND `item` = 6365;
+
+-- schematic: minor recombobulator gagsprocket
+DELETE FROM `npc_vendor` WHERE `entry` = 3495 AND `item` = 14639;
+
+-- missing items gagsprocket
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(3495, 4389, 1, 10800),
+(3495, 4382, 1, 10800),
+(3495, 4363, 2, 10800),
+(3495, 4404, 3, 10800),
+(3495, 4361, 2, 10800);
+
+-- gyrochronatom fradd swiftgear
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2682 AND `item` = 4389;
 
 -- End of migration.
 END IF;
