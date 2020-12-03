@@ -420,6 +420,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 -- gyrochronatom fradd swiftgear
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2682 AND `item` = 4389;
 
+--durotar
 -- allow razor hill guards to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` IN (7668, 6385, 6388, 10278, 7294, 8424, 10279, 8417, 10276, 10271, 10273, 10427, 6383, 7669, 10274);
 
@@ -436,6 +437,93 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (319101, 7, 1, 25, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Torka - Emote');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (319102, 1, 1, 69, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Torka - Emote');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (319102, 19, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cook Torka - Emote');
+
+-- sen jin watcher waypoints
+UPDATE `creature` SET `position_x` = -820.061, `position_y` = -4892.82, `position_z` = 19.3183, `movement_type` = 2 WHERE `guid` = 6401;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(6401, 1, -820.061, -4892.82, 19.3183, 100, 0, 0, 0),
+(6401, 2, -814.445, -4894.38, 19.1953, 100, 0, 0, 0),
+(6401, 3, -810.197, -4898.55, 19.2201, 100, 0, 0, 0),
+(6401, 4, -805.71, -4902.39, 19.3582, 100, 0, 0, 0),
+(6401, 5, -800.273, -4902.95, 19.4798, 100, 0, 0, 0),
+(6401, 6, -794.502, -4901.52, 19.5224, 100, 0, 0, 0),
+(6401, 7, -791.733, -4902.05, 19.5467, 100, 0, 0, 0),
+(6401, 8, -789.871, -4904.44, 19.5926, 100, 0, 0, 0),
+(6401, 9, -790.881, -4909.7, 19.5959, 100, 0, 0, 0),
+(6401, 10, -793.125, -4911.08, 19.5652, 100, 0, 0, 0),
+(6401, 11, -798.939, -4909.47, 19.4492, 100, 0, 0, 0),
+(6401, 12, -801.808, -4908.93, 19.3913, 100, 0, 0, 0),
+(6401, 13, -804.86, -4909.7, 19.3525, 100, 0, 0, 0),
+(6401, 14, -808.699, -4913.92, 19.2707, 100, 0, 0, 0),
+(6401, 15, -811.502, -4919.28, 19.3742, 100, 0, 0, 0),
+(6401, 16, -815.664, -4923.35, 19.5169, 100, 0, 0, 0),
+(6401, 17, -821.037, -4926.27, 19.7472, 100, 0, 0, 0),
+(6401, 18, -824.913, -4930.46, 20.2496, 100, 0, 0, 0),
+(6401, 19, -825.216, -4933.02, 20.4924, 100, 0, 0, 0),
+(6401, 20, -822.131, -4938.15, 20.9481, 100, 0, 0, 0),
+(6401, 21, -822.812, -4941.48, 21.2641, 100, 0, 0, 0),
+(6401, 22, -828.34, -4939.55, 21.1166, 100, 0, 0, 0),
+(6401, 23, -831.006, -4931.77, 20.6677, 100, 0, 0, 0),
+(6401, 24, -833.433, -4930.48, 20.7289, 100, 0, 0, 0),
+(6401, 25, -835.654, -4928.46, 20.7985, 100, 0, 0, 0),
+(6401, 26, -839.542, -4923.88, 20.6797, 100, 0, 0, 0),
+(6401, 27, -840.869, -4921.56, 20.6249, 100, 0, 0, 0),
+(6401, 28, -842.204, -4918.86, 20.5327, 100, 0, 0, 0),
+(6401, 29, -842.497, -4916.01, 20.4017, 100, 0, 0, 0),
+(6401, 30, -840.453, -4910.24, 20.1169, 100, 0, 0, 0),
+(6401, 31, -838.588, -4907.94, 19.9559, 100, 0, 0, 0),
+(6401, 32, -833.656, -4904.45, 19.8107, 100, 0, 0, 0),
+(6401, 33, -831.472, -4902.45, 19.8099, 100, 0, 0, 0),
+(6401, 34, -829.256, -4897.08, 19.89, 100, 0, 0, 0),
+(6401, 35, -828.472, -4894.54, 19.858, 100, 0, 0, 0);
+
+-- sen jin watcher waypoints
+UPDATE `creature` SET `position_x` = -772.175, `position_y` = -4941.56, `position_z` = 36.863, `movement_type` = 2 WHERE `guid` = 7324;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(7324, 1, -772.175, -4941.56, 36.863, 100, 0, 0, 0),
+(7324, 2, -774.724, -4940.84, 38.2501, 100, 0, 0, 0),
+(7324, 3, -777.686, -4940.8, 38.2811, 100, 0, 0, 0),
+(7324, 4, -779.612, -4942.97, 38.2811, 100, 0, 0, 0),
+(7324, 5, -781.083, -4945.55, 38.2811, 100, 0, 0, 0),
+(7324, 6, -786.085, -4947.83, 38.2811, 100, 0, 0, 0),
+(7324, 7, -788.325, -4946.54, 38.2811, 100, 0, 0, 0),
+(7324, 8, -789.578, -4943.82, 38.2811, 100, 0, 0, 0),
+(7324, 9, -789.76, -4940.87, 38.2811, 100, 0, 0, 0),
+(7324, 10, -784.81, -4937.9, 38.2811, 100, 0, 0, 0),
+(7324, 11, -779.324, -4939.52, 38.2811, 100, 0, 0, 0),
+(7324, 12, -776.578, -4940.72, 38.2811, 100, 0, 0, 0),
+(7324, 13, -768.679, -4942.92, 34.9, 100, 0, 0, 0),
+(7324, 14, -766.035, -4944.11, 33.9918, 100, 0, 0, 0),
+(7324, 15, -763.665, -4945.41, 32.7905, 100, 0, 0, 0),
+(7324, 16, -762.145, -4947.73, 31.7292, 100, 0, 0, 0),
+(7324, 17, -762.604, -4953.17, 29.8729, 100, 0, 0, 0),
+(7324, 18, -764.436, -4955.34, 29.2952, 100, 0, 0, 0),
+(7324, 19, -767.039, -4956.27, 28.2648, 100, 0, 0, 0),
+(7324, 20, -772.457, -4955.5, 26.0306, 100, 0, 0, 0),
+(7324, 21, -779.579, -4952.01, 22.2463, 100, 0, 0, 0),
+(7324, 22, -782.32, -4950.71, 22.2463, 100, 0, 0, 0),
+(7324, 23, -786.267, -4947.33, 22.2463, 100, 0, 0, 0),
+(7324, 24, -786.019, -4944.63, 22.2463, 100, 0, 0, 0),
+(7324, 25, -781.034, -4943.89, 22.2463, 100, 0, 0, 0),
+(7324, 26, -778.747, -4948.8, 22.2463, 100, 0, 0, 0),
+(7324, 27, -777.972, -4951.7, 22.2463, 100, 0, 0, 0),
+(7324, 28, -771.84, -4955.62, 26.2679, 100, 0, 0, 0),
+(7324, 29, -769.283, -4956.47, 27.5535, 100, 0, 0, 0),
+(7324, 30, -766.381, -4956.36, 28.4894, 100, 0, 0, 0),
+(7324, 31, -763.87, -4955.03, 29.4397, 100, 0, 0, 0),
+(7324, 32, -762.094, -4952.75, 30.1289, 100, 0, 0, 0),
+(7324, 33, -761.814, -4947.37, 31.8481, 100, 0, 0, 0),
+(7324, 34, -763.198, -4945, 32.8622, 100, 0, 0, 0),
+(7324, 35, -768.301, -4942.61, 34.8163, 100, 0, 0, 0);
+
+-- bombay script
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1057802, 10578, 0, 1, 0, 100, 1, 0, 0, 120000, 120000, 1057802, 0, 0, 'Bom\'bay - Start Script OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1057802, 0, 39, 1057802, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Bom\'bay - Start Script');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1057802, 0, 20, 0, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bom\'bay - Set Movement Type');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1057802, 1, 1, 25, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bom\'bay - Emote');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1057802, 3, 1, 11, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bom\'bay - Emote');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1057802, 11, 1, 15, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bom\'bay - Emote');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1057802, 15, 20, 1, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 'Bom\'bay - Set Movement Type');
 
 
 -- End of migration.
