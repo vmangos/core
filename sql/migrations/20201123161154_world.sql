@@ -420,7 +420,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 -- gyrochronatom fradd swiftgear
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2682 AND `item` = 4389;
 
---durotar
+-- durotar
 -- allow razor hill guards to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` IN (7668, 6385, 6388, 10278, 7294, 8424, 10279, 8417, 10276, 10271, 10273, 10427, 6383, 7669, 10274);
 
