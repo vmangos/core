@@ -88,7 +88,7 @@ bool LoginQueryHolder::Initialize()
     // !!! NOTE: including unused `zone`,`online`
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADFROM,            "SELECT `guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `playerBytes`, `playerBytes2`, `playerFlags`, "
                      "`position_x`, `position_y`, `position_z`, `map`, `orientation`, `taximask`, `cinematic`, `totaltime`, `leveltime`, `rest_bonus`, `logout_time`, `is_logout_resting`, `resettalents_multiplier`, "
-                     "`resettalents_time`, `trans_x, trans_y`, `trans_z`, `trans_o`, `transguid`, `extra_flags`, `stable_slots`, `at_login`, `zone`, `online`, `death_expire_time`, `taxi_path`, "
+                     "`resettalents_time`, `trans_x`, `trans_y`, `trans_z`, `trans_o`, `transguid`, `extra_flags`, `stable_slots`, `at_login`, `zone`, `online`, `death_expire_time`, `taxi_path`, "
                      "`honorRankPoints`, `honorHighestRank`, `honorStanding`, `honorLastWeekHK`, `honorLastWeekCP`, `honorStoredHK`, `honorStoredDK`, "
                      "`watchedFaction`, `drunk`, `health`, `power1`, `power2`, `power3`, `power4`, `power5`, `exploredZones`, `equipmentCache`, `ammoId`, `actionBars`, "
                      "`world_phase_mask` FROM `characters` WHERE `guid` = '%u'", m_guid.GetCounter());
@@ -186,10 +186,10 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   "`characters`.`zone`, `characters`.`map`, `characters`.`position_x`, `characters`.`position_y`, `characters`.`position_z`, `guild_member`.`guildid`, `characters`.`playerFlags`, "
                                   //          15                        16                         17                         18                     19
                                   "`characters`.`at_login`, `character_pet`.`entry`, `character_pet`.`modelid`, `character_pet`.`level`, `characters`.`equipmentCache` "
-                                  "FROM `characters` LEFT JOIN `character_pet` ON `characters`.`guid` = `character_pet.owner` AND `character_pet`.`slot` = '%u' "
+                                  "FROM `characters` LEFT JOIN `character_pet` ON `characters`.`guid` = `character_pet`.`owner` AND `character_pet`.`slot` = '%u' "
                                   "LEFT JOIN `guild_member` ON `characters`.`guid` = `guild_member`.`guid` "
                                   "WHERE `characters`.`account` = '%u' ORDER BY `characters`.`guid` "
-                                  "LIMIT `0`, `10`",
+                                  "LIMIT 0, 10",
                                   PET_SAVE_AS_CURRENT, GetAccountId());
 }
 
