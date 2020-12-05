@@ -9,6 +9,9 @@
 [10]: https://travis-ci.com/github/vmangos/core
 
 
+![C/C++ CI](https://github.com/vmangos/core/workflows/C/C++%20CI/badge.svg)
+
+
 # Progressive Vanilla
 This project is an independent continuation of the Elysium / LightsHope codebases, focused on delivering the most complete and accurate content progression system possible, including support for the patch appropriate game clients.
 

@@ -309,7 +309,7 @@ class BattleGround
         uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
 
         int32 GetStartDelayTime() const     { return m_StartDelayTime; }
-        uint8 GetWinner() const             { return m_Winner; }
+        BattleGroundWinner GetWinner() const { return m_Winner; }
         uint32 GetBattlemasterEntry() const;
         uint32 GetBonusHonorFromKill(uint32 kills) const;
         float GetHonorModifier();
@@ -329,7 +329,7 @@ class BattleGround
         void SetHordeWinSpell(uint32 WinSpell)       { m_HordeWinSpell = WinSpell; }
         void SetHordeLoseSpell(uint32 LoseSpell)     { m_HordeLoseSpell = LoseSpell; }
         void SetLevelRange(uint32 min, uint32 max)   { m_LevelMin = min; m_LevelMax = max; }
-        void SetWinner(uint8 winner)                 { m_Winner = winner; }
+        void SetWinner(BattleGroundWinner winner)    { m_Winner = winner; }
 
         void ModifyStartDelayTime(int diff) { m_StartDelayTime -= diff; }
         void SetStartDelayTime(int Time)    { m_StartDelayTime = Time; }
@@ -550,12 +550,13 @@ class BattleGround
         /* Battleground */
         BattleGroundTypeId m_TypeID;
         BattleGroundStatus m_Status;
+        BattleGroundWinner  m_Winner;
+
         uint32 m_ClientInstanceID;                          //the instance-id which is sent to the client and without any other internal use
         uint32 m_StartTime;
         int32 m_EndTime;                                    // it is set to 120000 when bg is ending and it decreases itself
         BattleGroundBracketId m_BracketId;
         bool   m_InBGFreeSlotQueue;                         // used to make sure that BG is only once inserted into the BattleGroundMgr.BGFreeSlotQueue[bgTypeId] deque
-        uint8  m_Winner;                                    // 0=alliance, 1=horde, 2=none
         int32  m_StartDelayTime;
         bool   m_PrematureCountDown;
         uint32 m_PrematureCountDownTimer;

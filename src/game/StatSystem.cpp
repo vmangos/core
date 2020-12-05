@@ -690,6 +690,7 @@ bool Creature::UpdateAllStats()
 {
     UpdateMaxHealth();
     UpdateAttackPowerAndDamage();
+    UpdateAttackPowerAndDamage(true);
 
     for (int i = POWER_MANA; i < MAX_POWERS; ++i)
         UpdateMaxPower(Powers(i));
@@ -776,7 +777,11 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 #endif
 
     if (ranged)
+    {
+        UpdateDamagePhysical(RANGED_ATTACK);
         return;
+    }
+
     //automatically update weapon damage after attack power modification
     UpdateDamagePhysical(BASE_ATTACK);
     UpdateDamagePhysical(OFF_ATTACK);
@@ -784,10 +789,25 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 
 void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 {
-    if (attType > OFF_ATTACK)
-        return;
+    UnitMods unitMod;
+    float databaseAttackPower;
 
-    UnitMods unitMod = (attType == BASE_ATTACK) ? UNIT_MOD_DAMAGE_MAINHAND : UNIT_MOD_DAMAGE_OFFHAND;
+    switch (attType)
+    {
+        case BASE_ATTACK:
+        default:
+            unitMod = UNIT_MOD_DAMAGE_MAINHAND;
+            databaseAttackPower = GetCreatureInfo()->attack_power;
+            break;
+        case OFF_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            databaseAttackPower = GetCreatureInfo()->attack_power;
+            break;
+        case RANGED_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_RANGED;
+            databaseAttackPower = GetCreatureInfo()->ranged_attack_power;
+            break;
+    }
 
     float base_value  = GetModifierValue(unitMod, BASE_VALUE);
     float base_pct    = GetModifierValue(unitMod, BASE_PCT);
@@ -810,9 +830,8 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
      * ie if AP is reduced to 0, attack will be reduced of 30%
      * We have to ignore creatures that don't have AP set in database (we would divide by 0)
      */
-    if (GetCreatureInfo()->attack_power)
+    if (databaseAttackPower)
     {
-        float databaseAttackPower = GetCreatureInfo()->attack_power;
         float attackPowerNow = GetTotalAttackPowerValue(attType);
         weapon_mindamage = weapon_mindamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
         weapon_maxdamage = weapon_maxdamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
@@ -821,8 +840,28 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
     float mindamage = ((base_value + weapon_mindamage) * dmg_multiplier * base_pct + total_value + total_phys) * total_pct;
     float maxdamage = ((base_value + weapon_maxdamage) * dmg_multiplier * base_pct + total_value + total_phys) * total_pct;
 
-    SetStatFloatValue(attType == BASE_ATTACK ? UNIT_FIELD_MINDAMAGE : UNIT_FIELD_MINOFFHANDDAMAGE, mindamage);
-    SetStatFloatValue(attType == BASE_ATTACK ? UNIT_FIELD_MAXDAMAGE : UNIT_FIELD_MAXOFFHANDDAMAGE, maxdamage);
+    uint16 fieldmin, fieldmax;
+
+    switch (attType)
+    {
+        case RANGED_ATTACK:
+            fieldmin = UNIT_FIELD_MINRANGEDDAMAGE;
+            fieldmax = UNIT_FIELD_MAXRANGEDDAMAGE;
+            break;
+        case BASE_ATTACK:
+            fieldmin = UNIT_FIELD_MINDAMAGE;
+            fieldmax = UNIT_FIELD_MAXDAMAGE;
+            break;
+        case OFF_ATTACK:
+            fieldmin = UNIT_FIELD_MINOFFHANDDAMAGE;
+            fieldmax = UNIT_FIELD_MAXOFFHANDDAMAGE;
+            break;
+        default:
+            return;
+    }
+
+    SetStatFloatValue(fieldmin, mindamage);
+    SetStatFloatValue(fieldmax, maxdamage);
 }
 
 /*#######################################

@@ -5074,11 +5074,18 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 Unit* target = unitTarget ? unitTarget : m_casterUnit;
                 if (!target)
                     return;
-                target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                target->RemoveNegativeSpellsCausingAura(SPELL_AURA_MOD_ROOT);
                 Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                 for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
                 {
                     SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+
+                    // skip positive and forced debuff auras
+                    if ((*iter)->IsPositive() || aurSpellInfo->HasAttribute(SPELL_ATTR_NEGATIVE))
+                    {
+                        ++iter;
+                        continue;
+                    }
 
                     uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
 

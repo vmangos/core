@@ -496,6 +496,22 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType)
     }
 }
 
+void Unit::RemoveNegativeSpellsCausingAura(AuraType auraType)
+{
+    for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
+    {
+        // forced debuff auras skipped too
+        if ((*iter)->GetHolder()->IsPositive() || (*iter)->GetHolder()->GetSpellProto()->HasAttribute(SPELL_ATTR_NEGATIVE))
+        {
+            ++iter;
+            continue;
+        }
+
+        RemoveAurasDueToSpell((*iter)->GetId());
+        iter = m_modAuras[auraType].begin();
+    }
+}
+
 void Unit::RemoveNonPassiveSpellsCausingAura(AuraType auraType)
 {
     for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
