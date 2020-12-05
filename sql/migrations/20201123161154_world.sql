@@ -568,6 +568,13 @@ UPDATE `creature` SET `orientation` = 1.29154 WHERE `guid` = 29248;
 INSERT INTO `creature_addon` (`guid`, `stand_state`) VALUES
 (29248, 8);
 
+-- make tsunaman script more blizzlike
+UPDATE `creature_movement_template` SET `waittime` = 6000 WHERE `entry` = 11862 AND `point` = 1;
+UPDATE `creature_movement_template` SET `waittime` = 20000 WHERE `entry` = 11862 AND `point` = 2;
+DELETE FROM `creature_movement_scripts` WHERE `id`=1186201;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1186201, 3, 1, 36, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tsunaman: Attack animation 1');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1186201, 5, 1, 36, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tsunaman: Attack animation 2');
+
 
 -- End of migration.
 END IF;
