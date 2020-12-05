@@ -563,6 +563,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7656, 32, -600.667, -4370, 39.3044, 100, 0, 0, 0),
 (7656, 33, -600.132, -4356.39, 38.4777, 100, 0, 0, 0);
 
+-- tammra windfield correct orientation and stand state
+UPDATE `creature` SET `orientation` = 1.29154 WHERE `guid` = 29248;
+INSERT INTO `creature_addon` (`guid`, `stand_state`) VALUES
+(29248, 8);
+
 
 -- End of migration.
 END IF;
