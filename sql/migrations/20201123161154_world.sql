@@ -563,6 +563,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7656, 32, -600.667, -4370, 39.3044, 100, 0, 0, 0),
 (7656, 33, -600.132, -4356.39, 38.4777, 100, 0, 0, 0);
 
+-- stonetalon mountains
 -- tammra windfield correct orientation and stand state
 UPDATE `creature` SET `orientation` = 1.29154 WHERE `guid` = 29248;
 INSERT INTO `creature_addon` (`guid`, `stand_state`) VALUES
@@ -574,6 +575,32 @@ UPDATE `creature_movement_template` SET `waittime` = 20000 WHERE `entry` = 11862
 DELETE FROM `creature_movement_scripts` WHERE `id`=1186201;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1186201, 3, 1, 36, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tsunaman: Attack animation 1');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1186201, 5, 1, 36, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tsunaman: Attack animation 2');
+
+-- mulgore
+-- bloodhoof villiage guards should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` IN (25468, 25797, 25768, 25996, 25946);
+
+-- brave leaping deer waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 25829;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(3219, 1, -2208.56, -525.993, -9.4698, 100, 0, 0, 0),
+(3219, 2, -2236.1, -544.934, -9.65718, 100, 0, 0, 0),
+(3219, 3, -2259.71, -559.708, -9.20742, 100, 0, 0, 0),
+(3219, 4, -2281.74, -584.24, -9.10078, 100, 30000, 7, 0),
+(3219, 5, -2268.75, -567.413, -9.00321, 100, 0, 0, 0),
+(3219, 6, -2247.59, -552.333, -9.54903, 100, 0, 0, 0),
+(3219, 7, -2225.09, -537.307, -9.5637, 100, 0, 0, 0),
+(3219, 8, -2217.62, -532.102, -9.51646, 100, 0, 0, 0),
+(3219, 9, -2205, -523.247, -9.40787, 100, 0, 0, 0),
+(3219, 10, -2186.05, -510.91, -9.42115, 100, 0, 0, 0),
+(3219, 11, -2167.06, -495.788, -9.33765, 100, 0, 0, 0),
+(3219, 12, -2148.64, -477.487, -9.15026, 100, 0, 0, 0),
+(3219, 13, -2127.3, -456.44, -9.32358, 100, 0, 0, 0),
+(3219, 14, -2115.18, -449.772, -9.02284, 100, 20000, 7, 0),
+(3219, 15, -2138.84, -467.702, -9.38845, 100, 0, 0, 0),
+(3219, 16, -2159.41, -488.417, -9.14587, 100, 0, 0, 0),
+(3219, 17, -2179.17, -505.939, -9.41828, 100, 0, 0, 0),
+(3219, 18, -2196.54, -517.991, -9.35223, 100, 0, 0, 0);
 
 
 -- End of migration.
