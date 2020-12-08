@@ -602,6 +602,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3219, 17, -2179.17, -505.939, -9.41828, 100, 0, 0, 0),
 (3219, 18, -2196.54, -517.991, -9.35223, 100, 0, 0, 0);
 
+-- camp narache guards should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 7 WHERE `guid` IN (25345, 25242, 24932, 24949);
+
 
 -- End of migration.
 END IF;
