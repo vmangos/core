@@ -2168,6 +2168,23 @@ bool ChatHandler::HandleDebugMoveToCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDebugMoveDistanceCommand(char* args)
+{
+    Player* player = m_session->GetPlayer();
+    Unit* target = GetSelectedUnit();
+    if (!player || !target || player == target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        return true;
+    }
+
+    float distance = 10.0f;
+    ExtractFloat(&args, distance);
+    target->GetMotionMaster()->MoveDistance(player, distance);
+    PSendSysMessage("%s is moving %g yards away from you.", target->GetName(), distance);
+    return true;
+}
+
 bool ChatHandler::HandleDebugFaceMeCommand(char* args)
 {
     Player* player = m_session->GetPlayer();

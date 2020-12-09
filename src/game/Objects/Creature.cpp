@@ -658,7 +658,10 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 else
                     SetDeathState(JUST_ALIVED);
 
-                //Call AI respawn virtual function
+                if (CreatureGroup* group = GetCreatureGroup())
+                    group->OnRespawn(this);
+
+                // Call AI respawn virtual function
                 if (AI())
                 {
                     AI()->JustRespawned();
@@ -1954,9 +1957,6 @@ void Creature::Respawn()
             GetMap()->GetPersistentState()->SaveCreatureRespawnTime(GetGUIDLow(), 0);
         m_respawnTime = time(nullptr);                         // respawn at next tick
     }
-
-    if (CreatureGroup* group = GetCreatureGroup())
-        group->OnRespawn(this);
 }
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn)

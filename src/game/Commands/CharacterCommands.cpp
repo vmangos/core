@@ -53,7 +53,8 @@ bool ChatHandler::HandleCharacterAIInfoCommand(char* /*args*/)
     PSendSysMessage("AI info for %s", pTarget->GetObjectGuid().GetString().c_str());
     char const* cstrAIClass = pTarget->AI() ? typeid(*pTarget->AI()).name() : " - ";
     PSendSysMessage("Current AI: %s", cstrAIClass);
-    PSendSysMessage(LANG_NPC_MOTION_TYPE, pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType());
+    MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
+    PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
 
     return true;
 }

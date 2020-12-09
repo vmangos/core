@@ -656,6 +656,25 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleListMoveGensCommand(char* /*args*/)
+{
+    Unit* unit = GetSelectedUnit();
+    if (!unit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("List of move gens for %s:", unit->GetObjectGuid().GetString().c_str());
+    std::vector<MovementGeneratorType> generators;
+    unit->GetMotionMaster()->GetUsedMovementGeneratorsList(generators);
+    for (uint32 i = 0; i < generators.size(); i++)
+        PSendSysMessage("%u. %s (%u)", (i+1), MotionMaster::GetMovementGeneratorTypeName(generators[i]), generators[i]);
+
+    return true;
+}
+
 bool ChatHandler::HandleCastCommand(char* args)
 {
     if (!*args)
