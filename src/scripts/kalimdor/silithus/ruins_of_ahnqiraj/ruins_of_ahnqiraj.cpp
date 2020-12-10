@@ -911,7 +911,7 @@ struct QirajiWarriorAI : public ScriptedAI
         /** Needed for "marking target system" */
         if (!m_creature->GetCreatureGroup()) // Should not happen
             return;
-        if (m_creature->GetCreatureGroup()->GetLeaderGuid().GetEntry() != NPC_CAPTAIN_TUUBID || !m_bisTuubidAlive)
+        if (m_creature->GetCreatureGroup()->GetOriginalLeaderGuid().GetEntry() != NPC_CAPTAIN_TUUBID || !m_bisTuubidAlive)
         {
             // Threat calculation
             if (!m_creature->SelectHostileTarget())
@@ -1008,7 +1008,7 @@ struct SwarmguardNeedlerAI : public ScriptedAI
         /** Needed for "marking target system" */
         if (!m_creature->GetCreatureGroup()) // Should not happen
             return;
-        if (m_creature->GetCreatureGroup()->GetLeaderGuid().GetEntry() != NPC_CAPTAIN_TUUBID || !m_bisTuubidAlive)
+        if (m_creature->GetCreatureGroup()->GetOriginalLeaderGuid().GetEntry() != NPC_CAPTAIN_TUUBID || !m_bisTuubidAlive)
         {
             // Threat calculation
             if (!m_creature->SelectHostileTarget())
