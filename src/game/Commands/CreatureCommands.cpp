@@ -1404,9 +1404,18 @@ bool ChatHandler::HandleNpcGroupDelCommand(char *args)
         return false;
     }
 
-    g->RemoveMember(target->GetObjectGuid());
-    g->SaveToDb();
-    target->SetCreatureGroup(nullptr);
+    if (g->GetOriginalLeaderGuid() == target->GetObjectGuid())
+    {
+        g->DeleteFromDb();
+        target->LeaveCreatureGroup(); // group is deleted
+        g = nullptr;
+    }
+    else
+    {
+        target->LeaveCreatureGroup();
+        g->SaveToDb();
+    }
+
     target->GetMotionMaster()->Initialize();
     return true;
 }

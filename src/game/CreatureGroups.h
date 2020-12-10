@@ -54,6 +54,7 @@ class CreatureGroup
         }
         CreatureGroupMember* AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags = (OPTION_FORMATION_MOVE|OPTION_AGGRO_TOGETHER));
         void RemoveMember(ObjectGuid guid);
+        void RemoveTemporaryLeader(Creature* pLeader);
         void DisbandGroup(Creature* pMember);
         void DeleteFromDb();
         void SaveToDb();
@@ -91,11 +92,11 @@ class CreatureGroupsManager
             return i;
         }
         void LoadCreatureGroup(Creature* creature, CreatureGroup*& group);
-        void RegisterNewGroup(CreatureGroup* group) { _groups[group->GetLeaderGuid()] = group; }
+        void RegisterNewGroup(CreatureGroup* group) { m_groups[group->GetOriginalLeaderGuid()] = group; }
         void Load();
         static ObjectGuid ConvertDBGuid(uint32 guidlow);
     protected:
-        std::map<ObjectGuid, CreatureGroup*> _groups;
+        std::map<ObjectGuid, CreatureGroup*> m_groups;
 };
 
 #define sCreatureGroupsManager (CreatureGroupsManager::instance())

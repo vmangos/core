@@ -3733,7 +3733,11 @@ void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
 void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint32 options)
 {
     if (CreatureGroup* myGroup = GetCreatureGroup())
-        myGroup->RemoveMember(GetObjectGuid());
+    {
+        sLog.outError("%s attempts to join group, but is already in one.", GetGuidStr().c_str());
+        return;
+    }
+
     CreatureGroup* group = leader->GetCreatureGroup();
     if (!group)
     {
@@ -3750,16 +3754,19 @@ void Creature::LeaveCreatureGroup()
 {
     if (CreatureGroup* pGroup = GetCreatureGroup())
     {
-        if (pGroup->GetLeaderGuid() == GetObjectGuid())
+        if (pGroup->GetOriginalLeaderGuid() == GetObjectGuid())
         {
             pGroup->DisbandGroup(this);
             delete pGroup;
         }
         else
         {
-            pGroup->RemoveMember(GetObjectGuid());
-            SetCreatureGroup(nullptr);
+            if (pGroup->GetLeaderGuid() == GetObjectGuid())
+                pGroup->RemoveTemporaryLeader(this);
+            else
+                pGroup->RemoveMember(GetObjectGuid());
         }
+        SetCreatureGroup(nullptr);
     }
 }
 

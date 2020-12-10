@@ -205,6 +205,18 @@ void CreatureGroup::MemberAssist(Creature* member, Unit* target)
     }
 }
 
+void CreatureGroup::RemoveTemporaryLeader(Creature* pLeader)
+{
+    m_leaderGuid = m_originalLeaderGuid;
+    RemoveMember(pLeader->GetObjectGuid());
+
+    for (const auto& itr : m_members)
+        if (itr.first != pLeader->GetObjectGuid())
+            if (Creature* otherMember = pLeader->GetMap()->GetCreature(itr.first))
+                if (otherMember->IsInWorld() && otherMember->IsAlive())
+                    otherMember->GetMotionMaster()->ReInitializePatrolMovement();
+}
+
 void CreatureGroup::RemoveMember(ObjectGuid guid)
 {
     std::map<ObjectGuid, CreatureGroupMember*>::iterator it = m_members.find(guid);
@@ -267,7 +279,7 @@ void CreatureGroupsManager::Load()
     uint32 oldMSTime = WorldTimer::getMSTime();
 
     // Memory leak, but we cannot delete the loaded groups, since pointer may be present at loaded creatures
-    _groups.clear();
+    m_groups.clear();
 
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `leader_guid`, `member_guid`, `dist`, `angle`, `flags` FROM `creature_groups` ORDER BY `leader_guid`"));
 
@@ -326,7 +338,7 @@ void CreatureGroupsManager::LoadCreatureGroup(Creature* creature, CreatureGroup*
     group = nullptr;
     if (!creature->HasStaticDBSpawnData())
         return;
-    for (const auto& itr : _groups)
+    for (const auto& itr : m_groups)
     {
         if (itr.first == creature->GetObjectGuid() || itr.second->ContainsGuid(creature->GetObjectGuid()))
         {
