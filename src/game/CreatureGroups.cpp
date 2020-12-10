@@ -44,16 +44,16 @@ void CreatureGroup::OnMemberAttackStart(Creature* member, Unit* target)
         if (itr.first != member->GetObjectGuid())
             MemberAssist(member->GetMap()->GetCreature(itr.first), target);
 
-    if (member->GetObjectGuid() != GetLeaderGuid())
-        MemberAssist(member->GetMap()->GetCreature(GetLeaderGuid()), target);
+    if (member->GetObjectGuid() != GetOriginalLeaderGuid())
+        MemberAssist(member->GetMap()->GetCreature(GetOriginalLeaderGuid()), target);
 }
 
 void CreatureGroup::OnMemberDied(Creature* member)
 {
     if (m_options & OPTION_INFORM_LEADER_ON_MEMBER_DIED)
     {
-        if (member->GetObjectGuid() != GetLeaderGuid())
-            if (Creature* groupLeader = member->GetMap()->GetCreature(GetLeaderGuid()))
+        if (member->GetObjectGuid() != GetOriginalLeaderGuid())
+            if (Creature* groupLeader = member->GetMap()->GetCreature(GetOriginalLeaderGuid()))
                 if (groupLeader->IsInWorld() && groupLeader->IsAlive() && groupLeader->AI())
                     groupLeader->AI()->GroupMemberJustDied(member, false);
     }
@@ -63,7 +63,7 @@ void CreatureGroup::OnMemberDied(Creature* member)
             if (itr.first != member->GetObjectGuid())
                 if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
                     if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
-                        otherMember->AI()->GroupMemberJustDied(member, member->GetObjectGuid() == GetLeaderGuid());
+                        otherMember->AI()->GroupMemberJustDied(member, member->GetObjectGuid() == GetOriginalLeaderGuid());
     }
 
     // Select new leader on death if group uses formation movement.
@@ -154,8 +154,8 @@ void CreatureGroup::RespawnAll(Creature* except)
             if (Creature* otherMember = except->GetMap()->GetCreature(itr.first))
                 Respawn(otherMember, itr.second);
 
-    if (except->GetObjectGuid() != GetLeaderGuid())
-        if (Creature* otherMember = except->GetMap()->GetCreature(GetLeaderGuid()))
+    if (except->GetObjectGuid() != GetOriginalLeaderGuid())
+        if (Creature* otherMember = except->GetMap()->GetCreature(GetOriginalLeaderGuid()))
             Respawn(otherMember, nullptr);
 }
 
@@ -170,7 +170,7 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
     {
         if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
         {
-            if (Unit* leader = member->GetMap()->GetUnit(GetLeaderGuid()))
+            if (Unit* leader = member->GetMap()->GetUnit(GetOriginalLeaderGuid()))
             {
                 float x, y, z;
                 if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
@@ -217,7 +217,7 @@ void CreatureGroup::RemoveMember(ObjectGuid guid)
 
 void CreatureGroup::DisbandGroup(Creature* pMember)
 {
-    if (Creature* pLeader = pMember->GetMap()->GetCreature(GetLeaderGuid()))
+    if (Creature* pLeader = pMember->GetMap()->GetCreature(GetOriginalLeaderGuid()))
         pLeader->SetCreatureGroup(nullptr);
 
     for (auto& it : m_members)
@@ -306,7 +306,7 @@ void CreatureGroupsManager::Load()
         }
         else
         {
-            if (!currentGroup || leaderGuid != currentGroup->GetLeaderGuid())
+            if (!currentGroup || leaderGuid != currentGroup->GetOriginalLeaderGuid())
             {
                 currentGroup = new CreatureGroup(leaderGuid);
                 RegisterNewGroup(currentGroup);

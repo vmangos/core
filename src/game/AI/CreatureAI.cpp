@@ -419,12 +419,15 @@ void CreatureAI::SetCombatMovement(bool enabled)
     if (Unit* pVictim = m_creature->GetVictim())
     {
         if (!enabled && (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE))
+        {
+            m_creature->GetMotionMaster()->MovementExpired(false);
             m_creature->GetMotionMaster()->MoveIdle();
+        }
         else if (enabled && (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE))
         {
-            m_creature->GetMotionMaster()->ClearType(CHASE_MOTION_TYPE);
+            m_creature->GetMotionMaster()->MovementExpired(false);
             m_creature->GetMotionMaster()->MoveChase(pVictim);
-        }
+        }  
     }
 }
 

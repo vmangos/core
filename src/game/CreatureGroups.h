@@ -58,8 +58,8 @@ class CreatureGroup
         void DeleteFromDb();
         void SaveToDb();
 
-        ObjectGuid GetLeaderGuid() const { return m_leaderGuid; }
-        ObjectGuid GetOriginalLeaderGuid() const { return m_originalLeaderGuid; }
+        ObjectGuid const& GetLeaderGuid() const { return m_leaderGuid; }
+        ObjectGuid const& GetOriginalLeaderGuid() const { return m_originalLeaderGuid; }
         std::map<ObjectGuid, CreatureGroupMember*> const& GetMembers() const { return m_members; }
         bool ContainsGuid(ObjectGuid guid) const { return m_members.find(guid) != m_members.end(); }
         bool IsFormation() const { return m_options & OPTION_FORMATION_MOVE; }

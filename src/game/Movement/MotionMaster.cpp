@@ -414,7 +414,7 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
         // interrupt current movespline
         if (!m_owner->IsStopped())
             m_owner->StopMoving();
-
+        
         Mutate(new ChaseMovementGenerator<Creature>(*target, dist, angle));
     }
 }
@@ -642,13 +642,18 @@ void MotionMaster::Mutate(MovementGenerator* m)
     {
         switch (top()->GetMovementGeneratorType())
         {
+            // Chase movement should not be preserved in most cases
+            case CHASE_MOTION_TYPE:
+            {
+                if (m->GetMovementGeneratorType() == DISTANCING_MOTION_TYPE)
+                    break;
+            }
             // HomeMovement is not that important, delete it if meanwhile a new comes
             case HOME_MOTION_TYPE:
             // Distract and Distancing movement interrupted by any other movement
             case DISTRACT_MOTION_TYPE:
             case DISTANCING_MOTION_TYPE:
                 MovementExpired(false);
-            default:
                 break;
         }
 
