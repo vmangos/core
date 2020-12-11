@@ -49,6 +49,12 @@ struct npc_mistAI : public FollowerAI
 
     void Reset() override { }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
+    }
+
     void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
@@ -133,6 +139,7 @@ bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, Quest const* pQu
         if (npc_mistAI* pMistAI = dynamic_cast<npc_mistAI*>(pCreature->AI()))
         {
             pCreature->SetFactionTemporary(FACTION_DARNASSUS, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pMistAI->StartFollow(pPlayer, FACTION_DARNASSUS, pQuest);
         } 
     }

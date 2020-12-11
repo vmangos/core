@@ -313,6 +313,12 @@ struct npc_feero_ironhandAI : public npc_escortAI
         }
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
@@ -417,6 +423,7 @@ bool QuestAccept_npc_feero_ironhand(Player* pPlayer, Creature* pCreature, Quest 
     {
         DoScriptText(SAY_QUEST_START, pCreature, pPlayer);
         pCreature->SetFactionTemplateId(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (npc_feero_ironhandAI* pEscortAI = dynamic_cast<npc_feero_ironhandAI*>(pCreature->AI()))
             pEscortAI->Start(true, pPlayer->GetGUID(), pQuest);

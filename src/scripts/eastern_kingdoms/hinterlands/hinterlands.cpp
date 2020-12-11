@@ -90,7 +90,7 @@ struct npc_rinjiAI : public npc_escortAI
     {
         m_bIsByOutrunner = false;
         m_iSpawnId = 0;
-
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         npc_escortAI::JustRespawned();
     }
 
@@ -212,6 +212,7 @@ bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, Quest const* pQ
             pGo->UseDoorOrButton();
 
         pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (npc_rinjiAI* pEscortAI = dynamic_cast<npc_rinjiAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);

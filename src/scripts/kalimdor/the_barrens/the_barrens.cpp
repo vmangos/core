@@ -540,10 +540,9 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
                             break;
                         case 3:
                             if (Player* pPlayer = GetPlayerForEscort())
-                            {
                                 pPlayer->GroupEventHappens(QUEST_ESCAPE, m_creature);
-                                m_creature->SummonCreature(NPC_PILOT_WIZZ, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 180000);
-                            }
+                            m_creature->SummonCreature(NPC_PILOT_WIZZ, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 180000);
+                            m_creature->ResetHomePosition();
                             break;
                     }
 

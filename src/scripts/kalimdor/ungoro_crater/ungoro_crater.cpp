@@ -53,6 +53,12 @@ struct npc_ame01AI : public npc_escortAI
 
     void Reset() override { }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
@@ -105,6 +111,7 @@ bool QuestAccept_npc_ame01(Player* pPlayer, Creature* pCreature, Quest const* pQ
         {
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
             pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pAmeAI->Start(false, pPlayer->GetGUID(), pQuest);
         }
     }
@@ -168,6 +175,12 @@ struct npc_ringoAI : public FollowerAI
         m_uiEndEventProgress = 0;
         m_uiEndEventTimer = 1000;
         pSpraggle = nullptr;
+    }
+
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
     }
 
     void MoveInLineOfSight(Unit *pWho) override
@@ -342,6 +355,7 @@ bool QuestAccept_npc_ringo(Player* pPlayer, Creature* pCreature, Quest const* pQ
         if (npc_ringoAI* pRingoAI = dynamic_cast<npc_ringoAI*>(pCreature->AI()))
         {
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pRingoAI->StartFollow(pPlayer, FACTION_ESCORTEE, pQuest);
         }
     }
