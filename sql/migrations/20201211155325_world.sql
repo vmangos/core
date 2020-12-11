@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20201211155325');
 
 -- Kolkar Wrangler should run away from rooted target.
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3272;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (327201, 3272, 0, 2, 0, 100, 0, 15, 0, 0, 0, 327201, 0, 0, 'Kolkar Wrangler - Flee at 15\% HP');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (327201, 3272, 0, 2, 0, 100, 0, 15, 0, 0, 0, 327201, 0, 0, 'Kolkar Wrangler - Flee at 15% HP');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (327202, 3272, 0, 33, 0, 100, 1, 20000, 20000, 0, 0, 327202, 0, 0, 'Kolkar Wrangler - Run Away from Target when Rooted');
 DELETE FROM `creature_ai_scripts` WHERE `id`=327202;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (327202, 0, 20, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2428, 'Kolkar Wrangler - Move Away from Target');
