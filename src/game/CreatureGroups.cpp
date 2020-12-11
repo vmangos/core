@@ -99,6 +99,8 @@ void CreatureGroup::OnMemberDied(Creature* member)
                             if (otherMember->IsInWorld() && otherMember->IsAlive())
                                 otherMember->GetMotionMaster()->ReInitializePatrolMovement();
             }
+            else
+                m_leaderGuid = m_originalLeaderGuid; // Everyone is dead, reset leader to original.
         }
     }
 }
