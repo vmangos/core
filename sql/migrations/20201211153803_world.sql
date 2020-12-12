@@ -70,6 +70,13 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 (3029, 6533, 2, 7200);
 
 
+-- durotar
+-- missing items jark
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(3164, 2946),
+(3164, 3131);
+
+
 -- End of migration.
 END IF;
 END??
