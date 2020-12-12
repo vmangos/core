@@ -283,6 +283,9 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
     if (target == this)                                     // building packet for yourself
         updateFlags |= UPDATEFLAG_SELF;
 
+    if (IsUnit() && static_cast<Unit const*>(this)->HasUnitState(UNIT_STAT_MELEE_ATTACKING) && static_cast<Unit const*>(this)->GetVictim())
+        updateFlags |= UPDATEFLAG_MELEE_ATTACKING;
+
     if (m_isNewObject)
         updatetype = UPDATETYPE_CREATE_OBJECT2;
 #else
@@ -290,7 +293,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
         updateFlags |= UPDATEFLAG_SELF;
 #endif
 
-    if (isType(TYPEMASK_GAMEOBJECT) && ((GameObject*)this)->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT)
+    if (isType(TYPEMASK_GAMEOBJECT) && static_cast<GameObject const*>(this)->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT)
         updateFlags |= UPDATEFLAG_TRANSPORT;
 
     //DEBUG_LOG("BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
@@ -310,7 +313,12 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
     buf << uint32(updateFlags); // Flags
     buf << uint32(1); // AttackCycle (always 1 in sniffs)
     buf << uint32(0); // TimerId
-    buf << uint64(0); // VictimGuid
+
+    // VictimGuid
+    if (IsUnit() && static_cast<Unit const*>(this)->HasUnitState(UNIT_STAT_MELEE_ATTACKING) && static_cast<Unit const*>(this)->GetVictim())
+        buf << uint64(static_cast<Unit const*>(this)->GetVictim()->GetGUID());
+    else
+        buf << uint64(0);
 
     if (updateFlags & UPDATEFLAG_TRANSPORT)
     {
@@ -470,7 +478,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
         *data << uint32(1);
     }
 
-    if (updateFlags & UPDATEFLAG_FULLGUID)
+    if (updateFlags & UPDATEFLAG_MELEE_ATTACKING)
     {
         if (Unit const* me = ToUnit())
         {
