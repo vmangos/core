@@ -403,9 +403,15 @@ void CreatureAI::SetMeleeAttack(bool enabled)
     if (Unit* pVictim = m_creature->GetVictim())
     { 
         if (enabled)
+        {
+            m_creature->AddUnitState(UNIT_STAT_MELEE_ATTACKING);
             m_creature->SendMeleeAttackStart(pVictim);
+        } 
         else
+        {
+            m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
             m_creature->SendMeleeAttackStop(pVictim);
+        }
     }
 }
 
