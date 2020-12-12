@@ -83,7 +83,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 (4587, 4361, 2, 10800);
 
 -- Teldrassil
--- Missing Items - Felicia Doan
+-- Missing Items - Aldia
 INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
 (3608, 3131),
 (3608, 2946);
@@ -103,7 +103,7 @@ UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 4195 AND 
 DELETE FROM `npc_vendor` WHERE `entry` = 4191 AND `item` IN (4536, 4537, 4538, 4539, 4602, 8953, 16171);
 UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 4191 AND `item` IN (21030, 21033, 21031);
 
--- Striped Yellowtail - Heldan Galesong
+-- Striped Yellowtail - Laird
 UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 4200 AND `item` = 21552;
 
 -- Rune Thread - Gorbold Steelhand
@@ -130,14 +130,14 @@ UPDATE `npc_vendor` SET `maxcount` = 3 WHERE `entry` = 4189 AND `item` = 5772;
 -- Pattern: Red Linen Bag - Valdaron
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 4189 AND `item` = 5771;
 
--- Pattern: Blue Linen Bag - Valdaron
+-- Pattern: Blue Linen Vest - Valdaron
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 4189 AND `item` = 6270;
 
 -- Ashenvale
 -- Pattern: Herbalist's Gloves - Harloen Darkweave
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 6731 AND `item` = 7361;
 
--- Correct Items - Maiynn
+-- Correct Items - Allyndia
 DELETE FROM `npc_vendor` WHERE `entry` = 4191 AND `item` = 16171;
 UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 4191 AND `item` IN (21030, 21033, 21031);
 
