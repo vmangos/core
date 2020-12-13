@@ -142,6 +142,122 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 -- gyrochronatom fradd swiftgear
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2682 AND `item` = 4389;
 
+-- small throwing knife and crude throwing axe - christi galvanis
+DELETE FROM `npc_vendor` WHERE `entry` = 12960 AND `item` IN (2947, 3111);
+
+-- greater healing potion - vendor-tron 1000
+UPDATE `npc_vendor` SET `maxcount` = 4 WHERE `entry` = 12245 AND `item` = 1710;
+
+-- mana potion - vendor-tron 1000
+UPDATE `npc_vendor` SET `maxcount` = 4 WHERE `entry` = 12245 AND `item` = 3827;
+
+
+-- desolace
+-- blacksmith hammer - vendor-tron 1000
+DELETE FROM `npc_vendor` WHERE `entry` = 12245 AND `item` = 5956;
+
+-- imbued vial - vendor-tron 1000
+DELETE FROM `npc_vendor` WHERE `entry` = 12245 AND `item` = 18256;
+
+-- rune thread - vendor-tron 1000
+DELETE FROM `npc_vendor` WHERE `entry` = 12245 AND `item` = 14341;
+
+-- recipe: free action potion - vendor-tron 1000
+DELETE FROM `npc_vendor` WHERE `entry` = 12245 AND `item` = 5642;
+
+-- recipe: great rage potion - vendor-tron 1000
+DELETE FROM `npc_vendor` WHERE `entry` = 12245 AND `item` = 5643;
+
+-- scroll of agility 2 - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 3 WHERE `entry` = 12246 AND `item` = 2289;
+
+-- scroll of stamina 2 - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 3 WHERE `entry` = 12246 AND `item` = 1711;
+
+-- scroll of strength 2 - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 3 WHERE `entry` = 12246 AND `item` = 2289;
+
+-- scroll of intellect 2 - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 3 WHERE `entry` = 12246 AND `item` = 2290;
+
+-- recipe: big bear steak - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 3734;
+
+-- scroll of protection 3 - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 2, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 4421;
+
+-- scroll of spirit 3 - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 2, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 4424;
+
+-- recipe: barbecued buzzard wing - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 4609;
+
+-- pattern: dark silk shirt - vendor-tron 680
+DELETE FROM `npc_vendor` WHERE `entry` = 12246 AND `item` = 6401;
+
+-- pattern: crimson silk shirt - vendor-tron 680
+DELETE FROM `npc_vendor` WHERE `entry` = 12246 AND `item` = 7087;
+
+-- schematic: goblin jumper cables - vendor-tron 680
+DELETE FROM `npc_vendor` WHERE `entry` = 12246 AND `item` = 7561;
+
+-- recipe: lean wolf steak - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 12227;
+
+-- recipe: hot wolf ribsk - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 12229;
+
+-- recipe: mystery stew - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 12233;
+
+-- recipe: dragonbreath chilli - super-seller 680
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 12246 AND `item` = 12239;
+
+-- schematic: ice deflector - vendor-tron 680
+DELETE FROM `npc_vendor` WHERE `entry` = 12246 AND `item` = 13308;
+
+-- schematic: accurate scope - vendor-tron 680
+DELETE FROM `npc_vendor` WHERE `entry` = 12246 AND `item` = 13310;
+
+-- pattern: enchanters cowl - vendor-tron 680
+DELETE FROM `npc_vendor` WHERE `entry` = 12246 AND `item` = 14630;
+
+-- missing items shadi mistrunner
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(12246, 15326),
+(12246, 15327),
+(12246, 3108),
+(12246, 3137),
+(12246, 3107),
+(12246, 3135);
+
+-- missing items kireena
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(9636, 4342),
+(9636, 2325),
+(9636, 8343),
+(9636, 8925),
+(9636, 4340),
+(9636, 2928),
+(9636, 2604),
+(9636, 6529),
+(9636, 7005),
+(9636, 6256),
+(9636, 8878),
+(9636, 4341);
+
+-- small throwing knife and crude throwing axe - tukk
+DELETE FROM `npc_vendor` WHERE `entry` = 12027 AND `item` IN (2947, 3111);
+
+-- imbued vial - lah
+DELETE FROM `npc_vendor` WHERE `entry` = 12028 AND `item` = 18256;
+
+-- rune thread - lah
+DELETE FROM `npc_vendor` WHERE `entry` = 12028 AND `item` = 14341;
+
+-- aquadynamic fish attractor - mai
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 12031 AND `item` = 6533;
+
 
 -- End of migration.
 END IF;
