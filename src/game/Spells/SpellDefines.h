@@ -741,13 +741,13 @@ enum SpellAttributes
     SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Spells with this attribute are not visible in spellbook or aura bar
     SPELL_ATTR_HIDE_IN_COMBAT_LOG             = 0x00000100,            // 8 this attributes controls whether spell appears in combat logs
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
-    SPELL_ATTR_ON_NEXT_SWING_2                = 0x00000400,            // 10 on next swing 2
-    SPELL_ATTR_UNK11                          = 0x00000800,            // 11
+    SPELL_ATTR_ON_NEXT_NPC_SWING              = 0x00000400,            // on next swing (npcs)
+    SPELL_ATTR_PERIODICALLY_TRIGGER           = 0x00000800,            // 11 periodically trigger spell
     SPELL_ATTR_DAYTIME_ONLY                   = 0x00001000,            // 12 only useable at daytime, not set in 2.4.2
     SPELL_ATTR_NIGHT_ONLY                     = 0x00002000,            // 13 only useable at night, not set in 2.4.2
     SPELL_ATTR_INDOORS_ONLY                   = 0x00004000,            // 14 only useable indoors, not set in 2.4.2
     SPELL_ATTR_OUTDOORS_ONLY                  = 0x00008000,            // 15 Only useable outdoors.
-    SPELL_ATTR_NOT_SHAPESHIFT                 = 0x00010000,            // 16 Not while shapeshifted
+    SPELL_ATTR_NOT_SHAPESHIFT                 = 0x00010000,            // 16 cannot be used while shapeshifted
     SPELL_ATTR_ONLY_STEALTHED                 = 0x00020000,            // 17 Must be in stealth
     SPELL_ATTR_DONT_AFFECT_SHEATH_STATE       = 0x00040000,            // 18 client won't hide unit weapons in sheath on cast/channel
     SPELL_ATTR_LEVEL_DAMAGE_CALCULATION       = 0x00080000,            // 19 spelldamage depends on caster level
@@ -760,8 +760,8 @@ enum SpellAttributes
     SPELL_ATTR_NEGATIVE                       = 0x04000000,            // 26 Almost all negative spell have it
     SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 castable while sitting
     SPELL_ATTR_CANT_USED_IN_COMBAT            = 0x10000000,            // 28 Cannot be used in combat
-    SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability (hmm possible not...)
-    SPELL_ATTR_DIMINISHING_RETURNS            = 0x40000000,            // 30 breakable by damage?
+    SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability
+    SPELL_ATTR_CAN_ONLY_AFFECT_ONE_TARGET     = 0x40000000,            // 30 can only affect one target
     SPELL_ATTR_CANT_CANCEL                    = 0x80000000             // 31 positive aura can't be canceled
 };
 
@@ -867,7 +867,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK25                      = 0x02000000,            // 25 no cause spell pushback ?
     SPELL_ATTR_EX3_UNK26                      = 0x04000000,            // 26
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
-    SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
+    SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // Does not appear in log (Blizzard)
     SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_UNK31                      = 0x80000000             // 31

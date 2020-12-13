@@ -7816,7 +7816,7 @@ void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
     // Check si positif fait dans Aura::Aura car ici le dernier Aura ajoute n'est pas encore dans 'm_auras'
     if (!m_permanent && m_maxDuration > 10000)
     {
-        if (m_spellProto->Attributes & SPELL_ATTR_DIMINISHING_RETURNS
+        if (m_spellProto->Attributes & SPELL_ATTR_CAN_ONLY_AFFECT_ONE_TARGET
                 // Exception pour la coiffe de controle gnome/Heaume-fusee gobelin
                 || m_spellProto->Id == 13181 || m_spellProto->Id == 13327)
         {
