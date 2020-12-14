@@ -742,7 +742,7 @@ enum SpellAttributes
     SPELL_ATTR_CAST_TIME_IS_HIDDEN            = 0x00000100,            // 8 Cast time is hidden
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
     SPELL_ATTR_ON_NEXT_NPC_SWING              = 0x00000400,            // on next swing (npcs)
-    SPELL_ATTR_PERIODICALLY_TRIGGER           = 0x00000800,            // 11 periodically trigger spell
+    SPELL_ATTR_PERIODICALLY_TRIGGER           = 0x00000800,            // 11 TODO: confirm & implement - periodically trigger spell
     SPELL_ATTR_DAYTIME_ONLY                   = 0x00001000,            // 12 only useable at daytime, not set in 2.4.2
     SPELL_ATTR_NIGHT_ONLY                     = 0x00002000,            // 13 only useable at night, not set in 2.4.2
     SPELL_ATTR_INDOORS_ONLY                   = 0x00004000,            // 14 only useable indoors, not set in 2.4.2
@@ -785,7 +785,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    = 0x00008000,            // 15 remove auras on immunity
     SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 Unaffected by school immunity
     SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS      = 0x00020000,            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
-    SPELL_ATTR_EX_STOPS_AUTO_ATTACK           = 0x00040000,            // 18 Stops auto-attack (stun, polymorph, daze, sleep)
+    SPELL_ATTR_EX_STOPS_AUTO_ATTACK           = 0x00040000,            // 18 TODO: confirm: Stops auto-attack (stun, polymorph, daze, sleep)
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
     SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Requires combo points on target
     SPELL_ATTR_EX_UNK21                       = 0x00200000,            // 21

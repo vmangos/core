@@ -4065,7 +4065,7 @@ void Spell::SendSpellCooldown()
         if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
             return;
 
-    m_caster->AddCooldown(*m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr, m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_AFTER_AURA_FADES));
+    m_caster->AddCooldown(*m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr, m_spellInfo->HasAttribute(SPELL_ATTR_DISABLED_WHILE_ACTIVE));
 }
 
 void Spell::update(uint32 difftime)
@@ -5409,7 +5409,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (!m_IsTriggeredSpell && m_caster->IsPlayer() && !m_spellInfo->HasAttribute(SPELL_ATTR_PASSIVE)
         && !m_caster->IsSpellReady(*m_spellInfo, m_CastItem ? m_CastItem->GetProto() : nullptr))
     {
-        return (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_COOLDOWN_AFTER_AURA_FADES) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
+        return (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
     }
 
     // check death state to prevent cheating ("deathbug")
@@ -5426,7 +5426,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         // Activated spells will get stuck if we return SPELL_FAILED_NOT_READY during GCD
         if (strict && m_caster->HasGCD(m_spellInfo))
-            return m_spellInfo->HasAttribute(SPELL_ATTR_COOLDOWN_AFTER_AURA_FADES) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
+            return m_spellInfo->HasAttribute(SPELL_ATTR_DISABLED_WHILE_ACTIVE) ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_NOT_READY;
 
         // only allow triggered spells if at an ended battleground
         if (m_caster->IsPlayer())
