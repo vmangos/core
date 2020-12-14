@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: Azshara
 SD%Complete: 90
-SDComment: Quest support: 2744, 3141, 9364
+SDComment: Quest support: 2744, 3141
 SDCategory: Azshara
 EndScriptData */
 
@@ -29,83 +29,6 @@ EndContentData */
 
 #include "scriptPCH.h"
 #include "World.h"
-
-/*######
-## mobs_spitelashes
-######*/
-
-struct mobs_spitelashesAI : public ScriptedAI
-{
-    mobs_spitelashesAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 morphtimer;
-    bool spellhit;
-
-    void Reset() override
-    {
-        morphtimer = 0;
-        spellhit = false;
-    }
-
-    void SpellHit(Unit *Hitter, SpellEntry const* Spellkind) override
-    {
-        if (!spellhit && Hitter->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (((Player*)Hitter)->GetQuestStatus(9364) == QUEST_STATUS_INCOMPLETE &&
-                    (Spellkind->Id == 118 || Spellkind->Id == 12824 || Spellkind->Id == 12825 || Spellkind->Id == 12826))
-            {
-                spellhit = true;
-                DoCastSpellIfCan(m_creature, 29124);                      //become a sheep
-            }
-        }
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        // we mustn't remove the creature in the same round in which we cast the summon spell, otherwise there will be no summons
-        if (spellhit && morphtimer >= 5000)
-        {
-            m_creature->ForcedDespawn();
-            return;
-        }
-
-        // walk 5 seconds before summoning
-        if (spellhit && morphtimer < 5000)
-        {
-            morphtimer += diff;
-            if (morphtimer >= 5000)
-            {
-                DoCastSpellIfCan(m_creature, 28406);                  //summon copies
-                DoCastSpellIfCan(m_creature, 6924);                   //visual explosion
-                uint32 invocation_nb = rand() % 4;
-                invocation_nb = invocation_nb + 2;
-                for (uint32 counter = 0; counter < invocation_nb; counter++)
-                {
-                    if (Creature* summoned = DoSpawnCreature(16479, 8.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 12000))
-                    {
-                        summoned->SetHomePosition(summoned->GetPositionX(), summoned->GetPositionY(), summoned->GetPositionZ(), 0.0f);
-                        summoned->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-                        summoned->SetWanderDistance(55.0f);
-                    }
-                }
-
-            }
-        }
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        //TODO: add abilities for the different creatures
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mobs_spitelashes(Creature* pCreature)
-{
-    return new mobs_spitelashesAI(pCreature);
-}
 
 /*######
 ## npc_loramus_thalipedes
@@ -329,11 +252,6 @@ CreatureAI* GetAI_mob_maws(Creature* pCreature)
 void AddSC_azshara()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "mobs_spitelashes";
-    newscript->GetAI = &GetAI_mobs_spitelashes;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_loramus_thalipedes";

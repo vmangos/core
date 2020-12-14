@@ -64,7 +64,6 @@ void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
-void AddSC_boss_quatermasterzigris();
 void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_razorgore();                         //blackwing_lair
 void AddSC_boss_vael();
@@ -318,7 +317,6 @@ void AddScripts()
     AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
     AddSC_boss_warmastervoone();
-    AddSC_boss_quatermasterzigris();
 
     AddSC_instance_blackrock_spire();
     AddSC_boss_pyroguard_emberseer();
