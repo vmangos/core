@@ -2096,7 +2096,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
     if (spellInfo->EquippedItemClass >= 0 && m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         // main hand weapon required
-        if (spellInfo->AttributesEx3 & SPELL_ATTR_EX3_MAIN_HAND)
+        if (spellInfo->AttributesEx3 & SPELL_ATTR_EX3_REQ_MAIN_HAND)
         {
             Item* item = ((Player*)m_caster)->GetWeaponForAttack(BASE_ATTACK, true, false);
 

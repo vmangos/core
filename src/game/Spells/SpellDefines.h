@@ -731,7 +731,7 @@ enum SpellVisualKit
 // ***********************************
 enum SpellAttributes
 {
-    SPELL_ATTR_DONT_DISPLAY_SPELL_RESULT      = 0x00000001,            // 0 - used by shaman windfury spells - Cast time Instant? GCD 0 seconds?
+    SPELL_ATTR_DONT_DISPLAY_SPELL_RESULT      = 0x00000001,            // 0
     SPELL_ATTR_RANGED                         = 0x00000002,            // 1 Requires a ranged weapon
     SPELL_ATTR_ON_NEXT_PLAYER_SWING           = 0x00000004,            // 2 On next swing (players)
     SPELL_ATTR_IS_REPLENISHMENT               = 0x00000008,            // 3 not set in 2.4.2
@@ -777,17 +777,17 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_CANT_BE_REFLECTED           = 0x00000080,            // 7 Cannot be reflected
     SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 The target cannot be in combat
     SPELL_ATTR_EX_MELEE_COMBAT_START          = 0x00000200,            // 9 player starts melee combat after this spell is cast
-    SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 no generates threat on cast 100%
-    SPELL_ATTR_EX_UNK11                       = 0x00000800,            // 11
+    SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 Generates no threat
+    SPELL_ATTR_EX_UNK11                       = 0x00000800,            // 11 
     SPELL_ATTR_EX_IS_PICKPOCKET               = 0x00001000,            // 12
-    SPELL_ATTR_EX_FARSIGHT                    = 0x00002000,            // 13
+    SPELL_ATTR_EX_BIND_SIGHT                  = 0x00002000,            // 13 Bind sight effects
     SPELL_ATTR_EX_CHANNEL_TRACK_TARGET        = 0x00004000,            // 14 Client automatically forces player to face target when channeling
     SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    = 0x00008000,            // 15 remove auras on immunity
     SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 Unaffected by school immunity
     SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS      = 0x00020000,            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
     SPELL_ATTR_EX_STOPS_AUTO_ATTACK           = 0x00040000,            // 18 Stops auto-attack (stun, polymorph, daze, sleep)
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
-    SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Req combo points on target
+    SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Requires combo points on target
     SPELL_ATTR_EX_UNK21                       = 0x00200000,            // 21
     SPELL_ATTR_EX_REQ_COMBO_POINTS            = 0x00400000,            // 22 Use combo points (in 4.x not required combo point target selected)
     SPELL_ATTR_EX_UNK23                       = 0x00800000,            // 23
@@ -798,7 +798,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_DONT_DISPLAY_IN_AURA_BAR    = 0x10000000,            // 28 client doesn't display these spells in aura bar
     SPELL_ATTR_EX_CHANNEL_DISPLAY_SPELL_NAME  = 0x20000000,            // 29 spell name is displayed in cast bar instead of 'channeling' text
     SPELL_ATTR_EX_ENABLE_AT_DODGE             = 0x40000000,            // 30 Overpower
-    SPELL_ATTR_EX_UNK31                       = 0x80000000             // 31
+    SPELL_ATTR_EX_UNK31                       = 0x80000000             // 31 something with self cast?
 };
 
 enum SpellAttributesEx2
@@ -849,7 +849,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_STACK_FOR_DIFF_CASTERS     = 0x00000080,            // 7 create a separate (de)buff stack for each caster
     SPELL_ATTR_EX3_TARGET_ONLY_PLAYER         = 0x00000100,            // 8 can target only players
     SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_PROC = 0x00000200,            // 9
-    SPELL_ATTR_EX3_MAIN_HAND                  = 0x00000400,            // 10 Main hand weapon required
+    SPELL_ATTR_EX3_REQ_MAIN_HAND              = 0x00000400,            // 10 Requires main hand weapon
     SPELL_ATTR_EX3_BATTLEGROUND               = 0x00000800,            // 11 Can casted only on battleground
     SPELL_ATTR_EX3_CAST_ON_DEAD               = 0x00001000,            // 12 target is a dead player (not every spell has this flag)
     SPELL_ATTR_EX3_DONT_DISPLAY_CHANNEL_BAR   = 0x00002000,            // 13 Clientside attribute - will not display channeling bar

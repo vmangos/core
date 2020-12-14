@@ -4886,7 +4886,7 @@ void Spell::SendChannelUpdate(uint32 time, bool interrupted)
     if (!time)
     {
         // Reset farsight for some possessing auras of possessed summoned (as they might work with different aura types)
-        if (m_spellInfo->Attributes & SPELL_ATTR_EX_FARSIGHT && m_caster->IsPlayer() && m_casterUnit->GetCharmGuid()
+        if (m_spellInfo->Attributes & SPELL_ATTR_EX_BIND_SIGHT && m_caster->IsPlayer() && m_casterUnit->GetCharmGuid()
                 && !m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS) && !m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS_PET))
         {
             Player* player = (Player*)m_caster;
