@@ -738,7 +738,7 @@ enum SpellAttributes
     SPELL_ATTR_IS_ABILITY                     = 0x00000010,            // 4 client puts 'ability' instead of 'spell' in game strings for these spells
     SPELL_ATTR_TRADESPELL                     = 0x00000020,            // 5 trade spells, will be added by client to a sublist of profession spell
     SPELL_ATTR_PASSIVE                        = 0x00000040,            // 6 Passive spell
-    SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Aura is hidden
+    SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Aura is hidden (not visible in spellbook or aura bar)
     SPELL_ATTR_CAST_TIME_IS_HIDDEN            = 0x00000100,            // 8 Cast time is hidden
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
     SPELL_ATTR_ON_NEXT_NPC_SWING              = 0x00000400,            // on next swing (npcs)
@@ -761,7 +761,7 @@ enum SpellAttributes
     SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 Can be used while sitting
     SPELL_ATTR_CANT_USED_IN_COMBAT            = 0x10000000,            // 28 Cannot be used in combat
     SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability
-    SPELL_ATTR_CAN_ONLY_AFFECT_ONE_TARGET     = 0x40000000,            // 30 can only affect one target
+    SPELL_ATTR_HEARTBEAT_RESIST_CHECK         = 0x40000000,            // 30 Chance for spell effects to break early (heartbeat resist)
     SPELL_ATTR_CANT_CANCEL                    = 0x80000000             // 31 positive aura can't be canceled
 };
 
@@ -829,7 +829,7 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_IS_ARCANE_CONCENTRATION    = 0x00800000,            // 23 Only mage Arcane Concentration have this flag
     SPELL_ATTR_EX2_UNK24                      = 0x01000000,            // 24
     SPELL_ATTR_EX2_UNK25                      = 0x02000000,            // 25
-    SPELL_ATTR_EX2_MODIFY_THREAD              = 0x04000000,            // 26 Almost all Threat, Taunt spells have this flag - should be unaffected by school immunity!?
+    SPELL_ATTR_EX2_MODIFY_THREAD              = 0x04000000,            // 26 modifies thread - not 100% sure (unaffected by school immunity)
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
     SPELL_ATTR_EX2_UNK28                      = 0x10000000,            // 28 no breaks stealth if it fails??
     SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Cannot crit
@@ -878,7 +878,7 @@ enum SpellAttributesEx4
     SPELL_ATTR_EX4_IGNORE_RESISTANCES         = 0x00000001,            // 0 From TC 3.3.5, but not present in 1.12 native DBCs. Add it with spell_mod to prevent a spell from being resisted.
     SPELL_ATTR_EX4_UNK1                       = 0x00000002,            // 1 proc on finishing move?
     SPELL_ATTR_EX4_REAL_TIME_DURATION         = 0x00000004,            // 2 aura continues to expire while player is offline
-    SPELL_ATTR_EX4_UNK3                       = 0x00000008,            // 3
+    SPELL_ATTR_EX4_UNK3                       = 0x00000008,            // 3 Uses resource: Energy? / Rouge only?
     SPELL_ATTR_EX4_UNK4                       = 0x00000010,            // 4 This will no longer cause guards to attack on use??
     SPELL_ATTR_EX4_UNK5                       = 0x00000020,            // 5
     SPELL_ATTR_EX4_NOT_STEALABLE              = 0x00000040,            // 6 although such auras might be dispellable, they cannot be stolen

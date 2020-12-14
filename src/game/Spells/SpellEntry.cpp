@@ -499,7 +499,7 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
 
 bool SpellEntry::IsPvEHeartBeat() const
 {
-    if (!(Attributes & SPELL_ATTR_CAN_ONLY_AFFECT_ONE_TARGET))
+    if (!(Attributes & SPELL_ATTR_HEARTBEAT_RESIST_CHECK))
         return false;
 
     for (uint32 i : EffectApplyAuraName)
