@@ -731,15 +731,15 @@ enum SpellVisualKit
 // ***********************************
 enum SpellAttributes
 {
-    SPELL_ATTR_DONT_DISPLAY_SPELL_RESULT      = 0x00000001,            // 0
-    SPELL_ATTR_RANGED                         = 0x00000002,            // 1 All ranged abilites have this flag
-    SPELL_ATTR_ON_NEXT_SWING_1                = 0x00000004,            // 2 on next swing
+    SPELL_ATTR_DONT_DISPLAY_SPELL_RESULT      = 0x00000001,            // 0 - used by shaman windfury spells - Cast time Instant? GCD 0 seconds?
+    SPELL_ATTR_RANGED                         = 0x00000002,            // 1 Requires a ranged weapon
+    SPELL_ATTR_ON_NEXT_PLAYER_SWING           = 0x00000004,            // 2 On next swing (players)
     SPELL_ATTR_IS_REPLENISHMENT               = 0x00000008,            // 3 not set in 2.4.2
     SPELL_ATTR_IS_ABILITY                     = 0x00000010,            // 4 client puts 'ability' instead of 'spell' in game strings for these spells
     SPELL_ATTR_TRADESPELL                     = 0x00000020,            // 5 trade spells, will be added by client to a sublist of profession spell
     SPELL_ATTR_PASSIVE                        = 0x00000040,            // 6 Passive spell
-    SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Spells with this attribute are not visible in spellbook or aura bar
-    SPELL_ATTR_HIDE_IN_COMBAT_LOG             = 0x00000100,            // 8 this attributes controls whether spell appears in combat logs
+    SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Aura is hidden
+    SPELL_ATTR_CAST_TIME_IS_HIDDEN            = 0x00000100,            // 8 Cast time is hidden
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
     SPELL_ATTR_ON_NEXT_NPC_SWING              = 0x00000400,            // on next swing (npcs)
     SPELL_ATTR_PERIODICALLY_TRIGGER           = 0x00000800,            // 11 periodically trigger spell
@@ -754,11 +754,11 @@ enum SpellAttributes
     SPELL_ATTR_STOP_ATTACK_TARGET             = 0x00100000,            // 20 Stop attack after use this spell (and not begin attack if use)
     SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK   = 0x00200000,            // 21 Cannot be dodged/parried/blocked
     SPELL_ATTR_SET_TRACKING_TARGET            = 0x00400000,            // 22 SetTrackingTarget
-    SPELL_ATTR_CASTABLE_WHILE_DEAD            = 0x00800000,            // 23 castable while dead?
-    SPELL_ATTR_CASTABLE_WHILE_MOUNTED         = 0x01000000,            // 24 castable while mounted
-    SPELL_ATTR_DISABLED_WHILE_ACTIVE          = 0x02000000,            // 25 Activate and start cooldown after aura fade or remove summoned creature or go
+    SPELL_ATTR_CASTABLE_WHILE_DEAD            = 0x00800000,            // 23 Can be used while dead
+    SPELL_ATTR_CASTABLE_WHILE_MOUNTED         = 0x01000000,            // 24 Can be used while mounted
+    SPELL_ATTR_COOLDOWN_AFTER_AURA_FADES      = 0x02000000,            // 25 Starts cooldown after aura fades
     SPELL_ATTR_NEGATIVE                       = 0x04000000,            // 26 Almost all negative spell have it
-    SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 castable while sitting
+    SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 Can be used while sitting
     SPELL_ATTR_CANT_USED_IN_COMBAT            = 0x10000000,            // 28 Cannot be used in combat
     SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability
     SPELL_ATTR_CAN_ONLY_AFFECT_ONE_TARGET     = 0x40000000,            // 30 can only affect one target
@@ -774,8 +774,8 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_UNK4                        = 0x00000010,            // 4
     SPELL_ATTR_EX_NOT_BREAK_STEALTH           = 0x00000020,            // 5 Not break stealth
     SPELL_ATTR_EX_CHANNELED_2                 = 0x00000040,            // 6 channeled 2
-    SPELL_ATTR_EX_CANT_BE_REFLECTED           = 0x00000080,            // 7
-    SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 Spell req target not to be in combat state
+    SPELL_ATTR_EX_CANT_BE_REFLECTED           = 0x00000080,            // 7 Cannot be reflected
+    SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 The target cannot be in combat
     SPELL_ATTR_EX_MELEE_COMBAT_START          = 0x00000200,            // 9 player starts melee combat after this spell is cast
     SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 no generates threat on cast 100%
     SPELL_ATTR_EX_UNK11                       = 0x00000800,            // 11
@@ -783,9 +783,9 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_FARSIGHT                    = 0x00002000,            // 13
     SPELL_ATTR_EX_CHANNEL_TRACK_TARGET        = 0x00004000,            // 14 Client automatically forces player to face target when channeling
     SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    = 0x00008000,            // 15 remove auras on immunity
-    SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 unaffected by school immunity
+    SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 Unaffected by school immunity
     SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS      = 0x00020000,            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
-    SPELL_ATTR_EX_UNK18                       = 0x00040000,            // 18 stun, polymorph, daze, sleep
+    SPELL_ATTR_EX_STOPS_AUTO_ATTACK           = 0x00040000,            // 18 Stops auto-attack (stun, polymorph, daze, sleep)
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
     SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Req combo points on target
     SPELL_ATTR_EX_UNK21                       = 0x00200000,            // 21
@@ -829,12 +829,12 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_IS_ARCANE_CONCENTRATION    = 0x00800000,            // 23 Only mage Arcane Concentration have this flag
     SPELL_ATTR_EX2_UNK24                      = 0x01000000,            // 24
     SPELL_ATTR_EX2_UNK25                      = 0x02000000,            // 25
-    SPELL_ATTR_EX2_UNK26                      = 0x04000000,            // 26 unaffected by school immunity
+    SPELL_ATTR_EX2_MODIFY_THREAD              = 0x04000000,            // 26 Almost all Threat, Taunt spells have this flag - should be unaffected by school immunity!?
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
     SPELL_ATTR_EX2_UNK28                      = 0x10000000,            // 28 no breaks stealth if it fails??
-    SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
+    SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Cannot crit
     SPELL_ATTR_EX2_TRIGGERED_CAN_TRIGGER_PROC = 0x40000000,            // 30
-    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
+    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food/Drink buff
 };
 
 enum SpellAttributesEx3
