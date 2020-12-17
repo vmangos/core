@@ -43,22 +43,22 @@ enum
     SPELL_AWAKENING         = 6271,
     SPELL_SHAPESHIFT        = 8153,
 
-    SAY_CAST_MARK           = -1614998,
-    SAY_1ST_WP              = -1614997,
-    SAY_AFTER_1ST_TRASH     = -1614996,
-    SAY_BEFORE_CIRCLE       = -1614995,
-    SAY_AFTER_CIRCLE        = -1614994,
-    SAY_BEFORE_CHAMBER      = -1614993,
-    SAY_BEFORE_RITUAL       = -1614992,
-    EMOTE_DISCIPLE_1        = -1614991,
-    EMOTE_NARALEX_1         = -1614990,
-    SAY_ATTACKED            = -1614989,
-    EMOTE_NARALEX_2         = -1614987,
-    SAY_BEFORE_MUTANUS      = -1614986,
-    SAY_NARALEX_AWAKEN      = -1614985,
-    SAY_DISCIPLE_FINAL      = -1614984,
-    SAY_NARALEX_FINAL1      = -1614983,
-    SAY_NARALEX_FINAL2      = -1614982,
+    SAY_CAST_MARK           = 1255, 
+    SAY_1ST_WP              = 1256, 
+    SAY_AFTER_1ST_TRASH     = 1257, 
+    SAY_BEFORE_CIRCLE       = 1258, 
+    SAY_AFTER_CIRCLE        = 1259, 
+    SAY_BEFORE_CHAMBER      = 1263,  
+    SAY_BEFORE_RITUAL       = 1264,  
+    EMOTE_DISCIPLE_1        = 1265, 
+    EMOTE_NARALEX_1         = 1268, 
+    SAY_ATTACKED            = 1273, 
+    EMOTE_NARALEX_2         = 1269, 
+    SAY_BEFORE_MUTANUS      = 1276, 
+    SAY_NARALEX_AWAKEN      = 1271, 
+    SAY_DISCIPLE_FINAL      = 1267, 
+    SAY_NARALEX_FINAL1      = 1272, 
+    SAY_NARALEX_FINAL2      = 2103, 
 
     MOB_DEVIATE_RAPTOR      = 3636,
     MOB_DEVIATE_VIPER       = 5755,
@@ -497,7 +497,10 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             Event_Timer = 10000;
                             DoScriptText(EMOTE_NARALEX_2, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            DoScriptText(SAY_BEFORE_MUTANUS, m_creature);
+                            if (Player* player = GetPlayerForEscort())
+                            {
+                                DoScriptText(SAY_BEFORE_MUTANUS, m_creature, player);
+                            }
                             m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             break;
                         case 6:
