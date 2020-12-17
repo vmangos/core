@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20201216203835');
 
 
 -- update cear darrow citizen template
-UPDATE `creature_template` SET `level_min` = 14, `gossip_menu_id` = 3362, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000, `faction` = 35, `npc_flags` = 1 WHERE `entry` = 11277;
+UPDATE `creature_template` SET `ai_name`='EventAI', `level_min` = 14, `gossip_menu_id` = 3362, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000, `faction` = 35, `npc_flags` = 1 WHERE `entry` = 11277;
 
 UPDATE `creature` SET `position_x` = 1146.79, `position_y` = -2561.22, `position_z` = 60.1145,`orientation` = 0.959931 WHERE `guid` = 13179;
 UPDATE `creature` SET `position_x` = 1095.56, `position_y` = -2529.47, `position_z` = 61.1291, `orientation` = 2.37365 WHERE `guid` = 300335;
