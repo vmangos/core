@@ -19,7 +19,7 @@ UPDATE `creature` SET `position_x` = 1148.08, `position_y` = -2559.31, `position
 UPDATE `creature` SET `position_x` = 1098.58, `position_y` = -2589.77, `position_z` = 60.6845, `orientation` = 6.10865 WHERE `guid` = 300336;
 UPDATE `creature` SET `position_x` = 1146.79, `position_y` = -2561.22, `position_z` = 60.1145, `orientation` = 0.959931 WHERE `guid` = 300338;
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(23, 11277, 0, 0, 0, 0, 1127.87, -2387.57, 59.297, 1.58825, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
+(118, 11277, 0, 0, 0, 0, 1127.87, -2387.57, 59.297, 1.58825, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
 
 
 -- update caer darrow guardsman template
