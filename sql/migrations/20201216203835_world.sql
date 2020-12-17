@@ -18,8 +18,25 @@ UPDATE `creature` SET `position_x` = 1093.95, `position_y` = -2528.63, `position
 UPDATE `creature` SET `position_x` = 1148.08, `position_y` = -2559.31, `position_z` = 60.1493, `orientation` = 4.15388 WHERE `guid` = 300337;
 UPDATE `creature` SET `position_x` = 1098.58, `position_y` = -2589.77, `position_z` = 60.6845, `orientation` = 6.10865 WHERE `guid` = 300336;
 UPDATE `creature` SET `position_x` = 1146.79, `position_y` = -2561.22, `position_z` = 60.1145, `orientation` = 0.959931 WHERE `guid` = 300338;
+UPDATE `creature` SET `position_x` = 1026.56, `position_y` = -2514.09, `position_z` = 59.236, `orientation` = 4.49877 WHERE `guid` = 300339;
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (118, 11277, 0, 0, 0, 0, 1127.87, -2387.57, 59.297, 1.58825, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(120, 11277, 0, 0, 0, 0, 1201.59, -2595.37, 78.5883, 2.76145, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
+
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300338, '10848 17622'),
+(300339, '10848 17622'),
+(120, '10848 17622'),
+(13179, '10848 17622'),
+(300335, '10848 17622'),
+(300334, '10848 17622'),
+(300337, '10848 17622'),
+(300338, '10848 17622');
+
+REPLACE INTO `creature_addon` (`guid`, `stand_state`, `auras`) VALUES
+(300336, 8, '10848 17622'),
+(118, 3, '10848 17622');
 
 
 -- update caer darrow guardsman template
