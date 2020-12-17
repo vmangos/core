@@ -497,10 +497,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             Event_Timer = 10000;
                             DoScriptText(EMOTE_NARALEX_2, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            if (Player* player = GetPlayerForEscort())
-                            {
-                                DoScriptText(SAY_BEFORE_MUTANUS, m_creature, player);
-                            }
+                            // TODO: DoScriptText(SAY_BEFORE_MUTANUS, m_creature); This $n is a minion from Naralex's nightmare no doubt!
                             m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             break;
                         case 6:
