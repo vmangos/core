@@ -22,7 +22,7 @@ UPDATE `creature` SET `position_x` = 1026.56, `position_y` = -2514.09, `position
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (118, 11277, 0, 0, 0, 0, 1127.87, -2387.57, 59.297, 1.58825, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(120, 11277, 0, 0, 0, 0, 1201.59, -2595.37, 78.5883, 2.76145, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
+(120, 11277, 0, 0, 0, 0, 1201.59, -2595.37, 78.5883, 2.76145, 25, 25, 0, 100, 0, 2, 0, 0, 0, 10);
 
 REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
 (300338, '10848 17622'),
@@ -37,6 +37,24 @@ REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
 REPLACE INTO `creature_addon` (`guid`, `stand_state`, `auras`) VALUES
 (300336, 8, '10848 17622'),
 (118, 3, '10848 17622');
+
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(120, 1, 1174.25, -2610.72, 72.8297, 100, 0, 0, 0),
+(120, 2, 1179.46, -2599.8, 72.8422, 100, 0, 0, 0),
+(120, 3, 1187.82, -2592.99, 73.8428, 100, 0, 0, 0),
+(120, 4, 1202.09, -2595.57, 78.5905, 100, 0, 0, 0),
+(120, 5, 1211.82, -2600.81, 83.0063, 100, 0, 0, 0),
+(120, 6, 1222.93, -2601.57, 87.2163, 100, 0, 0, 0),
+(120, 7, 1233.54, -2596.76, 89.6665, 100, 0, 0, 0),
+(120, 8, 1234.81, -2578.97, 90.7113, 100, 0, 0, 0),
+(120, 9, 1236.69, -2551.75, 91.9315, 100, 0, 0, 0),
+(120, 10, 1234.24, -2571.39, 91.0141, 100, 0, 0, 0),
+(120, 11, 1236.66, -2591.24, 90.1614, 100, 0, 0, 0),
+(120, 12, 1229.78, -2598.95, 88.8933, 100, 0, 0, 0),
+(120, 13, 1218.81, -2601.86, 85.7477, 100, 0, 0, 0),
+(120, 14, 1208.49, -2598.82, 81.4217, 100, 0, 0, 0),
+(120, 15, 1194.73, -2592.63, 75.712, 100, 0, 0, 0),
+(120, 16, 1187.46, -2593.08, 73.7622, 100, 0, 0, 0);
 
 
 -- update caer darrow guardsman template
