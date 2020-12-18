@@ -165,7 +165,7 @@ UPDATE `creature_template` SET `health_min` = 3293, `health_max` = 3293, `speed_
 
 
 -- update magnus frostwake template
-UPDATE `creature_template` SET `faction` = 35, `health_min` = 2769, `health_max` = 2769, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11278;
+UPDATE `creature_template` SET `npc_flags` = 4, `faction` = 35, `health_min` = 2769, `health_max` = 2769, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11278;
 UPDATE `creature` SET `position_x` = 1144.51, `position_y` = -2510.08, `position_z` = 62.1604, `orientation` = 4.03171 WHERE `guid` = 300332;
 
 
