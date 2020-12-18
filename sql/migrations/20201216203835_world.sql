@@ -167,7 +167,7 @@ REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
 
 
 -- update magistrate marduke template
-UPDATE `creature_template` SET `gossip_menu_id` = 3372, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
+UPDATE `creature_template` SET `health_min` = 3758, `health_max` = 3758, `gossip_menu_id` = 3372, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
 UPDATE `creature` SET `position_x` = 1245.52, `position_y` = -2616.74, `position_z` = 90.4419, `orientation` = 2.23402 WHERE `guid` = 18037;
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
@@ -199,7 +199,7 @@ UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1
 
 
 -- update eva sarkhoff template
-UPDATE `creature_template` SET `health_min` = 3293, `health_max` = 3293, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
+UPDATE `creature_template` SET `health_min` = 3293, `health_max` = 3293, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11216;
 
 
 -- update magnus frostwake template
