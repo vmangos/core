@@ -255,7 +255,7 @@ enum eScriptCommand
                                                             // datalong2 = start_point
                                                             // datalong3 = initial_delay
                                                             // datalong4 = (bool) repeat
-                                                            // dataint = unused
+                                                            // dataint = overwrite_guid
                                                             // dataint2 = overwrite_entry
     SCRIPT_COMMAND_START_MAP_EVENT          = 61,           // source = Map
                                                             // datalong = event_id
@@ -874,7 +874,7 @@ struct ScriptInfo
             uint32 initialDelay;                            // datalong3
             uint32 canRepeat;                               // datalong4
             uint32 unused;                                  // data_flags
-            int32  unused2;                                // dataint
+            int32  overwriteGuid;                           // dataint
             int32  overwriteEntry;                          // dataint2
         } startWaypoints;
         

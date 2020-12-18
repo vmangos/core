@@ -1670,7 +1670,7 @@ bool Map::ScriptCommand_StartWaypoints(ScriptInfo const& script, WorldObject* so
         return ShouldAbortScript(script);
 
     pSource->GetMotionMaster()->Clear(false, true);
-    pSource->GetMotionMaster()->MoveWaypoint(script.startWaypoints.startPoint, script.startWaypoints.wpSource, script.startWaypoints.initialDelay, 0, script.startWaypoints.overwriteEntry, script.startWaypoints.canRepeat);
+    pSource->GetMotionMaster()->MoveWaypoint(script.startWaypoints.startPoint, script.startWaypoints.wpSource, script.startWaypoints.initialDelay, script.startWaypoints.overwriteGuid, script.startWaypoints.overwriteEntry, script.startWaypoints.canRepeat);
 
     return false;
 }
