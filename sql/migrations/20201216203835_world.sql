@@ -133,6 +133,17 @@ UPDATE `creature` SET `position_x` = 1064.06, `position_y` = -2519.78, `position
 UPDATE `creature` SET `position_x` = 1239.31, `position_y` = -2587.39, `position_z` = 90.4068, `orientation` = 3.66519 WHERE `guid` = 300345;
 UPDATE `creature` SET `position_x` = 1245.02, `position_y` = -2597.47, `position_z` = 90.3675, `orientation` = 3.52556 WHERE `guid` = 300344;
 
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300342, '10848 17622'),
+(300343, '10848 17622'),
+(300345, '10848 17622'),
+(300344, '10848 17622');
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3363, 4119);
+
+UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1, `Probability3` = 1, `Probability4` = 1 WHERE `id` = 4119;
+
 
 -- update caer darrow cannoneer template
 UPDATE `creature_template` SET `level_min` = 50, `level_max` = 54, `faction` = 35, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11280;
