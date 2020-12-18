@@ -155,6 +155,16 @@ UPDATE `creature` SET `position_x` = 1163.91, `position_y` = -2591.62, `position
 UPDATE `creature` SET `position_x` = 1210.32, `position_y` = -2575.44, `position_z` = 94.3508, `orientation` = 4.56343 WHERE `guid` = 300351;
 UPDATE `creature` SET `position_x` = 1208.19, `position_y` = -2583.32, `position_z` = 98.2479, `orientation` = 2.72271 WHERE `guid` = 300352;
 
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300347, '10848 17622'),
+(300350, '10848 17622'),
+(300351, '10848 17622'),
+(300352, '10848 17622');
+
+REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
+(300348, 133, '10848 17622'),
+(300349, 133, '10848 17622');
+
 
 -- update magistrate marduke template
 UPDATE `creature_template` SET `gossip_menu_id` = 3372, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
