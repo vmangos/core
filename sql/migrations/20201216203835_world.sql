@@ -250,6 +250,17 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (130, 39, 1138.21, -2611.25, 64.5378, 100, 0, 0, 0);
 
 
+-- update rory template
+UPDATE `creature_template` SET `gossip_menu_id` = 3361, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11285;
+UPDATE `creature` SET `position_x` = 1221.76, `position_y` = -2317.21, `position_z` = 57.1717, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 300353;
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3361, 4117);
+
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300353, '10848 17622');
+
+
 -- End of migration.
 END IF;
 END??
