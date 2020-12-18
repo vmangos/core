@@ -170,6 +170,12 @@ REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
 UPDATE `creature_template` SET `gossip_menu_id` = 3372, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
 UPDATE `creature` SET `position_x` = 1245.52, `position_y` = -2616.74, `position_z` = 90.4419, `orientation` = 2.23402 WHERE `guid` = 18037;
 
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3372, 4130);
+
+REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
+(18037,'10848 17622');
+
 
 -- update baker masterson template
 UPDATE `creature_template` SET `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11287;
