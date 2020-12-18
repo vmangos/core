@@ -181,10 +181,21 @@ REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
 UPDATE `creature_template` SET `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11287;
 UPDATE `creature` SET `position_x` = 1086.09, `position_y` = -2573.8, `position_z` = 60.0421, `orientation` = 0.383972 WHERE `guid` = 300333;
 
+REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
+(300333,'10848 17622');
+
 
 -- update joseph dirte template
 UPDATE `creature_template` SET `gossip_menu_id` = 3381, `npc_flags` = 1, `health_min` = 1107, `health_max` = 1107, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11316;
 UPDATE `creature` SET `position_x` = 1223.27, `position_y` = -2506.41, `position_z` = 72.9261, `orientation` = 4.10152 WHERE `guid` = 300346;
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3381, 4133);
+
+REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
+(300346,'10848 17622');
+
+UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1, `Probability3` = 1 WHERE `id` = 4133;
 
 
 -- update eva sarkhoff template
