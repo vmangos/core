@@ -278,6 +278,43 @@ REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
 (300353, '10848 17622');
 
 
+-- update sammy and melia template
+UPDATE `creature_template` SET `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` IN (11282, 11283);
+
+UPDATE `creature` SET `movement_type` = 2, `position_x` = 1113.59, `position_y` = -2555.59, `position_z` = 59.2532 WHERE `guid` = 300340;
+
+UPDATE `creature` SET `position_x` = 1111.49, `position_y` = -2556.4, `position_z` = 59.2532 WHERE `guid` = 300341;
+
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(11282, 1, 1113.59, -2555.59, 59.1993, 100, 129000, 0, 1128203),
+(11282, 2, 1113.59, -2555.59, 59.1994, 100, 1000, 0, 1128201),
+(11282, 3, 1118.4, -2545.76, 59.1689, 100, 0, 0, 0),
+(11282, 4, 1109.59, -2539.25, 59.1498, 100, 0, 0, 0),
+(11282, 5, 1100.85, -2547.02, 59.1427, 100, 0, 0, 0),
+(11282, 6, 1109.6, -2558.2, 59.1416, 100, 6000, 0, 1128202);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128201, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melia - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6806, 0, 0, 0, 0, 0, 0, 0, 0, 'Melia - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128201, 3, 0, 0, 0, 0, 0, 300341, 0, 9, 2, 6807, 0, 0, 0, 0, 0, 0, 0, 0, 'Sammy - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128201, 5, 60, 2, 0, 0, 0, 300341, 0, 9, 2, 0, 11283, 0, 0, 0, 0, 0, 0, 0, 'Melia - Start Waypoints');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128202, 5, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6808, 0, 0, 0, 0, 0, 0, 0, 0, 'Melia - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128203, 5, 35, 0, 0, 0, 0, 300341, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melia - Orientation');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128203, 6, 0, 0, 0, 0, 0, 300341, 0, 9, 2, 6810, 0, 0, 0, 0, 0, 0, 0, 0, 'Sammy - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128203, 8, 0, 0, 0, 0, 0, 0, 0, 0, 4, 6809, 0, 0, 0, 0, 0, 0, 0, 0, 'Melia - Talk');
+
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(11283, 1, 1120.33, -2547.83, 59.1464, 100, 0, 0, 0),
+(11283, 2, 1111.22, -2538.78, 59.1418, 100, 0, 0, 0),
+(11283, 3, 1101.14, -2548.09, 59.1417, 100, 0, 0, 0),
+(11283, 4, 1109.56, -2557.59, 59.1415, 100, 6000, 0, 1128302),
+(11283, 5, 1111.49, -2556.4, 59.1738, 100, 1000, 0, 1128301);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128301, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sammy - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128302, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sammy - Walk');
+
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300340, '10848 17622'),
+(300341, '10848 17622');
+
+
 -- End of migration.
 END IF;
 END??
