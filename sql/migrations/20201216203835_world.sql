@@ -192,6 +192,20 @@ UPDATE `creature` SET `position_x` = 1144.51, `position_y` = -2510.08, `position
 REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
 (300332, '10848 17622');
 
+
+-- update caer darrow horseman template
+UPDATE `creature_template` SET `gossip_menu_id` = 3363, `level_max` = 55, `faction` = 35, `npc_flags` = 1, `speed_walk` = 1, `speed_run` = 1.28968, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11281;
+
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(130, 11281, 0, 0, 0, 0, 1198.16, -2594.55, 76.9266, 3.12597, 25, 25, 0, 100, 0, 2, 0, 0, 0, 10);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(153, 11281, 0, 0, 0, 0, 1200.16, -2591.76, 77.71333, 2.63314, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
+
+REPLACE INTO `creature_addon` (`guid`, `mount_display_id`, `auras`) VALUES
+(130, 5228, '17622'),
+(153, 5228, '17622');
+
+
 -- End of migration.
 END IF;
 END??
