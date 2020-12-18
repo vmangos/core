@@ -120,6 +120,11 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1127702, 8, 1, 1, 0, 0, 0, 300334, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Caer Darrow Citizen 300334 - Emote');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1127702, 52, 300335, 0, 0, 0, 0);
 
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3362, 4118);
+
+UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1, `Probability3` = 1, `Probability4` = 1 WHERE `id` = 4118;
+
 
 -- update caer darrow guardsman template
 UPDATE `creature_template` SET `gossip_menu_id` = 3363, `level_max` = 55, `faction` = 35, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11279;
