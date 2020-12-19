@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20201216203835');
 
 
 -- update cear darrow citizen template
-UPDATE `creature_template` SET `ai_name`='EventAI', `level_min` = 14, `gossip_menu_id` = 3362, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000, `faction` = 35, `npc_flags` = 1 WHERE `entry` = 11277;
+UPDATE `creature_template` SET `auras` = '10848 17622', `ai_name`='EventAI', `level_min` = 14, `gossip_menu_id` = 3362, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000, `faction` = 35, `npc_flags` = 1 WHERE `entry` = 11277;
 
 UPDATE `creature` SET `position_x` = 1146.79, `position_y` = -2561.22, `position_z` = 60.1145,`orientation` = 0.959931 WHERE `guid` = 13179;
 UPDATE `creature` SET `position_x` = 1095.56, `position_y` = -2529.47, `position_z` = 61.1291, `orientation` = 2.37365 WHERE `guid` = 300335;
@@ -24,19 +24,9 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (120, 11277, 0, 0, 0, 0, 1201.59, -2595.37, 78.5883, 2.76145, 25, 25, 0, 100, 0, 2, 0, 0, 0, 10);
 
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300338, '10848 17622'),
-(300339, '10848 17622'),
-(120, '10848 17622'),
-(13179, '10848 17622'),
-(300335, '10848 17622'),
-(300334, '10848 17622'),
-(300337, '10848 17622'),
-(300338, '10848 17622');
-
-REPLACE INTO `creature_addon` (`guid`, `stand_state`, `auras`) VALUES
-(300336, 8, '10848 17622'),
-(118, 3, '10848 17622');
+REPLACE INTO `creature_addon` (`guid`, `stand_state`) VALUES
+(300336, 8),
+(118, 3);
 
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (120, 1, 1174.25, -2610.72, 72.8297, 100, 0, 0, 0),
@@ -127,17 +117,11 @@ UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1
 
 
 -- update caer darrow guardsman template
-UPDATE `creature_template` SET `gossip_menu_id` = 3363, `level_max` = 55, `faction` = 35, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11279;
+UPDATE `creature_template` SET `auras` = '10848 17622', `gossip_menu_id` = 3363, `level_max` = 55, `faction` = 35, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11279;
 UPDATE `creature` SET `position_x` = 1056.5, `position_y` = -2536.54, `position_z` = 59.9694, `orientation` = 2.35619 WHERE `guid` = 300342;
 UPDATE `creature` SET `position_x` = 1064.06, `position_y` = -2519.78, `position_z` = 60.2259, `orientation` = 3.19395 WHERE `guid` = 300343;
 UPDATE `creature` SET `position_x` = 1239.31, `position_y` = -2587.39, `position_z` = 90.4068, `orientation` = 3.66519 WHERE `guid` = 300345;
 UPDATE `creature` SET `position_x` = 1245.02, `position_y` = -2597.47, `position_z` = 90.3675, `orientation` = 3.52556 WHERE `guid` = 300344;
-
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300342, '10848 17622'),
-(300343, '10848 17622'),
-(300345, '10848 17622'),
-(300344, '10848 17622');
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3363, 4119);
@@ -146,7 +130,7 @@ UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1
 
 
 -- update caer darrow cannoneer template
-UPDATE `creature_template` SET `level_min` = 50, `level_max` = 54, `faction` = 35, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11280;
+UPDATE `creature_template` SET `auras` = '10848 17622', `level_min` = 50, `level_max` = 54, `faction` = 35, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11280;
 
 UPDATE `creature` SET `position_x` = 1162.86, `position_y` = -2595.08, `position_z` = 75.4329, `orientation` = 2.71204 WHERE `guid` = 300347;
 UPDATE `creature` SET `position_x` = 1180.07, `position_y` = -2536.72, `position_z` = 85.3681, `orientation` = 1.0821 WHERE `guid` = 300348;
@@ -155,26 +139,17 @@ UPDATE `creature` SET `position_x` = 1163.91, `position_y` = -2591.62, `position
 UPDATE `creature` SET `position_x` = 1210.32, `position_y` = -2575.44, `position_z` = 94.3508, `orientation` = 4.56343 WHERE `guid` = 300351;
 UPDATE `creature` SET `position_x` = 1208.19, `position_y` = -2583.32, `position_z` = 98.2479, `orientation` = 2.72271 WHERE `guid` = 300352;
 
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300347, '10848 17622'),
-(300350, '10848 17622'),
-(300351, '10848 17622'),
-(300352, '10848 17622');
-
-REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
-(300348, 133, '10848 17622'),
-(300349, 133, '10848 17622');
+REPLACE INTO `creature_addon` (`guid`, `emote_state`) VALUES
+(300348, 133),
+(300349, 133);
 
 
 -- update magistrate marduke template
-UPDATE `creature_template` SET `health_min` = 3758, `health_max` = 3758, `gossip_menu_id` = 3372, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
+UPDATE `creature_template` SET `auras` = '10848 17622', `health_min` = 3758, `health_max` = 3758, `gossip_menu_id` = 3372, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11286;
 UPDATE `creature` SET `position_x` = 1245.52, `position_y` = -2616.74, `position_z` = 90.4419, `orientation` = 2.23402 WHERE `guid` = 18037;
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3372, 4130);
-
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(18037, '10848 17622');
 
 
 -- update baker masterson template
@@ -186,14 +161,11 @@ REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
 
 
 -- update joseph dirte template
-UPDATE `creature_template` SET `gossip_menu_id` = 3381, `npc_flags` = 1, `health_min` = 1107, `health_max` = 1107, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11316;
+UPDATE `creature_template` SET `auras` = '10848 17622', `gossip_menu_id` = 3381, `npc_flags` = 1, `health_min` = 1107, `health_max` = 1107, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11316;
 UPDATE `creature` SET `position_x` = 1223.27, `position_y` = -2506.41, `position_z` = 72.9261, `orientation` = 4.10152 WHERE `guid` = 300346;
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3381, 4133);
-
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300346, '10848 17622');
 
 UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1, `Probability3` = 1 WHERE `id` = 4133;
 
@@ -203,24 +175,21 @@ UPDATE `creature_template` SET `health_min` = 3293, `health_max` = 3293, `speed_
 
 
 -- update magnus frostwake template
-UPDATE `creature_template` SET `npc_flags` = 4, `faction` = 35, `health_min` = 2769, `health_max` = 2769, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11278;
+UPDATE `creature_template` SET `auras` = '10848 17622', `npc_flags` = 4, `faction` = 35, `health_min` = 2769, `health_max` = 2769, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11278;
 UPDATE `creature` SET `position_x` = 1144.51, `position_y` = -2510.08, `position_z` = 62.1604, `orientation` = 4.03171 WHERE `guid` = 300332;
-
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300332, '10848 17622');
 
 
 -- update caer darrow horseman template
-UPDATE `creature_template` SET `gossip_menu_id` = 3363, `level_max` = 56, `faction` = 35, `npc_flags` = 1, `speed_walk` = 1, `speed_run` = 1.28968, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11281;
+UPDATE `creature_template` SET `auras` = '17622', `gossip_menu_id` = 3363, `level_max` = 56, `faction` = 35, `npc_flags` = 1, `speed_walk` = 1, `speed_run` = 1.28968, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11281;
 
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (130, 11281, 0, 0, 0, 0, 1198.16, -2594.55, 76.9266, 3.12597, 25, 25, 0, 100, 0, 2, 0, 0, 0, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (153, 11281, 0, 0, 0, 0, 1200.16, -2591.76, 77.71333, 2.63314, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
 
-REPLACE INTO `creature_addon` (`guid`, `mount_display_id`, `auras`) VALUES
-(130, 5228, '17622'),
-(153, 5228, '17622');
+REPLACE INTO `creature_addon` (`guid`, `mount_display_id`) VALUES
+(130, 5228),
+(153, 5228);
 
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (130, 153, 15, 3, 11);
@@ -268,18 +237,15 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 
 -- update rory template
-UPDATE `creature_template` SET `faction` = 35, `gossip_menu_id` = 3361, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11285;
+UPDATE `creature_template` SET `auras` = '10848 17622', `faction` = 35, `gossip_menu_id` = 3361, `npc_flags` = 1, `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11285;
 UPDATE `creature` SET `position_x` = 1221.76, `position_y` = -2317.21, `position_z` = 57.1717, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 300353;
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3361, 4117);
 
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300353, '10848 17622');
-
 
 -- update sammy and melia template
-UPDATE `creature_template` SET `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` IN (11282, 11283);
+UPDATE `creature_template` SET `auras` = '10848 17622', `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` IN (11282, 11283);
 
 UPDATE `creature` SET `movement_type` = 2, `position_x` = 1113.59, `position_y` = -2555.59, `position_z` = 59.2532 WHERE `guid` = 300340;
 
@@ -309,10 +275,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (11283, 5, 1111.49, -2556.4, 59.1738, 100, 1000, 0, 1128301);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128301, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sammy - Run');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128302, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sammy - Walk');
-
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300340, '10848 17622'),
-(300341, '10848 17622');
 
 
 -- End of migration.
