@@ -173,16 +173,16 @@ UPDATE `creature` SET `position_x` = 1245.52, `position_y` = -2616.74, `position
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3372, 4130);
 
-REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
-(18037,'10848 17622');
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(18037, '10848 17622');
 
 
 -- update baker masterson template
 UPDATE `creature_template` SET `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11287;
 UPDATE `creature` SET `position_x` = 1086.09, `position_y` = -2573.8, `position_z` = 60.0421, `orientation` = 0.383972 WHERE `guid` = 300333;
 
-REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
-(300333,'10848 17622');
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300333, '10848 17622');
 
 
 -- update joseph dirte template
@@ -192,8 +192,8 @@ UPDATE `creature` SET `position_x` = 1223.27, `position_y` = -2506.41, `position
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3381, 4133);
 
-REPLACE INTO `creature_addon` (`guid`, `emote_state`, `auras`) VALUES
-(300346,'10848 17622');
+REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
+(300346, '10848 17622');
 
 UPDATE `npc_text` SET `Probability0` = 1, `Probability1` = 1, `Probability2` = 1, `Probability3` = 1 WHERE `id` = 4133;
 
