@@ -259,6 +259,84 @@ DELETE FROM `npc_vendor` WHERE `entry` = 12028 AND `item` = 14341;
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 12031 AND `item` = 6533;
 
 
+-- orgrimmar
+-- imbued vial - shimra
+DELETE FROM `npc_vendor` WHERE `entry` = 5817 AND `item` = 18256;
+
+-- rune thread - shimra
+DELETE FROM `npc_vendor` WHERE `entry` = 5817 AND `item` = 14341;
+
+-- balanced throwing dagger - asoran
+DELETE FROM `npc_vendor` WHERE `entry` = 3350 AND `item` = 2946;
+
+-- weighted throwing \xe - asoran
+DELETE FROM `npc_vendor` WHERE `entry` = 3350 AND `item` = 3131;
+
+-- strange dust - kithas
+UPDATE `npc_vendor` SET `maxcount` = 4 WHERE `entry` = 3346 AND `item` = 10940;
+
+-- imbued vial - felika
+DELETE FROM `npc_vendor` WHERE `entry` = 3367 AND `item` = 18256;
+
+-- rune thread - felika
+DELETE FROM `npc_vendor` WHERE `entry` = 3367 AND `item` = 14341;
+
+-- missing items - felika
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(3367, 2605),
+(3367, 6260),
+(3367, 6529),
+(3367, 2324);
+
+-- pale leggings - torphan
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 3315 AND `item` = 12255;
+
+-- massive longbow - jinsora
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 3410 AND `item` = 11307;
+
+-- sturdy recurve - jinsora
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 3410 AND `item` = 11306;
+
+-- fine shortbow - jinsora
+UPDATE `npc_vendor` SET `maxcount` = 2, `incrtime` = 10800 WHERE `entry` = 3410 AND `item` = 11303;
+
+-- missing items - sovik
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(3413, 16041, 1, 10800),
+(3413, 16042, 1, 10800),
+(3413, 4389, 1, 10800),
+(3413, 4382, 1, 10800),
+(3413, 4371, 2, 10800),
+(3413, 4363, 2, 10800),
+(3413, 4361, 2, 10800);
+
+-- missing items - zendojian
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(3409, 15326),
+(3409, 15327),
+(3409, 3108),
+(3409, 3137),
+(3409, 3107),
+(3409, 3135),
+(3409, 2946),
+(3409, 3131),
+(3409, 2947),
+(3409, 3111);
+
+-- aquadynamic fish attractor - shankys
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3333 AND `item` = 6533;
+
+-- strong fishing pole - shankys
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(3333, 6365, 1, 7200);
+
+-- recipe: great rage potion - hagrus
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3335 AND `item` = 5643;
+
+-- recipe: rage potion - hagrus
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3335 AND `item` = 5640;
+
+
 -- End of migration.
 END IF;
 END??
