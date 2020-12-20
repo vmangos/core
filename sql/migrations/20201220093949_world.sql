@@ -9,10 +9,10 @@ INSERT INTO `migrations` VALUES ('20201220093949');
 -- Add your query below.
 
 
-UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` = 6344;
-UPDATE `quest_template` SET `RequiredRaces` = 68 WHERE `entry` = 6387;
-UPDATE `quest_template` SET `RequiredRaces` = 16 WHERE `entry` = 6321;
-UPDATE `quest_template` SET `RequiredRaces` = 1 WHERE `entry` = 6181;
+UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` IN (6344, 6341, 6342, 6343);
+UPDATE `quest_template` SET `RequiredRaces` = 68 WHERE `entry` IN (6387, 6391, 6388, 6392);
+UPDATE `quest_template` SET `RequiredRaces` = 16 WHERE `entry` IN (6321, 6323, 6322, 6324);
+UPDATE `quest_template` SET `RequiredRaces` = 1 WHERE `entry` IN (6181, 6281, 6261, 6285);
 
 
 -- End of migration.
