@@ -153,11 +153,8 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 
 
 -- update baker masterson template
-UPDATE `creature_template` SET `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11287;
+UPDATE `creature_template` SET `auras` = '10848 17622', `speed_walk` = 1, `base_attack_time` = 2000, `ranged_attack_time` = 2000 WHERE `entry` = 11287;
 UPDATE `creature` SET `position_x` = 1086.09, `position_y` = -2573.8, `position_z` = 60.0421, `orientation` = 0.383972 WHERE `guid` = 300333;
-
-REPLACE INTO `creature_addon` (`guid`, `auras`) VALUES
-(300333, '10848 17622');
 
 
 -- update joseph dirte template
