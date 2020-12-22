@@ -9,8 +9,11 @@ INSERT INTO `migrations` VALUES ('20201222170619');
 -- Add your query below.
 
 
--- correct flags to mining trainers
+-- correct flags for mining trainers
 UPDATE `creature_template` SET `npc_flags` = 18 WHERE `entry` IN (8128, 3175, 3555);
+
+-- correct flags for herbalism trainers
+UPDATE `creature_template` SET `npc_flags` = 18 WHERE `entry` IN (4204, 12025, 3965, 3185, 2390, 2114);
 
 
 -- End of migration.
