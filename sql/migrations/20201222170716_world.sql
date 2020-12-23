@@ -64,6 +64,48 @@ DELETE FROM `npc_vendor` WHERE `entry` = 12959 AND `item` = 3131;
 -- pattern: azure silk cloak - brienna starglow
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 43200 WHERE `entry` = 6576 AND `item` = 7089;
 
+-- missing items - zorbin fandazzle
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(14637, 4389, 1, 10800),
+(14637, 4382, 1, 10800),
+(14637, 4404, 3, 10800),
+(14637, 4371, 2, 10800),
+(14637, 4363, 2, 10800);
+
+-- correct items - harklane
+UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 7943 AND `item` IN (159, 1179, 1205, 1645, 1708, 21552);
+
+-- strong fishing pole - savanne
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 7945 AND `item` = 6365;
+
+-- correct items - mardrack greenwell
+UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 7941 AND `item` IN (21030, 21031, 21033);
+DELETE FROM `npc_vendor` WHERE `entry` = 7941 AND `item` IN (117, 2287, 3770, 3771, 4599, 8952, 16171);
+
+-- imbued vial - vivianna
+DELETE FROM `npc_vendor` WHERE `entry` = 7947 AND `item` = 18256;
+
+-- rune thread - vivianna
+DELETE FROM `npc_vendor` WHERE `entry` = 7947 AND `item` = 14341;
+
+-- lesser healing potion - logannas
+DELETE FROM `npc_vendor` WHERE `entry` = 8157 AND `item` = 858;
+
+-- lesser mana potion - logannas
+DELETE FROM `npc_vendor` WHERE `entry` = 8157 AND `item` = 3385;
+
+-- small throwing knofe and crude throwing axe - faralorn
+DELETE FROM `npc_vendor` WHERE `entry` = 7942 AND `item` IN (2947, 3111);
+
+-- pattern: green whelp bracers - patt mcgrubben
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 7852 AND `item` = 7451;
+
+-- pattern: turtle scale gloves - patt mcgrubben
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 7852 AND `item` = 8385;
+
+-- pattern: living shoulders - patt mcgrubben
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 7852 AND `item` = 15734;
+
 
 -- End of migration.
 END IF;
