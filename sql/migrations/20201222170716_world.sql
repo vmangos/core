@@ -52,6 +52,19 @@ DELETE FROM `npc_vendor` WHERE `entry` = 8139 AND `item` = 2946;
 DELETE FROM `npc_vendor` WHERE `entry` = 8139 AND `item` = 3131;
 
 
+-- ungoro
+-- balanced throwing dagger - nergal
+DELETE FROM `npc_vendor` WHERE `entry` = 12959 AND `item` = 2946;
+
+-- weighted throwing axe - nergal
+DELETE FROM `npc_vendor` WHERE `entry` = 12959 AND `item` = 3131;
+
+
+-- feralas
+-- pattern: azure silk cloak - brienna starglow
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 43200 WHERE `entry` = 6576 AND `item` = 7089;
+
+
 -- End of migration.
 END IF;
 END??
