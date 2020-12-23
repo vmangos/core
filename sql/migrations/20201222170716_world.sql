@@ -106,6 +106,12 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 7852 A
 -- pattern: living shoulders - patt mcgrubben
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 7852 AND `item` = 15734;
 
+-- imbued vial - sheendra tallgrass
+DELETE FROM `npc_vendor` WHERE `entry` = 8145 AND `item` = 18256;
+
+-- rune thread - sheendra tallgrass
+DELETE FROM `npc_vendor` WHERE `entry` = 8145 AND `item` = 14341;
+
 
 -- End of migration.
 END IF;
