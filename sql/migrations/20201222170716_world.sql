@@ -112,6 +112,24 @@ DELETE FROM `npc_vendor` WHERE `entry` = 8145 AND `item` = 18256;
 -- rune thread - sheendra tallgrass
 DELETE FROM `npc_vendor` WHERE `entry` = 8145 AND `item` = 14341;
 
+-- missing items calandrath
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(15174, 15326),
+(15174, 15327),
+(15174, 3108),
+(15174, 3137),
+(15174, 3107),
+(15174, 3135);
+
+-- blacksmith hammer - mishta
+DELETE FROM `npc_vendor` WHERE `entry` = 15179 AND `item` = 5956;
+
+-- imbued vial - mishta
+DELETE FROM `npc_vendor` WHERE `entry` = 15179 AND `item` = 18256;
+
+-- rune thread - mishta
+DELETE FROM `npc_vendor` WHERE `entry` = 15179 AND `item` = 14341;
+
 
 -- End of migration.
 END IF;
