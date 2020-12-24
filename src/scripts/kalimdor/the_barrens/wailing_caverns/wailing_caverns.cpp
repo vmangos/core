@@ -54,7 +54,7 @@ enum
     EMOTE_NARALEX_1         = 1268,
     SAY_ATTACKED            = 1273,
     EMOTE_NARALEX_2         = 1269,
-    SAY_BEFORE_MUTANUS      = 1276,
+    SAY_MUTANUS_SPAWNED     = 1276,
     SAY_NARALEX_AWAKEN      = 1271,
     SAY_DISCIPLE_FINAL      = 1267,
     SAY_NARALEX_FINAL1      = 1272,
@@ -497,7 +497,6 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             Event_Timer = 10000;
                             DoScriptText(EMOTE_NARALEX_2, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            // TODO: DoScriptText(SAY_BEFORE_MUTANUS, m_creature); This $n is a minion from Naralex's nightmare no doubt!
                             m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             break;
                         case 6:
@@ -506,20 +505,28 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             Event_Timer = 2000;
                             break;
                         case 7:
+                            Subevent_Phase = 8;
+                            Event_Timer = 2000;
+                            if (Creature* Mutanus = Naralex->FindNearestCreature(MOB_MUTANUS_DEVOURER, 100.0f))
+                            {
+                                DoScriptText(SAY_MUTANUS_SPAWNED, m_creature, Mutanus);
+                            }
+                            break;
+                        case 8:
                             if (m_pInstance->GetData(TYPE_MUTANUS) == DONE)
                             {
                                 Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SIT);
-                                DoScriptText(SAY_NARALEX_AWAKEN, Naralex);
+                                DoScriptText(SAY_NARALEX_AWAKEN, Naralex, nullptr, /*Chat Type Yell*/ 1);
                                 Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                                 m_creature->InterruptNonMeleeSpells(false, SPELL_AWAKENING);
                                 m_creature->RemoveAurasDueToSpell(SPELL_AWAKENING);
                                 m_pInstance->SetData(TYPE_DISCIPLE, DONE);
                                 Event_Timer = 2000;
-                                Subevent_Phase = 8;
+                                Subevent_Phase = 9;
                             }
                             else Event_Timer = 2000;
                             break;
-                        case 8:
+                        case 9:
                             if (m_creature->IsAlive() &&
                                 !m_creature->GetVictim())
                             {
@@ -527,27 +534,27 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                                 m_creature->CombatStop(true);
                                 DoScriptText(SAY_DISCIPLE_FINAL, m_creature);
                                 m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                                Subevent_Phase = 9;
+                                Subevent_Phase = 10;
                                 Event_Timer = 5000;
                             }
                             else Event_Timer = 2000;
                             break;
-                        case 9:
+                        case 10:
                             DoScriptText(SAY_NARALEX_FINAL1, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND);
                             Event_Timer = 8000;
-                            Subevent_Phase = 10;
+                            Subevent_Phase = 11;
                             break;
-                        case 10:
+                        case 11:
                             DoScriptText(SAY_NARALEX_FINAL2, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                             m_creature->CastSpell(m_creature, SPELL_SHAPESHIFT, false);
                             Naralex->CastSpell(Naralex, SPELL_SHAPESHIFT, false);
                             Event_Timer = 8000;
-                            Subevent_Phase = 11;
+                            Subevent_Phase = 12;
                             break;
-                        case 11:
+                        case 12:
                             m_creature->SetFly(true);
                             Naralex->SetFly(true);
                             m_creature->GetMotionMaster()->MovePoint(33, 101.0f, 239.2f, -91.2f, MOVE_FLY_MODE, 35.0f, 3.5f);
