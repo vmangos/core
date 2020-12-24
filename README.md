@@ -47,7 +47,8 @@ On arch linux it can be installed with `yay -S ace`
 2. Make install directory: `mkdir run`
 3. Go to build directory: `cd build`
 4. CMake: `cmake -DCMAKE_INSTALL_PREFIX=../run -DDEBUG=0 -DUSE_LIBCURL=1 ..`
-5. Make: `make -j2`
+5. Make: `make`
+6. Install: `make install`
 
 More infos [here](https://github.com/vmangos/wiki/wiki/Getting-it-working)
 
