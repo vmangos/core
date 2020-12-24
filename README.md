@@ -30,6 +30,26 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - Full progression: The ultimate goal of this project is to have complete progression starting from patch 1.2 through 1.12. This means every piece of data must be marked with the patch in which it was added or changed to it's current state.
 - Tools are great: Content creation should not require programming knowledge. We hope to eventually provide tools that allow for user-friendly editing of database scripts and content, with all data presented in human-readable form.
 
+### Software requirements
+
+#### TBB
+A high level abstract threading library
+
+On arch linux it can be installed with `pacman -S tbb`
+
+#### ACE
+Framework that provides many components and patterns for developing high-performance, distributed real-time and embedded systems.
+
+On arch linux it can be installed with `yay -S ace`
+
+### How to install
+1. Make build directory: `mkdir build`
+2. Make install directory: `mkdir run`
+3. Go to build directory: `cd build`
+4. CMake: `cmake -DCMAKE_INSTALL_PREFIX=../run -DDEBUG=0 -DUSE_LIBCURL=1 ..`
+5. Make: `make -j2`
+
+More infos [here](https://github.com/vmangos/wiki/wiki/Getting-it-working)
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
