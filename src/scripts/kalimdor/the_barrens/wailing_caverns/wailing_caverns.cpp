@@ -319,7 +319,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
             return;
         if (!Yelled)
         {
-            m_creature->MonsterYell(SAY_ATTACKED, LANG_UNIVERSAL, attacker);
+            DoScriptText(SAY_ATTACKED, m_creature, attacker);
             Yelled = true;
         }
     }
