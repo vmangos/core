@@ -70,7 +70,7 @@ You can run `cmake` with several more options:
 
 
 Full command example:
-`cmake ..
+```cmake ..
     -DCMAKE_INSTALL_PREFIX=${RUN_DIR} \
     -DPCH=1 \
     -DDEBUG=0 \
@@ -81,7 +81,7 @@ Full command example:
     -DSCRIPTS=1 \
     -DUSE_EXTRACTORS=1 \
     -DUSE_LIBCURL=1
-`
+```
 
 SUPPORTED_CLIENT_BUILD options:
 - `CLIENT_BUILD_1_2_4`
