@@ -25,7 +25,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (120, 11277, 0, 0, 0, 0, 1201.59, -2595.37, 78.5883, 2.76145, 25, 25, 0, 100, 0, 2, 0, 0, 0, 10);
 
 REPLACE INTO `creature_addon` (`guid`, `stand_state`) VALUES
-(300336, 8),
+(300336, 1),
 (118, 3);
 
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
