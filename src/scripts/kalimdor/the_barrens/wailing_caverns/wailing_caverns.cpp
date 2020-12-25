@@ -516,7 +516,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             if (m_pInstance->GetData(TYPE_MUTANUS) == DONE)
                             {
                                 Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SIT);
-                                DoScriptText(SAY_NARALEX_AWAKEN, Naralex, nullptr, /*Chat Type Yell*/ 1);
+                                DoScriptText(SAY_NARALEX_AWAKEN, Naralex);
                                 Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                                 m_creature->InterruptNonMeleeSpells(false, SPELL_AWAKENING);
                                 m_creature->RemoveAurasDueToSpell(SPELL_AWAKENING);
