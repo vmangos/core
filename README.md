@@ -70,7 +70,8 @@ You can run `cmake` with several more options:
 
 
 Full command example:
-```cmake ..
+```
+cmake ..
     -DCMAKE_INSTALL_PREFIX=${RUN_DIR} \
     -DPCH=1 \
     -DDEBUG=0 \
