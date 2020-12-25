@@ -46,11 +46,55 @@ On arch linux it can be installed with `yay -S ace`
 1. Make build directory: `mkdir build`
 2. Make install directory: `mkdir run`
 3. Go to build directory: `cd build`
-4. CMake: `cmake -DCMAKE_INSTALL_PREFIX=../run -DDEBUG=0 -DUSE_LIBCURL=1 ..`
+4. CMake: `cmake -DCMAKE_INSTALL_PREFIX=../run ..`
 5. Make: `make`
 6. Install: `make install`
 
 More infos [here](https://github.com/vmangos/wiki/wiki/Getting-it-working)
+
+#### More install options
+
+You can run `cmake` with several more options:
+| Command                   | Default           | Description                                               |
+| -------                   | -------           | -----------                                               |
+| CMAKE_INSTALL_PREFIX      | /usr/local        | Define output directory for the executables               |
+| PCH                       | ?                 | Use precompiled headers to speed up the compile process   |
+| DEBUG                     | 0                 | Debug mode                                                |
+| SUPPORTED_CLIENT_BUILD    | CLIENT_BUILD_1_12_1 | Client version the core will support                    |
+| USE_STD_MALLOC            | 0                 | Use malloc instead of TBB                                 |
+| TBB_DEBUG                 | 0                 | Use TBB debug librairies                                  |
+| USE_ANTICHEAT             | 0                 | Use anticheat                                             |
+| SCRIPTS                   | 1                 | Compile scripts                                           |
+| USE_EXTRACTORS            | 0                 | Compile extractors                                        |
+| USE_LIBCURL               | 0                 | Compile with libcurl for email support                    |
+
+
+Full command example:
+`cmake ..
+    -DCMAKE_INSTALL_PREFIX=${RUN_DIR} \
+    -DPCH=1 \
+    -DDEBUG=0 \
+    -DSUPPORTED_CLIENT_BUILD=CLIENT_BUILD_1_12_1 \
+    -DUSE_STD_MALLOC=0 \
+    -DTBB_DEBUG=0 \
+    -DUSE_ANTICHEAT=1 \
+    -DSCRIPTS=1 \
+    -DUSE_EXTRACTORS=1 \
+    -DUSE_LIBCURL=1
+`
+
+SUPPORTED_CLIENT_BUILD options:
+- `CLIENT_BUILD_1_2_4`
+- `CLIENT_BUILD_1_3_1`
+- `CLIENT_BUILD_1_4_2`
+- `CLIENT_BUILD_1_5_1`
+- `CLIENT_BUILD_1_6_1`
+- `CLIENT_BUILD_1_7_1`
+- `CLIENT_BUILD_1_8_4`
+- `CLIENT_BUILD_1_9_4`
+- `CLIENT_BUILD_1_10_2`
+- `CLIENT_BUILD_1_11_2`
+- `CLIENT_BUILD_1_12_1`
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
