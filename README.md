@@ -16,13 +16,17 @@
 This project is an independent continuation of the Elysium / LightsHope codebases, focused on delivering the most complete and accurate content progression system possible, including support for the patch appropriate game clients.
 
 ### Currently supported builds
-- 1.12.1.5875+
-- 1.11.2.5464
-- 1.10.2.5302
-- 1.9.4.5086
-- 1.8.4.4878
-- 1.7.1.4695
-- 1.6.1.4544
+- 1.12.1.5875+ (`CLIENT_BUILD_1_12_1`)
+- 1.11.2.5464 (`CLIENT_BUILD_1_11_2`)
+- 1.10.2.5302 (`CLIENT_BUILD_1_10_2`)
+- 1.9.4.5086 (`CLIENT_BUILD_1_9_4`)
+- 1.8.4.4878 (`CLIENT_BUILD_1_8_4`)
+- 1.7.1.4695 (`CLIENT_BUILD_1_7_1`)
+- 1.6.1.4544 (`CLIENT_BUILD_1_6_1`)
+- 1.5.1.4449 (`CLIENT_BUILD_1_5_1`)
+- 1.4.2.4375 (`CLIENT_BUILD_1_4_2`)
+- 1.3.1.4297 (`CLIENT_BUILD_1_3_1`)
+- 1.2.4.4222 (`CLIENT_BUILD_1_2_4`)
 
 ### Project guidelines
 - Accuracy: The point of an emulator is to recreate the functionality of that which it is emulating as closely as possible. Therefore any custom behaviour should be behind a config option and off by default.
