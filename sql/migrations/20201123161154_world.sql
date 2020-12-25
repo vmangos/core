@@ -134,7 +134,8 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1471803, 24, 1, 234, 0, 0, 0, 14432, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Laborer - Emote');
 
 -- make mogg script more blizzlike
-UPDATE `creature_equip_template` SET `equipentry1` = 0 WHERE `entry` = 14908;
+DELETE FROM `creature_equip_template` WHERE `entry`=14908;
+UPDATE `creature_template` SET `equipment_id` = 0 WHERE `entry` = 14908;
 DELETE FROM `creature_movement_template` WHERE `entry` = 14908;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (14908, 1, 1022.24, -2235.11, 93.3114, 0, 0, 0, 0),
