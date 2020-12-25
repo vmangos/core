@@ -101,6 +101,28 @@ SUPPORTED_CLIENT_BUILD options:
 - `CLIENT_BUILD_1_11_2`
 - `CLIENT_BUILD_1_12_1`
 
+### Extract Client Data
+Copy `mapextractor`, `vmapextractor`, `vmap_assembler` and `MoveMapGen` into your WoW Folder and run the tools in the following order:
+
+1. `mapextractor`
+2. `vmapextractor`
+3. `vmap_assembler`
+4. create mmaps folder: `mkdir mmaps`
+5. `MoveMapGen`
+
+Be aware that mangos expects the dbc folder created to be a subfolder of the build number the server is built for. That means you have to move the generated dbc folder. Furthermore `MoveMapGen` requires the `mmaps` folder to exist and will not create it like all other tools. Therefore make sure to manually create it.
+
+The resulting folder structure looks like this:
+
+```
+|- 5875
+|  |- dbc
+|- Buildings
+|- maps
+|- mmaps
+|- vmaps
+```
+
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
 - [Discord](https://discord.gg/x9a2jt7)
