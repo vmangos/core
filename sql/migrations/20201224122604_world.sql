@@ -89,6 +89,22 @@ UPDATE `creature_movement` SET `script_id` = 2169302 WHERE `id` = 21693 AND `poi
 UPDATE `creature` SET `position_x` = -4507.80, `position_y` = -766.646, `position_z` = -37.5925, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 50057;
 
 
+-- Un'Goro
+-- add Bloodpetal Pest infestation event
+DELETE FROM `creature` WHERE `guid` IN (24444, 24442, 24441);
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 9119;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (911901, 9119, 0, 1, 0, 100, 1, 360000, 360000, 360000, 360000, 911901, 0, 0, 'Muigin - Summon Creature OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 2, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodpetal Pest - Run');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6190.68, -1099.47, -215.189, 0, 0, 'Bloodpetal Pest - Move');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6202.634, -1114.64, -220.1, 0, 0, 'Bloodpetal Pest - Move');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 12, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 'Bloodpetal Pest - Set Move type');
+
+
 -- End of migration.
 END IF;
 END??
