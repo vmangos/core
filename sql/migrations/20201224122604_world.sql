@@ -84,6 +84,11 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 UPDATE `creature_movement` SET `script_id` = 2169302 WHERE `id` = 21693 AND `point` = 4;
 
 
+-- Ferales
+-- Kristy Grant should roam
+UPDATE `creature` SET `position_x` = -4507.80, `position_y` = -766.646, `position_z` = -37.5925, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 50057;
+
+
 -- End of migration.
 END IF;
 END??
