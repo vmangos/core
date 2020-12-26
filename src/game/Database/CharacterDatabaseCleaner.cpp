@@ -36,7 +36,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     sLog.outString("Cleaning character database...");
 
     // check flags which clean ups are necessary
-    QueryResult* result = CharacterDatabase.PQuery("SELECT cleaning_flags FROM saved_variables");
+    QueryResult* result = CharacterDatabase.PQuery("SELECT `cleaning_flags` FROM `saved_variables`");
     if (!result)
         return;
     uint32 flags = (*result)[0].GetUInt32();
@@ -47,12 +47,12 @@ void CharacterDatabaseCleaner::CleanDatabase()
         CleanCharacterSkills();
     if (flags & CLEANING_FLAG_SPELLS)
         CleanCharacterSpell();
-    CharacterDatabase.Execute("UPDATE saved_variables SET cleaning_flags = 0");
+    CharacterDatabase.Execute("UPDATE `saved_variables` SET `cleaning_flags` = 0");
 }
 
 void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table, bool (*check)(uint32))
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT DISTINCT '%s' FROM '%s'", column, table);
     if (!result)
     {
         sLog.outString("Table %s is empty.", table);
@@ -74,7 +74,7 @@ void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table
         {
             if (!found)
             {
-                ss << "DELETE FROM " << table << " WHERE " << column << " IN (";
+                ss << "DELETE FROM `" << table << "` WHERE `" << column << "` IN (`";
                 found = true;
             }
             else
@@ -87,7 +87,7 @@ void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table
 
     if (found)
     {
-        ss << ")";
+        ss << "`)";
         CharacterDatabase.Execute(ss.str().c_str());
     }
 }
@@ -99,7 +99,7 @@ bool CharacterDatabaseCleaner::SkillCheck(uint32 skill)
 
 void CharacterDatabaseCleaner::CleanCharacterSkills()
 {
-    CheckUnique("skill", "character_skills", &SkillCheck);
+    CheckUnique("`skill`", "`character_skills`", &SkillCheck);
 }
 
 bool CharacterDatabaseCleaner::SpellCheck(uint32 spell_id)
@@ -109,5 +109,5 @@ bool CharacterDatabaseCleaner::SpellCheck(uint32 spell_id)
 
 void CharacterDatabaseCleaner::CleanCharacterSpell()
 {
-    CheckUnique("spell", "character_spell", &SpellCheck);
+    CheckUnique("`spell`", "`character_spell`", &SpellCheck);
 }

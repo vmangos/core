@@ -541,7 +541,7 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventQuests.resize(mGameEvent.size());
 
-    result = WorldDatabase.PQuery("SELECT quest, event FROM game_event_quest WHERE patch_min <= %u", sWorld.GetWowPatch());
+    result = WorldDatabase.PQuery("SELECT `quest`, `event` FROM `game_event_quest` WHERE `patch_min` <= '%u'", sWorld.GetWowPatch());
 
     count = 0;
     if (!result)
@@ -602,7 +602,7 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventMails.resize(mGameEvent.size() * 2 - 1);
 
-    result = WorldDatabase.Query("SELECT event, raceMask, quest, mailTemplateId, senderEntry FROM game_event_mail");
+    result = WorldDatabase.Query("SELECT `event`, `raceMask`, `quest`, `mailTemplateId`, `senderEntry` FROM `game_event_mail`");
 
     count = 0;
     if (!result)
@@ -688,7 +688,7 @@ uint32 GameEventMgr::Initialize()                           // return the next e
 
     ActiveEvents activeAtShutdown;
 
-    if (QueryResult* result = CharacterDatabase.Query("SELECT event FROM game_event_status"))
+    if (QueryResult* result = CharacterDatabase.Query("SELECT `event` FROM `game_event_status`"))
     {
         do
         {
@@ -699,7 +699,7 @@ uint32 GameEventMgr::Initialize()                           // return the next e
         while (result->NextRow());
         delete result;
 
-        CharacterDatabase.Execute("TRUNCATE game_event_status");
+        CharacterDatabase.Execute("TRUNCATE `game_event_status`");
     }
 
     uint32 delay = Update(&activeAtShutdown);
@@ -778,7 +778,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= nullptr*/)
 void GameEventMgr::UnApplyEvent(uint16 event_id)
 {
     m_ActiveEvents.erase(event_id);
-    CharacterDatabase.PExecute("DELETE FROM game_event_status WHERE event = %u", event_id);
+    CharacterDatabase.PExecute("DELETE FROM `game_event_status` WHERE `event` = '%u'", event_id);
 
     BASIC_LOG("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
     // un-spawn positive event tagged objects
@@ -796,7 +796,7 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
 void GameEventMgr::ApplyNewEvent(uint16 event_id, bool resume)
 {
     m_ActiveEvents.insert(event_id);
-    CharacterDatabase.PExecute("INSERT IGNORE INTO game_event_status (event) VALUES (%u)", event_id);
+    CharacterDatabase.PExecute("INSERT IGNORE INTO `game_event_status` (`event`) VALUES ('%u')", event_id);
 
     if (sWorld.getConfig(CONFIG_BOOL_EVENT_ANNOUNCE))
         sWorld.SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
@@ -1060,12 +1060,12 @@ void GameEventMgr::SendEventMails(int16 event_id)
         {
             // need special query
             std::ostringstream ss;
-            ss << "SELECT characters.guid FROM characters, character_queststatus "
-               "WHERE (1 << (characters.race - 1)) & "
+            ss << "SELECT `characters`.`guid` FROM `characters`, `character_queststatus` "
+               "WHERE (1 << (`characters`.`race` - 1)) & "
                << mail.raceMask
-               << " AND characters.deleteDate IS NULL AND character_queststatus.guid = characters.guid AND character_queststatus.quest = "
+               << " AND `characters`.`deleteDate` IS NULL AND `character_queststatus`.`guid` = `characters`.`guid` AND `character_queststatus`.`quest` = "
                << mail.questId
-               << " AND character_queststatus.rewarded <> 0";
+               << " AND `character_queststatus`.`rewarded` <> 0";
             sMassMailMgr.AddMassMailTask(new MailDraft(mail.mailTemplateId), MailSender(MAIL_CREATURE, mail.senderEntry), ss.str().c_str());
         }
         else
