@@ -19,14 +19,35 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (780401, 0, 39, 780401, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Trenton Lighthammer - Start Script');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (780401, 0, 39, 780401, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Trenton Lighthammer - Start Script');
 
--- chronalis correct position
+-- Chronalis correct position
 UPDATE `creature` SET `position_x` = -8182.6, `position_y` = -4693.49, `position_z` = 16.4608 WHERE `guid` = 21774;
 
--- tick correct position
+-- Tick correct position
 UPDATE `creature` SET `position_x` = -8189.83, `position_y` = -4586.73, `position_z` = 8.14232, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 21775;
 
--- occulus correct position
+-- Occulus correct position
 UPDATE `creature` SET `position_x` = -8195.5, `position_y` = -4480.25, `position_z` = 9.20932, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 21773;
+
+
+-- Thousand Needles
+-- Tarkreu Shadowstalker should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 21697;
+
+-- Nagzehn waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 21695;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(4545, 1, -5854.42, -3418.36, -50.9324, 100, 5000, 0, 0),
+(4545, 2, -5853.9, -3410.98, -50.9325, 100, 0, 0, 0),
+(4545, 3, -5852.32, -3407.94, -50.9325, 100, 0, 0, 0),
+(4545, 4, -5849.7, -3407.4, -50.9335, 100, 5000, 0, 0),
+(4545, 5, -5843.16, -3408.65, -50.9749, 100, 0, 0, 0),
+(4545, 6, -5840.28, -3409.66, -50.9317, 100, 0, 0, 0),
+(4545, 7, -5837.72, -3410.56, -50.9328, 100, 0, 0, 0),
+(4545, 8, -5832.82, -3415.98, -50.9326, 100, 5000, 0, 0),
+(4545, 9, -5834.44, -3418.55, -50.9325, 100, 0, 0, 0),
+(4545, 10, -5839.25, -3421.45, -50.9325, 100, 0, 0, 0),
+(4545, 11, -5850.07, -3415.56, -50.9325, 100, 0, 0, 0);
+
 
 
 -- End of migration.
