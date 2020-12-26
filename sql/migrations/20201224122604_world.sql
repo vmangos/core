@@ -78,6 +78,10 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (6495, 18, -6187.61, -3933.56, -58.7496, 100, 0, 0, 0),
 (6495, 19, -6198.61, -3950.78, -58.7495, 100, 0, 0, 0);
 
+-- make Motega Firemane more blizzlike
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2169302, 1, 28, 8, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Motega Firemane - Set Stand State');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2169302, 4, 28, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Motega Firemane - Set Stand State');
+UPDATE `creature_movement` SET `script_id` = 2169302 WHERE `id` = 21693 AND `point` = 4;
 
 
 -- End of migration.
