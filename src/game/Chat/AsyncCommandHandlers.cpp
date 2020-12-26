@@ -63,7 +63,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
         data->target_guid = target_guid;
         CharacterDatabase.AsyncPQuery(&PInfoHandler::HandlePlayerLookupResult, data,
             //  0          1      2      3        4     5
-            "SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'",
+            "SELECT `totaltime`, `level`, `money`, `account`, `race`, `class` FROM `characters` WHERE `guid` = '%u'",
             target_guid.GetCounter());
     }
 }
@@ -93,8 +93,8 @@ void PInfoHandler::HandleDataAfterPlayerLookup(PInfoData *data)
 {
     SqlQueryHolder* charHolder = new SqlQueryHolder;
     charHolder->SetSize(2);
-    charHolder->SetPQuery(PINFO_QUERY_GOLD_SENT, "SELECT SUM(money) FROM mail WHERE sender = %u", data->target_guid.GetCounter());
-    charHolder->SetPQuery(PINFO_QUERY_GOLD_RECEIVED, "SELECT SUM(money) FROM mail WHERE receiver = %u", data->target_guid.GetCounter());
+    charHolder->SetPQuery(PINFO_QUERY_GOLD_SENT, "SELECT SUM(`money`) FROM `mail` WHERE `sender` = '%u'", data->target_guid.GetCounter());
+    charHolder->SetPQuery(PINFO_QUERY_GOLD_RECEIVED, "SELECT SUM(`money`) FROM `mail` WHERE `receiver` = '%u'", data->target_guid.GetCounter());
 
     CharacterDatabase.DelayQueryHolder(&PInfoHandler::HandleDelayedMoneyQuery, charHolder, data);
 }
@@ -121,7 +121,7 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
     // and print the result once it completes. We also read guild info
     // so this cannot be done in an async task
     LoginDatabase.AsyncPQueryUnsafe(&PInfoHandler::HandleAccountInfoResult, data,
-        "SELECT username,last_ip,last_login,locale,locked FROM account WHERE id = '%u'",
+        "SELECT `username`, `last_ip`, `last_login`, `locale`, `locked` FROM `account` WHERE `id` = '%u'",
         data->accId);
 }
 
@@ -518,7 +518,7 @@ void PlayerGoldRemovalHandler::HandleGoldLookupResult(QueryResult* result, uint3
         newMoney = prevMoney - removeAmount;
     // Wrap inside user serial or they might login while the query is in progress and all the gold is back
     CharacterDatabase.BeginTransaction(guidLow);
-    auto res = CharacterDatabase.PExecute("UPDATE characters SET money = %u WHERE guid = '%u'", newMoney, guidLow);
+    auto res = CharacterDatabase.PExecute("UPDATE `characters` SET `money` = '%u' WHERE `guid` = '%u'", newMoney, guidLow);
     CharacterDatabase.CommitTransaction();
 
     if (!res)
