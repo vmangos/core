@@ -49,7 +49,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (4545, 11, -5850.07, -3415.56, -50.9325, 100, 0, 0, 0);
 
 -- Gnome Pit Crewman should roam
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (21557, 21559, 21558, 21556, 21555, 21552, 21551, 21553, 21554);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` IN (21557, 21559, 21558, 21556, 21555, 21552, 21551, 21553, 21554);
 
 -- Kravel Koalbeard should kneel
 REPLACE INTO `creature_addon` (`guid`, `stand_state`) VALUES
