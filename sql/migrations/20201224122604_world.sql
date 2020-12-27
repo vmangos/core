@@ -114,6 +114,9 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (42895, 42898, 6, 3, 11);
 
+-- Glibb should roam and set correct scale
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 42754;
+
 
 -- End of migration.
 END IF;
