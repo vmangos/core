@@ -23,8 +23,6 @@ enum
     NPC_BARON                   = 10440,
     NPC_YSIDA_TRIGGER           = 16100,
     NPC_TIMMY                   = 10808,
-    NPC_AURIUS_1                = 10917,
-    NPC_AURIUS_2                = 10931,
     NPC_DATHROHAN               = 10812,
     NPC_MAGISTRATE              = 10435,
 
@@ -36,9 +34,6 @@ enum
     NPC_PLAGUED_RAT             = 10441,
     NPC_PLAGUED_INSECT          = 10461,
     NPC_PLAGUED_MAGGOT          = 10536,
-
-    QUEST_AURIUSRECKONING       = 5125,
-    QUEST_THEMEDALLIONOFFAITH   = 5122,
 
     RIVENDARE_YELL_45MIN        = -1000020,
     RIVENDARE_YELL_10MIN        = -1000021,
@@ -100,9 +95,7 @@ struct instance_stratholme : public ScriptedInstance
     uint64 m_uiTimmyGUID;
     uint64 m_uiYsidaTriggerGUID;
     uint64 m_uiYsidaGUID;
-    uint64 m_uiAuriusGUID;
     uint64 m_uiRamsteinGUID;
-    uint64 m_uiQuestPlayerGUID;
     uint64 m_uiDathrohanGUID;
     std::set<uint64> crystalsGUID;
     std::set<uint64> abomnationGUID;
@@ -146,9 +139,7 @@ struct instance_stratholme : public ScriptedInstance
         m_uiBaronGUID = 0;
         m_uiYsidaTriggerGUID = 0;
         m_uiYsidaGUID = 0;
-        m_uiAuriusGUID = 0;
         m_uiRamsteinGUID = 0;
-        m_uiQuestPlayerGUID = 0;
         m_uiDathrohanGUID = 0;
 
         crystalsGUID.clear();
@@ -229,9 +220,6 @@ struct instance_stratholme : public ScriptedInstance
                 break;
             case NPC_YSIDA:
                 m_uiYsidaGUID = pCreature->GetGUID();
-                break;
-            case NPC_AURIUS_1:
-                m_uiAuriusGUID = pCreature->GetGUID();
                 break;
             case NPC_CRYSTAL:
                 crystalsGUID.insert(pCreature->GetGUID());
@@ -364,25 +352,12 @@ struct instance_stratholme : public ScriptedInstance
                 return m_uiBaronGUID;
             case DATA_YSIDA_TRIGGER:
                 return m_uiYsidaTriggerGUID;
-            case DATA_AURIUS:
-                return m_uiAuriusGUID;
-            case DATA_QUESTPLAYER:
-                return m_uiQuestPlayerGUID;
             case NPC_DATHROHAN:
                 return m_uiDathrohanGUID;
         }
         return 0;
     }
 
-    void SetData64(uint32 uiType, uint64 uiData) override
-    {
-        switch (uiType)
-        {
-            case DATA_QUESTPLAYER:
-                m_uiQuestPlayerGUID = uiData;
-                break;
-        }
-    }
     void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
@@ -509,14 +484,6 @@ struct instance_stratholme : public ScriptedInstance
             {
                 if (uiData == IN_PROGRESS)
                 {
-                    if (GetData(TYPE_EVENT_AURIUS) == SPECIAL)
-                    {
-                        if (Player* pPlayer = instance->GetPlayer(GetData64(DATA_QUESTPLAYER)))
-                        {
-                            pPlayer->SummonCreature(NPC_AURIUS_2, 4045.71f, -3357.38f, 115.10f, 2.08f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1800000);
-                            SetData(TYPE_EVENT_AURIUS, IN_PROGRESS);
-                        }
-                    }
                     if (GameObject* pGob = instance->GetGameObject(m_uiZiggurat4GUID))
                         if (pGob->GetGoState() != GO_STATE_READY) // Si pas ferm�e
                             UpdateGoState(m_uiZiggurat4GUID, GO_STATE_READY, false);
