@@ -82,7 +82,7 @@ void GmTicket::SaveToDB() const
 {
     static SqlStatementID gmTicketSave;
 
-    SqlStatement stmt = CharacterDatabase.CreateStatement(gmTicketSave, "REPLACE INTO gm_tickets (ticketId, guid, name, message, createTime, mapId, posX, posY, posZ, lastModifiedTime, closedBy, assignedTo, comment, response, completed, escalated, viewed, haveTicket, ticketType, securityNeeded) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    SqlStatement stmt = CharacterDatabase.CreateStatement(gmTicketSave, "REPLACE INTO `gm_tickets` (`ticketId`, `guid`, `name`, `message`, `createTime`, `mapId`, `posX`, `posY`, `posZ`, `lastModifiedTime`, `closedBy`, `assignedTo`, `comment`, `response`, `completed`, `escalated`, `viewed`, `haveTicket`, `ticketType`, `securityNeeded`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     stmt.addUInt32(_id);
     stmt.addUInt32(_playerGuid.GetCounter());
     stmt.addString(_playerName);
@@ -109,7 +109,7 @@ void GmTicket::SaveToDB() const
 void GmTicket::DeleteFromDB()
 {
     static SqlStatementID delTicket;
-    SqlStatement stmt = CharacterDatabase.CreateStatement(delTicket, "DELETE FROM gm_tickets WHERE ticketId = ?");
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delTicket, "DELETE FROM `gm_tickets` WHERE `ticketId` = ?");
     stmt.addUInt32(_id);
     stmt.Execute();
 }
@@ -306,10 +306,10 @@ void TicketMgr::ResetTickets()
 
     _lastTicketId = 0;
 
-    CharacterDatabase.Execute("TRUNCATE TABLE gm_tickets");
+    CharacterDatabase.Execute("TRUNCATE TABLE `gm_tickets`");
 }
 
-#define TICKET_TABLE_FIELDS "ticketId, guid, name, message, createTime, mapId, posX, posY, posZ, lastModifiedTime, closedBy, assignedTo, comment, response, completed, escalated, viewed, haveTicket, ticketType, securityNeeded"
+#define TICKET_TABLE_FIELDS "`ticketId`, `guid`, `name`, `message`, `createTime`, `mapId`, `posX`, `posY`, `posZ`, `lastModifiedTime`, `closedBy`, `assignedTo`, `comment`, `response`, `completed`, `escalated`, `viewed`, `haveTicket`, `ticketType`, `securityNeeded`"
 
 void TicketMgr::LoadTickets()
 {
@@ -322,7 +322,7 @@ void TicketMgr::LoadTickets()
     _lastTicketId = 0;
     _openTicketCount = 0;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT " TICKET_TABLE_FIELDS " FROM gm_tickets");
+    QueryResult* result = CharacterDatabase.Query("SELECT " TICKET_TABLE_FIELDS " FROM `gm_tickets`");
     if (!result)
     {
         sLog.outString(">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
@@ -361,7 +361,7 @@ void TicketMgr::LoadSurveys()
     _lastSurveyId = 0;
 
     uint32 oldMSTime = WorldTimer::getMSTime();
-    if (QueryResult* result = CharacterDatabase.Query("SELECT MAX(surveyId) FROM gm_surveys"))
+    if (QueryResult* result = CharacterDatabase.Query("SELECT MAX(`surveyId`) FROM `gm_surveys`"))
     {
         _lastSurveyId = (*result)[0].GetUInt32();
         delete result;
@@ -476,5 +476,5 @@ void TicketMgr::ReloadTicket(uint32 ticketId)
     if (_reloadTicketsSet.find(ticketId) != _reloadTicketsSet.end())
         return;
     _reloadTicketsSet.insert(ticketId);
-    CharacterDatabase.AsyncPQueryUnsafe(this, &TicketMgr::ReloadTicketCallback, "SELECT " TICKET_TABLE_FIELDS " FROM gm_tickets WHERE ticketId = '%u'", ticketId);
+    CharacterDatabase.AsyncPQueryUnsafe(this, &TicketMgr::ReloadTicketCallback, "SELECT " TICKET_TABLE_FIELDS " FROM `gm_tickets` WHERE `ticketId` = '%u'", ticketId);
 }
