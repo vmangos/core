@@ -187,6 +187,7 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 
 -- Glibb should roam and set correct scale
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 42754;
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 15172;
 
 
 -- End of migration.
