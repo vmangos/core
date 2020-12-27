@@ -105,6 +105,16 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 12, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 'Bloodpetal Pest - Set Move type');
 
 
+-- Silithus
+-- Correct Cenarion Hold Infantry Patrols
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(42897, 60006, 6, 3, 11);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(42898, 15184, 0, 0, 0, 1, -6813.65, 726.728, 40.185, 1.99952, 600, 600, 0, 100, 0, 2, 0, 0, 6, 10);
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(42895, 42898, 6, 3, 11);
+
+
 -- End of migration.
 END IF;
 END??
