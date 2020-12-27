@@ -363,6 +363,7 @@ enum eMoveToCoordinateTypes
     SO_MOVETO_COORDINATES_NORMAL               = 0,
     SO_MOVETO_COORDINATES_RELATIVE_TO_TARGET   = 1,            // Coordinates are added to that of target.
     SO_MOVETO_COORDINATES_DISTANCE_FROM_TARGET = 2,            // X is distance from target, others not used.
+    SO_MOVETO_COORDINATES_RANDOM_POINT         = 3,            // O is max distance from coordinates
 
     MOVETO_COORDINATES_MAX
 };

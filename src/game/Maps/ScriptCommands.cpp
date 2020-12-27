@@ -124,34 +124,44 @@ bool Map::ScriptCommand_MoveTo(ScriptInfo const& script, WorldObject* source, Wo
     float y = script.y;
     float z = script.z;
 
-    if (script.moveTo.coordinatesType)
+    switch (script.moveTo.coordinatesType)
     {
-        if (WorldObject* pTarget = target)
+        case SO_MOVETO_COORDINATES_RELATIVE_TO_TARGET:
         {
-            switch (script.moveTo.coordinatesType)
+            if (WorldObject* pTarget = target)
             {
-                case SO_MOVETO_COORDINATES_RELATIVE_TO_TARGET:
-                {
-                    // Coordinates are added to those of the target.
-                    x += pTarget->GetPositionX();
-                    y += pTarget->GetPositionY();
-                    z += pTarget->GetPositionZ();
-                    break;
-                }
-                case SO_MOVETO_COORDINATES_DISTANCE_FROM_TARGET:
-                {
-                    // X is distance from the target.
-                    float distance = x;
-                    float angle = script.o < 0.0f ? pTarget->GetAngle(pSource) : frand(0, 2 * M_PI_F);
-                    pTarget->GetNearPoint(pSource, x, y, z, 0, distance, angle);
-                    break;
-                }
+                // Coordinates are added to those of the target.
+                x += pTarget->GetPositionX();
+                y += pTarget->GetPositionY();
+                z += pTarget->GetPositionZ();
             }
+            else
+            {
+                sLog.outError("SCRIPT_COMMAND_MOVE_TO (script id %u) call with datalong = %u for a nullptr or non-worldobject target, skipping.", script.id, script.moveTo.coordinatesType);
+                return ShouldAbortScript(script);
+            }
+            break;
         }
-        else
+        case SO_MOVETO_COORDINATES_DISTANCE_FROM_TARGET:
         {
-            sLog.outError("SCRIPT_COMMAND_MOVE_TO (script id %u) call with datalong = %u for a nullptr or non-worldobject target, skipping.", script.id, script.moveTo.coordinatesType);
-            return ShouldAbortScript(script);
+            if (WorldObject* pTarget = target)
+            {
+                // X is distance from the target.
+                float distance = x;
+                float angle = script.o < 0.0f ? pTarget->GetAngle(pSource) : frand(0, 2 * M_PI_F);
+                pTarget->GetNearPoint(pSource, x, y, z, 0, distance, angle);
+            }
+            else
+            {
+                sLog.outError("SCRIPT_COMMAND_MOVE_TO (script id %u) call with datalong = %u for a nullptr or non-worldobject target, skipping.", script.id, script.moveTo.coordinatesType);
+                return ShouldAbortScript(script);
+            }
+            break;
+        }
+        case SO_MOVETO_COORDINATES_RANDOM_POINT:
+        {
+            pSource->GetRandomPoint(x, y, z, script.o, x, y, z);
+            break;
         }
     }
 
@@ -161,6 +171,10 @@ bool Map::ScriptCommand_MoveTo(ScriptInfo const& script, WorldObject* source, Wo
 
     float speed = script.moveTo.travelTime != 0 ? pSource->GetDistance(x, y, z) / ((float)script.moveTo.travelTime * 0.001f) : 0.0f;
     float orientation = script.o > 0.0f ? script.o : -10.0f;
+
+    // o is distance in this case
+    if (script.moveTo.coordinatesType == SO_MOVETO_COORDINATES_RANDOM_POINT)
+        orientation = -10.0f;
 
     if (script.moveTo.flags & SF_MOVETO_POINT_MOVEGEN)
         pSource->GetMotionMaster()->MovePoint(script.moveTo.pointId, x, y, z, script.moveTo.movementOptions, speed, orientation);
