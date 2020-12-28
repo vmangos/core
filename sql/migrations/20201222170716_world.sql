@@ -130,6 +130,10 @@ DELETE FROM `npc_vendor` WHERE `entry` = 15179 AND `item` = 18256;
 -- rune thread - mishta
 DELETE FROM `npc_vendor` WHERE `entry` = 15179 AND `item` = 14341;
 
+-- Gubber Blump should be selling fishing poles and baits permanently https://classic.wowhead.com/npc=10216/gubber-blump#sells
+UPDATE `npc_vendor` SET `maxcount`='0', `incrtime`='0' WHERE (`entry`='10216') AND (`item`='6256');
+UPDATE `npc_vendor` SET `maxcount`='0', `incrtime`='0' WHERE (`entry`='10216') AND (`item`='6529');
+
 
 -- End of migration.
 END IF;
