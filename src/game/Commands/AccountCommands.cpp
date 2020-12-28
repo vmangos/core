@@ -553,7 +553,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     } while (result->NextRow());
 
     delete result;
-    if (result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `account` IN (`%s`) AND `level` > '%u' GROUP BY `account`", allAccounts.str().c_str(), maxLevel))
+    if (result = CharacterDatabase.PQuery("SELECT `account` FROM `characters` WHERE `account` IN '%s' AND `level` > '%u' GROUP BY `account`", allAccounts.str().c_str(), maxLevel))
     {
         do
         {
