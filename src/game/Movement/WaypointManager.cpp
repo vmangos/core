@@ -401,49 +401,49 @@ void WaypointManager::Load()
 void WaypointManager::Cleanup()
 {
     // check if points need to be renumbered and do it
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 FROM `creature_movement` AS `T` WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = `T`.`id` AND `point` <= `T`.`point`) LIMIT 1"))
     {
         delete result;
-        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement");
-        WorldDatabase.DirectExecute("INSERT INTO temp SELECT * FROM creature_movement");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement DROP PRIMARY KEY");
-        WorldDatabase.DirectExecute("UPDATE creature_movement AS T SET point = (SELECT COUNT(*) FROM temp WHERE id = T.id AND point <= T.point)");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement ADD PRIMARY KEY (id, point)");
-        WorldDatabase.DirectExecute("DROP TABLE temp");
+        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement`");
+        WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement`");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement` DROP PRIMARY KEY");
+        WorldDatabase.DirectExecute("UPDATE `creature_movement` AS `T` SET `point` = (SELECT COUNT(*) FROM `temp` WHERE `id` = `T`.`id` AND point <= `T`.`point`)");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement` ADD PRIMARY KEY (`id`, `point`)");
+        WorldDatabase.DirectExecute("DROP TABLE `temp`");
 
         sLog.outErrorDb("Table `creature_movement` was auto corrected for using points out of order (invalid or points missing)");
 
-        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 FROM `creature_movement` AS `T` WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = `T`.`id` AND `point` <= `T`.`point`) LIMIT 1")));
     }
 
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 FROM `creature_movement_template` AS `T` WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = `T`.`entry` AND `point` <= `T`.`point`) LIMIT 1"))
     {
         delete result;
-        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement_template");
-        WorldDatabase.DirectExecute("INSERT INTO temp SELECT * FROM creature_movement_template");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_template DROP PRIMARY KEY");
-        WorldDatabase.DirectExecute("UPDATE creature_movement_template AS T SET point = (SELECT COUNT(*) FROM temp WHERE entry = T.entry AND point <= T.point)");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_template ADD PRIMARY KEY (entry, point)");
-        WorldDatabase.DirectExecute("DROP TABLE temp");
+        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement_template`");
+        WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement_template`");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_template` DROP PRIMARY KEY");
+        WorldDatabase.DirectExecute("UPDATE `creature_movement_template` AS `T` SET `point` = (SELECT COUNT(*) FROM `temp` WHERE `entry` = `T`.`entry` AND `point` <= `T`.`point`)");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_template` ADD PRIMARY KEY (`entry`, `point`)");
+        WorldDatabase.DirectExecute("DROP TABLE `temp`");
 
         sLog.outErrorDb("Table `creature_movement_template` was auto corrected for using points out of order (invalid or points missing)");
 
-        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 FROM `creature_movement_template` AS `T` WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = `T`.`entry` AND `point` <= `T`.`point`) LIMIT 1")));
     }
 
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement_special As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_special WHERE id = T.id AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 FROM `creature_movement_special` AS `T` WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_special` WHERE `id` = `T`.`id` AND `point` <= `T`.`point`) LIMIT 1"))
     {
         delete result;
-        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement_special");
-        WorldDatabase.DirectExecute("INSERT INTO temp SELECT * FROM creature_movement_special");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_special DROP PRIMARY KEY");
-        WorldDatabase.DirectExecute("UPDATE creature_movement_special AS T SET point = (SELECT COUNT(*) FROM temp WHERE id = T.id AND point <= T.point)");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_special ADD PRIMARY KEY (id, point)");
+        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement_special`");
+        WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement_special`");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_special` DROP PRIMARY KEY");
+        WorldDatabase.DirectExecute("UPDATE `creature_movement_special` AS `T` SET `point` = (SELECT COUNT(*) FROM `temp` WHERE `id` = `T`.`id` AND `point` <= `T`.`point`)");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_special` ADD PRIMARY KEY (`id`, `point`)");
         WorldDatabase.DirectExecute("DROP TABLE temp");
 
         sLog.outErrorDb("Table `creature_movement_special` was auto corrected for using points out of order (invalid or points missing)");
 
-        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_special As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_special WHERE id = T.id AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 FROM `creature_movement_special` AS `T` WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_special` WHERE `id` = `T`.`id` AND `point` <= `T`.`point`) LIMIT 1")));
     }
 }
 
@@ -508,10 +508,10 @@ WaypointNode const* WaypointManager::AddNode(uint32 entry, uint32 dbGuid, uint32
     for (WaypointPath::reverse_iterator rItr = path.rbegin(); rItr != path.rend() && rItr->first > pointId; ++rItr)
     {
         if (rItr->first <= nextPoint)
-            WorldDatabase.PExecuteLog("UPDATE %s SET point=point+1 WHERE %s=%u AND point=%u", table, key_field, keydb, rItr->first - 1);
+            WorldDatabase.PExecuteLog("UPDATE `%s` SET `point`=`point+1` WHERE `%s`=%u AND `point`=%u", table, key_field, keydb, rItr->first - 1);
     }
     // Insert new Point to database
-    WorldDatabase.PExecuteLog("INSERT INTO %s (%s,point,position_x,position_y,position_z,orientation) VALUES (%u,%u, %f,%f,%f, 100)", table, key_field, keydb, pointId+1, x, y, z);
+    WorldDatabase.PExecuteLog("INSERT INTO `%s` (`%s`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (%u,%u, %f,%f,%f, 100)", table, key_field, keydb, pointId+1, x, y, z);
 
     return &path[pointId];
 }
@@ -529,14 +529,14 @@ void WaypointManager::DeleteNode(uint32 entry, uint32 dbGuid, uint32 point, int3
     char const* const table = wpOrigin == PATH_FROM_GUID ? "creature_movement" : "creature_movement_template";
     char const* const key_field = wpOrigin == PATH_FROM_GUID ? "id" : "entry";
     uint32 const key = wpOrigin == PATH_FROM_GUID ? dbGuid : entry;
-    WorldDatabase.PExecuteLog("DELETE FROM %s WHERE %s=%u AND point=%u", table, key_field, key, point+1);
+    WorldDatabase.PExecuteLog("DELETE FROM `%s` WHERE `%s`=%u AND `point`=%u", table, key_field, key, point+1);
 
     path->erase(point);
 }
 
 void WaypointManager::DeletePath(uint32 id)
 {
-    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id=%u", id);
+    WorldDatabase.PExecuteLog("DELETE FROM `creature_movement` WHERE `id`=%u", id);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if (itr != m_pathMap.end())
         _clearPath(itr->second);
@@ -563,7 +563,7 @@ void WaypointManager::SetNodePosition(uint32 entry, uint32 dbGuid, uint32 point,
     char const* const table = wpOrigin == PATH_FROM_GUID ? "creature_movement" : "creature_movement_template";
     char const* const key_field = wpOrigin == PATH_FROM_GUID ? "id" : "entry";
     uint32 const key = wpOrigin == PATH_FROM_GUID ? dbGuid : entry;
-    WorldDatabase.PExecuteLog("UPDATE %s SET position_x=%f, position_y=%f, position_z=%f WHERE %s=%u AND point=%u", table, x, y, z, key_field, key, point+1);
+    WorldDatabase.PExecuteLog("UPDATE `%s` SET `position_x`=%f, `position_y`=%f, `position_z`=%f WHERE `%s`=%u AND `point`=%u", table, x, y, z, key_field, key, point+1);
 
     WaypointPath::iterator find = path->find(point);
     if (find != path->end())
@@ -587,7 +587,7 @@ void WaypointManager::SetNodeWaittime(uint32 entry, uint32 dbGuid, uint32 point,
     char const* const table = wpOrigin == PATH_FROM_GUID ? "creature_movement" : "creature_movement_template";
     char const* const key_field = wpOrigin == PATH_FROM_GUID ? "id" : "entry";
     uint32 const key = wpOrigin == PATH_FROM_GUID ? dbGuid : entry;
-    WorldDatabase.PExecuteLog("UPDATE %s SET waittime=%u WHERE %s=%u AND point=%u", table, waittime, key_field, key, point+1);
+    WorldDatabase.PExecuteLog("UPDATE `%s` SET `waittime`=%u WHERE `%s`=%u AND `point`=%u", table, waittime, key_field, key, point+1);
 
     WaypointPath::iterator find = path->find(point);
     if (find != path->end())
@@ -607,7 +607,7 @@ void WaypointManager::SetNodeOrientation(uint32 entry, uint32 dbGuid, uint32 poi
     char const* const table = wpOrigin == PATH_FROM_GUID ? "creature_movement" : "creature_movement_template";
     char const* const key_field = wpOrigin == PATH_FROM_GUID ? "id" : "entry";
     uint32 const key = wpOrigin == PATH_FROM_GUID ? dbGuid : entry;
-    WorldDatabase.PExecuteLog("UPDATE %s SET orientation=%f WHERE %s=%u AND point=%u", table, orientation, key_field, key, point+1);
+    WorldDatabase.PExecuteLog("UPDATE `%s` SET `orientation`=%f WHERE `%s`=%u AND `point`=%u", table, orientation, key_field, key, point+1);
 
     WaypointPath::iterator find = path->find(point);
     if (find != path->end())
@@ -628,7 +628,7 @@ bool WaypointManager::SetNodeScriptId(uint32 entry, uint32 dbGuid, uint32 point,
     char const* const table = wpOrigin == PATH_FROM_GUID ? "creature_movement" : "creature_movement_template";
     char const* const key_field = wpOrigin == PATH_FROM_GUID ? "id" : "entry";
     uint32 const key = wpOrigin == PATH_FROM_GUID ? dbGuid : entry;
-    WorldDatabase.PExecuteLog("UPDATE %s SET script_id=%u WHERE %s=%u AND point=%u", table, scriptId, key_field, key, point+1);
+    WorldDatabase.PExecuteLog("UPDATE `%s` SET `script_id`=%u WHERE `%s`=%u AND `point`=%u", table, scriptId, key_field, key, point+1);
 
     WaypointPath::iterator find = path->find(point);
     if (find != path->end())

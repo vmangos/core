@@ -1620,7 +1620,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
                 wpDestination = PATH_FROM_ENTRY;                // Default place to store paths
                 if (wpOwner->HasStaticDBSpawnData())
                 {
-                    QueryResult* result = WorldDatabase.PQuery("SELECT COUNT(id) FROM creature WHERE id = %u", wpOwner->GetEntry());
+                    QueryResult* result = WorldDatabase.PQuery("SELECT COUNT(`id`) FROM `creature` WHERE `id` = %u", wpOwner->GetEntry());
                     if (result && result->Fetch()[0].GetUInt32() != 1)
                         wpDestination = PATH_FROM_GUID;
                     delete result;
@@ -2241,8 +2241,8 @@ bool ChatHandler::HandleWpExportCommand(char* args)
             return false;
     }
 
-    outfile << "DELETE FROM " << table << " WHERE " << key_field << "=" << key << ";\n";
-    outfile << "INSERT INTO " << table << " (" << key_field << ", point, position_x, position_y, position_z, orientation, waittime, script_id) VALUES\n";
+    outfile << "DELETE FROM `" << table << "` WHERE " << key_field << " = " << key << ";\n";
+    outfile << "INSERT INTO `" << table << "` (" << key_field << ", `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES\n";
 
     WaypointPath::const_iterator itr = wpPath->begin();
     uint32 countDown = wpPath->size();
@@ -2337,7 +2337,7 @@ bool ChatHandler::HandleEscortHideWpCommand(char* /*args*/)
 
     auto map = m_session->GetPlayer()->GetMap();
 
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u AND map=%u", VISUAL_WAYPOINT, map->GetId()));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `guid` FROM `creature` WHERE `id`=%u AND `map`=%u", VISUAL_WAYPOINT, map->GetId()));
     if (!result)
     {
         SendSysMessage(LANG_WAYPOINT_VP_NOTFOUND);
@@ -2353,7 +2353,7 @@ bool ChatHandler::HandleEscortHideWpCommand(char* /*args*/)
         if (!pCreature)
         {
             hasError = true;
-            WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", wpGuid);
+            WorldDatabase.PExecuteLog("DELETE FROM `creature` WHERE `guid`=%u", wpGuid);
         }
         else
         {
@@ -2398,21 +2398,21 @@ bool ChatHandler::HandleEscortAddWpCommand(char *args)
     Field* pFields       = nullptr;
     if (waypointId == 0)
     {
-        pResult = WorldDatabase.PQuery("SELECT MAX(pointid) FROM script_waypoint WHERE entry=%u", creatureEntry);
+        pResult = WorldDatabase.PQuery("SELECT MAX(`pointid`) FROM `script_waypoint` WHERE `entry`=%u", creatureEntry);
         if (pResult)
         {
             pFields = pResult->Fetch();
             waypointId = pFields[0].GetUInt32() + 1;
         }
     }
-    WorldDatabase.PExecute("DELETE FROM script_waypoint WHERE entry=%u AND pointid=%u", creatureEntry, waypointId);
-    WorldDatabase.PExecute("INSERT INTO script_waypoint SET "
-                           "entry=%u, "
-                           "pointid=%u, "
-                           "location_x=%f, "
-                           "location_y=%f, "
-                           "location_z=%f, "
-                           "waittime=%u; ",
+    WorldDatabase.PExecute("DELETE FROM `script_waypoint` WHERE `entry`=%u AND `pointid`=%u", creatureEntry, waypointId);
+    WorldDatabase.PExecute("INSERT INTO `script_waypoint` SET "
+                           "`entry`=%u, "
+                           "`pointid`=%u, "
+                           "`location_x`=%f, "
+                           "`location_y`=%f, "
+                           "`location_z`=%f, "
+                           "`waittime`=%u; ",
                            creatureEntry, waypointId,
                            finiteAlways(pPlayer->GetPositionX()), finiteAlways(pPlayer->GetPositionY()), finiteAlways(pPlayer->GetPositionZ()),
                            waittime);
@@ -2435,9 +2435,9 @@ bool ChatHandler::HandleEscortModifyWpCommand(char *args)
     }
     Player* pPlayer = m_session->GetPlayer();
 
-    WorldDatabase.PExecute("UPDATE script_waypoint "
-                           "SET location_x=%f, location_y=%f, location_z=%f, waittime=%u"
-                           "WHERE entry=%u AND pointid=%u",
+    WorldDatabase.PExecute("UPDATE `script_waypoint` "
+                           "SET `location_x`=%f, `location_y`=%f, `location_z`=%f, `waittime`=%u"
+                           "WHERE `entry`=%u AND `pointid`=%u",
                            finiteAlways(pPlayer->GetPositionX()), finiteAlways(pPlayer->GetPositionY()), finiteAlways(pPlayer->GetPositionZ()), newWaitTime,
                            creatureEntry, waypointId);
     SendSysMessage("Waypoint modified.");
@@ -2460,8 +2460,8 @@ bool ChatHandler::HandleEscortCreateCommand(char *args)
         return false;
     }
 
-    WorldDatabase.PExecute("DELETE FROM script_escort_data WHERE creature_id=%u", creatureEntry);
-    WorldDatabase.PExecute("INSERT INTO script_escort_data (creature_id, quest, escort_faction) VALUES "
+    WorldDatabase.PExecute("DELETE FROM `script_escort_data` WHERE `creature_id`=%u", creatureEntry);
+    WorldDatabase.PExecute("INSERT INTO `script_escort_data` (`creature_id`, `quest`, `escort_faction`) VALUES "
                            "(%u, %u, %u)",
                            creatureEntry, questEntry, faction
                           );
@@ -2481,7 +2481,7 @@ bool ChatHandler::HandleEscortClearWpCommand(char *args)
         SetSentErrorMessage(true);
         return false;
     }
-    WorldDatabase.PExecute("DELETE FROM script_waypoint WHERE creature_id=%u", creatureEntry);
+    WorldDatabase.PExecute("DELETE FROM `script_waypoint` WHERE `creature_id`=%u", creatureEntry);
     PSendSysMessage("All script_waypoint entries for creature %u have been removed.", creatureEntry);
     return true;
 }

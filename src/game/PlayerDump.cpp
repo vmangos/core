@@ -340,7 +340,7 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
         else                                                // not set case, get single guid string
             wherestr = GenerateWhereStr(fieldname, guid);
 
-        QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM %s WHERE %s", tableFrom, wherestr.c_str());
+        QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM `%s` WHERE `%s`", tableFrom, wherestr.c_str());
         if (!result)
             return;
 
@@ -388,7 +388,7 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     dump += "IMPORTANT NOTE: NOT APPLY ITS DIRECTLY to character DB or you will DAMAGE and CORRUPT character DB\n\n";
 
     // revision check guard
-    QueryNamedResult* result = CharacterDatabase.QueryNamed("SELECT * FROM character_db_version LIMIT 1");
+    QueryNamedResult* result = CharacterDatabase.QueryNamed("SELECT * FROM `character_db_version` LIMIT 1");
     if (result)
     {
         QueryFieldNames const& namesMap = result->GetFieldNames();
@@ -405,7 +405,7 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
         if (!reqName.empty())
         {
             // this will fail at wrong character DB version
-            dump += "UPDATE character_db_version SET " + reqName + " = 1 WHERE FALSE;\n\n";
+            dump += "UPDATE `character_db_version` SET " + reqName + " = 1 WHERE FALSE;\n\n";
         }
         else
             sLog.outError("Table 'character_db_version' not have revision guard field, revision guard query not added to pdump.");
@@ -458,7 +458,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     bool incHighest = true;
     if (guid != 0 && guid < sObjectMgr.m_CharGuids.GetNextAfterMaxUsed())
     {
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE guid = '%u'", guid);
+        result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `guid` = '%u'", guid);
         if (result)
         {
             guid = sObjectMgr.m_CharGuids.GetNextAfterMaxUsed();
@@ -476,7 +476,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
         CharacterDatabase.escape_string(name);              // for safe, we use name only for sql quearies anyway
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
+        result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `name` = '%s'", name.c_str());
         if (result)
         {
             name.clear();                                      // use the one from the dump
@@ -524,7 +524,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
             continue;
 
         // add required_ check
-        if (line.substr(nw_pos, 41) == "UPDATE character_db_version SET required_")
+        if (line.substr(nw_pos, 41) == "UPDATE `character_db_version` SET `required_`")
         {
             if (!CharacterDatabase.Execute(line.c_str()))
                 ROLLBACK(DUMP_FILE_BROKEN);
@@ -579,7 +579,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                     name = getnth(line, 3);                 // characters.name
                     CharacterDatabase.escape_string(name);
 
-                    result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
+                    result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `name` = '%s'", name.c_str());
                     if (result)
                     {
                         delete result;
