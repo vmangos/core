@@ -273,8 +273,8 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventCreatureGuids.resize(mGameEvent.size() * 2 - 1);
     //                                   1              2
-    result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.event "
-                                 "FROM creature JOIN game_event_creature ON creature.guid = game_event_creature.guid");
+    result = WorldDatabase.Query("SELECT `creature`.`guid`, `game_event_creature`.`event` "
+                                 "FROM `creature` JOIN `game_event_creature` ON `creature`.`guid` = `game_event_creature`.`guid`");
 
     count = 0;
     if (!result)
@@ -358,8 +358,8 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventGameobjectGuids.resize(mGameEvent.size() * 2 - 1);
     //                                   1                2
-    result = WorldDatabase.Query("SELECT gameobject.guid, game_event_gameobject.event "
-                                 "FROM gameobject JOIN game_event_gameobject ON gameobject.guid=game_event_gameobject.guid");
+    result = WorldDatabase.Query("SELECT `gameobject`.`guid`, `game_event_gameobject`.`event` "
+                                 "FROM `gameobject` JOIN `game_event_gameobject` ON `gameobject`.`guid`=`game_event_gameobject`.`guid`");
 
     count = 0;
     if (!result)
@@ -446,12 +446,12 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventCreatureData.resize(mGameEvent.size());
     //                                   0              1                             2
-    result = WorldDatabase.Query("SELECT creature.guid, game_event_creature_data.event, game_event_creature_data.display_id,"
+    result = WorldDatabase.Query("SELECT `creature`.`guid`, `game_event_creature_data`.`event`, `game_event_creature_data`.`display_id`,"
                                  //   3                                      4
-                                 "game_event_creature_data.equipment_id, game_event_creature_data.entry_id, "
+                                 "`game_event_creature_data`.`equipment_id`, `game_event_creature_data`.`entry_id`, "
                                  //   5                                     6
-                                 "game_event_creature_data.spell_start, game_event_creature_data.spell_end "
-                                 "FROM creature JOIN game_event_creature_data ON creature.guid=game_event_creature_data.guid");
+                                 "`game_event_creature_data`.`spell_start`, `game_event_creature_data`.`spell_end` "
+                                 "FROM `creature` JOIN `game_event_creature_data` ON `creature`.`guid`=`game_event_creature_data`.`guid`");
 
     count = 0;
     if (!result)

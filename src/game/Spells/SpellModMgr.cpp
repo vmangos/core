@@ -70,12 +70,12 @@ void SpellModMgr::LoadSpellMods()
 
     // 1 : Table spell_mod
     std::unique_ptr<QueryResult> result(WorldDatabase.Query(
-                              "SELECT Id, procChance, procFlags, Custom, DurationIndex, "
-                              "Category, CastingTimeIndex, StackAmount, SpellIconID, activeIconID, manaCost, "
-                              "Attributes, AttributesEx, AttributesEx2, AttributesEx3, AttributesEx4, "
-                              "InterruptFlags, AuraInterruptFlags, ChannelInterruptFlags, Dispel, "
-                              "Stances, StancesNot, SpellVisual, ManaCostPercentage, StartRecoveryCategory, StartRecoveryTime, MaxTargetLevel, MaxAffectedTargets, DmgClass, "
-                              "rangeIndex, RecoveryTime, CategoryRecoveryTime, procCharges, SpellFamilyName, SpellFamilyFlags, Mechanic, EquippedItemClass "
+                              "SELECT `Id`, `procChance`, `procFlags`, `Custom`, `DurationIndex`, "
+                              "`Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, "
+                              "`Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, "
+                              "`InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, "
+                              "`Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxTargetLevel`, `MaxAffectedTargets`, `DmgClass`, "
+                              "`rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `procCharges`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass` "
                               "FROM spell_mod"));
     uint32 total_count = 0;
     if (!result)
@@ -190,11 +190,11 @@ void SpellModMgr::LoadSpellMods()
     // 2 : Table spell_effect_mod
     sLog.outString("Loading spell effect mods ...");
     result.reset(WorldDatabase.Query(
-                 "SELECT Id, EffectIndex, Effect, EffectApplyAuraName, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB, "
-                 "EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell, "
-                 "EffectDieSides, EffectBaseDice, EffectBasePoints, EffectAmplitude, EffectChainTarget, " // Int
-                 "EffectDicePerLevel, EffectRealPointsPerLevel, EffectPointsPerComboPoint, EffectMultipleValue " // Float
-                 "FROM spell_effect_mod"
+                 "SELECT `Id`, `EffectIndex`, `Effect`, `EffectApplyAuraName`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, "
+                 "`EffectRadiusIndex`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, "
+                 "`EffectDieSides`, `EffectBaseDice`, `EffectBasePoints`, `EffectAmplitude`, `EffectChainTarget`, " // Int
+                 "`EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectPointsPerComboPoint`, `EffectMultipleValue` " // Float
+                 "FROM `spell_effect_mod`"
                 ));
     total_count = 0;
 

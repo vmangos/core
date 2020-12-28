@@ -351,7 +351,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
             item->DeleteFromInventoryDB();                  // deletes item from character's inventory
             item->SaveToDB();                               // recursive and not have transaction guard into self, item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
-            CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'", req->receiver.GetCounter(), item->GetGUIDLow());
+            CharacterDatabase.PExecute("UPDATE `item_instance` SET `owner_guid` = '%u' WHERE `guid`='%u'", req->receiver.GetCounter(), item->GetGUIDLow());
             CharacterDatabase.CommitTransaction();
 
             draft.AddItem(item);
