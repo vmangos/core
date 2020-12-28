@@ -1771,12 +1771,12 @@ void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
     sObjectMgr.DeleteCreatureData(lowguid);
 
     WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", lowguid);
-    WorldDatabase.PExecuteLog("DELETE FROM creature_addon WHERE guid=%u", lowguid);
-    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id=%u", lowguid);
-    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature WHERE guid=%u", lowguid);
-    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature_data WHERE guid=%u", lowguid);
-    WorldDatabase.PExecuteLog("DELETE FROM creature_battleground WHERE guid=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM `creature` WHERE `guid`=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM `creature_addon` WHERE `guid`=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM `creature_movement` WHERE `id`=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM `game_event_creature` WHERE `guid`=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM `game_event_creature_data` WHERE `guid`=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM `creature_battleground` WHERE `guid`=%u", lowguid);
     WorldDatabase.CommitTransaction();
 }
 
@@ -2562,7 +2562,7 @@ void Creature::LogDeath(Unit* pKiller) const
     }
 
     static SqlStatementID insLogDeath;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO smartlog_creature SET type=?, entry=?, guid=?, specifier=?, combatTime=?, content=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO `smartlog_creature` SET `type`=?, `entry`=?, `guid`=?, `specifier`=?, `combatTime`=?, `content`=?");
 
     logStmt.addString("Death");
     logStmt.addInt32(GetEntry());
@@ -2634,7 +2634,7 @@ void Creature::LogLongCombat() const
         return;
 
     static SqlStatementID insLogDeath;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO smartlog_creature SET type=?, entry=?, guid=?, specifier=?, combatTime=?, content=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO `smartlog_creature` SET `type`=?, `entry`=?, `guid`=?, `specifier`=?, `combatTime`=?, `content`=?");
 
     logStmt.addString("LongCombat");
     logStmt.addInt32(GetEntry());
@@ -2656,7 +2656,7 @@ void Creature::LogScriptInfo(std::ostringstream& data) const
         return;
 
     static SqlStatementID insLogDeath;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO smartlog_creature SET type=?, entry=?, guid=?, specifier=?, combatTime=?, content=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO `smartlog_creature` SET `type`=?, `entry`=?, `guid`=?, `specifier`=?, `combatTime`=?, `content`=?");
 
     logStmt.addString("ScriptInfo");
     logStmt.addInt32(GetEntry());

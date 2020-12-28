@@ -53,7 +53,7 @@ bool ChatHandler::HandleSpellIconFixCommand(char *args)
     uint32 spellId = ExtractSpellIdFromLink(&args);
     if (!spellId)
         return false;
-    WorldDatabase.PExecute("REPLACE INTO spell_mod SET SpellIconID=1, Comment='Fix SpellIconID', Id=%u;", spellId);
+    WorldDatabase.PExecute("REPLACE INTO `spell_mod` SET `SpellIconID`=1, `Comment`='Fix SpellIconID', `Id`=%u;", spellId);
     sSpellModMgr.LoadSpellMods();
     return true;
 }

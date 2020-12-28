@@ -375,7 +375,7 @@ void Petition::SaveToDB()
 {
     std::string escaped_name = m_name;
     CharacterDatabase.escape_string(escaped_name);
-    CharacterDatabase.PExecute("INSERT INTO petition (ownerguid, petitionguid, charterguid, name) VALUES ('%u', '%u', '%u', '%s')",
+    CharacterDatabase.PExecute("INSERT INTO `petition` (`ownerguid`, `petitionguid`, `charterguid`, `name`) VALUES ('%u', '%u', '%u', '%s')",
         m_ownerGuid.GetCounter(), m_id, m_charterGuid.GetCounter(), escaped_name.c_str());
 }
 
@@ -442,6 +442,6 @@ PetitionSignature::PetitionSignature(Petition* petition, Player* player)
 
 void PetitionSignature::SaveToDB()
 {
-    CharacterDatabase.PExecute("INSERT INTO petition_sign (ownerguid, petitionguid, playerguid, player_account) VALUES ('%u', '%u', '%u','%u')",
+    CharacterDatabase.PExecute("INSERT INTO `petition_sign` (`ownerguid`, `petitionguid`, `playerguid`, `player_account`) VALUES ('%u', '%u', '%u','%u')",
         m_petition->GetOwnerGuid().GetCounter(), m_petition->GetId(), m_playerGuid.GetCounter(), m_playerAccount);
 }
