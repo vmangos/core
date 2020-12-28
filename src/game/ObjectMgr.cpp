@@ -469,7 +469,7 @@ void ObjectMgr::LoadPlayerPhaseFromDb()
 {
     m_PlayerPhases.clear();
 
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT guid, world_phase_mask FROM characters"));
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `guid`, `world_phase_mask` FROM `characters`"));
 
     uint32 total_count = 0;
 

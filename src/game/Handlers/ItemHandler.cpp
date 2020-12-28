@@ -1231,7 +1231,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
     }
 
     CharacterDatabase.BeginTransaction(_player->GetGUIDLow());
-    CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", item->GetOwnerGuid().GetCounter(), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
+    CharacterDatabase.PExecute("INSERT INTO `character_gifts` VALUES ('%u', '%u', '%u', '%u')", item->GetOwnerGuid().GetCounter(), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
     item->SetEntry(gift->GetEntry());
 
     switch (item->GetEntry())

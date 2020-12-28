@@ -449,8 +449,8 @@ void ReputationMgr::SaveToDB()
     static SqlStatementID delRep ;
     static SqlStatementID insRep ;
 
-    SqlStatement stmtDel = CharacterDatabase.CreateStatement(delRep, "DELETE FROM character_reputation WHERE guid = ? AND faction=?");
-    SqlStatement stmtIns = CharacterDatabase.CreateStatement(insRep, "INSERT INTO character_reputation (guid,faction,standing,flags) VALUES (?, ?, ?, ?)");
+    SqlStatement stmtDel = CharacterDatabase.CreateStatement(delRep, "DELETE FROM `character_reputation` WHERE `guid` = ? AND `faction`=?");
+    SqlStatement stmtIns = CharacterDatabase.CreateStatement(insRep, "INSERT INTO `character_reputation` (`guid`, `faction`, `standing`, `flags`) VALUES (?, ?, ?, ?)");
 
     for (auto& itr : m_factions)
     {
