@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20201228205225');
 -- Add your query below.
 
 
--- remove gossip and questgiver flags from quest 97 
+-- remove gossip and questgiver flags from quest 997 
 DELETE FROM `quest_end_scripts` WHERE `id`=997;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (997, 0, 4, 147, 3, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Denalan - Modify Flags');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (997, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1239, 0, 0, 0, 0, 0, 0, 0, 0, 'Denalan - Talk');
