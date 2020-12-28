@@ -190,7 +190,7 @@ template<class DerivedLoader, class StorageClass>
 void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store, bool error_at_empty /*= true*/)
 {
     Field* fields = nullptr;
-    QueryResult* result  = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s", store.EntryFieldName(), store.GetTableName());
+    QueryResult* result  = WorldDatabase.PQuery("SELECT MAX(`%s`) FROM `%s`", store.EntryFieldName(), store.GetTableName());
     if (!result)
     {
         sLog.outError("Error loading %s table (not exist?)\n", store.GetTableName());
@@ -203,7 +203,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
     uint32 recordsize = 0;
     delete result;
 
-    result = WorldDatabase.PQuery("SELECT COUNT(*) FROM %s", store.GetTableName());
+    result = WorldDatabase.PQuery("SELECT COUNT(*) FROM `%s`", store.GetTableName());
     if (result)
     {
         fields = result->Fetch();
@@ -211,7 +211,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
         delete result;
     }
 
-    result = WorldDatabase.PQuery("SELECT * FROM %s", store.GetTableName());
+    result = WorldDatabase.PQuery("SELECT * FROM `%s`", store.GetTableName());
 
     if (!result)
     {
@@ -336,7 +336,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
 {
     // To be used on tables that need to support patch progression. Second column must be the `patch` column.
     Field* fields = nullptr;
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(%s) FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.EntryFieldName(), store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
+    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(`%s`) FROM `%s` t1 WHERE `%s`=(SELECT max(`%s`) FROM `%s` t2 WHERE t1.`%s`=t2.`%s` && `%s` <= %u)", store.EntryFieldName(), store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
     if (!result)
     {
         sLog.outError("Error loading %s table (not exist?)\n", store.GetTableName());
@@ -349,7 +349,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
     uint32 recordsize = 0;
     delete result;
 
-    result = WorldDatabase.PQuery("SELECT COUNT(*) FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
+    result = WorldDatabase.PQuery("SELECT COUNT(*) FROM `%s` t1 WHERE `%s`=(SELECT max(`%s`) FROM `%s` t2 WHERE t1.`%s`=t2.`%s` && `%s` <= %u)", store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
     if (result)
     {
         fields = result->Fetch();
@@ -357,7 +357,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageC
         delete result;
     }
 
-    result = WorldDatabase.PQuery("SELECT * FROM %s t1 WHERE %s=(SELECT max(%s) FROM %s t2 WHERE t1.%s=t2.%s && %s <= %u)", store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
+    result = WorldDatabase.PQuery("SELECT * FROM `%s` t1 WHERE `%s`=(SELECT max(`%s`) FROM `%s` t2 WHERE t1.`%s`=t2.`%s` && `%s` <= %u)", store.GetTableName(), column_name.c_str(), column_name.c_str(), store.GetTableName(), store.EntryFieldName(), store.EntryFieldName(), column_name.c_str(), wow_patch);
 
     if (!result)
     {

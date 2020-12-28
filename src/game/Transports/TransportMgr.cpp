@@ -47,7 +47,7 @@ void TransportMgr::LoadTransportTemplates()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    QueryResult* result = WorldDatabase.PQuery("SELECT entry FROM gameobject_template t1 WHERE ((type = 15) && (patch=(SELECT max(patch) FROM gameobject_template t2 WHERE t1.entry=t2.entry && patch <= %u))) ORDER BY entry ASC", sWorld.GetWowPatch());
+    QueryResult* result = WorldDatabase.PQuery("SELECT `entry` FROM `gameobject_template` t1 WHERE ((`type` = 15) && (`patch`=(SELECT max(`patch`) FROM `gameobject_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u))) ORDER BY `entry` ASC", sWorld.GetWowPatch());
 
     if (!result)
     {
@@ -391,7 +391,7 @@ void TransportMgr::SpawnContinentTransports()
 
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    QueryResult* result = WorldDatabase.Query("SELECT guid, entry FROM transports");
+    QueryResult* result = WorldDatabase.Query("SELECT `guid`, `entry` FROM `transports`");
 
     uint32 count = 0;
     if (result)
