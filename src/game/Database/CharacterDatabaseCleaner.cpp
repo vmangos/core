@@ -52,7 +52,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
 
 void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table, bool (*check)(uint32))
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT DISTINCT '%s' FROM '%s'", column, table);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT DISTINCT `%s` FROM `%s`", column, table);
     if (!result)
     {
         sLog.outString("Table %s is empty.", table);
