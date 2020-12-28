@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20200810160102');
 -- Add your query below.
 
 
--- partial correct waypoints for creature guid 49855
+-- waypoints for creature guid 49855
 DELETE FROM `creature_movement` WHERE `id` = 49855;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (49855, 1, 9761.1, 916.333, 1296.89, 100, 0, 0, 0),
@@ -52,16 +52,16 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (49855, 38, 9744.31, 946.046, 1293.16, 100, 0, 0, 0),
 (49855, 39, 9749.49, 928.846, 1295.62, 100, 0, 0, 0);
 
--- add waypoints to creature 48164 (done by eye data not available)
+-- waypoints to creature 48164
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 48164;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (48164, 1, 9817.79, 432.526, 1317.18, 100, 10000, 0, 0),
 (48164, 2, 9835.47, 438.116, 1317.18, 100, 10000, 0, 0);
 
--- move creature 49499 (done by eye data not available)
+-- move creature 49499
 UPDATE `creature` SET `position_x` = 9549.59, `position_y` = 690.513, `position_z` = 1264.922, `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 49499;
 
--- correct waypoints for creature guid 49845
+-- waypoints for creature guid 49845
 DELETE FROM `creature_movement` WHERE `id` = 49845;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (49845, 1, 9767.78, 935.563, 1302.9, 100, 0, 0, 0),
@@ -80,7 +80,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (49845, 14, 9772.77, 945.122, 1306.45, 100, 0, 0, 0),
 (49845, 15, 9769.25, 940.681, 1304.99, 100, 0, 0, 0);
 
--- correct waypoints for creature guid 49857
+-- waypoints for creature guid 49857
 DELETE FROM `creature_movement` WHERE `id` = 49857;
 UPDATE `creature` SET `position_x` = 9953.169922, `position_y` = 2042.369995, `position_z` = 1329.109985 WHERE `guid` = 49857;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
