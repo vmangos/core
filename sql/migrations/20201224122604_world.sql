@@ -109,7 +109,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 -- Feathermoon Sentinel waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 49977;
-INSERT INTO `creature_movement_template` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (49977, 1, -4484.77, 3263.51, 11.8672, 100, 0, 0, 0),
 (49977, 2, -4491.54, 3251.08, 11.1786, 100, 0, 0, 0),
 (49977, 3, -4487.44, 3258.28, 11.7369, 100, 0, 0, 0),
@@ -136,7 +136,7 @@ INSERT INTO `creature_movement_template` (`id`, `point`, `position_x`, `position
 
 -- Feathermoon Sentinel waypoints
 DELETE FROM `creature_movement` WHERE `id` = 49969;
-INSERT INTO `creature_movement_template` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (49969, 1, -4377.73, 3242.32, 12.1581, 100, 0, 0, 0),
 (49969, 2, -4379.68, 3234.61, 11.9775, 100, 0, 0, 0),
 (49969, 3, -4396.23, 3230.53, 11.84, 100, 0, 0, 0),
