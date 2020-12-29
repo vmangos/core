@@ -7695,22 +7695,22 @@ SpellCastResult Spell::CheckItems()
         {
             case SPELL_EFFECT_CREATE_ITEM:
             {
-                if (!m_IsTriggeredSpell && m_spellInfo->EffectItemType[i])
+                if (Unit* target = m_targets.getUnitTarget())
                 {
+                    if (!target->IsPlayer())
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                    uint32 count = CalculateDamage(SpellEffectIndex(i), target);
                     ItemPosCountVec dest;
-                    Unit* createItemTarget = p_caster;
-                    if (m_spellInfo->Id == 24726)
-                        createItemTarget = m_targets.getUnitTarget();
-                    // Quelle idee d'ajouter un item a un mob ...
-                    if (createItemTarget->GetTypeId() != TYPEID_PLAYER)
-                        return SPELL_FAILED_DONT_REPORT;
-                    InventoryResult msg = createItemTarget->ToPlayer()->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], 1);
+                    uint32 no_space = 0;
+                    InventoryResult msg = static_cast<Player*>(target)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->EffectItemType[i], count, &no_space);
                     if (msg != EQUIP_ERR_OK)
                     {
-                        createItemTarget->ToPlayer() ->SendEquipError(msg, nullptr, nullptr, m_spellInfo->EffectItemType[i]);
+                        static_cast<Player*>(target)->SendEquipError(msg, nullptr, nullptr, m_spellInfo->EffectItemType[i]);
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }
+
                 break;
             }
             case SPELL_EFFECT_ENCHANT_ITEM:
