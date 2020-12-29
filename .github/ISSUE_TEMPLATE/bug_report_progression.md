@@ -1,15 +1,15 @@
 ---
-name: 🦠 Bug Report - Progression
+name: 🐜 Bug Report - Progression
 about: Report any bug or defect regarding progression.
 labels: "bug, progression"
-title: 🦠 [Bug] 
+title: 🐜 [Bug] 
 ---
 <!--
 Visit our Discord to engage directly with the developers of VMaNGOS.
 
 Discord: https://discord.gg/x9a2jt7
 -->
-## 🦠 Bug report - Progression
+## 🐜 Bug report - Progression
 <!-- Describe your issue in detail. Give us as much information as possible. You should include a screenshot! -->
 
 ### Expected behavior
