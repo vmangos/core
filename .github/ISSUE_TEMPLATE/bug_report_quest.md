@@ -1,5 +1,5 @@
 ---
-name: 🐝 Bug Report - Quest
+name: 🐛 Bug Report - 🐝 Quest
 about: Report any bug or defect regarding a quest.
 labels: "bug, quest"
 title: 🐝 [Bug] 

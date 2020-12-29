@@ -1,5 +1,5 @@
 ---
-name: 🐞 Bug Report - Spell
+name: 🐛 Bug Report - 🐞 Spell
 about: Report any bug or defect regarding a spell.
 labels: "bug, spell"
 title: 🐞 [Bug] 

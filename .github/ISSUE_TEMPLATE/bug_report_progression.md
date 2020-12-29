@@ -1,5 +1,5 @@
 ---
-name: 🐜 Bug Report - Progression
+name: 🐛 Bug Report - 🐜 Progression
 about: Report any bug or defect regarding progression.
 labels: "bug, progression"
 title: 🐜 [Bug] 
