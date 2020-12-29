@@ -342,6 +342,8 @@ enum eScriptCommand
                                                             // target = WorldObject
                                                             // datalong = event_id
                                                             // datalong2 = event_data
+    SCRIPT_COMMAND_SET_PVP                  = 86,           // source = Player
+                                                            // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -1029,6 +1031,11 @@ struct ScriptInfo
             uint32 eventId;                                 // datalong
             uint32 eventData;                               // datalong2
         } sendScriptEvent;
+
+        struct                                              // SCRIPT_COMMAND_SET_PVP (86)
+        {
+            uint32 enabled;                                 // datalong
+        } setPvP;
 
         struct
         {

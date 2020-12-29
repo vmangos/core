@@ -2321,3 +2321,22 @@ bool Map::ScriptCommand_SendScriptEvent(ScriptInfo const& script, WorldObject* s
 
     return false;
 }
+
+// SCRIPT_COMMAND_SET_PVP (86)
+bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Player* pSource;
+
+    if (!((pSource = ToPlayer(target)) || (pSource = ToPlayer(source))))
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_PVP (script id %u) call for a nullptr or non-player object (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->UpdatePvP(script.setPvP.enabled);
+    if (script.setPvP.enabled)
+        pSource->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+
+    return false;
+
+}
