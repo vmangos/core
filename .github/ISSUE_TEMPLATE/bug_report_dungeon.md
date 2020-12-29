@@ -1,7 +1,7 @@
 ---
 name: 🦂 Bug Report - Dungeon
 about: Report any bug or defect regarding a dungeon.
-labels: "bug" "dungeon"
+labels: "bug, dungeon"
 title: 🦂 [Bug] 
 ---
 <!--
