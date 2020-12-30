@@ -888,20 +888,20 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         }
     }
 
-    bool questFailed()
+    bool IsPlayerAlive()
     {
         Player* pPlayer = sObjectMgr.GetPlayer(starterGuid);
 
         if (!pPlayer) 
-            return true;
+            return false;
 
-        if (pPlayer->IsDead()) // TODO: handle player in group
+        if (pPlayer->IsDead()) // TODO: what if player was in group? Keep event alive?
         {
             if (pPlayer->GetQuestStatus(QUEST_COUNTERATTACK) == QUEST_STATUS_INCOMPLETE)
                 pPlayer->FailQuest(QUEST_COUNTERATTACK);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
 
@@ -909,8 +909,8 @@ struct npc_regthar_deathgateAI : public ScriptedAI
     {
         if (eventPhase > 0)
         {
-            if (questFailed())
-                endEvent(); // player who started event is dead or gone
+            if (!IsPlayerAlive())
+                endEvent();
 
             if (eventPhase < 3)
             {
