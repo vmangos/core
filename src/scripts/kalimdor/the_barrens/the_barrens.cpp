@@ -642,6 +642,19 @@ static const sSummonInformation asSummonDefenderPositions[5] =
 //TEMPSUMMON_TIMED_OR_DEAD_DESPAWN ??
 struct npc_regthar_deathgateAI : public ScriptedAI
 {
+    uint64 starterGuid; // guid of player who started the event
+    uint8 eventPhase;//0:nothing, 1: phase1 being the first half.
+    //2: phase2 being the second half 3: phase3 being the boss
+    //4: phase4 after boss dies
+    uint32 phaseTimer;
+    uint8 deadKolkarCount;
+    uint64 GuidKolkar[12];
+    GuidList AllKolkars;
+    uint32 TimerTable[12];
+    uint64 GuidPhaseOneGuards[9];
+    uint64 GuidPhaseTwoGuards[8];
+    ObjectGuid kromzarGUID;
+
     npc_regthar_deathgateAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
@@ -658,6 +671,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
 
     void ResetVars()
     {
+        starterGuid = 0;
         memset(&GuidKolkar, 0x0, sizeof(GuidKolkar));
         memset(&TimerTable, 0x0, sizeof(TimerTable));
         memset(&GuidPhaseOneGuards, 0x0, sizeof(GuidPhaseOneGuards));
@@ -665,17 +679,6 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         kromzarGUID = ObjectGuid();
         AllKolkars.clear();
     }
-    uint8 eventPhase;//0:nothing, 1: phase1 being the first half.
-    //2: phase2 being the second half 3: phase3 being the boss
-    //4: phase4 after boss dies
-    uint32 phaseTimer;
-    uint8 deadKolkarCount;
-    uint64 GuidKolkar[12];
-    GuidList AllKolkars;
-    uint32 TimerTable[12];
-    uint64 GuidPhaseOneGuards[9];
-    uint64 GuidPhaseTwoGuards[8];
-    ObjectGuid kromzarGUID;
 
     void DoSummonKolkars()
     {
@@ -754,10 +757,11 @@ struct npc_regthar_deathgateAI : public ScriptedAI
     {
         return !eventPhase;
     }
-    bool StartEvent()
+    bool StartEvent(Player* pPlayer)
     {
         if (eventPhase)
             return false;
+        starterGuid = pPlayer->GetGUID();
         eventPhase = 1;
         phaseTimer = 1200000;
         DoSummonKolkars();
@@ -883,10 +887,31 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             }
         }
     }
+
+    bool questFailed()
+    {
+        Player* pPlayer = sObjectMgr.GetPlayer(starterGuid);
+
+        if (!pPlayer) 
+            return true;
+
+        if (pPlayer->IsDead()) // TODO: handle player in group
+        {
+            if (pPlayer->GetQuestStatus(QUEST_COUNTERATTACK) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->FailQuest(QUEST_COUNTERATTACK);
+            return true;
+        }
+        return false;
+    }
+
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (eventPhase > 0)
         {
+            if (questFailed())
+                endEvent(); // player who started event is dead or gone
+
             if (eventPhase < 3)
             {
                 for (int i = 0; i < 12; i++)
@@ -932,7 +957,7 @@ bool GossipSelect_npc_regthar_deathgate(Player* pPlayer, Creature* pCreature, ui
     {
         if (npc_regthar_deathgateAI* pEmiAI = dynamic_cast<npc_regthar_deathgateAI*>(pCreature->AI()))
         {
-            if (pEmiAI->StartEvent())
+            if (pEmiAI->StartEvent(pPlayer))
                 DoScriptText(SAY_BEWARE, pCreature, pPlayer);
         }
     }
@@ -964,7 +989,7 @@ bool QuestAccept_npc_regthar_deathgate(Player* pPlayer, Creature* pCreature, Que
     {
         if (npc_regthar_deathgateAI* pEmiAI = dynamic_cast<npc_regthar_deathgateAI*>(pCreature->AI()))
         {
-            if (pEmiAI->StartEvent())
+            if (pEmiAI->StartEvent(pPlayer))
                 DoScriptText(SAY_BEWARE, pCreature, pPlayer);
         }
     }
