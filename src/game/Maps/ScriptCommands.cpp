@@ -2338,5 +2338,4 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
         pSource->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
     return false;
-
 }
