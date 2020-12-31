@@ -86,7 +86,7 @@ void freezeDetector(uint32 _delaytime)
         }
         // possible freeze
 #ifdef NDEBUG
-        else if (WorldTimer::getMSTimeDiff(w_lastchange, curtime) > _delaytime)
+        else if (WorldTimer::getMSTimeDiff(lastchange, curtime) > _delaytime)
         {
             sLog.outError("World Thread hangs, kicking out server!");
             std::terminate();              // bang crash
