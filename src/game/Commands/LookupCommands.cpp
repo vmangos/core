@@ -199,8 +199,8 @@ void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target 
     {
         uint32 color = ItemQualityColors[itemProto->Quality];
         std::ostringstream itemStr;
-        itemStr << "|c" << std::hex << color << "|Hitem:" << std::to_string(itemProto->ItemId) << ":0:0:0:0:0:0:0|h" << name << "|h|r";
-        PSendSysMessage(LANG_ITEM_LIST_CHAT, itemId, itemId, itemStr.str().c_str(), usableStr);
+        itemStr << "|c" << std::hex << color << "|Hitem:" << std::to_string(itemProto->ItemId) << ":0:0:0:0:0:0:0|h[" << name << "]|h|r";
+        PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, itemId, itemStr.str().c_str());
     }
     else
         PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemId, name.c_str(), usableStr);
