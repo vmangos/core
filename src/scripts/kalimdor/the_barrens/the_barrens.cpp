@@ -1074,24 +1074,28 @@ struct npc_axe_throwerAI : public ScriptedAI
     }
     void Aggro(Unit *who) override
     {
+        /*
+         
+        TODO: Not sure when these texts are acutally broadcasted
+
         uint32 aggroText = 0;
         switch (urand(0, 3))
         {
-            case 0:
-                aggroText = SAY_AGGRO_FOR_HORDE;
-                break;
-            case 1:
-                aggroText = SAY_AGGRO_FOES;
-                break;
-            case 2:
-                aggroText = SAY_BEWARE;
-                break;
+        case 0:
+            aggroText = SAY_AGGRO_FOR_HORDE;
+            break;
+        case 1:
+            aggroText = SAY_AGGRO_FOES;
+            break;
+        case 2:
+            aggroText = SAY_AGGRO_BEWARE;
+            break;
         }
+        DoScriptText(aggroText, m_creature);
 
-        if (aggroText)
-        {
-            DoScriptText(aggroText, m_creature);
-        }
+        */
+
+        if(urand(0, 1)) // not always play aggro sound, TODO: npc=9457/horde-defender should have this as aggro sound as well
         m_creature->PlayDirectSound(SOUND_HORDE_DEFENDER_AGGRO);
     }
 
