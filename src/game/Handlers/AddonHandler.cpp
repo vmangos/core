@@ -24,7 +24,7 @@
 #include "Opcodes.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
-#include "zlib/zlib.h"
+#include "zlib.h"
 
 INSTANTIATE_SINGLETON_1(AddonHandler);
 
@@ -36,7 +36,7 @@ AddonHandler::~AddonHandler()
 {
 }
 
-bool AddonHandler::BuildAddonPacket(WorldPacket *Source, WorldPacket *Target)
+bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 {
     ByteBuffer AddOnPacked;
     uLongf AddonRealSize;

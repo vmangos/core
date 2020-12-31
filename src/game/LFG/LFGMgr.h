@@ -92,16 +92,16 @@ class LFGQueue
 
         void AddToQueue(Player* leader, uint32 queAreaID);
         void RestoreOfflinePlayer(Player* player);
-        bool IsPlayerInQueue(const ObjectGuid& plrGuid) const;
-        void RemovePlayerFromQueue(const ObjectGuid& plrGuid, PlayerLeaveMethod leaveMethod = PLAYER_CLIENT_LEAVE); // 0 == by default system (cmsg, leader leave), 1 == by lfg system (no need report text you left queu)
+        bool IsPlayerInQueue(ObjectGuid const& plrGuid) const;
+        void RemovePlayerFromQueue(ObjectGuid const& plrGuid, PlayerLeaveMethod leaveMethod = PLAYER_CLIENT_LEAVE); // 0 == by default system (cmsg, leader leave), 1 == by lfg system (no need report text you left queu)
         void RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod = GROUP_CLIENT_LEAVE);
         void Update(uint32 diff);
         void UpdateGroup(uint32 groupId);
 
-        static void BuildSetQueuePacket(WorldPacket &data, uint32 areaId, uint8 status);
-        static void BuildMemberAddedPacket(WorldPacket &data, ObjectGuid plrGuid);
-        static void BuildInProgressPacket(WorldPacket &data);
-        static void BuildCompletePacket(WorldPacket &data);
+        static void BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status);
+        static void BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid);
+        static void BuildInProgressPacket(WorldPacket& data);
+        static void BuildCompletePacket(WorldPacket& data);
 
         static ClassRoles CalculateRoles(Classes playerClass);
         static RolesPriority getPriority(Classes playerClass, ClassRoles playerRoles);

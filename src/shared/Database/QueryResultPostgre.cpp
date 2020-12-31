@@ -23,7 +23,7 @@
 
 #include "DatabaseEnv.h"
 
-QueryResultPostgre::QueryResultPostgre(PGresult *result, uint64 rowCount, uint32 fieldCount) :
+QueryResultPostgre::QueryResultPostgre(PGresult* result, uint64 rowCount, uint32 fieldCount) :
     QueryResult(rowCount, fieldCount), mResult(result),  mTableIndex(0)
 {
 
@@ -31,7 +31,7 @@ QueryResultPostgre::QueryResultPostgre(PGresult *result, uint64 rowCount, uint32
     MANGOS_ASSERT(mCurrentRow);
 
     for (uint32 i = 0; i < mFieldCount; i++)
-        mCurrentRow[i].SetType(ConvertNativeType(PQftype( result, i )));
+        mCurrentRow[i].SetType(ConvertNativeType(PQftype(result, i)));
 }
 
 QueryResultPostgre::~QueryResultPostgre()
@@ -55,7 +55,7 @@ bool QueryResultPostgre::NextRow()
     {
         pPQgetvalue = PQgetvalue(mResult, mTableIndex, j);
         if(pPQgetvalue && !(*pPQgetvalue))
-            pPQgetvalue = NULL;
+            pPQgetvalue = nullptr;
 
         mCurrentRow[j].SetValue(pPQgetvalue);
     }
@@ -80,7 +80,7 @@ void QueryResultPostgre::EndQuery()
 }
 
 // see types in #include <postgre/pg_type.h>
-enum Field::DataTypes QueryResultPostgre::ConvertNativeType(Oid  pOid ) const
+enum Field::DataTypes QueryResultPostgre::ConvertNativeType(Oid  pOid) const
 {
     switch (pOid)
     {

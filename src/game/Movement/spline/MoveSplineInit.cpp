@@ -22,6 +22,8 @@
 #include "Unit.h"
 #include "Transport.h"
 #include "ObjectAccessor.h"
+#include "Anticheat.h"
+#include "WorldPacket.h"
 
 namespace Movement
 {
@@ -36,7 +38,7 @@ UnitMoveType SelectSpeedType(uint32 moveFlags)
     }
     else if (moveFlags & MOVEFLAG_WALK_MODE)
     {
-        // if ( speed_obj.run > speed_obj.walk )
+        // if (speed_obj.run > speed_obj.walk)
         return MOVE_WALK;
     }
     else if (moveFlags & MOVEFLAG_BACKWARD /*&& speed_obj.run >= speed_obj.run_back*/)
@@ -55,12 +57,14 @@ void MoveSplineInit::Move(PathFinder const* pfinder)
         SetFly();
 }
 
+static thread_local uint32 splineCounter = 1;
+
 int32 MoveSplineInit::Launch()
 {
     float realSpeedRun = 0.0f;
     MoveSpline& move_spline = *unit.movespline;
 
-    Transport* newTransport = NULL;
+    Transport* newTransport = nullptr;
     if (args.transportGuid)
         newTransport = HashMapHolder<Transport>::Find(ObjectGuid(HIGHGUID_MO_TRANSPORT, args.transportGuid));
     Vector3 real_position(unit.GetPositionX(), unit.GetPositionY(), unit.GetPositionZ());
@@ -69,7 +73,7 @@ int32 MoveSplineInit::Launch()
     if (!move_spline.Finalized())
     {
         real_position = move_spline.ComputePosition();
-        Transport* oldTransport = NULL;
+        Transport* oldTransport = nullptr;
         if (move_spline.GetTransportGuid())
             oldTransport = HashMapHolder<Transport>::Find(ObjectGuid(HIGHGUID_MO_TRANSPORT, move_spline.GetTransportGuid()));
         if (oldTransport)
@@ -115,6 +119,11 @@ int32 MoveSplineInit::Launch()
 
     if (!args.Validate(&unit))
         return 0;
+
+    args.splineId = splineCounter++;
+
+    if (Player* pPlayer = unit.ToPlayer())
+        pPlayer->GetCheatData()->ResetJumpCounters();
 
     unit.m_movementInfo.SetMovementFlags((MovementFlags)moveFlags);
     move_spline.SetMovementOrigin(movementType);
@@ -167,7 +176,7 @@ int32 MoveSplineInit::Launch()
         compress = false;
 #endif
 
-    MovementData mvtData(compress ? NULL : &unit);
+    MovementData mvtData(compress ? nullptr : &unit);
     // Nostalrius: client has a hardcoded limit to spline movement speed : 4*runSpeed.
     // We need to fix this, in case of charges for example (if character has movement slowing effects)
     if (args.velocity > 4 * realSpeedRun && !args.flags.done) // From client
@@ -188,9 +197,6 @@ int32 MoveSplineInit::Launch()
     if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
         mvtData.SetSplineOpcode(MSG_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
 #endif
-
-    // Clear client root here, after we've added it to the packet - STATE SHOULD NOT BE USED
-    unit.clearUnitState(UNIT_STAT_CLIENT_ROOT);
         
     mvtData.AddPacket(data);
     // Do not forget to restore velocity after movement !
@@ -200,13 +206,12 @@ int32 MoveSplineInit::Launch()
 #else
         mvtData.SetUnitSpeed(MSG_MOVE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
 #endif
+
     // Restore correct walk mode for players
     if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-#else
-        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-#endif
+
     if (compress)
     {
         WorldPacket data2;
@@ -217,10 +222,14 @@ int32 MoveSplineInit::Launch()
             sLog.outError("[MoveSplineInit] Unable to compress move packet, move spline not sent");
         }
     }
+#else
+        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
+#endif
+    
     return move_spline.Duration();
 }
 
-MoveSplineInit::MoveSplineInit(Unit& m, const char* mvtType) : unit(m), movementType(mvtType)
+MoveSplineInit::MoveSplineInit(Unit& m, char const* mvtType) : unit(m), movementType(mvtType)
 {
     // mix existing state into new
     args.flags.runmode = !unit.m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE);

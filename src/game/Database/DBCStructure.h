@@ -36,7 +36,7 @@
 // Structures using to access raw DBC data and required packing to portability
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -99,6 +99,41 @@ struct ChatChannelsEntry
                                                             // 20 string flag
 };
 
+struct CharacterFacialHairStylesEntry
+{
+    uint32 RaceID;                                          // 0
+    uint32 SexID;                                           // 1
+    uint32 VariationID;                                     // 2
+  //uint32 Geoset[6];                                       // 3-8
+};
+
+enum CharSectionFlags
+{
+    SECTION_FLAG_UNAVAILABLE = 0x01,
+};
+
+enum CharSectionType
+{
+    SECTION_TYPE_SKIN = 0,
+    SECTION_TYPE_FACE = 1,
+    SECTION_TYPE_FACIAL_HAIR = 2,
+    SECTION_TYPE_HAIR = 3,
+    SECTION_TYPE_UNDERWEAR = 4
+};
+
+struct CharSectionsEntry
+{
+    //uint32 Id;
+    uint32 Race;
+    uint32 Gender;
+    uint32 BaseSection;
+    uint32 VariationIndex;
+    uint32 ColorIndex;
+    //char* TexturePath[3];
+    uint32 Flags;
+    inline bool HasFlag(CharSectionFlags flag) const { return (Flags & flag) != 0; }
+};
+
 struct ChrClassesEntry
 {
     uint32  ClassID;                                        // 0        m_ID
@@ -113,29 +148,38 @@ struct ChrClassesEntry
     //uint32 flags2;                                        // 16       m_flags (0x1 HasRelicSlot)
 };
 
+enum ChrRacesFlags
+{
+    CHRRACES_FLAGS_NOT_PLAYABLE = 0x01,
+    CHRRACES_FLAGS_BARE_FEET    = 0x02,
+    CHRRACES_FLAGS_CAN_MOUNT    = 0x04
+};
+
 struct ChrRacesEntry
 {
-    uint32      RaceID;                                     // 0        m_ID
+    uint32      RaceID;                                     // 0        m_Id
     uint32      Flags;                                      // 1        m_flags
-    uint32      FactionID;                                  // 2        m_factionID
-                                                            // 3        m_ExplorationSoundID
+    uint32      FactionID;                                  // 2        m_factionId
+                                                            // 3        m_ExplorationSoundId
     uint32      model_m;                                    // 4        m_MaleDisplayId
     uint32      model_f;                                    // 5        m_FemaleDisplayId
                                                             // 6        m_ClientPrefix
                                                             // 7        unused
     uint32      TeamID;                                     // 8        m_BaseLanguage (7-Alliance 1-Horde)
-                                                            // 9        m_creatureType
+    uint32      creatureType;                               // 9        m_creatureType (blizzlike always 7-humanoid)
                                                             // 10       unused, all 836
                                                             // 11       unused, all 1604
-                                                            // 12       m_ResSicknessSpellID
+    uint32      resSicknessSpellId;                         // 12       m_ResSicknessSpellId (blizzlike always 15007)
                                                             // 13       m_SplashSoundID
     uint32      startingTaxiMask;                           // 14
                                                             // 15       m_clientFileString
-    uint32      CinematicSequence;                          // 16       m_cinematicSequenceID
+    uint32      CinematicSequence;                          // 16       m_cinematicSequenceId
     char*       name[8];                                    // 17-24    m_name_lang used for DBC language detection/selection
                                                             // 25 string flags
                                                             // 26-27    m_facialHairCustomization[2]
                                                             // 28       m_hairCustomization
+
+    inline bool HasFlag(ChrRacesFlags flag) const { return !!(Flags & flag); }
 };
 
 /*struct CinematicCameraEntry
@@ -184,6 +228,11 @@ struct CreatureDisplayInfoExtraEntry
     //char*                                                 // 18       m_BakeName CreatureDisplayExtra-*.blp
 };
 
+enum CreatureModelDataFlags
+{
+    CREATURE_MODEL_DATA_FLAGS_CAN_MOUNT = 0x00000080
+};
+
 struct CreatureModelDataEntry
 {
     uint32_t ID;                                            // 0        m_ID
@@ -202,6 +251,8 @@ struct CreatureModelDataEntry
     //uint32 creatureSoundId                                // 13       m_soundId
     //float collisionWidth;                                 // 14       m_collisionWidth
     float collisionHeight;                                  // 15       m_collisionHeight
+
+    inline bool HasFlag(CreatureModelDataFlags flag) const { return !!(flags & flag); }
 };
 
 struct CreatureFamilyEntry
@@ -225,12 +276,19 @@ struct CreatureSpellDataEntry
     //uint32    availability[MAX_CREATURE_SPELL_DATA_SLOT]; // 4-7      m_availability[4]
 };
 
+enum CreatureTypeEntryFlags
+{
+    CREATURE_TYPE_ENTRY_FLAGS_IGNORED_TAB_TARGETING = 0x01 // Means do not include in tab targeting.
+};
+
 struct CreatureTypeEntry
 {
     uint32    ID;                                           // 0        m_ID
     //char*   Name[8];                                      // 1-8      m_name_lang
                                                             // 9 string flags
-    //uint32    no_expirience;                              // 10       m_flags
+    //uint32    flags;                                      // 10       m_flags
+
+    //inline bool HasFlag(CreatureTypeEntryFlags flag) const { return !!(flags & flag); }
 };
 
 struct DurabilityCostsEntry
@@ -273,7 +331,9 @@ struct FactionEntry
     int32       BaseRepValue[4];                            // 10-13    m_reputationBase
     uint32      ReputationFlags[4];                         // 14-17    m_reputationFlags
     uint32      team;                                       // 18       m_parentFactionID
-    char*       name[8];                                    // 19-26    m_name_lang
+    std::string name[8];
+
+    //char*       name[8];                                  // 19-26    m_name_lang
                                                             // 27 string flags
     //char*     description[8];                             // 28-35    m_description_lang
                                                             // 36 string flags
@@ -313,26 +373,26 @@ struct FactionTemplateEntry
     // helpers
     bool IsFriendlyTo(FactionTemplateEntry const& entry) const
     {
-        if(entry.faction)
+        if (entry.faction)
         {
-            for(int i = 0; i < 4; ++i)
-                if (enemyFaction[i]  == entry.faction)
+            for(uint32 i : enemyFaction)
+                if (i  == entry.faction)
                     return false;
-            for(int i = 0; i < 4; ++i)
-                if (friendFaction[i] == entry.faction)
+            for(uint32 i : friendFaction)
+                if (i == entry.faction)
                     return true;
         }
         return (friendlyMask & entry.ourMask) || (ourMask & entry.friendlyMask);
     }
     bool IsHostileTo(FactionTemplateEntry const& entry) const
     {
-        if(entry.faction)
+        if (entry.faction)
         {
-            for(int i = 0; i < 4; ++i)
-                if (enemyFaction[i]  == entry.faction)
+            for(uint32 i : enemyFaction)
+                if (i  == entry.faction)
                     return true;
-            for(int i = 0; i < 4; ++i)
-                if (friendFaction[i] == entry.faction)
+            for(uint32 i : friendFaction)
+                if (i == entry.faction)
                     return false;
         }
         return (hostileMask & entry.ourMask) != 0;
@@ -340,8 +400,8 @@ struct FactionTemplateEntry
     bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) !=0; }
     bool IsNeutralToAll() const
     {
-        for(int i = 0; i < 4; ++i)
-            if (enemyFaction[i] != 0)
+        for(uint32 i : enemyFaction)
+            if (i != 0)
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
@@ -389,8 +449,10 @@ struct ItemSetEntry
     //uint32    itemId[17];                                 // 10-26    m_itemID
     uint32    spells[8];                                    // 27-34    m_setSpellID
     uint32    items_to_triggerspell[8];                     // 35-42    m_setThreshold
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     uint32    required_skill_id;                            // 43       m_requiredSkill
     uint32    required_skill_value;                         // 44       m_requiredSkillRank
+#endif
 };
 
 struct LiquidTypeEntry
@@ -417,8 +479,20 @@ struct LockEntry
 struct MailTemplateEntry
 {
     uint32      ID;                                         // 0        m_ID
-    //char*       subject[8];                               // 1-8      m_subject_lang
+    char*       subject[8];                                 // 1-8      m_subject_lang
                                                             // 9 string flags
+};
+
+struct NamesProfanityEntry
+{
+    //uint32    ID;                                         // 0
+    char const* Name;                                       // 1
+};
+
+struct NamesReservedEntry
+{
+    //uint32    ID;                                         // 0
+    char const* Name;                                       // 1
 };
 
 struct QuestSortEntry
@@ -689,7 +763,7 @@ struct WorldSafeLocsEntry
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack()
 #else
 #pragma pack(pop)
@@ -725,7 +799,7 @@ typedef std::map<uint32,TaxiPathSetForSource> TaxiPathSetBySource;
 
 struct TaxiPathNodePtr
 {
-    TaxiPathNodePtr() : i_ptr(NULL) {}
+    TaxiPathNodePtr() : i_ptr(nullptr) {}
     TaxiPathNodePtr(TaxiPathNodeEntry const* ptr) : i_ptr(ptr) {}
 
     TaxiPathNodeEntry const* i_ptr;

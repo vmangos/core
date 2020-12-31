@@ -23,7 +23,7 @@
 #include "Player.h"
 #include "World.h"
 
-Quest::Quest(Field * questRecord)
+Quest::Quest(Field* questRecord)
 {
     QuestId = questRecord[0].GetUInt32();
     QuestMethod = questRecord[1].GetUInt32();
@@ -36,6 +36,7 @@ Quest::Quest(Field * questRecord)
     RequiredRaces = questRecord[7].GetUInt32();
     RequiredSkill = questRecord[8].GetUInt32();
     RequiredSkillValue = questRecord[9].GetUInt32();
+    RequiredCondition = questRecord[128].GetUInt32();
     RepObjectiveFaction = questRecord[10].GetUInt32();
     RepObjectiveValue = questRecord[11].GetInt32();
     RequiredMinRepFaction = questRecord[12].GetUInt32();
@@ -102,12 +103,14 @@ Quest::Quest(Field * questRecord)
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
         RewRepValue[i] = questRecord[90 + i].GetInt32();
 
+    RewXP = questRecord[127].GetUInt32();
     RewOrReqMoney = questRecord[95].GetInt32();
     RewMoneyMaxLevel = questRecord[96].GetUInt32();
     RewSpell = questRecord[97].GetUInt32();
     RewSpellCast = questRecord[98].GetUInt32();
-    RewMailTemplateId = questRecord[99].GetUInt32();
+    RewMailTemplateId = questRecord[99].GetInt32();
     RewMailDelaySecs = questRecord[100].GetUInt32();
+    RewMailMoney = questRecord[126].GetUInt32();
     PointMapId = questRecord[101].GetUInt32();
     PointX = questRecord[102].GetFloat();
     PointY = questRecord[103].GetFloat();
@@ -155,40 +158,28 @@ Quest::Quest(Field * questRecord)
             ++m_reqCreatureOrGOcount;
     }
 
-    for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
+    for (uint32 i : RewItemId)
     {
-        if (RewItemId[i])
+        if (i)
             ++m_rewitemscount;
     }
 
-    for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+    for (uint32 i : RewChoiceItemId)
     {
-        if (RewChoiceItemId[i])
+        if (i)
             ++m_rewchoiceitemscount;
     }
 }
 
-uint32 Quest::XPValue(Player *pPlayer) const
+uint32 Quest::XPValue(Player* pPlayer) const
 {
     if (pPlayer)
     {
-        if (RewMoneyMaxLevel > 0)
+        if (RewXP > 0)
         {
-            uint32 pLevel = pPlayer->getLevel();
+            uint32 pLevel = pPlayer->GetLevel();
             uint32 qLevel = QuestLevel;
-            float fullxp = 0;
-            if (qLevel >= 65)
-                fullxp = RewMoneyMaxLevel / 6.0f;
-            else if (qLevel == 64)
-                fullxp = RewMoneyMaxLevel / 4.8f;
-            else if (qLevel == 63)
-                fullxp = RewMoneyMaxLevel / 3.6f;
-            else if (qLevel == 62)
-                fullxp = RewMoneyMaxLevel / 2.4f;
-            else if (qLevel == 61)
-                fullxp = RewMoneyMaxLevel / 1.2f;
-            else if (qLevel > 0 && qLevel <= 60)
-                fullxp = RewMoneyMaxLevel / 0.6f;
+            float fullxp = RewXP;
 
             if (pLevel <= qLevel +  5)
                 return uint32(ceilf(fullxp));

@@ -37,10 +37,10 @@ enum eEscortState
 
 class ChatHandler;
 
-struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
+struct npc_escortAI : ScriptedAI
 {
         explicit npc_escortAI(Creature* pCreature);
-        ~npc_escortAI() {}
+        ~npc_escortAI() override {}
 
         void Aggro(Unit*) override;
 
@@ -64,8 +64,8 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
 
         void EnterEvadeMode() override;
 
-        void UpdateAI(const uint32) override;               //the "internal" update, calls UpdateEscortAI()
-        virtual void UpdateEscortAI(const uint32);          //used when it's needed to add code in update (abilities, scripted events, etc)
+        void UpdateAI(uint32 const) override;               //the "internal" update, calls UpdateEscortAI()
+        virtual void UpdateEscortAI(uint32 const);          //used when it's needed to add code in update (abilities, scripted events, etc)
 
         void ResetEscort();                                 // Kills the NPC and returns it to the original state
 
@@ -77,7 +77,7 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
         virtual void WaypointReached(uint32 uiPointId) = 0;
         virtual void WaypointStart(uint32 /*uiPointId*/) {}
 
-        void Start(bool bRun = false, uint64 uiPlayerGUID = 0, const Quest* pQuest = nullptr, bool bInstantRespawn = false, bool bCanLoopPath = false);
+        void Start(bool bRun = false, uint64 uiPlayerGUID = 0, Quest const* pQuest = nullptr, bool bInstantRespawn = false, bool bCanLoopPath = false);
         void Stop();
         void SetRun(bool bRun = true);
         void SetEscortPaused(bool uPaused);
@@ -116,7 +116,7 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
         uint32 m_uiEscortState;
         uint32 m_uiDelayBeforeTheFirstWaypoint;
 
-        const Quest* m_pQuestForEscort;                     //generally passed in Start() when regular escort script.
+        Quest const* m_pQuestForEscort;                     //generally passed in Start() when regular escort script.
 
         std::vector<Escort_Waypoint> WaypointList;
         uint32  m_currentWaypointIdx;

@@ -19,8 +19,6 @@ enum
 
 #define DATA_BARON              10
 #define DATA_YSIDA_TRIGGER      11
-#define DATA_AURIUS             12
-#define DATA_QUESTPLAYER        13
 
 #define TYPE_SH_QUEST           20
 #define TYPE_SH_CATHELA         21

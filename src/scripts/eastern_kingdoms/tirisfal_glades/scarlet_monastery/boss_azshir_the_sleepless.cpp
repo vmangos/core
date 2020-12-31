@@ -38,16 +38,16 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
     uint32 CallOftheGrave_Timer;
     uint32 Terrify_Timer;
 
-    void Reset()
+    void Reset() override
     {
         SoulSiphon_Timer = 1;
         CallOftheGrave_Timer = 30000;
         Terrify_Timer = 20000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //If we are <50% hp cast Soul Siphon rank 1
@@ -56,7 +56,7 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
             //SoulSiphon_Timer
             if (SoulSiphon_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOULSIPHON);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SOULSIPHON);
                 return;
 
                 SoulSiphon_Timer = 20000;
@@ -67,7 +67,7 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
         //CallOfTheGrave_Timer
         if (CallOftheGrave_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CALLOFTHEGRAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CALLOFTHEGRAVE);
             CallOftheGrave_Timer = 30000;
         }
         else CallOftheGrave_Timer -= diff;
@@ -75,7 +75,7 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
         //Terrify_Timer
         if (Terrify_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_TERRIFY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TERRIFY);
             Terrify_Timer = 20000;
         }
         else Terrify_Timer -= diff;
@@ -91,7 +91,7 @@ CreatureAI* GetAI_boss_azshir_the_sleepless(Creature* pCreature)
 
 void AddSC_boss_azshir_the_sleepless()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_azshir_the_sleepless";
     newscript->GetAI = &GetAI_boss_azshir_the_sleepless;

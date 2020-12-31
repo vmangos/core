@@ -15,11 +15,11 @@
 
 struct ObjectDistanceOrder
 {
-    const Unit* m_pSource;
+    Unit const* m_pSource;
 
-    ObjectDistanceOrder(const Unit* pSource) : m_pSource(pSource) {};
+    ObjectDistanceOrder(Unit const* pSource) : m_pSource(pSource) {};
 
-    bool operator()(const WorldObject* pLeft, const WorldObject* pRight) const
+    bool operator()(WorldObject const* pLeft, WorldObject const* pRight) const
     {
         return m_pSource->GetDistanceOrder(pLeft, pRight);
     }
@@ -27,11 +27,11 @@ struct ObjectDistanceOrder
 
 struct ObjectDistanceOrderReversed
 {
-    const Unit* m_pSource;
+    Unit const* m_pSource;
 
-    ObjectDistanceOrderReversed(const Unit* pSource) : m_pSource(pSource) {};
+    ObjectDistanceOrderReversed(Unit const* pSource) : m_pSource(pSource) {};
 
-    bool operator()(const WorldObject* pLeft, const WorldObject* pRight) const
+    bool operator()(WorldObject const* pLeft, WorldObject const* pRight) const
     {
         return !m_pSource->GetDistanceOrder(pLeft, pRight);
     }
@@ -42,7 +42,7 @@ Creature* GetClosestCreatureWithEntry(WorldObject* pSource, uint32 uiEntry, floa
 
 void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList , WorldObject* pSource, uint32 uiEntry, float fMaxSearchRange);
 void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pSource, uint32 uiEntry, float fMaxSearchRange);
-void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pSource, const std::vector<uint32>& entries, float fMaxSearchRange);
+void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pSource, std::vector<uint32> const& entries, float fMaxSearchRange);
 
 /*
 //Used in:
@@ -53,7 +53,7 @@ class AllFriendlyCreaturesInGrid
         AllFriendlyCreaturesInGrid(Unit const* obj) : pUnit(obj) {}
         bool operator() (Unit* u)
         {
-            if (u->isAlive() && u->GetVisibility() == VISIBILITY_ON && u->IsFriendlyTo(pUnit))
+            if (u->IsAlive() && u->GetVisibility() == VISIBILITY_ON && u->IsFriendlyTo(pUnit))
                 return true;
 
             return false;
@@ -66,7 +66,7 @@ class AllFriendlyCreaturesInGrid
 class AllGameObjectsWithEntryInRangeCheck
 {
     public:
-        AllGameObjectsWithEntryInRangeCheck(const WorldObject* pObject, uint32 uiEntry, float fMaxRange) : m_pObject(pObject), m_uiEntry(uiEntry), m_fRange(fMaxRange) {}
+        AllGameObjectsWithEntryInRangeCheck(WorldObject const* pObject, uint32 uiEntry, float fMaxRange) : m_pObject(pObject), m_uiEntry(uiEntry), m_fRange(fMaxRange) {}
         bool operator() (GameObject* pGo)
         {
             if (pGo->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pGo,m_fRange,false))
@@ -76,7 +76,7 @@ class AllGameObjectsWithEntryInRangeCheck
         }
 
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
 };
@@ -84,7 +84,7 @@ class AllGameObjectsWithEntryInRangeCheck
 class AllCreaturesOfEntryInRangeCheck
 {
     public:
-        AllCreaturesOfEntryInRangeCheck(const WorldObject* pObject, uint32 uiEntry, float fMaxRange) : m_pObject(pObject), m_uiEntry(uiEntry), m_fRange(fMaxRange) {}
+        AllCreaturesOfEntryInRangeCheck(WorldObject const* pObject, uint32 uiEntry, float fMaxRange) : m_pObject(pObject), m_uiEntry(uiEntry), m_fRange(fMaxRange) {}
         bool operator() (Unit* pUnit)
         {
             if (pUnit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pUnit,m_fRange,false))
@@ -94,7 +94,7 @@ class AllCreaturesOfEntryInRangeCheck
         }
 
     private:
-        const WorldObject* m_pObject;
+        WorldObject const* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
 };
@@ -106,7 +106,7 @@ class PlayerAtMinimumRangeAway
         bool operator() (Player* pPlayer)
         {
             //No threat list check, must be done explicit if expected to be in combat with creature
-            if (!pPlayer->IsGameMaster() && pPlayer->isAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false))
+            if (!pPlayer->IsGameMaster() && pPlayer->IsAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false))
                 return true;
 
             return false;

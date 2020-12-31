@@ -29,10 +29,10 @@ class DBCStorage
 {
     typedef std::list<char*> StringPoolList;
     public:
-        explicit DBCStorage(const char *f) : nCount(0), fieldCount(0), fmt(f), indexTable(NULL), m_dataTable(NULL) { }
+        explicit DBCStorage(char const* f) : nCount(0), fieldCount(0), fmt(f), indexTable(nullptr), m_dataTable(nullptr) { }
         ~DBCStorage() { Clear(); }
 
-        T const* LookupEntry(uint32 id) const { return (id>=nCount)?NULL:indexTable[id]; }
+        T const* LookupEntry(uint32 id) const { return (id>=nCount)?nullptr:indexTable[id]; }
         bool InsertEntry(uint32 id, T* data) { if (id >= nCount) return false; indexTable[id] = data; return true; }
 
         uint32  GetNumRows() const { return nCount; }
@@ -54,8 +54,8 @@ class DBCStorage
             // load strings from dbc data
             m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable));
 
-            // error in dbc file at loading if NULL
-            return indexTable!=NULL;
+            // error in dbc file at loading if nullptr
+            return indexTable!=nullptr;
         }
 
         bool LoadStringsFrom(char const* fn)
@@ -81,9 +81,9 @@ class DBCStorage
                 return;
 
             delete[] ((char*)indexTable);
-            indexTable = NULL;
+            indexTable = nullptr;
             delete[] ((char*)m_dataTable);
-            m_dataTable = NULL;
+            m_dataTable = nullptr;
 
             while(!m_stringPoolList.empty())
             {
@@ -93,7 +93,7 @@ class DBCStorage
             nCount = 0;
         }
 
-        void EraseEntry(uint32 id) { indexTable[id] = NULL; }
+        void EraseEntry(uint32 id) { indexTable[id] = nullptr; }
 
     private:
         uint32 nCount;

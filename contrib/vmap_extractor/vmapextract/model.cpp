@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <cstdio>
 
-Model::Model(std::string& filename) : filename(filename), vertices(0), indices(0)
+Model::Model(std::string& filename) : vertices(nullptr), indices(nullptr), filename(filename)
 {
 }
 
@@ -104,9 +104,8 @@ bool Model::ConvertToVMAPModel(const char* outfilename)
         return false;
     }
     fwrite(szRawVMAPMagic, 8, 1, output);
-    uint32 nVertices = 0;
-    nVertices = header.nBoundingVertices;
 
+    uint32 nVertices = header.nBoundingVertices;
     fwrite(&nVertices, sizeof(int), 1, output);
     uint32 nofgroups = 1;
     fwrite(&nofgroups, sizeof(uint32), 1, output);
@@ -119,7 +118,8 @@ bool Model::ConvertToVMAPModel(const char* outfilename)
     wsize = sizeof(branches) + sizeof(uint32) * branches;
     fwrite(&wsize, sizeof(int), 1, output);
     fwrite(&branches, sizeof(branches), 1, output);
-    uint32 nIndexes = (uint32) nIndices;
+
+    uint32 nIndexes = header.nBoundingTriangles;
     fwrite(&nIndexes, sizeof(uint32), 1, output);
     fwrite("INDX", 4, 1, output);
     wsize = sizeof(uint32) + sizeof(unsigned short) * nIndexes;
@@ -133,8 +133,8 @@ bool Model::ConvertToVMAPModel(const char* outfilename)
             if ((i % 3) - 1 == 0)
             {
                 uint16 tmp = indices[i];
-                indices[i] = indices[i+1];
-                indices[i+1] = tmp;
+                indices[i] = indices[i + 1];
+                indices[i + 1] = tmp;
             }
         }
         fwrite(indices, sizeof(unsigned short), nIndexes, output);
@@ -178,15 +178,18 @@ ModelInstance::ModelInstance(MPQFile& f, const char* ModelInstName, uint32 mapID
     pos = fixCoords(Vec3D(ff[0], ff[1], ff[2]));
     f.read(ff, 12);
     rot = Vec3D(ff[0], ff[1], ff[2]);
-    f.read(&scale, 4);
+
+    uint16 dummyFlags;        // dummy var
+    f.read(&scale, 2);
+    f.read(&dummyFlags, 2);   // unknown but flag 1 is used for biodome in Outland, currently this value is not used
+
     // scale factor - divide by 1024. blizzard devs must be on crack, why not just use a float?
     sc = scale / 1024.0f;
 
     char tempname[512];
     sprintf(tempname, "%s/%s", szWorkDirWmo, ModelInstName);
-    FILE* input;
-    input = fopen(tempname, "r+b");
 
+    FILE* input = fopen(tempname, "r+b");
     if (!input)
     {
         //printf("ModelInstance::ModelInstance couldn't open %s\n", tempname);
@@ -195,17 +198,19 @@ ModelInstance::ModelInstance(MPQFile& f, const char* ModelInstName, uint32 mapID
 
     fseek(input, 8, SEEK_SET); // get the correct no of vertices
     int nVertices;
-    fread(&nVertices, sizeof(int), 1, input);
+    int count = fread(&nVertices, sizeof(int), 1, input);
     fclose(input);
 
-    if (nVertices == 0)
+    if (count != 1 || nVertices == 0)
         return;
 
-    uint16 adtId = 0;// not used for models
+    uint16 adtId = 0; // not used for models
     uint32 flags = MOD_M2;
-    if (tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
+    if (tileX == 65 && tileY == 65)
+        flags |= MOD_WORLDSPAWN;
     if (!ModelLOSMgr::IsLOSEnabled(id, ModelInstName))
         flags |= MOD_NO_BREAK_LOS;
+
     //write mapID, tileX, tileY, Flags, ID, Pos, Rot, Scale, name
     fwrite(&mapID, sizeof(uint32), 1, pDirfile);
     fwrite(&tileX, sizeof(uint32), 1, pDirfile);

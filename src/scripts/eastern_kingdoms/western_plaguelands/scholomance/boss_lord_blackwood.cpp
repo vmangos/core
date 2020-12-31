@@ -13,7 +13,7 @@ EndScriptData */
 //18651
 //20735
 //coup de bouclier 11972
-//summoned->addUnitState(UNIT_STAT_ROOT);
+//summoned->AddUnitState(UNIT_STAT_ROOT);
 /*
 enum
 {
@@ -36,17 +36,17 @@ struct boss_lordblackwoodAI : public ScriptedAI
         MultiShot_Timer = 1000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if(!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if(!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
         {
             m_creature->MonsterSay("pas au cac!");
             if (MultiShot_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MULTI_SHOT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MULTI_SHOT) == CAST_OK)
                     MultiShot_Timer=2000;
             }
             MultiShot_Timer-=diff;
@@ -54,7 +54,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
         if (ShieldBash_Timer < diff)
         {
         m_creature->MonsterSay("yo");
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
                 ShieldBash_Timer=8000;
         }
         ShieldBash_Timer -=diff;
@@ -69,7 +69,7 @@ CreatureAI* GetAI_boss_lordblackwood(Creature* pCreature)
 
 void AddSC_boss_lordblackwood()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_lord_blackwood";
     newscript->GetAI = &GetAI_boss_lordblackwood;

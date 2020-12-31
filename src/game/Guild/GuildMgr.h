@@ -61,14 +61,14 @@ class GuildMgr
             std::map<uint32, uint32>::iterator it = m_guid2guild.find(lowguid);
             if (it != m_guid2guild.end())
                 return GetGuildById(it->second);
-            return NULL;
+            return nullptr;
         }
 
-        void CreatePetition(uint32 id, Player* player, const ObjectGuid& charterGuid, std::string& name);
+        void CreatePetition(uint32 id, Player* player, ObjectGuid const& charterGuid, std::string& name);
         void DeletePetition(Petition* petition);
-        Petition* GetPetitionByCharterGuid(const ObjectGuid& charterGuid);
+        Petition* GetPetitionByCharterGuid(ObjectGuid const& charterGuid);
         Petition* GetPetitionById(uint32 id);
-        Petition* GetPetitionByOwnerGuid(const ObjectGuid& ownerGuid);
+        Petition* GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid);
 
         void LoadGuilds();
         void LoadPetitions();
@@ -99,20 +99,20 @@ public:
     void SaveToDB();
 
     uint32 GetId() const { return m_id; }
-    const ObjectGuid& GetCharterGuid() { return m_charterGuid; }
-    const ObjectGuid& GetOwnerGuid() { return m_ownerGuid; }
-    const std::string& GetName() { return m_name; }
+    ObjectGuid const& GetCharterGuid() { return m_charterGuid; }
+    ObjectGuid const& GetOwnerGuid() { return m_ownerGuid; }
+    std::string const& GetName() { return m_name; }
     Team GetTeam() const { return m_team; }
     void SetTeam(Team team) { m_team = team; }
 
     uint8 GetSignatureCount() const { return static_cast<uint8>(m_signatures.size()); }
     const PetitionSignatureList& GetSignatureList() { return m_signatures; }
 
-    void BuildSignatureData(WorldPacket &data);
+    void BuildSignatureData(WorldPacket& data);
 
     bool Rename(std::string& newname);
 
-    PetitionSignature* GetSignatureForPlayerGuid(const ObjectGuid& player);
+    PetitionSignature* GetSignatureForPlayerGuid(ObjectGuid const& player);
     PetitionSignature* GetSignatureForPlayer(Player* player);
     PetitionSignature* GetSignatureForAccount(uint32 accountId);
     void AddSignature(PetitionSignature* signature);
@@ -143,7 +143,7 @@ public:
 
     void SaveToDB();
 
-    const ObjectGuid& GetSignatureGuid() { return m_playerGuid; }
+    ObjectGuid const& GetSignatureGuid() { return m_playerGuid; }
     uint32 GetSignatureAccountId() const { return m_playerAccount; }
 
 private:

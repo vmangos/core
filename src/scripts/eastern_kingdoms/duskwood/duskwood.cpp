@@ -15,7 +15,7 @@ EndContentData */
 
 #include "scriptPCH.h"
 
-enum
+enum NightmareCorruptionData
 {
     SPELL_SOUL_CORRUPTION = 25805,
     SPELL_CREATURE_OF_NIGHTMARE = 25806,
@@ -28,7 +28,7 @@ enum
 
 void Handle_NightmareCorruption(/*const*/ Player* player)
 {
-    if (player->isDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
+    if (player->IsDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
     {
         return;
     }
@@ -54,11 +54,16 @@ void Handle_NightmareCorruption(/*const*/ Player* player)
     corrupter->MonsterWhisper(message, player);
 }
 
-bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_twilight_grove(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     Handle_NightmareCorruption(pPlayer);
     return false;
 }
+
+enum TwilightCorrupterData
+{
+    AGGRO_TEXT = 11269
+};
 
 struct npc_twilight_corrupterAI : ScriptedAI
 {
@@ -84,39 +89,39 @@ struct npc_twilight_corrupterAI : ScriptedAI
         CoNPlayerAggro  = 0;
         bEngaged        = false;
 
-        for (int i = 0; i < 40; i++)
-            GUIDs[i] = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
     }
 
     void Aggro(Unit* /*pWho*/) override
     {
         if (!bEngaged)
         {
-            m_creature->MonsterSay("The Nightmare cannot be stopped!");
+            DoScriptText(AGGRO_TEXT, m_creature);
             bEngaged = true;
         }
     }
 
     void FillPlayerList()
     {
-        for (int i = 0; i < 40; i++)
-            GUIDs[i] = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
 
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+        for (const auto i : tList)
         {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
 
             if (pUnit && pUnit->IsPlayer())
-                for (int i = 0; i < 40; i++)
-                    if (GUIDs[i] == 0)
-                        GUIDs[i] = pUnit->GetGUID();
+                for (uint64 & guid : GUIDs)
+                    if (guid == 0)
+                        guid = pUnit->GetGUID();
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSoulCorruptionTimer < uiDiff)
@@ -133,8 +138,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
             {
                 if (!pTarget->HasAura(SPELL_CREATURE_OF_NIGHTMARE))
                 {
-                    m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                    m_creature->getThreatManager().addThreatDirectly(pTarget, CoNPlayerAggro);
+                    m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                    m_creature->GetThreatManager().addThreatDirectly(pTarget, CoNPlayerAggro);
                     CoNPlayerGuid = 0;
                     CoNPlayerAggro = 0;
                 }
@@ -152,7 +157,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
             if (pTarg && pTarg->IsPlayer())
             {
                 CoNPlayerGuid = pTarg->GetGUID();
-                CoNPlayerAggro = m_creature->getThreatManager().getThreat(pTarg);
+                CoNPlayerAggro = m_creature->GetThreatManager().getThreat(pTarg);
                 if (DoCastSpellIfCan(pTarg, SPELL_CREATURE_OF_NIGHTMARE) == CAST_OK)
                     m_uiCreatureOfNightmareTimer = urand(35000, 40000);
             }
@@ -163,17 +168,17 @@ struct npc_twilight_corrupterAI : ScriptedAI
         if (m_uiCheckTimer < uiDiff)
         {
             FillPlayerList();
-            for (int i = 0; i < 40; i++)
+            for (uint64 & guid : GUIDs)
             {
-                if (Player* player = m_creature->GetMap()->GetPlayer(GUIDs[i]))
+                if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                 {
-                    if (player->isDead())
+                    if (player->IsDead())
                     {
                         char eMessage[200];
                         sprintf(eMessage, "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
                         m_creature->MonsterTextEmote(eMessage, nullptr, false);
                         m_creature->CastSpell(m_creature, SPELL_SWELL_OF_SOULS, true);
-                        GUIDs[i] = 0;
+                        guid = 0;
                     }
                 }
             }
@@ -195,7 +200,7 @@ CreatureAI* GetAI_npc_twilight_corrupter(Creature* pCreature)
  * Watcher Blomberg (Stitches event support)
  */
 
-enum
+enum WatcherBlombergData
 {
     NPC_WATCHER_DODDS   = 888,
     NPC_WATCHER_PAIGE   = 499
@@ -225,7 +230,7 @@ struct npc_watcher_blombergAI : ScriptedAI
         m_uiSayTimer = 3000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bIsEngaged)
         {
@@ -276,17 +281,13 @@ struct npc_watcher_selkinAI : npc_escortAI
         m_creature->SetWalk(false);
     }
 
-    void WaypointReached(uint32 /*uiPoint*/) override {}
+    void WaypointReached(uint32 /*uiPoint*/) override { }
 };
 
 CreatureAI* GetAI_watcherSelkin(Creature* pCreature)
 {
     return new npc_watcher_selkinAI(pCreature);
 }
-
-/*
- *
- */
 
 struct npc_commander_felstromAI : ScriptedAI
 {
@@ -311,9 +312,9 @@ struct npc_commander_felstromAI : ScriptedAI
             m_creature->SetLootRecipient(nullptr);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSuicide_Timer < uiDiff)
@@ -343,11 +344,11 @@ CreatureAI* GetAI_commanderFelstrom(Creature* pCreature)
 * Lord Ello Ebonlocke
 */
 
-enum
+enum LordElloEbonlockeData
 {
     NPC_STITCHES = 412,
 
-    QUEST_TRANSLATION_TO_ELO = 252,
+    QUEST_TRANSLATION_TO_ELO = 252
 };
 
 struct elloEbonlockeAI : ScriptedAI
@@ -362,7 +363,7 @@ struct elloEbonlockeAI : ScriptedAI
     uint32 m_uiTimer;
     bool m_bCanSummon;
 
-    void Reset() override {}
+    void Reset() override { }
 
     void ResetCreature() override
     {
@@ -377,6 +378,7 @@ struct elloEbonlockeAI : ScriptedAI
     }
 
     bool SummonStitches();
+
     void LaunchStitches(Creature* pStitches) const;
 
     void UpdateAI(uint32 const uiDiff) override
@@ -397,7 +399,7 @@ struct elloEbonlockeAI : ScriptedAI
  * Stitches
  */
 
-enum
+enum StitchesData
 {
     NPC_WATCHER_CORWIN      = 1204,
     NPC_WATCHER_SARYS       = 1203,
@@ -410,14 +412,14 @@ enum
     NPC_WATCHER_SELKIN      = 1100,
     NPC_WATCHER_THAYER      = 1101,
 
-    STITCHES_YELL_1         = -1500000,
-    STITCHES_YELL_2         = -1500001,
-    TOWNCRIER_YELL_1        = -1500002,
-    TOWNCRIER_YELL_2        = -1500003,
-    TOWNCRIER_YELL_3        = -1500004,
-    TOWNCRIER_YELL_4        = -1500005,
-    TOWNCRIER_YELL_5        = -1500006,
-    CUTFORD_YELL            = -1500007,
+    STITCHES_YELL_1         = 277,
+    STITCHES_YELL_2         = 278,
+    TOWNCRIER_YELL_1        = 89,
+    TOWNCRIER_YELL_2        = 90,
+    TOWNCRIER_YELL_3        = 91,
+    TOWNCRIER_YELL_4        = 92,
+    TOWNCRIER_YELL_5        = 93,
+    CUTFORD_YELL            = 276,
 
     SPELL_AURA_OF_ROT       = 3106
 };
@@ -467,7 +469,7 @@ struct npc_stitchesAI : npc_escortAI
     void JustDied(Unit* /*pKiller*/) override
     {
         auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-        if (pTownCrier && pTownCrier->isAlive())
+        if (pTownCrier && pTownCrier->IsAlive())
             pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_5);
 
         DespawnWatcher();
@@ -490,18 +492,18 @@ struct npc_stitchesAI : npc_escortAI
         if (pUnit && (pUnit->GetEntry() == NPC_WATCHER_SELKIN))
         {
             auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-            if (pTownCrier && pTownCrier->isAlive())
+            if (pTownCrier && pTownCrier->IsAlive())
                 pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_3);
         }
     }
 
     void DespawnWatcher()
     {
-        for (auto itr = m_lWatchman.begin(); itr != m_lWatchman.end(); ++itr)
+        for (const auto& guid : m_lWatchman)
         {
-            if (auto pWatchman = m_creature->GetMap()->GetCreature(*itr))
+            if (auto pWatchman = m_creature->GetMap()->GetCreature(guid))
             {
-                if (pWatchman->isAlive())
+                if (pWatchman->IsAlive())
                     pWatchman->DisappearAndDie();
             }
         }
@@ -531,39 +533,39 @@ struct npc_stitchesAI : npc_escortAI
 
         switch (pSummoned->GetEntry())
         {
-        case NPC_WATCHER_HUTCHINS:
-            pSummoned->SetWalk(false);
-            pSummoned->GetMotionMaster()->MovePoint(0, -10905.52f, -374.1f, 39.88f, MOVE_PATHFINDING);
-            pSummoned->SetCombatStartPosition(-10905.52f, -374.1f, 39.88f);
-            pSummoned->SetHomePosition(-10905.52f, -374.1f, 39.88f, 0.0f); 
-            break;
-        case NPC_WATCHER_BLOMBERG:
-            pSummoned->SetWalk(false);
-            pSummoned->GetMotionMaster()->MovePoint(0, -10902.211914f, -375.488495f, 40.000954f, MOVE_PATHFINDING);
-            pSummoned->SetCombatStartPosition(-10902.211914f, -375.488495f, 40.000954f);
-            pSummoned->SetHomePosition(-10902.211914f, -375.488495f, 40.000954f, 0.0f);
-            if (auto pSummonedAI = static_cast<npc_watcher_blombergAI*>(pSummoned->AI()))
-            {
-                m_DoddsGuid = pSummonedAI->m_DoddsGuid;
-                m_PaigeGuid = pSummonedAI->m_PaigeGuid;
-            }
-            break;
-        case NPC_WATCHER_CUTFORD:
-            pSummoned->SetWalk(false);
-            if (pSummoned->GetDistance2d(m_creature) > 40.0f)
-            {
-                pSummoned->GetMotionMaster()->MovePoint(0, -10904.632f, -425.087f, 42.189217f, MOVE_PATHFINDING);
-                pSummoned->SetCombatStartPosition(-10904.632f, -425.087f, 42.189217f);
-                pSummoned->SetHomePosition(-10904.632f, -425.087f, 42.189217f, 0.0f);
-            }
-            else
-                pSummoned->AI()->AttackStart(m_creature);
-            pSummoned->MonsterYell(CUTFORD_YELL);
-            break;
-        case NPC_WATCHER_SELKIN:
-            if (auto pSummonedAI = static_cast<npc_watcher_selkinAI*>(pSummoned->AI()))
-                pSummonedAI->Start(true);
-            break;
+            case NPC_WATCHER_HUTCHINS:
+                pSummoned->SetWalk(false);
+                pSummoned->GetMotionMaster()->MovePoint(0, -10905.52f, -374.1f, 39.88f, MOVE_PATHFINDING);
+                pSummoned->SetCombatStartPosition(-10905.52f, -374.1f, 39.88f);
+                pSummoned->SetHomePosition(-10905.52f, -374.1f, 39.88f, 0.0f); 
+                break;
+            case NPC_WATCHER_BLOMBERG:
+                pSummoned->SetWalk(false);
+                pSummoned->GetMotionMaster()->MovePoint(0, -10902.211914f, -375.488495f, 40.000954f, MOVE_PATHFINDING);
+                pSummoned->SetCombatStartPosition(-10902.211914f, -375.488495f, 40.000954f);
+                pSummoned->SetHomePosition(-10902.211914f, -375.488495f, 40.000954f, 0.0f);
+                if (auto pSummonedAI = static_cast<npc_watcher_blombergAI*>(pSummoned->AI()))
+                {
+                    m_DoddsGuid = pSummonedAI->m_DoddsGuid;
+                    m_PaigeGuid = pSummonedAI->m_PaigeGuid;
+                }
+                break;
+            case NPC_WATCHER_CUTFORD:
+                pSummoned->SetWalk(false);
+                if (pSummoned->GetDistance2d(m_creature) > 40.0f)
+                {
+                    pSummoned->GetMotionMaster()->MovePoint(0, -10904.632f, -425.087f, 42.189217f, MOVE_PATHFINDING);
+                    pSummoned->SetCombatStartPosition(-10904.632f, -425.087f, 42.189217f);
+                    pSummoned->SetHomePosition(-10904.632f, -425.087f, 42.189217f, 0.0f);
+                }
+                else
+                    pSummoned->AI()->AttackStart(m_creature);
+                pSummoned->MonsterYell(CUTFORD_YELL);
+                break;
+            case NPC_WATCHER_SELKIN:
+                if (auto pSummonedAI = static_cast<npc_watcher_selkinAI*>(pSummoned->AI()))
+                    pSummonedAI->Start(true);
+                break;
         }
     }
 
@@ -576,32 +578,32 @@ struct npc_stitchesAI : npc_escortAI
     {
         switch (uiPoint)
         {
-        case 10:
-        case 29:
-            m_creature->MonsterYellToZone(STITCHES_YELL_1);
-            break;
-        case 30:
+            case 10:
+            case 29:
+                m_creature->MonsterYellToZone(STITCHES_YELL_1);
+                break;
+            case 30:
+                {
+                    auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
+                    if (pTownCrier && pTownCrier->IsAlive())
+                        pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
+                }
+                break;
+            case 31:
+                SummonWatchman(0);
+                SummonWatchman(1);
+                break;
+            case 34:
+                SummonWatchman(2);
+                break;
+            case 35:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
-                    pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
-            }
-            break;
-        case 31:
-            SummonWatchman(0);
-            SummonWatchman(1);
-            break;
-        case 34:
-            SummonWatchman(2);
-            break;
-        case 35:
-            {
-                auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_2);
             }
             break;
-        case 39:
+            case 39:
             {
                 auto pLeader = SummonWatchman(3);
                 AddToFormation(pLeader, SummonWatchman(4));
@@ -610,21 +612,21 @@ struct npc_stitchesAI : npc_escortAI
                 pLeader->SetWalk(false);             
             }
             break;
-        case 61:
+            case 61:
             {
                 m_creature->MonsterYellToZone(STITCHES_YELL_1);
                 SummonWatchman(7);
                 SummonWatchman(8);
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_4);
             }
             break;
-        case 65:
-            m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.64f);
-            Stop();
-            m_creature->GetMotionMaster()->MoveRandom();
-            break;
+            case 65:
+                m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.64f);
+                Stop();
+                m_creature->GetMotionMaster()->MoveRandom();
+                break;
         }
     }
 
@@ -652,12 +654,12 @@ struct npc_stitchesAI : npc_escortAI
                 m_uiLaunchTimer -= uiDiff;            
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAuraOfRotTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AURA_OF_ROT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AURA_OF_ROT) == CAST_OK)
                 m_uiAuraOfRotTimer = 3000;
         }
         else
@@ -712,7 +714,6 @@ void elloEbonlockeAI::LaunchStitches(Creature* pStitches) const
     else
         sLog.outError("[Duskwood.Stitches] Failed to cast AI.");
 }
-
 
 CreatureAI* GetAI_ElloEbonlocke(Creature* pCreature)
 {

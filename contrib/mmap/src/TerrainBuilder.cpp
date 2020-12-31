@@ -18,17 +18,15 @@
 
 #include <cassert>
 #include "TerrainBuilder.h"
-
 #include "MMapCommon.h"
 #include "MapBuilder.h"
-
 #include "MapTree.h"
 #include "ModelInstance.h"
-
+#include "Maps/GridMapDefines.h"
 
 namespace MMAP
 {
-    TerrainBuilder::TerrainBuilder(bool skipLiquid, bool quick) : m_skipLiquid(skipLiquid), m_V9(NULL), m_V8(NULL), m_mapId(0), m_quick(quick) { }
+    TerrainBuilder::TerrainBuilder(bool skipLiquid, bool quick) : m_skipLiquid(skipLiquid), m_V9(nullptr), m_V8(nullptr), m_quick(quick), m_mapId(0) { }
     TerrainBuilder::~TerrainBuilder() { }
 
     /**************************************************************************/
@@ -113,7 +111,11 @@ namespace MMAP
         // data used later
         uint16 holes[16][16];
         memset(holes, 0, sizeof(holes));
-
+        uint16 liquid_entry[16][16];
+        memset(liquid_entry, 0, sizeof(liquid_entry));
+        uint8 liquid_flags[16][16];
+        memset(liquid_flags, 0, sizeof(liquid_flags));
+        bool liquid_type_loaded = false;
         G3D::Array<int> ltriangles;
         G3D::Array<int> ttriangles;
 
@@ -210,89 +212,97 @@ namespace MMAP
         }
 
         // liquid data
-        uint16* liquid_type = NULL;
-        uint8* liquid_flags = NULL;
         if (haveLiquid)
         {
             GridMapLiquidHeader lheader;
             fseek(mapFile, fheader.liquidMapOffset, SEEK_SET);
-            fread(&lheader, sizeof(GridMapLiquidHeader), 1, mapFile);
 
-            float* liquid_map = NULL;
+            float* liquid_map = nullptr;
 
-            if (!(lheader.flags & MAP_LIQUID_NO_TYPE))
+            if (fread(&lheader, sizeof(GridMapLiquidHeader), 1, mapFile) == 1)
             {
-                liquid_type = new uint16[16*16];
-                fread(liquid_type, sizeof(uint16), 16*16, mapFile);
-                liquid_flags = new uint8[16*16];
-                fread(liquid_flags, sizeof(uint8), 16*16, mapFile);
-            }
-
-            if (!(lheader.flags & MAP_LIQUID_NO_HEIGHT))
-            {
-                liquid_map = new float [lheader.width * lheader.height];
-                fread(liquid_map, sizeof(float), lheader.width * lheader.height, mapFile);
-            }
-
-            if (liquid_type)
-            {
-                int count = meshData.liquidVerts.size() / 3;
-                float xoffset = (float(tileX) - 32) * GRID_SIZE;
-                float yoffset = (float(tileY) - 32) * GRID_SIZE;
-
-                float coord[3];
-                int row, col;
-
-                // generate coordinates
-                if (liquid_map)
+                if (!(lheader.flags & MAP_LIQUID_NO_TYPE))
                 {
-                    int j = 0;
-                    for (int i = 0; i < V9_SIZE_SQ; ++i)
-                    {
-                        row = i / V9_SIZE;
-                        col = i % V9_SIZE;
-
-                        if (row < lheader.offsetY || row >= lheader.offsetY + lheader.height ||
-                                col < lheader.offsetX || col >= lheader.offsetX + lheader.width)
-                        {
-                            // dummy vert using invalid height
-                            meshData.liquidVerts.append((xoffset + col * GRID_PART_SIZE) * -1, INVALID_MAP_LIQ_HEIGHT, (yoffset + row * GRID_PART_SIZE) * -1);
-                            continue;
-                        }
-
-                        getLiquidCoord(i, j, xoffset, yoffset, coord, liquid_map);
-                        meshData.liquidVerts.append(coord[0]);
-                        meshData.liquidVerts.append(coord[2]);
-                        meshData.liquidVerts.append(coord[1]);
-                        j++;
-                    }
-                    delete [] liquid_map;
-                    liquid_map = NULL;
+                    if (fread(liquid_entry, sizeof(liquid_entry), 1, mapFile) == 1 &&
+                        fread(liquid_flags, sizeof(liquid_flags), 1, mapFile) == 1)
+                        liquid_type_loaded = true;
                 }
                 else
                 {
-                    for (int i = 0; i < V9_SIZE_SQ; ++i)
-                    {
-                        row = i / V9_SIZE;
-                        col = i % V9_SIZE;
-                        meshData.liquidVerts.append((xoffset + col * GRID_PART_SIZE) * -1, lheader.liquidLevel, (yoffset + row * GRID_PART_SIZE) * -1);
-                    }
+                    std::fill_n(&liquid_entry[0][0], 16 * 16, lheader.liquidType);
+                    std::fill_n(&liquid_flags[0][0], 16 * 16, lheader.liquidFlags);
                 }
 
-                int indices[3], loopStart, loopEnd, loopInc, triInc;
-                getLoopVars(portion, loopStart, loopEnd, loopInc);
-                triInc = BOTTOM - TOP;
-
-                // generate triangles
-                for (int i = loopStart; i < loopEnd; i += loopInc)
-                    for (int j = TOP; j <= BOTTOM; j += triInc)
+                if (!(lheader.flags & MAP_LIQUID_NO_HEIGHT))
+                {
+                    uint32 dataSize = lheader.width * lheader.height;
+                    liquid_map = new float[dataSize];
+                    if (fread(liquid_map, sizeof(float), dataSize, mapFile) != dataSize)
                     {
-                        getHeightTriangle(i, Spot(j), indices, true);
-                        ltriangles.append(indices[2] + count);
-                        ltriangles.append(indices[1] + count);
-                        ltriangles.append(indices[0] + count);
+                        delete[] liquid_map;
+                        liquid_map = nullptr;
                     }
+                }
             }
+
+
+            int count = meshData.liquidVerts.size() / 3;
+            float xoffset = (float(tileX) - 32) * GRID_SIZE;
+            float yoffset = (float(tileY) - 32) * GRID_SIZE;
+
+            float coord[3];
+            int row, col;
+
+            // generate coordinates
+            if (liquid_map)
+            {
+                int j = 0;
+                for (int i = 0; i < V9_SIZE_SQ; ++i)
+                {
+                    row = i / V9_SIZE;
+                    col = i % V9_SIZE;
+
+                    if (row < lheader.offsetY || row >= lheader.offsetY + lheader.height ||
+                        col < lheader.offsetX || col >= lheader.offsetX + lheader.width)
+                    {
+                        // dummy vert using invalid height
+                        meshData.liquidVerts.append((xoffset + col * GRID_PART_SIZE) * -1, INVALID_MAP_LIQ_HEIGHT, (yoffset + row * GRID_PART_SIZE) * -1);
+                        continue;
+                    }
+
+                    getLiquidCoord(i, j, xoffset, yoffset, coord, liquid_map);
+                    meshData.liquidVerts.append(coord[0]);
+                    meshData.liquidVerts.append(coord[2]);
+                    meshData.liquidVerts.append(coord[1]);
+                    j++;
+                }
+                delete [] liquid_map;
+                liquid_map = nullptr;
+            }
+            else
+            {
+                for (int i = 0; i < V9_SIZE_SQ; ++i)
+                {
+                    row = i / V9_SIZE;
+                    col = i % V9_SIZE;
+                    meshData.liquidVerts.append((xoffset + col * GRID_PART_SIZE) * -1, lheader.liquidLevel, (yoffset + row * GRID_PART_SIZE) * -1);
+                }
+            }
+
+            int indices[3], loopStart, loopEnd, loopInc, triInc;
+            getLoopVars(portion, loopStart, loopEnd, loopInc);
+            triInc = BOTTOM - TOP;
+
+            // generate triangles
+            for (int i = loopStart; i < loopEnd; i += loopInc)
+                for (int j = TOP; j <= BOTTOM; j += triInc)
+                {
+                    getHeightTriangle(i, Spot(j), indices, true);
+                    ltriangles.append(indices[2] + count);
+                    ltriangles.append(indices[1] + count);
+                    ltriangles.append(indices[0] + count);
+                }
+
         }
 
         fclose(mapFile);
@@ -309,15 +319,11 @@ namespace MMAP
         int* ttris = ttriangles.getCArray();
 
         if (ltriangles.size() + ttriangles.size() == 0)
-        {
-            delete [] liquid_type;
-            delete [] liquid_flags;
             return false;
-        }
 
         // make a copy of liquid vertices
         // used to pad right-bottom frame due to lost vertex data at extraction
-        float* lverts_copy = NULL;
+        float* lverts_copy = nullptr;
         if (meshData.liquidVerts.size())
         {
             lverts_copy = new float[meshData.liquidVerts.size()];
@@ -335,37 +341,29 @@ namespace MMAP
                 uint8 liquidType = AREA_NONE;
 
                 // if there is no liquid, don't use liquid
-                if (!liquid_type || !meshData.liquidVerts.size() || !ltriangles.size())
+                if (!liquid_type_loaded || !meshData.liquidVerts.size() || !ltriangles.size())
                     useLiquid = false;
                 else
                 {
                     if (portion == ENTIRE)
-                        liquidType = getLiquidType(i, liquid_type);
+                        liquidType = getLiquidType(i, liquid_flags);
                     else
                         liquidType = MAP_LIQUID_TYPE_WATER;
 
-                    switch (liquidType)
+                    if (liquidType & MAP_LIQUID_TYPE_DARK_WATER)
                     {
-                        default:
-                            useLiquid = false;
-                            break;
-                        case MAP_LIQUID_TYPE_WATER:
-                        case MAP_LIQUID_TYPE_OCEAN:
-                            // merge different types of water
-                            liquidType = AREA_WATER;
-                            break;
-                        case MAP_LIQUID_TYPE_MAGMA:
-                            liquidType = AREA_MAGMA;
-                            break;
-                        case MAP_LIQUID_TYPE_SLIME:
-                            liquidType = AREA_SLIME;
-                            break;
-                        case MAP_LIQUID_TYPE_DARK_WATER:
-                            // players should not be here, so logically neither should creatures
-                            useTerrain = false;
-                            useLiquid = false;
-                            break;
+                        // players should not be here, so logically neither should creatures
+                        useTerrain = false;
+                        useLiquid = false;
                     }
+                    else if ((liquidType & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN)) != 0)
+                        liquidType = AREA_WATER;
+                    else if (liquidType & MAP_LIQUID_TYPE_MAGMA)
+                        liquidType = AREA_MAGMA;
+                    else if (liquidType & MAP_LIQUID_TYPE_SLIME)
+                        liquidType = AREA_SLIME;
+                    else
+                        useLiquid = false;
                 }
 
                 // if there is no terrain, don't use terrain
@@ -464,10 +462,8 @@ namespace MMAP
             }
         }
 
-        if (lverts_copy) {
-            delete [] liquid_flags;
-            delete [] lverts_copy;
-        }
+        if (lverts_copy)
+            delete[] lverts_copy;
 
         return meshData.solidTris.size() || meshData.liquidTris.size();
     }
@@ -524,7 +520,7 @@ namespace MMAP
         else
             switch (triangle)
             {
-                    //           0-----1 .... 128
+                                                                        //           0-----1 .... 128
                 case TOP:                                               //           |\    |
                     indices[0] = square + rowOffset;                    //           | \ T |
                     indices[1] = square + 1 + rowOffset;                //           |  \  |
@@ -568,15 +564,16 @@ namespace MMAP
         return (hole & holetab_h[holeCol] & holetab_v[holeRow]) != 0;
     }
     /**************************************************************************/
-    uint16 TerrainBuilder::getLiquidType(int square, const uint16* liquid_type)
+    uint8 TerrainBuilder::getLiquidType(int square, const uint8 liquid_type[16][16])
     {
         int row = square / 128;
         int col = square % 128;
         int cellRow = row / 8;     // 8 squares per cell
         int cellCol = col / 8;
-        int j = cellRow*16 + cellCol;
-        if (j < 16*16)
-            return liquid_type[j];
+
+        if (cellRow < 16 && cellCol < 16)
+            return liquid_type[cellRow][cellCol];
+
         return MAP_LIQUID_TYPE_WATER;
     }
 
@@ -587,7 +584,7 @@ namespace MMAP
         VMAPLoadResult result = vmapManager.loadMap("vmaps", mapID, tileX, tileY);
         InstanceTreeMap instanceTrees;
         vmapManager.getInstanceMapTree(instanceTrees);
-        ModelInstance* models = NULL;
+        ModelInstance* models = nullptr;
         uint32 count = 0;
         if (instanceTrees[mapID])
             instanceTrees[mapID]->getModelInstances(models, count);
@@ -628,7 +625,7 @@ namespace MMAP
                 vector<Vector3> tempVertices;
                 vector<Vector3> transformedVertices;
                 vector<MeshTriangle> tempTriangles;
-                WmoLiquid* liquid = NULL;
+                WmoLiquid* liquid = nullptr;
 
                 (*it).getMeshData(tempVertices, tempTriangles, liquid);
 
@@ -655,7 +652,7 @@ namespace MMAP
                     uint8 type = AREA_NONE;
 
                     // convert liquid type to NavTerrain
-                    switch (liquid->GetType())
+                    switch (liquid->GetType() & 3)
                     {
                         case 0:
                         case 1:
@@ -998,7 +995,7 @@ namespace MMAP
     void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, const char* offMeshFilePath)
     {
         // no meshfile input given?
-        if (offMeshFilePath == NULL)
+        if (offMeshFilePath == nullptr)
             return;
 
         FILE* fp = fopen(offMeshFilePath, "rb");

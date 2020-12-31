@@ -30,12 +30,13 @@
 #include "GridNotifiersImpl.h"
 #include "SpellMgr.h"
 
-DynamicObject::DynamicObject() : WorldObject(), m_effIndex(EFFECT_INDEX_0), m_spellId(0), m_aliveDuration(0), m_positive(false), m_radius(0)
+DynamicObject::DynamicObject() : WorldObject(), m_spellId(0), m_effIndex(EFFECT_INDEX_0), m_aliveDuration(0), m_radius(0), m_positive(false), m_channeled(false)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     m_updateFlag = (UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
-
+#endif
     m_valuesCount = DYNAMICOBJECT_END;
 }
 
@@ -60,7 +61,7 @@ void DynamicObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
-bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
+bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
 {
     WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT);
     SetMap(caster->GetMap());
@@ -117,23 +118,61 @@ bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEf
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
-    m_positive = IsPositiveEffect(spellProto, m_effIndex);
-    m_channeled = IsChanneledSpell(spellProto);
+    m_positive = spellProto->IsPositiveEffect(m_effIndex);
+    m_channeled = spellProto->IsChanneledSpell();
 
     return true;
 }
 
-Unit* DynamicObject::GetCaster() const
+WorldObject* DynamicObject::GetCaster() const
 {
+    if (ObjectGuid guid = GetCasterGuid())
+    {
+        if (!guid.IsEmpty())
+        {
+            if (guid.IsUnit())
+                return ObjectAccessor::GetUnit(*this, guid);
+            else if (guid.IsGameObject())
+            {
+                return GetMap()->GetGameObject(guid);
+            }
+        }
+    }
     // can be not found in some cases
-    return ObjectAccessor::GetUnit(*this, GetCasterGuid());
+    return nullptr;
+}
+
+Unit* DynamicObject::GetUnitCaster() const
+{
+    WorldObject* pCaster = GetCaster();
+    if (!pCaster)
+        return nullptr;
+
+    if (pCaster->IsUnit())
+        return static_cast<Unit*>(pCaster);
+    
+    if (GameObject* pGo = pCaster->ToGameObject())
+        return pGo->GetOwner();
+
+    // can be not found in some cases
+    return nullptr;
+}
+
+uint32 DynamicObject::GetFactionTemplateId() const
+{
+    return GetCaster()->GetFactionTemplateId();
+}
+
+uint32 DynamicObject::GetLevel() const
+{
+    return GetCaster()->GetLevel();
 }
 
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 {
     WorldObject::Update(update_diff, p_time);
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
-    Unit* caster = GetCaster();
+    WorldObject* caster = GetCaster();
     if (!caster)
     {
         Delete();
@@ -152,11 +191,11 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
     if (m_aliveDuration <= 0)
         m_aliveDuration = 0;
 
-    if (m_aliveDuration == 0 && (!m_channeled || caster->GetChannelObjectGuid() != GetObjectGuid()))
+    if (m_aliveDuration == 0 && (!m_channeled || (caster->IsUnit() && static_cast<Unit*>(caster)->GetChannelObjectGuid() != GetObjectGuid())))
         deleteThis = true;
 
-    for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end(); ++iter)
-        iter->second += update_diff;
+    for (auto& iter : m_affected)
+        iter.second += update_diff;
 
     // have radius and work as persistent effect
     if (m_radius)
@@ -190,15 +229,25 @@ void DynamicObject::Delete()
     AddObjectToRemoveList();
 }
 
+void DynamicObject::AddAffected(Unit* unit)
+{
+    m_affected[unit->GetObjectGuid()] = 0;
+}
+
+void DynamicObject::RemoveAffected(Unit* unit)
+{
+    m_affected.erase(unit->GetObjectGuid());
+}
+
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
     for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end();)
     {
-        Unit *target = GetMap()->GetUnit(iter->first);
+        Unit* target = GetMap()->GetUnit(iter->first);
         if (target)
         {
-            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
+            SpellAuraHolder* holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
             if (!holder)
             {
                 ++iter;
@@ -229,31 +278,31 @@ void DynamicObject::Delay(int32 delaytime)
     }
 }
 
-bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool DynamicObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    if (!IsInWorld() || !u->IsInWorld())
+    if (!IsInWorld() || !pDetector->IsInWorld())
         return false;
 
     // always seen by owner
-    if (GetCasterGuid() == u->GetObjectGuid())
+    if (GetCasterGuid() == pDetector->GetObjectGuid())
         return true;
 
     // normal case
-    return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
+    return IsWithinDistInMap(viewPoint, std::max(GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), GetVisibilityModifier()), false);
 }
 
-bool DynamicObject::IsHostileTo(Unit const* unit) const
+bool DynamicObject::IsHostileTo(WorldObject const* target) const
 {
-    if (Unit* owner = GetCaster())
-        return owner->IsHostileTo(unit);
+    if (WorldObject* owner = GetCaster())
+        return owner->IsHostileTo(target);
     else
         return false;
 }
 
-bool DynamicObject::IsFriendlyTo(Unit const* unit) const
+bool DynamicObject::IsFriendlyTo(WorldObject const* target) const
 {
-    if (Unit* owner = GetCaster())
-        return owner->IsFriendlyTo(unit);
+    if (WorldObject* owner = GetCaster())
+        return owner->IsFriendlyTo(target);
     else
         return true;
 }

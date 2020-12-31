@@ -143,14 +143,14 @@ struct instance_shadowfang_keep : public ScriptedInstance
         if (pCreature->GetRespawnDelay() == 7201)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
         }
 
         /** Initialize 4278 Patrol */
         if (pCreature->GetRespawnDelay() == 7202)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
         }
     }
 
@@ -204,11 +204,11 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 if (m_uiSpawnPatrolOnBaronDeath <= uiDiff)
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pBaron, 3854, 400.0f);
-                    for (std::list<Creature*>::iterator it = m_EscortList.begin(); it != m_EscortList.end(); ++it)
-                        if ((*it)->GetRespawnDelay() == 7201)
+                    for (const auto& it : m_EscortList)
+                        if (it->GetRespawnDelay() == 7201)
                         {
-                            (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            it->SetVisibility(VISIBILITY_ON);
+                            it->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
                 }
@@ -226,11 +226,11 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 if (m_uiSpawnPatrolOnCmdDeath <= uiDiff)
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pCmd, 3854, 400.0f);
-                    for (std::list<Creature*>::iterator it = m_EscortList.begin(); it != m_EscortList.end(); ++it)
-                        if ((*it)->GetRespawnDelay() == 7202)
+                    for (const auto& it : m_EscortList)
+                        if (it->GetRespawnDelay() == 7202)
                         {
-                            (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            it->SetVisibility(VISIBILITY_ON);
+                            it->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
                 }
@@ -309,12 +309,12 @@ struct instance_shadowfang_keep : public ScriptedInstance
         return 0;
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -328,10 +328,10 @@ struct instance_shadowfang_keep : public ScriptedInstance
         loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3]
                    >> m_auiEncounter[4] >> m_auiEncounter[5];
 
-        for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+        for (uint32 & i : m_auiEncounter)
         {
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
         }
 
         OUT_LOAD_INST_DATA_COMPLETE;
@@ -345,7 +345,7 @@ InstanceData* GetInstanceData_instance_shadowfang_keep(Map* pMap)
 
 void AddSC_instance_shadowfang_keep()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_shadowfang_keep";
     newscript->GetInstanceData = &GetInstanceData_instance_shadowfang_keep;

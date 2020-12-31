@@ -23,7 +23,6 @@
 #include <G3D/Ray.h>
 #include <G3D/AABox.h>
 #include <G3D/Table.h>
-#include <G3D/BoundsTrait.h>
 #include <G3D/PositionTrait.h>
 
 #include "Errors.h"
@@ -40,11 +39,11 @@ struct NodeCreator
 };
 
 template < class T,
-         class Node,
-         class NodeCreatorFunc = NodeCreator<Node>,
-         /*class BoundsFunc = BoundsTrait<T>,*/
-         class PositionFunc = PositionTrait<T>
-         >
+           class Node,
+           class NodeCreatorFunc = NodeCreator<Node>,
+           /*class BoundsFunc = BoundsTrait<T>,*/
+           class PositionFunc = PositionTrait<T>
+           >
 class RegularGrid2D
 {
     public:
@@ -57,7 +56,7 @@ class RegularGrid2D
 #define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
 #define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
 
-        typedef G3D::Table<const T*, Node*> MemberTable;
+        typedef G3D::Table<T const*, Node*> MemberTable;
 
         MemberTable memberTable;
         Node* nodes[CELL_NUMBER][CELL_NUMBER];
@@ -74,7 +73,7 @@ class RegularGrid2D
                     delete nodes[x][y];
         }
 
-        void insert(const T& value)
+        void insert(T const& value)
         {
             Vector3 pos;
             PositionFunc::getPosition(value, pos);
@@ -83,7 +82,7 @@ class RegularGrid2D
             memberTable.set(&value, &node);
         }
 
-        void remove(const T& value)
+        void remove(T const& value)
         {
             memberTable[&value]->remove(value);
             // Remove the member
@@ -98,13 +97,13 @@ class RegularGrid2D
                         n->balance();
         }
 
-        bool contains(const T& value) const { return memberTable.containsKey(&value); }
+        bool contains(T const& value) const { return memberTable.containsKey(&value); }
         int size() const { return memberTable.size(); }
 
         struct Cell
         {
             int x, y;
-            bool operator == (const Cell& c2) const { return x == c2.x && y == c2.y;}
+            bool operator == (Cell const& c2) const { return x == c2.x && y == c2.y;}
 
             static Cell ComputeCell(float fx, float fy)
             {
@@ -131,13 +130,13 @@ class RegularGrid2D
         }
 
         template<typename RayCallback>
-        void intersectRay(const Ray& ray, RayCallback& intersectCallback, float max_dist)
+        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float max_dist)
         {
             intersectRay(ray, intersectCallback, max_dist, ray.origin() + ray.direction() * max_dist);
         }
 
         template<typename RayCallback>
-        void intersectRay(const Ray& ray, RayCallback& intersectCallback, float& max_dist, const Vector3& end)
+        void intersectRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist, Vector3 const& end)
         {
             Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
             if (!cell.isValid())
@@ -214,7 +213,7 @@ class RegularGrid2D
         }
 
         template<typename IsectCallback>
-        void intersectPoint(const Vector3& point, IsectCallback& intersectCallback)
+        void intersectPoint(Vector3 const& point, IsectCallback& intersectCallback)
         {
             Cell cell = Cell::ComputeCell(point.x, point.y);
             if (!cell.isValid())
@@ -225,7 +224,7 @@ class RegularGrid2D
 
         // Optimized verson of intersectRay function for rays with vertical directions
         template<typename RayCallback>
-        void intersectZAllignedRay(const Ray& ray, RayCallback& intersectCallback, float& max_dist)
+        void intersectZAllignedRay(Ray const& ray, RayCallback& intersectCallback, float& max_dist)
         {
             Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
             if (!cell.isValid())

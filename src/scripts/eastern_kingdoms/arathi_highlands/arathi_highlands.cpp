@@ -33,16 +33,16 @@ EndContentData */
 
 enum
 {
-    SAY_PROGRESS_1          = -1000264,
-    SAY_PROGRESS_2          = -1000265,
-    SAY_PROGRESS_3          = -1000266,
-    EMOTE_PROGRESS_4        = -1000267,
-    SAY_AGGRO               = -1000268,
-    SAY_PROGRESS_5          = -1000269,
-    SAY_PROGRESS_6          = -1000270,
-    SAY_PROGRESS_7          = -1000271,
-    EMOTE_PROGRESS_8        = -1000272,
-    SAY_PROGRESS_9          = -1000273,
+    SAY_PROGRESS_1          = 845,
+    SAY_PROGRESS_2          = 846,
+    SAY_PROGRESS_3          = 847,
+    EMOTE_PROGRESS_4        = 848,
+    SAY_AGGRO               = 859,
+    SAY_PROGRESS_5          = 849,
+    SAY_PROGRESS_6          = 850,
+    SAY_PROGRESS_7          = 851,
+    EMOTE_PROGRESS_8        = 889,
+    SAY_PROGRESS_9          = 890,
 
     QUEST_SUNKEN_TREASURE   = 665,
     ENTRY_VENGEFUL_SURGE    = 2776
@@ -55,9 +55,9 @@ struct npc_professor_phizzlethorpeAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -97,22 +97,22 @@ struct npc_professor_phizzlethorpeAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->AI()->AttackStart(m_creature);
     }
 };
 
-bool QuestAccept_npc_professor_phizzlethorpe(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_professor_phizzlethorpe(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_SUNKEN_TREASURE)
     {
-        pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_PASSIVE);
+        pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_PASSIVE);
         DoScriptText(SAY_PROGRESS_1, pCreature, pPlayer);
 
         if (npc_professor_phizzlethorpeAI* pEscortAI = dynamic_cast<npc_professor_phizzlethorpeAI*>(pCreature->AI()))
@@ -136,11 +136,11 @@ enum
 
     NPC_DAGGERSPINE_RAIDER     = 2595,
     NPC_DAGGERSPINE_SORCERESS  = 2596,
-};
 
-#define BREEN_YELL_1    "All hands to battle stations! Naga incoming!"
-#define NAGA_YELL_1     "You've plundered our treasures too long. Prepare to meet your watery grave!"
-#define BREEN_SAY_2     "If we can just hold them now, I am sure we will be in the clear."
+    BREEN_YELL_1 = 6372,
+    NAGA_YELL_1  = 854,
+    BREEN_SAY_2  = 863,
+};
 
 static float m_afNagaCoord[4][4] =
 {
@@ -254,7 +254,7 @@ struct npc_shakes_o_breenAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -292,7 +292,7 @@ struct npc_shakes_o_breenAI : npc_escortAI
     }
 };
 
-bool QuestAccept_npc_shakes_o_breen(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_shakes_o_breen(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_DEATH_FROM_BELOW)
     {
@@ -319,16 +319,16 @@ CreatureAI* GetAI_npc_shakes_o_breen(Creature* pCreature)
 
 enum
 {
-    SAY_START               = -1000948,
-    SAY_REACH_BOTTOM        = -1000949,
-    SAY_AGGRO_KINELORY      = -1000950,
-    SAY_AGGRO_JORELL        = -1000951,
-    SAY_WATCH_BACK          = -1000952,
-    EMOTE_BELONGINGS        = -1000953,
-    SAY_DATA_FOUND          = -1000954,
-    SAY_ESCAPE              = -1000955,
-    SAY_FINISH              = -1000956,
-    EMOTE_HAND_PACK         = -1000957,
+    SAY_START               = 816,
+    SAY_REACH_BOTTOM        = 817,
+    SAY_AGGRO_KINELORY      = 897,
+    SAY_AGGRO_JORELL        = 896,
+    SAY_WATCH_BACK          = 818,
+    EMOTE_BELONGINGS        = 819,
+    SAY_DATA_FOUND          = 821,
+    SAY_ESCAPE              = 822,
+    SAY_FINISH              = 892,
+    EMOTE_HAND_PACK         = 891,
 
     SPELL_REJUVENATION      = 3627,
     SPELL_BEAR_FORM         = 4948,
@@ -353,6 +353,12 @@ struct npc_kineloryAI : public npc_escortAI
     {
         m_uiBearFormTimer = urand(5000, 7000);
         m_uiHealTimer     = urand(2000, 5000);
+    }
+
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -398,9 +404,9 @@ struct npc_kineloryAI : public npc_escortAI
             DoScriptText(SAY_AGGRO_KINELORY, m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiBearFormTimer < uiDiff)
@@ -431,13 +437,14 @@ CreatureAI* GetAI_npc_kinelory(Creature* pCreature)
     return new npc_kineloryAI(pCreature);
 }
 
-bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HINTS_NEW_PLAGUE)
     {
         if (npc_kineloryAI* pKineloryAI = dynamic_cast<npc_kineloryAI*>(pCreature->AI()))
         {
             DoScriptText(SAY_START, pCreature);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pKineloryAI->Start(false, pPlayer->GetGUID(), pQuest);
         }
     }
@@ -446,7 +453,7 @@ bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, const Quest*
 
 void AddSC_arathi_highlands()
 {
-    Script * newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_professor_phizzlethorpe";

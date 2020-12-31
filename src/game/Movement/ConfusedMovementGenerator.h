@@ -23,7 +23,7 @@
 #include "Timer.h"
 
 template<class T>
-class MANGOS_DLL_SPEC ConfusedMovementGenerator : public MovementGeneratorMedium< T, ConfusedMovementGenerator<T> >
+class ConfusedMovementGenerator : public MovementGeneratorMedium< T, ConfusedMovementGenerator<T> >
 {
     public:
         explicit ConfusedMovementGenerator(): i_x(0.0f), i_y(0.0f), i_z(0.0f) {}
@@ -32,7 +32,7 @@ class MANGOS_DLL_SPEC ConfusedMovementGenerator : public MovementGeneratorMedium
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
 
         MovementGeneratorType GetMovementGeneratorType() const { return CONFUSED_MOTION_TYPE; }
     private:

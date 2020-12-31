@@ -37,16 +37,16 @@ struct boss_grilekAI : public ScriptedAI
     uint32 Avartar_Timer;
     uint32 GroundTremor_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Avartar_Timer = urand(15000, 25000);
         GroundTremor_Timer = urand(8000, 16000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Avartar_Timer
@@ -54,12 +54,12 @@ struct boss_grilekAI : public ScriptedAI
         {
 
             DoCastSpellIfCan(m_creature, SPELL_AVARTAR);
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
 
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -50);
+            if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -50);
             if (target)
                 AttackStart(target);
 
@@ -70,7 +70,7 @@ struct boss_grilekAI : public ScriptedAI
         //GroundTremor_Timer
         if (GroundTremor_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_GROUNDTREMOR);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_GROUNDTREMOR);
             GroundTremor_Timer = urand(12000, 16000);
         }
         else GroundTremor_Timer -= diff;
@@ -85,7 +85,7 @@ CreatureAI* GetAI_boss_grilek(Creature* pCreature)
 
 void AddSC_boss_grilek()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_grilek";
     newscript->GetAI = &GetAI_boss_grilek;

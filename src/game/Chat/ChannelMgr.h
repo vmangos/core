@@ -41,11 +41,11 @@ class ChannelMgr
         }
         ~ChannelMgr();
 
-        Channel *GetJoinChannel(std::string name, bool allowAreaDependantChans = true);
-        Channel *GetChannel(std::string name, PlayerPointer p, bool pkt = true);
-        void LeftChannel(std::string name);
+        Channel *GetJoinChannel(std::string const& name, bool allowAreaDependantChans = true);
+        Channel *GetChannel(std::string const& name, PlayerPointer p, bool pkt = true);
+        void LeftChannel(std::string const& name);
         void CreateDefaultChannels();
-        static void AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, const char* message);
+        static void AnnounceBothFactionsChannel(std::string const& channelName, ObjectGuid playerGuid, char const* message);
     private:
         ChannelMap channels;
 };

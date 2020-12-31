@@ -59,26 +59,26 @@ SplineBase::InitMethtod SplineBase::initializers[] =
 #pragma region evaluation methtods
 
 using G3D::Matrix4;
-static const Matrix4 s_catmullRomCoeffs(
+static Matrix4 const s_catmullRomCoeffs(
     -0.5f, 1.5f, -1.5f, 0.5f,
     1.f, -2.5f, 2.f, -0.5f,
     -0.5f, 0.f,  0.5f, 0.f,
     0.f,  1.f,  0.f,  0.f);
 
-static const Matrix4 s_Bezier3Coeffs(
+static Matrix4 const s_Bezier3Coeffs(
     -1.f,  3.f, -3.f, 1.f,
     3.f, -6.f,  3.f, 0.f,
     -3.f,  3.f,  0.f, 0.f,
     1.f,  0.f,  0.f, 0.f);
 
 /*  classic view:
-inline void C_Evaluate(const Vector3 *vertice, float t, const float (&matrix)[4][4], Vector3 &position)
+inline void C_Evaluate(Vector3 const* vertice, float t, float const (&matrix)[4][4], Vector3 &position)
 {
     Vector3 tvec(t*t*t, t*t, t);
     int i = 0;
     double c;
     double x = 0, y = 0, z = 0;
-    while ( i < 4 )
+    while (i < 4)
     {
         c = matrix[0][i]*tvec.x + matrix[1][i]*tvec.y + matrix[2][i]*tvec.z + matrix[3][i];
 
@@ -95,7 +95,7 @@ inline void C_Evaluate(const Vector3 *vertice, float t, const float (&matrix)[4]
     position.z = z;
 }*/
 
-inline void C_Evaluate(const Vector3* vertice, float t, const Matrix4& matr, Vector3& result)
+inline void C_Evaluate(Vector3 const* vertice, float t, Matrix4 const& matr, Vector3& result)
 {
     Vector4 tvec(t * t * t, t * t, t, 1.f);
     Vector4 weights(tvec * matr);
@@ -104,7 +104,7 @@ inline void C_Evaluate(const Vector3* vertice, float t, const Matrix4& matr, Vec
              + vertice[2] * weights[2] + vertice[3] * weights[3];
 }
 
-inline void C_Evaluate_Derivative(const Vector3* vertice, float t, const Matrix4& matr, Vector3& result)
+inline void C_Evaluate_Derivative(Vector3 const* vertice, float t, Matrix4 const& matr, Vector3& result)
 {
     Vector4 tvec(3.f * t * t, 2.f * t, 1.f, 0.f);
     Vector4 weights(tvec * matr);
@@ -162,7 +162,7 @@ float SplineBase::SegLengthCatmullRom(index_type index) const
     MANGOS_ASSERT(index >= index_lo && index < index_hi);
 
     Vector3 curPos, nextPos;
-    const Vector3* p = &points[index - 1];
+    Vector3 const* p = &points[index - 1];
     curPos = nextPos = p[1];
 
     index_type i = 1;
@@ -183,7 +183,7 @@ float SplineBase::SegLengthBezier3(index_type index) const
     MANGOS_ASSERT(index >= index_lo && index < index_hi);
 
     Vector3 curPos, nextPos;
-    const Vector3* p = &points[index];
+    Vector3 const* p = &points[index];
 
     C_Evaluate(p, 0.f, s_Bezier3Coeffs, nextPos);
     curPos = nextPos;
@@ -201,7 +201,7 @@ float SplineBase::SegLengthBezier3(index_type index) const
 }
 #pragma endregion
 
-void SplineBase::init_spline(const Vector3* controls, index_type count, EvaluationMode m)
+void SplineBase::init_spline(Vector3 const* controls, index_type count, EvaluationMode m)
 {
     m_mode = m;
     cyclic = false;
@@ -209,7 +209,7 @@ void SplineBase::init_spline(const Vector3* controls, index_type count, Evaluati
     (this->*initializers[m_mode])(controls, count, cyclic, 0);
 }
 
-void SplineBase::init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point)
+void SplineBase::init_cyclic_spline(Vector3 const* controls, index_type count, EvaluationMode m, index_type cyclic_point)
 {
     m_mode = m;
     cyclic = true;
@@ -217,10 +217,10 @@ void SplineBase::init_cyclic_spline(const Vector3* controls, index_type count, E
     (this->*initializers[m_mode])(controls, count, cyclic, cyclic_point);
 }
 
-void SplineBase::InitLinear(const Vector3* controls, index_type count, bool cyclic, index_type cyclic_point)
+void SplineBase::InitLinear(Vector3 const* controls, index_type count, bool cyclic, index_type cyclic_point)
 {
     MANGOS_ASSERT(count >= 2);
-    const int real_size = count + 1;
+    int const real_size = count + 1;
 
     points.resize(real_size);
 
@@ -237,9 +237,9 @@ void SplineBase::InitLinear(const Vector3* controls, index_type count, bool cycl
     index_hi = cyclic ? count : (count - 1);
 }
 
-void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, bool cyclic, index_type cyclic_point)
+void SplineBase::InitCatmullRom(Vector3 const* controls, index_type count, bool cyclic, index_type cyclic_point)
 {
-    const int real_size = count + (cyclic ? (1 + 2) : (1 + 1));
+    int const real_size = count + (cyclic ? (1 + 2) : (1 + 1));
 
     points.resize(real_size);
 
@@ -270,7 +270,7 @@ void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, bool 
     index_hi = high_index + (cyclic ? 1 : 0);
 }
 
-void SplineBase::InitBezier3(const Vector3* controls, index_type count, bool /*cyclic*/, index_type /*cyclic_point*/)
+void SplineBase::InitBezier3(Vector3 const* controls, index_type count, bool /*cyclic*/, index_type /*cyclic_point*/)
 {
     index_type c = count / 3u * 3u;
     index_type t = c / 3u;
@@ -293,7 +293,7 @@ void SplineBase::clear()
 std::string SplineBase::ToString() const
 {
     std::stringstream str;
-    const char* mode_str[ModesEnd] = {"Linear", "CatmullRom", "Bezier3", "Uninitialized"};
+    char const* mode_str[ModesEnd] = {"Linear", "CatmullRom", "Bezier3", "Uninitialized"};
 
     index_type count = this->points.size();
     str << "mode: " << mode_str[mode()] << std::endl;

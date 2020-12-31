@@ -30,17 +30,20 @@
 #include "World.h"
 #include "ObjectMgr.h"
 
-Corpse::Corpse(CorpseType type) : WorldObject(), loot(NULL), lootRecipient(NULL), m_faction(NULL)
+Corpse::Corpse(CorpseType type) : WorldObject(), loot(nullptr), lootRecipient(nullptr), m_faction(nullptr)
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     m_updateFlag = (UPDATEFLAG_TRANSPORT | UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
-
+#else
+    m_updateFlag = UPDATEFLAG_TRANSPORT;
+#endif
     m_valuesCount = CORPSE_END;
 
     m_type = type;
 
-    m_time = time(NULL);
+    m_time = time(nullptr);
 
     lootForBody = false;
 }
@@ -75,7 +78,7 @@ bool Corpse::Create(uint32 guidlow)
     return true;
 }
 
-bool Corpse::Create(uint32 guidlow, Player *owner)
+bool Corpse::Create(uint32 guidlow, Player* owner)
 {
     if (!owner)
         return false;
@@ -152,10 +155,10 @@ void Corpse::DeleteFromDB()
     stmt.PExecute(GetOwnerGuid().GetCounter());
 }
 
-bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
+bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 {
     ////                                                    0            1       2                  3                  4                  5                   6
-    //QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
+    //QueryResult* result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
     ////   7     8            9         10      11    12     13           14            15              16       17
     //    "time, corpse_type, instance, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse"
     uint32 playerLowGuid = fields[1].GetUInt32();
@@ -194,7 +197,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
 
     SetObjectScale(DEFAULT_OBJECT_SCALE);
 
-    PlayerInfo const *info = sObjectMgr.GetPlayerInfo(race, _class);
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(race, _class);
     if (!info)
     {
         sLog.outError("Player %u has incorrect race/class pair.", GetGUIDLow());
@@ -208,7 +211,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     {
         uint32 visualbase = slot * 2;
         uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
-        const ItemPrototype * proto = ObjectMgr::GetItemPrototype(item_id);
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
         if (!proto)
         {
             SetUInt32Value(CORPSE_FIELD_ITEM + slot, 0);
@@ -255,31 +258,31 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     return true;
 }
 
-bool Corpse::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool Corpse::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    return IsInWorld() && u->IsInWorld() && IsWithinDist(viewPoint, u->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
+    return IsInWorld() && pDetector->IsInWorld() && IsWithinDist(viewPoint, std::max(pDetector->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), GetVisibilityModifier()), false);
 }
 
-ReputationRank Corpse::GetReactionTo(Unit const* unit) const
+ReputationRank Corpse::GetReactionTo(WorldObject const* target) const
 {
     if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGuid()))
-        return owner->GetReactionTo(unit);
-    else if (unit->IsPlayer() && unit->ToPlayer()->GetGroup() && unit->ToPlayer()->GetGroup()->IsMember(GetOwnerGuid()))
+        return owner->GetReactionTo(target);
+    else if (target->IsPlayer() && target->ToPlayer()->GetGroup() && target->ToPlayer()->GetGroup()->IsMember(GetOwnerGuid()))
         return REP_FRIENDLY;
     else if (m_faction)
-        return Unit::GetFactionReactionTo(m_faction, unit);
+        return WorldObject::GetFactionReactionTo(m_faction, target);
     else
         return REP_NEUTRAL;
 }
 
-bool Corpse::IsHostileTo(Unit const* unit) const
+bool Corpse::IsHostileTo(WorldObject const* target) const
 {
-    return GetReactionTo(unit) <= REP_HOSTILE;
+    return GetReactionTo(target) <= REP_HOSTILE;
 }
 
-bool Corpse::IsFriendlyTo(Unit const* unit) const
+bool Corpse::IsFriendlyTo(WorldObject const* target) const
 {
-    return GetReactionTo(unit) >= REP_FRIENDLY;
+    return GetReactionTo(target) >= REP_FRIENDLY;
 }
 
 bool Corpse::IsExpired(time_t t) const
@@ -288,4 +291,16 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - sWorld.getConfig(CONFIG_UINT32_BONES_EXPIRE_MINUTES) * MINUTE;
     else
         return m_time < t - 3 * DAY;
+}
+
+uint32 Corpse::GetFactionTemplateId() const 
+{
+    return m_faction->ID;
+}
+
+uint32 Corpse::GetLevel() const
+{
+    if (Unit* pOwner = ObjectAccessor::GetUnit(*this, GetOwnerGuid()))
+        return pOwner->GetLevel();
+    return PLAYER_MAX_LEVEL;
 }

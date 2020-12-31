@@ -23,11 +23,10 @@
 #define MANGOS_CREATURE_EAI_H
 
 #include "Common.h"
-#include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "ScriptMgr.h"
 
+class Unit;
+class Creature;
 class Player;
 class WorldObject;
 
@@ -45,7 +44,7 @@ enum EventAI_Type
     EVENT_T_KILL                    = 5,                    // RepeatMin, RepeatMax, PlayerOnly
     EVENT_T_DEATH                   = 6,                    // NONE
     EVENT_T_EVADE                   = 7,                    // NONE
-    EVENT_T_SPELLHIT                = 8,                    // SpellID, School, RepeatMin, RepeatMax
+    EVENT_T_HIT_BY_SPELL            = 8,                    // SpellID, School, RepeatMin, RepeatMax
     EVENT_T_RANGE                   = 9,                    // MinDist, MaxDist, RepeatMin, RepeatMax
     EVENT_T_OOC_LOS                 = 10,                   // NoHostile, MaxRnage, RepeatMin, RepeatMax
     EVENT_T_SPAWNED                 = 11,                   // NONE
@@ -71,6 +70,7 @@ enum EventAI_Type
     EVENT_T_MAP_SCRIPT_EVENT        = 31,                   // Param1 = EventID, Param2 = Data
     EVENT_T_GROUP_MEMBER_DIED       = 32,                   // Param1 = CreatureId, Param2 = IsLeader
     EVENT_T_VICTIM_ROOTED           = 33,                   // RepeatMin, RepeatMax
+    EVENT_T_HIT_BY_AURA             = 34,                   // AuraType, Unused, RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -133,14 +133,14 @@ struct CreatureEventAI_Event
             uint32 repeatMax;
             uint32 playerOnly;
         } kill;
-        // EVENT_T_SPELLHIT                                 = 8
+        // EVENT_T_HIT_BY_SPELL                             = 8
         struct
         {
             uint32 spellId;
             uint32 schoolMask;                              // -1 (==0xffffffff) is ok value for full mask, or must be more limited mask like (0 < 1) = 1 for normal/physical school
             uint32 repeatMin;
             uint32 repeatMax;
-        } spell_hit;
+        } hit_by_spell;
         // EVENT_T_RANGE                                    = 9
         struct
         {
@@ -244,6 +244,14 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } victim_rooted;
+        // EVENT_T_HIT_BY_AURA                              = 33
+        struct
+        {
+            uint32 auraType;
+            uint32 unused;
+            uint32 repeatMin;
+            uint32 repeatMax;
+        } hit_by_aura;
         // RAW
         struct
         {
@@ -273,10 +281,10 @@ struct CreatureEventAIHolder
     bool UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax);
 };
 
-class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
+class CreatureEventAI : public CreatureAI
 {
     public:
-        explicit CreatureEventAI(Creature *c);
+        explicit CreatureEventAI(Creature* c);
         ~CreatureEventAI()
         {
             m_CreatureEventAIList.clear();
@@ -287,25 +295,25 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void JustRespawned() override;
         void Reset();
         void JustReachedHome() override;
-        void EnterCombat(Unit *enemy) override;
+        void EnterCombat(Unit* enemy) override;
         void EnterEvadeMode() override;
         void OnCombatStop() override;
         void JustDied(Unit* killer) override;
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
-        void AttackStart(Unit *who) override;
-        void MoveInLineOfSight(Unit *who) override;
-        void SpellHit(Unit* pUnit, const SpellEntry* pSpell) override;
+        void AttackStart(Unit* who) override;
+        void MoveInLineOfSight(Unit* who) override;
+        void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override;
         void MovementInform(uint32 type, uint32 id) override;
         void DamageTaken(Unit* done_by, uint32& damage) override;
-        void UpdateAI(const uint32 diff) override;
+        void UpdateAI(uint32 const diff) override;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
         void GroupMemberJustDied(Creature* unit, bool isLeader) override;
         void SummonedCreatureJustDied(Creature* unit) override;
         void SummonedCreatureDespawn(Creature* unit) override;
-        void MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiData) override;
+        void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override;
 
-        static int Permissible(const Creature *);
+        static int Permissible(Creature const*);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = nullptr);
         void ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker);
@@ -326,7 +334,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
         bool m_bCanSummonGuards;
 
-        void UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat);
+        void UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);
 };
 

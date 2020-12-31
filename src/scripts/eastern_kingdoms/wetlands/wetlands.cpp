@@ -35,12 +35,12 @@ EndContentData */
 
 enum
 {
-    // ids from "script_texts" table
-    SAY_PROGRESS_1_TAP = -1999906, // Oh, it's on now! But you thought I'd be alone too, huh?!
-    SAY_PROGRESS_2_FRI = -1999907, // Whoa! This is way more than what I bargained for, you're on your own, Slim!
-    SAY_PROGRESS_3_TAP = -1999908, // Okay, okay! No need to get all violent. I'll talk. I'll talk!
-    SAY_PROGRESS_4_TAP = -1999909, // I have a few notes from the job back at my place. I'll get them and then meet you back in the inn.
-    SAY_PROGRESS_5_MIC = -1999910, // I'm glad the commotions died down some around here. The last thing this place needs is another brawl.
+    // ids from "broadcast_text" table
+    SAY_PROGRESS_1_TAP = 5827, // Oh, it's on now! But you thought I'd be alone too, huh?!
+    SAY_PROGRESS_2_FRI = 5828, // Whoa! This is way more than what I bargained for, you're on your own, Slim!
+    SAY_PROGRESS_3_TAP = 1743, // Okay, okay! No need to get all violent. I'll talk. I'll talk!
+    SAY_PROGRESS_4_TAP = 1744, // I have a few notes from the job back at my place. I'll get them and then meet you back in the inn.
+    SAY_PROGRESS_5_MIC = 4169, // I'm glad the commotions died down some around here. The last thing this place needs is another brawl.
     // quest id
     QUEST_MISSING_DIPLOMAT_PART11 = 1249,
     // factions
@@ -75,34 +75,34 @@ public:
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_slowingPoisonTimer = urand(5000, 8900);
         m_backstabTimer = 500;
         m_creature->CastSpell(m_creature, SPELL_POISON_PROC, false);
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (pWho && m_creature->Attack(pWho, true))
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
-        if (!pAttacker || m_creature->getVictim())
+        if (!pAttacker || m_creature->GetVictim())
             return;
 
-        if (m_creature->GetCharmInfo() && m_creature->CanReachWithMeleeAttack(pAttacker))
+        if (m_creature->GetCharmInfo() && m_creature->CanReachWithMeleeAutoAttack(pAttacker))
             AttackStart(pAttacker);
     }
 
-    void UpdateCombatAI(const uint32 uiDiff)
+    void UpdateCombatAI(uint32 const uiDiff)
     {
         // slowing poison timer
         if (m_slowingPoisonTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
+            CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
             if (castResult == CAST_OK)
                 m_slowingPoisonTimer = urand(8400, 15300);
         }
@@ -112,7 +112,7 @@ public:
         // backstab timer
         if (m_backstabTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKSTAB);
+            CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB);
             if (castResult == CAST_OK)
                 m_backstabTimer = urand(2100, 5600);
         }
@@ -123,9 +123,9 @@ public:
     }
 
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        Unit* pTarget = m_creature->getVictim();
+        Unit* pTarget = m_creature->GetVictim();
         if (pTarget) // in combat
         {
             // update when in combat
@@ -138,9 +138,9 @@ public:
             if (!pOwner)
                 return;
 
-            if (pOwner->isInCombat())
+            if (pOwner->IsInCombat())
             {
-                Unit* pTarget = pOwner->getAttackerForHelper();
+                Unit* pTarget = pOwner->GetAttackerForHelper();
                 if (pTarget)
                 {
                     AttackStart(pTarget);
@@ -149,7 +149,7 @@ public:
             else // not in combat
             {
                 // if not following, start follow
-                if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+                if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
                     m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
         }
@@ -199,7 +199,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_nextPhaseDelay = 0;
         m_mdDialogPhase = 0;
@@ -208,21 +208,21 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
     }
 
     // This function is also called when NPC runs away from player/group range.
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DespawnFriendIfExists();
         // Let escort ai do all checks for players and quests.
         npc_escortAI::JustDied(pKiller);
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         npc_escortAI::JustRespawned(); // calls Reset()
 
         // restore original respawn delay.
         m_creature->SetRespawnDelay(m_respawnDelay);
         // restore faction, which usually getting restored automatically, but in rare cases it still can fail.
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
         // "announce" that Tapoke Slim Jahn is back and event is ready to start.
         // distance between Mikhail and Tapoke "Slim" Jahn is about 16 yards, 20 used for "safety".
         Creature* npcMikhail = GetClosestCreatureWithEntry(m_creature, NPC_MIKHAIL, 20.0f);
@@ -231,29 +231,31 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             DoScriptText(SAY_PROGRESS_5_MIC, npcMikhail);
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
-        case WAYPOINT_MAILBOX:
-        {
-            SetRun();
-            // change faction, which makes him attackable.
-            m_creature->setFaction(FACTION_NEUTRAL);
-        }break;
-        case WAYPOINT_GATE:
-        {
-            // set quest failed if tapoke slim escaped
-            Player* player = GetPlayerForEscort();
-            if (player)
-                player->GroupEventFailHappens(QUEST_MISSING_DIPLOMAT_PART11);
+            case WAYPOINT_MAILBOX:
+            {
+                SetRun();
+                // change faction, which makes him attackable.
+                m_creature->SetFactionTemplateId(FACTION_NEUTRAL);
+            }
+            break;
+            case WAYPOINT_GATE:
+            {
+                // set quest failed if tapoke slim escaped
+                Player* player = GetPlayerForEscort();
+                if (player)
+                    player->GroupEventFailHappens(QUEST_MISSING_DIPLOMAT_PART11);
 
-            DespawnFriendIfExists();
-        }break;
+                DespawnFriendIfExists();
+            }
+            break;
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         // This function is also called when Tapoke Slim Jahn has been defeated!
         if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
@@ -266,15 +268,15 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             DoScriptText(SAY_PROGRESS_1_TAP, m_creature);
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
-        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->GetVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (m_justCreated)
         {
@@ -288,57 +290,61 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             {
                 switch (m_mdDialogPhase)
                 {
-                case 0:
-                {
-                    // Set Tapoke Tapoke Slim Jahn and his friend facing to player character.
-                    // An better option can be to move this to DamageTaken(), but it will not work.
-                    // It's probably because Aggro() is being called after DamageTaken().
-                    Player* player = GetPlayerForEscort();
-                    if (player)
+                    case 0:
                     {
-                        m_creature->SetFacingToObject(player);
-
-                        if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
+                        // Set Tapoke Tapoke Slim Jahn and his friend facing to player character.
+                        // An better option can be to move this to DamageTaken(), but it will not work.
+                        // It's probably because Aggro() is being called after DamageTaken().
+                        Player* player = GetPlayerForEscort();
+                        if (player)
                         {
-                            if (slimsFriend->isAlive())
-                                slimsFriend->SetFacingToObject(player);
+                            m_creature->SetFacingToObject(player);
+                    
+                            if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
+                            {
+                                if (slimsFriend->IsAlive())
+                                    slimsFriend->SetFacingToObject(player);
+                            }
                         }
+                        m_nextPhaseDelay = 2000;
                     }
-                    m_nextPhaseDelay = 2000;
-                }break;
-                case 1: // Say_0
-                {
-                    // despawn Slims friend
-                    DespawnFriendIfExists();
+                    break;
+                    case 1: // Say_0
+                    {
+                        // despawn Slims friend
+                        DespawnFriendIfExists();
 
-                    m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
-                    DoScriptText(SAY_PROGRESS_3_TAP, m_creature);
-                    m_nextPhaseDelay = 4000;
-                }break;
-                case 2: // Say_1
-                {
-                    m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                    DoScriptText(SAY_PROGRESS_4_TAP, m_creature);
-                    m_nextPhaseDelay = 6000;
-                }break;
-                case 3: // The End
-                {
-                    Player* player = GetPlayerForEscort();
-                    if (player)
-                        player->GroupEventHappens(QUEST_MISSING_DIPLOMAT_PART11, m_creature);
+                        m_creature->HandleEmote(EMOTE_ONESHOT_BEG);
+                        DoScriptText(SAY_PROGRESS_3_TAP, m_creature);
+                        m_nextPhaseDelay = 4000;
+                    }
+                    break;
+                    case 2: // Say_1
+                    {
+                        m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
+                        DoScriptText(SAY_PROGRESS_4_TAP, m_creature);
+                        m_nextPhaseDelay = 6000;
+                    }
+                    break;
+                    case 3: // The End
+                    {
+                        Player* player = GetPlayerForEscort();
+                        if (player)
+                            player->GroupEventHappens(QUEST_MISSING_DIPLOMAT_PART11, m_creature);
 
-                    // make an illusion returning him back to the inn
-                    Stop();
+                        // make an illusion returning him back to the inn
+                        Stop();
 
-                    // despawn and respawn at inn
-                    m_creature->ForcedDespawn(1000);
-                    // respawn in 2 seconds.
-                    m_creature->SetRespawnDelay(2);
+                        // despawn and respawn at inn
+                        m_creature->ForcedDespawn(1000);
+                        // respawn in 2 seconds.
+                        m_creature->SetRespawnDelay(2);
 
-                    m_nextPhaseDelay = 0;
-                    m_mdDialogPhase = 0;
-                    m_isBeaten = false;
-                }break;
+                        m_nextPhaseDelay = 0;
+                        m_mdDialogPhase = 0;
+                        m_isBeaten = false;
+                    }
+                    break;
                 }
                 // move to the next phase
                 ++m_mdDialogPhase;
@@ -348,13 +354,13 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         }
         else
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
 
             // Pummel timer
             if (m_pummelTimer < uiDiff)
             {
-                CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL);
+                CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL);
                 if (castResult == CAST_OK)
                     m_pummelTimer = urand(7300, 15000);
             }
@@ -365,13 +371,13 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         }
     }
 
-    void JustStartedEscort()
+    void JustStartedEscort() override
     {
         // Once event starts, NPC will use his Stealth spell.
         m_creature->CastSpell(m_creature, SPELL_STEALTH, false);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
             return;
@@ -387,14 +393,14 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
                 slimsFriend->CombatStop(true);
                 slimsFriend->RemoveAllAuras();
                 slimsFriend->DeleteThreatList();
-                slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
 
                 DoScriptText(SAY_PROGRESS_2_FRI, slimsFriend);
             }
 
             SetEscortPaused(true);
 
-            m_creature->setFaction(FACTION_FRIENDLY_TO_ALL);
+            m_creature->SetFactionTemplateId(FACTION_FRIENDLY_TO_ALL);
             m_creature->RemoveAllAuras();
             m_creature->DeleteThreatList();
             m_creature->CombatStop(true);
@@ -414,9 +420,10 @@ CreatureAI* GetAI_npc_tapoke_slim_jahn(Creature* pCreature)
 {
     return new npc_tapoke_slim_jahnAI(pCreature);
 }
+
 //-----------------------------------------------------------------------------
 // Mikhail gossip scripts
-bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return false;
@@ -506,12 +513,13 @@ bool GossipHello_npc_mikhail(Player* pPlayer, Creature* pCreature)
 
     return true;
 }
+
 //-----------------------------------------------------------------------------
 // AddSC
 //-----------------------------------------------------------------------------
 void AddSC_wetlands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_slims_friend";

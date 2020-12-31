@@ -49,7 +49,7 @@ class AccountPersistentData
 public:
     struct WhisperData
     {
-        WhisperData() : first_whisp(time(NULL)), score(0), whispers_count(0) {}
+        WhisperData() : first_whisp(time(nullptr)), score(0), whispers_count(0) {}
         time_t first_whisp;
         uint32 score;
         uint32 whispers_count;
@@ -58,10 +58,10 @@ public:
     uint32 CountWhispersTo(MasterPlayer* from, MasterPlayer* player);
     bool CanWhisper(MasterPlayer* player) const;
     uint32 GetWhisperScore(MasterPlayer* from, MasterPlayer* player) const;
-    uint32 CountDifferentWhispTargets() const { return _whisperTargets.size(); }
+    uint32 CountDifferentWhispTargets() const { return m_whisperTargets.size(); }
 
     typedef std::map<uint32 /*lowguid*/, WhisperData> WhispersMap;
-    WhispersMap _whisperTargets;
+    WhispersMap m_whisperTargets;
 
 /// MAIL FLOOD
 public:
@@ -69,7 +69,7 @@ public:
     bool CanMail(uint32 targetAccount);
 protected:
     typedef std::map<uint32, time_t> MailsSentMap;
-    MailsSentMap _mailsSent;
+    MailsSentMap m_mailsSent;
 };
 
 class AccountMgr
@@ -99,26 +99,26 @@ class AccountMgr
         void Update(uint32 diff);
         void LoadIPBanList(bool silent=false);
         void LoadAccountBanList(bool silent=false);
-        void BanIP(std::string const& ip, uint32 unbandate) { _ipBanned[ip] = unbandate; }
-        void UnbanIP(std::string const& ip) { _ipBanned.erase(ip); }
-        void BanAccount(uint32 account, uint32 unbandate) { _accountBanned[account] = unbandate; }
-        void UnbanAccount(uint32 acc) { _accountBanned.erase(acc); }
+        void BanIP(std::string const& ip, uint32 unbandate) { m_ipBanned[ip] = unbandate; }
+        void UnbanIP(std::string const& ip) { m_ipBanned.erase(ip); }
+        void BanAccount(uint32 account, uint32 unbandate) { m_accountBanned[account] = unbandate; }
+        void UnbanAccount(uint32 acc) { m_accountBanned.erase(acc); }
         bool IsIPBanned(std::string const& ip) const;
         bool IsAccountBanned(uint32 acc) const;
         // Max instance reset per account per hour
         bool CheckInstanceCount(uint32 accountId, uint32 instanceId, uint32 maxCount);
         void AddInstanceEnterTime(uint32 accountId, uint32 instanceId, time_t enterTime);
 
-        AccountPersistentData& GetAccountPersistentData(uint32 accountId) { return _accountPersistentData[accountId]; }
+        AccountPersistentData& GetAccountPersistentData(uint32 accountId) { return m_accountPersistentData[accountId]; }
     protected:
-        std::map<uint32, AccountTypes> _accountSecurity;
-        uint32 _banlistUpdateTimer;
-        std::map<std::string, uint32> _ipBanned;
-        std::map<uint32, uint32> _accountBanned;
+        std::map<uint32, AccountTypes> m_accountSecurity;
+        uint32 m_banlistUpdateTimer;
+        std::map<std::string, uint32> m_ipBanned;
+        std::map<uint32, uint32> m_accountBanned;
         typedef std::map<uint32 /* instanceId */, time_t /* enter time */> InstanceEnterTimesMap;
         typedef std::map<uint32 /* accountId */, InstanceEnterTimesMap> AccountInstanceEnterTimesMap;
-        AccountInstanceEnterTimesMap _instanceEnterTimes;
-        std::map<uint32, AccountPersistentData> _accountPersistentData;
+        AccountInstanceEnterTimesMap m_instanceEnterTimes;
+        std::map<uint32, AccountPersistentData> m_accountPersistentData;
 };
 
 #define sAccountMgr MaNGOS::Singleton<AccountMgr>::Instance()

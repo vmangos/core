@@ -28,10 +28,10 @@
 class UpdateMask
 {
     public:
-        UpdateMask( ) : mCount( 0 ), mBlocks( 0 ), mUpdateMask( 0 ) { }
-        UpdateMask( const UpdateMask& mask ) : mUpdateMask( 0 ) { *this = mask; }
+        UpdateMask() : mCount(0), mBlocks(0), mUpdateMask(0) { }
+        UpdateMask(UpdateMask const& mask) : mUpdateMask(0) { *this = mask; }
 
-        ~UpdateMask( )
+        ~UpdateMask()
         {
             delete [] mUpdateMask;
         }
@@ -73,7 +73,7 @@ class UpdateMask
                 memset(mUpdateMask, 0, mBlocks << 2);
         }
 
-        UpdateMask& operator = ( const UpdateMask& mask )
+        UpdateMask& operator = (UpdateMask const& mask)
         {
             SetCount(mask.mCount);
             memcpy(mUpdateMask, mask.mUpdateMask, mBlocks << 2);
@@ -81,21 +81,21 @@ class UpdateMask
             return *this;
         }
 
-        void operator &= ( const UpdateMask& mask )
+        void operator &= (UpdateMask const& mask)
         {
             //MANGOS_ASSERT(mask.mCount <= mCount);
             for (uint32 i = 0; i < mBlocks; ++i)
                 mUpdateMask[i] &= mask.mUpdateMask[i];
         }
 
-        void operator |= ( const UpdateMask& mask )
+        void operator |= (UpdateMask const& mask)
         {
             //MANGOS_ASSERT(mask.mCount <= mCount);
             for (uint32 i = 0; i < mBlocks; ++i)
                 mUpdateMask[i] |= mask.mUpdateMask[i];
         }
 
-        UpdateMask operator & ( const UpdateMask& mask ) const
+        UpdateMask operator & (UpdateMask const& mask) const
         {
             //MANGOS_ASSERT(mask.mCount <= mCount);
 
@@ -106,7 +106,7 @@ class UpdateMask
             return newmask;
         }
 
-        UpdateMask operator | ( const UpdateMask& mask ) const
+        UpdateMask operator | (UpdateMask const& mask) const
         {
             //MANGOS_ASSERT(mask.mCount <= mCount);
 

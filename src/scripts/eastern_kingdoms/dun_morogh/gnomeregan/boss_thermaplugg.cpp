@@ -40,7 +40,7 @@ enum
     NPC_WALKING_BOMB                    = 7915,
 };
 
-static const float fBombSpawnZ  = -316.2625f;
+static float const fBombSpawnZ  = -316.2625f;
 
 struct boss_thermapluggAI : public ScriptedAI
 {
@@ -62,23 +62,23 @@ struct boss_thermapluggAI : public ScriptedAI
     std::list<uint64> m_lSummonedBombGUIDs;
     std::list<uint64> m_lLandedBombGUIDs;
 
-    void Reset()
+    void Reset() override
     {
         m_uiKnockAwayTimer = urand(17000, 20000);
         m_uiActivateBombTimer = urand(10000, 15000);
         m_bIsPhaseTwo = false;
-        m_asBombFaces = NULL;
+        m_asBombFaces = nullptr;
 
         memset(&m_afSpawnPos, 0.0f, sizeof(m_afSpawnPos));
         m_lLandedBombGUIDs.clear();
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_THERMAPLUGG, DONE);
@@ -86,7 +86,7 @@ struct boss_thermapluggAI : public ScriptedAI
         m_lSummonedBombGUIDs.clear();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -101,21 +101,21 @@ struct boss_thermapluggAI : public ScriptedAI
         m_afSpawnPos[2] = m_creature->GetPositionZ();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_THERMAPLUGG, FAIL);
 
         // Remove remaining bombs
-        for (std::list<uint64>::const_iterator itr = m_lSummonedBombGUIDs.begin(); itr != m_lSummonedBombGUIDs.end(); itr++)
+        for (const auto& guid : m_lSummonedBombGUIDs)
         {
-            if (Creature* pBomb = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pBomb = m_creature->GetMap()->GetCreature(guid))
                 pBomb->ForcedDespawn();
         }
         m_lSummonedBombGUIDs.clear();
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_WALKING_BOMB)
         {
@@ -130,28 +130,28 @@ struct boss_thermapluggAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override
     {
         if (pSummoned->GetEntry() == NPC_WALKING_BOMB && uiMotionType == POINT_MOTION_TYPE && uiPointId == 1)
             m_lLandedBombGUIDs.push_back(pSummoned->GetGUID());
     }
 
-    void SummonedCreatureDespawn(Creature* pSummoned)
+    void SummonedCreatureDespawn(Creature* pSummoned) override
     {
         m_lSummonedBombGUIDs.remove(pSummoned->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Movement of Summoned mobs
         if (!m_lLandedBombGUIDs.empty())
         {
-            for (std::list<uint64>::const_iterator itr = m_lLandedBombGUIDs.begin(); itr != m_lLandedBombGUIDs.end(); itr++)
+            for (const auto& guid : m_lLandedBombGUIDs)
             {
-                if (Creature* pBomb = m_creature->GetMap()->GetCreature(*itr))
+                if (Creature* pBomb = m_creature->GetMap()->GetCreature(guid))
                     pBomb->GetMotionMaster()->MoveFollow(m_creature, 0.0f, 0.0f);
             }
             m_lLandedBombGUIDs.clear();
@@ -172,7 +172,7 @@ struct boss_thermapluggAI : public ScriptedAI
             }
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                     m_uiKnockAwayTimer = urand(17000, 20000);
             }
         }
@@ -230,7 +230,7 @@ CreatureAI* GetAI_boss_thermaplugg(Creature* pCreature)
     return new boss_thermapluggAI(pCreature);
 }
 
-bool EffectDummyCreature_spell_boss_thermaplugg(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_spell_boss_thermaplugg(WorldObject* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
     if ((uiSpellId != SPELL_ACTIVATE_BOMB_A && uiSpellId != SPELL_ACTIVATE_BOMB_B) || uiEffIndex != EFFECT_INDEX_0)
         return false;

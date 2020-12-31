@@ -29,7 +29,7 @@ EndScriptData */
 
 enum
 {
-    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    EMOTE_GENERIC_FRENZY_KILL   = 7797,
     EMOTE_GENERIC_BERSERK       = -1000004,
 
     SPELL_ACIDSPIT              = 26050,
@@ -60,8 +60,8 @@ struct boss_huhuranAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         
-        if (m_creature->canAttack(pWho)
-            && !m_creature->isInCombat()
+        if (m_creature->CanAttack(pWho)
+            && !m_creature->IsInCombat()
             && m_creature->IsWithinDistInMap(pWho, 80.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
@@ -88,7 +88,7 @@ struct boss_huhuranAI : public ScriptedAI
             m_pInstance->SetData(TYPE_HUHURAN, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiFrenzyTimer        = urand(25000, 35000);
         m_uiWyvernTimer        = urand(18000, 28000);
@@ -99,10 +99,10 @@ struct boss_huhuranAI : public ScriptedAI
         m_bBerserk             = false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //m_uiFrenzyTimer
@@ -117,19 +117,23 @@ struct boss_huhuranAI : public ScriptedAI
         else
             m_uiFrenzyTimer -= uiDiff;
 
-        // Wyvern Timer
-        if (m_uiWyvernTimer < uiDiff)
+        // No longer cast wyvern string during enrage
+        if (!m_bBerserk)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WYVERNSTING) == CAST_OK)
-                m_uiWyvernTimer = urand(15000, 32000);
+            // Wyvern Timer
+            if (m_uiWyvernTimer < uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WYVERNSTING) == CAST_OK)
+                    m_uiWyvernTimer = urand(15000, 32000);
+            }
+            else
+                m_uiWyvernTimer -= uiDiff;
         }
-        else
-            m_uiWyvernTimer -= uiDiff;
 
         //Spit Timer
         if (m_uiSpitTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACIDSPIT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACIDSPIT) == CAST_OK)
                 m_uiSpitTimer = urand(5000, 10000);
         }
         else
@@ -166,7 +170,7 @@ CreatureAI* GetAI_boss_huhuran(Creature* pCreature)
 
 void AddSC_boss_huhuran()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_huhuran";
     newscript->GetAI = &GetAI_boss_huhuran;

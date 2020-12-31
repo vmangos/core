@@ -33,10 +33,7 @@ bool GOHello_go_door_lever_dm(Player* pPlayer, GameObject* pGo)
 
     GameObject* pGoDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_DEFIAS_DOOR));
 
-    if (pGoDoor && pGoDoor->GetGoState() == 1)
-        return false;
-
-    return true;
+    return !(pGoDoor && pGoDoor->GetGoState() == 1);
 }
 
 bool GOHello_go_defias_cannon(Player* pPlayer, GameObject* pGo)
@@ -77,7 +74,7 @@ struct go_defias_gunpowderAI: public GameObjectAI
 {
     go_defias_gunpowderAI(GameObject* go) : GameObjectAI(go) {}
 
-    void SummonedMovementInform(Creature* summoned, uint32 motion_type, uint32 point_id)
+    void SummonedMovementInform(Creature* summoned, uint32 motion_type, uint32 point_id) override
     {
         if (motion_type == POINT_MOTION_TYPE)
         {
@@ -96,7 +93,7 @@ GameObjectAI* GetAIgo_defias_gunpowder(GameObject *go)
 
 void AddSC_deadmines()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_door_lever_dm";

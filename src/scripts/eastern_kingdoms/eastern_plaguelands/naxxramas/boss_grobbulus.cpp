@@ -32,13 +32,12 @@ Fallout slime 28218
 Mutating Injection 28169
 Enrages 26527*/
 
-
 #include "naxxramas.h"
 
-enum
+enum GrobbulusData
 {
-    EMOTE_SPRAY_SLIME   = -1533021, // todo: not working, should it?
-    EMOTE_INJECTION     = -1533158, // todo: not working, should it?
+    // EMOTE_SPRAY_SLIME   = -1533021, // todo: not working, should it?
+    // EMOTE_INJECTION     = -1533158, // todo: not working, should it?
 
     SPELL_SLIME_STREAM = 28137,
     SPELL_MUTATING_INJECTION = 28169,
@@ -49,11 +48,11 @@ enum
     SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
     //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
-    
+
     SPELL_BOMBARD_SLIME = 28280, // todo: should spawn a slime at the room before patch every patroll round, if any are dead.
-    
+
     NPC_FALLOUT_SLIME   = 16290,
-    NPC_POISON_CLOUD    = 16363,
+    NPC_POISON_CLOUD    = 16363
 };
 
 enum eGrobbulusEvents
@@ -61,13 +60,12 @@ enum eGrobbulusEvents
     EVENT_MUTATING_INJECTION = 1,
     EVENT_POISON_CLOUD,
     EVENT_SLIME_SPRAY,
-    EVENT_BERSERK,
+    EVENT_BERSERK
 };
 
-
-static const uint32 POISONCLOUD_CD()            { return 15000; } //return urand(20000, 25000); }
-static const uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000): urand(30000,35000); }
-static constexpr uint32 BERSERK_TIMER           = 12 * 60 * 1000; // 12 minute enrage
+static uint32 POISONCLOUD_CD() { return 15000; } //return urand(20000, 25000); }
+static uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000): urand(30000,35000); }
+static constexpr uint32 BERSERK_TIMER = 12 * 60 * 1000; // 12 minute enrage
 
 static constexpr uint32 SLIMESTREAM_REPEAT_CD   = 1500; // used every 1500ms if current target is out of melee range
 
@@ -131,11 +129,11 @@ struct boss_grobbulusAI : public ScriptedAI
             return false;
 
         std::vector<Unit*> suitableTargets;
-        ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& threatList = m_creature->GetThreatManager().getThreatList();
 
-        for (ThreatList::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+        for (const auto itr : threatList)
         {
-            if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
             {
                 if (pTarget->GetTypeId() == TYPEID_PLAYER && !pTarget->HasAura(SPELL_MUTATING_INJECTION))
                     suitableTargets.push_back(pTarget);
@@ -155,7 +153,7 @@ struct boss_grobbulusAI : public ScriptedAI
             return false;
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if ((pSpell->Id == SPELL_SLIME_SPRAY) && pTarget->GetTypeId() == TYPEID_PLAYER)
             if (Creature* pSlime = m_creature->SummonCreature(NPC_FALLOUT_SLIME, 
@@ -168,7 +166,7 @@ struct boss_grobbulusAI : public ScriptedAI
 
     void UpdateSlimeStream(uint32 uiDiff)
     {
-        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+        if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             m_uiSlimeStreamTimer = SLIMESTREAM_REPEAT_CD;
         else
         {
@@ -182,9 +180,9 @@ struct boss_grobbulusAI : public ScriptedAI
         }
     }
     
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -212,7 +210,7 @@ struct boss_grobbulusAI : public ScriptedAI
                         m_events.Repeat(100);
                     break;
                 case EVENT_SLIME_SPRAY:
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
                     {
                         m_events.Repeat(SLIMESPRAY_CD(false));
                         //DoScriptText(EMOTE_SPRAY_SLIME, m_creature);
@@ -237,19 +235,21 @@ struct grob_poison_cloud : public ScriptedAI
     {
         Reset();
     }
+
     uint32 untilDespawn;
+
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
-        m_creature->SetMovement(MOVE_ROOT);
+        m_creature->SetRooted(true);
         untilDespawn = 70000;
     }
 
-    void AttackStart(Unit* /*pWho*/) { }
-    void MoveInLineOfSight(Unit* /*pWho*/) { }
+    void AttackStart(Unit* /*pWho*/) override { }
+    void MoveInLineOfSight(Unit* /*pWho*/) override { }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (untilDespawn == 70000)
             m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD_PASSIVE, true);

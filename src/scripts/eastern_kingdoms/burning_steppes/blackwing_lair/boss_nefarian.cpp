@@ -52,7 +52,8 @@ enum
     SPELL_VEIL_OF_SHADOW        = 22687,                // old spell id 7068 -> wrong
     SPELL_CLEAVE                = 20691,
     SPELL_TAIL_LASH             = 23364,
-    SPELL_BONE_CONTRUST         = 23363,                //23362, 23361   Missing from DBC!
+    SPELL_BONE_CONTRUST         = 23363,
+    SPELL_RAISE_DRAKONID        = 23362,
 
     SPELL_MAGE                  = 23410,                // wild magic
     SPELL_WARRIOR               = 23397,                // beserk
@@ -187,7 +188,7 @@ struct boss_nefarianAI : ScriptedAI
     }
 
     /*
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell)
     {
         if (!pTarget)
             return;
@@ -211,12 +212,12 @@ struct boss_nefarianAI : ScriptedAI
         // Clear mage GUIDs or we'll be adding the same players again for subsequent
         // mage class calls, resulting in far more polymorphs than intended
         MagePlayerGUID.clear();
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (const auto& itr : players)
         {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive())
+            Player* pPlayer = itr.getSource();
+            if (pPlayer && pPlayer->IsAlive())
             {
-                if (pPlayer->getClass() == ClassCalled)
+                if (pPlayer->GetClass() == ClassCalled)
                 {
                     bClassFound = true;
                     switch (ClassCalled)
@@ -237,10 +238,10 @@ struct boss_nefarianAI : ScriptedAI
                         double dsin = sin(dang);
                         double dcos = cos(dang);
                         m_creature->GetPosition(loc);
-                        loc.coord_x += 5.0f * dcos;
-                        loc.coord_y += 5.0f * dsin;
-                        loc.coord_z += 0.5f;
-                        loc.orientation = dang - M_PI_F;
+                        loc.x += 5.0f * dcos;
+                        loc.y += 5.0f * dsin;
+                        loc.z += 0.5f;
+                        loc.o = dang - M_PI_F;
                         pPlayer->TeleportTo(loc);
                         pPlayer->AddAura(SPELL_ROGUE); // OK
                         break;
@@ -280,7 +281,7 @@ struct boss_nefarianAI : ScriptedAI
         return bClassFound;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiTransitionTimer && !m_bTransitionDone)
         {
@@ -311,7 +312,7 @@ struct boss_nefarianAI : ScriptedAI
                     case 2:
                         m_creature->SetWalk(true);
                         m_creature->RemoveAurasDueToSpell(17131);
-                        if (Unit* pTarget = m_creature->getVictim())
+                        if (Unit* pTarget = m_creature->GetVictim())
                         {
                             //m_creature->AI()->AttackStart(pTarget);
                             //m_creature->GetMotionMaster()->Clear(false);
@@ -327,7 +328,7 @@ struct boss_nefarianAI : ScriptedAI
                 m_uiTransitionTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_bTransitionDone)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_bTransitionDone)
             return;
 
         // ShadowFlame_Timer
@@ -357,7 +358,7 @@ struct boss_nefarianAI : ScriptedAI
         // VeilOfShadow_Timer
         if (m_uiVeilOfShadowTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VEIL_OF_SHADOW) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VEIL_OF_SHADOW) == CAST_OK)
                 m_uiVeilOfShadowTimer = urand(10000, 15000);
         }
         else
@@ -366,7 +367,7 @@ struct boss_nefarianAI : ScriptedAI
         // Cleave_Timer
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(7000, 10000);
         }
         else
@@ -407,17 +408,17 @@ struct boss_nefarianAI : ScriptedAI
         {
             if (m_uiMageTriggerTimer < uiDiff)
             {
-                for (std::list<ObjectGuid>::const_iterator itr = MagePlayerGUID.begin(); itr != MagePlayerGUID.end(); ++itr)
+                for (const auto& guid : MagePlayerGUID)
                 {
-                    if (Player* pMage = m_creature->GetMap()->GetPlayer(*itr))
+                    if (Player* pMage = m_creature->GetMap()->GetPlayer(guid))
                     {
                         if (pMage->HasAura(SPELL_MAGE))
                         {
                             std::vector<ObjectGuid> m_vPossibleVictim;
-                            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-                            for (ThreatList::const_iterator itr2 = tList.begin(); itr2 != tList.end(); ++itr2)
+                            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+                            for (const auto itr2 : tList)
                             {
-                                Unit* pUnit = m_creature->GetMap()->GetUnit((*itr2)->getUnitGuid());
+                                Unit* pUnit = m_creature->GetMap()->GetUnit(itr2->getUnitGuid());
                                 if (pUnit && pUnit->IsCreature() && pUnit->ToCreature()->IsTotem())
                                     pUnit = nullptr;
                                 if (pUnit && pUnit->GetDistance(pMage) < 60.0f && !pUnit->HasAura(SPELL_POLYMORPH))
@@ -448,18 +449,7 @@ struct boss_nefarianAI : ScriptedAI
         {
             m_bPhase3 = true;
             DoScriptText(SAY_RAISE_SKELETONS, m_creature);
-            std::list<GameObject*> GOListe;
-            GetGameObjectListWithEntryInGrid(GOListe, m_creature, 179804, 200.0f);
-
-            for (auto itr = GOListe.begin(); itr != GOListe.end(); ++itr)
-            {
-                m_creature->SummonCreature(NPC_BONE_CONSTRUCT,
-                    (*itr)->GetPositionX(),
-                    (*itr)->GetPositionY(),
-                    (*itr)->GetPositionZ(),
-                    (*itr)->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                (*itr)->DeleteLater();
-            }
+            m_creature->CastSpell(m_creature, SPELL_RAISE_DRAKONID, true);
         }
 
         // 5% hp yell
@@ -483,7 +473,7 @@ CreatureAI* GetAI_boss_nefarian(Creature* pCreature)
 
 enum
 {
-    SPELL_ROOT_SELF     = 23973,
+    SPELL_ROOT_SELF     = 17507,
 };
 
 struct npc_corrupted_totemAI : ScriptedAI
@@ -507,7 +497,7 @@ struct npc_corrupted_totemAI : ScriptedAI
 
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
 
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);
@@ -575,10 +565,10 @@ struct npc_corrupted_totemAI : ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (!curr->isAlive())
+                if (!curr->IsAlive())
                     continue;
 
-                if (on && m_creature->isAlive())
+                if (on && m_creature->IsAlive())
                 {
                     if (m_creature->IsWithinDistInMap(curr, 40.0f))
                     {
@@ -602,12 +592,12 @@ struct npc_corrupted_totemAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         uint32 addAuraEntry = 0;

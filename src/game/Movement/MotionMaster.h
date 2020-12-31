@@ -55,10 +55,6 @@ enum MovementGeneratorType
     PATROL_MOTION_TYPE              = 16,
     CHARGE_MOTION_TYPE              = 17,
     DISTANCING_MOTION_TYPE          = 18,
-
-    WAYPOINT_SPECIAL_REACHED        = 256,                  // Only used in CreatureAI::MovementInform when a special waypoint is reached. The pathId >= 0 is added as additonal value
-    WAYPOINT_SPECIAL_STARTED        = 512,                  // Only used in CreatureAI::MovementInform when a special waypoint is started. The pathId >= 0 is added as additional value
-    WAYPOINT_SPECIAL_FINISHED_LAST  = 1024,                 // Only used in CreatureAI::MovementInform when the waittime of the last special wp is finished. The pathId >= 0 is added as additional value
 };
 
 enum MMCleanFlag
@@ -82,14 +78,14 @@ enum MoveOptions
     MOVE_STRAIGHT_PATH       = 0x100,
 };
 
-class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
+class MotionMaster : std::stack<MovementGenerator *>
 {
         typedef stack<MovementGenerator *> Impl;
         typedef std::vector<MovementGenerator *> ExpireList;
 
     public:
 
-        explicit MotionMaster(Unit *unit) : m_needsAsyncUpdate(false), m_owner(unit), m_expList(nullptr), m_cleanFlag(MMCF_NONE) {}
+        explicit MotionMaster(Unit* unit) : m_needsAsyncUpdate(false), m_owner(unit), m_expList(nullptr), m_cleanFlag(MMCF_NONE) {}
         ~MotionMaster();
 
         void Initialize();
@@ -128,7 +124,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         void ClearType(MovementGeneratorType moveType);
 
         void MoveIdle();
-        void MoveRandom(bool use_current_position = false, float wander_distance = 0.0f);
+        void MoveRandom(bool use_current_position = false, float wander_distance = 0.0f, uint32 expire_time = 0);
         void MoveTargetedHome();
         void MoveFollow(Unit* target, float dist, float angle);
         void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
@@ -138,17 +134,21 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         void MovePoint(uint32 id, float x, float y, float z, uint32 options = MOVE_NONE, float speed = 0.0f, float finalOrientation = -10);
         void MoveSeekAssistance(float x,float y,float z);
         void MoveSeekAssistanceDistract(uint32 timer);
-        void MoveWaypoint(int32 id = 0, uint32 startPoint = 0, uint32 source = 0, uint32 initialDelay = 0, uint32 overwriteEntry = 0, bool repeat = true);
+        void MoveWaypoint(uint32 startPoint = 0, uint32 source = 0, uint32 initialDelay = 0, uint32 overwriteGuid = 0, uint32 overwriteEntry = 0, bool repeat = true);
+        void MoveWaypointAsDefault(uint32 startPoint = 0, uint32 source = 0, uint32 initialDelay = 0, uint32 overwriteGuid = 0, uint32 overwriteEntry = 0, bool repeat = true);
         void MoveTaxiFlight(uint32 path, uint32 pathnode);
         void MoveTaxiFlight();
         void MoveDistract(uint32 timeLimit);
         void MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id = 0);
         void MoveCharge(Unit* target, uint32 delay = 0, bool triggerAutoAttack = false);
-        void MoveDistance(Unit* target, float distance);
+        bool MoveDistance(Unit* target, float distance);
+        void ReInitializePatrolMovement();
 
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
+        static char const* GetMovementGeneratorTypeName(MovementGeneratorType generator);
+        void GetUsedMovementGeneratorsList(std::vector<MovementGeneratorType>& list) const;
 
-        void propagateSpeedChange();
+        void PropagateSpeedChange();
         bool SetNextWaypoint(uint32 pointId);
 
         uint32 getLastReachedWaypoint() const;
@@ -161,7 +161,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         bool NeedsAsyncUpdate() const { return m_needsAsyncUpdate; }
         void SetNeedAsyncUpdate() { m_needsAsyncUpdate = true; }
     private:
-        void Mutate(MovementGenerator *m);                  // use Move* functions instead
+        void Mutate(MovementGenerator* m);                  // use Move* functions instead
 
         void DirectClean(bool reset, bool all);
         void DelayedClean(bool reset, bool all);

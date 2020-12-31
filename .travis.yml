@@ -1,51 +1,65 @@
-language: cpp
-compiler: gcc
-dist: trusty
+#Travis jobs summary: 
+# - 2 x86_64 jobs using gcc/clang
+# - 1 windows job using visual studio 2017
 
-os:
-  - linux
+language: c++
 
-before_script:
-  # g++6
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq g++-6
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+arch:
+  - amd64 #x86_64
 
-  - g++   --version
-  - g++-6 --version
+dist: xenial
 
-  # TBB
-  - sudo apt-get install -y libtbb-dev
+compiler:
+  - gcc
+  - clang
+
+addons:
+  apt:
+    packages:
+      - libtbb-dev
+      - libcurl4-openssl-dev
+      - libace-dev
+      - libmysql++-dev
+      
+install:
   - export TBB_ROOT_DIR=/usr/include/tbb/
-
-  # Libcurl
-  - sudo apt-get install -qq libcurl4-openssl-dev
-
-  # BEGIN Install ACE
-
-  ## BEGIN Backup ACE install
-  #
-  #- wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.0.3.tar.gz
-  #- tar xzf ACE-6.0.3.tar.gz
-  #- cd ACE_wrappers/
-  #- mkdir build
-  #- cd build
-  #- ../configure --disable-ssl &> /dev/null
-  #- echo "Beginning ACE build. May take 10+ minutes."
-  #- make > /dev/null
-  #- sudo make install
-  #- cd ../../
-  #
-  ## END Backup ACE install
-
-  - sudo apt-get install -qq libace-dev
   - export ACE_ROOT=/usr/include/ace/
 
-  # END Install ACE
+matrix:
+  include:
+    #Windows build amd64 Visual Studio
+    - name: "Windows build Visual Studio"
+      os: windows
+      arch: amd64
+      env:
+        - ACE_VERSION=6.5.11
+        - ACE_VERSION2=6_5_11
+        - TBB_VERSION=2020.3
+      install:
+        - export ACE_ROOT=$TRAVIS_BUILD_DIR/ACE_wrappers  
+        - export TBB_ROOT_DIR=$TRAVIS_BUILD_DIR/tbb
+        - wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
+        - unzip ACE-$ACE_VERSION.zip
+        - rm ACE-$ACE_VERSION.zip
+        - echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
+        - wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        - unzip tbb-$TBB_VERSION-win.zip
+        - rm tbb-$TBB_VERSION-win.zip
+        - choco install -y make
+        - choco install -y openssl
+      scripts:
+        - cd $ACE_ROOT
+        - /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/MSBuild/15.0/Bin/MSBuild.exe "ACE_wrappers_vs2017.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
+        - cd $TRAVIS_BUILD_DIR
+        - mkdir build
+        - cd build
+        - cmake -D TBB_ROOT_DIR=$TBB_ROOT_DIR -G "Visual Studio 15 2017 Win64" ..
+        - /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/MSBuild/15.0/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
 
-  - mkdir build
-  - cd build
-  - cmake -DDEBUG=0 -DUSE_LIBCURL=1 ..
-
-script: make -j4
+scripts: |-
+  mkdir build
+  mkdir _install
+  cd build 
+  cmake -DCMAKE_INSTALL_PREFIX=../_install -DDEBUG=0 -DUSE_LIBCURL=1 .. 
+  make -j2
+  make install 

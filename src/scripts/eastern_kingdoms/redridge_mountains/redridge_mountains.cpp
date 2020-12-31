@@ -30,18 +30,21 @@ npc_corporal_keeshan */
 ## npc_corporal_leehsan
 ######*/
 
-enum
+enum CorporalLeehsanData
 {
+    FACTION_ESCORTEE        = 10, // only during escort
+    FACTION_STORMWIND       = 12, // default ooc faction
+
     QUEST_MISSING_IN_ACTION = 219,
 
     SPELL_MOCKING_BLOW      = 21008,
     SPELL_SHIELD_BASH       = 11972,
 
-    SAY_CORPORAL_KEESHAN_1  = -1000561,
-    SAY_CORPORAL_KEESHAN_2  = -1000562,
-    SAY_CORPORAL_KEESHAN_3  = -1000563,
-    SAY_CORPORAL_KEESHAN_4  = -1000564,
-    SAY_CORPORAL_KEESHAN_5  = -1000565,
+    SAY_CORPORAL_KEESHAN_1  = 25,
+    SAY_CORPORAL_KEESHAN_2  = 26,
+    SAY_CORPORAL_KEESHAN_3  = 27,
+    SAY_CORPORAL_KEESHAN_4  = 29,
+    SAY_CORPORAL_KEESHAN_5  = 30
 };
 
 struct npc_corporal_keeshan_escortAI : npc_escortAI
@@ -64,12 +67,14 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
     {
         switch (uiWP)
         {
-            case 27:                                        //break outside
-                DoScriptText(SAY_CORPORAL_KEESHAN_3, m_creature);
+            case 27: // break outside
+                if (Player* pPlayer = GetPlayerForEscort())
+                    DoScriptText(SAY_CORPORAL_KEESHAN_3, m_creature, pPlayer);
                 m_creature->SetStandState(UNIT_STAND_STATE_STAND);
                 break;
-            case 54:                                        //say goodbye
-                DoScriptText(SAY_CORPORAL_KEESHAN_5, m_creature);
+            case 54: // say goodbye
+                if (Player* pPlayer = GetPlayerForEscort())
+                    DoScriptText(SAY_CORPORAL_KEESHAN_5, m_creature, pPlayer);
                 break;
         }
     }
@@ -80,7 +85,8 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
         {
             case 26:                                        //break outside
                 m_creature->SetStandState(UNIT_STAND_STATE_SIT);
-                DoScriptText(SAY_CORPORAL_KEESHAN_2, m_creature);
+                if (Player* pPlayer = GetPlayerForEscort())
+                    DoScriptText(SAY_CORPORAL_KEESHAN_2, m_creature, pPlayer);
                 break;
             case 53:                                        //quest_complete
                 DoScriptText(SAY_CORPORAL_KEESHAN_4, m_creature);
@@ -90,15 +96,15 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         //Combat check
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiMockingBlowTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MOCKING_BLOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MOCKING_BLOW);
             m_uiMockingBlowTimer = 5000;
         }
         else
@@ -106,7 +112,7 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
 
         if (m_uiShieldBashTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH);
             m_uiShieldBashTimer = 8000;
         }
         else
@@ -121,18 +127,18 @@ CreatureAI* GetAI_npc_corporal_keeshan(Creature* pCreature)
     return new npc_corporal_keeshan_escortAI(pCreature);
 }
 
-bool QuestAccept_npc_corporal_keeshan(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_corporal_keeshan(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MISSING_IN_ACTION)
     {
         if (auto pEscortAI = dynamic_cast<npc_corporal_keeshan_escortAI*>(pCreature->AI()))
         {
-            DoScriptText(SAY_CORPORAL_KEESHAN_1, pCreature);
+            DoScriptText(SAY_CORPORAL_KEESHAN_1, pCreature, pPlayer);
+            pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
         }
     }
     return true;
-
 }
 
 void AddSC_redridge_mountains()

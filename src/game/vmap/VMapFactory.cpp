@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <sys/types.h>
 #include "VMapFactory.h"
 #include "VMapManager2.h"
 
@@ -44,13 +43,13 @@ void chompAndTrim(std::string& str)
     }
 }
 
-IVMapManager* gVMapManager = 0;
-Table<unsigned int , bool>* iIgnoreSpellIds = 0;
+IVMapManager* gVMapManager = nullptr;
+Table<unsigned int, bool>* iIgnoreSpellIds = nullptr;
 
 //===============================================
 // result false, if no more id are found
 
-bool getNextId(const std::string& pString, unsigned int& pStartPos, unsigned int& pId)
+bool getNextId(std::string const& pString, unsigned int& pStartPos, unsigned int& pId)
 {
     bool result = false;
     unsigned int i;
@@ -75,11 +74,11 @@ bool getNextId(const std::string& pString, unsigned int& pStartPos, unsigned int
 parameter: String of map ids. Delimiter = ","
 */
 
-void VMapFactory::preventSpellsFromBeingTestedForLoS(const char* pSpellIdString)
+void VMapFactory::preventSpellsFromBeingTestedForLoS(char const* pSpellIdString)
 {
     if (!iIgnoreSpellIds)
         iIgnoreSpellIds = new Table<unsigned int , bool>();
-    if (pSpellIdString != NULL)
+    if (pSpellIdString != nullptr)
     {
         unsigned int pos = 0;
         unsigned int id;
@@ -101,7 +100,7 @@ bool VMapFactory::checkSpellForLoS(unsigned int pSpellId)
 // just return the instance
 IVMapManager* VMapFactory::createOrGetVMapManager()
 {
-    if (gVMapManager == 0)
+    if (!gVMapManager)
         gVMapManager = new VMapManager2();              // should be taken from config ... Please change if you like :-)
     return gVMapManager;
 }
@@ -113,7 +112,7 @@ void VMapFactory::clear()
     delete iIgnoreSpellIds;
     delete gVMapManager;
 
-    iIgnoreSpellIds = NULL;
-    gVMapManager = NULL;
+    iIgnoreSpellIds = nullptr;
+    gVMapManager = nullptr;
 }
 }

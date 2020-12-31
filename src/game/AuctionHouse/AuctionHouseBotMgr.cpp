@@ -47,7 +47,7 @@ void AuctionHouseBotMgr::Load()
     uint32 count = 0;
     BarGoLink bar(result->GetRowCount());
 
-    Field *fields;
+    Field* fields;
     do
     {
         bar.step();
@@ -96,7 +96,7 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
     if (!(m_config->enable || force))
         return;
 
-    if (m_items.size() == 0 ||  /*m_config->botguid==0 ||*/ m_config->botaccount == 0)
+    if (m_items.empty() ||  /*m_config->botguid==0 ||*/ m_config->botaccount == 0)
     {
         sLog.outError("AHBot::Update() : Bad config or empty table.");
         return;

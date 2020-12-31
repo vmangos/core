@@ -62,14 +62,11 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_tomb_of_seven.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/instance_blackrock_depths.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_drakkisath.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_gyth.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_halycon.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_highlord_omokk.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_mother_smolderweb.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_overlord_wyrmthalak.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_pyroguard_emberseer.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_quartermaster_zigris.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_rend_blackhand.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_shadow_hunter_voshgajin.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_the_beast.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_urok.cpp
@@ -121,7 +118,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/eastern_plaguelands/naxxramas/boss_thaddius.cpp
     eastern_kingdoms/eastern_plaguelands/naxxramas/instance_naxxramas.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_baroness_anastari.cpp
-    eastern_kingdoms/eastern_plaguelands/stratholme/boss_baron_rivendare.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_cannon_master_willey.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_dathrohan_balnazzar.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_magistrate_barthilas.cpp
@@ -131,13 +127,11 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_postmaster_malown.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_ramstein_the_gorger.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_timmy_the_cruel.cpp
-    eastern_kingdoms/eastern_plaguelands/stratholme/boss_atiesh.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/instance_stratholme.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/stratholme.cpp
     eastern_kingdoms/elwynn_forest/elwynn_forest.cpp
     eastern_kingdoms/hillsbrad_foothills/hillsbrad_foothills.cpp
     eastern_kingdoms/hinterlands/hinterlands.cpp
-    eastern_kingdoms/ironforge/ironforge.cpp
     eastern_kingdoms/loch_modan/loch_modan.cpp
     eastern_kingdoms/redridge_mountains/redridge_mountains.cpp
     eastern_kingdoms/searing_gorge/searing_gorge.cpp
@@ -164,7 +158,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/swamp_of_sorrows/swamp_of_sorrows.cpp
     eastern_kingdoms/swamp_of_sorrows/sunken_temple/instance_sunken_temple.cpp
     eastern_kingdoms/swamp_of_sorrows/sunken_temple/sunken_temple.cpp
-    eastern_kingdoms/tirisfal_glades/tirisfal_glades.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_arcanist_doan.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_azshir_the_sleepless.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_bloodmage_thalnos.cpp
@@ -224,8 +217,6 @@ set (SCRIPTS_SRCS
     kalimdor/feralas/dire_maul/boss_zevrim.cpp
     kalimdor/feralas/dire_maul/dreadsteed_ritual.cpp
     kalimdor/feralas/dire_maul/instance_dire_maul.cpp
-    kalimdor/feralas/dire_maul/npc_ecorcefer.cpp
-    kalimdor/feralas/dire_maul/npc_pusillin.cpp
     kalimdor/moonglade/boss_omen.cpp
     kalimdor/moonglade/moonglade.cpp
     kalimdor/mulgore/mulgore.cpp
@@ -264,15 +255,13 @@ set (SCRIPTS_SRCS
     kalimdor/the_barrens/wailing_caverns/instance_wailing_caverns.cpp
     kalimdor/the_barrens/wailing_caverns/wailing_caverns.cpp
     kalimdor/thousand_needles/thousand_needles.cpp
-    kalimdor/thunder_bluff/thunder_bluff.cpp
     kalimdor/ungoro_crater/ungoro_crater.cpp
     kalimdor/winterspring/winterspring.cpp
     PrecompiledHeaders/scriptPCH.cpp
     world/areatrigger_scripts.cpp
-    world/boss_anachronos.cpp
-    world/boss_lord_kazzak.cpp
     world/elemental_invasions.cpp
     world/event_scourge_invasion.cpp
+    world/fireworks_show.cpp
     world/go_scripts.cpp
     world/npcs_special.cpp
     world/spell_scripts.cpp
@@ -289,6 +278,11 @@ set (SCRIPTS_SRCS
 
 )
 
+if(WIN32)
+  if(MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+  endif()
+endif()
 
 # Used in game ScriptMgr, not need here
 list(REMOVE_ITEM SCRIPTS_SRCS ScriptLoader.cpp)
@@ -314,7 +308,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/AI
   ${CMAKE_SOURCE_DIR}/src/game/Anticheat
   ${CMAKE_SOURCE_DIR}/src/game/AuctionHouse
-  ${CMAKE_SOURCE_DIR}/src/game/AutoTesting
   ${CMAKE_SOURCE_DIR}/src/game/Battlegrounds
   ${CMAKE_SOURCE_DIR}/src/game/Chat
   ${CMAKE_SOURCE_DIR}/src/game/Commands
@@ -333,11 +326,9 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/PlayerBots
   ${CMAKE_SOURCE_DIR}/src/game/Protocol
   ${CMAKE_SOURCE_DIR}/src/game/Spells
-  ${CMAKE_SOURCE_DIR}/src/game/Texts
   ${CMAKE_SOURCE_DIR}/src/game/Threat
   ${CMAKE_SOURCE_DIR}/src/game/Transports
   ${CMAKE_SOURCE_DIR}/src/game/vmap
-  ${CMAKE_SOURCE_DIR}/src/game/Warden
   ${CMAKE_SOURCE_DIR}/dep/include
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite

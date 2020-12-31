@@ -17,17 +17,15 @@
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum FaerlinaData
 {
-    SAY_PULL                    = -1533010, // slay them in the masters name
-    SAY_ENRAGE1                 = -1533011, // you cannot hide from me!
-    SAY_ENRAGE2                 = -1533012, // kneel before me, worm!
-    SAY_ENRAGE3                 = -1533013, // Run while you can!
-    SAY_SLAY1                   = -1533014, // You have failed!
-    SAY_SLAY2                   = -1533015, // Pathethic Wretch
-    SAY_DEATH                   = -1533016, // the master... will avenge me!
-
-    //SOUND_RANDOM_AGGRO          = 8955,   //soundId containing the 4 aggro sounds, we not using this
+    SAY_PULL                    = 12856, // slay them in the masters name
+    SAY_ENRAGE1                 = 12857, // you cannot hide from me!
+    SAY_ENRAGE2                 = 12858, // kneel before me, worm!
+    SAY_ENRAGE3                 = 12859, // Run while you can!
+    SAY_SLAY1                   = 12854, // You have failed!
+    SAY_SLAY2                   = 12855, // Pathethic Wretch
+    SAY_DEATH                   = 12853, // the master... will avenge me!
 
     SPELL_POSIONBOLT_VOLLEY     = 28796,
     SPELL_ENRAGE                = 28798, 
@@ -40,15 +38,15 @@ enum
     MOB_WORSHIPPER              = 16506
 };
 
-
 /*
 https://www.youtube.com/watch?v=pVjB7pCX3XM
 https://www.youtube.com/watch?v=iTUc8xUeLgw
 ^ Around 7-10sec cooldown. Times she's not casting it for 30+sec she is silenced by worshipper sacrifice.
   Might be fixed 8sec cast, but slightly delayed sometimes due to rain of fire or other reasons.
 */
-static const uint32 POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
-static const uint32 INITIAL_POISONBOLT_VOLLEY_CD = 8000;
+
+static uint32 POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
+static uint32 const INITIAL_POISONBOLT_VOLLEY_CD = 8000;
 
 /*
 https://www.youtube.com/watch?v=pVjB7pCX3XM
@@ -58,16 +56,18 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 
   Initial cd seems to be around 16sec
 */
-static const uint32 RAINOFFIRE_CD() { return urand(8000, 12000); }
-static const uint32 RAINOFFIRE_INITIAL_CD = 16000;
 
-static const float ADD_DESPAWN_TIME = 20000;
-static const float followerPos[2][4] =
+static uint32 RAINOFFIRE_CD() { return urand(8000, 12000); }
+static uint32 const RAINOFFIRE_INITIAL_CD = 16000;
+
+static float const ADD_DESPAWN_TIME = 20000;
+static float const followerPos[2][4] =
 {
     { 3359.75f, -3621.77f, 261.18f, 4.54f },
     {3346.29f, -3619.32f, 261.18f, 4.61f }
 };
-static const float worshipPos[4][4] =
+
+static float const worshipPos[4][4] =
 {
     {3350.61f, -3619.74f, 261.18f, 4.65f},
     {3341.36f, -3619.35f, 261.18f, 4.68f},
@@ -95,14 +95,14 @@ struct boss_faerlinaAI : public ScriptedAI
     ObjectGuid followers[2] = { 0,0 };
     ObjectGuid worshippers[4] = { 0,0,0,0 };
 
-    void Reset()
+    void Reset() override
     {
         m_uiPoisonBoltVolleyTimer   = INITIAL_POISONBOLT_VOLLEY_CD;
         m_uiRainOfFireTimer         = RAINOFFIRE_INITIAL_CD;
         m_uiEnrageTimer             = 60000;
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override 
+    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override 
     {
         /*
         note from wowhead:
@@ -164,26 +164,26 @@ struct boss_faerlinaAI : public ScriptedAI
     {
         switch (pSummoned->GetEntry())
         {
-        case MOB_FOLLOWER:
-            for (int i = 0; i < 2; i++)
-            {
-                if (followers[i] == pSummoned->GetObjectGuid())
+            case MOB_FOLLOWER:
+                for (auto& follower : followers)
                 {
-                    followers[i] = 0;
-                    break;
+                    if (follower == pSummoned->GetObjectGuid())
+                    {
+                        follower = 0;
+                        break;
+                    }
                 }
-            }
-            break;
-        case MOB_WORSHIPPER:
-            for (int i = 0; i < 4; i++)
-            {
-                if (worshippers[i] == pSummoned->GetObjectGuid())
+                break;
+            case MOB_WORSHIPPER:
+                for (auto& worshipper : worshippers)
                 {
-                    worshippers[i] = 0;
-                    break;
+                    if (worshipper == pSummoned->GetObjectGuid())
+                    {
+                        worshipper = 0;
+                        break;
+                    }
                 }
-            }
-            break;
+                break;
         }
     }
 
@@ -194,35 +194,35 @@ struct boss_faerlinaAI : public ScriptedAI
         CheckRespawnAdds();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_PULL, m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_FAERLINA, IN_PROGRESS);
 
-        for (int i = 0; i < 2; i++) {
-            if (Creature* c = m_pInstance->GetCreature(followers[i]))
+        for (const auto& follower : followers)
+        {
+            if (Creature* c = m_pInstance->GetCreature(follower))
                 c->AI()->AttackStart(pWho);
         }
 
-        for (int i = 0; i < 4; i++) {
-            if (Creature* c = m_pInstance->GetCreature(worshippers[i]))
+        for (const auto& worshipper : worshippers)
+        {
+            if (Creature* c = m_pInstance->GetCreature(worshipper))
                 c->AI()->AttackStart(pWho);
         }
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         //todo aggro range
-        if (m_creature->IsWithinDistInMap(pWho, 60.0f))
-        {
-        }
+        if (m_creature->IsWithinDistInMap(pWho, 60.0f)) { }
 
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -230,7 +230,7 @@ struct boss_faerlinaAI : public ScriptedAI
         DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -238,11 +238,11 @@ struct boss_faerlinaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_FAERLINA, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        
+
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
         {
             std::list<Creature*> creatures;
@@ -263,7 +263,7 @@ struct boss_faerlinaAI : public ScriptedAI
             }
             else 
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POSIONBOLT_VOLLEY) == CanCastResult::CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POSIONBOLT_VOLLEY) == CanCastResult::CAST_OK)
                 {
                     m_uiPoisonBoltVolleyTimer = POSIONBOLT_VOLLEY_CD();
                 }
@@ -296,7 +296,7 @@ struct boss_faerlinaAI : public ScriptedAI
                 if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CanCastResult::CAST_OK)
                 {
                     m_uiEnrageTimer = 60000;
-                    DoScriptText(SAY_ENRAGE3 + urand(0, 2), m_creature);
+                    DoScriptText(urand(SAY_ENRAGE1, SAY_ENRAGE3), m_creature);
                 }
             }
         }
@@ -309,13 +309,14 @@ struct boss_faerlinaAI : public ScriptedAI
 
 struct mob_faerlina_rp : public ScriptedAI
 {
-    enum eEvents {
+    enum eEvents
+    {
         EVENT_KNEEL = 1,
         EVENT_CAST,
         EVENT_STAND,
         EVENT_UNAURA
     };
-    
+
     EventMap events;
 
     mob_faerlina_rp(Creature* pCreature) : ScriptedAI(pCreature)
@@ -323,20 +324,20 @@ struct mob_faerlina_rp : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
         events.ScheduleEvent(EVENT_KNEEL, Seconds(urand(5, 10)));
     }
-    
+
     std::list<Creature*> getGroup()
     {
         std::list<Creature*> creatures;
         GetCreatureListWithEntryInGrid(creatures, m_creature, { NPC_NaxxramasAcolyte, NPC_NaxxramasCultist }, 11.0f);
         return creatures;
     }
-    
-    void UpdateAI(const uint32 diff) override
+
+    void UpdateAI(uint32 const diff) override
     {
         events.Update(diff);
         while (uint32 eventId = events.ExecuteEvent())
@@ -347,7 +348,7 @@ struct mob_faerlina_rp : public ScriptedAI
                 Reset();
                 break;
             }
-            if ((*creatures.begin())->isInCombat())
+            if ((*creatures.begin())->IsInCombat())
             {
                 Reset();
                 break;
@@ -355,7 +356,7 @@ struct mob_faerlina_rp : public ScriptedAI
 
             for (auto it = creatures.begin(); it != creatures.end();)
             {
-                if ((*it)->isDead())
+                if ((*it)->IsDead())
                     it = creatures.erase(it);
                 else
                     ++it;

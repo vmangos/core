@@ -40,16 +40,18 @@ void AddItemsSetItem(Player* player, Item* item)
         return;
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (set->required_skill_id && player->GetSkillValue(set->required_skill_id) < set->required_skill_value)
         return;
+#endif
 
     ItemSetEffect* eff = nullptr;
 
-    for (size_t x = 0; x < player->m_ItemSetEff.size(); ++x)
+    for (const auto& x : player->m_ItemSetEff)
     {
-        if (player->m_ItemSetEff[x] && player->m_ItemSetEff[x]->setid == setid)
+        if (x && x->setid == setid)
         {
-            eff = player->m_ItemSetEff[x];
+            eff = x;
             break;
         }
     }
@@ -90,9 +92,9 @@ void AddItemsSetItem(Player* player, Item* item)
             continue;
 
         // new spell
-        for (uint32 y = 0; y < 8; y++)
+        for (auto& spell : eff->spells)
         {
-            if (!eff->spells[y])                             // free slot
+            if (!spell)                             // free slot
             {
                 SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(set->spells[x]);
                 if (!spellInfo)
@@ -103,7 +105,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
                 // spell casted only if fit form requirement, in other case will casted at form change
                 player->ApplyEquipSpell(spellInfo, nullptr, true);
-                eff->spells[y] = spellInfo;
+                spell = spellInfo;
                 break;
             }
         }
@@ -148,13 +150,13 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
         if (set->items_to_triggerspell[x] <= eff->item_count)
             continue;
 
-        for (uint32 z = 0; z < 8; z++)
+        for (auto& spell : eff->spells)
         {
-            if (eff->spells[z] && eff->spells[z]->Id == set->spells[x])
+            if (spell && spell->Id == set->spells[x])
             {
                 // spell can be not active if not fit form requirement
-                player->ApplyEquipSpell(eff->spells[z], nullptr, false);
-                eff->spells[z] = nullptr;
+                player->ApplyEquipSpell(spell, nullptr, false);
+                spell = nullptr;
                 break;
             }
         }
@@ -192,10 +194,6 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                     if (pProto->BagFamily != BAG_FAMILY_ENCHANTING_SUPP)
                         return false;
                     return true;
-                case ITEM_SUBCLASS_ENGINEERING_CONTAINER:
-                    if (pProto->BagFamily != BAG_FAMILY_ENGINEERING_SUPP)
-                        return false;
-                    return true;
             }
             return false;
         case ITEM_CLASS_QUIVER:
@@ -220,8 +218,9 @@ Item::Item() : loot(nullptr)
 {
     m_objectType |= TYPEMASK_ITEM;
     m_objectTypeId = TYPEID_ITEM;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     m_updateFlag = UPDATEFLAG_ALL;
-
+#endif
     m_valuesCount = ITEM_END;
     m_slot = 0;
     uState = ITEM_NEW;
@@ -475,13 +474,12 @@ bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint3
     // Remove bind flag for items vs NO_BIND set
     if (IsSoulBound() && proto->Bonding == NO_BIND)
     {
-        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, false);
+        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND, false);
         need_save = true;
     }
 
-
     std::string enchants = fields[6].GetString();
-    _LoadIntoDataField(enchants.c_str(), ITEM_FIELD_ENCHANTMENT, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
+    _LoadIntoDataField(enchants, ITEM_FIELD_ENCHANTMENT, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
 
     uint32 durability = fields[8].GetUInt16();
@@ -598,9 +596,9 @@ Player* Item::GetOwner()const
     return sObjectMgr.GetPlayer(GetOwnerGuid());
 }
 
-uint32 Item::GetSkill()
+uint32 ItemPrototype::GetProficiencySkill() const
 {
-    const static uint32 item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
+    static uint32 const item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
     {
         SKILL_AXES,     SKILL_2H_AXES,  SKILL_BOWS,          SKILL_GUNS,      SKILL_MACES,
         SKILL_2H_MACES, SKILL_POLEARMS, SKILL_SWORDS,        SKILL_2H_SWORDS, 0,
@@ -609,40 +607,36 @@ uint32 Item::GetSkill()
         SKILL_FISHING
     };
 
-    const static uint32 item_armor_skills[MAX_ITEM_SUBCLASS_ARMOR] =
+    static uint32 const item_armor_skills[MAX_ITEM_SUBCLASS_ARMOR] =
     {
         0, SKILL_CLOTH, SKILL_LEATHER, SKILL_MAIL, SKILL_PLATE_MAIL, 0, SKILL_SHIELD, 0, 0, 0
     };
 
-    ItemPrototype const* proto = GetProto();
-
-    switch (proto->Class)
+    switch (Class)
     {
         case ITEM_CLASS_WEAPON:
-            if (proto->SubClass >= MAX_ITEM_SUBCLASS_WEAPON)
+            if (SubClass >= MAX_ITEM_SUBCLASS_WEAPON)
                 return 0;
             else
-                return item_weapon_skills[proto->SubClass];
+                return item_weapon_skills[SubClass];
 
         case ITEM_CLASS_ARMOR:
-            if (proto->SubClass >= MAX_ITEM_SUBCLASS_ARMOR)
+            if (SubClass >= MAX_ITEM_SUBCLASS_ARMOR)
                 return 0;
             else
-                return item_armor_skills[proto->SubClass];
+                return item_armor_skills[SubClass];
 
         default:
             return 0;
     }
 }
 
-uint32 Item::GetSpell()
+uint32 ItemPrototype::GetProficiencySpell() const
 {
-    ItemPrototype const* proto = GetProto();
-
-    switch (proto->Class)
+    switch (Class)
     {
         case ITEM_CLASS_WEAPON:
-            switch (proto->SubClass)
+            switch (SubClass)
             {
                 case ITEM_SUBCLASS_WEAPON_AXE:
                     return  196;
@@ -677,7 +671,7 @@ uint32 Item::GetSpell()
             }
             return 0;
         case ITEM_CLASS_ARMOR:
-            switch (proto->SubClass)
+            switch (SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
                     return 9078;
@@ -1002,11 +996,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
         MANGOS_ASSERT(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* pItem = NewItemOrBag(pProto);
-        uint32 lowGuid = 0;
-        if (player)
-            lowGuid = player->GetSession()->GenerateItemLowGuid();
-        else
-            lowGuid = sObjectMgr.GenerateItemLowGuid();
+        uint32 lowGuid = sObjectMgr.GenerateItemLowGuid();
 
         if (pItem->Create(lowGuid, item, player ? player->GetObjectGuid() : ObjectGuid()))
         {
@@ -1099,9 +1089,9 @@ bool ItemRequiredTarget::IsFitToRequirements(Unit* pUnitTarget) const
     switch (m_uiType)
     {
         case ITEM_TARGET_TYPE_CREATURE:
-            return pUnitTarget->isAlive();
+            return pUnitTarget->IsAlive();
         case ITEM_TARGET_TYPE_DEAD:
-            return !pUnitTarget->isAlive();
+            return !pUnitTarget->IsAlive();
         default:
             return false;
     }
@@ -1163,12 +1153,12 @@ bool Item::ChangeEntry(ItemPrototype const* pNewProto)
     return true;
 }
 
-void Item::GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale)
+void Item::GetLocalizedNameWithSuffix(std::string& name, ItemPrototype const* proto, ItemRandomPropertiesEntry const* randomProp, int dbLocale, LocaleConstant dbcLocale)
 {
     // local name
     if (dbLocale >= 0)
     {
-        ItemLocale const *il = sObjectMgr.GetItemLocale(proto->ItemId);
+        ItemLocale const* il = sObjectMgr.GetItemLocale(proto->ItemId);
         if (il)
         {
             if (il->Name.size() > size_t(dbLocale) && !il->Name[dbLocale].empty())

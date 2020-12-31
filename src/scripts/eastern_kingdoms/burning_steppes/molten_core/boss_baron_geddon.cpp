@@ -51,7 +51,7 @@ struct boss_baron_geddonAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         m_uiIgniteManaTimer    = urand(10000, 15000);
         m_uiLivingBombTimer    = urand(15000, 20000);
@@ -60,28 +60,28 @@ struct boss_baron_geddonAI : public ScriptedAI
         m_bInferno             = false;
         m_bArmageddon          = false;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_GEDDON, NOT_STARTED);
 
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GEDDON, IN_PROGRESS);
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GEDDON, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_bArmageddon)
@@ -123,7 +123,7 @@ struct boss_baron_geddonAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= diff)
             {
-                if (Unit* pTarget = m_creature->getVictim())
+                if (Unit* pTarget = m_creature->GetVictim())
                 {
                     m_creature->SetInFront(pTarget);
                     m_creature->SetTargetGuid(pTarget->GetObjectGuid());
@@ -150,7 +150,7 @@ struct boss_baron_geddonAI : public ScriptedAI
                 InfCount = 0;
                 Tick = 1000;
                 m_bInferno = true;
-                m_creature->addUnitState(UNIT_STAT_ROOT);
+                m_creature->AddUnitState(UNIT_STAT_ROOT);
             }
         }
         else
@@ -183,10 +183,10 @@ struct boss_baron_geddonAI : public ScriptedAI
                     case 8:
                         Damage = 2500;
                         m_bInferno = false;
-                        m_creature->clearUnitState(UNIT_STAT_ROOT);
+                        m_creature->ClearUnitState(UNIT_STAT_ROOT);
                         break;
                 }
-                m_creature->CastCustomSpell(m_creature, 19698, &Damage, NULL, NULL, true);
+                m_creature->CastCustomSpell(m_creature, 19698, &Damage, nullptr, nullptr, true);
                 InfCount++;
                 Tick = 0;
             }
@@ -206,7 +206,7 @@ CreatureAI* GetAI_boss_baron_geddon(Creature* pCreature)
 
 void AddSC_boss_baron_geddon()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_baron_geddon";
     newscript->GetAI = &GetAI_boss_baron_geddon;

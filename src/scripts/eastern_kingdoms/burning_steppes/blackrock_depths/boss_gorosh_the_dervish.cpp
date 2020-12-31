@@ -39,17 +39,17 @@ struct boss_gorosh_the_dervishAI : public ScriptedAI
     uint32 MortalStrike_Timer;
     uint32 Bloodlust_Timer;
 
-    void Reset()
+    void Reset() override
     {
         WhirlWind_Timer = 12000;
         MortalStrike_Timer = 22000;
         Bloodlust_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //WhirlWind_Timer
@@ -63,7 +63,7 @@ struct boss_gorosh_the_dervishAI : public ScriptedAI
         //MortalStrike_Timer
         if (MortalStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALSTRIKE);
             MortalStrike_Timer = 15000;
         }
         else MortalStrike_Timer -= diff;
@@ -90,7 +90,7 @@ CreatureAI* GetAI_boss_gorosh_the_dervish(Creature* pCreature)
 
 void AddSC_boss_gorosh_the_dervish()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_gorosh_the_dervish";
     newscript->GetAI = &GetAI_boss_gorosh_the_dervish;

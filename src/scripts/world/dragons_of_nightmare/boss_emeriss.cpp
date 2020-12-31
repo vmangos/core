@@ -52,7 +52,7 @@ bool boss_emerissAI::DoSpecialAbility()
     return false;
 }
 
-bool boss_emerissAI::UpdateDragonAI(const uint32 uiDiff)
+bool boss_emerissAI::UpdateDragonAI(uint32 const uiDiff)
 {
     // Emeriss Aura
     if (m_uiEmerissAuraTimer <= uiDiff)

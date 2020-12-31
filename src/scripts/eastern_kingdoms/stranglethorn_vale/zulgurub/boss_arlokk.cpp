@@ -103,7 +103,7 @@ struct boss_arlokkAI : public ScriptedAI
     bool m_bIsVanished;
     ObjectGuid m_doorGuid;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShadowWordPain_Timer = 8000;
         m_uiGouge_Timer = 14000;
@@ -130,7 +130,7 @@ struct boss_arlokkAI : public ScriptedAI
         m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
@@ -138,7 +138,7 @@ struct boss_arlokkAI : public ScriptedAI
             door->UseDoorOrButton();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             if (m_pInstance->GetData(TYPE_ARLOKK) != DONE)
@@ -152,7 +152,7 @@ struct boss_arlokkAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -164,6 +164,9 @@ struct boss_arlokkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_ARLOKK, DONE);
         if (GameObject* door = m_creature->FindNearestGameObject(GO_ARLOKK_FORCE_FIELD, 100.0f))
             door->ResetDoorOrButton();
+
+        // Remove a Hakkar Power stack.
+        m_creature->CastSpell(m_creature, SPELL_HAKKAR_POWER_DOWN, true);
     }
 
     void DoSummonSinglePhanter(float x, float y, float z, Unit* pTarget)
@@ -179,11 +182,11 @@ struct boss_arlokkAI : public ScriptedAI
         DoSummonSinglePhanter(-11532.9970f, -1606.4840f, 41.2979f, pUnit);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (Unit* pUnit = m_creature->GetMap()->GetUnit(m_uiMarkedGUID))
         {
-            if (pUnit->isAlive())
+            if (pUnit->IsAlive())
             {
                 pSummoned->AI()->AttackStart(pUnit);
                 ++m_uiSummonCount;
@@ -201,16 +204,16 @@ struct boss_arlokkAI : public ScriptedAI
         EnterEvadeMode();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!m_bIsPhaseTwo && !m_bIsVanished) //P1
         {
             if (m_uiShadowWordPain_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWWORDPAIN) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWWORDPAIN) == CAST_OK)
                     m_uiShadowWordPain_Timer = 15000;
             }
             else
@@ -218,7 +221,7 @@ struct boss_arlokkAI : public ScriptedAI
 
             if (m_uiBackstab_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKSTAB) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB) == CAST_OK)
                     m_uiBackstab_Timer = urand(6000, 12000);
             }
             else
@@ -257,7 +260,7 @@ struct boss_arlokkAI : public ScriptedAI
         {
             if (m_uiThrash_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ROSSER) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ROSSER) == CAST_OK)
                     m_uiThrash_Timer = urand(5000, 9000);
             }
             else
@@ -266,7 +269,7 @@ struct boss_arlokkAI : public ScriptedAI
             // Ravage Timer
             if (m_uiRavage_Timer <= uiDiff)
             {
-                if (DoCastSpellIfCan(me->getVictim(), SPELL_RAVAGE) == CAST_OK)
+                if (DoCastSpellIfCan(me->GetVictim(), SPELL_RAVAGE) == CAST_OK)
                     m_uiRavage_Timer = 16000;
             }
             else
@@ -275,10 +278,10 @@ struct boss_arlokkAI : public ScriptedAI
             //Gouge_Timer
             if (m_uiGouge_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GOUGE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_GOUGE) == CAST_OK)
                 {
-                    if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -80);
+                    if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                        m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -80);
 
                     m_uiGouge_Timer = urand(17000, 27000);
                 }
@@ -288,7 +291,7 @@ struct boss_arlokkAI : public ScriptedAI
 
             if (m_uiTourbillon_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TOURBILLON) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TOURBILLON) == CAST_OK)
                     m_uiTourbillon_Timer = 16000;
             }
             else
@@ -333,7 +336,7 @@ struct boss_arlokkAI : public ScriptedAI
                 // Transformation en panthere
                 m_creature->CastSpell(m_creature, SPELL_PANTHER_TRANSFORM, false);
                 m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.7f);
-                const CreatureInfo *cinfo = m_creature->GetCreatureInfo();
+                CreatureInfo const *cinfo = m_creature->GetCreatureInfo();
                 m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->dmg_min + ((cinfo->dmg_min / 100) * 35)));
                 m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->dmg_max + ((cinfo->dmg_max / 100) * 35)));
                 m_creature->UpdateDamagePhysical(BASE_ATTACK);
@@ -390,28 +393,28 @@ struct mob_prowlerAI : public ScriptedAI
                 m_uiArlokkGuid = pArlokk->GetGUID();
 
         if (Creature* pArlokk = m_creature->GetMap()->GetCreature(m_uiArlokkGuid))
-            if (pArlokk->isAlive())
+            if (pArlokk->IsAlive())
                 return CAST_AI(boss_arlokkAI, pArlokk->AI());
-        return NULL;
+        return nullptr;
     }
-    void Reset()
+    void Reset() override
     {
         DoCast(m_creature, 22766);
         m_uiThrash_Timer = urand(5000, 9000);
         m_uiUpdateTarget_Timer = 2000;
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (boss_arlokkAI* pArlokkAI = GetArlokkAI())
             pArlokkAI->m_uiSummonCount--;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiUpdateTarget_Timer <= uiDiff)
         {
-            Unit *pMarkedTarget = NULL;
+            Unit *pMarkedTarget = nullptr;
             if (boss_arlokkAI* pArlokkAI = GetArlokkAI())
                 pMarkedTarget = m_creature->GetMap()->GetUnit(pArlokkAI->m_uiMarkedGUID);
             else
@@ -419,8 +422,8 @@ struct mob_prowlerAI : public ScriptedAI
                 m_creature->AddObjectToRemoveList();
                 return;
             }
-            if (DoGetThreat(m_creature->getVictim()))
-                DoModifyThreatPercent(m_creature->getVictim(), -100);
+            if (DoGetThreat(m_creature->GetVictim()))
+                DoModifyThreatPercent(m_creature->GetVictim(), -100);
             if (pMarkedTarget)
             {
                 
@@ -456,7 +459,7 @@ CreatureAI* GetAI_mob_prowler(Creature* pCreature)
 
 void AddSC_boss_arlokk()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_gong_of_bethekk";

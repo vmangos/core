@@ -42,8 +42,8 @@ struct boss_omenAI : ScriptedAI
     uint32 m_uiStarfallTimer;
 
     void Reset() override;
-    void UpdateAI(const uint32 uiDiff) override;
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override;
+    void UpdateAI(uint32 const uiDiff) override;
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override;
     void JustDied(Unit* pKiller) override;
     
     static void OnFireworkLaunch(Unit* pSummoner);

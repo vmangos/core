@@ -53,17 +53,17 @@ enum CorpseFlags
 class Corpse : public WorldObject
 {
     public:
-        explicit Corpse( CorpseType type = CORPSE_BONES );
-        ~Corpse( );
+        explicit Corpse(CorpseType type = CORPSE_BONES);
+        ~Corpse() override;
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
-        bool Create( uint32 guidlow );
-        bool Create( uint32 guidlow, Player *owner );
+        bool Create(uint32 guidlow);
+        bool Create(uint32 guidlow, Player* owner);
 
         void SaveToDB();
-        bool LoadFromDB(uint32 guid, Field *fields);
+        bool LoadFromDB(uint32 guid, Field* fields);
 
         void DeleteBonesFromWorld();
         void DeleteFromDB();
@@ -71,27 +71,29 @@ class Corpse : public WorldObject
         ObjectGuid const& GetOwnerGuid() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
         time_t const& GetGhostTime() const { return m_time; }
-        void ResetGhostTime() { m_time = time(NULL); }
+        void ResetGhostTime() { m_time = time(nullptr); }
         CorpseType GetType() const { return m_type; }
 
-        ReputationRank GetReactionTo(Unit const* unit) const;
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        ReputationRank GetReactionTo(WorldObject const* target) const final ;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
 
         GridPair const& GetGrid() const { return m_grid; }
         void SetGrid(GridPair const& grid) { m_grid = grid; }
 
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
+        bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         Loot loot;                                          // remove insignia ONLY at BG
         Player* lootRecipient;
         bool lootForBody;
 
-        GridReference<Corpse> &GetGridRef() { return m_gridRef; }
+        GridReference<Corpse>& GetGridRef() { return m_gridRef; }
 
         bool IsExpired(time_t t) const;
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }
         FactionTemplateEntry const* GetFactionTemplate() { return m_faction; }
+        uint32 GetFactionTemplateId() const final;
+        uint32 GetLevel() const final ;
     private:
         GridReference<Corpse> m_gridRef;
         FactionTemplateEntry const* m_faction;

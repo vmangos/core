@@ -24,7 +24,6 @@
 */
 
 #include "WorldSocketMgr.h"
-#include "NodesMgr.h"
 #include "Common.h"
 #include "World.h"
 #include "WorldRunnable.h"
@@ -107,14 +106,16 @@ void WorldRunnable::operator()()
         #endif
     }
 
+    sLog.outString("Shutting down world...");
     sWorld.Shutdown();
 
     // unload battleground templates before different singletons destroyed
     sBattleGroundMgr.DeleteAllBattleGrounds();
 
+    sLog.outString("Stopping network threads...");
     sWorldSocketMgr->StopNetwork();
-    sNodesMgr->OnServerShutdown();
 
+    sLog.outString("Unloading all maps...");
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)
 
     ///- End the database thread

@@ -24,8 +24,8 @@
 
 // Client expected level limitation, like as used in DBC item max levels for "until max player level"
 // use as default max player level, must be fit max level for used client
-// also see MAX_LEVEL and STRONG_MAX_LEVEL define
-#define DEFAULT_MAX_LEVEL 60
+// also see MAX_LEVEL and PLAYER_STRONG_MAX_LEVEL define
+#define PLAYER_MAX_LEVEL 60
 
 // client supported max level for player/pets/etc. Avoid overflow or client stability affected.
 // also see GT_MAX_LEVEL define
@@ -33,7 +33,10 @@
 
 // Server side limitation. Base at used code requirements.
 // also see MAX_LEVEL and GT_MAX_LEVEL define
-#define STRONG_MAX_LEVEL 255
+#define PLAYER_STRONG_MAX_LEVEL 255
+
+// Max creature level in vanilla (included some bosses and elite) (no cls data above this level)
+#define CREATURE_MAX_LEVEL 65
 
 enum AreaTeams
 {

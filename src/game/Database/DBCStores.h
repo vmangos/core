@@ -38,31 +38,28 @@ TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
 WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
 
-uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
+CharacterFacialHairStylesEntry const* GetCharFacialHairEntry(uint8 race, uint8 gender, uint8 facialHairId);
+CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color);
 
 ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id);
-ChatChannelsEntry const* GetChannelEntryFor(const std::string& name);
-
-// [-ZERO] bool IsTotemCategoryCompatiableWith(uint32 itemTotemCategoryId, uint32 requiredTotemCategoryId);
+ChatChannelsEntry const* GetChannelEntryFor(std::string const& name);
 
 bool Zone2MapCoordinates(float& x,float& y,uint32 zone);
 bool Map2ZoneCoordinates(float& x,float& y,uint32 zone);
 
-uint32 GetTalentInspectBitPosInTab(uint32 talentId);
-uint32 GetTalentTabInspectBitSize(uint32 talentTabId);
-uint32 const* /*[3]*/ GetTalentTabPages(uint32 cls);
-
 bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, float x, float y, float z, float delta = 0.0f);
-
-MANGOS_DLL_SPEC uint32 GetCreatureModelRace(uint32 model_id);
 
 typedef std::multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfoMap;
 typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
 SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_);
 
+uint8 ValidateName(std::wstring const& name);
+
 extern DBCStorage <AuctionHouseEntry>            sAuctionHouseStore;
 extern DBCStorage <BankBagSlotPricesEntry>       sBankBagSlotPricesStore;
 //extern DBCStorage <ChatChannelsEntry>           sChatChannelsStore; -- accessed using function, no usable index
+extern DBCStorage <CharacterFacialHairStylesEntry>  sCharacterFacialHairStylesStore;
+extern DBCStorage <CharSectionsEntry>            sCharSectionsStore;
 extern DBCStorage <ChrClassesEntry>              sChrClassesStore;
 extern DBCStorage <ChrRacesEntry>                sChrRacesStore;
 extern DBCStorage <CinematicSequencesEntry>      sCinematicSequencesStore;
@@ -70,7 +67,6 @@ extern DBCStorage <CreatureDisplayInfoEntry>     sCreatureDisplayInfoStore;
 extern DBCStorage <CreatureDisplayInfoExtraEntry>sCreatureDisplayInfoExtraStore;
 extern DBCStorage <CreatureModelDataEntry>       sCreatureModelDataStore;
 extern DBCStorage <CreatureFamilyEntry>          sCreatureFamilyStore;
-extern DBCStorage <CreatureSpellDataEntry>       sCreatureSpellDataStore;
 extern DBCStorage <CreatureTypeEntry>            sCreatureTypeStore;
 extern DBCStorage <DurabilityCostsEntry>         sDurabilityCostsStore;
 extern DBCStorage <DurabilityQualityEntry>       sDurabilityQualityStore;
@@ -83,7 +79,6 @@ extern DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore;
 extern DBCStorage <ItemRandomPropertiesEntry>    sItemRandomPropertiesStore;
 extern DBCStorage <ItemSetEntry>                 sItemSetStore;
 extern DBCStorage <LockEntry>                    sLockStore;
-extern DBCStorage <MailTemplateEntry>            sMailTemplateStore;
 extern DBCStorage <QuestSortEntry>               sQuestSortStore;
 extern DBCStorage <SkillLineEntry>               sSkillLineStore;
 extern DBCStorage <SkillRaceClassInfoEntry>      sSkillRaceClassInfoStore;
@@ -109,15 +104,9 @@ extern DBCStorage <WMOAreaTableEntry>            sWMOAreaTableStore;
 //extern DBCStorage <WorldMapOverlayEntry>         sWorldMapOverlayStore;
 extern DBCStorage <WorldSafeLocsEntry>           sWorldSafeLocsStore;
 
-void LoadDBCStores(const std::string& dataPath);
+void LoadDBCStores(std::string const& dataPath);
 
-// script support functions
-MANGOS_DLL_SPEC DBCStorage <SpellRangeEntry>            const* GetSpellRangeStore();
-MANGOS_DLL_SPEC DBCStorage <CreatureDisplayInfoEntry>   const* GetCreatureDisplayStore();
-MANGOS_DLL_SPEC DBCStorage <EmotesEntry>                const* GetEmotesStore();
-MANGOS_DLL_SPEC DBCStorage <EmotesTextEntry>            const* GetEmotesTextStore();
-
-char const* GetRaceName(uint8 race, uint8 locale);
-char const* GetClassName(uint8 class_, uint8 locale);
+char const* GetUnitRaceName(uint8 race, uint8 locale);
+char const* GetUnitClassName(uint8 class_, uint8 locale);
 
 #endif

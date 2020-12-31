@@ -24,15 +24,15 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum PatchwerkData
 {
-    SAY_AGGRO1            = -1533017,
-    SAY_AGGRO2            = -1533018,
-    SAY_SLAY              = -1533019,
-    SAY_DEATH             = -1533020,
+    SAY_AGGRO1            = 13068,
+    SAY_AGGRO2            = 13069,
+    SAY_SLAY              = 13071,
+    SAY_DEATH             = 13070,
 
-    EMOTE_BERSERK         = -1533021,
-    EMOTE_ENRAGE          = -1533022,
+    EMOTE_BERSERK         = 4428,
+    EMOTE_ENRAGE          = 2384,
 
     SPELL_HATEFULSTRIKE   = 28308,
     SPELL_ENRAGE          = 28131, // 5% enrage soft enrage
@@ -73,7 +73,7 @@ struct boss_patchwerkAI : public ScriptedAI
     bool   m_bBerserk;
     ObjectGuid previousTarget;
 
-    void Reset()
+    void Reset() override
     {
         m_events.Reset();
         m_bEnraged = false;
@@ -81,7 +81,7 @@ struct boss_patchwerkAI : public ScriptedAI
         previousTarget = 0;
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (urand(0, 4))
             return;
@@ -89,7 +89,7 @@ struct boss_patchwerkAI : public ScriptedAI
         DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -103,7 +103,7 @@ struct boss_patchwerkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_PATCHWERK, FAIL);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(urand(0, 1) ? SAY_AGGRO1 : SAY_AGGRO2, m_creature);
 
@@ -124,43 +124,56 @@ struct boss_patchwerkAI : public ScriptedAI
         
         // todo: can it hit anything other than players?
 
-        Unit* mainTank = m_creature->getVictim();
+        Unit* mainTank = m_creature->GetVictim();
         
         // Shouldnt really be possible, but hey, weirder things have happened
         if (!mainTank)
             return;
-        const ObjectGuid& mainTankGuid = mainTank->GetObjectGuid();
+        ObjectGuid const& mainTankGuid = mainTank->GetObjectGuid();
 
         Unit* pTarget = nullptr;
         uint32 uiHighestHP = 0;
+        uint8 threatListPosition = 0;
 
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        for (ThreatList::const_iterator iter = tList.begin(); iter != tList.end(); ++iter)
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+        for (const auto iter : tList)
         {
-            // Skipping maintank, only using him if there is no other viable target todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
-            if ((*iter)->getUnitGuid() == mainTankGuid)
+            // Only top 4 players on threat in melee range are targetted.
+            if (threatListPosition > 3)
+                break;
+
+            if (!iter->getUnitGuid().IsPlayer())
                 continue;
-            if (!(*iter)->getUnitGuid().IsPlayer())
+            
+            Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid());
+            if (!pTempTarget)
                 continue;
 
-            if (Unit* pTempTarget = m_creature->GetMap()->GetUnit((*iter)->getUnitGuid()))
+            if (!m_creature->IsInMap(pTempTarget))
+                continue;
+
+            if (!m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
+                continue;
+
+            // Skipping maintank, only using him if there is no other viable target 
+            // todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
+            if (iter->getUnitGuid() != mainTankGuid)
             {
                 // target has higher hp than anyone checked so far
                 if (pTempTarget->GetHealth() > uiHighestHP)
                 {
-                    // target is in melee range, 2d distance will do
-                    if (m_creature->IsInMap(pTempTarget) && m_creature->GetDistance2d(pTempTarget) < MELEE_DISTANCE)
-                    {
-                        pTarget = pTempTarget;
-                        uiHighestHP = pTarget->GetHealth();
-                    }
+                    pTarget = pTempTarget;
+                    uiHighestHP = pTarget->GetHealth();
                 }
             }
+
+            threatListPosition++;
         }
 
         // If we found no viable target, we choose the maintank
         if (!pTarget)
             pTarget = mainTank;
+
         if (pTarget->GetObjectGuid() != previousTarget)
         {
             m_creature->SetInFront(pTarget);
@@ -172,23 +185,22 @@ struct boss_patchwerkAI : public ScriptedAI
 
     bool CustomGetTarget()
     {
-        if (!m_creature->isAlive())
+        if (!m_creature->IsAlive())
             return false;
 
         Unit* target = nullptr;
 
         // No taunt aura or taunt aura caster is dead, standard target selection
-        if (!target && !m_creature->getThreatManager().isThreatListEmpty())
-            target = m_creature->getThreatManager().getHostileTarget();
+        if (!target && !m_creature->GetThreatManager().isThreatListEmpty())
+            target = m_creature->GetThreatManager().getHostileTarget();
 
         if (target)
         {
             // Nostalrius : Correction bug sheep/fear
-            if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
+            if (!m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
                 && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
             {
-                
-                if (!m_creature->isAttackReady(BASE_ATTACK) && m_creature->IsWithinMeleeRange(target)) // he does not have offhand attack
+                if (!m_creature->IsAttackReady(BASE_ATTACK) && m_creature->IsWithinMeleeRange(target)) // he does not have offhand attack
                     return true;
 
                 if (target->GetObjectGuid() != previousTarget)
@@ -203,7 +215,7 @@ struct boss_patchwerkAI : public ScriptedAI
         }
 
         // no target but something prevent go to evade mode // Nostalrius - fix evade quand CM.
-        if (!m_creature->isInCombat() || m_creature->HasAuraType(SPELL_AURA_MOD_TAUNT) || m_creature->GetCharmerGuid())
+        if (!m_creature->IsInCombat() || m_creature->HasAuraType(SPELL_AURA_MOD_TAUNT) || m_creature->GetCharmerGuid())
             return false;
 
         // last case when creature don't must go to evade mode:
@@ -212,9 +224,9 @@ struct boss_patchwerkAI : public ScriptedAI
         // Note: creature not have targeted movement generator but have attacker in this case
         if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
         {
-            for (std::set<Unit*>::const_iterator itr = m_creature->getAttackers().begin(); itr != m_creature->getAttackers().end(); ++itr)
+            for (const auto itr : m_creature->GetAttackers())
             {
-                if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack())
+                if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack())
                     return false;
             }
         }
@@ -224,9 +236,9 @@ struct boss_patchwerkAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!CustomGetTarget() || !m_creature->getVictim())
+        if (!CustomGetTarget() || !m_creature->GetVictim())
             return;
 
         // Soft Enrage at 5%
@@ -239,31 +251,31 @@ struct boss_patchwerkAI : public ScriptedAI
                 m_bEnraged = true;
             }
         }
-        
+
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
             switch (l_EventId)
             {
-            case EVENT_BERSERK:
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                {
-                    DoScriptText(EMOTE_BERSERK, m_creature);
-                    m_bBerserk = true;
-                }
-                else
-                    m_events.Repeat(100);
-                break;
-            case EVENT_HATEFULSTRIKE:
-                DoHatefulStrike();
-                m_events.Repeat(HATEFUL_CD);
-                break;
-            case EVENT_SLIMEBOLT:
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIMEBOLT) == CAST_OK)
-                    m_events.Repeat(SLIMEBOLT_REPEAT_CD);
-                else
-                    m_events.Repeat(100);
-                break;
+                case EVENT_BERSERK:
+                    if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                    {
+                        DoScriptText(EMOTE_BERSERK, m_creature);
+                        m_bBerserk = true;
+                    }
+                    else
+                        m_events.Repeat(100);
+                    break;
+                case EVENT_HATEFULSTRIKE:
+                    DoHatefulStrike();
+                    m_events.Repeat(HATEFUL_CD);
+                    break;
+                case EVENT_SLIMEBOLT:
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIMEBOLT) == CAST_OK)
+                        m_events.Repeat(SLIMEBOLT_REPEAT_CD);
+                    else
+                        m_events.Repeat(100);
+                    break;
             }
         }
 

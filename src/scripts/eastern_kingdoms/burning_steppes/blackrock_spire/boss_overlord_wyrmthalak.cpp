@@ -35,7 +35,7 @@ enum
 
 };
 
-const float afLocations[2][4] =
+float const afLocations[2][4] =
 {
     { -39.355381f, -513.456482f, 88.472046f, 4.679872f},
     { -49.875881f, -511.896942f, 88.195160f, 4.613114f}
@@ -56,7 +56,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
     bool m_bPulledByPet;
     uint32 m_uiLeashCheckTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBlastWaveTimer = 20000;
         m_uiShoutTimer     = 2000;
@@ -68,15 +68,15 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         m_uiLeashCheckTimer = 5000;
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() != NPC_SPIRESTONE_WARLORD && pSummoned->GetEntry() != NPC_SMOLDERTHORN_BERSERKER)
             return;
 
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
         {
             Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            pSummoned->AI()->AttackStart(pTarget ? pTarget : m_creature->getVictim());
+            pSummoned->AI()->AttackStart(pTarget ? pTarget : m_creature->GetVictim());
         }
     }
 
@@ -104,10 +104,10 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
             EnterEvadeMode();
     } 
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Prevent players from pulling Wyrmthalak into UBRS
@@ -134,7 +134,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
             m_uiCleaveTimer = 7000;
         }
         else

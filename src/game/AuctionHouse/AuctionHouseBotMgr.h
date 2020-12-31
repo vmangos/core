@@ -39,7 +39,7 @@ class AuctionHouseBotMgr
 
         // force - put items in AH even if bot is disabled
         void Update(bool force = false);
-        void AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auctionHouse );
+        void AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auctionHouse);
 
     protected:
         std::vector<AuctionHouseBotEntry> m_items;

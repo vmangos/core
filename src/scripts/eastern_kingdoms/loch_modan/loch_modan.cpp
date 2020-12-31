@@ -17,81 +17,28 @@
 /* ScriptData
 SDName: Loch_Modan
 SD%Complete: 100
-SDComment: Quest support: 3181 (only to argue with pebblebitty to get to searing gorge, before quest rewarded), 309
+SDComment: Quest support: 309,  273
 SDCategory: Loch Modan
 EndScriptData */
 
 /* ContentData
-npc_mountaineer_pebblebitty
 npc_miran
 EndContentData */
 
 #include "scriptPCH.h"
 
 /*######
-## npc_mountaineer_pebblebitty
-######*/
-
-bool GossipHello_npc_mountaineer_pebblebitty(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (!pPlayer->GetQuestRewardStatus(3181) == 1)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Open the gate please, i need to get to Searing Gorge", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_mountaineer_pebblebitty(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "But i need to get there, now open the gate!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(1833, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ok, so what is this other way?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(1834, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Doesn't matter, i'm invulnerable.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->SEND_GOSSIP_MENU(1835, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Yes...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(1836, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ok, i'll try to remember that.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            pPlayer->SEND_GOSSIP_MENU(1837, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "A key? Ok!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-            pPlayer->SEND_GOSSIP_MENU(1838, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+7:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            break;
-    }
-    return true;
-}
-
-/*######
 ## npc_miran
 ######*/
 
-enum
+enum MiranData
 {
     QUEST_PROTECTING_THE_SHIPMENT = 309,
 
-    SAY_MIRAN_1           = -1000571,
-    SAY_DARK_IRON_DWARF   = -1000572,
-    SAY_MIRAN_2           = -1000573,
-    SAY_MIRAN_3           = -1000574,
+    SAY_MIRAN_1           = 510,
+    SAY_DARK_IRON_DWARF   = 1936,
+    SAY_MIRAN_2           = 511,
+    SAY_MIRAN_3           = 498,
 
     NPC_DARK_IRON_DWARF   = 2149
 };
@@ -116,13 +63,13 @@ struct npc_miranAI: public npc_escortAI
 
     uint8 m_uiDwarves;
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
             m_uiDwarves = 0;
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -139,7 +86,7 @@ struct npc_miranAI: public npc_escortAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
         {
@@ -149,7 +96,7 @@ struct npc_miranAI: public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
         {
@@ -161,7 +108,7 @@ struct npc_miranAI: public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_miran(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_miran(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PROTECTING_THE_SHIPMENT)
     {
@@ -181,7 +128,7 @@ CreatureAI* GetAI_npc_miran(Creature* pCreature)
 // Author: Kampeador
 //-----------------------------------------------------------------------------
 
-enum
+enum SaeanData
 {
     QUEST_RESUPPLYING_THE_EXCAVATION = 273,
  
@@ -212,28 +159,28 @@ struct npc_saeanAI : public ScriptedAI
     npc_saeanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // zero init required to prevent crash
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_darkIronAmbusher[i] = nullptr;
+        for (auto& i : m_darkIronAmbusher)
+            i = nullptr;
         m_numSummonedAmbushers = 0;
 
         m_eventStarted = false;
     }
 
-    void Reset() { }
+    void Reset() override { }
 
     // called when Saean summons his guards
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         // optimization: safely assume, that m_numSummonedAmbushers don't go outside range
         m_darkIronAmbusher[m_numSummonedAmbushers] = pSummoned;
         ++m_numSummonedAmbushers;
     }
 
-    void JustDied(Unit* pVictim)
+    void JustDied(Unit* pVictim) override
     {
         // It is safe to forget about ambushers, they will despawn automatically.
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_darkIronAmbusher[i] = nullptr;
+        for (auto& i : m_darkIronAmbusher)
+            i = nullptr;
         m_numSummonedAmbushers = 0;
 
         m_eventStarted = false;
@@ -250,7 +197,7 @@ CreatureAI* GetAI_npc_saean(Creature* pCreature)
 bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
     // If player is dead, GM mode is ON, quest complete or no quest
-    if (!pPlayer->isAlive() || pPlayer->IsGameMaster() ||
+    if (!pPlayer->IsAlive() || pPlayer->IsGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_NONE)
     return false;
@@ -265,7 +212,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     Creature* huldar = GetClosestCreatureWithEntry(pPlayer, NPC_HULDAR, 60.0f);
     if (huldar)
     {
-        if (!huldar->isAlive())
+        if (!huldar->IsAlive())
             return false;
     }
     else
@@ -275,7 +222,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     Creature* miran = GetClosestCreatureWithEntry(pPlayer, NPC_MIRAN, 60.0f);
     if (miran)
     {
-        if (!miran->isAlive())
+        if (!miran->IsAlive())
             return false;
         else
         {
@@ -292,16 +239,15 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     else
         return false;
 
-    
     // minor optimization: Quest NPCs are already in combat with someone, so skip further checks.
-    if (miran->isInCombat() || huldar->isInCombat())
+    if (miran->IsInCombat() || huldar->IsInCombat())
         return true;
-    
+
     // Check if Saean is available.
     Creature* saean = GetClosestCreatureWithEntry(pPlayer, NPC_SAEAN, 60.0f);
     if (saean)
     {
-        if (saean->isAlive())
+        if (saean->IsAlive())
         {
             npc_saeanAI* saeanAI = dynamic_cast<npc_saeanAI*>(saean->AI());
             if (saeanAI)
@@ -343,12 +289,6 @@ void AddSC_loch_modan()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "npc_mountaineer_pebblebitty";
-    newscript->pGossipHello =  &GossipHello_npc_mountaineer_pebblebitty;
-    newscript->pGossipSelect = &GossipSelect_npc_mountaineer_pebblebitty;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_miran";
     newscript->GetAI = &GetAI_npc_miran;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_miran;
@@ -364,4 +304,3 @@ void AddSC_loch_modan()
     newscript->pAreaTrigger = &AreaTrigger_at_huldar_miran;
     newscript->RegisterSelf();
 }
-

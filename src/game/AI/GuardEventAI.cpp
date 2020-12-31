@@ -21,7 +21,7 @@
 GuardEventAI::GuardEventAI(Creature* pCreature) : CreatureEventAI(pCreature)
 {}
 
-int GuardEventAI::Permissible(const Creature *creature)
+int GuardEventAI::Permissible(Creature const* creature)
 {
     if ((creature->GetAIName() == "GuardEventAI") || (creature->IsGuard() && (creature->GetAIName() == "EventAI")))
         return PERMIT_BASE_SPECIAL;
@@ -30,26 +30,26 @@ int GuardEventAI::Permissible(const Creature *creature)
 }
 
 // Returns whether the Unit is currently attacking other players or friendly npcs.
-bool GuardEventAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
+bool GuardEventAI::IsAttackingPlayerOrFriendly(Unit const* pWho) const
 {
     if (pWho->IsPvPContested())
         return true;
 
-    if (Unit* pVictim = pWho->getVictim())
+    if (Unit* pVictim = pWho->GetVictim())
     {
-        if (m_creature->IsFriendlyTo(pVictim) || pVictim->isTaxi())
+        if (m_creature->IsFriendlyTo(pVictim) || pVictim->IsTaxi())
             return true;
     }
 
     return false;
 }
 
-void GuardEventAI::MoveInLineOfSight(Unit *pWho)
+void GuardEventAI::MoveInLineOfSight(Unit* pWho)
 {
     if (!pWho)
         return;
 
-    if (m_creature->getVictim())
+    if (m_creature->GetVictim())
         return;
 
     // Check for OOC LOS Event
@@ -75,21 +75,21 @@ void GuardEventAI::MoveInLineOfSight(Unit *pWho)
     if (!m_creature->IsWithinDistInMap(pWho, attackRadius))
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() &&
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsValidAttackTarget(pWho) &&
         (pWho->IsHostileToPlayers() || m_creature->IsHostileTo(pWho) || isAttackingFriend) &&
-        pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+        pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
     {
         AttackStart(pWho);
     }
 }
 
-void GuardEventAI::EnterCombat(Unit *pWho)
+void GuardEventAI::EnterCombat(Unit* pWho)
 {
     CreatureEventAI::EnterCombat(pWho);
     m_creature->CallForHelp(30.0f);
 }
 
-void GuardEventAI::JustDied(Unit *pKiller)
+void GuardEventAI::JustDied(Unit* pKiller)
 {
     CreatureEventAI::JustDied(pKiller);
 

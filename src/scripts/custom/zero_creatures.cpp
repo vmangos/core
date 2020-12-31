@@ -105,7 +105,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
     uint32 Razor_Phase_2;
     uint32 Razor_Remove_Auras;
 
-    void Reset()
+    void Reset() override
     {
         Cleave_Timer = 15000;                               //These times are probably wrong
         WarStomp_Timer = 35000;
@@ -124,23 +124,23 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
 
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
 
-        //m_creature->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
+        //m_creature->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, nullptr);
         DoPlaySoundToSet(m_creature, 8272);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         m_pInstance->SetData(TYPE_RAZORGORE, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (Razor_Phase_1 == 1)
@@ -160,7 +160,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
         if (Razor_Remove_Auras < diff)
         {
 
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             m_creature->AI()->AttackStart(target);
 
@@ -179,7 +179,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
             //Cleave_Timer
             if (Cleave_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
                 Cleave_Timer = urand(7000, 10000);
             }
             else Cleave_Timer -= diff;
@@ -188,7 +188,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
             //WarStomp_Timer
             if (WarStomp_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_WARSTOMP);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WARSTOMP);
                 WarStomp_Timer = urand(15000, 25000);
             }
             else WarStomp_Timer -= diff;
@@ -197,7 +197,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
             //FireballVolley_Timer
             if (FireballVolley_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIREBALLVOLLEY);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIREBALLVOLLEY);
                 FireballVolley_Timer = urand(12000, 15000);
             }
             else FireballVolley_Timer -= diff;
@@ -205,16 +205,16 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
             //Conflagration_Timer
             if (Conflagration_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_CONFLAGRATION);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CONFLAGRATION);
 
                 Conflagration_Timer = 12000;
             }
             else Conflagration_Timer -= diff;
 
             // Aura Check. If the gamer is affected by confliguration we attack a random gamer.
-            if (m_creature->getVictim()->HasAura(SPELL_CONFLAGRATION, EFFECT_INDEX_0))
+            if (m_creature->GetVictim()->HasAura(SPELL_CONFLAGRATION, EFFECT_INDEX_0))
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
                 if (target)
                     m_creature->TauntApply(target);
@@ -314,8 +314,8 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                         break;
                 }
 
-                Creature* Spawned = NULL;
-                Unit* target = NULL;
+                Creature* Spawned = nullptr;
+                Unit* target = nullptr;
 
                 ++SpawnedAdds;
 
@@ -327,51 +327,51 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
                 }
 
                 ++SpawnedAdds;
 
                 //Spawn creature and force it to start attacking a random target
-                target = NULL;
-                Spawned = NULL;
+                target = nullptr;
+                Spawned = nullptr;
                 Spawned = m_creature->SummonCreature(SpawnType2, SPAWN_X2, SPAWN_Y2, SPAWN_Z2, 5.000, TEMPSUMMON_TIMED_DESPAWN, Despawn_Timer);
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
                 }
 
 
                 ++SpawnedAdds;
 
                 //Spawn creature and force it to start attacking a random target
-                target = NULL;
-                Spawned = NULL;
+                target = nullptr;
+                Spawned = nullptr;
                 Spawned = m_creature->SummonCreature(SpawnType3, SPAWN_X3, SPAWN_Y3, SPAWN_Z3, 5.000, TEMPSUMMON_TIMED_DESPAWN, Despawn_Timer);
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
 
                 }
 
                 ++SpawnedAdds;
 
                 //Spawn creature and force it to start attacking a random target
-                target = NULL;
-                Spawned = NULL;
+                target = nullptr;
+                Spawned = nullptr;
                 Spawned = m_creature->SummonCreature(SpawnType4, SPAWN_X4, SPAWN_Y4, SPAWN_Z4, 5.000, TEMPSUMMON_TIMED_DESPAWN, Despawn_Timer);
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
                 }
                 Despawn_Timer = Despawn_Timer - 15000;
                 AddSpawnTimer = 15000;
@@ -399,7 +399,7 @@ struct Mob_Grethok_The_ControllerAI : public ScriptedAI
     uint32 Slow_Timer;
     uint32 Razorgore_Spawn;
 
-    void Reset()
+    void Reset() override
     {
         Greater_Polymorph_Timer = 3000;
         Dominate_Mind_Timer = 1000;
@@ -408,15 +408,15 @@ struct Mob_Grethok_The_ControllerAI : public ScriptedAI
         Razorgore_Spawn = 1;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
 
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Greater Polymorph
@@ -471,7 +471,7 @@ CreatureAI* GetZeroAI_Mob_Grethok_The_Controller(Creature* pCreature)
 
 void AddSC_zero_creatures()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "zero_boss_razorgore";
     newscript->GetAI = &GetZeroAI_boss_razorgore;

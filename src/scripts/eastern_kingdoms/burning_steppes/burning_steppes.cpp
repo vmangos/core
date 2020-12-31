@@ -17,116 +17,10 @@
 /* ScriptData
 SDName: Burning_Steppes
 SD%Complete: 100
-SDComment: Quest support: 4224, 4866
 SDCategory: Burning Steppes
 EndScriptData */
 
-/* ContentData
-npc_ragged_john
-EndContentData */
-
 #include "scriptPCH.h"
-
-/*######
-## npc_ragged_john
-######*/
-
-struct npc_ragged_johnAI : public ScriptedAI
-{
-    npc_ragged_johnAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() {}
-
-    void MoveInLineOfSight(Unit *who)
-    {
-        if (who->HasAura(16468, EFFECT_INDEX_0))
-        {
-            if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 15) && who->isInAccessablePlaceFor(m_creature))
-            {
-                DoCastSpellIfCan(who, 16472);
-                ((Player*)who)->AreaExploredOrEventHappens(4866);
-            }
-        }
-
-        ScriptedAI::MoveInLineOfSight(who);
-    }
-};
-
-CreatureAI* GetAI_npc_ragged_john(Creature* pCreature)
-{
-    return new npc_ragged_johnAI(pCreature);
-}
-
-bool GossipHello_npc_ragged_john(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(4224) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Official business, John. I need some information about Marshal Windsor. Tell me about the last time you saw him.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(2713, pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_ragged_john(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "So what did you do?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->SEND_GOSSIP_MENU(2714, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Start making sense, dwarf. I don't want to have anything to do with your cracker, your pappy, or any sort of 'discreditin'.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(2715, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ironfoe?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(2716, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Interesting... continue John.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->SEND_GOSSIP_MENU(2717, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "So that's how Windsor died...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(2718, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "So how did he die?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            pPlayer->SEND_GOSSIP_MENU(2719, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ok so where the hell is he? Wait a minute! Are you drunk?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-            pPlayer->SEND_GOSSIP_MENU(2720, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+7:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "WHY is he in Blackrock Depths?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-            pPlayer->SEND_GOSSIP_MENU(2721, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+8:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "300? So the Dark Irons killed him and dragged him into the Depths?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-            pPlayer->SEND_GOSSIP_MENU(2722, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+9:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ahh... Ironfoe", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-            pPlayer->SEND_GOSSIP_MENU(2723, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+10:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thanks, Ragged John. Your story was very uplifting and informative", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-            pPlayer->SEND_GOSSIP_MENU(2725, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+11:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->AreaExploredOrEventHappens(4224);
-            break;
-    }
-    return true;
-}
 
 //IMPORT SD2
 /*######
@@ -283,9 +177,9 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 //break;ok so... it turns out I kill them BEFORE  we get to the paused ^.^
 
                 // Set all the dragons in combat
-                for (GuidList::const_iterator itr = m_lSearscaleGuidList.begin(); itr != m_lSearscaleGuidList.end(); ++itr)
+                for (const auto& guid : m_lSearscaleGuidList)
                 {
-                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
                         pTemp->AI()->AttackStart(pPlayer);
                 }
                 break;
@@ -374,7 +268,7 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 if (Player* pPlayer = GetPlayerForEscort())
                     pPlayer->GroupEventHappens(QUEST_ID_PRECARIOUS_PREDICAMENT, m_creature);
                 // Kill self
-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, nullptr, false);
                 break;
         }
     }
@@ -450,11 +344,11 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 return m_creature->GetMap()->GetCreature(m_lexlortGuid);
 
             default:
-                return NULL;
+                return nullptr;
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         DialogueUpdate(uiDiff);
         if (HasEscortState(STATE_ESCORT_PAUSED) && HasEscortState(STATE_ESCORT_ESCORTING))
@@ -467,7 +361,7 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 m_uiSomethingWentWrongTimer -=  uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -479,7 +373,7 @@ CreatureAI* GetAI_npc_grark_lorkrub(Creature* pCreature)
     return new npc_grark_lorkrubAI(pCreature);
 }
 
-bool QuestAccept_npc_grark_lorkrub(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_grark_lorkrub(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_PRECARIOUS_PREDICAMENT)
     {
@@ -492,7 +386,7 @@ bool QuestAccept_npc_grark_lorkrub(Player* pPlayer, Creature* pCreature, const Q
     return false;
 }
 
-bool EffectDummyCreature_spell_capture_grark(Unit* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget/*, ObjectGuid*/ /*originalCasterGuid*/)
+bool EffectDummyCreature_spell_capture_grark(WorldObject* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget/*, ObjectGuid*/ /*originalCasterGuid*/)
 {
     // always check spellid and effectindex
     if (uiSpellId == SPELL_CAPTURE_GRARK && uiEffIndex == EFFECT_INDEX_0)
@@ -520,7 +414,7 @@ enum
     SPELL_DEMONIC_FRENZY            = 23257,
     SPELL_ENTROPIC_STING            = 23260,
 
-    EMOTE_FRENZY                    = -1000001,
+    EMOTE_FRENZY                    = 7797,
 
     NPC_NELSON_THE_NICE             = 14529,
     NPC_KLINFRAN_THE_CRAZED         = 14534,
@@ -556,7 +450,7 @@ struct npc_klinfranAI : public ScriptedAI
     uint32 m_uiDemonic_Frenzy_Timer;
     uint32 m_uiDespawn_Timer;
 
-    void Reset() 
+    void Reset()  override
     {
         switch (m_creature->GetEntry())
         {
@@ -608,9 +502,9 @@ struct npc_klinfranAI : public ScriptedAI
     }
 
     /** Klinfran the Crazed */
-    void Aggro(Unit* pWho) 
+    void Aggro(Unit* pWho) override
     {
-        if (pWho->getClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
+        if (pWho->GetClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
         {
             m_hunterGuid = pWho->GetObjectGuid();
         }
@@ -618,7 +512,7 @@ struct npc_klinfranAI : public ScriptedAI
             DemonDespawn();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         m_creature->SetHomePosition(-8318.19f, -993.662f, 176.956f, 5.65024f);
 
@@ -644,13 +538,13 @@ struct npc_klinfranAI : public ScriptedAI
             Creature* pCleaner = m_creature->SummonCreature(NPC_THE_CLEANER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(m_creature), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20*MINUTE*IN_MILLISECONDS);
             if (pCleaner)
             {
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 
-                for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
+                for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {
-                        if (pUnit->isAlive())
+                        if (pUnit->IsAlive())
                         {
                             pCleaner->SetInCombatWith(pUnit);
                             pCleaner->AddThreat(pUnit);
@@ -664,7 +558,7 @@ struct npc_klinfranAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
     
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell && pSpell->Id == 14277)   // Scorpid Sting (Rank 4)
         {
@@ -673,7 +567,7 @@ struct npc_klinfranAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Franklin the Friendly */
         if (m_bTransform)
@@ -703,17 +597,17 @@ struct npc_klinfranAI : public ScriptedAI
         {
             if (m_uiDespawn_Timer <= uiDiff)
             {
-                if (m_creature->isAlive() && !m_creature->isInCombat())
+                if (m_creature->IsAlive() && !m_creature->IsInCombat())
                     DemonDespawn(false);
             }
             else
                 m_uiDespawn_Timer -= uiDiff;
         }
             
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->getThreatManager().getThreatList().size() > 1 /*|| pHunter->isDead()*/)
+        if (m_creature->GetThreatManager().getThreatList().size() > 1 /*|| pHunter->IsDead()*/)
             DemonDespawn();
 
         if (m_uiDemonic_Frenzy_Timer < uiDiff)
@@ -754,14 +648,8 @@ CreatureAI* GetAI_npc_klinfran(Creature* pCreature)
 
 void AddSC_burning_steppes()
 {
-    Script *newscript;
+    Script* newscript;
 
-    newscript = new Script;
-    newscript->Name = "npc_ragged_john";
-    newscript->GetAI = &GetAI_npc_ragged_john;
-    newscript->pGossipHello =  &GossipHello_npc_ragged_john;
-    newscript->pGossipSelect = &GossipSelect_npc_ragged_john;
-    newscript->RegisterSelf();
     //import SD2
     newscript = new Script;
     newscript->Name = "npc_grark_lorkrub";

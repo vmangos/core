@@ -23,7 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 
-#define EMOTE_GENERIC_FRENZY_KILL   -1000001
+#define EMOTE_GENERIC_FRENZY_KILL   7797
 
 #define SPELL_GROUNDTREMOR          6524
 #define SPELL_FRENZY                8269
@@ -38,16 +38,16 @@ struct boss_grizzleAI : public ScriptedAI
     uint32 GroundTremor_Timer;
     uint32 Frenzy_Timer;
 
-    void Reset()
+    void Reset() override
     {
         GroundTremor_Timer = 12000;
         Frenzy_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //GroundTremor_Timer
@@ -82,7 +82,7 @@ CreatureAI* GetAI_boss_grizzle(Creature* pCreature)
 
 void AddSC_boss_grizzle()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_grizzle";
     newscript->GetAI = &GetAI_boss_grizzle;

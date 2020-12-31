@@ -67,13 +67,13 @@ class TypeUnorderedMapContainer
         template<class SPECIFIC_TYPE>
         bool erase(KEY_TYPE handle, SPECIFIC_TYPE* /*obj*/)
         {
-            return TypeUnorderedMapContainer::erase(i_elements, handle, (SPECIFIC_TYPE*)NULL);
+            return TypeUnorderedMapContainer::erase(i_elements, handle, (SPECIFIC_TYPE*)nullptr);
         }
 
         template<class SPECIFIC_TYPE>
         SPECIFIC_TYPE* find(KEY_TYPE hdl, SPECIFIC_TYPE* /*obj*/)
         {
-            return TypeUnorderedMapContainer::find(i_elements, hdl, (SPECIFIC_TYPE*)NULL);
+            return TypeUnorderedMapContainer::find(i_elements, hdl, (SPECIFIC_TYPE*)nullptr);
         }
 
     private:
@@ -123,7 +123,7 @@ class TypeUnorderedMapContainer
         {
             typename std::unordered_map<KEY_TYPE, SPECIFIC_TYPE*>::iterator i = elements._element.find(hdl);
             if (i == elements._element.end())
-                return NULL;
+                return nullptr;
             else
                 return i->second;
         }
@@ -131,20 +131,20 @@ class TypeUnorderedMapContainer
         template<class SPECIFIC_TYPE>
         static SPECIFIC_TYPE* find(ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*elements*/, KEY_TYPE /*hdl*/, SPECIFIC_TYPE* /*obj*/)
         {
-            return NULL;
+            return nullptr;
         }
 
         template<class SPECIFIC_TYPE, class T>
         static SPECIFIC_TYPE* find(ContainerUnorderedMap<T, KEY_TYPE>& /*elements*/, KEY_TYPE /*hdl*/, SPECIFIC_TYPE* /*obj*/)
         {
-            return NULL;
+            return nullptr;
         }
 
         template<class SPECIFIC_TYPE, class H, class T>
         static SPECIFIC_TYPE* find(ContainerUnorderedMap< TypeList<H, T>, KEY_TYPE >& elements, KEY_TYPE hdl, SPECIFIC_TYPE* /*obj*/)
         {
-            SPECIFIC_TYPE* ret = TypeUnorderedMapContainer::find(elements._elements, hdl, (SPECIFIC_TYPE*)NULL);
-            return ret ? ret : TypeUnorderedMapContainer::find(elements._TailElements, hdl, (SPECIFIC_TYPE*)NULL);
+            SPECIFIC_TYPE* ret = TypeUnorderedMapContainer::find(elements._elements, hdl, (SPECIFIC_TYPE*)nullptr);
+            return ret ? ret : TypeUnorderedMapContainer::find(elements._TailElements, hdl, (SPECIFIC_TYPE*)nullptr);
         }
 
         // Erase helpers
@@ -171,8 +171,8 @@ class TypeUnorderedMapContainer
         template<class SPECIFIC_TYPE, class H, class T>
         static bool erase(ContainerUnorderedMap< TypeList<H, T>, KEY_TYPE >& elements, KEY_TYPE handle, SPECIFIC_TYPE* /*obj*/)
         {
-            bool ret = TypeUnorderedMapContainer::erase(elements._elements, handle, (SPECIFIC_TYPE*)NULL);
-            return ret ? ret : TypeUnorderedMapContainer::erase(elements._TailElements, handle, (SPECIFIC_TYPE*)NULL);
+            bool ret = TypeUnorderedMapContainer::erase(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
+            return ret ? ret : TypeUnorderedMapContainer::erase(elements._TailElements, handle, (SPECIFIC_TYPE*)nullptr);
         }
 };
 
@@ -209,19 +209,19 @@ struct ContainerMapList<TypeList<H, T> >
  */
 
 template<class OBJECT_TYPES>
-class MANGOS_DLL_DECL TypeMapContainer
+class TypeMapContainer
 {
     public:
 
         template<class SPECIFIC_TYPE>
-        size_t Count() const { return MaNGOS::Count(i_elements, (SPECIFIC_TYPE*)NULL); }
+        size_t Count() const { return MaNGOS::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
         /// inserts a specific object into the container
         template<class SPECIFIC_TYPE>
         bool insert(SPECIFIC_TYPE *obj)
         {
             SPECIFIC_TYPE* t = MaNGOS::Insert(i_elements, obj);
-            return (t != NULL);
+            return (t != nullptr);
         }
 
         ///  Removes the object from the container, and returns the removed object
@@ -229,7 +229,7 @@ class MANGOS_DLL_DECL TypeMapContainer
         bool remove(SPECIFIC_TYPE* obj)
         {
             SPECIFIC_TYPE* t = MaNGOS::Remove(i_elements, obj);
-            return (t != NULL);
+            return (t != nullptr);
         }
 
         ContainerMapList<OBJECT_TYPES> & GetElements() { return i_elements; }

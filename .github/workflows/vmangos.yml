@@ -1,0 +1,97 @@
+#3 build types 
+# - gcc under Ubuntu
+# - clang under Ubuntu
+# - visual studio under Windows
+#
+# Builds are set to use 2 threads per type
+name: vmangos CI build
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      #matrix declaration
+      matrix:
+        os: [ubuntu-latest]
+        compiler: [gcc, clang]
+        include:
+          - os: windows-latest
+
+    steps:
+
+    #git checkout
+    - uses: actions/checkout@v2
+
+    #before install dependencies
+    - name: ubuntu dependencies
+      #ubuntu dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get -qq install libmysql++-dev libace-dev libtbb-dev
+        sudo apt-get -qq install cmake build-essential cppcheck git make binutils-dev libiberty-dev openssl libssl-dev
+      #windows dependencies
+    - name: windows dependencies
+      if: matrix.os == 'windows-latest'
+      #Sets versions for ACE/TBB
+      env:
+        ACE_VERSION: 6.5.11
+        ACE_VERSION2: 6_5_11
+        TBB_VERSION: 2020.3
+      
+      run: |
+        #directory variables
+        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
+        #wget
+        choco install -y wget
+        #ACE package download
+        wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
+        unzip ACE-$ACE_VERSION.zip
+        rm ACE-$ACE_VERSION.zip
+        #configuration of ACE header
+        echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
+        #TBB package download
+        wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        unzip tbb-$TBB_VERSION-win.zip
+        rm tbb-$TBB_VERSION-win.zip
+        #make
+        choco install -y make
+        #cmake
+        choco install -y cmake
+        #openssl
+        choco install -y openssl
+      #git bash shell
+      shell: bash
+
+    #build and install
+    #ubuntu
+    - name: ubuntu build & install
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        mkdir build
+        mkdir _install
+        cd build
+        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DSERVERS=1 -DTOOLS=1 -DSCRIPTS=1 -DWITH_DOCS=1 -DWITH_WARNINGS=0 -DELUNA=0 -DWITH_COREDEBUG=0
+        make -j2
+        make install
+    #windows 
+    - name: windows build & install
+      if: matrix.os == 'windows-latest'
+      run: |
+        #directory variables
+        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        cd $GITHUB_WORKSPACE/ACE_wrappers
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
+        cd $GITHUB_WORKSPACE
+        mkdir build
+        cd build
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -G "Visual Studio 16 2019" -A x64 ..
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
+      #git bash shell
+      shell: bash

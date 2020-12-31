@@ -35,9 +35,9 @@ class SqlDelayThread
 
     private:
         SqlQueue m_sqlQueue;                                ///< Queue of SQL statements
-        Database* m_dbEngine;                               ///< Pointer to used Database engine
-        SqlConnection * m_dbConnection;                     ///< Pointer to DB connection
+        Database *m_dbEngine;                               ///< Pointer to used Database engine
         SqlQueue m_serialDelayQueue;
+        SqlConnection *m_dbConnection;                     ///< Pointer to DB connection
         volatile bool m_running;
 
 
@@ -54,6 +54,6 @@ class SqlDelayThread
         bool HasAsyncQuery();
 
         virtual void Stop();                                ///< Stop event
-        virtual void run();                                 ///< Main Thread loop
+        void run();                                 ///< Main Thread loop
 };
 #endif                                                      //__SQLDELAYTHREAD_H

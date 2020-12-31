@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: Azshara
 SD%Complete: 90
-SDComment: Quest support: 2744, 3141, 9364
+SDComment: Quest support: 2744, 3141
 SDCategory: Azshara
 EndScriptData */
 
@@ -31,89 +31,12 @@ EndContentData */
 #include "World.h"
 
 /*######
-## mobs_spitelashes
-######*/
-
-struct mobs_spitelashesAI : public ScriptedAI
-{
-    mobs_spitelashesAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 morphtimer;
-    bool spellhit;
-
-    void Reset()
-    {
-        morphtimer = 0;
-        spellhit = false;
-    }
-
-    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind)
-    {
-        if (!spellhit && Hitter->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (((Player*)Hitter)->GetQuestStatus(9364) == QUEST_STATUS_INCOMPLETE &&
-                    (Spellkind->Id == 118 || Spellkind->Id == 12824 || Spellkind->Id == 12825 || Spellkind->Id == 12826))
-            {
-                spellhit = true;
-                DoCastSpellIfCan(m_creature, 29124);                      //become a sheep
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        // we mustn't remove the creature in the same round in which we cast the summon spell, otherwise there will be no summons
-        if (spellhit && morphtimer >= 5000)
-        {
-            m_creature->ForcedDespawn();
-            return;
-        }
-
-        // walk 5 seconds before summoning
-        if (spellhit && morphtimer < 5000)
-        {
-            morphtimer += diff;
-            if (morphtimer >= 5000)
-            {
-                DoCastSpellIfCan(m_creature, 28406);                  //summon copies
-                DoCastSpellIfCan(m_creature, 6924);                   //visual explosion
-                uint32 invocation_nb = rand() % 4;
-                invocation_nb = invocation_nb + 2;
-                for (uint32 counter = 0; counter < invocation_nb; counter++)
-                {
-                    if (Creature* summoned = DoSpawnCreature(16479, 8.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 12000))
-                    {
-                        summoned->SetHomePosition(summoned->GetPositionX(), summoned->GetPositionY(), summoned->GetPositionZ(), 0.0f);
-                        summoned->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-                        summoned->SetRespawnRadius(55.0f);
-                    }
-                }
-
-            }
-        }
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        //TODO: add abilities for the different creatures
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mobs_spitelashes(Creature* pCreature)
-{
-    return new mobs_spitelashesAI(pCreature);
-}
-
-/*######
 ## npc_loramus_thalipedes
 ######*/
 
 bool GossipHello_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(2744) == QUEST_STATUS_INCOMPLETE)
@@ -135,7 +58,6 @@ bool GossipSelect_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature, u
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->AreaExploredOrEventHappens(2744);
             break;
-
         case GOSSIP_ACTION_INFO_DEF+2:
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Please continue", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
             pPlayer->SEND_GOSSIP_MENU(1813, pCreature->GetGUID());
@@ -167,21 +89,22 @@ bool GossipSelect_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature, u
 //--Alita MAWS
 enum
 {
-    //sorts
-    EAU_SOMBRE  = 25743,
-    FRENESIE    = 19812,
-    SACCAGER    = 25744, //charge
-    EMOTE_THE_BEAST_RETURNS = -1000800
+    SPELL_DARK_WATER = 25743,
+    SPELL_FRENZY     = 19812,
+    SPELL_RAMPAGE    = 25744,
+    EMOTE_THE_BEAST_RETURNS = 11160
 };
+
 struct Locations
 {
     float x, y, z;
 };
-//tourne dans l'eau avant aggro.
+
+// out of combat waypoints
 static Locations ronde[] =
 {
-    { 3525.413330f, -6673.905273f, -20.0f },//à cause de l'animation qui tombe je m'étais dit hop dans l'eau. non utilisé.
-    { 3561.725098f, -6647.203613f, -7.5f },//entre 57 et 58 metres du maelstom //spawn
+    { 3525.413330f, -6673.905273f, -20.0f }, // because of the animation that falls I said to myself hop in the water. Not used.
+    { 3561.725098f, -6647.203613f, -7.5f },  // between 57 and 58 meters from the maelstom // spawn
     { 3569.491211f, -6601.534668f, -7.5f },
     { 3567.581787f, -6601.534668f, -7.5f },
 
@@ -208,17 +131,17 @@ struct mob_mawsAI : public ScriptedAI
         Reset();
     }
     uint32 LastWayPoint;
-    uint32 SaccagerTimer;
-    uint32 SaccagerTimerMax;
+    uint32 RampageTimer;
+    uint32 RampageTimerMax;
     uint32 FrenzyTimer;
     uint32 FrenzyTimerMax;
     uint32 DarkWaterTimer;
-    uint32 LeaveCombatTimer; //juste pour éviter des abus.
+    uint32 LeaveCombatTimer; // just to avoid abuse
 
     bool InCombat;
     bool PhaseTwo;
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (!InCombat)
         {
@@ -231,11 +154,11 @@ struct mob_mawsAI : public ScriptedAI
             LastWayPoint = uiPointId;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (InCombat)
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || LeaveCombatTimer < uiDiff) // m_creature->getThreatManager().isThreatListEmpty() ?
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || LeaveCombatTimer < uiDiff) // m_creature->GetThreatManager().isThreatListEmpty() ?
             {
                 InCombat = 0;
                 Reset();
@@ -246,25 +169,25 @@ struct mob_mawsAI : public ScriptedAI
                 if (!PhaseTwo && m_creature->GetHealthPercent() < 20.0f)
                 {
                     PhaseTwo = true;
-                    SaccagerTimerMax = 12000;
+                    RampageTimerMax = 12000;
                     FrenzyTimerMax = 15000;
-                    if (SaccagerTimerMax < SaccagerTimer)
-                        SaccagerTimer = SaccagerTimerMax;
+                    if (RampageTimerMax < RampageTimer)
+                        RampageTimer = RampageTimerMax;
                     if (FrenzyTimerMax < FrenzyTimer)
                         FrenzyTimer = FrenzyTimerMax;
                 }
-                if (SaccagerTimer < uiDiff)
+                if (RampageTimer < uiDiff)
                 {
-                    DoCastSpellIfCan(m_creature->getVictim(), SACCAGER);
+                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RAMPAGE);
                     if (!PhaseTwo)
-                        SaccagerTimerMax = urand(20, 120) * 1000;
-                    SaccagerTimer = SaccagerTimerMax;
+                        RampageTimerMax = urand(20, 120) * 1000;
+                    RampageTimer = RampageTimerMax;
                 }
                 else
-                    SaccagerTimer -= uiDiff;
+                    RampageTimer -= uiDiff;
                 if (FrenzyTimer < uiDiff)
                 {
-                    DoCastSpellIfCan(m_creature, FRENESIE);
+                    DoCastSpellIfCan(m_creature, SPELL_FRENZY);
                     FrenzyTimer = FrenzyTimerMax;
                 }
                 else
@@ -273,7 +196,7 @@ struct mob_mawsAI : public ScriptedAI
                 {
                     if (DarkWaterTimer < uiDiff)
                     {
-                        DoCastSpellIfCan(m_creature, EAU_SOMBRE);
+                        DoCastSpellIfCan(m_creature, SPELL_DARK_WATER);
                         DarkWaterTimer = 15000;
                     }
                     else
@@ -281,35 +204,36 @@ struct mob_mawsAI : public ScriptedAI
                 }
 
                 if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
                 LeaveCombatTimer -= uiDiff;
                 DoMeleeAttackIfReady();
             }
         }
-        else if (m_creature->getVictim())
+        else if (m_creature->GetVictim())
             InCombat = 1;
     }
-    void DamageTaken(Unit *done_by, uint32 &damage)// l'empecher d'etre kittable infini. s'applique pas aux dégats de la charge.
+
+    void DamageTaken(Unit *done_by, uint32 &damage) override // Prevent infinite kiting. Does not apply to charge damage.
     {
         LeaveCombatTimer = 30000;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         sWorld.SendWorldText(EMOTE_THE_BEAST_RETURNS);
     }
 
-    void Reset()
+    void Reset() override
     {
         PhaseTwo = 0;
         InCombat = 0;
         m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
-        m_creature->SetLootRecipient(NULL);
+        m_creature->SetLootRecipient(nullptr);
         LeaveCombatTimer = 30000;
-        SaccagerTimer = urand(20, 120) * 1000;
-        SaccagerTimerMax = 120000;
+        RampageTimer = urand(20, 120) * 1000;
+        RampageTimerMax = 120000;
         FrenzyTimer = 25000;
         FrenzyTimerMax = 25000;
         DarkWaterTimer = 15000;
@@ -327,12 +251,7 @@ CreatureAI* GetAI_mob_maws(Creature* pCreature)
 
 void AddSC_azshara()
 {
-    Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "mobs_spitelashes";
-    newscript->GetAI = &GetAI_mobs_spitelashes;
-    newscript->RegisterSelf();
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_loramus_thalipedes";

@@ -32,7 +32,7 @@
 #include "SharedDefines.h"
 #include "Nostalrius.h"
 #include "ObjectGuid.h"
-#include "MapNodes/AbstractPlayer.h"
+#include "Chat/AbstractPlayer.h"
 #include "WorldPacket.h"
 
 #include <map>
@@ -192,8 +192,6 @@ enum eConfigUInt32Values
     CONFIG_UINT32_MAX_PLAYER_LEVEL,
     CONFIG_UINT32_START_PLAYER_LEVEL,
     CONFIG_UINT32_START_PLAYER_MONEY,
-    CONFIG_UINT32_MAX_HONOR_POINTS,
-    CONFIG_UINT32_START_HONOR_POINTS,
     CONFIG_UINT32_MIN_HONOR_KILLS,
     CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR,
     CONFIG_UINT32_INSTANCE_UNLOAD_DELAY,
@@ -268,6 +266,74 @@ enum eConfigUInt32Values
     CONFIG_UINT32_WAR_EFFORT_AUTOCOMPLETE_PERIOD,
     CONFIG_UINT32_ACCOUNT_CONCURRENT_AUCTION_LIMIT,
     CONFIG_UINT32_BANLIST_RELOAD_TIMER,
+    CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_REVERSE_TIME_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_REVERSE_TIME_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_NULL_TIME_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_NULL_TIME_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_THRESHOLD_TICK,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_THRESHOLD_TOTAL,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_NUM_DESYNCS_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_NUM_DESYNCS_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_THRESHOLD_TICK,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_THRESHOLD_TOTAL,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WALL_CLIMB_THRESHOLD_TICK,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WALL_CLIMB_THRESHOLD_TOTAL,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WALL_CLIMB_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_HOVER_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_HOVER_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD_TICK,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD_TOTAL,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SELF_ROOT_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_SELF_ROOT_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_PENALTY,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD,
+    CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY,
+    CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME,
+    CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY,
+    CONFIG_UINT32_AC_WARDEN_CLIENT_CHECK_HOLDOFF,
+    CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY,
+    CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION,
+    CONFIG_UINT32_AC_WARDEN_NUM_MEM_CHECKS,
+    CONFIG_UINT32_AC_WARDEN_NUM_OTHER_CHECKS,
+    CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL,
+    CONFIG_UINT32_AUTOBROADCAST_INTERVAL,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -288,6 +354,7 @@ enum eConfigInt32Values
     CONFIG_INT32_DEATH_SICKNESS_LEVEL = 0,
     CONFIG_INT32_QUEST_LOW_LEVEL_HIDE_DIFF,
     CONFIG_INT32_QUEST_HIGH_LEVEL_HIDE_DIFF,
+    CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC,
     CONFIG_INT32_VALUE_COUNT
 };
 
@@ -316,6 +383,7 @@ enum eConfigFloatValues
     CONFIG_FLOAT_RATE_DROP_ITEM_REFERENCED,
     CONFIG_FLOAT_RATE_DROP_MONEY,
     CONFIG_FLOAT_RATE_XP_KILL,
+    CONFIG_FLOAT_RATE_XP_KILL_ELITE,
     CONFIG_FLOAT_RATE_XP_QUEST,
     CONFIG_FLOAT_RATE_XP_EXPLORE,
     CONFIG_FLOAT_RATE_REPUTATION_GAIN,
@@ -366,6 +434,10 @@ enum eConfigFloatValues
     CONFIG_FLOAT_GHOST_RUN_SPEED_WORLD,
     CONFIG_FLOAT_GHOST_RUN_SPEED_BG,
     CONFIG_FLOAT_RATE_WAR_EFFORT_RESOURCE,
+    CONFIG_FLOAT_RATE_XP_PERSONAL_MIN,
+    CONFIG_FLOAT_RATE_XP_PERSONAL_MAX,
+    CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE,
+    CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE,
     CONFIG_FLOAT_VALUE_COUNT
 };
 
@@ -374,7 +446,6 @@ enum eConfigBoolValues
 {
     CONFIG_BOOL_GRID_UNLOAD = 0,
     CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW,
-    CONFIG_BOOL_IS_MAPSERVER,
     CONFIG_BOOL_GMS_ALLOW_PUBLIC_CHANNELS,
     CONFIG_BOOL_GMTICKETS_ENABLE,
     CONFIG_BOOL_TAG_IN_BATTLEGROUNDS,
@@ -443,12 +514,12 @@ enum eConfigBoolValues
     CONFIG_BOOL_VMAP_INDOOR_CHECK,
     CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,
     CONFIG_BOOL_ENABLE_DK,
+    CONFIG_BOOL_ENABLE_CITY_PROTECTOR,
     CONFIG_BOOL_ENABLE_MOVEMENT_INTERP,
     CONFIG_BOOL_WHISPER_RESTRICTION,
     CONFIG_BOOL_MAILSPAM_ITEM,
     CONFIG_BOOL_ACCURATE_PVP_EQUIP_REQUIREMENTS,
     CONFIG_BOOL_ACCURATE_PVP_PURCHASE_REQUIREMENTS,
-    CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS,
     CONFIG_BOOL_ACCURATE_PVP_TIMELINE,
     CONFIG_BOOL_ACCURATE_PVP_REWARDS,
     CONFIG_BOOL_BATTLEGROUND_RANDOMIZE,
@@ -463,6 +534,57 @@ enum eConfigBoolValues
     CONFIG_BOOL_RESTORE_DELETED_ITEMS,
     CONFIG_BOOL_UNLINKED_AUCTION_HOUSES,
     CONFIG_BOOL_PREVENT_ITEM_DATAMINING,
+    CONFIG_BOOL_AC_MOVEMENT_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY,
+    CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS,
+    CONFIG_BOOL_AC_MOVEMENT_LOG_DATA,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_REVERSE_TIME_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_NULL_TIME_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_TIME_DESYNC_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_NUM_DESYNCS_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_SPEED_HACK_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_SLOW_FALL_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_SLOW_FALL_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_HOVER_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_HOVER_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_SELF_ROOT_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_SELF_ROOT_REJECT,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED,
+    CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED,
+    CONFIG_BOOL_AC_WARDEN_WIN_ENABLED,
+    CONFIG_BOOL_AC_WARDEN_OSX_ENABLED,
+    CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY,
+    CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS,
+    CONFIG_BOOL_PLAYER_BOT_SHOW_IN_WHO_LIST,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -526,7 +648,7 @@ private:
 
 struct TransactionPart
 {
-    static const int MAX_TRANSACTION_ITEMS = 6;
+    static int const MAX_TRANSACTION_ITEMS = 6;
     TransactionPart()
     {
         memset(this, 0, sizeof(TransactionPart));
@@ -541,14 +663,14 @@ struct TransactionPart
 
 struct PlayerTransactionData
 {
-    const char* type;
+    char const* type;
     TransactionPart parts[2];
 };
 
 /// Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
-    typedef void Print(void*, const char*);
+    typedef void Print(void*, char const*);
     typedef void CommandFinished(void*, bool success);
 
     uint32 m_cliAccountId;                                  // 0 for console and real account id for RA/soap
@@ -558,7 +680,7 @@ struct CliCommandHolder
     Print* m_print;
     CommandFinished* m_commandFinished;
 
-    CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, const char *command, Print* zprint, CommandFinished* commandFinished)
+    CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, char const* command, Print* zprint, CommandFinished* commandFinished)
         : m_cliAccountId(accountId), m_cliAccessLevel(cliAccessLevel), m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
     {
         size_t len = strlen(command)+1;
@@ -584,7 +706,7 @@ class World
         typedef std::set<WorldSession*> SessionSet;
         SessionMap GetAllSessions() { return m_sessions; }
         WorldSession* FindSession(uint32 id) const;
-        void AddSession(WorldSession *s);
+        void AddSession(WorldSession* s);
         bool RemoveSession(uint32 id);
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();
@@ -609,9 +731,9 @@ class World
         int32 GetQueuedSessionPos(WorldSession*);
 
         /// Set a new Message of the Day
-        void SetMotd(const std::string& motd) { m_motd = motd; }
+        void SetMotd(std::string const& motd) { m_motd = motd; }
         /// Get the current Message of the Day
-        const char* GetMotd() const { return m_motd.c_str(); }
+        char const* GetMotd() const { return m_motd.c_str(); }
 
         // Get current server's WoW Patch
         uint8 GetWowPatch() const { return m_wowPatch; }
@@ -621,6 +743,9 @@ class World
 
         /// Get the path where data (dbc, maps) are stored on disk
         std::string GetDataPath() const { return m_dataPath; }
+
+        /// Get the path where honor logs are stored on disk
+        std::string GetHonorPath() const { return m_honorPath; }
 
         /// When server started?
         time_t const& GetStartTime() const { return m_startTime; }
@@ -654,26 +779,26 @@ class World
         void SendWorldText(int32 string_id, ...);
          // Only for GMs with ticket notification ON
         void SendGMTicketText(int32 string_id, ...);
-        void SendGMTicketText(const char* text);
+        void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);
-        void SendGlobalText(const char* text, WorldSession *self);
-        void SendGlobalMessage(WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
-        void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
-        void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
-        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = NULL);
+        void SendGlobalText(char const* text, WorldSession* self);
+        void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
+        void SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
+        void SendZoneText(uint32 zone, char const* text, WorldSession* self = 0, uint32 team = 0);
+        void SendServerMessage(ServerMessageType type, char const* text = "", Player* player = nullptr);
 
         /// Are we in the middle of a shutdown?
         bool IsShutdowning() const { return m_ShutdownTimer > 0; }
         void ShutdownServ(uint32 time, uint32 options, uint8 exitcode);
         void ShutdownCancel();
-        void ShutdownMsg(bool show = false, Player* player = NULL);
+        void ShutdownMsg(bool show = false, Player* player = nullptr);
         static uint8 GetExitCode() { return m_ExitCode; }
         static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
         static bool IsStopped() { return m_stopEvent; }
 
         void Update(uint32 diff);
 
-        void UpdateSessions( uint32 diff );
+        void UpdateSessions(uint32 diff);
 
         /// Get a server configuration element (see #eConfigFloatValues)
         void setConfig(eConfigFloatValues index,float value) { m_configFloatValues[index]=value; }
@@ -701,10 +826,10 @@ class World
 
         void KickAll();
         void KickAllLess(AccountTypes sec);
-        void WarnAccount(uint32 accountId, std::string from, std::string reason, const char* type = "WARNING");
-        void BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string author);
+        void WarnAccount(uint32 accountId, std::string from, std::string reason, char const* type = "WARNING");
+        void BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string const& author);
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_secs, std::string reason, std::string author);
-        bool RemoveBanAccount(BanMode mode, const std::string& source, const std::string& message, std::string nameOrIP);
+        bool RemoveBanAccount(BanMode mode, std::string const& source, std::string const& message, std::string nameOrIP);
 
         // for max speed access
         static float GetMaxVisibleDistanceOnContinents()    { return m_MaxVisibleDistanceOnContinents; }
@@ -718,7 +843,7 @@ class World
         static float GetRelocationLowerLimitSq()            { return m_relocation_lower_limit_sq; }
         static uint32 GetRelocationAINotifyDelay()          { return m_relocation_ai_notify_delay; }
 
-        static uint32 GetCreatureSummonCountLimit()         { return m_creatureSummonCountLimit; }
+        std::string const& GetWardenModuleDirectory() const { return m_wardenModuleDirectory; }
 
         void ProcessCliCommands();
         void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
@@ -728,7 +853,7 @@ class World
 
         void UpdateRealmCharCount(uint32 accid);
 
-        LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if(m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
+        LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
 
         // Nostalrius
         MovementBroadcaster* GetBroadcaster() { return m_broadcaster.get(); }
@@ -752,10 +877,10 @@ class World
         /**
          * Database logs system
          */
-        void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, const char* type, uint32 dataInt);
-        void LogCharacter(Player* character, const char* action);
-        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, const char* action);
-        void LogChat(WorldSession* sess, const char* type, std::string const& msg, PlayerPointer target = NULL, uint32 chanId = 0, const char* chanStr = NULL);
+        void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt);
+        void LogCharacter(Player* character, char const* action);
+        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action);
+        void LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target = nullptr, uint32 chanId = 0, char const* chanStr = nullptr);
         void LogTransaction(PlayerTransactionData const& data);
         void Shutdown();
         void AddSessionToSessionsMap(WorldSession* sess);
@@ -780,6 +905,10 @@ class World
         **/
         void InvalidatePlayerDataToAllClient(ObjectGuid guid);
 
+        static uint32 GetCurrentMSTime() { return m_currentMSTime; }
+        static TimePoint GetCurrentClockTime() { return m_currentTime; }
+        static uint32 GetCurrentDiff() { return m_currentDiff; }
+
         // Manually override timer update secs to force a faster update
         void SetWorldUpdateTimer(WorldTimers timer, uint32 current);
         time_t GetWorldUpdateTimer(WorldTimers timer);
@@ -788,7 +917,7 @@ class World
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
-        void _UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId);
+        void _UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId);
 
     private:
         void setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
@@ -843,6 +972,8 @@ class World
         bool m_allowMovement;
         std::string m_motd;
         std::string m_dataPath;
+        std::string m_honorPath;
+        std::string m_wardenModuleDirectory;
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
@@ -855,8 +986,6 @@ class World
 
         static float  m_relocation_lower_limit_sq;
         static uint32 m_relocation_ai_notify_delay;
-
-        static uint32 m_creatureSummonCountLimit;
 
         // CLI command holder to be thread safe
         LockedQueue<CliCommandHolder*,std::mutex> cliCmdQueue;
@@ -879,6 +1008,10 @@ class World
         std::unique_ptr<MovementBroadcaster> m_broadcaster;
 
         std::unique_ptr<ThreadPool> m_updateThreads;
+        
+        static uint32 m_currentMSTime;
+        static TimePoint m_currentTime;
+        static uint32 m_currentDiff;
 };
 
 extern uint32 realmID;

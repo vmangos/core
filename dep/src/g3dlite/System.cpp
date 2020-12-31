@@ -45,7 +45,11 @@
 #   include <sys/timeb.h>
 #   include "G3D/RegistryUtil.h"
 #include <Ole2.h>
+#ifdef _MSC_VER
 #include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
 
 #elif defined(G3D_LINUX) 
 
@@ -77,9 +81,6 @@
     #include <sstream>
     #include <CoreServices/CoreServices.h>
 #endif
-
-// SIMM include
-#include <xmmintrin.h>
 
 
 namespace G3D {
@@ -548,8 +549,11 @@ static bool checkForCPUID() {
     // all known supported architectures have cpuid
     // add cases for incompatible architectures if they are added
     // e.g., if we ever support __powerpc__ being defined again
-
+#   if defined (__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_AMD64)
     return true;
+#   else
+    return false;
+# endif
 }
 
 
@@ -1286,6 +1290,10 @@ public:
 
         if (ptr == NULL) {
 #           ifdef G3D_WINDOWS
+
+#ifndef _CrtCheckMemory
+#define _CrtCheckMemory() ((int)1)
+#endif
                 // Check for memory corruption
                 alwaysAssertM(_CrtCheckMemory() == TRUE, "Heap corruption detected.");
 #           endif
@@ -1697,7 +1705,7 @@ void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, ui
 	edx = regs[3];
 }
 
-#else
+#elif defined (__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_AMD64)
 
 // See http://sam.zoy.org/blog/2007-04-13-shlib-with-non-pic-code-have-inline-assembly-and-pic-mix-well
 // for a discussion of why the second version saves ebx; it allows 32-bit code to compile with the -fPIC option.
@@ -1721,6 +1729,16 @@ void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, ui
                  : "=a"(eax), "=r"(ebx), "=c"(ecx), "=d"(edx)
                  : "a"(func));
 #endif
+}
+
+#else
+
+// non-x86 CPU; no CPUID
+void System::cpuid(CPUIDFunction func, uint32& eax, uint32& ebx, uint32& ecx, uint32& edx) {
+    eax = 0;
+    ebx = 0;
+    ecx = 0;
+    edx = 0;
 }
 
 #endif

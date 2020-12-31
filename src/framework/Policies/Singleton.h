@@ -39,7 +39,7 @@ namespace MaNGOS
     class CreatePolicy = MaNGOS::OperatorNew<T>,
     class LifeTimePolicy = MaNGOS::ObjectLifeTime<T>
     >
-    class MANGOS_DLL_DECL Singleton
+    class Singleton
     {
         public:
 

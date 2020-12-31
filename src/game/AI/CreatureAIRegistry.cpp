@@ -22,6 +22,7 @@
 #include "NullCreatureAI.h"
 #include "ReactorAI.h"
 #include "AggressorAI.h"
+#include "CritterAI.h"
 #include "GuardAI.h"
 #include "GuardEventAI.h"
 #include "PetAI.h"
@@ -41,6 +42,7 @@ void Initialize()
     (new CreatureAIFactory<NullCreatureAI>("NullAI"))->RegisterSelf();
     (new CreatureAIFactory<AggressorAI>("AggressorAI"))->RegisterSelf();
     (new CreatureAIFactory<ReactorAI>("ReactorAI"))->RegisterSelf();
+    (new CreatureAIFactory<CritterAI>("CritterAI"))->RegisterSelf();
     (new CreatureAIFactory<GuardAI>("GuardAI"))->RegisterSelf();
     (new CreatureAIFactory<PetAI>("PetAI"))->RegisterSelf();
     (new CreatureAIFactory<TotemAI>("TotemAI"))->RegisterSelf();

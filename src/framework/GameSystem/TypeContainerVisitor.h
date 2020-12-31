@@ -69,7 +69,7 @@ void VisitorHelper(VISITOR &v, TypeMapContainer<OBJECT_TYPES> &c)
 }
 
 template<class VISITOR, class TYPE_CONTAINER>
-class MANGOS_DLL_DECL TypeContainerVisitor
+class TypeContainerVisitor
 {
     public:
 

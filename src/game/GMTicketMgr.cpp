@@ -29,7 +29,7 @@
 #include "Opcodes.h"
 #include "Database/DatabaseImpl.h"
 
-inline float GetAge(uint64 t) { return float(time(NULL) - t) / DAY; }
+inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket
@@ -39,7 +39,7 @@ GmTicket::GmTicket() : _id(0), _posX(0), _posY(0), _posZ(0), _mapId(0), _createT
 {
 }
 
-GmTicket::GmTicket(Player* player) : _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(time(NULL)), _lastModifiedTime(time(NULL)),
+GmTicket::GmTicket(Player* player) : _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(time(nullptr)), _lastModifiedTime(time(nullptr)),
                        _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false),
                        _needResponse(false), _needMoreHelp(false), _securityNeeded(SEC_MODERATOR)
 {
@@ -156,7 +156,7 @@ void GmTicket::SendResponse(WorldSession* session) const
 
 std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) const
 {
-    time_t curTime = time(NULL);
+    time_t curTime = time(nullptr);
 
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
@@ -180,7 +180,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
     return ss.str();
 }
 
-std::string GmTicket::FormatMessageString(ChatHandler& handler, const char* szClosedName, const char* szAssignedToName, const char* szUnassignedName, const char* szDeletedName, const char* szCompletedName) const
+std::string GmTicket::FormatMessageString(ChatHandler& handler, char const* szClosedName, char const* szAssignedToName, char const* szUnassignedName, char const* szDeletedName, char const* szCompletedName) const
 {
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
@@ -198,7 +198,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, const char* szCl
     return ss.str();
 }
 
-const char* GmTicket::GetTicketCategoryName(TicketType category) const
+char const* GmTicket::GetTicketCategoryName(TicketType category) const
 {
     switch (category)
     {
@@ -277,12 +277,12 @@ void GmTicket::SetChatLog(std::list<uint32> time, std::string const& log)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Ticket manager
 TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _openTicketCount(0),
-    _lastChange(time(NULL)) { }
+    _lastChange(time(nullptr)) { }
 
 TicketMgr::~TicketMgr()
 {
-    for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-        delete itr->second;
+    for (const auto& itr : _ticketList)
+        delete itr.second;
 }
 
 void TicketMgr::Initialize()
@@ -315,8 +315,8 @@ void TicketMgr::LoadTickets()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-        delete itr->second;
+    for (const auto& itr : _ticketList)
+        delete itr.second;
     _ticketList.clear();
 
     _lastTicketId = 0;
@@ -402,26 +402,26 @@ void TicketMgr::RemoveTicket(uint32 ticketId)
 void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly, uint8 category) const
 {
     handler.SendSysMessage(onlineOnly ? LANG_COMMAND_TICKETSHOWONLINELIST : LANG_COMMAND_TICKETSHOWLIST);
-    for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-        if (!itr->second->IsClosed() && !itr->second->IsCompleted())
-            if ((!onlineOnly || itr->second->GetPlayer()) && (!category || (itr->second->GetTicketType() == TicketType(category))))
-                handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
+    for (const auto& itr : _ticketList)
+        if (!itr.second->IsClosed() && !itr.second->IsCompleted())
+            if ((!onlineOnly || itr.second->GetPlayer()) && (!category || (itr.second->GetTicketType() == TicketType(category))))
+                handler.SendSysMessage(itr.second->FormatMessageString(handler).c_str());
 }
 
 void TicketMgr::ShowClosedList(ChatHandler& handler) const
 {
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
-    for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-        if (itr->second->IsClosed())
-            handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
+    for (const auto& itr : _ticketList)
+        if (itr.second->IsClosed())
+            handler.SendSysMessage(itr.second->FormatMessageString(handler).c_str());
 }
 
 void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
 {
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWESCALATEDLIST);
-    for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-        if (!itr->second->IsClosed() && itr->second->GetEscalatedStatus() == TICKET_IN_ESCALATION_QUEUE)
-            handler.PSendSysMessage(LANG_COMMAND_TICKETESCALATED_TICKET, itr->second->FormatMessageString(handler).c_str(), itr->second->GetNeededSecurityLevel());
+    for (const auto& itr : _ticketList)
+        if (!itr.second->IsClosed() && itr.second->GetEscalatedStatus() == TICKET_IN_ESCALATION_QUEUE)
+            handler.PSendSysMessage(LANG_COMMAND_TICKETESCALATED_TICKET, itr.second->FormatMessageString(handler).c_str(), itr.second->GetNeededSecurityLevel());
 }
 
 void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
@@ -464,7 +464,7 @@ void TicketMgr::ReloadTicketCallback(QueryResult* holder)
         if (!assignedTo.empty() || !closedBy.empty() || !completedBy.empty())
         {
             NullChatHandler handler;
-            std::string msg = newTicket->FormatMessageString(handler, closedBy.empty() ? NULL : closedBy.c_str(), assignedTo.empty() ? NULL : assignedTo.c_str(), NULL, NULL, completedBy.empty() ? NULL : completedBy.c_str());
+            std::string msg = newTicket->FormatMessageString(handler, closedBy.empty() ? nullptr : closedBy.c_str(), assignedTo.empty() ? nullptr : assignedTo.c_str(), nullptr, nullptr, completedBy.empty() ? nullptr : completedBy.c_str());
             sWorld.SendGMTicketText(msg.c_str());
         }
     }

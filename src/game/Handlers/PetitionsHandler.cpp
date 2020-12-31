@@ -38,7 +38,7 @@
 #define GUILD_CHARTER_COST          1000                    // 10 S
 #define CHARTER_DISPLAY_ID          16161
 
-void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_PETITION_BUY");
 
@@ -69,18 +69,18 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     DEBUG_LOG("Petitioner %s tried sell petition: name %s", guidNPC.GetString().c_str(), name.c_str());
 
     // prevent cheating
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guidNPC, UNIT_NPC_FLAG_PETITIONER);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guidNPC, UNIT_NPC_FLAG_PETITIONER);
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandlePetitionBuyOpcode - %s not found or you can't interact with him.", guidNPC.GetString().c_str());
         return;
     }
 
-    if (!pCreature->isTabardDesigner())
+    if (!pCreature->IsTabardDesigner())
         return;
 
     // remove fake death
-    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     // if tabard designer, then trying to buy a guild charter.
@@ -107,7 +107,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     }
 
     // Check guild petition name (use whisper type - 6)
-    if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+    if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
     {
         if (a->filterMessage(name))
         {
@@ -117,10 +117,10 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
         }
     }
 
-    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(charterid);
+    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(charterid);
     if (!pProto)
     {
-        _player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, charterid, 0);
+        _player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, nullptr, charterid, 0);
         return;
     }
 
@@ -135,7 +135,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     InventoryResult msg = _player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount);
     if (msg != EQUIP_ERR_OK)
     {
-        _player->SendEquipError(msg, NULL, NULL, charterid);
+        _player->SendEquipError(msg, nullptr, nullptr, charterid);
         return;
     }
 
@@ -156,7 +156,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     _player->SaveInventoryAndGoldToDB();
 }
 
-void WorldSession::HandlePetitionShowSignOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 {
     // ok
     DEBUG_LOG("Received opcode CMSG_PETITION_SHOW_SIGNATURES");
@@ -199,7 +199,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_PETITION_QUERY");
     //recv_data.hexlike();
@@ -213,8 +213,6 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recv_data)
     Petition* petition = sGuildMgr.GetPetitionById(petitionguid);
     if (!petition)
         return;
-
-    uint8 signs = petition->GetSignatureCount();
 
     WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->GetName().size() + 1 + 2 + 4 * 11));
     data << uint32(petitionguid);                           // petition guid
@@ -238,7 +236,7 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionRenameOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode MSG_PETITION_RENAME");   // ok
     //recv_data.hexlike();
@@ -280,7 +278,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_PETITION_SIGN");    // ok
     //recv_data.hexlike();
@@ -351,7 +349,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
 
         // Update for owner if online. Note: Unsure if this is the correct message,
         // but sending SMSG_PETITION_SIGN_RESULTS does nothing for the owner here
-        if (Player *owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid()))
+        if (Player* owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid()))
             owner->GetSession()->SendGuildCommandResult(GUILD_INVITE_S, _player->GetName(), ERR_ALREADY_INVITED_TO_GUILD_S);
         return;
     }
@@ -370,16 +368,16 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
 
         // update signs count on charter, required testing...
         //Item *item = _player->GetItemByGuid(petitionguid));
-        //if(item)
+        //if (item)
         //    item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT+1, signs);
 
         // update for owner if online
-        if (Player *owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid()))
+        if (Player* owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid()))
             owner->GetSession()->SendPacket(&data);
     }
 }
 
-void WorldSession::HandlePetitionDeclineOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode MSG_PETITION_DECLINE");  // ok
     //recv_data.hexlike();
@@ -395,7 +393,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket & recv_data)
         return;
 
     // TODO: Check if this is actually used
-    Player *owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid());
+    Player* owner = sObjectMgr.GetPlayer(petition->GetOwnerGuid());
     if (owner)                                              // petition owner online
     {
         WorldPacket data(MSG_PETITION_DECLINE, 8);
@@ -404,7 +402,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recv_data)
+void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_OFFER_PETITION");   // ok
     //recv_data.hexlike();
@@ -414,7 +412,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recv_data)
     recv_data >> itemGuid;                              // item guid
     recv_data >> playerGuid;                            // player guid
 
-    Player *player = ObjectAccessor::FindPlayer(playerGuid);
+    Player* player = ObjectAccessor::FindPlayer(playerGuid);
     if (!player)
         return;
 
@@ -466,7 +464,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recv_data)
     player->GetSession()->SendPacket(&data);
 }
 
-void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
+void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_TURN_IN_PETITION"); // ok
     //recv_data.hexlike();
@@ -517,9 +515,6 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
 
     // OK!
 
-    // signs
-    uint8 signs = petition->GetSignatureCount();
-
     Guild* guild = new Guild;
     if (!guild->Create(petition, _player))
     {
@@ -546,7 +541,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandlePetitionShowListOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received CMSG_PETITION_SHOWLIST");
     //recv_data.hexlike();
@@ -558,7 +553,7 @@ void WorldSession::HandlePetitionShowListOpcode(WorldPacket & recv_data)
 
 void WorldSession::SendPetitionShowList(ObjectGuid& guid)
 {
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandlePetitionShowListOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
@@ -566,7 +561,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid& guid)
     }
 
     // remove fake death
-    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     uint8 count = 1;

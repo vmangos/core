@@ -518,7 +518,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
         WriteDoodadsTriangles(output, nColVertices);
 
         // write vertices
-        int VERT[] = {0x54524556, (nColVertices + doodadsVerticesCount) * 3 * sizeof(float) + 4, nColVertices + doodadsVerticesCount}; // "VERT"
+        int VERT[] = {0x54524556, int((nColVertices + doodadsVerticesCount) * 3 * sizeof(float) + 4), nColVertices + doodadsVerticesCount}; // "VERT"
         fwrite(VERT, 4, 3, output);
         for (uint32 i = 0; i < nVertices; ++i)
             if (IndexRenum[i] >= 0)
@@ -533,7 +533,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
     //------LIQU------------------------
     if (LiquEx_size != 0)
     {
-        int LIQU_h[] = {0x5551494C, sizeof(WMOLiquidHeader) + LiquEx_size + hlq->xtiles* hlq->ytiles}; // "LIQU"
+        int LIQU_h[] = {0x5551494C, int(sizeof(WMOLiquidHeader) + LiquEx_size + hlq->xtiles * hlq->ytiles)}; // "LIQU"
         fwrite(LIQU_h, 4, 2, output);
 
         // according to WoW.Dev Wiki:

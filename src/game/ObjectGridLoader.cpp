@@ -32,26 +32,26 @@
 #include "CellImpl.h"
 #include "BattleGround.h"
 
-class MANGOS_DLL_DECL ObjectGridRespawnMover
+class ObjectGridRespawnMover
 {
 public:
     ObjectGridRespawnMover() {}
 
-    void Move(GridType &grid);
+    void Move(GridType& grid);
 
-    template<class T> void Visit(GridRefManager<T> &) {}
-    void Visit(CreatureMapType &m);
+    template<class T> void Visit(GridRefManager<T>&) {}
+    void Visit(CreatureMapType& m);
 };
 
 void
-ObjectGridRespawnMover::Move(GridType &grid)
+ObjectGridRespawnMover::Move(GridType& grid)
 {
     TypeContainerVisitor<ObjectGridRespawnMover, GridTypeMapContainer > mover(*this);
     grid.Visit(mover);
 }
 
 void
-ObjectGridRespawnMover::Visit(CreatureMapType &m)
+ObjectGridRespawnMover::Visit(CreatureMapType& m)
 {
     // creature in unloading grid can have respawn point in another grid
     // if it will be unloaded then it will not respawn in original grid until unload/load original grid
@@ -61,7 +61,7 @@ ObjectGridRespawnMover::Visit(CreatureMapType &m)
         next = iter;
         ++next;
 
-        Creature * c = iter->getSource();
+        Creature* c = iter->getSource();
 
         MANGOS_ASSERT(!c->IsPet() && "ObjectGridRespawnMover don't must be called for pets");
 
@@ -85,26 +85,25 @@ class ObjectWorldLoader
 {
 public:
     explicit ObjectWorldLoader(ObjectGridLoader& gloader)
-        : i_cell(gloader.i_cell), i_grid(gloader.i_grid), i_map(gloader.i_map), i_corpses(0)
+        : i_cell(gloader.i_cell), i_map(gloader.i_map), i_corpses(0)
     {}
 
-    void Visit(CorpseMapType &m);
+    void Visit(CorpseMapType& m);
 
     template<class T> void Visit(GridRefManager<T>&) { }
 
 private:
     Cell i_cell;
-    NGridType &i_grid;
     Map* i_map;
 public:
     uint32 i_corpses;
 };
 
-template<class T> void addUnitState(T* /*obj*/, CellPair const& /*cell_pair*/)
+template<class T> void AddUnitState(T* /*obj*/, CellPair const& /*cell_pair*/)
 {
 }
 
-template<> void addUnitState(Creature *obj, CellPair const& cell_pair)
+template<> void AddUnitState(Creature* obj, CellPair const& cell_pair)
 {
     Cell cell(cell_pair);
 
@@ -139,13 +138,12 @@ bool IsEnabledOnMap<Creature>(Map* map, uint32 guid)
 }
 
 template <class T>
-void LoadHelper(CellGuidSet const& guid_set, CellPair &cell, GridRefManager<T> &m, uint32 &count, Map* map, GridType& grid)
+void LoadHelper(CellGuidSet const& guid_set, CellPair& cell, GridRefManager<T>& m, uint32& count, Map* map, GridType& grid)
 {
-    BattleGround* bg = map->IsBattleGround() ? ((BattleGroundMap*)map)->GetBG() : NULL;
+    BattleGround* bg = map->IsBattleGround() ? ((BattleGroundMap*)map)->GetBG() : nullptr;
 
-    for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
+    for (const auto& guid : guid_set)
     {
-        uint32 guid = *i_guid;
         if (!IsEnabledOnMap<T>(map, guid))
             continue;
 
@@ -159,7 +157,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair &cell, GridRefManager<T> &
 
         grid.AddGridObject(obj);
 
-        addUnitState(obj, cell);
+        AddUnitState(obj, cell);
         obj->SetMap(map);
         obj->AddToWorld();
         if (obj->isActiveObject() && !map->IsUnloading())
@@ -174,25 +172,25 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair &cell, GridRefManager<T> &
     }
 }
 
-void LoadHelper(CellCorpseSet const& cell_corpses, CellPair &cell, CorpseMapType &m, uint32 &count, Map* map, GridType& grid)
+void LoadHelper(CellCorpseSet const& cell_corpses, CellPair& cell, CorpseMapType& m, uint32& count, Map* map, GridType& grid)
 {
     if (cell_corpses.empty())
         return;
 
-    for (CellCorpseSet::const_iterator itr = cell_corpses.begin(); itr != cell_corpses.end(); ++itr)
+    for (const auto& itr : cell_corpses)
     {
-        if (itr->second != map->GetInstanceId())
+        if (itr.second != map->GetInstanceId())
             continue;
 
-        uint32 player_lowguid = itr->first;
+        uint32 player_lowguid = itr.first;
 
-        Corpse *obj = sObjectAccessor.GetCorpseForPlayerGUID(ObjectGuid(HIGHGUID_PLAYER, player_lowguid));
+        Corpse* obj = sObjectAccessor.GetCorpseForPlayerGUID(ObjectGuid(HIGHGUID_PLAYER, player_lowguid));
         if (!obj)
             continue;
 
         grid.AddWorldObject(obj);
 
-        addUnitState(obj, cell);
+        AddUnitState(obj, cell);
         obj->SetMap(map);
         obj->AddToWorld();
         if (obj->isActiveObject() && !map->IsUnloading())
@@ -203,7 +201,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair &cell, CorpseMapType
 }
 
 void
-ObjectGridLoader::Visit(GameObjectMapType &m)
+ObjectGridLoader::Visit(GameObjectMapType& m)
 {
     uint32 x = (i_cell.GridX() * MAX_NUMBER_OF_CELLS) + i_cell.CellX();
     uint32 y = (i_cell.GridY() * MAX_NUMBER_OF_CELLS) + i_cell.CellY();
@@ -218,7 +216,7 @@ ObjectGridLoader::Visit(GameObjectMapType &m)
 }
 
 void
-ObjectGridLoader::Visit(CreatureMapType &m)
+ObjectGridLoader::Visit(CreatureMapType& m)
 {
     uint32 x = (i_cell.GridX() * MAX_NUMBER_OF_CELLS) + i_cell.CellX();
     uint32 y = (i_cell.GridY() * MAX_NUMBER_OF_CELLS) + i_cell.CellY();
@@ -233,7 +231,7 @@ ObjectGridLoader::Visit(CreatureMapType &m)
 }
 
 void
-ObjectWorldLoader::Visit(CorpseMapType &m)
+ObjectWorldLoader::Visit(CorpseMapType& m)
 {
     uint32 x = (i_cell.GridX() * MAX_NUMBER_OF_CELLS) + i_cell.CellX();
     uint32 y = (i_cell.GridY() * MAX_NUMBER_OF_CELLS) + i_cell.CellY();
@@ -246,7 +244,7 @@ ObjectWorldLoader::Visit(CorpseMapType &m)
 }
 
 void
-ObjectGridLoader::Load(GridType &grid)
+ObjectGridLoader::Load(GridType& grid)
 {
     {
         TypeContainerVisitor<ObjectGridLoader, GridTypeMapContainer > loader(*this);
@@ -267,10 +265,10 @@ void ObjectGridLoader::LoadN(void)
     i_creatures = 0;
     i_corpses = 0;
     i_cell.data.Part.cell_y = 0;
-    for (unsigned int x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
+    for (uint32 x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
     {
         i_cell.data.Part.cell_x = x;
-        for (unsigned int y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
+        for (uint32 y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
         {
             i_cell.data.Part.cell_y = y;
             GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
@@ -282,9 +280,9 @@ void ObjectGridLoader::LoadN(void)
 
 void ObjectGridUnloader::MoveToRespawnN()
 {
-    for (unsigned int x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
+    for (uint32 x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
     {
-        for (unsigned int y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
+        for (uint32 y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
         {
             ObjectGridRespawnMover mover;
             mover.Move(i_grid(x, y));
@@ -293,7 +291,7 @@ void ObjectGridUnloader::MoveToRespawnN()
 }
 
 void
-ObjectGridUnloader::Unload(GridType &grid)
+ObjectGridUnloader::Unload(GridType& grid)
 {
     TypeContainerVisitor<ObjectGridUnloader, GridTypeMapContainer > unloader(*this);
     grid.Visit(unloader);
@@ -301,7 +299,7 @@ ObjectGridUnloader::Unload(GridType &grid)
 
 template<class T>
 void
-ObjectGridUnloader::Visit(GridRefManager<T> &m)
+ObjectGridUnloader::Visit(GridRefManager<T>& m)
 {
     // remove all cross-reference before deleting
     for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
@@ -309,7 +307,7 @@ ObjectGridUnloader::Visit(GridRefManager<T> &m)
 
     while (!m.isEmpty())
     {
-        T *obj = m.getFirst()->getSource();
+        T* obj = m.getFirst()->getSource();
         // if option set then object already saved at this moment
         if (!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY))
             obj->SaveRespawnTime();
@@ -321,23 +319,32 @@ ObjectGridUnloader::Visit(GridRefManager<T> &m)
 }
 
 void
-ObjectGridStoper::Stop(GridType &grid)
+ObjectGridStoper::Stop(GridType& grid)
 {
     TypeContainerVisitor<ObjectGridStoper, GridTypeMapContainer > stoper(*this);
     grid.Visit(stoper);
 }
 
 void
-ObjectGridStoper::Visit(CreatureMapType &m)
+ObjectGridStoper::Visit(CreatureMapType& m)
 {
     // stop any fights at grid de-activation and remove dynobjects created at cast by creatures
-    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (const auto& iter : m)
     {
-        iter->getSource()->AI()->EnterEvadeMode();
-        iter->getSource()->DeleteThreatList();
-        iter->getSource()->RemoveAllDynObjects();
+        iter.getSource()->AI()->EnterEvadeMode();
+        iter.getSource()->DeleteThreatList();
+        iter.getSource()->RemoveAllDynObjects();
     }
 }
 
-template void ObjectGridUnloader::Visit(GameObjectMapType &);
-template void ObjectGridUnloader::Visit(DynamicObjectMapType &);
+void
+ObjectGridStoper::Visit(GameObjectMapType& m)
+{
+    // remove dynobjects created at cast at grid de-activation
+    for (const auto& iter : m)
+    {
+        iter.getSource()->RemoveAllDynObjects();
+    }
+}
+
+template void ObjectGridUnloader::Visit(DynamicObjectMapType&);

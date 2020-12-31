@@ -32,13 +32,12 @@
 #include "Recast.h"
 #include "DetourNavMesh.h"
 
-using namespace std;
 using namespace VMAP;
 // G3D namespace typedefs conflicts with ACE typedefs
 
 namespace MMAP
 {
-    typedef map<uint32, set<uint32>*> TileList;
+    typedef std::map<uint32, std::set<uint32>*> TileList;
     struct Tile
     {
         Tile() : chf(NULL), solid(NULL), cset(NULL), pmesh(NULL), dmesh(NULL) {}
@@ -60,15 +59,14 @@ namespace MMAP
     class MapBuilder
     {
         public:
-            MapBuilder(float maxWalkableAngle   = 60.f,
-                       bool skipLiquid          = false,
+            MapBuilder(bool skipLiquid          = false,
                        bool skipContinents      = false,
                        bool skipJunkMaps        = true,
                        bool skipBattlegrounds   = false,
                        bool debugOutput         = false,
                        bool bigBaseUnit         = false,
                        bool quick               = false,
-                       const char* offMeshFilePath = NULL);
+                       const char* offMeshFilePath = nullptr);
 
             ~MapBuilder();
 
@@ -87,11 +85,11 @@ namespace MMAP
         private:
             // detect maps and tiles
             void discoverTiles();
-            set<uint32>* getTileList(uint32 mapID);
+            std::set<uint32>* getTileList(uint32 mapID);
 
             void buildNavMesh(uint32 mapID, dtNavMesh*& navMesh);
 
-            void buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh);
+            void buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh, uint32 curTile, uint32 tileCount);
 
             // move map building
             void buildMoveMapTile(uint32 mapID,
@@ -121,13 +119,10 @@ namespace MMAP
             bool m_skipJunkMaps;
             bool m_skipBattlegrounds;
             bool m_quick;
-
-            float m_maxWalkableAngle;
             bool m_bigBaseUnit;
 
             // build performance - not really used for now
             rcContext* m_rcContext;
-            uint32 m_lastMapTriangle;
     };
 }
 

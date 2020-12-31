@@ -125,7 +125,7 @@ public:
     void SetMessage(std::string const& message)
     {
         _message = message;
-        _lastModifiedTime = uint64(time(NULL));
+        _lastModifiedTime = uint64(time(nullptr));
     }
     void SetComment(std::string const& comment) { _comment = comment; }
     void SetViewed() { _viewed = true; }
@@ -145,8 +145,8 @@ public:
 
     void TeleportTo(Player* player) const;
     std::string FormatMessageString(ChatHandler& handler, bool detailed = false) const;
-    std::string FormatMessageString(ChatHandler& handler, const char* szClosedName, const char* szAssignedToName, const char* szUnassignedName, const char* szDeletedName, const char* szCompletedName) const;
-    const char* GetTicketCategoryName(TicketType category) const;
+    std::string FormatMessageString(ChatHandler& handler, char const* szClosedName, char const* szAssignedToName, char const* szUnassignedName, char const* szDeletedName, char const* szCompletedName) const;
+    char const* GetTicketCategoryName(TicketType category) const;
 
     void SetChatLog(std::list<uint32> time, std::string const& log);
     std::string const& GetChatLog() const { return _chatLog; }
@@ -204,34 +204,34 @@ public:
         if (itr != _ticketList.end())
             return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetTicketByPlayer(ObjectGuid playerGuid)
     {
-        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-            if (itr->second && itr->second->IsFromPlayer(playerGuid) && !itr->second->IsClosed())
-                return itr->second;
+        for (const auto& itr : _ticketList)
+            if (itr.second && itr.second->IsFromPlayer(playerGuid) && !itr.second->IsClosed())
+                return itr.second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetOldestOpenTicket()
     {
-        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-            if (itr->second && !itr->second->IsClosed() && !itr->second->IsCompleted())
-                return itr->second;
+        for (const auto& itr : _ticketList)
+            if (itr.second && !itr.second->IsClosed() && !itr.second->IsCompleted())
+                return itr.second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetNextTicket(uint32 counter)
     {
-        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-            if (itr->first > counter && !itr->second->IsClosed() && !itr->second->IsCompleted())
-                return itr->second;
+        for (const auto& itr : _ticketList)
+            if (itr.first > counter && !itr.second->IsClosed() && !itr.second->IsCompleted())
+                return itr.second;
 
-        return NULL;
+        return nullptr;
     }
 
     GmTicket* GetPreviousTicket(uint32 counter)
@@ -240,7 +240,7 @@ public:
             if (itr->first < counter && !itr->second->IsClosed() && !itr->second->IsCompleted())
                 return itr->second;
 
-        return NULL;
+        return nullptr;
     }
 
     void AddTicket(GmTicket* ticket);
@@ -251,7 +251,7 @@ public:
     void SetStatus(bool status) { _status = status; }
 
     uint64 GetLastChange() const { return _lastChange; }
-    void UpdateLastChange() { _lastChange = uint64(time(NULL)); }
+    void UpdateLastChange() { _lastChange = uint64(time(nullptr)); }
 
     uint32 GetLastTicketId() const { return _lastTicketId; }
     uint32 GenerateTicketId() { return ++_lastTicketId; }

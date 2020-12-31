@@ -38,22 +38,22 @@ struct boss_hazzarahAI : public ScriptedAI
     uint32 Sleep_Timer;
     uint32 Illusions_Timer;
 
-    void Reset()
+    void Reset() override
     {
         ManaBurn_Timer = urand(4000, 10000);
         Sleep_Timer = urand(10000, 18000);
         Illusions_Timer = urand(10000, 18000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ManaBurn_Timer
         if (ManaBurn_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MANABURN);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MANABURN);
             ManaBurn_Timer = urand(8000, 16000);
         }
         else ManaBurn_Timer -= diff;
@@ -61,10 +61,10 @@ struct boss_hazzarahAI : public ScriptedAI
         //Sleep_Timer
         if (Sleep_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLEEP);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLEEP);
             Sleep_Timer = urand(12000, 20000);
 
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
@@ -102,7 +102,7 @@ CreatureAI* GetAI_boss_hazzarah(Creature* pCreature)
 
 void AddSC_boss_hazzarah()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_hazzarah";
     newscript->GetAI = &GetAI_boss_hazzarah;

@@ -49,7 +49,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
     bool PowerWordShield;
     bool bAshbringer;
 
-    void Reset()
+    void Reset() override
     {
         CurseOfBlood_Timer = 10000;
         DispelMagic_Timer = 30000;
@@ -61,7 +61,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         bAshbringer = false;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 28441 && !bAshbringer && pCaster && me->IsWithinLOSInMap(pCaster))
         {
@@ -73,9 +73,9 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //If we are <25% hp cast Heal
@@ -126,7 +126,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         //CurseOfBlood_Timer
         if (CurseOfBlood_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSEOFBLOOD);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSEOFBLOOD);
             CurseOfBlood_Timer = 25000;
         }
         else CurseOfBlood_Timer -= diff;
@@ -143,7 +143,7 @@ CreatureAI* GetAI_boss_high_inquisitor_fairbanks(Creature* pCreature)
 
 void AddSC_boss_high_inquisitor_fairbanks()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_high_inquisitor_fairbanks";
     newscript->GetAI = &GetAI_boss_high_inquisitor_fairbanks;

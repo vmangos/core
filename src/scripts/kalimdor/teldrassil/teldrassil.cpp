@@ -31,13 +31,13 @@ EndContentData */
 # npc_mist
 ####*/
 
-enum
+enum MistData
 {
-    SAY_AT_HOME             = -1000323,
-    EMOTE_AT_HOME           = -1000324,
-    QUEST_MIST              = 938,
-    NPC_ARYNIA              = 3519,
-    FACTION_DARNASSUS       = 79
+    SAY_AT_HOME       = 1330,
+    EMOTE_AT_HOME     = 1340,
+    QUEST_MIST        = 938,
+    NPC_ARYNIA        = 3519,
+    FACTION_DARNASSUS = 79
 };
 
 struct npc_mistAI : public FollowerAI
@@ -47,13 +47,19 @@ struct npc_mistAI : public FollowerAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
+    }
+
+    void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
-        if (!m_creature->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_ARYNIA)
+        if (!m_creature->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_ARYNIA)
         {
             if (m_creature->IsWithinDistInMap(pWho, 10.0f))
             {
@@ -78,9 +84,9 @@ struct npc_mistAI : public FollowerAI
     }
 
     //call not needed here, no known abilities
-    /*void UpdateFollowerAI(const uint32 uiDiff)
+    /*void UpdateFollowerAI(uint32 const uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -99,11 +105,9 @@ struct npc_sethirAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
-    {
-    }
+    void Reset() override { }
 
-    void Aggro(Unit* pUnit)
+    void Aggro(Unit* pUnit) override
     {
         m_creature->MonsterSay("Filfh! Filfh everywhere! The forests must be cleansed!");
         for (uint32 counter = 0; counter < 6; counter++)
@@ -114,29 +118,28 @@ struct npc_sethirAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
     }
 };
 
-
 CreatureAI* GetAI_npc_sethir(Creature* pCreature)
 {
     return new npc_sethirAI(pCreature);
 }
 
-
-bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MIST)
     {
         if (npc_mistAI* pMistAI = dynamic_cast<npc_mistAI*>(pCreature->AI()))
         {
             pCreature->SetFactionTemporary(FACTION_DARNASSUS, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pMistAI->StartFollow(pPlayer, FACTION_DARNASSUS, pQuest);
         } 
     }
@@ -144,103 +147,16 @@ bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQu
     return true;
 }
 
-
-enum eSpells
-{
-    SPELL_WRATH         = 20698,
-    SPELL_AE_ROOT       = 20699,
-    SPELL_REJUVENATION  = 20701,
-    SPELL_SUMM_TREANT   = 20702,
-    SPELL_HURRICANE     = 27530,
-};
-
-struct boss_fandral_staghelmAI : public ScriptedAI
-{
-public:
-    boss_fandral_staghelmAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        m_uiWrathTimer = 0;
-        m_uiRootTimer = 25000;
-        m_uiRejuvenationTimer = 5000;
-        m_uiTreantTimer = 15000;
-        m_uiHurricaneTimer = 27000;
-    }
-
-    void UpdateAI(const uint32 uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiWrathTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WRATH) == CAST_OK)
-                m_uiWrathTimer = urand(1, 5) * 1000;
-        }
-        else
-            m_uiWrathTimer -= uiDiff;
-
-        if (m_uiRootTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_AE_ROOT) == CAST_OK)
-                m_uiRootTimer = 30000;
-        }
-        else
-            m_uiRootTimer -= uiDiff;
-
-        if (m_uiRejuvenationTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_REJUVENATION) == CAST_OK)
-                m_uiRejuvenationTimer = 15000;
-        }
-        else
-            m_uiRejuvenationTimer -= uiDiff;
-
-        if (m_uiTreantTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_SUMM_TREANT) == CAST_OK)
-                m_uiTreantTimer = 25000;
-        }
-        else
-            m_uiTreantTimer -= uiDiff;
-
-        if (m_uiHurricaneTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_HURRICANE) == CAST_OK)
-                m_uiHurricaneTimer = 30000;
-        }
-        else
-            m_uiHurricaneTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-        EnterEvadeIfOutOfCombatArea(uiDiff);
-    }
-
-private:
-    uint32 m_uiWrathTimer;
-    uint32 m_uiRootTimer;
-    uint32 m_uiRejuvenationTimer;
-    uint32 m_uiTreantTimer;
-    uint32 m_uiHurricaneTimer;
-};
-
-CreatureAI* GetAI_boss_fandral_staghelm(Creature* pCreature)
-{
-    return new boss_fandral_staghelmAI(pCreature);
-}
 //Alita
-enum
+enum TreshalaFallowbrookData
 {
-    QUEST_MORTALITY_WANES =  1142
+    QUEST_MORTALITY_WANES = 1142
 };
+
 bool QuestComplete_npc_treshala_fallowbrook(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
     if (!pQuestGiver)
-            return false;
+        return false;
     if (pQuest->GetQuestId() == QUEST_MORTALITY_WANES)
     {
         pQuestGiver->HandleEmoteCommand(EMOTE_ONESHOT_CRY);
@@ -250,7 +166,7 @@ bool QuestComplete_npc_treshala_fallowbrook(Player* pPlayer, Creature* pQuestGiv
 
 void AddSC_teldrassil()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_mist";
@@ -261,11 +177,6 @@ void AddSC_teldrassil()
     newscript = new Script;
     newscript->Name = "npc_sethir";
     newscript->GetAI = &GetAI_npc_sethir;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "boss_fandral_staghelm";
-    newscript->GetAI = &GetAI_boss_fandral_staghelm;
     newscript->RegisterSelf();
 
     newscript = new Script;

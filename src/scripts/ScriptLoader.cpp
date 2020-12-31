@@ -26,17 +26,15 @@ void AddSC_elemental_invasions();
 void AddSC_instance_dire_maul();
 void AddSC_boss_immol_thar();
 void AddSC_boss_tendris_warpwood();
-void AddSC_npc_pusillin();
 void AddSC_boss_zevrim();
-void AddSC_npc_ecorcefer();
 void AddSC_dreadsteed_ritual();
 void AddSC_npc_king_gordok();
 
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_dragons_of_nightmare();
-void AddSC_boss_lord_kazzak();
 void AddSC_go_scripts();
+void AddSC_event_fireworks();
 void AddSC_npcs_special();
 void AddSC_Totems();
 void AddSC_world_event_naxxramas();
@@ -66,10 +64,7 @@ void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
-void AddSC_boss_quatermasterzigris();
 void AddSC_boss_pyroguard_emberseer();
-void AddSC_boss_gyth();
-void AddSC_boss_rend_blackhand();
 void AddSC_boss_razorgore();                         //blackwing_lair
 void AddSC_boss_vael();
 void AddSC_boss_broodlord();
@@ -150,9 +145,7 @@ void AddSC_boss_baroness_anastari();
 void AddSC_boss_ramstein_the_gorger();
 void AddSC_boss_timmy_the_cruel();
 void AddSC_boss_postmaster_malown();
-void AddSC_boss_baron_rivendare();
 void AddSC_boss_dathrohan_balnazzar();
-void AddSC_boss_atiesh();
 void AddSC_instance_stratholme();
 void AddSC_stratholme();
 void AddSC_instance_sunken_temple();                 //sunken_temple
@@ -188,7 +181,6 @@ void AddSC_eastern_plaguelands();
 void AddSC_elwynn_forest();
 void AddSC_hillsbrad_foothills();
 void AddSC_hinterlands();
-void AddSC_ironforge();
 void AddSC_loch_modan();
 void AddSC_redridge_mountains();
 void AddSC_searing_gorge();
@@ -197,7 +189,6 @@ void AddSC_stormwind_city();
 void AddSC_quest_stormwind_rendezvous();
 void AddSC_stranglethorn_vale();
 void AddSC_swamp_of_sorrows();
-void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
@@ -242,7 +233,6 @@ void AddSC_instance_zulfarrak();
 
 void AddSC_ashenvale();
 void AddSC_azshara();
-void AddSC_boss_anachronos();
 void AddSC_darkshore();
 void AddSC_desolace();
 void AddSC_durotar();
@@ -259,7 +249,6 @@ void AddSC_tanaris();
 void AddSC_teldrassil();
 void AddSC_the_barrens();
 void AddSC_thousand_needles();
-void AddSC_thunder_bluff();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
 void AddSC_war_effort();
@@ -289,8 +278,6 @@ void AddScripts()
     AddSC_instance_dire_maul();
     AddSC_boss_immol_thar();
     AddSC_boss_tendris_warpwood();
-    AddSC_npc_pusillin();
-    AddSC_npc_ecorcefer();
     AddSC_boss_zevrim();
     AddSC_dreadsteed_ritual();
     AddSC_npc_king_gordok();
@@ -298,8 +285,8 @@ void AddScripts()
     //world
     AddSC_areatrigger_scripts();
     AddSC_dragons_of_nightmare();
-    AddSC_boss_lord_kazzak();
     AddSC_go_scripts();
+    AddSC_event_fireworks();
     AddSC_npcs_special();
     AddSC_Totems();
     AddSC_world_event_naxxramas();
@@ -330,12 +317,9 @@ void AddScripts()
     AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
     AddSC_boss_warmastervoone();
-    AddSC_boss_quatermasterzigris();
 
     AddSC_instance_blackrock_spire();
     AddSC_boss_pyroguard_emberseer();
-    AddSC_boss_gyth();
-    AddSC_boss_rend_blackhand();
     AddSC_boss_razorgore();                                 //blackwing_lair
     AddSC_boss_vael();
     AddSC_boss_broodlord();
@@ -413,9 +397,7 @@ void AddScripts()
     AddSC_boss_ramstein_the_gorger();
     AddSC_boss_timmy_the_cruel();
     AddSC_boss_postmaster_malown();
-    AddSC_boss_baron_rivendare();
     AddSC_boss_dathrohan_balnazzar();
-    AddSC_boss_atiesh();
     AddSC_instance_stratholme();
     AddSC_stratholme();
     AddSC_instance_sunken_temple();                         //sunken_temple
@@ -451,7 +433,6 @@ void AddScripts()
     AddSC_elwynn_forest();
     AddSC_hillsbrad_foothills();
     AddSC_hinterlands();
-    AddSC_ironforge();
     AddSC_loch_modan();
     AddSC_redridge_mountains();
     AddSC_searing_gorge();
@@ -460,7 +441,6 @@ void AddScripts()
     AddSC_quest_stormwind_rendezvous();
     AddSC_stranglethorn_vale();
     AddSC_swamp_of_sorrows();
-    AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();
     AddSC_westfall();
@@ -505,7 +485,6 @@ void AddScripts()
 
     AddSC_ashenvale();
     AddSC_azshara();
-    AddSC_boss_anachronos();
     AddSC_darkshore();
     AddSC_desolace();
     AddSC_durotar();
@@ -522,7 +501,6 @@ void AddScripts()
     AddSC_teldrassil();
     AddSC_the_barrens();
     AddSC_thousand_needles();
-    AddSC_thunder_bluff();
     AddSC_ungoro_crater();
     AddSC_winterspring();
 

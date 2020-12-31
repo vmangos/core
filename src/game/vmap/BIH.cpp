@@ -18,10 +18,12 @@
 
 #include "BIH.h"
 
+#include <cmath>
+
 void BIH::buildHierarchy(std::vector<uint32>& tempTree, buildData& dat, BuildStats& stats)
 {
     // create space for the first node
-    tempTree.push_back(3 << 30); // dummy leaf
+    tempTree.push_back(static_cast<uint32>(3 << 30)); // dummy leaf
     tempTree.insert(tempTree.end(), 2, 0);
     // tempTree.add(0);
 
@@ -42,14 +44,16 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
         return;
     }
     // calculate extents
-    int axis = -1, prevAxis, rightOrig;
-    float clipL = G3D::fnan(), clipR = G3D::fnan(), prevClip = G3D::fnan();
-    float split = G3D::fnan(), prevSplit;
+    int axis = -1, rightOrig;
+    float clipL = G3D::fnan();
+    float clipR = G3D::fnan();
+    float prevClip = G3D::fnan();
+    float split = G3D::fnan();
     bool wasLeft = true;
     while (true)
     {
-        prevAxis = axis;
-        prevSplit = split;
+        int prevAxis = axis;
+        float prevSplit = split;
         // perform quick consistency checks
         Vector3 d(gridBox.hi - gridBox.lo);
         if (d.x < 0 || d.y < 0 || d.z < 0)
@@ -148,6 +152,7 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
         else if (left > right)
         {
             // all right
+            right = rightOrig;
             if (prevAxis == axis && G3D::fuzzyEq(prevSplit, split))
             {
                 // we are stuck here - create a leaf
@@ -155,7 +160,6 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
                 createNode(tempTree, nodeIndex, left, right);
                 return;
             }
-            right = rightOrig;
             if (clipR >= split)
             {
                 // keep looping on right half
@@ -170,7 +174,7 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
         else
         {
             // we are actually splitting stuff
-            if (prevAxis != -1 && !isnan(prevClip))
+            if (prevAxis != -1 && !std::isnan(prevClip))
             {
                 // second time through - lets create the previous split
                 // since it produced empty space

@@ -29,7 +29,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 
-int TotemAI::Permissible(const Creature *creature)
+int TotemAI::Permissible(Creature const* creature)
 {
     if (creature->IsTotem())
         return PERMIT_BASE_PROACTIVE;
@@ -37,9 +37,9 @@ int TotemAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
+TotemAI::TotemAI(Creature* pCreature) : CreatureAI(pCreature)
 {
-    pCreature->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+    pCreature->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
 
     if (Totem const* pTotem = pCreature->ToTotem())
     {
@@ -50,44 +50,44 @@ TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
     {
         m_spellId = m_creature->GetCreatureInfo()->spells[0];
         SpellEntry const* totemSpell = sSpellMgr.GetSpellEntry(m_spellId);
-        if (totemSpell && GetSpellCastTime(totemSpell))
+        if (totemSpell && totemSpell->GetCastTime())
             m_totemType = TOTEM_ACTIVE;
         else
         {
             m_totemType = TOTEM_PASSIVE;
 
-            if (totemSpell && IsSpellAppliesAura(totemSpell))
+            if (totemSpell && totemSpell->IsSpellAppliesAura())
                 pCreature->CastSpell(pCreature, totemSpell, true);
         }
             
     }
 }
 
-void TotemAI::UpdateAI(const uint32 /*diff*/)
+void TotemAI::UpdateAI(uint32 const /*diff*/)
 {
     if (m_totemType != TOTEM_ACTIVE)
         return;
 
-    if (!m_creature->isAlive() || m_creature->IsNonMeleeSpellCasted(false))
+    if (!m_creature->IsAlive() || m_creature->IsNonMeleeSpellCasted(false))
         return;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(m_spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(m_spellId);
     if (!spellInfo)
         return;
 
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
-    float max_range = GetSpellMaxRange(srange);
+    float max_range = Spells::GetSpellMaxRange(srange);
 
     Unit* victim = m_creature->GetMap()->GetUnit(m_victimGuid);
     Unit* owner = m_creature->GetCharmerOrOwner();
 
     // Check owner's attackers for targets.
     if (!victim && owner)
-        victim = owner->getAttackerForHelper();
+        victim = owner->GetAttackerForHelper();
 
     // Search for another target if current is invalid.
     if (!victim || !m_creature->IsWithinDistInMap(victim, max_range) ||
-            !m_creature->IsValidAttackTarget(victim) || !victim->isVisibleForOrDetect(m_creature, m_creature, false))
+            !m_creature->IsValidAttackTarget(victim) || !victim->IsVisibleForOrDetect(m_creature, m_creature, false))
     {
         victim = nullptr;
 

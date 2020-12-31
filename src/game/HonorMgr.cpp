@@ -6,7 +6,6 @@
 #include "HonorMgr.h"
 #include "Language.h"
 #include "World.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "Player.h"
 #include "Database/DatabaseEnv.h"
@@ -126,8 +125,8 @@ void HonorMaintenancer::LoadStandingLists()
     }
 
     // Make sure all things are sorted
-    m_allianceStandingList.sort();
-    m_hordeStandingList.sort();
+    std::sort(m_allianceStandingList.begin(), m_allianceStandingList.end());
+    std::sort(m_hordeStandingList.begin(), m_hordeStandingList.end());
 
     sLog.outHonor("[MAINTENANCE] Alliance: %u, Horde: %u, Inactive: %u",
         m_allianceStandingList.size(), m_hordeStandingList.size(), m_inactiveStandingList.size());
@@ -181,6 +180,50 @@ void HonorMaintenancer::InactiveDecayRankPoints()
     }
 }
 
+void HonorMaintenancer::SetCityRanks()
+{
+    CharacterDatabase.Execute("UPDATE `characters` SET `extra_flags` = `extra_flags` & ~0x0400");
+
+    std::map<uint8, std::pair<uint32, uint32>> highestStandingInRace =
+    {
+        {RACE_HUMAN, {0,0}},
+        {RACE_ORC, {0,0}},
+        {RACE_DWARF, {0,0}},
+        {RACE_NIGHTELF, {0,0}},
+        {RACE_UNDEAD, {0,0}},
+        {RACE_TAUREN, {0,0}},
+        {RACE_GNOME, {0,0}},
+        {RACE_TROLL, {0,0}},
+    };
+
+    for (uint8 i = 1; i < MAX_RACES; ++i)
+    {
+        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM `characters` WHERE `honorStanding` > 0 and `race` = %u ORDER BY `honorStanding` ASC LIMIT 1", i);
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 guid = fields[0].GetUInt32();
+                uint32 honorStanding = fields[1].GetUInt32();
+
+                highestStandingInRace[i] = std::make_pair(guid, honorStanding);
+            } 
+            while (result->NextRow());
+            delete result;
+        }
+    }
+
+    for (auto& standing : highestStandingInRace)
+    {
+        uint32 lowGuid = standing.second.first;
+
+        if (lowGuid > 0)
+            CharacterDatabase.PExecute("UPDATE `characters` SET `extra_flags` = `extra_flags` | 0x0400 WHERE `guid` = %u", standing.second.first);
+    }
+}
+
 void HonorMaintenancer::FlushRankPoints()
 {
     // Imediatly reset honor standing before flushing
@@ -228,6 +271,13 @@ void HonorMaintenancer::DoMaintenance()
     DistributeRankPoints(HORDE);
     sLog.outHonor("[MAINTENANCE] Decay rank points for inactive players.");
     InactiveDecayRankPoints();
+
+    if (sWorld.getConfig(CONFIG_BOOL_ENABLE_CITY_PROTECTOR))
+    {
+        sLog.outHonor("[MAINTENANCE] Assign city titles.");
+        SetCityRanks();
+    }
+
     sLog.outHonor("[MAINTENANCE] Flush rank points.");
     FlushRankPoints();
 
@@ -243,9 +293,10 @@ void HonorMaintenancer::CreateCalculationReport()
 {
     std::string timestamp = Log::GetTimestampStr();
     std::string filename = "HCR_" + timestamp + ".txt";
+    std::string path = sWorld.GetHonorPath() + filename;
 
     std::ofstream ofs;
-    ofs.open(filename.c_str());
+    ofs.open(path.c_str());
     if (!ofs.is_open())
     {
         sLog.outError("Can't create HCR file!");
@@ -422,8 +473,8 @@ HonorScores HonorMaintenancer::GenerateScores(HonorStandingList& standingList)
     }
 
     // get the WS scores at the top of each break point
-    for (uint8 group = 0; group < 14; group++)
-        sc.BRK[group] = floor((sc.BRK[group] * standingList.size()) + 0.5f);
+    for (float & group : sc.BRK)
+        group = floor((group * standingList.size()) + 0.5f);
 
     // initialize RP array
     // set the low point
@@ -717,11 +768,11 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
     float honor = (type == DISHONORABLE) ? -cp : cp;
 
     // get IP if source is player
-    std::string ip = "";
+    std::string ip;
     if (Player* victim = source->ToPlayer())
         ip = victim->GetSession()->GetRemoteAddress();
 
-    bool plr = source->GetTypeId() == TYPEID_PLAYER ? true : false;
+    bool plr = source->GetTypeId() == TYPEID_PLAYER;
 
     if (m_owner->GetMap()->IsBattleGround())
         sLog.outHonor("[BATTLEGROUND]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
@@ -952,12 +1003,10 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     if (!killer || !victim || !groupSize)
         return 0.0;
 
-    uint32 today = sWorld.GetGameDay();
-
     uint32 totalKills = killer->GetHonorMgr().CalculateTotalKills(victim);
     uint32 victimRank = victim->GetHonorMgr().GetRank().visualRank;
-    uint8 killerLevel = killer->getLevel();
-    uint8 victimLevel = victim->getLevel();
+    uint8 killerLevel = killer->GetLevel();
+    uint8 victimLevel = victim->GetLevel();
         
     return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }

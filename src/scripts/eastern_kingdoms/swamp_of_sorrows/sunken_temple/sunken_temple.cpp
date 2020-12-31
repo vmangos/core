@@ -80,9 +80,9 @@ struct npc_malfurionAI : public ScriptedAI
     uint32 m_uiSpeech;
     bool m_inDungeon;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // We are in Sunken Temple
         if (m_inDungeon)
@@ -148,7 +148,7 @@ CreatureAI* GetAI_npc_malfurion(Creature* pCreature)
 // Summon Malfurion trigger (AQ scepter quest)
 bool AreaTrigger_at_shade_of_eranikus(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    if (!pPlayer || !pPlayer->isAlive() || !pAt)
+    if (!pPlayer || !pPlayer->IsAlive() || !pAt)
         return false;
 
     if (pAt->id != AREATRIGGER_MALFURION)
@@ -178,7 +178,7 @@ struct go_eternal_flameAI: public GameObjectAI
 {
     go_eternal_flameAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         if (me->GetGoState() == GO_STATE_ACTIVE)    // already used - script handler calls twice
             return true;
@@ -218,7 +218,7 @@ struct SpawnLocation
     float m_fX, m_fY, m_fZ, m_fO;
 };
 
-static const SpawnLocation aMobLocs[8] =
+static SpawnLocation const aMobLocs[8] =
 {
     { -451.838f, 270.88f, -90.5418f, 2.39622f},
     { -477.712f, 283.707f, -90.5464f, 3.9631f},
@@ -230,7 +230,7 @@ static const SpawnLocation aMobLocs[8] =
     { -457.922f, 286.686f, -90.5413f, 1.02569f}
 };
 
-static const SpawnLocation aMobDest[8] =
+static SpawnLocation const aMobDest[8] =
 {
     { -441.838f, 270.387f, -90.791f, 6.23f},
     { -487.712f, 291.707f, -90.7024f, 2.448f},
@@ -247,7 +247,7 @@ enum
     SPELL_SUPPRESSION   = 12623
 };
 
-static const uint32 brazierEntries[] = { GO_ETERNAL_FLAME_1, GO_ETERNAL_FLAME_2, GO_ETERNAL_FLAME_3, GO_ETERNAL_FLAME_4 };
+static uint32 const brazierEntries[] = { GO_ETERNAL_FLAME_1, GO_ETERNAL_FLAME_2, GO_ETERNAL_FLAME_3, GO_ETERNAL_FLAME_4 };
 
 npc_shade_hakkarAI::npc_shade_hakkarAI(Creature* pCreature) : ScriptedAI(pCreature)
 {
@@ -300,14 +300,14 @@ void npc_shade_hakkarAI::Reset()
     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-    for (uint32 i = 0; i < SHADE_SPAWN_TYPES; ++i)
-        eventSpawns[i] = 0;
+    for (uint32 & eventSpawn : eventSpawns)
+        eventSpawn = 0;
 
     if (m_pInstance)
     {
-        for (uint32 i = 0; i < NUM_BRAZIERS; ++i)
+        for (uint32 i : brazierEntries)
         {
-            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(brazierEntries[i])))
+            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(i)))
                 UpdateBrazierState(go, false);
         }
     }
@@ -366,7 +366,7 @@ void npc_shade_hakkarAI::SummonTheAvatar()
     std::list<GameObject*> circles;
     m_creature->GetGameObjectListWithEntryInGrid(circles, GO_EVIL_CIRCLE, 20);
 
-    for (auto go : circles)
+    for (const auto go : circles)
         go->Use(m_creature);
 
     m_creature->ForcedDespawn(500);
@@ -397,7 +397,7 @@ void npc_shade_hakkarAI::JustSummoned(Creature* summoned)
 
 void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
 {
-    if (uiMotionType != POINT_MOTION_TYPE || !pSummoned->isAlive())
+    if (uiMotionType != POINT_MOTION_TYPE || !pSummoned->IsAlive())
         return;
 
     if (pSummoned->GetEntry() == NPC_HAKKARI_MINION)
@@ -460,7 +460,7 @@ void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMo
         {
             case 0:
                 pSummoned->GetMotionMaster()->MoveIdle();
-                if (pSummoned->isAlive())
+                if (pSummoned->IsAlive())
                     if (Creature* Shade = pSummoned->FindNearestCreature(8440, 150.0f)) // NPC_SHADE_OF_HAKKAR
                         pSummoned->CastSpell(Shade, SPELL_SUPPRESSION, false);
                 break;
@@ -468,7 +468,7 @@ void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMo
     }
 }
 
-void npc_shade_hakkarAI::UpdateAI(const uint32 uiDiff)
+void npc_shade_hakkarAI::UpdateAI(uint32 const uiDiff)
 {
     if (CheckTimer <= uiDiff && !EngagedOnce)
     {
@@ -484,7 +484,7 @@ void npc_shade_hakkarAI::UpdateAI(const uint32 uiDiff)
     else
         CheckTimer -= uiDiff;
 
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
         return;
 
     if (m_creature->HasAura(SPELL_SUPPRESSION))
@@ -589,7 +589,7 @@ struct go_atalai_lightAI: public GameObjectAI
 {
     go_atalai_lightAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
 

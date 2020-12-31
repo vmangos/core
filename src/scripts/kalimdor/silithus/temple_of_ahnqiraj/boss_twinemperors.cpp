@@ -98,11 +98,11 @@ static constexpr uint32 TELEPORTTIME_MAX_CD         = 40000;    // Longest possi
 
 static constexpr uint32 TRY_HEAL_FREQUENCY          = 0;        // How ofthen will the emperors TRY to heal eachother, 0 for every update
 static constexpr uint32 SUCCESS_HEAL_FREQUENCY      = 1500;     // How ofthen will the emperors actually heal, when in range of each other
-static constexpr float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
+//static constexpr float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
 static constexpr float  HEAL_BROTHER_RANGE          = 60.0f;
 
 static constexpr uint32 RESPAWN_BUG_FREQUENCY       = 10000;    // How often do we try to respawn a dead bug
-static constexpr float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
+//static constexpr float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
 static constexpr float  BUG_SPELL_MAX_DIST          = 20.0f;    // Max distance a bug can be for the twin to choose it
 
 // Vek'nilash constants
@@ -141,7 +141,7 @@ struct mob_TwinsBug : public ScriptedAI {
     void GoBeBadBug(uint32 whatKindOfbad)
     {
         m_creature->AddAura(whatKindOfbad);
-        m_creature->setFaction(14);
+        m_creature->SetFactionTemplateId(14);
         m_creature->SetInCombatWithZone();
         if (whatKindOfbad == SPELL_MUTATE_BUG) {
             m_creature->SetFullHealth();
@@ -150,33 +150,33 @@ struct mob_TwinsBug : public ScriptedAI {
 
     void JustDied(Unit* Killer) override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_creature->RemoveAllAuras();
     }
 
-    virtual void Reset() override
+    void Reset() override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_creature->RemoveAllAuras();
         pierceArmorTimer = 5000;
         acidSpitTimer = 6000;
 
     }
 
-    virtual void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (pierceArmorTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PIERCE_ARMOR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PIERCE_ARMOR) == CAST_OK)
                 pierceArmorTimer = urand(5000, 9000);
         }
         else
             pierceArmorTimer -= diff;
 
         if (acidSpitTimer < diff) {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPIT) == CAST_OK)
+            if(DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_SPIT) == CAST_OK)
                 acidSpitTimer = urand(6000, 12000);
         }
         else 
@@ -238,16 +238,16 @@ struct boss_twinemperorsAI : public ScriptedAI
         justTeleported  = false;
         didPullDialogue = false;
         killSayCooldown = 0;
-        m_creature->clearUnitState(UNIT_STAT_STUNNED);
+        m_creature->ClearUnitState(UNIT_STAT_STUNNED);
     }
 
     void MoveInLineOfSight(Unit *who) override
     {
         // Only want to run this if we are not in combat
-        if (!who || m_creature->getVictim() || m_creature->isInCombat())
+        if (!who || m_creature->GetVictim() || m_creature->IsInCombat())
             return;
 
-        if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+        if (who->IsTargetableForAttack() && who->IsInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
         {
             float attackRadius = m_creature->GetAttackDistance(who);
             if (attackRadius < PULL_RANGE)
@@ -318,13 +318,12 @@ struct boss_twinemperorsAI : public ScriptedAI
         bool bOpenEntrance = false;
         std::list<Creature*> lst;
         GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
-        for (auto it = lst.begin(); it != lst.end(); it++)
+        for (const auto pCreature : lst)
         {
-            Creature* pC = *it;
-            if (pC->isDead()) continue;
-            pC->SetActiveObjectState(true);
-            pC->SetInCombatWithZone();
-            pC->AI()->AttackStart(pWho);
+            if (pCreature->IsDead()) continue;
+            pCreature->SetActiveObjectState(true);
+            pCreature->SetInCombatWithZone();
+            pCreature->AI()->AttackStart(pWho);
             bOpenEntrance = true;
         }
         
@@ -364,7 +363,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // The rest of this script requires an instance, less managment and code duplication, and a bit of lazyness
         if (!m_pInstance)
@@ -381,7 +380,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 //todo: any potential issues with using GetNearestVictimInRange and 300 maxrange?
                 if (Unit* closestPlayer = m_creature->GetNearestVictimInRange(0, 300.0f)) {
                     closestTargetAfterTP = closestPlayer->GetGUID();
-                    m_creature->getThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
+                    m_creature->GetThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
                 }
                 else {
                     sLog.outBasic("Twins unable to select closest target during TP stun");
@@ -397,7 +396,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         else {
             // Not attempting to get a hostile target during teleport-idle
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
                 return;
             }
         }
@@ -479,7 +478,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
             std::list<Creature*>::iterator iter;
             for (iter = lUnitList.begin(); iter != lUnitList.end();) {
-                if ((*iter)->isDead()) {
+                if ((*iter)->IsDead()) {
                     iter = lUnitList.erase(iter);
                 }
                 // Ignoring bugs that has already been affected by a spell
@@ -491,7 +490,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 }
             }
 
-            if (lUnitList.size() == 0)
+            if (lUnitList.empty())
                 return;
 
             iter = lUnitList.begin();
@@ -531,9 +530,9 @@ struct boss_twinemperorsAI : public ScriptedAI
     // simply center-to-center
     Player* GetPlayerInP2PRange(float min, float max, bool skipTopAggro)
     {
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
-        if (tList.size() == 0)
+        if (tList.empty())
             return nullptr;
 
         std::list<Player*> candidates;
@@ -552,7 +551,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
         }
 
-        if (candidates.size() == 0)
+        if (candidates.empty())
             return nullptr;
 
         auto candIt = candidates.begin();
@@ -607,7 +606,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     void AttackStart(Unit* who) override
     {
-        float dist = m_creature->GetDistanceToCenter(who);
+        float dist = m_creature->GetDistance3dToCenter(who);
         if (dist <= VEKLOR_DIST) {
             // if he is <= VEKLOR_DIST he should not start chasing again until
             // target is further away than shadowboltRange
@@ -634,12 +633,12 @@ struct boss_veklorAI : public boss_twinemperorsAI
         return urand(EXPLODE_BUG_MIN_CD, EXPLODE_BUG_MAX_CD);
     }
 
-    uint32 GetBugSpell()
+    uint32 GetBugSpell() override
     {
         return SPELL_EXPLODEBUG;
     }
 
-    virtual void UpdateTeleportToMyBrother(uint32 diff) override
+    void UpdateTeleportToMyBrother(uint32 diff) override
     {
         // Updating time and returning if it's not yet time to teleport
         if (teleportTimer >= diff) {
@@ -753,7 +752,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         UpdateBlizzard(diff);
         updateArcaneBurst(diff);
    
-        Unit* victim = m_creature->getVictim();
+        Unit* victim = m_creature->GetVictim();
         if (!victim) 
             return;
 
@@ -777,11 +776,11 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
         else if (!m_creature->IsMoving())
         {
-            if(m_creature->getStandState() != UNIT_STAND_STATE_STAND)
+            if(m_creature->GetStandState() != UNIT_STAND_STATE_STAND)
                 m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             if (shadowBoltTimer < diff) 
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) 
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT) == CAST_OK) 
                 {
                     timeSinceLastSB = 0;
                     if (isMelee) 
@@ -835,7 +834,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_SPELL, true);
     }
 
-    void OnEndTeleportVirtual()
+    void OnEndTeleportVirtual() override
     {
         //todo: anything that needs doing?
     }
@@ -845,7 +844,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         return urand(MUTATE_BUG_MIN_CD, MUTATE_BUG_MAX_CD);
     }
 
-    uint32 GetBugSpell()
+    uint32 GetBugSpell() override
     {
         return SPELL_MUTATE_BUG;
     }
@@ -854,20 +853,20 @@ struct boss_veknilashAI : public boss_twinemperorsAI
     {
         std::list<HostileReference*> candidates;
 
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        if (tList.size() < 1)
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+        if (tList.empty())
             return nullptr;
 
-        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i) {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+        for (const auto i : tList) {
+            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
             if (!pUnit) continue;
 
             if (m_creature->IsWithinMeleeRange(pUnit)) {
-                candidates.push_back((*i));
+                candidates.push_back(i);
             }
         }
 
-        if (!candidates.size())
+        if (candidates.empty())
             return nullptr;
 
         auto it = candidates.begin();
@@ -875,7 +874,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         return m_creature->GetMap()->GetUnit((*it)->getUnitGuid());
     }
     
-    void UpdateEmperor(uint32 diff)
+    void UpdateEmperor(uint32 diff) override
     {       
         // Vek'nilash goes first, instantly does his yell when we are in combat. 
         if (!didPullDialogue) {
@@ -888,7 +887,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         //UnbalancingStrike_Timer
         if (UnbalancingStrike_Timer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UNBALANCING_STRIKE) == CAST_OK) {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UNBALANCING_STRIKE) == CAST_OK) {
                 UnbalancingStrike_Timer = urand(UNBALANCING_STRIKE_MIN_CD, UNBALANCING_STRIKE_MAX_CD);
             }
         }
@@ -918,7 +917,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         }
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         ScriptedAI::AttackStart(who);
     }
@@ -947,7 +946,7 @@ struct mob_mastersEye : public ScriptedAI {
         flightUpdate = 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->IsDespawned() || m_pInstance->TwinsDialogueStartedOrDone())
             return;
@@ -984,7 +983,7 @@ CreatureAI* GetAI_twinsBug(Creature* pCreature)
 
 void AddSC_boss_twinemperors()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_veknilash";

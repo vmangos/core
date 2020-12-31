@@ -153,7 +153,7 @@ class MailSender
 class MailReceiver
 {
     public:                                                 // Constructors
-        explicit MailReceiver(ObjectGuid receiver_guid) : m_receiver(NULL), m_receiver_guid(receiver_guid) {}
+        explicit MailReceiver(ObjectGuid receiver_guid) : m_receiver(nullptr), m_receiver_guid(receiver_guid) {}
         MailReceiver(Player* receiver);
         MailReceiver(Player* receiver, ObjectGuid receiver_guid);
     public:                                                 // Accessors
@@ -200,9 +200,7 @@ class MailDraft
         * @param a boolean specifying whether the mail needs items or not.
         *
         */
-        explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
-            : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_bodyId(0), m_money(0), m_COD(0)
-        {}
+        explicit MailDraft(uint16 mailTemplateId, bool need_items = true, LocaleConstant locale_idx = LOCALE_enUS);
         /**
          * Creates a new MailDraft object using subject text and content text id.
          *
@@ -360,7 +358,7 @@ struct Mail
     {
         for(MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
-            if(itr->item_guid == item_guid)
+            if (itr->item_guid == item_guid)
             {
                 items.erase(itr);
                 return true;

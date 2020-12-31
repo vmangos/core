@@ -37,7 +37,7 @@ struct boss_lordalexeibarovAI : public ScriptedAI
     uint32 Immolate_Timer;
     uint32 VeilofShadow_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Immolate_Timer = 7000;
         VeilofShadow_Timer = 15000;
@@ -45,21 +45,21 @@ struct boss_lordalexeibarovAI : public ScriptedAI
         m_creature->LoadCreatureAddon(true);
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_ALEXEIBAROV, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Immolate_Timer
         if (Immolate_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_IMMOLATE);
 
@@ -70,7 +70,7 @@ struct boss_lordalexeibarovAI : public ScriptedAI
         //VeilofShadow_Timer
         if (VeilofShadow_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_VEILOFSHADOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VEILOFSHADOW);
             VeilofShadow_Timer = 20000;
         }
         else VeilofShadow_Timer -= diff;
@@ -85,7 +85,7 @@ CreatureAI* GetAI_boss_lordalexeibarov(Creature* pCreature)
 
 void AddSC_boss_lordalexeibarov()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_lord_alexei_barov";
     newscript->GetAI = &GetAI_boss_lordalexeibarov;

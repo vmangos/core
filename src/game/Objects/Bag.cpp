@@ -37,8 +37,8 @@ Bag::Bag(): Item()
 
 Bag::~Bag()
 {
-    for (int i = 0; i < MAX_BAG_SIZE; ++i)
-        delete m_bagslot[i];
+    for (const auto& i : m_bagslot)
+        delete i;
 }
 
 void Bag::AddToWorld()
@@ -85,7 +85,7 @@ bool Bag::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
     {
         SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), ObjectGuid());
-        m_bagslot[i] = NULL;
+        m_bagslot[i] = nullptr;
     }
 
     return true;
@@ -110,7 +110,7 @@ bool Bag::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint32
         if (m_bagslot[i])
         {
             delete m_bagslot[i];
-            m_bagslot[i] = NULL;
+            m_bagslot[i] = nullptr;
         }
     }
 
@@ -119,9 +119,9 @@ bool Bag::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint32
 
 void Bag::DeleteFromDB()
 {
-    for (int i = 0; i < MAX_BAG_SIZE; ++i)
-        if (m_bagslot[i])
-            m_bagslot[i]->DeleteFromDB();
+    for (const auto& i : m_bagslot)
+        if (i)
+            i->DeleteFromDB();
 
     Item::DeleteFromDB();
 }
@@ -141,9 +141,9 @@ void Bag::RemoveItem(uint8 slot, bool /*update*/)
     MANGOS_ASSERT(slot < MAX_BAG_SIZE);
 
     if (m_bagslot[slot])
-        m_bagslot[slot]->SetContainer(NULL);
+        m_bagslot[slot]->SetContainer(nullptr);
 
-    m_bagslot[slot] = NULL;
+    m_bagslot[slot] = nullptr;
     SetGuidValue(CONTAINER_FIELD_SLOT_1 + (slot * 2), ObjectGuid());
 }
 
@@ -187,7 +187,7 @@ Item* Bag::GetItemByEntry(uint32 item) const
         if (m_bagslot[i] && m_bagslot[i]->GetEntry() == item)
             return m_bagslot[i];
 
-    return NULL;
+    return nullptr;
 }
 
 uint32 Bag::GetItemCount(uint32 item, Item* eItem) const
@@ -217,5 +217,5 @@ Item* Bag::GetItemByPos(uint8 slot) const
     if (slot < GetBagSize())
         return m_bagslot[slot];
 
-    return NULL;
+    return nullptr;
 }

@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -41,6 +40,9 @@ VMapManager2::VMapManager2()
 
 VMapManager2::~VMapManager2(void)
 {
+    for (auto& iInstanceMapTree : iInstanceMapTrees)
+        delete iInstanceMapTree.second;
+    iLoadedModelFiles.clear();
 }
 
 //=========================================================
@@ -48,7 +50,7 @@ VMapManager2::~VMapManager2(void)
 Vector3 VMapManager2::convertPositionToInternalRep(float x, float y, float z) const
 {
     Vector3 pos;
-    const float mid = 0.5f * 64.0f * 533.33333333f;
+    float const mid = 0.5f * 64.0f * 533.33333333f;
     pos.x = mid - x;
     pos.y = mid - y;
     pos.z = z;
@@ -67,7 +69,7 @@ std::string VMapManager2::getMapFileName(unsigned int pMapId)
 
 //=========================================================
 
-VMAPLoadResult VMapManager2::loadMap(const char* pBasePath, unsigned int pMapId, int x, int y)
+VMAPLoadResult VMapManager2::loadMap(char const* pBasePath, unsigned int pMapId, int x, int y)
 {
     VMAPLoadResult result = VMAP_LOAD_RESULT_IGNORED;
     if (isMapLoadingEnabled())
@@ -83,7 +85,7 @@ VMAPLoadResult VMapManager2::loadMap(const char* pBasePath, unsigned int pMapId,
 //=========================================================
 // load one tile (internal use only)
 
-bool VMapManager2::_loadMap(unsigned int pMapId, const std::string& basePath, uint32 tileX, uint32 tileY)
+bool VMapManager2::_loadMap(unsigned int pMapId, std::string const& basePath, uint32 tileX, uint32 tileY)
 {
     InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(pMapId);
     if (instanceTree == iInstanceMapTrees.end())
@@ -91,7 +93,10 @@ bool VMapManager2::_loadMap(unsigned int pMapId, const std::string& basePath, ui
         std::string mapFileName = getMapFileName(pMapId);
         StaticMapTree* newTree = new StaticMapTree(pMapId, basePath);
         if (!newTree->InitMap(mapFileName, this))
+        {
+            delete newTree;
             return false;
+        }
         instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(pMapId, newTree)).first;
     }
     return instanceTree->second->LoadMapTile(tileX, tileY, this);
@@ -147,8 +152,8 @@ bool VMapManager2::isInLineOfSight(unsigned int pMapId, float x1, float y1, floa
 }
 ModelInstance* VMapManager2::FindCollisionModel(unsigned int mapId, float x0, float y0, float z0, float x1, float y1, float z1)
 {
-    if (!isLineOfSightCalcEnabled()) return NULL;
-    ModelInstance* result = NULL;
+    if (!isLineOfSightCalcEnabled()) return nullptr;
+    ModelInstance* result = nullptr;
     InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(mapId);
     if (instanceTree != iInstanceMapTrees.end())
     {
@@ -262,7 +267,7 @@ bool VMapManager2::GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint
 
 //=========================================================
 
-std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(const std::string& basepath, const std::string& filename)
+std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(std::string const& basepath, std::string const& filename)
 {
     std::shared_lock<std::shared_timed_mutex> slock (m_modelsLock);
     ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
@@ -304,7 +309,7 @@ std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(const std::string
 
 //=========================================================
 
-bool VMapManager2::existsMap(const char* pBasePath, unsigned int pMapId, int x, int y)
+bool VMapManager2::existsMap(char const* pBasePath, unsigned int pMapId, int x, int y)
 {
     return StaticMapTree::CanLoadMap(std::string(pBasePath), pMapId, x, y);
 }

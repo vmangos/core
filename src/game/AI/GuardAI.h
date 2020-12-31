@@ -26,18 +26,18 @@
 
 class Creature;
 
-class MANGOS_DLL_DECL GuardAI : public CreatureAI
+class GuardAI : public CreatureAI
 {
     public:
-        explicit GuardAI(Creature *c);
+        explicit GuardAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *) override;
-        void AttackStart(Unit *) override;
-        void JustDied(Unit *) override;
-        void EnterCombat(Unit *) override;
-        void UpdateAI(const uint32) override;
-        static int Permissible(const Creature *);
+        void MoveInLineOfSight(Unit*) override;
+        void AttackStart(Unit*) override;
+        void JustDied(Unit*) override;
+        void EnterCombat(Unit*) override;
+        void UpdateAI(uint32 const) override;
+        static int Permissible(Creature const*);
     private:
-        bool IsAttackingPlayerOrFriendly(const Unit *) const;
+        bool IsAttackingPlayerOrFriendly(Unit const*) const;
 };
 #endif

@@ -24,10 +24,11 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "stratholme.h"
 
-#define SPELL_TRAMPLE       5568
-#define SPELL_KNOCKOUT      17307
-
-#define C_MINDLESS_UNDEAD   11030
+enum
+{
+    SPELL_TRAMPLE = 5568,
+    SPELL_KNOCKOUT = 17307,
+};
 
 struct boss_ramstein_the_gorgerAI : public ScriptedAI
 {
@@ -44,7 +45,7 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
     uint32 Knockout_Timer;
     bool Engaged;
 
-    void Reset()
+    void Reset() override
     {
         Trample_Timer = 3000;
         Knockout_Timer = 12000;
@@ -53,31 +54,22 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
         Engaged = false;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         Engaged = true;
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAMSTEIN, IN_PROGRESS);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
-        for (uint8 i = 0; i < 25; ++i)
-        {
-            if (Creature* temp_skeleton =  m_creature->SummonCreature(C_MINDLESS_UNDEAD, 3969.35f + float(urand(1, 15)), -3391.87f + float(urand(1, 15)), 119.11f, 5.91f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-            {
-                temp_skeleton->GetMotionMaster()->MovePoint(0, 4033.34f, -3419.75f, 116.35f);
-                temp_skeleton->SetHomePosition(4033.34f, -3419.75f, 116.35f, 4.80f);
-            }
-        }
-
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAMSTEIN, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Trample
@@ -91,9 +83,9 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
         //Knockout
         if (Knockout_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKOUT) == CAST_OK)
             {
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
                 Knockout_Timer = 10000;
             }
         }
@@ -109,7 +101,7 @@ CreatureAI* GetAI_boss_ramstein_the_gorger(Creature* pCreature)
 
 void AddSC_boss_ramstein_the_gorger()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ramstein_the_gorger";
     newscript->GetAI = &GetAI_boss_ramstein_the_gorger;

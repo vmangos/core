@@ -27,14 +27,16 @@
 
 extern SQLStorage sCreatureStorage;
 extern SQLStorage sCreatureDataAddonStorage;
-extern SQLStorage sCreatureInfoAddonStorage;
-extern SQLStorage sCreatureModelStorage;
+extern SQLStorage sCreatureDisplayInfoAddonStorage;
+extern SQLStorage sGameObjectDisplayInfoAddonStorage;
 extern SQLStorage sEquipmentStorage;
 extern SQLStorage sPageTextStore;
 extern SQLStorage sItemStorage;
 extern SQLStorage sMapStorage;
 extern SQLStorage sConditionStorage;
 extern SQLStorage sAreaStorage;
+extern SQLStorage sMailTemplateStorage;
+extern SQLStorage sCreatureSpellDataStorage;
 
 extern SQLHashStorage sGOStorage;
 

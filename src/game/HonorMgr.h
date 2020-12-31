@@ -23,19 +23,20 @@ struct HonorStanding
     float  cp;
 
     // create the standing order
-    bool operator < (const HonorStanding& hs)
+    bool operator < (HonorStanding const& hs) const
     {
         return cp > hs.cp;
     }
 };
 
-typedef std::list<HonorStanding> HonorStandingList;
+typedef std::vector<HonorStanding> HonorStandingList;
 
 struct WeeklyScore
 {
     WeeklyScore()
-        : level(0), account(0), hk(0), dk(0), standing(0), highestRank(0),
-            cp(0.0f), oldRp(0.0f), newRp(0.0f), earning(0.0f) {}
+        : level(0), account(0), hk(0), dk(0), 
+          cp(0.0f), oldRp(0.0f), newRp(0.0f), earning(0.0f), 
+          standing(0), highestRank(0) {}
 
     uint8  level;
     uint32 account;
@@ -54,7 +55,7 @@ typedef std::unordered_map<uint32, WeeklyScore> WeeklyScoresHash;
 class HonorMaintenancer
 {
     public:
-        HonorMaintenancer() : m_markerToStart(false), m_lastMaintenanceDay(0), m_nextMaintenanceDay(0) {}
+        HonorMaintenancer() : m_lastMaintenanceDay(0), m_nextMaintenanceDay(0), m_markerToStart(false) {}
         ~HonorMaintenancer() {}
 
         void Initialize();
@@ -65,6 +66,7 @@ class HonorMaintenancer
         void DistributeRankPoints(Team team);
         void InactiveDecayRankPoints();
         void FlushRankPoints();
+        void SetCityRanks();
         void CreateCalculationReport();
 
         float GetStandingCPByPosition(HonorStandingList& standingList, uint32 position);
@@ -123,7 +125,7 @@ struct HonorCP
 struct HonorRankInfo
 {
     HonorRankInfo()
-        : rank(0), visualRank(0), minRP(0.0f), maxRP(0.0f), positive(true) {}
+        : rank(0), visualRank(0), maxRP(0.0f), minRP(0.0f), positive(true) {}
 
     uint8 rank;        // internal range [0..18]
     int8  visualRank;  // number visualized in rank bar [-4..14]

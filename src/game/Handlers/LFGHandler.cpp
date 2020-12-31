@@ -50,7 +50,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
     if (!_player->IsSelfMover())
         return;
 
-    GameObject *obj = _player->GetGameObjectIfCanInteractWith(guid);
+    GameObject* obj = _player->GetGameObjectIfCanInteractWith(guid);
 
     if (!obj)
         return;
@@ -93,9 +93,9 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
 void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_MEETINGSTONE_LEAVE");
-    if(Group *grp = _player->GetGroup())
+    if (Group* grp = _player->GetGroup())
     {
-        if(grp->IsLeader(_player->GetObjectGuid()) && grp->isInLFG())
+        if (grp->IsLeader(_player->GetObjectGuid()) && grp->isInLFG())
         {
             sLFGMgr.RemoveGroupFromQueue(grp->GetId());
         }
@@ -110,13 +110,13 @@ void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
     }
 }
 
-void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Received CMSG_MEETING_STONE_INFO");
 
-    if(Group *grp = _player->GetGroup())
+    if (Group* grp = _player->GetGroup())
     {
-        if(grp->isInLFG())
+        if (grp->isInLFG())
         {
             SendMeetingstoneSetqueue(grp->GetLFGAreaId(), MEETINGSTONE_STATUS_JOINED_QUEUE);
         }

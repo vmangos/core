@@ -50,6 +50,12 @@ struct npc_piznikAI : public ScriptedAI
     {
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        ScriptedAI::JustRespawned();
+    }
+
     void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->GetMotionMaster()->MovePoint(2, 959.93f, -261.39f, -5.75f,MOVE_PATHFINDING);
@@ -73,8 +79,10 @@ struct npc_piznikAI : public ScriptedAI
         EventTimer = 0;
         pGuid = plr->GetObjectGuid();
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
-        m_creature->SetFactionTemporary(495, TEMPFACTION_RESTORE_RESPAWN);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        m_creature->SetFactionTemporary(FACTION_ESCORT_N_FRIEND_ACTIVE, TEMPFACTION_RESTORE_RESPAWN);
     }
+
     void AttackStart(Unit* pWho) override
     {
         if (InEvent)
@@ -82,9 +90,10 @@ struct npc_piznikAI : public ScriptedAI
 
         ScriptedAI::AttackStart(pWho);
     }
-    void UpdateAI(const uint32 uiDiff) override
+
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (m_creature->SelectHostileTarget() || m_creature->getVictim())
+        if (m_creature->SelectHostileTarget() || m_creature->GetVictim())
                 DoMeleeAttackIfReady();
         else if(InEvent)
         {
@@ -131,7 +140,7 @@ CreatureAI* GetAI_npc_piznik(Creature* pCreature)
     return new npc_piznikAI(pCreature);
 }
 
-bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, const Quest *pQuest)
+bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, Quest const *pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_GERENOS_ORDERS)
     {
@@ -147,7 +156,7 @@ bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, const Quest *p
 
 void AddSC_stonetalon_mountains()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_piznik";

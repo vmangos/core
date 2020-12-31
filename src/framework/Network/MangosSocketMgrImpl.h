@@ -194,10 +194,10 @@ MangosSocketMgr<SocketType>::MangosSocketMgr():
     m_NetThreadsCount(0),
     m_SockOutKBuff(-1),
     m_SockOutUBuff(65536),
-    m_Interval(10000),
     m_UseNoDelay(true),
-    m_Acceptor(0),
-    m_port(0)
+    m_Interval(10000),
+    m_port(0),
+    m_Acceptor(0)
 {
 }
 
@@ -276,7 +276,10 @@ void MangosSocketMgr<SocketType>::StopNetwork()
             m_NetThreads[i].Stop();
     }
 
+    // Avoid hanging on shutdown on some unix systems.
+#ifdef _WIN32
     Wait();
+#endif
 }
 
 template <typename SocketType>
@@ -345,7 +348,7 @@ int MangosSocketMgr<SocketType>::Connect(int port, std::string const& address, S
     if (connector.connect(handler,addr) == -1)
     {
         // Handler is already deleted.
-        handler = NULL;
+        handler = nullptr;
         return -1;
     }
     // Now add a reactor so our connnection gets updated

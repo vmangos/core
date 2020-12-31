@@ -41,7 +41,7 @@ struct boss_ptheradrasAI : public ScriptedAI
     uint32 RepulsiveGaze_Timer;
     uint32 RestoreTargetTimer;
 
-    void Reset()
+    void Reset() override
     {
         Dustfield_Timer = 8000;
         Boulder_Timer = 2000;
@@ -50,14 +50,14 @@ struct boss_ptheradrasAI : public ScriptedAI
         RestoreTargetTimer = 0;
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         m_creature->SummonCreature(12238, 28.067f, 61.875f, -123.405f, 4.67f, TEMPSUMMON_TIMED_DESPAWN, 600000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Restore target after casting Boulder
@@ -65,7 +65,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         {
             if (RestoreTargetTimer <= diff)
             {
-                if (Unit *pTarget = m_creature->getVictim())
+                if (Unit *pTarget = m_creature->GetVictim())
                 {
                     m_creature->SetInFront(pTarget);
                     m_creature->SetTargetGuid(pTarget->GetObjectGuid());
@@ -87,7 +87,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         //Boulder_Timer
         if (Boulder_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target)
                 if (DoCastSpellIfCan(target, SPELL_BOULDER) == CAST_OK)
@@ -103,7 +103,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         //RepulsiveGaze_Timer
         if (RepulsiveGaze_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REPULSIVEGAZE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REPULSIVEGAZE);
             RepulsiveGaze_Timer = 20000;
         }
         else RepulsiveGaze_Timer -= diff;
@@ -126,7 +126,7 @@ CreatureAI* GetAI_boss_ptheradras(Creature* pCreature)
 
 void AddSC_boss_ptheradras()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_princess_theradras";
     newscript->GetAI = &GetAI_boss_ptheradras;

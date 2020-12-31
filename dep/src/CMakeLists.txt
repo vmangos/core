@@ -16,6 +16,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+if (MINGW)
+add_subdirectory(libseh)
+endif()
 add_subdirectory(g3dlite)
 add_subdirectory(gsoap)
 if(WIN32)

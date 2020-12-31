@@ -350,8 +350,8 @@ WeatherSystem::WeatherSystem(Map const* _map) : m_map(_map)
 WeatherSystem::~WeatherSystem()
 {
     ///- Empty the WeatherMap
-    for (WeatherMap::const_iterator itr = m_weathers.begin(); itr != m_weathers.end(); ++itr)
-        delete itr->second;
+    for (const auto& weather : m_weathers)
+        delete weather.second;
 
     m_weathers.clear();
 }

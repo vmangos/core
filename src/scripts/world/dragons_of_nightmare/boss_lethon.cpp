@@ -39,7 +39,7 @@ void boss_lethonAI::Aggro(Unit* pWho)
     DoScriptText(SAY_LETHON_AGGRO, m_creature);
 }
 
-void boss_lethonAI::SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+void boss_lethonAI::SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell)
 {
     if (pSpell->Id == SPELL_DRAW_SPIRIT)
     {
@@ -98,13 +98,13 @@ void npc_spirit_shadeAI::Reset()
     m_creature->SetVisibility(VISIBILITY_OFF);
 }
 
-void npc_spirit_shadeAI::SpellHitTarget(Unit* /*pTarget*/, const SpellEntry* pSpell)
+void npc_spirit_shadeAI::SpellHitTarget(Unit* /*pTarget*/, SpellEntry const* pSpell)
 {
     if (pSpell->Id == SPELL_DARK_OFFERING)
         m_creature->ForcedDespawn(300);
 }
 
-void npc_spirit_shadeAI::UpdateAI(const uint32 uiDiff)
+void npc_spirit_shadeAI::UpdateAI(uint32 const uiDiff)
 {
     if (m_uiDelay)
     {

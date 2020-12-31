@@ -33,7 +33,7 @@
 #define MAX_CONNECTION_POOL_SIZE 16
 
 //////////////////////////////////////////////////////////////////////////
-SqlPreparedStatement * SqlConnection::CreateStatement( const std::string& fmt )
+SqlPreparedStatement* SqlConnection::CreateStatement(std::string const& fmt)
 {
     return new SqlPlainPreparedStatement(fmt, *this);
 }
@@ -49,19 +49,19 @@ void SqlConnection::FreePreparedStatements()
     m_holder.clear();
 }
 
-SqlPreparedStatement * SqlConnection::GetStmt( int nIndex )
+SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
 {
     if(nIndex < 0)
-        return NULL;
+        return nullptr;
 
     //resize stmt container
     if(m_holder.size() <= nIndex)
-        m_holder.resize(nIndex + 1, NULL);
+        m_holder.resize(nIndex + 1, nullptr);
 
-    SqlPreparedStatement * pStmt = NULL;
+    SqlPreparedStatement* pStmt = nullptr;
 
     //create stmt if needed
-    if(m_holder[nIndex] == NULL)
+    if(m_holder[nIndex] == nullptr)
     {
         //obtain SQL request string
         std::string fmt = m_db.GetStmtString(nIndex);
@@ -73,7 +73,7 @@ SqlPreparedStatement * SqlConnection::GetStmt( int nIndex )
         {
             //MANGOS_ASSERT(false && "Unable to prepare SQL statement");
             sLog.outError("Can't prepare %s, statement not executed!", fmt.c_str());
-            return NULL;
+            return nullptr;
         }
 
         //save statement in internal registry
@@ -85,7 +85,7 @@ SqlPreparedStatement * SqlConnection::GetStmt( int nIndex )
     return pStmt;
 }
 
-bool SqlConnection::Initialize(const char *infoString)
+bool SqlConnection::Initialize(char const* infoString)
 {
     Tokens tokens = StrSplit(infoString, ";");
 
@@ -118,13 +118,13 @@ bool SqlConnection::Initialize(const char *infoString)
     return OpenConnection(false);
 }
 
-bool SqlConnection::ExecuteStmt(int nIndex, const SqlStmtParameters& id )
+bool SqlConnection::ExecuteStmt(int nIndex, SqlStmtParameters const& id)
 {
     if(nIndex == -1)
         return false;
 
     //get prepared statement object
-    if (SqlPreparedStatement * pStmt = GetStmt(nIndex))
+    if (SqlPreparedStatement* pStmt = GetStmt(nIndex))
     {
         //bind parameters
         pStmt->bind(id);
@@ -140,7 +140,7 @@ Database::~Database()
     StopServer();
 }
 
-bool Database::Initialize(const char * infoString, int nConns /*= 1*/, int nWorkers)
+bool Database::Initialize(char const* infoString, int nConns /*= 1*/, int nWorkers)
 {
     // Enable logging of SQL commands (usually only GM commands)
     // (See method: PExecuteLog)
@@ -167,7 +167,7 @@ bool Database::Initialize(const char * infoString, int nConns /*= 1*/, int nWork
     //create connection pool for sync requests
     for (int i = 0; i < m_nQueryConnPoolSize; ++i)
     {
-        SqlConnection * pConn = CreateConnection();
+        SqlConnection* pConn = CreateConnection();
         if(!pConn->Initialize(infoString))
         {
             delete pConn;
@@ -202,13 +202,13 @@ void Database::StopServer()
         // Delete queued queries
         m_pResultQueue->CancelAll();
         delete m_pResultQueue;
-        m_pResultQueue = NULL;
+        m_pResultQueue = nullptr;
     }
 
     if (m_pAsyncConn)
     {
         delete m_pAsyncConn;
-        m_pAsyncConn = NULL;
+        m_pAsyncConn = nullptr;
     }
 
     for (size_t i = 0; i < m_pQueryConnections.size(); ++i)
@@ -280,7 +280,7 @@ void Database::escape_string(std::string& str)
     delete[] buf;
 }
 
-SqlConnection * Database::getQueryConnection()
+SqlConnection* Database::getQueryConnection()
 {
     int nCount = 0;
 
@@ -294,7 +294,7 @@ SqlConnection * Database::getQueryConnection()
 
 void Database::Ping()
 {
-    const char * sql = "SELECT 1";
+    char const* sql = "SELECT 1";
 
     {
         SqlConnection::Lock guard(m_pAsyncConn);
@@ -308,7 +308,7 @@ void Database::Ping()
     }
 }
 
-bool Database::PExecuteLog(const char * format,...)
+bool Database::PExecuteLog(char const* format,...)
 {
     if (!format)
         return false;
@@ -316,7 +316,7 @@ bool Database::PExecuteLog(const char * format,...)
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
     va_start(ap, format);
-    int res = vsnprintf( szQuery, MAX_QUERY_LEN, format, ap );
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
     if(res==-1)
@@ -325,14 +325,14 @@ bool Database::PExecuteLog(const char * format,...)
         return false;
     }
 
-    if( m_logSQL )
+    if(m_logSQL)
     {
         time_t curr;
         tm local;
         time(&curr);                                        // get current time_t value
         local=*(localtime(&curr));                          // dereference and assign
         char fName[128];
-        sprintf( fName, "%04d-%02d-%02d_logSQL.sql", local.tm_year+1900, local.tm_mon+1, local.tm_mday );
+        sprintf(fName, "%04d-%02d-%02d_logSQL.sql", local.tm_year+1900, local.tm_mon+1, local.tm_mday);
 
         FILE* log_file;
         std::string logsDir_fname = m_logsDir+fName;
@@ -352,45 +352,45 @@ bool Database::PExecuteLog(const char * format,...)
     return Execute(szQuery);
 }
 
-QueryResult* Database::PQuery(const char *format,...)
+QueryResult* Database::PQuery(char const* format,...)
 {
-    if(!format) return NULL;
+    if(!format) return nullptr;
 
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
     va_start(ap, format);
-    int res = vsnprintf( szQuery, MAX_QUERY_LEN, format, ap );
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
     if(res==-1)
     {
         sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
-        return NULL;
+        return nullptr;
     }
 
     return Query(szQuery);
 }
 
-QueryNamedResult* Database::PQueryNamed(const char *format,...)
+QueryNamedResult* Database::PQueryNamed(char const* format,...)
 {
-    if(!format) return NULL;
+    if(!format) return nullptr;
 
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
     va_start(ap, format);
-    int res = vsnprintf( szQuery, MAX_QUERY_LEN, format, ap );
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
     if(res==-1)
     {
         sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
-        return NULL;
+        return nullptr;
     }
 
     return QueryNamed(szQuery);
 }
 
-bool Database::Execute(const char *sql)
+bool Database::Execute(char const* sql)
 {
     if (!m_pAsyncConn)
         return false;
@@ -414,7 +414,7 @@ bool Database::Execute(const char *sql)
     return true;
 }
 
-bool Database::PExecute(const char * format,...)
+bool Database::PExecute(char const* format,...)
 {
     if (!format)
         return false;
@@ -422,7 +422,7 @@ bool Database::PExecute(const char * format,...)
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
     va_start(ap, format);
-    int res = vsnprintf( szQuery, MAX_QUERY_LEN, format, ap );
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
     if(res==-1)
@@ -434,7 +434,7 @@ bool Database::PExecute(const char * format,...)
     return Execute(szQuery);
 }
 
-bool Database::DirectPExecute(const char * format,...)
+bool Database::DirectPExecute(char const* format,...)
 {
     if (!format)
         return false;
@@ -442,7 +442,7 @@ bool Database::DirectPExecute(const char * format,...)
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
     va_start(ap, format);
-    int res = vsnprintf( szQuery, MAX_QUERY_LEN, format, ap );
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
     if(res==-1)
@@ -469,7 +469,7 @@ bool Database::BeginTransaction(uint32 serialId)
 
 bool Database::InTransaction()
 {
-    return m_TransStorage->get() != NULL;
+    return m_TransStorage->get() != nullptr;
 }
 
 uint32 Database::GetTransactionSerialId()
@@ -534,7 +534,7 @@ bool Database::RollbackTransaction()
     return true;
 }
 
-void Database::AddToSerialDelayQueue(SqlOperation *op)
+void Database::AddToSerialDelayQueue(SqlOperation* op)
 {
     if (op->GetSerialId() == 0 || m_numAsyncWorkers == 0)
     {
@@ -559,11 +559,11 @@ bool Database::HasAsyncQuery()
     return hasQuery;
 }
 
-bool Database::CheckRequiredMigrations(const char **migrations)
+bool Database::CheckRequiredMigrations(char const** migrations)
 {
     std::set<std::string> appliedMigrations;
 
-    QueryResult *result = Query("SELECT * FROM `migrations`");
+    QueryResult* result = Query("SELECT * FROM `migrations`");
 
     if (result)
     {
@@ -617,7 +617,7 @@ bool Database::CheckRequiredMigrations(const char **migrations)
     return true;
 }
 
-bool Database::ExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params)
+bool Database::ExecuteStmt(SqlStatementID const& id, SqlStmtParameters* params)
 {
     if (!m_pAsyncConn)
         return false;
@@ -641,7 +641,7 @@ bool Database::ExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params)
     return true;
 }
 
-bool Database::DirectExecuteStmt( const SqlStatementID& id, SqlStmtParameters * params )
+bool Database::DirectExecuteStmt(SqlStatementID const& id, SqlStmtParameters* params)
 {
     MANGOS_ASSERT(params);
     std::unique_ptr<SqlStmtParameters> p(params);
@@ -650,7 +650,7 @@ bool Database::DirectExecuteStmt( const SqlStatementID& id, SqlStmtParameters * 
     return _guard->ExecuteStmt(id.ID(), *params);
 }
 
-SqlStatement Database::CreateStatement(SqlStatementID& index, const char * fmt )
+SqlStatement Database::CreateStatement(SqlStatementID& index, char const* fmt)
 {
     int nId = -1;
     //check if statement ID is initialized
@@ -678,7 +678,7 @@ SqlStatement Database::CreateStatement(SqlStatementID& index, const char * fmt )
     return SqlStatement(index, *this);
 }
 
-std::string Database::GetStmtString(const int stmtId) const
+std::string Database::GetStmtString(int const stmtId) const
 {
     LOCK_GUARD _guard(m_stmtGuard);
 
@@ -712,7 +712,7 @@ SqlTransaction * Database::TransHelper::init(uint32 serialId)
 SqlTransaction * Database::TransHelper::detach()
 {
     SqlTransaction * pRes = m_pTrans;
-    m_pTrans = NULL;
+    m_pTrans = nullptr;
     return pRes;
 }
 
@@ -721,6 +721,6 @@ void Database::TransHelper::reset()
     if(m_pTrans)
     {
         delete m_pTrans;
-        m_pTrans = NULL;
+        m_pTrans = nullptr;
     }
 }

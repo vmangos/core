@@ -135,7 +135,7 @@ bool ChatHandler::HandleSaveAllCommand(char* /*args*/)
 
 bool ChatHandler::HandleAntiSpamAdd(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* wordStr = ExtractQuotedArg(&args);
@@ -161,7 +161,7 @@ bool ChatHandler::HandleAntiSpamAdd(char* args)
 
 bool ChatHandler::HandleAntiSpamRemove(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* wordStr = ExtractQuotedArg(&args);
@@ -181,7 +181,7 @@ bool ChatHandler::HandleAntiSpamRemove(char* args)
 
 bool ChatHandler::HandleAntiSpamReplace(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* fromStr = ExtractQuotedArg(&args);
@@ -210,7 +210,7 @@ bool ChatHandler::HandleAntiSpamReplace(char* args)
 
 bool ChatHandler::HandleAntiSpamRemoveReplace(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* fromStr = ExtractQuotedArg(&args);
@@ -412,6 +412,13 @@ bool ChatHandler::HandleServerCorpsesCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleServerResetAllRaidCommand(char* /*args*/)
+{
+    SendSysMessage("Global raid instances reset, all players in raid instances will be teleported to homebind!");
+    sMapPersistentStateMgr.GetScheduler().ResetAllRaid();
+    return true;
+}
+
 bool ChatHandler::HandleServerShutDownCancelCommand(char* /*args*/)
 {
     sWorld.ShutdownCancel();
@@ -607,7 +614,7 @@ bool ChatHandler::HandleGroupAddSpellCommand(char *args)
         return false;
     }
     LocaleConstant loc = GetSessionDbcLocale();
-    ShowSpellListHelper(NULL, pSpell, loc);
+    ShowSpellListHelper(nullptr, pSpell, loc);
 
     WorldDatabase.PExecute("INSERT INTO `spell_group` SET id=%u, spell_id=%u", groupId, spellId);
     PSendSysMessage("Spell added to group %u in DB.", groupId);
@@ -712,8 +719,8 @@ bool ChatHandler::HandleEventInfoCommand(char* args)
     std::string endTimeStr = TimeToTimestampStr(eventData.end);
 
     uint32 delay = sGameEventMgr.NextCheck(event_id);
-    time_t nextTime = time(NULL) + delay;
-    std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(NULL) + delay) : "-";
+    time_t nextTime = time(nullptr) + delay;
+    std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(nullptr) + delay) : "-";
 
     std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE);
     std::string lengthStr = secsToTimeString(eventData.length * MINUTE);
@@ -959,6 +966,7 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
     sLog.outString("Re-Loading Scripts...");
     HandleReloadGameObjectScriptsCommand((char*)"a");
     HandleReloadGossipScriptsCommand((char*)"a");
+    HandleReloadGenericScriptsCommand((char*)"a");
     HandleReloadEventScriptsCommand((char*)"a");
     HandleReloadQuestEndScriptsCommand((char*)"a");
     HandleReloadQuestStartScriptsCommand((char*)"a");
@@ -977,7 +985,6 @@ bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
     HandleReloadSpellElixirCommand((char*)"a");
     HandleReloadSpellLearnSpellCommand((char*)"a");
     HandleReloadSpellProcEventCommand((char*)"a");
-    HandleReloadSpellBonusesCommand((char*)"a");
     HandleReloadSpellProcItemEnchantCommand((char*)"a");
     HandleReloadSpellScriptTargetCommand((char*)"a");
     HandleReloadSpellTargetPositionCommand((char*)"a");
@@ -1075,7 +1082,10 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
 bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading `gossip_menu` Table!");
-    sObjectMgr.LoadGossipMenu();
+    std::set<uint32> gossipScriptSet;
+    for (const auto& itr : sGossipScripts)
+        gossipScriptSet.insert(itr.first);
+    sObjectMgr.LoadGossipMenu(gossipScriptSet);
     SendSysMessage("DB table `gossip_menu` reloaded.");
     return true;
 }
@@ -1083,7 +1093,10 @@ bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 bool ChatHandler::HandleReloadGossipMenuOptionCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading `gossip_menu_option` Table!");
-    sObjectMgr.LoadGossipMenuItems();
+    std::set<uint32> gossipScriptSet;
+    for (const auto& itr : sGossipScripts)
+        gossipScriptSet.insert(itr.first);
+    sObjectMgr.LoadGossipMenuItems(gossipScriptSet);
     SendSysMessage("DB table `gossip_menu_option` reloaded.");
     return true;
 }
@@ -1354,14 +1367,6 @@ bool ChatHandler::HandleReloadSpellAreaCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadSpellBonusesCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Spell Bonus Data...");
-    sSpellMgr.LoadSpellBonuses();
-    SendSysMessage("DB table `spell_bonus_data` (spell damage/healing coefficients) reloaded.");
-    return true;
-}
-
 bool ChatHandler::HandleReloadSpellChainCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading Spell Chain Data... ");
@@ -1482,6 +1487,26 @@ bool ChatHandler::HandleReloadGameObjectScriptsCommand(char* args)
 
     if (*args != 'a')
         SendSysMessage("DB table `gameobject_scripts` reloaded.");
+
+    return true;
+}
+
+bool ChatHandler::HandleReloadGenericScriptsCommand(char* args)
+{
+    if (sScriptMgr.IsScriptScheduled())
+    {
+        SendSysMessage("DB scripts used currently, please attempt reload later.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (*args != 'a')
+        sLog.outString("Re-Loading Scripts from `generic_scripts`...");
+
+    sScriptMgr.LoadGenericScripts();
+
+    if (*args != 'a')
+        SendSysMessage("DB table `generic_scripts` reloaded.");
 
     return true;
 }
@@ -1814,10 +1839,10 @@ bool ChatHandler::HandleReloadFactionChangeMounts(char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureModelInfo(char*)
+bool ChatHandler::HandleReloadCreatureDisplayInfoAddon(char*)
 {
-    sObjectMgr.LoadCreatureModelInfo();
-    SendSysMessage(">> Table `creature_model_info` reloaded.");
+    sObjectMgr.LoadCreatureDisplayInfoAddon();
+    SendSysMessage(">> Table `creature_display_info_addon` reloaded.");
     return true;
 }
 
@@ -1879,7 +1904,7 @@ bool ChatHandler::HandleReloadSpellDisabledCommand(char *args)
 
 bool ChatHandler::HandleReloadAutoBroadcastCommand(char *args)
 {
-    sAutoBroadCastMgr.load();
+    sAutoBroadCastMgr.Load();
     SendSysMessage("DB table `autobroadcast` reloaded.");
     return true;
 }
@@ -1908,7 +1933,7 @@ bool ChatHandler::HandleReloadConditionsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAnticheatCommand(char*)
 {
-    sAnticheatLib->LoadAnticheatData();
+    sAnticheatMgr->LoadAnticheatData();
     SendSysMessage(">> Anticheat data reloaded");
     return true;
 }

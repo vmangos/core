@@ -28,8 +28,6 @@
 #endif
 
 #include "WorldSocketMgr.h"
-#include "MapNodes/NodesMgr.h"
-
 #include "Common.h"
 #include "Master.h"
 #include "WorldSocket.h"
@@ -88,7 +86,7 @@ void freezeDetector(uint32 _delaytime)
         }
         // possible freeze
 #ifdef NDEBUG
-        else if (WorldTimer::getMSTimeDiff(lastchange, curtime) > _delaytime)
+        else if (WorldTimer::getMSTimeDiff(w_lastchange, curtime) > _delaytime)
         {
             sLog.outError("World Thread hangs, kicking out server!");
             std::terminate();              // bang crash
@@ -340,36 +338,26 @@ int Master::Run()
         //freeze_thread->setPriority(ACE_Based::Highest);
     }
 
-    if (!sNodesMgr->OnServerStartup())
+    // Wait for clients ?
+    ///- Launch the world listener socket
+    uint16 wsport = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
+    std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+
+    // Start WorldSockets
+    sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
+    sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
+    sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
+    sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
+    sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
+
+    if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
     {
-        sLog.outError ("[FATAL] Unable to start cluster NodesMgr");
+        sLog.outError("Failed to start WorldSocket network");
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
+        // go down and shutdown the server
     }
-
-    // Wait for clients ?
-    if (!sWorld.getConfig(CONFIG_BOOL_IS_MAPSERVER))
-    {
-        ///- Launch the world listener socket
-        uint16 wsport = sWorld.getConfig (CONFIG_UINT32_PORT_WORLD);
-        std::string bind_ip = sConfig.GetStringDefault ("BindIP", "0.0.0.0");
-
-        // Start WorldSockets
-        sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
-        sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
-        sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
-        sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
-        sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
-
-        if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
-        {
-            sLog.outError ("Failed to start WorldSocket network");
-            Log::WaitBeforeContinueIfNeed();
-            World::StopNow(ERROR_EXIT_CODE);
-            // go down and shutdown the server
-        }
-        sWorldSocketMgr->Wait();
-    }
+    sWorldSocketMgr->Wait();
 
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)
@@ -408,61 +396,65 @@ int Master::Run()
     }
 
     ///- Clean account database before leaving
+    sLog.outString("Cleaning character database...");
     clearOnlineAccounts();
 
     // send all still queued mass mails (before DB connections shutdown)
+    sLog.outString("Sending queued mail...");
     sMassMailMgr.Update(true);
 
     ///- Wait for DB delay threads to end
+    sLog.outString("Closing database connections...");
     CharacterDatabase.StopServer();
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
 
-    sLog.outString( "Halting process..." );
+    sLog.outString("Halting process...");
 
     if (cliThread)
     {
+
 #ifdef WIN32
-		// this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
-		//_exit(1);
-		// send keyboard input to safely unblock the CLI thread
-		INPUT_RECORD b[5];
-		HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
-		b[0].EventType = KEY_EVENT;
-		b[0].Event.KeyEvent.bKeyDown = TRUE;
-		b[0].Event.KeyEvent.uChar.AsciiChar = 'X';
-		b[0].Event.KeyEvent.wVirtualKeyCode = 'X';
-		b[0].Event.KeyEvent.wRepeatCount = 1;
+        // this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
+        //_exit(1);
+        // send keyboard input to safely unblock the CLI thread
+        INPUT_RECORD b[5];
+        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+        b[0].EventType = KEY_EVENT;
+        b[0].Event.KeyEvent.bKeyDown = TRUE;
+        b[0].Event.KeyEvent.uChar.AsciiChar = 'X';
+        b[0].Event.KeyEvent.wVirtualKeyCode = 'X';
+        b[0].Event.KeyEvent.wRepeatCount = 1;
 
-		b[1].EventType = KEY_EVENT;
-		b[1].Event.KeyEvent.bKeyDown = FALSE;
-		b[1].Event.KeyEvent.uChar.AsciiChar = 'X';
-		b[1].Event.KeyEvent.wVirtualKeyCode = 'X';
-		b[1].Event.KeyEvent.wRepeatCount = 1;
+        b[1].EventType = KEY_EVENT;
+        b[1].Event.KeyEvent.bKeyDown = FALSE;
+        b[1].Event.KeyEvent.uChar.AsciiChar = 'X';
+        b[1].Event.KeyEvent.wVirtualKeyCode = 'X';
+        b[1].Event.KeyEvent.wRepeatCount = 1;
 
-		b[2].EventType = KEY_EVENT;
-		b[2].Event.KeyEvent.bKeyDown = TRUE;
-		b[2].Event.KeyEvent.dwControlKeyState = 0;
-		b[2].Event.KeyEvent.uChar.AsciiChar = '\r';
-		b[2].Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
-		b[2].Event.KeyEvent.wRepeatCount = 1;
-		b[2].Event.KeyEvent.wVirtualScanCode = 0x1c;
+        b[2].EventType = KEY_EVENT;
+        b[2].Event.KeyEvent.bKeyDown = TRUE;
+        b[2].Event.KeyEvent.dwControlKeyState = 0;
+        b[2].Event.KeyEvent.uChar.AsciiChar = '\r';
+        b[2].Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
+        b[2].Event.KeyEvent.wRepeatCount = 1;
+        b[2].Event.KeyEvent.wVirtualScanCode = 0x1c;
 
-		b[3].EventType = KEY_EVENT;
-		b[3].Event.KeyEvent.bKeyDown = FALSE;
-		b[3].Event.KeyEvent.dwControlKeyState = 0;
-		b[3].Event.KeyEvent.uChar.AsciiChar = '\r';
-		b[3].Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
-		b[3].Event.KeyEvent.wVirtualScanCode = 0x1c;
-		b[3].Event.KeyEvent.wRepeatCount = 1;
-		DWORD numb;
-		BOOL ret = WriteConsoleInput(hStdIn, b, 4, &numb);
+        b[3].EventType = KEY_EVENT;
+        b[3].Event.KeyEvent.bKeyDown = FALSE;
+        b[3].Event.KeyEvent.dwControlKeyState = 0;
+        b[3].Event.KeyEvent.uChar.AsciiChar = '\r';
+        b[3].Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
+        b[3].Event.KeyEvent.wVirtualScanCode = 0x1c;
+        b[3].Event.KeyEvent.wRepeatCount = 1;
+        DWORD numb;
+        WriteConsoleInput(hStdIn, b, 4, &numb);
 #else
         fclose(stdin);
 #endif
-
-        cliThread->join();
+        if (cliThread->joinable())
+            cliThread->join();
 
         delete cliThread;
     }
@@ -525,10 +517,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
         return false;
     }
 
-    if (!database.CheckRequiredMigrations(migrations))
-        return false;
-
-    return true;
+    return database.CheckRequiredMigrations(migrations);
 }
 /// Initialize connection to the databases
 bool Master::_StartDB()

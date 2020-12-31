@@ -5,7 +5,7 @@
 #include "Player.h"
 
 MovementBroadcaster::MovementBroadcaster(std::size_t threads, std::chrono::milliseconds frequency)
-    : m_sleep_timer(frequency), m_num_threads(threads)
+    : m_num_threads(threads), m_sleep_timer(frequency)
 {
     if (threads)
         sLog.outInfo("[NETWORK] Movement broadcaster configured to run every %ums "
@@ -31,32 +31,46 @@ void MovementBroadcaster::StartThreads()
     m_stop = false;
 
     // start the workers
-    for(std::size_t i = 0; i < m_num_threads; ++i)
-        m_threads.emplace_back(&MovementBroadcaster::Work, this, i);
+    for (std::size_t i = 0; i < m_num_threads; ++i) {
+        auto mb = new MovementBroadcasterWorker(i, this);
+        m_threads.emplace_back(new std::thread(
+                                [mb, i](){mb->run();
+        }),[mb](std::thread *thread) {
+            if (thread->joinable())
+                thread->join();
+            delete thread;
+            delete mb;
+        });
+    }
 
 }
 
-void MovementBroadcaster::RegisterPlayer(const std::shared_ptr<PlayerBroadcaster>& player)
+void MovementBroadcaster::RegisterPlayer(std::shared_ptr<PlayerBroadcaster> const& player)
 {
     if (!m_num_threads)
         return;
 
     std::size_t index = player->GetGUID().GetRawValue() % m_num_threads;
-    std::lock_guard<std::mutex> guard(m_thread_locks[index]);
+    std::unique_lock<std::mutex>(m_thread_locks[index]);
     m_thread_players[index].insert(player);
 }
 
-void MovementBroadcaster::RemovePlayer(const std::shared_ptr<PlayerBroadcaster>& player)
+void MovementBroadcaster::RemovePlayer(std::shared_ptr<PlayerBroadcaster> const& player)
 {
     if (!m_num_threads)
         return;
 
     std::size_t index = player->GetGUID().GetRawValue() % m_num_threads;
-    std::lock_guard<std::mutex> guard(m_thread_locks[index]);
+    std::unique_lock<std::mutex>(m_thread_locks[index]);
     auto it = m_thread_players[index].find(player);
 
     if (it != m_thread_players[index].end())
         m_thread_players[index].erase(it);
+}
+
+void MovementBroadcasterWorker::run()
+{
+    m_broadcaster->Work(m_threadId);
 }
 
 void MovementBroadcaster::Work(std::size_t thread_id)
@@ -89,19 +103,21 @@ uint32 MovementBroadcaster::IdentifySlowMap(std::size_t thread_id)
 {
     std::map<uint32 /* instanceId */, uint32 /* numPackets */> map_packets;
 
-    std::lock_guard<std::mutex> guard(m_thread_locks[thread_id]);
+    std::unique_lock<std::mutex>(m_thread_locks[thread_id]);
 
     for (auto& player : m_thread_players[thread_id])
         map_packets[player->instanceId] += player->lastUpdatePackets;
 
     uint32 max_number_packets = 0;
     uint32 max_instance_id = 0;
-    for (auto it = map_packets.begin(); it != map_packets.end(); ++it)
-        if (it->second > max_number_packets)
+    for (const auto& itr : map_packets)
+    {
+        if (itr.second > max_number_packets)
         {
-            max_instance_id = it->first;
-            max_number_packets = it->second;
+            max_instance_id = itr.first;
+            max_number_packets = itr.second;
         }
+    }
     return max_instance_id;
 }
 
@@ -109,7 +125,7 @@ void MovementBroadcaster::BroadcastPackets(std::size_t index, uint32& num_packet
 {
     PlayersBCastSet my_players;
     {
-        std::lock_guard<std::mutex> guard(m_thread_locks[index]);
+        std::unique_lock<std::mutex>(m_thread_locks[index]);
         my_players = m_thread_players[index];
     }
 
@@ -123,11 +139,6 @@ void MovementBroadcaster::Stop()
 
     m_stop = true;
 
-    for (auto& thread : m_threads)
-    {
-        if (thread.joinable())
-            thread.join();
-    }
     m_threads.clear();
 }
 

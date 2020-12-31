@@ -112,7 +112,7 @@ struct aqsentinelAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // Increase aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 45.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 45.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
@@ -143,9 +143,9 @@ struct aqsentinelAI : public ScriptedAI
         {
             if (aqsentinelAI* sentinelAI = dynamic_cast<aqsentinelAI*>(buddy->AI()))
             {
-                for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
+                for (const auto& guid : nearby)
                 {
-                    if (Creature* otherBuddy = m_creature->GetMap()->GetCreature(*iter))
+                    if (Creature* otherBuddy = m_creature->GetMap()->GetCreature(guid))
                     {
                         sentinelAI->AddBuddyToList(otherBuddy);
                     }
@@ -157,19 +157,19 @@ struct aqsentinelAI : public ScriptedAI
 
     void SendMyListToBuddies()
     {
-        for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
+        for (const auto& guid : nearby)
         {
-            GiveBuddyMyList(*iter);
+            GiveBuddyMyList(guid);
         }
     }
 
     void CallBuddiesToAttack(Unit *who)
     {
-        for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
+        for (const auto& guid : nearby)
         {
-            if (Creature* creature = m_creature->GetMap()->GetCreature(*iter))
+            if (Creature* creature = m_creature->GetMap()->GetCreature(guid))
             {
-                if (creature->isInCombat())
+                if (creature->IsInCombat())
                     continue;
 
                 creature->SetNoCallAssistance(true);
@@ -187,8 +187,8 @@ struct aqsentinelAI : public ScriptedAI
         if (assistList.empty())
             return;
 
-        for (std::list<Creature*>::iterator iter = assistList.begin(); iter != assistList.end(); ++iter)
-            AddBuddyToList(*iter);
+        for (const auto& iter : assistList)
+            AddBuddyToList(iter);
     }
 
     int pickAbilityRandom(std::vector<bool>& chosenAbilities)
@@ -215,9 +215,9 @@ struct aqsentinelAI : public ScriptedAI
         ClearBuddyList();
         AddSentinelsNear(m_creature);
 
-        for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
+        for (const auto& guid : nearby)
         {
-            if (Creature* buddy = m_creature->GetMap()->GetCreature(*iter))
+            if (Creature* buddy = m_creature->GetMap()->GetCreature(guid))
             {
                 if (aqsentinelAI* sentinelAI = dynamic_cast<aqsentinelAI*>(buddy->AI()))
                 {
@@ -233,15 +233,15 @@ struct aqsentinelAI : public ScriptedAI
         CallBuddiesToAttack(who);
     }
 
-    void Reset()
+    void Reset() override
     {
-        if (!m_creature->isDead())
+        if (!m_creature->IsDead())
         {
-            for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
+            for (const auto& guid : nearby)
             {
-                if (Creature* buddy = m_creature->GetMap()->GetCreature(*iter))
+                if (Creature* buddy = m_creature->GetMap()->GetCreature(guid))
                 {
-                    if (buddy->isDead())
+                    if (buddy->IsDead())
                         buddy->Respawn();
                 }
             }
@@ -259,16 +259,16 @@ struct aqsentinelAI : public ScriptedAI
     }
 
     // Threat reduction for Knock Away
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if ((pSpell->Id == SPELL_KNOCK) && pTarget->GetTypeId() == TYPEID_PLAYER)
         {
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -20);
+            if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -20);
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (gatherOthersWhenAggro)
             GetOtherSentinels(pWho);
@@ -279,14 +279,14 @@ struct aqsentinelAI : public ScriptedAI
     }
 
     // Transfer powers on death
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         m_bAlone = true;
-        for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
+        for (const auto& guid : nearby)
         {
-            if (Creature* buddy = m_creature->GetMap()->GetCreature(*iter))
+            if (Creature* buddy = m_creature->GetMap()->GetCreature(guid))
             {
-                if (buddy->isDead())
+                if (buddy->IsDead())
                     continue;
 
                 m_bAlone = false;
@@ -305,17 +305,17 @@ struct aqsentinelAI : public ScriptedAI
             DoScriptText(EMOTE_TRANSFER, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_abilitySpellId == SPELL_KNOCK_BUFF)
         {
             if (m_uiKnock_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK);
                 m_uiKnock_Timer = 13000;
             }
             else
@@ -341,7 +341,7 @@ CreatureAI* GetAI_mob_anubisath_sentinelAI(Creature* pCreature)
 
 void AddSC_mob_anubisath_sentinel()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "mob_anubisath_sentinel";
     newscript->GetAI = &GetAI_mob_anubisath_sentinelAI;

@@ -20,6 +20,8 @@
 
 #include "ZoneScript.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 enum OutdoorPvPSISpells
 {
     SI_SILITHYST_FLAG_GO_SPELL       = 29518,
@@ -28,14 +30,14 @@ enum OutdoorPvPSISpells
     SI_CENARION_FAVOR                = 30754
 };
 
-const uint32 SI_MAX_RESOURCES_DEFAULT = 200;
-const uint8 OutdoorPvPSIBuffZonesNum = 3;
-const uint32 OutdoorPvPSIBuffZones[OutdoorPvPSIBuffZonesNum] = { 1377, 3428, 3429 };
-const uint32 SI_AREATRIGGER_H        = 4168;
-const uint32 SI_AREATRIGGER_A        = 4162;
-const uint32 SI_TURNIN_QUEST_CM_A    = 17090;
-const uint32 SI_TURNIN_QUEST_CM_H    = 18199;
-const uint32 SI_SILITHYST_MOUND      = 181597;
+uint32 const SI_MAX_RESOURCES_DEFAULT = 200;
+uint8 const OutdoorPvPSIBuffZonesNum = 3;
+uint32 const OutdoorPvPSIBuffZones[OutdoorPvPSIBuffZonesNum] = { 1377, 3428, 3429 };
+uint32 const SI_AREATRIGGER_H        = 4168;
+uint32 const SI_AREATRIGGER_A        = 4162;
+uint32 const SI_TURNIN_QUEST_CM_A    = 17090;
+uint32 const SI_TURNIN_QUEST_CM_H    = 18199;
+uint32 const SI_SILITHYST_MOUND      = 181597;
 
 enum SI_WorldStates
 {
@@ -52,20 +54,20 @@ class OutdoorPvPSI : public OutdoorPvP
 
         bool SetupZoneScript();
 
-        void OnPlayerEnter(Player *plr);
-        void OnPlayerLeave(Player *plr);
+        void OnPlayerEnter(Player* plr);
+        void OnPlayerLeave(Player* plr);
 
         void Update(uint32 diff);
 
-        uint32 FillInitialWorldStates(WorldPacket &data);
+        uint32 FillInitialWorldStates(WorldPacket& data);
 
-        void SendRemoveWorldStates(Player * plr);
+        void SendRemoveWorldStates(Player* plr);
 
-        bool HandleAreaTrigger(Player * plr, uint32 trigger);
+        bool HandleAreaTrigger(Player* plr, uint32 trigger);
 
-        bool HandleDropFlag(Player * plr, uint32 spellId);
+        bool HandleDropFlag(Player* plr, uint32 spellId);
 
-        bool HandleCustomSpell(Player * plr, uint32 spellId, GameObject *go);
+        bool HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go);
 
         void UpdateWorldState();
 
@@ -77,5 +79,7 @@ class OutdoorPvPSI : public OutdoorPvP
 
         uint32 m_LastController;
 };
+
+#endif
 
 #endif

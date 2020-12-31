@@ -62,10 +62,10 @@ void LFGPlayerQueueInfo::CalculateRoles(Classes playerClass)
 
 RolesPriority LFGPlayerQueueInfo::GetRolePriority(ClassRoles role)
 {
-    for (auto iter = rolePriority.cbegin(); iter != rolePriority.cend(); ++iter)
+    for (const auto& iter : rolePriority)
     {
-        if (iter->first == role)
-            return iter->second;
+        if (iter.first == role)
+            return iter.second;
     }
 
     return LFG_PRIORITY_NONE;
@@ -109,7 +109,7 @@ void LFGQueue::AddToQueue(Player* leader, uint32 queueAreaID)
         i_Player.team = leader->GetTeam();
         i_Player.areaId = queueAreaID;
         i_Player.hasQueuePriority = false;
-        i_Player.CalculateRoles(static_cast<Classes>(leader->getClass()));
+        i_Player.CalculateRoles(static_cast<Classes>(leader->GetClass()));
         i_Player.name = leader->GetName();
 
         leader->GetSession()->SendMeetingstoneSetqueue(queueAreaID, MEETINGSTONE_STATUS_JOINED_QUEUE);
@@ -388,21 +388,21 @@ bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles r
         bool queueTimePriority = qPlayer->second.hasQueuePriority;
         bool classPriority = qPlayer->second.GetRolePriority(role);
         // Iterate over QueuedPlayersMap to find if players have been longer in Queue.
-        for (QueuedPlayersMap::iterator iter = m_QueuedPlayers.begin(); iter != m_QueuedPlayers.end(); ++iter)
+        for (auto& itr : m_QueuedPlayers)
         {
-            if (qPlayer->first == iter->first)
+            if (qPlayer->first == itr.first)
                 continue;
 
             // Ignore players queuing for a different dungeon or from opposite factions
-            if (qPlayer->second.areaId != iter->second.areaId || qPlayer->second.team != iter->second.team)
+            if (qPlayer->second.areaId != itr.second.areaId || qPlayer->second.team != itr.second.team)
                 continue;
 
             // Compare priority/queue time to players that can fill the same role
-            if ((iter->second.roleMask & role) == role)
+            if ((itr.second.roleMask & role) == role)
             {
-                bool otherTimePriority = iter->second.hasQueuePriority;
-                bool otherClassPriority = iter->second.GetRolePriority(role);
-                bool otherLongerInQueue = iter->second.timeInLFG > qPlayer->second.timeInLFG;
+                bool otherTimePriority = itr.second.hasQueuePriority;
+                bool otherClassPriority = itr.second.GetRolePriority(role);
+                bool otherLongerInQueue = itr.second.timeInLFG > qPlayer->second.timeInLFG;
 
                 // Another player is more valuable in this role, they have priority
                 if (otherClassPriority > classPriority)
@@ -473,12 +473,12 @@ bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles r
     return false;
 }
 
-bool LFGQueue::IsPlayerInQueue(const ObjectGuid& plrGuid) const
+bool LFGQueue::IsPlayerInQueue(ObjectGuid const& plrGuid) const
 {
     return m_QueuedPlayers.find(plrGuid) != m_QueuedPlayers.end();
 }
 
-void LFGQueue::RemovePlayerFromQueue(const ObjectGuid& plrGuid, PlayerLeaveMethod leaveMethod)
+void LFGQueue::RemovePlayerFromQueue(ObjectGuid const& plrGuid, PlayerLeaveMethod leaveMethod)
 {
     QueuedPlayersMap::iterator iter = m_QueuedPlayers.find(plrGuid);
     if (iter != m_QueuedPlayers.end())
@@ -534,35 +534,35 @@ void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod
 
 void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
 {
-    for (QueuedPlayersMap::iterator itr = m_QueuedPlayers.begin(); itr != m_QueuedPlayers.end(); ++itr)
+    for (const auto& itr : m_QueuedPlayers)
     {
-        if (itr->first == exclude)
+        if (itr.first == exclude)
             continue;
 
-        if (itr->second.areaId == area && itr->second.team == team)
-            players.push_back(itr->first);
+        if (itr.second.areaId == area && itr.second.team == team)
+            players.push_back(itr.first);
     }
 }
 
-void LFGQueue::BuildSetQueuePacket(WorldPacket &data, uint32 areaId, uint8 status)
+void LFGQueue::BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status)
 {
     data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
     data << uint32(areaId);
     data << uint8(status);
 }
 
-void LFGQueue::BuildMemberAddedPacket(WorldPacket &data, ObjectGuid plrGuid)
+void LFGQueue::BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid)
 {
     data.Initialize(SMSG_MEETINGSTONE_MEMBER_ADDED, 8);
     data << uint64(plrGuid);
 }
 
-void LFGQueue::BuildInProgressPacket(WorldPacket &data)
+void LFGQueue::BuildInProgressPacket(WorldPacket& data)
 {
     data.Initialize(SMSG_MEETINGSTONE_IN_PROGRESS, 0);
 }
 
-void LFGQueue::BuildCompletePacket(WorldPacket &data)
+void LFGQueue::BuildCompletePacket(WorldPacket& data)
 {
     data.Initialize(SMSG_MEETINGSTONE_COMPLETE, 0);
 }

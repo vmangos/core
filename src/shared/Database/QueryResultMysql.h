@@ -28,25 +28,23 @@
 
 #ifdef WIN32
 #include <winsock2.h>
-#include <mysql/mysql.h>
-#else
-#include <mysql.h>
 #endif
+#include <mysql.h>
 
 class QueryResultMysql : public QueryResult
 {
     public:
-        QueryResultMysql(MYSQL_RES *result, MYSQL_FIELD *fields, uint64 rowCount, uint32 fieldCount);
+        QueryResultMysql(MYSQL_RES* result, MYSQL_FIELD* fields, uint64 rowCount, uint32 fieldCount);
 
-        ~QueryResultMysql();
+        ~QueryResultMysql() override;
 
-        bool NextRow();
+        bool NextRow() override;
 
     private:
         enum Field::DataTypes ConvertNativeType(enum_field_types mysqlType) const;
         void EndQuery();
 
-        MYSQL_RES *mResult;
+        MYSQL_RES* mResult;
 };
 #endif
 #endif

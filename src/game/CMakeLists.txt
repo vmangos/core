@@ -16,8 +16,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 set (game_SRCS 
-    AdvancedPlayerBotAI.h
-    AdvancedPlayerBotAI.cpp
     AccountMgr.cpp
     AuraRemovalMgr.cpp
     AutoBroadCastMgr.cpp
@@ -55,6 +53,7 @@ set (game_SRCS
     AI/CreatureAISelector.cpp
     AI/CreatureEventAI.cpp
     AI/CreatureEventAIMgr.cpp
+    AI/CritterAI.cpp
     AI/GenericSpellAI.cpp
     AI/GuardAI.cpp
     AI/GuardEventAI.cpp
@@ -72,18 +71,6 @@ set (game_SRCS
     Anticheat/Anticheat.cpp
     AuctionHouse/AuctionHouseBotMgr.cpp
     AuctionHouse/AuctionHouseMgr.cpp
-    AutoTesting/AutoTestingMgr.cpp
-    AutoTesting/TestLoader.cpp
-    AutoTesting/Tests/AurasStack.cpp
-    AutoTesting/Tests/ChanneledSpells.cpp
-    AutoTesting/Tests/Cinematics.cpp
-    AutoTesting/Tests/ControlSpells.cpp
-    AutoTesting/Tests/Generic.cpp
-    AutoTesting/Tests/Mage.cpp
-    AutoTesting/Tests/PacketBroadcaster.cpp
-    AutoTesting/Tests/Shaman.cpp
-    AutoTesting/Tests/Test.cpp
-    AutoTesting/Tests/Warlock.cpp
     Battlegrounds/BattleGround.cpp
     Battlegrounds/BattleGroundAB.cpp
     Battlegrounds/BattleGroundAV.cpp
@@ -93,8 +80,9 @@ set (game_SRCS
     Chat/ChannelMgr.cpp
     Chat/Chat.cpp
     Chat/AsyncCommandHandlers.cpp
-    CinematicStuff/CinematicStuff.cpp
-    CinematicStuff/CinematicStuff.h
+    Chat/AbstractPlayer.cpp
+    Chat/MasterPlayer.cpp
+    Chat/MasterPlayerChat.cpp
     Commands/AccountCommands.cpp
     Commands/CharacterCommands.cpp
     Commands/CreatureCommands.cpp
@@ -144,20 +132,6 @@ set (game_SRCS
     LFG/LFGMgr.cpp
     Mail/Mail.cpp
     Mail/MassMailMgr.cpp
-    MapNodes/AbstractPlayer.cpp
-    MapNodes/GMCommands.cpp
-    MapNodes/MapSocket.cpp
-    MapNodes/MapSocketMgr.cpp
-    MapNodes/MasterPlayer.cpp
-    MapNodes/MasterPlayerChat.cpp
-    MapNodes/NodeSession.cpp
-    MapNodes/NodesMgr.cpp
-    MapNodes/NodesOpcodes.cpp
-    MapNodes/Handlers/GuidsSynchronization.cpp
-    MapNodes/Handlers/Protocol.cpp
-    MapNodes/Handlers/SessionTransfert.cpp
-    MapNodes/Serializers/ItemSerializer.cpp
-    MapNodes/Serializers/PlayerSerializer.cpp
     Maps/GridMap.cpp
     Maps/GridNotifiers.cpp
     Maps/GridSearchers.cpp
@@ -166,6 +140,7 @@ set (game_SRCS
     Maps/Map.cpp
     Maps/MapManager.cpp
     Maps/MapPersistentStateMgr.cpp
+    Maps/MapReference.cpp
     Maps/MoveMap.cpp
     Maps/PathFinder.cpp
     Maps/ScriptCommands.cpp
@@ -180,6 +155,7 @@ set (game_SRCS
     Movement/IdleMovementGenerator.cpp
     Movement/MotionMaster.cpp
     Movement/MovementGenerator.cpp
+    Movement/MovementPacketSender.cpp
     Movement/PointMovementGenerator.cpp
     Movement/RandomMovementGenerator.cpp
     Movement/TargetedMovementGenerator.cpp
@@ -209,6 +185,10 @@ set (game_SRCS
     PacketBroadcast/ChatCommands.cpp
     PacketBroadcast/MovementBroadcaster.cpp
     PacketBroadcast/PlayerBroadcaster.cpp
+    PlayerBots/PartyBotAI.cpp
+    PlayerBots/CombatBotBaseAI.cpp
+    PlayerBots/BattleBotAI.cpp
+    PlayerBots/BattleBotWaypoints.cpp
     PlayerBots/PlayerBotAI.cpp
     PlayerBots/PlayerBotMgr.cpp
     Protocol/Opcodes.cpp
@@ -274,6 +254,7 @@ set (game_SRCS
     AI/CreatureAISelector.h
     AI/CreatureEventAI.h
     AI/CreatureEventAIMgr.h
+    AI/CritterAI.h
     AI/GameObjectAI.h
     AI/GuardAI.h
     AI/GuardEventAI.h
@@ -286,15 +267,12 @@ set (game_SRCS
     AI/ScriptedEscortAI.h
     AI/ScriptedFollowerAI.h
     AI/ScriptedGameObject.h
-    AI/ScriptedGossip.h
     AI/ScriptedInstance.h
     AI/ScriptedPetAI.h
     AI/TotemAI.h
     Anticheat/Anticheat.h
     AuctionHouse/AuctionHouseBotMgr.h
     AuctionHouse/AuctionHouseMgr.h
-    AutoTesting/AutoTestingMgr.h
-    AutoTesting/Tests/TestPCH.h
     Battlegrounds/BattleGround.h
     Battlegrounds/BattleGroundAB.h
     Battlegrounds/BattleGroundAV.h
@@ -304,6 +282,8 @@ set (game_SRCS
     Chat/ChannelMgr.h
     Chat/Chat.h
     Chat/AsyncCommandHandlers.h
+    Chat/AbstractPlayer.h
+    Chat/MasterPlayer.h
     Commands/Nostalrius.h
     Database/CharacterDatabaseCache.h
     Database/CharacterDatabaseCleaner.h
@@ -324,20 +304,11 @@ set (game_SRCS
     LFG/LFGMgr.h
     Mail/Mail.h
     Mail/MassMailMgr.h
-    MapNodes/AbstractPlayer.h
-    MapNodes/MapSocket.h
-    MapNodes/MapSocketMgr.h
-    MapNodes/MasterPlayer.h
-    MapNodes/NodeSession.h
-    MapNodes/NodesMgr.h
-    MapNodes/NodesOpcodes.h
-    MapNodes/Serializers/ItemSerializer.h
-    MapNodes/Serializers/PlayerSerializer.h
-    MapNodes/Serializers/Serializer.h
     Maps/Cell.h
     Maps/CellImpl.h
     Maps/GridDefines.h
     Maps/GridMap.h
+    Maps/GridMapDefines.h
     Maps/GridNotifiers.h
     Maps/GridNotifiersImpl.h
     Maps/GridSearchers.h
@@ -347,7 +318,6 @@ set (game_SRCS
     Maps/MapManager.h
     Maps/MapPersistentStateMgr.h
     Maps/MapReference.h
-    Maps/MapReferenceImpl.h
     Maps/MapRefManager.h
     Maps/MoveMap.h
     Maps/MoveMapSharedDefines.h
@@ -366,6 +336,7 @@ set (game_SRCS
     Movement/MotionMaster.h
     Movement/MovementGenerator.h
     Movement/MovementGeneratorImpl.h
+    Movement/MovementPacketSender.h
     Movement/PointMovementGenerator.h
     Movement/RandomMovementGenerator.h
     Movement/TargetedMovementGenerator.h
@@ -392,6 +363,7 @@ set (game_SRCS
     Objects/TemporarySummon.h
     Objects/Totem.h
     Objects/Unit.h
+    Objects/UnitDefines.h
     Objects/UpdateData.h
     Objects/UpdateFields.h
     Objects/UpdateMask.h
@@ -399,6 +371,10 @@ set (game_SRCS
     OutdoorPvP/OutdoorPvPSI.h
     PacketBroadcast/MovementBroadcaster.h
     PacketBroadcast/PlayerBroadcaster.h
+    PlayerBots/CombatBotBaseAI.h
+    PlayerBots/PartyBotAI.h
+    PlayerBots/BattleBotAI.h
+    PlayerBots/BattleBotWaypoints.h
     PlayerBots/PlayerBotAI.h
     PlayerBots/PlayerBotMgr.h
     Protocol/Opcodes.h
@@ -408,6 +384,7 @@ set (game_SRCS
     Spells/SpellAuraDefines.h
     Spells/SpellAuras.h
     Spells/SpellClassMask.h
+    Spells/SpellDefines.h
     Spells/SpellEntry.h
     Spells/SpellMgr.h
     Spells/SpellModMgr.h
@@ -435,8 +412,12 @@ set (game_SRCS
 
 if(WIN32)
   #allow exceptions in destructors
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
+  if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
+  elseif(MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+  endif()
 endif()
 
 # Used in game ScriptMgr
@@ -454,23 +435,17 @@ endif()
 
 if(USE_ANTICHEAT)
   list(APPEND game_SRCS
-      Anticheat/module/libanticheat.cpp
-      Anticheat/module/libanticheat.h
-      Anticheat/module/Antispam/Antispam.cpp
-      Anticheat/module/Antispam/Antispam.h
-      Anticheat/module/MovementAnticheat/Cheat.cpp
-      Anticheat/module/MovementAnticheat/Cheat.h
-      Anticheat/module/WardenAnticheat/Warden.cpp
-      Anticheat/module/WardenAnticheat/Warden.h
-      Anticheat/module/WardenAnticheat/WardenMac.cpp
-      Anticheat/module/WardenAnticheat/WardenMac.h
-      Anticheat/module/WardenAnticheat/WardenWin.cpp
-      Anticheat/module/WardenAnticheat/WardenWin.h
-      Anticheat/module/WardenAnticheat/WardenStorageMgr.cpp
-      Anticheat/module/WardenAnticheat/WardenStorageMgr.h
-      Anticheat/module/WardenAnticheat/WardenModuleMac.h
-      Anticheat/module/WardenAnticheat/WardenModuleWin.h
-      Anticheat/module/WardenAnticheat/WardenKeyGeneration.h
+      Anticheat/MovementAnticheat/MovementAnticheat.cpp
+      Anticheat/MovementAnticheat/MovementAnticheat.h
+      Anticheat/WardenAnticheat/Warden.cpp
+      Anticheat/WardenAnticheat/Warden.h
+      Anticheat/WardenAnticheat/WardenMac.cpp
+      Anticheat/WardenAnticheat/WardenMac.h
+      Anticheat/WardenAnticheat/WardenWin.cpp
+      Anticheat/WardenAnticheat/WardenWin.h
+      Anticheat/WardenAnticheat/WardenMgr.cpp
+      Anticheat/WardenAnticheat/WardenMgr.h
+      Anticheat/WardenAnticheat/WardenKeyGen.h
   )
 endif()
 
@@ -480,10 +455,8 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/AI
   ${CMAKE_CURRENT_SOURCE_DIR}/Anticheat
   ${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouse
-  ${CMAKE_CURRENT_SOURCE_DIR}/AutoTesting
   ${CMAKE_CURRENT_SOURCE_DIR}/Battlegrounds
   ${CMAKE_CURRENT_SOURCE_DIR}/Chat
-  ${CMAKE_CURRENT_SOURCE_DIR}/CinematicStuff
   ${CMAKE_CURRENT_SOURCE_DIR}/Commands
   ${CMAKE_CURRENT_SOURCE_DIR}/Database
   ${CMAKE_CURRENT_SOURCE_DIR}/Group
@@ -491,9 +464,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Handlers
   ${CMAKE_CURRENT_SOURCE_DIR}/LFG
   ${CMAKE_CURRENT_SOURCE_DIR}/Mail
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Handlers
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Serializers
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps/Pool
   ${CMAKE_CURRENT_SOURCE_DIR}/Movement
@@ -504,11 +474,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots
   ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
   ${CMAKE_CURRENT_SOURCE_DIR}/Spells
-  ${CMAKE_CURRENT_SOURCE_DIR}/Texts
   ${CMAKE_CURRENT_SOURCE_DIR}/Threat
   ${CMAKE_CURRENT_SOURCE_DIR}/Transports
   ${CMAKE_CURRENT_SOURCE_DIR}/vmap
-  ${CMAKE_CURRENT_SOURCE_DIR}/Warden
   ${CMAKE_SOURCE_DIR}/src/scripts
   ${CMAKE_SOURCE_DIR}/src/scripts/PrecompiledHeaders
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
@@ -523,12 +491,13 @@ include_directories(
   ${MYSQL_INCLUDE_DIR}
   ${TBB_INCLUDE_DIRS}
   ${ACE_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
+  ${OPENSSL_INCLUDE_DIR}
+  ${ZLIB_INCLUDE_DIRS}
 )
 
 if(WIN32)
   include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/include-windows
+    ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
 endif()
 
@@ -580,7 +549,7 @@ SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
 
 target_link_libraries(game
   shared
-  detour
+  Detour
 )
 
 #add_dependencies(game revision.h)

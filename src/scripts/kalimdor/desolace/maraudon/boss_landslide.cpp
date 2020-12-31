@@ -38,22 +38,22 @@ struct boss_landslideAI : public ScriptedAI
     uint32 Trample_Timer;
     uint32 Landslide_Timer;
 
-    void Reset()
+    void Reset() override
     {
         KnockAway_Timer = 8000;
         Trample_Timer = 2000;
         Landslide_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //KnockAway_Timer
         if (KnockAway_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKAWAY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKAWAY);
             KnockAway_Timer = 15000;
         }
         else KnockAway_Timer -= diff;
@@ -88,7 +88,7 @@ CreatureAI* GetAI_boss_landslide(Creature* pCreature)
 
 void AddSC_boss_landslide()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_landslide";
     newscript->GetAI = &GetAI_boss_landslide;

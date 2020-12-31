@@ -50,7 +50,7 @@ void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pS
     Cell::VisitGridObjects(pSource, searcher, fMaxSearchRange);
 }
 
-void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pSource, const std::vector<uint32>& entries, float fMaxSearchRange)
+void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pSource, std::vector<uint32> const& entries, float fMaxSearchRange)
 {
     ASSERT(pSource);
     MaNGOS::AllCreaturesMatchingOneEntryInRange check(pSource, entries, fMaxSearchRange);

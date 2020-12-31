@@ -33,12 +33,12 @@ class Transport : public GameObject
     public:
         typedef std::set<WorldObject*> PassengerSet;
 
-        ~Transport();
+        ~Transport() override;
 
         bool Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
         void CleanupsBeforeDelete() override;
 
-        void Update(uint32 diff, uint32) override;
+        void Update(uint32 update_diff, uint32 /*time_diff*/) override;
 
         void BuildUpdate(UpdateDataMapType& data_map);
 
@@ -47,13 +47,13 @@ class Transport : public GameObject
         PassengerSet const& GetPassengers() const { return _passengers; }
 
         /// This method transforms supplied transport offsets into global coordinates
-        void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const
+        void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
         {
             CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         }
 
         /// This method transforms supplied global coordinates into local offsets
-        void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const
+        void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const
         {
             CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         }

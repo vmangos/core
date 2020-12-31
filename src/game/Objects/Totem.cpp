@@ -40,9 +40,7 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
 {
     SetMap(cPos.GetMap());
 
-    Team team = owner->GetTypeId() == TYPEID_PLAYER ? ((Player*)owner)->GetTeam() : TEAM_NONE;
-
-    if (!CreateFromProto(guidlow, cinfo, team))
+    if (!CreateFromProto(guidlow, cinfo, cinfo->entry))
         return false;
 
     cPos.SelectFinalPoint(this);
@@ -62,13 +60,15 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
 
     LoadCreatureAddon();
 
+    SetWalk(true, true);
+
     return true;
 }
 
 void Totem::Update(uint32 update_diff, uint32 time)
 {
-    Unit *owner = GetOwner();
-    if (!owner || !owner->isAlive() || !isAlive())
+    Unit* owner = GetOwner();
+    if (!owner || !owner->IsAlive() || !IsAlive())
     {
         UnSummon();                                         // remove self
         return;
@@ -125,7 +125,7 @@ void Totem::UnSummon()
     CombatStop();
     RemoveAurasDueToSpell(GetSpell());
 
-    if (Unit *owner = GetOwner())
+    if (Unit* owner = GetOwner())
     {
         owner->_RemoveTotem(this);
         owner->RemoveAurasDueToSpell(GetSpell());
@@ -134,9 +134,9 @@ void Totem::UnSummon()
         if (owner->GetTypeId() == TYPEID_PLAYER)
         {
             // Not only the player can summon the totem (scripted AI)
-            if (Group *pGroup = ((Player*)owner)->GetGroup())
+            if (Group* pGroup = ((Player*)owner)->GetGroup())
             {
-                for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* Target = itr->getSource();
                     if (Target && pGroup->SameSubGroup((Player*)owner, Target))
@@ -150,7 +150,7 @@ void Totem::UnSummon()
     }
 
     // any totem unsummon look like as totem kill, req. for proper animation
-    if (isAlive())
+    if (IsAlive())
         SetDeathState(DEAD);
 
     AddObjectToRemoveList();
@@ -160,33 +160,33 @@ void Totem::SetOwner(Unit* owner)
 {
     SetCreatorGuid(owner->GetObjectGuid());
     SetOwnerGuid(owner->GetObjectGuid());
-    setFaction(owner->getFaction());
-    SetLevel(owner->getLevel());
+    SetFactionTemplateId(owner->GetFactionTemplateId());
+    SetLevel(owner->GetLevel());
 }
 
-Unit *Totem::GetOwner()
+Unit* Totem::GetOwner()
 {
     if (ObjectGuid ownerGuid = GetOwnerGuid())
         return ObjectAccessor::GetUnit(*this, ownerGuid);
 
-    return NULL;
+    return nullptr;
 }
 
-void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)
+void Totem::SetTypeBySummonSpell(SpellEntry const* spellProto)
 {
     // Get spell casted by totem
-    SpellEntry const * totemSpell = sSpellMgr.GetSpellEntry(GetSpell());
+    SpellEntry const* totemSpell = sSpellMgr.GetSpellEntry(GetSpell());
     if (totemSpell)
     {
         // If spell have cast time -> so its active totem
-        if (GetSpellCastTime(totemSpell))
+        if (totemSpell->GetCastTime())
             m_type = TOTEM_ACTIVE;
     }
     if (spellProto->SpellIconID == 2056)
         m_type = TOTEM_STATUE;                              //Jewelery statue
 }
 
-bool Totem::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex index, bool castOnSelf) const
+bool Totem::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
     // Check for Mana Spring & Healing Stream totems
     switch (spellInfo->SpellFamilyName)
@@ -218,16 +218,16 @@ bool Totem::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex 
             break;
     }
 
-    if (!IsPositiveSpell(spellInfo))
+    if (!spellInfo->IsPositiveSpell())
     {
         // immune to all negative auras
-        if (IsSpellAppliesAura(spellInfo, 1 << index))
+        if (spellInfo->IsSpellAppliesAura(1 << index))
             return true;
     }
     else
     {
         // immune to any type of regeneration auras hp/mana etc.
-        if (IsPeriodicRegenerateEffect(spellInfo, index))
+        if (spellInfo->IsPeriodicRegenerateEffect(index))
             return true;
     }
     return Creature::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);

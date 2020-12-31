@@ -146,8 +146,8 @@ struct boss_mandokirAI : public ScriptedAI
     uint64 m_uiTargetToKill;
     bool m_bTargetMoved;
     float m_fWatchedTargetAllowedMoveRange;
-    bool m_bTargetCasted;
-    bool m_bTargetAttacked;
+    bool m_bTargetActed;
+    float m_fTargetThreat;
     bool m_bFearAfterCharge;
 
     bool m_bChargeCasted;
@@ -157,7 +157,7 @@ struct boss_mandokirAI : public ScriptedAI
 
     std::vector<uint64> m_lSpirits;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown = 0;
 
@@ -178,8 +178,8 @@ struct boss_mandokirAI : public ScriptedAI
         m_uiTargetToKill = 0;
         m_bTargetMoved = false;
         m_fWatchedTargetAllowedMoveRange = 2.0;
-        m_bTargetCasted = false;
-        m_bTargetAttacked = false;
+        m_bTargetActed = false;
+        m_fTargetThreat = 0.0f;
 
         m_uiPlayerToRez = 0;
 
@@ -196,12 +196,12 @@ struct boss_mandokirAI : public ScriptedAI
         CheckVilebranchState(true);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
             DoCastSpellIfCan(m_creature, SPELL_LEVEL_UP, true);
-            m_creature->SetLevel(m_creature->getLevel() + 1);
+            m_creature->SetLevel(m_creature->GetLevel() + 1);
             m_uiPlayerToRez = pVictim->GetGUID();
 
             DoScriptText(SAY_DING_KILL, m_creature);
@@ -213,7 +213,7 @@ struct boss_mandokirAI : public ScriptedAI
             {
                 if (Creature* jTemp = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_JINDO)))
                 {
-                    if (jTemp->isAlive())
+                    if (jTemp->IsAlive())
                         DoScriptText(SAY_GRATS_JINDO, jTemp);
                 }
                 else
@@ -222,7 +222,7 @@ struct boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -257,7 +257,7 @@ struct boss_mandokirAI : public ScriptedAI
         // If Vilebranch dies and group wipes, boss should start at the bottom of the stairs
         // Video: https://www.youtube.com/watch?v=joaWY0wjOXI
         Creature* vileBranch = m_creature->FindNearestCreature(11391, 100.0f, true);
-        bool isVilebranchDead = !vileBranch || !vileBranch->isAlive();
+        bool isVilebranchDead = !vileBranch || !vileBranch->IsAlive();
         if (reset || m_VilebranchDead != isVilebranchDead)
         {
             if (isVilebranchDead)
@@ -282,7 +282,7 @@ struct boss_mandokirAI : public ScriptedAI
         {
             Unit* pWatchTarget = m_creature->GetMap()->GetUnit(m_uiWatchTarget);
 
-            if (pWatchTarget && pWatchTarget->isAlive())
+            if (pWatchTarget && pWatchTarget->IsAlive())
             {
                 // Pendant le debuff
                 if (pWatchTarget->HasAura(SPELL_WATCH))
@@ -301,17 +301,14 @@ struct boss_mandokirAI : public ScriptedAI
                         m_fWatchedTargetAllowedMoveRange = 2.0;
                     }
 
-                    // Ni attaquer, soigner, ou participer au combat
-                    if ((!m_bTargetCasted) && (pWatchTarget->GetLastCastedSpell(true)))
-                        m_bTargetCasted = true;
                     // Ni attaquer.
-                    if ((!m_bTargetAttacked) && (pWatchTarget->GetLastAttackType() < MAX_ATTACK))
-                        m_bTargetAttacked = true;
+                    if ((!m_bTargetActed) && (m_creature->GetThreatManager().getThreat(pWatchTarget) > m_fTargetThreat))
+                        m_bTargetActed = true;
                 }
                 // Le debuff est termine
                 else
                 {
-                    if (m_bTargetMoved || m_bTargetCasted || m_bTargetAttacked)
+                    if (m_bTargetMoved || m_bTargetActed)
                         m_uiTargetToKill = m_uiWatchTarget;
                     else
                         m_uiTargetToKill = 0;
@@ -325,10 +322,10 @@ struct boss_mandokirAI : public ScriptedAI
     {
         if (!m_lSpirits.empty())
         {
-            for (std::vector<uint64>::iterator it = m_lSpirits.begin(); it != m_lSpirits.end(); ++it)
+            for (const auto& guid : m_lSpirits)
             {
-                if (Creature* pSpirit = m_creature->GetMap()->GetCreature(*it))
-                    if (pSpirit->isAlive())
+                if (Creature* pSpirit = m_creature->GetMap()->GetCreature(guid))
+                    if (pSpirit->IsAlive())
                         pSpirit->AddObjectToRemoveList();
             }
         }
@@ -354,7 +351,7 @@ struct boss_mandokirAI : public ScriptedAI
         if (!m_uiRaptorGUID.IsEmpty())
         {
             if (Creature* pRaptor = m_creature->GetMap()->GetCreature(m_uiRaptorGUID))
-                if (pRaptor->isAlive())
+                if (pRaptor->IsAlive())
                     pRaptor->AddObjectToRemoveList();
         }
         m_uiRaptorGUID.Clear();
@@ -371,18 +368,18 @@ struct boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
 
         if (pSummoned->GetEntry() == NPC_OHGAN)
-            pSummoned->AI()->AttackStart(m_creature->getVictim());
+            pSummoned->AI()->AttackStart(m_creature->GetVictim());
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
             return;
 
         if (Player* pPlayer = pWho->ToPlayer())
@@ -392,27 +389,25 @@ struct boss_mandokirAI : public ScriptedAI
                         AttackStart(pWho);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_WATCH)
         {
             m_uiWatchTarget = pTarget->GetGUID();
             m_fTargetX      = pTarget->GetPositionX();
             m_fTargetY      = pTarget->GetPositionY();
-            pTarget->SetLastCastedSpell(0, true);
-            pTarget->SetLastAttackType(MAX_ATTACK);
             m_bTargetMoved = false;
-            m_bTargetCasted = false;
-            m_bTargetAttacked = false;
+            m_bTargetActed = false;
+            m_fTargetThreat = m_creature->GetThreatManager().getThreat(pTarget);
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_VilebranchDead)
             CheckVilebranchState();
 
-        if (!m_VilebranchDead || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_VilebranchDead || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         CheckRaptor();
@@ -422,14 +417,14 @@ struct boss_mandokirAI : public ScriptedAI
         {
             if (Player* killedPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerToRez))
             {
-                if (killedPlayer->getDeathState() == CORPSE && !killedPlayer->IsRessurectRequested())
+                if (killedPlayer->GetDeathState() == CORPSE && !killedPlayer->IsRessurectRequested())
                 {
                     // Find nearest spirit ready to resurrect
-                    Creature* spirit = NULL;
+                    Creature* spirit = nullptr;
                     float spiritDist = 0.0f;
-                    for (std::vector<uint64>::iterator it = m_lSpirits.begin(); it != m_lSpirits.end(); ++it)
+                    for (const auto& guid : m_lSpirits)
                     {
-                        if (Creature* current = m_creature->GetMap()->GetCreature(*it))
+                        if (Creature* current = m_creature->GetMap()->GetCreature(guid))
                         {
                             // Ready to resurrect ?
                             if (current->AI() && current->AI()->GetData(0))
@@ -446,7 +441,7 @@ struct boss_mandokirAI : public ScriptedAI
                     if (spirit)
                     {
                         spirit->MonsterWhisper("I am released through you! Avenge me!", killedPlayer);
-                        spirit->AI()->SpellHitTarget(killedPlayer, NULL);
+                        spirit->AI()->SpellHitTarget(killedPlayer, nullptr);
                     }
                 }
             }
@@ -497,16 +492,16 @@ struct boss_mandokirAI : public ScriptedAI
             {
                 if (Unit* pTargetToKill = m_creature->GetMap()->GetUnit(m_uiTargetToKill))
                 {
-                    if (pTargetToKill->isAlive())
+                    if (pTargetToKill->IsAlive())
                     {
                         bool bTargetKilled = false;
                         float addAggro = 0;
-                        if (float agro = m_creature->getThreatManager().getThreat(m_creature->getVictim()))
+                        if (float agro = m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
                         {
-                            m_creature->getThreatManager().modifyThreatPercent(pTargetToKill, -100);
+                            m_creature->GetThreatManager().modifyThreatPercent(pTargetToKill, -100);
                             addAggro = agro;
                         }
-                        m_creature->getThreatManager().addThreat(pTargetToKill, (addAggro + 2000));
+                        m_creature->GetThreatManager().addThreat(pTargetToKill, (addAggro + 2000));
                         m_creature->SelectHostileTarget();
 
 
@@ -518,7 +513,7 @@ struct boss_mandokirAI : public ScriptedAI
                         }
                         if (!bTargetKilled)
                             m_creature->DoKillUnit(pTargetToKill);
-                        if(pTargetToKill->isAlive())
+                        if(pTargetToKill->IsAlive())
                             m_creature->DoKillUnit(pTargetToKill);
                         m_uiGlobalCooldown = 1000;
                         m_uiTargetToKill = 0;
@@ -556,13 +551,13 @@ struct boss_mandokirAI : public ScriptedAI
         else
         {
             m_uiCharge_Timer -= diff;
-            if (m_bChargeCasted == true)
+            if (m_bChargeCasted)
             {
                 m_uiChargeCasted_Timer -= diff;
                 if (m_uiChargeCasted_Timer < diff)
                 {
                     m_bChargeCasted = false;
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
                 }
             }
         }
@@ -577,7 +572,7 @@ struct boss_mandokirAI : public ScriptedAI
                 {
                     if (Player* player = m_creature->GetMap()->GetPlayer(m_uiChargedPlayerGUID))
                     {
-                        if (player->isAlive())
+                        if (player->IsAlive())
                         {
                             if(m_creature->GetDistance(player) < 4.0f)
                             {
@@ -623,9 +618,9 @@ struct boss_mandokirAI : public ScriptedAI
         // MORTAL STRIKE
         if (m_uiMortalStrike_Timer < diff)
         {
-            if ((m_uiGlobalCooldown == 0) && (m_creature->getVictim()->GetHealthPercent() < 50.0f))
+            if ((m_uiGlobalCooldown == 0) && (m_creature->GetVictim()->GetHealthPercent() < 50.0f))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                 {
                     m_uiMortalStrike_Timer = 15000;
                     m_uiGlobalCooldown = 500;
@@ -654,36 +649,36 @@ struct mob_ohganAI : public ScriptedAI
     uint32 Thrash_Timer;
     uint32 Execute_Timer;
 
-    void Reset()
+    void Reset() override
     {
         SunderArmor_Timer = 5000;
         Thrash_Timer = urand(5000, 9000);
         Execute_Timer = 1000;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OHGAN, DONE);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
-            if (m_creature->isInCombat())
+            if (m_creature->IsInCombat())
                 if (Creature* pMandokir = pVictim->FindNearestCreature(NPC_MANDOKIR, 100.0f))
                     pMandokir->AI()->KilledUnit(pVictim);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // SunderArmor_Timer
         if (SunderArmor_Timer <= diff)
         {
-            DoCast(me->getVictim(), SPELL_SUNDERARMOR);
+            DoCast(me->GetVictim(), SPELL_SUNDERARMOR);
             SunderArmor_Timer = 10000 + rand() % 5000;
         }
         else
@@ -699,11 +694,11 @@ struct mob_ohganAI : public ScriptedAI
             Thrash_Timer -= diff;
 
         // Execute_Timer
-        if (me->getVictim()->GetHealth() <= me->getVictim()->GetMaxHealth() * 0.2f)  // check health first
+        if (me->GetVictim()->GetHealth() <= me->GetVictim()->GetMaxHealth() * 0.2f)  // check health first
         {
             if (Execute_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_EXECUTE);
+                DoCast(me->GetVictim(), SPELL_EXECUTE);
                 Execute_Timer = 10000;
             }
             else
@@ -743,20 +738,20 @@ struct mob_chainedSpiritsAI : public ScriptedAI
     uint64 m_uiTargetRezGUID;
     uint32 m_uiRezTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRezTimer = 0;
     }
 
     // Ready to revive someone ?
-    uint32 GetData(uint32)
+    uint32 GetData(uint32) override
     {
         if (m_uiTargetRezGUID)
             return 0;
         return 1;
     }
 
-    void SpellHitTarget(Unit* pDead, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pDead, SpellEntry const* pSpell) override
     {
         if (!pSpell)
         {
@@ -769,13 +764,13 @@ struct mob_chainedSpiritsAI : public ScriptedAI
             m_creature->DeleteLater();
     }
 
-    void MovementInform(uint32 mvtType, uint32 moveId)
+    void MovementInform(uint32 mvtType, uint32 moveId) override
     {
         if (mvtType == POINT_MOTION_TYPE && moveId == 1)
             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiTargetRezGUID))
                 m_uiRezTimer = 2500;
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (m_uiRezTimer)
         {
@@ -783,7 +778,7 @@ struct mob_chainedSpiritsAI : public ScriptedAI
             {
                 // Attempt to rez player
                 Player* target = m_creature->GetMap()->GetPlayer(m_uiTargetRezGUID);
-                if (target && target->getDeathState() == CORPSE && !target->IsRessurectRequested())
+                if (target && target->GetDeathState() == CORPSE && !target->IsRessurectRequested())
                     m_creature->CastSpell(target, SPELL_REVIVE, true); // Will despawn at SpellHit
                 else
                     m_creature->AddObjectToRemoveList();
@@ -807,18 +802,18 @@ struct mob_vilebrancheAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         //
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -832,7 +827,7 @@ CreatureAI* GetAI_mob_vilebranche(Creature* pCreature)
 
 void AddSC_boss_mandokir()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_mandokir";

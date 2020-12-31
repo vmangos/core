@@ -24,26 +24,26 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum RazuviousData
 {
-    SAY_AGGRO1               = -1533120,
-    SAY_AGGRO2               = -1533121,
-    SAY_AGGRO3               = -1533122,
-    SAY_SLAY1                = -1533123,
-    SAY_SLAY2                = -1533124,
-    SAY_COMMAND1             = -1533125,
-    SAY_COMMAND2             = -1533126,
-    SAY_COMMAND3             = -1533127,
-    SAY_COMMAND4             = -1533128,
-    SAY_DEATH                = -1533129,
+    SAY_AGGRO1               = 13072,
+    SAY_AGGRO2               = 13073,
+    SAY_AGGRO3               = 13074,
+    SAY_SLAY1                = 13080,
+    SAY_SLAY2                = 13081,
+    SAY_COMMAND1             = 13075,
+    SAY_COMMAND2             = 13076,
+    SAY_COMMAND3             = 13077,
+    SAY_COMMAND4             = 13078,
+    SAY_DEATH                = 13079,
 
-    EMOTE_SHOUT              = -1533159,
+    EMOTE_SHOUT              = 13082,
 
     SPELL_UNBALANCING_STRIKE = 26613,
     SPELL_DISRUPTING_SHOUT   = 29107,
     SPELL_HOPELESS           = 29125,
 
-    NPC_DK_UNDERSTUDY   = 16803,
+    NPC_DK_UNDERSTUDY   = 16803
 };
 
 static constexpr float addPositions[4][4] =
@@ -67,7 +67,7 @@ enum Events
     EVENT_ADD_TALK,
     EVENT_ADD_SALUTE,
     EVENT_ADD_TURN_BACK,
-    EVENT_ADD_ATTACK,
+    EVENT_ADD_ATTACK
 };
 
 struct mob_deathknightUnderstudyAI : public ScriptedAI
@@ -82,7 +82,8 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
 
     uint32 attackTimer;
     bool runAttack;
-    void Reset()
+
+    void Reset() override
     {
         m_creature->HandleEmote(EMOTE_STATE_READY1H);
         attackTimer = urand(5000, 10000);
@@ -95,7 +96,7 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
         m_creature->CallForHelp(30.0f);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (runAttack)
         {
@@ -108,7 +109,7 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
                 attackTimer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -130,22 +131,22 @@ struct boss_razuviousAI : public ScriptedAI
 
     EventMap rpEvents;
     ObjectGuid rpBuddy;
-    
-    void Reset()
+
+    void Reset() override
     {
         events.Reset();
     }
-    
+
     void MoveInLineOfSight(Unit* pWho) override
     {
         if (!m_creature->IsWithinDistInMap(pWho, 33.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -182,6 +183,7 @@ struct boss_razuviousAI : public ScriptedAI
                 if (i == 1)
                     rpBuddy = pAdd->GetObjectGuid();
                 summonedAdds.push_back(pAdd->GetObjectGuid());
+                pAdd->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
             }
         }
     }
@@ -194,14 +196,14 @@ struct boss_razuviousAI : public ScriptedAI
         RespawnAdds();
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         if (urand(0, 3))
             return;
-        DoScriptText(urand(SAY_SLAY2, SAY_SLAY1), m_creature);
+        DoScriptText(urand(SAY_SLAY1, SAY_SLAY2), m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         DoCastSpellIfCan(m_creature, SPELL_HOPELESS, CF_TRIGGERED);
@@ -209,14 +211,13 @@ struct boss_razuviousAI : public ScriptedAI
             m_pInstance->SetData(TYPE_RAZUVIOUS, DONE);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
-
-        DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
+        DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAZUVIOUS, IN_PROGRESS);
-        
+
         events.Reset();
         rpEvents.Reset();
         m_creature->CallForHelp(30.0f);
@@ -228,24 +229,25 @@ struct boss_razuviousAI : public ScriptedAI
 
     void MovementInform(uint32 movementType, uint32 id) override
     {
-        if (movementType != WAYPOINT_MOTION_TYPE) return;
+        if (movementType != WAYPOINT_MOTION_TYPE)
+            return;
+
         if (id == 6)
         {
             rpEvents.Reset();
             rpEvents.ScheduleEvent(EVENT_TURN_TO_TRAINEE, Seconds(0));
-            rpEvents.ScheduleEvent(EVENT_EMOTE_SHOUT,     Seconds(1));
-            rpEvents.ScheduleEvent(EVENT_ADD_TURN_RAZUV,  Milliseconds(1750));
-            rpEvents.ScheduleEvent(EVENT_ADD_TALK,        Milliseconds(3500));
-            rpEvents.ScheduleEvent(EVENT_ADD_SALUTE,      Seconds(8));
-            rpEvents.ScheduleEvent(EVENT_ADD_TURN_BACK,   Seconds(12));
-            rpEvents.ScheduleEvent(EVENT_ADD_ATTACK,      Milliseconds(12500));
+            rpEvents.ScheduleEvent(EVENT_EMOTE_SHOUT, Seconds(1));
+            rpEvents.ScheduleEvent(EVENT_ADD_TURN_RAZUV, Milliseconds(1750));
+            rpEvents.ScheduleEvent(EVENT_ADD_TALK, Milliseconds(3500));
+            rpEvents.ScheduleEvent(EVENT_ADD_SALUTE, Seconds(8));
+            rpEvents.ScheduleEvent(EVENT_ADD_TURN_BACK, Seconds(12));
+            rpEvents.ScheduleEvent(EVENT_ADD_ATTACK, Milliseconds(12500));
         }
     }
 
     Creature* getRPBuddy()
     {
         return m_pInstance->GetCreature(rpBuddy);
-
     }
 
     void UpdateRP(uint32 diff)
@@ -255,65 +257,65 @@ struct boss_razuviousAI : public ScriptedAI
         {
             switch (eventId)
             {
-            case EVENT_TURN_TO_TRAINEE:
-                if (Creature* b = getRPBuddy())
-                    m_creature->SetFacingToObject(b);
-                break;
-            case EVENT_EMOTE_SHOUT:
-                m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-                break;
-            case EVENT_ADD_TURN_RAZUV:
-                if (Creature* b = getRPBuddy())
-                {
-                    if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
+                case EVENT_TURN_TO_TRAINEE:
+                    if (Creature* b = getRPBuddy())
+                        m_creature->SetFacingToObject(b);
+                    break;
+                case EVENT_EMOTE_SHOUT:
+                    m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
+                    break;
+                case EVENT_ADD_TURN_RAZUV:
+                    if (Creature* b = getRPBuddy())
                     {
-                        ai->attackTimer = 0;
-                        ai->runAttack = false;
+                        if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
+                        {
+                            ai->attackTimer = 0;
+                            ai->runAttack = false;
+                        }
+                        b->SetFacingToObject(m_creature);
+                        b->HandleEmote(EMOTE_STATE_STAND);
                     }
-                    b->SetFacingToObject(m_creature);
-                    b->HandleEmote(EMOTE_STATE_STAND);
-                }
-                break;
-            case EVENT_ADD_TALK:
-                if (Creature* b = getRPBuddy())
-                    b->HandleEmote(EMOTE_ONESHOT_TALK);
-                break;
-            case EVENT_ADD_SALUTE:
-                if (Creature* b = getRPBuddy())
-                    b->HandleEmote(EMOTE_ONESHOT_SALUTE);
-                break;
-            case EVENT_ADD_TURN_BACK:
-                if (Creature* b = getRPBuddy())
-                {
-                    std::list<Creature*> lst;
-                    GetCreatureListWithEntryInGrid(lst, b, 16211, 5.0f);
-                    if (lst.size())
-                        b->SetFacingToObject((*lst.begin()));
-                }
-                break;
-            case EVENT_ADD_ATTACK:
-                if (Creature* b = getRPBuddy())
-                {
-                    b->HandleEmote(EMOTE_STATE_READY1H);
-                    if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
+                    break;
+                case EVENT_ADD_TALK:
+                    if (Creature* b = getRPBuddy())
+                        b->HandleEmote(EMOTE_ONESHOT_TALK);
+                    break;
+                case EVENT_ADD_SALUTE:
+                    if (Creature* b = getRPBuddy())
+                        b->HandleEmote(EMOTE_ONESHOT_SALUTE);
+                    break;
+                case EVENT_ADD_TURN_BACK:
+                    if (Creature* b = getRPBuddy())
                     {
-                        ai->attackTimer = 500;
-                        ai->runAttack = true;
+                        std::list<Creature*> lst;
+                        GetCreatureListWithEntryInGrid(lst, b, 16211, 5.0f);
+                        if (!lst.empty())
+                            b->SetFacingToObject((*lst.begin()));
                     }
-                }
-                break;
+                    break;
+                case EVENT_ADD_ATTACK:
+                    if (Creature* b = getRPBuddy())
+                    {
+                        b->HandleEmote(EMOTE_STATE_READY1H);
+                        if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
+                        {
+                            ai->attackTimer = 500;
+                            ai->runAttack = true;
+                        }
+                    }
+                    break;
             }
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
             UpdateRP(uiDiff);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        
+
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
 
@@ -322,19 +324,19 @@ struct boss_razuviousAI : public ScriptedAI
         {
             switch (eventId)
             {
-            case EVENT_UNBALANCING_STRIKE:
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_UNBALANCING_STRIKE);
-                events.Repeat(Seconds(30));
-                break;
-            case EVENT_DISRUPTING_SHOUT:
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISRUPTING_SHOUT);
-                DoScriptText(EMOTE_SHOUT, m_creature);
-                events.Repeat(Seconds(25));
-                break;
-            case EVENT_COMMAND:
-                DoScriptText(urand(SAY_COMMAND4, SAY_COMMAND1), m_creature);
-                events.Repeat(Seconds(urand(30,60)));
-                break;
+                case EVENT_UNBALANCING_STRIKE:
+                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UNBALANCING_STRIKE);
+                    events.Repeat(Seconds(30));
+                    break;
+                case EVENT_DISRUPTING_SHOUT:
+                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISRUPTING_SHOUT);
+                    DoScriptText(EMOTE_SHOUT, m_creature);
+                    events.Repeat(Seconds(25));
+                    break;
+                case EVENT_COMMAND:
+                    DoScriptText(urand(SAY_COMMAND1, SAY_COMMAND4), m_creature);
+                    events.Repeat(Seconds(urand(30,60)));
+                    break;
             }
         }
 

@@ -45,7 +45,11 @@ enum
     NPC_TENDRIS            = 11489,
     NPC_TENDRIS_PROTECTOR  = 11459,
 
-    SAY_FREE_IMMOLTHAR     = -1900008,
+    SAY_FREE_IMMOLTHAR     = 9364,
+    SAY_KING_DEAD          = 9472,
+    SAY_IMMOL_THAR_DEAD    = 9407,
+
+    FACTION_FRIENDLY       = 35,
 
     GO_FORCE_FIELD         = 179503,
     GO_MAGIC_VORTEX        = 179506,
@@ -67,9 +71,6 @@ enum
     GO_BROKEN_TRAP         = 179485,
     GO_FIXED_TRAP          = 179512,
 
-    NPC_TRIBUTE            = 11500,
-    SPELL_TRIBUTE_EVENT    = 23318,
-    SPELL_CHORUSH_EVENT    = 23320,
     SPELL_KING_OF_GORDOK   = 22799,
 
     GO_GORDOK_TRIBUTE_0    = 179564,
@@ -87,7 +88,7 @@ enum
 struct sGossipMenuItems
 {
     uint16 m_uiMenu;
-    const char* m_chItem;
+    char const* m_chItem;
 };
 
 const sGossipMenuItems sKromcrushGossips[4] =
@@ -110,23 +111,23 @@ class instance_dire_maul : public ScriptedInstance
 {
     public:
         instance_dire_maul(Map* pMap);
-        ~instance_dire_maul() {}
+        ~instance_dire_maul() override {}
 
-        void Initialize();
+        void Initialize() override;
 
-        void OnPlayerEnter(Player* pPlayer);
-        void OnPlayerLeave(Player* pPlayer);
-        void OnObjectCreate(GameObject* pGo);
-        void OnCreatureDeath(Creature* pCreature);
-        void OnCreatureCreate(Creature* pCreature);
+        void OnPlayerEnter(Player* pPlayer) override;
+        void OnPlayerLeave(Player* pPlayer) override;
+        void OnObjectCreate(GameObject* pGo) override;
+        void OnCreatureDeath(Creature* pCreature) override;
+        void OnCreatureCreate(Creature* pCreature) override;
 
-        void SetData(uint32 uiType, uint32 uiData);
-        void SetData64(uint32 uiType, uint64 uiData);
-        uint32 GetData(uint32 uiType);
-        uint64 GetData64(uint32 uiType);
+        void SetData(uint32 uiType, uint32 uiData) override;
+        void SetData64(uint32 uiType, uint64 uiData) override;
+        uint32 GetData(uint32 uiType) override;
+        uint64 GetData64(uint32 uiType) override;
 
-        const char* Save() { return strInstData.c_str(); }
-        void Load(const char* chrIn);
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
         uint8 GetChoRushEquipment();
         void DoSortCristalsEventMobs();
@@ -154,7 +155,6 @@ class instance_dire_maul : public ScriptedInstance
 
         // North
         uint32 m_uiGuardAliveCount;
-        uint64 m_uiTributeGUID;
         uint64 m_uiTendrisGUID;
         uint64 m_uiOldIronbarkGUID;
         uint64 m_uiSlipKikGUID;
@@ -171,7 +171,6 @@ class instance_dire_maul : public ScriptedInstance
         uint64 m_uiGordokTribute5GUID;
         uint64 m_uiGordokTribute6GUID;
 
-        uint64 m_uiKnotsBallandChainGUID;
         uint64 m_uiBrokenTrapGUID;
         bool m_bIsGordokTributeRespawned;
         bool m_bIsTanninLooted;

@@ -66,7 +66,7 @@ class Path
                 float xd = node.x - prev.x;
                 float yd = node.y - prev.y;
                 float zd = node.z - prev.z;
-                len += sqrtf( xd*xd + yd*yd + zd*zd );
+                len += sqrtf(xd*xd + yd*yd + zd*zd);
             }
             return len;
         }
@@ -83,7 +83,7 @@ class Path
                 float xd = x - node.x;
                 float yd = y - node.y;
                 float zd = z - node.z;
-                len += sqrtf( xd*xd + yd*yd + zd*zd );
+                len += sqrtf(xd*xd + yd*yd + zd*zd);
             }
 
             return len;

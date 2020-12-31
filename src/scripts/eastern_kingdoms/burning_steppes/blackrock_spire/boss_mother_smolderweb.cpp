@@ -40,22 +40,22 @@ struct boss_mothersmolderwebAI : public ScriptedAI
     uint32 m_uiCrystalizeTimer;
     uint32 m_uiMothersMilkTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCrystalizeTimer  = 20000;
         m_uiMothersMilkTimer = 10000;
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         if (m_creature->GetHealth() <= uiDamage)
             DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIRE_SPIDERLING, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Crystalize

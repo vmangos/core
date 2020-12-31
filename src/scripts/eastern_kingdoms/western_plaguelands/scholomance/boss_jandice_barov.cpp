@@ -52,7 +52,7 @@ struct boss_jandicebarovAI : public ScriptedAI
     bool Invisible;
     bool checkForDamage;
 
-    void Reset()
+    void Reset() override
     {
         CurseOfBlood_Timer = 10000;
         Illusion_Timer = 15000;
@@ -86,7 +86,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         IllusionGUIDS.clear(); 
     }
 
-    void JustDied(Unit *pKiller)
+    void JustDied(Unit *pKiller) override
     {
         UnsummonIllusions();
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -98,7 +98,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* /*pDealer*/, uint32& uiDamage)
+    void DamageTaken(Unit* /*pDealer*/, uint32& uiDamage) override
     {
         if (checkForDamage)
         {
@@ -112,12 +112,12 @@ struct boss_jandicebarovAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (Invisible && Invisible_Timer < diff)
         {
             //Become visible again
-            m_creature->setFaction(14);
+            m_creature->SetFactionTemplateId(14);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->SetVisibility(VISIBILITY_ON);
             Invisible = false;
@@ -132,13 +132,13 @@ struct boss_jandicebarovAI : public ScriptedAI
         }
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //CurseOfBlood_Timer
         if (CurseOfBlood_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSEOFBLOOD);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSEOFBLOOD);
             CurseOfBlood_Timer = 30000;
         }
         else
@@ -149,9 +149,9 @@ struct boss_jandicebarovAI : public ScriptedAI
         {
             //Inturrupt any spell casting
             m_creature->InterruptNonMeleeSpells(false);
-            m_creature->setFaction(35);
+            m_creature->SetFactionTemplateId(35);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -99);
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -99);
             m_creature->SetVisibility(VISIBILITY_OFF);
 
             damageTaken = 0;
@@ -162,7 +162,7 @@ struct boss_jandicebarovAI : public ScriptedAI
             Illusion_Timer = 25000;
 
             //Summon 10 Illusions attacking random gamers
-            Unit* target = NULL;
+            Unit* target = nullptr;
             for (int i = 0; i < 10; ++i)
             {
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
@@ -187,22 +187,22 @@ struct mob_illusionofjandicebarovAI : public ScriptedAI
 
     uint32 Cleave_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Cleave_Timer = urand(2000, 8000);
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Cleave_Timer
         if (Cleave_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 Cleave_Timer = urand(5000, 15000);
         }
         else
@@ -224,7 +224,7 @@ CreatureAI* GetAI_mob_illusionofjandicebarov(Creature* pCreature)
 
 void AddSC_boss_jandicebarov()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_jandice_barov";
     newscript->GetAI = &GetAI_boss_jandicebarov;

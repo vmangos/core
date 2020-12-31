@@ -27,7 +27,13 @@
 
 enum AuraFlags
 {
-    AFLAG_MASK              = 0x09
+    AFLAG_NONE                  = 0x00,
+    AFLAG_CANCELABLE            = 0x01,
+    ALFAG_UNK2                  = 0x02,
+    AFLAG_UNK3                  = 0x04,
+    AFLAG_UNK4                  = 0x08,
+
+    AFLAG_MASK_ALL              = 0x0F
 };
 
 /**
@@ -107,7 +113,7 @@ enum AuraType
      */
     SPELL_AURA_MOD_STEALTH = 16,
     /**
-     * Not handled by the Aura class, implemented in Unit::isVisibleForOrDetect
+     * Not handled by the Aura class, implemented in Unit::IsVisibleForOrDetect
      * which does a lot of checks to determine whether the person is visible or not,
      * the SPELL_AURA_MOD_STEALTH seems to determine how in/visible ie a rogue is.
      */

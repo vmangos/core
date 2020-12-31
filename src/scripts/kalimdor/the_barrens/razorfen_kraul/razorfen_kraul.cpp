@@ -53,7 +53,7 @@ enum
     NPC_RAGING_AGAMAR          = 4514
 };
 
-static const float aBoarSpawn[4][3] =
+static float const aBoarSpawn[4][3] =
 {
     {2151.420f, 1733.18f, 52.10f},
     {2144.463f, 1726.89f, 51.93f},
@@ -69,6 +69,12 @@ struct npc_willix_the_importerAI : public npc_escortAI
     }
 
     void Reset() override {}
+
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
 
     // Exact use of these texts remains unknown, it seems that he should only talk when he initiates the attack or he is the first who is attacked by a npc
     void Aggro(Unit* pWho) override
@@ -143,7 +149,7 @@ CreatureAI* GetAI_npc_willix_the_importer(Creature* pCreature)
     return new npc_willix_the_importerAI(pCreature);
 }
 
-bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_WILLIX_THE_IMPORTER)
     {
@@ -153,6 +159,7 @@ bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, c
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_WILLIX_READY, pCreature, pPlayer);
             pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 
@@ -197,7 +204,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
 
     void Reset() override
     {
-        m_creature->setFaction(35);
+        m_creature->SetFactionTemplateId(35);
         m_bIsMovementActive  = false;
         m_followPausedTimer = 3000;
     }
@@ -234,14 +241,14 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return;
 
         lTubersInRange.sort(ObjectDistanceOrder(m_creature));
-        GameObject* pNearestTuber = NULL;
+        GameObject* pNearestTuber = nullptr;
 
         // Always need to find new ones
-        for (std::list<GameObject*>::const_iterator itr = lTubersInRange.begin(); itr != lTubersInRange.end(); ++itr)
+        for (const auto itr : lTubersInRange)
         {
-            if (IsValidTuber(*itr))
+            if (IsValidTuber(itr))
             {
-                pNearestTuber = *itr;
+                pNearestTuber = itr;
                 break;
             }
 
@@ -273,18 +280,15 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return false;
 
         // Check if tuber is in list of already found tubers
-        for (std::list<ObjectGuid>::const_iterator itr2 = m_foundTubers.begin(); itr2 != m_foundTubers.end(); ++itr2)
-            if (tuber->GetObjectGuid() == (*itr2))
+        for (const auto& guid : m_foundTubers)
+            if (tuber->GetObjectGuid() == guid)
                 return false;
 
         // Check that tuber is not more than 15 yards above or below current position
-        if (fabs(viewPoint->GetPositionZ() - tuber->GetPositionZ()) > 15)
-            return false;
-
-        return true;
+        return fabs(viewPoint->GetPositionZ() - tuber->GetPositionZ()) <= 15;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bIsMovementActive)
             return;
@@ -304,22 +308,26 @@ CreatureAI* GetAI_npc_snufflenose_gopher(Creature* pCreature)
     return new npc_snufflenose_gopherAI(pCreature);
 }
 
-bool EffectDummyCreature_npc_snufflenose_gopher(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_npc_snufflenose_gopher(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
+    Unit* pUnit = pCaster->ToUnit();
+    if (!pUnit)
+        return false;
+
     // always check spellid and effectindex
     if (uiSpellId == SPELL_SNUFFLENOSE_COMMAND && uiEffIndex == EFFECT_INDEX_0)
     {
         if (pCreatureTarget->GetEntry() == NPC_SNUFFLENOSE_GOPHER)
         {
             // Do nothing if player has not targeted gopher
-            if (pCaster->GetTargetGuid() != pCreatureTarget->GetObjectGuid())
+            if (pUnit->GetTargetGuid() != pCreatureTarget->GetObjectGuid())
             {
                 // Send Spell_FAILED_BAD_TARGETS
                 pCreatureTarget->SendPetCastFail(uiSpellId, (SpellCastResult)0x0A);
                 return false;
             }
 
-            DoScriptText(SAY_GOPHER_COMMAND, pCreatureTarget, pCaster);
+            DoScriptText(SAY_GOPHER_COMMAND, pCreatureTarget, pUnit);
 
             if (npc_snufflenose_gopherAI* pGopherAI = dynamic_cast<npc_snufflenose_gopherAI*>(pCreatureTarget->AI()))
             {
@@ -358,26 +366,26 @@ struct RazorfenDefenderAI : public ScriptedAI
     uint32 m_uiImprovedBlocking_Timer;
     uint32 m_uiShieldBash_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiImprovedBlocking_Timer = 1000;
         m_uiShieldBash_Timer      = 6600;
         DoCastSpellIfCan(m_creature, SPELL_DEFENSIVE_STANCE, true);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiShieldBash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
                 m_uiShieldBash_Timer = 8100;
         }
         else

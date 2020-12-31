@@ -69,8 +69,6 @@ enum
     POINT_LAST_POINT    = 0xFFFFFF
 };
 
-#define GOSSIP_ITEM_BEGIN   "Let the event begin!"
-
 float Position [10][3] =
 {
     {-52.9f, 269.8f, -92.8f},
@@ -108,7 +106,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
     bool Yelled;
     bool isAggro;
 
-    void Reset()
+    void Reset() override
     {
         Event_Timer = 0;
         Sleep_Timer = 5000;
@@ -122,7 +120,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         isAggro = false;
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
@@ -137,7 +135,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         SetEscortPaused(false);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         isAggro = true;
         if (OnCastWaypoint() || OnFightWaypoint())
@@ -273,7 +271,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         while (it != vSummoned.end())
         {
             if (Creature* pSummon = m_pInstance->GetCreature(*it))
-                if (pSummon->isAlive())
+                if (pSummon->IsAlive())
                     pSummon->ForcedDespawn();
             it = vSummoned.erase(it);
         }
@@ -326,7 +324,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 diff)
+    void UpdateEscortAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -335,11 +333,11 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         if (!Naralex)
             return;
 
-        for (const auto& it : vSummoned)
+        for (const auto& guid : vSummoned)
         {
-            if (Creature* pSummon = m_pInstance->GetCreature(it))
+            if (Creature* pSummon = m_pInstance->GetCreature(guid))
             {
-                if (!pSummon->getVictim() && m_creature->isAlive())
+                if (!pSummon->GetVictim() && m_creature->IsAlive())
                 {
                     //the summon has reached the disciple, attack him
                     if (pSummon->GetDistance2d(m_creature) < ATTACK_DISTANCE)
@@ -368,10 +366,10 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         Map::PlayerList const &PlayerList = map->GetPlayers();
                         if (!PlayerList.isEmpty())
                         {
-                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            for (const auto& i : PlayerList)
                             {
-                                if (i->getSource()->isAlive() && (i->getSource()->GetDistance(m_creature) < 30))
-                                    m_creature->CastSpell(i->getSource(), SPELL_MARK, false);
+                                if (i.getSource()->IsAlive() && (i.getSource()->GetDistance(m_creature) < 30))
+                                    m_creature->CastSpell(i.getSource(), SPELL_MARK, false);
                             }
                         }
                     }
@@ -416,7 +414,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             break;
                         case 1:
                             m_creature->CastSpell(m_creature, SPELL_CLEANSING, false);
-                            m_creature->addUnitState(UNIT_STAT_ROOT);
+                            m_creature->AddUnitState(UNIT_STAT_ROOT);
                             Subevent_Phase = 2;
                             Event_Timer = 15000;
                             break;
@@ -429,7 +427,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 3:
                             if (!m_creature->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                             {
-                                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                                 Subevent_Phase = 4;
                             }
                             Event_Timer = 1000;
@@ -437,7 +435,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 4:
                         {
                             Player* eventStarter = m_creature->GetMap()->GetPlayer(m_playerGuid);
-                            if (!m_creature->isInCombat() && eventStarter && !eventStarter->isInCombat())
+                            if (!m_creature->IsInCombat() && eventStarter && !eventStarter->IsInCombat())
                             {
                                 DoScriptText(SAY_AFTER_CIRCLE, m_creature);
                                 m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
@@ -510,7 +508,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 7:
                             if (m_pInstance->GetData(TYPE_MUTANUS) == DONE)
                             {
-                                Naralex->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SIT);
+                                Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SIT);
                                 DoScriptText(SAY_NARALEX_AWAKEN, Naralex);
                                 Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                                 m_creature->InterruptNonMeleeSpells(false, SPELL_AWAKENING);
@@ -522,8 +520,8 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             else Event_Timer = 2000;
                             break;
                         case 8:
-                            if (m_creature->isAlive() &&
-                                !m_creature->getVictim())
+                            if (m_creature->IsAlive() &&
+                                !m_creature->GetVictim())
                             {
                                 m_creature->DeleteThreatList();
                                 m_creature->CombatStop(true);
@@ -537,7 +535,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 9:
                             DoScriptText(SAY_NARALEX_FINAL1, Naralex);
                             Naralex->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            Naralex->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND);
+                            Naralex->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND);
                             Event_Timer = 8000;
                             Subevent_Phase = 10;
                             break;
@@ -576,7 +574,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         if (OnCastWaypoint())
             return;
 
-        if (m_creature->SelectHostileTarget() && m_creature->getVictim())
+        if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
         {
             if (Sleep_Timer < diff)
             {
@@ -589,46 +587,23 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
             DoMeleeAttackIfReady();
         }
     }
-};
 
-bool GossipHello_npc_disciple_of_naralex(Player* pPlayer, Creature* pCreature)
-{
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-    pCreature->CastSpell(pPlayer, SPELL_MARK, false);
-
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    if (m_pInstance && m_pInstance->GetData(TYPE_DISCIPLE) == SPECIAL)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEGIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(699, pCreature->GetGUID());
-    }
-    else if (m_pInstance && m_pInstance->GetData(TYPE_DISCIPLE) != DONE)
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    else pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
-    return true;
-}
+        if (!m_pInstance)
+            return;
 
-bool GossipSelect_npc_disciple_of_naralex(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        if (!pInvoker || !pInvoker->IsPlayer())
+            return;
 
-    if (!m_pInstance)
-        return false;
-
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        if (npc_disciple_of_naralexAI* pEscortAI = dynamic_cast<npc_disciple_of_naralexAI*>(pCreature->AI()))
+        if (m_pInstance->GetData(TYPE_DISCIPLE) == SPECIAL)
         {
-            pEscortAI->Start(false, /*pPlayer->GetGUID()*/NULL);//we don't want the out of range check.
-            pEscortAI->m_playerGuid = pPlayer->GetObjectGuid();
-            pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            Start(false, /*pInvoker->GetGUID()*/ 0); // we don't want the out of range check.
+            m_playerGuid = pInvoker->GetObjectGuid();
+            m_creature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
         }
-        pPlayer->CLOSE_GOSSIP_MENU();
     }
-    return true;
-}
+};
 
 CreatureAI* GetAI_npc_disciple_of_naralex(Creature* pCreature)
 {
@@ -637,10 +612,15 @@ CreatureAI* GetAI_npc_disciple_of_naralex(Creature* pCreature)
 
 enum
 {
-    SPELL_IMMUNE_FIRE    =   7942,
-    SPELL_IMMUNE_FROST   =   7940,
-    SPELL_IMMUNE_NATURE  =   7941,
-    SPELL_IMMUNE_SHADOW  =   7743,
+    SPELL_IMMUNE_FIRE    =  7942,
+    SPELL_IMMUNE_FROST   =  7940,
+    SPELL_IMMUNE_NATURE  =  7941,
+    SPELL_IMMUNE_SHADOW  =  7743,
+
+    SPELL_TRANSFORM_RED   = 7943,
+    SPELL_TRANSFORM_BLUE  = 7944,
+    SPELL_TRANSFORM_GREEN = 7945,
+    SPELL_TRANSFORM_BLACK = 7946,
 };
 
 struct EvolvingEctoplasmAI : public ScriptedAI
@@ -653,53 +633,56 @@ struct EvolvingEctoplasmAI : public ScriptedAI
     uint32 m_uiImmuneTimer;
     bool   isImmune;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->RemoveAllAuras();
         m_uiImmuneTimer = 0;
         isImmune = false;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (!isImmune)
         {
             if (pSpell->School == SPELL_SCHOOL_FROST)
             {
-//                m_creature->SetDisplayId(1751);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FROST, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_BLUE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FROST, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
             else if (pSpell->School == SPELL_SCHOOL_FIRE)
             {
-//                m_creature->SetDisplayId(11138);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FIRE, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_RED, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FIRE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
             else if (pSpell->School == SPELL_SCHOOL_NATURE)
             {
-//                m_creature->SetDisplayId(4266);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_NATURE, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_GREEN, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_NATURE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
             else if (pSpell->School == SPELL_SCHOOL_SHADOW)
             {
-//                m_creature->SetDisplayId(767);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_SHADOW, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_BLACK, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_SHADOW, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiImmuneTimer < uiDiff)
         {
-//            m_creature->SetDisplayId(1751);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_RED);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_BLUE);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_GREEN);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_BLACK);
             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_SHADOW);
             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_FROST);
             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_FIRE);
@@ -709,7 +692,7 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         else
             m_uiImmuneTimer -= uiDiff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -723,7 +706,7 @@ CreatureAI* GetAI_EvolvingEctoplasmAI(Creature* pCreature)
 
 void AddSC_wailing_caverns()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_evolving_ectoplasm";
@@ -733,7 +716,5 @@ void AddSC_wailing_caverns()
     newscript = new Script;
     newscript->Name = "npc_disciple_of_naralex";
     newscript->GetAI = &GetAI_npc_disciple_of_naralex;
-    newscript->pGossipHello =  &GossipHello_npc_disciple_of_naralex;
-    newscript->pGossipSelect = &GossipSelect_npc_disciple_of_naralex;
     newscript->RegisterSelf();
 }

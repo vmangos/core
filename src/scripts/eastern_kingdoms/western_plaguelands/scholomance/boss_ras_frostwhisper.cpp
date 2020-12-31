@@ -44,7 +44,7 @@ struct boss_rasfrostAI : public ScriptedAI
     uint32 ChillNova_Timer;
     uint32 FrostVolley_Timer;
 
-    void Reset()
+    void Reset() override
     {
         IceArmor_Timer = 2000;
         Frostbolt_Timer = 8000;
@@ -56,9 +56,9 @@ struct boss_rasfrostAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_ICEARMOR, true);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //IceArmor_Timer
@@ -72,7 +72,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //Frostbolt_Timer
         if (Frostbolt_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_FROSTBOLT);
 
@@ -83,7 +83,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //Freeze_Timer
         if (Freeze_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FREEZE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FREEZE);
             Freeze_Timer = 24000;
         }
         else Freeze_Timer -= diff;
@@ -91,7 +91,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //Fear_Timer
         if (Fear_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
             Fear_Timer = 30000;
         }
         else Fear_Timer -= diff;
@@ -99,7 +99,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //ChillNova_Timer
         if (ChillNova_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHILLNOVA);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHILLNOVA);
             ChillNova_Timer = 14000;
         }
         else ChillNova_Timer -= diff;
@@ -107,7 +107,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //FrostVolley_Timer
         if (FrostVolley_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROSTVOLLEY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROSTVOLLEY);
             FrostVolley_Timer = 15000;
         }
         else FrostVolley_Timer -= diff;
@@ -122,7 +122,7 @@ CreatureAI* GetAI_boss_rasfrost(Creature* pCreature)
 
 void AddSC_boss_rasfrost()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_boss_ras_frostwhisper";
     newscript->GetAI = &GetAI_boss_rasfrost;

@@ -30,11 +30,11 @@ class HmacHash
 {
     public:
         HmacHash() { }
-        HmacHash(const uint8* data, int length);
+        HmacHash(uint8 const* data, int length);
         ~HmacHash();
         void UpdateBigNumber(BigNumber* bn);
-        void UpdateData(const std::vector<uint8>& data);
-        void UpdateData(const uint8* data, int length);
+        void UpdateData(std::vector<uint8> const& data);
+        void UpdateData(uint8 const* data, int length);
         void Initialize();
         void Finalize();
         uint8* GetDigest() { return m_digest; };

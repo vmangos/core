@@ -27,7 +27,7 @@
 // Nostalrius : pour SD0.
 #define barGoLink BarGoLink
 
-class MANGOS_DLL_SPEC BarGoLink
+class BarGoLink
 {
     public:                                                 // constructors
         explicit BarGoLink(int row_count);

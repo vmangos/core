@@ -1,114 +1,16 @@
 /* ScriptData
 SDName: Western_Plaguelands
 SD%Complete: 90
-SDComment: Quest support: 5216,5219,5222,5225,5229,5231,5233,5235. To obtain Vitreous Focuser (could use more spesifics about gossip items)
+SDComment: Quest support: 5216,5219,5222,5225,5229,5231,5233,5235.
 SDCategory: Western Plaguelands
 EndScriptData */
 
 /* ContentData
-npcs_dithers_and_arbington
 npc_myranda_hag
 npc_the_scourge_cauldron
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npcs_dithers_and_arbington
-######*/
-
-bool GossipHello_npcs_dithers_and_arbington(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    if (pCreature->isVendor())
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-    if (pPlayer->GetQuestRewardStatus(5237) || pPlayer->GetQuestRewardStatus(5238))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What does the Felstone Field Cauldron need?",      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What does the Dalson's Tears Cauldron need?",      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What does the Writhing Haunt Cauldron need?",      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What does the Gahrron's Withering Cauldron need?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-        pPlayer->SEND_GOSSIP_MENU(3985, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npcs_dithers_and_arbington(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_TRADE:
-            pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thanks, i need a Vitreous Focuser", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(3980, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thanks, i need a Vitreous Focuser", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(3981, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thanks, i need a Vitreous Focuser", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(3982, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thanks, i need a Vitreous Focuser", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(3983, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pCreature->CastSpell(pPlayer, 17529, false);
-            break;
-    }
-    return true;
-}
-
-/*######
-## npc_myranda_the_hag
-######*/
-
-enum
-{
-    QUEST_SUBTERFUGE        = 5862,
-    QUEST_IN_DREAMS         = 5944,
-    SPELL_SCARLET_ILLUSION  = 17961
-};
-
-#define GOSSIP_ITEM_ILLUSION    "I am ready for the illusion, Myranda."
-
-bool GossipHello_npc_myranda_the_hag(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(QUEST_SUBTERFUGE) == QUEST_STATUS_COMPLETE &&
-            !pPlayer->GetQuestRewardStatus(QUEST_IN_DREAMS) && !pPlayer->HasAura(SPELL_SCARLET_ILLUSION))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ILLUSION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(4773, pCreature->GetGUID());
-        return true;
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_myranda_the_hag(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, SPELL_SCARLET_ILLUSION, false);
-    }
-    return true;
-}
 
 /*######
 ## npc_the_scourge_cauldron
@@ -126,7 +28,7 @@ struct npc_the_scourge_cauldronAI : public ScriptedAI
     void DoDie()
     {
         //summoner dies here
-        m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+        m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
         //override any database `spawntimesecs` to prevent duplicated summons
         uint32 rTime = m_creature->GetRespawnDelay();
         if (rTime < 600)
@@ -250,13 +152,13 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         m_uiShieldSlamTimer         = 2000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(SPELL_RETRIBUTIONAURA))
             m_creature->CastSpell(m_creature, SPELL_RETRIBUTIONAURA, true);
 
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // GlobalCD non ecoule.
@@ -290,7 +192,7 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         {
             if (!m_uiGlobalCooldown)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEBLAST) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEBLAST) == CAST_OK)
                 {
                     m_uiArcaneBlastTimer = urand(10000, 12000);
                     m_uiGlobalCooldown = 1000;
@@ -318,9 +220,9 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         // SHIELDSLAM
         if (m_uiShieldSlamTimer < uiDiff)
         {
-            if (!m_uiGlobalCooldown && m_creature->getVictim()->IsNonMeleeSpellCasted(false))
+            if (!m_uiGlobalCooldown && m_creature->GetVictim()->IsNonMeleeSpellCasted(false))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELDSLAM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELDSLAM) == CAST_OK)
                 {
                     m_uiShieldSlamTimer = 9000;
                     m_uiGlobalCooldown = 1000;
@@ -347,19 +249,7 @@ CreatureAI* GetAI_npc_highprotectorlorik(Creature* pCreature)
 
 void AddSC_western_plaguelands()
 {
-    Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "npcs_dithers_and_arbington";
-    newscript->pGossipHello = &GossipHello_npcs_dithers_and_arbington;
-    newscript->pGossipSelect = &GossipSelect_npcs_dithers_and_arbington;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_myranda_the_hag";
-    newscript->pGossipHello = &GossipHello_npc_myranda_the_hag;
-    newscript->pGossipSelect = &GossipSelect_npc_myranda_the_hag;
-    newscript->RegisterSelf();
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_the_scourge_cauldron";

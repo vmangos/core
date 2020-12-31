@@ -25,20 +25,20 @@
 #include "CreatureAI.h"
 #include "Creature.h"
 
-class MANGOS_DLL_DECL NullCreatureAI : public CreatureAI
+class NullCreatureAI : public CreatureAI
 {
     public:
         explicit NullCreatureAI(Creature* c) : CreatureAI(c)
         {
-            c->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+            c->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
         }
-        ~NullCreatureAI();
+        ~NullCreatureAI() override;
 
-        void MoveInLineOfSight(Unit *) override {}
-        void AttackStart(Unit *) override {}
-        void AttackedBy(Unit *) override {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
+        void AttackedBy(Unit*) override {}
 
-        void UpdateAI(const uint32) override;
-        static int Permissible(const Creature *) { return PERMIT_BASE_IDLE;  }
+        void UpdateAI(uint32 const) override;
+        static int Permissible(Creature const*) { return PERMIT_BASE_IDLE;  }
 };
 #endif

@@ -48,7 +48,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
     bool bCanDetonate;
     bool bShielded;
 
-    void Reset()
+    void Reset() override
     {
         Polymorph_Timer = 20000;
         AoESilence_Timer = 15000;
@@ -57,14 +57,14 @@ struct boss_arcanist_doanAI : public ScriptedAI
         bShielded = false;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (bShielded && bCanDetonate)
@@ -102,7 +102,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
         //AoESilence_Timer
         if (AoESilence_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_AOESILENCE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AOESILENCE);
             AoESilence_Timer = urand(15000, 20000);
         }
         else AoESilence_Timer -= diff;
@@ -110,7 +110,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
         //ArcaneExplosion_Timer
         if (ArcaneExplosion_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEEXPLOSION);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEEXPLOSION);
             ArcaneExplosion_Timer = 8000;
         }
         else ArcaneExplosion_Timer -= diff;
@@ -125,7 +125,7 @@ CreatureAI* GetAI_boss_arcanist_doan(Creature* pCreature)
 
 void AddSC_boss_arcanist_doan()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_arcanist_doan";
     newscript->GetAI = &GetAI_boss_arcanist_doan;

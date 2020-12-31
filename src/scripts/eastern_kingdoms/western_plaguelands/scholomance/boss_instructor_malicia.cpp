@@ -45,7 +45,7 @@ struct boss_instructormaliciaAI : public ScriptedAI
     uint32 FlashCounter;
     uint32 TouchCounter;
 
-    void Reset()
+    void Reset() override
     {
         CallOfGraves_Timer = 4000;
         Corruption_Timer = 8000;
@@ -56,21 +56,21 @@ struct boss_instructormaliciaAI : public ScriptedAI
         TouchCounter = 0;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_MALICIA, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //CallOfGraves_Timer
         if (CallOfGraves_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CALLOFGRAVES);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CALLOFGRAVES);
             CallOfGraves_Timer = 65000;
         }
         else CallOfGraves_Timer -= diff;
@@ -78,7 +78,7 @@ struct boss_instructormaliciaAI : public ScriptedAI
         //Corruption_Timer
         if (Corruption_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_CORRUPTION);
 
@@ -142,7 +142,7 @@ CreatureAI* GetAI_boss_instructormalicia(Creature* pCreature)
 
 void AddSC_boss_instructormalicia()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_instructor_malicia";
     newscript->GetAI = &GetAI_boss_instructormalicia;

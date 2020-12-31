@@ -40,8 +40,8 @@ struct boss_dragon_of_nightmareAI : ScriptedAI
     void EnterEvadeMode() override;
     void JustDied(Unit* pKiller) override;
     virtual bool DoSpecialAbility() = 0;
-    virtual bool UpdateDragonAI(const uint32 /*uiDiff*/) { return true; }
-    void UpdateAI(const uint32 uiDiff) override;
+    virtual bool UpdateDragonAI(uint32 const /*uiDiff*/) { return true; }
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 struct boss_emerissAI : boss_dragon_of_nightmareAI
@@ -54,7 +54,7 @@ struct boss_emerissAI : boss_dragon_of_nightmareAI
     void Reset() override;
     void Aggro(Unit* pWho) override;
     bool DoSpecialAbility() override;
-    bool UpdateDragonAI(const uint32 uiDiff) override;
+    bool UpdateDragonAI(uint32 const uiDiff) override;
 };
 
 struct boss_lethonAI : boss_dragon_of_nightmareAI
@@ -63,7 +63,7 @@ struct boss_lethonAI : boss_dragon_of_nightmareAI
 
     void Reset() override;
     void Aggro(Unit* pWho) override;
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override;
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override;
     void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override;
     bool DoSpecialAbility() override;
 };
@@ -84,7 +84,7 @@ struct boss_taerarAI : boss_dragon_of_nightmareAI
     bool DoSpecialAbility() override;
     void SummonedCreatureJustDied(Creature* pSummoned) override;
     void DoUnbanish();
-    bool UpdateDragonAI(const uint32 uiDiff) override;
+    bool UpdateDragonAI(uint32 const uiDiff) override;
 };
 
 struct boss_ysondreAI : boss_dragon_of_nightmareAI
@@ -97,7 +97,7 @@ struct boss_ysondreAI : boss_dragon_of_nightmareAI
     void Aggro(Unit* pWho) override;
     void JustSummoned(Creature* pSummoned) override;
     bool DoSpecialAbility() override;
-    bool UpdateDragonAI(const uint32 uiDiff) override;
+    bool UpdateDragonAI(uint32 const uiDiff) override;
 };
 
 struct npc_spirit_shadeAI : ScriptedAI
@@ -112,8 +112,8 @@ struct npc_spirit_shadeAI : ScriptedAI
     void AttackedBy(Unit*) override {}
     void AttackStart(Unit*) override {}
     void EnterEvadeMode() override {}
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 struct npc_shade_of_taerarAI : ScriptedPetAI
@@ -124,7 +124,7 @@ struct npc_shade_of_taerarAI : ScriptedPetAI
     uint32 m_uiPoisonCloudTimer;
 
     void Reset() override;
-    void UpdatePetAI(const uint32 uiDiff) override;
+    void UpdatePetAI(uint32 const uiDiff) override;
 };
 
 struct npc_demented_druidAI : ScriptedAI
@@ -136,7 +136,7 @@ struct npc_demented_druidAI : ScriptedAI
     uint32 m_uiSilenceTimer;
 
     void Reset() override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 struct go_putrid_shroomAI : GameObjectAI

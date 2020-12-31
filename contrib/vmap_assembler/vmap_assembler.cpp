@@ -40,9 +40,9 @@ int main(int argc, char* argv[])
         src = "Buildings";
         dest = "vmaps";
         #ifdef WIN32
-        int RetCode = mkdir (dest.c_str());
+        /*int RetCode =*/ mkdir (dest.c_str());
         #else
-        int RetCode = mkdir (dest.c_str(), 0777);
+        /*int RetCode =*/ mkdir (dest.c_str(), 0777);
         #endif
     }
     else

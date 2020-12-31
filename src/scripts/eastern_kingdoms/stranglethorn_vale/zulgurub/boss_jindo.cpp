@@ -90,12 +90,12 @@ struct boss_jindoAI : public ScriptedAI
         while (Creature* Crea = m_creature->FindNearestCreature(NPC_BRAINWASH_TOTEM, 150.0f))
             Crea->DisappearAndDie();
     }
-    void JustSummoned(Creature* c)
+    void JustSummoned(Creature* c) override
     {
         summonedCreatures.push_back(c->GetObjectGuid());
         ScriptedAI::JustSummoned(c);
     }
-    void Reset()
+    void Reset() override
     {
         BrainWashTotem_Timer    = 22000;
         HealingWard_Timer       = 12000;
@@ -116,7 +116,7 @@ struct boss_jindoAI : public ScriptedAI
             m_pInstance->SetData(TYPE_JINDO, NOT_STARTED);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_HEX)
         {
@@ -124,20 +124,20 @@ struct boss_jindoAI : public ScriptedAI
                 return;
 
             HexGuid = pCaster->GetGUID();
-            HexAggro = m_creature->getThreatManager().getThreat(pCaster);
+            HexAggro = m_creature->GetThreatManager().getThreat(pCaster);
 
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -100);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DespawnAllSummons();
         if (m_pInstance)
             m_pInstance->SetData(TYPE_JINDO, DONE);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         if (m_pInstance)
@@ -151,9 +151,9 @@ struct boss_jindoAI : public ScriptedAI
             Skeleton->AI()->AttackStart(initialTarget);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (HexGuid)
@@ -161,7 +161,7 @@ struct boss_jindoAI : public ScriptedAI
             Player* hexPlayer = m_creature->GetMap()->GetPlayer(HexGuid);
             if (hexPlayer && !hexPlayer->HasAura(SPELL_HEX))
             {
-                m_creature->getThreatManager().addThreatDirectly(hexPlayer, HexAggro);
+                m_creature->GetThreatManager().addThreatDirectly(hexPlayer, HexAggro);
                 HexGuid = 0;
                 HexAggro = 0;
             }
@@ -190,14 +190,14 @@ struct boss_jindoAI : public ScriptedAI
                 bool AuraRemoved = false;
 
                 uint32 var = 0;
-                for (std::list<uint64>::const_iterator itr = BrainWashedPlayerGuid.begin(); itr != BrainWashedPlayerGuid.end(); itr++)
+                for (const auto& guid : BrainWashedPlayerGuid)
                 {
-                    if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)))
+                    if (Player* pTarget = m_creature->GetMap()->GetPlayer(guid))
                     {
-                        if ((pTarget->isAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->isDead()) // SPELL_BRAINWASH 24261
+                        if ((pTarget->IsAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->IsDead()) // SPELL_BRAINWASH 24261
                         {
-                            PlayerBrainWashedGuid = *itr;
-                            if (pTarget->isDead())
+                            PlayerBrainWashedGuid = guid;
+                            if (pTarget->IsDead())
                                 PlayerDead = true;
                             else
                                 AuraRemoved = true;
@@ -215,8 +215,8 @@ struct boss_jindoAI : public ScriptedAI
                     Player* playerBrainWashed = m_creature->GetMap()->GetPlayer(PlayerBrainWashedGuid);
                     if (AuraRemoved)
                     {
-                        m_creature->getThreatManager().modifyThreatPercent(playerBrainWashed, -100);
-                        m_creature->getThreatManager().addThreatDirectly(playerBrainWashed, (*Iter));
+                        m_creature->GetThreatManager().modifyThreatPercent(playerBrainWashed, -100);
+                        m_creature->GetThreatManager().addThreatDirectly(playerBrainWashed, (*Iter));
                     }
 
                     BrainWashedPlayerGuid.remove(PlayerBrainWashedGuid);
@@ -243,7 +243,7 @@ struct boss_jindoAI : public ScriptedAI
         //Hex_Timer
         if (Hex_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HEX) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HEX) == CAST_OK)
                 Hex_Timer = urand(12000, 20000);
         }
         else
@@ -299,30 +299,30 @@ struct mob_shade_of_jindoAI : public ScriptedAI
 
     uint32 ShadowShock_Timer;
 
-    void Reset()
+    void Reset() override
     {
         ShadowShock_Timer = 1000;
         m_creature->AddAura(SPELL_INVISIBLE, ADD_AURA_PERMANENT);
     }
 
-    void DamageTaken(Unit *done_by, uint32 &damage)
+    void DamageTaken(Unit *done_by, uint32 &damage) override
     {
         if (done_by && !done_by->HasAura(SPELL_DELUSIONS_OF_JINDO))
             damage = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->getVictim()->HasAura(SPELL_HEX))
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        if (m_creature->GetVictim()->HasAura(SPELL_HEX))
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
         //ShadowShock_Timer
         if (ShadowShock_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWSHOCK);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWSHOCK);
             ShadowShock_Timer = 2000;
         }
         else
@@ -345,33 +345,33 @@ struct mob_brain_wash_totemAI : public ScriptedAI
     uint64 PlayerMCGuid;
     uint32 CheckTimer;
 
-    void Reset()
+    void Reset() override
     {
         PlayerMCGuid = 0;
         CheckTimer = 0;
 
         m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : pas touché par les AOE
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
         {
             m_creature->DisappearAndDie();
             return;
         }
 
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
 
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
             m_creature->SetInCombatWithZone();
 
         // Deja en train de CM le joueur
         if (PlayerMCGuid)
             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(PlayerMCGuid))
-                if (pPlayer->isAlive() && pPlayer->HasAura(24261, EFFECT_INDEX_0))
+                if (pPlayer->IsAlive() && pPlayer->HasAura(24261, EFFECT_INDEX_0))
                     return;
 
 
@@ -380,13 +380,13 @@ struct mob_brain_wash_totemAI : public ScriptedAI
             // Il faut au moins 2 personnes dans le threatlist de Jin'do, sinon il va reset !
             if (pJindo->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1))
             {
-                Unit* pTarget = pJindo ? pJindo->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : NULL;
-                if (pTarget && pTarget->isAlive() && pTarget->IsPlayer() && !pTarget->HasAura(SPELL_HEX) && !pTarget->HasAura(SPELL_BRAINWASH))
+                Unit* pTarget = pJindo ? pJindo->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : nullptr;
+                if (pTarget && pTarget->IsAlive() && pTarget->IsPlayer() && !pTarget->HasAura(SPELL_HEX) && !pTarget->HasAura(SPELL_BRAINWASH))
                 {
                     if (boss_jindoAI* pJindoAI = dynamic_cast<boss_jindoAI*>(pJindo->AI()))
                     {
                         pJindoAI->BrainWashedPlayerGuid.push_back(pTarget->GetGUID());
-                        pJindoAI->BrainWashedPlayerAggro.push_back(pJindo->getThreatManager().getThreat(pTarget));
+                        pJindoAI->BrainWashedPlayerAggro.push_back(pJindo->GetThreatManager().getThreat(pTarget));
                         if (DoCastSpellIfCan(pTarget, SPELL_BRAINWASH) == CAST_OK)
                         {
                             PlayerMCGuid = pTarget->GetGUID();
@@ -417,7 +417,7 @@ CreatureAI* GetAI_mob_brain_wash(Creature* pCreature)
 // UPDATE `creature_template` SET `ai_name` = '', `script_name` = 'mob_brain_wash' WHERE `entry` = 15112;
 void AddSC_boss_jindo()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_jindo";

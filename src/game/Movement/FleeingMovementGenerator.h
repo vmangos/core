@@ -23,7 +23,7 @@
 #include "ObjectGuid.h"
 
 template<class T>
-class MANGOS_DLL_SPEC FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >
+class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >
 {
     public:
         explicit FleeingMovementGenerator(ObjectGuid fright) : _forceWalking(false), _customSpeed(-1.0f), i_frightGuid(fright), i_nextCheckTime(0), _forceUpdate(false) {}
@@ -32,10 +32,10 @@ class MANGOS_DLL_SPEC FleeingMovementGenerator : public MovementGeneratorMedium<
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
 
-        void unitSpeedChanged() override { _forceUpdate = true; }
-        MovementGeneratorType GetMovementGeneratorType() const { return FLEEING_MOTION_TYPE; }
+        void UnitSpeedChanged() override { _forceUpdate = true; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
 
     protected:
         bool _forceWalking;
@@ -49,15 +49,15 @@ class MANGOS_DLL_SPEC FleeingMovementGenerator : public MovementGeneratorMedium<
         bool _forceUpdate;
 };
 
-class MANGOS_DLL_SPEC TimedFleeingMovementGenerator : public FleeingMovementGenerator<Creature>
+class TimedFleeingMovementGenerator : public FleeingMovementGenerator<Creature>
 {
     public:
         TimedFleeingMovementGenerator(ObjectGuid fright, uint32 time) :
             FleeingMovementGenerator<Creature>(fright),
             i_totalFleeTime(time) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return TIMED_FLEEING_MOTION_TYPE; }
-        bool Update(Unit &, const uint32 &);
+        MovementGeneratorType GetMovementGeneratorType() const override { return TIMED_FLEEING_MOTION_TYPE; }
+        bool Update(Unit &, uint32 const&);
         void Initialize(Unit &);
         void Finalize(Unit &);
 

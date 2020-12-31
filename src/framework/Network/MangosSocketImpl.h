@@ -74,7 +74,7 @@ void MangosSocket<SessionType, SocketName, Crypt>::CloseSocket(void)
     {
         GuardType lock(m_SessionLock);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 }
 
@@ -268,7 +268,7 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_close(ACE_HANDLE h, ACE
     {
         GuardType lock(m_SessionLock);
 
-        m_Session = NULL;
+        m_Session = nullptr;
     }
 
     reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
@@ -290,7 +290,7 @@ int MangosSocket<SessionType, SocketName, Crypt>::Update(void)
 template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::handle_input_header(void)
 {
-    MANGOS_ASSERT(m_RecvWPct == NULL);
+    MANGOS_ASSERT(m_RecvWPct == nullptr);
 
     MANGOS_ASSERT(m_Header.length() == sizeof(ClientPktHeader));
 
@@ -333,13 +333,13 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_payload(void)
 
     MANGOS_ASSERT(m_RecvPct.space() == 0);
     MANGOS_ASSERT(m_Header.space() == 0);
-    MANGOS_ASSERT(m_RecvWPct != NULL);
+    MANGOS_ASSERT(m_RecvWPct != nullptr);
 
     const int ret = ((SocketName*)this)->ProcessIncoming(m_RecvWPct);
 
-    m_RecvPct.base(NULL, 0);
+    m_RecvPct.base(nullptr, 0);
     m_RecvPct.reset();
-    m_RecvWPct = NULL;
+    m_RecvWPct = nullptr;
 
     m_Header.reset();
 
@@ -406,7 +406,7 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_input_missing_data(void
         // hope this is not hack ,as proper m_RecvWPct is asserted around
         if (!m_RecvWPct)
         {
-            sLog.outError("Forcing close on input m_RecvWPct = NULL");
+            sLog.outError("Forcing close on input m_RecvWPct = nullptr");
             errno = EINVAL;
             return -1;
         }

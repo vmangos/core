@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
+-- Host:                         127.0.0.1
 -- Server version:               5.5.53 - MySQL Community Server (GPL)
 -- Server OS:                    Win32
--- HeidiSQL Версия:              9.3.0.4998
+-- HeidiSQL Version:             9.3.0.4998
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -11,7 +11,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for table characters.auction
-DROP TABLE IF EXISTS `auction`;
 CREATE TABLE IF NOT EXISTS `auction` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `houseid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -32,7 +31,6 @@ CREATE TABLE IF NOT EXISTS `auction` (
 
 
 -- Dumping structure for table characters.bugreport
-DROP TABLE IF EXISTS `bugreport`;
 CREATE TABLE IF NOT EXISTS `bugreport` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `type` longtext NOT NULL,
@@ -44,7 +42,6 @@ CREATE TABLE IF NOT EXISTS `bugreport` (
 
 
 -- Dumping structure for table characters.bugreports
-DROP TABLE IF EXISTS `bugreports`;
 CREATE TABLE IF NOT EXISTS `bugreports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `reportTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -66,7 +63,6 @@ CREATE TABLE IF NOT EXISTS `bugreports` (
 
 
 -- Dumping structure for table characters.census
-DROP TABLE IF EXISTS `census`;
 CREATE TABLE IF NOT EXISTS `census` (
   `time` datetime DEFAULT NULL,
   `race` int(11) DEFAULT NULL,
@@ -77,7 +73,6 @@ CREATE TABLE IF NOT EXISTS `census` (
 
 
 -- Dumping structure for table characters.characters
-DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `account` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Account Identifier',
@@ -152,7 +147,6 @@ CREATE TABLE IF NOT EXISTS `characters` (
 
 
 -- Dumping structure for table characters.characters_guid_delete
-DROP TABLE IF EXISTS `characters_guid_delete`;
 CREATE TABLE IF NOT EXISTS `characters_guid_delete` (
   `guid` int(11) DEFAULT NULL,
   UNIQUE KEY `key_guid` (`guid`)
@@ -162,7 +156,6 @@ CREATE TABLE IF NOT EXISTS `characters_guid_delete` (
 
 
 -- Dumping structure for table characters.characters_item_delete
-DROP TABLE IF EXISTS `characters_item_delete`;
 CREATE TABLE IF NOT EXISTS `characters_item_delete` (
   `entry` int(11) DEFAULT NULL,
   UNIQUE KEY `key_entry` (`entry`)
@@ -172,7 +165,6 @@ CREATE TABLE IF NOT EXISTS `characters_item_delete` (
 
 
 -- Dumping structure for table characters.character_action
-DROP TABLE IF EXISTS `character_action`;
 CREATE TABLE IF NOT EXISTS `character_action` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `button` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -185,7 +177,6 @@ CREATE TABLE IF NOT EXISTS `character_action` (
 
 
 -- Dumping structure for table characters.character_aura
-DROP TABLE IF EXISTS `character_aura`;
 CREATE TABLE IF NOT EXISTS `character_aura` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `caster_guid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
@@ -209,7 +200,6 @@ CREATE TABLE IF NOT EXISTS `character_aura` (
 
 
 -- Dumping structure for table characters.character_battleground_data
-DROP TABLE IF EXISTS `character_battleground_data`;
 CREATE TABLE IF NOT EXISTS `character_battleground_data` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `instance_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -226,7 +216,6 @@ CREATE TABLE IF NOT EXISTS `character_battleground_data` (
 
 
 -- Dumping structure for table characters.character_bgqueue
-DROP TABLE IF EXISTS `character_bgqueue`;
 CREATE TABLE IF NOT EXISTS `character_bgqueue` (
   `PlayerGUID` int(11) NOT NULL DEFAULT '0',
   `playerName` varchar(12) CHARACTER SET latin1 NOT NULL,
@@ -241,7 +230,6 @@ CREATE TABLE IF NOT EXISTS `character_bgqueue` (
 
 
 -- Dumping structure for table characters.character_deleted_items
-DROP TABLE IF EXISTS `character_deleted_items`;
 CREATE TABLE IF NOT EXISTS `character_deleted_items` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `player_guid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -254,7 +242,6 @@ CREATE TABLE IF NOT EXISTS `character_deleted_items` (
 
 
 -- Dumping structure for table characters.character_duplicate_account
-DROP TABLE IF EXISTS `character_duplicate_account`;
 CREATE TABLE IF NOT EXISTS `character_duplicate_account` (
   `account` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -263,7 +250,6 @@ CREATE TABLE IF NOT EXISTS `character_duplicate_account` (
 
 
 -- Dumping structure for table characters.character_forgotten_skills
-DROP TABLE IF EXISTS `character_forgotten_skills`;
 CREATE TABLE IF NOT EXISTS `character_forgotten_skills` (
   `guid` int(11) unsigned NOT NULL COMMENT 'Global Unique Identifier',
   `skill` mediumint(9) unsigned NOT NULL,
@@ -275,7 +261,6 @@ CREATE TABLE IF NOT EXISTS `character_forgotten_skills` (
 
 
 -- Dumping structure for table characters.character_gifts
-DROP TABLE IF EXISTS `character_gifts`;
 CREATE TABLE IF NOT EXISTS `character_gifts` (
   `guid` int(20) unsigned NOT NULL DEFAULT '0',
   `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -289,7 +274,6 @@ CREATE TABLE IF NOT EXISTS `character_gifts` (
 
 
 -- Dumping structure for table characters.character_homebind
-DROP TABLE IF EXISTS `character_homebind`;
 CREATE TABLE IF NOT EXISTS `character_homebind` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `map` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
@@ -304,7 +288,6 @@ CREATE TABLE IF NOT EXISTS `character_homebind` (
 
 
 -- Dumping structure for table characters.character_honor_cp
-DROP TABLE IF EXISTS `character_honor_cp`;
 CREATE TABLE IF NOT EXISTS `character_honor_cp` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `victimType` tinyint(3) unsigned NOT NULL DEFAULT '4',
@@ -319,7 +302,6 @@ CREATE TABLE IF NOT EXISTS `character_honor_cp` (
 
 
 -- Dumping structure for table characters.character_instance
-DROP TABLE IF EXISTS `character_instance`;
 CREATE TABLE IF NOT EXISTS `character_instance` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0',
   `instance` int(11) unsigned NOT NULL DEFAULT '0',
@@ -332,7 +314,6 @@ CREATE TABLE IF NOT EXISTS `character_instance` (
 
 
 -- Dumping structure for table characters.character_inventory
-DROP TABLE IF EXISTS `character_inventory`;
 CREATE TABLE IF NOT EXISTS `character_inventory` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `bag` int(11) unsigned NOT NULL DEFAULT '0',
@@ -347,7 +328,6 @@ CREATE TABLE IF NOT EXISTS `character_inventory` (
 
 
 -- Dumping structure for table characters.character_pet
-DROP TABLE IF EXISTS `character_pet`;
 CREATE TABLE IF NOT EXISTS `character_pet` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `entry` int(11) unsigned NOT NULL DEFAULT '0',
@@ -380,7 +360,6 @@ CREATE TABLE IF NOT EXISTS `character_pet` (
 
 
 -- Dumping structure for table characters.character_queststatus
-DROP TABLE IF EXISTS `character_queststatus`;
 CREATE TABLE IF NOT EXISTS `character_queststatus` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `quest` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
@@ -404,7 +383,6 @@ CREATE TABLE IF NOT EXISTS `character_queststatus` (
 
 
 -- Dumping structure for table characters.character_reputation
-DROP TABLE IF EXISTS `character_reputation`;
 CREATE TABLE IF NOT EXISTS `character_reputation` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `faction` int(11) unsigned NOT NULL DEFAULT '0',
@@ -417,7 +395,6 @@ CREATE TABLE IF NOT EXISTS `character_reputation` (
 
 
 -- Dumping structure for table characters.character_skills
-DROP TABLE IF EXISTS `character_skills`;
 CREATE TABLE IF NOT EXISTS `character_skills` (
   `guid` int(11) unsigned NOT NULL COMMENT 'Global Unique Identifier',
   `skill` mediumint(9) unsigned NOT NULL,
@@ -430,7 +407,6 @@ CREATE TABLE IF NOT EXISTS `character_skills` (
 
 
 -- Dumping structure for table characters.character_social
-DROP TABLE IF EXISTS `character_social`;
 CREATE TABLE IF NOT EXISTS `character_social` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   `friend` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Friend Global Unique Identifier',
@@ -446,7 +422,6 @@ CREATE TABLE IF NOT EXISTS `character_social` (
 
 
 -- Dumping structure for table characters.character_spell
-DROP TABLE IF EXISTS `character_spell`;
 CREATE TABLE IF NOT EXISTS `character_spell` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
@@ -460,21 +435,20 @@ CREATE TABLE IF NOT EXISTS `character_spell` (
 
 
 -- Dumping structure for table characters.character_spell_cooldown
-DROP TABLE IF EXISTS `character_spell_cooldown`;
 CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
-  `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
-  `item` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
-  `time` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `catTime` bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guid`,`spell`)
+  `SpellId` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
+  `SpellExpireTime` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell cooldown expire time',
+  `Category` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category',
+  `CategoryExpireTime` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category cooldown expire time',
+  `ItemId` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
+  PRIMARY KEY (`guid`,`SpellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 
 
 -- Dumping structure for table characters.character_stats
-DROP TABLE IF EXISTS `character_stats`;
 CREATE TABLE IF NOT EXISTS `character_stats` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
   `maxhealth` int(10) unsigned NOT NULL DEFAULT '0',
@@ -511,7 +485,6 @@ CREATE TABLE IF NOT EXISTS `character_stats` (
 
 
 -- Dumping structure for table characters.character_ticket
-DROP TABLE IF EXISTS `character_ticket`;
 CREATE TABLE IF NOT EXISTS `character_ticket` (
   `ticket_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -525,7 +498,6 @@ CREATE TABLE IF NOT EXISTS `character_ticket` (
 
 
 -- Dumping structure for table characters.character_tutorial
-DROP TABLE IF EXISTS `character_tutorial`;
 CREATE TABLE IF NOT EXISTS `character_tutorial` (
   `account` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Account Identifier',
   `tut0` int(11) unsigned NOT NULL DEFAULT '0',
@@ -543,7 +515,6 @@ CREATE TABLE IF NOT EXISTS `character_tutorial` (
 
 
 -- Dumping structure for table characters.corpse
-DROP TABLE IF EXISTS `corpse`;
 CREATE TABLE IF NOT EXISTS `corpse` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `player` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
@@ -566,7 +537,6 @@ CREATE TABLE IF NOT EXISTS `corpse` (
 
 
 -- Dumping structure for table characters.creature_respawn
-DROP TABLE IF EXISTS `creature_respawn`;
 CREATE TABLE IF NOT EXISTS `creature_respawn` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `respawntime` bigint(20) NOT NULL DEFAULT '0',
@@ -580,7 +550,6 @@ CREATE TABLE IF NOT EXISTS `creature_respawn` (
 
 
 -- Dumping structure for table characters.gameobject_respawn
-DROP TABLE IF EXISTS `gameobject_respawn`;
 CREATE TABLE IF NOT EXISTS `gameobject_respawn` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `respawntime` bigint(20) NOT NULL DEFAULT '0',
@@ -594,7 +563,6 @@ CREATE TABLE IF NOT EXISTS `gameobject_respawn` (
 
 
 -- Dumping structure for table characters.game_event_status
-DROP TABLE IF EXISTS `game_event_status`;
 CREATE TABLE IF NOT EXISTS `game_event_status` (
   `event` smallint(6) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`event`)
@@ -604,7 +572,6 @@ CREATE TABLE IF NOT EXISTS `game_event_status` (
 
 
 -- Dumping structure for table characters.gm_subsurveys
-DROP TABLE IF EXISTS `gm_subsurveys`;
 CREATE TABLE IF NOT EXISTS `gm_subsurveys` (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `subsurveyId` int(10) unsigned NOT NULL DEFAULT '0',
@@ -617,7 +584,6 @@ CREATE TABLE IF NOT EXISTS `gm_subsurveys` (
 
 
 -- Dumping structure for table characters.gm_surveys
-DROP TABLE IF EXISTS `gm_surveys`;
 CREATE TABLE IF NOT EXISTS `gm_surveys` (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
@@ -631,7 +597,6 @@ CREATE TABLE IF NOT EXISTS `gm_surveys` (
 
 
 -- Dumping structure for table characters.gm_tickets
-DROP TABLE IF EXISTS `gm_tickets`;
 CREATE TABLE IF NOT EXISTS `gm_tickets` (
   `ticketId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier of ticket creator',
@@ -660,7 +625,6 @@ CREATE TABLE IF NOT EXISTS `gm_tickets` (
 
 
 -- Dumping structure for table characters.groups
-DROP TABLE IF EXISTS `groups`;
 CREATE TABLE IF NOT EXISTS `groups` (
   `groupId` int(11) unsigned NOT NULL,
   `leaderGuid` int(11) unsigned NOT NULL,
@@ -686,7 +650,6 @@ CREATE TABLE IF NOT EXISTS `groups` (
 
 
 -- Dumping structure for table characters.group_instance
-DROP TABLE IF EXISTS `group_instance`;
 CREATE TABLE IF NOT EXISTS `group_instance` (
   `leaderGuid` int(11) unsigned NOT NULL DEFAULT '0',
   `instance` int(11) unsigned NOT NULL DEFAULT '0',
@@ -699,7 +662,6 @@ CREATE TABLE IF NOT EXISTS `group_instance` (
 
 
 -- Dumping structure for table characters.group_member
-DROP TABLE IF EXISTS `group_member`;
 CREATE TABLE IF NOT EXISTS `group_member` (
   `groupId` int(11) unsigned NOT NULL,
   `memberGuid` int(11) unsigned NOT NULL,
@@ -713,7 +675,6 @@ CREATE TABLE IF NOT EXISTS `group_member` (
 
 
 -- Dumping structure for table characters.guild
-DROP TABLE IF EXISTS `guild`;
 CREATE TABLE IF NOT EXISTS `guild` (
   `guildid` int(6) unsigned NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
@@ -733,7 +694,6 @@ CREATE TABLE IF NOT EXISTS `guild` (
 
 
 -- Dumping structure for table characters.guild_eventlog
-DROP TABLE IF EXISTS `guild_eventlog`;
 CREATE TABLE IF NOT EXISTS `guild_eventlog` (
   `guildid` int(11) NOT NULL COMMENT 'Guild Identificator',
   `LogGuid` int(11) NOT NULL COMMENT 'Log record identificator - auxiliary column',
@@ -752,7 +712,6 @@ CREATE TABLE IF NOT EXISTS `guild_eventlog` (
 
 
 -- Dumping structure for table characters.guild_member
-DROP TABLE IF EXISTS `guild_member`;
 CREATE TABLE IF NOT EXISTS `guild_member` (
   `guildid` int(6) unsigned NOT NULL DEFAULT '0',
   `guid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -768,7 +727,6 @@ CREATE TABLE IF NOT EXISTS `guild_member` (
 
 
 -- Dumping structure for table characters.guild_rank
-DROP TABLE IF EXISTS `guild_rank`;
 CREATE TABLE IF NOT EXISTS `guild_rank` (
   `guildid` int(6) unsigned NOT NULL DEFAULT '0',
   `rid` int(11) unsigned NOT NULL,
@@ -782,7 +740,6 @@ CREATE TABLE IF NOT EXISTS `guild_rank` (
 
 
 -- Dumping structure for table characters.instance
-DROP TABLE IF EXISTS `instance`;
 CREATE TABLE IF NOT EXISTS `instance` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `map` int(11) unsigned NOT NULL DEFAULT '0',
@@ -797,7 +754,6 @@ CREATE TABLE IF NOT EXISTS `instance` (
 
 
 -- Dumping structure for table characters.instance_reset
-DROP TABLE IF EXISTS `instance_reset`;
 CREATE TABLE IF NOT EXISTS `instance_reset` (
   `mapid` int(11) unsigned NOT NULL DEFAULT '0',
   `resettime` bigint(40) NOT NULL DEFAULT '0',
@@ -808,7 +764,6 @@ CREATE TABLE IF NOT EXISTS `instance_reset` (
 
 
 -- Dumping structure for table characters.item_instance
-DROP TABLE IF EXISTS `item_instance`;
 CREATE TABLE IF NOT EXISTS `item_instance` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
   `itemEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -833,7 +788,6 @@ CREATE TABLE IF NOT EXISTS `item_instance` (
 
 
 -- Dumping structure for table characters.item_loot
-DROP TABLE IF EXISTS `item_loot`;
 CREATE TABLE IF NOT EXISTS `item_loot` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0',
   `owner_guid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -848,7 +802,6 @@ CREATE TABLE IF NOT EXISTS `item_loot` (
 
 
 -- Dumping structure for table characters.item_text
-DROP TABLE IF EXISTS `item_text`;
 CREATE TABLE IF NOT EXISTS `item_text` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `text` longtext,
@@ -859,7 +812,6 @@ CREATE TABLE IF NOT EXISTS `item_text` (
 
 
 -- Dumping structure for table characters.mail
-DROP TABLE IF EXISTS `mail`;
 CREATE TABLE IF NOT EXISTS `mail` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `messageType` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -883,7 +835,6 @@ CREATE TABLE IF NOT EXISTS `mail` (
 
 
 -- Dumping structure for table characters.mail_items
-DROP TABLE IF EXISTS `mail_items`;
 CREATE TABLE IF NOT EXISTS `mail_items` (
   `mail_id` int(11) unsigned NOT NULL DEFAULT '0',
   `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -898,7 +849,6 @@ CREATE TABLE IF NOT EXISTS `mail_items` (
 
 
 -- Dumping structure for table characters.migrations
-DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
@@ -908,7 +858,6 @@ CREATE TABLE IF NOT EXISTS `migrations` (
 
 
 -- Dumping structure for table characters.petition
-DROP TABLE IF EXISTS `petition`;
 CREATE TABLE IF NOT EXISTS `petition` (
   `ownerguid` int(10) unsigned NOT NULL,
   `petitionguid` int(10) unsigned DEFAULT '0',
@@ -923,7 +872,6 @@ CREATE TABLE IF NOT EXISTS `petition` (
 
 
 -- Dumping structure for table characters.petition_sign
-DROP TABLE IF EXISTS `petition_sign`;
 CREATE TABLE IF NOT EXISTS `petition_sign` (
   `ownerguid` int(10) unsigned NOT NULL,
   `petitionguid` int(11) unsigned NOT NULL DEFAULT '0',
@@ -938,7 +886,6 @@ CREATE TABLE IF NOT EXISTS `petition_sign` (
 
 
 -- Dumping structure for table characters.pet_aura
-DROP TABLE IF EXISTS `pet_aura`;
 CREATE TABLE IF NOT EXISTS `pet_aura` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `caster_guid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
@@ -962,7 +909,6 @@ CREATE TABLE IF NOT EXISTS `pet_aura` (
 
 
 -- Dumping structure for table characters.pet_spell
-DROP TABLE IF EXISTS `pet_spell`;
 CREATE TABLE IF NOT EXISTS `pet_spell` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
@@ -974,7 +920,6 @@ CREATE TABLE IF NOT EXISTS `pet_spell` (
 
 
 -- Dumping structure for table characters.pet_spell_cooldown
-DROP TABLE IF EXISTS `pet_spell_cooldown`;
 CREATE TABLE IF NOT EXISTS `pet_spell_cooldown` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
   `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
@@ -986,7 +931,6 @@ CREATE TABLE IF NOT EXISTS `pet_spell_cooldown` (
 
 
 -- Dumping structure for table characters.playerbot
-DROP TABLE IF EXISTS `playerbot`;
 CREATE TABLE IF NOT EXISTS `playerbot` (
   `char_guid` bigint(20) unsigned NOT NULL,
   `chance` int(10) unsigned NOT NULL DEFAULT '10',
@@ -999,7 +943,6 @@ CREATE TABLE IF NOT EXISTS `playerbot` (
 
 
 -- Dumping structure for table characters.saved_variables
-DROP TABLE IF EXISTS `saved_variables`;
 CREATE TABLE IF NOT EXISTS `saved_variables` (
   `key` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `cleaning_flags` int(11) unsigned NOT NULL DEFAULT '0',
@@ -1013,7 +956,6 @@ CREATE TABLE IF NOT EXISTS `saved_variables` (
 
 
 -- Dumping structure for table characters.world
-DROP TABLE IF EXISTS `world`;
 CREATE TABLE IF NOT EXISTS `world` (
   `map` int(11) unsigned NOT NULL DEFAULT '0',
   `data` longtext,
@@ -1024,7 +966,6 @@ CREATE TABLE IF NOT EXISTS `world` (
 
 
 -- Dumping structure for table characters.worldstates
-DROP TABLE IF EXISTS `worldstates`;
 CREATE TABLE IF NOT EXISTS `worldstates` (
   `entry` int(11) DEFAULT NULL,
   `value` int(11) DEFAULT NULL,

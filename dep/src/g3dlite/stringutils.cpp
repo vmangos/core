@@ -12,7 +12,7 @@
 #include "G3D/BinaryInput.h"
 #include <algorithm>
 
-#ifdef G3D_WINDOWS
+#ifdef _MSC_VER
 extern "C" {    
     // Define functions for ffmpeg since we don't link in gcc's c library
     extern int strncasecmp(const char *string1, const char *string2, size_t count) { return _strnicmp(string1, string2, count); }

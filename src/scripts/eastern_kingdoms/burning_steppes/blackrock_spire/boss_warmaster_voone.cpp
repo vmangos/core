@@ -44,7 +44,7 @@ struct boss_warmastervooneAI : public ScriptedAI
     uint32 Pummel_Timer;
     uint32 ThrowAxe_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Snapkick_Timer = 8000;
         Cleave_Timer = 14000;
@@ -54,16 +54,16 @@ struct boss_warmastervooneAI : public ScriptedAI
         ThrowAxe_Timer = 1000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Snapkick_Timer
         if (Snapkick_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SNAPKICK);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SNAPKICK);
             Snapkick_Timer = 6000;
         }
         else Snapkick_Timer -= diff;
@@ -71,7 +71,7 @@ struct boss_warmastervooneAI : public ScriptedAI
         //Cleave_Timer
         if (Cleave_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
             Cleave_Timer = 12000;
         }
         else Cleave_Timer -= diff;
@@ -79,7 +79,7 @@ struct boss_warmastervooneAI : public ScriptedAI
         //Uppercut_Timer
         if (Uppercut_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT);
             Uppercut_Timer = 14000;
         }
         else Uppercut_Timer -= diff;
@@ -87,7 +87,7 @@ struct boss_warmastervooneAI : public ScriptedAI
         //MortalStrike_Timer
         if (MortalStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALSTRIKE);
             MortalStrike_Timer = 10000;
         }
         else MortalStrike_Timer -= diff;
@@ -95,7 +95,7 @@ struct boss_warmastervooneAI : public ScriptedAI
         //Pummel_Timer
         if (Pummel_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL);
             Pummel_Timer = 16000;
         }
         else Pummel_Timer -= diff;
@@ -103,7 +103,7 @@ struct boss_warmastervooneAI : public ScriptedAI
         //ThrowAxe_Timer
         if (ThrowAxe_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_THROWAXE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THROWAXE);
             ThrowAxe_Timer = 8000;
         }
         else ThrowAxe_Timer -= diff;
@@ -119,7 +119,7 @@ CreatureAI* GetAI_boss_warmastervoone(Creature* pCreature)
 
 void AddSC_boss_warmastervoone()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_warmaster_voone";
     newscript->GetAI = &GetAI_boss_warmastervoone;

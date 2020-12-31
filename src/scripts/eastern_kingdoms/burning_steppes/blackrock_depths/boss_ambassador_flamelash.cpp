@@ -52,10 +52,10 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
 
     GuidList lBurningSpirits;
 
-    void Reset()
+    void Reset() override
     {
-        for (uint8 i = 0; i < DWARF_RUNES_MAX; i++)
-            m_uiSpiritTimer[i] = 5 * IN_MILLISECONDS;
+        for (uint32 & i : m_uiSpiritTimer)
+            i = 5 * IN_MILLISECONDS;
     }
 
     void JustSummoned(Creature* pSummoned) override
@@ -84,9 +84,9 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
                 pRune->ResetDoorOrButton();
         }
 
-        for (GuidList::const_iterator itr = lBurningSpirits.begin(); itr != lBurningSpirits.end(); ++itr)
+        for (const auto& guid : lBurningSpirits)
         {
-            if (Creature* pSummon = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pSummon = m_creature->GetMap()->GetCreature(guid))
                 pSummon->ForcedDespawn();
         }
 
@@ -99,7 +99,7 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
             lBurningSpirits.remove(pSummoned->GetObjectGuid());
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override
     {
         if (pWho->GetEntry() == NPC_BURNING_SPIRIT && pSpell->Id == SPELL_BURNING_SPIRIT)
             m_creature->CastSpell(m_creature, SPELL_BURNING_SPIRIT_BUFF, true);
@@ -109,14 +109,14 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
     {
         ScriptedAI::MoveInLineOfSight(pWho);
 
-        if (pWho->GetEntry() == NPC_BURNING_SPIRIT && pWho->isAlive() && !pWho->isInCombat() && pWho->IsWithinDistInMap(m_creature, 4 * CONTACT_DISTANCE))
+        if (pWho->GetEntry() == NPC_BURNING_SPIRIT && pWho->IsAlive() && !pWho->IsInCombat() && pWho->IsWithinDistInMap(m_creature, 4 * CONTACT_DISTANCE))
             pWho->CastSpell(m_creature, SPELL_BURNING_SPIRIT, true);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Burning Spirit
@@ -149,7 +149,7 @@ CreatureAI* GetAI_boss_ambassador_flamelash(Creature* pCreature)
 
 void AddSC_boss_ambassador_flamelash()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ambassador_flamelash";
     newscript->GetAI = &GetAI_boss_ambassador_flamelash;

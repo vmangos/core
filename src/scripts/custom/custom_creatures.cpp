@@ -610,7 +610,7 @@ bool GossipHello_EnchantNPC(Player* player, Creature* creature)
     player->ADD_GOSSIP_ITEM(5, "Mainhand", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_MAINHAND);
     player->ADD_GOSSIP_ITEM(5, "Offhand", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_OFFHAND);
 
-    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
     return true;
 }
 bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
@@ -803,7 +803,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
 
 void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
 {
-    uint32 classmask = player->getClassMask();
+    uint32 classmask = player->GetClassMask();
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
@@ -873,9 +873,7 @@ bool GossipHello_ProfessionNPC(Player* player, Creature* creature)
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Fishing",              GOSSIP_SENDER_MAIN, 13);
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Cooking",              GOSSIP_SENDER_MAIN, 14);
 
-    player->PlayerTalkClass->SendGossipMenu(1, creature->GetGUID());
-
-    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
     return true;
 }
 void CompleteLearnProfession(Player *pPlayer, Creature *pCreature, SkillType skill)
@@ -952,6 +950,56 @@ bool GossipSelect_ProfessionNPC(Player* player, Creature* creature, uint32 sende
 }
 
 /*
+* Custom premade gear and spec scripts
+*/
+
+#define SPELL_LIGHTNING_VISUAL 24240
+
+bool GossipHello_PremadeGearNPC(Player* player, Creature* creature)
+{
+    for (auto itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+    {
+        if (itr.second.requiredClass == player->GetClass())
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, itr.second.name.c_str(), GOSSIP_SENDER_MAIN, itr.first);
+        }
+    }
+
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_PremadeGearNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    player->SendSpellGo(player, SPELL_LIGHTNING_VISUAL);
+    sObjectMgr.ApplyPremadeGearTemplateToPlayer(action, player);
+    player->CLOSE_GOSSIP_MENU();
+    return true;
+}
+
+bool GossipHello_PremadeSpecNPC(Player* player, Creature* creature)
+{
+    for (auto itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+    {
+        if (itr.second.requiredClass == player->GetClass())
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, itr.second.name.c_str(), GOSSIP_SENDER_MAIN, itr.first);
+        }
+    }
+
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_PremadeSpecNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    player->SendSpellGo(player, SPELL_LIGHTNING_VISUAL);
+    sObjectMgr.ApplyPremadeSpecTemplateToPlayer(action, player);
+    player->CLOSE_GOSSIP_MENU();
+    return true;
+}
+
+/*
 * Custom training dummy script
 */
 
@@ -997,15 +1045,15 @@ struct npc_training_dummyAI : ScriptedAI
             AddAttackerToList(pWho);
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* /*pSpell*/) override
+    void SpellHit(Unit* pWho, SpellEntry const* /*pSpell*/) override
     {
         if (pWho)
             AddAttackerToList(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->isInCombat())
+        if (m_creature->IsInCombat())
         {
             if (m_uiCombatTimer <= diff)
             {
@@ -1021,14 +1069,14 @@ struct npc_training_dummyAI : ScriptedAI
                     if (itr->second + 10 < std::time(nullptr))
                     {
                         m_creature->_removeAttacker(pAttacker);
-                        m_creature->getThreatManager().modifyThreatPercent(pAttacker, -101.0f);
+                        m_creature->GetThreatManager().modifyThreatPercent(pAttacker, -101.0f);
                         itr = attackers.erase(itr);
                         continue;
                     }
                     ++itr;
                 }
 
-                if (m_creature->getThreatManager().isThreatListEmpty())
+                if (m_creature->GetThreatManager().isThreatListEmpty())
                     EnterEvadeMode();
 
                 m_uiCombatTimer = 15000;
@@ -1077,9 +1125,9 @@ struct npc_summon_debugAI : ScriptedAI
         Reset();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
 
         if (m_summonCount >= m_maxSummonCount)
@@ -1096,7 +1144,7 @@ CreatureAI* GetAI_custom_summon_debug(Creature *creature)
 
 void AddSC_custom_creatures()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "custom_teleport_npc";
@@ -1114,6 +1162,18 @@ void AddSC_custom_creatures()
     newscript->Name = "custom_professions_npc";
     newscript->pGossipHello = &GossipHello_ProfessionNPC;
     newscript->pGossipSelect = &GossipSelect_ProfessionNPC;
+    newscript->RegisterSelf(false);
+
+    newscript = new Script;
+    newscript->Name = "custom_premade_gear_npc";
+    newscript->pGossipHello = &GossipHello_PremadeGearNPC;
+    newscript->pGossipSelect = &GossipSelect_PremadeGearNPC;
+    newscript->RegisterSelf(false);
+
+    newscript = new Script;
+    newscript->Name = "custom_premade_spec_npc";
+    newscript->pGossipHello = &GossipHello_PremadeSpecNPC;
+    newscript->pGossipSelect = &GossipSelect_PremadeSpecNPC;
     newscript->RegisterSelf(false);
 
     newscript = new Script;

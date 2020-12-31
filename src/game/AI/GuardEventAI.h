@@ -27,12 +27,12 @@ public:
     explicit GuardEventAI(Creature*);
     ~GuardEventAI() {}
 
-    void MoveInLineOfSight(Unit *) override;
-    void EnterCombat(Unit *) override;
-    void JustDied(Unit *) override;
-    static int Permissible(const Creature *);
+    void MoveInLineOfSight(Unit*) override;
+    void EnterCombat(Unit*) override;
+    void JustDied(Unit*) override;
+    static int Permissible(Creature const*);
 private:
-    bool IsAttackingPlayerOrFriendly(const Unit *) const;
+    bool IsAttackingPlayerOrFriendly(Unit const*) const;
 };
 
 #endif

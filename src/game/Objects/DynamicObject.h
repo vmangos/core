@@ -24,7 +24,6 @@
 
 #include "Object.h"
 #include "DBCEnums.h"
-#include "Unit.h"
 
 enum DynamicObjectType
 {
@@ -41,36 +40,39 @@ class DynamicObject : public WorldObject
         typedef std::map<ObjectGuid, uint32> AffectedMap;
         explicit DynamicObject();
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type);
+        bool Create(uint32 guidlow, WorldObject* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type);
         void Update(uint32 update_diff, uint32 p_time) override;
         void Delete();
         uint32 GetSpellId() const { return m_spellId; }
         SpellEffectIndex GetEffIndex() const { return m_effIndex; }
         uint32 GetDuration() const { return m_aliveDuration; }
         ObjectGuid const& GetCasterGuid() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
-        Unit* GetCaster() const;
+        WorldObject* GetCaster() const;
+        Unit* GetUnitCaster() const;
         float GetRadius() const { return m_radius; }
         DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES,0); }
-        bool NeedsRefresh(Unit *unit) const;
+        bool NeedsRefresh(Unit* unit) const;
         bool IsChanneled() const { return m_channeled; }
-        void AddAffected(Unit *unit) { m_affected[unit->GetObjectGuid()] = 0; }
-        void RemoveAffected(Unit *unit) { m_affected.erase(unit->GetObjectGuid()); }
+        void AddAffected(Unit* unit);
+        void RemoveAffected(Unit* unit);
         void Delay(int32 delaytime);
 
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
+        uint32 GetFactionTemplateId() const final ;
+        uint32 GetLevel() const final ;
 
-        float GetObjectBoundingRadius() const               // overwrite WorldObject version
+        float GetObjectBoundingRadius() const override      // overwrite WorldObject version
         {
             return 0.0f;                                    // dynamic object not have real interact size
         }
 
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
+        bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
-        GridReference<DynamicObject> &GetGridRef() { return m_gridRef; }
+        GridReference<DynamicObject>& GetGridRef() { return m_gridRef; }
 
     protected:
         uint32 m_spellId;

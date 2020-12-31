@@ -50,8 +50,7 @@ enum NaxxEvents
 
     EVENT_DKWING_INTRO_2,
     EVENT_DKWING_INTRO_3,
-    EVENT_DKWING_INTRO_4,
-
+    EVENT_DKWING_INTRO_4
 };
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
@@ -112,80 +111,80 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
     if (pWho->IsInEvadeMode())
         return false;
+
     uint32 entry = pWho->GetEntry();
     float dist;
     switch (entry)
     {
-    case NPC_GROBBULUS:
-        dist = 180.0f;
-        break;
-    case NPC_FAERLINA:
-        if (pWho->GetPositionZ() > 266.0f)
+        case NPC_GROBBULUS:
+            dist = 180.0f;
+            break;
+        case NPC_FAERLINA:
+            if (pWho->GetPositionZ() > 266.0f)
+            {
+                pWho->AI()->EnterEvadeMode();
+                return false;
+            }
+            return true;
+        case NPC_ANUB_REKHAN:
+            dist = 130.0f;
+            break;
+        case NPC_NOTH:
+            dist = 120.0f;
+            break;
+        case NPC_HEIGAN:
         {
-            pWho->AI()->EnterEvadeMode();
-            return false;
+            // evade if brought out of room towards bat/grub/beast gauntlet
+            if (pWho->GetPositionX() > 2825.0f)
+            {
+                pWho->AI()->EnterEvadeMode();
+                return false;
+            }
+            dist = 90.0f;
+            break;
         }
-        return true;
-    case NPC_ANUB_REKHAN:
-        dist = 130.0f;
-        break;
-    case NPC_NOTH:
-        dist = 120.0f;
-        break;
-    case NPC_HEIGAN:
-    {
-        // evade if brought out of room towards bat/grub/beast gauntlet
-        if (pWho->GetPositionX() > 2825.0f)
+        case NPC_LOATHEB:
+            dist = 100.0f;
+            break;
+        case NPC_GOTHIK:
         {
-            pWho->AI()->EnterEvadeMode();
-            return false;
+            dist = 150.0f;
+            break;
         }
-        dist = 90.0f;
-        break;
+        case NPC_RAZUVIOUS:
+            if (pWho->GetPositionZ() > 275.0f)
+            {
+                pWho->AI()->EnterEvadeMode();
+                return false;
+            }
+            return true;
+        case NPC_KELTHUZAD:
+            dist = 130.0f;
+            break;
+        case NPC_BLAUMEUX:
+        case NPC_MOGRAINE:
+        case NPC_ZELIEK:
+        case NPC_THANE:
+            dist = 115.0f;
+            break;
+        default:
+            sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
+            dist = 9999.0f;
+            break;
     }
-    case NPC_LOATHEB:
-        dist = 100.0f;
-        break;
-    case NPC_GOTHIK:
-    {
-        dist = 150.0f;
-        break;
-    }
-    case NPC_RAZUVIOUS:
-        if (pWho->GetPositionZ() > 275.0f)
-        {
-            pWho->AI()->EnterEvadeMode();
-            return false;
-        }
-        return true;
-    case NPC_KELTHUZAD:
-        dist = 130.0f;
-        break;
-    case NPC_BLAUMEUX:
-    case NPC_MOGRAINE:
-    case NPC_ZELIEK:
-    case NPC_THANE:
-        dist = 115.0f;
-        break;
-    default:
-        sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
-        dist = 9999.0f;
-        break;
-    }
-    float x, y, z, o;
-    pWho->GetHomePosition(x, y, z, o);
-    if (pWho->GetDistance2d(x, y) > dist)
+
+    if (pWho->GetDistance2d(pWho->GetHomePosition()) > dist)
     {
         if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
         {
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
         }
         else
         {
@@ -204,7 +203,7 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
         GetCreatureListWithEntryInGrid(sewageSlimes, creature, NPC_SewageSlime, 100.0f);
         for (Creature* pC : sewageSlimes)
         {
-            if (!pC->isInCombat())
+            if (!pC->IsInCombat())
             {
                 pC->CastSpell(pC, 28033, true); // aggro all in los
             }
@@ -301,48 +300,48 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
     // DoRespawnGameObject(GO_<WING>_PORTAL, 30 * MINUTE);
     switch (uiType)
     {
-    case TYPE_MAEXXNA:
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_BOSS))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_RAMP))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
-            SetTeleporterState(pGO, uiData);
-        break;
-    case TYPE_THADDIUS:
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_BOSS))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_RAMP))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_PORTAL))
-            SetTeleporterState(pGO, uiData);
-        break;
-    case TYPE_LOATHEB:
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_BOSS))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_RAMP))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_PORTAL))
-            SetTeleporterState(pGO, uiData);
-        break;
-    case TYPE_FOUR_HORSEMEN:
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_BOSS))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_RAMP))
-            SetTeleporterVisualState(pGO, uiData);
-
-        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_PORTAL))
-            SetTeleporterState(pGO, uiData);
-        break;
-    default:
-        sLog.outError("instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
+        case TYPE_MAEXXNA:
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_BOSS))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_RAMP))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
+                SetTeleporterState(pGO, uiData);
+            break;
+        case TYPE_THADDIUS:
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_BOSS))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_RAMP))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_PORTAL))
+                SetTeleporterState(pGO, uiData);
+            break;
+        case TYPE_LOATHEB:
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_BOSS))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_RAMP))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_PORTAL))
+                SetTeleporterState(pGO, uiData);
+            break;
+        case TYPE_FOUR_HORSEMEN:
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_BOSS))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_RAMP))
+                SetTeleporterVisualState(pGO, uiData);
+        
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_PORTAL))
+                SetTeleporterState(pGO, uiData);
+            break;
+        default:
+            sLog.outError("instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
     }
 
     if (WingsAreCleared())
@@ -397,7 +396,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
             break;
         case NPC_SewageSlime:
-            pCreature->SetRespawnRadius(30.0f);
+            pCreature->SetWanderDistance(30.0f);
             break;
         case NPC_BileSludge:
         {
@@ -413,7 +412,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
     // 4hm
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
     {
-        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->isDead())
+        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->IsDead())
         {
             pCreature->Respawn();
         }
@@ -473,6 +472,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }
+
     if (pGo->GetEntry() == GO_CHEST_HORSEMEN_NORM)
         m_uiHorsemenChestGUID = pGo->GetGUID();
 
@@ -554,7 +554,6 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
-
         // Plague wing
         case GO_PLAG_NOTH_ENTRY_DOOR:
             UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_NOTH]);
@@ -571,7 +570,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             UpdateBossGate(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
 
-        // -- Millitary wing
+        // Millitary wing
         case GO_MILI_GOTH_ENTRY_GATE:
             UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_RAZUVIOUS]);
             break;
@@ -588,8 +587,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             //todo: anything to be done?
             break;
 
-
-        // -- Cons wing doors
+        // Cons wing doors
         case GO_CONS_PATH_EXIT_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_PATCHWERK]);
             break;
@@ -599,15 +597,13 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             UpdateManualDoor(pGo, m_auiEncounter[TYPE_GLUTH]);
             break;
 
-
-        // -- Frostwyrm lair
+        // Frostwyrm lair
         case GO_KELTHUZAD_WATERFALL_DOOR:
         case GO_KELTHUZAD_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_SAPPHIRON]);
             break;
 
-
-        // --- Teleporters visual thing
+        // Teleporters visual thing
         case GO_ARAC_EYE_RAMP:
         case GO_ARAC_EYE_BOSS:
             SetTeleporterVisualState(pGo, m_auiEncounter[TYPE_MAEXXNA]);
@@ -625,7 +621,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             SetTeleporterVisualState(pGo, m_auiEncounter[TYPE_THADDIUS]);
             break;
 
-        // --- Actual teleporters
+        // Actual teleporters
         case GO_ARAC_PORTAL:
             SetTeleporterState(pGo, m_auiEncounter[TYPE_MAEXXNA]);
             break;
@@ -659,7 +655,6 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             if(m_auiEncounter[TYPE_SAPPHIRON] == DONE)
                 pGo->DeleteLater();
             break;
-
     }
 }
 
@@ -668,54 +663,54 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
     bool forcedDespawn = false;
     switch (pCreature->GetEntry())
     {
-    case NPC_ANUB_REKHAN:
-        forcedDespawn = (GetData(TYPE_ANUB_REKHAN) == DONE);
-        break;
-    case NPC_FAERLINA:
-        forcedDespawn = (GetData(TYPE_FAERLINA) == DONE);
-        break;
-    case NPC_MAEXXNA:
-        forcedDespawn = (GetData(TYPE_MAEXXNA) == DONE);
-        break;
-    case NPC_PATCHWERK:
-        forcedDespawn = (GetData(TYPE_PATCHWERK) == DONE);
-        break;
-    case NPC_GROBBULUS:
-        forcedDespawn = (GetData(TYPE_GROBBULUS) == DONE);
-        break;
-    case NPC_GLUTH:
-        forcedDespawn = (GetData(TYPE_GLUTH) == DONE);
-        break;
-    case NPC_THADDIUS:
-        forcedDespawn = (GetData(TYPE_THADDIUS) == DONE);
-        break;
-    case NPC_NOTH:
-        forcedDespawn = (GetData(TYPE_NOTH) == DONE);
-        break;
-    case NPC_HEIGAN:
-        forcedDespawn = (GetData(TYPE_HEIGAN) == DONE);
-        break;
-    case NPC_LOATHEB:
-        forcedDespawn = (GetData(TYPE_LOATHEB) == DONE);
-        break;
-    case NPC_RAZUVIOUS:
-        forcedDespawn = (GetData(TYPE_RAZUVIOUS) == DONE);
-        break;
-    case NPC_GOTHIK:
-        forcedDespawn = (GetData(TYPE_GOTHIK) == DONE);
-        break;
-    case NPC_ZELIEK:
-    case NPC_THANE:
-    case NPC_BLAUMEUX:
-    case NPC_MOGRAINE:
-        forcedDespawn = (GetData(TYPE_FOUR_HORSEMEN) == DONE);
-        break;
-    case NPC_SAPPHIRON:
-        forcedDespawn = (GetData(TYPE_SAPPHIRON) == DONE);
-        break;
-    case NPC_KELTHUZAD:
-        forcedDespawn = (GetData(TYPE_KELTHUZAD) == DONE);
-        break;
+        case NPC_ANUB_REKHAN:
+            forcedDespawn = (GetData(TYPE_ANUB_REKHAN) == DONE);
+            break;
+        case NPC_FAERLINA:
+            forcedDespawn = (GetData(TYPE_FAERLINA) == DONE);
+            break;
+        case NPC_MAEXXNA:
+            forcedDespawn = (GetData(TYPE_MAEXXNA) == DONE);
+            break;
+        case NPC_PATCHWERK:
+            forcedDespawn = (GetData(TYPE_PATCHWERK) == DONE);
+            break;
+        case NPC_GROBBULUS:
+            forcedDespawn = (GetData(TYPE_GROBBULUS) == DONE);
+            break;
+        case NPC_GLUTH:
+            forcedDespawn = (GetData(TYPE_GLUTH) == DONE);
+            break;
+        case NPC_THADDIUS:
+            forcedDespawn = (GetData(TYPE_THADDIUS) == DONE);
+            break;
+        case NPC_NOTH:
+            forcedDespawn = (GetData(TYPE_NOTH) == DONE);
+            break;
+        case NPC_HEIGAN:
+            forcedDespawn = (GetData(TYPE_HEIGAN) == DONE);
+            break;
+        case NPC_LOATHEB:
+            forcedDespawn = (GetData(TYPE_LOATHEB) == DONE);
+            break;
+        case NPC_RAZUVIOUS:
+            forcedDespawn = (GetData(TYPE_RAZUVIOUS) == DONE);
+            break;
+        case NPC_GOTHIK:
+            forcedDespawn = (GetData(TYPE_GOTHIK) == DONE);
+            break;
+        case NPC_ZELIEK:
+        case NPC_THANE:
+        case NPC_BLAUMEUX:
+        case NPC_MOGRAINE:
+            forcedDespawn = (GetData(TYPE_FOUR_HORSEMEN) == DONE);
+            break;
+        case NPC_SAPPHIRON:
+            forcedDespawn = (GetData(TYPE_SAPPHIRON) == DONE);
+            break;
+        case NPC_KELTHUZAD:
+            forcedDespawn = (GetData(TYPE_KELTHUZAD) == DONE);
+            break;
     }
 
     // Something, probably silly, makes gothik respawn, thus the trash
@@ -736,7 +731,6 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
         {
             forcedDespawn = true;
         }
-
     }
 
     if (forcedDespawn)
@@ -747,8 +741,8 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
 
 bool instance_naxxramas::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+    for (uint32 i : m_auiEncounter)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
 
     return false;
@@ -871,10 +865,9 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 for (uint32 i = NPC_MOGRAINE; i <= NPC_BLAUMEUX; i++)
                 {
                     if (Creature* p = GetSingleCreatureFromStorage(i))
-                        if (p->isDead())
+                        if (p->IsDead())
                             p->Respawn();
                 }
-
             }
             else if (uiData == DONE)
             {
@@ -890,11 +883,10 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 if (factionEntry)
                 {
                     Map::PlayerList const &liste = GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+                    for (const auto& i : liste)
                     {
-                        if (Player* pPlayer = i->getSource())
+                        if (Player* pPlayer = i.getSource())
                         {
-                            uint32 current_reputation_rank1 = pPlayer->GetReputationMgr().GetRank(factionEntry);
                             pPlayer->GetReputationMgr().ModifyReputation(factionEntry, 100);
                         }
                     }
@@ -904,8 +896,6 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     sLog.outError("4hm just died. Unable to find Argent Dawn faction for reputation ");
                 }
             }
-
-
             break;
         case TYPE_PATCHWERK:
             m_auiEncounter[uiType] = uiData;
@@ -954,9 +944,9 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 
                     bool bCanBegin = true;
 
-                    for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                    for (const auto& itr : lPlayers)
                     {
-                        if (Player* pPlayer = itr->getSource())
+                        if (Player* pPlayer = itr.getSource())
                         {
                             if (!pPlayer->IsWithinDist2d(m_fChamberCenterX, m_fChamberCenterY, 15.0f))
                                 bCanBegin = false;
@@ -983,56 +973,53 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         uint32 entry = 0;
         switch (uiType)
         {
-        case TYPE_ANUB_REKHAN:
-            entry = NPC_ANUB_REKHAN;
-        break;
-        case TYPE_FAERLINA:
-            entry = NPC_FAERLINA;
-        break;
-        case TYPE_MAEXXNA:
-            entry = NPC_MAEXXNA;
-        break;
-        case TYPE_NOTH:
-            entry = NPC_NOTH;
-        break;
-        case TYPE_HEIGAN:
-            entry = NPC_HEIGAN;
-        break;
-        case TYPE_LOATHEB:
-            entry = NPC_LOATHEB;
-        break;
-
-        case TYPE_RAZUVIOUS:
-            entry = NPC_RAZUVIOUS;
-        break;
-        case TYPE_GOTHIK:
-            entry = NPC_GOTHIK;
-        break;
-        case TYPE_FOUR_HORSEMEN:
-        {
-            entry = NPC_ZELIEK;
-        }
-        break;
-
-        case TYPE_PATCHWERK:
-            entry = NPC_PATCHWERK;
-        break;
-        case TYPE_GROBBULUS:
-            entry = NPC_GROBBULUS;
-        break;
-        case TYPE_GLUTH:
-            entry = NPC_GLUTH;
-        break;
-        case TYPE_THADDIUS:
-            entry = NPC_THADDIUS;
-        break;
-
-        case TYPE_SAPPHIRON:
-            entry = NPC_SAPPHIRON;
-        break;
-        case TYPE_KELTHUZAD:
-            entry = NPC_KELTHUZAD;
-        break;
+            case TYPE_ANUB_REKHAN:
+                entry = NPC_ANUB_REKHAN;
+            break;
+            case TYPE_FAERLINA:
+                entry = NPC_FAERLINA;
+            break;
+            case TYPE_MAEXXNA:
+                entry = NPC_MAEXXNA;
+            break;
+            case TYPE_NOTH:
+                entry = NPC_NOTH;
+            break;
+            case TYPE_HEIGAN:
+                entry = NPC_HEIGAN;
+            break;
+            case TYPE_LOATHEB:
+                entry = NPC_LOATHEB;
+            break;
+            case TYPE_RAZUVIOUS:
+                entry = NPC_RAZUVIOUS;
+            break;
+            case TYPE_GOTHIK:
+                entry = NPC_GOTHIK;
+            break;
+            case TYPE_FOUR_HORSEMEN:
+            {
+                entry = NPC_ZELIEK;
+            }
+            break;
+            case TYPE_PATCHWERK:
+                entry = NPC_PATCHWERK;
+            break;
+            case TYPE_GROBBULUS:
+                entry = NPC_GROBBULUS;
+            break;
+            case TYPE_GLUTH:
+                entry = NPC_GLUTH;
+            break;
+            case TYPE_THADDIUS:
+                entry = NPC_THADDIUS;
+            break;
+            case TYPE_SAPPHIRON:
+                entry = NPC_SAPPHIRON;
+            break;
+            case TYPE_KELTHUZAD:
+                entry = NPC_KELTHUZAD;
+            break;
         }
 
         if (entry)
@@ -1061,8 +1048,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        for (int i = 0; i < MAX_ENCOUNTER; ++i)
-            saveStream << m_auiEncounter[i] << " ";
+        for (uint32 i : m_auiEncounter)
+            saveStream << i << " ";
 
         strInstData = saveStream.str();
 
@@ -1071,7 +1058,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-void instance_naxxramas::Load(const char* chrIn)
+void instance_naxxramas::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -1082,11 +1069,11 @@ void instance_naxxramas::Load(const char* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-    for (int i = 0; i < MAX_ENCOUNTER; ++i)
+    for (uint32 & i : m_auiEncounter)
     {
-        loadStream >> m_auiEncounter[i];
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        loadStream >> i;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     if (m_auiEncounter[TYPE_THADDIUS] == SPECIAL)
         m_auiEncounter[TYPE_THADDIUS] = FAIL;
@@ -1128,9 +1115,9 @@ void instance_naxxramas::SetGothTriggers()
     if (!pGoth)
         return;
 
-    for (std::list<uint64>::iterator itr = m_lGothTriggerList.begin(); itr != m_lGothTriggerList.end(); ++itr)
+    for (const auto& guid : m_lGothTriggerList)
     {
-        if (Creature* pTrigger = instance->GetCreature(*itr))
+        if (Creature* pTrigger = instance->GetCreature(guid))
         {
             GothTrigger pGt;
             pGt.bIsAnchorHigh = (pTrigger->GetPositionZ() >= (pGoth->GetPositionZ() - 5.0f));
@@ -1145,15 +1132,15 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 {
     std::list<Creature* > lList;
 
-    for (auto itr = m_mGothTriggerMap.begin(); itr != m_mGothTriggerMap.end(); ++itr)
+    for (const auto& itr : m_mGothTriggerMap)
     {
-        if (!itr->second.bIsAnchorHigh)
+        if (!itr.second.bIsAnchorHigh)
             continue;
 
-        if (itr->second.bIsRightSide != bRightSide)
+        if (itr.second.bIsRightSide != bRightSide)
             continue;
 
-        if (Creature* pCreature = instance->GetCreature(itr->first))
+        if (Creature* pCreature = instance->GetCreature(itr.first))
             lList.push_back(pCreature);
     }
 
@@ -1163,25 +1150,25 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
         return lList.front();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide)
 {
-    for (std::unordered_map<uint64, GothTrigger>::iterator itr = m_mGothTriggerMap.begin(); itr != m_mGothTriggerMap.end(); ++itr)
+    for (const auto& itr : m_mGothTriggerMap)
     {
-        if (itr->second.bIsAnchorHigh)
+        if (itr.second.bIsAnchorHigh)
             continue;
 
-        if (itr->second.bIsRightSide != bRightSide)
+        if (itr.second.bIsRightSide != bRightSide)
             continue;
 
-        if (Creature* pCreature = instance->GetCreature(itr->first))
+        if (Creature* pCreature = instance->GetCreature(itr.first))
             lList.push_back(pCreature);
     }
 }
 
-bool instance_naxxramas::IsInRightSideGothArea(const Unit* pUnit)
+bool instance_naxxramas::IsInRightSideGothArea(Unit const* pUnit)
 {
     if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
@@ -1238,27 +1225,27 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-    case NPC_MR_BIGGLESWORTH:
-    {
-        if(GetData(TYPE_KELTHUZAD) != DONE)
+        case NPC_MR_BIGGLESWORTH:
         {
-            m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
-            sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
+            if(GetData(TYPE_KELTHUZAD) != DONE)
+            {
+                m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
+                sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
+            }
+            break;
         }
-        break;
-    }
-    case NPC_FrenziedBat:
-    case NPC_PlaguedBat:
-    case NPC_MutatedGrub:
-    case NPC_PlagueBeast:
-        pCreature->ForcedDespawn(10000);
-        break;
-    case NPC_EmbalmingSlime:
-        pCreature->ForcedDespawn(30000);
-        break;
-    case NPC_LightningTotem:
-        pCreature->DeleteLater();
-        break;
+        case NPC_FrenziedBat:
+        case NPC_PlaguedBat:
+        case NPC_MutatedGrub:
+        case NPC_PlagueBeast:
+            pCreature->ForcedDespawn(10000);
+            break;
+        case NPC_EmbalmingSlime:
+            pCreature->ForcedDespawn(30000);
+            break;
+        case NPC_LightningTotem:
+            pCreature->DeleteLater();
+            break;
     }
 }
 
@@ -1269,103 +1256,101 @@ void instance_naxxramas::Update(uint32 diff)
     {
         switch (l_EventId)
         {
-        case EVENT_BIGGLESWORTH_DIED_YELL:
-            DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_CAT_DIED, NPC_KELTHUZAD);
-            break;
-        case EVENT_THADDIUS_SCREAM:
-            if (m_auiEncounter[TYPE_THADDIUS] != DONE)
-            {
-                if (m_auiEncounter[TYPE_THADDIUS] != IN_PROGRESS && m_auiEncounter[TYPE_THADDIUS] != SPECIAL)
-                    DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM4 + urand(0, 3), NPC_THADDIUS);
-                m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, Minutes(urand(5,10)));
-            }
-            break;
-        case EVENT_WINGBOSS_DEAD:
-            DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_TAUNT1 - GetNumEndbossDead()+1, NPC_KELTHUZAD);
-            break;
-        case EVENT_KT_LK_DIALOGUE_1:
-            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG1, NPC_KELTHUZAD);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_2, Seconds(5));
-            break;
-        case EVENT_KT_LK_DIALOGUE_2:
-            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG2_LICH, NPC_LICH_KING);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_3, 16500);
-            break;
-        case EVENT_KT_LK_DIALOGUE_3:
-            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG3, NPC_KELTHUZAD);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_4, Seconds(6));
-            break;
-        case EVENT_KT_LK_DIALOGUE_4:
-            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG4_LICH, NPC_LICH_KING);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_5, Seconds(8));
-            break;
-        case EVENT_KT_LK_DIALOGUE_5:
-            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG5, NPC_KELTHUZAD);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_GATE_OPEN, 5500);
-            break;
-        case EVENT_KT_LK_DIALOGUE_GATE_OPEN:
-            UpdateBossGate(GO_KELTHUZAD_DOOR, DONE);
-            break;
-        case EVENT_SUMMON_FROGGER_WAVE:
-        {
-
-            static constexpr float pos[6][4] = {
-            {3128.66f, -3121.27f, 293.341f, 4.73893f},
-            {3154.58f, -3126.18f, 293.591f, 4.43020f},
-            {3175.28f, -3134.76f, 293.437f, 4.24492f},
-            {3129.630f, -3157.652f, 293.32f, 4.73893f},
-            {3144.894f, -3159.587f, 293.32f, 4.43020f},
-            {3159.510f, -3166.001f, 293.27f, 4.24492f} };
-
-            for (int i = 0; i < 3; i++)
-            {
-                if (Creature* frogger = instance->SummonCreature(NPC_LivingPoison, pos[i][0], pos[i][1], pos[i][2], pos[i][3], TEMPSUMMON_TIMED_DESPAWN, 13000))
+            case EVENT_BIGGLESWORTH_DIED_YELL:
+                DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_CAT_DIED, NPC_KELTHUZAD);
+                break;
+            case EVENT_THADDIUS_SCREAM:
+                if (m_auiEncounter[TYPE_THADDIUS] != DONE)
                 {
-                    frogger->GetMotionMaster()->MovePoint(0, pos[i+3][0], pos[i + 3][1], pos[i + 3][2], pos[i + 3][3]);
+                    if (m_auiEncounter[TYPE_THADDIUS] != IN_PROGRESS && m_auiEncounter[TYPE_THADDIUS] != SPECIAL)
+                        DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM1 + urand(0, 3), NPC_THADDIUS);
+                    m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, Minutes(urand(5,10)));
                 }
-            }
-            m_events.Repeat(Seconds(6));
-            break;
-        }
-        case EVENT_4HM_DIALOGUE_1:
-            DoOrSimulateScriptTextForMap(-1533059, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
-            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_2, Seconds(7));
-            break;
-        case EVENT_4HM_DIALOGUE_2:
-            DoOrSimulateScriptTextForMap(-1533045, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
-            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_3, Seconds(7));
-            break;
-        case EVENT_4HM_DIALOGUE_3:
-            DoOrSimulateScriptTextForMap(-1533071, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
-            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_4, Seconds(7));
-            break;
-        case EVENT_4HM_DIALOGUE_4:
-            DoOrSimulateScriptTextForMap(-1533046, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
-            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_5, Seconds(7));
-            break;
-        case EVENT_4HM_DIALOGUE_5:
-            DoOrSimulateScriptTextForMap(-1533060, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
-            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_6, Seconds(6));
-            break;
-        case EVENT_4HM_DIALOGUE_6:
-            DoOrSimulateScriptTextForMap(-1533053, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
-            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_7, Seconds(7));
-            break;
-        case EVENT_4HM_DIALOGUE_7:
-            DoOrSimulateScriptTextForMap(-1533072, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
-            break;
+                break;
+            case EVENT_WINGBOSS_DEAD:
+                DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_TAUNT1 + GetNumEndbossDead()-1, NPC_KELTHUZAD);
+                break;
+            case EVENT_KT_LK_DIALOGUE_1:
+                DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG1, NPC_KELTHUZAD);
+                m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_2, Seconds(5));
+                break;
+            case EVENT_KT_LK_DIALOGUE_2:
+                DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG2_LICH, NPC_LICH_KING);
+                m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_3, 16500);
+                break;
+            case EVENT_KT_LK_DIALOGUE_3:
+                DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG3, NPC_KELTHUZAD);
+                m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_4, Seconds(6));
+                break;
+            case EVENT_KT_LK_DIALOGUE_4:
+                DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG4_LICH, NPC_LICH_KING);
+                m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_5, Seconds(8));
+                break;
+            case EVENT_KT_LK_DIALOGUE_5:
+                DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG5, NPC_KELTHUZAD);
+                m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_GATE_OPEN, 5500);
+                break;
+            case EVENT_KT_LK_DIALOGUE_GATE_OPEN:
+                UpdateBossGate(GO_KELTHUZAD_DOOR, DONE);
+                break;
+            case EVENT_SUMMON_FROGGER_WAVE:
+            {
+                static constexpr float pos[6][4] = {
+                {3128.66f, -3121.27f, 293.341f, 4.73893f},
+                {3154.58f, -3126.18f, 293.591f, 4.43020f},
+                {3175.28f, -3134.76f, 293.437f, 4.24492f},
+                {3129.630f, -3157.652f, 293.32f, 4.73893f},
+                {3144.894f, -3159.587f, 293.32f, 4.43020f},
+                {3159.510f, -3166.001f, 293.27f, 4.24492f} };
 
-        case EVENT_DKWING_INTRO_2:
-            DoOrSimulateScriptTextForMap(SAY_ZELI_TAUNT3, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
-            m_events.ScheduleEvent(EVENT_DKWING_INTRO_3, 5000);
-            break;
-        case EVENT_DKWING_INTRO_3:
-            DoOrSimulateScriptTextForMap(SAY_MOG_TAUNT3, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
-            m_events.ScheduleEvent(EVENT_DKWING_INTRO_4, 6200);
-            break;
-        case EVENT_DKWING_INTRO_4:
-            DoOrSimulateScriptTextForMap(SAY_BLAU_TAUNT3, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
-            break;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (Creature* frogger = instance->SummonCreature(NPC_LivingPoison, pos[i][0], pos[i][1], pos[i][2], pos[i][3], TEMPSUMMON_TIMED_DESPAWN, 13000))
+                    {
+                        frogger->GetMotionMaster()->MovePoint(0, pos[i+3][0], pos[i + 3][1], pos[i + 3][2], pos[i + 3][3]);
+                    }
+                }
+                m_events.Repeat(Seconds(6));
+                break;
+            }
+            case EVENT_4HM_DIALOGUE_1:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_1, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
+                m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_2, Seconds(7));
+                break;
+            case EVENT_4HM_DIALOGUE_2:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_2, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
+                m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_3, Seconds(7));
+                break;
+            case EVENT_4HM_DIALOGUE_3:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_3, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+                m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_4, Seconds(7));
+                break;
+            case EVENT_4HM_DIALOGUE_4:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_4, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
+                m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_5, Seconds(7));
+                break;
+            case EVENT_4HM_DIALOGUE_5:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_5, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
+                m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_6, Seconds(6));
+                break;
+            case EVENT_4HM_DIALOGUE_6:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_6, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
+                m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_7, Seconds(7));
+                break;
+            case EVENT_4HM_DIALOGUE_7:
+                DoOrSimulateScriptTextForMap(SAY_4HM_DIALOGUE_7, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+                break;
+            case EVENT_DKWING_INTRO_2:
+                DoOrSimulateScriptTextForMap(SAY_ZELI_TAUNT3, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
+                m_events.ScheduleEvent(EVENT_DKWING_INTRO_3, 5000);
+                break;
+            case EVENT_DKWING_INTRO_3:
+                DoOrSimulateScriptTextForMap(SAY_MOG_TAUNT3, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+                m_events.ScheduleEvent(EVENT_DKWING_INTRO_4, 6200);
+                break;
+            case EVENT_DKWING_INTRO_4:
+                DoOrSimulateScriptTextForMap(SAY_BLAU_TAUNT3, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
+                break;
         }
     }
 }
@@ -1375,58 +1360,58 @@ InstanceData* GetInstanceData_instance_naxxramas(Map* pMap)
     return new instance_naxxramas(pMap);
 }
 
-void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt)
+void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     switch (pAt->id)
     {
-    case AREATRIGGER_HUB_TO_FROSTWYRM:
-        if (WingsAreCleared())
-        {
-            pPlayer->TeleportTo(toFrostwyrmTPPos);
-        }
-        break;
-    case AREATRIGGER_KELTHUZAD:
-        OnKTAreaTrigger(pAt);
-        break;
-    case AREATRIGGER_FAERLINA:
-        if (!m_faerlinaHaveGreeted)
-        {
-            m_faerlinaHaveGreeted = true;
-            if (Creature* pFaerlina = GetSingleCreatureFromStorage(NPC_FAERLINA))
+        case AREATRIGGER_HUB_TO_FROSTWYRM:
+            if (WingsAreCleared())
             {
-                if(pFaerlina->isAlive())
-                    DoScriptText(SAY_FAERLINA_GREET, pFaerlina);
+                pPlayer->TeleportTo(toFrostwyrmTPPos);
             }
-        }
-        break;
-    case AREATRIGGER_THADDIUS_ENTRANCE:
-        if (!m_thaddiusHaveGreeted)
-        {
-            m_thaddiusHaveGreeted = true;
-            if (Creature* pThaddius = GetSingleCreatureFromStorage(NPC_THADDIUS))
+            break;
+        case AREATRIGGER_KELTHUZAD:
+            OnKTAreaTrigger(pAt);
+            break;
+        case AREATRIGGER_FAERLINA:
+            if (!m_faerlinaHaveGreeted)
             {
-                if (pThaddius->isAlive())
-                    DoScriptText(SAY_THADDIUS_GREET, pThaddius);
+                m_faerlinaHaveGreeted = true;
+                if (Creature* pFaerlina = GetSingleCreatureFromStorage(NPC_FAERLINA))
+                {
+                    if(pFaerlina->IsAlive())
+                        DoScriptText(SAY_FAERLINA_GREET, pFaerlina);
+                }
             }
-        }
-        break;
-    case AREATRIGGER_START_DK_WING:
-        if (!m_haveDoneDKWingIntro)
-        {
-            m_haveDoneDKWingIntro = true;
-            if (GetData(TYPE_FOUR_HORSEMEN) != DONE)
+            break;
+        case AREATRIGGER_THADDIUS_ENTRANCE:
+            if (!m_thaddiusHaveGreeted)
             {
-                DoOrSimulateScriptTextForMap(SAY_KORT_TAUNT1, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
-                m_events.ScheduleEvent(EVENT_DKWING_INTRO_2, 5500);
+                m_thaddiusHaveGreeted = true;
+                if (Creature* pThaddius = GetSingleCreatureFromStorage(NPC_THADDIUS))
+                {
+                    if (pThaddius->IsAlive())
+                        DoScriptText(SAY_THADDIUS_GREET, pThaddius);
+                }
             }
-        }
-        break;
+            break;
+        case AREATRIGGER_START_DK_WING:
+            if (!m_haveDoneDKWingIntro)
+            {
+                m_haveDoneDKWingIntro = true;
+                if (GetData(TYPE_FOUR_HORSEMEN) != DONE)
+                {
+                    DoOrSimulateScriptTextForMap(SAY_KORT_TAUNT1, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
+                    m_events.ScheduleEvent(EVENT_DKWING_INTRO_2, 5500);
+                }
+            }
+            break;
     }
 }
 
-bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_naxxramas(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+    if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
         return false;
 
     if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
@@ -1438,8 +1423,7 @@ bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
 
 struct mob_spiritOfNaxxramasAI : public ScriptedAI
 {
-    mob_spiritOfNaxxramasAI(Creature* pCreature)
-        : ScriptedAI(pCreature)
+    mob_spiritOfNaxxramasAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
         m_creature->CastSpell(m_creature, 18950, true); // stealth detection
@@ -1460,6 +1444,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
         }
         portal = 0;
     }
+
     void Reset() override
     {
         portalTimer = 5000;
@@ -1472,9 +1457,9 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
         DespawnPortal();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (portalTimer)
@@ -1508,13 +1493,11 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
 };
 
 struct mob_naxxramasGarboyleAI : public ScriptedAI
 {
-    mob_naxxramasGarboyleAI(Creature* pCreature)
-        : ScriptedAI(pCreature)
+    mob_naxxramasGarboyleAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
         goStoneform();
@@ -1533,6 +1516,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     }
 
     uint32 acidVolleyTimer;
+
     void Reset() override
     {
         acidVolleyTimer = 4000;
@@ -1543,12 +1527,12 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         goStoneform();
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
-                && !m_creature->isInCombat()
+                && !m_creature->IsInCombat()
                 && m_creature->IsWithinDistInMap(pWho, 17.0f)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
                 && m_creature->IsWithinLOSInMap(pWho))
@@ -1562,7 +1546,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit*) override
     {
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
         {
@@ -1570,9 +1554,9 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(28995))
@@ -1580,7 +1564,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
             if (DoCastSpellIfCan(m_creature, 28995) == CAST_OK)
             {
                 m_creature->CastSpell(m_creature, 28995, true); // Stoneskin
-                DoScriptText(-1531100, m_creature); // %s emits a strange noise.
+                DoScriptText(10755, m_creature); // %s emits a strange noise.
             }
         }
 
@@ -1603,21 +1587,25 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
 
 struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
 {
-    mob_naxxramasPlagueSlimeAI(Creature* pCreature)
-        : ScriptedAI(pCreature)
+    mob_naxxramasPlagueSlimeAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
         prev_spell = 0;
     }
+
     uint32 colorChangeTimer;
     uint32 prev_spell;
+
     void ChangeColor()
     {
         uint32 spell = urand(28987, 28990);
-        if(const SpellEntry* entry = sSpellMgr.GetSpellEntry(spell))
+
+        if(SpellEntry const* entry = sSpellMgr.GetSpellEntry(spell))
             m_creature->UpdateEntry(entry->EffectMiscValue[0]);
+
         if (prev_spell)
             m_creature->RemoveAurasDueToSpell(prev_spell);
+
         DoCastSpellIfCan(m_creature, spell, CF_TRIGGERED);
         m_creature->SetObjectScale(2.0f); // updateentry and the actual spells screws up the scale...
         prev_spell = spell;
@@ -1629,14 +1617,14 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
         ChangeColor();
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit*) override
     {
         m_creature->CallForHelp(10.0f);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (colorChangeTimer < diff)
@@ -1650,23 +1638,25 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
+
 struct mob_toxic_tunnelAI : public ScriptedAI
 {
-    mob_toxic_tunnelAI(Creature* pCreature)
-        : ScriptedAI(pCreature)
+    mob_toxic_tunnelAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
+
     uint32 checktime;
     uint32 _evadeTimer;
+
     void Reset() override
     {
         checktime = 0;
         _evadeTimer = 0;
     }
 
-    void AttackStart(Unit*) { }
-    void MoveInLineOfSight(Unit*) { }
+    void AttackStart(Unit*) override { }
+    void MoveInLineOfSight(Unit*) override { }
 
     void EnterCombat(Unit*) override
     {
@@ -1675,7 +1665,7 @@ struct mob_toxic_tunnelAI : public ScriptedAI
             _evadeTimer = 5000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!!_evadeTimer)
         {
@@ -1703,13 +1693,13 @@ struct mob_toxic_tunnelAI : public ScriptedAI
 
 struct mob_dark_touched_warriorAI : public ScriptedAI
 {
-    mob_dark_touched_warriorAI(Creature* pCreature)
-        : ScriptedAI(pCreature)
+    mob_dark_touched_warriorAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
 
     bool hasFled;
+
     void Reset() override
     {
         hasFled = false;
@@ -1717,10 +1707,10 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
 
     void FleeToHorse()
     {
-        if (!m_creature->getVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        if (!m_creature->GetVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
             return;
 
-        Creature* pNearest = NULL;
+        Creature* pNearest = nullptr;
         MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_creature, 16067, true, 100.0f);
         MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pNearest, u_check);
 
@@ -1735,9 +1725,9 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!hasFled && m_creature->GetHealthPercent() < 50.0f)
@@ -1748,7 +1738,6 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
 };
 
 CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
@@ -1778,20 +1767,21 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
 
 bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->getStandState() != UNIT_STAND_STATE_SIT)
+    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
         pCreature->SetStandState(UNIT_STAND_STATE_SIT);
     return false;
 }
 
-static constexpr char* tailorText = "I am a master tailor, Omarion";
-static constexpr char* blacksmithText = "I am a master blacksmith, Omarion";
-static constexpr char* leatherworkerText = "I am a master leatherworker, Omarion";
-static constexpr char* nocraftText = "Omarion, I am not a craftsman. Can you still help me?";
-static constexpr char* close_nocrafter = "Thank you, Omarion. You have taken a fatal blow for the team on this day.";
-static constexpr char* close_crafter = "I need to go. Evil stirs. Die well, Omarion.";
-
-enum OmarionMisc {
+enum OmarionMisc
+{
     QUEST_OMARIONS_HANDBOOK = 9233,
+
+    BC_TAILOR_TEXT        = 12251, // I am a master tailor, Omarion.
+    BC_BLACKSMITH_TEXT    = 12269, // I am a master blacksmith, Omarion.
+    BC_LEATHERWORKER_TEXT = 12257, // I am a master leatherworker, Omarion.
+    BC_NO_CRAFT_TEXT      = 12279, // Omarion, I am not a craftsman. Can you still help me?
+    BC_CLOSE_NO_CRAFTER   = 12281, // Thank you, Omarion. You have taken a fatal blow for the team on this day.
+    BC_CLOSE_CRAFTER      = 12270, // I need to go. Evil stirs. Die well, Omarion.
 
     GOSSIP_MENU_INTRO   = 8507,
     GOSSIP_MENU_CRAFTER = 8508,
@@ -1823,9 +1813,8 @@ enum OmarionMisc {
     GOSSIP_SELECT_ICEBANE_WRISTS  = GOSSIP_SELECT_CRAFT_BEGIN + 12, // BS exalted
     GOSSIP_SELECT_ICEBANE_CHEST   = GOSSIP_SELECT_CRAFT_BEGIN + 13, // BS exalted
 
-    GOSSIP_CLOSE = 100,
+    GOSSIP_CLOSE = 100
 };
-
 
 void LearnCraftIfCan(uint32 learnId, uint32 knowId, Player* pPlayer, ReputationRank minRank, uint32 currSkill)
 {
@@ -1867,138 +1856,137 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
 
     switch (uiAction)
     {
-    case GOSSIP_SELECT_TAILOR:
-        if (argentDawnRep >= CRACT1_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Gloves", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_GLOVES);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Wrists", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_WRISTS);
-        }
-        if (argentDawnRep >= CRAFT2_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Vest" , GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_CHEST);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Cloak", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_CLOAK);
-        }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_TAILOR, GOSSIP_CLOSE);
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
-        return true;
-    case GOSSIP_SELECT_BS:
-        if (argentDawnRep >= CRACT1_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Gauntlets", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_GLOVES);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Bracers", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_WRISTS);
-        }
-        if (argentDawnRep >= CRAFT2_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Breastplate", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_CHEST);
-        }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_BS, GOSSIP_CLOSE);
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
-        return true;
-    case GOSSIP_SELECT_LW:
-        if (argentDawnRep >= CRACT1_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Gloves", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_GLOVES);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Gauntlets", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_GLOVES);
-
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Bracers", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_WRISTS);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Bracers", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_WRISTS);
-        }
-        if (argentDawnRep >= CRAFT2_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Tunic", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_CHEST);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Breastplate", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_CHEST);
-        }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_LW, GOSSIP_CLOSE);
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
-        return true;
-    case GOSSIP_SELECT_NOCRAFT:
-    {
-        if (argentDawnRep >= BOOK_REQ_RANK)
-        {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_nocrafter, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_NOCRAFT, pCreature->GetGUID());
-            if (!pPlayer->HasItemCount(22719, 1, true))
+        case GOSSIP_SELECT_TAILOR:
+            if (argentDawnRep >= CRACT1_REQ_RANK)
             {
-                pPlayer->AddItem(22719);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Gloves", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_GLOVES);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Wrists", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_WRISTS);
             }
+            if (argentDawnRep >= CRAFT2_REQ_RANK)
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Vest" , GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_CHEST);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Cloak", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_CLOAK);
+            }
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, GOSSIP_SELECT_TAILOR, GOSSIP_CLOSE);
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
+            return true;
+        case GOSSIP_SELECT_BS:
+            if (argentDawnRep >= CRACT1_REQ_RANK)
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Gauntlets", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_GLOVES);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Bracers", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_WRISTS);
+            }
+            if (argentDawnRep >= CRAFT2_REQ_RANK)
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Breastplate", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_CHEST);
+            }
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, GOSSIP_SELECT_BS, GOSSIP_CLOSE);
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
+            return true;
+        case GOSSIP_SELECT_LW:
+            if (argentDawnRep >= CRACT1_REQ_RANK)
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Gloves", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_GLOVES);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Gauntlets", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_GLOVES);
+        
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Bracers", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_WRISTS);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Bracers", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_WRISTS);
+            }
+            if (argentDawnRep >= CRAFT2_REQ_RANK)
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Tunic", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_CHEST);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Breastplate", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_CHEST);
+            }
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, GOSSIP_SELECT_LW, GOSSIP_CLOSE);
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
+            return true;
+        case GOSSIP_SELECT_NOCRAFT:
+        {
+            if (argentDawnRep >= BOOK_REQ_RANK)
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_NO_CRAFTER, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
+                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_NOCRAFT, pCreature->GetGUID());
+                if (!pPlayer->HasItemCount(22719, 1, true))
+                {
+                    pPlayer->AddItem(22719);
+                }
+            }
+            return true;
         }
-        return true;
+
+        /***************************
+        *       Craft spells
+        ****************************/
+
+        case GOSSIP_SELECT_GLACIAL_GLOVES:
+        {
+            LearnCraftIfCan(28212, 28205, pPlayer, CRACT1_REQ_RANK, tailorSkill);
+            break;
+        }
+        case GOSSIP_SELECT_GLACIAL_WRISTS:
+        {
+            LearnCraftIfCan(28215, 28209, pPlayer, CRACT1_REQ_RANK, tailorSkill);
+            break;
+        }
+        case GOSSIP_SELECT_GLACIAL_CHEST:
+        {
+            // spell castbar bug, displays as "glacial gloves"
+            LearnCraftIfCan(28213, 28207, pPlayer, CRAFT2_REQ_RANK, tailorSkill);
+            break;
+        }
+        case GOSSIP_SELECT_GLACIAL_CLOAK:
+        {
+            LearnCraftIfCan(28214, 28208, pPlayer, CRAFT2_REQ_RANK, tailorSkill);
+            break;
+        }
+        case GOSSIP_SELECT_POLAR_GLOVES:
+        {
+            LearnCraftIfCan(28229, 28220, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
+            break;
+        }
+        case GOSSIP_SELECT_POLAR_WRISTS:
+        {
+            LearnCraftIfCan(28230, 28221, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
+            break;
+        }
+        case GOSSIP_SELECT_POLAR_CHEST:
+        {
+            LearnCraftIfCan(28228, 28219, pPlayer, CRAFT2_REQ_RANK, leatherworkSkill);
+            break;
+        }
+        case GOSSIP_SELECT_ICYSCALE_GLOVES:
+        {
+            LearnCraftIfCan(28232, 28223, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
+            break;
+        }
+        case GOSSIP_SELECT_ICYSCALE_WRISTS:
+        {
+            LearnCraftIfCan(28233, 28224, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
+            break;
+        }
+        case GOSSIP_SELECT_ICYSCALE_CHEST:
+        {
+            LearnCraftIfCan(28231, 28222, pPlayer, CRAFT2_REQ_RANK, leatherworkSkill);
+            break;
+        }
+        case GOSSIP_SELECT_ICEBANE_GLOVES:
+        {
+            LearnCraftIfCan(28248, 28243, pPlayer, CRACT1_REQ_RANK, blacksmithSkill);
+            break;
+        }
+        case GOSSIP_SELECT_ICEBANE_WRISTS:
+        {
+            LearnCraftIfCan(28249, 28244, pPlayer, CRACT1_REQ_RANK, blacksmithSkill);
+            break;
+        }
+        case GOSSIP_SELECT_ICEBANE_CHEST:
+        {
+            LearnCraftIfCan(28245, 28242,  pPlayer, CRAFT2_REQ_RANK, blacksmithSkill);
+            break;
+        }
     }
 
-
-    /***************************
-    *       Craft spells
-    ****************************/
-
-    case GOSSIP_SELECT_GLACIAL_GLOVES:
-    {
-        LearnCraftIfCan(28212, 28205, pPlayer, CRACT1_REQ_RANK, tailorSkill);
-        break;
-    }
-    case GOSSIP_SELECT_GLACIAL_WRISTS:
-    {
-        LearnCraftIfCan(28215, 28209, pPlayer, CRACT1_REQ_RANK, tailorSkill);
-        break;
-    }
-    case GOSSIP_SELECT_GLACIAL_CHEST:
-    {
-        // spell castbar bug, displays as "glacial gloves"
-        LearnCraftIfCan(28213, 28207, pPlayer, CRAFT2_REQ_RANK, tailorSkill);
-        break;
-    }
-    case GOSSIP_SELECT_GLACIAL_CLOAK:
-    {
-        LearnCraftIfCan(28214, 28208, pPlayer, CRAFT2_REQ_RANK, tailorSkill);
-        break;
-    }
-    case GOSSIP_SELECT_POLAR_GLOVES:
-    {
-        LearnCraftIfCan(28229, 28220, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
-        break;
-    }
-    case GOSSIP_SELECT_POLAR_WRISTS:
-    {
-        LearnCraftIfCan(28230, 28221, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
-        break;
-    }
-    case GOSSIP_SELECT_POLAR_CHEST:
-    {
-        LearnCraftIfCan(28228, 28219, pPlayer, CRAFT2_REQ_RANK, leatherworkSkill);
-        break;
-    }
-    case GOSSIP_SELECT_ICYSCALE_GLOVES:
-    {
-        LearnCraftIfCan(28232, 28223, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
-        break;
-    }
-    case GOSSIP_SELECT_ICYSCALE_WRISTS:
-    {
-        LearnCraftIfCan(28233, 28224, pPlayer, CRACT1_REQ_RANK, leatherworkSkill);
-        break;
-    }
-    case GOSSIP_SELECT_ICYSCALE_CHEST:
-    {
-        LearnCraftIfCan(28231, 28222, pPlayer, CRAFT2_REQ_RANK, leatherworkSkill);
-        break;
-    }
-    case GOSSIP_SELECT_ICEBANE_GLOVES:
-    {
-        LearnCraftIfCan(28248, 28243, pPlayer, CRACT1_REQ_RANK, blacksmithSkill);
-        break;
-    }
-    case GOSSIP_SELECT_ICEBANE_WRISTS:
-    {
-        LearnCraftIfCan(28249, 28244, pPlayer, CRACT1_REQ_RANK, blacksmithSkill);
-        break;
-    }
-    case GOSSIP_SELECT_ICEBANE_CHEST:
-    {
-        LearnCraftIfCan(28245, 28242,  pPlayer, CRAFT2_REQ_RANK, blacksmithSkill);
-        break;
-    }
-    }
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, uiSender, GOSSIP_CLOSE);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, uiSender, GOSSIP_CLOSE);
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
     return true;
 }
@@ -2010,13 +1998,15 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     uint32 leatherworkSkill = pPlayer->GetSkillValue(SKILL_LEATHERWORKING);
 
     if(tailorSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, tailorText, GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_TAILOR);
-    if(blacksmithSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, blacksmithText, GOSSIP_SELECT_BS, GOSSIP_SELECT_BS);
-    if(leatherworkSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, leatherworkerText, GOSSIP_SELECT_LW, GOSSIP_SELECT_LW);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_TAILOR_TEXT, GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_TAILOR);
 
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, nocraftText, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_NOCRAFT);
+    if(blacksmithSkill >= 225)
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_BLACKSMITH_TEXT, GOSSIP_SELECT_BS, GOSSIP_SELECT_BS);
+
+    if(leatherworkSkill >= 225)
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_LEATHERWORKER_TEXT, GOSSIP_SELECT_LW, GOSSIP_SELECT_LW);
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_NO_CRAFT_TEXT, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_NOCRAFT);
 
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_INTRO, pCreature->GetGUID());
     pCreature->HandleEmote(EMOTE_ONESHOT_LAUGH);
