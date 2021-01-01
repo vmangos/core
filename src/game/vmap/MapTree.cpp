@@ -39,7 +39,7 @@ public:
     bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
         //  certain models are not used for line of sight collision in classic (trees, fences ...)
-        if (los && prims[entry].flags & MOD_NO_BREAK_LOS && !M2ObjectLosEnabled)
+        if (los && prims[entry].flags & MOD_NO_BREAK_LOS /*&& !M2ObjectLosEnabled */)
             return false;
 
         bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);

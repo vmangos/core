@@ -39,8 +39,6 @@ namespace VMAP
         VMAP_LOAD_RESULT_IGNORED,
     };
 
-    static bool M2ObjectLosEnabled = false;             // custom world.conf setting
-
 #define VMAP_INVALID_HEIGHT       -100000.0f            // for check
 #define VMAP_INVALID_HEIGHT_VALUE -200000.0f            // real assigned value in unknown height case
 
@@ -51,9 +49,10 @@ namespace VMAP
             bool iEnableLineOfSightCalc;
             bool iEnableHeightCalc;
             bool iDisableModelUnloads;
+            bool ienableM2ObjectLos;
 
         public:
-            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false) {}
+            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false), ienableM2ObjectLos(false){}
 
             virtual ~IVMapManager(void) {}
 
@@ -92,11 +91,16 @@ namespace VMAP
             It is disabled by default. If it is enabled the manager will no longer process unload requests on reference clear
             */
             void setDisableModelUnload(bool pVal) { iDisableModelUnloads = pVal; }
+            /**
+            Enable/disable los calculation for additional objects (like trees, fences, ...) 
+            */
+            void setM2ObjectLosEnabled(bool pVal) { ienableM2ObjectLos = pVal; }
 
             bool isLineOfSightCalcEnabled() const { return iEnableLineOfSightCalc; }
             bool isHeightCalcEnabled() const { return iEnableHeightCalc; }
             bool isMapLoadingEnabled() const { return iEnableLineOfSightCalc || iEnableHeightCalc; }
             bool isModelUnloadDisabled() const { return iDisableModelUnloads; }
+            bool isM2ObjectLosEnabled() const { return ienableM2ObjectLos; }
 
             virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
             /**
