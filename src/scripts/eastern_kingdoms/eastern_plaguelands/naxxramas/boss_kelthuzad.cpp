@@ -845,7 +845,7 @@ struct mob_abomAI : public kt_p1AddAI
 
         if (mortalWoundTimer < diff)
         {
-            if(m_creature->GetVictim() && m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if(m_creature->GetVictim() && m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
                     mortalWoundTimer = 7500;
         }

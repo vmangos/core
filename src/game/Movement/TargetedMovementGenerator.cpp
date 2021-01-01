@@ -60,7 +60,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     }
     else if (!m_fOffset)
     {
-        if (owner.IsWithinMeleeRange(i_target.getTarget()))
+        if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
         {
             losResult = owner.IsWithinLOSInMap(i_target.getTarget());
             losChecked = true;

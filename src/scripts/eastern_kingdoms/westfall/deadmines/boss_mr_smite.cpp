@@ -301,7 +301,7 @@ struct boss_mr_smiteAI : public ScriptedAI
                 break;
             }
         }
-        if (!equiping && !m_creature->IsWithinMeleeRange(target) && m_creature->IsWithinDistInMap(target, m_creature->GetMeleeReach() * 2)) //test Alita GetDistance
+        if (!equiping && !m_creature->CanReachWithMeleeAutoAttack(target) && m_creature->IsWithinDistInMap(target, m_creature->GetMeleeReach() * 2)) //test Alita GetDistance
         {
             float x, y, z;
             m_creature->GetRandomAttackPoint(target, x, y, z);

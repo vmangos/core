@@ -709,7 +709,7 @@ struct npc_death_talon_SeetherAI : public ScriptedAI
 
         if (!m_bEngaged)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                 m_bEngaged = true;
         }
         else

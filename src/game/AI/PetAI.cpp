@@ -689,7 +689,7 @@ bool PetAI::CanAttack(Unit* target)
 
     // Stay - can attack if target is within range or commanded to
     if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_STAY))
-        return (m_creature->IsWithinMeleeRange(target) || m_creature->GetCharmInfo()->IsCommandAttack());
+        return (m_creature->CanReachWithMeleeAutoAttack(target) || m_creature->GetCharmInfo()->IsCommandAttack());
 
     //  Pets attacking something (or chasing) should only switch targets if owner tells them to
     if (m_creature->GetVictim() && m_creature->GetVictim() != target)

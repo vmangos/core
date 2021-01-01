@@ -369,7 +369,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         else
             Bomb_Timer -= diff;
 
-        if (m_creature->IsAttackReady() && !m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+        if (m_creature->IsAttackReady() && !m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
             m_creature->SetSheath(SHEATH_STATE_RANGED);

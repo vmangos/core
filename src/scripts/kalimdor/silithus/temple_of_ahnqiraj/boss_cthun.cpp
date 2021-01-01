@@ -454,7 +454,7 @@ struct cthunTentacle : public ScriptedAI
                 ThreatList::const_iterator itr = threatlist.begin();
                 
                 // Implementing this loop manually instead of using Creature::SelectAttackingTarget
-                // to use target->CanReachWithMeleeAutoAttack(creature) instead of creature->isWithinMeleeRange(target),
+                // to use target->CanReachWithMeleeAutoAttack(creature) instead of creature->CanReachWithMeleeAutoAttack(target),
                 // because melee ranges are fucked up. todo: fix melee ranges....
                 for (; itr != threatlist.end(); ++itr) {
                     if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid())) {
@@ -470,7 +470,7 @@ struct cthunTentacle : public ScriptedAI
 
             // Resetting threat of old target if it has left melee range
             if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAutoAttack(m_creature)) {
-            //if (oldTarget && tmpTarget != oldTarget && !m_creature->IsWithinMeleeRange(oldTarget)) {
+            //if (oldTarget && tmpTarget != oldTarget && !m_creature->CanReachWithMeleeAutoAttack(oldTarget)) {
                 m_creature->GetThreatManager().modifyThreatPercent(oldTarget, -100);
             }
 

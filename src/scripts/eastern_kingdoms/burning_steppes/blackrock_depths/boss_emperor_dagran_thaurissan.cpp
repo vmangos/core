@@ -119,7 +119,7 @@ struct boss_emperor_dagran_thaurissanAI : public ScriptedAI
         /*
         if (m_uiIronfoeTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                 if (DoCastSpellIfCan(m_creature, SPELL_IRONFOE) == CAST_OK)
                     m_uiIronfoeTimer = urand(20000, 25000);
         }

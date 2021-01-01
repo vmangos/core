@@ -246,7 +246,7 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
         }
         else
         {
-            bool inMeleeRange = me->IsWithinMeleeRange(victim);
+            bool inMeleeRange = me->CanReachWithMeleeAutoAttack(victim);
             if ((bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving() && me->IsWithinDist(victim, 30.0f)))
             {
                 me->GetMotionMaster()->Clear();

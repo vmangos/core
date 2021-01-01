@@ -399,7 +399,7 @@ struct boss_onyxiaAI : public ScriptedAI
 
         if (m_uiWingBuffetTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WINGBUFFET) == CAST_OK)
                 {
@@ -413,7 +413,7 @@ struct boss_onyxiaAI : public ScriptedAI
 
         if (m_uiKnockAwayTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 {

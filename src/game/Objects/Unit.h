@@ -1026,7 +1026,6 @@ class Unit : public WorldObject
         bool IsTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
         bool IsAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
 
-        bool IsWithinMeleeRange(Unit const* obj, float dist = 0.0f) const;
         bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
         float GetMeleeReach() const;

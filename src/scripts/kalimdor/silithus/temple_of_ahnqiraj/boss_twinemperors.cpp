@@ -756,7 +756,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         if (!victim) 
             return;
 
-        bool isMelee = m_creature->IsWithinMeleeRange(victim);
+        bool isMelee = m_creature->CanReachWithMeleeAutoAttack(victim);
         bool isInLos = m_creature->IsWithinLOSInMap(victim);
         
         // Overriding shadowboltTimer if we're not in melee and we have not casted
@@ -861,7 +861,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
             Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
             if (!pUnit) continue;
 
-            if (m_creature->IsWithinMeleeRange(pUnit)) {
+            if (m_creature->CanReachWithMeleeAutoAttack(pUnit)) {
                 candidates.push_back(i);
             }
         }
