@@ -147,7 +147,7 @@ bool VMapManager2::isInLineOfSight(unsigned int pMapId, float x1, float y1, floa
         Vector3 pos1 = convertPositionToInternalRep(x1, y1, z1);
         Vector3 pos2 = convertPositionToInternalRep(x2, y2, z2);
         if (pos1 != pos2)
-            result = instanceTree->second->isInLineOfSight(pos1, pos2, m_m2ObjectLosEnabled);
+            result = instanceTree->second->isInLineOfSight(pos1, pos2, useM2ObjectsForLos);
     }
     return result;
 }
@@ -184,7 +184,7 @@ bool VMapManager2::getObjectHitPos(unsigned int pMapId, float x1, float y1, floa
             Vector3 pos1 = convertPositionToInternalRep(x1, y1, z1);
             Vector3 pos2 = convertPositionToInternalRep(x2, y2, z2);
             Vector3 resultPos;
-            result = instanceTree->second->getObjectHitPos(pos1, pos2, resultPos, pModifyDist, m_m2ObjectLosEnabled);
+            result = instanceTree->second->getObjectHitPos(pos1, pos2, resultPos, pModifyDist, useM2ObjectsForLos);
             resultPos = convertPositionToInternalRep(resultPos.x, resultPos.y, resultPos.z);
             rx = resultPos.x;
             ry = resultPos.y;
@@ -208,7 +208,7 @@ float VMapManager2::getHeight(unsigned int pMapId, float x, float y, float z, fl
         if (instanceTree != iInstanceMapTrees.end())
         {
             Vector3 pos = convertPositionToInternalRep(x, y, z);
-            height = instanceTree->second->getHeight(pos, maxSearchDist, m_m2ObjectLosEnabled);
+            height = instanceTree->second->getHeight(pos, maxSearchDist, useM2ObjectsForLos);
             if (!(height < G3D::inf()))
             {
                 height = VMAP_INVALID_HEIGHT_VALUE;     // no height

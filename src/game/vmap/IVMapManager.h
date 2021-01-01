@@ -51,10 +51,10 @@ namespace VMAP
             bool iDisableModelUnloads;
 
     protected:
-        bool m_m2ObjectLosEnabled;
+        bool useM2ObjectsForLos;
 
         public:
-            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false), m_m2ObjectLosEnabled(false){}
+            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false), useM2ObjectsForLos(false){}
 
             virtual ~IVMapManager(void) {}
 
@@ -96,7 +96,7 @@ namespace VMAP
             /**
             Enable/disable los calculation for additional objects (like trees, fences, ...) 
             */
-            void setM2ObjectLosEnabled(bool pVal) { m_m2ObjectLosEnabled = pVal; }
+            void setM2ObjectLosEnabled(bool pVal) { useM2ObjectsForLos = pVal; }
 
             bool isLineOfSightCalcEnabled() const { return iEnableLineOfSightCalc; }
             bool isHeightCalcEnabled() const { return iEnableHeightCalc; }
