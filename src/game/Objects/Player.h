@@ -2059,6 +2059,7 @@ class Player final: public Unit
     public:
         WorldSession* GetSession() const { return m_session; }
         void SetSession(WorldSession* s);
+        bool IsBot() const { return m_session->GetBot() != nullptr; }
 
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
         void DestroyForPlayer(Player* target) const override;

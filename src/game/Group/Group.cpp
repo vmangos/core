@@ -1421,7 +1421,7 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
                 player->m_InstanceValid = true;
     }
 
-    if (!isBGGroup() && !(player && player->GetSession()->GetBot()))
+    if (!isBGGroup() && !(player && player->IsBot()))
     {
         // insert into group table
         CharacterDatabase.PExecute("INSERT INTO group_member(groupId,memberGuid,assistant,subgroup) VALUES('%u','%u','%u','%u')",

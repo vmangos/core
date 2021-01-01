@@ -125,7 +125,7 @@ public:
             }
 
             // skip bots
-            if (!showBotsInWhoList && pPlayer->GetSession()->GetBot())
+            if (!showBotsInWhoList && pPlayer->IsBot())
                 continue;
 
             // do not process players which are not in world
