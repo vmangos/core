@@ -509,20 +509,8 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
 
                         // TODO: all traps can be activated, also those without spell.
                         // Some may have have animation and/or are expected to despawn.
-                        switch (GetDisplayId())
-                        {
-                            case 3071: // freezing trap
-                            case 3072: // explosive trap
-                            case 3073: // frost trap, fixed trap
-                            case 3074: // immolation trap
-                            case 4392: // lava fissure
-                            case 4472: // lava fissure
-                            case 4491: // mortar in dun morogh
-                            case 6785: // plague fissure
-                            case 6747: // sapphiron birth
-                                SendGameObjectCustomAnim();
-                                break;
-                        }
+                        if (HasCustomAnim())
+                            SendGameObjectCustomAnim();
                     }
                 }
 
@@ -1433,6 +1421,9 @@ void GameObject::Use(Unit* user)
                 else
                     CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
             }
+
+            if (HasCustomAnim())
+                SendGameObjectCustomAnim();
 
             if (uint32 max_charges = GetGOInfo()->GetCharges())
             {
@@ -2345,6 +2336,25 @@ void GameObject::UpdateModelPosition()
 GameObjectData const* GameObject::GetGOData() const
 {
     return sObjectMgr.GetGOData(GetGUIDLow());
+}
+
+bool GameObject::HasCustomAnim() const
+{
+    switch (GetDisplayId())
+    {
+        case 3071: // freezing trap
+        case 3072: // explosive trap
+        case 3073: // frost trap, fixed trap
+        case 3074: // immolation trap
+        case 4392: // lava fissure
+        case 4472: // lava fissure
+        case 4491: // mortar in dun morogh
+        case 6785: // plague fissure
+        case 6747: // sapphiron birth
+            return true;
+    }
+
+    return false;
 }
 
 void GameObject::SendGameObjectCustomAnim(uint32 animId /*= 0*/)

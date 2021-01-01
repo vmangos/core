@@ -773,6 +773,7 @@ class GameObject : public WorldObject
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
         void SetDisplayId(uint32 modelId);
 
+        bool HasCustomAnim() const;
         void SendGameObjectCustomAnim(uint32 animId = 0);
         void SendGameObjectReset();
 
