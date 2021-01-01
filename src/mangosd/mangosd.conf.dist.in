@@ -274,7 +274,6 @@ vmap.enableLOS = 1
 vmap.enableHeight = 1
 vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
-vmap.petLOS = 1
 vmap.enableM2ObjectLos = 0
 mmap.enabled = 1
 Collision.Models.Unload = 1

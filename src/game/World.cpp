@@ -862,7 +862,6 @@ void World::LoadConfigSettings(bool reload)
     bool enableHeight = sConfig.GetBoolDefault("vmap.enableHeight", false);
     bool disableModelUnload = sConfig.GetBoolDefault("Collision.Models.Unload", false);
     std::string ignoreSpellIds = sConfig.GetStringDefault("vmap.ignoreSpellIds", "");
-    setConfig(CONFIG_BOOL_PET_LOS, "vmap.petLoS", true);
 
     if (!enableHeight)
         sLog.outError("VMAP height use disabled! Creatures movements and other things will be in broken state.");
