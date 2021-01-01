@@ -25,6 +25,8 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiForceFieldGUID(0),
     m_uiImmolTharGUID(0),
     m_uiTortheldrinGUID(0),
+    m_uiRitualCandleAuraGUID(0),
+    m_uiRitualPlayerGUID(0),
     
     // North
     m_uiGuardAliveCount(6),
@@ -160,6 +162,9 @@ void instance_dire_maul::OnObjectCreate(GameObject* pGo)
             break;
         case GO_BROKEN_TRAP:
             m_uiBrokenTrapGUID = pGo->GetGUID();
+            break;
+        case GO_RITUAL_CANDLE_AURA:
+            m_uiRitualCandleAuraGUID = pGo->GetGUID();
             break;
         default:
             break;
@@ -451,6 +456,7 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
 #ifdef DEBUG_ON
     sLog.outString("SetData64(%u, %u) data is %u", uiType, uiData, GetData(TYPE_CRISTAL_EVENT));
 #endif
+
     if (uiType == TYPE_CRISTAL_EVENT && GetData(TYPE_CRISTAL_EVENT) == NOT_STARTED)
         DoSortCristalsEventMobs();
 
@@ -477,6 +483,9 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
         if (!uiNotEmptyRoomsCount)
             SetData(TYPE_CRISTAL_EVENT, DONE);
     }
+
+    if (uiType == DATA_DREADSTEED_RITUAL_PLAYER)
+        m_uiRitualPlayerGUID = uiData;
 }
 
 void instance_dire_maul::Load(char const* chrIn)
@@ -528,6 +537,10 @@ uint64 instance_dire_maul::GetData64(uint32 uiType)
             return m_uiForceFieldGUID;
         case GO_MAGIC_VORTEX:
             return m_uiMagicVortexGUID;
+        case GO_RITUAL_CANDLE_AURA:
+            return m_uiRitualCandleAuraGUID;
+        case DATA_DREADSTEED_RITUAL_PLAYER:
+            return m_uiRitualPlayerGUID;
     }
     return 0;
 }
