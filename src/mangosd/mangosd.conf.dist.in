@@ -196,6 +196,12 @@ BindIP = "0.0.0.0"
 #        Default: 1 (Enabled)
 #                 0 (Disabled)
 #
+#    vmap.enableM2ObjectLos
+#        Enable/Disable line of sight collision for additional objects (like trees, fences, ...)
+#        Requires VMaps enabled to work.
+#        Default: 0 (Disabled)
+#                 1 (Enabled)
+#
 #    mmap.enabled
 #        Enable/Disable pathfinding using mmaps
 #        Default: 1 (Enabled)
@@ -269,6 +275,7 @@ vmap.enableHeight = 1
 vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
 vmap.petLOS = 1
+vmap.enableM2ObjectLos = 0
 mmap.enabled = 1
 Collision.Models.Unload = 1
 DetectPosCollision = 1

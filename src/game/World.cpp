@@ -859,6 +859,7 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
     bool enableLOS = sConfig.GetBoolDefault("vmap.enableLOS", false);
+    bool enableM2ObjectLos = sConfig.GetBoolDefault("vmap.enableM2ObjectLos", false);
     bool enableHeight = sConfig.GetBoolDefault("vmap.enableHeight", false);
     bool disableModelUnload = sConfig.GetBoolDefault("Collision.Models.Unload", false);
     std::string ignoreSpellIds = sConfig.GetStringDefault("vmap.ignoreSpellIds", "");
@@ -870,6 +871,7 @@ void World::LoadConfigSettings(bool reload)
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
     VMAP::VMapFactory::createOrGetVMapManager()->setDisableModelUnload(disableModelUnload);
+    VMAP::VMapFactory::createOrGetVMapManager()->setEnableM2ObjectLos(enableM2ObjectLos);
     VMAP::VMapFactory::preventSpellsFromBeingTestedForLoS(ignoreSpellIds.c_str());
     sLog.outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i", enableLOS, enableHeight, getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) ? 1 : 0);
     sLog.outString("WORLD: VMap data directory is: %svmaps", m_dataPath.c_str());
