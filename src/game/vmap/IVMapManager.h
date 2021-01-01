@@ -49,10 +49,12 @@ namespace VMAP
             bool iEnableLineOfSightCalc;
             bool iEnableHeightCalc;
             bool iDisableModelUnloads;
-            bool ienableM2ObjectLos;
+
+    protected:
+        bool m_m2ObjectLosEnabled;
 
         public:
-            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false), ienableM2ObjectLos(false){}
+            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false), m_m2ObjectLosEnabled(false){}
 
             virtual ~IVMapManager(void) {}
 
@@ -94,13 +96,12 @@ namespace VMAP
             /**
             Enable/disable los calculation for additional objects (like trees, fences, ...) 
             */
-            void setM2ObjectLosEnabled(bool pVal) { ienableM2ObjectLos = pVal; }
+            void setM2ObjectLosEnabled(bool pVal) { m_m2ObjectLosEnabled = pVal; }
 
             bool isLineOfSightCalcEnabled() const { return iEnableLineOfSightCalc; }
             bool isHeightCalcEnabled() const { return iEnableHeightCalc; }
             bool isMapLoadingEnabled() const { return iEnableLineOfSightCalc || iEnableHeightCalc; }
             bool isModelUnloadDisabled() const { return iDisableModelUnloads; }
-            bool isM2ObjectLosEnabled() const { return ienableM2ObjectLos; }
 
             virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
             /**
