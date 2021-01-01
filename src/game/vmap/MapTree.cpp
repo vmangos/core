@@ -34,12 +34,15 @@ namespace VMAP
 class MapRayCallback
 {
 public:
-    MapRayCallback(ModelInstance* val, bool isLos): prims(val), hit(false), los(isLos) {}
+    MapRayCallback(ModelInstance* val, bool isLos, bool forceM2ObjectLos): prims(val), hit(false), los(isLos), useM2ObjectsForLos(forceM2ObjectLos){}
 
     bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
+
+        sLog.outError("useM2ObjectsForLos: %d ", useM2ObjectsForLos);
+
         //  certain models are not used for line of sight collision in classic (trees, fences ...)
-        if (los && prims[entry].flags & MOD_NO_BREAK_LOS /*&& !M2ObjectLosEnabled */)
+        if (los && prims[entry].flags & MOD_NO_BREAK_LOS && !useM2ObjectsForLos)
             return false;
 
         bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
@@ -55,6 +58,7 @@ protected:
     ModelInstance* prims;
     bool hit;
     bool los;
+    bool useM2ObjectsForLos;
 };
 
 class MapIntersectionFinderCallback
@@ -199,10 +203,10 @@ If intersection is found within pMaxDist, sets pMaxDist to intersection distance
 Else, pMaxDist is not modified and returns false;
 */
 
-bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const
+bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck, bool forceM2ObjectLos) const
 {
     float distance = pMaxDist;
-    MapRayCallback intersectionCallBack(iTreeValues, isLosCheck);
+    MapRayCallback intersectionCallBack(iTreeValues, isLosCheck, forceM2ObjectLos);
     iTree.intersectRay(pRay, intersectionCallBack, distance, pStopAtFirstHit);
     if (intersectionCallBack.didHit())
         pMaxDist = distance;
@@ -210,7 +214,7 @@ bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, b
 }
 //=========================================================
 
-bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) const
+bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2, bool forceM2ObjectLos) const
 {
     float maxDist = (pos2 - pos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
@@ -220,7 +224,7 @@ bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) co
         return true;
     // direction with length of 1
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
-    return !getIntersectionTime(ray, maxDist, true, true);
+    return !getIntersectionTime(ray, maxDist, true, true, forceM2ObjectLos);
 }
 //=========================================================
 /**
@@ -228,7 +232,7 @@ When moving from pos1 to pos2 check if we hit an object. Return true and the pos
 Return the hit pos or the original dest pos
 */
 
-bool StaticMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2, Vector3& pResultHitPos, float pModifyDist) const
+bool StaticMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2, Vector3& pResultHitPos, float pModifyDist, bool forceM2ObjectLos) const
 {
     float maxDist = (pPos2 - pPos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
@@ -242,7 +246,7 @@ bool StaticMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2, 
     Vector3 dir = (pPos2 - pPos1) / maxDist;            // direction with length of 1
     G3D::Ray ray(pPos1, dir);
     float dist = maxDist;
-    if (getIntersectionTime(ray, dist, false, false))
+    if (getIntersectionTime(ray, dist, false, false, forceM2ObjectLos))
     {
         pResultHitPos = pPos1 + dir * dist;
         if (pModifyDist < 0)
@@ -276,13 +280,13 @@ ModelInstance* StaticMapTree::FindCollisionModel(G3D::Vector3 const& pos1, G3D::
 
 //=========================================================
 
-float StaticMapTree::getHeight(Vector3 const& pPos, float maxSearchDist) const
+float StaticMapTree::getHeight(Vector3 const& pPos, float maxSearchDist, bool forceM2ObjectLos) const
 {
     float height = G3D::inf();
     Vector3 dir = Vector3(0, 0, -1);
     G3D::Ray ray(pPos, dir);   // direction with length of 1
     float maxDist = maxSearchDist;
-    if (getIntersectionTime(ray, maxDist, false, false))
+    if (getIntersectionTime(ray, maxDist, false, false, forceM2ObjectLos))
         height = pPos.z - maxDist;
     return height;
 }

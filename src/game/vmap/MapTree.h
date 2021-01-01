@@ -57,7 +57,7 @@ namespace VMAP
             std::string iBasePath;
 
         private:
-            bool getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const;
+            bool getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck, bool forceM2ObjectLos) const;
             // bool containsLoadedMapTile(unsigned int pTileIdent) const { return(iLoadedMapTiles.containsKey(pTileIdent)); }
         public:
             static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -68,10 +68,10 @@ namespace VMAP
             StaticMapTree(uint32 mapID, std::string const& basePath);
             ~StaticMapTree();
 
-            bool isInLineOfSight(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2) const;
+            bool isInLineOfSight(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, bool forceM2ObjectLos) const;
             ModelInstance* FindCollisionModel(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2);
-            bool getObjectHitPos(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
-            float getHeight(G3D::Vector3 const& pPos, float maxSearchDist) const;
+            bool getObjectHitPos(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, G3D::Vector3& pResultHitPos, float pModifyDist, bool forceM2ObjectLos) const;
+            float getHeight(G3D::Vector3 const& pPos, float maxSearchDist, bool forceM2ObjectLos) const;
             bool getAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
             bool isUnderModel(G3D::Vector3& pos, float* outDist = nullptr, float* inDist = nullptr) const;
             bool GetLocationInfo(Vector3 const& pos, LocationInfo& info) const;
