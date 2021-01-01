@@ -2122,13 +2122,13 @@ CreatureAI* GetAI_boss_alzzin_the_wildshaper(Creature* pCreature)
 
 CreatureAI* GetAI_npc_alzzins_minion(Creature* pCreature)
 {
-	return new npc_alzzins_minionAI(pCreature);
+    return new npc_alzzins_minionAI(pCreature);
 }
 
 enum
 {
-	SPELL_CHARGE = 22911,
-	SPELL_MAUL = 17156
+    SPELL_CHARGE = 22911,
+    SPELL_MAUL = 17156
 };
 
 struct boss_ferraAI : public ScriptedAI
@@ -2149,7 +2149,7 @@ struct boss_ferraAI : public ScriptedAI
         m_uiCharge_Timer        = 0;
         m_uiMaul_Timer          = urand(5000, 10000);
 
-		m_creature->SetNoCallAssistance(true);
+        m_creature->SetNoCallAssistance(true);
     }   
 
     void MoveInLineOfSight(Unit *pWho) override

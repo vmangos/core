@@ -9,11 +9,11 @@
 
 enum
 {
-    TYPE_ANACONDRA						= 0,
-	TYPE_COBRAHN						= 1,
-	TYPE_PYTHAS							= 2,
-	TYPE_SERPENTIS						= 3,
-	TYPE_DISCIPLE						= 4,
+    TYPE_ANACONDRA                      = 0,
+    TYPE_COBRAHN                        = 1,
+    TYPE_PYTHAS                         = 2,
+    TYPE_SERPENTIS                      = 3,
+    TYPE_DISCIPLE                       = 4,
     TYPE_MUTANUS                        = 5,
     WAILING_CAVERNS_MAX_ENCOUNTER       = 6,
 

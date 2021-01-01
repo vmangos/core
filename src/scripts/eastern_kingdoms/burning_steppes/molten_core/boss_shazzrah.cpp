@@ -89,8 +89,8 @@ struct boss_shazzrahAI : public ScriptedAI
         //ShazzrahCurse_Timer
         if (ShazzrahCurse_Timer < diff)
         {
-			if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHAZZRAHCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
-				ShazzrahCurse_Timer = 20000;
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHAZZRAHCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
+                ShazzrahCurse_Timer = 20000;
         }
         else ShazzrahCurse_Timer -= diff;
 

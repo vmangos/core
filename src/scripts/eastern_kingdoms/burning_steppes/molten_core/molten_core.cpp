@@ -560,10 +560,10 @@ void AddSC_molten_core()
     newscript = new Script;
     newscript->Name = "mob_lava_surger";
     newscript->GetAI = &GetAI_mob_lava_surger;
-	newscript->RegisterSelf();
+    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "mob_firelord";
-	newscript->GetAI = &GetAI_mob_firelord;
+    newscript->GetAI = &GetAI_mob_firelord;
     newscript->RegisterSelf();
 }

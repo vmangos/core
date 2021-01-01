@@ -417,7 +417,7 @@ void instance_temple_of_ahnqiraj::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-	   for (uint32 & i : m_auiEncounter)
+       for (uint32 & i : m_auiEncounter)
     {
         loadStream >> i;
         if (i == IN_PROGRESS)

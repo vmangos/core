@@ -193,7 +193,7 @@ struct npc_artoriusAI : public ScriptedAI
     
     void BeginEvent(ObjectGuid playerGuid)
     {
-		m_hunterGuid = playerGuid;
+        m_hunterGuid = playerGuid;
         m_creature->GetMotionMaster()->Clear(false);
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);

@@ -2445,7 +2445,7 @@ void AddSC_blackrock_depths()
     newscript = new Script;
     newscript->Name = "npc_hurley_blackbreath";
     newscript->GetAI = &GetAI_npc_hurley_blackbreath;
-	newscript->RegisterSelf();
+    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "boss_plugger_spazzring";

@@ -393,8 +393,8 @@ bool AreaTrigger_at_scent_larkorwi(Player* pPlayer, AreaTriggerEntry const* pAt)
 
 enum
 {
-	SPELL_MERGING_OOZES = 16032,
-	NPC_PRIMAL_OOZE = 6557
+    SPELL_MERGING_OOZES = 16032,
+    NPC_PRIMAL_OOZE = 6557
 };
 
 struct mob_captured_felwood_oozeAI : public ScriptedAI
