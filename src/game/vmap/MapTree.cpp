@@ -30,14 +30,14 @@ using G3D::Vector3;
 
 namespace VMAP
 {
+
 class MapRayCallback
 {
 public:
     MapRayCallback(ModelInstance* val, bool isLos): prims(val), hit(false), los(isLos) {}
+
     bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
-        bool M2ObjectLosEnabled = &VMapManager2::isM2ObjectLosEnabled; // custom world.conf setting 
-
         //  certain models are not used for line of sight collision in classic (trees, fences ...)
         if (los && prims[entry].flags & MOD_NO_BREAK_LOS && !M2ObjectLosEnabled)
             return false;
