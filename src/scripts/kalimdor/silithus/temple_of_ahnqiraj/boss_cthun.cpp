@@ -438,48 +438,24 @@ struct cthunTentacle : public ScriptedAI
                 target = caster;
                 break;
             }
-            else {
-                // Target is not in melee and reset his threat
+            else // Target is not in melee and reset his threat    
                 m_creature->GetThreatManager().modifyThreatPercent(caster, -100);
-            }
         }
         // So far so good. If we have a target after this loop it means we have a valid target in melee range.
 
         // If we dont have a target we need to keep searching through the threatlist
         if (!target)
         {
-            Unit* tmpTarget = nullptr;
-            if (m_creature->CanHaveThreatList()) {
-                ThreatList const& threatlist = m_creature->GetThreatManager().getThreatList();
-                ThreatList::const_iterator itr = threatlist.begin();
-                
-                // Implementing this loop manually instead of using Creature::SelectAttackingTarget
-                // to use target->CanReachWithMeleeAutoAttack(creature) instead of creature->CanReachWithMeleeAutoAttack(target),
-                // because melee ranges are fucked up. todo: fix melee ranges....
-                for (; itr != threatlist.end(); ++itr) {
-                    if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid())) {
-                        if (pTarget->IsTargetableForAttack() 
-                            && pTarget->CanReachWithMeleeAutoAttack(m_creature)
-                            && pTarget->IsWithinLOSInMap(m_creature)) {
-                            tmpTarget = pTarget;
-                            break;
-                        }
-                    }
-                }
-            }
+            Unit* tmpTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_IN_MELEE_RANGE);
 
             // Resetting threat of old target if it has left melee range
-            if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAutoAttack(m_creature)) {
-            //if (oldTarget && tmpTarget != oldTarget && !m_creature->CanReachWithMeleeAutoAttack(oldTarget)) {
+            if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAutoAttack(m_creature))
                 m_creature->GetThreatManager().modifyThreatPercent(oldTarget, -100);
-            }
 
-            if (tmpTarget) {
-                // Need to call getHostileTarget to force an update of the threatlist, bleh
+            // Need to call getHostileTarget to force an update of the threatlist, bleh
+            if (tmpTarget)
                 target = m_creature->GetThreatManager().getHostileTarget();
-            }
         }
-        
 
         if (target)
         {
