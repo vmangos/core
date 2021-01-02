@@ -2732,7 +2732,7 @@ void Aura::HandleForceReaction(bool apply, bool Real)
             player->StopAttackFaction(scarlet_crusade_faction_id);
     }
 
-    if (!apply && player->GetZoneId() == 1377 && GetId() == 29519 && m_removeMode == AURA_REMOVE_BY_DEATH)
+    if (!apply && player->GetZoneId() == 1377 && GetId() == 29519 && (m_removeMode == AURA_REMOVE_BY_CANCEL || m_removeMode == AURA_REMOVE_BY_DEATH))
     {
         // OutdoorPVP Silithus : Perte du buff silithyste
         if (ZoneScript* pScript = player->GetZoneScript())
