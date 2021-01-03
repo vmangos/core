@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210102160021');
 
 
 -- Terrordale Haunting Spirit (179747) gameobject should despawn when Exorcism Censer (18752) is used
-INSERT INTO spell_script_target(entry, type, targetEntry, inverseEffectMask) VALUES
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `inverseEffectMask`) VALUES
 (23208,0,179747,0);
 
 
