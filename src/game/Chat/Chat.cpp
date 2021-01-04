@@ -3679,7 +3679,10 @@ std::string ChatHandler::GetNameLink(Player* chr) const
 
 std::string ChatHandler::GetItemLink(ItemPrototype const* pItem) const
 {
-    return m_session ? "|cffffffff|Hitem:" + std::to_string(pItem->ItemId) + ":0:0:0:0:0:0:0|h[" + pItem->Name1 + "]|h|r" : pItem->Name1;
+    uint32 color = ItemQualityColors[pItem->Quality];
+    std::ostringstream itemStr;
+    itemStr << "|c" << std::hex << color << "|Hitem:" << std::to_string(pItem->ItemId) << ":0:0:0:0:0:0:0|h[" << pItem->Name1 << "]|h|r";
+    return m_session ? itemStr.str().c_str() : pItem->Name1;
 }
 
 bool ChatHandler::needReportToTarget(Player* chr) const
