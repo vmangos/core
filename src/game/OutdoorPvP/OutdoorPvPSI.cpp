@@ -157,10 +157,10 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
     plr->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(609), 10); /** Cenarian faction */
 
     sLog.out(LOG_BG, "%s [%u:%u:'%s'] added a Silithyst to its faction",
-             plr->GetName(),
-             plr->GetGUIDLow(),
-             plr->GetSession()->GetAccountId(),
-             plr->GetSession()->GetRemoteAddress().c_str());
+        plr->GetName(),
+        plr->GetGUIDLow(),
+        plr->GetSession()->GetAccountId(),
+        plr->GetSession()->GetRemoteAddress().c_str());
 
     return true;
 }
@@ -169,88 +169,27 @@ bool OutdoorPvPSI::HandleDropFlag(Player* plr, uint32 spellId)
 {
     if (spellId == SI_SILITHYST_FLAG)
     {
-        /** if it was dropped away from the player's turn-in point,
-         * then create a silithyst mound. Ff it was dropped near the areatrigger,
-         * then it was dispelled by the outdoorpvp, so do nothing
-         */
-        switch (plr->GetTeam())
-        {
-            case ALLIANCE:
+        // if the aura was canceled or player died, then create a silithyst mound, if it was dropped near the areatrigger, then it was dispelled by the outdoorpvp, so do nothing
+        if (AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(plr->GetTeam() == ALLIANCE ? SI_AREATRIGGER_A : SI_AREATRIGGER_H))
+            if (atEntry)
             {
-                AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(SI_AREATRIGGER_A);
-                if (atEntry)
+                if (plr->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
                 {
-                    // 5.0f is safe-distance
-                    if (plr->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
+                    // he dropped it further, summon mound
+                    plr->CastSpell(plr, SILLITHUS_FLAG_DROP, true);
                     {
-                        // he dropped it further, summon mound
-                        if (GameObject* pGo = plr->SummonGameObject(
-                                                  SI_SILITHYST_MOUND,
-                                                  plr->GetPositionX(),
-                                                  plr->GetPositionY(),
-                                                  plr->GetPositionZ(),
-                                                  plr->GetOrientation(),
-                                                  0, 0, 0, 0, 25000, false))
-                        {
-                            pGo->SetRespawnTime(0);
-                            sLog.out(LOG_BG, "%s [%u:%u:'%s'] dropped a silithyst",
-                                     plr->GetName(),
-                                     plr->GetGUIDLow(),
-                                     plr->GetSession()->GetAccountId(),
-                                     plr->GetSession()->GetRemoteAddress().c_str());
-                        }
+                        sLog.out(LOG_BG, "%s [%u:%u:'%s'] dropped a silithyst",
+                            plr->GetName(),
+                            plr->GetGUIDLow(),
+                            plr->GetSession()->GetAccountId(),
+                            plr->GetSession()->GetRemoteAddress().c_str());
                     }
                 }
             }
-            break;
-            case HORDE:
-            {
-                AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(SI_AREATRIGGER_H);
-                if (atEntry)
-                {
-                    // 5.0f is safe-distance
-                    if (plr->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
-                    {
-                        // he dropped it further, summon mound
-                        if (GameObject* pGo = plr->SummonGameObject(
-                                                  SI_SILITHYST_MOUND,
-                                                  plr->GetPositionX(),
-                                                  plr->GetPositionY(),
-                                                  plr->GetPositionZ(),
-                                                  plr->GetOrientation(),
-                                                  0, 0, 0, 0, 25000, false))
-                        {
-                            pGo->SetRespawnTime(0);
-                            sLog.out(LOG_BG, "%s [%u:%u:'%s'] dropped a silithyst",
-                                     plr->GetName(),
-                                     plr->GetGUIDLow(),
-                                     plr->GetSession()->GetAccountId(),
-                                     plr->GetSession()->GetRemoteAddress().c_str());
-                        }
-                    }
-                }
-            }
-            break;
-        }
+
         return true;
     }
     return false;
-}
-
-/** Player taking a silithyst from geyser or from silithyst mound*/
-bool OutdoorPvPSI::HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go)
-{
-    if (!go || spellId != SI_SILITHYST_FLAG_GO_SPELL)
-        return false;
-    plr->CastSpell(plr, SI_SILITHYST_FLAG, true);
-
-    /** If it was taken from silithyst mound, delete it */
-    if (go->GetGOInfo()->id == SI_SILITHYST_MOUND)
-    {
-        go->SetRespawnTime(0);
-        go->Delete();
-    }
-    return true;
 }
 
 class OutdoorPvP_silithus : public ZoneScript_Script
