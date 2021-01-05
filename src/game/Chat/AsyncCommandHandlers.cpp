@@ -63,7 +63,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
         data->target_guid = target_guid;
         CharacterDatabase.AsyncPQuery(&PInfoHandler::HandlePlayerLookupResult, data,
             //  0          1      2      3        4     5
-            "SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'",
+            "SELECT `totaltime`, `level`, `money`, `account`, `race`, `class` FROM `characters` WHERE `guid` = '%u'",
             target_guid.GetCounter());
     }
 }
@@ -121,7 +121,7 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
     // and print the result once it completes. We also read guild info
     // so this cannot be done in an async task
     LoginDatabase.AsyncPQueryUnsafe(&PInfoHandler::HandleAccountInfoResult, data,
-        "SELECT username,last_ip,last_login,locale,locked FROM account WHERE id = '%u'",
+        "SELECT `username`, `last_ip`, `last_login`, `locale`, `locked` FROM `account` WHERE `id` = '%u'",
         data->accId);
 }
 
