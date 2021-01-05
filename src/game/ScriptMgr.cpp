@@ -80,8 +80,8 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
     scripts.clear();                                        // need for reload support
 
-    //                                                  0    1       2         3         4          5          6         7           8             9          10        11        12        13        14    15 16 17 18       19
-    QueryResult* result = WorldDatabase.PQuery("SELECT id, delay, command, datalong, datalong2, datalong3, datalong4, target_param1, target_param2, target_type, data_flags, dataint, dataint2, dataint3, dataint4, x, y, z, o, condition_id FROM %s", tablename);
+    //                                                  0     1        2          3           4            5            6            7                8                9              10            11         12          13          14         15   16   17   18       19
+    QueryResult* result = WorldDatabase.PQuery("SELECT `id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id` FROM %s", tablename);
 
     uint32 count = 0;
 
@@ -1429,7 +1429,7 @@ void ScriptMgr::LoadCreatureEventAIScripts()
     // Check for scripts with delay, which is not supported for this table.
     for (uint8 i = 1; i <= 3; i++)
     {
-        result = WorldDatabase.Query("SELECT DISTINCT id FROM creature_ai_scripts WHERE delay != 0");
+        result = WorldDatabase.Query("SELECT DISTINCT `id` FROM `creature_ai_scripts` WHERE `delay` != 0");
 
         if (result)
         {
@@ -1447,7 +1447,7 @@ void ScriptMgr::LoadCreatureEventAIScripts()
     std::set<uint32> actionIds;
     for (uint8 i = 1; i <= 3; i++)
     {
-        result = WorldDatabase.PQuery("SELECT action%u_script FROM creature_ai_events", i);
+        result = WorldDatabase.PQuery("SELECT `action%u_script` FROM `creature_ai_events`", i);
 
         if (result)
         {
@@ -1506,7 +1506,7 @@ void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
 void ScriptMgr::LoadAreaTriggerScripts()
 {
     m_AreaTriggerScripts.clear();                           // need for reload case
-    QueryResult* result = WorldDatabase.Query("SELECT entry, script_name FROM scripted_areatrigger");
+    QueryResult* result = WorldDatabase.Query("SELECT `entry`, `script_name` FROM `scripted_areatrigger`");
 
     uint32 count = 0;
 
@@ -1552,7 +1552,7 @@ void ScriptMgr::LoadAreaTriggerScripts()
 void ScriptMgr::LoadEventIdScripts()
 {
     m_EventIdScripts.clear();                           // need for reload case
-    QueryResult* result = WorldDatabase.Query("SELECT id, script_name FROM scripted_event_id");
+    QueryResult* result = WorldDatabase.Query("SELECT `id`, `script_name` FROM `scripted_event_id`");
 
     uint32 count = 0;
 
@@ -1601,15 +1601,15 @@ void ScriptMgr::LoadScriptNames()
 {
     m_scriptNames.push_back("");
     QueryResult* result = WorldDatabase.Query(
-                              "SELECT DISTINCT(script_name) FROM creature_template WHERE script_name <> '' "
+                              "SELECT DISTINCT(`script_name`) FROM `creature_template` WHERE `script_name` <> '' "
                               "UNION "
-                              "SELECT DISTINCT(script_name) FROM gameobject_template WHERE script_name <> '' "
+                              "SELECT DISTINCT(`script_name`) FROM `gameobject_template` WHERE `script_name` <> '' "
                               "UNION "
-                              "SELECT DISTINCT(script_name) FROM scripted_areatrigger WHERE script_name <> '' "
+                              "SELECT DISTINCT(`script_name`) FROM `scripted_areatrigger` WHERE `script_name` <> '' "
                               "UNION "
-                              "SELECT DISTINCT(script_name) FROM scripted_event_id WHERE script_name <> '' "
+                              "SELECT DISTINCT(`script_name`) FROM `scripted_event_id` WHERE `script_name` <> '' "
                               "UNION "
-                              "SELECT DISTINCT(script_name) FROM map_template WHERE script_name <> ''");
+                              "SELECT DISTINCT(`script_name`) FROM `map_template` WHERE `script_name` <> ''");
 
     if (!result)
     {
@@ -1985,7 +1985,7 @@ void ScriptMgr::LoadScriptTexts()
     sLog.outString("Loading Script Texts...");
     sObjectMgr.LoadMangosStrings(WorldDatabase, "script_texts", TEXT_SOURCE_TEXT_START, TEXT_SOURCE_TEXT_END, true);
 
-    QueryResult* result = WorldDatabase.PQuery("SELECT entry, sound, type, language, emote FROM script_texts WHERE entry BETWEEN %i AND %i", TEXT_SOURCE_TEXT_END, TEXT_SOURCE_TEXT_START);
+    QueryResult* result = WorldDatabase.PQuery("SELECT `entry`, `sound`, `type`, `language`, `emote` FROM `script_texts` WHERE `entry` BETWEEN %i AND %i", TEXT_SOURCE_TEXT_END, TEXT_SOURCE_TEXT_START);
 
     sLog.outString("Loading Script Texts additional data...");
 
@@ -2047,7 +2047,7 @@ void ScriptMgr::LoadScriptTextsCustom()
     sLog.outString("Loading Custom Texts...");
     sObjectMgr.LoadMangosStrings(WorldDatabase, "custom_texts", TEXT_SOURCE_CUSTOM_START, TEXT_SOURCE_CUSTOM_END, true);
 
-    QueryResult* result = WorldDatabase.PQuery("SELECT entry, sound, type, language, emote FROM custom_texts WHERE entry BETWEEN %i AND %i", TEXT_SOURCE_CUSTOM_END, TEXT_SOURCE_CUSTOM_START);
+    QueryResult* result = WorldDatabase.PQuery("SELECT `entry`, `sound`, `type`, `language`, `emote` FROM `custom_texts` WHERE `entry` BETWEEN %i AND %i", TEXT_SOURCE_CUSTOM_END, TEXT_SOURCE_CUSTOM_START);
 
     sLog.outString("Loading Custom Texts additional data...");
 
@@ -2112,7 +2112,7 @@ void ScriptMgr::LoadScriptWaypoints()
     uint64 uiCreatureCount = 0;
 
     // Load Waypoints
-    QueryResult* result = WorldDatabase.PQuery("SELECT COUNT(entry) FROM script_waypoint GROUP BY entry");
+    QueryResult* result = WorldDatabase.PQuery("SELECT COUNT(`entry`) FROM `script_waypoint` GROUP BY `entry`");
     if (result)
     {
         uiCreatureCount = result->GetRowCount();
@@ -2121,7 +2121,7 @@ void ScriptMgr::LoadScriptWaypoints()
 
     sLog.outString("Loading Script Waypoints for %u creature(s)...", uiCreatureCount);
 
-    result = WorldDatabase.PQuery("SELECT entry, pointid, location_x, location_y, location_z, waittime FROM script_waypoint ORDER BY pointid");
+    result = WorldDatabase.PQuery("SELECT `entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime` FROM `script_waypoint` ORDER BY `pointid`");
 
     if (result)
     {
@@ -2179,7 +2179,7 @@ void ScriptMgr::LoadEscortData()
 
     uint64 EscortDataCount = 0;
 
-    QueryResult* pResult = WorldDatabase.PQuery("SELECT creature_id, quest, escort_faction FROM script_escort_data");
+    QueryResult* pResult = WorldDatabase.PQuery("SELECT `creature_id`, `quest`, `escort_faction` FROM `script_escort_data`");
 
     if (pResult)
     {

@@ -669,7 +669,7 @@ void WorldSession::LogoutPlayer(bool Save)
         // No SQL injection as AccountID is uint32
         static SqlStatementID id;
 
-        SqlStatement stmt = LoginDatabase.CreateStatement(id, "UPDATE account SET current_realm = ?, online = 0 WHERE id = ?");
+        SqlStatement stmt = LoginDatabase.CreateStatement(id, "UPDATE `account` SET `current_realm` = ?, `online` = 0 WHERE `id` = ?");
         stmt.PExecute(uint32(0), GetAccountId());
 
         ///- If the player is in a guild, update the guild roster and broadcast a logout message to other guild members
@@ -1099,7 +1099,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         action = "Muted from public channels.";
         if (GetSecurity() == SEC_PLAYER)
         {
-            LoginDatabase.PExecute("UPDATE account SET flags = flags | 0x%x WHERE id = %u", ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS, GetAccountId());
+            LoginDatabase.PExecute("UPDATE `account` SET `flags` = `flags` | 0x%x WHERE `id` = %u", ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS, GetAccountId());
             SetAccountFlags(GetAccountFlags() | ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS);
         }
     }

@@ -141,10 +141,10 @@ bool Group::Create(ObjectGuid guid, char const*  name)
 
         // store group in database
         CharacterDatabase.BeginTransaction();
-        CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId ='%u'", m_Id);
-        CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId ='%u'", m_Id);
+        CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `groupId` ='%u'", m_Id);
+        CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `groupId` ='%u'", m_Id);
 
-        CharacterDatabase.PExecute("INSERT INTO groups(groupId,leaderGuid,mainTank,mainAssistant,lootMethod,looterGuid,lootThreshold,icon1,icon2,icon3,icon4,icon5,icon6,icon7,icon8,isRaid) "
+        CharacterDatabase.PExecute("INSERT INTO `groups` (`groupId`, `leaderGuid`, `mainTank`, `mainAssistant`, `lootMethod`, `looterGuid`, `lootThreshold`, `icon1`, `icon2`, `icon3`, `icon4`, `icon5`, `icon6`, `icon7`, `icon8`, `isRaid`) "
                                    "VALUES('%u','%u','%u','%u','%u','%u','%u','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','%u')",
                                    m_Id, m_leaderGuid.GetCounter(), m_mainTankGuid.GetCounter(), m_mainAssistantGuid.GetCounter(), uint32(m_lootMethod),
                                    m_looterGuid.GetCounter(), uint32(m_lootThreshold),
@@ -229,7 +229,7 @@ void Group::ConvertToRaid()
     _initRaidSubGroupsCounter();
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET isRaid = 1 WHERE groupId='%u'", m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET `isRaid` = 1 WHERE `groupId`='%u'", m_Id);
     SendUpdate();
 
     // update quest related GO states (quest activity dependent from raid membership)
@@ -522,8 +522,8 @@ void Group::Disband(bool hideDestroy)
     if (!isBGGroup())
     {
         CharacterDatabase.BeginTransaction();
-        CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId='%u'", m_Id);
-        CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId='%u'", m_Id);
+        CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `groupId`='%u'", m_Id);
+        CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `groupId`='%u'", m_Id);
         CharacterDatabase.CommitTransaction();
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, nullptr);
     }
@@ -1424,7 +1424,7 @@ bool Group::_addMember(ObjectGuid guid, char const* name, bool isAssistant, uint
     if (!isBGGroup() && !(player && player->IsBot()))
     {
         // insert into group table
-        CharacterDatabase.PExecute("INSERT INTO group_member(groupId,memberGuid,assistant,subgroup) VALUES('%u','%u','%u','%u')",
+        CharacterDatabase.PExecute("INSERT INTO `group_member` (`groupId`, `memberGuid`, `assistant`, `subgroup`) VALUES('%u','%u','%u','%u')",
                                    m_Id, member.guid.GetCounter(), ((member.assistant == 1) ? 1 : 0), member.group);
     }
 
@@ -1460,7 +1460,7 @@ bool Group::_removeMember(ObjectGuid guid)
     }
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid='%u'", guid.GetCounter());
+        CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `memberGuid`='%u'", guid.GetCounter());
 
     if (m_leaderGuid == guid)                               // leader was removed
     {
@@ -1538,8 +1538,8 @@ void Group::_setLeader(ObjectGuid guid)
         // in the DB also remove solo binds that will be replaced with permbinds
         // from the new leader
         CharacterDatabase.PExecute(
-            "DELETE FROM group_instance WHERE leaderguid='%u' AND (permanent = 1 OR "
-            "instance IN (SELECT instance FROM character_instance WHERE guid = '%u')"
+            "DELETE FROM `group_instance` WHERE `leaderguid`='%u' AND (`permanent` = 1 OR "
+            "`instance` IN (SELECT `instance` FROM `character_instance` WHERE `guid` = '%u')"
             ")", leader_lowguid, slot_lowguid);
 
         Player* player = sObjectMgr.GetPlayer(slot->guid);
@@ -1559,7 +1559,7 @@ void Group::_setLeader(ObjectGuid guid)
         }
 
         // update the group's solo binds to the new leader
-        CharacterDatabase.PExecute("UPDATE group_instance SET leaderGuid='%u' WHERE leaderGuid = '%u'",
+        CharacterDatabase.PExecute("UPDATE `group_instance` SET `leaderGuid`='%u' WHERE `leaderGuid` = '%u'",
                                    slot_lowguid, leader_lowguid);
 
         // copy the permanent binds from the new leader to the group
@@ -1568,7 +1568,7 @@ void Group::_setLeader(ObjectGuid guid)
         Player::ConvertInstancesToGroup(player, this, slot->guid);
 
         // update the group leader
-        CharacterDatabase.PExecute("UPDATE groups SET leaderGuid='%u' WHERE groupId='%u'", slot_lowguid, m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET `leaderGuid`='%u' WHERE `groupId`='%u'", slot_lowguid, m_Id);
         CharacterDatabase.CommitTransaction();
     }
 
@@ -1631,8 +1631,8 @@ bool Group::_swapMembersGroup(ObjectGuid guid, ObjectGuid swapGuid)
     // Don't need to change group counters since we are swapping
     if (!isBGGroup())
     {
-        CharacterDatabase.PExecute("UPDATE group_member SET subgroup='%u' WHERE memberGuid='%u'", slot->group, guid.GetCounter());
-        CharacterDatabase.PExecute("UPDATE group_member SET subgroup='%u' WHERE memberGuid='%u'", swapSlot->group, swapGuid.GetCounter());
+        CharacterDatabase.PExecute("UPDATE `group_member` SET `subgroup`='%u' WHERE `memberGuid`='%u'", slot->group, guid.GetCounter());
+        CharacterDatabase.PExecute("UPDATE `group_member` SET `subgroup`='%u' WHERE `memberGuid`='%u'", swapSlot->group, swapGuid.GetCounter());
     }
 
     return true;
@@ -1649,7 +1649,7 @@ bool Group::_setMembersGroup(ObjectGuid guid, uint8 group)
     SubGroupCounterIncrease(group);
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE group_member SET subgroup='%u' WHERE memberGuid='%u'", group, guid.GetCounter());
+        CharacterDatabase.PExecute("UPDATE `group_member` SET `subgroup`='%u' WHERE `memberGuid`='%u'", group, guid.GetCounter());
 
     return true;
 }
@@ -1662,7 +1662,7 @@ bool Group::_setAssistantFlag(ObjectGuid guid, bool const& state)
 
     slot->assistant = state;
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE group_member SET assistant='%u' WHERE memberGuid='%u'", (state) ? 1 : 0, guid.GetCounter());
+        CharacterDatabase.PExecute("UPDATE `group_member` SET `assistant`='%u' WHERE `memberGuid`='%u'", (state) ? 1 : 0, guid.GetCounter());
     return true;
 }
 
@@ -1684,7 +1684,7 @@ bool Group::_setMainTank(ObjectGuid guid)
     m_mainTankGuid = guid;
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET mainTank='%u' WHERE groupId='%u'", m_mainTankGuid.GetCounter(), m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET `mainTank`='%u' WHERE `groupId`='%u'", m_mainTankGuid.GetCounter(), m_Id);
 
     return true;
 }
@@ -1707,7 +1707,7 @@ bool Group::_setMainAssistant(ObjectGuid guid)
     m_mainAssistantGuid = guid;
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET mainAssistant='%u' WHERE groupId='%u'",
+        CharacterDatabase.PExecute("UPDATE `groups` SET `mainAssistant`='%u' WHERE `groupId`='%u'",
                                    m_mainAssistantGuid.GetCounter(), m_Id);
 
     return true;
@@ -1990,7 +1990,7 @@ void Group::ResetInstances(InstanceResetMethod method, Player* SendMsgTo)
             if (state->CanReset())
                 state->DeleteFromDB();
             else
-                CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", state->GetInstanceId());
+                CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `instance` = '%u'", state->GetInstanceId());
             // i don't know for sure if hash_map iterators
             m_boundInstances.erase(itr);
             itr = m_boundInstances.begin();
@@ -2028,11 +2028,11 @@ InstanceGroupBind* Group::BindToInstance(DungeonPersistentState* state, bool per
             // when a boss is killed or when copying the players's binds to the group
             if (permanent != bind.perm || state != bind.state)
                 if (!load)
-                    CharacterDatabase.PExecute("UPDATE group_instance SET instance = '%u', permanent = '%u' WHERE leaderGuid = '%u' AND instance = '%u'",
+                    CharacterDatabase.PExecute("UPDATE `group_instance` SET `instance` = '%u', `permanent` = '%u' WHERE `leaderGuid` = '%u' AND `instance` = '%u'",
                                                state->GetInstanceId(), permanent, GetLeaderGuid().GetCounter(), bind.state->GetInstanceId());
         }
         else if (!load)
-            CharacterDatabase.PExecute("INSERT INTO group_instance (leaderGuid, instance, permanent) VALUES ('%u', '%u', '%u')",
+            CharacterDatabase.PExecute("INSERT INTO `group_instance` (`leaderGuid`, `instance`, `permanent`) VALUES ('%u', '%u', '%u')",
                                        GetLeaderGuid().GetCounter(), state->GetInstanceId(), permanent);
 
         if (bind.state != state)
@@ -2059,7 +2059,7 @@ void Group::UnbindInstance(uint32 mapid, bool unload)
     if (itr != m_boundInstances.end())
     {
         if (!unload)
-            CharacterDatabase.PExecute("DELETE FROM group_instance WHERE leaderGuid = '%u' AND instance = '%u'",
+            CharacterDatabase.PExecute("DELETE FROM `group_instance` WHERE `leaderGuid` = '%u' AND `instance` = '%u'",
                                        GetLeaderGuid().GetCounter(), itr->second.state->GetInstanceId());
         itr->second.state->RemoveGroup(this);               // save can become invalid
         m_boundInstances.erase(itr);

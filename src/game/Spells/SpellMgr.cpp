@@ -49,8 +49,8 @@ void SpellMgr::LoadSpellTargetPositions()
 
     uint32 count = 0;
 
-    //                                                               0   1           2                  3                  4                  5
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT id, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM spell_target_position WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
+    //                                                                0     1             2                    3                    4                    5
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation` FROM `spell_target_position` WHERE (`build_min` <= %u) && (`build_max` >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -318,8 +318,8 @@ void SpellMgr::LoadSpellProcEvents()
 {
     mSpellProcEventMap.clear();                             // need for reload case
 
-    //                                                               0      1           2                3                 4                 5                 6          7       8        9             10
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
+    //                                                                0        1             2                  3                   4                   5                   6            7         8          9               10
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown` FROM `spell_proc_event` WHERE (`build_min` <= %u) && (`build_max` >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -383,8 +383,8 @@ void SpellMgr::LoadSpellProcItemEnchant()
 
     uint32 count = 0;
 
-    //                                                              0      1
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT entry, ppmRate FROM spell_proc_item_enchant"));
+    //                                                               0        1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `ppmRate` FROM `spell_proc_item_enchant`"));
     if (!result)
     {
 
@@ -509,8 +509,8 @@ void SpellMgr::LoadSpellGroups()
 
     uint32 count = 0;
 
-    //                                                               0         1
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT group_id, spell_id FROM spell_group WHERE %u BETWEEN build_min AND build_max ORDER BY group_id, group_spell_id, spell_id", SUPPORTED_CLIENT_BUILD));
+    //                                                                0           1
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `group_id`, `spell_id` FROM `spell_group` WHERE %u BETWEEN `build_min` AND `build_max` ORDER BY `group_id`, `group_spell_id`, `spell_id`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -590,8 +590,8 @@ void SpellMgr::LoadSpellGroupStackRules()
 
     uint32 count = 0;
 
-    //                                                               0         1
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT group_id, stack_rule FROM spell_group_stack_rules t1 WHERE build=(SELECT max(build) FROM spell_group_stack_rules t2 WHERE t1.group_id=t2.group_id && build <= %u)", SUPPORTED_CLIENT_BUILD));
+    //                                                                0           1
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `group_id`, `stack_rule` FROM `spell_group_stack_rules` t1 WHERE `build`=(SELECT max(`build`) FROM `spell_group_stack_rules` t2 WHERE t1.`group_id`=t2.`group_id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -721,8 +721,8 @@ void SpellMgr::LoadSpellElixirs()
 
     uint32 count = 0;
 
-    //                                                               0      1
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, mask FROM spell_elixir WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
+    //                                                                0        1
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `mask` FROM `spell_elixir` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
 
@@ -830,8 +830,8 @@ void SpellMgr::LoadSpellThreats()
 {
     mSpellThreatMap.clear();                                // need for reload case
 
-    //                                                               0      1       2           3
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
+    //                                                                0        1         2             3
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Threat`, `multiplier`, `ap_bonus` FROM `spell_threat` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -1579,7 +1579,7 @@ void SpellMgr::LoadSpellChains()
     }
 
     // load custom case
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT spell_id, prev_spell, first_spell, `rank`, req_spell FROM spell_chain WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `spell_id`, `prev_spell`, `first_spell`, `rank`, `req_spell` FROM `spell_chain` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -1849,8 +1849,8 @@ void SpellMgr::LoadSpellEnchantCharges()
 
     uint32 count = 0;
 
-    //                                                              0      1
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT entry, charges FROM spell_enchant_charges"));
+    //                                                               0        1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `charges` FROM `spell_enchant_charges`"));
     if (!result)
     {
         BarGoLink bar(1);
@@ -1894,8 +1894,8 @@ void SpellMgr::LoadSpellLearnSpells()
 {
     mSpellLearnSpells.clear();                              // need for reload case
 
-    //                                                               0      1        2
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, SpellID, Active FROM spell_learn_spell WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
+    //                                                                0        1          2
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `SpellID`, `Active` FROM `spell_learn_spell` WHERE (`build_min` <= %u) && (`build_max` >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -2183,8 +2183,8 @@ void SpellMgr::LoadSpellPetAuras()
 
     uint32 count = 0;
 
-    //                                                              0      1    2
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT spell, pet, aura FROM spell_pet_auras"));
+    //                                                               0        1      2
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `spell`, `pet`, `aura` FROM `spell_pet_auras`"));
     if (!result)
     {
 
@@ -2337,8 +2337,8 @@ void SpellMgr::LoadSpellAreas()
 
     uint32 count = 0;
 
-    //                                                              0      1     2            3                   4          5           6         7       8
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT spell, area, quest_start, quest_start_active, quest_end, aura_spell, racemask, gender, autocast FROM spell_area"));
+    //                                                               0        1       2              3                     4            5             6           7         8
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `spell`, `area`, `quest_start`, `quest_start_active`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast` FROM `spell_area`"));
 
     if (!result)
     {
@@ -2714,8 +2714,8 @@ void SpellMgr::CheckUsedSpells(char const* table)
     uint32 countSpells = 0;
     uint32 countMasks = 0;
 
-    //                                                               0       1               2               3         4           5             6          7          8         9    10
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT spellid,SpellFamilyName,SpellFamilyMask,SpellIcon,SpellVisual,SpellCategory,EffectType,EffectAura,EffectIdx,Name,Code FROM %s", table));
+    //                                                                0         1                  2                  3            4              5                6             7             8            9       10
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `spellid`, `SpellFamilyName`, `SpellFamilyMask`, `SpellIcon`, `SpellVisual`, `SpellCategory`, `EffectType`, `EffectAura`, `EffectIdx`, `Name`, `Code` FROM %s", table));
 
     if (!result)
     {
@@ -3021,8 +3021,8 @@ void SpellMgr::LoadSpellAffects()
 
     uint32 count = 0;
 
-    //                                                               0      1         2
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, effectId, SpellFamilyMask FROM spell_affect WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
+    //                                                                0        1           2
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `effectId`, `SpellFamilyMask` FROM `spell_affect` WHERE (`build_min` <= %u) && (`build_max` >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
 

@@ -304,7 +304,7 @@ int Master::Run()
         std::string builds = AcceptableClientBuildsListStr();
         LoginDatabase.escape_string(builds);
 
-        LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
+        LoginDatabase.PExecute("UPDATE `realmlist` SET `realmflags` = `realmflags` & ~(%u), `population` = 0, `realmbuilds` = '%s'  WHERE `id` = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
     }
 
     ACE_Based::Thread* cliThread = nullptr;
@@ -614,12 +614,12 @@ void Master::clearOnlineAccounts()
 {
     // Cleanup online status for characters hosted at current realm
     /// \todo Only accounts with characters logged on *this* realm should have online status reset. Move the online column from 'account' to 'realmcharacters'?
-    LoginDatabase.PExecute("UPDATE account SET current_realm = 0 WHERE current_realm = '%u'", realmID);
+    LoginDatabase.PExecute("UPDATE `account` SET `current_realm` = 0 WHERE `current_realm` = '%u'", realmID);
 
-    CharacterDatabase.Execute("UPDATE characters SET online = 0 WHERE online<>0");
+    CharacterDatabase.Execute("UPDATE `characters` SET `online` = 0 WHERE `online`<>0");
 
     // Battleground instance ids reset at server restart
-    CharacterDatabase.Execute("UPDATE character_battleground_data SET instance_id = 0");
+    CharacterDatabase.Execute("UPDATE `character_battleground_data` SET `instance_id` = 0");
 }
 
 #include "ObjectAccessor.h"
