@@ -663,6 +663,10 @@ bool AuthSocket::_HandleLogonProof()
         xferh.file_size = file_size;
 
         send((const char*)&xferh, sizeof(xferh));
+
+	// All ok.
+	_status = STATUS_PATCH;
+
         return true;
     }
     /// </ul>
