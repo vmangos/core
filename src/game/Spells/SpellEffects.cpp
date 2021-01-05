@@ -579,6 +579,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }, 1);
                     return;
                 }
+                case 28091: // NAXX EVENT TEST - casting Spirit Spawn-out
+                {
+                    unitTarget->CastSpell(unitTarget, 17680, false);
+                    return;
+                }
                 case 23383: // Alliance Flag Click
                 case 23384: // Horde Flag Click
                 {
