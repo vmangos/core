@@ -87,8 +87,6 @@ void OutdoorPvPSI::OnPlayerEnter(Player* plr)
 
 void OutdoorPvPSI::OnPlayerLeave(Player* plr)
 {
-    // remove buffs
-    plr->RemoveAurasDueToSpell(SI_CENARION_FAVOR);
     OutdoorPvP::OnPlayerLeave(plr);
 }
 
@@ -122,7 +120,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
                 // complete quest
                 plr->KilledMonsterCredit(SI_TURNIN_QUEST_CM_A, ObjectGuid());
             }
-            else // H2 dans le trigger A2
+            else
                 return true;
             break;
         case SI_AREATRIGGER_H:
@@ -143,18 +141,20 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
                 // complete quest
                 plr->KilledMonsterCredit(SI_TURNIN_QUEST_CM_H, ObjectGuid());
             }
-            else // A2 dans le trigger H2
+            else
                 return true;
             break;
         default:
             return false;
     }
-    plr->RemoveAurasDueToSpell(SI_SILITHYST_FLAG);                               /** Remove silithyst aura */
-    UpdateWorldState();
 
-    plr->CastSpell(plr, SI_TRACES_OF_SILITHYST, true);                           /** Reward animation */
-    plr->GetHonorMgr().Add(19, BONUS);                                       /** Instant honor reward */
-    plr->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(609), 10); /** Cenarian faction */
+    plr->RemoveAurasDueToSpell(SI_SILITHYST_FLAG); 
+    //plr->CastSpell(plr, SILLITHUS_FLAG_CAPTURE_TEST, true);
+    plr->CastSpell(plr, SI_TRACES_OF_SILITHYST, true);
+    plr->CastSpell(plr, HONOR_POINTS_199, true);                // Honor reward
+    plr->CastSpell(plr, SILITHYST_CAP_REWARD, true);            // Cenarian faction
+
+    UpdateWorldState();
 
     sLog.out(LOG_BG, "%s [%u:%u:'%s'] added a Silithyst to its faction",
         plr->GetName(),
@@ -167,29 +167,23 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
 
 bool OutdoorPvPSI::HandleDropFlag(Player* plr, uint32 spellId)
 {
-    if (spellId == SI_SILITHYST_FLAG)
-    {
-        // if the aura was canceled or player died, then create a silithyst mound, if it was dropped near the areatrigger, then it was dispelled by the outdoorpvp, so do nothing
-        if (AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(plr->GetTeam() == ALLIANCE ? SI_AREATRIGGER_A : SI_AREATRIGGER_H))
-            if (atEntry)
-            {
-                if (plr->GetDistance(atEntry->x, atEntry->y, atEntry->z) > 5.0f + atEntry->radius)
-                {
-                    // he dropped it further, summon mound
-                    plr->CastSpell(plr, SILLITHUS_FLAG_DROP, true);
-                    {
-                        sLog.out(LOG_BG, "%s [%u:%u:'%s'] dropped a silithyst",
-                            plr->GetName(),
-                            plr->GetGUIDLow(),
-                            plr->GetSession()->GetAccountId(),
-                            plr->GetSession()->GetRemoteAddress().c_str());
-                    }
-                }
-            }
+    if (spellId != SI_SILITHYST_FLAG)
+        return false;
 
-        return true;
+    if (AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(plr->GetTeam() == ALLIANCE ? SI_AREATRIGGER_A : SI_AREATRIGGER_H))
+        if (plr->IsWithinDist3d(atEntry->x, atEntry->y, atEntry->z, 5.0f))
+            return false;
+
+    plr->CastSpell(plr, SILLITHUS_FLAG_DROP, true);
+    {
+        sLog.out(LOG_BG, "%s [%u:%u:'%s'] dropped a silithyst",
+            plr->GetName(),
+            plr->GetGUIDLow(),
+            plr->GetSession()->GetAccountId(),
+            plr->GetSession()->GetRemoteAddress().c_str());
     }
-    return false;
+
+    return true;
 }
 
 class OutdoorPvP_silithus : public ZoneScript_Script
