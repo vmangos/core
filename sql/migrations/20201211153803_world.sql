@@ -84,7 +84,7 @@ UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 14964;
 -- feral blade vrang wildgore
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3682 AND `item` = 4766;
 
--- stable boots piznukle
+-- agile boots pizznukle
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 3684 AND `item` = 4788;
 
 -- pattern: blue overalls yonada
