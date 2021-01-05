@@ -883,7 +883,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
             // Journeyman Riding
             case 33391:
             {
-                if (!CharacterDatabase.PExecute("UPDATE `character_skills` SET `value` = 75, `max` = 75 WHERE `skill` = 762 AND `value` = 150 AND `max` = `150` AND `guid` = '%u'", target_guid.GetCounter()))
+                if (!CharacterDatabase.PExecute("UPDATE `character_skills` SET `value` = 75, `max` = 75 WHERE `skill` = 762 AND `value` = 150 AND `max` = 150 AND `guid` = '%u'", target_guid.GetCounter()))
                 {
                     SendSysMessage(LANG_REMOVE_RIDING_ERROR);
                     SetSentErrorMessage(true);
@@ -1255,7 +1255,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
                 std::copy(list.begin(), list.end(), std::ostream_iterator<int>(accountStream, ","));
                 std::string accounts = accountStream.str();
                 accounts.pop_back();
-                resultChar = CharacterDatabase.PQuery("SELECT `guid`, `deleteInfos_Name`, `deleteInfos_Account`, `deleteDate` FROM `characters` WHERE `deleteDate` IS NOT NULL AND `deleteInfos_Account` IN '%s' LIMIT 0,50", accounts.c_str());
+                resultChar = CharacterDatabase.PQuery("SELECT `guid`, `deleteInfos_Name`, `deleteInfos_Account`, `deleteDate` FROM `characters` WHERE `deleteDate` IS NOT NULL AND `deleteInfos_Account` IN ('%s') LIMIT 0,50", accounts.c_str());
             }
         }
     }
