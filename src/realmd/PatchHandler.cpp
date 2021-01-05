@@ -153,10 +153,9 @@ PatchCache* PatchCache::instance()
 void PatchCache::LoadPatchMD5(const char* szFileName)
 {
     // Try to open the patch file
-    std::string path = "./patches/";
-    path += szFileName;
+    std::string path = szFileName;
     FILE* pPatch = fopen(path.c_str (), "rb");
-    DEBUG_LOG("Loading patch info from %s", path.c_str());
+    DEBUG_LOG("Loading patch info from file %s", path.c_str());
 
     if(!pPatch)
         return;
@@ -196,7 +195,10 @@ bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
 
 void PatchCache::LoadPatchesInfo()
 {
-    ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT("./patches/"));
+    std::string path = sConfig.GetStringDefault("PatchesDir","./patches") + "/";
+    std::string fullpath;
+    ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT(path.c_str()));
+    DEBUG_LOG("Loading patch info from folder %s", path.c_str());
 
     if(!dirp)
         return;
@@ -210,7 +212,10 @@ void PatchCache::LoadPatchesInfo()
             continue;
 
         if(!memcmp(&dp->d_name[l - 4], ".mpq", 4))
-            LoadPatchMD5(dp->d_name);
+	{
+	    fullpath = path + dp->d_name;
+	    LoadPatchMD5(fullpath.c_str());
+	}
     }
 
     ACE_OS::closedir(dirp);
