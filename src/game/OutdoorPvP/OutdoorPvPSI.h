@@ -30,7 +30,10 @@ enum OutdoorPvPSISpells
     SI_CENARION_FAVOR                   = 30754,
     SILLITHUS_FLAG_HORDE_SPEED_LIMIT    = 29895,
     SILLITHUS_FLAG_ALLIANCE_SPEED_LIMIT = 29894,
-    SILLITHUS_FLAG_DROP                 = 29533
+    SILLITHUS_FLAG_CAPTURE_TEST         = 29530,
+    SILLITHUS_FLAG_DROP                 = 29533,
+    HONOR_POINTS_199                    = 31420,
+    SILITHYST_CAP_REWARD                = 31247
 };
 
 uint32 const SI_MAX_RESOURCES_DEFAULT = 200;
@@ -41,6 +44,7 @@ uint32 const SI_AREATRIGGER_A       = 4162;
 uint32 const SI_TURNIN_QUEST_CM_A   = 17090;
 uint32 const SI_TURNIN_QUEST_CM_H   = 18199;
 uint32 const SI_SILITHYST_MOUND     = 181597;
+uint32 const SI_SILITHYST_GEYSER    = 181598;
 
 enum SI_WorldStates
 {
