@@ -2732,7 +2732,7 @@ void Aura::HandleForceReaction(bool apply, bool Real)
             player->StopAttackFaction(scarlet_crusade_faction_id);
     }
 
-    if (player->GetZoneId() == 1377 && GetId() == 29519)
+    if (GetId() == 29519 && player->GetZoneId() == 1377)
     {
         if (apply)
             player->CastSpell(player, (player->GetTeam() == ALLIANCE ? 29894 : 29895), true);
