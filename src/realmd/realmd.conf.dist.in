@@ -3,7 +3,7 @@
 ############################################
 
 [RealmdConf]
-ConfVersion=2010062001
+ConfVersion=2020010501
 
 ###################################################################################################################
 # REALMD SETTINGS
@@ -21,6 +21,11 @@ ConfVersion=2010062001
 #         Important: Logs dir must exists, or all logs be disable
 #         Default: "" - no log directory prefix. if used log names aren't absolute paths
 #                       then logs will be stored in the current directory of the running program.
+#
+#    PatchesDir
+#         Folder to serve client patches.
+#         Important: Patches dir must contain mpq files like this: <build><lang>.mpq e.g. 65535enGB.mpq
+#         Default: "./patches"
 #
 #    MaxPingTime
 #         Settings for maximum database-ping interval (minutes between pings)
@@ -154,6 +159,7 @@ ConfVersion=2010062001
 
 LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
 LogsDir = ""
+PatchesDir = "./patches"
 MaxPingTime = 30
 RealmServerPort = 3724
 BindIP = "0.0.0.0"

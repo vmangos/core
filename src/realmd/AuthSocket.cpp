@@ -615,9 +615,9 @@ bool AuthSocket::_HandleLogonProof()
 
         ///- Check if we have the apropriate patch on the disk
         // file looks like: 65535enGB.mpq
-        char tmp[64];
+        char tmp[256];
 
-        snprintf(tmp, 24, "./patches/%d%s.mpq", _build, _localizationName.c_str());
+        snprintf(tmp, 256, "%s/%d%s.mpq", sConfig.GetStringDefault("PatchesDir","./patches").c_str(), _build, _localizationName.c_str());
 
         char filename[PATH_MAX];
         if (ACE_OS::realpath(tmp, filename) != nullptr)
