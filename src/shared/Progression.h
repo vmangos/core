@@ -30,7 +30,7 @@
 #define CLIENT_BUILD_1_11_0 5428
 #define CLIENT_BUILD_1_11_2 5464
 #define CLIENT_BUILD_1_12_1 5875
-#define CLIENT_BUILD_2_0_0 5610
+#define CLIENT_BUILD_2_0_0 6080
 
 // Change this to define which build of the game to emulate.
 // Has an effect on things such as core gameplay mechanics,
