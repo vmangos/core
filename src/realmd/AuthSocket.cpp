@@ -306,25 +306,25 @@ void AuthSocket::SendProof(Sha1Hash sha)
 {
   if (_build < CLIENT_BUILD_2_0_0)
   {
-    sAuthLogonProof_S_BUILD_6005 proof;
-    memcpy(proof.M2, sha.GetDigest(), 20);
-    proof.cmd = CMD_AUTH_LOGON_PROOF;
-    proof.error = 0;
-    proof.unk2 = 0x00;
+      sAuthLogonProof_S_BUILD_6005 proof;
+      memcpy(proof.M2, sha.GetDigest(), 20);
+      proof.cmd = CMD_AUTH_LOGON_PROOF;
+      proof.error = 0;
+      proof.unk2 = 0x00;
 
-    send((char *)&proof, sizeof(proof));
+      send((char *)&proof, sizeof(proof));
   }
   else
   {
-    sAuthLogonProof_S proof;
-    memcpy(proof.M2, sha.GetDigest(), 20);
-    proof.cmd = CMD_AUTH_LOGON_PROOF;
-    proof.error = 0;
-    proof.accountFlags = ACCOUNT_FLAG_PROPASS;
-    proof.surveyId = 0x00000000;
-    proof.LoginFlags = 0x0000;
+      sAuthLogonProof_S proof;
+      memcpy(proof.M2, sha.GetDigest(), 20);
+      proof.cmd = CMD_AUTH_LOGON_PROOF;
+      proof.error = 0;
+      proof.accountFlags = ACCOUNT_FLAG_PROPASS;
+      proof.surveyId = 0x00000000;
+      proof.LoginFlags = 0x0000;
 
-    send((char *)&proof, sizeof(proof));
+      send((char *)&proof, sizeof(proof));
   }
 }
 
@@ -1100,117 +1100,117 @@ bool AuthSocket::_HandleRealmList()
 
 void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
-  if (_build < CLIENT_BUILD_2_0_0)
-  {
-    pkt << uint32(0);                               // unused value
-    pkt << uint8(sRealmList.size());
-
-    for(RealmList::RealmMap::const_iterator  i = sRealmList.begin(); i != sRealmList.end(); ++i)
+    if (_build < CLIENT_BUILD_2_0_0)
     {
-      uint8 AmountOfCharacters;
+        pkt << uint32(0);                               // unused value
+	pkt << uint8(sRealmList.size());
 
-      // No SQL injection. id of realm is controlled by the database.
-      QueryResult *result = LoginDatabase.PQuery( "SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, _accountId);
-      if( result )
-      {
-	Field *fields = result->Fetch();
-	AmountOfCharacters = fields[0].GetUInt8();
-	delete result;
-      }
-      else
-	AmountOfCharacters = 0;
+	for(RealmList::RealmMap::const_iterator  i = sRealmList.begin(); i != sRealmList.end(); ++i)
+	{
+	    uint8 AmountOfCharacters;
 
-      bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end();
+	    // No SQL injection. id of realm is controlled by the database.
+	    QueryResult *result = LoginDatabase.PQuery( "SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, _accountId);
+	    if( result )
+	    {
+		Field *fields = result->Fetch();
+		AmountOfCharacters = fields[0].GetUInt8();
+		delete result;
+	    }
+	    else
+	        AmountOfCharacters = 0;
 
-      RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : nullptr;
-      if (!buildInfo)
-	buildInfo = &i->second.realmBuildInfo;
+	    bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end();
 
-      RealmFlags realmflags = i->second.realmflags;
+	    RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : nullptr;
+	    if (!buildInfo)
+	        buildInfo = &i->second.realmBuildInfo;
 
-      // 1.x clients not support explicitly REALM_FLAG_SPECIFYBUILD, so manually form similar name as show in more recent clients
-      std::string name = i->first;
-      if (realmflags & REALM_FLAG_SPECIFYBUILD)
-      {
-	char buf[20];
-	snprintf(buf, 20," (%u,%u,%u)", buildInfo->major_version, buildInfo->minor_version, buildInfo->bugfix_version);
-	name += buf;
-      }
+	    RealmFlags realmflags = i->second.realmflags;
 
-      // Show offline state for unsupported client builds and locked realms (1.x clients not support locked state show)
-      if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)))
-	realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
+	    // 1.x clients not support explicitly REALM_FLAG_SPECIFYBUILD, so manually form similar name as show in more recent clients
+	    std::string name = i->first;
+	    if (realmflags & REALM_FLAG_SPECIFYBUILD)
+	    {
+		char buf[20];
+		snprintf(buf, 20," (%u,%u,%u)", buildInfo->major_version, buildInfo->minor_version, buildInfo->bugfix_version);
+		name += buf;
+	    }
 
-      pkt << uint32(i->second.icon);              // realm type
-      pkt << uint8(realmflags);                   // realmflags
-      pkt << name;                                // name
-      pkt << i->second.address;                   // address
-      pkt << float(i->second.populationLevel);
-      pkt << uint8(AmountOfCharacters);
-      pkt << uint8(i->second.timezone);           // realm category
-      pkt << uint8(0x00);                         // unk, may be realm number/id?
+	    // Show offline state for unsupported client builds and locked realms (1.x clients not support locked state show)
+	    if (!ok_build || (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)))
+	        realmflags = RealmFlags(realmflags | REALM_FLAG_OFFLINE);
+
+	    pkt << uint32(i->second.icon);              // realm type
+	    pkt << uint8(realmflags);                   // realmflags
+	    pkt << name;                                // name
+	    pkt << i->second.address;                   // address
+	    pkt << float(i->second.populationLevel);
+	    pkt << uint8(AmountOfCharacters);
+	    pkt << uint8(i->second.timezone);           // realm category
+	    pkt << uint8(0x00);                         // unk, may be realm number/id?
+	}
+
+	pkt << uint16(0x0002);                          // unused value (why 2?)
     }
-
-    pkt << uint16(0x0002);                          // unused value (why 2?)
-  }
-  else
-  {
-    pkt << uint32(0);                               // unused value
-    pkt << uint16(sRealmList.size());
-
-    for(RealmList::RealmMap::const_iterator  i = sRealmList.begin(); i != sRealmList.end(); ++i)
+    else
     {
-      uint8 AmountOfCharacters;
+	pkt << uint32(0);                               // unused value
+	pkt << uint16(sRealmList.size());
 
-      // No SQL injection. id of realm is controlled by the database.
-      QueryResult *result = LoginDatabase.PQuery( "SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, _accountId);
-      if( result )
-      {
-	Field *fields = result->Fetch();
-	AmountOfCharacters = fields[0].GetUInt8();
-	delete result;
-      }
-      else
-	AmountOfCharacters = 0;
+	for(RealmList::RealmMap::const_iterator  i = sRealmList.begin(); i != sRealmList.end(); ++i)
+	{
+	    uint8 AmountOfCharacters;
 
-      bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end();
+	    // No SQL injection. id of realm is controlled by the database.
+	    QueryResult *result = LoginDatabase.PQuery( "SELECT `numchars` FROM `realmcharacters` WHERE `realmid` = '%d' AND `acctid`='%u'", i->second.m_ID, _accountId);
+	    if( result )
+	    {
+		Field *fields = result->Fetch();
+		AmountOfCharacters = fields[0].GetUInt8();
+		delete result;
+	    }
+	    else
+	        AmountOfCharacters = 0;
 
-      RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : nullptr;
-      if (!buildInfo)
-	buildInfo = &i->second.realmBuildInfo;
+	    bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end();
 
-      uint8 lock = (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)) ? 1 : 0;
+	    RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : nullptr;
+	    if (!buildInfo)
+	        buildInfo = &i->second.realmBuildInfo;
 
-      RealmFlags realmFlags = i->second.realmflags;
+	    uint8 lock = (i->second.allowedSecurityLevel > GetSecurityOn(i->second.m_ID)) ? 1 : 0;
 
-      // Show offline state for unsupported client builds
-      if (!ok_build)
-	realmFlags = RealmFlags(realmFlags | REALM_FLAG_OFFLINE);
+	    RealmFlags realmFlags = i->second.realmflags;
 
-      if (!buildInfo)
-	realmFlags = RealmFlags(realmFlags & ~REALM_FLAG_SPECIFYBUILD);
+	    // Show offline state for unsupported client builds
+	    if (!ok_build)
+	        realmFlags = RealmFlags(realmFlags | REALM_FLAG_OFFLINE);
 
-      pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
-      pkt << uint8(lock);                         // flags, if 0x01, then realm locked
-      pkt << uint8(realmFlags);                   // see enum RealmFlags
-      pkt << i->first;                            // name
-      pkt << i->second.address;                   // address
-      pkt << float(i->second.populationLevel);
-      pkt << uint8(AmountOfCharacters);
-      pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)
-      pkt << uint8(0x2C);                         // unk, may be realm number/id?
+	    if (!buildInfo)
+	        realmFlags = RealmFlags(realmFlags & ~REALM_FLAG_SPECIFYBUILD);
 
-      if (realmFlags & REALM_FLAG_SPECIFYBUILD)
-      {
-	pkt << uint8(buildInfo->major_version);
-	pkt << uint8(buildInfo->minor_version);
-	pkt << uint8(buildInfo->bugfix_version);
-	pkt << uint16(_build);
-      }
+	    pkt << uint8(i->second.icon);               // realm type (this is second column in Cfg_Configs.dbc)
+	    pkt << uint8(lock);                         // flags, if 0x01, then realm locked
+	    pkt << uint8(realmFlags);                   // see enum RealmFlags
+	    pkt << i->first;                            // name
+	    pkt << i->second.address;                   // address
+	    pkt << float(i->second.populationLevel);
+	    pkt << uint8(AmountOfCharacters);
+	    pkt << uint8(i->second.timezone);           // realm category (Cfg_Categories.dbc)
+	    pkt << uint8(0x2C);                         // unk, may be realm number/id?
+
+	    if (realmFlags & REALM_FLAG_SPECIFYBUILD)
+	    {
+		pkt << uint8(buildInfo->major_version);
+		pkt << uint8(buildInfo->minor_version);
+		pkt << uint8(buildInfo->bugfix_version);
+		pkt << uint16(_build);
+	    }
+	}
+
+	pkt << uint16(0x0010);                          // unused value (why 10?)
     }
-
-    pkt << uint16(0x0010);                          // unused value (why 10?)
-  }
 }
 
 /// Resume patch transfer
