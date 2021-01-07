@@ -2351,6 +2351,7 @@ bool GameObject::HasCustomAnim() const
         case 4491: // mortar in dun morogh
         case 6785: // plague fissure
         case 6747: // sapphiron birth
+        case 6871: // Silithyst bring in
             return true;
     }
 

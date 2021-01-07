@@ -1576,6 +1576,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         unitTarget->AddCooldown(*spellInfo, itemProto);
                     return;
                 }
+                case 29518: // Sillithus Flag Click (DND)
+                {
+                    // Also mark player with pvp on
+                    unitTarget->CastSpell(unitTarget, 29519, true);
+                    unitTarget->SetPvPContested(true);
+
+                    return;
+                }
                 case 17190: // Ras Frostwhisper Visual Dummy
                 {
                     if (unitTarget)
