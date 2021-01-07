@@ -81,14 +81,22 @@ struct boss_ptheradrasAI : public ScriptedAI
         {
 
             //only cast Dust Field if an attacker is in melee range 
+            bool m_bMeleeAttackers = false;
+
             Unit::AttackerSet attackers = m_creature->GetAttackers();
             for (const auto itr : attackers)
                 if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                     if (m_creature->IsInRange(attacker, 0.0f, m_creature->GetMeleeReach(), false))
                     {
-                        DoCastSpellIfCan(m_creature, SPELL_DUSTFIELD);
-                        Dustfield_Timer = 14000;
+                        m_bMeleeAttackers = true;
+                        break;
                     }
+            
+            if (m_bMeleeAttackers)
+            {
+                DoCastSpellIfCan(m_creature, SPELL_DUSTFIELD);
+                Dustfield_Timer = 14000;
+            }
 
         }
         else Dustfield_Timer -= diff;
