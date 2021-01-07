@@ -6397,6 +6397,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!go->IsUseRequirementMet())
                         return SPELL_FAILED_TRY_AGAIN;
 
+                    // check if its in use only when cast is finished (called from spell::cast() with strict = false)
+                    if (!strict && go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->loot.HasPlayersLooting())
+                        return SPELL_FAILED_CHEST_IN_USE;
+
                     if (!strict && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE))
                         return SPELL_FAILED_CHEST_IN_USE;
 
