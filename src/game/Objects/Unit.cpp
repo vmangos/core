@@ -736,8 +736,6 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     {
         SetInCombatWithVictim(pVictim);
         pVictim->SetInCombatWithAggressor(this);
-        if (IsPlayer() && pVictim->IsCreature())
-            pVictim->ToCreature()->ResetLastDamageTakenTime();;
     }
     if (pVictim->IsCreature())
         pVictim->ToCreature()->CountDamageTaken(damage, GetCharmerOrOwnerOrOwnGuid().IsPlayer() || pVictim == this);
@@ -4579,6 +4577,7 @@ void Unit::CombatStop(bool includingCast)
     {
         pCreature->UpdateCombatState(false);
         pCreature->UpdateCombatWithZoneState(false);
+        pCreature->ClearLastLeashExtensionTimePtr();
         pCreature->m_TargetNotReachableTimer = 0;
         if (pCreature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
             pCreature->ClearTemporaryFaction();
@@ -5584,7 +5583,11 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
     }
 
     if (!touchOnly)
+    {
         SetInCombatWith(pAggressor);
+        if (Creature* pCreature = ToCreature())
+            pCreature->UpdateLeashExtensionTime();
+    }
 }
 
 void Unit::SetInCombatWithAssisted(Unit* pAssisted)

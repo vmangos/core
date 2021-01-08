@@ -182,7 +182,7 @@ public:
             return false;
 
         u->AddThreat(&i_obj, 1.0f);
-        u->ResetLastDamageTakenTime();
+        u->UpdateLeashExtensionTime();
         return false;
     }
 private:
@@ -288,7 +288,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         }
 
         if (Creature* c = m_creature->GetVictim()->ToCreature())
-            c->ResetLastDamageTakenTime();
+            c->UpdateLeashExtensionTime();
         DoMeleeAttackIfReady();
     }
     void CorpseRemoved(uint32&) override

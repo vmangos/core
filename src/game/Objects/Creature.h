@@ -914,9 +914,13 @@ class Creature : public Unit
         // Auto evade timer (if target not reachable)
         // Tested on retail 5.4.0: Creatures evade after 3 seconds (but does not return to home position)
         bool IsEvadeBecauseTargetNotReachable() const { return m_TargetNotReachableTimer > 3000; }
-        uint32 GetLastDamageTakenTime() const { return m_lastDamageTakenForEvade; }
-        void   ResetLastDamageTakenTime() { m_lastDamageTakenForEvade = 0; }
         uint32 m_TargetNotReachableTimer;
+
+        std::shared_ptr<time_t> const& GetLastLeashExtensionTimePtr() const;
+        void SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer);
+        void ClearLastLeashExtensionTimePtr();
+        time_t GetLastLeashExtensionTime() const;
+        void UpdateLeashExtensionTime();
 
         bool IsTempPacified() const         { return m_pacifiedTimer > 0; }
         void SetTempPacified(uint32 timer)  { if (m_pacifiedTimer < timer) m_pacifiedTimer = timer; }
@@ -1042,7 +1046,10 @@ class Creature : public Unit
 
         Position m_summonPos;
 
-        uint32 m_lastDamageTakenForEvade;
+        // Shared timer between mobs who assist another.
+        // Damaging one extends leash range on all of them.
+        mutable std::shared_ptr<time_t> m_lastLeashExtensionTime;
+
         // Used to compute XP.
         uint32 m_playerDamageTaken;
         uint32 m_nonPlayerDamageTaken;

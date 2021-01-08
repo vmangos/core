@@ -384,10 +384,22 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
                 }
             }
         }
-        
+
+        // Mobs should chase you infinitely if you stop and wait every few seconds.
+        m_leashExtensionTimer.Update(time_diff);
+        if (m_leashExtensionTimer.Passed())
+        {
+            m_leashExtensionTimer.Reset(5000);
+            if (Creature* creature = owner.ToCreature())
+                creature->UpdateLeashExtensionTime();
+        }
     }
     else if (m_bRecalculateTravel)
+    {
+        m_leashExtensionTimer.Reset(5000);
         owner.GetMotionMaster()->SetNeedAsyncUpdate();
+    }
+
     return true;
 }
 
