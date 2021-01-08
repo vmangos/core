@@ -94,7 +94,8 @@ namespace VMAP
             */
             void setDisableModelUnload(bool pVal) { iDisableModelUnloads = pVal; }
             /**
-            Enable/disable los calculation for additional objects (like trees, fences, ...) 
+            Enable/disable additional objects to be used for LOS calculation (trees, fences, ...) 
+            It is disabled by default.
             */
             void setM2ObjectLosEnabled(bool pVal) { useM2ObjectsForLos = pVal; }
 
