@@ -304,7 +304,7 @@ void AuthSocket::_SetVSFields(const std::string& rI)
 
 void AuthSocket::SendProof(Sha1Hash sha)
 {
-  if (_build < CLIENT_BUILD_2_0_0)
+  if (_build < 6080)        // before version 2.0.0 (exclusive)
   {
       sAuthLogonProof_S_BUILD_6005 proof;
       memcpy(proof.M2, sha.GetDigest(), 20);
@@ -545,7 +545,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     }
                     else
                     {
-                        if (_build >= CLIENT_BUILD_1_11_0)
+		      if (_build >= 5428)        // version 1.11.0 or later
                             pkt << uint8(0);
                     }
 
@@ -581,7 +581,7 @@ bool AuthSocket::_HandleLogonProof()
     sAuthLogonProof_C_1_11 lp;
     
     ///- Read the packet
-    if (_build < CLIENT_BUILD_1_11_0)
+    if (_build < 5428)        // before version 1.11.0 (exclusive)
     {
         if (!recv((char *)&lp, sizeof(sAuthLogonProof_C_Base)))
             return false;
@@ -1100,7 +1100,7 @@ bool AuthSocket::_HandleRealmList()
 
 void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
-    if (_build < CLIENT_BUILD_2_0_0)
+    if (_build < 6080)        // before version 2.0.0 (exclusive)
     {
         pkt << uint32(0);                               // unused value
 	pkt << uint8(sRealmList.size());
