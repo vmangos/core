@@ -348,6 +348,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1482, 39, -11339.4, -929.807, 31.1679, 100, 0, 0, 0);
 
 -- ol sooty waypoints
+DELETE FROM  `creature_movement_template` WHERE entry = 1225;
 UPDATE `creature` SET `position_x` = -5677.17, `position_y` = -3165.29, `position_z` = 317.711,  `movement_type` = 2 WHERE `id` = 1225;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (1225, 1, -5677.17, -3165.29, 317.711, 100, 0, 0, 0),
@@ -382,7 +383,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1225, 30, -5677.17, -3165.29, 317.711, 100, 0, 0, 0),
 (1225, 31, -5679.01, -3185.05, 319.508, 100, 0, 0, 0);
 
---kuz waypoints
+-- kuz waypoints
+DELETE FROM  `creature_movement_template` WHERE entry = 3436;
 UPDATE `creature` SET `position_x` = -3797.26, `position_y` = -1949.7, `position_z` = 94.8798, `movement_type` = 2 WHERE `id` = 3436;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3436, 1, -3797.26, -1949.7, 94.8798, 100, 0, 0, 0),
@@ -399,7 +401,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3436, 12, -3765.38, -1765.41, 94.6422, 100, 0, 0, 0),
 (3436, 13, -3783.77, -1763.73, 93.0782, 100, 0, 0, 0),
 (3436, 14, -3802.32, -1764.79, 91.8298, 100, 0, 0, 0),
-(3436, 15, -3816.88, -1768.73, 93.2129, 100 0, 0, 0),
+(3436, 15, -3816.88, -1768.73, 93.2129, 100, 0, 0, 0),
 (3436, 16, -3833.85, -1772.97, 94.0804, 100, 0, 0, 0),
 (3436, 17, -3848.28, -1777.73, 92.9392, 100, 0, 0, 0),
 (3436, 18, -3864.28, -1785.3, 91.667, 100, 0, 0, 0),
@@ -409,7 +411,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3436, 22, -3891.44, -1848.93, 93.5678, 100, 0, 0, 0),
 (3436, 23, -3886.81, -1857.38, 94.3543, 100, 0, 0, 0),
 (3436, 24, -3883.24, -1866.03, 94.0712, 100, 0, 0, 0),
-(3436, 25, -3873.34, -1880.98, 93.5397, 100 0, 0, 0),
+(3436, 25, -3873.34, -1880.98, 93.5397, 100, 0, 0, 0),
 (3436, 26, -3863.73, -1897.22, 93.0921, 100, 0, 0, 0),
 (3436, 27, -3859.57, -1918.04, 93.1066, 100, 0, 0, 0),
 (3436, 28, -3852.57, -1943.15, 91.7095, 100, 0, 0, 0),
