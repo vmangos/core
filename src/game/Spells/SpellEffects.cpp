@@ -579,9 +579,34 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }, 1);
                     return;
                 }
-                case 28091: // NAXX EVENT TEST - casting Spirit Spawn-out
+                case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
                     unitTarget->CastSpell(unitTarget, 17680, false);
+                    return;
+                }
+                case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
+                {
+                    unitTarget->CastSpell(unitTarget, 28281, true);
+                    return;
+                }
+                case 28349: // [Event: Scourge Invasion] Spell (Despawner, other)
+                {
+                    if (unitTarget->GetEntry() != 16401)
+                        return;
+
+                    if (GameObject* pGo = unitTarget->FindNearestGameObject(181373, 5.0f))
+                        pGo->Despawn();
+                    if (GameObject* pGo = unitTarget->FindNearestGameObject(181223, 5.0f))
+                        pGo->Despawn();
+                    if (GameObject* pGo = unitTarget->FindNearestGameObject(181215, 5.0f))
+                        pGo->Despawn();
+                    if (GameObject* pGo = unitTarget->FindNearestGameObject(181172, 5.0f))
+                        pGo->Despawn();
+                    if (GameObject* pGo = unitTarget->FindNearestGameObject(181154, 5.0f))
+                        pGo->Despawn();
+                    if (GameObject* pGo = unitTarget->FindNearestGameObject(181374, 5.0f))
+                        pGo->Despawn();
+                        unitTarget->RemoveFromWorld();
                     return;
                 }
                 case 23383: // Alliance Flag Click
