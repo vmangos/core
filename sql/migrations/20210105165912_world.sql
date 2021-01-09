@@ -348,7 +348,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1482, 39, -11339.4, -929.807, 31.1679, 100, 0, 0, 0);
 
 -- ol sooty waypoints
-UPDATE `creature` SET `position_x` = -5677.17, `position_y` = -3165.29, `position_z` = 317.711,  `movement_type` = 2 WHERE `entry` = 1225;
+UPDATE `creature` SET `position_x` = -5677.17, `position_y` = -3165.29, `position_z` = 317.711,  `movement_type` = 2 WHERE `id` = 1225;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (1225, 1, -5677.17, -3165.29, 317.711, 100, 0, 0, 0),
 (1225, 2, -5683.2, -3147.19, 313.037, 100, 0, 0, 0),
@@ -383,7 +383,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1225, 31, -5679.01, -3185.05, 319.508, 100, 0, 0, 0);
 
 --kuz waypoints
-UPDATE `creature` SET `position_x` = -3797.26, `position_y` = -1949.7, `position_z` = 94.8798, `movement_type` = 2 WHERE `entry` = 3436;
+UPDATE `creature` SET `position_x` = -3797.26, `position_y` = -1949.7, `position_z` = 94.8798, `movement_type` = 2 WHERE `id` = 3436;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3436, 1, -3797.26, -1949.7, 94.8798, 100, 0, 0, 0),
 (3436, 2, -3774.34, -1943.45, 95.1557, 100, 0, 0, 0),
