@@ -73,7 +73,9 @@ enum ScourgeInvasionSpells
     SPELL_DESPAWNER_OTHER                       = 28349, // Despawner GameObject Necropolis?
 
     // Necropolis Health
-    SPELL_ZAP_NECROPOLIS                        = 28386, // Despawner GameObject Necropolis?
+    SPELL_ZAP_NECROPOLIS                        = 28386, // There are always 3 Necrotic Shards spawned per Necropolis. Spell is castet NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
+                                                         // "Necropolis Health" has 42 health. 42 / 3 = 14 damage.
+                                                         // We have set the armor value from "Necropolis Health" to 950 to reduce the damage from 40 to 14.
 
     // Necropolis -> Proxy
     SPELL_COMMUNIQUE_TIMER_NECROPOLIS           = 28395, // Periodically triggers 28373 Communique, Necropolis-to-Proxies every 15 seconds.
