@@ -732,36 +732,36 @@ enum SpellVisualKit
 enum SpellAttributes
 {
     SPELL_ATTR_DONT_DISPLAY_SPELL_RESULT      = 0x00000001,            // 0
-    SPELL_ATTR_RANGED                         = 0x00000002,            // 1 All ranged abilites have this flag
-    SPELL_ATTR_ON_NEXT_SWING_1                = 0x00000004,            // 2 on next swing
+    SPELL_ATTR_RANGED                         = 0x00000002,            // 1 Requires a ranged weapon
+    SPELL_ATTR_ON_NEXT_PLAYER_SWING           = 0x00000004,            // 2 On next swing (players)
     SPELL_ATTR_IS_REPLENISHMENT               = 0x00000008,            // 3 not set in 2.4.2
     SPELL_ATTR_IS_ABILITY                     = 0x00000010,            // 4 client puts 'ability' instead of 'spell' in game strings for these spells
     SPELL_ATTR_TRADESPELL                     = 0x00000020,            // 5 trade spells, will be added by client to a sublist of profession spell
     SPELL_ATTR_PASSIVE                        = 0x00000040,            // 6 Passive spell
-    SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Spells with this attribute are not visible in spellbook or aura bar
-    SPELL_ATTR_HIDE_IN_COMBAT_LOG             = 0x00000100,            // 8 this attributes controls whether spell appears in combat logs
+    SPELL_ATTR_HIDDEN_CLIENTSIDE              = 0x00000080,            // 7 Aura is hidden (not visible in spellbook or aura bar)
+    SPELL_ATTR_CAST_TIME_IS_HIDDEN            = 0x00000100,            // 8 Cast time is hidden
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
-    SPELL_ATTR_ON_NEXT_SWING_2                = 0x00000400,            // 10 on next swing 2
-    SPELL_ATTR_UNK11                          = 0x00000800,            // 11
+    SPELL_ATTR_ON_NEXT_NPC_SWING              = 0x00000400,            // on next swing (npcs)
+    SPELL_ATTR_PERIODICALLY_TRIGGER           = 0x00000800,            // 11 TODO: confirm & implement - periodically trigger spell
     SPELL_ATTR_DAYTIME_ONLY                   = 0x00001000,            // 12 only useable at daytime, not set in 2.4.2
     SPELL_ATTR_NIGHT_ONLY                     = 0x00002000,            // 13 only useable at night, not set in 2.4.2
     SPELL_ATTR_INDOORS_ONLY                   = 0x00004000,            // 14 only useable indoors, not set in 2.4.2
     SPELL_ATTR_OUTDOORS_ONLY                  = 0x00008000,            // 15 Only useable outdoors.
-    SPELL_ATTR_NOT_SHAPESHIFT                 = 0x00010000,            // 16 Not while shapeshifted
+    SPELL_ATTR_NOT_SHAPESHIFT                 = 0x00010000,            // 16 cannot be used while shapeshifted
     SPELL_ATTR_ONLY_STEALTHED                 = 0x00020000,            // 17 Must be in stealth
     SPELL_ATTR_DONT_AFFECT_SHEATH_STATE       = 0x00040000,            // 18 client won't hide unit weapons in sheath on cast/channel
     SPELL_ATTR_LEVEL_DAMAGE_CALCULATION       = 0x00080000,            // 19 spelldamage depends on caster level
     SPELL_ATTR_STOP_ATTACK_TARGET             = 0x00100000,            // 20 Stop attack after use this spell (and not begin attack if use)
     SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK   = 0x00200000,            // 21 Cannot be dodged/parried/blocked
     SPELL_ATTR_SET_TRACKING_TARGET            = 0x00400000,            // 22 SetTrackingTarget
-    SPELL_ATTR_CASTABLE_WHILE_DEAD            = 0x00800000,            // 23 castable while dead?
-    SPELL_ATTR_CASTABLE_WHILE_MOUNTED         = 0x01000000,            // 24 castable while mounted
+    SPELL_ATTR_CASTABLE_WHILE_DEAD            = 0x00800000,            // 23 Can be used while dead
+    SPELL_ATTR_CASTABLE_WHILE_MOUNTED         = 0x01000000,            // 24 Can be used while mounted
     SPELL_ATTR_DISABLED_WHILE_ACTIVE          = 0x02000000,            // 25 Activate and start cooldown after aura fade or remove summoned creature or go
     SPELL_ATTR_NEGATIVE                       = 0x04000000,            // 26 Almost all negative spell have it
-    SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 castable while sitting
+    SPELL_ATTR_CASTABLE_WHILE_SITTING         = 0x08000000,            // 27 Can be used while sitting
     SPELL_ATTR_CANT_USED_IN_COMBAT            = 0x10000000,            // 28 Cannot be used in combat
-    SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability (hmm possible not...)
-    SPELL_ATTR_DIMINISHING_RETURNS            = 0x40000000,            // 30 breakable by damage?
+    SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability
+    SPELL_ATTR_HEARTBEAT_RESIST_CHECK         = 0x40000000,            // 30 Chance for spell effects to break early (heartbeat resist)
     SPELL_ATTR_CANT_CANCEL                    = 0x80000000             // 31 positive aura can't be canceled
 };
 
@@ -774,20 +774,20 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_UNK4                        = 0x00000010,            // 4
     SPELL_ATTR_EX_NOT_BREAK_STEALTH           = 0x00000020,            // 5 Not break stealth
     SPELL_ATTR_EX_CHANNELED_2                 = 0x00000040,            // 6 channeled 2
-    SPELL_ATTR_EX_CANT_BE_REFLECTED           = 0x00000080,            // 7
-    SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 Spell req target not to be in combat state
+    SPELL_ATTR_EX_CANT_BE_REFLECTED           = 0x00000080,            // 7 Cannot be reflected
+    SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 The target cannot be in combat
     SPELL_ATTR_EX_MELEE_COMBAT_START          = 0x00000200,            // 9 player starts melee combat after this spell is cast
-    SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 no generates threat on cast 100%
-    SPELL_ATTR_EX_UNK11                       = 0x00000800,            // 11
+    SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 Generates no threat
+    SPELL_ATTR_EX_UNK11                       = 0x00000800,            // 11 
     SPELL_ATTR_EX_IS_PICKPOCKET               = 0x00001000,            // 12
-    SPELL_ATTR_EX_FARSIGHT                    = 0x00002000,            // 13
+    SPELL_ATTR_EX_BIND_SIGHT                  = 0x00002000,            // 13 Bind sight effects
     SPELL_ATTR_EX_CHANNEL_TRACK_TARGET        = 0x00004000,            // 14 Client automatically forces player to face target when channeling
     SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    = 0x00008000,            // 15 remove auras on immunity
-    SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 unaffected by school immunity
+    SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 Unaffected by school immunity
     SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS      = 0x00020000,            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
-    SPELL_ATTR_EX_UNK18                       = 0x00040000,            // 18 stun, polymorph, daze, sleep
+    SPELL_ATTR_EX_STOPS_AUTO_ATTACK           = 0x00040000,            // 18 TODO: confirm: Stops auto-attack (stun, polymorph, daze, sleep)
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
-    SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Req combo points on target
+    SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Requires combo points on target
     SPELL_ATTR_EX_UNK21                       = 0x00200000,            // 21
     SPELL_ATTR_EX_REQ_COMBO_POINTS            = 0x00400000,            // 22 Use combo points (in 4.x not required combo point target selected)
     SPELL_ATTR_EX_UNK23                       = 0x00800000,            // 23
@@ -798,7 +798,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_DONT_DISPLAY_IN_AURA_BAR    = 0x10000000,            // 28 client doesn't display these spells in aura bar
     SPELL_ATTR_EX_CHANNEL_DISPLAY_SPELL_NAME  = 0x20000000,            // 29 spell name is displayed in cast bar instead of 'channeling' text
     SPELL_ATTR_EX_ENABLE_AT_DODGE             = 0x40000000,            // 30 Overpower
-    SPELL_ATTR_EX_UNK31                       = 0x80000000             // 31
+    SPELL_ATTR_EX_UNK31                       = 0x80000000             // 31 something with self cast?
 };
 
 enum SpellAttributesEx2
@@ -832,9 +832,9 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_UNK26                      = 0x04000000,            // 26 unaffected by school immunity
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
     SPELL_ATTR_EX2_UNK28                      = 0x10000000,            // 28 no breaks stealth if it fails??
-    SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
+    SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Cannot crit
     SPELL_ATTR_EX2_TRIGGERED_CAN_TRIGGER_PROC = 0x40000000,            // 30
-    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
+    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food/Drink buff
 };
 
 enum SpellAttributesEx3
@@ -849,7 +849,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_STACK_FOR_DIFF_CASTERS     = 0x00000080,            // 7 create a separate (de)buff stack for each caster
     SPELL_ATTR_EX3_TARGET_ONLY_PLAYER         = 0x00000100,            // 8 can target only players
     SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_PROC = 0x00000200,            // 9
-    SPELL_ATTR_EX3_MAIN_HAND                  = 0x00000400,            // 10 Main hand weapon required
+    SPELL_ATTR_EX3_REQ_MAIN_HAND              = 0x00000400,            // 10 Requires main hand weapon
     SPELL_ATTR_EX3_BATTLEGROUND               = 0x00000800,            // 11 Can casted only on battleground
     SPELL_ATTR_EX3_CAST_ON_DEAD               = 0x00001000,            // 12 target is a dead player (not every spell has this flag)
     SPELL_ATTR_EX3_DONT_DISPLAY_CHANNEL_BAR   = 0x00002000,            // 13 Clientside attribute - will not display channeling bar
@@ -867,7 +867,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK25                      = 0x02000000,            // 25 no cause spell pushback ?
     SPELL_ATTR_EX3_UNK26                      = 0x04000000,            // 26
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
-    SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
+    SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // Does not appear in log (Blizzard)
     SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_UNK31                      = 0x80000000             // 31
@@ -878,7 +878,7 @@ enum SpellAttributesEx4
     SPELL_ATTR_EX4_IGNORE_RESISTANCES         = 0x00000001,            // 0 From TC 3.3.5, but not present in 1.12 native DBCs. Add it with spell_mod to prevent a spell from being resisted.
     SPELL_ATTR_EX4_UNK1                       = 0x00000002,            // 1 proc on finishing move?
     SPELL_ATTR_EX4_REAL_TIME_DURATION         = 0x00000004,            // 2 aura continues to expire while player is offline
-    SPELL_ATTR_EX4_UNK3                       = 0x00000008,            // 3
+    SPELL_ATTR_EX4_UNK3                       = 0x00000008,            // 3 Uses resource: Energy? / Rogue only?
     SPELL_ATTR_EX4_UNK4                       = 0x00000010,            // 4 This will no longer cause guards to attack on use??
     SPELL_ATTR_EX4_UNK5                       = 0x00000020,            // 5
     SPELL_ATTR_EX4_NOT_STEALABLE              = 0x00000040,            // 6 although such auras might be dispellable, they cannot be stolen
