@@ -42,22 +42,42 @@ bool IsPermanent(uint32 zone)
 Necropolis
 */
 
-class go_necropolis : public GameObjectAI
+class GoNecropolis : public GameObjectAI
 {
 public:
-    go_necropolis(GameObject* go) : GameObjectAI(go)
+    GoNecropolis(GameObject* go) : GameObjectAI(go)
     {
-        me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
+        uint32 zoneid = me->GetZoneId();
+        me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0.25f, true);
     }
     void UpdateAI(uint32 const diff) override
     {
     }
 };
 
-GameObjectAI* GetAI_go_necropolis(GameObject* go)
+GameObjectAI* GetAI_GoNecropolis(GameObject* go)
 {
-    return new go_necropolis(go);
+    return new GoNecropolis(go);
+}
+
+class GoNecropolisCritterSpawner : public GameObjectAI
+{
+public:
+    GoNecropolisCritterSpawner(GameObject* go) : GameObjectAI(go)
+    {
+        me->CastSpell(me, SPELL_SUMMON_NECROPOLIS_CRITTERS, true);
+        me->Despawn();
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+    }
+};
+
+GameObjectAI* GetAI_GoNecropolisCritterSpawner(GameObject* go)
+{
+    return new GoNecropolisCritterSpawner(go);
 }
 
 /*
@@ -76,17 +96,18 @@ struct NecropolisHealthAI : public ScriptedAI
     void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            DoCastSpellIfCan(m_creature, SPELL_ZAP_NECROPOLIS, CF_TRIGGERED);
+            me->CastSpell(me, SPELL_ZAP_NECROPOLIS, true);
     }
 
     void JustDied(Unit* pKiller) override
     {
         if (Creature* NECROPOLIS = me->FindNearestCreature(NPC_NECROPOLIS, 200.0f))
-            DoCastSpellIfCan(NECROPOLIS, SPELL_DESPAWNER_OTHER, CF_TRIGGERED);
+            me->CastSpell(NECROPOLIS, SPELL_DESPAWNER_OTHER, true);
     }
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
+        // Make sure we despawn after SPELL_DESPAWNER_OTHER triggered.
         if (spell->Id == SPELL_DESPAWNER_OTHER)
             target->RemoveFromWorld();
     }
@@ -114,19 +135,24 @@ struct NecropolisProxyAI : public ScriptedAI
 
     void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
-        if (spell->Id == SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES)
-            DoCastSpellIfCan(m_creature, SPELL_COMMUNIQUE_PROXY_TO_RELAY), CF_TRIGGERED;
-
-        if (spell->Id == SPELL_COMMUNIQUE_RELAY_TO_PROXY)
-            DoCastSpellIfCan(m_creature, SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, CF_TRIGGERED);
-
-        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
+        switch (spell->Id)
+        {
+        case SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES:
+            me->CastSpell(me, SPELL_COMMUNIQUE_PROXY_TO_RELAY, true);
+            break;
+        case SPELL_COMMUNIQUE_RELAY_TO_PROXY:
+            me->CastSpell(me, SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, true);
+            break;
+        case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
             if (Creature* NECROPOLIS_HEALTH = me->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 200.0f))
-                DoCastSpellIfCan(NECROPOLIS_HEALTH, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, CF_TRIGGERED);
+                me->CastSpell(NECROPOLIS_HEALTH, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+            break;
+        }
     }
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
+        // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             me->RemoveFromWorld();
     }
@@ -154,19 +180,24 @@ struct NecropolisRelayAI : public ScriptedAI
 
     void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
-        if (spell->Id == SPELL_COMMUNIQUE_PROXY_TO_RELAY)
-            DoCastSpellIfCan(m_creature, SPELL_COMMUNIQUE_RELAY_TO_CAMP, CF_TRIGGERED);
-
-        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY)
-            DoCastSpellIfCan(m_creature, SPELL_COMMUNIQUE_RELAY_TO_PROXY, CF_TRIGGERED);
-
-        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
+        switch (spell->Id)
+        {
+        case SPELL_COMMUNIQUE_PROXY_TO_RELAY:
+            me->CastSpell(me, SPELL_COMMUNIQUE_RELAY_TO_CAMP, true);
+            break;
+        case SPELL_COMMUNIQUE_CAMP_TO_RELAY:
+            me->CastSpell(me, SPELL_COMMUNIQUE_RELAY_TO_PROXY, true);
+            break;
+        case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
             if (Creature* NECROPOLIS_PROXY = me->FindNearestCreature(NPC_NECROPOLIS_PROXY, 200.0f))
-                DoCastSpellIfCan(NECROPOLIS_PROXY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, CF_TRIGGERED);
+                me->CastSpell(NECROPOLIS_PROXY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+            break;
+        }
     }
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
+        // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             me->RemoveFromWorld();
     }
@@ -186,20 +217,30 @@ struct NecroticShard : public ScriptedAI
 {
     NecroticShard(Creature* creature) : ScriptedAI(creature)
     {
-        me->SetVisibilityModifier(3000.0f);
         Reset();
+        me->SetVisibilityModifier(3000.0f);
     }
 
     void Reset() override {}
 
     void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
-        if (spell->Id == SPELL_COMMUNIQUE_RELAY_TO_CAMP)
-            DoCastSpellIfCan(m_creature, SPELL_CAMP_RECEIVES_COMMUNIQUE, CF_TRIGGERED);
+        switch (spell->Id)
+        {
+        case SPELL_COMMUNIQUE_RELAY_TO_CAMP:
+            me->CastSpell(me, SPELL_CAMP_RECEIVES_COMMUNIQUE, true);
+            break;
+        case SPELL_ZAP_CRYSTAL_CORPSE:
+            me->CastSpell(me, SPELL_DAMAGE_CRYSTAL, true);
+            break;
+        }
     }
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
+        if (me->GetEntry() == !NPC_DAMAGED_NECROTIC_SHARD)
+            return;
+
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             me->RemoveFromWorld();
     }
@@ -212,7 +253,7 @@ struct NecroticShard : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_SOUL_REVIVAL, CF_TRIGGERED);
 
         if (Creature* NECROPOLIS_RELAY = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 200.0f))
-            DoCastSpellIfCan(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, CF_TRIGGERED);
+            me->CastSpell(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1006,7 +1047,12 @@ void AddSC_world_event_naxxramas()
 
     newscript = new Script;
     newscript->Name = "go_necropolis";
-    newscript->GOGetAI = &GetAI_go_necropolis;
+    newscript->GOGetAI = &GetAI_GoNecropolis;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_necropolis_critter_spawner";
+    newscript->GOGetAI = &GetAI_GoNecropolisCritterSpawner;
     newscript->RegisterSelf();
 
     newscript = new Script;
