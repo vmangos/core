@@ -49,7 +49,7 @@ public:
     {
         me->SetVisibilityModifier(3000.0f);
         uint32 zoneid = me->GetZoneId();
-        me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0.25f, true);
+        me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_STORM, 0.25f, true);
     }
     void UpdateAI(uint32 const diff) override
     {
