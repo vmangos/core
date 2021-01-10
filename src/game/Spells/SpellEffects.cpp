@@ -607,6 +607,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181374, 5.0f))
                         pGo->Despawn();
                         unitTarget->RemoveFromWorld();
+                        uint32 zoneid = unitTarget->GetZoneId();
+                        unitTarget->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0, false);
                     return;
                 }
                 case 23383: // Alliance Flag Click
