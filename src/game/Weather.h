@@ -48,7 +48,7 @@ enum WeatherState
     WEATHER_STATE_LIGHT_SANDSTORM   = 22,
     WEATHER_STATE_MEDIUM_SANDSTORM  = 41,
     WEATHER_STATE_HEAVY_SANDSTORM   = 42,
-    WEATHER_STATE_SCOURGE_INVASION  = 86 // [Event: Scourge Invasion] Weather
+    WEATHER_STATE_THUNDERS          = 86,
 };
 
 struct WeatherZoneChances;
