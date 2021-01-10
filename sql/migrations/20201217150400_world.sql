@@ -25,7 +25,7 @@ DELETE FROM `script_texts` WHERE `entry`= -1614984;
 DELETE FROM `script_texts` WHERE `entry`= -1614983;
 DELETE FROM `script_texts` WHERE `entry`= -1614982;
 
-UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=1271;
+UPDATE `broadcast_text` SET `chat_type`=1, `sound_id`=5789 WHERE `entry`=1271;
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=1273;
 
 -- End of migration.
