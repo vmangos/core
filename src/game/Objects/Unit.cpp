@@ -5519,17 +5519,18 @@ void Unit::SetInCombatState(bool bPvP, Unit* pEnemy)
 
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
 
-    if (IsCharmed() || (!IsPlayer() && ((Creature*)this)->IsPet()))
+    if (IsCharmed() || (IsCreature() && ((Creature*)this)->IsPet()))
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+
     // set pet in combat
     if (Pet* pet = GetPet())
+    {
         if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
         {
-            pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
-
             if (IsPlayer() && pet->IsAlive() && pEnemy)
                 pet->AI()->OwnerAttacked(pEnemy);
         }
+    }
 
     // interrupt all delayed non-combat casts
     if (!wasInCombat)
