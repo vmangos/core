@@ -547,7 +547,7 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
         return eventData->display_id;
     }
 
-    // Use creature display id explicit, override template (creature.display_id)
+    // Use creature spawn display id explicit, override template (creature.display_id)
     if (addon && addon->display_id)
     {
         if (scale)
@@ -555,10 +555,11 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
         return addon->display_id;
     }
 
-    // use defaults from the template
+    // Use defaults from the template
     int8 displayIndex = -1;
     if (cinfo->display_total_probability)
     {
+        // All probabilities are whole integers, even though they are sent as floats in packet on classic
         uint32 const roll = urand(1, cinfo->display_total_probability);
         uint32 sum = 0;
 
@@ -580,9 +581,8 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
             sum += currentChance;
         }
     }
-    else
+    else // Equal chance for all
     {
-        // display id selected here may be replaced with other_gender using own function
         uint32 maxDisplayId = 0;
         for (; maxDisplayId < MAX_DISPLAY_IDS_PER_CREATURE && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
 
@@ -590,7 +590,7 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
             displayIndex = urand(0, maxDisplayId - 1);
     }
 
-    // fail safe, we use creature entry 1 and make error
+    // Fail safe, use first display id present in dbc, shouldn't happen
     if (displayIndex < 0)
     {
         sLog.outErrorDb("Creature::ChooseDisplayId can not select native display id for creature entry %u, placeholder model will be used.", cinfo->entry);
