@@ -285,6 +285,8 @@ WeatherState Weather::GetWeatherState() const
             else
                 return WEATHER_STATE_HEAVY_SANDSTORM;
         case WEATHER_TYPE_FINE:
+            if (m_grade == 0.25f)
+                return WEATHER_STATE_SCOURGE_INVASION;
         default:
             return WEATHER_STATE_FINE;
     }
