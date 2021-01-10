@@ -63,35 +63,38 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 enum ScourgeInvasionSpells
 {
-    SPELL_ZAP_CRYSTAL                           = 28032, // [Zap Crystal]. 15 damage.
-    SPELL_DAMAGE_CRYSTAL                        = 28041, // [Damage Crystal]. 100 damage.
+    SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage.
+    SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 damage.
     SPELL_BUTTRESS_CHANNEL                      = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard.
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
-    SPELL_SOUL_REVIVAL                          = 28681, // [Soul Revival] Increases all damage caused by 10%.
+    SPELL_SOUL_REVIVAL                          = 28681, // Increases all damage caused by 10%.
+
+    // Object 181214 Necropolis critter spawner
+    SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
 
     // Necropolis Health -> Necropolis
     SPELL_DESPAWNER_OTHER                       = 28349, // Despawner GameObject Necropolis?
 
     // Necropolis Health
-    SPELL_ZAP_NECROPOLIS                        = 28386, // There are always 3 Necrotic Shards spawned per Necropolis. Spell is castet NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
-                                                         // "Necropolis Health" has 42 health. 42 / 3 = 14 damage.
-                                                         // We have set the armor value from "Necropolis Health" to 950 to reduce the damage from 40 to 14.
+    SPELL_ZAP_NECROPOLIS                        = 28386, // There are always 3 Necrotic Shards spawns per Necropolis. This Spell is castet on the NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
+                                                         // "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
+                                                         // We have set the armor value from the NPC "Necropolis Health" to 950 to reduce the damage from 40 to 14.
 
     // Necropolis -> Proxy
     SPELL_COMMUNIQUE_TIMER_NECROPOLIS           = 28395, // Periodically triggers 28373 Communique, Necropolis-to-Proxies every 15 seconds.
-    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES      = 28373,
+    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES      = 28373, // purple bolt Visual (BIG)
 
     // Proxy -> Necropolis
-    SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS        = 28367, // (purple bolt SMALL)
+    SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS        = 28367, // Purple bolt Visual (SMALL)
 
     // Proxy -> Relay
-    SPELL_COMMUNIQUE_PROXY_TO_RELAY             = 28366, // (purple bolt BIG)
+    SPELL_COMMUNIQUE_PROXY_TO_RELAY             = 28366, // purple bolt Visual (BIG)
 
     // Relay -> Proxy
-    SPELL_COMMUNIQUE_RELAY_TO_PROXY             = 28365, // (purple bolt SMALL)
+    SPELL_COMMUNIQUE_RELAY_TO_PROXY             = 28365, // Purple bolt Visual (SMALL)
 
     // Relay -> Camp
-    SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // (purple bolt BIG)
+    SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG)
 
     // Camp
     SPELL_CAMP_RECEIVES_COMMUNIQUE              = 28449, // Impact Visual.
@@ -99,7 +102,7 @@ enum ScourgeInvasionSpells
     SPELL_COMMUNIQUE_TRIGGER                    = 28345, // Triggers 28281 SPELL_COMMUNIQUE_CAMP_TO_RELAY via void Spell::EffectDummy.
 
     // Camp -> Relay
-    SPELL_COMMUNIQUE_CAMP_TO_RELAY              = 28281, // (purple bolt SMALL)
+    SPELL_COMMUNIQUE_CAMP_TO_RELAY              = 28281, // Purple bolt Visual (SMALL)
     SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH        = 28351, // Visual when Damaged Necrotic Shard dies.
 
     // Minions Spells
@@ -119,8 +122,6 @@ enum ScourgeInvasionSpells
     SPELL_CREATE_SUP_MARK                       = 28321, // Create Greater Mark of the Dawn
 
     // Rare Minions
-    SPELL_FEAR                                  = 12542,
-    SPELL_MINDFLAY                              = 16568,
     SPELL_ARCANE_BOLT                           = 13748,
     SPELL_RIBBON_OF_SOULS                       = 16243,
 
@@ -128,10 +129,14 @@ enum ScourgeInvasionSpells
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
     SPELL_SUMMON_BOSS                           = 31315, // Reagents, 8 Necrotic Rune
 
+    // Shadow of Doom
+    SPELL_SPAWN_SMOKE                           = 10389, // Spawning Visual.
+    SPELL_FEAR                                  = 12542,
+    SPELL_MINDFLAY                              = 16568,
+    SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Doom dies.
+
     // Unused
     SPELL_CREATE_CRYSTAL                        = 28344, // (NECROTIC_SHARD = 16136) CIRCLE - Gob 181136 CASTS this
-    SPELL_SUMMON_NAXXRAMAS_GHOST                = 28389,
-    SPELL_VISUAL_VOILE_TENEBRES                 = 28350,
 };
 
 enum ScourgeInvasionNPC
@@ -173,16 +178,16 @@ enum ScourgeInvasionNPC
 
 enum ScourgeInvasionMisc
 {
-    ITEM_NECROTIC_RUNE = 22484,
+    ITEM_NECROTIC_RUNE          = 22484,
 
-    GOBJ_SUMMON_CIRCLE = 181227,
-    GOBJ_NECROPOLIS = 181223,
+    GOBJ_SUMMON_CIRCLE          = 181227,
+    GOBJ_NECROPOLIS             = 181223,
 
-    MODELID_PYLON_RESET = 16135,
-    MODELID_PYLON_DAMAGED = 16136,
+    MODELID_PYLON_RESET         = 16135,
+    MODELID_PYLON_DAMAGED       = 16136,
 
-    FACTIONID_GHOULS = 38,
-    FACTIONID_FRIENDLY = 35,
+    FACTIONID_GHOULS            = 38,
+    FACTIONID_FRIENDLY          = 35,
 
     ENGINEER_MOD_HEALTH_PER_SEC = 15,
 
@@ -190,18 +195,18 @@ enum ScourgeInvasionMisc
 //    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
 //#else
     // The change of zone takes 4 hours
-    NECROPOLIS_ATTACK_TIMER = 60 * 60, // 1 hour
+    NECROPOLIS_ATTACK_TIMER     = 60 * 60, // 1 hour
 //#endif
-    ELITE_SPAWN_MINIMUM = 1000*60*12, // 12min
-    ELITE_SPAWN_MAXIMUM = 1000*60*18, // 18 min
-    ELITE_DESPAWN       = 1000*60*15, // 15 min
+    ELITE_SPAWN_MINIMUM         = 1000*60*12, // 12min
+    ELITE_SPAWN_MAXIMUM         = 1000*60*18, // 18 min
+    ELITE_DESPAWN               = 1000*60*15, // 15 min
 
-    ZONEID_WINTERSPRING = 618,
-    ZONEID_AZSHARA = 16,
-    ZONEID_EASTERN_PLAGUELANDS = 139,
-    ZONEID_BLASTED_LANDS = 4,
-    ZONEID_BURNING_STEPPES = 46,
-    ZONEID_TANARIS = 440,
+    ZONEID_WINTERSPRING         = 618,
+    ZONEID_AZSHARA              = 16,
+    ZONEID_EASTERN_PLAGUELANDS  = 139,
+    ZONEID_BLASTED_LANDS        = 4,
+    ZONEID_BURNING_STEPPES      = 46,
+    ZONEID_TANARIS              = 440,
 
     GAME_EVENT_SCOURGE_INVASION = 17,
 };
@@ -209,20 +214,20 @@ enum ScourgeInvasionMisc
 enum ScourgeInvasionWorldStatesVariables
 {
     // Worldstates
-    WORLDSTATE_WINTERSPRING = 0x08D3, // 2259 - Icon on map
-    WORLDSTATE_AZSHARA = 0x08D4, // 2260 - Icon on map
-    WORLDSTATE_EASTERN_PLAGUELANDS = 0x08D8, // 2264 - Icon on map
-    WORLDSTATE_BLASTED_LANDS = 0x08D5, // 2261 - Icon on map
-    WORLDSTATE_BURNING_STEPPES = 0x08D6, // 2262 - Icon on map
-    WORLDSTATE_TANARIS = 0x08D7, // 2263 - Icon on map
+    WORLDSTATE_WINTERSPRING         = 0x08D3, // 2259 - Icon on map
+    WORLDSTATE_AZSHARA              = 0x08D4, // 2260 - Icon on map
+    WORLDSTATE_EASTERN_PLAGUELANDS  = 0x08D8, // 2264 - Icon on map
+    WORLDSTATE_BLASTED_LANDS        = 0x08D5, // 2261 - Icon on map
+    WORLDSTATE_BURNING_STEPPES      = 0x08D6, // 2262 - Icon on map
+    WORLDSTATE_TANARIS              = 0x08D7, // 2263 - Icon on map
 
-    WORLDSTATE_SI_BATTLES_WON = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
-    WORLDSTATE_SI_AZSHARA_REMAINING = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
-    WORLDSTATE_SI_BLASTED_LANDS_REMAINING = 2280,// The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
+    WORLDSTATE_SI_BATTLES_WON               = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
+    WORLDSTATE_SI_AZSHARA_REMAINING         = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
+    WORLDSTATE_SI_BLASTED_LANDS_REMAINING   = 2280,// The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
     WORLDSTATE_SI_BURNING_STEPPES_REMAINING = 2281, // If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
-    WORLDSTATE_SI_EASTERN_PLAGUELANDS = 2282, // The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
-    WORLDSTATE_SI_TANARIS = 2283, // It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
-    WORLDSTATE_SI_WINTERSPRING = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
+    WORLDSTATE_SI_EASTERN_PLAGUELANDS       = 2282, // The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
+    WORLDSTATE_SI_TANARIS                   = 2283, // It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
+    WORLDSTATE_SI_WINTERSPRING              = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
 
     // Variables
     VARIABLE_NAXX_ATTACK_ZONE1 = 10,
@@ -231,16 +236,16 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_NAXX_ATTACK_TIME2 = 13,
     VARIABLE_NAXX_ATTACK_COUNT = 14,
 
-    VARIABLE_NAXX_ELITE_ID = 15,
-    VARIABLE_NAXX_ELITE_PYLON = 16,
-    VARIABLE_NAXX_ELITE_SPAWNTIME = 17,
+    VARIABLE_NAXX_ELITE_ID          = 15,
+    VARIABLE_NAXX_ELITE_PYLON       = 16,
+    VARIABLE_NAXX_ELITE_SPAWNTIME   = 17,
 
-    VARIABLE_SI_AZSHARA_REMAINING = 18,
-    VARIABLE_SI_BLASTED_LANDS_REMAINING = 19,
-    VARIABLE_SI_BURNING_STEPPES_REMAINING = 20,
-    VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING = 21,
-    VARIABLE_SI_TANARIS_REMAINING = 22,
-    VARIABLE_SI_WINTERSPRING_REMAINING = 23
+    VARIABLE_SI_AZSHARA_REMAINING               = 18,
+    VARIABLE_SI_BLASTED_LANDS_REMAINING         = 19,
+    VARIABLE_SI_BURNING_STEPPES_REMAINING       = 20,
+    VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING   = 21,
+    VARIABLE_SI_TANARIS_REMAINING               = 22,
+    VARIABLE_SI_WINTERSPRING_REMAINING          = 23
 };
 
 enum ScourgeInvasionQuests
