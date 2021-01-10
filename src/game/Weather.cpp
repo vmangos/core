@@ -278,15 +278,15 @@ WeatherState Weather::GetWeatherState() const
             else
                 return WEATHER_STATE_HEAVY_SNOW;
         case WEATHER_TYPE_STORM:
-            if (m_grade < 0.40f)
+            if (m_grade <= 0.25f)
+                return WEATHER_STATE_THUNDERS;
+            else if (m_grade < 0.40f)
                 return WEATHER_STATE_LIGHT_SANDSTORM;
             else if (m_grade < 0.70f)
                 return WEATHER_STATE_MEDIUM_SANDSTORM;
             else
                 return WEATHER_STATE_HEAVY_SANDSTORM;
         case WEATHER_TYPE_FINE:
-            if (m_grade == 0.25f)
-                return WEATHER_STATE_SCOURGE_INVASION;
         default:
             return WEATHER_STATE_FINE;
     }
