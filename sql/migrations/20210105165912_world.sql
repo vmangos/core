@@ -475,6 +475,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2174, 23, -11674.2, 631.017, 50.3015, 100, 0, 0, 0),
 (2174, 24, -11664.2, 624.674, 50.5842, 100, 0, 0, 0);
 
+-- remove incorrect creatures
+DELETE FROM `creature` WHERE `guid` IN (994, 993);
+
 
 -- End of migration.
 END IF;
