@@ -478,6 +478,21 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- remove incorrect creatures
 DELETE FROM `creature` WHERE `guid` IN (994, 993);
 
+-- add creature 2174 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1104;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1104, 1, -13456.6, 703.932, 6.84452, 100, 0, 0, 0),
+(1104, 2, -13453, 719.546, 4.86789, 100, 0, 0, 0),
+(1104, 3, -13448.9, 734.868, 2.40726, 100, 0, 0, 0),
+(1104, 4, -13449.7, 746.844, 1.63538, 100, 0, 0, 0),
+(1104, 5, -13450.8, 757.005, 1.23967, 100, 0, 0, 0),
+(1104, 6, -13447.4, 732.875, 2.5683, 100, 0, 0, 0),
+(1104, 7, -13443.9, 713.09, 5.46649, 100, 0, 0, 0),
+(1104, 8, -13445.1, 701.425, 7.45237, 100, 0, 0, 0),
+(1104, 9, -13449.7, 690.31, 8.62241, 100, 0, 0, 0),
+(1104, 10, -13453.4, 683.116, 9.20681, 100, 0, 0, 0),
+(1104, 11, -13461.3, 668.127, 9.60396, 100, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
