@@ -353,6 +353,13 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             spellInfo = actualSpellInfo;
     }
 
+    // Casting spells interrupts looting
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING))
+    {
+        if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
+            DoLootRelease(lootGuid);
+    }
+
     // World of Warcraft Client Patch 1.10.0 (2006-03-28)
     // - Stealth and Invisibility effects will now be canceled at the
     //   beginning of an action(spellcast, ability use etc...), rather than

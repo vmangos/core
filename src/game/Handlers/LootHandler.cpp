@@ -310,6 +310,9 @@ void WorldSession::HandleLootOpcode(WorldPacket& recv_data)
     if (!_player->IsInWorld())
         return;
 
+    if (_player->IsNonMeleeSpellCasted())
+        _player->InterruptNonMeleeSpells(false);
+
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
 
