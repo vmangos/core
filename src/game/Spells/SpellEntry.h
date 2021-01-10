@@ -243,6 +243,18 @@ namespace Spells
         return false;
     }
 
+    inline bool IsIgnoreLosTarget(uint32 target)
+    {
+        switch (target)
+        {
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_UNIT_RAID_AND_CLASS:
+                return true;
+        }
+
+        return false;
+    }
+
     bool IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2);
 
     inline bool IsCasterSourceTarget(uint32 target)
