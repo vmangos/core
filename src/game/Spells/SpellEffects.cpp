@@ -595,17 +595,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         return;
 
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181373, 5.0f))
-                        pGo->Despawn();
+                        pGo->Delete();
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181223, 5.0f))
-                        pGo->Despawn();
+                        pGo->Delete();
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181215, 5.0f))
-                        pGo->Despawn();
+                        pGo->Delete();
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181172, 5.0f))
-                        pGo->Despawn();
+                        pGo->Delete();
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181154, 5.0f))
-                        pGo->Despawn();
+                        pGo->Delete();
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181374, 5.0f))
-                        pGo->Despawn();
+                        pGo->Delete();
                         unitTarget->RemoveFromWorld();
                         uint32 zoneid = unitTarget->GetZoneId();
                         unitTarget->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0, false);
