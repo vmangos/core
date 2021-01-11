@@ -346,9 +346,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         case HIGHGUID_GAMEOBJECT:
         {
             GameObject* go = GetPlayer()->GetMap()->GetGameObject(lguid);
-
-            // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-            if (!go || ((go->GetOwnerGuid() != _player->GetObjectGuid() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
+            if (!go)
                 return;
 
             loot = &go->loot;
