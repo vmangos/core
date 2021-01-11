@@ -1002,7 +1002,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         return;
 
                     // immediately finishes the cooldown on certain Rogue abilities
-                    auto cdCheck = [](SpellEntry const & spellEntry) -> bool { return (spellEntry.SpellFamilyName == SPELLFAMILY_ROGUE && (spellEntry.SpellFamilyFlags & uint64(0x0000026000000860))); };
+                    auto cdCheck = [](SpellEntry const & spellEntry) -> bool { return (spellEntry.SpellFamilyName == SPELLFAMILY_ROGUE && spellEntry.GetRecoveryTime() > 0); };
                     static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
                     return;
                 }
