@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210112133917');
 -- Add your query below.
 
-UPDATE `creature` SET `spawn_flags` = 1 WHERE `id` in (4484, 5633, 10646);
+UPDATE `creature` SET `spawn_flags` = 1 WHERE `id` in (4484, 5644, 10646);
 
 -- End of migration.
 END IF;
