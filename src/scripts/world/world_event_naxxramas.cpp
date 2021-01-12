@@ -39,9 +39,28 @@ bool IsPermanent(uint32 zone)
 }
 
 /*
+Circle
+*/
+class GoCircle : public GameObjectAI
+{
+public:
+    GoCircle(GameObject* go) : GameObjectAI(go)
+    {
+        me->CastSpell(me, CREATE_CRYSTAL, true);
+    }
+    void UpdateAI(uint32 const diff) override
+    {
+    }
+};
+
+GameObjectAI* GetAI_GoCircle(GameObject* go)
+{
+    return new GoCircle(go);
+}
+
+/*
 Necropolis
 */
-
 class GoNecropolis : public GameObjectAI
 {
 public:
@@ -50,6 +69,7 @@ public:
         me->SetVisibilityModifier(3000.0f);
         uint32 zoneid = me->GetZoneId();
         me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_STORM, 0.25f, true);
+        me->CastSpell(me, SPELL_SUMMON_NECROPOLIS_CRITTERS, true);
     }
     void UpdateAI(uint32 const diff) override
     {
@@ -59,25 +79,6 @@ public:
 GameObjectAI* GetAI_GoNecropolis(GameObject* go)
 {
     return new GoNecropolis(go);
-}
-
-class GoNecropolisCritterSpawner : public GameObjectAI
-{
-public:
-    GoNecropolisCritterSpawner(GameObject* go) : GameObjectAI(go)
-    {
-        me->CastSpell(me, SPELL_SUMMON_NECROPOLIS_CRITTERS, true);
-        me->Despawn();
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-    }
-};
-
-GameObjectAI* GetAI_GoNecropolisCritterSpawner(GameObject* go)
-{
-    return new GoNecropolisCritterSpawner(go);
 }
 
 /*
@@ -387,8 +388,10 @@ struct ShadowOfDoomAI : public ScriptedAI
         m_uiScourgeStrike_Timer = 120000;
     }
 
-    void Aggro(Unit* pWho) override
+    void JustDied(Unit*) override
     {
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 200.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL_CORPSE, CF_TRIGGERED);
     }
 
     void JustSummoned(Creature* creature) override
@@ -1046,13 +1049,13 @@ void AddSC_world_event_naxxramas()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_necropolis";
-    newscript->GOGetAI = &GetAI_GoNecropolis;
+    newscript->Name = "go_circle";
+    newscript->GOGetAI = &GetAI_GoCircle;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_necropolis_critter_spawner";
-    newscript->GOGetAI = &GetAI_GoNecropolisCritterSpawner;
+    newscript->Name = "go_necropolis";
+    newscript->GOGetAI = &GetAI_GoNecropolis;
     newscript->RegisterSelf();
 
     newscript = new Script;
