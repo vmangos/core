@@ -3507,17 +3507,13 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, SpellEntry const* pSpellInfo,
         if (pSpellInfo->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
 
-        if (!pSpellInfo->IsAreaOfEffectSpell())
-        {
-            // If the spell requires the target having a specific power type.
-            if (!pSpellInfo->IsTargetPowerTypeValid(pTarget->GetPowerType()))
-                return SPELL_FAILED_UNKNOWN;
+        // If the spell requires the target having a specific power type.
+        if (!pSpellInfo->IsAreaOfEffectSpell() && !pSpellInfo->IsTargetPowerTypeValid(pTarget->GetPowerType()))
+            return SPELL_FAILED_UNKNOWN;
 
-            // No point in casting if target is immune.
-            if (!pSpellInfo->IsPositiveSpell() &&
-                pTarget->IsImmuneToDamage(pSpellInfo->GetSpellSchoolMask(), pSpellInfo))
-                return SPELL_FAILED_IMMUNE;
-        }
+        // No point in casting if target is immune.
+        if ((pTarget != this) && !pSpellInfo->IsPositiveSpell() && pTarget->IsImmuneToDamage(pSpellInfo->GetSpellSchoolMask(), pSpellInfo))
+            return SPELL_FAILED_IMMUNE;
 
         // Mind control abilities can't be used with just 1 attacker or mob will reset.
         if ((GetThreatManager().getThreatList().size() == 1) && pSpellInfo->IsCharmSpell())
