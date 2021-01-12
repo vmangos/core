@@ -569,6 +569,18 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (14491, 37, -13771.36, -194.1479, 23.58299, 100, 0, 0, 0),
 (14491, 38, -13768.64, -210.9160, 28.39240, 100, 0, 0, 0);
 
+-- kernda waypoints
+UPDATE `creature` SET `position_x` = 7031.818, `position_y` = -2119.087, `position_z` = 586.5599,  `movement_type` = 2 WHERE `guid` = 39359;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(11558, 1, 7031.818, -2119.087, 586.5599, 100, 0, 0, 0),
+(11558, 2, 7049.333, -2116.203, 586.4012, 100, 0, 0, 0),
+(11558, 3, 7059.674, -2115.573, 586.4418, 100, 0, 0, 0),
+(11558, 4, 7085.175, -2116.508, 582.4188, 100, 0, 0, 0),
+(11558, 5, 7059.865, -2115.562, 586.5015, 100, 0, 0, 0),
+(11558, 6, 7049.333, -2116.203, 586.4012, 100, 0, 0, 0),
+(11558, 7, 7031.818, -2119.087, 586.5679, 100, 0, 0, 0),
+(11558, 8, 7000.174, -2123.915, 588.5158, 100, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
