@@ -63,11 +63,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 enum ScourgeInvasionSpells
 {
-    SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage.
-    SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 damage.
-    SPELL_BUTTRESS_CHANNEL                      = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard.
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
-    SPELL_SOUL_REVIVAL                          = 28681, // Increases all damage caused by 10%.
 
     // Object 181214 Necropolis critter spawner
     SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
@@ -93,19 +89,23 @@ enum ScourgeInvasionSpells
     // Relay -> Proxy
     SPELL_COMMUNIQUE_RELAY_TO_PROXY             = 28365, // Purple bolt Visual (SMALL)
 
-    // Relay -> Camp
+    // Relay -> Shard
     SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG)
 
-    // Camp
+    // Shard
+    CREATE_CRYSTAL                              = 28344,
     SPELL_CAMP_RECEIVES_COMMUNIQUE              = 28449, // Impact Visual.
     SPELL_COMMUNIQUE_TIMER_CAMP                 = 28346, // Cast on npc_necrotic_shard on spawn? Periodically triggers 28345 Communique Trigger every 35 seconds.
     SPELL_COMMUNIQUE_TRIGGER                    = 28345, // Triggers 28281 SPELL_COMMUNIQUE_CAMP_TO_RELAY via void Spell::EffectDummy.
+    SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 damage triggered by (28056) after a Shadow of Doom dies.
+    SPELL_SOUL_REVIVAL                          = 28681, // Increases all damage caused by 10%.
 
-    // Camp -> Relay
+    // Shard -> Relay
     SPELL_COMMUNIQUE_CAMP_TO_RELAY              = 28281, // Purple bolt Visual (SMALL)
     SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH        = 28351, // Visual when Damaged Necrotic Shard dies.
 
     // Minions Spells
+    SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage to a Shard on death.
     SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
     SPELL_MINION_SPAWN_IN                       = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                      = 17680, // Makes invisible.
@@ -126,6 +126,7 @@ enum ScourgeInvasionSpells
     SPELL_RIBBON_OF_SOULS                       = 16243,
 
     // Cultist Engineer
+    SPELL_BUTTRESS_CHANNEL                      = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard.
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
     SPELL_SUMMON_BOSS                           = 31315, // Reagents, 8 Necrotic Rune
 
@@ -133,10 +134,7 @@ enum ScourgeInvasionSpells
     SPELL_SPAWN_SMOKE                           = 10389, // Spawning Visual.
     SPELL_FEAR                                  = 12542,
     SPELL_MINDFLAY                              = 16568,
-    SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Doom dies.
-
-    // Unused
-    SPELL_CREATE_CRYSTAL                        = 28344, // (NECROTIC_SHARD = 16136) CIRCLE - Gob 181136 CASTS this
+    SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Doom dies. Triggers (28041)
 };
 
 enum ScourgeInvasionNPC
