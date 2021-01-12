@@ -1135,53 +1135,6 @@ CreatureAI* GetAI_npc_warlord_kromzar(Creature* pCreature)
     return new npc_warlord_kromzarAI(pCreature);
 }
 
-/*######
-## npc_razormane_stalker
-######*/
-
-#define SPELL_STEALTH                1784
-#define SPELL_SINISTERSTRIKE         15667
-#define NPC_RAZORMANE_STALKER        3457
-
-struct npc_razormane_stalkerAI : public ScriptedAI
-{
-    npc_razormane_stalkerAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
-
-    uint32 SinisterStrike_Timer;
-    uint32 SinisterStrike_Counter;
-
-    void Reset() override
-    {
-        SinisterStrike_Timer = 8000;
-        SinisterStrike_Counter = 0;
-        DoCastSpellIfCan(m_creature, SPELL_STEALTH);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (SinisterStrike_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SINISTERSTRIKE);
-            SinisterStrike_Counter += 1;
-            if (SinisterStrike_Counter == 1) SinisterStrike_Timer = 15000;
-            else if (SinisterStrike_Counter == 2) SinisterStrike_Timer = 12000;
-            else SinisterStrike_Timer = 15000;
-        }
-        else SinisterStrike_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_razormane_stalker(Creature* pCreature)
-{
-    return new npc_razormane_stalkerAI(pCreature);
-}
-
 /*
  * 'Mission: Possible But Not Probable' support:
  * Grand Foreman Puzik Gallywix
@@ -1423,11 +1376,6 @@ void AddSC_the_barrens()
     newscript = new Script;
     newscript->Name = "npc_warlord_kromzar";
     newscript->GetAI = &GetAI_npc_warlord_kromzar;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_razormane_stalker";
-    newscript->GetAI = &GetAI_npc_razormane_stalker;
     newscript->RegisterSelf();
 
     newscript = new Script;
