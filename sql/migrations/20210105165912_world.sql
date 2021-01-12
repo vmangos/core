@@ -776,7 +776,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (4705, 20, -145.7213, -4275.718, 63.28702, 100, 0, 0, 0);
 
 -- missing craetures and waypoints uldaman entrance (taken from https://github.com/cmangos/classic-db/commit/6a793966b388d274c0a7e142d2788df13b826cee)
-INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`  `patch_max`) VALUES
+INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `patch_max`) VALUES
 (7400, 4846, -6061.596, -3148.339, 254.2748, 5.9166660, 300, 300, 0, 100, 0, 0, 10),
 (7483, 4846, -6091.622, -3160.969, 253.4217, 2.5307270, 300, 300, 0, 100, 0, 0, 10),
 (7764, 4846, -6078.361, -3100.635, 251.1098, 0.2617994, 300, 300, 0, 100, 0, 0, 10),
