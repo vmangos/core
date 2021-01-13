@@ -1626,6 +1626,13 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (5768, 5772, 5, 6, 11),
 (5768, 5770, 5, 9, 11);
 
+-- avette fellwood waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4204;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(228, 1, -10522.4, -1145.08, 27.8022, 100, 15000, 0, 0),
+(228, 2, -10523.2, -1145.05, 27.8022, 100, 0, 0, 0),
+(228, 3, -10517.2, -1138.53, 26.1772, 100, 17000, 0, 0);
+
 
 -- End of migration.
 END IF;
