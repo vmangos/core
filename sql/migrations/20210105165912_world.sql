@@ -1590,7 +1590,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (2453, 15, 631.456, -679.19, 154.09, 100, 0, 0, 0),
 (2453, 16, 624.023, -675.308, 152.823, 100, 0, 0, 0);
 
---shadowsilk patrol waypoints
+-- shadowsilk patrol waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 5768;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (5768, 1, -6468.846, -1635.523, 301.2275, 100, 0, 0, 0),
