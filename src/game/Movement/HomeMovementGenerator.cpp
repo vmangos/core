@@ -67,7 +67,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         init.Launch();
     }
     else // too far away or no path
-        owner.NearTeleportTo(x, y, z, o);
+        owner.NearTeleportTo(x, y, z, setFacing ? o : owner.GetOrientation());
     
     arrived = false;
 
