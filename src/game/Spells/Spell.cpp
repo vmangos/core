@@ -4347,7 +4347,7 @@ void Spell::HandleAddTargetTriggerAuras()
                 SpellEffectIndex auraSpellIdx = targetTrigger->GetEffIndex();
                 // Calculate chance at that moment (can be depend for example from combo points)
                 int32 auraBasePoints = targetTrigger->GetBasePoints();
-                int32 chance = m_casterUnit->CalculateSpellDamage(target, auraSpellInfo, auraSpellIdx, &auraBasePoints);
+                int32 chance = m_casterUnit->CalculateSpellEffectValue(target, auraSpellInfo, auraSpellIdx, &auraBasePoints);
                 if ((m_casterUnit->IsPlayer() && m_casterUnit->ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC)) || roll_chance_i(chance))
                     m_casterUnit->CastSpell(target, auraSpellInfo->EffectTriggerSpell[auraSpellIdx], true, nullptr, targetTrigger);
             }
@@ -4448,7 +4448,7 @@ void Spell::finish(bool ok)
         if (Unit* const pTarget = m_targets.getUnitTarget())
         {
             SpellEntry const* DRLaunchEntry = sSpellMgr.GetSpellEntry(13279);
-            int32 DRdamage = m_caster->CalculateSpellDamage(pTarget, DRLaunchEntry, EFFECT_INDEX_0, m_currentBasePoints, nullptr);
+            int32 DRdamage = m_caster->CalculateSpellEffectValue(pTarget, DRLaunchEntry, EFFECT_INDEX_0, m_currentBasePoints, nullptr);
             m_caster->CastCustomSpell(pTarget, 13279, &DRdamage, nullptr, nullptr, true, m_CastItem);
         }
     }

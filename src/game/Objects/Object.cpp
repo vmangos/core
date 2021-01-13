@@ -4097,7 +4097,7 @@ uint32 WorldObject::CalcArmorReducedDamage(Unit* pVictim, uint32 const damage) c
     return (newdamage > 1) ? newdamage : 1;
 }
 
-int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* effBasePoints, Spell* spell) const
+int32 WorldObject::CalculateSpellEffectValue(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* effBasePoints, Spell* spell) const
 {
     Unit const* pUnit = ToUnit();
     Player const* pPlayer = ToPlayer();
