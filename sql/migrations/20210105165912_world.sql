@@ -1623,10 +1623,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (5768, 26, -6518.35, -1653.155, 291.5102, 100, 0, 0, 0),
 (5768, 27, -6489.119, -1636.143, 298.477, 100, 0, 0, 0);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(5768, 5771, 5, 1, 11),
-(5768, 5769, 5, 3, 11),
-(5768, 5772, 5, 6, 11),
-(5768, 5770, 5, 9, 11);
+(5768, 5771, 2, 0, 11),
+(5768, 5768, 2, 6.25244, 11),
+(5768, 5769, 2, 3.14, 11),
+(5768, 5772, 2, 1.57, 11),
+(5768, 5770, 2, 4.71, 11);
 
 -- avette fellwood waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4204;
