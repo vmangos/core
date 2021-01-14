@@ -9,11 +9,11 @@ INSERT INTO `migrations` VALUES ('20201224122604');
 -- Add your query below.
 
 
--- remove incorrect Gadgetzan Bruisers
+-- Remove incorrect Gadgetzan Bruisers
 DELETE FROM `creature` WHERE `guid` IN (60002, 60000, 60001, 23576, 23582, 23583);
 DELETE FROM `creature_movement` WHERE `id` = 60000;
 
--- add Trenton Lighthammer script
+-- Add Trenton Lighthammer script
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 7804;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (780401, 7804, 0, 1, 0, 100, 1, 0, 0, 78000, 78000, 780401, 0, 0, 'Trenton Lighthammer - Start Script OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (780401, 0, 39, 780401, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Trenton Lighthammer - Start Script');
@@ -28,7 +28,6 @@ UPDATE `creature` SET `position_x` = -8189.83, `position_y` = -4586.73, `positio
 
 -- Occulus correct position
 UPDATE `creature` SET `position_x` = -8195.5, `position_y` = -4480.25, `position_z` = 9.20932, `movement_type` = 1, `wander_distance` = 7 WHERE `guid` = 21773;
-
 
 -- Thousand Needles
 -- Tarkreu Shadowstalker should roam
@@ -75,11 +74,10 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (6495, 18, -6187.61, -3933.56, -58.7496, 100, 0, 0, 0),
 (6495, 19, -6198.61, -3950.78, -58.7495, 100, 0, 0, 0);
 
--- make Motega Firemane more blizzlike
+-- Make Motega Firemane more blizzlike
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2169302, 1, 28, 8, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Motega Firemane - Set Stand State');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2169302, 4, 28, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Motega Firemane - Set Stand State');
 UPDATE `creature_movement` SET `script_id` = 2169302 WHERE `id` = 21693 AND `point` = 4;
-
 
 -- Ferales
 -- Kristy Grant should roam
@@ -160,26 +158,27 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (49969, 20, -4375.5, 3299.96, 13.5609, 100, 0, 0, 0),
 (49969, 21, -4374.09, 3259.01, 13.0068, 100, 0, 0, 0);
 
-
 -- Un'Goro
 -- add Bloodpetal Pest infestation event
 DELETE FROM `creature` WHERE `guid` IN (24444, 24442, 24441, 24443);
+UPDATE `creature_template` SET `movement_type`=0 WHERE `entry`=9157;
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 9119;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (911901, 9119, 0, 1, 0, 100, 1, 360000, 360000, 360000, 360000, 911901, 0, 0, 'Muigin - Summon Creature OOC');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 0, 915701, 6, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 0, 59, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodpetal Pest - Set React State');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 2, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodpetal Pest - Run');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6190.68, -1099.47, -215.189, 0, 0, 'Bloodpetal Pest - Move');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6202.634, -1114.64, -220.1, 0, 0, 'Bloodpetal Pest - Move');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 12, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 'Bloodpetal Pest - Set Move type');
-
+DELETE FROM `creature_ai_scripts` WHERE `id`=911901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 5, 100, 0, 0, 0, 0, 9, 915701, -1, 10, -6213.662, -1056.375, -197.906, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 5, 100, 0, 0, 0, 0, 9, 915701, -1, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 5, 100, 0, 0, 0, 0, 9, 915701, -1, 10, -6210.807, -1053.875, -197.906, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 5, 100, 0, 0, 0, 0, 9, 915701, -1, 10, -6213.333, -1059.195, -197.906, 0, 0, 'Muigin - Summon Creature');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911901, 0, 10, 9157, 660000, 5, 100, 0, 0, 0, 0, 9, 915701, -1, 10, -6210.617, -1059.143, -197.906, 0, 0, 'Muigin - Summon Creature');
+DELETE FROM `generic_scripts` WHERE `id`=915701;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodpetal Pest - Set React State');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 3, 3, 0, 0, 5, 2, 0, 0, 0, 4, 0, 0, 0, 0, -6190.68, -1099.47, -215.189, 0, 117, 'Bloodpetal Pest - Move');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 9, 3, 0, 0, 5, 2, 0, 0, 0, 4, 0, 0, 0, 0, -6202.63, -1114.64, -220.1, 0, 117, 'Bloodpetal Pest - Move');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (915701, 12, 20, 1, 1, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 15, 0, 0, 0, 117, 'Bloodpetal Pest - Set Move type');
 
 -- Silithus
 -- Correct Cenarion Hold Infantry Patrols
+UPDATE `creature` SET `position_x`=-6766.219, `position_y`=755.833, `position_z`=85.337, `orientation`=3.4 WHERE `guid`=60006;
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (42897, 60006, 6, 3, 11);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
