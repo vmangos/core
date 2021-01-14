@@ -2225,6 +2225,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2237, 17, -11619.6, 673.263, 52.5111, 100, 0, 0, 0),
 (2237, 18, -11621, 688.394, 47.0331, 100, 0, 0, 0);
 
+-- grimungous has waypoints might as well use them
+UPDATE `creature` SET `movement_type` =2 WHERE `guid` = 77480;
+
 
 -- End of migration.
 END IF;
