@@ -19,9 +19,6 @@ UPDATE `gameobject` SET `position_x`=-2414.87, `position_y`=-3147.57, `position_
 UPDATE `gameobject` SET `position_x`=-3119.02, `position_y`=-2246.05, `position_z`=94.0295, `orientation`=1.18682, `rotation0`=0, `rotation1`=0, `rotation2`=0.559193, `rotation3`=0.829038 WHERE `guid`=4390;
 
 
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1238, 1, 'Kingsblood in Wailing Caverns', 0, 0, 0, 10);
-
-
 -- Missing spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (3938, 1624, 0, 55.5641, -50.3888, 99.1906, 5.044, 0, 0, -0.580703, 0.814116, 1800, 1800, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (3938, 1057, 'Kingsblood');
@@ -116,13 +113,13 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (1041
 
 -- Missing spawns in Wailing Caverns.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (4032, 1624, 1, -583.072, -2260.18, 38.7323, 0.785397, 0, 0, 0.382683, 0.92388, 1800, 1800, 255, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (4032, 1238, 'Kingsblood');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (4032, 1053, 'Kingsblood');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (4036, 1624, 1, -564.824, -2200.06, 50.2902, 5.044, 0, 0, -0.580703, 0.814116, 1800, 1800, 255, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (4036, 1238, 'Kingsblood');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (4036, 1053, 'Kingsblood');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10429, 1624, 1, -682.903, -2338.59, 17.1252, 1.36136, 0, 0, 0.62932, 0.777146, 1800, 1800, 255, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10429, 1238, 'Kingsblood');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10429, 1053, 'Kingsblood');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10441, 1624, 1, -605.093, -2352.9, 24.3262, 4.67748, 0, 0, -0.719339, 0.694659, 1800, 1800, 255, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10441, 1238, 'Kingsblood');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10441, 1053, 'Kingsblood');
 
 
 -- Missing spawns in Wetlands.
