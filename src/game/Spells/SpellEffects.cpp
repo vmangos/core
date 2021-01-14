@@ -847,7 +847,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!pPlayer)
                         return;
 
-                    uint32 spellId = PickRandomValue(8064, 8065, 8066, 8067, 8068);
+                    uint32 spellId = PickRandomValue(8064, 8065, 8066, 8067, 8068, 8070);
                     pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
                     return;
                 }
