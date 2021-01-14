@@ -79,18 +79,21 @@ struct boss_ptheradrasAI : public ScriptedAI
         //Dustfield_Timer
         if (Dustfield_Timer < diff)
         {
-
             //only cast Dust Field if an attacker is in melee range 
             bool m_bMeleeAttackers = false;
 
             Unit::AttackerSet attackers = m_creature->GetAttackers();
             for (const auto itr : attackers)
+            {
                 if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
+                {
                     if (m_creature->IsInRange(attacker, 0.0f, m_creature->GetMeleeReach(), false))
                     {
                         m_bMeleeAttackers = true;
                         break;
                     }
+                }
+            }
             
             if (m_bMeleeAttackers)
             {
@@ -104,15 +107,15 @@ struct boss_ptheradrasAI : public ScriptedAI
         //Boulder_Timer
         if (Boulder_Timer < diff)
         {
-            Unit* target = nullptr;
-            target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            if (target)
+            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            {
                 if (DoCastSpellIfCan(target, SPELL_BOULDER) == CAST_OK)
                 {
                     m_creature->SetInFront(target);
                     m_creature->SetTargetGuid(target->GetObjectGuid());
                     RestoreTargetTimer = 2000 + 750; // cast time + 1/2 gcd ?
                 }
+            }
             Boulder_Timer = 10000;
         }
         else Boulder_Timer -= diff;
