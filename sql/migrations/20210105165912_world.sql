@@ -1900,6 +1900,12 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3662, 49, 7132.28, -779.241, 66.7349, 100, 2000, 0, 0),
 (3662, 50, 7131.55, -780.963, 66.9849, 100, 2000, 0, 0);
 
+-- meven korgal waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 44986;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1667, 1, 1772.69, 1381.04, 90.9636, 5.62306, 30000, 0, 0),
+(1667, 2, 1763.48, 1384.8, 92.7069, 5.40707, 30000, 0, 0);
+
 
 -- End of migration.
 END IF;
