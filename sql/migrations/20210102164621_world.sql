@@ -26,10 +26,6 @@ UPDATE `gameobject` SET `position_x`=-2083.43, `position_y`=103.156, `position_z
 UPDATE `gameobject` SET `position_x`=-2049.12, `position_y`=-291.195, `position_z`=-7.16006, `orientation`=1.43117, `rotation0`=0, `rotation1`=0, `rotation2`=0.656058, `rotation3`=0.75471 WHERE `guid`=830;
 UPDATE `gameobject` SET `position_x`=-1571.92, `position_y`=-575.409, `position_z`=-48.7972, `orientation`=2.58308, `rotation0`=0, `rotation1`=0, `rotation2`=0.961261, `rotation3`=0.27564 WHERE `guid`=743;
 
-
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (997, 1, 'Silverleaf in Thunder Bluff', 0, 0, 0, 10);
-
-
 -- Missing spawns in Durotar.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10264, 1617, 1, 1402.2, -4671.18, 32.9784, 2.02458, 0, 0, 0.848047, 0.529921, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10264, 1022, 'Silverleaf');
@@ -39,7 +35,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10397, 1022, 'Silverleaf');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10398, 1617, 1, 1056.99, -5000.04, 17.4907, 4.92183, 0, 0, -0.62932, 0.777146, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10398, 1022, 'Silverleaf');
-
 
 -- Missing spawns in Elwynn Forest.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (748, 1617, 0, -9127.98, -15.8528, 85.698, 6.14356, 0, 0, -0.0697555, 0.997564, 900, 900, 255, 1);
@@ -61,7 +56,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (1113
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (1156, 1617, 0, -9198.81, -1258.92, 77.0887, 0.314158, 0, 0, 0.156434, 0.987688, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (1156, 1013, 'Silverleaf');
 
-
 -- Missing spawns in Loch Modan.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (588, 1617, 0, -4749.33, -3077.36, 313.461, 5.96903, 0, 0, -0.156434, 0.987688, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (588, 1162, 'Silverleaf');
@@ -73,7 +67,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (1179, 1162, 'Silverleaf');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (9720, 1617, 0, -5108.3, -2945.94, 334.151, 5.77704, 0, 0, -0.25038, 0.968148, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (9720, 1162, 'Silverleaf');
-
 
 -- Missing spawns in Mulgore.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10262, 1617, 1, -1240.85, -573.591, -55.5674, 6.10865, 0, 0, -0.0871553, 0.996195, 900, 900, 255, 1);
@@ -92,7 +85,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (18277, 1027, 'Silverleaf');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (19969, 1617, 1, -906.076, -97.406, 2.42219, 1.98967, 0, 0, 0.83867, 0.54464, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (19969, 1027, 'Silverleaf');
-
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (18271, 1617, 1, -940.065, 15.0219, 16.501, 5.96903, 0, 0, -0.156434, 0.987688, 900, 900, 255, 1);
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (18271, 1027, 'Silverleaf');
 
 -- Missing spawns in Silverpine Forest.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (582, 1617, 0, 1397.55, 1006.83, 53.7419, 1.0821, 0, 0, 0.515037, 0.857168, 900, 900, 255, 1);
@@ -104,18 +98,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (960,
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (8402, 1617, 0, 1129.89, 1426.89, 37.3946, 3.57793, 0, 0, -0.976295, 0.216442, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (8402, 1042, 'Silverleaf');
 
-
 -- Missing spawns in Teldrassil.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10283, 1617, 1, 10232, 1437.95, 1332.42, 1.02974, 0, 0, 0.492423, 0.870356, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10283, 1003, 'Silverleaf');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (19972, 1617, 1, 10044.2, 1254.35, 1325.02, 4.95674, 0, 0, -0.615661, 0.788011, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (19972, 1003, 'Silverleaf');
-
-
--- Missing spawns in Thunder Bluff.
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (18271, 1617, 1, -940.065, 15.0219, 16.501, 5.96903, 0, 0, -0.156434, 0.987688, 900, 900, 255, 1);
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (18271, 997, 'Silverleaf');
-
 
 -- Missing spawns in Tirisfal Glades.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (475, 1617, 0, 2060.01, 4.3954, 43.3182, 0.925024, 0, 0, 0.446198, 0.894934, 900, 900, 255, 1);
@@ -156,7 +143,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (9708, 1007, 'Silverleaf');
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (10260, 1617, 0, 1604.38, -641.317, 52.6502, 1.97222, 0, 0, 0.833885, 0.551938, 900, 900, 255, 1);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES (10260, 1007, 'Silverleaf');
-
 
 -- Missing spawns in Westfall.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (1108, 1617, 0, -10128.5, 1001.42, 37.3444, 0.279252, 0, 0, 0.139173, 0.990268, 900, 900, 255, 1);
