@@ -11,12 +11,11 @@ INSERT INTO `migrations` VALUES ('20201222170716');
 
 -- misc
 -- smudge thunderwood should only sell recipe: thistle tea to rogues who have completed quests 2359 or 2478
-UPDATE `npc_vendor` SET `condition_id`= 677905 WHERE  `entry`= 6779 AND `item` =18160;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (677901, 14, 255, 8, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (677902, 8, 2359, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (677903, 8, 2478, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (677904, -2, 677902, 677903, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (677905, -1, 677901, 677904, 0, 0, 0);
+UPDATE `npc_vendor` SET `condition_id` = 482 WHERE  `entry` = 6779 AND `item` = 18160;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (479, 8, 2359, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (480, 8, 2478, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (481, -2, 479, 480, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (482, -1, 100, 481, 0, 0, 0);
 
 
 -- thousand needles
