@@ -2467,6 +2467,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (994, 15, -11648, 589.458, 50.1729, 100, 0, 0, 0),
 (994, 16, -11624.7, 591.707, 49.6399, 100, 0, 0, 0);
 
+-- guard roberts correct position
+UPDATE `creature` SET  `position_x` = -9514.61, `position_y` = -135.652, `position_z` = 60.4096, `orientation` = 5.39307 WHERE `id` = 12423;
 
 
 
