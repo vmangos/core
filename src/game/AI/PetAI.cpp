@@ -123,7 +123,7 @@ void PetAI::UpdateAI(uint32 const diff)
             {
                 if (m_creature->GetCharmInfo()->IsCommandAttack() || (m_creature->GetCharmInfo()->IsAtStay() && m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim())))
                 {
-                    if (!m_creature->HasInArc(M_PI_F, m_creature->GetVictim()))
+                    if (!m_creature->HasInArc(m_creature->GetVictim()))
                         m_creature->SetInFront(m_creature->GetVictim());
                     attacked = DoMeleeAttackIfReady();
                 }
@@ -298,7 +298,7 @@ void PetAI::UpdateAI(uint32 const diff)
             SpellCastTargets targets;
             targets.setUnitTarget(target);
 
-            if (!m_creature->HasInArc(M_PI_F, target))
+            if (!m_creature->HasInArc(target))
             {
                 m_creature->SetInFront(target);
                 if (target->GetTypeId() == TYPEID_PLAYER)

@@ -2736,7 +2736,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                             break;
                     }
 
-                    if (m_caster->HasInArc(arc, itr, angle))
+                    if (m_caster->HasInArc(itr, arc, angle))
                         targetUnitMap.push_back(itr);                
                 }
 
@@ -5761,7 +5761,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         //Target must be facing you.
-        if ((m_spellInfo->Attributes == 0x150010) && !target->HasInArc(M_PI_F, m_caster))
+        if ((m_spellInfo->Attributes == 0x150010) && !target->HasInArc(m_caster))
         {
             SendInterrupted(2);
             return SPELL_FAILED_NOT_INFRONT;
@@ -6085,7 +6085,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_targets.getUnitTarget() &&
                        !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) &&
                        (m_caster->GetDistance2dToCenter(m_targets.getUnitTarget()) > NO_FACING_CHECKS_DISTANCE) &&
-                       !m_caster->HasInArc(M_PI_F, m_targets.getUnitTarget()))
+                       !m_caster->HasInArc(m_targets.getUnitTarget()))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
                 }
                 else if (m_spellInfo->Id == 13278) // Gnomish Death Ray
@@ -7231,7 +7231,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
                 // Requires target forward for these spells
                 if ((m_caster->GetDistance2dToCenter(target) > NO_FACING_CHECKS_DISTANCE) &&
-                    !m_caster->HasInArc(M_PI_F, target))
+                    !m_caster->HasInArc(target))
                     return SPELL_FAILED_UNIT_NOT_INFRONT;
 
                 float range_mod = 1.0f;
@@ -7285,7 +7285,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         if (m_caster->IsPlayer() &&
            (m_spellInfo->Custom & SPELL_CUSTOM_FACE_TARGET) &&
            (m_caster->GetDistance2dToCenter(target) > NO_FACING_CHECKS_DISTANCE) &&
-           !m_caster->HasInArc(M_PI_F, target))
+           !m_caster->HasInArc(target))
             return SPELL_FAILED_UNIT_NOT_INFRONT;
     }
 

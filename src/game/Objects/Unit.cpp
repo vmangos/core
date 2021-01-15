@@ -354,7 +354,7 @@ AutoAttackCheckResult Unit::CanAutoAttackTarget(Unit const* pVictim) const
 
     if (GetDistance2dToCenter(pVictim) > NO_FACING_CHECKS_DISTANCE)
     {
-        if (!HasInArc(2 * M_PI_F / 3, pVictim))
+        if (!HasInArc(pVictim, 2 * M_PI_F / 3))
             return ATTACK_RESULT_BAD_FACING;
     }
 
@@ -1635,7 +1635,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     DealDamage(pVictim, damageInfo->totalDamage, &cleanDamage, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->subDamage[0].damageSchoolMask), nullptr, durabilityLoss);
 
     // If this is a creature and it attacks from behind it has a probability to daze it's victim
-    if (damageInfo->totalDamage && !IsPlayer() && !((Creature*)this)->GetCharmerOrOwnerGuid() && !pVictim->HasInArc(M_PI_F, this))
+    if (damageInfo->totalDamage && !IsPlayer() && !((Creature*)this)->GetCharmerOrOwnerGuid() && !pVictim->HasInArc(this))
     {
         // -probability is between 0% and 40%
         // 20% base chance
@@ -2176,7 +2176,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
         return MELEE_HIT_CRIT;
     }
 
-    bool from_behind = !pVictim->HasInArc(M_PI_F, this);
+    bool from_behind = !pVictim->HasInArc(this);
 
     if (from_behind)
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: attack came from behind.");
@@ -2405,7 +2405,7 @@ void Unit::SendMeleeAttackStop(Unit* pVictim) const
 
 bool Unit::IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const* spellEntry, WeaponAttackType attackType) const
 {
-    if (!HasInArc(M_PI_F, pCaster))
+    if (!HasInArc(pCaster))
         return false;
 
     if (spellEntry)
@@ -2878,7 +2878,7 @@ bool Unit::IsBehindTarget(Unit const* pTarget, bool strict) const
         }
     }
 
-    return !pTarget->HasInArc(M_PI_F, this);
+    return !pTarget->HasInArc(this);
 }
 
 bool Unit::CantPathToVictim() const
@@ -6156,7 +6156,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     float visibleDistance = IsPlayer() ? MaxStealthDetectRange : ((Creature*)this)->GetAttackDistance(target);
 
     //Always invisible from back (when stealth detection is on), also filter max distance cases
-    bool isInFront = distance < visibleDistance && HasInArc(M_PI_F, target);
+    bool isInFront = distance < visibleDistance && HasInArc(target);
     if (!isInFront)
         return false;
 
@@ -8693,7 +8693,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radiu
     // remove not LoS targets
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if ((!IsWithinLOSInMap(*tIter)) || (inFront && !this->HasInArc(M_PI_F / 2, *tIter)) || (isValidAttackTarget && !IsValidAttackTarget(*tIter)))
+        if ((!IsWithinLOSInMap(*tIter)) || (inFront && !this->HasInArc(*tIter, M_PI_F / 2)) || (isValidAttackTarget && !IsValidAttackTarget(*tIter)))
         {
             std::list<Unit*>::iterator tIter2 = tIter;
             ++tIter;

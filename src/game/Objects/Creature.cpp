@@ -3504,7 +3504,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, SpellEntry const* pSpellInfo,
         }
 
         // If the spell requires to be behind the target.
-        if (pSpellInfo->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(M_PI_F, this))
+        if (pSpellInfo->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
 
         // If the spell requires the target having a specific power type.
