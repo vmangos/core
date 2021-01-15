@@ -49,6 +49,7 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 
 -- Update GameObjects
 UPDATE `gameobject_template` SET `script_name`='go_circle' WHERE  `entry`=181136 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE  `entry`=181154 AND `patch`=9;
 
 -- End of migration.
 END IF;
