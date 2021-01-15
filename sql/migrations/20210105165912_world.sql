@@ -2468,6 +2468,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (994, 16, -11624.7, 591.707, 49.6399, 100, 0, 0, 0);
 
 
+
+
+UPDATE `creature` SET `wander_distance` = 0 WHERE `movement_type` = 2;
+
+
 -- End of migration.
 END IF;
 END??
