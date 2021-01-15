@@ -1076,14 +1076,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         m_casterUnit->CastSpell(m_casterUnit, 29940, true, nullptr);
                     return;
                 }
-                case 17950:
+                case 17950:                                 // Shadow Portal
                 {
                     if (!unitTarget)
                         return;
 
-                    // Shadow Portal
+                    if (!m_casterUnit)
+                        return;
+
+                    if (m_casterUnit->GetThreatManager().getThreat(unitTarget))
+                        m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
+                    
                     uint32 spellId = PickRandomValue(17863, 17939, 17943, 17944, 17946, 17948);
-                    m_caster->CastSpell(unitTarget, spellId, true);
+                    m_casterUnit->CastSpell(unitTarget, spellId, true);
                     return;
                 }
                 case 18350:                                 // Dummy Trigger
