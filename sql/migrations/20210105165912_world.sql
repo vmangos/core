@@ -2690,6 +2690,15 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2111, 13, -11544.9, 727.757, 59.4597, 100, 0, 0, 0),
 (2111, 14, -11556.8, 730.024, 59.5396, 100, 0, 0, 0);
 
+-- creature 793 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 793;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(793, 1, -12210.5, 34.3149, 16.1189, 100, 0, 0, 0),
+(793, 2, -12231.7, 40.5723, 21.022, 100, 0, 0, 0),
+(793, 3, -12216.4, 36.2551, 17.6715, 100, 0, 0, 0),
+(793, 4, -12189.2, 25.7189, 8.19729, 100, 0, 0, 0),
+(793, 5, -12162.7, 14.3586, -3.5121, 100, 0, 0, 0);
+
 -- use creature 2120 for a missing spawn
 UPDATE `creature` SET `position_x` = -11515.8, `position_y` = 733.258, `position_z` = 61.2011, `orientation` = 3.35103 WHERE `guid` = 2120;
 
