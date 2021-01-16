@@ -172,9 +172,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1927, 156, -11652, 566.686, 49.8779, 100, 0, 0, 0),
 (1927, 157, -11652, 567.684, 49.9407, 100, 0, 0, 0);
 
--- remove duplicate creature
-DELETE FROM `creature` WHERE `guid` IN (2120);
-
 -- add creature 2106 waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 2106;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -2675,6 +2672,26 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1618, 21, -11511.5, -913.971, 26.8268, 100, 0, 0, 0),
 (1618, 22, -11519, -910.987, 26.5973, 100, 0, 0, 0);
 
+-- creature 2111 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 2111;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(2111, 1, -11562.7, 730.125, 59.5396, 100, 0, 0, 0),
+(2111, 2, -11570.7, 730.073, 59.6153, 100, 10000, 0, 0),
+(2111, 3, -11580.2, 734.024, 60.546, 100, 0, 0, 0),
+(2111, 4, -11573.3, 724.686, 59.4631, 100, 0, 0, 0),
+(2111, 5, -11573.5, 709.302, 59.52, 100, 30000, 5, 0),
+(2111, 6, -11570.6, 685.584, 59.4153, 100, 0, 0, 0),
+(2111, 7, -11572.4, 696.983, 59.5091, 100, 0, 0, 0),
+(2111, 8, -11568.7, 712.694, 59.4357, 100, 0, 0, 0),
+(2111, 9, -11559.2, 719.229, 59.6381, 100, 0, 0, 0),
+(2111, 10, -11547.6, 722.859, 59.4914, 100, 0, 0, 0),
+(2111, 11, -11529.7, 724.632, 59.4292, 100, 20000, 0, 0),
+(2111, 12, -11537, 725.983, 59.4205, 100, 0, 0, 0),
+(2111, 13, -11544.9, 727.757, 59.4597, 100, 0, 0, 0),
+(2111, 14, -11556.8, 730.024, 59.5396, 100, 0, 0, 0);
+
+-- use creature 2120 for a missing spawn
+UPDATE `creature` SET `position_x` = -11515.8, `position_y` = 733.258, `position_z` = 61.2011, `orientation` = 3.35103 WHERE `guid` = 2120;
 
 -- guard roberts correct position
 UPDATE `creature` SET  `position_x` = -9514.61, `position_y` = -135.652, `position_z` = 60.4096, `orientation` = 5.39307 WHERE `id` = 12423;
