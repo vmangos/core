@@ -1134,9 +1134,13 @@ enum ScriptTarget
 
     TARGET_T_HOSTILE                        = 1,            //Our current target (ie: highest aggro).
     TARGET_T_HOSTILE_SECOND_AGGRO           = 2,            //Second highest aggro (generaly used for cleaves and some special attacks).
+                                                            //Param2 = select_flags
     TARGET_T_HOSTILE_LAST_AGGRO             = 3,            //Dead last on aggro (no idea what this could be used for).
+                                                            //Param2 = select_flags
     TARGET_T_HOSTILE_RANDOM                 = 4,            //Just any random target on our threat list.
+                                                            //Param2 = select_flags
     TARGET_T_HOSTILE_RANDOM_NOT_TOP         = 5,            //Any random target except top threat.
+                                                            //Param2 = select_flags
 
     TARGET_T_OWNER_OR_SELF                  = 6,            //Either self or owner if pet or controlled.
     TARGET_T_OWNER                          = 7,            //The owner of the source.

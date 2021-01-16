@@ -2649,19 +2649,19 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
             break;
         case TARGET_T_HOSTILE_SECOND_AGGRO:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_HOSTILE_LAST_AGGRO:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_HOSTILE_RANDOM:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, nullptr, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_OWNER_OR_SELF:
             if (Unit* pUnitSource = ToUnit(pSource))

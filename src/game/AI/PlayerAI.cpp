@@ -250,11 +250,11 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
             if ((bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving() && me->IsWithinDist(victim, 30.0f)))
             {
                 me->GetMotionMaster()->Clear();
-                if (bIsMelee && !me->HasInArc(0.2f, victim))
+                if (bIsMelee && !me->HasInArc(victim, 0.2f))
                 {
                     me->SetFacingToObject(victim);
                 }
-                else if (!me->HasInArc(0.5f, victim))
+                else if (!me->HasInArc(victim, 0.5f))
                 {
                     me->SetFacingToObject(victim);
                 }
