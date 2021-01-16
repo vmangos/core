@@ -173,7 +173,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1927, 157, -11652, 567.684, 49.9407, 100, 0, 0, 0);
 
 -- remove duplicate creature
-DELETE FROM `creature` WHERE `guid` = 2120;
+DELETE FROM `creature` WHERE `guid` IN (2120, 1129);
 
 -- add creature 2106 waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 2106;
