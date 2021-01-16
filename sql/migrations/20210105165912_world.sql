@@ -2488,6 +2488,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1128, 16, -11536.6, 557.812, 50.3393, 100, 0, 0, 0),
 (1128, 17, -11533.2, 558.577, 49.6933, 100, 0, 0, 0);
 
+-- creature 1063 waypoints
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1063, 1, -11691.8, 644.795, 49.1451, 100, 30000, 0, 0),
+(1063, 2, -11698.6, 653.232, 49.3079, 100, 30000, 0, 0);
+
 -- guard roberts correct position
 UPDATE `creature` SET  `position_x` = -9514.61, `position_y` = -135.652, `position_z` = 60.4096, `orientation` = 5.39307 WHERE `id` = 12423;
 
