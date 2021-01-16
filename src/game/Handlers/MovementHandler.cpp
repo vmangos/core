@@ -1038,6 +1038,12 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             }
         }
 
+        if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        {
+            if (ObjectGuid lootGuid = pPlayerMover->GetLootGuid())
+                pPlayerMover->GetSession()->DoLootRelease(lootGuid);
+        }
+
         if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) != pPlayerMover->IsInWater())
         {
             // now client not include swimming flag in case jumping under water
@@ -1046,11 +1052,6 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
 
         pPlayerMover->SetPosition(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
         pPlayerMover->m_movementInfo = movementInfo;
-
-        // super smart decision; rework required
-        if (ObjectGuid lootGuid = pPlayerMover->GetLootGuid())
-            if (!lootGuid.IsItem())
-                pPlayerMover->SendLootRelease(lootGuid);
 
         // Nostalrius - antiundermap1
         if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))
