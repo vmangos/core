@@ -2824,6 +2824,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- allow some creatures to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` in (2545, 2584, 2581, 2574, 2576);
 
+-- allow tethis to roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 1342;
+
 -- missing spawns
 INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `movement_type`, `wander_distance`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_max`) VALUES
 (317, 1565, -13565.8, 130.811, 41.7738, 1, 3, 300, 300, 100, 10),
