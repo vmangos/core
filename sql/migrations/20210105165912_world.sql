@@ -2797,6 +2797,19 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2221, 10, -13379.7, 15.0227, 20.9821, 100, 0, 0, 0),
 (2221, 11, -13377.8, 7.14262, 21.5172, 100, 0, 0, 0);
 
+-- creature 1940 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1940;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1940, 1, -11545.3, 674.327, 61.1382, 100, 0, 0, 0),
+(1940, 2, -11545.7, 670.391, 60.3692, 100, 0, 0, 0),
+(1940, 3, -11550.7, 659.512, 59.8318, 100, 0, 0, 0),
+(1940, 4, -11557.5, 655.708, 59.5337, 100, 0, 0, 0),
+(1940, 5, -11575.1, 655.162, 59.5185, 100, 3000, 2, 0),
+(1940, 6, -11570, 654.206, 59.4592, 100, 0, 0, 0),
+(1940, 7, -11558.3, 656.596, 59.5236, 100, 0, 0, 0),
+(1940, 8, -11551.2, 660.466, 59.9162, 100, 0, 0, 0),
+(1940, 9, -11546.3, 666.331, 60.2032, 100, 0, 0, 0);
+
 -- allow some creatures to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` in (2545, 2584, 2581, 2574, 2576);
 
