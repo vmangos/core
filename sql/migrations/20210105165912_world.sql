@@ -2764,6 +2764,14 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (853, 20, -12354.8, -1007.67, 8.62256, 100, 0, 0, 0),
 (853, 0, -12359, -1001.3, 9.76074, 100, 0, 0, 0);
 
+-- missing spawns
+INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `movement_type`, `wander_distance`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_max`) VALUES
+(317, 1565, -13565.8, 130.811, 41.7738, 1, 3, 300, 300, 100, 10),
+(320, 1565, -13573.2, 130.455, 41.4361, 1, 3, 300, 300, 100, 10),
+(425, 1565, -13494, 191.256, 43.7976, 1, 3, 300, 300, 100, 10),
+(502, 1565, -13555, 179.66, 43.7341, 1, 3, 300, 300, 100, 10),
+(518, 1565, -13544.6, 177.559, 42.5709, 1, 3, 300, 300, 100, 10);
+
 -- use creature 2120 for a missing spawn
 UPDATE `creature` SET `position_x` = -11515.8, `position_y` = 733.258, `position_z` = 61.2011, `orientation` = 3.35103 WHERE `guid` = 2120;
 
