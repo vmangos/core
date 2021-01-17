@@ -2764,6 +2764,27 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (853, 20, -12354.8, -1007.67, 8.62256, 100, 0, 0, 0),
 (853, 0, -12359, -1001.3, 9.76074, 100, 0, 0, 0);
 
+-- creature 2571 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 2571;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(2571, 1, -14141.8, 477.248, 3.25545, 100, 0, 0, 0),
+(2571, 2, -14142.4, 469.125, 3.45588, 100, 0, 0, 0),
+(2571, 3, -14142.3, 461.028, 3.90766, 100, 0, 0, 0),
+(2571, 4, -14140.9, 449.034, 4.35122, 100, 0, 0, 0),
+(2571, 5, -14148.7, 435.761, 7.70542, 100, 20000, 0, 0),
+(2571, 6, -14145, 436.995, 6.62403, 100, 0, 0, 0),
+(2571, 7, -14130, 442.173, 4.18188, 100, 0, 0, 0),
+(2571, 8, -14122.7, 451.231, 3.60192, 100, 0, 0, 0),
+(2571, 9, -14118.5, 466.56, 1.52169, 100, 0, 0, 0),
+(2571, 10, -14117.9, 470.515, 1.12745, 100, 0, 0, 0),
+(2571, 11, -14119.3, 482.943, 0.297835, 100, 30000, 0, 0),
+(2571, 12, -14127.3, 482.846, 1.3567, 100, 0, 0, 0),
+(2571, 13, -14138.5, 479.154, 2.71788, 100, 0, 0, 0),
+(2571, 14, -14142.4, 469.113, 3.45617,  100, 0, 0, 0);
+
+-- allow some creatures to roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` in (2545, 2584, 2581, 2574, 2576);
+
 -- missing spawns
 INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `movement_type`, `wander_distance`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_max`) VALUES
 (317, 1565, -13565.8, 130.811, 41.7738, 1, 3, 300, 300, 100, 10),
