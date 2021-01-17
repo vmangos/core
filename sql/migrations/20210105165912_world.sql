@@ -1518,6 +1518,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 -- cranky benj waypoints
 -- uses waypoints not multiple spawns
+DELETE FROM `pool_creature` WHERE `pool_entry` = 14223;
 DELETE FROM `creature` WHERE `guid` IN (301283, 90511, 301281);
 UPDATE `creature` SET `position_x` = 1129.865967, `position_y` = -260.800964, `position_z` = 33.192471, `movement_type` = 2 WHERE `guid` = 301282;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
