@@ -631,6 +631,20 @@ bool ChatHandler::HandleGameObjectResetCommand(char*)
     return true;
 }
 
+bool ChatHandler::HandleGameObjectUseCommand(char*)
+{
+    GameObject* go = getSelectedGameObject();
+    if (!go)
+    {
+        SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+
+    go->Use(m_session->GetPlayer());
+    PSendSysMessage("You have used %s.", go->GetGuidStr().c_str());
+    return true;
+}
+
 bool ChatHandler::HandleGameObjectSetGoStateCommand(char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r

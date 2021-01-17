@@ -409,6 +409,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "toggle",         SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectToggleCommand,    "", nullptr },
         { "reset",          SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectResetCommand,     "", nullptr },
         { "respawn",        SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectRespawnCommand,   "", nullptr },
+        { "use",            SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectUseCommand,       "", nullptr },
         { "setgostate",     SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectSetGoStateCommand,"", nullptr },
         { "setlootstate",   SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectSetLootStateCommand,"", nullptr },
         { "customanim",     SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectSendCustomAnimCommand,"", nullptr },
