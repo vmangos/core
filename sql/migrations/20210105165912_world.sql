@@ -2872,6 +2872,86 @@ UPDATE `creature` SET  `position_x` = -9514.61, `position_y` = -135.652, `positi
 -- remove unneeded wander distance
 UPDATE `creature` SET `wander_distance` = 0 WHERE `movement_type` = 2;
 
+-- seradane creatures should be grouped and wander
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92937;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92937, 92936, 4, 2.35619, 11),
+(92937, 92935, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92866;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92866, 92867, 4, 2.35619, 11),
+(92866, 92865, 4, 3.92699, 11);
+
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 93047;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(93047, 93049, 4, 2.35619, 11),
+(93047, 93048, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92871;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92871, 92873, 4, 2.35619, 11),
+(92871, 92872, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 93247;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(93247, 93249, 4, 2.35619, 11),
+(93247, 93248, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92874;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92874, 92876, 4, 2.35619, 11),
+(92874, 92875, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92928;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92928, 92926, 4, 2.35619, 11),
+(92928, 92927, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92938;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92938, 92940, 4, 2.35619, 11),
+(92938, 92939, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92929;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92929, 92930, 4, 2.35619, 11),
+(92929, 92931, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92856;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92856, 92858, 4, 2.35619, 11),
+(92856, 92857, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 93051;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(93051, 93053, 4, 2.35619, 11),
+(93051, 93052, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92932;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92932, 92934, 4, 2.35619, 11),
+(92932, 92933, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92868;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92868, 92870, 4, 2.35619, 11),
+(92868, 92869, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92863;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92863, 92862, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 30 WHERE `guid` = 92859;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(92859, 92861, 4, 2.35619, 11),
+(92859, 92860, 4, 3.92699, 11);
+
+-- update angle for shadow bough groups
+UPDATE `creature_groups` SET `angle` = 2.35619 WHERE `member_guid` IN (33208, 33210, 33227, 33228, 33213, 33231);
+UPDATE `creature_groups` SET `angle` = 3.92699 WHERE `member_guid` IN (33230, 33212, 33229, 33211, 33226, 33209);
+
 
 -- End of migration.
 END IF;
