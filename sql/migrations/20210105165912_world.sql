@@ -2956,6 +2956,13 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 UPDATE `creature_groups` SET `angle` = 2.35619 WHERE `member_guid` IN (33208, 33210, 33227, 33228, 33213, 33231);
 UPDATE `creature_groups` SET `angle` = 3.92699 WHERE `member_guid` IN (33230, 33212, 33229, 33211, 33226, 33209);
 
+-- bloodscalp tigers should be summoned by bloodscalp beastmasters
+DELETE FROM `creature` WHERE `guid` IN (1947, 1665, 1312, 1237, 1115, 1070);
+
+-- skullsplitter panther should be summoned by skullsplitter hunter and beastmaster
+DELETE FROM `creature` WHERE `guid` IN (1395, 1392, 1383, 1382, 1377, 1374, 1369, 1361, 1345, 1317, 1215, 1162, 1158);
+DELETE FROM `creature_groups` WHERE `leader_guid` IN (1391, 1380, 1381, 1360, 1213);
+
 
 -- End of migration.
 END IF;
