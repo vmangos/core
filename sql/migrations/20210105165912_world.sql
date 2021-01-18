@@ -195,7 +195,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2106, 18, -11891.1, 687.014, 27.5948, 100, 0, 0, 0);
 
 -- correct position for creature 2116
-UPDATE `creature` SET `position_x` = -11957.68, `position_y` = 492.454, `position_z` = 0.9470 WHERE `guid` = 2116;
+UPDATE `creature` SET `position_x` = -11957.68, `position_y` = 492.454, `position_z` = 24.1645 WHERE `guid` = 2116;
 
 -- add creature 993 waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 993;
