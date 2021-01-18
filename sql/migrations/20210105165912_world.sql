@@ -798,6 +798,7 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (7727, 4846, -6089.713, -3129.134, 253.7381, 3.9095380, 300, 300, 0, 100, 0, 2, 10),
 (7458, 4846, -6080.854, -3164.193, 255.3357, 5.3756140, 300, 300, 0, 100, 0, 2, 10);
 
+UPDATE `creature` SET `movement_type`=2, `wander_distance`=0 WHERE `guid`=9230;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (9230, 1, -6071.022, -3133.923, 254.0056, 100, 0, 0, 0),
 (9230, 2, -6067.031, -3134.642, 253.7443, 100, 0, 0, 0),
@@ -838,6 +839,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7978, 19, -6087.236, -3078.455, 243.0242, 100, 0, 0, 0),
 (7978, 20, -6083.168, -3075.361, 243.9205, 100, 0, 0, 0);
 
+UPDATE `creature` SET `movement_type`=2, `wander_distance`=0 WHERE `guid`=7220;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (7220, 1, -6144.042, -3081.531, 225.9803, 100, 0, 0, 0),
 (7220, 2, -6146.375, -3077.724, 225.7653, 100, 0, 0, 0),
@@ -942,6 +944,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7727, 2, -6088.088, -3128.182, 253.2332, 100, 0, 0, 0),
 (7727, 3, -6089.709, -3129.257, 253.6562, 0, 45000, 0, 0);
 
+UPDATE `creature` SET `movement_type`=2, `wander_distance`=0 WHERE `guid`=7224;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (7224, 1, -6154.459, -3053.129, 224.8258, 100, 0, 0, 0),
 (7224, 2, -6154.061, -3046.471, 224.6519, 100, 0, 0, 0),
@@ -950,6 +953,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7224, 5, -6153.585, -3059.572, 224.9298, 100, 0, 0, 0),
 (7224, 6, -6151.697, -3060.308, 225.2451, 0.4712389, 45000, 0, 0);
 
+UPDATE `creature` SET `movement_type`=2, `wander_distance`=0 WHERE `guid`=7736;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (7736, 1, -6116.140, -3006.021, 223.4517, 100, 45000, 0, 0),
 (7736, 2, -6123.767, -3009.480, 221.8325, 100, 45000, 0, 0);
@@ -962,7 +966,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7458, 1, -6083.516, -3157.839, 253.9827, 100, 45000, 0, 0),
 (7458, 2, -6080.800, -3164.309, 255.2561, 100, 45000, 0, 0);
 
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` IN (9230, 7220, 7224, 7736, 8027, 7458);
 
 -- respawn ruins of alterac (taken from https://github.com/cmangos/classic-db/commit/f768b9206ab6daa33f924b45472f95c50c2a7fe6)
 DELETE FROM `creature_movement` WHERE `id` = 16998;
@@ -2468,6 +2471,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1128, 17, -11533.2, 558.577, 49.6933, 100, 0, 0, 0);
 
 -- creature 1063 waypoints
+UPDATE `creature` SET `movement_type`=2, `wander_distance`=0 WHERE `guid`=1063;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (1063, 1, -11691.8, 644.795, 49.1451, 100, 30000, 0, 0),
 (1063, 2, -11698.6, 653.232, 49.3079, 100, 30000, 0, 0);
@@ -2967,6 +2971,34 @@ DELETE FROM `creature` WHERE `guid` IN (1947, 1665, 1312, 1237, 1115, 1070);
 -- skullsplitter panther should be summoned by skullsplitter hunter and beastmaster
 DELETE FROM `creature` WHERE `guid` IN (1395, 1392, 1383, 1382, 1377, 1374, 1369, 1361, 1345, 1317, 1215, 1162, 1158);
 DELETE FROM `creature_groups` WHERE `leader_guid` IN (1391, 1380, 1381, 1360, 1213);
+
+-- Events list for Bloodscalp Beastmaster
+DELETE FROM `creature_ai_events` WHERE `creature_id`=699;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (69901, 699, 0, 1, 0, 100, 0, 0, 0, 0, 0, 69901, 0, 0, 'Bloodscalp Beastmaster - Summon Bloodscalp Tiger on OOC');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (69902, 699, 0, 2, 0, 100, 0, 30, 1, 0, 0, 69902, 0, 0, 'Bloodscalp Beastmaster - Enrage at 30% HP');
+DELETE FROM `creature_ai_scripts` WHERE `id`=69901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (69901, 0, 15, 3612, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodscalp Beastmaster - Cast Spell Bloodscalp Pet');
+DELETE FROM `creature_ai_scripts` WHERE `id`=69902;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (69902, 0, 15, 8599, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodscalp Beastmaster - Cast Spell Enrage');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (69902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2384, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodscalp Beastmaster - Say Emoted Text');
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (6990, 'Stranglethorn Vale - Bloodscalp Beastmaster', 6660, 100, 1, 0, 0, 8, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `creature_template` SET `spell_list_id`=6990, `ai_name`='EventAI', `script_name`='' WHERE `entry`=699;
+
+-- Events list for Skullsplitter Beastmaster
+DELETE FROM `creature_ai_events` WHERE `creature_id`=784;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (78401, 784, 0, 1, 0, 100, 0, 0, 0, 0, 0, 78401, 0, 0, 'Skullsplitter Beastmaster - Cast Skullsplitter Pet on OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=78401;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (78401, 0, 15, 3621, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Skullsplitter Beastmaster - Cast Spell Skullsplitter Pet');
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (7840, 'Stranglethorn Vale - Skullsplitter Beastmaster', 3148, 100, 1, 0, 0, 32, 5, 7, 23, 26, 0, 6660, 100, 1, 0, 0, 8, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `creature_template` SET `spell_list_id`=7840, `ai_name`='EventAI', `script_name`='' WHERE `entry`=784;
+
+-- Events list for Skullsplitter Hunter
+DELETE FROM `creature_ai_events` WHERE `creature_id`=669;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (66901, 669, 0, 1, 0, 100, 0, 0, 0, 0, 0, 66901, 0, 0, 'Skullsplitter Hunter - Cast Skullsplitter Pet on OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=66901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (66901, 0, 15, 3621, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Skullsplitter Hunter - Cast Spell Skullsplitter Pet');
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (6690, 'Stranglethorn Vale - Skullsplitter Hunter', 3148, 100, 1, 0, 0, 32, 5, 7, 23, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `creature_template` SET `spell_list_id`=6690, `ai_name`='EventAI', `script_name`='' WHERE `entry`=669;
 
 
 -- End of migration.
