@@ -962,6 +962,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7458, 1, -6083.516, -3157.839, 253.9827, 100, 45000, 0, 0),
 (7458, 2, -6080.800, -3164.309, 255.2561, 100, 45000, 0, 0);
 
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` IN (9230, 7220, 7224, 7736, 8027, 7458);
 
 -- respawn ruins of alterac (taken from https://github.com/cmangos/classic-db/commit/f768b9206ab6daa33f924b45472f95c50c2a7fe6)
 DELETE FROM `creature_movement` WHERE `id` = 16998;
