@@ -2955,6 +2955,10 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 -- update angle for shadow bough groups
 UPDATE `creature_groups` SET `angle` = 2.35619 WHERE `member_guid` IN (33208, 33210, 33227, 33228, 33213, 33231);
 UPDATE `creature_groups` SET `angle` = 3.92699 WHERE `member_guid` IN (33230, 33212, 33229, 33211, 33226, 33209);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 12 WHERE `guid` = 33246;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(33246, 33215, 4, 2.35619, 11),
+(33246, 33214, 4, 3.92699, 11);
 
 -- bloodscalp tigers should be summoned by bloodscalp beastmasters
 DELETE FROM `creature` WHERE `guid` IN (1947, 1665, 1312, 1237, 1115, 1070);
