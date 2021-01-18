@@ -2865,7 +2865,7 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (518, 1565, -13544.6, 177.559, 42.5709, 1, 3, 300, 300, 100, 10);
 
 -- use creature 2254 for a missing spawn
-UPDATE `creature` SET `position_x` = -11515.8, `position_y` = 733.258, `position_z` = 61.2011, `orientation` = 3.35103 WHERE `guid` = 2254;
+UPDATE `creature` SET `position_x` = -11515.8, `position_y` = 733.258, `position_z` = 61.2011, `orientation` = 3.35103, `movement_type` = 0 WHERE `guid` = 2254;
 
 -- use creature 2251 for a missing spawn
 UPDATE `creature` SET `position_x` = -11557.77, `position_y` = 733.776, `position_z` = 59.8591, WHERE `guid` = 2251;
