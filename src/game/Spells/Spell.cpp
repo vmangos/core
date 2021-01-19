@@ -1630,7 +1630,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                     (m_spellInfo->Id == 6358 || // Exception to fix succubus seduction.
                      m_caster->IsVisibleForOrDetect(unit, unit, false)))
             {
-                if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NO_INITIAL_AGGRO))
+                if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX3_NO_INITIAL_AGGRO) && !IsTriggeredByAura())
                 {
                     // use speedup check to avoid re-remove after above lines
                     if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH)
