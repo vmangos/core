@@ -145,11 +145,12 @@ void MoveSpline::Initialize(MoveSplineInitArgs const& args)
     time_passed = 0;
     transportGuid = args.transportGuid;
     last_point_sent_Idx = -1;
+    m_uninterruptible = args.uninterruptible;
 
     init_spline(args);
 }
 
-MoveSpline::MoveSpline() : m_Id(0), transportGuid(0), time_passed(0), point_Idx(0), last_point_sent_Idx(-1), point_Idx_offset(0), mvtOrigin("Unknown")
+MoveSpline::MoveSpline() : m_Id(0), transportGuid(0), time_passed(0), point_Idx(0), last_point_sent_Idx(-1), point_Idx_offset(0), mvtOrigin("Unknown"), m_uninterruptible(false)
 {
     splineflags.done = true;
 }

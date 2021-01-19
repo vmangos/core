@@ -8294,8 +8294,12 @@ void Unit::SendPetAIReaction()
 
 void Unit::StopMoving(bool force)
 {
+    if (!force && movespline->IsUninterruptible())
+        return;
+
     ClearUnitState(UNIT_STAT_MOVING);
     RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
+
     // not need send any packets if not in world
     if (!IsInWorld())
         return;
@@ -9075,6 +9079,16 @@ void Unit::MonsterMoveWithSpeed(float x, float y, float z, float o, float speed,
 {
     Movement::MoveSplineInit init(*this, "MonsterMoveWithSpeed");
     init.MoveTo(x, y, z, options);
+    if (options & MOVE_WALK_MODE)
+        init.SetWalk(true);
+    if (options & MOVE_RUN_MODE)
+        init.SetWalk(false);
+    if (options & MOVE_FLY_MODE)
+        init.SetFly();
+    if (options & MOVE_FALLING)
+        init.SetFall();
+    if (options & MOVE_CYCLIC)
+        init.SetCyclic();
     if (speed > 0.0f)
         init.SetVelocity(speed);
     if (o > -7.0f)

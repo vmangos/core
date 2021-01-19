@@ -122,6 +122,7 @@ namespace Movement
 
     inline void MoveSplineInit::MoveTo(Vector3 const& dest, uint32 options)
     {
+        args.uninterruptible = (options & MOVE_FORCE_DESTINATION);
         if (options & MOVE_PATHFINDING)
         {
             PathFinder path(&unit);

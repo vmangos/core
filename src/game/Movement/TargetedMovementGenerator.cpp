@@ -244,6 +244,9 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     if (!owner.IsAlive())
         return true;
 
+    if (owner.movespline->IsUninterruptible() && !owner.movespline->Finalized())
+        return true;
+
     if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED))
     {
         _clearUnitStateMove(owner);
