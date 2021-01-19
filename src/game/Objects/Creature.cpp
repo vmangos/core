@@ -3206,6 +3206,10 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
 
         if (pWho->IsPlayer() && CanSummonGuards())
             sGuardMgr.SummonGuard(this, static_cast<Player*>(pWho));
+
+        if (IsPet())
+            if (Creature* pOwner = ::ToCreature(GetOwner()))
+                SetLastLeashExtensionTimePtr(pOwner->GetLastLeashExtensionTimePtr());
     }
 }
 
