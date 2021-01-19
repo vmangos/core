@@ -1015,6 +1015,7 @@ class WorldObject : public Object
 
         bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         float GetLeewayBonusRange(Unit const* target, bool ability) const;
+        static float GetLeewayBonusRangeForTargets(Player const* player, Unit const* target, bool ability);
         float GetLeewayBonusRadius() const;
 
         // Gestion des positions

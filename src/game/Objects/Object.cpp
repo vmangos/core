@@ -1671,19 +1671,25 @@ bool WorldObject::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_m
     return dx * dx + dy * dy < reach * reach;
 }
 
+float WorldObject::GetLeewayBonusRangeForTargets(Player const* player, Unit const* target, bool ability)
+{
+    if (ability)
+        return (player->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED && target->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED) ? LEEWAY_BONUS_RANGE : 0.0f;
+
+    // auto attacks do not check speed, only flags
+    return (player->IsMovingButNotWalking() && target->IsMovingButNotWalking()) ? LEEWAY_BONUS_RANGE : 0.0f;
+}
+
 float WorldObject::GetLeewayBonusRange(Unit const* target, bool ability) const
 {
-    if (Player const* pPlayer = ToPlayer())
+    if (target && IsUnit())
     {
-        if (target)
-        {
-            if (ability)
-                return (pPlayer->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED && target->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED) ? LEEWAY_BONUS_RANGE : 0.0f;
-            else // auto attacks do not check speed, only flags
-                return (IsMovingButNotWalking() && target->IsMovingButNotWalking()) ? LEEWAY_BONUS_RANGE : 0.0f;
-        }
+        if (Player const* pPlayer = ToPlayer())
+            return GetLeewayBonusRangeForTargets(pPlayer, target, ability);
+        else if (Player const* pPlayer = target->ToPlayer())
+            return GetLeewayBonusRangeForTargets(pPlayer, static_cast<Unit const*>(this), ability);
     }
-    
+
     return 0.0f;
 }
 
