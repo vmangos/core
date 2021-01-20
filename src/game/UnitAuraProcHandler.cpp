@@ -389,7 +389,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
     else
         EventProcFlag = spellProto->procFlags;       // else get from spell proto
     // Continue if no trigger exist
-
     if (!EventProcFlag)
         return false;
 
