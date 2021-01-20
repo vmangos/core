@@ -281,7 +281,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
             // Should be able to proc when negative magical effect lands on a target.
             if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !procSpell->IsPositiveSpell() && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(procSpell->IsSpellAppliesAura() && (procFlag & PROC_FLAG_ON_DO_PERIODIC)))
                 return roll_chance_f((float)spellProto->procChance);
-
         }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         // World of Warcraft Client Patch 1.11.0 (2006-06-20)
@@ -390,7 +389,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
     else
         EventProcFlag = spellProto->procFlags;       // else get from spell proto
     // Continue if no trigger exist
-    
+
     if (!EventProcFlag)
         return false;
 
@@ -460,6 +459,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         if (modOwner->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC))
             return true;
     }
+
     return roll_chance_f(chance);
 }
 
