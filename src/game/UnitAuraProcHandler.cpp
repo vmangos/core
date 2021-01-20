@@ -279,7 +279,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
         if (spellProto->Id == 25906)
         {
             // Should be able to proc when negative magical effect lands on a target.
-            if (!isVictim && !procSpell->IsPositiveSpell() && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(procSpell->IsSpellAppliesAura() && (procFlag & PROC_FLAG_ON_DO_PERIODIC)) && (procSpell->School != SPELL_SCHOOL_NORMAL)){
+            if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !procSpell->IsPositiveSpell() && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(procSpell->IsSpellAppliesAura() && (procFlag & PROC_FLAG_ON_DO_PERIODIC))){
                 return roll_chance_f((float)spellProto->procChance);
             }
             return false;   
