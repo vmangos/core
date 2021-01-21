@@ -1155,6 +1155,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2818, 14, -10888.7, -3479.92, 68.2514, 100, 0, 0, 0),
 (2818, 15, -10910.6, -3495.16, 65.1038, 100, 0, 0, 0);
 
+-- patrol should be in a group
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(6251, 6690, 3, 2.35619, 11),
+(6251, 9961, 3, 3.92699, 11);
+
 
 -- End of migration.
 END IF;
