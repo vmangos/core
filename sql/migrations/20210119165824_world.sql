@@ -1321,6 +1321,44 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (6251, 6690, 3, 2.35619, 11),
 (6251, 9961, 3, 3.92699, 11);
 
+-- dream bough creatures should be grouped
+UPDATE `creature` SET `movement_type` = 0 WHERE `guid` IN (51288, 51265, 51267, 51246, 51287, 51264, 51295, 51251, 51284, 51240, 51286, 51242, 51277, 51299);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51244;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51244, 51288, 4, 2.35619, 11),
+(51244, 51265, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51290;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51290, 51267, 4, 2.35619, 11),
+(51290, 51246, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51243;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51243, 51287, 4, 2.35619, 11),
+(51243, 51264, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51272;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51272, 51295, 4, 2.35619, 11),
+(51272, 51251, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51261;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51261, 51284, 4, 2.35619, 11),
+(51261, 51240, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51263;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51263, 51286, 4, 2.35619, 11),
+(51263, 51242, 4, 3.92699, 11);
+
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 51256;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(51256, 51277, 4, 2.35619, 11),
+(51256, 51299, 4, 3.92699, 11);
+
 
 -- End of migration.
 END IF;
