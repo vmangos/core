@@ -1040,8 +1040,9 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
 
         if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
         {
-            if (ObjectGuid lootGuid = pPlayerMover->GetLootGuid())
-                pPlayerMover->GetSession()->DoLootRelease(lootGuid);
+            if (ObjectGuid const& lootGuid = pPlayerMover->GetLootGuid())
+                if (!lootGuid.IsItem())
+                    pPlayerMover->GetSession()->DoLootRelease(lootGuid);
         }
 
         if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) != pPlayerMover->IsInWater())

@@ -7762,9 +7762,6 @@ SpellCastResult Spell::CheckItems()
                 if (m_targets.getItemTarget()->GetOwnerGuid() != m_caster->GetObjectGuid())
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
 
-                if (m_targets.getItemTarget()->IsEquipped())
-                    return SPELL_FAILED_CANT_BE_DISENCHANTED;
-
                 ItemPrototype const* itemProto = m_targets.getItemTarget()->GetProto();
                 if (!itemProto)
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
