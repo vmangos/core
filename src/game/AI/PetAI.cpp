@@ -59,9 +59,10 @@ bool PetAI::_needToStop() const
         return true;
 
     Unit* pOwner = m_creature->GetCharmerOrOwnerOrSelf();
+    Creature* pOwnerCreature = pOwner->ToCreature();
 
     // Prevent creature pets from chasing forever
-    if (pOwner->IsCreature() && !pOwner->IsInCombat() && m_creature->IsOutOfThreatArea(m_creature->GetVictim()))
+    if (pOwnerCreature && !pOwnerCreature->IsInCombat() && (pOwnerCreature->IsInEvadeMode() || m_creature->IsOutOfThreatArea(m_creature->GetVictim())))
         return true;
 
     return !m_creature->GetVictim()->IsTargetableForAttack(false, pOwner->IsPlayer());
@@ -500,6 +501,11 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget(bool allowAutoS
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
         return std::make_pair(nullptr, PSTR_FAIL_NO_OWNER);
+
+    // Owner is creature and is evading. We must not re-aggro.
+    if (Creature const* pOwnerCreature = owner->ToCreature())
+        if (pOwnerCreature->IsInEvadeMode())
+            return std::make_pair(nullptr, PSTR_FAIL_NOT_ENABLED);
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->GetAttackerForHelper())

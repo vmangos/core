@@ -2818,8 +2818,14 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
 
 bool Creature::IsInEvadeMode() const
 {
+    if (IsPet())
+        if (Creature const* pOwner = GetOwnerCreature())
+            if (pOwner->IsInEvadeMode())
+                return true;
+
     if (IsEvadeBecauseTargetNotReachable())
         return true;
+
     return !i_motionMaster.empty() && i_motionMaster.GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE;
 }
 
@@ -3211,7 +3217,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
             sGuardMgr.SummonGuard(this, static_cast<Player*>(pWho));
 
         if (IsPet())
-            if (Creature* pOwner = ::ToCreature(GetOwner()))
+            if (Creature* pOwner = GetOwnerCreature())
                 SetLastLeashExtensionTimePtr(pOwner->GetLastLeashExtensionTimePtr());
     }
 }
