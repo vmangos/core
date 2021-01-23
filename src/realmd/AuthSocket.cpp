@@ -545,7 +545,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     }
                     else
                     {
-		                if (_build >= 5428)        // version 1.11.0 or later
+                        if (_build >= 5428)        // version 1.11.0 or later
                             pkt << uint8(0);
                     }
 
