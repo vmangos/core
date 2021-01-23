@@ -40,7 +40,7 @@ void AggressorAI::MoveInLineOfSight(Unit* u)
         return;
 
     if (m_creature->CanInitiateAttack() && u->IsTargetableForAttack() && m_creature->IsHostileTo(u) &&
-            m_creature->IsWithinLOSInMap(u) && u->IsInAccessablePlaceFor(m_creature))
+            m_creature->IsWithinLOSInMap(u, true, true) && u->IsInAccessablePlaceFor(m_creature))
     {
         if (!m_creature->GetVictim())
             AttackStart(u);

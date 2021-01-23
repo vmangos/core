@@ -997,8 +997,8 @@ class WorldObject : public Object
         {
             return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
-        bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f) const;
-        bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true) const;
+        bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f, bool includingM2Objects = false) const;
+        bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true, bool includingM2Objects = false) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
         bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
         bool IsInRange2d(float x, float y, float minRange, float maxRange) const;

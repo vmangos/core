@@ -1541,7 +1541,7 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
     return distsq < maxdist * maxdist;
 }
 
-bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos) const
+bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos, bool includingM2Objects) const
 {
     ASSERT(obj);
     if (!IsInMap(obj))
@@ -1551,15 +1551,15 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos) con
     float ox, oy, oz;
     obj->GetPosition(ox, oy, oz);
     float targetHeight = obj->IsUnit() ? obj->ToUnit()->GetCollisionHeight() : 2.f;
-    return (IsWithinLOS(ox, oy, oz, checkDynLos, targetHeight));
+    return (IsWithinLOS(ox, oy, oz, checkDynLos, targetHeight, includingM2Objects));
 }
 
-bool WorldObject::IsWithinLOS(float ox, float oy, float oz, bool checkDynLos, float targetHeight) const
+bool WorldObject::IsWithinLOS(float ox, float oy, float oz, bool checkDynLos, float targetHeight, bool includingM2Objects) const
 {
     if (IsInWorld())
     {
         float height = IsUnit() ? ToUnit()->GetCollisionHeight() : 2.f;
-        return GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ() + height, ox, oy, oz + targetHeight, checkDynLos);
+        return GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ() + height, ox, oy, oz + targetHeight, checkDynLos, includingM2Objects);
     }
 
     return true;

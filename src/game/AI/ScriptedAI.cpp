@@ -31,7 +31,7 @@ void ScriptedAI::MoveInLineOfSight(Unit* pWho)
 
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
     {
-        if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+        if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho, true, true))
         {
             if (!m_creature->GetVictim())
                 AttackStart(pWho);
