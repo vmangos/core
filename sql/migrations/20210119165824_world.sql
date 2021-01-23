@@ -1479,7 +1479,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (3033, 11, -11219, -3497.81, 8.18111, 100, 0, 0, 0);
 
 -- creature 12307 waypoints
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12307;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (12307, 1, 69.2959, -4609.61, 48.2853, 100, 0, 0, 0),
 (12307, 2, 72.8356, -4591.06, 55.2529, 100, 0, 0, 0),
@@ -1505,7 +1505,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12307, 22, 72.7215, -4599.41, 52.3967, 100, 0, 0, 0);
 
 -- creature 12312 waypoints
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12312;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (12312, 1, -61.8657, -4828.86, 22.6982, 100, 0, 0, 0),
 (12312, 2, -74.1842, -4823.68, 23.4622, 100, 0, 0, 0),
@@ -1529,7 +1529,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12312, 20, -56.5215, -4843.12, 22.1018, 100, 0, 0, 0);
 
 -- creature 12316 waypoints
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12316;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (12316, 1, 124.53, -4582.72, 63.7189, 100, 0, 0, 0),
 (12316, 2, 133.618, -4582.61, 63.8564, 100, 0, 0, 0),
@@ -1548,7 +1548,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12316, 15, 121.21, -4582.27, 63.9267, 100, 0, 0, 0);
 
 -- creature 12322 waypoints
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12322;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (12322, 1, 7.38613, -3980.17, 51.9131, 100, 0, 0, 0),
 (12322, 2, 21.7668, -3970.2, 48.8869, 100, 0, 0, 0),
@@ -1574,7 +1574,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12322, 22, -3.36773, -3990.43, 54.991, 100, 0, 0, 0);
 
 -- creature 12943 waypoints
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12943;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (12943, 1, -200.386, -4883.89, 27.1407, 100, 0, 0, 0),
 (12943, 2, -193.105, -4896.78, 25.5057, 100, 0, 0, 0),
@@ -1606,7 +1606,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12943, 28, -206.247, -4873.63, 28.7488, 100, 0, 0, 0);
 
 -- creature 12998 waypoints
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 12998;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (12998, 1, -230.719, -5125.15, 42.4774, 100, 0, 0, 0),
 (12998, 2, -230.686, -5131.19, 45.7119, 100, 0, 0, 0),
