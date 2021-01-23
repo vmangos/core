@@ -62,8 +62,19 @@ bool PetAI::_needToStop() const
     Creature* pOwnerCreature = pOwner->ToCreature();
 
     // Prevent creature pets from chasing forever
-    if (pOwnerCreature && !pOwnerCreature->IsInCombat() && (pOwnerCreature->IsInEvadeMode() || m_creature->IsOutOfThreatArea(m_creature->GetVictim())))
-        return true;
+    if (pOwnerCreature && !pOwnerCreature->IsInCombat())
+    {
+        if (pOwnerCreature->IsAlive())
+        {
+            if (pOwnerCreature->IsInEvadeMode())
+                return true;
+        }
+        else
+        {
+            if (m_creature->IsOutOfThreatArea(m_creature->GetVictim()))
+                return true;
+        }
+    }
 
     return !m_creature->GetVictim()->IsTargetableForAttack(false, pOwner->IsPlayer());
 }
@@ -613,11 +624,22 @@ void PetAI::DoAttack(Unit* target, bool chase)
             m_creature->GetMotionMaster()->MoveIdle();
         }
 
-        // Flag owner for PvP if owner is player and target is flagged
         Unit* pOwner = m_creature->GetCharmerOrOwner();
-        if (pOwner && pOwner->IsPlayer() && !pOwner->IsPvP())
+        if (pOwner)
         {
-            pOwner->TogglePlayerPvPFlagOnAttackVictim(target);
+            if (pOwner->IsPlayer())
+            {
+                // Flag owner for PvP if owner is player and target is flagged
+                if (!pOwner->IsPvP())
+                    pOwner->TogglePlayerPvPFlagOnAttackVictim(target);
+            }
+            else
+            {
+                // Creature pet should instantly enter combat with target
+                m_creature->AddThreat(target);
+                m_creature->SetInCombatWith(target);
+                target->SetInCombatWith(m_creature);
+            }
         }
     }
 }
