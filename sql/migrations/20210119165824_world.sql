@@ -2168,6 +2168,9 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (51256, 51277, 4, 2.35619, 11),
 (51256, 51299, 4, 3.92699, 11);
 
+-- remove unneeded wander distance
+UPDATE `creature` SET `wander_distance` = 0 WHERE `movement_type` = 2;
+
 
 -- End of migration.
 END IF;
