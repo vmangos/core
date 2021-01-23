@@ -711,7 +711,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (3186, 16, -5388, -263.463, 362.999, 100, 0, 0, 0);
 
 -- creature 3187 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 3187;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 3187;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3187, 1, -5425.7, -223.195, 371.936, 100, 0, 0, 0),
 (3187, 2, -5425.14, -215.183, 372.811, 100, 0, 0, 0),
@@ -725,7 +725,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (3187, 10, -5425.13, -216.157, 372.689, 100, 0, 0, 0);
 
 -- creature 4025 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 4025;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4025;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (4025, 1, -11095.1, -1910.74, 3.21322, 100, 0, 0, 0),
 (4025, 2, -11094.6, -1892.78, 2.01981, 100, 0, 0, 0),
@@ -753,7 +753,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (4025, 24, -11093.8, -1892.31, 2.02048, 100, 0, 0, 0);
 
 -- creature 4030 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 4030;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4030;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (4030, 1, -11106.1, -1917.02, 1.84265, 100, 0, 0, 0),
 (4030, 2, -11095.6, -1932.36, 4.8592, 100, 0, 0, 0),
@@ -779,7 +779,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (4030, 22, -11096, -1933.57, 4.96026, 100, 0, 0, 0);
 
  -- creature 4051 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 4051;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4051;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (4051, 1, -11210.8, -2191.99, 22.7419, 100, 0, 0, 0),
 (4051, 2, -11241, -2198.84, 22.7022, 100, 0, 0, 0),
@@ -792,7 +792,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (4051, 9, -11246, -2200.46, 22.7043, 100, 0, 0, 0);
 
 -- creature 4055 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 4055;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4055;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (4055, 1, -11183.7, -2076.16, 35.5059, 100, 0, 0, 0),
 (4055, 2, -11172, -2076.4, 35.5059, 100, 0, 0, 0),
@@ -820,7 +820,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (4055, 24, -11192.5, -2075.51, 35.5054, 100, 0, 0, 0);
 
 -- creature 4542 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 4542;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4542;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (4542, 1, -5627.38, -1692.46, 399.612, 100, 0, 0, 0),
 (4542, 2, -5638.73, -1696.96, 399.131, 100, 0, 0, 0),
@@ -854,7 +854,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (4542, 30, -5638.97, -1697.98, 399.135, 100, 0, 0, 0);
 
 -- creature 4545 waypoints
-UPDATE `creature` SET `position_x` = `movement_type` = 2 WHERE `guid` = 4545;
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4545;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (4545, 1, -5596.2, -1683.52, 347.276, 100, 0, 0, 0),
 (4545, 2, -5600.28, -1681.07, 349.036, 100, 0, 0, 0),
