@@ -226,7 +226,7 @@ struct boss_patchwerkAI : public ScriptedAI
         {
             for (const auto itr : m_creature->GetAttackers())
             {
-                if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack())
+                if (itr->IsInMap(m_creature) && itr->IsTargetable(true, false))
                     return false;
             }
         }

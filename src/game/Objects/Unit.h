@@ -1022,9 +1022,7 @@ class Unit : public WorldObject
         void AddExtraAttackOnUpdate() { m_doExtraAttacks = true; };
 
         bool CanAttack(Unit const* target, bool force = false) const;
-        bool IsValidAttackTarget(Unit const* target) const final;
-        bool IsTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
-        bool IsAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
+        bool IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE = false, bool checkAlive = true) const;
 
         bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
@@ -1245,8 +1243,7 @@ class Unit : public WorldObject
         ObjectGuid const& GetCharmerGuid() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
         void SetCharmerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
         bool IsCharmed() const { return !GetCharmerGuid().IsEmpty(); }
-        bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
-        bool IsCharmedOwnedByPlayerOrPlayer() const { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
+        bool IsCharmerOrOwnerPlayerOrPlayerItself() const final { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {

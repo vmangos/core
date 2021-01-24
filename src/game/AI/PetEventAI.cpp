@@ -59,7 +59,7 @@ void PetEventAI::MoveInLineOfSight(Unit* pWho)
         return;
 #endif
 
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack())
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()))
     {
         float const attackRadius = m_creature->GetAttackDistance(pWho);
         if (m_creature->IsWithinDistInMap(pWho, attackRadius) && m_creature->IsHostileTo(pWho) &&
@@ -139,7 +139,7 @@ bool PetEventAI::FindTargetForAttack()
     Unit::AttackerSet attackers = m_creature->GetAttackers();
     for (const auto& itr : attackers)
     {
-        if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack() && !itr->HasAuraPetShouldAvoidBreaking())
+        if (itr->IsInMap(m_creature) && m_creature->IsValidAttackTarget(itr) && !itr->HasAuraPetShouldAvoidBreaking())
         {
             AttackStart(itr);
             return true;
@@ -166,7 +166,7 @@ bool PetEventAI::FindTargetForAttack()
             Unit::AttackerSet owner_attackers = pOwner->GetAttackers();
             for (const auto& itr : owner_attackers)
             {
-                if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack() && !itr->HasAuraPetShouldAvoidBreaking())
+                if (itr->IsInMap(m_creature) && m_creature->IsValidAttackTarget(itr) && !itr->HasAuraPetShouldAvoidBreaking())
                 {
                     AttackStart(itr);
                     return true;

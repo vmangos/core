@@ -695,6 +695,19 @@ class SpellEntry
             return (AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD) || (Id == 2584);
         }
 
+        inline bool CanTargetDeadTarget() const
+        {
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+        }
+
+        inline bool CanTargetAliveState(bool alive) const
+        {
+            if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
+                return !alive;
+
+            return alive || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+        }
+
         inline bool IsDeathPersistentSpell() const
         {
             return HasAttribute(SPELL_ATTR_EX3_DEATH_PERSISTENT);

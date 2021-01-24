@@ -236,7 +236,7 @@ struct boss_onyxiaAI : public ScriptedAI
             {
                 if (Player* pPlayer = itr.getSource())
                 {
-                    if (m_creature->IsWithinDistInMap(pPlayer, ONYXIA_AGGRO_RANGE) && pPlayer->IsTargetableForAttack())
+                    if (m_creature->IsWithinDistInMap(pPlayer, ONYXIA_AGGRO_RANGE) && pPlayer->IsTargetable(true, false))
                     {
                         pPlayer->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
                         m_creature->AI()->AttackStart(pPlayer);

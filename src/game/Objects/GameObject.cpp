@@ -1029,6 +1029,17 @@ Unit* GameObject::GetOwner() const
     return FindMap()->GetUnit(GetOwnerGuid());
 }
 
+Player* GameObject::GetAffectingPlayer() const
+{
+    if (!GetOwnerGuid())
+        return nullptr;
+
+    if (Unit* owner = GetOwner())
+        return owner->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+    return nullptr;
+}
+
 void GameObject::SaveRespawnTime()
 {
     if (m_respawnTime > time(nullptr) && m_spawnedByDefault)
@@ -2416,58 +2427,6 @@ uint32 GameObject::GetLevel() const
         level = GetUInt32Value(GAMEOBJECT_LEVEL);
 
     return level > 0 ? level : PLAYER_MAX_LEVEL;
-}
-
-// function based on function Unit::CanAttack from 13850 client
-bool GameObject::IsValidAttackTarget(Unit const* target) const
-{
-    ASSERT(target);
-
-    if (FindMap() != target->FindMap())
-        return false;
-
-    // can't attack unattackable units or GMs
-    if (target->GetTypeId() == TYPEID_PLAYER && target->ToPlayer()->IsGameMaster())
-        return false;
-
-    // check flags
-    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
-        return false;
-
-    // CvC case - can attack each other only when one of them is hostile
-    if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
-        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
-
-    // PvP, PvC, CvP case
-    // can't attack friendly targets
-    if (GetReactionTo(target) > REP_NEUTRAL
-        || target->GetReactionTo(this) > REP_NEUTRAL)
-        return false;
-
-    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) ? target->GetAffectingPlayer() : nullptr;
-
-    // Not all neutral creatures can be attacked
-    if (GetReactionTo(target) == REP_NEUTRAL &&
-        target->GetReactionTo(this) == REP_NEUTRAL)
-    {
-        if (playerAffectingTarget)
-        {
-            Player const* player = playerAffectingTarget;
-            WorldObject const* non_player = this;
-
-            if (FactionTemplateEntry const* factionTemplate = non_player->getFactionTemplateEntry())
-            {
-                if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
-                    if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionTemplate->faction))
-                        if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
-                            if (!(repState->Flags & FACTION_FLAG_AT_WAR))
-                                return false;
-
-            }
-        }
-    }
-
-    return true;
 }
 
 bool GameObject::IsAtInteractDistance(Player const* player, uint32 maxRange) const

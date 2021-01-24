@@ -5654,3 +5654,77 @@ void WorldObject::PrintCooldownList(ChatHandler& chat) const
     chat.PSendSysMessage("Found %u cooldown%s.", cdCount, (cdCount > 1) ? "s" : "");
     chat.PSendSysMessage("Found %u permanent cooldown%s.", permCDCount, (permCDCount > 1) ? "s" : "");
 }
+
+// function based on function Unit::CanAttack from 13850 client
+bool WorldObject::IsValidAttackTarget(Unit const* target) const
+{
+    ASSERT(target);
+
+    // can't attack self
+    if (this == target)
+        return false;
+
+    if (FindMap() != target->FindMap())
+        return false;
+
+    if (!target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()))
+        return false;
+
+    Unit const* pThisUnit = ToUnit();
+
+    // CvC case - can attack each other only when one of them is hostile
+    if ((!pThisUnit || !pThisUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED)) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
+
+    // PvP, PvC, CvP case
+    // can't attack friendly targets
+    if (GetReactionTo(target) > REP_NEUTRAL
+            || target->GetReactionTo(this) > REP_NEUTRAL)
+        return false;
+
+    Player const* playerAffectingAttacker = GetAffectingPlayer();
+    Player const* playerAffectingTarget = target->GetAffectingPlayer();
+
+    // Not all neutral creatures can be attacked
+    if (GetReactionTo(target) == REP_NEUTRAL &&
+            target->GetReactionTo(this) == REP_NEUTRAL)
+    {
+        if (!(playerAffectingTarget && playerAffectingAttacker) &&
+                !(!playerAffectingTarget && !playerAffectingAttacker))
+        {
+            Player const* player = playerAffectingTarget ? playerAffectingTarget : playerAffectingAttacker;
+            WorldObject const* object = playerAffectingTarget ? this : target;
+
+            if (FactionTemplateEntry const* factionTemplate = object->getFactionTemplateEntry())
+            {
+                if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
+                    if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionTemplate->faction))
+                        if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
+                            if (!(repState->Flags & FACTION_FLAG_AT_WAR))
+                                return false;
+
+            }
+        }
+    }
+
+    // PvP checks
+    if (playerAffectingAttacker && playerAffectingTarget)
+    {
+        if (playerAffectingAttacker->duel && playerAffectingAttacker->duel->opponent == playerAffectingTarget && playerAffectingAttacker->duel->startTime != 0)
+            return true;
+
+        if (playerAffectingTarget->IsPvP())
+            return true;
+
+        if ((playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_FFA_PVP)
+                && (playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_FFA_PVP))
+            return true;
+
+        if (playerAffectingAttacker->IsFFAPvP() && playerAffectingTarget->IsFFAPvP())
+            return true;
+
+        return (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_UNK1)
+               || (playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_UNK1);
+    }
+    return true;
+}

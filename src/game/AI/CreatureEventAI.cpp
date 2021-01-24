@@ -659,7 +659,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit* pWho)
             UpdateEventsOn_MoveInLineOfSight(pWho);
 
         if (m_bCanSummonGuards && pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()) &&
-            m_creature->IsHostileTo(pWho) && pWho->IsTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho, true, true))
+            m_creature->IsHostileTo(pWho) && pWho->IsTargetable(true, false) && m_creature->IsWithinLOSInMap(pWho, true, true))
         {
             m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
         } 
@@ -675,7 +675,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->CanFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack())
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false))
     {
         float attackRadius = m_creature->GetAttackDistance(pWho);
         if (m_creature->IsWithinDistInMap(pWho, attackRadius) && m_creature->IsHostileTo(pWho))

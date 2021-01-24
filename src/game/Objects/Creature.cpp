@@ -3551,7 +3551,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
 
     // if the target cannot be attacked, the target is not acceptable
     if (IsFriendlyTo(target)
-            || !target->IsAttackableByAOE()
+            || !target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself())
             || target->HasUnitState(UNIT_STAT_DIED))
         return false;
 

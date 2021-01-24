@@ -19551,7 +19551,7 @@ bool Player::IsHonorOrXPTarget(Unit* pVictim) const
 
 void Player::RewardSinglePlayerAtKill(Unit* pVictim)
 {
-    bool PvP = pVictim->IsCharmedOwnedByPlayerOrPlayer();
+    bool PvP = pVictim->IsCharmerOrOwnerPlayerOrPlayerItself();
 
     uint32 xp = PvP ? 0 : MaNGOS::XP::Gain(this, static_cast<Creature*>(pVictim));
 

@@ -76,7 +76,7 @@ bool PetAI::_needToStop() const
         }
     }
 
-    return !m_creature->GetVictim()->IsTargetableForAttack(false, pOwner->IsPlayer());
+    return !m_creature->IsValidAttackTarget(m_creature->GetVictim());
 }
 
 void PetAI::_stopAttack()

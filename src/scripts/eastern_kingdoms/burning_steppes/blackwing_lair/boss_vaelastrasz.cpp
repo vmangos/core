@@ -561,7 +561,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
             return;
 
         if (pUnit->IsPlayer() && m_creature->GetDistance2d(pUnit) < 29.0f && m_creature->IsWithinLOSInMap(pUnit)
-          && pUnit->IsTargetableForAttack() && pUnit->IsInAccessablePlaceFor(m_creature))
+          && pUnit->IsTargetable(true, false) && pUnit->IsInAccessablePlaceFor(m_creature))
             AttackStart(pUnit);
     }
 
