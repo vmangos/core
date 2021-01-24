@@ -3520,14 +3520,17 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (80020, 1, -8768.63, -113.135, 83.6789, 100, 10000, 0, 0),
 (80020, 2, -8779.78, -112.687, 82.8591, 100, 10000, 0, 0);
 
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3801, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Defias Thug - Walk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3802, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Defias Thug - Run');
+
 -- creature 80149 waypoints
 UPDATE `creature` SET `position_x` = -9008.89, `position_y` = -320.603, `position_z` = 75.8279, `movement_type` = 2 WHERE `guid` = 80149;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(80149, 1, -9008.89, -320.603, 75.8279, 100, 1000, 0, 0),
+(80149, 1, -9008.89, -320.603, 75.8279, 100, 1000, 0, 3802),
 (80149, 2, -8981.22, -335.138, 73.3474, 100, 0, 0, 0),
 (80149, 3, -8946.51, -338.891, 71.1134, 100, 0, 0, 0),
 (80149, 4, -8912.77, -352.085, 72.5823, 100, 0, 0, 0),
-(80149, 5, -8881.49, -355.84, 73.1462, 100, 0, 0, 0),
+(80149, 5, -8881.49, -355.84, 73.1462, 100, 0, 0, 3801),
 (80149, 6, -8910.65, -346.602, 71.1023, 100, 0, 0, 0),
 (80149, 7, -8883.13, -352.739, 72.9499, 100, 0, 0, 0),
 (80149, 8, -8911.38, -347.166, 71.3269, 100, 0, 0, 0),
@@ -3537,34 +3540,34 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- creature 80171 waypoints
 UPDATE `creature` SET `position_x` = -9120.29, `position_y` = -275.579, `position_z` = 72.9006, `movement_type` = 2 WHERE `guid` = 80171;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(80171, 1, -9120.29, -275.579, 72.9006, 100, 0, 0, 0),
-(80171, 2, -9112.23, -263.542, 74.4268, 100, 0, 0, 0),
-(80171, 3, -9110.18, -259.698, 74.7637, 100, 0, 0, 0),
-(80171, 4, -9120.29, -269.848, 73.5204, 100, 0, 0, 0);
+(80171, 1, -9120.29, -275.579, 72.9006, 100, 2000, 0, 3802),
+(80171, 2, -9112.23, -263.542, 74.4268, 100, 3000, 0, 3801),
+(80171, 3, -9110.18, -259.698, 74.7637, 100, 0, 0, 3802),
+(80171, 4, -9120.29, -269.848, 73.5204, 100, 4000, 0, 3801);
 
 -- creature 80181 waypoints
 UPDATE `creature` SET `position_x` = -9131.36, `position_y` = -306.832, `position_z` = 73.5301, `movement_type` = 2 WHERE `guid` = 80181;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(80181, 1, -9131.36, -306.832, 73.5301, 100, 0, 0, 0),
-(80181, 2, -9132.83, -313.89, 73.306, 100, 0, 0, 0),
-(80181, 3, -9124.91, -379.208, 73.2856, 100, 0, 0, 0),
-(80181, 4, -9125.01, -372.703, 73.5785, 100, 0, 0, 0),
+(80181, 1, -9131.36, -306.832, 73.5301, 100, 0, 0, 3802),
+(80181, 2, -9132.83, -313.89, 73.306, 100, 4000, 0, 0),
+(80181, 3, -9124.91, -379.208, 73.2856, 100, 3000, 0, 3801),
+(80181, 4, -9125.01, -372.703, 73.5785, 100, 0, 0, 3802),
 (80181, 5, -9138.42, -339.389, 72.5674, 100, 0, 0, 0),
-(80181, 6, -9123.32, -311.799, 72.985, 100, 0, 0, 0);
+(80181, 6, -9123.32, -311.799, 72.985, 100, 4000, 0, 3801);
 
 -- creature 80251 waypoints
 UPDATE `creature` SET `position_x` = -8878.29, `position_y` = -410.994, `position_z` = 65.6802, `movement_type` = 2 WHERE `guid` = 80251;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(80251, 1, -8878.29, -410.994, 65.6802, 100, 0, 0, 0),
+(80251, 1, -8878.29, -410.994, 65.6802, 100, 1000, 0, 3802),
 (80251, 2, -8880.02, -399.363, 66.0983, 100, 0, 0, 0),
 (80251, 3, -8898.18, -391.582, 68.6285, 100, 0, 0, 0),
 (80251, 4, -8914.49, -391.059, 69.3006, 100, 0, 0, 0),
 (80251, 5, -8928.27, -375.636, 71.218, 100, 0, 0, 0),
-(80251, 6, -8958.87, -373.826, 72.3354, 100, 0, 0, 0),
+(80251, 6, -8958.87, -373.826, 72.3354, 100, 5000, 0, 0),
 (80251, 7, -8921.43, -376.858, 71.1848, 100, 0, 0, 0),
 (80251, 8, -8909.08, -366.763, 72.135, 100, 0, 0, 0),
 (80251, 9, -8870.04, -371.407, 71.997, 100, 0, 0, 0),
-(80251, 10, -8878.29, -410.994, 65.6802, 100, 0, 0, 0),
+(80251, 10, -8878.29, -410.994, 65.6802, 100, 0, 0, 3801),
 (80251, 11, -8878.29, -410.994, 65.6802, 100, 0, 0, 0);
 
 -- creature 80586 waypoints
