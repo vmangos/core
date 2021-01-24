@@ -918,10 +918,7 @@ namespace MaNGOS
                 if (!i_obj->IsWithinDistInMap(u, i_range))
                     return false;
 
-                if (i_originalCaster->IsUnit() || i_originalCaster->IsGameObject())
-                    return i_originalCaster->ToUnit()->IsValidAttackTarget(u);
-                else // Corpse case
-                    return i_originalCaster->IsHostileTo(u) && u->IsTargetable(true, i_originalCaster->IsCharmerOrOwnerPlayerOrPlayerItself(), true, true);
+                return i_originalCaster->IsValidAttackTarget(u);
             }
         private:
             WorldObject const* i_obj;
@@ -949,10 +946,7 @@ namespace MaNGOS
                 if (!i_obj->IsWithinDistInMap(u, i_range))
                     return false;
 
-                if (i_originalCaster->IsUnit() || i_originalCaster->IsGameObject())
-                    return i_originalCaster->ToUnit()->IsValidAttackTarget(u);
-                else // Corpse case
-                    return i_originalCaster->IsHostileTo(u) && u->IsTargetable(true, i_originalCaster->IsCharmerOrOwnerPlayerOrPlayerItself(), true, true);
+                return i_originalCaster->IsValidAttackTarget(u);
             }
         private:
             WorldObject const* i_obj;
