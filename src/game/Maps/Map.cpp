@@ -2429,143 +2429,21 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, Scr
     // If we have a buddy lets find it.
     if (script.target_type)
     {
-        switch (script.target_type)
+        if (!(target = GetTargetByType(source, target, this, script.target_type, script.target_param1, script.target_param2)))
         {
-            case TARGET_T_CREATURE_WITH_ENTRY:
+            switch (script.target_type)
             {
-                WorldObject* pSearcher;
-
-                if (!((pSearcher = source) || (pSearcher = original_source)))
+                case TARGET_T_NEAREST_CREATURE_WITH_ENTRY:
+                case TARGET_T_RANDOM_CREATURE_WITH_ENTRY:
+                case TARGET_T_CREATURE_WITH_GUID:
+                case TARGET_T_CREATURE_FROM_INSTANCE_DATA:
+                case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
+                case TARGET_T_GAMEOBJECT_WITH_GUID:
+                case TARGET_T_GAMEOBJECT_FROM_INSTANCE_DATA:
                 {
-                    sLog.outError("FindScriptTargets: Attempt to search for nearby creature in script with id %u but source is a nullptr object.", script.id);
+                    sLog.outError("FindScriptTargets: Failed to find target for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
                     return false;
                 }
-
-                Creature* pCreatureBuddy = pSearcher->FindNearestCreature(script.target_param1, script.target_param2, true);
-
-                if (pCreatureBuddy)
-                    target = pCreatureBuddy;
-                else
-                {
-                    sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                    return false;
-                }
-                break;
-            }
-            case TARGET_T_RANDOM_CREATURE_WITH_ENTRY:
-            {
-                WorldObject* pSearcher;
-
-                if (!((pSearcher = source) || (pSearcher = original_source)))
-                {
-                    sLog.outError("FindScriptTargets: Attempt to search for random creature in script with id %u but source is a nullptr object.", script.id);
-                    return false;
-                }
-
-                Creature* pCreatureBuddy = pSearcher->FindRandomCreature(script.target_param1, script.target_param2, true, pSearcher->ToCreature());
-
-                if (pCreatureBuddy)
-                    target = pCreatureBuddy;
-                else
-                {
-                    sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                    return false;
-                }
-                break;
-            }
-            case TARGET_T_CREATURE_WITH_GUID:
-            {
-                CreatureData const* pCreatureData = sObjectMgr.GetCreatureData(script.target_param1);
-                if (pCreatureData)
-                {
-                    Creature* pCreatureBuddy = this->GetCreature(ObjectGuid(HIGHGUID_UNIT, pCreatureData->creature_id[0], script.target_param1));
-
-                    if (pCreatureBuddy)
-                        target = pCreatureBuddy;
-                    else
-                    {
-                        sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                        return false;
-                    }
-                }
-                break;
-            }
-            case TARGET_T_CREATURE_FROM_INSTANCE_DATA:
-            {
-                InstanceData* pInstanceData = this->GetInstanceData();
-                if (pInstanceData)
-                {
-                    Creature* pCreatureBuddy = pInstanceData->GetCreature(pInstanceData->GetData64(script.target_param1));
-
-                    if (pCreatureBuddy)
-                        target = pCreatureBuddy;
-                    else
-                    {
-                        sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                        return false;
-                    }
-                }
-                break;
-            }
-            case TARGET_T_GAMEOBJECT_WITH_ENTRY:
-            {
-                WorldObject* pSearcher;
-
-                if (!((pSearcher = source) || (pSearcher = original_source)))
-                {
-                    sLog.outError("FindScriptTargets: Attempt to search for nearby gameobject in script with id %u but source is a nullptr object.", script.id);
-                    return false;
-                }
-
-                GameObject* pGameObjectBuddy = pSearcher->FindNearestGameObject(script.target_param1, script.target_param2);
-
-                if (pGameObjectBuddy)
-                    target = pGameObjectBuddy;
-                else
-                {
-                    sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                    return false;
-                }
-                break;
-            }
-            case TARGET_T_GAMEOBJECT_WITH_GUID:
-            {
-                GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(script.target_param1);
-                if (pGameObjectData)
-                {
-                    GameObject* pGameObjectBuddy = this->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, script.target_param1));
-
-                    if (pGameObjectBuddy)
-                        target = pGameObjectBuddy;
-                    else
-                    {
-                        sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                        return false;
-                    }
-                }
-                break;
-            }
-            case TARGET_T_GAMEOBJECT_FROM_INSTANCE_DATA:
-            {
-                InstanceData* pInstanceData = this->GetInstanceData();
-                if (pInstanceData)
-                {
-                    GameObject* pGameObjectBuddy = pInstanceData->GetGameObject(pInstanceData->GetData64(script.target_param1));
-
-                    if (pGameObjectBuddy)
-                        target = pGameObjectBuddy;
-                    else
-                    {
-                        sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (target_param1: %u), (target_param2: %u), (target_type: %u).", script.id, script.target_param1, script.target_param2, script.target_type);
-                        return false;
-                    }
-                }
-                break;
-            }
-            default:
-            {
-                target = GetTargetByType(source, target, script.target_type, script.target_param1, script.target_param2);
-                break;
             }
         }
     }

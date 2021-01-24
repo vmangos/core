@@ -905,6 +905,7 @@ class SpellEntry
         float CalculateDefaultCoefficient(DamageEffectType const damagetype) const;
         float CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
         SpellCastResult GetErrorAtShapeshiftedCast(uint32 form) const;
+        bool IsTargetInRange(WorldObject const* pCaster, WorldObject const* pTarget) const; // to be used in scripts for simple pre-cast range checks
         uint32 GetMechanic() const { return Mechanic; }
         uint32 GetManaCost() const { return manaCost; }
         uint32 GetSpellFamilyName() const { return SpellFamilyName; }

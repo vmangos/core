@@ -1147,3 +1147,35 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
 
     return SPELL_CAST_OK;
 }
+
+bool SpellEntry::IsTargetInRange(WorldObject const* pCaster, WorldObject const* pTarget) const
+{
+    switch (rangeIndex)
+    {
+        case SPELL_RANGE_IDX_SELF_ONLY:
+            for (auto radiusIndex : EffectRadiusIndex)
+            {
+                if (radiusIndex)
+                    return pCaster->GetCombatDistance(pTarget) <= Spells::GetSpellRadius(sSpellRadiusStore.LookupEntry(radiusIndex));
+            }
+            for (auto triggeredSpell : EffectTriggerSpell)
+            {
+                if (triggeredSpell)
+                    if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(triggeredSpell))
+                        if (pSpellEntry->IsTargetInRange(pCaster, pTarget))
+                            return true;
+            }
+            return pCaster == pTarget;
+        case SPELL_RANGE_IDX_ANYWHERE:
+            return true;
+        case SPELL_RANGE_IDX_COMBAT:
+            return pCaster->CanReachWithMeleeSpellAttack(pTarget);
+    }
+
+    SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(rangeIndex);
+    float max_range = Spells::GetSpellMaxRange(srange);
+    float min_range = Spells::GetSpellMinRange(srange);
+    float dist = pCaster->GetCombatDistance(pTarget);
+
+    return dist < max_range && dist >= min_range;
+}

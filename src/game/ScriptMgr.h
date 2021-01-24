@@ -42,6 +42,7 @@ class Item;
 class Map;
 class Quest;
 class SpellCastTargets;
+class SpellEntry;
 
 // Legend:
 // source - the type of object which executes the command
@@ -1134,19 +1135,19 @@ enum ScriptTarget
 
     TARGET_T_HOSTILE                        = 1,            //Our current target (ie: highest aggro).
     TARGET_T_HOSTILE_SECOND_AGGRO           = 2,            //Second highest aggro (generaly used for cleaves and some special attacks).
-                                                            //Param2 = select_flags
+                                                            //Param1 = select_flags
     TARGET_T_HOSTILE_LAST_AGGRO             = 3,            //Dead last on aggro (no idea what this could be used for).
-                                                            //Param2 = select_flags
+                                                            //Param1 = select_flags
     TARGET_T_HOSTILE_RANDOM                 = 4,            //Just any random target on our threat list.
-                                                            //Param2 = select_flags
+                                                            //Param1 = select_flags
     TARGET_T_HOSTILE_RANDOM_NOT_TOP         = 5,            //Any random target except top threat.
-                                                            //Param2 = select_flags
+                                                            //Param1 = select_flags
 
     TARGET_T_OWNER_OR_SELF                  = 6,            //Either self or owner if pet or controlled.
     TARGET_T_OWNER                          = 7,            //The owner of the source.
     
 
-    TARGET_T_CREATURE_WITH_ENTRY            = 8,            //Searches for closest nearby creature with the given entry.
+    TARGET_T_NEAREST_CREATURE_WITH_ENTRY    = 8,            //Searches for closest nearby creature with the given entry.
                                                             //Param1 = creature_entry
                                                             //Param2 = search_radius
 
@@ -1156,7 +1157,7 @@ enum ScriptTarget
     TARGET_T_CREATURE_FROM_INSTANCE_DATA    = 10,           //Find creature by guid stored in instance data.
                                                             //Param1 = instance_data_field
 
-    TARGET_T_GAMEOBJECT_WITH_ENTRY          = 11,           //Searches for closest nearby gameobject with the given entry.
+    TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY          = 11,           //Searches for closest nearby gameobject with the given entry.
                                                             //Param1 = gameobject_entry
                                                             //Param2 = search_radius
 
@@ -1207,7 +1208,7 @@ void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr,
 void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 // Returns a target based on the type specified.
-WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1 = 0u, uint32 Param2 = 0u);
+WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pMap, uint8 targetType, uint32 param1 = 0u, uint32 param2 = 0u, SpellEntry const* pSpellEntry = nullptr);
 
 //TODO: find better namings and definitions.
 //N=Neutral, A=Alliance, H=Horde.
@@ -1326,6 +1327,7 @@ class ScriptMgr
         void LoadCreatureEventAIScripts();
 
         void CheckAllScriptTexts();
+        bool CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint32 targetParam2, char const* tableName, uint32 tableEntry);
 
         void LoadScriptNames();
         void LoadAreaTriggerScripts();

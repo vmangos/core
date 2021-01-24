@@ -220,7 +220,7 @@ void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
             // Checked on startup.
             SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(spell.spellId);
 
-            Unit* pTarget = ToUnit(GetTargetByType(m_creature, m_creature, spell.castTarget, spell.targetParam1 ? spell.targetParam1 : sSpellRangeStore.LookupEntry(pSpellInfo->rangeIndex)->maxRange, spell.targetParam2));
+            Unit* pTarget = ToUnit(GetTargetByType(m_creature, m_creature, m_creature->GetMap(), spell.castTarget, spell.targetParam1, spell.targetParam2, pSpellInfo));
 
             SpellCastResult result = m_creature->TryToCast(pTarget, pSpellInfo, spell.castFlags, spell.probability);
             

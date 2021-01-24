@@ -201,7 +201,6 @@ set (SCRIPTS_SRCS
     kalimdor/desolace/maraudon/boss_celebras_the_cursed.cpp
     kalimdor/desolace/maraudon/boss_landslide.cpp
     kalimdor/desolace/maraudon/boss_noxxion.cpp
-    kalimdor/desolace/maraudon/boss_princess_theradras.cpp
     kalimdor/desolace/maraudon/instance_maraudon.cpp
     kalimdor/desolace/maraudon/maraudon.cpp
     kalimdor/durotar/durotar.cpp

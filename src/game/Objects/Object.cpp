@@ -1656,12 +1656,13 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
     return distsq < maxdist * maxdist;
 }
 
-bool WorldObject::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const
+bool WorldObject::CanReachWithMeleeSpellAttack(WorldObject const* pVictim, float flat_mod /*= 0.0f*/) const
 {
     if (!pVictim || !pVictim->IsInWorld())
         return false;
 
-    float reach = IsUnit() ? static_cast<Unit const*>(this)->GetCombatReach(pVictim, true, flat_mod) : ATTACK_DISTANCE;
+    float reach = IsUnit() && pVictim->IsUnit() ? 
+        static_cast<Unit const*>(this)->GetCombatReach(static_cast<Unit const*>(pVictim), true, flat_mod) : ATTACK_DISTANCE;
 
     // This check is not related to bounding radius
     float dx = GetPositionX() - pVictim->GetPositionX();

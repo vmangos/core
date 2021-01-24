@@ -413,7 +413,7 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
 
     if (script.summonCreature.attackTarget >= 0)
     {
-        if (Unit* pAttackTarget = ToUnit(GetTargetByType(pSummoner, ToUnit(target), script.summonCreature.attackTarget)))
+        if (Unit* pAttackTarget = ToUnit(GetTargetByType(pSummoner, ToUnit(target), this, script.summonCreature.attackTarget)))
         {
             if (pCreature->AI())
                 pCreature->AI()->AttackStart(pAttackTarget);
@@ -964,7 +964,7 @@ bool Map::ScriptCommand_ModifyThreat(ScriptInfo const& script, WorldObject* sour
     }
     else
     {
-        if (Unit* pTarget = ToUnit(GetTargetByType(pSource, target, script.modThreat.target)))
+        if (Unit* pTarget = ToUnit(GetTargetByType(pSource, target, this, script.modThreat.target)))
             pSource->GetThreatManager().modifyThreatPercent(pTarget, script.x);
     }
 

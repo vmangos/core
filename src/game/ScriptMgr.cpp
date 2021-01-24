@@ -30,6 +30,7 @@
 #include "Conditions.h"
 #include "GameEventMgr.h"
 #include "CreatureGroups.h"
+#include "InstanceData.h"
 
 typedef std::vector<Script*> ScriptVector;
 int num_sc_scripts;
@@ -132,88 +133,8 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             continue;
         }
 
-        switch (tmp.target_type)
-        {
-            case TARGET_T_CREATURE_WITH_ENTRY:
-            {
-                if (!ObjectMgr::GetCreatureTemplate(tmp.target_param1))
-                {
-                    if (!sObjectMgr.IsExistingCreatureId(tmp.target_param1))
-                    {
-                        sLog.outErrorDb("Table `%s` has target_param1 = %u for script id %u, but this creature_template does not exist.", tablename, tmp.target_param1, tmp.id);
-                        continue;
-                    }
-                    else
-                        DisableScriptAction(tmp);
-                }
-                if (!tmp.target_param2)
-                {
-                    sLog.outErrorDb("Table `%s` has target_param1 = %u for script id %u, but search radius is too small (target_param2 = %u).", tablename, tmp.target_param1, tmp.id, tmp.target_param2);
-                    continue;
-                }
-                break;
-            }
-            case TARGET_T_CREATURE_WITH_GUID:
-            {
-                if (!sObjectMgr.GetCreatureData(tmp.target_param1))
-                {
-                    if (!sObjectMgr.IsExistingCreatureGuid(tmp.target_param1))
-                    {
-                        sLog.outErrorDb("Table `%s` has target_param1 = %u for script id %u, but this creature guid does not exist.", tablename, tmp.target_param1, tmp.id);
-                        continue;
-                    }
-                    else
-                        DisableScriptAction(tmp);
-                }
-                break;
-            }
-            case TARGET_T_GAMEOBJECT_WITH_ENTRY:
-            {
-                if (!ObjectMgr::GetGameObjectInfo(tmp.target_param1))
-                {
-                    if (!sObjectMgr.IsExistingGameObjectId(tmp.target_param1))
-                    {
-                        sLog.outErrorDb("Table `%s` has target_param1 = %u for script id %u, but this gameobject_template does not exist.", tablename, tmp.target_param1, tmp.id);
-                        continue;
-                    }
-                    else
-                        DisableScriptAction(tmp);
-                }
-                break;
-            }
-            case TARGET_T_GAMEOBJECT_WITH_GUID:
-            {
-                GameObjectData const* data = sObjectMgr.GetGOData(tmp.target_param1);
-                if (!data)
-                {
-                    if (!sObjectMgr.IsExistingGameObjectGuid(tmp.target_param1))
-                    {
-                        sLog.outErrorDb("Table `%s` has target_param1 = %u for script id %u, but this gameobject guid does not exist.", tablename, tmp.target_param1, tmp.id);
-                        continue;
-                    }
-                    else
-                    {
-                        DisableScriptAction(tmp);
-                        break;
-                    }
-
-                }
-
-                GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id);
-                if (!info)
-                {
-                    sLog.outErrorDb("Table `%s` has target_param1 = %u for script id %u, but this guid is for a non-existent gameobject entry %u.", tablename, tmp.target_param1, tmp.id, data->id);
-                    continue;
-                }
-                break;
-            }
-            default:
-            {
-                if (tmp.target_type >= TARGET_T_END)
-                    sLog.outError("Table `%s` has an unknown target_type = %u used for script id %u.", tablename, tmp.target_type, tmp.id);
-                break;
-            }
-        }
+        if (!CheckScriptTargets(tmp.target_type, tmp.target_param1, tmp.target_param2, tablename, tmp.id))
+            DisableScriptAction(tmp);
 
         if (!tmp.target_type && (tmp.raw.data[4] & SF_GENERAL_SWAP_INITIAL_TARGETS) && (tmp.raw.data[4] & SF_GENERAL_SWAP_FINAL_TARGETS))
         {
@@ -1265,6 +1186,162 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
     sLog.outString();
     sLog.outString(">> Loaded %u script definitions", count);
+}
+
+bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint32 targetParam2, char const* tableName, uint32 tableEntry)
+{
+    switch (targetType)
+    {
+        case TARGET_T_PROVIDED_TARGET:
+        case TARGET_T_HOSTILE:
+        case TARGET_T_OWNER_OR_SELF:
+        case TARGET_T_OWNER:
+        {
+            if (targetParam1)
+                sLog.outErrorDb("Table `%s` has target_param1 = %u with target_type = %u for id %u, but this target type has no parameters.", tableName, targetParam1, targetType, tableEntry);
+            if (targetParam2)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but this target type has no parameters.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_HOSTILE_SECOND_AGGRO:
+        case TARGET_T_HOSTILE_LAST_AGGRO:
+        case TARGET_T_HOSTILE_RANDOM:
+        case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
+        {
+            if (targetParam1& ~MAX_SELECT_FLAG_MASK)
+            {
+                sLog.outErrorDb("Table `%s` has unknown select flag target_param1 = %u with target_type = %u for id %u.", tableName, targetParam1, targetType, tableEntry);
+                return false;
+            }
+            if (targetParam2)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but this parameter is unused.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_NEAREST_CREATURE_WITH_ENTRY:
+        case TARGET_T_RANDOM_CREATURE_WITH_ENTRY:
+        {
+            if (!ObjectMgr::GetCreatureTemplate(targetParam1))
+            {
+                if (!sObjectMgr.IsExistingCreatureId(targetParam1))
+                    sLog.outErrorDb("Table `%s` has target_param1 = %u for id %u, but this creature_template does not exist.", tableName, targetParam1, tableEntry);
+                return false;
+            }
+            if (!targetParam2)
+            {
+                sLog.outErrorDb("Table `%s` has target_param2 = %u for id %u, but search radius is expected.", tableName, targetParam2, tableEntry);
+                return false;
+            }
+            break;
+        }
+        case TARGET_T_CREATURE_WITH_GUID:
+        {
+            if (!sObjectMgr.GetCreatureData(targetParam1))
+            {
+                if (!sObjectMgr.IsExistingCreatureGuid(targetParam1))
+                    sLog.outErrorDb("Table `%s` has target_param1 = %u for id %u, but this creature guid does not exist.", tableName, targetParam1, tableEntry);
+                return false;
+            }
+            if (targetParam2)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but this parameter is unused.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
+        {
+            if (!ObjectMgr::GetGameObjectInfo(targetParam1))
+            {
+                if (!sObjectMgr.IsExistingGameObjectId(targetParam1))
+                    sLog.outErrorDb("Table `%s` has target_param1 = %u for id %u, but this gameobject_template does not exist.", tableName, targetParam1, tableEntry);
+                return false;
+            }
+            if (!targetParam2)
+            {
+                sLog.outErrorDb("Table `%s` has target_param2 = %u for id %u, but search radius is expected.", tableName, targetParam2, tableEntry);
+                return false;
+            }
+            break;
+        }
+        case TARGET_T_GAMEOBJECT_WITH_GUID:
+        {
+            if (!sObjectMgr.GetGOData(targetParam1))
+            {
+                if (!sObjectMgr.IsExistingGameObjectGuid(targetParam1))
+                    sLog.outErrorDb("Table `%s` has target_param1 = %u for id %u, but this gameobject guid does not exist.", tableName, targetParam1, tableEntry);
+                return false;
+
+            }
+            if (targetParam2)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but this parameter is unused.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_GAMEOBJECT_FROM_INSTANCE_DATA:
+        case TARGET_T_FRIENDLY_CC:
+        case TARGET_T_NEAREST_PLAYER:
+        case TARGET_T_NEAREST_HOSTILE_PLAYER:
+        case TARGET_T_NEAREST_FRIENDLY_PLAYER:
+        {
+            if (targetParam2)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but this parameter is unused.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_FRIENDLY:
+        {
+            if (targetParam2 > 1)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but a bool value is expected.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_FRIENDLY_INJURED:
+        case TARGET_T_FRIENDLY_INJURED_EXCEPT:
+        {
+            if (targetParam2 > 100)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but a percent value is expected.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_FRIENDLY_MISSING_BUFF:
+        case TARGET_T_FRIENDLY_MISSING_BUFF_EXCEPT:
+        {
+            if (targetParam2 && !sSpellMgr.GetSpellEntry(targetParam2))
+            {
+                if (!sSpellMgr.IsExistingSpellId(targetParam2))
+                    sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but spell does not exist.", tableName, targetParam2, targetType, tableEntry);
+   
+                return false;
+            }
+            break;
+        }
+        case TARGET_T_MAP_EVENT_SOURCE:
+        case TARGET_T_MAP_EVENT_TARGET:
+        {
+            if (!targetParam1)
+            {
+                sLog.outErrorDb("Table `%s` has target_param1 = %u with target_type = %u for id %u, but a scripted map event id is expected.", tableName, targetParam1, targetType, tableEntry);
+                return false;
+            }
+            if (targetParam2)
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but this parameter is unused.", tableName, targetParam2, targetType, tableEntry);
+            break;
+        }
+        case TARGET_T_MAP_EVENT_EXTRA_TARGET:
+        {
+            if (!targetParam1)
+            {
+                sLog.outErrorDb("Table `%s` has target_param1 = %u with target_type = %u for id %u, but a scripted map event id is expected.", tableName, targetParam1, targetType, tableEntry);
+                return false;
+            }
+            if (!targetParam2)
+            {
+                sLog.outErrorDb("Table `%s` has target_param2 = %u with target_type = %u for id %u, but a creature or gameobject entry is expected.", tableName, targetParam2, targetType, tableEntry);
+                return false;
+            }
+            break;
+        }
+        default:
+        {
+            if (targetType >= TARGET_T_END)
+                sLog.outError("Table `%s` has an unknown target_type = %u used for id %u.", tableName, targetType, tableEntry);
+            break;
+        }
+    }
+    return true;
 }
 
 void ScriptMgr::LoadGameObjectScripts()
@@ -2637,9 +2714,9 @@ void Script::RegisterSelf(bool bReportError)
 }
 
 // Returns a target based on the type specified.
-WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1, uint32 Param2)
+WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pMap, uint8 targetType, uint32 param1, uint32 param2, SpellEntry const* pSpellEntry)
 {
-    switch (TargetType)
+    switch (targetType)
     {
         case TARGET_T_PROVIDED_TARGET:
             return pTarget;
@@ -2649,19 +2726,19 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
             break;
         case TARGET_T_HOSTILE_SECOND_AGGRO:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_HOSTILE_LAST_AGGRO:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_HOSTILE_RANDOM:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
             if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, nullptr, Param2 ? Param2 : SELECT_FLAG_NO_TOTEM);
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, pSpellEntry, param1 ? param1 : SELECT_FLAG_NO_TOTEM);
             break;
         case TARGET_T_OWNER_OR_SELF:
             if (Unit* pUnitSource = ToUnit(pSource))
@@ -2671,59 +2748,130 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
             if (Unit* pUnitSource = ToUnit(pSource))
                 return pUnitSource->GetOwner();
             break;
+        case TARGET_T_NEAREST_CREATURE_WITH_ENTRY:
+        {
+            WorldObject* pSearcher;
+            if (!((pSearcher = pSource) || (pSearcher = pTarget)))
+                return nullptr;
+            return pSearcher->FindNearestCreature(param1, param2, true);
+        }
+        case TARGET_T_RANDOM_CREATURE_WITH_ENTRY:
+        {
+            WorldObject* pSearcher;
+            if (!((pSearcher = pSource) || (pSearcher = pTarget)))
+                return nullptr;
+            return pSearcher->FindRandomCreature(param1, param2, true, pSearcher->ToCreature());
+        }
+        case TARGET_T_CREATURE_WITH_GUID:
+        {
+            if (!pMap)
+                return nullptr;
+            if (CreatureData const* pCreatureData = sObjectMgr.GetCreatureData(param1))
+                return pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, pCreatureData->creature_id[0], param1));
+            break;
+        }
+        case TARGET_T_CREATURE_FROM_INSTANCE_DATA:
+        {
+            if (!pMap)
+                return nullptr;
+            if (InstanceData* pInstanceData = pMap->GetInstanceData())
+                return pInstanceData->GetCreature(pInstanceData->GetData64(param1));
+            break;
+        }
+        case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
+        {
+            WorldObject* pSearcher;
+            if (!((pSearcher = pSource) || (pSearcher = pTarget)))
+                return nullptr;
+            return pSearcher->FindNearestGameObject(param1, param2);
+        }
+        case TARGET_T_GAMEOBJECT_WITH_GUID:
+        {
+            if (!pMap)
+                return nullptr;
+            if (GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(param1))
+                return pMap->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, param1));
+            break;
+        }
+        case TARGET_T_GAMEOBJECT_FROM_INSTANCE_DATA:
+        {
+            if (!pMap)
+                return nullptr;
+            if (InstanceData* pInstanceData = pMap->GetInstanceData())
+                return pInstanceData->GetGameObject(pInstanceData->GetData64(param1));
+            break;
+        }
         case TARGET_T_FRIENDLY:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->SelectRandomFriendlyTarget(Param2 ? ToUnit(pTarget) : nullptr, Param1 ? Param1 : 30.0f, true);
+                return pUnitSource->SelectRandomFriendlyTarget(param2 ? ToUnit(pTarget) : nullptr, param1 ? param1 : 30.0f, true);
             break;
         case TARGET_T_FRIENDLY_INJURED:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindLowestHpFriendlyUnit(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
+                return pUnitSource->FindLowestHpFriendlyUnit(param1 ? param1 : 30.0f, param2 ? param2 : 50, true);
             break;
         case TARGET_T_FRIENDLY_INJURED_EXCEPT:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindLowestHpFriendlyUnit(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
+                return pUnitSource->FindLowestHpFriendlyUnit(param1 ? param1 : 30.0f, param2 ? param2 : 50, true, ToUnit(pTarget));
             break;
         case TARGET_T_FRIENDLY_MISSING_BUFF:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindFriendlyUnitMissingBuff(Param1 ? Param1 : 30.0f, Param2);
+                return pUnitSource->FindFriendlyUnitMissingBuff(param1 ? param1 : 30.0f, param2);
             break;
         case TARGET_T_FRIENDLY_MISSING_BUFF_EXCEPT:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindFriendlyUnitMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
+                return pUnitSource->FindFriendlyUnitMissingBuff(param1 ? param1 : 30.0f, param2, ToUnit(pTarget));
             break;
         case TARGET_T_FRIENDLY_CC:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindFriendlyUnitCC(Param1 ? Param1 : 30.0f);
+                return pUnitSource->FindFriendlyUnitCC(param1 ? param1 : 30.0f);
             break;
         case TARGET_T_MAP_EVENT_SOURCE:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
-                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(Param1))
+                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(param1))
                     return pEvent->GetSourceObject();
             break;
         case TARGET_T_MAP_EVENT_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
-                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(Param1))
+                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(param1))
                     return pEvent->GetTargetObject();
             break;
         case TARGET_T_MAP_EVENT_EXTRA_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
-                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(Param1))
+                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(param1))
                     for (const auto& target : pEvent->m_vTargets)
                         if (WorldObject* pObject = pMap->GetWorldObject(target.target))
-                            if (pObject && (pObject->GetEntry() == Param2))
+                            if (pObject && (pObject->GetEntry() == param2))
                                 return pObject;
             break;
         case TARGET_T_NEAREST_PLAYER:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (pSource)
-                return pSource->FindNearestPlayer(Param1);
+                return pSource->FindNearestPlayer(param1);
             break;
         case TARGET_T_NEAREST_HOSTILE_PLAYER:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindNearestHostilePlayer(Param1);
+                return pUnitSource->FindNearestHostilePlayer(param1);
             break;
         case TARGET_T_NEAREST_FRIENDLY_PLAYER:
+            if (!param1 && pSpellEntry)
+                param1 = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex)->maxRange;
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->FindNearestFriendlyPlayer(Param1);
+                return pUnitSource->FindNearestFriendlyPlayer(param1);
             break;
     }
     return nullptr;

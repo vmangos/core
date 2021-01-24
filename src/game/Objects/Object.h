@@ -1013,7 +1013,7 @@ class WorldObject : public Object
         bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
-        bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
+        bool CanReachWithMeleeSpellAttack(WorldObject const* pVictim, float flat_mod = 0.0f) const;
         float GetLeewayBonusRange(Unit const* target, bool ability) const;
         static float GetLeewayBonusRangeForTargets(Player const* player, Unit const* target, bool ability);
         float GetLeewayBonusRadius() const;
