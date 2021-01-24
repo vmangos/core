@@ -218,5 +218,8 @@ void PatchCache::LoadPatchesInfo()
         }
     }
 
+    // causes crash on windows
+#ifndef _WIN32
     ACE_OS::closedir(dirp);
+#endif
 }
