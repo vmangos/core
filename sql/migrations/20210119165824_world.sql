@@ -5206,6 +5206,22 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (5969, 11, -10286.2, 147.016, 2.79024, 100, 0, 0, 0),
 (5969, 12, -10329.6, 139.619, 2.96308, 100, 0, 0, 0);
 
+-- creature 4402 waypoints
+UPDATE `creature` SET `position_x` = -10414.1, `position_y` = 403.54, `position_z` = 47.7959, `movement_type` = 2 WHERE `guid` = 4402;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(4402, 1, -10414.1, 403.54, 47.7959, 100, 0, 0, 0),
+(4402, 2, -10411, 415.171, 40.1772, 100, 0, 0, 0),
+(4402, 3, -10392.9, 416.29, 29.1068, 100, 0, 0, 0),
+(4402, 4, -10379, 412.91, 29.0842, 100, 0, 0, 0),
+(4402, 5, -10348.1, 405.259, 15.9644, 100, 0, 0, 0),
+(4402, 6, -10320.1, 398.071, 15.8847, 100, 0, 0, 0),
+(4402, 7, -10285.7, 389.61, 15.6853, 100, 0, 0, 0),
+(4402, 8, -10313.8, 396.488, 15.7496, 100, 0, 0, 0),
+(4402, 9, -10345.2, 404.513, 16.0038, 100, 0, 0, 0),
+(4402, 10, -10371, 410.878, 27.9095, 100, 0, 0, 0),
+(4402, 11, -10384.4, 414.328, 29.0818, 100, 0, 0, 0),
+(4402, 12, -10406.5, 418.847, 38.4252, 100, 0, 0, 0);
+
 -- steelsnaps patrol should be in a group
 DELETE FROM `creature_movement` WHERE `id` IN (21661, 21660);
 UPDATE `creature` SET `movement_type` = 0 WHERE guid IN (21661, 21660);
