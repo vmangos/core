@@ -413,7 +413,7 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
 
     if (script.summonCreature.attackTarget >= 0)
     {
-        if (Unit* pAttackTarget = ToUnit(GetTargetByType(pSummoner, ToUnit(target), script.summonCreature.attackTarget)))
+        if (Unit* pAttackTarget = ToUnit(GetTargetByType(pSummoner, ToUnit(target), this, script.summonCreature.attackTarget)))
         {
             if (pCreature->AI())
                 pCreature->AI()->AttackStart(pAttackTarget);
@@ -894,7 +894,7 @@ bool Map::ScriptCommand_AttackStart(ScriptInfo const& script, WorldObject* sourc
     if (!pAttacker->IsAlive())
         return ShouldAbortScript(script);
 
-    if (pAttacker->IsFriendlyTo(pTarget) || !pTarget->IsTargetableForAttack() || !pAttacker->IsInMap(pTarget))
+    if (!pAttacker->IsValidAttackTarget(pTarget) || !pAttacker->IsInMap(pTarget))
     {
         sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) for an invalid attack target, skipping.", script.id);
         return ShouldAbortScript(script);
@@ -964,7 +964,7 @@ bool Map::ScriptCommand_ModifyThreat(ScriptInfo const& script, WorldObject* sour
     }
     else
     {
-        if (Unit* pTarget = ToUnit(GetTargetByType(pSource, target, script.modThreat.target)))
+        if (Unit* pTarget = ToUnit(GetTargetByType(pSource, target, this, script.modThreat.target)))
             pSource->GetThreatManager().modifyThreatPercent(pTarget, script.x);
     }
 
@@ -2040,12 +2040,12 @@ bool Map::ScriptCommand_AssistUnit(ScriptInfo const& script, WorldObject* source
         if (pVictim == pAttacker)
             return false;
 
-        if (!pSource->IsFriendlyTo(pAttacker) && pAttacker->IsTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        if (pSource->IsValidAttackTarget(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AddThreat(pAttacker);
     }
     else
     {
-        if (pSource->AI() && !pSource->IsFriendlyTo(pAttacker) && pAttacker->IsTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        if (pSource->AI() && pSource->IsValidAttackTarget(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AI()->AttackStart(pAttacker);
     }
 
@@ -2110,7 +2110,7 @@ bool Map::ScriptCommand_AddThreat(ScriptInfo const& script, WorldObject* source,
         return ShouldAbortScript(script);
     }
 
-    if (pTarget->IsTargetableForAttack() && pSource->IsInMap(pTarget) && !pSource->IsFriendlyTo(pTarget))
+    if (pSource->IsValidAttackTarget(pTarget) && pSource->IsInMap(pTarget))
         pSource->AddThreat(pTarget);
 
     return false;

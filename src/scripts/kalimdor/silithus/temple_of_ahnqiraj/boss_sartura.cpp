@@ -389,7 +389,7 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
             // Knockback
             if (m_uiKnockbackTimer < uiDiff)
             {
-                if(m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+                if(m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                     if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKBACK) == CAST_OK)
                         m_uiKnockbackTimer = urand(8000, 14000);
             }

@@ -325,23 +325,25 @@ enum SelectFlags
     SELECT_FLAG_POWER_NOT_MANA      = 0x1000,               // Used in some dungeon encounters
 };
 
+#define MAX_SELECT_FLAG_MASK (SELECT_FLAG_IN_LOS | SELECT_FLAG_PLAYER | SELECT_FLAG_POWER_MANA | SELECT_FLAG_POWER_RAGE | SELECT_FLAG_POWER_ENERGY | SELECT_FLAG_IN_MELEE_RANGE | SELECT_FLAG_NOT_IN_MELEE_RANGE | SELECT_FLAG_NO_TOTEM | SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_PET | SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_POWER_NOT_MANA)
+
 enum RegenStatsFlags
 {
     REGEN_FLAG_HEALTH               = 0x001,
     REGEN_FLAG_POWER                = 0x002,
 };
 
-// Change to uint16 if adding more flags!
-enum CreatureStateFlag : uint8
+enum CreatureStateFlag : uint16
 {
-    CSTATE_ALREADY_CALL_ASSIST   = 0x01,
-    CSTATE_ALREADY_SEARCH_ASSIST = 0x02,
-    CSTATE_REGEN_HEALTH          = 0x04,
-    CSTATE_REGEN_MANA            = 0x08,
-    CSTATE_INIT_AI_ON_RESPAWN    = 0x10,
-    CSTATE_COMBAT                = 0x20,
-    CSTATE_COMBAT_WITH_ZONE      = 0x40,
-    CSTATE_ESCORTABLE            = 0x80,
+    CSTATE_ALREADY_CALL_ASSIST   = 0x0001,
+    CSTATE_ALREADY_SEARCH_ASSIST = 0x0002,
+    CSTATE_REGEN_HEALTH          = 0x0004,
+    CSTATE_REGEN_MANA            = 0x0008,
+    CSTATE_INIT_AI_ON_RESPAWN    = 0x0010,
+    CSTATE_COMBAT                = 0x0020,
+    CSTATE_COMBAT_WITH_ZONE      = 0x0040,
+    CSTATE_ESCORTABLE            = 0x0080,
+    CSTATE_DESPAWNING            = 0x0100,
 };
 
 // Vendors
@@ -914,9 +916,13 @@ class Creature : public Unit
         // Auto evade timer (if target not reachable)
         // Tested on retail 5.4.0: Creatures evade after 3 seconds (but does not return to home position)
         bool IsEvadeBecauseTargetNotReachable() const { return m_TargetNotReachableTimer > 3000; }
-        uint32 GetLastDamageTakenTime() const { return m_lastDamageTakenForEvade; }
-        void   ResetLastDamageTakenTime() { m_lastDamageTakenForEvade = 0; }
         uint32 m_TargetNotReachableTimer;
+
+        std::shared_ptr<time_t> const& GetLastLeashExtensionTimePtr() const;
+        void SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer);
+        void ClearLastLeashExtensionTimePtr();
+        time_t GetLastLeashExtensionTime() const;
+        void UpdateLeashExtensionTime();
 
         bool IsTempPacified() const         { return m_pacifiedTimer > 0; }
         void SetTempPacified(uint32 timer)  { if (m_pacifiedTimer < timer) m_pacifiedTimer = timer; }
@@ -1022,7 +1028,7 @@ class Creature : public Unit
         uint32 m_mountId;                                   // display Id to mount
 
         bool m_AI_locked;
-        uint8 m_creatureStateFlags;                         // change this to uint16 if adding more state flags
+        uint16 m_creatureStateFlags;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)
         int32 m_reputationId;                               // Id of the creature's faction in the client reputations list.
         uint32 m_gossipMenuId;
@@ -1042,7 +1048,10 @@ class Creature : public Unit
 
         Position m_summonPos;
 
-        uint32 m_lastDamageTakenForEvade;
+        // Shared timer between mobs who assist another.
+        // Damaging one extends leash range on all of them.
+        mutable std::shared_ptr<time_t> m_lastLeashExtensionTime;
+
         // Used to compute XP.
         uint32 m_playerDamageTaken;
         uint32 m_nonPlayerDamageTaken;

@@ -23,10 +23,14 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - 1.8.4.4878
 - 1.7.1.4695
 - 1.6.1.4544
+<!--- 1.5.1.4449
+- 1.4.2.4375
+- 1.3.1.4297
+- 1.2.4.4222-->
 
 ### Project guidelines
 - Accuracy: The point of an emulator is to recreate the functionality of that which it is emulating as closely as possible. Therefore any custom behaviour should be behind a config option and off by default.
-- DB Scripting: Content should be separate from the core itself, so hardcoding scripts should be avoided where possible. When database scripting functionality is insuficient, we simply expand it.
+- DB Scripting: Content should be separate from the core itself, so hardcoding scripts should be avoided where possible. When database scripting functionality is insufficient, we simply expand it.
 - Full progression: The ultimate goal of this project is to have complete progression starting from patch 1.2 through 1.12. This means every piece of data must be marked with the patch in which it was added or changed to it's current state.
 - Tools are great: Content creation should not require programming knowledge. We hope to eventually provide tools that allow for user-friendly editing of database scripts and content, with all data presented in human-readable form.
 

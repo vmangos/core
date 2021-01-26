@@ -243,6 +243,18 @@ namespace Spells
         return false;
     }
 
+    inline bool IsIgnoreLosTarget(uint32 target)
+    {
+        switch (target)
+        {
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_UNIT_RAID_AND_CLASS:
+                return true;
+        }
+
+        return false;
+    }
+
     bool IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2);
 
     inline bool IsCasterSourceTarget(uint32 target)
@@ -683,6 +695,19 @@ class SpellEntry
             return (AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD) || (Id == 2584);
         }
 
+        inline bool CanTargetDeadTarget() const
+        {
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+        }
+
+        inline bool CanTargetAliveState(bool alive) const
+        {
+            if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
+                return !alive;
+
+            return alive || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+        }
+
         inline bool IsDeathPersistentSpell() const
         {
             return HasAttribute(SPELL_ATTR_EX3_DEATH_PERSISTENT);
@@ -893,6 +918,7 @@ class SpellEntry
         float CalculateDefaultCoefficient(DamageEffectType const damagetype) const;
         float CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
         SpellCastResult GetErrorAtShapeshiftedCast(uint32 form) const;
+        bool IsTargetInRange(WorldObject const* pCaster, WorldObject const* pTarget) const; // to be used in scripts for simple pre-cast range checks
         uint32 GetMechanic() const { return Mechanic; }
         uint32 GetManaCost() const { return manaCost; }
         uint32 GetSpellFamilyName() const { return SpellFamilyName; }

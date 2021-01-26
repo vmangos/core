@@ -283,7 +283,7 @@ Aura::Aura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBas
     if (!caster)
         damage = m_currentBasePoints;
     else
-        damage = caster->CalculateSpellDamage(target, spellproto, m_effIndex, &m_currentBasePoints);
+        damage = caster->CalculateSpellEffectValue(target, spellproto, m_effIndex, &m_currentBasePoints);
 
     damage *= GetStackAmount();
 
@@ -2732,11 +2732,18 @@ void Aura::HandleForceReaction(bool apply, bool Real)
             player->StopAttackFaction(scarlet_crusade_faction_id);
     }
 
-    if (!apply && player->GetZoneId() == 1377 && GetId() == 29519 && m_removeMode == AURA_REMOVE_BY_DEATH)
+    if (GetId() == 29519 && player->GetZoneId() == 1377)
     {
-        // OutdoorPVP Silithus : Perte du buff silithyste
-        if (ZoneScript* pScript = player->GetZoneScript())
-            pScript->HandleDropFlag(player, GetId());
+        if (apply)
+            player->CastSpell(player, (player->GetTeam() == ALLIANCE ? 29894 : 29895), true);
+        else
+        {
+            player->RemoveAurasDueToSpell((player->GetTeam() == ALLIANCE ? 29894 : 29895));
+            // Outdoor PVP Silithus : Loss of Silithyst Buff.
+            if (m_removeMode == AURA_REMOVE_BY_CANCEL || m_removeMode == AURA_REMOVE_BY_DEATH || m_removeMode == AURA_REMOVE_BY_DISPEL)
+                if (ZoneScript* pScript = player->GetZoneScript())
+                    pScript->HandleDropFlag(player, GetId());
+        }
     }
 
 }
@@ -2983,9 +2990,16 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pCaster->PossessSpellInitialize();
 
         if (Creature* pCreature = pTarget->ToCreature())
+        {
             if (!pCreature->HasUnitState(UNIT_STAT_CAN_NOT_REACT))
                 if (pCreature->AI()->SwitchAiAtControl())
                     pCreature->AIM_Initialize();
+        }
+        else if (Player* pPlayer = pTarget->ToPlayer())
+        {
+            if (ObjectGuid lootGuid = pPlayer->GetLootGuid())
+                pPlayer->GetSession()->DoLootRelease(lootGuid);
+        }
 
         // Mobs should attack the target being mind controlled.
         // So we call 'MoveInLineOfSight' for nearby mobs.
@@ -3231,6 +3245,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (Player* pPlayer = target->ToPlayer())
         {
+            if (ObjectGuid lootGuid = pPlayer->GetLootGuid())
+                pPlayer->GetSession()->DoLootRelease(lootGuid);
+
             pPlayer->SetControlledBy(caster);
             if (pPlayer->i_AI && m_spellAuraHolder->GetId() == 28410)
                 pPlayer->i_AI->enablePositiveSpells = true;
@@ -4917,27 +4934,29 @@ void Aura::HandleModSpellCritChanceSchool(bool /*apply*/, bool Real)
 
 void Aura::HandleModCastingSpeed(bool apply, bool /*Real*/)
 {
-    float amount = m_modifier.m_amount;
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, m_modifier.m_amount);
+    }
 
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
-
-    GetTarget()->ApplyCastTimePercentMod(amount, apply);
+    GetTarget()->ApplyCastTimePercentMod(m_modifier.m_amount, apply);
 }
 
 void Aura::HandleModAttackSpeed(bool apply, bool /*Real*/)
 {
-    float amount = m_modifier.m_amount;
-
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, m_modifier.m_amount);
+    }
 
     Unit* target = GetTarget();
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, amount, apply);
-    target->ApplyAttackTimePercentMod(OFF_ATTACK, amount, apply);
-    target->ApplyAttackTimePercentMod(RANGED_ATTACK, amount, apply);
+    target->ApplyAttackTimePercentMod(BASE_ATTACK, m_modifier.m_amount, apply);
+    target->ApplyAttackTimePercentMod(OFF_ATTACK, m_modifier.m_amount, apply);
+    target->ApplyAttackTimePercentMod(RANGED_ATTACK, m_modifier.m_amount, apply);
 
     // Seal of the Crusader damage reduction
     // SoC increases attack speed but reduces damage to maintain the same DPS
@@ -4950,40 +4969,48 @@ void Aura::HandleModAttackSpeed(bool apply, bool /*Real*/)
 
 void Aura::HandleModMeleeSpeedPct(bool apply, bool /*Real*/)
 {
-    float amount = m_modifier.m_amount;
-
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, m_modifier.m_amount);
+    }
 
     Unit* target = GetTarget();
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, amount, apply);
-    target->ApplyAttackTimePercentMod(OFF_ATTACK, amount, apply);
+    target->ApplyAttackTimePercentMod(BASE_ATTACK, m_modifier.m_amount, apply);
+    target->ApplyAttackTimePercentMod(OFF_ATTACK, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleAuraModRangedHaste(bool apply, bool /*Real*/)
 {
-    float amount = m_modifier.m_amount;
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, m_modifier.m_amount);
+    }
 
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
-
-    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, amount, apply);
+    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleRangedAmmoHaste(bool apply, bool /*Real*/)
 {
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
+	
+	// Quivers should not increase attack speed for ranged weapons which do not require any ammo.
+    Item* ranged_weapon = GetTarget()->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+    if (!ranged_weapon || ranged_weapon->GetProto()->AmmoType == 0)
+        return;
 
-    float amount = m_modifier.m_amount;
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, m_modifier.m_amount);
+    }
 
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
-
-    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, amount, apply);
+    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, m_modifier.m_amount, apply);
 }
 
 /********************************/
@@ -4992,13 +5019,14 @@ void Aura::HandleRangedAmmoHaste(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModAttackPower(bool apply, bool /*Real*/)
 {
-    float amount = m_modifier.m_amount;
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, m_modifier.m_amount);
+    }
 
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
-
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, amount, apply);
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, m_modifier.m_amount, apply);
 
 #if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1) && (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4)
     // Blood Fury- Add aura to decrease attack power on remove
@@ -5021,25 +5049,27 @@ void Aura::HandleAuraModRangedAttackPower(bool apply, bool /*Real*/)
     if ((GetTarget()->GetClassMask() & CLASSMASK_WAND_USERS) != 0)
         return;
 
-    float amount = m_modifier.m_amount;
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, m_modifier.m_amount);
+    }
 
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
-
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, amount, apply);
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleAuraModAttackPowerPercent(bool apply, bool /*Real*/)
 {
-    float amount = m_modifier.m_amount;
-
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, m_modifier.m_amount);
+    }
 
     // UNIT_FIELD_ATTACK_POWER_MULTIPLIER = multiplier - 1
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, amount, apply);
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
@@ -5048,14 +5078,15 @@ void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
     if ((GetTarget()->GetClassMask() & CLASSMASK_WAND_USERS) != 0)
         return;
 
-    float amount = m_modifier.m_amount;
-
-    if (Unit* caster = GetCaster())
-        if (Player* modOwner = caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
+    if (apply)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, m_modifier.m_amount);
+    }
 
     // UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, amount, apply);
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, m_modifier.m_amount, apply);
 #endif
 }
 
@@ -6234,7 +6265,10 @@ void Aura::PeriodicDummyTick()
                 }
                 case 8067:                                  // Party Time!
                 {
-                    target->HandleEmoteCommand(PickRandomValue(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_DANCE));
+                    if (target->IsMoving())
+                        target->HandleEmoteCommand(PickRandomValue(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN, EMOTE_ONESHOT_LAUGH));
+                    else
+                        target->HandleEmoteCommand(PickRandomValue(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_DANCE));
                     return;
                 }
                 case 7057:                                  // Haunting Spirits
@@ -6695,7 +6729,7 @@ void SpellAuraHolder::SetStackAmount(uint32 stackAmount)
             if (Aura* aur = m_auras[i])
             {
                 int32 bp = aur->GetBasePoints();
-                int32 amount = m_stackAmount * caster->CalculateSpellDamage(target, m_spellProto, SpellEffectIndex(i), &bp);
+                int32 amount = m_stackAmount * caster->CalculateSpellEffectValue(target, m_spellProto, SpellEffectIndex(i), &bp);
                 // Reapply if amount change
                 if (amount != aur->GetModifier()->m_amount)
                 {

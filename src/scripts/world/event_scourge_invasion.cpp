@@ -182,7 +182,7 @@ public:
             return false;
 
         u->AddThreat(&i_obj, 1.0f);
-        u->ResetLastDamageTakenTime();
+        u->UpdateLeashExtensionTime();
         return false;
     }
 private:
@@ -218,7 +218,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         if (!m_creature->GetVictim() && m_creature->CanInitiateAttack())
             if (Unit* victim = who->GetVictim())
                 if (victim->GetEntry() == m_creature->GetEntry())
-                    if (who->IsTargetableForAttack())
+                    if (who->IsTargetable(true, false))
                         if (!who->IsWithinDistInMap(m_creature, 20.0f))
                             AttackStart(who);
    }
@@ -288,7 +288,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         }
 
         if (Creature* c = m_creature->GetVictim()->ToCreature())
-            c->ResetLastDamageTakenTime();
+            c->UpdateLeashExtensionTime();
         DoMeleeAttackIfReady();
     }
     void CorpseRemoved(uint32&) override

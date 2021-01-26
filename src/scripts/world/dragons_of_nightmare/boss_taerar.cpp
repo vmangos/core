@@ -106,7 +106,7 @@ bool boss_taerarAI::UpdateDragonAI(uint32 const uiDiff)
 {
     if (m_uiShadesTimeoutTimer)
     {
-        m_creature->ResetLastDamageTakenTime();
+        m_creature->UpdateLeashExtensionTime();
 
         if (m_uiShadesTimeoutTimer <= uiDiff)
             DoUnbanish();

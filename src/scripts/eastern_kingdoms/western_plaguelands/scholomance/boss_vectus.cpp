@@ -253,7 +253,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
             pMarduck->SetFactionTemplateId(FACTION_MONSTER);
 
         if (Creature* pVectus = m_creature->FindNearestCreature(NPC_VECTUS, 100.0f))
-			pVectus->SetFactionTemplateId(FACTION_MONSTER);
+            pVectus->SetFactionTemplateId(FACTION_MONSTER);
     }
 
     void JustDied(Unit* Killer) override

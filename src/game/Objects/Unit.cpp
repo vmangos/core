@@ -354,7 +354,7 @@ AutoAttackCheckResult Unit::CanAutoAttackTarget(Unit const* pVictim) const
 
     if (GetDistance2dToCenter(pVictim) > NO_FACING_CHECKS_DISTANCE)
     {
-        if (!HasInArc(2 * M_PI_F / 3, pVictim))
+        if (!HasInArc(pVictim, 2 * M_PI_F / 3))
             return ATTACK_RESULT_BAD_FACING;
     }
 
@@ -736,8 +736,6 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     {
         SetInCombatWithVictim(pVictim);
         pVictim->SetInCombatWithAggressor(this);
-        if (IsPlayer() && pVictim->IsCreature())
-            pVictim->ToCreature()->ResetLastDamageTakenTime();;
     }
     if (pVictim->IsCreature())
         pVictim->ToCreature()->CountDamageTaken(damage, GetCharmerOrOwnerOrOwnGuid().IsPlayer() || pVictim == this);
@@ -1637,7 +1635,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     DealDamage(pVictim, damageInfo->totalDamage, &cleanDamage, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->subDamage[0].damageSchoolMask), nullptr, durabilityLoss);
 
     // If this is a creature and it attacks from behind it has a probability to daze it's victim
-    if (damageInfo->totalDamage && !IsPlayer() && !((Creature*)this)->GetCharmerOrOwnerGuid() && !pVictim->HasInArc(M_PI_F, this))
+    if (damageInfo->totalDamage && !IsPlayer() && !((Creature*)this)->GetCharmerOrOwnerGuid() && !pVictim->HasInArc(this))
     {
         // -probability is between 0% and 40%
         // 20% base chance
@@ -2178,7 +2176,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
         return MELEE_HIT_CRIT;
     }
 
-    bool from_behind = !pVictim->HasInArc(M_PI_F, this);
+    bool from_behind = !pVictim->HasInArc(this);
 
     if (from_behind)
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: attack came from behind.");
@@ -2407,7 +2405,7 @@ void Unit::SendMeleeAttackStop(Unit* pVictim) const
 
 bool Unit::IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const* spellEntry, WeaponAttackType attackType) const
 {
-    if (!HasInArc(M_PI_F, pCaster))
+    if (!HasInArc(pCaster))
         return false;
 
     if (spellEntry)
@@ -2880,7 +2878,7 @@ bool Unit::IsBehindTarget(Unit const* pTarget, bool strict) const
         }
     }
 
-    return !pTarget->HasInArc(M_PI_F, this);
+    return !pTarget->HasInArc(this);
 }
 
 bool Unit::CantPathToVictim() const
@@ -3041,8 +3039,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
     SpellEntry const* aurSpellInfo = holder->GetSpellProto();
 
     // ghost spell check, allow apply any auras at player loading in ghost mode (will be cleanup after load)
-    if (!IsAlive() && !aurSpellInfo->IsDeathPersistentSpell() &&
-            !aurSpellInfo->IsDeathOnlySpell() &&
+    if (!IsAlive() && !aurSpellInfo->IsDeathPersistentSpell() && !aurSpellInfo->CanTargetDeadTarget() &&
             (!IsPlayer() || !((Player*)this)->GetSession()->PlayerLoading()))
     {
         delete holder;
@@ -4579,6 +4576,7 @@ void Unit::CombatStop(bool includingCast)
     {
         pCreature->UpdateCombatState(false);
         pCreature->UpdateCombatWithZoneState(false);
+        pCreature->ClearLastLeashExtensionTimePtr();
         pCreature->m_TargetNotReachableTimer = 0;
         if (pCreature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
             pCreature->ClearTemporaryFaction();
@@ -4692,6 +4690,20 @@ Unit* Unit::GetOwner() const
     return nullptr;
 }
 
+// Optimized version when we only want creature owner.
+// Check guid type before doing lookup for unit.
+Creature* Unit::GetOwnerCreature() const
+{
+    if (!IsInWorld())
+        return nullptr;
+
+    if (ObjectGuid ownerid = GetOwnerGuid())
+        if (ownerid.IsCreature())
+            return GetMap()->GetCreature(ownerid);
+
+    return nullptr;
+}
+
 Unit* Unit::GetCharmer() const
 {
     if (ObjectGuid charmerid = GetCharmerGuid())
@@ -4706,14 +4718,6 @@ Player* Unit::GetPossessor() const
             return ObjectAccessor::FindPlayer(possessor);
 
     return nullptr;
-}
-
-bool Unit::IsCharmerOrOwnerPlayerOrPlayerItself() const
-{
-    if (IsPlayer())
-        return true;
-
-    return GetCharmerOrOwnerGuid().IsPlayer();
 }
 
 Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
@@ -4834,7 +4838,7 @@ bool Unit::CanAttack(Unit const* target, bool force) const
     else if (!IsHostileTo(target))
         return false;
 
-    if (!target->IsAttackableByAOE(false, IsPlayer()) || target->HasUnitState(UNIT_STAT_DIED))
+    if (!target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()) || target->HasUnitState(UNIT_STAT_DIED))
         return false;
 
     // shaman totem quests: spell 8898, shaman can detect elementals but elementals cannot see shaman
@@ -5520,17 +5524,18 @@ void Unit::SetInCombatState(bool bPvP, Unit* pEnemy)
 
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
 
-    if (IsCharmed() || (!IsPlayer() && ((Creature*)this)->IsPet()))
+    if (IsCharmed() || (IsCreature() && ((Creature*)this)->IsPet()))
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+
     // set pet in combat
     if (Pet* pet = GetPet())
+    {
         if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
         {
-            pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
-
             if (IsPlayer() && pet->IsAlive() && pEnemy)
                 pet->AI()->OwnerAttacked(pEnemy);
         }
+    }
 
     // interrupt all delayed non-combat casts
     if (!wasInCombat)
@@ -5584,7 +5589,11 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
     }
 
     if (!touchOnly)
+    {
         SetInCombatWith(pAggressor);
+        if (Creature* pCreature = ToCreature())
+            pCreature->UpdateLeashExtensionTime();
+    }
 }
 
 void Unit::SetInCombatWithAssisted(Unit* pAssisted)
@@ -5666,9 +5675,12 @@ void Unit::ClearInCombat()
         static_cast<Player*>(this)->pvpInfo.inPvPCombat = false;
 }
 
-bool Unit::IsTargetableForAttack(bool inverseAlive /*=false*/, bool isAttackerPlayer /*=false*/) const
+bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool checkAlive) const
 {
-    if (!CanBeDetected())
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+        return false;
+
+    if (checkAlive && !IsAlive())
         return false;
 
     if (Player const* pPlayer = ToPlayer())
@@ -5677,103 +5689,29 @@ bool Unit::IsTargetableForAttack(bool inverseAlive /*=false*/, bool isAttackerPl
             return false;
     }
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
-        return false;
-
-    if (isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
-        return false;
-
-    if (!isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
-        return false;
-
-    // Players or their pets can attack feigned players
-    if (!isAttackerPlayer && HasUnitState(UNIT_STAT_DIED))
-        return false;
-
-    // inversealive is needed for some spells which need to be casted at dead targets (aoe)
-    if (IsAlive() == inverseAlive)
-        return false;
-
-    return IsInWorld() && !IsTaxiFlying();
-}
-
-// function based on function Unit::CanAttack from 13850 client
-bool Unit::IsValidAttackTarget(Unit const* target) const
-{
-    ASSERT(target);
-    // can't attack self
-    if (this == target)
-        return false;
-
-    if (FindMap() != target->FindMap())
-        return false;
-
-    // can't attack unattackable units or GMs
-    if (target->IsPlayer() && target->ToPlayer()->IsGameMaster())
-        return false;
-
-    // check flags
-    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
-        return false;
-
-    if (IsPlayer() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
-        return false;
-
-    // CvC case - can attack each other only when one of them is hostile
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
-        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
-
-    // PvP, PvC, CvP case
-    // can't attack friendly targets
-    if (GetReactionTo(target) > REP_NEUTRAL
-            || target->GetReactionTo(this) > REP_NEUTRAL)
-        return false;
-
-    Player const* playerAffectingAttacker = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) ? GetAffectingPlayer() : nullptr;
-    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) ? target->GetAffectingPlayer() : nullptr;
-
-    // Not all neutral creatures can be attacked
-    if (GetReactionTo(target) == REP_NEUTRAL &&
-            target->GetReactionTo(this) == REP_NEUTRAL)
+    if (forAttack)
     {
-        if (!(playerAffectingTarget && playerAffectingAttacker) &&
-                !(!playerAffectingTarget && !playerAffectingAttacker))
-        {
-            Player const* player = playerAffectingTarget ? playerAffectingTarget : playerAffectingAttacker;
-            Unit const* creature = playerAffectingTarget ? this : target;
+        if (!forAoE && !CanBeDetected())
+            return false;
 
-            if (FactionTemplateEntry const* factionTemplate = creature->getFactionTemplateEntry())
-            {
-                if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
-                    if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionTemplate->faction))
-                        if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
-                            if (!(repState->Flags & FACTION_FLAG_AT_WAR))
-                                return false;
+        if (!isAttackerPlayer && !forAoE && HasUnitState(UNIT_STAT_DIED))
+            return false;
 
-            }
-        }
+        // check flags
+        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
+            return false;
+
+        if (isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+            return false;
+
+        if (!isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+            return false;
+
+        if (IsTaxiFlying())
+            return false;
     }
 
-    // PvP checks
-    if (playerAffectingAttacker && playerAffectingTarget)
-    {
-        if (playerAffectingAttacker->duel && playerAffectingAttacker->duel->opponent == playerAffectingTarget && playerAffectingAttacker->duel->startTime != 0)
-            return true;
-
-        if (playerAffectingTarget->IsPvP())
-            return true;
-
-        if (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_FFA_PVP
-                && playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_FFA_PVP)
-            return true;
-
-        if (playerAffectingAttacker->IsFFAPvP() && playerAffectingTarget->IsFFAPvP())
-            return true;
-
-        return (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_UNK1)
-               || (playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS) & UNIT_BYTE2_FLAG_UNK1);
-    }
-    return true;
+    return IsInWorld();
 }
 
 int32 Unit::ModifyHealth(int32 dVal)
@@ -6152,7 +6090,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     float visibleDistance = IsPlayer() ? MaxStealthDetectRange : ((Creature*)this)->GetAttackDistance(target);
 
     //Always invisible from back (when stealth detection is on), also filter max distance cases
-    bool isInFront = distance < visibleDistance && HasInArc(M_PI_F, target);
+    bool isInFront = distance < visibleDistance && HasInArc(target);
     if (!isInFront)
         return false;
 
@@ -6467,7 +6405,7 @@ bool Unit::IsMovedByPlayer() const
         if (pPossessor->GetCharmGuid() == GetObjectGuid())
             return true;
 
-    return IsPlayer() && !static_cast<Player const*>(this)->GetSession()->GetBot();
+    return IsPlayer() && !static_cast<Player const*>(this)->IsBot();
 }
 
 PlayerMovementPendingChange::PlayerMovementPendingChange()
@@ -7010,7 +6948,7 @@ Unit* Unit::GetTauntTarget() const
         do
         {
             --aura;
-            if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) && caster->IsTargetableForAttack())
+            if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) && IsValidAttackTarget(caster))
             {
                 return caster;
                 break;
@@ -7069,7 +7007,7 @@ bool Unit::SelectHostileTarget()
     {
         for (const auto& itr : m_attackers)
         {
-            if (itr->IsInMap(this) && itr->IsTargetableForAttack())
+            if (itr->IsInMap(this) && itr->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()))
                 return false;
         }
     }
@@ -8211,7 +8149,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
             continue;
 
         SpellProcEventEntry const* spellProcEvent = nullptr;
-        if (!IsTriggeredAtSpellProcEvent(pTarget, itr.second, procSpell, procFlag, procExtra, attType, isVictim, spellProcEvent))
+        if (!IsTriggeredAtSpellProcEvent(pTarget, itr.second, procSpell, procFlag, procExtra, attType, isVictim, spellProcEvent, (spell && spell->IsTriggeredByAura())))
             continue;
 
         itr.second->SetInUse(true);                        // prevent holder deletion
@@ -8290,8 +8228,12 @@ void Unit::SendPetAIReaction()
 
 void Unit::StopMoving(bool force)
 {
+    if (!force && movespline->IsUninterruptible())
+        return;
+
     ClearUnitState(UNIT_STAT_MOVING);
     RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
+
     // not need send any packets if not in world
     if (!IsInWorld())
         return;
@@ -8388,6 +8330,8 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
 
         if (IsCreature())
             SetTargetGuid(ObjectGuid());
+        else if (ObjectGuid lootGuid = static_cast<Player*>(this)->GetLootGuid())
+            static_cast<Player*>(this)->GetSession()->DoLootRelease(lootGuid);
     }
     else
     {
@@ -8689,7 +8633,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radiu
     // remove not LoS targets
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if ((!IsWithinLOSInMap(*tIter)) || (inFront && !this->HasInArc(M_PI_F / 2, *tIter)) || (isValidAttackTarget && !IsValidAttackTarget(*tIter)))
+        if ((!IsWithinLOSInMap(*tIter)) || (inFront && !this->HasInArc(*tIter, M_PI_F / 2)) || (isValidAttackTarget && !IsValidAttackTarget(*tIter)))
         {
             std::list<Unit*>::iterator tIter2 = tIter;
             ++tIter;
@@ -9069,6 +9013,16 @@ void Unit::MonsterMoveWithSpeed(float x, float y, float z, float o, float speed,
 {
     Movement::MoveSplineInit init(*this, "MonsterMoveWithSpeed");
     init.MoveTo(x, y, z, options);
+    if (options & MOVE_WALK_MODE)
+        init.SetWalk(true);
+    if (options & MOVE_RUN_MODE)
+        init.SetWalk(false);
+    if (options & MOVE_FLY_MODE)
+        init.SetFly();
+    if (options & MOVE_FALLING)
+        init.SetFall();
+    if (options & MOVE_CYCLIC)
+        init.SetCyclic();
     if (speed > 0.0f)
         init.SetVelocity(speed);
     if (o > -7.0f)
@@ -9429,24 +9383,6 @@ uint32 Unit::RespawnNearCreaturesByEntry(uint32 entry, float range)
     return count;
 }
 
-bool Unit::IsWithinMeleeRange(Unit const* obj, float dist) const
-{
-    if (!obj || !IsInMap(obj))
-        return false;
-
-    float dx = GetPositionX() - obj->GetPositionX();
-    float dy = GetPositionY() - obj->GetPositionY();
-    float dz = GetPositionZ() - obj->GetPositionZ();
-    float distsq = dx * dx + dy * dy + dz * dz;
-
-    float maxdist = dist + BASE_MELEERANGE_OFFSET + GetMeleeReach() + obj->GetObjectBoundingRadius();
-
-    if (maxdist < ATTACK_DISTANCE)
-        maxdist = ATTACK_DISTANCE;
-
-    return distsq < maxdist * maxdist;
-}
-
 // TriniyCore
 void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float &z) const
 {
@@ -9627,27 +9563,6 @@ bool Unit::IsCaster() const
         default:
             return false;
     }
-}
-
-bool Unit::IsAttackableByAOE(bool requireDeadTarget, bool isCasterPlayer) const
-{
-    if (IsAlive() == requireDeadTarget)
-        return false;
-
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
-        return false;
-
-    if (isCasterPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
-        return false;
-
-    if (!isCasterPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
-        return false;
-
-    if (Player const* pPlayer = ToPlayer())
-        if (pPlayer->IsGameMaster())
-            return false;
-
-    return true;
 }
 
 bool Unit::IsImmuneToSchoolMask(uint32 schoolMask) const

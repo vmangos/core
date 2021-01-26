@@ -88,7 +88,7 @@ bool FollowerAI::AssistPlayerInCombat(Unit* pWho)
 
 void FollowerAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (pWho->IsTargetableForAttack() && pWho->IsInAccessablePlaceFor(m_creature))
+    if (pWho->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()) && pWho->IsInAccessablePlaceFor(m_creature))
     {
         // AssistPlayerInCombat can start, so return if true
         if (HasFollowState(STATE_FOLLOW_INPROGRESS) && AssistPlayerInCombat(pWho))
@@ -103,7 +103,7 @@ void FollowerAI::MoveInLineOfSight(Unit* pWho)
         if (m_creature->IsHostileTo(pWho))
         {
             float fAttackRadius = m_creature->GetAttackDistance(pWho);
-            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius) && m_creature->IsWithinLOSInMap(pWho))
+            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius) && m_creature->IsWithinLOSInMap(pWho, true, true))
             {
                 if (!m_creature->GetVictim())
                 {

@@ -659,7 +659,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit* pWho)
             UpdateEventsOn_MoveInLineOfSight(pWho);
 
         if (m_bCanSummonGuards && pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()) &&
-            m_creature->IsHostileTo(pWho) && pWho->IsTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
+            m_creature->IsHostileTo(pWho) && pWho->IsTargetable(true, false) && m_creature->IsWithinLOSInMap(pWho, true, true))
         {
             m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
         } 
@@ -675,19 +675,19 @@ void CreatureEventAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->CanFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack())
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false))
     {
         float attackRadius = m_creature->GetAttackDistance(pWho);
         if (m_creature->IsWithinDistInMap(pWho, attackRadius) && m_creature->IsHostileTo(pWho))
         {
             if (!m_creature->GetVictim())
             {
-                if (m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
+                if (m_creature->IsWithinLOSInMap(pWho, true, true) && pWho->IsInAccessablePlaceFor(m_creature))
                     AttackStart(pWho);
             }
             else if (m_creature->GetMap()->IsDungeon())
             {
-                if (m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
+                if (m_creature->IsWithinLOSInMap(pWho, true, true) && pWho->IsInAccessablePlaceFor(m_creature))
                 {
                     m_creature->AddThreat(pWho);
                     pWho->SetInCombatWith(m_creature);
@@ -712,7 +712,7 @@ void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
                 //if friendly event&&who is not hostile OR hostile event&&who is hostile
                 if ((itr.Event.ooc_los.noHostile && !m_creature->IsHostileTo(pWho)) ||
                     (!itr.Event.ooc_los.noHostile && m_creature->IsHostileTo(pWho)))
-                    if (m_creature->IsWithinLOSInMap(pWho))
+                    if (m_creature->IsWithinLOSInMap(pWho, true, true))
                         ProcessEvent(itr, pWho);
             }
         }

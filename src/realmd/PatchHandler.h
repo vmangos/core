@@ -26,6 +26,8 @@
 #ifndef _PATCHHANDLER_H_
 #define _PATCHHANDLER_H_
 
+#include "Config/Config.h"
+
 #include <ace/Basic_Types.h>
 #include <ace/Synch_Traits.h>
 #include <ace/Svc_Handler.h>

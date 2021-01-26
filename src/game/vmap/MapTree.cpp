@@ -36,8 +36,8 @@ public:
     MapRayCallback(ModelInstance* val, bool isLos): prims(val), hit(false), los(isLos) {}
     bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
-        // Nostalrius: pas de LoS pour certains models (arbres, ...)
-        if (los && prims[entry].flags & MOD_NO_BREAK_LOS)
+        // No LoS for some models (trees, fences, ...)
+        if (los && (prims[entry].flags & MOD_NO_BREAK_LOS))
             return false;
 
         bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
@@ -62,7 +62,7 @@ public:
     bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
         bool hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
-        if (hit && (!result || result->flags & MOD_NO_BREAK_LOS))
+        if (hit && (!result || ((result->flags & MOD_NO_BREAK_LOS))))
             result = &prims[entry];
         return hit;
     }
@@ -208,7 +208,7 @@ bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, b
 }
 //=========================================================
 
-bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) const
+bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2, bool includingM2Objects) const
 {
     float maxDist = (pos2 - pos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
@@ -218,7 +218,7 @@ bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) co
         return true;
     // direction with length of 1
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
-    return !getIntersectionTime(ray, maxDist, true, true);
+    return !getIntersectionTime(ray, maxDist, true, !includingM2Objects);
 }
 //=========================================================
 /**

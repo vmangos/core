@@ -103,6 +103,7 @@ class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMo
         void _reachTarget(T &);
     private:
         ShortTimeTracker m_spreadTimer{ 0 };
+        ShortTimeTracker m_leashExtensionTimer{ 5000 };
         bool m_bIsSpreading = false;
         bool m_bCanSpread = true;
         uint8 m_uiSpreadAttempts = 0;

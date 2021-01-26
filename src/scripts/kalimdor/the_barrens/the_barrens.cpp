@@ -590,15 +590,18 @@ enum
 
     GOSSIP_ITEM_START       = 4793,
 
-    SAY_BEWARE              = -1780211,
-    SAY_DEFENDER_FALLEN     = -1780212,
-    EMOTE_CHARGE            = -1780213,
-    YELL_HALF_WAY           = -1780214,
-    SAY_DEFEND              = -1780215,
-    SAY_FOES                = -1780216,
-    SAY_HORDE               = -1780217,
-    YELL_KOLKAR_STRONGEST   = -1780218,
-    YELL_RETREATING         = -1780219,
+    SAY_BEWARE              = 4926,
+    SAY_DEFENDER_FALLEN     = 4757,
+    EMOTE_CHARGE            = 1254,
+    YELL_HALF_WAY           = 8439,
+    SAY_DEFEND              = 4922,
+    SAY_AGGRO_FOES          = 4925,
+    SAY_AGGRO_FOR_HORDE     = 8283,
+    SAY_AGGRO_BEWARE        = 4924,
+    YELL_WARLORD_KROMZAR    = 4919,
+    YELL_RETREATING         = 8897,
+
+    SOUND_HORDE_DEFENDER_AGGRO = 7120,
 
     QUEST_COUNTERATTACK     = 4021,
     GO_KOLKAR_BANNER        = 164690
@@ -849,7 +852,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
                             c->SetRespawnDelay(120);
                         }
                     }
-                    DoScriptText(YELL_KOLKAR_STRONGEST, kromzar);
+                    DoScriptText(YELL_WARLORD_KROMZAR, kromzar);
                 }
                 else
                 {
@@ -1071,9 +1074,31 @@ struct npc_axe_throwerAI : public ScriptedAI
     }
     void Aggro(Unit *who) override
     {
-        if (urand(0, 1))
-            DoScriptText(urand(0, 1) ? SAY_HORDE : SAY_FOES, m_creature);
+        /*
+         
+        TODO: Not sure when these texts are acutally broadcasted
+
+        uint32 aggroText = 0;
+        switch (urand(0, 3))
+        {
+        case 0:
+            aggroText = SAY_AGGRO_FOR_HORDE;
+            break;
+        case 1:
+            aggroText = SAY_AGGRO_FOES;
+            break;
+        case 2:
+            aggroText = SAY_AGGRO_BEWARE;
+            break;
+        }
+        DoScriptText(aggroText, m_creature);
+
+        */
+
+        if(urand(0, 1)) // not always play aggro sound, TODO: npc=9457/horde-defender should have this as aggro sound as well
+        m_creature->PlayDirectSound(SOUND_HORDE_DEFENDER_AGGRO);
     }
+
     uint32 throwTimer;
     void UpdateAI(uint32 const uiDiff) override
     {
@@ -1133,53 +1158,6 @@ struct npc_warlord_kromzarAI : public ScriptedAI
 CreatureAI* GetAI_npc_warlord_kromzar(Creature* pCreature)
 {
     return new npc_warlord_kromzarAI(pCreature);
-}
-
-/*######
-## npc_razormane_stalker
-######*/
-
-#define SPELL_STEALTH                1784
-#define SPELL_SINISTERSTRIKE         15667
-#define NPC_RAZORMANE_STALKER        3457
-
-struct npc_razormane_stalkerAI : public ScriptedAI
-{
-    npc_razormane_stalkerAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
-
-    uint32 SinisterStrike_Timer;
-    uint32 SinisterStrike_Counter;
-
-    void Reset() override
-    {
-        SinisterStrike_Timer = 8000;
-        SinisterStrike_Counter = 0;
-        DoCastSpellIfCan(m_creature, SPELL_STEALTH);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (SinisterStrike_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SINISTERSTRIKE);
-            SinisterStrike_Counter += 1;
-            if (SinisterStrike_Counter == 1) SinisterStrike_Timer = 15000;
-            else if (SinisterStrike_Counter == 2) SinisterStrike_Timer = 12000;
-            else SinisterStrike_Timer = 15000;
-        }
-        else SinisterStrike_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_razormane_stalker(Creature* pCreature)
-{
-    return new npc_razormane_stalkerAI(pCreature);
 }
 
 /*
@@ -1423,11 +1401,6 @@ void AddSC_the_barrens()
     newscript = new Script;
     newscript->Name = "npc_warlord_kromzar";
     newscript->GetAI = &GetAI_npc_warlord_kromzar;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_razormane_stalker";
-    newscript->GetAI = &GetAI_npc_razormane_stalker;
     newscript->RegisterSelf();
 
     newscript = new Script;

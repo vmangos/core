@@ -175,7 +175,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/uldaman/uldaman.cpp
     eastern_kingdoms/undercity/undercity.cpp
     eastern_kingdoms/western_plaguelands/western_plaguelands.cpp
-    eastern_kingdoms/western_plaguelands/scholomance/boss_darkmaster_gandling.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_doctor_theolen_krastinov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_illucia_barov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_instructor_malicia.cpp
@@ -202,7 +201,6 @@ set (SCRIPTS_SRCS
     kalimdor/desolace/maraudon/boss_celebras_the_cursed.cpp
     kalimdor/desolace/maraudon/boss_landslide.cpp
     kalimdor/desolace/maraudon/boss_noxxion.cpp
-    kalimdor/desolace/maraudon/boss_princess_theradras.cpp
     kalimdor/desolace/maraudon/instance_maraudon.cpp
     kalimdor/desolace/maraudon/maraudon.cpp
     kalimdor/durotar/durotar.cpp

@@ -180,7 +180,7 @@ void WorldSession::HandleGMSurveySubmitOpcode(WorldPacket& recvData)
             continue;
 
         static SqlStatementID insSubSurvey;
-        SqlStatement stmt = CharacterDatabase.CreateStatement(insSubSurvey, "INSERT INTO gm_subsurveys (surveyId, subsurveyId, rank, comment) VALUES (?, ?, ?, ?)");
+        SqlStatement stmt = CharacterDatabase.CreateStatement(insSubSurvey, "INSERT INTO `gm_subsurveys` (`surveyId`, `subsurveyId`, `rank`, `comment`) VALUES (?, ?, ?, ?)");
         stmt.addUInt32(nextSurveyID);
         stmt.addUInt32(subSurveyId);
         stmt.addUInt32(rank);
@@ -192,7 +192,7 @@ void WorldSession::HandleGMSurveySubmitOpcode(WorldPacket& recvData)
     recvData >> comment;
 
     static SqlStatementID insSurvey;
-    SqlStatement stmt = CharacterDatabase.CreateStatement(insSurvey, "INSERT INTO gm_surveys (guid, surveyId, mainSurvey, overallComment, createTime) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(NOW()))");
+    SqlStatement stmt = CharacterDatabase.CreateStatement(insSurvey, "INSERT INTO `gm_surveys` (`guid`, `surveyId`, `mainSurvey`, `overallComment`, `createTime`) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(NOW()))");
     stmt.addUInt32(GetPlayer()->GetGUIDLow());
     stmt.addUInt32(nextSurveyID);
     stmt.addUInt32(mainSurvey);

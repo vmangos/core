@@ -851,7 +851,7 @@ class Unit : public WorldObject
         bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final;
         bool IsEffectResist(SpellEntry const* spell, int eff) const; // SPELL_AURA_MOD_MECHANIC_RESISTANCE
         
-        bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent) const;
+        bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool dontTriggerSpecial) const;
         // only to be used in proc handlers - basepoints is expected to be a MAX_EFFECT_INDEX sized array
         SpellAuraProcResult TriggerProccedSpell(Unit* target, int32* basepoints, uint32 triggeredSpellId, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredByParent = nullptr);
         SpellAuraProcResult TriggerProccedSpell(Unit* target, int32* basepoints, SpellEntry const* spellInfo, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredByParent = nullptr);
@@ -1022,11 +1022,8 @@ class Unit : public WorldObject
         void AddExtraAttackOnUpdate() { m_doExtraAttacks = true; };
 
         bool CanAttack(Unit const* target, bool force = false) const;
-        bool IsValidAttackTarget(Unit const* target) const final;
-        bool IsTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
-        bool IsAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
+        bool IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE = false, bool checkAlive = true) const;
 
-        bool IsWithinMeleeRange(Unit const* obj, float dist = 0.0f) const;
         bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
         float GetMeleeReach() const;
@@ -1209,6 +1206,7 @@ class Unit : public WorldObject
         CharmInfo* InitCharmInfo(Unit* charm);
 
         Unit* GetOwner() const;
+        Creature* GetOwnerCreature() const;
         ObjectGuid const& GetOwnerGuid() const { return  GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
         void SetOwnerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_SUMMONEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
         ObjectGuid const& GetCreatorGuid() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
@@ -1245,8 +1243,7 @@ class Unit : public WorldObject
         ObjectGuid const& GetCharmerGuid() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
         void SetCharmerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
         bool IsCharmed() const { return !GetCharmerGuid().IsEmpty(); }
-        bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
-        bool IsCharmedOwnedByPlayerOrPlayer() const { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
+        bool IsCharmerOrOwnerPlayerOrPlayerItself() const final { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {

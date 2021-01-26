@@ -23,7 +23,8 @@ enum
 
     INSTANCE_DIRE_MAUL_MAX_ENCOUNTER = 12,
 
-    DATA_TANNIN_LOOTED     = 13,
+    DATA_TANNIN_LOOTED            = 13,
+    DATA_DREADSTEED_RITUAL_PLAYER = 14,
 
     // DM East
     NPC_OLD_IRONBARK       = 11491,
@@ -58,6 +59,7 @@ enum
     GO_CRISTAL_3_EVENT     = 177258,
     GO_CRISTAL_4_EVENT     = 179504,
     GO_CRISTAL_5_EVENT     = 179505,
+    GO_RITUAL_CANDLE_AURA  = 179688, // invis trap - true caster of 23226
 
     // DM North
     NPC_GUARD_MOLDAR       = 14326,
@@ -148,6 +150,9 @@ class instance_dire_maul : public ScriptedInstance
         uint64 m_uiImmolTharGUID;
         uint64 m_uiTortheldrinGUID;
         uint64 m_auiCristalsGUID[MAX_CRISTALS];
+        uint64 m_uiRitualCandleAuraGUID;
+        uint64 m_uiRitualPlayerGUID;
+
         std::list<uint64> m_alCristalsEventtMobGUIDSorted[MAX_CRISTALS];
         std::list<uint64> m_lCristalsEventtMobGUIDList;
         std::list<uint64> m_lImmolTharGardiensMobGUIDList;

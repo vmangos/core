@@ -135,7 +135,7 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* pWho)
 
 void npc_escortAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (pWho->IsTargetableForAttack() && pWho->IsInAccessablePlaceFor(m_creature))
+    if (pWho->IsTargetable(true, false) && pWho->IsInAccessablePlaceFor(m_creature))
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombat(pWho))
             return;
@@ -148,7 +148,7 @@ void npc_escortAI::MoveInLineOfSight(Unit* pWho)
         if (m_creature->IsHostileTo(pWho))
         {
             float fAttackRadius = m_creature->GetAttackDistance(pWho);
-            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius) && m_creature->IsWithinLOSInMap(pWho))
+            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius) && m_creature->IsWithinLOSInMap(pWho, true, true))
             {
                 if (!m_creature->GetVictim())
                 {

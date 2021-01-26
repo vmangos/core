@@ -393,8 +393,8 @@ bool AreaTrigger_at_scent_larkorwi(Player* pPlayer, AreaTriggerEntry const* pAt)
 
 enum
 {
-	SPELL_MERGING_OOZES = 16032,
-	NPC_PRIMAL_OOZE = 6557
+    SPELL_MERGING_OOZES = 16032,
+    NPC_PRIMAL_OOZE = 6557
 };
 
 struct mob_captured_felwood_oozeAI : public ScriptedAI
@@ -510,7 +510,7 @@ struct npc_precious_the_devourerAI : public ScriptedAI
         if (Creature* pSimone = m_creature->GetMap()->GetCreature(m_simoneGuid))
         {
             if (pSimone->IsAlive())
-                pSimone->ResetLastDamageTakenTime();
+                pSimone->UpdateLeashExtensionTime();
         }
     }
 
@@ -713,7 +713,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         if (Creature* pPrecious = m_creature->GetMap()->GetCreature(m_preciousGuid))
         {
             if (pPrecious->IsAlive())
-                pPrecious->ResetLastDamageTakenTime();
+                pPrecious->UpdateLeashExtensionTime();
         }
     }
     

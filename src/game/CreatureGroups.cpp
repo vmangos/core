@@ -251,14 +251,14 @@ void CreatureGroup::DisbandGroup(Creature* pMember)
 
 void CreatureGroup::DeleteFromDb()
 {
-    WorldDatabase.PExecute("DELETE FROM creature_groups WHERE leader_guid=%u", m_originalLeaderGuid.GetCounter());
+    WorldDatabase.PExecute("DELETE FROM `creature_groups` WHERE `leader_guid`=%u", m_originalLeaderGuid.GetCounter());
 }
 
 void CreatureGroup::SaveToDb()
 {
     DeleteFromDb();
     for (const auto& itr : m_members)
-        WorldDatabase.PExecute("INSERT INTO creature_groups SET leader_guid=%u, member_guid=%u, dist='%f', angle='%f', flags=%u",
+        WorldDatabase.PExecute("INSERT INTO `creature_groups` SET `leader_guid`=%u, `member_guid`=%u, `dist`='%f', `angle`='%f', `flags`=%u",
                                m_originalLeaderGuid.GetCounter(), itr.first.GetCounter(), itr.second->followDistance, itr.second->followAngle, itr.second->memberFlags);
 }
 

@@ -715,6 +715,9 @@ uint32 BattleGround::GetBattlemasterEntry() const
 
 void BattleGround::RewardMark(Player* pPlayer, bool winner)
 {
+    if (pPlayer->IsBot())
+        return;
+
     if (winner)
         RewardSpellCast(pPlayer, pPlayer->GetTeamId() ? GetHordeWinSpell() : GetAllianceWinSpell());
     else

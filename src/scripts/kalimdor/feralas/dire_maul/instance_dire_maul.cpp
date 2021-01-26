@@ -25,6 +25,8 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiForceFieldGUID(0),
     m_uiImmolTharGUID(0),
     m_uiTortheldrinGUID(0),
+    m_uiRitualCandleAuraGUID(0),
+    m_uiRitualPlayerGUID(0),
     
     // North
     m_uiGuardAliveCount(6),
@@ -160,6 +162,9 @@ void instance_dire_maul::OnObjectCreate(GameObject* pGo)
             break;
         case GO_BROKEN_TRAP:
             m_uiBrokenTrapGUID = pGo->GetGUID();
+            break;
+        case GO_RITUAL_CANDLE_AURA:
+            m_uiRitualCandleAuraGUID = pGo->GetGUID();
             break;
         default:
             break;
@@ -451,6 +456,7 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
 #ifdef DEBUG_ON
     sLog.outString("SetData64(%u, %u) data is %u", uiType, uiData, GetData(TYPE_CRISTAL_EVENT));
 #endif
+
     if (uiType == TYPE_CRISTAL_EVENT && GetData(TYPE_CRISTAL_EVENT) == NOT_STARTED)
         DoSortCristalsEventMobs();
 
@@ -477,6 +483,9 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
         if (!uiNotEmptyRoomsCount)
             SetData(TYPE_CRISTAL_EVENT, DONE);
     }
+
+    if (uiType == DATA_DREADSTEED_RITUAL_PLAYER)
+        m_uiRitualPlayerGUID = uiData;
 }
 
 void instance_dire_maul::Load(char const* chrIn)
@@ -528,6 +537,10 @@ uint64 instance_dire_maul::GetData64(uint32 uiType)
             return m_uiForceFieldGUID;
         case GO_MAGIC_VORTEX:
             return m_uiMagicVortexGUID;
+        case GO_RITUAL_CANDLE_AURA:
+            return m_uiRitualCandleAuraGUID;
+        case DATA_DREADSTEED_RITUAL_PLAYER:
+            return m_uiRitualPlayerGUID;
     }
     return 0;
 }
@@ -2087,7 +2100,7 @@ struct npc_alzzins_minionAI : ScriptedAI
     {
         if (!m_creature->IsInCombat())
         {
-            if (pWho->IsPlayer() && pWho->IsTargetableForAttack() && m_creature->IsWithinDistInMap(pWho, 30.0f) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsPlayer() && pWho->IsTargetable(true, false) && m_creature->IsWithinDistInMap(pWho, 30.0f) && m_creature->IsWithinLOSInMap(pWho))
                 m_creature->AttackedBy(pWho);
         }
     }
@@ -2109,13 +2122,13 @@ CreatureAI* GetAI_boss_alzzin_the_wildshaper(Creature* pCreature)
 
 CreatureAI* GetAI_npc_alzzins_minion(Creature* pCreature)
 {
-	return new npc_alzzins_minionAI(pCreature);
+    return new npc_alzzins_minionAI(pCreature);
 }
 
 enum
 {
-	SPELL_CHARGE = 22911,
-	SPELL_MAUL = 17156
+    SPELL_CHARGE = 22911,
+    SPELL_MAUL = 17156
 };
 
 struct boss_ferraAI : public ScriptedAI
@@ -2136,7 +2149,7 @@ struct boss_ferraAI : public ScriptedAI
         m_uiCharge_Timer        = 0;
         m_uiMaul_Timer          = urand(5000, 10000);
 
-		m_creature->SetNoCallAssistance(true);
+        m_creature->SetNoCallAssistance(true);
     }   
 
     void MoveInLineOfSight(Unit *pWho) override
@@ -2144,7 +2157,7 @@ struct boss_ferraAI : public ScriptedAI
         if (!m_creature->IsInCombat()) 
         {
             if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 80.0f) && m_creature->IsWithinLOSInMap(pWho)
-            &&  pWho->IsTargetableForAttack())
+            &&  pWho->IsTargetable(true, false))
             {
                 // don't aggro people through the floor, ever!
                 if ((m_creature->GetPositionZ() - pWho->GetPositionZ()) < 10.0f)

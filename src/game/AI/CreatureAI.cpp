@@ -68,7 +68,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, 
             return CAST_FAIL_POWER;
     }
 
-    if (pSpell->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(M_PI_F, m_creature))
+    if (pSpell->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(m_creature))
         return CAST_FAIL_OTHER;
 
     // If the spell requires the target having a specific power type
@@ -220,7 +220,7 @@ void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
             // Checked on startup.
             SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(spell.spellId);
 
-            Unit* pTarget = ToUnit(GetTargetByType(m_creature, m_creature, spell.castTarget, spell.targetParam1 ? spell.targetParam1 : sSpellRangeStore.LookupEntry(pSpellInfo->rangeIndex)->maxRange, spell.targetParam2));
+            Unit* pTarget = ToUnit(GetTargetByType(m_creature, m_creature, m_creature->GetMap(), spell.castTarget, spell.targetParam1, spell.targetParam2, pSpellInfo));
 
             SpellCastResult result = m_creature->TryToCast(pTarget, pSpellInfo, spell.castFlags, spell.probability);
             

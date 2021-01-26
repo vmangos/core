@@ -158,7 +158,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         {
             m_uiShootTimer = 1000;
 
-            if (!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
 
         }

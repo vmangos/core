@@ -748,7 +748,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, uint32 playerGuid, QuestItem** q
             if (qitem)
                 *qitem = qitem2;
             item = &m_questItems[qitem2->index];
-            is_looted = item->is_looted;
+            is_looted = item->is_looted || qitem2->is_looted;
         }
     }
     else

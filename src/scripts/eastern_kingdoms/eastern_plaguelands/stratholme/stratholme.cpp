@@ -296,7 +296,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
                     m_creature->HandleEmoteCommand(EMOTE_STATE_DANCE);
                 break;
             case TEXTEMOTE_RUDE:
-                if (m_creature->IsWithinMeleeRange(pPlayer))
+                if (m_creature->CanReachWithMeleeAutoAttack(pPlayer))
                     m_creature->CastSpell(pPlayer, SPELL_SLAP, false);
                 else
                     m_creature->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);

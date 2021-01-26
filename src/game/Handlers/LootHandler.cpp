@@ -310,6 +310,9 @@ void WorldSession::HandleLootOpcode(WorldPacket& recv_data)
     if (!_player->IsInWorld())
         return;
 
+    if (_player->IsNonMeleeSpellCasted())
+        _player->InterruptNonMeleeSpells(false);
+
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
 
@@ -327,11 +330,14 @@ void WorldSession::HandleLootReleaseOpcode(WorldPacket& recv_data)
 
 void WorldSession::DoLootRelease(ObjectGuid lguid)
 {
-    Player  *player = GetPlayer();
-    Loot    *loot;
+    Player*  player = GetPlayer();
+    Loot*    loot;
 
     player->SetLootGuid(ObjectGuid());
-    player->SendLootRelease(lguid);
+
+    // for disenchanted items first show loot as removed before release
+    if (lguid.GetHigh() != HIGHGUID_ITEM)
+        player->SendLootRelease(lguid);
 
     player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 
@@ -342,10 +348,8 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     {
         case HIGHGUID_GAMEOBJECT:
         {
-            GameObject* go = GetPlayer()->GetMap()->GetGameObject(lguid);
-
-            // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
-            if (!go || ((go->GetOwnerGuid() != _player->GetObjectGuid() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
+            GameObject* go = player->GetMap()->GetGameObject(lguid);
+            if (!go)
                 return;
 
             loot = &go->loot;
@@ -432,7 +436,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         case HIGHGUID_CORPSE:                               // ONLY remove insignia at BG
         {
             Corpse* corpse = _player->GetMap()->GetCorpse(lguid);
-            if (!corpse || !corpse->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+            if (!corpse)
                 return;
 
             loot = &corpse->loot;
@@ -476,14 +480,13 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                     break;
                 }
             }
+            player->SendLootRelease(lguid);
             return;                                         // item can be looted only single player
         }
         case HIGHGUID_UNIT:
         {
-            Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
-
-            bool ok_loot = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->lootForPickPocketed);
-            if (!ok_loot || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
+            Creature* creature = player->GetMap()->GetCreature(lguid);
+            if (!creature)
                 return;
 
             loot = &creature->loot;
@@ -526,7 +529,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         }
     }
 
-    //Player is not looking at loot list, he doesn't need to see updates on the loot list
+    // Player is not looking at loot list, he doesn't need to see updates on the loot list
     loot->RemoveLooter(player->GetObjectGuid());
 }
 
