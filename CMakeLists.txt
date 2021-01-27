@@ -18,7 +18,7 @@
 project(MaNGOS)
 
 # CMake policies
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
@@ -33,7 +33,12 @@ option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
-option(PCH "Use precompiled headers" 1)
+
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+    option(PCH "Use precompiled headers" ON)
+else()
+    option(PCH "Use precompiled headers" OFF)
+endif()
 
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
@@ -242,6 +247,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Progression.h.cmake ${CMAKE_CUR
 
 # Generate migrations list
 include(cmake/migrations.cmake)
+
+if (PCH AND (${CMAKE_VERSION} VERSION_LESS "3.16"))
+    message(FATAL_ERROR "Precompiled headers require CMake 3.16 or newer (${CMAKE_VERSION} used). Set PCH to OFF or update your cmake installation.")
+endif()
 
 message(STATUS "")
 message(STATUS "Core revision: ${rev_hash} ${rev_date} ")
