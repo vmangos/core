@@ -20,7 +20,7 @@ INSERT INTO `migrations` VALUES ('20210113090439');
 -- 		H [60] Cairne's Hoofprint q.925
 -- 			H [60] A Warden of the Horde q.5502
 
-UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=0, NextQuestId=0, ExclusiveGroup=0, NextQuestInChain=0, RequiredCondition=0 WHERE entry=172; -- Children's Week (Horde)
+UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=0, NextQuestId=0, ExclusiveGroup=0, NextQuestInChain=0, RequiredCondition=0 WHERE entry=172 && `patch`>=2; -- Children's Week (Horde)
 
 UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=172, NextQuestId=0, ExclusiveGroup=0, NextQuestInChain=0, RequiredCondition=0 WHERE entry=911; -- Gateway to the Frontier
 UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=172, NextQuestId=0, ExclusiveGroup=0, NextQuestInChain=0, RequiredCondition=0 WHERE entry=910; -- Down at the Docks
@@ -65,7 +65,7 @@ INSERT INTO conditions (condition_entry, type, value1, value2, value3, value4) V
 UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=0, NextQuestId=171, ExclusiveGroup=-4822, NextQuestInChain=0, RequiredCondition=10236 WHERE entry=4822; -- You Scream, I Scream...
 UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=0, NextQuestId=171, ExclusiveGroup=-4822, NextQuestInChain=0, RequiredCondition=10236 WHERE entry=558; -- Jaina's Autograph
 
-UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=0, NextQuestId=0, ExclusiveGroup=0, NextQuestInChain=0, RequiredCondition=0 WHERE entry=171; -- A Warden of the Alliance
+UPDATE quest_template SET MinLevel=10, QuestLevel=60, PrevQuestId=0, NextQuestId=0, ExclusiveGroup=0, NextQuestInChain=0, RequiredCondition=0 WHERE entry=171 && `patch`>=2; -- A Warden of the Alliance
 
 
 -- End of migration.
