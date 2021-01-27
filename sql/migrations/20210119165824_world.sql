@@ -5960,6 +5960,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- remove unneeded wander distance
 UPDATE `creature` SET `wander_distance` = 0 WHERE `movement_type` = 2;
 
+-- fix incorrect creature coordinates that cause db error
+UPDATE `creature` SET `position_x` = -11635.7, `position_y` = 639.049, `position_z` = 51.2367 WHERE `guid` = 1083;
+
 
 -- End of migration.
 END IF;
