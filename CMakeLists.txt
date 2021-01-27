@@ -18,7 +18,7 @@
 project(MaNGOS)
 
 # CMake policies
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
@@ -33,8 +33,6 @@ option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
-
-find_package(PCHSupport)
 
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
@@ -97,13 +95,8 @@ if(WIN32)
 endif()
 
 # Add options for compile of mangos
-if(PCHSupport_FOUND)
-  if(WIN32)
-    option(PCH "Use precompiled headers" 1)
-  else()
-    option(PCH "Use precompiled headers" 0)
-  endif()
-endif()
+
+option(PCH "Use precompiled headers" 1)
 
 # Set up the install-prefix
 if(CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
@@ -258,15 +251,6 @@ message(STATUS "Core revision: ${rev_hash} ${rev_date} ")
 message(STATUS "Supported version: ${supported_build}")
 message(STATUS "Install server to: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "")
-
-if(PCH AND NOT PCHSupport_FOUND)
-  set(PCH 0 CACHE BOOL
-    "Use precompiled headers"
-    FORCE)
-  message(STATUS
-    "No PCH for your system possible but PCH was set to 1. Resetting it."
-  )
-endif()
 
 if(PCH)
   message(STATUS "Use PCH               : Yes")
