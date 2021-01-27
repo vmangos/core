@@ -38,14 +38,6 @@ ThreadPool::~ThreadPool()
     m_waitForWork.notify_all();
 }
 
-template struct ThreadPool::worker_mysql<ThreadPool::SingleQueue>;
-template struct ThreadPool::worker_mysql<ThreadPool::MultiQueue>;
-
-template void ThreadPool::start<ThreadPool::SingleQueue>();
-template void ThreadPool::start<ThreadPool::MultiQueue>();
-template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::SingleQueue>>();
-template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-
 std::future<void> ThreadPool::processWorkload(Callable pre, Callable post)
 {
     if (m_clearMode == ClearMode::AT_NEXT_WORKLOAD &&
@@ -274,3 +266,12 @@ void ThreadPool::worker_mysql<T>::doWork()
     T::doWork();
     mysql_thread_end();
 }
+
+
+template struct ThreadPool::worker_mysql<ThreadPool::SingleQueue>;
+template struct ThreadPool::worker_mysql<ThreadPool::MultiQueue>;
+
+template void ThreadPool::start<ThreadPool::SingleQueue>();
+template void ThreadPool::start<ThreadPool::MultiQueue>();
+template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::SingleQueue>>();
+template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
