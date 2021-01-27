@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210124213854');
 
 
 -- fix incorrect creature coordinates that cause db error
-UPDATE `creature` SET `position_x` = -11635.7, `position_y` = 639.049, `position_z` = 51.2367, `movement_type` = 2 WHERE `guid` = 1083;
+UPDATE `creature` SET `position_x` = -11635.7, `position_y` = 639.049, `position_z` = 51.2367 WHERE `guid` = 1083;
 
 
 -- End of migration.
