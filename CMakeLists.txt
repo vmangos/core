@@ -33,6 +33,7 @@ option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
+option(PCH "Use precompiled headers" 1)
 
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
@@ -93,10 +94,6 @@ if(WIN32)
     set(DEP_ARCH x64)
   endif()
 endif()
-
-# Add options for compile of mangos
-
-option(PCH "Use precompiled headers" 1)
 
 # Set up the install-prefix
 if(CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
