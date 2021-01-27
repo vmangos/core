@@ -305,6 +305,7 @@ void SpellEntry::ComputeBinary()
                     case SPELL_AURA_MOD_ROOT:
                     case SPELL_AURA_MOD_SILENCE:
                     case SPELL_AURA_MOD_DISARM:
+                    case SPELL_AURA_MOD_RESISTANCE:
                     case SPELL_AURA_MOD_DAMAGE_TAKEN:
                         foundNoDamageAura = true;
                         break;
