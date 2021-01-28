@@ -35,9 +35,9 @@ option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
-    option(PCH "Use precompiled headers" ON)
+  find_package(PCHSupport)
 else()
-    option(PCH "Use precompiled headers" OFF)
+  option(PCH "Use precompiled headers" ON)
 endif()
 
 if(USE_LIBCURL)
@@ -98,6 +98,19 @@ if(WIN32)
   else() # 64-bit
     set(DEP_ARCH x64)
   endif()
+endif()
+
+# Add options for compile of mangos
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+  if(PCHSupport_FOUND)
+    if(WIN32)
+      option(PCH "Use precompiled headers" 1)
+    else()
+      option(PCH "Use precompiled headers" 0)
+    endif()
+  endif()
+else()
+  option(PCH "Use precompiled headers" 1)
 endif()
 
 # Set up the install-prefix
@@ -248,15 +261,22 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Progression.h.cmake ${CMAKE_CUR
 # Generate migrations list
 include(cmake/migrations.cmake)
 
-if (PCH AND (${CMAKE_VERSION} VERSION_LESS "3.16"))
-    message(FATAL_ERROR "Precompiled headers require CMake 3.16 or newer (${CMAKE_VERSION} used). Set PCH to OFF or update your cmake installation.")
-endif()
-
 message(STATUS "")
 message(STATUS "Core revision: ${rev_hash} ${rev_date} ")
 message(STATUS "Supported version: ${supported_build}")
 message(STATUS "Install server to: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "")
+
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+  if(PCH AND NOT PCHSupport_FOUND)
+    set(PCH 0 CACHE BOOL
+        "Use precompiled headers"
+        FORCE)
+    message(STATUS
+      "No PCH for your system possible but PCH was set to 1. Resetting it."
+      )
+  endif()
+endif()
 
 if(PCH)
   message(STATUS "Use PCH               : Yes")
