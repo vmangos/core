@@ -6070,6 +6070,25 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (30450, 23, -3081.79, -2868.61, 34.6922, 100, 0, 0, 0),
 (30450, 24, -3089.66, -2871.72, 33.9905, 100, 0, 0, 0);
 
+-- creature 66995 waypoints
+UPDATE `creature` SET `position_x` = -11137.9, `position_y` = 528.19, `position_z` = 61.6491, `movement_type` = 2 WHERE `guid` = 66995;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(66995, 1, -11137.9, 528.19, 61.6491, 100, 0, 0, 0),
+(66995, 2, -11132.5, 531.749, 61.6491, 100, 0, 0, 0),
+(66995, 3, -11128.7, 538.241, 61.6491, 100, 0, 0, 0),
+(66995, 4, -11127.7, 545.851, 61.6491, 100, 0, 0, 0),
+(66995, 5, -11131.4, 554.485, 61.6491, 100, 0, 0, 0),
+(66995, 6, -11139.1, 558.844, 61.6491, 100, 0, 0, 0),
+(66995, 7, -11147.1, 559.053, 61.6491, 100, 0, 0, 0),
+(66995, 8, -11154.2, 554.621, 61.6491, 100, 0, 0, 0),
+(66995, 9, -11158.1, 546.604, 61.6491, 100, 0, 0, 0),
+(66995, 10, -11157.2, 538.943, 61.6491, 100, 0, 0, 0),
+(66995, 11, -11152.6, 531.842, 61.6491, 100, 0, 0, 0),
+(66995, 12, -11146.3, 529.056, 61.6491, 100, 0, 0, 0);
+
+-- correct quest text
+UPDATE `quest_template` SET `OfferRewardText` = 'Take this and remember, it is sacred.' WHERE `entry` = 1462;
+
 -- steelsnaps patrol should be in a group
 DELETE FROM `creature_movement` WHERE `id` IN (21661, 21660);
 UPDATE `creature` SET `movement_type` = 0 WHERE guid IN (21661, 21660);
