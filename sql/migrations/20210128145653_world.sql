@@ -8,6 +8,10 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210128145653');
 -- Add your query below.
 
+-- Plundering the Plunderers
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry` = 3170;
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry` = 3164;
+
 -- Free From the Hold
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry` = 1072;
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry` = 1073;

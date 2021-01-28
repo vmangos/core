@@ -32,6 +32,8 @@ EndContentData */
 
 enum
 {
+    SAY_SPAWN_1 = 3164,
+    SAY_SPAWN_2 = 3170, 
     SAY_CRACKER = 3167,
     SAY_SQUAWK  = 3165
 };
@@ -48,6 +50,18 @@ struct npc_pollyAI : public ScriptedAI
     void Reset() override
     {
         b_text = false;
+    }
+
+    void JustRespawned() override
+    {
+        if (urand(0, 1))
+        {
+            DoScriptText(SAY_SPAWN_1, m_creature); // SQUAWK! Polly wants to crack you!
+        }
+        else
+        {
+            DoScriptText(SAY_SPAWN_2, m_creature); // SQUAWK!
+        }
     }
 
     void Aggro(Unit* pWho) override
