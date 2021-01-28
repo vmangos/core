@@ -8,18 +8,16 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210128123217');
 -- Add your query below.
 
--- Drop chances for [Recipe: Savory Deviate Delight] according to https://classic.wowhead.com/item=6661/recipe-savory-deviate-delight
-
 -- Kolkar Stormseer
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.3 WHERE `item` = 6661 AND `entry` = 9523;
 -- Geopriest Gukk'rok
-REPLACE INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('5863','6661','0.3','0','1','1','0','0','10');
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('5863','6661','0.3','0','1','1','0','0','10');
 -- Sister Rathtalon
-REPLACE INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('5830','6661','0.3','0','1','1','0','0','10');
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('5830','6661','0.3','0','1','1','0','0','10');
 -- Muck Frenzy
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.3 WHERE `item` = 6661 AND `entry` = 8236;
 -- General Twinbraid
-REPLACE INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('3414','6661','0.19','0','1','1','0','0','10');
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('3414','6661','0.19','0','1','1','0','0','10');
 -- Razorfen Servitor
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.17 WHERE `item` = 6661 AND `entry` = 6132;
 -- Razormane Hunter
@@ -41,7 +39,7 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.1 WHERE `item` = 6
 -- Thunderhead
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.1 WHERE `item` = 6661 AND `entry` = 3239;
 -- Overseer Glibby
-REPLACE INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('6606','6661','0.1','0','1','1','0','0','10');
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('6606','6661','0.1','0','1','1','0','0','10');
 -- Savannah Prowler
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.09 WHERE `item` = 6661 AND `entry` = 3425;
 -- Southsea Cannoneer
@@ -85,7 +83,7 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.07 WHERE `item` = 
 -- Southsea Cutthroat
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.07 WHERE `item` = 6661 AND `entry` = 3383;
 -- Washte Pawne
-REPLACE INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('3472','6661','0.07','0','1','1','0','0','10');
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('3472','6661','0.07','0','1','1','0','0','10');
 -- Southsea Brigand
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.06 WHERE `item` = 6661 AND `entry` = 3381;
 -- Razormane Water Seeker
@@ -185,7 +183,7 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.02 WHERE `item` = 
 -- Supervisor Lugwizzle
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.02 WHERE `item` = 6661 AND `entry` = 3445;
 -- Verog the Dervish
-REPLACE INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('3395','6661','0.02','0','1','1','0','0','10');
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES('3395','6661','0.02','0','1','1','0','0','10');
 -- Bristleback Water Seeker
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.01 WHERE `item` = 6661 AND `entry` = 3260;
 -- Hecklefang Stalker
@@ -195,7 +193,7 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.01 WHERE `item` = 
 -- Greater Thunderhawk
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.01 WHERE `item` = 6661 AND `entry` = 3249;
 
--- Remaing barrens creatures below - Those where not mentioned on wowhead, but had a drop chance in vmangos db -> setting dropchance to 0.01
+-- Creatures below where not mentioned on wowhead, but had a drop chance for the recipe in vmangos db (since those are barrens creatures as well) -> setting dropchance to 0.01
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.01 WHERE `item` = 6661 AND `entry` = 3235;
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.01 WHERE `item` = 6661 AND `entry` = 3236;
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 0.01 WHERE `item` = 6661 AND `entry` = 3237;
