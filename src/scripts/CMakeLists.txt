@@ -275,6 +275,16 @@ set (SCRIPTS_SRCS
 
 )
 
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+  list(APPEND SCRIPTS_SRCS
+        PrecompiledHeaders/scriptPCH.cpp
+    )
+  # Enable precompiled headers when using the GCC compiler.
+  if (PCH)
+    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  endif()
+endif()
+
 if(WIN32)
   if(MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
@@ -349,44 +359,58 @@ target_link_libraries(scripts
 
 #add_dependencies(${LIBRARY_NAME} revision.h)
 
-set(PCHS
-    ../game/Mail/Mail.h
-    ../game/Commands/Nostalrius.h
-    ../game/ScriptMgr.h
-    ../game/Objects/Object.h
-    ../game/ObjectMgr.h
-    ../game/Objects/Unit.h
-    ../game/Spells/Spell.h
-    ../game/Objects/Creature.h
-    ../game/AI/CreatureAI.h
-    ../game/Objects/GameObject.h
-    ../game/GameEventMgr.h
-    ../game/AI/ScriptedAI.h
-    ../game/AI/ScriptedPetAI.h
-    ../game/AI/ScriptedGameObject.h
-    ../game/AI/ScriptedFollowerAI.h
-    ../game/AI/ScriptedEscortAI.h
-    ../game/ScriptedGossip.h
-    ../game/Maps/GridSearchers.h
-    ../game/AI/ScriptedInstance.h
-    ../game/Spells/SpellAuras.h
-    ../game/Objects/TemporarySummon.h
-    ../game/AI/NullCreatureAI.h
-    ../game/Chat/Chat.h
-    ../game/Battlegrounds/BattleGroundAV.h
-    ../game/World.h
-    ../game/Weather.h
-    ../game/AI/TotemAI.h
-    PrecompiledHeaders/scriptPCH.h
-    )
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+  if(PCH)
+    if(MSVC OR XCODE)
+      if(MSVC)
+        set(scripts_pch "${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders/scriptPCH.cpp")
+      endif()
+      add_native_precompiled_header(scripts ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders/scriptPCH.h)
+    elseif(CMAKE_COMPILER_IS_GNUCXX)
+      add_precompiled_header(scripts ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders/scriptPCH.h)
+    endif()
+  endif()
+else()
+  set(PCHS
+      ../game/Mail/Mail.h
+      ../game/Commands/Nostalrius.h
+      ../game/ScriptMgr.h
+      ../game/Objects/Object.h
+      ../game/ObjectMgr.h
+      ../game/Objects/Unit.h
+      ../game/Spells/Spell.h
+      ../game/Objects/Creature.h
+      ../game/AI/CreatureAI.h
+      ../game/Objects/GameObject.h
+      ../game/GameEventMgr.h
+      ../game/AI/ScriptedAI.h
+      ../game/AI/ScriptedPetAI.h
+      ../game/AI/ScriptedGameObject.h
+      ../game/AI/ScriptedFollowerAI.h
+      ../game/AI/ScriptedEscortAI.h
+      ../game/ScriptedGossip.h
+      ../game/Maps/GridSearchers.h
+      ../game/AI/ScriptedInstance.h
+      ../game/Spells/SpellAuras.h
+      ../game/Objects/TemporarySummon.h
+      ../game/AI/NullCreatureAI.h
+      ../game/Chat/Chat.h
+      ../game/Battlegrounds/BattleGroundAV.h
+      ../game/World.h
+      ../game/Weather.h
+      ../game/AI/TotemAI.h
+      PrecompiledHeaders/scriptPCH.h
+      )
 
-if(WIN32)
-    list(APPEND PCHS <windows.h>)
+  if(WIN32)
+      list(APPEND PCHS <windows.h>)
+  endif()
+
+  # Generate precompiled header
+  if(PCH)
+      target_precompile_headers(${LIBRARY_NAME} PRIVATE
+          ${PCHS}
+          )
+  endif()
 endif()
 
-# Generate precompiled header
-if(PCH)
-    target_precompile_headers(${LIBRARY_NAME} PRIVATE
-        ${PCHS}
-        )
-endif()
