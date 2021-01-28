@@ -35,9 +35,9 @@ option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
-    option(PCH "Use precompiled headers" ON)
+  option(PCH "Use precompiled headers" OFF)
 else()
-    option(PCH "Use precompiled headers" OFF)
+  option(PCH "Use precompiled headers" ON)
 endif()
 
 if(USE_LIBCURL)
