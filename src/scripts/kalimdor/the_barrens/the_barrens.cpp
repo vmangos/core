@@ -210,7 +210,7 @@ enum
     SAY_TWIGGY_FRAY    = 2318,  
     SAY_TWIGGY_DOWN    = 2355,  
     SAY_TWIGGY_OVER    = 2320,  
-    // TODO (or done via db script?): Klannoc Macleod(id: 6236) - SAY_QUEST_TURN_IN  = 2354,  // Hail $n!  New Champion of The Affray!
+    SAY_QUEST_TURN_IN  = 2354, // TODO: implement Klannoc Macleod (id: 6236) yells after quest was turned in: Hail $n!  New Champion of The Affray!
 
     NPC_TWIGGY = 6248,
     NPC_BIG_WILL = 6238,
