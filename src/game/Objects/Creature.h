@@ -49,32 +49,32 @@ struct GameEventCreatureData;
 
 enum CreatureFlagsExtra
 {
-    CREATURE_FLAG_EXTRA_INSTANCE_BIND                = 0x00000001,       // killing this creature will bind players to the raid
-    CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002,       // creature will not attack nearby hostile targets (ignore faction/reputation hostility)
-    CREATURE_FLAG_EXTRA_NO_PARRY                     = 0x00000004,       // creature can't parry
-    CREATURE_FLAG_EXTRA_SUMMON_GUARD                 = 0x00000008,       // creature summons a guard if an opposite faction player gets near or attacks
-    CREATURE_FLAG_EXTRA_NO_BLOCK                     = 0x00000010,       // creature can't block
-    CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020,       // creature can't do crush attacks
-    CREATURE_FLAG_EXTRA_FIXED_Z                      = 0x00000040,       // creature does not fall
-    CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080,       // creature is always invisible for player (mostly trigger creatures)
-    CREATURE_FLAG_EXTRA_NOT_TAUNTABLE                = 0x00000100,       // creature is immune to taunt auras and effect attack me
-    CREATURE_FLAG_EXTRA_AGGRO_ZONE                   = 0x00000200,       // creature sets itself in combat with zone on aggro
-    CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400,       // creature is a guard
-    CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800,       // creature does not select targets based on threat
-    CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000,       // creature keeps positive auras at reset
-    CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000,       // creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
-    CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000,       // creature is immune to AoE
-    CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING         = 0x00008000,       // creature does not move back when target is within bounding radius
-    CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000,       // creature does not aggro when nearby creatures aggro
-    CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000,       // creature does not acquire targets
-    CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY     = 0x00040000,       // creature can only be seen by friendly units
-    CREATURE_FLAG_EXTRA_PVP                          = 0x00080000,       // creature has pvp unit flag set by default
-    CREATURE_FLAG_EXTRA_CAN_ASSIST                   = 0x00100000,       // CREATURE_TYPEFLAGS_CAN_ASSIST from TBC
-    CREATURE_FLAG_EXTRA_LARGE_AOI                    = 0x00200000,       // CREATURE_DIFFICULTYFLAGS_LARGE_AOI (200 yards)
-    CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00400000,       // CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
-    CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00800000,       // CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
-    CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000,       // creature will not pause movement when player talks to it
-    CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x02000000,       // creature will use run speed out of combat
+    CREATURE_FLAG_EXTRA_INSTANCE_BIND                = 0x00000001, // 1        Killing this creature will bind players to the raid
+    CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002, // 2        Creature will not attack nearby hostile targets (ignore faction/reputation hostility)
+    CREATURE_FLAG_EXTRA_NO_PARRY                     = 0x00000004, // 4        Creature can't parry
+    CREATURE_FLAG_EXTRA_SUMMON_GUARD                 = 0x00000008, // 8        Creature summons a guard if an opposite faction player gets near or attacks
+    CREATURE_FLAG_EXTRA_NO_BLOCK                     = 0x00000010, // 16       Creature can't block
+    CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020, // 32       Creature can't do crush attacks
+    CREATURE_FLAG_EXTRA_FIXED_Z                      = 0x00000040, // 64       Creature does not fall
+    CREATURE_FLAG_EXTRA_INVISIBLE                    = 0x00000080, // 128      Creature is always invisible for player (mostly trigger creatures)
+    CREATURE_FLAG_EXTRA_NOT_TAUNTABLE                = 0x00000100, // 256      Creature is immune to taunt auras and effect attack me
+    CREATURE_FLAG_EXTRA_AGGRO_ZONE                   = 0x00000200, // 512      Creature sets itself in combat with zone on aggro
+    CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400, // 1024     Creature is a guard
+    CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800, // 2048     Creature does not select targets based on threat
+    CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000, // 4096     Creature keeps positive auras at reset
+    CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000, // 8192     Creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
+    CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000, // 16384    Creature is immune to AoE
+    CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING         = 0x00008000, // 32768    Creature does not move back when target is within bounding radius
+    CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000, // 65536    Creature does not aggro when nearby creatures aggro
+    CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000, // 131072   Creature does not acquire targets
+    CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY     = 0x00040000, // 262144   Creature can only be seen by friendly units
+    CREATURE_FLAG_EXTRA_PVP                          = 0x00080000, // 524288   Creature has pvp unit flag set by default
+    CREATURE_FLAG_EXTRA_CAN_ASSIST                   = 0x00100000, // 1048576  CREATURE_TYPEFLAGS_CAN_ASSIST from TBC
+    CREATURE_FLAG_EXTRA_LARGE_AOI                    = 0x00200000, // 2097152  CREATURE_DIFFICULTYFLAGS_LARGE_AOI (200 yards)
+    CREATURE_FLAG_EXTRA_GIGANTIC_AOI                 = 0x00400000, // 4194304  CREATURE_DIFFICULTYFLAGS_3_GIGANTIC_AOI (400 yards)
+    CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00800000, // 8388606  CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
+    CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000, // 16777216 Creature will not pause movement when player talks to it
+    CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x02000000, // 33554432 Creature will use run speed out of combat
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
