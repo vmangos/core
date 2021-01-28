@@ -33,10 +33,11 @@ option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
-option(PCH "Use precompiled headers" ON)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
-    find_package(PCHSupport)
+  find_package(PCHSupport)
+else()
+  option(PCH "Use precompiled headers" ON)
 endif()
 
 if(USE_LIBCURL)
