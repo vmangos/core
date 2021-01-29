@@ -280,7 +280,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
         PrecompiledHeaders/scriptPCH.cpp
     )
   # Enable precompiled headers when using the GCC compiler.
-  if(USE_PCH
+  if(USE_PCH)
     include_directories(${CMAKE_CURRENT_BINARY_DIR})
   endif()
 endif()
