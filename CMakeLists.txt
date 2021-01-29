@@ -272,7 +272,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
     set(USE_PCH OFF CACHE BOOL
         "Use precompiled headers"
         FORCE)
-    message(STATUS
+    message(WARNING
       "No PCH for your system possible but USE_PCH was set to ON. Resetting it.\nUpdate to cmake 3.16 or newer to use PCH."
       )
   endif()
