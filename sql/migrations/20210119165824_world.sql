@@ -6100,7 +6100,7 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 -- patrol should be in a group
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (6251, 6690, 3, 2.35619, 11),
-(6251, 9961, 3, 3.92699, 11);
+(6251, 6691, 3, 3.92699, 11);
 
 -- dream bough creatures should be grouped
 UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (51288, 51265, 51267, 51246, 51287, 51264, 51295, 51251, 51284, 51240, 51286, 51242, 51277, 51299);
