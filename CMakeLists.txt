@@ -273,7 +273,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
         "Use precompiled headers"
         FORCE)
     message(STATUS
-      "No PCH for your system possible but PCH was set to ON. Resetting it."
+      "No PCH for your system possible but PCH was set to ON. Resetting it.\nUpdate to cmake 3.16 or newer to use PCH."
       )
   endif()
 endif()
