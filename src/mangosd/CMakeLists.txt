@@ -101,7 +101,7 @@ add_executable(${EXECUTABLE_NAME}
   ${EXECUTABLE_SRCS}
 )
 
-if(SCRIPTS)
+if(USE_SCRIPTS)
   target_link_libraries(${EXECUTABLE_NAME}
     game
     scripts

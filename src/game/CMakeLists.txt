@@ -426,7 +426,7 @@ if(WIN32)
 endif()
 
 # Used in game ScriptMgr
-if(SCRIPTS)
+if(USE_SCRIPTS)
   list(APPEND game_SRCS
       ${CMAKE_SOURCE_DIR}/src/scripts/ScriptLoader.cpp
       ${CMAKE_SOURCE_DIR}/src/scripts/ScriptLoader.h
