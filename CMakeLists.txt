@@ -25,14 +25,14 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake
 )
 
-option(DEBUG "Debug mode" 0)
+option(DEBUG "Debug mode" OFF)
 set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
-option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
-option(TBB_DEBUG "Use TBB debug librairies" 0)
-option(USE_ANTICHEAT "Use anticheat" 0)
-option(SCRIPTS "Compile scripts" 1)
-option(USE_EXTRACTORS "Compile extractors" 0)
-option(USE_LIBCURL "Compile with libcurl for email support" 0)
+option(USE_STD_MALLOC "Use standard malloc instead of TBB" OFF)
+option(TBB_DEBUG "Use TBB debug librairies" OFF)
+option(USE_ANTICHEAT "Use anticheat" OFF)
+option(SCRIPTS "Compile scripts" ON)
+option(USE_EXTRACTORS "Compile extractors" OFF)
+option(USE_LIBCURL "Compile with libcurl for email support" OFF)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
   find_package(PCHSupport)
@@ -104,13 +104,13 @@ endif()
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
   if(PCHSupport_FOUND)
     if(WIN32)
-      option(PCH "Use precompiled headers" 1)
+      option(PCH "Use precompiled headers" ON)
     else()
-      option(PCH "Use precompiled headers" 0)
+      option(PCH "Use precompiled headers" OFF)
     endif()
   endif()
 else()
-  option(PCH "Use precompiled headers" 1)
+  option(PCH "Use precompiled headers" ON)
 endif()
 
 # Set up the install-prefix
@@ -141,10 +141,10 @@ else()
 endif()
 
 # Set RPATH-handing (CMake parameters)
-set(CMAKE_SKIP_BUILD_RPATH 0)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH 0)
+set(CMAKE_SKIP_BUILD_RPATH OFF)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
 set(CMAKE_INSTALL_RPATH ${LIBS_DIR})
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 # Find needed packages and if necessery abort if something important is missing
 unset(ACE_INCLUDE_DIR CACHE)
@@ -269,11 +269,11 @@ message(STATUS "")
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
   if(PCH AND NOT PCHSupport_FOUND)
-    set(PCH 0 CACHE BOOL
+    set(PCH OFF CACHE BOOL
         "Use precompiled headers"
         FORCE)
     message(STATUS
-      "No PCH for your system possible but PCH was set to 1. Resetting it."
+      "No PCH for your system possible but PCH was set to ON. Resetting it."
       )
   endif()
 endif()
