@@ -5575,6 +5575,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (87034, 12, -10154.6, 1770.99, 34.7537, 100, 0, 0, 0);
 
 -- creature 90331 waypoints
+UPDATE `creature` SET `position_x` = -11126.4, `position_y` = 585.159, `position_z` = 34.0327, `movement_type` = 2 WHERE `guid` = 90331;
 DELETE FROM `creature_movement` WHERE `id` = 90331;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (90331, 1, -11126.4, 585.159, 34.0327, 100, 0, 0, 0),
