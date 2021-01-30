@@ -62,10 +62,10 @@ template <typename T>
 class PlayerWrapper final: public AbstractPlayer
 {
 public:
-    PlayerWrapper(T& pl) : player(pl) {}
-    PlayerWrapper(T* pl) : player(*pl) {}
-    PlayerWrapper() : player(*((T*)nullptr)) {}
-    PlayerWrapper(PlayerWrapper<T> const& other) : player(other.player) {}
+    PlayerWrapper(T& pl);
+    PlayerWrapper(T* pl);
+    PlayerWrapper();
+    PlayerWrapper(PlayerWrapper<T> const& other);
 
     ObjectGuid GetObjectGuid() const override;
     Team GetTeam() const override;
@@ -93,5 +93,15 @@ public:
 protected:
     T& player;
 };
+
+template <>
+Player* PlayerWrapper<Player>::ToPlayer() const;
+template <>
+MasterPlayer* PlayerWrapper<Player>::ToMasterPlayer() const;
+
+template <>
+Player* PlayerWrapper<MasterPlayer>::ToPlayer() const;
+template <>
+MasterPlayer* PlayerWrapper<MasterPlayer>::ToMasterPlayer() const;
 
 typedef std::shared_ptr<AbstractPlayer> PlayerPointer;
