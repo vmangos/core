@@ -5193,7 +5193,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- old murk eye waypoints
 DELETE FROM `creature_movement_template` WHERE `entry` = 391;
 DELETE FROM `creature_movement` WHERE `id` = 86491;
-UPDATE `creature` SET `position_x` = -11172.1, `position_y` = 1992.28, `position_z` = 11.352, `movement_type` = 2 WHERE `guid` = 90206;
+UPDATE `creature` SET `position_x` = -11172.1, `position_y` = 1992.28, `position_z` = 11.352, `movement_type` = 2 WHERE `guid` = 86491;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (391, 1, -11172.1, 1992.28, 11.352, 100, 0, 0, 0),
 (391, 2, -11195.5, 1987.39, 14.0106, 100, 0, 0, 0),
