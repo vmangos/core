@@ -426,7 +426,7 @@ if(WIN32)
 endif()
 
 # Used in game ScriptMgr
-if(SCRIPTS)
+if(USE_SCRIPTS)
   list(APPEND game_SRCS
       ${CMAKE_SOURCE_DIR}/src/scripts/ScriptLoader.cpp
       ${CMAKE_SOURCE_DIR}/src/scripts/ScriptLoader.h
@@ -557,7 +557,7 @@ target_link_libraries(game
 
 # Generate precompiled header
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
-  if(PCH)
+  if(USE_PCH)
     if(MSVC OR XCODE)
       if(MSVC)
         set(game_pch "${CMAKE_CURRENT_SOURCE_DIR}/pchdef.cpp")
@@ -568,7 +568,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
     endif()
   endif()
 else()
-  if(PCH)
+  if(USE_PCH)
       target_precompile_headers(game PRIVATE
       Protocol/WorldSocket.h
       ../shared/Common.h

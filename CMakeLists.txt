@@ -25,19 +25,19 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake
 )
 
-option(DEBUG "Debug mode" 0)
+option(DEBUG "Debug mode" OFF)
 set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
-option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
-option(TBB_DEBUG "Use TBB debug librairies" 0)
-option(USE_ANTICHEAT "Use anticheat" 0)
-option(SCRIPTS "Compile scripts" 1)
-option(USE_EXTRACTORS "Compile extractors" 0)
-option(USE_LIBCURL "Compile with libcurl for email support" 0)
+option(USE_STD_MALLOC "Use standard malloc instead of TBB" OFF)
+option(TBB_DEBUG "Use TBB debug librairies" OFF)
+option(USE_ANTICHEAT "Use anticheat" OFF)
+option(USE_SCRIPTS "Compile scripts" ON)
+option(USE_EXTRACTORS "Compile extractors" OFF)
+option(USE_LIBCURL "Compile with libcurl for email support" OFF)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
   find_package(PCHSupport)
 else()
-  option(PCH "Use precompiled headers" ON)
+  option(USE_PCH "Use precompiled headers" ON)
 endif()
 
 if(USE_LIBCURL)
@@ -50,7 +50,7 @@ endif()
 # Force out-of-source build
 string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" BUILDING_IN_SOURCE)
 if(BUILDING_IN_SOURCE)
-  message(FATAL_ERRO
+  message(FATAL_ERROR
     "This project requires an out of source build. Remove the file 'CMakeCache.txt' found in this directory before continuing, create a separate build directory and run 'cmake <srcs> [options]' from there."
   )
 endif()
@@ -77,7 +77,7 @@ message(STATUS
   "\nThis script builds the MaNGOS server.
   Options that can be used in order to configure the process:
     PREFIX: Path where the server should be installed to
-    PCH: Use precompiled headers
+    USE_PCH: Use precompiled headers
     DEBUG: Debug mode
   To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
   For example: cmake .. -DDEBUG=1 -DPREFIX=/opt/mangos\n"
@@ -104,13 +104,13 @@ endif()
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
   if(PCHSupport_FOUND)
     if(WIN32)
-      option(PCH "Use precompiled headers" 1)
+      option(USE_PCH "Use precompiled headers" ON)
     else()
-      option(PCH "Use precompiled headers" 0)
+      option(USE_PCH "Use precompiled headers" OFF)
     endif()
   endif()
 else()
-  option(PCH "Use precompiled headers" 1)
+  option(USE_PCH "Use precompiled headers" ON)
 endif()
 
 # Set up the install-prefix
@@ -141,10 +141,10 @@ else()
 endif()
 
 # Set RPATH-handing (CMake parameters)
-set(CMAKE_SKIP_BUILD_RPATH 0)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH 0)
+set(CMAKE_SKIP_BUILD_RPATH OFF)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
 set(CMAKE_INSTALL_RPATH ${LIBS_DIR})
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 # Find needed packages and if necessery abort if something important is missing
 unset(ACE_INCLUDE_DIR CACHE)
@@ -268,17 +268,17 @@ message(STATUS "Install server to: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "")
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
-  if(PCH AND NOT PCHSupport_FOUND)
-    set(PCH 0 CACHE BOOL
+  if(USE_PCH AND NOT PCHSupport_FOUND)
+    set(USE_PCH OFF CACHE BOOL
         "Use precompiled headers"
         FORCE)
-    message(STATUS
-      "No PCH for your system possible but PCH was set to 1. Resetting it."
+    message(WARNING
+      "No PCH for your system possible but USE_PCH was set to ON. Resetting it.\nUpdate to cmake 3.16 or newer to use PCH."
       )
   endif()
 endif()
 
-if(PCH)
+if(USE_PCH)
   message(STATUS "Use PCH               : Yes")
 else()
   message(STATUS "Use PCH               : No")
@@ -319,7 +319,7 @@ else()
   message(STATUS "Use anticheat    : No  (default)")
 endif()
 
-if(SCRIPTS)
+if(USE_SCRIPTS)
   message(STATUS "Build scripts    : Yes (default)")
 else()
   message(STATUS "Build scripts    : No")

@@ -280,7 +280,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
         PrecompiledHeaders/scriptPCH.cpp
     )
   # Enable precompiled headers when using the GCC compiler.
-  if (PCH)
+  if(USE_PCH)
     include_directories(${CMAKE_CURRENT_BINARY_DIR})
   endif()
 endif()
@@ -360,7 +360,7 @@ target_link_libraries(scripts
 #add_dependencies(${LIBRARY_NAME} revision.h)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
-  if(PCH)
+  if(USE_PCH)
     if(MSVC OR XCODE)
       if(MSVC)
         set(scripts_pch "${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders/scriptPCH.cpp")
@@ -407,7 +407,7 @@ else()
   endif()
 
   # Generate precompiled header
-  if(PCH)
+  if(USE_PCH)
       target_precompile_headers(${LIBRARY_NAME} PRIVATE
           ${PCHS}
           )
