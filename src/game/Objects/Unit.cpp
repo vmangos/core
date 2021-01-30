@@ -5304,6 +5304,12 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
             if (itr.type == aura)
                 return true;
     }
+
+    // Mechanical units are immune to normal heal effects. There is a separate one for them.
+    if ((effect == SPELL_EFFECT_HEAL || effect == SPELL_EFFECT_HEAL_MAX_HEALTH) && 
+        (GetCreatureType() == CREATURE_TYPE_MECHANICAL))
+        return true;
+
     return false;
 }
 
