@@ -5817,7 +5817,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- creature 2720 waypoints
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(2720, 2721, 3, 5, 11);
+(2720, 2721, 3, 2, 11);
 UPDATE `creature` SET `position_x` = -11734.6, `position_y` = -3312.5, `position_z` = 11.035, `movement_type` = 2 WHERE `guid` = 2720;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (2720, 1, -11734.6, -3312.5, 11.035, 100, 0, 0, 0),
@@ -5835,7 +5835,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- creature 3913 waypoints
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(3913, 3806, 3, 5, 11);
+(3913, 3806, 3, 2, 11);
 UPDATE `creature` SET `position_x` = -11736.3, `position_y` = -3259.69, `position_z` = 3.54905, `movement_type` = 2 WHERE `guid` = 3913;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3913, 1, -11736.3, -3259.69, 3.54905, 100, 0, 0, 0),
@@ -5886,7 +5886,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- creature 2718 waypoints
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(2718, 2719, 3, 5, 11);
+(2718, 2719, 3, 2, 11);
 UPDATE `creature` SET `position_x` = -11697.2, `position_y` = -3175.77, `position_z` = 10.0519, `movement_type` = 2 WHERE `guid` = 2718;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (2718, 1, -11697.2, -3175.77, 10.0519, 100, 0, 0, 0),
@@ -5932,7 +5932,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- creature 3804 waypoints
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(3804, 3805, 3, 5, 11);
+(3804, 3805, 3, 2, 11);
 UPDATE `creature` SET `position_x` = -11667.7, `position_y` = -3181.51, `position_z` = 16.5394, `movement_type` = 2 WHERE `guid` = 3804;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3804, 1, -11667.7, -3181.51, 16.5394, 100, 0, 0, 0),
@@ -5950,7 +5950,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- creature 3883 waypoints
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(3883, 3884, 3, 5, 11);
+(3883, 3884, 3, 2, 11);
 UPDATE `creature` SET `position_x` = -11717.8, `position_y` = -3079.98, `position_z` = 16.7711, `movement_type` = 2 WHERE `guid` = 3883;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3883, 1, -11748, -3072.61, 12.723, 100, 0, 0, 0),
@@ -5965,6 +5965,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (3883, 10, -11717.8, -3079.98, 16.7711, 100, 0, 0, 0),
 (3883, 11, -11725.6, -3078.5, 15.7444, 100, 0, 0, 0),
 (3883, 12, -11740.5, -3072.44, 14.1576, 100, 0, 0, 0);
+
+-- remove incorrect creatures
+DELETE FROM `creature` WHERE `guid` IN (3854, 3855);
 
 -- correct quest text
 UPDATE `quest_template` SET `OfferRewardText` = 'Take this and remember, it is sacred.' WHERE `entry` = 1462;
