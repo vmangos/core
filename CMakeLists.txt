@@ -34,9 +34,8 @@ option(USE_SCRIPTS "Compile scripts" ON)
 option(USE_EXTRACTORS "Compile extractors" OFF)
 option(USE_LIBCURL "Compile with libcurl for email support" OFF)
 
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
-  find_package(PCHSupport)
-else()
+find_package(PCHSupport)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16")
   option(USE_PCH "Use precompiled headers" ON)
 endif()
 
