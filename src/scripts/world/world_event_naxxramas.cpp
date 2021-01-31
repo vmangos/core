@@ -66,9 +66,13 @@ class GoNecropolis : public GameObjectAI
 public:
     GoNecropolis(GameObject* go) : GameObjectAI(go)
     {
+        me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
         uint32 zoneid = me->GetZoneId();
-        me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_STORM, 0.25f, true);
+        if (zoneid == 440)
+            me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0, true);
+        else
+            me->GetMap()->SetWeather(zoneid, WEATHER_TYPE_STORM, 0.25f, true);
         me->CastSpell(me, SPELL_SUMMON_NECROPOLIS_CRITTERS, true);
     }
     void UpdateAI(uint32 const diff) override
@@ -82,6 +86,56 @@ GameObjectAI* GetAI_GoNecropolis(GameObject* go)
 }
 
 /*
+Scourge Invasion Minion spawner,
+Notes: For communiation between Necropolis and Necropolis Proxy
+*/
+struct Minion_spawnerAI : public ScriptedAI
+{
+    Minion_spawnerAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    void Reset() override {}
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!who)
+            return;
+    }
+
+    void UpdateAI(uint32 const uiDiff) override {}
+};
+
+CreatureAI* GetAI_Minion_spawner(Creature* pCreature)
+{
+    return new Minion_spawnerAI(pCreature);
+}
+
+/*
+Necropolis
+Notes: For communiation between Necropolis and Necropolis Proxy
+*/
+struct NecropolisAI : public ScriptedAI
+{
+    NecropolisAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
+        Reset();
+    }
+
+    void Reset() override {}
+
+    void UpdateAI(uint32 const uiDiff) override {}
+};
+
+CreatureAI* GetAI_Necropolis(Creature* pCreature)
+{
+    return new NecropolisAI(pCreature);
+}
+
+/*
 Necropolis Health
 Notes: For communiation between Necropolis Health and Necropolis Proxy
 */
@@ -89,6 +143,8 @@ struct NecropolisHealthAI : public ScriptedAI
 {
     NecropolisHealthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
         Reset();
     }
 
@@ -102,7 +158,7 @@ struct NecropolisHealthAI : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        if (Creature* NECROPOLIS = me->FindNearestCreature(NPC_NECROPOLIS, 200.0f))
+        if (Creature* NECROPOLIS = me->FindNearestCreature(NPC_NECROPOLIS, 5000.0f))
             me->CastSpell(NECROPOLIS, SPELL_DESPAWNER_OTHER, true);
     }
 
@@ -129,6 +185,8 @@ struct NecropolisProxyAI : public ScriptedAI
 {
     NecropolisProxyAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
         Reset();
     }
 
@@ -145,7 +203,7 @@ struct NecropolisProxyAI : public ScriptedAI
             me->CastSpell(me, SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, true);
             break;
         case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-            if (Creature* NECROPOLIS_HEALTH = me->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 200.0f))
+            if (Creature* NECROPOLIS_HEALTH = me->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 5000.0f))
                 me->CastSpell(NECROPOLIS_HEALTH, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
             break;
         }
@@ -174,6 +232,8 @@ struct NecropolisRelayAI : public ScriptedAI
 {
     NecropolisRelayAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
         Reset();
     }
 
@@ -190,7 +250,7 @@ struct NecropolisRelayAI : public ScriptedAI
             me->CastSpell(me, SPELL_COMMUNIQUE_RELAY_TO_PROXY, true);
             break;
         case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-            if (Creature* NECROPOLIS_PROXY = me->FindNearestCreature(NPC_NECROPOLIS_PROXY, 200.0f))
+            if (Creature* NECROPOLIS_PROXY = me->FindNearestCreature(NPC_NECROPOLIS_PROXY, 5000.0f))
                 me->CastSpell(NECROPOLIS_PROXY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
             break;
         }
@@ -218,11 +278,15 @@ struct NecroticShard : public ScriptedAI
 {
     NecroticShard(Creature* creature) : ScriptedAI(creature)
     {
-        Reset();
+        me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
+        Reset();
     }
 
-    void Reset() override {}
+    void Reset() override 
+    {
+        me->CastSpell(me, CHOOSE_CAMP_TYPE, true);
+    }
 
     void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
@@ -233,6 +297,14 @@ struct NecroticShard : public ScriptedAI
             break;
         case SPELL_ZAP_CRYSTAL_CORPSE:
             me->CastSpell(me, SPELL_DAMAGE_CRYSTAL, true);
+            break;
+        case FIND_CAMP_TYPE:
+            if (me->HasAura(CAMP_TYPE_GHOST_SKELETON))
+                caster->CastSpell(caster, SUMMON_MINION_PARENT_GHOST_SKELETON, true);
+            if (me->HasAura(CAMP_TYPE_GHOST_GHOUL))
+                caster->CastSpell(caster, SUMMON_MINION_PARENT_GHOST_GHOUL, true);
+            if (me->HasAura(CAMP_TYPE_GHOUL_SKELETON))
+                caster->CastSpell(caster, SUMMON_MINION_PARENT_GHOUL_SKELETON, true);
             break;
         }
     }
@@ -248,13 +320,17 @@ struct NecroticShard : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        if (me->GetEntry() == !NPC_DAMAGED_NECROTIC_SHARD)
-            return;
-
-        DoCastSpellIfCan(m_creature, SPELL_SOUL_REVIVAL, CF_TRIGGERED);
-
-        if (Creature* NECROPOLIS_RELAY = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 200.0f))
-            me->CastSpell(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+        switch (me->GetEntry())
+        {
+        case NPC_NECROTIC_SHARD:
+            me->CastSpell(me, CREATE_CRYSTAL_CORPSE, true);
+            break;
+        case NPC_DAMAGED_NECROTIC_SHARD:
+            me->CastSpell(me, SPELL_SOUL_REVIVAL, true);
+            if (Creature* NECROPOLIS_RELAY = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 5000.0f))
+                me->CastSpell(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+            break;
+        }
     }
 
     void UpdateAI(uint32 const diff) override
@@ -390,7 +466,7 @@ struct ShadowOfDoomAI : public ScriptedAI
 
     void JustDied(Unit*) override
     {
-        if (Unit* shard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 200.0f))
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 5000.0f))
             DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL_CORPSE, CF_TRIGGERED);
     }
 
@@ -472,21 +548,13 @@ struct GhoulBerserker : public ScriptedAI
         _enrageTimer = 0;
     }
 
-    void Aggro(Unit* pWho) override
+    void MoveInLineOfSight(Unit* who) override
     {
-    }
+        if (!who || m_creature->IsCharmerOrOwnerPlayerOrPlayerItself())
+            return;
 
-    void JustSummoned(Creature* creature)
-    {
-
-    }
-
-    void SummonedCreatureDespawn(Creature* creature)
-    {
-    }
-
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
-    {
+        if (m_creature->IsWithinDistInMap(who, 15.0f))
+            me->CastSpell(who, SPELL_SCOURGE_STRIKE, true);
     }
 
     void JustDied(Unit*) override
@@ -985,6 +1053,16 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
 void AddSC_world_event_naxxramas()
 {
     Script* newscript;
+
+    newscript = new Script;
+    newscript->Name = "npc_minion_spawner";
+    newscript->GetAI = &GetAI_Minion_spawner;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_necropolis";
+    newscript->GetAI = &GetAI_Necropolis;
+    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_necropolis_health";
