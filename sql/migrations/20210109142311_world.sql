@@ -42,6 +42,10 @@ UPDATE `creature_template` SET `faction`='1630', `speed_walk`='0.777776', `base_
 UPDATE `creature_template` SET `faction`='1630', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `auras`='28090 28126', `movement_type`='0' WHERE `entry`=16299 AND `patch`=9;
 UPDATE `creature_template` SET `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='64', `auras`='28292' WHERE `entry`=14697 AND `patch`=9;
 UPDATE `creature_template` SET `faction`='1630', `speed_run`='0.992063', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='64' WHERE `entry`=16379 AND `patch`=9;
+UPDATE `creature_template` SET `gossip_menu_id`='7166', `faction`='190', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='768', `speed_walk`='1' WHERE `entry`=16230 AND `patch`=9;
+UPDATE `creature_template` SET `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='64', `auras`='28292 28126' WHERE  `entry`=16380 AND `patch`=9;
+UPDATE `creature_template` SET `speed_run`='0.857143', `auras`='28126' WHERE  `entry`=16422 AND `patch`=9;
+UPDATE `creature_template` SET `speed_walk`='1.11111', `speed_run`='0.857143', `auras`='28126' WHERE  `entry`=16423 AND `patch`=9;
 
 -- Fix some Spells.
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (28373, 0, 181374, 0, 0, 5428, 5875);
