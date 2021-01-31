@@ -93,16 +93,27 @@ enum ScourgeInvasionSpells
     SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG)
 
     // Shard
-    CREATE_CRYSTAL                              = 28344,
+    CREATE_CRYSTAL                              = 28344, // Spawn a Necrotic Shard.
+    CREATE_CRYSTAL_CORPSE                       = 27895, // Spawn a Damaged Necrotic Shard.
     SPELL_CAMP_RECEIVES_COMMUNIQUE              = 28449, // Impact Visual.
     SPELL_COMMUNIQUE_TIMER_CAMP                 = 28346, // Cast on npc_necrotic_shard on spawn? Periodically triggers 28345 Communique Trigger every 35 seconds.
     SPELL_COMMUNIQUE_TRIGGER                    = 28345, // Triggers 28281 SPELL_COMMUNIQUE_CAMP_TO_RELAY via void Spell::EffectDummy.
     SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 damage triggered by (28056) after a Shadow of Doom dies.
     SPELL_SOUL_REVIVAL                          = 28681, // Increases all damage caused by 10%.
+    CAMP_TYPE_GHOST_SKELETON                    = 28197, // Camp Type, triggers server side script wich spawns the corresponding Scourge Invasion Minion spawners.
+    CAMP_TYPE_GHOST_GHOUL                       = 28198, // ""
+    CAMP_TYPE_GHOUL_SKELETON                    = 28199, // ""
 
     // Shard -> Relay
     SPELL_COMMUNIQUE_CAMP_TO_RELAY              = 28281, // Purple bolt Visual (SMALL)
     SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH        = 28351, // Visual when Damaged Necrotic Shard dies.
+
+    // Camp - Minion spawning system
+    CHOOSE_CAMP_TYPE                            = 28201, // used by Necrotic Shard.
+    FIND_CAMP_TYPE                              = 28203, // used by Scourge Invasion Minion, finder.
+    SUMMON_MINION_PARENT_GHOST_GHOUL            = 28183,
+    SUMMON_MINION_PARENT_GHOST_SKELETON         = 28184,
+    SUMMON_MINION_PARENT_GHOUL_SKELETON         = 28185,
 
     // Minions Spells
     SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage to a Shard on death.
@@ -110,6 +121,8 @@ enum ScourgeInvasionSpells
     SPELL_MINION_SPAWN_IN                       = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                      = 17680, // Makes invisible.
     SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) in 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
+    CONTROLLER_TIMER                            = 28095, // Triggers 28091 (Despawner, self) in 60 seconds. (We don't know who is casting this yet)
+    DESPAWNER_SELF                              = 28091, // Trigger from Spell above.
 
     // Minion abilities
     SPELL_ENRAGE                                = 8599,  // used by 16141 (Ghoul Berserker)
@@ -143,6 +156,12 @@ enum ScourgeInvasionNPC
     NPC_DAMAGED_NECROTIC_SHARD  = 16172,
     NPC_CULTIST_ENGINEER        = 16230,
     NPC_SHADOW_OF_DOOM          = 16143,
+
+    // Camp Helpers
+    SCOURGE_INVASION_MINION_FINDER                  = 16356, // casting 28203 (Find Camp Type).
+    SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL     = 16306, // casting 28183 ([PH] Summon Minion parent (ghost/ghoul)).
+    SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON  = 16336, // casting 28184 ([PH] Summon Minion parent (ghost/skeleton)).
+    SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON  = 16338, // casting 28185 ([PH] Summon Minion parent (ghoul/skeleton)).
 
     // Necropolis Helpers
     NPC_NECROPOLIS              = 16401,
