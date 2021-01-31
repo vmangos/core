@@ -8066,10 +8066,10 @@ void Aura::ComputeExclusive()
     m_exclusive = _IsExclusiveSpellAura(GetSpellProto(), GetEffIndex(), GetModifier()->m_auraname);
 }
 
-// Resultat :
-// - 0 : pas dans la meme categorie.
-// - 1 : je suis plus important. Je m'applique.
-// - 2 : il est plus important. Il s'applique.
+// Results :
+// - 0 : Not in the same category.
+// - 1 : I am more important. I apply myself. 
+// - 2 : Other aura is more important. It applies. 
 int Aura::CheckExclusiveWith(Aura const* other) const
 {
     ASSERT(IsExclusive());
@@ -8081,8 +8081,10 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 0;
     if (other->GetSpellProto()->EffectItemType[other->GetEffIndex()] != GetSpellProto()->EffectItemType[GetEffIndex()])
         return 0;
+    if (other->IsPositive() != IsPositive())
+        return 0;
 
-    // Lui est mieux
+    // Other aura is better.
     if (other->GetModifier()->m_amount > GetModifier()->m_amount && GetModifier()->m_amount >= 0)
         return 2;
     else if (other->GetModifier()->m_amount < GetModifier()->m_amount && GetModifier()->m_amount < 0)
@@ -8097,7 +8099,6 @@ bool Aura::ExclusiveAuraCanApply()
     ASSERT(target);
     if (Aura* mostImportant = target->GetMostImportantAuraAfter(this, this))
     {
-        // Il y a un souci dans le sort.
         if (mostImportant->IsInUse())
         {
             sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsInUse", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
@@ -8107,27 +8108,26 @@ bool Aura::ExclusiveAuraCanApply()
         int checkResult = CheckExclusiveWith(mostImportant);
         switch (checkResult)
         {
-            case 1: // Je suis plus important.
-                // Normalement, 'mostImportant' en etant le plus important de sa categorie
-                // doit etre applique.
+            case 1: // I am more important. 
+                // Normally 'mostImportant' being the most important in its category should be applied. 
                 if (!mostImportant->IsApplied())
                 {
                     sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsApplied", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
                     return false;
                 }
                 ASSERT(mostImportant->IsApplied());
-                // On le desactive, et je m'active.
+                // We deactivate the other aura, and I activate. 
                 mostImportant->ApplyModifier(false, true, true);
                 break;
-            case 2: // Il est plus important, je le laisse.
+            case 2: // The other aura is more important, I leave it. 
                 return false;
             case 0: // Impossible.
-                ASSERT(false);
-            default: // Impossible aussi
+            default: // Also impossible.
                 ASSERT(false);
         }
     }
-    // Pas d'autre aura trouve, je m'applique.
+
+    // No other aura found, I apply myself. 
     return true;
 }
 
