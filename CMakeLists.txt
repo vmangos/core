@@ -40,6 +40,16 @@ else()
   option(USE_PCH "Use precompiled headers" ON)
 endif()
 
+if(PCHSupport_FOUND AND (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16"))
+    if(MSVC)
+      option(USE_PCH_OLD "Use old precompiled headers implementation" ON)
+    else()
+      option(USE_PCH_OLD "Use old precompiled headers implementation" OFF)
+    endif()
+else()
+  unset(USE_PCH_OLD CACHE)
+endif()
+
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
   #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
