@@ -579,19 +579,70 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }, 1);
                     return;
                 }
-                case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
+                case DESPAWNER_SELF: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
                 {
-                    unitTarget->CastSpell(unitTarget, 17680, false);
+                    Creature* pCreature = unitTarget->ToCreature();
+
+                    if (pCreature)
+                    {
+                        // Get the spawner of this minion.
+                        if (Creature* pCreator = pCreature->GetMap()->GetCreature(pCreature->GetCreatorGuid()))
+                        {
+                            // Spawn a new minion if there is none on the spawner spot.
+                            if (!pCreator->IsWithinDist2d(pCreature->GetPositionX(), pCreature->GetPositionY(), CONTACT_DISTANCE))
+                            {
+                                pCreator->CastSpell(pCreator, SPELL_MINION_SPAWN_IN, true); // pink lightning TEST.
+                                switch (pCreator->GetEntry())
+                                {
+                                case SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL:
+                                    pCreator->CastSpell(pCreator, SUMMON_MINION_PARENT_GHOST_GHOUL, true);
+                                    break;
+                                case SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON:
+                                    pCreator->CastSpell(pCreator, SUMMON_MINION_PARENT_GHOST_SKELETON, true);
+                                    break;
+                                case SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON:
+                                    pCreator->CastSpell(pCreator, SUMMON_MINION_PARENT_GHOUL_SKELETON, true);
+                                    break;
+                                }
+                            }
+                            else
+                                pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_OUT, false);
+                        }
+                    }
                     return;
                 }
-                case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
+                case SUMMON_MINION_PARENT_GHOST_GHOUL: // [Event: Scourge Invasion].
                 {
-                    unitTarget->CastSpell(unitTarget, 28281, true);
+                    uint32 unit = PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER);
+                    m_caster->SummonCreature(unit, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
                     return;
                 }
-                case 28349: // [Event: Scourge Invasion] Spell (Despawner, other)
+                case SUMMON_MINION_PARENT_GHOST_SKELETON: // [Event: Scourge Invasion].
                 {
-                    if (unitTarget->GetEntry() != 16401)
+                    uint32 unit = PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_SKELETAL_SHOCKTROOPER);
+                    m_caster->SummonCreature(unit, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+                    return;
+                }
+                case SUMMON_MINION_PARENT_GHOUL_SKELETON: // [Event: Scourge Invasion].
+                {
+                    uint32 unit = PickRandomValue(NPC_GHOUL_BERSERKER, NPC_SKELETAL_SHOCKTROOPER);
+                    m_caster->SummonCreature(unit, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+                    return;
+                }
+                case CHOOSE_CAMP_TYPE: // [Event: Scourge Invasion] Choose Camp Type.
+                {
+                    uint32 spellId = PickRandomValue(CAMP_TYPE_GHOUL_SKELETON, CAMP_TYPE_GHOST_GHOUL, CAMP_TYPE_GHOST_SKELETON);
+                    m_casterUnit->CastSpell(m_casterUnit, spellId, true);
+                    return;
+                }
+                case SPELL_COMMUNIQUE_TRIGGER: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
+                {
+                    unitTarget->CastSpell(unitTarget, SPELL_COMMUNIQUE_CAMP_TO_RELAY, true);
+                    return;
+                }
+                case SPELL_DESPAWNER_OTHER: // [Event: Scourge Invasion] Spell (Despawner, other)
+                {
+                    if (unitTarget->GetEntry() != NPC_NECROPOLIS)
                         return;
 
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181373, 5.0f))
@@ -607,6 +658,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (GameObject* pGo = unitTarget->FindNearestGameObject(181374, 5.0f))
                         pGo->Delete();
                         unitTarget->RemoveFromWorld();
+
                         uint32 zoneid = unitTarget->GetZoneId();
                         unitTarget->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0, false);
                     return;
