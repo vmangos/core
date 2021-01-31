@@ -56,6 +56,7 @@
 #include "GameEventMgr.h"
 #include "InstanceData.h"
 #include "ScriptMgr.h"
+#include "..\scripts\world\world_event_naxxramas.h"
 
 using namespace Spells;
 
