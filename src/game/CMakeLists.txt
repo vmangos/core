@@ -407,7 +407,7 @@ set (game_SRCS
 
 )
 
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
+if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   list(APPEND game_SRCS
       pchdef.cpp
       pchdef.h
@@ -556,7 +556,7 @@ target_link_libraries(game
 #add_dependencies(game revision.h)
 
 # Generate precompiled header
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
+if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   if(USE_PCH)
     if(MSVC OR XCODE)
       if(MSVC)
