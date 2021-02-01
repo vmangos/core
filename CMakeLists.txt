@@ -110,7 +110,7 @@ if(WIN32)
 endif()
 
 # Add options for compile of mangos
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
+if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   if(PCHSupport_FOUND)
     if(WIN32)
       option(USE_PCH "Use precompiled headers" ON)

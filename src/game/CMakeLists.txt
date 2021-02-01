@@ -407,7 +407,7 @@ set (game_SRCS
 
 )
 
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
+if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   list(APPEND game_SRCS
       pchdef.cpp
       pchdef.h
