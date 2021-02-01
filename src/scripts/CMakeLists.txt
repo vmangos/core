@@ -359,7 +359,7 @@ target_link_libraries(scripts
 
 #add_dependencies(${LIBRARY_NAME} revision.h)
 
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
+if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
   if(USE_PCH)
     if(MSVC OR XCODE)
       if(MSVC)
