@@ -63,14 +63,15 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (28366, 1, 16386, 0, 0, 5428, 5875);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (28351, 1, 16421, 0, 0, 5428, 5875);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (28351, 1, 16398, 0, 0, 5428, 5875);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (28351, 1, 16386, 0, 0, 5428, 5875);
 
 -- Update GameObjects
-UPDATE `gameobject_template` SET `script_name`='go_circle' WHERE  `entry`=181136 AND `patch`=9;
-UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE  `entry`=181154 AND `patch`=9;
-UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE  `entry`=181373 AND `patch`=9;
-UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE  `entry`=181374 AND `patch`=9;
-UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE  `entry`=181215 AND `patch`=9;
-UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE  `entry`=181223 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_circle' WHERE `entry`=181136 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE `entry`=181154 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE `entry`=181373 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE `entry`=181374 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE `entry`=181215 AND `patch`=9;
+UPDATE `gameobject_template` SET `script_name`='go_necropolis' WHERE `entry`=181223 AND `patch`=9;
 
 -- End of migration.
 END IF;
