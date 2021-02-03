@@ -5465,19 +5465,16 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
     if ((!max) || (!value) || (value >= max))
         return false;
 
-    if (value * 512 < max * urand(0, 512))
-    {
-        uint32 new_value = value + step;
-        if (new_value > max)
-            new_value = max;
+   uint32 new_value = value + step;
 
-        SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, max));
-        if (itr->second.uState != SKILL_NEW)
-            itr->second.uState = SKILL_CHANGED;
-        return true;
-    }
+   if (new_value > max)
+       new_value = max;
 
-    return false;
+    SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, max));
+    if (itr->second.uState != SKILL_NEW)
+        itr->second.uState = SKILL_CHANGED;
+
+    return true;
 }
 
 inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel, uint32 YellowLevel)
@@ -5600,25 +5597,13 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 
 void Player::UpdateWeaponSkill(WeaponAttackType attType)
 {
-    // no skill gain in pvp
-    Unit* pVictim = GetVictim();
-    if (pVictim && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
-        return;
-
-    if (IsInFeralForm())
-        return;                                             // always maximized SKILL_FERAL_COMBAT in fact
-
-    if (GetShapeshiftForm() == FORM_TREE)
-        return;                                             // use weapon but not skill up
-
     uint32 weapon_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
+    Item* tmpitem = GetWeaponForAttack(attType, true, true);
 
     switch (attType)
     {
         case BASE_ATTACK:
         {
-            Item* tmpitem = GetWeaponForAttack(attType, true, true);
-
             if (!tmpitem)
                 UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
             else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
@@ -5628,7 +5613,6 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
         case OFF_ATTACK:
         case RANGED_ATTACK:
         {
-            Item* tmpitem = GetWeaponForAttack(attType, true, true);
             if (tmpitem)
                 UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
             break;
@@ -5639,39 +5623,50 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
 
 void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence)
 {
-    uint32 plevel = GetLevel();                             // if defense than pVictim == attacker
-    uint32 greylevel = MaNGOS::XP::GetGrayLevel(plevel);
-    uint32 moblevel = pVictim->GetLevelForTarget(this);
-
-    if (defence && moblevel < greylevel)
+    if (!pVictim)
         return;
-    if (!defence) //Alita, pour pas qu'on monte notre dernier point sur un sanglier de durotar...
-    {
-        uint32 weaponSkillGraylvl = MaNGOS::XP::GetGrayLevel(GetBaseWeaponSkillValue(attType) / 5);
-        if (moblevel + 5 < weaponSkillGraylvl)
-            return;
-    }
-    if (moblevel > plevel + 5)
-        moblevel = plevel + 5;
 
-    int32 lvldif = moblevel - greylevel;
+    // no skill gain in pvp
+    if (pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
+        return;
+
+    // no weapon skill gain while in tree/feral form
+    if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
+        return; 
+
+    uint32 pLevel    = GetLevel(); 
+    uint32 greyLevel = MaNGOS::XP::GetGrayLevel(pLevel);
+    uint32 mobLevel  = pVictim->GetLevelForTarget(this); // if defense than pVictim is the attacking mob
+
+    // dont increase weapon/defence skill when moblevel is grey according to players current skill (Formula: skillcap = level * 5)
+    uint32 greyLevelForSkill = defence ? MaNGOS::XP::GetGrayLevel(GetBaseDefenseSkillValue() / 5) : MaNGOS::XP::GetGrayLevel(GetBaseWeaponSkillValue(attType) / 5);
+    if (mobLevel < greyLevelForSkill)
+        return;
+
+    if (mobLevel > pLevel + 5)
+        mobLevel = pLevel + 5;
+
+    int32 lvldif = mobLevel - greyLevel;
     if (lvldif < 3)
         lvldif = 3;
 
-    int32 skilldif = 5 * plevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
+    int32 skillPointsUntilCap = 5 * pLevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (skilldif <= 0)
+    if (skillPointsUntilCap <= 0)
         return;
-    if (skilldif < 2)//Alita, pour aider pour le dernier point de comp du level
-        skilldif = 2;
 
-    float chance = float(3 * lvldif * skilldif) / plevel;
+    // calculate chance to increase - minimum is 1%
+    float chance = std::max(1.0f, (float (3 * lvldif * skillPointsUntilCap) / pLevel));
+
+    // add intellect bonus for weapon skill (cap bonus at 20%)
     if (!defence)
-        chance *= 0.1f * GetStat(STAT_INTELLECT);
+        chance += std::min(0.1f * GetStat(STAT_INTELLECT) , 20.0f);
 
-    chance = chance < 1.0f ? 1.0f : chance;                 //minimum chance to increase skill is 1%
+    if (chance > 100.0f)
+        chance = 100.0f;
+
     if (roll_chance_f(chance))
     {
         if (defence)
