@@ -5639,7 +5639,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
             if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
             {
-                // update dependent from defense skill part
+                // update values related to defense skill 
                 UpdateDefenseBonusesMod();
             }
         }
@@ -5650,22 +5650,23 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
             switch (attType)
             {
-            case BASE_ATTACK:
-            {
-                if (!tmpitem)
-                    UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-                else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-                    UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
-                break;
+                case BASE_ATTACK:
+                {
+                    if (!tmpitem)
+                        UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
+                    else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
+                        UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
+                    break;
+                }
+                case OFF_ATTACK:
+                case RANGED_ATTACK:
+                {
+                    if (tmpitem)
+                        UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
+                    break;
+                }
             }
-            case OFF_ATTACK:
-            case RANGED_ATTACK:
-            {
-                if (tmpitem)
-                    UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
-                break;
-            }
-            }
+            // update values related to weapon skill 
             UpdateAllCritPercentages();
         }
     }
