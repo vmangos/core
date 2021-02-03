@@ -5209,17 +5209,6 @@ void Player::LeaveLFGChannel()
     }
 }
 
-void Player::UpdateDefense()
-{
-    uint32 defense_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE);
-
-    if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
-    {
-        // update dependent from defense skill part
-        UpdateDefenseBonusesMod();
-    }
-}
-
 void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
 {
     if (modGroup >= BASEMOD_END || modType >= MOD_END)
@@ -5595,32 +5584,6 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return true;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
-{
-    uint32 weapon_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
-    Item* tmpitem = GetWeaponForAttack(attType, true, true);
-
-    switch (attType)
-    {
-        case BASE_ATTACK:
-        {
-            if (!tmpitem)
-                UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-            else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-                UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
-            break;
-        }
-        case OFF_ATTACK:
-        case RANGED_ATTACK:
-        {
-            if (tmpitem)
-                UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
-            break;
-        }
-    }
-    UpdateAllCritPercentages();
-}
-
 void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence)
 {
     if (!pVictim)
@@ -5671,9 +5634,40 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (roll_chance_f(chance))
     {
         if (defence)
-            UpdateDefense();
-        else
-            UpdateWeaponSkill(attType);
+        {
+            uint32 defense_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE);
+
+            if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
+            {
+                // update dependent from defense skill part
+                UpdateDefenseBonusesMod();
+            }
+        }
+        else // weapon
+        {
+            uint32 weapon_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
+            Item* tmpitem = GetWeaponForAttack(attType, true, true);
+
+            switch (attType)
+            {
+            case BASE_ATTACK:
+            {
+                if (!tmpitem)
+                    UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
+                else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
+                    UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
+                break;
+            }
+            case OFF_ATTACK:
+            case RANGED_ATTACK:
+            {
+                if (tmpitem)
+                    UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
+                break;
+            }
+            }
+            UpdateAllCritPercentages();
+        }
     }
 }
 
