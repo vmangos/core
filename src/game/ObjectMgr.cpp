@@ -1655,9 +1655,9 @@ void ObjectMgr::LoadCreatureDisplayInfoAddon()
                 const_cast<CreatureDisplayInfoAddon*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
             }
 
-            if (minfo->combat_reach != 1.5f)
+            if (minfo->combat_reach <= 0.0f)
             {
-                sLog.outErrorDb("Table `creature_display_info_addon` have wrong combat_reach %f for character race %u female display id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_f);
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong combat_reach %f for character race %u female display id %u, use 1.5f instead", minfo->combat_reach, race, raceEntry->model_f);
                 const_cast<CreatureDisplayInfoAddon*>(minfo)->combat_reach = 1.5f;
             }
         }
@@ -1678,9 +1678,9 @@ void ObjectMgr::LoadCreatureDisplayInfoAddon()
                 const_cast<CreatureDisplayInfoAddon*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
             }
 
-            if (minfo->combat_reach != 1.5f)
+            if (minfo->combat_reach <= 0.0f)
             {
-                sLog.outErrorDb("Table `creature_display_info_addon` have wrong combat_reach %f for character race %u male display id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_m);
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong combat_reach %f for character race %u male display id %u, use 1.5f instead", minfo->combat_reach, race, raceEntry->model_m);
                 const_cast<CreatureDisplayInfoAddon*>(minfo)->combat_reach = 1.5f;
             }
         }

@@ -8494,21 +8494,28 @@ void Unit::UpdateModelData()
     CreatureDisplayInfoAddon const* displayAddon = sObjectMgr.GetCreatureDisplayInfoAddon(GetDisplayId());
     if (displayAddon && displayEntry && displayAddon->bounding_radius && displayEntry->scale)
     {
-        // we expect values in database to be relative to scale = 1.0
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / displayEntry->scale) * displayAddon->bounding_radius);
-
-        // never actually update combat_reach for player, it's always the same. Below player case is for initialization
+        // Tauren and gnome players have scale != 1.0
+        float nativeScale = displayEntry->scale;
         if (IsPlayer())
         {
-            // Taurens have increased combat reach. Confirmed by Blizzard.
-            // https://us.forums.blizzard.com/en/wow/t/wow-classic-not-a-bug-list/175887
-            if (GetRace() == RACE_TAUREN && GetDisplayId() == GetNativeDisplayId())
-                SetFloatValue(UNIT_FIELD_COMBATREACH, 4.05f);
-            else
-                SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
+            switch (GetDisplayId())
+            {
+                case 59: // Tauren Male
+                    nativeScale = DEFAULT_TAUREN_MALE_SCALE;
+                    break;
+                case 60: // Tauren Female
+                    nativeScale = DEFAULT_TAUREN_FEMALE_SCALE;
+                    break;
+                case 1563: // Gnome Male
+                case 1564: // Gnome Female
+                    nativeScale = DEFAULT_OBJECT_SCALE;
+                    break;
+            }
         }
-        else
-            SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * displayAddon->combat_reach);
+
+        // we expect values in database to be relative to scale = 1.0
+        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / nativeScale) * displayAddon->bounding_radius);
+        SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / nativeScale) * displayAddon->combat_reach);
 
         if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
         {
