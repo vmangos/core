@@ -1706,19 +1706,9 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
 
                 uint32 damage = (*i)->GetModifier()->m_amount;
 
-                // Apply damage percentage modifiers (#1601)
-                float DoneTotalMod = 1.0f;
-                AuraList const& mModDamagePercentDone = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-                for (const auto& j : mModDamagePercentDone)
-                {
-                    if ((j->GetModifier()->m_miscvalue & pSpellProto->GetSpellSchoolMask()) &&
-                        j->GetSpellProto()->EquippedItemClass == -1 &&
-                        j->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
-                    {
-                        DoneTotalMod *= (j->GetModifier()->m_amount + 100.0f) / 100.0f;
-                    }
-                }
-                damage *= DoneTotalMod;
+                // Damage shield effects do benefit from damage done bonuses, including spell power if bonus coefficient is set.
+                // For example Flame Wrath has a coefficient of 1, making it scale with 100% of spell power.
+                damage = pVictim->SpellDamageBonusDone(this, pSpellProto, (*i)->GetEffIndex(), damage, SPELL_DIRECT_DAMAGE, (*i)->GetStackAmount());
 
                 // apply SpellBaseDamageBonusTaken for mobs only
                 // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
