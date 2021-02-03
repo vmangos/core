@@ -159,8 +159,10 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     float endPoint[VERTEX_SIZE] = {endPos.y, endPos.z, endPos.x};
 
     // First case : easy flying / swimming
-    if ((m_sourceUnit->CanSwim() && m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z)) ||
-            m_sourceUnit->CanFly())
+    if ((m_sourceUnit->CanSwim() &&
+         m_sourceUnit->GetTerrain()->IsSwimmable(startPos.x, startPos.y, startPos.z) &&
+         m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z)) ||
+         m_sourceUnit->CanFly())
     {
         if (!m_sourceUnit->GetMap()->FindCollisionModel(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z))
         {
