@@ -5640,6 +5640,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     // dont increase weapon/defence skill when moblevel is grey according to players current skill (Formula: skillcap = level * 5)
     uint32 greyLevelForSkill = defence ? MaNGOS::XP::GetGrayLevel(GetBaseDefenseSkillValue() / 5) : MaNGOS::XP::GetGrayLevel(GetBaseWeaponSkillValue(attType) / 5);
+
     if (mobLevel < greyLevelForSkill)
         return;
 
@@ -5674,8 +5675,6 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         else
             UpdateWeaponSkill(attType);
     }
-    else
-        return;
 }
 
 void Player::UpdateSkillsForLevel()
