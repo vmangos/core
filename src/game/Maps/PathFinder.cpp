@@ -206,8 +206,8 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     {
         //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ BuildPolyPath :: farFromPoly distToStartPoly=%.3f distToEndPoly=%.3f\n", distToStartPoly, distToEndPoly);
         bool buildShortcut = false;
-        Vector3 p = (distToStartPoly > 7.0f) ? startPos : endPos;
-        if (m_sourceUnit->GetTerrain()->IsInWater(p.x, p.y, p.z))
+        if (m_sourceUnit->GetTerrain()->IsSwimmable(startPos.x, startPos.y, startPos.z) &&
+            m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z))
         {
             //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ BuildPolyPath :: underWater case\n");
             if (m_sourceUnit->CanSwim())
@@ -234,7 +234,8 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
                 setActualEndPosition(Vector3(endPoint[2], endPoint[0], endPoint[1]));
             }
 
-            m_type = PATHFIND_INCOMPLETE;
+            if (!(m_sourceUnit->CanSwim() && m_sourceUnit->GetTerrain()->IsSwimmable(m_actualEndPosition.x, m_actualEndPosition.y, m_actualEndPosition.z)))
+                m_type = PATHFIND_INCOMPLETE;
         }
     }
 
