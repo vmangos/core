@@ -5660,9 +5660,9 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     // calculate chance to increase - minimum is 1%
     float chance = std::max(1.0f, (float (3 * lvldif * skillPointsUntilCap) / pLevel));
 
-    // add intellect bonus for weapon skill (cap bonus at 20%)
+    // add intellect bonus for weapon skill (cap bonus at 10%)
     if (!defence)
-        chance += std::min(0.1f * GetStat(STAT_INTELLECT) , 20.0f);
+        chance += std::min(0.02f * GetStat(STAT_INTELLECT) , 10.0f);
 
     if (chance > 100.0f)
         chance = 100.0f;
