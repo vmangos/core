@@ -5601,9 +5601,9 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     uint32 greyLevel = MaNGOS::XP::GetGrayLevel(pLevel);
     uint32 mobLevel  = pVictim->GetLevelForTarget(this); // if defense than pVictim is the attacking mob
 
-    // dont increase weapon/defence skill when moblevel is grey according to players current skill (Formula: skillcap = level * 5)
+    // Don't increase weapon/defence skill when moblevel is grey according to players current skill 
+    // Dividing by 5 because formula for skill cap is = level * 5
     uint32 greyLevelForSkill = defence ? MaNGOS::XP::GetGrayLevel(GetBaseDefenseSkillValue() / 5) : MaNGOS::XP::GetGrayLevel(GetBaseWeaponSkillValue(attType) / 5);
-
     if (mobLevel < greyLevelForSkill)
         return;
 
@@ -5623,10 +5623,14 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     // calculate chance to increase - minimum is 1%
     float chance = std::max(1.0f, (float (3 * lvldif * skillPointsUntilCap) / pLevel));
+    // calculate bonus by intellect (capped be at 10%)
+    float bonus  = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
-    // add intellect bonus for weapon skill (cap bonus at 10%)
+    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d) -> resulting base chance to gain a skill point is %f, bonus by intellect (only if weapon skill) is %f", defence, chance, bonus);
+
+    // add intellect bonus for weapon skill
     if (!defence)
-        chance += std::min(0.02f * GetStat(STAT_INTELLECT) , 10.0f);
+        chance += bonus;
 
     if (chance > 100.0f)
         chance = 100.0f;
