@@ -5589,11 +5589,11 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!pVictim)
         return;
 
-    // no skill gain in pvp
+    // No skill gain in pvp
     if (pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
         return;
 
-    // no weapon skill gain while in tree/feral form
+    // No weapon skill gain while in tree/feral form
     if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
         return; 
 
@@ -5621,19 +5621,16 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (skillPointsUntilCap <= 0)
         return;
 
-    // calculate chance to increase - minimum is 1%
+    // Calculate chance to increase - minimum is 1%
     float chance = std::max(1.0f, (float (3 * lvldif * skillPointsUntilCap) / pLevel));
-    // calculate bonus by intellect (capped be at 10%)
+    // Calculate bonus by intellect (capped at 10%)
     float bonus  = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
     DEBUG_LOG("Player::UpdateCombatSkills(defence=%d) -> resulting base chance to gain a skill point is %f, bonus by intellect (only if weapon skill) is %f", defence, chance, bonus);
 
-    // add intellect bonus for weapon skill
+    // Add intellect bonus for weapon skill
     if (!defence)
         chance += bonus;
-
-    if (chance > 100.0f)
-        chance = 100.0f;
 
     if (roll_chance_f(chance))
     {
@@ -5643,11 +5640,11 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
             if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
             {
-                // update values related to defense skill 
+                // Update values related to defense skill 
                 UpdateDefenseBonusesMod();
             }
         }
-        else // weapon
+        else // Weapon
         {
             uint32 weapon_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
             Item* tmpitem = GetWeaponForAttack(attType, true, true);
@@ -5670,7 +5667,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
                     break;
                 }
             }
-            // update values related to weapon skill 
+            // Update values related to weapon skill 
             UpdateAllCritPercentages();
         }
     }
