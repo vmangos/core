@@ -158,15 +158,16 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     float startPoint[VERTEX_SIZE] = {startPos.y, startPos.z, startPos.x};
     float endPoint[VERTEX_SIZE] = {endPos.y, endPos.z, endPos.x};
 
+    bool const canSwimToDestination = m_sourceUnit->CanSwim() &&
+                                      m_sourceUnit->GetTerrain()->IsSwimmable(startPos.x, startPos.y, startPos.z) &&
+                                      m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z);
+
     // First case : easy flying / swimming
-    if ((m_sourceUnit->CanSwim() &&
-         m_sourceUnit->GetTerrain()->IsSwimmable(startPos.x, startPos.y, startPos.z) &&
-         m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z)) ||
-         m_sourceUnit->CanFly())
+    if (canSwimToDestination || m_sourceUnit->CanFly())
     {
         if (!m_sourceUnit->GetMap()->FindCollisionModel(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z))
         {
-            if (m_sourceUnit->CanSwim())
+            if (canSwimToDestination)
                 BuildUnderwaterPath();
             else
             {
@@ -205,38 +206,29 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     if (farFromPoly)
     {
         //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ BuildPolyPath :: farFromPoly distToStartPoly=%.3f distToEndPoly=%.3f\n", distToStartPoly, distToEndPoly);
-        bool buildShortcut = false;
-        if (m_sourceUnit->GetTerrain()->IsSwimmable(startPos.x, startPos.y, startPos.z) &&
-            m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z))
+        if (canSwimToDestination)
         {
             //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ BuildPolyPath :: underWater case\n");
-            if (m_sourceUnit->CanSwim())
-            {
-                BuildUnderwaterPath();
-                return;
-            }
+            BuildUnderwaterPath();
+            return;
         }
-        if (m_sourceUnit->CanFly())
-            buildShortcut = true;
 
-        if (buildShortcut)
+        if (m_sourceUnit->CanFly())
         {
             BuildShortcut();
             m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
             return;
         }
-        else
+        
+        float closestPoint[VERTEX_SIZE];
+        if (dtStatusSucceed(m_navMeshQuery->closestPointOnPolyBoundary(endPoly, endPoint, closestPoint)))
         {
-            float closestPoint[VERTEX_SIZE];
-            if (dtStatusSucceed(m_navMeshQuery->closestPointOnPolyBoundary(endPoly, endPoint, closestPoint)))
-            {
-                dtVcopy(endPoint, closestPoint);
-                setActualEndPosition(Vector3(endPoint[2], endPoint[0], endPoint[1]));
-            }
-
-            if (!(m_sourceUnit->CanSwim() && m_sourceUnit->GetTerrain()->IsSwimmable(m_actualEndPosition.x, m_actualEndPosition.y, m_actualEndPosition.z)))
-                m_type = PATHFIND_INCOMPLETE;
+            dtVcopy(endPoint, closestPoint);
+            setActualEndPosition(Vector3(endPoint[2], endPoint[0], endPoint[1]));
         }
+
+        if (!(m_sourceUnit->CanSwim() && m_sourceUnit->GetTerrain()->IsSwimmable(m_actualEndPosition.x, m_actualEndPosition.y, m_actualEndPosition.z)))
+            m_type = PATHFIND_INCOMPLETE;
     }
 
     // *** poly path generating logic ***
