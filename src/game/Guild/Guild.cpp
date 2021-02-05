@@ -196,8 +196,6 @@ void Guild::Rename(std::string& newName)
 
 GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 {
-    if (members.size() >= GUILD_MAX_MEMBERS)
-        return GuildAddStatus::GUILD_FULL;
     Player* pl = sObjectAccessor.FindPlayerNotInWorld(plGuid);
     if (pl)
     {
@@ -754,58 +752,83 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
 {
     // we can only guess size
     WorldPacket data(SMSG_GUILD_ROSTER, (4 + MOTD.length() + 1 + GINFO.length() + 1 + 4 + m_Ranks.size() * 4 + members.size() * 50));
-    uint32 count = members.size();
-    if (count > GUILD_MAX_MEMBERS)
-        count = GUILD_MAX_MEMBERS;
-    data << uint32(count);
+    int32 spaceLeft = GUILD_ROSTER_MAX_LENGTH;
+
+    size_t count_pos = data.wpos();
+    data << uint32(0); // members count placeholder
+    spaceLeft -= sizeof(uint32);
     data << MOTD;
+    spaceLeft -= MOTD.length() + 1;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GINFO;
+    spaceLeft -= GINFO.length() + 1;
 #endif
 
     data << uint32(m_Ranks.size());
+    spaceLeft -= sizeof(uint32);
     for (const auto& itr : m_Ranks)
         data << uint32(itr.Rights);
+    spaceLeft -= m_Ranks.size() * sizeof(uint32);
 
-    MemberList::const_iterator itr = members.begin();
-    for (; itr != members.end(); ++itr)
+    uint32 count = 0;
+    for (const auto& itr : members)
     {
-        if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+        int32 spaceNeeded =
+            sizeof(ObjectGuid) +          // player guid
+            sizeof(uint8) +               // online indicator
+            itr.second.Name.length() +    // name
+            1 +                           // null byte for name
+            sizeof(uint32) +              // rank id
+            sizeof(uint8) +               // level
+            sizeof(uint8) +               // class
+            sizeof(uint32) +              // zone id
+            sizeof(float) +               // last online time
+            itr.second.Pnote.length() +   // player note
+            1 +                           // null byte for player note
+            itr.second.OFFnote.length() + // officer note
+            1;                            // null byte for officer note
+
+        spaceLeft -= spaceNeeded;
+        if (spaceLeft < 0)
+            break;
+        count++;
+        
+        if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr.first)))
         {
             data << pl->GetObjectGuid();
             data << uint8(1);
-            data << pl->GetName();
-            data << uint32(itr->second.RankId);
+            data << itr.second.Name;
+            data << uint32(itr.second.RankId);
             data << uint8(pl->GetLevel());
             data << uint8(pl->GetClass());
             data << uint32(pl->GetCachedZoneId());
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
             data << uint8(0);
 #endif
-            data << itr->second.Pnote;
-            data << itr->second.OFFnote;
+            data << itr.second.Pnote;
+            data << itr.second.OFFnote;
         }
         else
         {
-            data << ObjectGuid(HIGHGUID_PLAYER, itr->first);
+            data << ObjectGuid(HIGHGUID_PLAYER, itr.first);
             data << uint8(0);
-            data << itr->second.Name;
-            data << uint32(itr->second.RankId);
-            data << uint8(itr->second.Level);
-            data << uint8(itr->second.Class);
-            data << uint32(itr->second.ZoneId);
-            data << float(float(time(nullptr) - itr->second.LogoutTime) / DAY);
-            data << itr->second.Pnote;
-            data << itr->second.OFFnote;
+            data << itr.second.Name;
+            data << uint32(itr.second.RankId);
+            data << uint8(itr.second.Level);
+            data << uint8(itr.second.Class);
+            data << uint32(itr.second.ZoneId);
+            data << float(float(time(nullptr) - itr.second.LogoutTime) / DAY);
+            data << itr.second.Pnote;
+            data << itr.second.OFFnote;
         }
-        --count;
-        if (count == 0)
-            break;
     }
+    data.put<uint32>(count_pos, count);
+
     if (session)
         session->SendPacket(&data);
     else
         BroadcastPacket(&data);
+
     DEBUG_LOG("WORLD: Sent (SMSG_GUILD_ROSTER)");
 }
 
