@@ -24,43 +24,6 @@
  // Text nostalrius (nostalrius_string)
 #define NOST_TEXT(id) (id+2000010000)
 
-/*
-* EVENT_AI UNUSED RN JUST A BACKUP!
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (801, 16386, 0, 8, 0, 100, 1, 28366, -1, 0, 0, 801, 0, 0, 'Necropolis Relay on Spell Hit by Communique, Proxy-to-Relay');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (802, 16386, 0, 8, 0, 100, 1, 28281, -1, 0, 0, 802, 0, 0, 'Necropolis Relay on Spell Hit by Communique, Camp-to-Relay');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (803, 16398, 0, 8, 0, 100, 1, 28373, -1, 0, 0, 803, 0, 0, 'Necropolis Proxy on Spell Hit by Communique, Necropolis-to-Proxies');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (804, 16398, 0, 8, 0, 100, 1, 28365, -1, 0, 0, 804, 0, 0, 'Necropolis Proxy on Spell Hit by Communique, Relay-to-Proxy');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (805, 16136, 0, 8, 0, 100, 1, 28326, -1, 0, 0, 805, 0, 0, 'Necrotic Shard on Spell Hit by Communique, Relay-to-Camp');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (806, 16386, 0, 8, 0, 100, 1, 28351, -1, 0, 0, 806, 0, 0, 'Necropolis Relay on Spell Hit by Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (807, 16398, 0, 8, 0, 100, 1, 28351, -1, 0, 0, 807, 0, 0, 'Necropolis Proxy on Spell Hit by Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (808, 16172, 0, 6, 0, 100, 0, 0, 0, 0, 0, 808, 0, 0, 'Damaged Necrotic Shard on Death Cast by Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (809, 16421, 0, 8, 0, 100, 1, 28351, -1, 0, 0, 809, 0, 0, 'Necropolis health on Spell Hit by Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (810, 16421, 0, 6, 0, 100, 0, 0, 0, 0, 0, 810, 0, 0, 'Necropolis health on Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (811, 16401, 0, 8, 0, 100, 1, 28349, -1, 0, 0, 811, 0, 0, 'Necropolis health on Spell Hit by Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (812, 16172, 0, 8, 0, 100, 1, 28326, -1, 0, 0, 805, 0, 0, 'Necrotic Shard on Spell Hit by Communique, Relay-to-Camp');
-
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (801, 0, 15, 28326, 2, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay Cast Spell Communique, Relay-to-Camp');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (802, 0, 15, 28365, 2, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay Cast Spell Communique, Relay-to-Proxy');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (803, 0, 15, 28366, 2, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy Cast Spell Communique, Proxy-to-Relay');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (804, 0, 15, 28367, 2, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy Cast Spell Communique, Proxy-to-Necropolis');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (805, 0, 15, 28449, 2, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necrotic Shard Cast Spell Camp Receives Communique');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (806, 0, 18, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay - Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (806, 0, 15, 28351, 2, 0, 0, 16398, 5000, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Relay Cast Spell Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (807, 0, 18, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy - Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (807, 0, 15, 28351, 2, 0, 0, 16421, 5000, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Proxy Cast Spell Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (808, 0, 15, 28351, 2, 0, 0, 16386, 5000, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Damaged Necrotic Shard Cast Spell Communique, Camp-to-Relay, Death');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (809, 0, 15, 28386, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis health Cast Spell Zap Necropolis');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 5, 81, 0, 0, 0, 0, 181223, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis GameObject Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 5, 81, 0, 0, 0, 0, 181154, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis GameObject Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 5, 81, 0, 0, 0, 0, 181172, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis GameObject Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 5, 81, 0, 0, 0, 0, 181373, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis GameObject Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 5, 81, 0, 0, 0, 0, 181374, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis GameObject Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 0, 15, 28349, 2, 0, 0, 16401, 5, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis - Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (810, 5, 81, 0, 0, 0, 0, 181215, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis GameObject Despawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (811, 0, 18, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'despawn NPC necropolis');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (811, 0, 14, 28395, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'remove Communique Timer, Necropolis');
-*/
-
 enum ScourgeInvasionSpells
 {
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
@@ -69,11 +32,12 @@ enum ScourgeInvasionSpells
     SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
 
     // Necropolis Health -> Necropolis
-    SPELL_DESPAWNER_OTHER                       = 28349, // Despawner GameObject Necropolis?
+    SPELL_DESPAWNER_OTHER                       = 28349, // Casted by the NPC "Necropolis health" after getting hit by,
+                                                         // on the NPC "Necropolis" which destroys itself and the Necropolis Object.
 
     // Necropolis Health
     SPELL_ZAP_NECROPOLIS                        = 28386, // There are always 3 Necrotic Shards spawns per Necropolis. This Spell is castet on the NPC "Necropolis Health" if a Shard dies and does 40 Physical damage.
-                                                         // "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
+                                                         // NPC "Necropolis Health" has 42 health. 42 health / 3 Shards = 14 damage.
                                                          // We have set the armor value from the NPC "Necropolis Health" to 950 to reduce the damage from 40 to 14.
 
     // Necropolis -> Proxy
@@ -93,41 +57,52 @@ enum ScourgeInvasionSpells
     SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG)
 
     // Shard
-    CREATE_CRYSTAL                              = 28344, // Spawn a Necrotic Shard.
-    CREATE_CRYSTAL_CORPSE                       = 27895, // Spawn a Damaged Necrotic Shard.
+    SPELL_CREATE_CRYSTAL                        = 28344, // Spawn a Necrotic Shard.
+    SPELL_CREATE_CRYSTAL_CORPSE                 = 27895, // Summon (Damaged Necrotic Shard).
     SPELL_CAMP_RECEIVES_COMMUNIQUE              = 28449, // Impact Visual.
     SPELL_COMMUNIQUE_TIMER_CAMP                 = 28346, // Cast on npc_necrotic_shard on spawn? Periodically triggers 28345 Communique Trigger every 35 seconds.
     SPELL_COMMUNIQUE_TRIGGER                    = 28345, // Triggers 28281 SPELL_COMMUNIQUE_CAMP_TO_RELAY via void Spell::EffectDummy.
-    SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 damage triggered by (28056) after a Shadow of Doom dies.
+    SPELL_DAMAGE_CRYSTAL                        = 28041, // 100 Damage (Physical). Casted on itself, if 16143 (Shadow of Doom) spawns.
     SPELL_SOUL_REVIVAL                          = 28681, // Increases all damage caused by 10%.
-    CAMP_TYPE_GHOST_SKELETON                    = 28197, // Camp Type, triggers server side script wich spawns the corresponding Scourge Invasion Minion spawners.
-    CAMP_TYPE_GHOST_GHOUL                       = 28198, // ""
-    CAMP_TYPE_GHOUL_SKELETON                    = 28199, // ""
+    SPELL_CAMP_TYPE_GHOST_SKELETON              = 28197, // Camp Type, triggers server side script wich spawns the corresponding Scourge Invasion Minion spawners.
+    SPELL_CAMP_TYPE_GHOST_GHOUL                 = 28198, // ""
+    SPELL_CAMP_TYPE_GHOUL_SKELETON              = 28199, // ""
+    SPELL_MINION_SPAWNER_SMALL                  = 27887, // Triggers 27885 (Disturb Minion Trap, small) every 5 seconds. Activates unknown up to 3 Objects wich spawns the Minions.
+    SPELL_MINION_SPAWNER_BUTTRESS               = 27888, // Triggers 27886 (Disturb Minion Trap, Buttress) every 1 hour. Activates unknown Objects, They may also spawn the Cultists.
+    SPELL_CHOOSE_CAMP_TYPE                      = 28201, // casted by Necrotic Shard.
 
     // Shard -> Relay
     SPELL_COMMUNIQUE_CAMP_TO_RELAY              = 28281, // Purple bolt Visual (SMALL)
     SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH        = 28351, // Visual when Damaged Necrotic Shard dies.
 
     // Camp - Minion spawning system
-    CHOOSE_CAMP_TYPE                            = 28201, // used by Necrotic Shard.
-    FIND_CAMP_TYPE                              = 28203, // used by Scourge Invasion Minion, finder.
-    SUMMON_MINION_PARENT_GHOST_GHOUL            = 28183,
-    SUMMON_MINION_PARENT_GHOST_SKELETON         = 28184,
-    SUMMON_MINION_PARENT_GHOUL_SKELETON         = 28185,
+    SPELL_FIND_CAMP_TYPE                        = 28203, // casted by Scourge Invasion Minion, finder.
+
+    // Scourge Invasion Minion, spawner, Ghost/Ghoul
+    SPELL_PH_SUMMON_MINION_PARENT_GHOST_GHOUL   = 28183,
+
+    // Scourge Invasion Minion, spawner, Ghost/Skeleton
+    SPELL_PH_SUMMON_MINION_PARENT_GHOST_SKELETON = 28184,
+
+    //Scourge Invasion Minion, spawner, Ghoul/Skeleton
+    SPELL_PH_SUMMON_MINION_PARENT_GHOUL_SKELETON = 28185,
 
     // Minions Spells
     SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage to a Shard on death.
     SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
     SPELL_MINION_SPAWN_IN                       = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                      = 17680, // Makes invisible.
-    SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) in 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    CONTROLLER_TIMER                            = 28095, // Triggers 28091 (Despawner, self) in 60 seconds. (We don't know who is casting this yet)
-    DESPAWNER_SELF                              = 28091, // Trigger from Spell above.
+    SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
+    SPELL_CONTROLLER_TIMER                      = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (We don't know who is casting this yet)
+    SPELL_DESPAWNER_SELF                        = 28091, // Trigger from Spell above.
 
     // Minion abilities
-    SPELL_ENRAGE                                = 8599,  // used by 16141 (Ghoul Berserker)
-    SPELL_BONE_SHARDS                           = 17014, // used by 16299 (Skeletal Shocktrooper)
-    SPELL_SHADOW_WORD_PAIN                      = 589,
+    SPELL_ENRAGE                                = 8599,  // Used by 16141 (Ghoul Berserker)
+    SPELL_BONE_SHARDS                           = 17014, // Used by 16299 (Skeletal Shocktrooper)
+    SPELL_INFECTED_BITE                         = 7367,  // Used by 16141 (Ghoul Berserker)
+    SPELL_DAZED                                 = 1604,  // Used by 16141 (Ghoul Berserker)
+    SPELL_DEMORALIZING_SHOUT                    = 16244, // Used by 16298 (Spectral Soldier)
+    SPELL_SUNDER_ARMOR                          = 21081, // Used by 16298 (Spectral Soldier)
 
     // naxx_event_rewards_giver
     SPELL_CREATE_INF_MARK                       = 28319, // Create Lesser Mark of the Dawn
@@ -135,78 +110,111 @@ enum ScourgeInvasionSpells
     SPELL_CREATE_SUP_MARK                       = 28321, // Create Greater Mark of the Dawn
 
     // Rare Minions
+    SPELL_KNOCKDOWN                             = 16790, // Used by 14697 (Lumbering Horror)
+    SPELL_TRAMPLE                               = 5568,  // Used by 14697 (Lumbering Horror)
     SPELL_ARCANE_BOLT                           = 13748,
     SPELL_RIBBON_OF_SOULS                       = 16243,
+    SPELL_MINION_DESPAWN_TIMER_UNCOMMON         = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
 
     // Cultist Engineer
-    SPELL_BUTTRESS_CHANNEL                      = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard.
+    SPELL_CREATE_SUMMONER_SHIELD                = 28132, // Summon Object - Temporary (181142),
+                                                         // casted exactly the same time with 28234 (Minion Spawn-in) on spawn.
+    SPELL_BUTTRESS_CHANNEL                      = 28078, // Channeled by Cultist Engineer on Damaged Necrotic Shard shortly after spawning.
+    SPELL_BUTTRESS_TRAP                         = 28054, // Unknown.
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
-    SPELL_SUMMON_BOSS                           = 31315, // Reagents, 8 Necrotic Rune
+                                                         
+                                                         // Casting sequence:
+    SPELL_PH_KILL_SUMMONER_BUFF                 = 27852, // [1] Casted on Player.
+    SPELL_Kill_SUMMONER_WHO_WILL_SUMMON_BOSS    = 27894, // [2] Triggered by 27852 ([PH] Kill Summoner Buff)?
+    SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
+    SPELL_SUMMON_BOSS_BUFF                      = 31316, // [4] Summon Boss Buff, casted on Player
+    SPELL_SUMMON_BOSS                           = 31315, // [5] Reagents, 8 Necrotic Rune, Summon (Shadow of Doom) for 1 hour.
 
     // Shadow of Doom
     SPELL_SPAWN_SMOKE                           = 10389, // Spawning Visual.
-    SPELL_FEAR                                  = 12542,
+    SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Shadow of Doom dies.
     SPELL_MINDFLAY                              = 16568,
-    SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Doom dies. Triggers (28041)
+    SPELL_FEAR                                  = 12542,
+
+    /*
+    Unused spells that are not cast by any NPC or object in the sniff files.
+    The [PH] in the name means it's a placeholder. Blizzard often adds that to the names of things they add to the game but haven't finalized.
+    The fact that the [PH] is still there means the quest was never finished. (Google)
+        SPELL_PH_GET_TOKEN                          = 27922, // Create Item "Necrotic Rune".
+        SPELL_PH_BUTTRESS_ACTIVATOR                 = 28086,
+        SPELL_PH_CRYSTAL_CORPSE_DESPAWN             = 28020,
+        SPELL_PH_CRYSTAL_CORPSE_TIMER               = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
+        SPELL_PH_CYSTAL_BAZOOKA                     = 27849,
+        SPELL_PH_SUMMON_BUTTRESS                    = 28024, // Summon (Cultist Engineer) for 1 hour.
+        SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL     = 27883,
+        SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON  = 28186,
+        SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON  = 28187,
+    */
 };
 
 enum ScourgeInvasionNPC
 {
-    NPC_NECROTIC_SHARD          = 16136,
-    NPC_DAMAGED_NECROTIC_SHARD  = 16172,
-    NPC_CULTIST_ENGINEER        = 16230,
-    NPC_SHADOW_OF_DOOM          = 16143,
+    // Visible NPCs
+    NPC_NECROTIC_SHARD                                  = 16136,
+    NPC_DAMAGED_NECROTIC_SHARD                          = 16172,
+    NPC_CULTIST_ENGINEER                                = 16230,
+    NPC_SHADOW_OF_DOOM                                  = 16143,
 
-    // Camp Helpers
-    SCOURGE_INVASION_MINION_FINDER                  = 16356, // casting 28203 (Find Camp Type).
-    SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL     = 16306, // casting 28183 ([PH] Summon Minion parent (ghost/ghoul)).
-    SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON  = 16336, // casting 28184 ([PH] Summon Minion parent (ghost/skeleton)).
-    SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON  = 16338, // casting 28185 ([PH] Summon Minion parent (ghoul/skeleton)).
+    // Camp Helpers (invisible)
+    NPC_SCOURGE_INVASION_MINION_FINDER                  = 16356, // casting 28203 (Find Camp Type).
+    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL     = 16306,
+    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON  = 16336,
+    NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON  = 16338,
 
-    // Necropolis Helpers
-    NPC_NECROPOLIS              = 16401,
-    NPC_NECROPOLIS_HEALTH       = 16421,
-    NPC_NECROPOLIS_PROXY        = 16398,
-    NPC_NECROPOLIS_RELAY        = 16386,
+    // Necropolis Helpers (invisible)
+    NPC_NECROPOLIS                                      = 16401,
+    NPC_NECROPOLIS_HEALTH                               = 16421,
+    NPC_NECROPOLIS_PROXY                                = 16398,
+    NPC_NECROPOLIS_RELAY                                = 16386,
 
     // Minions
-    NPC_SKELETAL_SHOCKTROOPER   = 16299,
-    NPC_GHOUL_BERSERKER         = 16141,
-    NPC_SPECTRAL_SOLDIER        = 16298,
+    NPC_SKELETAL_SHOCKTROOPER                           = 16299,
+    NPC_GHOUL_BERSERKER                                 = 16141,
+    NPC_SPECTRAL_SOLDIER                                = 16298,
 
     // Rare Minions
-    NPC_LUMBERING_HORROR        = 14697,
-    NPC_BONE_WITCH              = 16380,
-    NPC_SPIRIT_OF_THE_DAMNED    = 16379,
+    NPC_LUMBERING_HORROR                                = 14697,
+    NPC_BONE_WITCH                                      = 16380,
+    NPC_SPIRIT_OF_THE_DAMNED                            = 16379,
 
-    NPC_ARGENT_DAWN_REW_GIVER_1H = 16384, // Argent Dawn Initiate <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_2H = 16435, // Argent Dawn Cleric <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_3H = 16436, // Argent Dawn Priest <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_1A = 16395, // Argent Dawn Paladin <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_2A = 16433, // Argent Dawn Crusader <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_3A = 16434, // Argent Dawn Champion <The Argent Dawn>
+    NPC_ARGENT_DAWN_REW_GIVER_1H                        = 16384, // Argent Dawn Initiate <The Argent Dawn>
+    NPC_ARGENT_DAWN_REW_GIVER_2H                        = 16435, // Argent Dawn Cleric <The Argent Dawn>
+    NPC_ARGENT_DAWN_REW_GIVER_3H                        = 16436, // Argent Dawn Priest <The Argent Dawn>
+    NPC_ARGENT_DAWN_REW_GIVER_1A                        = 16395, // Argent Dawn Paladin <The Argent Dawn>
+    NPC_ARGENT_DAWN_REW_GIVER_2A                        = 16433, // Argent Dawn Crusader <The Argent Dawn>
+    NPC_ARGENT_DAWN_REW_GIVER_3A                        = 16434, // Argent Dawn Champion <The Argent Dawn>
 
     // Low level Minions
-    NPC_SKELETAL_TROOPER        = 16438,
-    NPC_SPECTRAL_SPIRIT         = 16437,
-    NPC_SKELETAL_SOLDIER        = 16422,
-    NPC_SPECTRAL_APPARITATION   = 16423
+    NPC_SKELETAL_TROOPER                                = 16438,
+    NPC_SPECTRAL_SPIRIT                                 = 16437,
+    NPC_SKELETAL_SOLDIER                                = 16422,
+    NPC_SPECTRAL_APPARITATION                           = 16423
 };
 
 enum ScourgeInvasionMisc
 {
-    ITEM_NECROTIC_RUNE          = 22484,
+    ITEM_NECROTIC_RUNE                      = 22484,
 
-    GOBJ_SUMMON_CIRCLE          = 181227,
-    GOBJ_NECROPOLIS             = 181223,
+    // Invisible Objects
+    GOBJ_BUTTRESS_TRAP                      = 181112, // [Guessed] Object is not in Sniffs or any Database such as WoWHead.
 
-    MODELID_PYLON_RESET         = 16135,
-    MODELID_PYLON_DAMAGED       = 16136,
+    GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL     = 181111, // Object is not in Sniffs or any Database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) summons it.
+    GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON  = 181155, // ""
+    GOBJ_SUMMON_MINION_TRAP_GHOUL_SKELETON  = 181156, // ""
 
-    FACTIONID_GHOULS            = 38,
-    FACTIONID_FRIENDLY          = 35,
+    // Visible Objects
+    GOBJ_SUMMON_CIRCLE                      = 181136,
 
-    ENGINEER_MOD_HEALTH_PER_SEC = 15,
+    GOBJ_NECROPOLIS_TINY                    = 181154, // Necropolis (scale 1.0)
+    GOBJ_NECROPOLIS_SMALL                   = 181373, // Necropolis (scale 1.5)
+    GOBJ_NECROPOLIS_MEDIUM                  = 181374, // Necropolis (scale 2.0)
+    GOBJ_NECROPOLIS_BIG                     = 181215, // Necropolis (scale 2.5)
+    GOBJ_NECROPOLIS_HUGE                    = 181223, // Necropolis (scale 3.5)
 
 //#ifdef DEBUG_WORLD_EVENT
 //    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
@@ -226,6 +234,12 @@ enum ScourgeInvasionMisc
     ZONEID_TANARIS              = 440,
 
     GAME_EVENT_SCOURGE_INVASION = 17,
+};
+
+enum ScourgeInvasionNPCEvents
+{
+    EVENT_SHARD_MINION_SPAWNER_SMALL = 1,
+    EVENT_SHARD_MINION_SPAWNER_BUTTRESS = 2,
 };
 
 enum ScourgeInvasionWorldStatesVariables
