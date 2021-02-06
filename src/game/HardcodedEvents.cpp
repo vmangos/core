@@ -819,7 +819,7 @@ void ScourgeInvasionEvent::Disable()
             for (Creature* pShard : shardList)
                 pShard->DeleteLater();
             std::list<GameObject*> necropolisList;
-            GetGameObjectListWithEntryInGrid(necropolisList, pRelay, GOBJ_NECROPOLIS, 100.0f);
+            GetGameObjectListWithEntryInGrid(necropolisList, pRelay, GOBJ_NECROPOLIS_HUGE, 100.0f);
             for (GameObject* pNecro : necropolisList)
                 pNecro->DeleteLater();
             
@@ -1016,7 +1016,7 @@ bool ScourgeInvasionEvent::SummonNecropolis(Map* pMap, InvasionNecropolis& point
     }
     point.relayGuid = pRelay->GetObjectGuid();
 
-    GameObject* pNecropolis = pRelay->SummonGameObject(GOBJ_NECROPOLIS, point.x, point.y, point.z, point.o);
+    GameObject* pNecropolis = pRelay->SummonGameObject(GOBJ_NECROPOLIS_HUGE, point.x, point.y, point.z, point.o);
     if (!pNecropolis) {
         sLog.outError("ScourgeInvasionEvent::SummonNecropolis failed summoning necropolis");
         return false;
