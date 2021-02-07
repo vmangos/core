@@ -64,6 +64,16 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equip
 (94926, 0, 0, 0, 26520, 0, 7),
 (94928, 0, 0, 0, 26520, 0, 7);
 
+-- add missing mail_loot_template
+INSERT INTO `mail_loot_template` VALUES
+(137, 21746, 100, 0, 1, 1, 0, 0, 10);
+
+-- add mail template 135 to elder quests
+UPDATE `quest_template` SET `RewMailDelaySec` = 86400, `RewMailTemplateId` = 135 WHERE `entry` IN (8619, 8635, 8636, 8642, 8643, 8644, 8645, 8646, 8647, 8648, 8649, 8650, 8651, 8652, 8653, 8654, 8670, 8671, 8672, 8673, 8679, 8680, 8681, 8682, 8683);
+
+-- add mail template 137 to elder quests
+UPDATE `quest_template` SET `RewMailDelaySec` = 86400, `RewMailTemplateId` = 137 WHERE `entry` IN (8685, 8686, 8688, 8713, 8714, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 8724, 8725, 8726, 8727, 8866, 8678, 8674, 8675, 8676, 8677, 8684);
+
 
 -- End of migration.
 END IF;
