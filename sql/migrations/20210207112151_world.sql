@@ -67,10 +67,18 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equip
 
 -- use auras for alliance lunar festival emissary (bugged)
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
-(91626, 0, 0, 0, 26520, 0, 7),
-(91632, 0, 0, 0, 26520, 0, 7),
-(94919, 0, 0, 0, 26520, 0, 7);
-
+(91623, 0, 0, 0, 26520, 0, 7),
+(91628, 0, 0, 0, 26520, 0, 7),
+(91634, 0, 0, 0, 26520, 0, 7),
+(91624, 0, 0, 0, 26520, 0, 7),
+(91629, 0, 0, 0, 26520, 0, 7),
+(91633, 0, 0, 0, 26520, 0, 7),
+(91622, 0, 0, 0, 26520, 0, 7),
+(91637, 0, 0, 0, 26520, 0, 7),
+(91688, 0, 0, 0, 26520, 0, 7),
+(94927, 0, 0, 0, 26520, 0, 7),
+(94926, 0, 0, 0, 26520, 0, 7),
+(94928, 0, 0, 0, 26520, 0, 7);
 
 
 -- End of migration.
