@@ -74,6 +74,30 @@ UPDATE `quest_template` SET `RewMailDelaySec` = 86400, `RewMailTemplateId` = 135
 -- add mail template 137 to elder quests
 UPDATE `quest_template` SET `RewMailDelaySec` = 86400, `RewMailTemplateId` = 137 WHERE `entry` IN (8685, 8686, 8688, 8713, 8714, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 8724, 8725, 8726, 8727, 8866, 8678, 8674, 8675, 8676, 8677, 8684);
 
+-- quest 8870 should only be available from creature guid 91623
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8870, 20, 7292, 50, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 8870 WHERE `entry` = 8870;
+
+-- quest 8871 should only be available from creature guid 91629
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8871, 20, 6740, 70, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 8871 WHERE `entry` = 8871;
+
+-- quest 8872 should only be available from creature guid 91688
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8872, 20, 4209, 70, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 8872 WHERE `entry` = 8872;
+
+-- quest 8873 should only be available from creature guid 91595
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8873, 20, 3309, 50, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 8873 WHERE `entry` = 8873;
+
+-- quest 8874 should only be available from creature guid 91605
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8874, 20, 2459, 10, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 8874 WHERE `entry` = 8874;
+
+-- quest 8875 should only be available from creature guid 91599
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8875, 20, 8362, 10, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 8875 WHERE `entry` = 8875;
+
 
 -- End of migration.
 END IF;
