@@ -18,6 +18,10 @@ DELETE FROM `npc_vendor` WHERE `entry` = 15864;
 UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 15864;
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 6917 AND `id` IN (2, 3);
 
+-- gossip menu option 6917 should only be available when quest 8868 is in players log
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8868, 9, 8868, 0, 0, 0, 0);
+UPDATE `gossip_menu_option` SET `condition_id`= 8868 WHERE `menu_id` = 6917 AND `id` = 0;
+
 -- correct reward text for elunes candle and set to not repeatable
 UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these coins of ancestry.  Please take Elune's candle with my blessing.  Also, please enjoy these complimentary fireworks.$b$bMay your Lunar Festival be joyous and filled with merriment, $n.$b$bAnd if you choose to face Omen and his minions, you will find Elune's candle quite useful...', `Special_Flags` = 0 WHERE `entry` = 8862;
 
