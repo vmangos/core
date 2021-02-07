@@ -37,14 +37,18 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equip
 (91632, 0, 0, 0, 26383, 0, 7),
 (94919, 0, 0, 0, 26383, 0, 7);
 
--- use auras for alliance lunar festival vendor (bugged)
+-- add lunar festival ne vendor 
+REPLACE INTO `creature_template` VALUES
+(15899, 7, 15870, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Vendor', '', 0, 55, 55, 1830, 1830, 5013, 5013, 1644, 35, 4, 1, 1.14286, 20, 5, 0, 0, 1, 316, 316, 0, 248, 1, 2000, 2000, 8, 32768, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
+
+-- use auras for alliance lunar festival vendor
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
 (91636, 0, 0, 0, 26384, 0, 7),
 (91625, 0, 0, 0, 26384, 0, 7),
 (91689, 0, 0, 0, 26384, 0, 7),
 (94920, 0, 0, 0, 26384, 0, 7);
 
--- use auras for alliance lunar festival emissary (bugged)
+-- use auras for alliance lunar festival emissary
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
 (91623, 0, 0, 0, 26520, 0, 7),
 (91628, 0, 0, 0, 26520, 0, 7),
