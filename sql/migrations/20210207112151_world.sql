@@ -28,7 +28,6 @@ UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these
 -- add progress text for elunes blessing and set to not repeatable
 UPDATE `quest_template` SET `RequestItemsText` = 'Omen yet stirs below below Lake Elune\'ara, $n...', `SpecialFlags` = 2 WHERE `entry` = 8868;
 
-
 -- update elder farwhisper coords
 UPDATE `creature` SET `position_x` = 3705.5, `position_y`= -3466.29, `position_z` = 130.77, `orientation` = 6.22097 WHERE `guid` = 91695
 
