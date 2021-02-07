@@ -38,7 +38,7 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equip
 (91632, 0, 0, 0, 26383, 0, 7),
 (94919, 0, 0, 0, 26383, 0, 7);
 
--- add lunar festival ne vendor 
+-- add lunar festival ne vendor template
 REPLACE INTO `creature_template` VALUES
 (15899, 7, 15870, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Vendor', '', 0, 55, 55, 1830, 1830, 5013, 5013, 1644, 35, 4, 1, 1.14286, 20, 5, 0, 0, 1, 316, 316, 0, 248, 1, 2000, 2000, 8, 32768, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
 
