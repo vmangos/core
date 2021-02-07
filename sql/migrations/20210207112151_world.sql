@@ -1,0 +1,81 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20210207112151');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20210207112151');
+-- Add your query below.
+
+
+-- fariel starsong is not a vendor
+DELETE FROM `npc_vendor` WHERE `entry` = 15909;
+UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 15909;
+
+-- valadar starsong is not a vendor
+DELETE FROM `npc_vendor` WHERE `entry` = 15864;
+UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 15864;
+DELETE FROM `gossip_menu_option` WHERE `menu_id` = 6917 AND `id` IN (2, 3);
+
+-- correct reward text for elunes candle and set to not repeatable
+UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these coins of ancestry.  Please take Elune's candle with my blessing.  Also, please enjoy these complimentary fireworks.$b$bMay your Lunar Festival be joyous and filled with merriment, $n.$b$bAnd if you choose to face Omen and his minions, you will find Elune's candle quite useful...', `Special_Flags` = 0 WHERE `entry` = 8862;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- update elder farwhisper coords
+UPDATE `creature` SET `position_x` = 3705.5, `position_y`= -3466.29, `position_z` = 130.77, `orientation` = 6.22097 WHERE `guid` = 91695
+
+
+
+-- use auras for alliance lunar festival harbinger (bugged)
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
+(91626, 0, 0, 0, 26383, 0, 7),
+(91632, 0, 0, 0, 26383, 0, 7),
+(94919, 0, 0, 0, 26383, 0, 7);
+
+-- use auras for alliance lunar festival vendor (bugged)
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
+(91636, 0, 0, 0, 26384, 0, 7),
+(91625, 0, 0, 0, 26384, 0, 7),
+(91689, 0, 0, 0, 26384, 0, 7),
+(94920, 0, 0, 0, 26384, 0, 7);
+
+-- use auras for alliance lunar festival emissary (bugged)
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
+(91626, 0, 0, 0, 26520, 0, 7),
+(91632, 0, 0, 0, 26520, 0, 7),
+(94919, 0, 0, 0, 26520, 0, 7);
+
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
