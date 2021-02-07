@@ -21,7 +21,8 @@ DELETE FROM `gossip_menu_option` WHERE `menu_id` = 6917 AND `id` IN (2, 3);
 -- correct reward text for elunes candle and set to not repeatable
 UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these coins of ancestry.  Please take Elune's candle with my blessing.  Also, please enjoy these complimentary fireworks.$b$bMay your Lunar Festival be joyous and filled with merriment, $n.$b$bAnd if you choose to face Omen and his minions, you will find Elune's candle quite useful...', `Special_Flags` = 0 WHERE `entry` = 8862;
 
-
+-- add progress text for elunes blessing and set to not repeatable
+UPDATE `quest_template` SET `RequestItemsText` = 'Omen yet stirs below below Lake Elune\'ara, $n...', `SpecialFlags` = 2 WHERE `entry` = 8868;
 
 
 -- update elder farwhisper coords
