@@ -43,6 +43,12 @@ UPDATE `creature_template` SET `display_scale1` = 1.25 WHERE `entry` IN (15572, 
 -- correct bluffwatcher scale
 UPDATE `creature_template` SET `display_scale1` = 1.35 `display_scale3` = 1.35 WHERE `entry` = 3084;
 
+-- correct storm shadowhoof scale
+UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` = 10303;
+
+-- correct mor grayhoof scale
+UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` = 16080;
+
 -- add lunar festival ne harbinger template
 REPLACE INTO `creature_template` VALUES
 (15900, 7, 15871, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Harbinger', '', 6918, 55, 55, 1830, 1830, 5013, 5013, 1644, 35, 3, 1, 1.14286, 20, 5, 0, 0, 1, 316, 316, 0, 248, 1, 2000, 2000, 8, 32768, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
