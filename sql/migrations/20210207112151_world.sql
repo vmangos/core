@@ -34,6 +34,15 @@ UPDATE `creature` SET `position_x` = 3705.5, `position_y`= -3466.29, `position_z
 -- update elder winterhoof coords
 UPDATE `creature` SET `position_x` = -14327.47, `position_y`= 458.7897, `position_z` = 7.9709, `orientation` = 2.669944 WHERE `guid` = 91526;
 
+-- correct male tauren elders scale
+UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` IN (15581, 15575, 15586, 15588, 15584, 15583, 15574, 15580, 15576);
+
+-- correct female tauren elders scale
+UPDATE `creature_template` SET `display_scale1` = 1.25 WHERE `entry` IN (15572, 15587, 15573, 15582, 15579, 15585, 15577, 15578);
+
+-- correct bluffwatcher scale
+UPDATE `creature_template` SET `display_scale1` = 1.35 `display_scale3` = 1.35 WHERE `entry` = 3084;
+
 -- add lunar festival ne harbinger template
 REPLACE INTO `creature_template` VALUES
 (15900, 7, 15871, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Harbinger', '', 6918, 55, 55, 1830, 1830, 5013, 5013, 1644, 35, 3, 1, 1.14286, 20, 5, 0, 0, 1, 316, 316, 0, 248, 1, 2000, 2000, 8, 32768, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
