@@ -539,6 +539,18 @@ void Aura::Update(uint32 diff)
             PeriodicTick();
         }
     }
+
+    if (GetSpellProto()->EffectImplicitTargetA[0] == TARGET_UNIT_RAID_AND_CLASS) // remove greater blessings on leaving raid
+    {
+        Unit* pTarget = GetTarget();
+        ObjectGuid casterGuid = GetCasterGuid();
+        if (casterGuid.IsPlayer() && casterGuid != pTarget->GetObjectGuid() && casterGuid != pTarget->GetCharmerOrOwnerGuid())
+        {
+            Player* pTargetPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (!pTargetPlayer || !pTargetPlayer->GetGroup() || !pTargetPlayer->GetGroup()->IsMember(casterGuid))
+                pTarget->RemoveAurasByCasterSpell(GetId(), GetCasterGuid(), AURA_REMOVE_BY_GROUP);
+        }
+    }
 }
 
 // Called by caster of this area aura to tick auras for affected targets
