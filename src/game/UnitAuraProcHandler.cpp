@@ -1389,6 +1389,12 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
             break;
         case SPELLFAMILY_PALADIN:
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+            // Copy of Seal of Command for Seal Twisting - Don't proc if target already has Seal of Command.
+            if (auraSpellInfo->Id == 33006 && (HasAura(20375) || HasAura(20915) || HasAura(20918) || HasAura(20919) || HasAura(20920)))
+                return SPELL_AURA_PROC_FAILED;
+#endif
+
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
             if (auraSpellInfo->IsFitToFamilyMask<CF_PALADIN_SEALS>())
             {

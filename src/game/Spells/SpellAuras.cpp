@@ -4106,9 +4106,25 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
     {
         // some spell have charges by functionality not have its in spell data
         case 28200:                                         // Ascendance (Talisman of Ascendance trinket)
+        {
             if (apply)
                 GetHolder()->SetAuraCharges(6);
             break;
+        }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        // Seal of Command - Enable Seal Twisting
+        case 20375: // Rank 1
+        case 20915: // Rank 2
+        case 20918: // Rank 3
+        case 20919: // Rank 4
+        case 20920: // Rank 5
+        {
+            // Using custom copy of seal of commmand aura.
+            if (!apply && m_removeMode == AURA_REMOVE_BY_DEFAULT)
+                GetTarget()->CastSpell(GetTarget(), 33006, true);
+            break;
+        }
+#endif
         default:
             break;
     }
@@ -6805,6 +6821,10 @@ bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) co
 
 bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
 {
+    // Custom spells cannot be displayed on aura bar.
+    if (m_spellProto->IsCustomSpell())
+        return false;
+
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem();
 
     // Check for persistent area auras that only do damage. If it has a secondary effect, it takes
