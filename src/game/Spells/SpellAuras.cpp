@@ -548,7 +548,7 @@ void Aura::Update(uint32 diff)
         {
             Player* pTargetPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
             if (!pTargetPlayer || !pTargetPlayer->GetGroup() || !pTargetPlayer->GetGroup()->IsMember(casterGuid))
-                pTarget->RemoveAurasByCasterSpell(GetId(), GetCasterGuid(), AURA_REMOVE_BY_GROUP);
+                pTarget->RemoveAurasByCasterSpell(GetId(), casterGuid, AURA_REMOVE_BY_GROUP);
         }
     }
 }
