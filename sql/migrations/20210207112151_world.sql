@@ -29,7 +29,10 @@ UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these
 UPDATE `quest_template` SET `RequestItemsText` = 'Omen yet stirs below below Lake Elune\'ara, $n...', `SpecialFlags` = 2 WHERE `entry` = 8868;
 
 -- update elder farwhisper coords
-UPDATE `creature` SET `position_x` = 3705.5, `position_y`= -3466.29, `position_z` = 130.77, `orientation` = 6.22097 WHERE `guid` = 91695
+UPDATE `creature` SET `position_x` = 3705.5, `position_y`= -3466.29, `position_z` = 130.77, `orientation` = 6.22097 WHERE `guid` = 91695;
+
+-- update elder winterhoof coords
+UPDATE `creature` SET `position_x` = -14327.47, `position_y`= 458.7897, `position_z` = 7.9709, `orientation` = 2.669944 WHERE `guid` = 91526;
 
 -- add lunar festival ne harbinger template
 REPLACE INTO `creature_template` VALUES
