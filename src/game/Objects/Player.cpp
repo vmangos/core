@@ -5616,15 +5616,16 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     float chance = 100 * (float (currentSkillMax - currenSkillValue) / currentSkillMax);
 
     // Slighly increase/reduce chance due to mob level
-    if (mobLevel > playerLevel)
+    if (mobLevel > playerLevel + 1)
         chance *= 1.1;
-    else if(mobLevel < playerLevel)
+    else if(mobLevel < playerLevel - 1)
         chance *= 0.9;
 
-    // Calculate bonus by intellect (capped at 10%)
+    // Calculate bonus by intellect (capped at 10% - guessed)
     float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
     // Add intellect bonus for weapon skill
+    // NOTE: TrinityCore checks additionally (GetClass() == CLASS_WARRIOR || GetClass() == CLASS_ROGUE) - correct for classic als well?
     if (!defence)
         chance += bonus;
 
