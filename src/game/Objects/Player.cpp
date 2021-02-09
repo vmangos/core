@@ -5606,8 +5606,12 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (mobLevel < greyLevelForSkill)
         return;
 
-    // benefit if mob is up to 3 level above player
-    int32 lvlDiff = mobLevel > playerLevel ? std::min(3, (mobLevel + 1) - playerLevel) : 1;
+    // benefit if mob level above is above player level
+    int32 lvlDiffBonus = 1;
+    if (mobLevel == playerLevel)
+        lvlDiffBonus = 2;
+    else if(mobLevel > playerLevel)
+        lvlDiffBonus = 3;
 
     int32 skillPointsUntilCap = 5 * playerLevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
 
@@ -5617,7 +5621,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         return;
 
     // Calculate chance to increase - minimum is 0,05%
-    float chance = std::max(0.05f, (float (3 * lvlDiff * skillPointsUntilCap) / playerLevel));
+    float chance = std::max(0.05f, (float (3 * lvlDiffBonus * skillPointsUntilCap) / playerLevel));
 
     // Calculate bonus by intellect (capped at 10%)
     float bonus  = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
