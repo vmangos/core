@@ -5597,34 +5597,32 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
         return; 
 
-    int32 playerLevel = GetLevel();
-    int32 mobLevel    = defence ? pVictim->GetLevelForTarget(this) : pVictim->GetLevel();
+    int32 playerLevel      = GetLevel();
+    int32 mobLevel         = defence ? pVictim->GetLevelForTarget(this) : pVictim->GetLevel(); // defense: pVictim = player
+    int32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
+    int32 currentSkillMax  = 5 * playerLevel;
 
-    // Don't increase weapon/defence skill when moblevel is grey according to players current skill 
-    // Dividing by 5 because formula for skill cap is = level * 5
-    uint32 greyLevelForSkill = defence ? MaNGOS::XP::GetGrayLevel(GetBaseDefenseSkillValue() / 5) : MaNGOS::XP::GetGrayLevel(GetBaseWeaponSkillValue(attType) / 5);
+    // Don't increase weapon/defence skill when moblevel is grey according to players current skill value
+    uint32 greyLevelForSkill = MaNGOS::XP::GetGrayLevel(currenSkillValue / 5);
     if (mobLevel < greyLevelForSkill)
         return;
 
-    // benefit if mob level above is above player level
-    int32 lvlDiffBonus = 1;
-    if (mobLevel == playerLevel)
-        lvlDiffBonus = 2;
-    else if(mobLevel > playerLevel)
-        lvlDiffBonus = 3;
-
-    int32 skillPointsUntilCap = 5 * playerLevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
-
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (skillPointsUntilCap <= 0)
+    if (currentSkillMax - currenSkillValue <= 0)
         return;
 
-    // Calculate chance to increase - minimum is 0,05%
-    float chance = std::max(0.05f, (float (3 * lvlDiffBonus * skillPointsUntilCap) / playerLevel));
+    // Calculate base chance to increase
+    float chance = 100 * (float (currentSkillMax - currenSkillValue) / currentSkillMax);
+
+    // Slighly increase/reduce chance due to mob level
+    if (mobLevel > playerLevel)
+        chance *= 1.1;
+    else if(mobLevel < playerLevel)
+        chance *= 0.9;
 
     // Calculate bonus by intellect (capped at 10%)
-    float bonus  = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
+    float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
     // Add intellect bonus for weapon skill
     if (!defence)
