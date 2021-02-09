@@ -4131,8 +4131,10 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
         case 20919: // Rank 4
         case 20920: // Rank 5
         {
-            // Using custom copy of seal of commmand aura.
-            if (!apply && m_removeMode == AURA_REMOVE_BY_DEFAULT)
+            // Using custom copy of seal of commmand aura that will remain for 0.5 sec.
+            if (apply)
+                GetTarget()->RemoveAurasDueToSpell(33006);
+            else if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
                 GetTarget()->CastSpell(GetTarget(), 33006, true);
             break;
         }
