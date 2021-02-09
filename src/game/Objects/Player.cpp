@@ -5597,9 +5597,8 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
         return; 
 
-    uint32 pLevel    = GetLevel(); 
-    uint32 greyLevel = MaNGOS::XP::GetGrayLevel(pLevel);
-    uint32 mobLevel  = pVictim->GetLevelForTarget(this); // if defense than pVictim is the attacking mob
+    int32 playerLevel = GetLevel();
+    int32 mobLevel    = defence ? pVictim->GetLevelForTarget(this) : pVictim->GetLevel();
 
     // Don't increase weapon/defence skill when moblevel is grey according to players current skill 
     // Dividing by 5 because formula for skill cap is = level * 5
@@ -5607,30 +5606,27 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (mobLevel < greyLevelForSkill)
         return;
 
-    if (mobLevel > pLevel + 5)
-        mobLevel = pLevel + 5;
+    // benefit if mob is up to 3 level above player
+    int32 lvlDiff = mobLevel > playerLevel ? std::min(3, (mobLevel + 1) - playerLevel) : 1;
 
-    int32 lvldif = mobLevel - greyLevel;
-    if (lvldif < 3)
-        lvldif = 3;
-
-    int32 skillPointsUntilCap = 5 * pLevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
+    int32 skillPointsUntilCap = 5 * playerLevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
     if (skillPointsUntilCap <= 0)
         return;
 
-    // Calculate chance to increase - minimum is 1%
-    float chance = std::max(1.0f, (float (3 * lvldif * skillPointsUntilCap) / pLevel));
+    // Calculate chance to increase - minimum is 0,05%
+    float chance = std::max(0.05f, (float (3 * lvlDiff * skillPointsUntilCap) / playerLevel));
+
     // Calculate bonus by intellect (capped at 10%)
     float bonus  = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
-
-    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d) -> resulting base chance to gain a skill point is %f, bonus by intellect (only if weapon skill) is %f", defence, chance, bonus);
 
     // Add intellect bonus for weapon skill
     if (!defence)
         chance += bonus;
+
+    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i, moblevel=%i) -> chance to increase skill is %f ", defence, playerLevel, mobLevel, chance);
 
     if (roll_chance_f(chance))
     {
