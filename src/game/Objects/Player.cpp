@@ -5625,7 +5625,6 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
     // Add intellect bonus for weapon skill
-    // NOTE: TrinityCore checks additionally (GetClass() == CLASS_WARRIOR || GetClass() == CLASS_ROGUE) - correct for classic als well?
     if (!defence)
         chance += bonus;
 
