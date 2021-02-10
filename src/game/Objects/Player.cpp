@@ -5612,18 +5612,15 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (currentSkillMax * 0.9 < currenSkillValue)
         chance = float (0.5 - 0.0168966 * currenSkillValue * (300.0 / currentSkillMax) + 0.0152069 * currentSkillMax * (300.0 / currentSkillMax)) * 100;
     else // skill is below last 10% 
-        chance = std::min(100.0f, 100 * float (currentSkillMax * 0.9 * 0.5) / currenSkillValue);
-        if(defence)
-            chance *= 0.5; // defence seems increase about 50% slower
-    
-        
+        chance = std::min(100.0f, 100 * float (currentSkillMax * 0.9 * 0.5) / currenSkillValue); 
 
     // Calculate bonus by intellect (capped at 10% - guessed)
     float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
-    // Add intellect bonus for weapon skill
     if (!defence)
-        chance += bonus;
+        chance += bonus; // Add intellect bonus for weapon skill
+    else
+        chance *= 0.5; // Defence seems to increase about 50% slower (more research needed)
 
     chance = std::min(100.0f, chance);
 
