@@ -5610,9 +5610,9 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     // Calculate base chance to increase
     float chance;
     if (currentSkillMax * 0.9 < currenSkillValue)
-        chance = (0.5 - 0.0168966 * currenSkillValue * (300 / currentSkillMax) + 0.0152069 * currentSkillMax * (300 / currentSkillMax)) * 100;
+        chance = float (0.5 - 0.0168966 * currenSkillValue * (300 / currentSkillMax) + 0.0152069 * currentSkillMax * (300 / currentSkillMax)) * 100;
     else // skill is below last 10% 
-        chance = std::min(100.0f, 100 * float(currentSkillMax * 0.9 * 0.5) / currenSkillValue);
+        chance = std::min(100.0f, 100 * float (currentSkillMax * 0.9 * 0.5) / currenSkillValue);
 
     // Calculate bonus by intellect (capped at 10% - guessed)
     float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
