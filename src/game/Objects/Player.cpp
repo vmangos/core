@@ -5616,11 +5616,11 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     // Calculate base chance to increase
     float chance;
     if (currentSkillMax * 0.9 < currenSkillValue)
-        chance = 100 * float(skillDiff * 3) / currentSkillMax; // skillcap almost reached (last 10%)
-    else if (currentSkillMax * 0.5 < currenSkillValue)
-        chance = 100 * float(currentSkillMax * 0.9 * 0.5) / currenSkillValue; // skill is below last 10% above 50%
+        chance = (0.5 - 0.0168966 * currenSkillValue * (300 / currentSkillMax) + 0.0152069 * currentSkillMax * (300 / currentSkillMax)) * 100;
+    else if (currentSkillMax * 0.5 < currenSkillValue) // skill is below last 10% but above 50%
+        chance =  100 * float(currentSkillMax * 0.9 * 0.5) / currenSkillValue;
     else
-        chance = 100; // skill is below 50% of current cap
+        chance = 100;
 
     // Slighly increase/reduce chance due to mob level
     if (mobLevel > playerLevel + 1)
@@ -5636,8 +5636,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence)
         chance += bonus;
 
-    if (chance > 100)
-        chance = 100;
+    chance = std::min(100.0f, chance);
 
     DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i, moblevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, mobLevel, currenSkillValue, currentSkillMax, chance);
 
