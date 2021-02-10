@@ -93,10 +93,10 @@ INSERT INTO `mail_loot_template` VALUES
 (137, 21746, 100, 0, 1, 1, 0, 0, 10);
 
 -- add mail template 135 to elder quests
-UPDATE `quest_template` SET `RewMailDelaySec` = 86400, `RewMailTemplateId` = 135 WHERE `entry` IN (8619, 8635, 8636, 8642, 8643, 8644, 8645, 8646, 8647, 8648, 8649, 8650, 8651, 8652, 8653, 8654, 8670, 8671, 8672, 8673, 8679, 8680, 8681, 8682, 8683);
+UPDATE `quest_template` SET `RewMailDelaySecs` = 86400, `RewMailTemplateId` = 135 WHERE `entry` IN (8619, 8635, 8636, 8642, 8643, 8644, 8645, 8646, 8647, 8648, 8649, 8650, 8651, 8652, 8653, 8654, 8670, 8671, 8672, 8673, 8679, 8680, 8681, 8682, 8683);
 
 -- add mail template 137 to elder quests
-UPDATE `quest_template` SET `RewMailDelaySec` = 86400, `RewMailTemplateId` = 137 WHERE `entry` IN (8685, 8686, 8688, 8713, 8714, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 8724, 8725, 8726, 8727, 8866, 8678, 8674, 8675, 8676, 8677, 8684);
+UPDATE `quest_template` SET `RewMailDelaySecs` = 86400, `RewMailTemplateId` = 137 WHERE `entry` IN (8685, 8686, 8688, 8713, 8714, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 8724, 8725, 8726, 8727, 8866, 8678, 8674, 8675, 8676, 8677, 8684);
 
 -- quest 8870 should only be available from creature guid 91623
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8870, 20, 7292, 50, 0, 0, 0);
@@ -149,7 +149,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- add trick - critter template
 INSERT INTO `creature_template` VALUES
-(15219, 0, 6296, 5556, 10992, 11009, 0, 0, 0, 0, 1, 1, 1, 1, 4, 0, 'Trick - Critter', '', 0, 1, 1, 42, 42, 0, 0, 15, 188, 0, 1, 0, 20, 0, 0, 0, 0, 2, 2, 0, 9, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, , 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
+(15219, 0, 6296, 5556, 10992, 11009, 0, 0, 0, 0, 1, 1, 1, 1, 4, 0, 'Trick - Critter', '', 0, 1, 1, 42, 42, 0, 0, 15, 188, 0, 1, 0, 20, 0, 0, 0, 0, 2, 2, 0, 9, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
 
 
 -- End of migration.
