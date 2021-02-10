@@ -5598,7 +5598,6 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         return; 
 
     int32 playerLevel      = GetLevel();
-    int32 mobLevel         = defence ? pVictim->GetLevelForTarget(this) : pVictim->GetLevel(); // defense: pVictim = player
     int32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
     int32 currentSkillMax  = 5 * playerLevel;
     int32 skillDiff        = currentSkillMax - currenSkillValue;
@@ -5624,7 +5623,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     chance = std::min(100.0f, chance);
 
-    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i, moblevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, mobLevel, currenSkillValue, currentSkillMax, chance);
+    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, currenSkillValue, currentSkillMax, chance);
 
     if (roll_chance_f(chance))
     {
