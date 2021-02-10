@@ -5615,12 +5615,6 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     else // skill is below last 10% 
         chance = std::min(100.0f, 100 * float(currentSkillMax * 0.9 * 0.5) / currenSkillValue);
 
-    // Slighly increase/reduce chance due to mob level
-    if (mobLevel > playerLevel + 1)
-        chance *= 1.1;
-    else if(mobLevel < playerLevel - 1)
-        chance *= 0.9;
-
     // Calculate bonus by intellect (capped at 10% - guessed)
     float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
 
