@@ -32,7 +32,7 @@ UPDATE `quest_template` SET `OfferRewardEmote1` = 2, `RequestItemsText` = 'Omen 
 UPDATE `creature` SET `position_x` = 3705.5, `position_y`= -3466.29, `position_z` = 130.77, `orientation` = 6.22097 WHERE `guid` = 91695;
 
 -- update elder winterhoof coords
-UPDATE `creature` SET `position_x` = -14327.47, `position_y`= 458.7897, `position_z` = 7.9709, `orientation` = 2.669944 WHERE `guid` = 91526;
+UPDATE `creature` SET `position_x` = -14327.47, `position_y`= 458.7897, `position_z` = 7.9709, `orientation` = 2.669944 WHERE `guid` = 91562;
 
 -- correct male tauren elders scale
 UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` IN (15581, 15575, 15586, 15588, 15584, 15583, 15574, 15580, 15576);
