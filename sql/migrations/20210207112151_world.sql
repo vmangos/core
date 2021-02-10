@@ -90,13 +90,109 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equip
 
 -- add missing mail_loot_template
 INSERT INTO `mail_loot_template` VALUES
-(137, 21746, 100, 0, 1, 1, 0, 0, 10);
+(84, 21746, 100, 0, 1, 1, 0, 0, 10),
+(85, 21746, 100, 0, 1, 1, 0, 0, 10),
+(86, 21746, 100, 0, 1, 1, 0, 0, 10),
+(88, 21746, 100, 0, 1, 1, 0, 0, 10),
+(89, 21746, 100, 0, 1, 1, 0, 0, 10),
+(90, 21746, 100, 0, 1, 1, 0, 0, 10),
+(91, 21746, 100, 0, 1, 1, 0, 0, 10),
+(92, 21746, 100, 0, 1, 1, 0, 0, 10),
+(95, 21746, 100, 0, 1, 1, 0, 0, 10),
+(96, 21746, 100, 0, 1, 1, 0, 0, 10),
+(97, 21746, 100, 0, 1, 1, 0, 0, 10),
+(121, 21746, 100, 0, 1, 1, 0, 0, 10),
+(124, 21746, 100, 0, 1, 1, 0, 0, 10),
+(125, 21746, 100, 0, 1, 1, 0, 0, 10),
+(126, 21746, 100, 0, 1, 1, 0, 0, 10),
+(127, 21746, 100, 0, 1, 1, 0, 0, 10),
+(128, 21746, 100, 0, 1, 1, 0, 0, 10),
+(129, 21746, 100, 0, 1, 1, 0, 0, 10),
+(130, 21746, 100, 0, 1, 1, 0, 0, 10),
+(131, 21746, 100, 0, 1, 1, 0, 0, 10),
+(132, 21746, 100, 0, 1, 1, 0, 0, 10),
+(133, 21746, 100, 0, 1, 1, 0, 0, 10),
+(134, 21746, 100, 0, 1, 1, 0, 0, 10),
+(136, 21746, 100, 0, 1, 1, 0, 0, 10),
+(137, 21746, 100, 0, 1, 1, 0, 0, 10),
+(138, 21746, 100, 0, 1, 1, 0, 0, 10),
+(139, 21746, 100, 0, 1, 1, 0, 0, 10),
+(140, 21746, 100, 0, 1, 1, 0, 0, 10),
+(141, 21746, 100, 0, 1, 1, 0, 0, 10),
+(142, 21746, 100, 0, 1, 1, 0, 0, 10),
+(143, 21746, 100, 0, 1, 1, 0, 0, 10),
+(144, 21746, 100, 0, 1, 1, 0, 0, 10),
+(145, 21746, 100, 0, 1, 1, 0, 0, 10),
+(146, 21746, 100, 0, 1, 1, 0, 0, 10),
+(147, 21746, 100, 0, 1, 1, 0, 0, 10),
+(148, 21746, 100, 0, 1, 1, 0, 0, 10),
+(149, 21746, 100, 0, 1, 1, 0, 0, 10),
+(150, 21746, 100, 0, 1, 1, 0, 0, 10),
+(151, 21746, 100, 0, 1, 1, 0, 0, 10),
+(152, 21746, 100, 0, 1, 1, 0, 0, 10),
+(153, 21746, 100, 0, 1, 1, 0, 0, 10),
+(154, 21746, 100, 0, 1, 1, 0, 0, 10),
+(155, 21746, 100, 0, 1, 1, 0, 0, 10),
+(156, 21746, 100, 0, 1, 1, 0, 0, 10),
+(157, 21746, 100, 0, 1, 1, 0, 0, 10),
+(158, 21746, 100, 0, 1, 1, 0, 0, 10),
+(159, 21746, 100, 0, 1, 1, 0, 0, 10),
+(160, 21746, 100, 0, 1, 1, 0, 0, 10),
+(168, 21746, 100, 0, 1, 1, 0, 0, 10);
 
--- add mail template 135 to elder quests
-UPDATE `quest_template` SET `RewMailDelaySecs` = 86400, `RewMailTemplateId` = 135 WHERE `entry` IN (8619, 8635, 8636, 8642, 8643, 8644, 8645, 8646, 8647, 8648, 8649, 8650, 8651, 8652, 8653, 8654, 8670, 8671, 8672, 8673, 8679, 8680, 8681, 8682, 8683);
+-- set correct mail delay to elder quests
+UPDATE `quest_template` SET `RewMailDelaySecs` = 86400, `RewMailTemplateId` = 137 WHERE `entry` IN (8685, 8686, 8688, 8713, 8714, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 8724, 8725, 8726, 8727, 8866, 8678, 8674, 8675, 8676, 8677, 8684, 8619, 8635, 8636, 8642, 8643, 8644, 8645, 8646, 8647, 8648, 8649, 8650, 8651, 8652, 8653, 8654, 8670, 8671, 8672, 8673, 8679, 8680, 8681, 8682, 8683);
 
--- add mail template 137 to elder quests
-UPDATE `quest_template` SET `RewMailDelaySecs` = 86400, `RewMailTemplateId` = 137 WHERE `entry` IN (8685, 8686, 8688, 8713, 8714, 8715, 8716, 8717, 8718, 8719, 8720, 8721, 8722, 8723, 8724, 8725, 8726, 8727, 8866, 8678, 8674, 8675, 8676, 8677, 8684);
+-- link mail templates to quests
+UPDATE `quest_template` SET `RewMailTemplateId` = 84 WHERE `entry` = 8619;
+UPDATE `quest_template` SET `RewMailTemplateId` = 85 WHERE `entry` = 8645;
+UPDATE `quest_template` SET `RewMailTemplateId` = 86 WHERE `entry` = 8719;
+UPDATE `quest_template` SET `RewMailTemplateId` = 88 WHERE `entry` = 8676;
+UPDATE `quest_template` SET `RewMailTemplateId` = 89 WHERE `entry` = 8686;
+UPDATE `quest_template` SET `RewMailTemplateId` = 90 WHERE `entry` = 8636;
+UPDATE `quest_template` SET `RewMailTemplateId` = 91 WHERE `entry` = 8679;
+UPDATE `quest_template` SET `RewMailTemplateId` = 92 WHERE `entry` = 8643;
+UPDATE `quest_template` SET `RewMailTemplateId` = 95 WHERE `entry` = 8688;
+UPDATE `quest_template` SET `RewMailTemplateId` = 96 WHERE `entry` = 8653;
+UPDATE `quest_template` SET `RewMailTemplateId` = 97 WHERE `entry` = 8650;
+UPDATE `quest_template` SET `RewMailTemplateId` = 121 WHERE `entry` = 8723;
+UPDATE `quest_template` SET `RewMailTemplateId` = 124 WHERE `entry` = 8727;
+UPDATE `quest_template` SET `RewMailTemplateId` = 125 WHERE `entry` = 8685;
+UPDATE `quest_template` SET `RewMailTemplateId` = 126 WHERE `entry` = 8648;
+UPDATE `quest_template` SET `RewMailTemplateId` = 127 WHERE `entry` = 8866;
+UPDATE `quest_template` SET `RewMailTemplateId` = 128 WHERE `entry` = 8635;
+UPDATE `quest_template` SET `RewMailTemplateId` = 129 WHERE `entry` = 8654;
+UPDATE `quest_template` SET `RewMailTemplateId` = 130 WHERE `entry` = 8715;
+UPDATE `quest_template` SET `RewMailTemplateId` = 131 WHERE `entry` = 8725;
+UPDATE `quest_template` SET `RewMailTemplateId` = 132 WHERE `entry` = 8714;
+UPDATE `quest_template` SET `RewMailTemplateId` = 133 WHERE `entry` = 8651;
+UPDATE `quest_template` SET `RewMailTemplateId` = 134 WHERE `entry` = 8722;
+UPDATE `quest_template` SET `RewMailTemplateId` = 135 WHERE `entry` = 8642;
+UPDATE `quest_template` SET `RewMailTemplateId` = 137 WHERE `entry` = 8644;
+UPDATE `quest_template` SET `RewMailTemplateId` = 138 WHERE `entry` = 8721;
+UPDATE `quest_template` SET `RewMailTemplateId` = 139 WHERE `entry` = 8682;
+UPDATE `quest_template` SET `RewMailTemplateId` = 140 WHERE `entry` = 8649;
+UPDATE `quest_template` SET `RewMailTemplateId` = 141 WHERE `entry` = 8670;
+UPDATE `quest_template` SET `RewMailTemplateId` = 142 WHERE `entry` = 8717;
+UPDATE `quest_template` SET `RewMailTemplateId` = 143 WHERE `entry` = 8718;
+UPDATE `quest_template` SET `RewMailTemplateId` = 144 WHERE `entry` = 8677;
+UPDATE `quest_template` SET `RewMailTemplateId` = 145 WHERE `entry` = 8675;
+UPDATE `quest_template` SET `RewMailTemplateId` = 146 WHERE `entry` = 8683;
+UPDATE `quest_template` SET `RewMailTemplateId` = 147 WHERE `entry` = 8713;
+UPDATE `quest_template` SET `RewMailTemplateId` = 148 WHERE `entry` = 8647;
+UPDATE `quest_template` SET `RewMailTemplateId` = 149 WHERE `entry` = 8716;
+UPDATE `quest_template` SET `RewMailTemplateId` = 150 WHERE `entry` = 8726;
+UPDATE `quest_template` SET `RewMailTemplateId` = 151 WHERE `entry` = 8724;
+UPDATE `quest_template` SET `RewMailTemplateId` = 152 WHERE `entry` = 8720;
+UPDATE `quest_template` SET `RewMailTemplateId` = 153 WHERE `entry` = 8681;
+UPDATE `quest_template` SET `RewMailTemplateId` = 154 WHERE `entry` = 8646;
+UPDATE `quest_template` SET `RewMailTemplateId` = 155 WHERE `entry` = 8652;
+UPDATE `quest_template` SET `RewMailTemplateId` = 156 WHERE `entry` = 8672;
+UPDATE `quest_template` SET `RewMailTemplateId` = 157 WHERE `entry` = 8673;
+UPDATE `quest_template` SET `RewMailTemplateId` = 158 WHERE `entry` = 8674;
+UPDATE `quest_template` SET `RewMailTemplateId` = 159 WHERE `entry` = 8684;
+UPDATE `quest_template` SET `RewMailTemplateId` = 160 WHERE `entry` = 8680;
+UPDATE `quest_template` SET `RewMailTemplateId` = 168 WHERE `entry` = 8671;
 
 -- quest 8870 should only be available from creature guid 91623
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8870, 20, 7292, 50, 0, 0, 0);
