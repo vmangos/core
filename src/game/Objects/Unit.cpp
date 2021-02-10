@@ -1706,19 +1706,9 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
 
                 uint32 damage = (*i)->GetModifier()->m_amount;
 
-                // Apply damage percentage modifiers (#1601)
-                float DoneTotalMod = 1.0f;
-                AuraList const& mModDamagePercentDone = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-                for (const auto& j : mModDamagePercentDone)
-                {
-                    if ((j->GetModifier()->m_miscvalue & pSpellProto->GetSpellSchoolMask()) &&
-                        j->GetSpellProto()->EquippedItemClass == -1 &&
-                        j->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
-                    {
-                        DoneTotalMod *= (j->GetModifier()->m_amount + 100.0f) / 100.0f;
-                    }
-                }
-                damage *= DoneTotalMod;
+                // Damage shield effects do benefit from damage done bonuses, including spell power if bonus coefficient is set.
+                // For example Flame Wrath has a coefficient of 1, making it scale with 100% of spell power.
+                damage = pVictim->SpellDamageBonusDone(this, pSpellProto, (*i)->GetEffIndex(), damage, SPELL_DIRECT_DAMAGE, (*i)->GetStackAmount());
 
                 // apply SpellBaseDamageBonusTaken for mobs only
                 // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
@@ -5304,6 +5294,12 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
             if (itr.type == aura)
                 return true;
     }
+
+    // Mechanical units are immune to normal heal effects. There is a separate one for them.
+    if ((effect == SPELL_EFFECT_HEAL || effect == SPELL_EFFECT_HEAL_MAX_HEALTH) && 
+        (GetCreatureType() == CREATURE_TYPE_MECHANICAL))
+        return true;
+
     return false;
 }
 
@@ -8498,21 +8494,28 @@ void Unit::UpdateModelData()
     CreatureDisplayInfoAddon const* displayAddon = sObjectMgr.GetCreatureDisplayInfoAddon(GetDisplayId());
     if (displayAddon && displayEntry && displayAddon->bounding_radius && displayEntry->scale)
     {
-        // we expect values in database to be relative to scale = 1.0
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / displayEntry->scale) * displayAddon->bounding_radius);
-
-        // never actually update combat_reach for player, it's always the same. Below player case is for initialization
+        // Tauren and gnome players have scale != 1.0
+        float nativeScale = displayEntry->scale;
         if (IsPlayer())
         {
-            // Taurens have increased combat reach. Confirmed by Blizzard.
-            // https://us.forums.blizzard.com/en/wow/t/wow-classic-not-a-bug-list/175887
-            if (GetRace() == RACE_TAUREN && GetDisplayId() == GetNativeDisplayId())
-                SetFloatValue(UNIT_FIELD_COMBATREACH, 4.05f);
-            else
-                SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
+            switch (GetDisplayId())
+            {
+                case 59: // Tauren Male
+                    nativeScale = DEFAULT_TAUREN_MALE_SCALE;
+                    break;
+                case 60: // Tauren Female
+                    nativeScale = DEFAULT_TAUREN_FEMALE_SCALE;
+                    break;
+                case 1563: // Gnome Male
+                case 1564: // Gnome Female
+                    nativeScale = DEFAULT_OBJECT_SCALE;
+                    break;
+            }
         }
-        else
-            SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * displayAddon->combat_reach);
+
+        // we expect values in database to be relative to scale = 1.0
+        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / nativeScale) * displayAddon->bounding_radius);
+        SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / nativeScale) * displayAddon->combat_reach);
 
         if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
         {

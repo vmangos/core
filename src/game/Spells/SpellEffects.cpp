@@ -633,16 +633,10 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 19395: // Gordunni Trap
                 {
-                    if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    if (m_casterGo && unitTarget)
                     {
-                        // If GameObject casting was implemented, or activating a trap actually despawned it, this wouldn't be needed.
-                        if (GameObject* pObject = unitTarget->FindNearestGameObject(144050, INTERACTION_DISTANCE))
-                        {
-                            if (pObject->HasStaticDBSpawnData())
-                                unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
-                            else
-                                pObject->AddObjectToRemoveList();
-                        }
+                        unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
+                        m_casterGo->SetLootState(GO_JUST_DEACTIVATED);
                     }
 
                     return;
@@ -3417,6 +3411,7 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetFactionTemporary(m_caster->GetFactionTemplateId(), TEMPFACTION_NONE);
                     summon->lootForCreator = true;
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
+                    summon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
                     if (m_casterUnit)
                         summon->SetLootRecipient(m_casterUnit);
                     break;
@@ -5172,7 +5167,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         continue;
 
                     // found, remove seal
-                    m_casterUnit->RemoveAurasDueToSpell(aura->GetId());
+                    m_casterUnit->RemoveAurasDueToSpellByCancel(aura->GetId());
                     break;
                 }
 

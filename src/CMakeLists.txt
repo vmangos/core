@@ -28,6 +28,6 @@ add_subdirectory(realmd)
 add_subdirectory(game)
 add_subdirectory(mangosd)
 
-if(SCRIPTS)
+if(USE_SCRIPTS)
   add_subdirectory(scripts)
 endif()

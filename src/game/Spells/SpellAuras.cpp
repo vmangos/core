@@ -539,6 +539,18 @@ void Aura::Update(uint32 diff)
             PeriodicTick();
         }
     }
+
+    if (GetSpellProto()->EffectImplicitTargetA[0] == TARGET_UNIT_RAID_AND_CLASS) // remove greater blessings on leaving raid
+    {
+        Unit* pTarget = GetTarget();
+        ObjectGuid casterGuid = GetCasterGuid();
+        if (casterGuid.IsPlayer() && casterGuid != pTarget->GetObjectGuid() && casterGuid != pTarget->GetCharmerOrOwnerGuid())
+        {
+            Player* pTargetPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (!pTargetPlayer || !pTargetPlayer->GetGroup() || !pTargetPlayer->GetGroup()->IsMember(casterGuid))
+                pTarget->RemoveAurasByCasterSpell(GetId(), casterGuid, AURA_REMOVE_BY_GROUP);
+        }
+    }
 }
 
 // Called by caster of this area aura to tick auras for affected targets
@@ -4106,9 +4118,27 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
     {
         // some spell have charges by functionality not have its in spell data
         case 28200:                                         // Ascendance (Talisman of Ascendance trinket)
+        {
             if (apply)
                 GetHolder()->SetAuraCharges(6);
             break;
+        }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        // Seal of Command - Enable Seal Twisting
+        case 20375: // Rank 1
+        case 20915: // Rank 2
+        case 20918: // Rank 3
+        case 20919: // Rank 4
+        case 20920: // Rank 5
+        {
+            // Using custom copy of seal of commmand aura that will remain for 0.5 sec.
+            if (apply)
+                GetTarget()->RemoveAurasDueToSpell(33006);
+            else if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
+                GetTarget()->CastSpell(GetTarget(), 33006, true);
+            break;
+        }
+#endif
         default:
             break;
     }
@@ -6805,6 +6835,10 @@ bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) co
 
 bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
 {
+    // Custom spells cannot be displayed on aura bar.
+    if (m_spellProto->IsCustomSpell())
+        return false;
+
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem();
 
     // Check for persistent area auras that only do damage. If it has a secondary effect, it takes
@@ -8066,10 +8100,10 @@ void Aura::ComputeExclusive()
     m_exclusive = _IsExclusiveSpellAura(GetSpellProto(), GetEffIndex(), GetModifier()->m_auraname);
 }
 
-// Resultat :
-// - 0 : pas dans la meme categorie.
-// - 1 : je suis plus important. Je m'applique.
-// - 2 : il est plus important. Il s'applique.
+// Results :
+// - 0 : Not in the same category.
+// - 1 : I am more important. I apply myself. 
+// - 2 : Other aura is more important. It applies. 
 int Aura::CheckExclusiveWith(Aura const* other) const
 {
     ASSERT(IsExclusive());
@@ -8081,8 +8115,10 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 0;
     if (other->GetSpellProto()->EffectItemType[other->GetEffIndex()] != GetSpellProto()->EffectItemType[GetEffIndex()])
         return 0;
+    if (other->IsPositive() != IsPositive())
+        return 0;
 
-    // Lui est mieux
+    // Other aura is better.
     if (other->GetModifier()->m_amount > GetModifier()->m_amount && GetModifier()->m_amount >= 0)
         return 2;
     else if (other->GetModifier()->m_amount < GetModifier()->m_amount && GetModifier()->m_amount < 0)
@@ -8097,7 +8133,6 @@ bool Aura::ExclusiveAuraCanApply()
     ASSERT(target);
     if (Aura* mostImportant = target->GetMostImportantAuraAfter(this, this))
     {
-        // Il y a un souci dans le sort.
         if (mostImportant->IsInUse())
         {
             sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsInUse", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
@@ -8107,27 +8142,26 @@ bool Aura::ExclusiveAuraCanApply()
         int checkResult = CheckExclusiveWith(mostImportant);
         switch (checkResult)
         {
-            case 1: // Je suis plus important.
-                // Normalement, 'mostImportant' en etant le plus important de sa categorie
-                // doit etre applique.
+            case 1: // I am more important. 
+                // Normally 'mostImportant' being the most important in its category should be applied. 
                 if (!mostImportant->IsApplied())
                 {
                     sLog.outInfo("[%s:Map%u:Aura%u:AuraImportant%u] Aura::ExclusiveAuraCanApply IsApplied", target->GetName(), target->GetMapId(), GetId(), mostImportant->GetId());
                     return false;
                 }
                 ASSERT(mostImportant->IsApplied());
-                // On le desactive, et je m'active.
+                // We deactivate the other aura, and I activate. 
                 mostImportant->ApplyModifier(false, true, true);
                 break;
-            case 2: // Il est plus important, je le laisse.
+            case 2: // The other aura is more important, I leave it. 
                 return false;
             case 0: // Impossible.
-                ASSERT(false);
-            default: // Impossible aussi
+            default: // Also impossible.
                 ASSERT(false);
         }
     }
-    // Pas d'autre aura trouve, je m'applique.
+
+    // No other aura found, I apply myself. 
     return true;
 }
 

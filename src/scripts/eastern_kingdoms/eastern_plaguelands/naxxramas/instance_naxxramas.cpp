@@ -152,7 +152,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
             break;
         }
         case NPC_RAZUVIOUS:
-            if (pWho->GetPositionZ() > 275.0f)
+            if (pWho->GetPositionZ() > 285.0f)
             {
                 pWho->AI()->EnterEvadeMode();
                 return false;

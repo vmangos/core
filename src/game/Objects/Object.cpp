@@ -4683,6 +4683,12 @@ int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffec
         // Calculate level penalty
         float LvlPenalty = CalculateLevelPenalty(spellProto);
 
+        // Flame Wrath (16560) scales at 100% without any penalty, yet spell level is 1.
+        // Damage shield auras must not be subject to level penalty.
+        if ((spellProto->Effect[effectIndex] == SPELL_EFFECT_APPLY_AURA) &&
+            (spellProto->EffectApplyAuraName[effectIndex] == SPELL_AURA_DAMAGE_SHIELD))
+            LvlPenalty = 1.0f;
+
         // Calculate custom coefficient
         coeff = spellProto->CalculateCustomCoefficient(pCaster, damagetype, coeff, spell, donePart);
 

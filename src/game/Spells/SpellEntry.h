@@ -662,6 +662,11 @@ class SpellEntry
             return hasAura;
         }
 
+        bool IsCustomSpell() const
+        {
+            return Internal & SPELL_INTERNAL_CUSTOM;
+        }
+
         inline bool IsSealSpell() const
         {
             //Collection of all the seal family flags. No other paladin spell has any of those.

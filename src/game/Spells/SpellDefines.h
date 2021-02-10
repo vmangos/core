@@ -929,18 +929,19 @@ enum SpellAttributesCustom
 // Custom flags assigned by the core based on spell template data
 enum SpellAttributesInternal
 {
-    SPELL_INTERNAL_APPLIES_AURA             = 0x001,
-    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x002,
-    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x004,
-    SPELL_INTERNAL_POSITIVE                 = 0x008,
-    SPELL_INTERNAL_HEAL                     = 0x010,
-    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x020,
-    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x040,
-    SPELL_INTERNAL_AOE                      = 0x080,
-    SPELL_INTERNAL_AOE_AURA                 = 0x100,
-    SPELL_INTERNAL_DISMOUNT                 = 0x200,
-    SPELL_INTERNAL_CHARM                    = 0x400,
-    SPELL_INTERNAL_REFLECTABLE              = 0x800,
+    SPELL_INTERNAL_APPLIES_AURA             = 0x0001,
+    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x0002,
+    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x0004,
+    SPELL_INTERNAL_POSITIVE                 = 0x0008,
+    SPELL_INTERNAL_HEAL                     = 0x0010,
+    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x0020,
+    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x0040,
+    SPELL_INTERNAL_AOE                      = 0x0080,
+    SPELL_INTERNAL_AOE_AURA                 = 0x0100,
+    SPELL_INTERNAL_DISMOUNT                 = 0x0200,
+    SPELL_INTERNAL_CHARM                    = 0x0400,
+    SPELL_INTERNAL_REFLECTABLE              = 0x0800,
+    SPELL_INTERNAL_CUSTOM                   = 0x1000,
 };
 
 // original names, do not edit
