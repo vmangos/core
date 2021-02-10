@@ -41,7 +41,7 @@ UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` IN (15581, 
 UPDATE `creature_template` SET `display_scale1` = 1.25 WHERE `entry` IN (15572, 15587, 15573, 15582, 15579, 15585, 15577, 15578);
 
 -- correct bluffwatcher scale
-UPDATE `creature_template` SET `display_scale1` = 1.35 `display_scale3` = 1.35 WHERE `entry` = 3084;
+UPDATE `creature_template` SET `display_scale1` = 1.35, `display_scale3` = 1.35 WHERE `entry` = 3084;
 
 -- correct storm shadowhoof scale
 UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` = 10303;
