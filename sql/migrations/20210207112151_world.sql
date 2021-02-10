@@ -214,11 +214,11 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `quest_template` SET `RequiredCondition` = 8873 WHERE `entry` = 8873;
 
 -- quest 8874 should only be available from creature guid 91605
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8874, 20, 2459, 10, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8874, 20, 2459, 20, 0, 0, 0);
 UPDATE `quest_template` SET `RequiredCondition` = 8874 WHERE `entry` = 8874;
 
 -- quest 8875 should only be available from creature guid 91599
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8875, 20, 8362, 10, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8875, 20, 8362, 20, 0, 0, 0);
 UPDATE `quest_template` SET `RequiredCondition` = 8875 WHERE `entry` = 8875;
 
 -- moonglade revelers should launch fireworks
