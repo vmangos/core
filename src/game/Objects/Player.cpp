@@ -5601,6 +5601,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     int32 mobLevel         = defence ? pVictim->GetLevelForTarget(this) : pVictim->GetLevel(); // defense: pVictim = player
     int32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
     int32 currentSkillMax  = 5 * playerLevel;
+    int32 skillDiff        = currentSkillMax - currenSkillValue;
 
     // Don't increase weapon/defence skill when moblevel is grey according to players current skill value
     uint32 greyLevelForSkill = MaNGOS::XP::GetGrayLevel(currenSkillValue / 5);
@@ -5609,11 +5610,17 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (currentSkillMax - currenSkillValue <= 0)
+    if (skillDiff <= 0)
         return;
 
     // Calculate base chance to increase
-    float chance = 100 * (float (currentSkillMax - currenSkillValue) / currentSkillMax);
+    float chance;
+    if (currentSkillMax * 0.9 < currenSkillValue)
+        chance = 100 * float(skillDiff * 3) / currentSkillMax; // skillcap almost reached (last 10%)
+    else if (currentSkillMax * 0.5 < currenSkillValue)
+        chance = 100 * float(currentSkillMax * 0.9 * 0.5) / currenSkillValue; // skill is below last 10% above 50%
+    else
+        chance = 100; // skill is below 50% of current cap
 
     // Slighly increase/reduce chance due to mob level
     if (mobLevel > playerLevel + 1)
@@ -5629,7 +5636,10 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence)
         chance += bonus;
 
-    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i, moblevel=%i) -> chance to increase skill is %f ", defence, playerLevel, mobLevel, chance);
+    if (chance > 100)
+        chance = 100;
+
+    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i, moblevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, mobLevel, currenSkillValue, currentSkillMax, chance);
 
     if (roll_chance_f(chance))
     {
