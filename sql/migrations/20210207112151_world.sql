@@ -23,7 +23,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `gossip_menu_option` SET `condition_id`= 8868 WHERE `menu_id` = 6917 AND `id` = 0;
 
 -- correct reward text for elunes candle and set to not repeatable
-UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these coins of ancestry.  Please take Elune's candle with my blessing.  Also, please enjoy these complimentary fireworks.$b$bMay your Lunar Festival be joyous and filled with merriment, $n.$b$bAnd if you choose to face Omen and his minions, you will find Elune's candle quite useful...', `Special_Flags` = 0 WHERE `entry` = 8862;
+UPDATE `quest_template` SET `OfferRewardText` = 'Very well then - I accept these coins of ancestry.  Please take Elune\'s candle with my blessing.  Also, please enjoy these complimentary fireworks.$b$bMay your Lunar Festival be joyous and filled with merriment, $n.$b$bAnd if you choose to face Omen and his minions, you will find Elune\'s candle quite useful...', `SpecialFlags` = 0 WHERE `entry` = 8862;
 
 -- add progress text for elunes blessing and set to not repeatable
 UPDATE `quest_template` SET `OfferRewardEmote1` = 2, `RequestItemsText` = 'Omen yet stirs below below Lake Elune\'ara, $n...', `SpecialFlags` = 0 WHERE `entry` = 8868;
