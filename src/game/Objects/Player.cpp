@@ -5603,11 +5603,6 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     int32 currentSkillMax  = 5 * playerLevel;
     int32 skillDiff        = currentSkillMax - currenSkillValue;
 
-    // Don't increase weapon/defence skill when moblevel is grey according to players current skill value
-    uint32 greyLevelForSkill = MaNGOS::XP::GetGrayLevel(currenSkillValue / 5);
-    if (mobLevel < greyLevelForSkill)
-        return;
-
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
     if (skillDiff <= 0)
