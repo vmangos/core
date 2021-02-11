@@ -5609,18 +5609,36 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     // Calculate base chance to increase
     float chance;
-    if (currentSkillMax * 0.9 < currenSkillValue)
-        chance = float (0.5 - 0.0168966 * currenSkillValue * (300.0 / currentSkillMax) + 0.0152069 * currentSkillMax * (300.0 / currentSkillMax)) * 100;
-    else // skill is below last 10% 
-        chance = std::min(100.0f, 100 * float (currentSkillMax * 0.9 * 0.5) / currenSkillValue); 
+    if (defence) // TODO: more research needed. Seems to increase slower than weapon skill. Using old formula:
+    {
+        uint32 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
+        uint32 mobLevel = pVictim->GetLevelForTarget(this);
 
-    // Calculate bonus by intellect (capped at 10% - guessed)
-    float bonus = std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
+        if (mobLevel > playerLevel + 5)
+            mobLevel = playerLevel + 5;
 
-    if (!defence)
-        chance += bonus; // Add intellect bonus for weapon skill
-    else
-        chance *= 0.5; // Defence seems to increase about 50% slower (more research needed)
+        uint32 lvldif = mobLevel - greylevel;
+        if (lvldif < 3)
+            lvldif = 3;
+
+        chance = float(3 * lvldif * skillDiff) / playerLevel;
+    }
+    else // weapon skill https://classic.wowhead.com/guides/classic-wow-weapon-skills
+    {
+        if (currentSkillMax * 0.9 < currenSkillValue)
+        {
+            // skill is within last 10% from cap - chance decreases from 50% to a minimum which depends on player level
+            chance = 100 * float(0.5 - 0.0168966 * currenSkillValue * (300.0 / currentSkillMax) + 0.0152069 * currentSkillMax * (300.0 / currentSkillMax));
+        }
+        else
+        {
+            // skill is below last 10% - chance decreases from 100% to 50%
+            chance = std::min(100.0f, 100 * float(currentSkillMax * 0.9 * 0.5) / currenSkillValue);
+        }      
+
+        // Calculate bonus by intellect (capped at 10% - guessed)
+        chance += std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
+    }
 
     chance = std::min(100.0f, chance);
 
