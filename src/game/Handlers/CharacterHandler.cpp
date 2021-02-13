@@ -443,14 +443,14 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
     ObjectGuid playerGuid;
     recv_data >> playerGuid;
 
-    if (PlayerLoading() || GetPlayer() != nullptr)
+    if ((!sWorld.getConfig(CONFIG_BOOL_WORLD_AVAILABLE) && GetSecurity() == SEC_PLAYER) ||
+        PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
     {
-        sLog.outError("Player tryes to login again, AccountId = %d", GetAccountId());
+        WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+        data << (uint8)1;
+        SendPacket(&data);
         return;
     }
-    if (!playerGuid.IsPlayer())
-        return;
-
 
     DEBUG_LOG("WORLD: Recvd Player Logon Message");
 
