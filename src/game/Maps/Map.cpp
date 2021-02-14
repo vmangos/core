@@ -2686,9 +2686,9 @@ void Map::SendObjectUpdates()
     ASSERT(threads >= 1);
 
     std::vector<std::set<Object*>::iterator> t;
-    t.reserve(i_objectsToClientUpdate.size());
+    t.reserve(i_objectsToClientUpdate.size()); //t will not contain end!
     for (std::set<Object*>::iterator it = i_objectsToClientUpdate.begin(); it != i_objectsToClientUpdate.end(); it++)
-        t.emplace_back(it);
+        t.push_back(it);
     std::atomic<int> ait(0);
     uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
     auto f = [&t, &ait, beginTime=now, timeout](){
@@ -2711,7 +2711,7 @@ void Map::SendObjectUpdates()
     f();
     if (job.valid())
         job.wait();
-    if (ait > i_objectsToClientUpdate.size()) //ait is increased before checks, so max value is `objectsCount + threads`
+    if (ait >= i_objectsToClientUpdate.size()) //ait is increased before checks, so max value is `objectsCount + threads`
         i_objectsToClientUpdate.clear();
     else
         i_objectsToClientUpdate.erase(t.front(), t[ait]);
