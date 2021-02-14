@@ -250,6 +250,10 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_template` VALUES
 (15219, 0, 6296, 5556, 10992, 11009, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 'Trick - Critter', '', 0, 1, 1, 42, 42, 0, 0, 15, 188, 0, 1, 0, 20, 0, 0, 0, 0, 2, 2, 0, 9, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
 
+-- Love is in the Air breadcrumb quests should be in exclusive group
+UPDATE `quest_template` SET `ExclusiveGroup` = 8897 WHERE `entry` IN (8897, 8899, 8898);
+UPDATE `quest_template` SET `ExclusiveGroup` = 8900 WHERE `entry` IN (8900, 8901, 8902);
+
 
 -- End of migration.
 END IF;
