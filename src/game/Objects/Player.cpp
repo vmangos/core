@@ -5625,15 +5625,15 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     }
     else // weapon skill https://classic.wowhead.com/guides/classic-wow-weapon-skills
     {
-        if (currentSkillMax * 0.9 > currenSkillValue)
+        if (currentSkillMax * 0.9f > currenSkillValue)
         {
             // Skill progress: 1% - 90% - chance decreases from 100% to 50%
-            chance = std::min(100.0f, float(currentSkillMax * 0.9 * 50) / currenSkillValue);
+            chance = std::min(100.0f, float(currentSkillMax * 0.9f * 50) / currenSkillValue);
         }
         else
         {
             // Skill progress: 90% - 100% - chance decreases from 50% to a minimum which is level dependent
-            chance = float(50 - 1.7 * currenSkillValue * (300.0 / currentSkillMax) + 1.53 * currentSkillMax * (300.0 / currentSkillMax));
+            chance = float(50 - 1.7f * currenSkillValue * (300.0f / currentSkillMax) + 1.53f * currentSkillMax * (300.0f / currentSkillMax));
         }      
 
         // Add intellect bonus (capped at 10% - guessed)
