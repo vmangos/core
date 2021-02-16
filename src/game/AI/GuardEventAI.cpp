@@ -88,11 +88,3 @@ void GuardEventAI::EnterCombat(Unit* pWho)
     CreatureEventAI::EnterCombat(pWho);
     m_creature->CallForHelp(30.0f);
 }
-
-void GuardEventAI::JustDied(Unit* pKiller)
-{
-    CreatureEventAI::JustDied(pKiller);
-
-    if (Player* pPlayerKiller = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself())
-        m_creature->SendZoneUnderAttackMessage(pPlayerKiller);
-}

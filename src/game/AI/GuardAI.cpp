@@ -113,9 +113,3 @@ void GuardAI::AttackStart(Unit* pWho)
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
 }
-
-void GuardAI::JustDied(Unit* pKiller)
-{
-    if (Player* pPlayerKiller = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself())
-        m_creature->SendZoneUnderAttackMessage(pPlayerKiller);
-}
