@@ -75,6 +75,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_INFINITE_AOI                 = 0x00800000, // 8388606  CREATURE_DIFFICULTYFLAGS_3_INFINITE_AOI
     CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000, // 16777216 Creature will not pause movement when player talks to it
     CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x02000000, // 33554432 Creature will use run speed out of combat
+    CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE         = 0x04000000, // 67108864 Creature will not evade due to target being unreachable
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform

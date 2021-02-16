@@ -790,7 +790,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, hpPercent < 6.0f);
 
             bool unreachableTarget = !i_motionMaster.empty() &&
-                                     GetVictim() &&
+                                     GetVictim() && !HasExtraFlag(CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE) &&
                                      GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
                                      !HasDistanceCasterMovement() &&
                                      (!CanReachWithMeleeAutoAttack(GetVictim()) || !IsWithinLOSInMap(GetVictim())) &&
