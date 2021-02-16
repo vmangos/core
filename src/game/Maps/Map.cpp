@@ -1717,10 +1717,13 @@ uint32 Map::GetPlayersCountExceptGMs() const
     return count;
 }
 
-void Map::SendToPlayers(WorldPacket const* data) const
+void Map::SendToPlayers(WorldPacket const* data, Team team) const
 {
     for (const auto& itr : m_mapRefManager)
-        itr.getSource()->GetSession()->SendPacket(data);
+    {
+        if (team == TEAM_NONE || itr.getSource()->GetTeam() == team)
+            itr.getSource()->GetSession()->SendPacket(data);
+    }
 }
 
 bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const

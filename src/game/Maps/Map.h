@@ -452,7 +452,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 
         // Send a Packet to all players on a map
-        void SendToPlayers(WorldPacket const* data) const;
+        void SendToPlayers(WorldPacket const* data, Team team = TEAM_NONE) const;
         // Send a Packet to all players in a zone. Return false if no player found
         bool SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const;
 
