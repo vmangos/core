@@ -90,7 +90,7 @@ namespace MovementPacketSender
         /* speed change */
         void AddSpeedChangeToController(Unit* unit, UnitMoveType mtype, float newRate);
         void SendSpeedChangeToController(Unit* unit, Player* mover, PlayerMovementPendingChange& pendingChange);
-        void SendSpeedChangeToObservers(Unit* unit, UnitMoveType mtype, float newRate);
+        void SendSpeedChangeToObservers(Unit* unit, UnitMoveType mtype, float newSpeed);
         void SendSpeedChangeToAll(Unit* unit, UnitMoveType mtype, float newRate);
 
         /* teleport */

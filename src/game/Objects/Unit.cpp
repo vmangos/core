@@ -6135,8 +6135,7 @@ void Unit::CheckPendingMovementChanges()
     Player* pController = GetPlayerMovingMe();
     if (!pController || !pController->IsInWorld() || pController->IsBeingTeleportedFar())
     {
-        ResolvePendingMovementChanges();
-        if (pController != this)
+        if (ResolvePendingMovementChanges() && pController != this)
             SendHeartBeat(true);
         return;
     }
@@ -6162,9 +6161,10 @@ void Unit::CheckPendingMovementChanges()
         // Previous controller didn't ack a movement change. Not our fault.
         if (oldestChangeToAck.controller != pController->GetObjectGuid())
         {
-            ResolvePendingMovementChange(oldestChangeToAck);
+            bool const needHeartBeat = ResolvePendingMovementChange(oldestChangeToAck);
             PopPendingMovementChange();
-            SendHeartBeat(true);
+            if (needHeartBeat)
+                SendHeartBeat(true);
             return;
         }
 
@@ -6172,9 +6172,10 @@ void Unit::CheckPendingMovementChanges()
         {
             // Change was resent but still no reply. Enforce the flags.
             pController->GetCheatData()->OnFailedToAckChange();
-            ResolvePendingMovementChange(oldestChangeToAck);
+            bool const needHeartBeat = ResolvePendingMovementChange(oldestChangeToAck);
             PopPendingMovementChange();
-            SendHeartBeat(true);
+            if (needHeartBeat)
+                SendHeartBeat(true);
         }
         else
         {
@@ -6228,53 +6229,64 @@ bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
     }) != m_pendingMovementChanges.end();
 }
 
-void Unit::ResolvePendingMovementChanges()
+bool Unit::ResolvePendingMovementChanges()
 {
+    bool needHeartBeat = false;
     while (!m_pendingMovementChanges.empty())
     {
         auto change = m_pendingMovementChanges.begin();
-        ResolvePendingMovementChange(*change);
+        if (ResolvePendingMovementChange(*change))
+            needHeartBeat = true;
         m_pendingMovementChanges.erase(change);
     }
+    return needHeartBeat;
 }
 
-void Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change)
+bool Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change)
 {
+    // returns true if heartbeat required
     switch (change.movementChangeType)
     {
         case ROOT:
             if (change.apply)
                 RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
             SetRootedReal(change.apply);
-            break;
+            return true;
         case WATER_WALK:
             SetWaterWalkingReal(change.apply);
-            break;
+            return true;
         case SET_HOVER:
             SetHoverReal(change.apply);
-            break;
+            return true;
         case FEATHER_FALL:
             SetFeatherFallReal(change.apply);
-            break;
+            return true;
         case SPEED_CHANGE_WALK:
+            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_WALK, change.newValue / baseMoveSpeed[MOVE_WALK]);
             SetSpeedRateReal(MOVE_WALK, change.newValue / baseMoveSpeed[MOVE_WALK]);
-            break;
+            return false;
         case SPEED_CHANGE_RUN:
+            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
             SetSpeedRateReal(MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
-            break;
+            return false;;
         case SPEED_CHANGE_RUN_BACK:
+            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
             SetSpeedRateReal(MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
-            break;
+            return false;;
         case SPEED_CHANGE_SWIM:
+            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_SWIM, change.newValue / baseMoveSpeed[MOVE_SWIM]);
             SetSpeedRateReal(MOVE_SWIM, change.newValue / baseMoveSpeed[MOVE_SWIM]);
-            break;
+            return false;;
         case SPEED_CHANGE_SWIM_BACK:
+            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_SWIM_BACK, change.newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
             SetSpeedRateReal(MOVE_SWIM_BACK, change.newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
-            break;
+            return false;;
         case RATE_CHANGE_TURN:
+            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
             SetSpeedRateReal(MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
-            break;
+            return false;;
     }
+    return false;
 }
 
 bool Unit::FindPendingMovementFlagChange(uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived)

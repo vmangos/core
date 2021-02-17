@@ -227,14 +227,14 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
 
     ObjectGuid guid;
     recvData >> guid;
-    uint32 counter = 0;
+    uint32 movementCounter = 0;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    recvData >> counter;
+    recvData >> movementCounter;
 #endif
     uint32 time = 0;
     recvData >> time;
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
-    DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
+    DEBUG_LOG("Counter %u, time %u", movementCounter, time / IN_MILLISECONDS);
 
     Unit* pMover = _player->GetMover();
     Player* pPlayerMover = pMover->ToPlayer();
@@ -245,10 +245,10 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     if (guid != pPlayerMover->GetObjectGuid())
         return;
 
-    if (!pMover->FindPendingMovementTeleportChange(counter))
+    if (!pMover->FindPendingMovementTeleportChange(movementCounter))
     {
-        sLog.outInfo("WorldSession::HandleMoveTeleportAckOpcode: Player %s from account id %u sent MSG_MOVE_TELEPORT_ACK, but no pending teleport found",
-            _player->GetName(), _player->GetSession()->GetAccountId());
+        sLog.outInfo("WorldSession::HandleMoveTeleportAckOpcode: Player %s from account id %u sent MSG_MOVE_TELEPORT_ACK with counter %u, but no pending teleport found (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), movementCounter, pMover->GetMovementCounter());
     }
 
     pPlayerMover->SetSemaphoreTeleportNear(false);
@@ -449,17 +449,19 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
     // verify that indeed the client is replying with the changes that were send to him
     if (!pMover->HasPendingMovementChange())
     {
-        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u sent opcode %u, but no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId(), opcode);
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u sent opcode %u with counter %u, but no movement change ack was expected from this player (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), opcode, movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
     if (!pMover->FindPendingMovementSpeedChange(speedReceived, movementCounter, move_type))
     {
-        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u sent opcode %u, but received data does not match pending change",
-            _player->GetName(), _player->GetSession()->GetAccountId(), opcode);
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u sent opcode %u with counter %u, but received data does not match pending change (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), opcode, movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
@@ -546,9 +548,10 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
     // verify that indeed the client is replying with the changes that were send to him
     if (!pMover->HasPendingMovementChange())
     {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u sent opcode %u, but no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId(), opcode);
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u sent opcode %u with counter %u, but no movement change ack was expected from this player (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), opcode, movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
@@ -567,9 +570,10 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
 
     if (!pMover->FindPendingMovementFlagChange(movementCounter, applyReceived, changeTypeReceived))
     {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u sent opcode %u, but received data does not match pending change",
-            _player->GetName(), _player->GetSession()->GetAccountId(), opcode);
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u sent opcode %u with counter %u, but received data does not match pending change (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), opcode, movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
@@ -659,9 +663,10 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     // verify that indeed the client is replying with the changes that were send to him
     if (!pMover->HasPendingMovementChange())
     {
-        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u sent opcode %u, but no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId(), opcode);
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u sent opcode %u with counter %u, but no movement change ack was expected from this player (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), opcode, movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
@@ -669,9 +674,10 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 
     if (!pMover->FindPendingMovementRootChange(movementCounter, applyReceived))
     {
-        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u sent opcode %u, but received data does not match pending change",
-            _player->GetName(), _player->GetSession()->GetAccountId(), opcode);
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u sent opcode %u with counter %u, but received data does not match pending change (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), opcode, movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
@@ -747,17 +753,19 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     // verify that indeed the client is replying with the changes that were send to him
     if (!pMover->HasPendingMovementChange())
     {
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u sent opcode %u, but no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId(), recvData.GetOpcode());
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u sent opcode %u with counter %u, but no movement change ack was expected from this player (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), recvData.GetOpcode(), movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
     if (!pMover->FindPendingMovementKnockbackChange(movementInfo, movementCounter))
     {
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u sent opcode %u, but received data does not match pending change",
-            _player->GetName(), _player->GetSession()->GetAccountId(), recvData.GetOpcode());
-        _player->GetCheatData()->OnWrongAckData();
+        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u sent opcode %u with counter %u, but received data does not match pending change (current counter is %u)",
+            _player->GetName(), _player->GetSession()->GetAccountId(), recvData.GetOpcode(), movementCounter, pMover->GetMovementCounter());
+        if (movementCounter == 0 || movementCounter > pMover->GetMovementCounter())
+            _player->GetCheatData()->OnWrongAckData();
         return;
     }
 
