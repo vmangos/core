@@ -8,6 +8,7 @@
 #include "WorldSession.h"
 #include "MoveSpline.h"
 #include "World.h"
+#include "MovementPacketSender.h"
 
 namespace Movement
 {
@@ -369,6 +370,19 @@ float MovementAnticheat::GetSpeedForMovementInfo(MovementInfo const& movementInf
     return speed;
 }
 
+UnitMoveType MovementAnticheat::GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const
+{
+    UnitMoveType type = MOVE_RUN;
+    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
+        type = movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_SWIM_BACK : MOVE_SWIM;
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
+        type = MOVE_WALK;
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        type = movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN;
+
+    return type;
+}
+
 bool IsFlagAckOpcode(uint16 opcode)
 {
     switch (opcode)
@@ -645,6 +659,13 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
         
         if (sendHeartbeat)
         {
+            if ((cheatFlags & (1 << CHEAT_TYPE_OVERSPEED_JUMP)) &&
+                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
+            {
+                if (float speed = GetSpeedForMovementInfo(GetLastMovementInfo()))
+                    MovementPacketSender::SendSpeedChangeToAll(me, GetMoveTypeForMovementInfo(GetLastMovementInfo()), speed);
+            }
+
             if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
             {
