@@ -658,6 +658,7 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
 
     ScriptedInstance* m_pInstance;
     bool Explode;
+    int despawnTimer = 2000;
 
     void Reset() override
     {
@@ -676,10 +677,12 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
             Explode = true;
     }
 
-    void UpdateAI(uint32 const /*diff*/) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (Explode)
+        if (Explode || despawnTimer <= 0)
             m_creature->ForcedDespawn();
+        else
+            despawnTimer -= diff;
     }
 };
 
