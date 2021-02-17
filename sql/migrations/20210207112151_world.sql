@@ -254,6 +254,10 @@ INSERT INTO `creature_template` VALUES
 UPDATE `quest_template` SET `ExclusiveGroup` = 8897 WHERE `entry` IN (8897, 8899, 8898);
 UPDATE `quest_template` SET `ExclusiveGroup` = 8900 WHERE `entry` IN (8900, 8901, 8902);
 
+-- allow quest elunes blessing to complete
+DELETE FROM `spell_scripts` WHERE `id`=26393;
+INSERT INTO `spell_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26393, 0, 15, 26394, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Elune\'s Blessing: Target - Cast Elune\'s BLessing (quest credit)');
+
 
 -- End of migration.
 END IF;
