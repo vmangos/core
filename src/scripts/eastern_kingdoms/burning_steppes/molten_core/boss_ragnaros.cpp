@@ -473,6 +473,7 @@ struct boss_ragnarosAI : ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_WRATH_OF_RAGNAROS) == CAST_OK)
             {
+                DoResetThreat();
                 m_uiWrathOfRagnarosTimer = urand(25000, 30000);
                 DoScriptText(SAY_WRATH, m_creature);
             }
