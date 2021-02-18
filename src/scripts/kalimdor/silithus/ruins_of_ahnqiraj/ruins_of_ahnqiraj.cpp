@@ -383,7 +383,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
 enum
 {
     SPELL_PURGE             =  25756,
-    SPELL_DRAINMANA         =  25755,
+    SPELL_DRAINMANA         =  25754,
 };
 
 
@@ -396,13 +396,11 @@ struct ObsidianDestroyerAI : public ScriptedAI
 
     bool m_bIsInCombat;
     uint32 m_uiDrainMana_Timer;
-    uint8 m_uiDrainCount;
-    std::vector<ObjectGuid> PlayerList;
 
     void Reset() override
     {
         m_uiDrainMana_Timer = 7000;
-        m_uiDrainCount = 0;
+        m_creature->SetPower(POWER_MANA, 0);
 
         m_bIsInCombat = false;
     }
@@ -423,62 +421,19 @@ struct ObsidianDestroyerAI : public ScriptedAI
             pObsidian->SetRespawnTime(345600);
     }
 
-    void FillPlayerList()
-    {
-        Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto& i : liste)
-        {
-            if (i.getSource()->IsAlive() && i.getSource()->GetPowerType() == POWER_MANA)
-                PlayerList.push_back(i.getSource()->GetObjectGuid());
-        }
-    }
-
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
+        if (m_creature->GetPower(POWER_MANA) >= m_creature->GetMaxPower(POWER_MANA) && m_bIsInCombat)
+            DoCast(m_creature, SPELL_PURGE, true);
+
         //m_uiDrainMana_Timer
         if (m_uiDrainMana_Timer < uiDiff)
         {
-            if (!m_uiDrainCount)
-                FillPlayerList();
-            if (!PlayerList.empty() && m_uiDrainCount < 6)
-            {
-                uint32 Rand = urand(0, PlayerList.size() - 1);
-                Player *Plr = m_creature->GetMap()->GetPlayer(PlayerList[Rand]);
-                if (Plr)
-                {
-                    if (Plr->IsAlive())
-                    {
-                        m_uiDrainCount++;
-                        uint32 Mana = Plr->GetPower(POWER_MANA);
-                        if (Mana > 500)
-                        {
-                            Plr->SetPower(POWER_MANA, Plr->GetPower(POWER_MANA) - 500);
-                            Mana = 500;
-                        }
-                        else
-                            Plr->SetPower(POWER_MANA, 0);
-                        Mana *= 2;
-                        if (m_creature->GetPower(POWER_MANA) + Mana < m_creature->GetMaxPower(POWER_MANA))
-                            m_creature->SetPower(POWER_MANA, m_creature->GetPower(POWER_MANA) + Mana);
-                        else if (m_creature->GetPower(POWER_MANA) < m_creature->GetMaxPower(POWER_MANA))
-                            m_creature->SetPower(POWER_MANA, m_creature->GetMaxPower(POWER_MANA));
-                    }
-                }
-                PlayerList.erase(PlayerList.begin() + Rand);
-
-                if (m_creature->GetPower(POWER_MANA) == m_creature->GetMaxPower(POWER_MANA) && m_bIsInCombat)
-                    DoCast(m_creature, SPELL_PURGE);
-
-            }
-            else
-            {
-                PlayerList.clear();
-                m_uiDrainCount = 0;
-                m_uiDrainMana_Timer = 7000;
-            }
+            DoCast(m_creature, SPELL_DRAINMANA);
+            m_uiDrainMana_Timer = 7000;
         }
         else
             m_uiDrainMana_Timer -= uiDiff;
