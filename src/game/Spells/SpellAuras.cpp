@@ -310,12 +310,7 @@ void Aura::Refresh(Unit* caster, Unit* target, SpellAuraHolder* pRefreshWithHold
     m_periodicTick = 0;
     Player* modOwner = caster ? caster->GetSpellModOwner() : nullptr;
     m_applyTime = time(nullptr);
-    // Refresh periodic period, but keep current timer.
-    // If we chain refresh a DoT, it should not prevent first damage tick!
-    int32 oldPeriodicTimer = m_periodicTimer;
     CalculatePeriodic(modOwner, true);
-    if (oldPeriodicTimer < m_periodicTimer)
-        m_periodicTimer = oldPeriodicTimer;
 
     // Re-calculation du montant de degats
     if (IsApplied() || !IsExclusive())
