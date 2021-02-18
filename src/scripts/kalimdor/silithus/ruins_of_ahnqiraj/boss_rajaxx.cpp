@@ -81,19 +81,7 @@ enum
 #endif
 
 #define ANDOROV_WAYPOINT_MAX  7
-#define OOC_BETWEEN_WAVE 1000
-
-struct RespawnAndEvadeHelper
-{
-    explicit RespawnAndEvadeHelper(Creature* _pCreature) : pCreature(_pCreature) {}
-    void operator()() const
-    {
-        if (!pCreature->IsAlive())
-            pCreature->Respawn();
-        pCreature->AI()->EnterEvadeMode();
-    }
-    Creature* pCreature;
-};
+#define OOC_BETWEEN_WAVE 5000
 
 struct boss_rajaxxAI : public ScriptedAI
 {
@@ -143,7 +131,6 @@ struct boss_rajaxxAI : public ScriptedAI
         if (waveIndex >= WAVE_MAX)
             return;
 
-        DEBUG_EMOTE_YELL(m_creature, "DEBUG : Wave Reset");
         uint64 leaderGUID = GetLeaderGuidFromWaveIndex(waveIndex);
         if (Creature* pLeader = m_pInstance->GetCreature(leaderGUID))
             if (CreatureGroup* group = pLeader->GetCreatureGroup())
@@ -319,14 +306,13 @@ struct boss_rajaxxAI : public ScriptedAI
         {
             if (IsCurrentWaveDead())
                 m_uiNextWave_Timer += uiDiff;
-            else
-                m_uiNextWave_Timer = 0;
 
             if (m_uiNextWaveIndex < WAVE_MAX)
             {
-                if ((m_uiWave_Timer < uiDiff) || (m_uiNextWave_Timer > OOC_BETWEEN_WAVE))
+                if (m_uiWave_Timer < uiDiff || m_uiNextWave_Timer > OOC_BETWEEN_WAVE)
                 {
                     StartWave(m_uiNextWaveIndex);
+                    m_uiNextWave_Timer = 0;
                     m_uiNextWaveIndex++;
                     m_uiWave_Timer = DELAY_BETWEEN_WAVE;
                 }
