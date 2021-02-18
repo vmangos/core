@@ -490,6 +490,10 @@ void CreatureAI::TriggerAlert(Unit const* who)
     if (WorldTimer::getMSTimeDiffToNow(m_uLastAlertTime) < 10000)
         return;
 
+    // only alert if target is within line of sight
+    if (!m_creature->IsWithinLOSInMap(who, true, true))
+        return;
+
     // Send alert sound (if any) for this creature
     m_creature->SendAIReaction(AI_REACTION_ALERT);
 
