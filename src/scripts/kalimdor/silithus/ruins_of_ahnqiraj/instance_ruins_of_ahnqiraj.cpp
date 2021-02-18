@@ -391,11 +391,10 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             else
                 m_uiGladiatorDeath = 0;
             return;
-            break;
         case TYPE_KURINNAXX:
             /** Spawn Andorov 3 minutes after Kurinaxx death */
             if (uiData == DONE)
-                SetAndorovSquadRespawnTime(6);//AQ_RESPAWN_3_MINUTES);
+                SetAndorovSquadRespawnTime(AQ_RESPAWN_3_MINUTES);
 
             m_auiEncounter[TYPE_KURINNAXX] = uiData;
             break;
