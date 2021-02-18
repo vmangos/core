@@ -26,7 +26,7 @@ EndScriptData */
 
 enum
 {
-    EMOTE_FRENZY            = -1000002,
+    EMOTE_FRENZY            = 10645,
 
     GO_TRAP                 =   180647,
 

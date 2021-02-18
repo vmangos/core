@@ -33,7 +33,7 @@ enum
     SPELL_FRENZY                =  8269,
     SPELL_LASH                  =  25852,
 
-    EMOTE_FRENZY                =  -1000002,
+    EMOTE_FRENZY                =  10645,
 
     SPELL_FEED                  =  25721,
 
