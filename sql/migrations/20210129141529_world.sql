@@ -65,6 +65,9 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (12597, 109, 'Lady Sathra #2'),
 (73001, 109, 'Lady Sathra #3');
 
+-- remove unused template
+DELETE FROM `pool_template` WHERE `entry` = 14223;
+
 
 -- End of migration.
 END IF;
