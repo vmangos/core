@@ -647,46 +647,7 @@ CreatureAI* GetAI_boss_ragnaros(Creature* pCreature)
     return new boss_ragnarosAI(pCreature);
 }
 
-struct boss_flame_of_ragnarosAI : ScriptedAI
-{
-    explicit boss_flame_of_ragnarosAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        boss_flame_of_ragnarosAI::Reset();
 
-        SetCombatMovement(false);
-    }
-
-    ScriptedInstance* m_pInstance;
-    bool Explode;
-
-    void Reset() override
-    {
-        m_creature->AddUnitState(UNIT_STAT_ROOT);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->SetLevel(63);
-        m_creature->SetFactionTemplateId(14);
-        m_creature->CastSpell(m_creature, SPELL_INTENSE_HEAT, false);
-        Explode = false;
-    }
-
-    void SpellHitTarget(Unit* /*pCaster*/, SpellEntry const* pSpell) override
-    {
-        if (pSpell->Id == SPELL_INTENSE_HEAT)
-            Explode = true;
-    }
-
-    void UpdateAI(uint32 const /*diff*/) override
-    {
-        if (Explode)
-            m_creature->ForcedDespawn();
-    }
-};
-
-CreatureAI* GetAI_boss_flame_of_ragnaros(Creature* pCreature)
-{
-    return new boss_flame_of_ragnarosAI(pCreature);
-}
 
 void AddSC_boss_ragnaros()
 {
@@ -696,8 +657,4 @@ void AddSC_boss_ragnaros()
     newscript->GetAI = &GetAI_boss_ragnaros;
     newscript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "boss_flame_of_ragnaros";
-    newscript->GetAI = &GetAI_boss_flame_of_ragnaros;
-    newscript->RegisterSelf();
 }
