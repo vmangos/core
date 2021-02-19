@@ -5723,7 +5723,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!target_friendly_checked)
                     {
                         target_friendly_checked = true;
-                        if (!m_caster->IsValidAttackTarget(target))
+                        if (!m_caster->IsValidAttackTarget(target, false))
                             return SPELL_FAILED_BAD_TARGETS;
                     }
                     explicit_target_mode = true;

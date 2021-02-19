@@ -6950,7 +6950,7 @@ Unit* Unit::GetTauntTarget() const
     Unit* caster = nullptr;
 
     // The last taunt aura caster is alive an we are happy to attack him
-    if ((caster = tauntAuras.back()->GetCaster()) && caster->IsAlive() && IsValidAttackTarget(caster))
+    if ((caster = tauntAuras.back()->GetCaster()) && IsValidAttackTarget(caster))
         return caster;
     else if (tauntAuras.size() > 1)
     {
