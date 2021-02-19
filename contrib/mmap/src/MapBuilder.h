@@ -82,6 +82,9 @@ namespace MMAP
             void buildGameObject(std::string modelName, uint32 displayId);
             void buildTransports();
 
+            bool duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX);
+            bool duDumpPolyMeshDetailToObj(rcPolyMeshDetail& dmesh, uint32 mapID, uint32 tileY, uint32 tileX);
+
         private:
             // detect maps and tiles
             void discoverTiles();
