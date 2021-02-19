@@ -176,7 +176,10 @@ struct boss_skeramAI : public ScriptedAI
         // Prophet Skeram will only cast Arcane Explosion if a given number of players are in melee range
         // Initial value was 4+ but it was changed in patch 1.12 to be less dependant on raid
         // We assume value is number of players / 10 (raid of 40 people in Classic -> value of 4)
-        m_maxMeleeAllowed = m_pInstance->GetMap()->GetPlayersCountExceptGMs() / 10;
+        if (sWorld.GetWowPatch() == WOW_PATCH_112)
+            m_maxMeleeAllowed = m_pInstance->GetMap()->GetPlayersCountExceptGMs() / 10;
+        else
+            m_maxMeleeAllowed = 4;
     }
 
     void JustReachedHome() override
