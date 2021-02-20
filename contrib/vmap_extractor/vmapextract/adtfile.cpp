@@ -58,7 +58,7 @@ void fixnamen(char* name, size_t len)
         }
     }
     //extension in lowercase
-    for (size_t i = len - 3; i < len; i++)
+    for (size_t i = len - 4; i < len; i++) //offset set to 4 wmoN - TODO: there is no wmo with more than 9 doodadsets, but if there where - we should improve this logic.
         name[i] |= 0x20;
 }
 
