@@ -126,7 +126,7 @@ DELETE FROM `gossip_menu` WHERE `entry`= 6029;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6029, 7182);
 -- Rizzle's Unguarded Plans 20805
-UPDATE `gameobject` SET `position_x` = -6236.64, `position_y` = -3830.48, `position_z` = -58.1364, `orientation` = -0.907571, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.438371, `rotation3 = 0.898794 WHERE `id` = 20805;
+UPDATE `gameobject` SET `position_x` = -6236.64, `position_y` = -3830.48, `position_z` = -58.1364, `orientation` = -0.907571, `rotation0` = 0, `rotation1` = 0, `rotation2` = 0.438371, `rotation3` = -0.898794 WHERE `id` = 20805;
 -- Explosive Charge 144065 - added
 DELETE FROM `gameobject` WHERE `guid` = 20;
 INSERT INTO `gameobject` VALUES (20, 144065,1, -6266.46, -3845.4, -58.7498, 0.550892, 0, 0, 0.271976, 0.962304, -5, -5, 255, 1, 0, 0, 0, 10);
