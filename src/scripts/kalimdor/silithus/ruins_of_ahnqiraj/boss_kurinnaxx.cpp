@@ -151,11 +151,11 @@ struct boss_kurinnaxxAI : public ScriptedAI
             if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
             {
 
-            	float x, y, z;
+                float x, y, z;
 
                 m_creature->SendSpellGo(pUnit, 25681);
-            	m_creature->GetRelativePositions(10.0f, 0.0f, 0.0f, x, y, z);
-            	pUnit->NearLandTo(x, y, z+3.5f, pUnit->GetOrientation());
+                m_creature->GetRelativePositions(10.0f, 0.0f, 0.0f, x, y, z);
+                pUnit->NearLandTo(x, y, z+3.5f, pUnit->GetOrientation());
                 m_uiInvocation_Timer = urand(5000, 10000);
             }
         }

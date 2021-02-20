@@ -202,8 +202,8 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
     ///- Get the accounts with GM Level >0
-    QueryResult* result = LoginDatabase.PQuery("SELECT username, account_access.gmlevel FROM account, account_access "
-        "WHERE account_access.id = account.id AND account_access.gmlevel > 0 AND RealmID=%u", realmID);
+    QueryResult* result = LoginDatabase.PQuery("SELECT `username`, `account_access`.`gmlevel` FROM `account`, `account_access` "
+        "WHERE `account_access`.`id` = `account`.`id` AND `account_access`.`gmlevel` > 0 AND `RealmID`=%u", realmID);
     if (result)
     {
         SendSysMessage(LANG_GMLIST);

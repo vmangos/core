@@ -802,6 +802,7 @@ class SpellMgr
             if (id < GetMaxSpellId())
             {
                 std::unique_ptr<SpellEntry> newSpell = std::make_unique<SpellEntry>();
+                newSpell->Internal |= SPELL_INTERNAL_CUSTOM;
                 for (uint32 i = 0; i < 8; ++i)
                 {
                     newSpell->SpellName[i] = "CustomSpell";

@@ -446,7 +446,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         return;
 
     // Do not save bot pets.
-    if (pOwner->GetSession()->GetBot())
+    if (pOwner->IsBot())
         return;
 
     // current/stable/not_in_slot
@@ -1703,13 +1703,13 @@ void Pet::_SaveSpells()
                 SqlStatement stmt = CharacterDatabase.CreateStatement(delSpell, "DELETE FROM pet_spell WHERE guid = ? and spell = ?");
                 stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first);
 
-                stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO pet_spell (guid,spell,active) VALUES (?, ?, ?)");
+                stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO `pet_spell` (`guid`, `spell`, `active`) VALUES (?, ?, ?)");
                 stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first, uint32(itr->second.active));
             }
             break;
             case PETSPELL_NEW:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO pet_spell (guid,spell,active) VALUES (?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO `pet_spell` (`guid`, `spell`, `active`) VALUES (?, ?, ?)");
                 stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first, uint32(itr->second.active));
             }
             break;

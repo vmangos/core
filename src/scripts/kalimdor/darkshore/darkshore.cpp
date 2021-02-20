@@ -72,6 +72,12 @@ struct npc_kerlonianAI : public FollowerAI
         m_uiFallAsleepTimer = urand(10000, 45000);
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
+    }
+
     void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
@@ -183,6 +189,7 @@ bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, Quest const
         if (npc_kerlonianAI* pKerlonianAI = dynamic_cast<npc_kerlonianAI*>(pCreature->AI()))
         {
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             DoScriptText(SAY_KER_START, pCreature, pPlayer);
             pKerlonianAI->StartFollow(pPlayer, FACTION_ESCORT_N_FRIEND_PASSIVE, pQuest);
         }
@@ -223,6 +230,12 @@ struct npc_prospector_remtravelAI : public npc_escortAI
     npc_prospector_remtravelAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
         Reset();
+    }
+
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
     }
 
     void WaypointReached(uint32 i) override
@@ -315,6 +328,7 @@ bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, 
         {
             DoScriptText(SAY_REM_START, pCreature, pPlayer);
             pCreature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest, true);
         }
     }
@@ -424,6 +438,12 @@ struct npc_theryluneAI : public npc_escortAI
 
     void Reset() override { }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
@@ -455,6 +475,7 @@ bool QuestAccept_npc_therylune(Player* pPlayer, Creature* pCreature, Quest const
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_THERYLUNE_START, pCreature, pPlayer);
             pCreature->SetFactionTemporary(79, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 
@@ -561,6 +582,7 @@ struct npc_volcorAI : public npc_escortAI
 
     void JustRespawned() override
     {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
         m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
 
@@ -623,6 +645,7 @@ struct npc_volcorAI : public npc_escortAI
             ForceDialogueStep = 0;
             ForceDialogueTimer = 0;
             Start(false, pPlayer->GetGUID(), pQuest);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 

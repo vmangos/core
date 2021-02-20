@@ -305,6 +305,7 @@ void SpellEntry::ComputeBinary()
                     case SPELL_AURA_MOD_ROOT:
                     case SPELL_AURA_MOD_SILENCE:
                     case SPELL_AURA_MOD_DISARM:
+                    case SPELL_AURA_MOD_RESISTANCE:
                     case SPELL_AURA_MOD_DAMAGE_TAKEN:
                         foundNoDamageAura = true;
                         break;
@@ -978,6 +979,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                     if (CalculateSimpleValue(effIndex) > 0)
                         return true;                        // some expected positive spells have unclear target modes // maybe don't need this at all now that we don't check for what was SPELL_ATTR_EX_NEGATIVE
                     break;
+                case SPELL_AURA_MOD_INCREASE_HEALTH:
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
                     return true;
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
@@ -1146,4 +1148,36 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     }
 
     return SPELL_CAST_OK;
+}
+
+bool SpellEntry::IsTargetInRange(WorldObject const* pCaster, WorldObject const* pTarget) const
+{
+    switch (rangeIndex)
+    {
+        case SPELL_RANGE_IDX_SELF_ONLY:
+            for (auto radiusIndex : EffectRadiusIndex)
+            {
+                if (radiusIndex)
+                    return pCaster->GetCombatDistance(pTarget) <= Spells::GetSpellRadius(sSpellRadiusStore.LookupEntry(radiusIndex));
+            }
+            for (auto triggeredSpell : EffectTriggerSpell)
+            {
+                if (triggeredSpell)
+                    if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(triggeredSpell))
+                        if (pSpellEntry->IsTargetInRange(pCaster, pTarget))
+                            return true;
+            }
+            return pCaster == pTarget;
+        case SPELL_RANGE_IDX_ANYWHERE:
+            return true;
+        case SPELL_RANGE_IDX_COMBAT:
+            return pCaster->CanReachWithMeleeSpellAttack(pTarget);
+    }
+
+    SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(rangeIndex);
+    float max_range = Spells::GetSpellMaxRange(srange);
+    float min_range = Spells::GetSpellMinRange(srange);
+    float dist = pCaster->GetCombatDistance(pTarget);
+
+    return dist < max_range && dist >= min_range;
 }

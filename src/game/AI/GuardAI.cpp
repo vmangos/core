@@ -74,7 +74,7 @@ void GuardAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->IsWithinDistInMap(pWho, attackRadius))
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsValidAttackTarget(pWho) &&
+    if (m_creature->CanInitiateAttack() && m_creature->IsValidAttackTarget(pWho) &&
        (pWho->IsHostileToPlayers() || m_creature->IsHostileTo(pWho) || isAttackingFriend) &&
         pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
     {
@@ -112,10 +112,4 @@ void GuardAI::AttackStart(Unit* pWho)
         if (m_bCombatMovement)
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
-}
-
-void GuardAI::JustDied(Unit* pKiller)
-{
-    if (Player* pPlayerKiller = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself())
-        m_creature->SendZoneUnderAttackMessage(pPlayerKiller);
 }

@@ -452,7 +452,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 
         // Send a Packet to all players on a map
-        void SendToPlayers(WorldPacket const* data) const;
+        void SendToPlayers(WorldPacket const* data, Team team = TEAM_NONE) const;
         // Send a Packet to all players in a zone. Return false if no player found
         bool SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const;
 
@@ -591,7 +591,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
 
         // GameObjectCollision
         float GetHeight(float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos = true) const;
+        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos = true, bool includingM2Objects = false) const;
         // First collision with object
         bool GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, float modifyDist) const;
         // Use navemesh to walk
@@ -919,6 +919,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         bool ScriptCommand_QuestCredit(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetGossipMenu(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SendScriptEvent(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         ScriptCommandFunction const m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -1009,6 +1010,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
             &Map::ScriptCommand_QuestCredit,            // 83
             &Map::ScriptCommand_SetGossipMenu,          // 84
             &Map::ScriptCommand_SendScriptEvent,        // 85
+            &Map::ScriptCommand_SetPvP,                 // 86
         };
 
     public:

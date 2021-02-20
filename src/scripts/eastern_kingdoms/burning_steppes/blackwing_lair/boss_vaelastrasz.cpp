@@ -561,7 +561,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
             return;
 
         if (pUnit->IsPlayer() && m_creature->GetDistance2d(pUnit) < 29.0f && m_creature->IsWithinLOSInMap(pUnit)
-          && pUnit->IsTargetableForAttack() && pUnit->IsInAccessablePlaceFor(m_creature))
+          && pUnit->IsTargetable(true, false) && pUnit->IsInAccessablePlaceFor(m_creature))
             AttackStart(pUnit);
     }
 
@@ -709,7 +709,7 @@ struct npc_death_talon_SeetherAI : public ScriptedAI
 
         if (!m_bEngaged)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                 m_bEngaged = true;
         }
         else

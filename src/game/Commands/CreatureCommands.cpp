@@ -167,7 +167,8 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
                     strScript.empty() ? " - " : strScript.c_str());
     PSendSysMessage(LANG_NPC_AI_MOVE, GetOnOffStr(pTarget->AI()->IsCombatMovementEnabled()));
     PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
-    PSendSysMessage(LANG_NPC_MOTION_TYPE, pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType());
+    MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
+    PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
     pTarget->AI()->GetAIInformation(*this);
 
     return true;
@@ -1403,9 +1404,18 @@ bool ChatHandler::HandleNpcGroupDelCommand(char *args)
         return false;
     }
 
-    g->RemoveMember(target->GetObjectGuid());
-    g->SaveToDb();
-    target->SetCreatureGroup(nullptr);
+    if (g->GetOriginalLeaderGuid() == target->GetObjectGuid())
+    {
+        g->DeleteFromDb();
+        target->LeaveCreatureGroup(); // group is deleted
+        g = nullptr;
+    }
+    else
+    {
+        target->LeaveCreatureGroup();
+        g->SaveToDb();
+    }
+
     target->GetMotionMaster()->Initialize();
     return true;
 }
@@ -1602,7 +1612,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         {
             if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
                 if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
-                    wpMMGen->GetPathInformation(wpPathId, wpDestination);
+                    wpMMGen->GetPathInformation(wpDestination);
 
             // Get information about default path if no current path. If no default path, prepare data dependendy on uniqueness
             if (wpDestination == PATH_NO_PATH && !sWaypointMgr.GetDefaultPath(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), &wpDestination))
@@ -1790,7 +1800,7 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
     {
         if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
             if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
-                wpMMGen->GetPathInformation(wpPathId, wpSource);
+                wpMMGen->GetPathInformation(wpSource);
 
         if (wpSource == PATH_NO_PATH)
             sWaypointMgr.GetDefaultPath(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), &wpSource);
@@ -2013,7 +2023,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
         if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
             if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
             {
-                wpMMGen->GetPathInformation(wpPathId, wpOrigin);
+                wpMMGen->GetPathInformation(wpOrigin);
                 wpPath = sWaypointMgr.GetPathFromOrigin(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpPathId, wpOrigin);
             }
 
@@ -2202,7 +2212,7 @@ bool ChatHandler::HandleWpExportCommand(char* args)
         {
             if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
                 if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
-                    wpMMGen->GetPathInformation(wpPathId, wpOrigin);
+                    wpMMGen->GetPathInformation(wpOrigin);
             if (wpOrigin == PATH_NO_PATH)
                 sWaypointMgr.GetDefaultPath(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), &wpOrigin);
         }

@@ -633,16 +633,10 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 19395: // Gordunni Trap
                 {
-                    if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    if (m_casterGo && unitTarget)
                     {
-                        // If GameObject casting was implemented, or activating a trap actually despawned it, this wouldn't be needed.
-                        if (GameObject* pObject = unitTarget->FindNearestGameObject(144050, INTERACTION_DISTANCE))
-                        {
-                            if (pObject->HasStaticDBSpawnData())
-                                unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
-                            else
-                                pObject->AddObjectToRemoveList();
-                        }
+                        unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
+                        m_casterGo->SetLootState(GO_JUST_DEACTIVATED);
                     }
 
                     return;
@@ -847,7 +841,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!pPlayer)
                         return;
 
-                    uint32 spellId = PickRandomValue(8064, 8065, 8066, 8067, 8068);
+                    uint32 spellId = PickRandomValue(8064, 8065, 8066, 8067, 8068, 8070);
                     pPlayer->CastSpell(pPlayer, spellId, true, nullptr);
                     return;
                 }
@@ -1002,7 +996,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         return;
 
                     // immediately finishes the cooldown on certain Rogue abilities
-                    auto cdCheck = [](SpellEntry const & spellEntry) -> bool { return (spellEntry.SpellFamilyName == SPELLFAMILY_ROGUE && (spellEntry.SpellFamilyFlags & uint64(0x0000026000000860))); };
+                    auto cdCheck = [](SpellEntry const & spellEntry) -> bool { return (spellEntry.SpellFamilyName == SPELLFAMILY_ROGUE && spellEntry.GetRecoveryTime() > 0); };
                     static_cast<Player*>(m_caster)->RemoveSomeCooldown(cdCheck);
                     return;
                 }
@@ -1076,14 +1070,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         m_casterUnit->CastSpell(m_casterUnit, 29940, true, nullptr);
                     return;
                 }
-                case 17950:
+                case 17950:                                 // Shadow Portal
                 {
                     if (!unitTarget)
                         return;
 
-                    // Shadow Portal
+                    if (!m_casterUnit)
+                        return;
+
+                    if (m_casterUnit->GetThreatManager().getThreat(unitTarget))
+                        m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
+                    
                     uint32 spellId = PickRandomValue(17863, 17939, 17943, 17944, 17946, 17948);
-                    m_caster->CastSpell(unitTarget, spellId, true);
+                    m_casterUnit->CastSpell(unitTarget, spellId, true);
                     return;
                 }
                 case 18350:                                 // Dummy Trigger
@@ -1576,6 +1575,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         unitTarget->AddCooldown(*spellInfo, itemProto);
                     return;
                 }
+                case 29518: // Sillithus Flag Click (DND)
+                {
+                    // Also mark player with pvp on
+                    unitTarget->CastSpell(unitTarget, 29519, true);
+                    unitTarget->SetPvPContested(true);
+
+                    return;
+                }
                 case 17190: // Ras Frostwhisper Visual Dummy
                 {
                     if (unitTarget)
@@ -1686,7 +1693,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 if (!m_casterUnit)
                     return;
 
-                int32 dmg = m_casterUnit->CalculateSpellDamage(m_casterUnit, m_spellInfo, eff_idx, &m_currentBasePoints[EFFECT_INDEX_0]);
+                int32 dmg = m_casterUnit->CalculateSpellEffectValue(m_casterUnit, m_spellInfo, eff_idx, &m_currentBasePoints[EFFECT_INDEX_0]);
                 if (Player* modOwner = m_casterUnit->GetSpellModOwner())
                     modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, dmg, this);
 
@@ -2241,7 +2248,7 @@ void Spell::EffectApplyAura(SpellEffectIndex eff_idx)
         return;
 
     // ghost spell check, allow apply any auras at player loading in ghost mode (will be cleanup after load)
-    if ((!unitTarget->IsAlive() && !(m_spellInfo->IsDeathOnlySpell() || m_spellInfo->IsDeathPersistentSpell())) &&
+    if ((!unitTarget->IsAlive() && !(m_spellInfo->CanTargetDeadTarget() || m_spellInfo->IsDeathPersistentSpell())) &&
             (unitTarget->GetTypeId() != TYPEID_PLAYER || !((Player*)unitTarget)->GetSession()->PlayerLoading()))
         return;
 
@@ -2261,14 +2268,11 @@ void Spell::EffectApplyAura(SpellEffectIndex eff_idx)
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: Aura is: %u [Spell%u:DiminishingGroup%u]", m_spellInfo->EffectApplyAuraName[eff_idx], m_spellInfo->Id, m_diminishGroup);
 
-    // Sayge's Dark Fortune of Damage: +1-10% (random)
-    if (m_spellInfo->Id == 23768)
-        m_currentBasePoints[EFFECT_INDEX_0] = urand(1, 10);
     // Gnomish Death Ray
     // rarely has a chance of dealing double damage, 14.29% chance (guess)
     // for now we use linear level scaling, but this is likely incorrect (hp pools don't scale exactly linearly)
     // there is some speculation that this should be tied to Engineering skill level, but since you don't need Engineering to use the item at all this seems doubtful
-    else if (m_spellInfo->Id == 13278)
+    if (m_spellInfo->Id == 13278)
         m_currentBasePoints[eff_idx] = eff_idx == EFFECT_INDEX_0 ? int32(urand(600, 1200) * (caster->GetLevel() / 60.0f)) * (!urand(0,6) ? 2 : 1)
                                                                  : m_currentBasePoints[EFFECT_INDEX_0] * 0.1249f;
     // Paladin T3 JoL
@@ -3407,6 +3411,7 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetFactionTemporary(m_caster->GetFactionTemplateId(), TEMPFACTION_NONE);
                     summon->lootForCreator = true;
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
+                    summon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
                     if (m_casterUnit)
                         summon->SetLootRecipient(m_casterUnit);
                     break;
@@ -4646,6 +4651,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
+                    // Hallowed Wands do not work in combat.
+                    if (unitTarget->IsInCombat())
+                        return;
+
                     // Pirate Costume (male or female)
                     m_caster->CastSpell(unitTarget, unitTarget->GetGender() == GENDER_MALE ? 24708 : 24709, true);
                     return;
@@ -4653,6 +4662,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 24718:                                 // Ninja Costume
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Hallowed Wands do not work in combat.
+                    if (unitTarget->IsInCombat())
                         return;
 
                     // Ninja Costume (male or female)
@@ -4664,6 +4677,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
+                    // Hallowed Wands do not work in combat.
+                    if (unitTarget->IsInCombat())
+                        return;
+
                     // Leper Gnome Costume (male or female)
                     m_caster->CastSpell(unitTarget, unitTarget->GetGender() == GENDER_MALE ? 24712 : 24713, true);
                     return;
@@ -4671,6 +4688,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 24720:                                 // Random Costume
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Hallowed Wands do not work in combat.
+                    if (unitTarget->IsInCombat())
                         return;
 
                     uint32 spellId = 0;
@@ -4706,6 +4727,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 24737:                                 // Ghost Costume
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Hallowed Wands do not work in combat.
+                    if (unitTarget->IsInCombat())
                         return;
 
                     // Ghost Costume (male or female)
@@ -5142,7 +5167,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         continue;
 
                     // found, remove seal
-                    m_casterUnit->RemoveAurasDueToSpell(aura->GetId());
+                    m_casterUnit->RemoveAurasDueToSpellByCancel(aura->GetId());
                     break;
                 }
 
@@ -5711,14 +5736,9 @@ void Spell::EffectDisEnchant(SpellEffectIndex /*eff_idx*/)
 
     Player* pCaster = static_cast<Player*>(m_caster);
 
+    itemTarget->SetBinding(true);
     pCaster->UpdateCraftSkill(m_spellInfo->Id);
     pCaster->SendLoot(itemTarget->GetObjectGuid(), LOOT_DISENCHANTING);
-
-    // quick solution to prevent exploiting; this will cause items loss on full bags though
-    // in order to fix this correctly have to fix first plMover->SendLootRelease(lootGuid); @ MovementHandler
-    // and in order to fix it the loot manager has to be rewritten; not me pls
-    if (ObjectGuid lootGuid = pCaster->GetLootGuid())
-        pCaster->GetSession()->DoLootRelease(lootGuid);
 
     // item will be removed at disenchanting end
 }

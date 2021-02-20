@@ -245,6 +245,7 @@ class ChatHandler
         bool HandleMmapStatsCommand(char* args);
 
         bool HandleDebugMoveToCommand(char* args);
+        bool HandleDebugMoveDistanceCommand(char* args);
         bool HandleDebugFaceMeCommand(char* args);
         // AHBot
         bool HandleAHBotReloadCommand(char *);
@@ -508,6 +509,7 @@ class ChatHandler
         bool HandleGameObjectSelectCommand(char* args);
         bool HandleGameObjectRespawnCommand(char* args);
         bool HandleGameObjectInfoCommand(char* args);
+        bool HandleGameObjectUseCommand(char* args);
         bool HandleGameObjectSetGoStateCommand(char* args);
         bool HandleGameObjectSetLootStateCommand(char* args);
         bool HandleGameObjectSendCustomAnimCommand(char* args);
@@ -582,6 +584,7 @@ class ChatHandler
         bool HandleListItemCommand(char* args);
         bool HandleListObjectCommand(char* args);
         bool HandleListTalentsCommand(char* args);
+        bool HandleListMoveGensCommand(char* args);
 
         bool HandleLookupAccountEmailCommand(char* args);
         bool HandleLookupAccountIpCommand(char* args);

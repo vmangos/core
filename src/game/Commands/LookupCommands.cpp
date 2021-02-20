@@ -60,7 +60,7 @@ bool ChatHandler::HandleListObjectCommand(char* args)
     QueryResult* result;
 
     uint32 obj_count = 0;
-    result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM gameobject WHERE id='%u'", go_id);
+    result = WorldDatabase.PQuery("SELECT COUNT(`guid`) FROM `gameobject` WHERE `id`='%u'", go_id);
     if (result)
     {
         obj_count = (*result)[0].GetUInt32();
@@ -70,11 +70,11 @@ bool ChatHandler::HandleListObjectCommand(char* args)
     if (m_session)
     {
         Player* pl = m_session->GetPlayer();
-        result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
+        result = WorldDatabase.PQuery("SELECT `guid`, `position_x`, `position_y`, `position_z`, `map`, (POW(`position_x` - '%f', 2) + POW(`position_y` - '%f', 2) + POW(`position_z` - '%f', 2)) AS order_ FROM `gameobject` WHERE `id` = '%u' ORDER BY order_ ASC LIMIT %u",
                                       pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), go_id, uint32(count));
     }
     else
-        result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map FROM gameobject WHERE id = '%u' LIMIT %u",
+        result = WorldDatabase.PQuery("SELECT `guid`, `position_x`, `position_y`, `position_z`, `map` FROM `gameobject` WHERE `id` = '%u' LIMIT %u",
                                       go_id, uint32(count));
 
     if (result)
@@ -131,7 +131,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
     QueryResult* result;
 
     uint32 cr_count = 0;
-    result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id='%u'", cr_id);
+    result = WorldDatabase.PQuery("SELECT COUNT(`guid`) FROM `creature` WHERE `id`='%u'", cr_id);
     if (result)
     {
         cr_count = (*result)[0].GetUInt32();
@@ -141,11 +141,11 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
     if (m_session)
     {
         Player* pl = m_session->GetPlayer();
-        result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM creature WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
+        result = WorldDatabase.PQuery("SELECT `guid`, `position_x`, `position_y`, `position_z`, `map`, (POW(`position_x` - '%f', 2) + POW(`position_y` - '%f', 2) + POW(`position_z` - '%f', 2)) AS order_ FROM `creature` WHERE `id` = '%u' ORDER BY order_ ASC LIMIT %u",
                                       pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), cr_id, uint32(count));
     }
     else
-        result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map FROM creature WHERE id = '%u' LIMIT %u",
+        result = WorldDatabase.PQuery("SELECT `guid`, `position_x`, `position_y`, `position_z`, `map` FROM `creature` WHERE `id` = '%u' LIMIT %u",
                                       cr_id, uint32(count));
 
     if (result)
@@ -196,7 +196,12 @@ void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target 
     }
 
     if (m_session)
-        PSendSysMessage(LANG_ITEM_LIST_CHAT, itemId, itemId, name.c_str(), usableStr);
+    {
+        uint32 color = ItemQualityColors[itemProto->Quality];
+        std::ostringstream itemStr;
+        itemStr << "|c" << std::hex << color << "|Hitem:" << std::to_string(itemProto->ItemId) << ":0:0:0:0:0:0:0|h[" << name << "]|h|r";
+        PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemId, itemStr.str().c_str(), usableStr);
+    }
     else
         PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itemId, name.c_str(), usableStr);
 }
@@ -930,8 +935,8 @@ bool ChatHandler::HandleLookupAccountEmailCommand(char* args)
 
     // No wildcard in front, cannot use table index
     LoginDatabase.AsyncPQuery(AccountSearchHandler::HandleAccountLookupResult, GetAccountId(), limit,
-        //      0   1         2        3        4
-        "SELECT id, username, last_ip, 0, expansion FROM account WHERE email " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u",
+        //      0      1           2         3        4
+        "SELECT `id`, `username`, `last_ip`, 0, `expansion` FROM `account` WHERE `email` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u",
         email.c_str(), limit);
 
     return true;
@@ -951,8 +956,8 @@ bool ChatHandler::ShowAccountIpListHelper(char* args, bool onlineonly)
     LoginDatabase.escape_string(ip);
 
     char const* query = onlineonly
-        ? "SELECT id, username, last_ip, 0, expansion FROM account WHERE online = 1 AND last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u"
-        : "SELECT id, username, last_ip, 0, expansion FROM account WHERE                last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u";
+        ? "SELECT `id`, `username`, `last_ip`, 0, `expansion` FROM `account` WHERE `online` = 1 AND `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u"
+        : "SELECT `id`, `username`, `last_ip`, 0, `expansion` FROM `account` WHERE                  `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u";
 
     LoginDatabase.AsyncPQuery(AccountSearchHandler::HandleAccountLookupResult, GetAccountId(), limit, query, ip.c_str(), limit);
 
@@ -986,8 +991,8 @@ bool ChatHandler::HandleLookupAccountNameCommand(char* args)
     LoginDatabase.escape_string(account);
 
     LoginDatabase.AsyncPQuery(AccountSearchHandler::HandleAccountLookupResult, GetAccountId(), limit,
-        //      0   1         2        3        4
-        "SELECT id, username, last_ip, 0, expansion FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " LIMIT %u",
+        //       0     1           2         3   4
+        "SELECT `id`, `username`, `last_ip`, 0, `expansion` FROM `account` WHERE `username` " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " LIMIT %u",
         account.c_str(), limit);
 
     return true;
@@ -1006,7 +1011,7 @@ bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
     QueryResult* result = nullptr;
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
-    result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), ip.c_str());
+    result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `last_ip` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), ip.c_str());
 
     return LookupPlayerSearchCommand(result, &limit);
 }
@@ -1027,7 +1032,7 @@ bool ChatHandler::HandleLookupPlayerAccountCommand(char* args)
 
     LoginDatabase.escape_string(account);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE username " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), account.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `username` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), account.c_str());
 
     return LookupPlayerSearchCommand(result, &limit);
 }
@@ -1045,7 +1050,7 @@ bool ChatHandler::HandleLookupPlayerEmailCommand(char* args)
     std::string email = emailStr;
     LoginDatabase.escape_string(email);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE email " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), email.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `email` " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), email.c_str());
 
     return LookupPlayerSearchCommand(result, &limit);
 }
@@ -1066,7 +1071,7 @@ bool ChatHandler::HandleLookupPlayerNameCommand(char* args)
 
     CharacterDatabase.AsyncPQuery(&PlayerSearchHandler::HandlePlayerCharacterLookupResult,
         GetAccountId(), limit_original,
-        "SELECT guid, name, race, class, level FROM characters WHERE name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"),
+        "SELECT `guid`, `name`, `race`, `class`, `level` FROM `characters` WHERE `name` " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"),
         name.c_str());
 
     return true;
@@ -1086,7 +1091,7 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
     std::string normalizedName = nameStr;
     if (normalizePlayerName(normalizedName))
         if (PlayerCacheData const* data = sObjectMgr.GetPlayerDataByName(normalizedName))
-            if (result = LoginDatabase.PQuery("SELECT id, last_ip FROM account WHERE id = %u", data->uiAccount))
+            if (result = LoginDatabase.PQuery("SELECT `id`, `last_ip` FROM `account` WHERE `id` = %u", data->uiAccount))
             {
                 Field* fields = result->Fetch();
                 uint32 id = fields[0].GetInt32();
@@ -1098,7 +1103,7 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
                     return LookupPlayerSearchCommand(nullptr, &limit);
 
                 LoginDatabase.escape_string(ip);
-                result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip = '%s'", ip.c_str());
+                result = LoginDatabase.PQuery("SELECT `id`, `username` FROM `account` WHERE `last_ip` = '%s'", ip.c_str());
             }
 
     return LookupPlayerSearchCommand(result, &limit);
@@ -1133,7 +1138,7 @@ bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)
         uint32 acc_id = fields[0].GetUInt32();
         std::string acc_name = fields[1].GetCppString();
 
-        holder->SetPQuery(count, "SELECT guid, name, race, class, level FROM characters WHERE account = %u", acc_id);
+        holder->SetPQuery(count, "SELECT `guid`, `name`, `race`, `class`, `level` FROM `characters` WHERE `account` = %u", acc_id);
         holder->AddAccountInfo(count, acc_id, acc_name);
 
         ++count;

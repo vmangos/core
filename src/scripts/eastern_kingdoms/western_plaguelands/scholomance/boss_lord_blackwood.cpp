@@ -41,7 +41,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if(!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+        if(!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
         {
             m_creature->MonsterSay("pas au cac!");
             if (MultiShot_Timer < diff)

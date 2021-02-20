@@ -421,7 +421,7 @@ void MasterPlayer::SaveActions()
         {
             case ACTIONBUTTON_NEW:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insertAction, "INSERT INTO character_action (guid,button,action,type) VALUES (?, ?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insertAction, "INSERT INTO `character_action` (`guid`, `button`, `action`, `type`) VALUES (?, ?, ?, ?)");
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(uint32(itr->first));
                 stmt.addUInt32(itr->second.GetAction());
@@ -433,7 +433,7 @@ void MasterPlayer::SaveActions()
             break;
             case ACTIONBUTTON_CHANGED:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(updateAction, "UPDATE character_action  SET action = ?, type = ? WHERE guid = ? AND button = ?");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(updateAction, "UPDATE `character_action`  SET `action` = ?, `type` = ? WHERE `guid` = ? AND `button` = ?");
                 stmt.addUInt32(itr->second.GetAction());
                 stmt.addUInt32(uint32(itr->second.GetType()));
                 stmt.addUInt32(GetGUIDLow());
@@ -445,7 +445,7 @@ void MasterPlayer::SaveActions()
             break;
             case ACTIONBUTTON_DELETED:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(deleteAction, "DELETE FROM character_action WHERE guid = ? AND button = ?");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(deleteAction, "DELETE FROM `character_action` WHERE `guid` = ? AND `button` = ?");
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(uint32(itr->first));
                 stmt.Execute();

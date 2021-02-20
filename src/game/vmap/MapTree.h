@@ -68,7 +68,7 @@ namespace VMAP
             StaticMapTree(uint32 mapID, std::string const& basePath);
             ~StaticMapTree();
 
-            bool isInLineOfSight(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2) const;
+            bool isInLineOfSight(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, bool includingM2Objects = false) const;
             ModelInstance* FindCollisionModel(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2);
             bool getObjectHitPos(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
             float getHeight(G3D::Vector3 const& pPos, float maxSearchDist) const;

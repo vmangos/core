@@ -1256,7 +1256,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 
         if (m_uiShoot_Timer < diff)
         {
-            if (!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT) == CAST_OK)
                     m_uiShoot_Timer = SHOOT_SPEED;

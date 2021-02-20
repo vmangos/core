@@ -137,7 +137,7 @@ void VMapManager2::unloadMap(unsigned int  pMapId, int x, int y)
 
 //==========================================================
 
-bool VMapManager2::isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2)
+bool VMapManager2::isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2, bool includingM2Objects)
 {
     if (!isLineOfSightCalcEnabled()) return true;
     bool result = true;
@@ -147,7 +147,7 @@ bool VMapManager2::isInLineOfSight(unsigned int pMapId, float x1, float y1, floa
         Vector3 pos1 = convertPositionToInternalRep(x1, y1, z1);
         Vector3 pos2 = convertPositionToInternalRep(x2, y2, z2);
         if (pos1 != pos2)
-            result = instanceTree->second->isInLineOfSight(pos1, pos2);
+            result = instanceTree->second->isInLineOfSight(pos1, pos2, includingM2Objects);
     }
     return result;
 }

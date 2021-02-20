@@ -1280,13 +1280,13 @@ struct boss_eranikusAI : public ScriptedAI
         //Alita : make sure he prefers targets he can hit. TO REMOVE WHEN AGGRO MECANICS WILL DO THE JOB.
         Unit* pTarget = m_creature->GetVictim();
 
-        if (!m_creature->IsWithinMeleeRange(pTarget))
+        if (!m_creature->CanReachWithMeleeAutoAttack(pTarget))
         {
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (const auto itr : tList)
             {
                 if (Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
-                    if (m_creature->IsWithinMeleeRange(pAttacker))
+                    if (m_creature->CanReachWithMeleeAutoAttack(pAttacker))
                         m_creature->GetThreatManager().modifyThreatPercent(pAttacker, 5);
             }
         }

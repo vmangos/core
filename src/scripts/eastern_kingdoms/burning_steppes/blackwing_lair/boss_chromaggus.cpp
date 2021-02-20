@@ -160,7 +160,7 @@ struct boss_chromaggusAI : public ScriptedAI
             return;
 
         if (m_bEngagedOnce && pUnit->IsPlayer() && m_creature->GetDistance2d(pUnit) < 55.0f && m_creature->IsWithinLOSInMap(pUnit)
-          && pUnit->IsTargetableForAttack() && pUnit->IsInAccessablePlaceFor(m_creature))
+          && pUnit->IsTargetable(true, false) && pUnit->IsInAccessablePlaceFor(m_creature))
             AttackStart(pUnit);
     }
 

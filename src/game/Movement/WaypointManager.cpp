@@ -401,49 +401,49 @@ void WaypointManager::Load()
 void WaypointManager::Cleanup()
 {
     // check if points need to be renumbered and do it
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from `creature_movement` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1"))
     {
         delete result;
-        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement");
-        WorldDatabase.DirectExecute("INSERT INTO temp SELECT * FROM creature_movement");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement DROP PRIMARY KEY");
-        WorldDatabase.DirectExecute("UPDATE creature_movement AS T SET point = (SELECT COUNT(*) FROM temp WHERE id = T.id AND point <= T.point)");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement ADD PRIMARY KEY (id, point)");
-        WorldDatabase.DirectExecute("DROP TABLE temp");
+        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement`");
+        WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement`");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement` DROP PRIMARY KEY");
+        WorldDatabase.DirectExecute("UPDATE `creature_movement` AS T SET `point` = (SELECT COUNT(*) FROM `temp` WHERE `id` = T.`id` AND `point` <= T.`point`)");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement` ADD PRIMARY KEY (`id`, `point`)");
+        WorldDatabase.DirectExecute("DROP TABLE `temp`");
 
         sLog.outErrorDb("Table `creature_movement` was auto corrected for using points out of order (invalid or points missing)");
 
-        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from `creature_movement` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1")));
     }
 
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from `creature_movement_template` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = T.`entry` AND `point` <= T.`point`) LIMIT 1"))
     {
         delete result;
-        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement_template");
-        WorldDatabase.DirectExecute("INSERT INTO temp SELECT * FROM creature_movement_template");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_template DROP PRIMARY KEY");
-        WorldDatabase.DirectExecute("UPDATE creature_movement_template AS T SET point = (SELECT COUNT(*) FROM temp WHERE entry = T.entry AND point <= T.point)");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_template ADD PRIMARY KEY (entry, point)");
-        WorldDatabase.DirectExecute("DROP TABLE temp");
+        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement_template`");
+        WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement_template`");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_template` DROP PRIMARY KEY");
+        WorldDatabase.DirectExecute("UPDATE `creature_movement_template` AS T SET `point` = (SELECT COUNT(*) FROM `temp` WHERE `entry` = T.`entry` AND `point` <= T.`point`)");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_template` ADD PRIMARY KEY (`entry`, `point`)");
+        WorldDatabase.DirectExecute("DROP TABLE `temp`");
 
         sLog.outErrorDb("Table `creature_movement_template` was auto corrected for using points out of order (invalid or points missing)");
 
-        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from `creature_movement_template` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_template` WHERE `entry` = T.`entry` AND `point` <= T.`point`) LIMIT 1")));
     }
 
-    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement_special As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_special WHERE id = T.id AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from `creature_movement_special` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_special` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1"))
     {
         delete result;
-        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement_special");
-        WorldDatabase.DirectExecute("INSERT INTO temp SELECT * FROM creature_movement_special");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_special DROP PRIMARY KEY");
-        WorldDatabase.DirectExecute("UPDATE creature_movement_special AS T SET point = (SELECT COUNT(*) FROM temp WHERE id = T.id AND point <= T.point)");
-        WorldDatabase.DirectExecute("ALTER TABLE creature_movement_special ADD PRIMARY KEY (id, point)");
-        WorldDatabase.DirectExecute("DROP TABLE temp");
+        WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE `temp` LIKE `creature_movement_special`");
+        WorldDatabase.DirectExecute("INSERT INTO `temp` SELECT * FROM `creature_movement_special`");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_special` DROP PRIMARY KEY");
+        WorldDatabase.DirectExecute("UPDATE `creature_movement_special` AS T SET `point` = (SELECT COUNT(*) FROM `temp` WHERE `id` = T.`id` AND `point` <= T.`point`)");
+        WorldDatabase.DirectExecute("ALTER TABLE `creature_movement_special` ADD PRIMARY KEY (`id`, `point`)");
+        WorldDatabase.DirectExecute("DROP TABLE `temp`");
 
         sLog.outErrorDb("Table `creature_movement_special` was auto corrected for using points out of order (invalid or points missing)");
 
-        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_special As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_special WHERE id = T.id AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from `creature_movement_special` As T WHERE `point` <> (SELECT COUNT(*) FROM `creature_movement_special` WHERE `id` = T.`id` AND `point` <= T.`point`) LIMIT 1")));
     }
 }
 

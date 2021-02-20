@@ -301,7 +301,7 @@ void BattleGroundQueue::LogQueueInscription(Player* plr, BattleGroundTypeId BgTy
 
     CharacterDatabase.escape_string(sPName);
     CharacterDatabase.escape_string(last_ip);
-    CharacterDatabase.PExecute("INSERT INTO character_bgqueue (playerGUID, playerName, playerIP, BGtype, action, time) "
+    CharacterDatabase.PExecute("INSERT INTO `character_bgqueue` (`playerGUID`, `playerName`, `playerIP`, `BGtype`, `action`, `time`) "
                                " VALUES ('%u', '%s', '%s', '%u', '%u', '%u')",
                                plr->GetGUIDLow(), sPName.c_str(), last_ip.c_str(), BgTypeId, uiAction, queuing_time);
     // CharacterDatabase.CommitTransaction(); // Pas de commit de transaction sans un BeginTransaction avant.

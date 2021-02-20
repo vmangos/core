@@ -652,7 +652,7 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
             }
 
             if (pFirstMob)
-                pFirstMob->GetMotionMaster()->MoveWaypoint(0, 0, PATH_FROM_SPECIAL, 0, WAYPOINT_ID_STADIUM, true);
+                pFirstMob->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, WAYPOINT_ID_STADIUM, true);
         }
 
         DoUseDoorOrButton(m_uiGythCombatDoorGUID);

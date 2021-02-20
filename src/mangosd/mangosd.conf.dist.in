@@ -805,6 +805,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Minimal name length (1..12)
 #        Default: 2
 #
+#    WorldAvailable
+#        If players are allowed to enter the world. Character creation will still be possible if world is disabled.
+#        Default: 1 (Enabled)
+#                 0 (Disabled)
+#
 #    CharactersCreatingDisabled
 #        Disable characters creating for specific team or any (non-player accounts not affected)
 #        Default: 0 - enabled
@@ -1064,6 +1069,7 @@ StrictPetNames = 0
 MinPlayerName = 2
 MinCharterName = 2
 MinPetName = 2
+WorldAvailable = 1
 CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10

@@ -70,8 +70,8 @@ void PlayerBotMgr::Load()
 
     // 3- Load usable account ID
     QueryResult* result = LoginDatabase.PQuery(
-                              "SELECT MAX(id)"
-                              " FROM account");
+                              "SELECT MAX(`id`)"
+                              " FROM `account`");
     if (!result)
     {
         sLog.outError("Playerbot: unable to load max account id.");

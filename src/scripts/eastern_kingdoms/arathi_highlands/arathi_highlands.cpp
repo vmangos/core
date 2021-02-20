@@ -355,6 +355,12 @@ struct npc_kineloryAI : public npc_escortAI
         m_uiHealTimer     = urand(2000, 5000);
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
@@ -438,6 +444,7 @@ bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, Quest const*
         if (npc_kineloryAI* pKineloryAI = dynamic_cast<npc_kineloryAI*>(pCreature->AI()))
         {
             DoScriptText(SAY_START, pCreature);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pKineloryAI->Start(false, pPlayer->GetGUID(), pQuest);
         }
     }

@@ -111,7 +111,7 @@ MovementGenerator* selectMovementGenerator(Creature* creature)
     MANGOS_ASSERT(creature->GetCreatureInfo() != nullptr);
     MovementGeneratorType type = creature->GetOwnerGuid().IsPlayer() ? FOLLOW_MOTION_TYPE : creature->GetDefaultMovementType();
     if (CreatureGroup* group = creature->GetCreatureGroup())
-        if (group->IsFormation() && group->GetLeaderGuid() != creature->GetObjectGuid())
+        if (group->IsFormation() && group->GetLeaderGuid() != creature->GetObjectGuid() && group->GetOriginalLeaderGuid() != creature->GetObjectGuid())
             type = PATROL_MOTION_TYPE;
     MovementGeneratorCreator const* mv_factory = mv_registry.GetRegistryItem(type);
     return (mv_factory == nullptr ? nullptr : mv_factory->Create(creature));

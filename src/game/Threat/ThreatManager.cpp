@@ -308,12 +308,11 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
 
             bool outOfThreatArea = pAttacker->IsOutOfThreatArea(target);
             bool validAttackTarget = pAttacker->IsValidAttackTarget(target);
-            bool targetableForAttack = target->IsTargetableForAttack();
 
             if (outOfThreatArea)
                 return nullptr;
 
-            if (!validAttackTarget || !targetableForAttack)
+            if (!validAttackTarget)
             {
                 if (currentRef == pCurrentVictim)
                     pCurrentVictim = nullptr;

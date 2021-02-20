@@ -446,15 +446,19 @@ CreatureAI* GetAI_npc_brazier(Creature* pCreature)
     return new npc_brazierAI(pCreature);
 }
 
-#define TABLET_GRILEK1			180358
-#define TABLET_HAZZARAH1		180364
-#define TABLET_RENATAKI1		180365
-#define TABLET_WUSHOOLAY1		180393
-#define TABLET_GRILEK2			987654
-#define TABLET_HAZZARAH2		987655
-#define TABLET_RENATAKI2		987656
-#define TABLET_WUSHOOLAY2		987657
-#define TABLET_ALCHEMIST_SPELL	24266
+enum
+{
+    TABLET_GRILEK1 = 180358,
+    TABLET_HAZZARAH1 = 180364,
+    TABLET_RENATAKI1 = 180365,
+    TABLET_WUSHOOLAY1 = 180393,
+    TABLET_GRILEK2 = 987654,
+    TABLET_HAZZARAH2 = 987655,
+    TABLET_RENATAKI2 = 987656,
+    TABLET_WUSHOOLAY2 = 987657,
+    TABLET_ALCHEMIST_SPELL = 24266,
+};
+
 
 bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
 {
@@ -485,7 +489,6 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     //char sMessage[200];
     //sprintf(sMessage, "boss ID=%d",randomBoss);
     //pPlayer->Say(sMessage,0);
-		
     switch(pGo->GetEntry())
     {
         case TABLET_GRILEK1:
@@ -493,28 +496,28 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
             if (randomBoss == BOSS_GRILEK)
                 pPlayer->SEND_GOSSIP_MENU(7669, pGo->GetGUID());
             else
-                pPlayer->SEND_GOSSIP_MENU(7643, pGo->GetGUID());			
+                pPlayer->SEND_GOSSIP_MENU(7643, pGo->GetGUID());
             break;
-	case TABLET_HAZZARAH1:
-	case TABLET_HAZZARAH2:
+    case TABLET_HAZZARAH1:
+    case TABLET_HAZZARAH2:
             if (randomBoss == BOSS_HAZZARAH)
                 pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
             else
-                pPlayer->SEND_GOSSIP_MENU(7670, pGo->GetGUID());			
+                pPlayer->SEND_GOSSIP_MENU(7670, pGo->GetGUID());
             break;
-	case TABLET_RENATAKI1:
-	case TABLET_RENATAKI2:
+    case TABLET_RENATAKI1:
+    case TABLET_RENATAKI2:
             if (randomBoss == BOSS_RENATAKI)
                 pPlayer->SEND_GOSSIP_MENU(7673, pGo->GetGUID());
             else
-                pPlayer->SEND_GOSSIP_MENU(7672, pGo->GetGUID());			
+                pPlayer->SEND_GOSSIP_MENU(7672, pGo->GetGUID());
             break;
-	case TABLET_WUSHOOLAY1:
-	case TABLET_WUSHOOLAY2:
+    case TABLET_WUSHOOLAY1:
+    case TABLET_WUSHOOLAY2:
             if (randomBoss == BOSS_WUSHOOLAY)
                 pPlayer->SEND_GOSSIP_MENU(7682, pGo->GetGUID());
             else
-                pPlayer->SEND_GOSSIP_MENU(7674, pGo->GetGUID());			
+                pPlayer->SEND_GOSSIP_MENU(7674, pGo->GetGUID());
             break;
     }
     return true;

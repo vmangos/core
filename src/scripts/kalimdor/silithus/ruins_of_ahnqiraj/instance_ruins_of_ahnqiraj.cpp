@@ -148,7 +148,7 @@ void instance_ruins_of_ahnqiraj::OnCreatureEnterCombat(Creature * pCreature)
         case NPC_QIRAJI_WARRIOR:
             /** Create Yeggeth list for Rajaxx Shield ability */
             if (CreatureGroup* g = pCreature->GetCreatureGroup())
-                if (g->GetLeaderGuid().GetEntry() == NPC_MAJOR_YEGGETH)
+                if (g->GetOriginalLeaderGuid().GetEntry() == NPC_MAJOR_YEGGETH)
                     m_lYeggethShieldList.push_back(pCreature->GetGUID());
             // If any creature from Rajaxx's wave enters combat, start Rajaxx event.
             if (m_auiEncounter[TYPE_RAJAXX] == NOT_STARTED)
@@ -575,7 +575,7 @@ uint8 instance_ruins_of_ahnqiraj::GetWaveFromCreature(Creature* creature)
         return 0;
     }
 //sLog.nostalrius("group leader : %u",group->GetLeaderGuid().GetEntry());
-    switch (group->GetLeaderGuid().GetEntry())
+    switch (group->GetOriginalLeaderGuid().GetEntry())
     {
         case NPC_CAPTAIN_QEEZ:
             return 1;

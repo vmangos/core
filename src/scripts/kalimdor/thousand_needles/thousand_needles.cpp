@@ -93,12 +93,18 @@ struct npc_lakota_windsongAI : public npc_escortAI
         }
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void DoSpawnBandits(int uiAmbushId)
     {
         for (int i = 0; i < 2; ++i)
             m_creature->SummonCreature(NPC_GRIM_BANDIT,
                                        m_afBanditLoc[i + uiAmbushId][0], m_afBanditLoc[i + uiAmbushId][1], m_afBanditLoc[i + uiAmbushId][2], 0.0f,
-                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20000);
     }
 };
 
@@ -113,6 +119,8 @@ bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, Quest
     {
         DoScriptText(SAY_LAKO_START, pCreature, pPlayer);
         pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
+        
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (npc_lakota_windsongAI* pEscortAI = dynamic_cast<npc_lakota_windsongAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
@@ -168,12 +176,18 @@ struct npc_paoka_swiftmountainAI : public npc_escortAI
         }
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void DoSpawnWyvern()
     {
         for (const auto& pos : m_afWyvernLoc)
             m_creature->SummonCreature(NPC_WYVERN,
                                        pos[0], pos[1], pos[2], 0.0f,
-                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+                                       TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20000);
     }
 };
 
@@ -188,6 +202,8 @@ bool QuestAccept_npc_paoka_swiftmountain(Player* pPlayer, Creature* pCreature, Q
     {
         DoScriptText(SAY_START, pCreature, pPlayer);
         pCreature->SetFactionTemplateId(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
+
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (npc_paoka_swiftmountainAI* pEscortAI = dynamic_cast<npc_paoka_swiftmountainAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);

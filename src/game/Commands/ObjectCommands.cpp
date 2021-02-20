@@ -173,7 +173,7 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         return false;
     }
     
-    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
+    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u, Flags: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
     if (pGameObject->isSpawned())
         SendSysMessage("Object is spawned.");
     else
@@ -628,6 +628,20 @@ bool ChatHandler::HandleGameObjectResetCommand(char*)
         return false;
     }
     go->ResetDoorOrButton();
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectUseCommand(char*)
+{
+    GameObject* go = getSelectedGameObject();
+    if (!go)
+    {
+        SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+
+    go->Use(m_session->GetPlayer());
+    PSendSysMessage("You have used %s.", go->GetGuidStr().c_str());
     return true;
 }
 

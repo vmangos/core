@@ -470,7 +470,7 @@ class Aura
                 m_periodicTick = maxticks - GetAuraDuration() / m_modifier.periodictime;
         }
 
-        bool IsPositive() { return m_positive; }
+        bool IsPositive() const { return m_positive; }
         bool IsPersistent() const { return m_isPersistent; }
         bool IsAreaAura() const { return m_isAreaAura; }
         bool IsPeriodic() const { return m_isPeriodic; }
@@ -485,10 +485,10 @@ class Aura
         void ComputeExclusive();
         bool IsExclusive() const { return m_exclusive; }
         bool IsApplied() const { return m_applied; }
-        // Resultat :
-        // - 0 : pas dans la meme categorie.
-        // - 1 : je suis plus important. Je m'applique.
-        // - 2 : il est plus important. Il s'applique.
+        // Results :
+        // - 0 : Not in the same category.
+        // - 1 : I am more important. I apply myself. 
+        // - 2 : Other aura is more important. It applies. 
         int CheckExclusiveWith(Aura const* other) const;
         bool ExclusiveAuraCanApply();
         void ExclusiveAuraUnapply();

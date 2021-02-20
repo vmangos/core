@@ -5,6 +5,7 @@ enum
 {
     GO_SERVICE_ENTRANCE         = 175368,
     GO_GAUNTLET_GATE1           = 175357,
+    GO_SLAUGHTER_SQUARE_GATE    = 175358,
     GO_ZIGGURAT1                = 175380,                   // baroness
     GO_ZIGGURAT2                = 175379,                   // nerub'enkan
     GO_ZIGGURAT3                = 175381,                   // maleki
@@ -23,8 +24,6 @@ enum
     NPC_BARON                   = 10440,
     NPC_YSIDA_TRIGGER           = 16100,
     NPC_TIMMY                   = 10808,
-    NPC_AURIUS_1                = 10917,
-    NPC_AURIUS_2                = 10931,
     NPC_DATHROHAN               = 10812,
     NPC_MAGISTRATE              = 10435,
 
@@ -36,9 +35,7 @@ enum
     NPC_PLAGUED_RAT             = 10441,
     NPC_PLAGUED_INSECT          = 10461,
     NPC_PLAGUED_MAGGOT          = 10536,
-
-    QUEST_AURIUSRECKONING       = 5125,
-    QUEST_THEMEDALLIONOFFAITH   = 5122,
+    NPC_MINDLESS_UNDEAD         = 11030,
 
     RIVENDARE_YELL_45MIN        = -1000020,
     RIVENDARE_YELL_10MIN        = -1000021,
@@ -85,6 +82,7 @@ struct instance_stratholme : public ScriptedInstance
 
     uint64 m_uiServiceEntranceGUID;
     uint64 m_uiGauntletGate1GUID;
+    uint64 m_uiSlaughterSquareGateGUID;
     uint64 m_uiZiggurat1GUID;
     uint64 m_uiZiggurat2GUID;
     uint64 m_uiZiggurat3GUID;
@@ -100,9 +98,7 @@ struct instance_stratholme : public ScriptedInstance
     uint64 m_uiTimmyGUID;
     uint64 m_uiYsidaTriggerGUID;
     uint64 m_uiYsidaGUID;
-    uint64 m_uiAuriusGUID;
     uint64 m_uiRamsteinGUID;
-    uint64 m_uiQuestPlayerGUID;
     uint64 m_uiDathrohanGUID;
     std::set<uint64> crystalsGUID;
     std::set<uint64> abomnationGUID;
@@ -133,6 +129,7 @@ struct instance_stratholme : public ScriptedInstance
 
         m_uiServiceEntranceGUID = 0;
         m_uiGauntletGate1GUID = 0;
+        m_uiSlaughterSquareGateGUID = 0;
         m_uiZiggurat1GUID = 0;
         m_uiZiggurat2GUID = 0;
         m_uiZiggurat3GUID = 0;
@@ -146,9 +143,7 @@ struct instance_stratholme : public ScriptedInstance
         m_uiBaronGUID = 0;
         m_uiYsidaTriggerGUID = 0;
         m_uiYsidaGUID = 0;
-        m_uiAuriusGUID = 0;
         m_uiRamsteinGUID = 0;
-        m_uiQuestPlayerGUID = 0;
         m_uiDathrohanGUID = 0;
 
         crystalsGUID.clear();
@@ -230,9 +225,6 @@ struct instance_stratholme : public ScriptedInstance
             case NPC_YSIDA:
                 m_uiYsidaGUID = pCreature->GetGUID();
                 break;
-            case NPC_AURIUS_1:
-                m_uiAuriusGUID = pCreature->GetGUID();
-                break;
             case NPC_CRYSTAL:
                 crystalsGUID.insert(pCreature->GetGUID());
                 break;
@@ -270,6 +262,9 @@ struct instance_stratholme : public ScriptedInstance
                 //weird, but unless flag is set, client will not respond as expected. DB bug?
                 pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                 m_uiGauntletGate1GUID = pGo->GetGUID();
+                break;
+            case GO_SLAUGHTER_SQUARE_GATE:
+                m_uiSlaughterSquareGateGUID = pGo->GetGUID();
                 break;
             case GO_ZIGGURAT1:
                 m_uiZiggurat1GUID = pGo->GetGUID();
@@ -364,25 +359,12 @@ struct instance_stratholme : public ScriptedInstance
                 return m_uiBaronGUID;
             case DATA_YSIDA_TRIGGER:
                 return m_uiYsidaTriggerGUID;
-            case DATA_AURIUS:
-                return m_uiAuriusGUID;
-            case DATA_QUESTPLAYER:
-                return m_uiQuestPlayerGUID;
             case NPC_DATHROHAN:
                 return m_uiDathrohanGUID;
         }
         return 0;
     }
 
-    void SetData64(uint32 uiType, uint64 uiData) override
-    {
-        switch (uiType)
-        {
-            case DATA_QUESTPLAYER:
-                m_uiQuestPlayerGUID = uiData;
-                break;
-        }
-    }
     void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
@@ -491,6 +473,23 @@ struct instance_stratholme : public ScriptedInstance
                 }
                 if (uiData == DONE) // on ramstein death OK
                 {
+                    DoUseDoorOrButton(m_uiSlaughterSquareGateGUID, 91);
+
+                    for (uint8 i = 0; i < 34; ++i)
+                    {
+                        if (Creature* pUndead = instance->SummonCreature(NPC_MINDLESS_UNDEAD, 3929.6f + frand(0.0f, 3.0f), -3384.3 + frand(0.0f, 3.0f), 120.0f, 4.88f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
+                        {
+                            float x = 4012.0f;
+                            float y = -3418.92f;
+                            float z = 117.294f;
+                            pUndead->GetRandomPoint(x, y, z, 10.0f, x, y, z);
+                            pUndead->SetHomePosition(x, y, z, frand(0.0f, 6.0f));
+                            pUndead->GetMotionMaster()->Clear();
+                            pUndead->GetMotionMaster()->MoveRandom(false, 5.0f);
+                            pUndead->SetWalk(false);
+                            pUndead->GetMotionMaster()->MovePoint(1, 3941.29f, -3394.84f, 119.69f, MOVE_FORCE_DESTINATION | MOVE_STRAIGHT_PATH);
+                        }
+                    }
                     //UpdateGoState(m_uiZiggurat4GUID,GO_STATE_ACTIVE,false);
                     m_uiSlaugtherSquare_Timer = 60000;
                     sLog.outDebug("Instance Stratholme: Slaugther event will continue in 60 sec.");
@@ -509,14 +508,6 @@ struct instance_stratholme : public ScriptedInstance
             {
                 if (uiData == IN_PROGRESS)
                 {
-                    if (GetData(TYPE_EVENT_AURIUS) == SPECIAL)
-                    {
-                        if (Player* pPlayer = instance->GetPlayer(GetData64(DATA_QUESTPLAYER)))
-                        {
-                            pPlayer->SummonCreature(NPC_AURIUS_2, 4045.71f, -3357.38f, 115.10f, 2.08f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1800000);
-                            SetData(TYPE_EVENT_AURIUS, IN_PROGRESS);
-                        }
-                    }
                     if (GameObject* pGob = instance->GetGameObject(m_uiZiggurat4GUID))
                         if (pGob->GetGoState() != GO_STATE_READY) // Si pas ferm�e
                             UpdateGoState(m_uiZiggurat4GUID, GO_STATE_READY, false);

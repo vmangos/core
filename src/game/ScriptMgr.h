@@ -42,6 +42,7 @@ class Item;
 class Map;
 class Quest;
 class SpellCastTargets;
+class SpellEntry;
 
 // Legend:
 // source - the type of object which executes the command
@@ -255,7 +256,7 @@ enum eScriptCommand
                                                             // datalong2 = start_point
                                                             // datalong3 = initial_delay
                                                             // datalong4 = (bool) repeat
-                                                            // dataint = path_id
+                                                            // dataint = overwrite_guid
                                                             // dataint2 = overwrite_entry
     SCRIPT_COMMAND_START_MAP_EVENT          = 61,           // source = Map
                                                             // datalong = event_id
@@ -342,6 +343,8 @@ enum eScriptCommand
                                                             // target = WorldObject
                                                             // datalong = event_id
                                                             // datalong2 = event_data
+    SCRIPT_COMMAND_SET_PVP                  = 86,           // source = Player
+                                                            // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -363,6 +366,7 @@ enum eMoveToCoordinateTypes
     SO_MOVETO_COORDINATES_NORMAL               = 0,
     SO_MOVETO_COORDINATES_RELATIVE_TO_TARGET   = 1,            // Coordinates are added to that of target.
     SO_MOVETO_COORDINATES_DISTANCE_FROM_TARGET = 2,            // X is distance from target, others not used.
+    SO_MOVETO_COORDINATES_RANDOM_POINT         = 3,            // O is max distance from coordinates
 
     MOVETO_COORDINATES_MAX
 };
@@ -874,7 +878,7 @@ struct ScriptInfo
             uint32 initialDelay;                            // datalong3
             uint32 canRepeat;                               // datalong4
             uint32 unused;                                  // data_flags
-            int32  pathId;                                  // dataint
+            int32  overwriteGuid;                           // dataint
             int32  overwriteEntry;                          // dataint2
         } startWaypoints;
         
@@ -1029,6 +1033,11 @@ struct ScriptInfo
             uint32 eventData;                               // datalong2
         } sendScriptEvent;
 
+        struct                                              // SCRIPT_COMMAND_SET_PVP (86)
+        {
+            uint32 enabled;                                 // datalong
+        } setPvP;
+
         struct
         {
             uint32 data[9];
@@ -1106,17 +1115,18 @@ extern ScriptMapMap sCreatureAIScripts;
 
 enum CastFlags
 {
-    CF_INTERRUPT_PREVIOUS     = 0x01,                     //Interrupt any spell casting
-    CF_TRIGGERED              = 0x02,                     //Triggered (this makes spell cost zero mana and have no cast time)
-    CF_FORCE_CAST             = 0x04,                     //Forces cast even if creature is out of mana or out of range
-    CF_MAIN_RANGED_SPELL      = 0x08,                     //To be used by ranged mobs only. Creature will not chase target until cast fails.
-    CF_TARGET_UNREACHABLE     = 0x10,                     //Will only use the ability if creature cannot currently get to target
-    CF_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
-    CF_ONLY_IN_MELEE          = 0x40,                     //Only casts if the creature is in melee range of the target
-    CF_NOT_IN_MELEE           = 0x80,                     //Only casts if the creature is not in melee range of the target
+    CF_INTERRUPT_PREVIOUS     = 0x001,                     // Interrupt any spell casting
+    CF_TRIGGERED              = 0x002,                     // Triggered (this makes spell cost zero mana and have no cast time)
+    CF_FORCE_CAST             = 0x004,                     // Bypasses extra checks in Creature::TryToCast
+    CF_MAIN_RANGED_SPELL      = 0x008,                     // To be used by ranged mobs only. Creature will not chase target until cast fails.
+    CF_TARGET_UNREACHABLE     = 0x010,                     // Will only use the ability if creature cannot currently get to target
+    CF_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
+    CF_ONLY_IN_MELEE          = 0x040,                     // Only casts if the creature is in melee range of the target
+    CF_NOT_IN_MELEE           = 0x080,                     // Only casts if the creature is not in melee range of the target
+    CF_TARGET_CASTING         = 0x100,                     // Only casts if the target is currently casting a spell
 };
 
-#define ALL_CAST_FLAGS (CF_INTERRUPT_PREVIOUS | CF_TRIGGERED | CF_FORCE_CAST | CF_MAIN_RANGED_SPELL | CF_TARGET_UNREACHABLE | CF_AURA_NOT_PRESENT)
+#define ALL_CAST_FLAGS (CF_INTERRUPT_PREVIOUS | CF_TRIGGERED | CF_FORCE_CAST | CF_MAIN_RANGED_SPELL | CF_TARGET_UNREACHABLE | CF_AURA_NOT_PRESENT | CF_ONLY_IN_MELEE | CF_NOT_IN_MELEE | CF_TARGET_CASTING)
 
 // Values used in target_type column
 enum ScriptTarget
@@ -1125,15 +1135,19 @@ enum ScriptTarget
 
     TARGET_T_HOSTILE                        = 1,            //Our current target (ie: highest aggro).
     TARGET_T_HOSTILE_SECOND_AGGRO           = 2,            //Second highest aggro (generaly used for cleaves and some special attacks).
+                                                            //Param1 = select_flags
     TARGET_T_HOSTILE_LAST_AGGRO             = 3,            //Dead last on aggro (no idea what this could be used for).
+                                                            //Param1 = select_flags
     TARGET_T_HOSTILE_RANDOM                 = 4,            //Just any random target on our threat list.
+                                                            //Param1 = select_flags
     TARGET_T_HOSTILE_RANDOM_NOT_TOP         = 5,            //Any random target except top threat.
+                                                            //Param1 = select_flags
 
     TARGET_T_OWNER_OR_SELF                  = 6,            //Either self or owner if pet or controlled.
     TARGET_T_OWNER                          = 7,            //The owner of the source.
     
 
-    TARGET_T_CREATURE_WITH_ENTRY            = 8,            //Searches for closest nearby creature with the given entry.
+    TARGET_T_NEAREST_CREATURE_WITH_ENTRY    = 8,            //Searches for closest nearby creature with the given entry.
                                                             //Param1 = creature_entry
                                                             //Param2 = search_radius
 
@@ -1143,7 +1157,7 @@ enum ScriptTarget
     TARGET_T_CREATURE_FROM_INSTANCE_DATA    = 10,           //Find creature by guid stored in instance data.
                                                             //Param1 = instance_data_field
 
-    TARGET_T_GAMEOBJECT_WITH_ENTRY          = 11,           //Searches for closest nearby gameobject with the given entry.
+    TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY          = 11,           //Searches for closest nearby gameobject with the given entry.
                                                             //Param1 = gameobject_entry
                                                             //Param2 = search_radius
 
@@ -1194,7 +1208,7 @@ void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr,
 void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 // Returns a target based on the type specified.
-WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1 = 0u, uint32 Param2 = 0u);
+WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pMap, uint8 targetType, uint32 param1 = 0u, uint32 param2 = 0u, SpellEntry const* pSpellEntry = nullptr);
 
 //TODO: find better namings and definitions.
 //N=Neutral, A=Alliance, H=Horde.
@@ -1313,6 +1327,7 @@ class ScriptMgr
         void LoadCreatureEventAIScripts();
 
         void CheckAllScriptTexts();
+        bool CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint32 targetParam2, char const* tableName, uint32 tableEntry);
 
         void LoadScriptNames();
         void LoadAreaTriggerScripts();

@@ -49,35 +49,38 @@ struct CreatureGroupMember
 class CreatureGroup
 {
     public:
-        CreatureGroup(ObjectGuid leader) : _leaderGuid(leader), _options(0), _respawnGuard(false)
+        CreatureGroup(ObjectGuid leader) : m_leaderGuid(leader), m_originalLeaderGuid(leader), m_options(0), m_respawnGuard(false), m_lastReachedWaypoint(0)
         {
         }
         CreatureGroupMember* AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags = (OPTION_FORMATION_MOVE|OPTION_AGGRO_TOGETHER));
         void RemoveMember(ObjectGuid guid);
+        void RemoveTemporaryLeader(Creature* pLeader);
         void DisbandGroup(Creature* pMember);
         void DeleteFromDb();
         void SaveToDb();
 
-        ObjectGuid GetLeaderGuid() const { return _leaderGuid; }
-        std::map<ObjectGuid, CreatureGroupMember*> const& GetMembers() const { return _members; }
-        bool ContainsGuid(ObjectGuid guid) const { return _members.find(guid) != _members.end(); }
-        bool IsFormation() const { return _options & OPTION_FORMATION_MOVE; }
+        ObjectGuid const& GetLeaderGuid() const { return m_leaderGuid; }
+        ObjectGuid const& GetOriginalLeaderGuid() const { return m_originalLeaderGuid; }
+        std::map<ObjectGuid, CreatureGroupMember*> const& GetMembers() const { return m_members; }
+        bool ContainsGuid(ObjectGuid guid) const { return m_members.find(guid) != m_members.end(); }
+        bool IsFormation() const { return m_options & OPTION_FORMATION_MOVE; }
+        void SetLastReachedWaypoint(uint32 point) { m_lastReachedWaypoint = point; }
 
-        uint32 GetWaitTime(Creature* member);
         void OnMemberAttackStart(Creature* member, Unit* target);
         void MemberAssist(Creature* member, Unit* target);
 
         void OnMemberDied(Creature* member);
-
         void OnLeaveCombat(Creature* creature);
         void OnRespawn(Creature* member);
         void RespawnAll(Creature* except);
     protected:
         void Respawn(Creature* member, CreatureGroupMember const* memberEntry);
-        ObjectGuid _leaderGuid;
-        uint32 _options;
-        bool    _respawnGuard;
-        std::map<ObjectGuid, CreatureGroupMember*> _members;
+        ObjectGuid m_leaderGuid;
+        ObjectGuid m_originalLeaderGuid;
+        uint32 m_options;
+        bool    m_respawnGuard;
+        uint32 m_lastReachedWaypoint;
+        std::map<ObjectGuid, CreatureGroupMember*> m_members;
 };
 
 class CreatureGroupsManager
@@ -89,11 +92,11 @@ class CreatureGroupsManager
             return i;
         }
         void LoadCreatureGroup(Creature* creature, CreatureGroup*& group);
-        void RegisterNewGroup(CreatureGroup* group) { _groups[group->GetLeaderGuid()] = group; }
+        void RegisterNewGroup(CreatureGroup* group) { m_groups[group->GetOriginalLeaderGuid()] = group; }
         void Load();
         static ObjectGuid ConvertDBGuid(uint32 guidlow);
     protected:
-        std::map<ObjectGuid, CreatureGroup*> _groups;
+        std::map<ObjectGuid, CreatureGroup*> m_groups;
 };
 
 #define sCreatureGroupsManager (CreatureGroupsManager::instance())

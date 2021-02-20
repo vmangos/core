@@ -37,7 +37,6 @@ enum
     NPC_XOROTHIAN_DREADSTEED = 14502,
     NPC_LORD_HEL_NURATH     = 14506,
     NPC_DREADSTEED_SPIRIT   = 14504,
-    NPC_RITUAL_TRIGGER      = 1000001, //Just created for this.
 
     SPELL_WHEEL_AURA        = 23120,
     SPELL_BELL_AURA         = 23117,
@@ -47,6 +46,7 @@ enum
     SAY_IMP_DESPAWN         = -1780202,
     SAY_DREAD_GUARD_DESPAWN = -1780203
 };
+
 struct EventLocations
 {
     float m_fX, m_fY, m_fZ, m_fO;
@@ -126,8 +126,10 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
 
     bool EventStart(uint64 playerGuid)
     {
-		if(eventPhase!=0)
-			return false;
+        if (eventPhase!=0)
+            return false;
+        if (m_pInstance)
+            m_pInstance->SetData64(DATA_DREADSTEED_RITUAL_PLAYER, playerGuid);
         GenerateGlyphAndNodeGuids();
         eventPhase = 1;
         if (Creature* jeevee = me->SummonCreature(NPC_J_EEVEE, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
@@ -142,8 +144,8 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     }
     void EventSecondPartStart()
     {
-		if(eventPhase!=3)
-			return;
+        if(eventPhase!=3)
+            return;
         eventPhase = 4;
         waveTimer = 8000;
         waveStep = 0;
@@ -703,10 +705,12 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         }
     }
 };
+
 GameObjectAI* GetAIgo_pedestal_of_immol_thar(GameObject *pGo)
 {
     return new go_pedestal_of_immol_tharAI(pGo);
 }
+
 bool ProcessEventId_event_dreadsteed_ritual_start(uint32 eventId, Object* source, Object* target, bool isStart)
 {
     if (!target || !source)
@@ -716,6 +720,7 @@ bool ProcessEventId_event_dreadsteed_ritual_start(uint32 eventId, Object* source
         pPedestalAI->EventStart(source->GetGUID());
     return true;//to always override what could be in DB.
 }
+
 bool GOHello_go_ritual_node(Player* pPlayer, GameObject* pGo)
 {
     pGo->SetGoState(GO_STATE_ACTIVE);
@@ -730,39 +735,6 @@ bool GOHello_go_ritual_node(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
-struct npc_ritual_triggerAI : public ScriptedAI
-{
-    npc_ritual_triggerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-    void Reset() override
-    {
-        timer = 0;
-    }
-    void EnterCombat(Unit* enemy) override {}
-    void AttackedBy(Unit* attacker) override {}
-    void AttackStart(Unit * unit) override {}
-    void EnterEvadeMode() override {}
-    uint32 timer;
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        /*if (timer < uiDiff)
-        {
-                //m_creature->CastSpell(m_creature, SPELL_WHEEL_AURA, false);
-                //m_creature->CastSpell(m_creature, SPELL_BELL_AURA , false);
-                m_creature->CastSpell(m_creature, SPELL_CANDLE_AURA, false);
-            timer=5000;
-        }
-        else
-            timer -= uiDiff;*/
-    }
-};
-
-CreatureAI* GetAI_npc_ritual_trigger(Creature* pCreature)
-{
-    return new npc_ritual_triggerAI(pCreature);
-}
 struct go_ritual_nodeAI: public GameObjectAI
 {
     go_ritual_nodeAI(GameObject* pGo, uint32 refreshTimer, uint32 spellId) : GameObjectAI(pGo)
@@ -774,7 +746,6 @@ struct go_ritual_nodeAI: public GameObjectAI
     uint32 timer;
     uint32 refreshTime;
     uint32 spell;
-    /*bool OnUse(Unit* pUser){ }*/
 
     void UpdateAI(uint32 const uiDiff) override
     {
@@ -782,8 +753,20 @@ struct go_ritual_nodeAI: public GameObjectAI
         {
             if (timer < uiDiff)
             {
-                if (Creature* trigger = me->FindNearestCreature(NPC_RITUAL_TRIGGER, 40.0f))
-                    trigger->CastSpell(trigger, spell, false);
+                if (instance_dire_maul* instance = (instance_dire_maul*)me->GetInstanceData())
+                {
+                    if (GameObject* candleAura = instance->GetGameObject(instance->GetData64(GO_RITUAL_CANDLE_AURA)))
+                    {
+                        if (Unit* target = instance->GetMap()->GetPlayer(instance->GetData64(DATA_DREADSTEED_RITUAL_PLAYER)))
+                        {
+                            if (spell == SPELL_CANDLE_AURA)
+                                candleAura->CastSpell(target, spell, true);
+                            else
+                                me->CastSpell(target, spell, true);
+                        }
+                    }
+                }
+
                 timer = refreshTime/*5000*/;
             }
             else
@@ -798,14 +781,17 @@ GameObjectAI* GetAIgo_ritual_wheel(GameObject *pGo)
 {
     return new go_ritual_nodeAI(pGo, 5000, SPELL_WHEEL_AURA);
 }
+
 GameObjectAI* GetAIgo_ritual_candle(GameObject *pGo)
 {
     return new go_ritual_nodeAI(pGo, 5000, SPELL_CANDLE_AURA);
 }
+
 GameObjectAI* GetAIgo_ritual_bell(GameObject *pGo)
 {
     return new go_ritual_nodeAI(pGo, 5000, SPELL_BELL_AURA);
 }
+
 bool ProcessEventId_event_dreadsteed_ritual_second_part(uint32 eventId, Object* source, Object* target, bool isStart)
 {
     if (!target)
@@ -817,6 +803,7 @@ bool ProcessEventId_event_dreadsteed_ritual_second_part(uint32 eventId, Object* 
 
     return true;
 }
+
 enum
 {
     //spells are absolutely certain.
@@ -828,6 +815,7 @@ enum
     SPELL_SLEEP                     = 20989, //OK
     SPELL_KNOCK_AWAY                = 18670 //OK
 };
+
 struct boss_lordHelNurathAI : public ScriptedAI
 {
     boss_lordHelNurathAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -884,10 +872,12 @@ struct boss_lordHelNurathAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
+
 CreatureAI* GetAI_boss_lord_hel_nurath(Creature* pCreature)
 {
     return new boss_lordHelNurathAI(pCreature);
 }
+
 struct boss_xorothianDreadsteedAI : public ScriptedAI
 {
     boss_xorothianDreadsteedAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -930,6 +920,7 @@ struct boss_xorothianDreadsteedAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_SUMMON_DREADSTEED_SPIRIT, true);
     }
 };
+
 CreatureAI* GetAI_boss_xorothian_dreadsteed(Creature* pCreature)
 {
     return new boss_xorothianDreadsteedAI(pCreature);
@@ -947,11 +938,6 @@ void AddSC_dreadsteed_ritual()
     newscript = new Script;
     newscript->Name = "event_dreadsteed_ritual_second_part";
     newscript->pProcessEventId = &ProcessEventId_event_dreadsteed_ritual_second_part;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_ritual_trigger";
-    newscript->GetAI = &GetAI_npc_ritual_trigger;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -981,7 +967,6 @@ void AddSC_dreadsteed_ritual()
     newscript->Name = "boss_lord_hel_nurath";
     newscript->GetAI = &GetAI_boss_lord_hel_nurath;
     newscript->RegisterSelf();
-
 
     newscript = new Script;
     newscript->Name = "go_pedestal_of_immol_thar";

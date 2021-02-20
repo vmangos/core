@@ -64,7 +64,6 @@ void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
-void AddSC_boss_quatermasterzigris();
 void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_razorgore();                         //blackwing_lair
 void AddSC_boss_vael();
@@ -123,7 +122,6 @@ void AddSC_boss_houndmaster_loksey();
 void AddSC_boss_interrogator_vishas();
 void AddSC_boss_mograine_and_whitemane();
 void AddSC_instance_scarlet_monastery();
-void AddSC_boss_darkmaster_gandling();               //scholomance
 void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
 void AddSC_boss_instructormalicia();
@@ -200,7 +198,6 @@ void AddSC_instance_blackfathom_deeps();             //blackfathom_deeps
 void AddSC_boss_celebras_the_cursed();               //maraudon
 void AddSC_boss_landslide();
 void AddSC_boss_noxxion();
-void AddSC_boss_ptheradras();
 void AddSC_maraudon();
 void AddSC_instance_maraudon();
 void AddSC_instance_onyxia_lair();
@@ -318,7 +315,6 @@ void AddScripts()
     AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
     AddSC_boss_warmastervoone();
-    AddSC_boss_quatermasterzigris();
 
     AddSC_instance_blackrock_spire();
     AddSC_boss_pyroguard_emberseer();
@@ -376,7 +372,6 @@ void AddScripts()
     AddSC_boss_interrogator_vishas();
     AddSC_boss_mograine_and_whitemane();
     AddSC_instance_scarlet_monastery();
-    AddSC_boss_darkmaster_gandling();                       //scholomance
     AddSC_boss_theolenkrastinov();
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
@@ -453,7 +448,6 @@ void AddScripts()
     AddSC_boss_celebras_the_cursed();                       //maraudon
     AddSC_boss_landslide();
     AddSC_boss_noxxion();
-    AddSC_boss_ptheradras();
     AddSC_maraudon();
     AddSC_instance_maraudon();
     AddSC_instance_onyxia_lair();

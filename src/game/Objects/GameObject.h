@@ -705,6 +705,8 @@ class GameObject : public WorldObject
 
         ObjectGuid const& GetOwnerGuid() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
         Unit* GetOwner() const;
+        Player* GetAffectingPlayer() const final;
+        bool IsCharmerOrOwnerPlayerOrPlayerItself() const final { return GetOwnerGuid().IsPlayer(); }
 
         void SetSpellId(uint32 id)
         {
@@ -773,6 +775,7 @@ class GameObject : public WorldObject
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
         void SetDisplayId(uint32 modelId);
 
+        bool HasCustomAnim() const;
         void SendGameObjectCustomAnim(uint32 animId = 0);
         void SendGameObjectReset();
 
@@ -856,7 +859,6 @@ class GameObject : public WorldObject
 
         uint32 GetFactionTemplateId() const final { return GetGOInfo()->faction; }
         uint32 GetLevel() const final ;
-        bool IsValidAttackTarget(Unit const* target) const final ;
 
         bool IsAtInteractDistance(Position const& pos, float radius) const;
         bool IsAtInteractDistance(Player const* player, uint32 maxRange = 0) const;

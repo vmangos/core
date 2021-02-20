@@ -13,6 +13,8 @@
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_types.h>
 #include <ace/os_include/sys/os_socket.h>
+#include <ace/Acceptor.h>
+#include <ace/SOCK_Acceptor.h>
 
 #include <set>
 
@@ -20,6 +22,40 @@
 #include "Common.h"
 #include "Config/Config.h"
 #include "Database/DatabaseEnv.h"
+
+template <typename SocketType>
+class MangosSocketAcceptor : public ACE_Acceptor<SocketType, ACE_SOCK_Acceptor>
+{
+public:
+    MangosSocketAcceptor(void) { }
+    virtual ~MangosSocketAcceptor(void)
+    {
+        if (this->reactor())
+            this->reactor()->cancel_timer(this, 1);
+    }
+
+protected:
+
+    virtual int handle_timeout(const ACE_Time_Value &current_time, const void *act = 0)
+    {
+        sLog.outBasic("Resuming acceptor");
+        this->reactor()->cancel_timer(this, 1);
+        return this->reactor()->register_handler(this, ACE_Event_Handler::ACCEPT_MASK);
+    }
+
+    virtual int handle_accept_error(void)
+    {
+#if defined(ENFILE) && defined(EMFILE)
+        if (errno == ENFILE || errno == EMFILE)
+        {
+            sLog.outError("Out of file descriptors, suspending incoming connections for 10 seconds");
+            this->reactor()->remove_handler(this, ACE_Event_Handler::ACCEPT_MASK | ACE_Event_Handler::DONT_CALL);
+            this->reactor()->schedule_timer(this, NULL, ACE_Time_Value(10));
+        }
+#endif
+        return 0;
+    }
+};
 
 /**
 * This is a helper class to WorldSocketMgr ,that manages
@@ -233,12 +269,11 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
         return -1;
     }
 
-    typename SocketType::Acceptor* acc = new typename SocketType::Acceptor;
-    m_Acceptor = acc;
+    m_Acceptor = new MangosSocketAcceptor<SocketType>();
 
     ACE_INET_Addr listen_addr(port, address);
 
-    if (acc->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
+    if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
         sLog.outError("Failed to open acceptor, check if the port is free");
         return -1;
@@ -263,12 +298,7 @@ template <typename SocketType>
 void MangosSocketMgr<SocketType>::StopNetwork()
 {
     if (m_Acceptor)
-    {
-        typename SocketType::Acceptor* acc = dynamic_cast<typename SocketType::Acceptor*>(m_Acceptor);
-
-        if (acc)
-            acc->close();
-    }
+        m_Acceptor->close();
 
     if (m_NetThreadsCount != 0)
     {

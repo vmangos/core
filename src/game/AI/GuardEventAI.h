@@ -29,7 +29,6 @@ public:
 
     void MoveInLineOfSight(Unit*) override;
     void EnterCombat(Unit*) override;
-    void JustDied(Unit*) override;
     static int Permissible(Creature const*);
 private:
     bool IsAttackingPlayerOrFriendly(Unit const*) const;

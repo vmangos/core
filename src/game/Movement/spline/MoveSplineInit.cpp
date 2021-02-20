@@ -57,6 +57,8 @@ void MoveSplineInit::Move(PathFinder const* pfinder)
         SetFly();
 }
 
+static thread_local uint32 splineCounter = 1;
+
 int32 MoveSplineInit::Launch()
 {
     float realSpeedRun = 0.0f;
@@ -117,6 +119,8 @@ int32 MoveSplineInit::Launch()
 
     if (!args.Validate(&unit))
         return 0;
+
+    args.splineId = splineCounter++;
 
     if (Player* pPlayer = unit.ToPlayer())
         pPlayer->GetCheatData()->ResetJumpCounters();

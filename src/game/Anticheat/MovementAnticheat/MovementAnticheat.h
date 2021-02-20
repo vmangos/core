@@ -94,7 +94,8 @@ private:
         MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
         float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
         float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
-        
+        UnitMoveType GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const;
+
         bool m_knockBack = false;
 
         // Multi jump

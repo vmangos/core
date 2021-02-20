@@ -848,7 +848,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK6                       = 0x00000040,            // 6
     SPELL_ATTR_EX3_STACK_FOR_DIFF_CASTERS     = 0x00000080,            // 7 create a separate (de)buff stack for each caster
     SPELL_ATTR_EX3_TARGET_ONLY_PLAYER         = 0x00000100,            // 8 can target only players
-    SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_PROC = 0x00000200,            // 9
+    SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_SPECIAL = 0x00000200,         // 9 Can only proc auras with SPELL_ATTR_EX3_CAN_PROC_FROM_TRIGGERED_SPECIAL
     SPELL_ATTR_EX3_MAIN_HAND                  = 0x00000400,            // 10 Main hand weapon required
     SPELL_ATTR_EX3_BATTLEGROUND               = 0x00000800,            // 11 Can casted only on battleground
     SPELL_ATTR_EX3_CAST_ON_DEAD               = 0x00001000,            // 12 target is a dead player (not every spell has this flag)
@@ -865,7 +865,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK23                      = 0x00800000,            // 23
     SPELL_ATTR_EX3_REQ_OFFHAND                = 0x01000000,            // 24 Req offhand weapon
     SPELL_ATTR_EX3_UNK25                      = 0x02000000,            // 25 no cause spell pushback ?
-    SPELL_ATTR_EX3_UNK26                      = 0x04000000,            // 26
+    SPELL_ATTR_EX3_CAN_PROC_FROM_TRIGGERED_SPECIAL = 0x04000000,       // 26 Auras with this attribute can proc off SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_SPECIAL
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
     SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
@@ -929,18 +929,19 @@ enum SpellAttributesCustom
 // Custom flags assigned by the core based on spell template data
 enum SpellAttributesInternal
 {
-    SPELL_INTERNAL_APPLIES_AURA             = 0x001,
-    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x002,
-    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x004,
-    SPELL_INTERNAL_POSITIVE                 = 0x008,
-    SPELL_INTERNAL_HEAL                     = 0x010,
-    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x020,
-    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x040,
-    SPELL_INTERNAL_AOE                      = 0x080,
-    SPELL_INTERNAL_AOE_AURA                 = 0x100,
-    SPELL_INTERNAL_DISMOUNT                 = 0x200,
-    SPELL_INTERNAL_CHARM                    = 0x400,
-    SPELL_INTERNAL_REFLECTABLE              = 0x800,
+    SPELL_INTERNAL_APPLIES_AURA             = 0x0001,
+    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x0002,
+    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x0004,
+    SPELL_INTERNAL_POSITIVE                 = 0x0008,
+    SPELL_INTERNAL_HEAL                     = 0x0010,
+    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x0020,
+    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x0040,
+    SPELL_INTERNAL_AOE                      = 0x0080,
+    SPELL_INTERNAL_AOE_AURA                 = 0x0100,
+    SPELL_INTERNAL_DISMOUNT                 = 0x0200,
+    SPELL_INTERNAL_CHARM                    = 0x0400,
+    SPELL_INTERNAL_REFLECTABLE              = 0x0800,
+    SPELL_INTERNAL_CUSTOM                   = 0x1000,
 };
 
 // original names, do not edit

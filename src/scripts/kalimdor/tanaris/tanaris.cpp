@@ -562,8 +562,6 @@ struct npc_yehkinyaAI : public npc_escortAI
         Event_Timer = 0;
         m_creature->SetFly(false);
         m_creature->SetWalk(false);
-    if (HasEscortState(STATE_ESCORT_ESCORTING))
-            return;
     }
 
     void WaypointReached(uint32 i) override
@@ -607,6 +605,7 @@ CreatureAI* GetAI_npc_yehkinya(Creature* pCreature)
 
 #define QUEST_HAKKAR_EVENT 8181
 #define QUEST_TEXT_HAKKAR_EVENT -1108999
+
 bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HAKKAR_EVENT)
@@ -614,10 +613,10 @@ bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest cons
         DoScriptText(QUEST_TEXT_HAKKAR_EVENT, pCreature);
 
         if (npc_yehkinyaAI* pEscortAI = dynamic_cast<npc_yehkinyaAI*>(pCreature->AI()))
-                {
+        {
             pEscortAI->Start(true, 0, nullptr, true);
-                        pCreature->SetWalk(false);
-                }
+            pCreature->SetWalk(false);
+        }
     }
     return true;
 }

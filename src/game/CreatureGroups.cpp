@@ -19,63 +19,98 @@
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "ObjectMgr.h"
-#include "MoveSpline.h"
 #include "CreatureAI.h"
-
-#define MAX_DESYNC 5.0f
 
 CreatureGroupMember* CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags)
 {
-    if (guid == _leaderGuid)
+    if (guid == m_leaderGuid)
         return nullptr;
-    CreatureGroupMember*& member = _members[guid];
+    CreatureGroupMember*& member = m_members[guid];
     if (!member)
         member = new CreatureGroupMember();
     member->followDistance = followDist;
     member->followAngle    = followAngle;
     member->memberFlags    = memberFlags;
-    _options |= memberFlags;
+    m_options |= memberFlags;
     return member;
 }
 
 void CreatureGroup::OnMemberAttackStart(Creature* member, Unit* target)
 {
-    if (!(_options & OPTION_AGGRO_TOGETHER))
+    if (!(m_options & OPTION_AGGRO_TOGETHER))
         return;
 
-    for (const auto& itr : _members)
+    for (const auto& itr : m_members)
         if (itr.first != member->GetObjectGuid())
             MemberAssist(member->GetMap()->GetCreature(itr.first), target);
 
-    if (member->GetObjectGuid() != GetLeaderGuid())
-        MemberAssist(member->GetMap()->GetCreature(GetLeaderGuid()), target);
+    if (member->GetObjectGuid() != GetOriginalLeaderGuid())
+        MemberAssist(member->GetMap()->GetCreature(GetOriginalLeaderGuid()), target);
 }
 
 void CreatureGroup::OnMemberDied(Creature* member)
 {
-    if (_options & OPTION_INFORM_LEADER_ON_MEMBER_DIED)
+    if (m_options & OPTION_INFORM_LEADER_ON_MEMBER_DIED)
     {
-        if (member->GetObjectGuid() != GetLeaderGuid())
-            if (Creature* groupLeader = member->GetMap()->GetCreature(GetLeaderGuid()))
+        if (member->GetObjectGuid() != GetOriginalLeaderGuid())
+            if (Creature* groupLeader = member->GetMap()->GetCreature(GetOriginalLeaderGuid()))
                 if (groupLeader->IsInWorld() && groupLeader->IsAlive() && groupLeader->AI())
                     groupLeader->AI()->GroupMemberJustDied(member, false);
     }
-    if (_options & OPTION_INFORM_MEMBERS_ON_ANY_DIED)
+    if (m_options & OPTION_INFORM_MEMBERS_ON_ANY_DIED)
     {
-        for (const auto& itr : _members)
+        for (const auto& itr : m_members)
             if (itr.first != member->GetObjectGuid())
                 if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
                     if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
-                        otherMember->AI()->GroupMemberJustDied(member, member->GetObjectGuid() == GetLeaderGuid());
+                        otherMember->AI()->GroupMemberJustDied(member, member->GetObjectGuid() == GetOriginalLeaderGuid());
+    }
+
+    // Select new leader on death if group uses formation movement.
+    if ((member->GetObjectGuid() == GetLeaderGuid()) && IsFormation())
+    {
+        Creature* pOriginalLeader = (member->GetObjectGuid() == GetOriginalLeaderGuid()) ? member : member->GetMap()->GetCreature(GetOriginalLeaderGuid());
+        if (pOriginalLeader && pOriginalLeader->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE)
+        {
+            Creature* pNewLeader = nullptr;
+            for (const auto& itr : m_members)
+            {
+                if (itr.first != member->GetObjectGuid())
+                {
+                    if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
+                    {
+                        if (otherMember->IsInWorld() && otherMember->IsAlive())
+                        {
+                            pNewLeader = otherMember;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (pNewLeader)
+            {
+                m_leaderGuid = pNewLeader->GetObjectGuid();
+                pNewLeader->GetMotionMaster()->MoveWaypointAsDefault(m_lastReachedWaypoint, 0, 1000, pOriginalLeader->GetGUIDLow(), pOriginalLeader->GetEntry(), true);
+
+                for (const auto& itr : m_members)
+                    if (itr.first != member->GetObjectGuid() && itr.first != pNewLeader->GetObjectGuid())
+                        if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
+                            if (otherMember->IsInWorld() && otherMember->IsAlive())
+                                otherMember->GetMotionMaster()->ReInitializePatrolMovement();
+            }
+            else
+                m_leaderGuid = m_originalLeaderGuid; // Everyone is dead, reset leader to original.
+        }
     }
 }
 
 void CreatureGroup::OnLeaveCombat(Creature* member)
 {
     bool masterEvade = member->GetObjectGuid() == GetLeaderGuid();
-    if (_options & OPTION_EVADE_TOGETHER)
+    if (m_options & OPTION_EVADE_TOGETHER)
     {
-        for (const auto& itr : _members)
+        for (const auto& itr : m_members)
             if (itr.first != member->GetObjectGuid())
                 if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
                     if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
@@ -89,14 +124,26 @@ void CreatureGroup::OnLeaveCombat(Creature* member)
                     otherMember->AI()->EnterEvadeMode();
                 }
     }
-    if (_options & OPTION_RESPAWN_ALL_ON_ANY_EVADE ||
-            (_options & OPTION_RESPAWN_ALL_ON_MASTER_EVADE && masterEvade))
+    if (m_options & OPTION_RESPAWN_ALL_ON_ANY_EVADE ||
+            (m_options & OPTION_RESPAWN_ALL_ON_MASTER_EVADE && masterEvade))
         RespawnAll(member);
 }
 
 void CreatureGroup::OnRespawn(Creature* member)
 {
-    if (!(_options & OPTION_RESPAWN_TOGETHER))
+    // On respawn of original leader, make sure other members
+    // follow him now instead of the temporary leader.
+    if ((m_leaderGuid != m_originalLeaderGuid) &&
+        (member->GetObjectGuid() == m_originalLeaderGuid))
+    {
+        m_leaderGuid = m_originalLeaderGuid;
+        for (const auto& itr : m_members)
+            if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
+                if (otherMember->IsInWorld() && otherMember->IsAlive())
+                    otherMember->GetMotionMaster()->Initialize();
+    }
+
+    if (!(m_options & OPTION_RESPAWN_TOGETHER))
         return;
 
     RespawnAll(member);
@@ -104,28 +151,28 @@ void CreatureGroup::OnRespawn(Creature* member)
 
 void CreatureGroup::RespawnAll(Creature* except)
 {
-    for (const auto& itr : _members)
+    for (const auto& itr : m_members)
         if (itr.first != except->GetObjectGuid())
             if (Creature* otherMember = except->GetMap()->GetCreature(itr.first))
                 Respawn(otherMember, itr.second);
 
-    if (except->GetObjectGuid() != GetLeaderGuid())
-        if (Creature* otherMember = except->GetMap()->GetCreature(GetLeaderGuid()))
+    if (except->GetObjectGuid() != GetOriginalLeaderGuid())
+        if (Creature* otherMember = except->GetMap()->GetCreature(GetOriginalLeaderGuid()))
             Respawn(otherMember, nullptr);
 }
 
 void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberEntry /* = nullptr for leader */)
 {
     // Prevent stack overflow (member->Respawn() can call CreatureGroup::Respawn, etc ...)
-    if (_respawnGuard)
+    if (m_respawnGuard)
         return;
 
-    _respawnGuard = true;
+    m_respawnGuard = true;
     if (member->IsInWorld() && member->GetRespawnTime() > time(nullptr))
     {
         if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
         {
-            if (Unit* leader = member->GetMap()->GetUnit(GetLeaderGuid()))
+            if (Unit* leader = member->GetMap()->GetUnit(GetOriginalLeaderGuid()))
             {
                 float x, y, z;
                 if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
@@ -139,7 +186,7 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
         }
         member->Respawn();
     }
-    _respawnGuard = false;
+    m_respawnGuard = false;
 }
 
 void CreatureGroup::MemberAssist(Creature* member, Unit* target)
@@ -160,22 +207,34 @@ void CreatureGroup::MemberAssist(Creature* member, Unit* target)
     }
 }
 
+void CreatureGroup::RemoveTemporaryLeader(Creature* pLeader)
+{
+    m_leaderGuid = m_originalLeaderGuid;
+    RemoveMember(pLeader->GetObjectGuid());
+
+    for (const auto& itr : m_members)
+        if (itr.first != pLeader->GetObjectGuid())
+            if (Creature* otherMember = pLeader->GetMap()->GetCreature(itr.first))
+                if (otherMember->IsInWorld() && otherMember->IsAlive())
+                    otherMember->GetMotionMaster()->ReInitializePatrolMovement();
+}
+
 void CreatureGroup::RemoveMember(ObjectGuid guid)
 {
-    std::map<ObjectGuid, CreatureGroupMember*>::iterator it = _members.find(guid);
-    if (it != _members.end())
+    std::map<ObjectGuid, CreatureGroupMember*>::iterator it = m_members.find(guid);
+    if (it != m_members.end())
     {
         delete it->second;
-        _members.erase(it);
+        m_members.erase(it);
     }
 }
 
 void CreatureGroup::DisbandGroup(Creature* pMember)
 {
-    if (Creature* pLeader = pMember->GetMap()->GetCreature(GetLeaderGuid()))
+    if (Creature* pLeader = pMember->GetMap()->GetCreature(GetOriginalLeaderGuid()))
         pLeader->SetCreatureGroup(nullptr);
 
-    for (auto& it : _members)
+    for (auto& it : m_members)
     {
         if (Creature* pOtherMember = pMember->GetMap()->GetCreature(it.first))
         {
@@ -187,29 +246,20 @@ void CreatureGroup::DisbandGroup(Creature* pMember)
         delete it.second;
     }
 
-    _members.clear();
+    m_members.clear();
 }
 
 void CreatureGroup::DeleteFromDb()
 {
-    WorldDatabase.PExecute("DELETE FROM creature_groups WHERE leader_guid=%u", _leaderGuid.GetCounter());
+    WorldDatabase.PExecute("DELETE FROM `creature_groups` WHERE `leader_guid`=%u", m_originalLeaderGuid.GetCounter());
 }
 
 void CreatureGroup::SaveToDb()
 {
     DeleteFromDb();
-    for (const auto& itr : _members)
-        WorldDatabase.PExecute("INSERT INTO creature_groups SET leader_guid=%u, member_guid=%u, dist='%f', angle='%f', flags=%u",
-                               _leaderGuid.GetCounter(), itr.first.GetCounter(), itr.second->followDistance, itr.second->followAngle, itr.second->memberFlags);
-}
-
-uint32 CreatureGroup::GetWaitTime(Creature* moving)
-{
-    for (const auto& itr : _members)
-        if (Creature* curr = moving->GetMap()->GetCreature(itr.first))
-            if (!curr->movespline->Finalized())
-                return 1;
-    return 0;
+    for (const auto& itr : m_members)
+        WorldDatabase.PExecute("INSERT INTO `creature_groups` SET `leader_guid`=%u, `member_guid`=%u, `dist`='%f', `angle`='%f', `flags`=%u",
+                               m_originalLeaderGuid.GetCounter(), itr.first.GetCounter(), itr.second->followDistance, itr.second->followAngle, itr.second->memberFlags);
 }
 
 bool CreatureGroupMember::ComputeRelativePosition(float leaderAngle, float &x, float &y) const
@@ -231,7 +281,7 @@ void CreatureGroupsManager::Load()
     uint32 oldMSTime = WorldTimer::getMSTime();
 
     // Memory leak, but we cannot delete the loaded groups, since pointer may be present at loaded creatures
-    _groups.clear();
+    m_groups.clear();
 
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `leader_guid`, `member_guid`, `dist`, `angle`, `flags` FROM `creature_groups` ORDER BY `leader_guid`"));
 
@@ -270,7 +320,7 @@ void CreatureGroupsManager::Load()
         }
         else
         {
-            if (!currentGroup || leaderGuid != currentGroup->GetLeaderGuid())
+            if (!currentGroup || leaderGuid != currentGroup->GetOriginalLeaderGuid())
             {
                 currentGroup = new CreatureGroup(leaderGuid);
                 RegisterNewGroup(currentGroup);
@@ -290,7 +340,7 @@ void CreatureGroupsManager::LoadCreatureGroup(Creature* creature, CreatureGroup*
     group = nullptr;
     if (!creature->HasStaticDBSpawnData())
         return;
-    for (const auto& itr : _groups)
+    for (const auto& itr : m_groups)
     {
         if (itr.first == creature->GetObjectGuid() || itr.second->ContainsGuid(creature->GetObjectGuid()))
         {

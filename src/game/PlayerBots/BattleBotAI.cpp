@@ -968,7 +968,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
     else
     {
-        if (!me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
+        if (!me->HasInArc(pVictim, 2 * M_PI_F / 3) && !me->IsMoving())
         {
             me->SetInFront(pVictim);
             me->SendMovementPacket(MSG_MOVE_SET_FACING, false);

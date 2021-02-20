@@ -1164,14 +1164,14 @@ struct instance_blackrock_depths : ScriptedInstance
 
 InstanceData* GetInstanceData_instance_blackrock_depths(Map* pMap)
 {
-	return new instance_blackrock_depths(pMap);
+    return new instance_blackrock_depths(pMap);
 }
 
 void AddSC_instance_blackrock_depths()
 {
-	Script* newscript;
-	newscript = new Script;
-	newscript->Name = "instance_blackrock_depths";
-	newscript->GetInstanceData = &GetInstanceData_instance_blackrock_depths;
-	newscript->RegisterSelf();
+    Script* newscript;
+    newscript = new Script;
+    newscript->Name = "instance_blackrock_depths";
+    newscript->GetInstanceData = &GetInstanceData_instance_blackrock_depths;
+    newscript->RegisterSelf();
 }
