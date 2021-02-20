@@ -115,7 +115,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 
 
 -- in case if object despawns before player accept next one
-UPDATE `quest_template` SET `RequiredCondition` = 20227, `PrevQuestId` = 0 WHERE `entry` = 1191;
+UPDATE `quest_template` SET `RequiredCondition` = 20227 WHERE `entry` = 1191;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES 
 (20225, 9, 1190, 0),
 (20226, 19, 1194, 0),
