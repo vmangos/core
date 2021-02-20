@@ -90,8 +90,6 @@ struct MapEntry
     uint32 parent;
     uint32 mapType;
     uint32 linkedZone;
-    uint32 levelMin;
-    uint32 levelMax;
     uint32 maxPlayers;
     uint32 resetDelay;
     int32 ghostEntranceMap;
