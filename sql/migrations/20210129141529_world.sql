@@ -68,6 +68,9 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 -- remove unused template
 DELETE FROM `pool_template` WHERE `entry` = 14223;
 
+-- remove tome of fire blast from kireena
+DELETE FROM `npc_vendor` WHERE `entry` = 9636 AND `item` = 8878;
+
 
 -- End of migration.
 END IF;
