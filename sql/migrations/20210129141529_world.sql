@@ -80,7 +80,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1191, 1, 60, 2, 1, 0, 0, 0, 0, 0, 0, 0, 4709, 0, 0, 0, 0, 0, 0, 0, 'Zamek - Start Waypoints');
 
 -- Add waypoints and scripts
-INSERT INTO creature_movement_template (entry,point,position_x,position_y,position_z,orientation,waittime,script_id) VALUES
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 -- Zamek 4709
 (4709,1,-6237.13,-3911.58,-60.5103,100,0,0),
 (4709,2,-6257.43,-3879.56,-58.8595,100,0,0),
@@ -113,24 +113,23 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (472002, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1543, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle Brassbolts - Talk');
 
 -- in case if object despawns before player accept next one
-UPDATE quest_template SET RequiredCondition=20227, PrevQuestId=0 WHERE entry=1191;
-DELETE FROM conditions WHERE condition_entry BETWEEN 20225 AND 20227;
-INSERT INTO conditions (condition_entry, type, value1, value2) VALUES 
+UPDATE `quest_template` SET `RequiredCondition` = 20227, `PrevQuestId` = 0 WHERE `entry` = 1191;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES 
 (20225, 9, 1190, 0),
 (20226, 19, 1194, 0),
 (20227, -2, 20226, 20225);
 
 -- Objects
 -- Rizzle's Guarded Plans 179888
-UPDATE gameobject SET spawntimesecsmin=45, spawntimesecsmax=45 WHERE id=179888;
-DELETE FROM gossip_menu WHERE entry=6029;
-INSERT INTO gossip_menu (entry, text_id) VALUES
+UPDATE `gameobject` SET `spawntimesecsmin` = 45, `spawntimesecsmax` = 45 WHERE `id = 179888;
+DELETE FROM `gossip_menu` WHERE `entry`= 6029;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6029, 7182);
 -- Rizzle's Unguarded Plans 20805
-UPDATE gameobject SET position_x=-6236.64, position_y=-3830.48, position_z=-58.1364, orientation=-0.907571, rotation0=0, rotation1=0, rotation2=-0.438371, rotation3=0.898794 WHERE id=20805;
+UPDATE `gameobject` SET `position_x` = -6236.64, `position_y` = -3830.48, `position_z` = -58.1364, `orientation` = -0.907571, `rotation0` = 0, `rotation1` = 0, `rotation2` = -0.438371, `rotation3 = 0.898794 WHERE `id` = 20805;
 -- Explosive Charge 144065 - added
-DELETE FROM gameobject WHERE guid=20;
-INSERT INTO gameobject VALUES (20,144065,1,-6266.46,-3845.4,-58.7498,0.550892,0,0,0.271976, 0.962304, -5, -5, 255, 1, 0, 0, 0, 10);
+DELETE FROM `gameobject` WHERE `guid` = 20;
+INSERT INTO `gameobject` VALUES (20, 144065,1, -6266.46, -3845.4, -58.7498, 0.550892, 0, 0, 0.271976, 0.962304, -5, -5, 255, 1, 0, 0, 0, 10);
 
 
 
