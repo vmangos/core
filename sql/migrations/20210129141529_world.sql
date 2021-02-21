@@ -71,7 +71,7 @@ DELETE FROM `pool_template` WHERE `entry` = 14223;
 -- remove tome of fire blast from kireena
 DELETE FROM `npc_vendor` WHERE `entry` = 9636 AND `item` = 8878;
 
--- q.1191 'Zamek's Distraction' - Redone
+-- q.1191 'Zamek's Distraction'
 -- Update End Script
 -- Based on TC Script
 DELETE FROM `quest_end_scripts` WHERE `id`=1191;
@@ -132,11 +132,6 @@ UPDATE `gameobject` SET `position_x` = -6236.64, `position_y` = -3830.48, `posit
 -- Explosive Charge 144065 - added
 DELETE FROM `gameobject` WHERE `guid` = 20;
 INSERT INTO `gameobject` VALUES (20, 144065,1, -6266.46, -3845.4, -58.7498, 0.550892, 0, 0, 0.271976, 0.962304, -5, -5, 255, 1, 0, 0, 0, 10);
-
-
-
-
-
 
 
 -- End of migration.
