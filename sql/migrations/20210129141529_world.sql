@@ -123,6 +123,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES
 
 -- Objects
 -- Rizzle's Guarded Plans 179888
+UPDATE `gameobject_template` SET `flags` = 0 WHERE entry = 179888;
 UPDATE `gameobject` SET `spawntimesecsmin` = 45, `spawntimesecsmax` = 45 WHERE `id` = 179888;
 DELETE FROM `gossip_menu` WHERE `entry` = 6029;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
