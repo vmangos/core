@@ -21,7 +21,6 @@
 
 #include "DetourNavMesh.h"
 #include "DetourStatus.h"
-#include <thread>
 
 
 // Define DT_VIRTUAL_QUERYFILTER if you wish to derive a custom filter from dtQueryFilter.
