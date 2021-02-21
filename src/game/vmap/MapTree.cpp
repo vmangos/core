@@ -358,7 +358,7 @@ bool StaticMapTree::InitMap(std::string const& fname, VMapManager2* vm)
 #endif
         if (!iIsTiled && ModelSpawn::readFromFile(rf, spawn))
         {
-            std::shared_ptr<WorldModel> model = vm->acquireModelInstance(iBasePath, spawn.name);
+            WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
             //DEBUG_FILTER_LOG(LOG_FILTER_MAP_LOADING, "StaticMapTree::InitMap(): loading %s", spawn.name.c_str());
             if (model)
             {
@@ -382,6 +382,12 @@ bool StaticMapTree::InitMap(std::string const& fname, VMapManager2* vm)
 
 void StaticMapTree::UnloadMap(VMapManager2* vm)
 {
+    for (auto& iLoadedSpawn : iLoadedSpawns)
+    {
+        iTreeValues[iLoadedSpawn.first].setUnloaded();
+        for (uint32 refCount = 0; refCount < iLoadedSpawn.second; ++refCount)
+            vm->releaseModelInstance(iTreeValues[iLoadedSpawn.first].name);
+    }
     iLoadedSpawns.clear();
     iLoadedTiles.clear();
 }
@@ -422,8 +428,8 @@ bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
             if (result)
             {
                 // acquire model instance
-                std::shared_ptr<WorldModel> model = vm->acquireModelInstance(iBasePath, spawn.name);
-                if (model == nullptr)
+                WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
+                if (!model)
                     ERROR_LOG("StaticMapTree::LoadMapTile() could not acquire WorldModel pointer for '%s'!", spawn.name.c_str());
 
                 // update tree
@@ -492,7 +498,7 @@ void StaticMapTree::UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
                 if (result)
                 {
                     // release model instance
-                    //vm->releaseModelInstance(spawn.name);
+                    vm->releaseModelInstance(spawn.name);
 
                     // update tree
                     uint32 referencedNode;

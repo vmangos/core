@@ -27,6 +27,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include "BattleGround.h"
+#include "ace/Recursive_Thread_Mutex.h"
 
 typedef std::map<uint32, BattleGround*> BattleGroundSet;
 
@@ -100,7 +101,7 @@ class BattleGroundQueue
         bool PlayerLoggedIn(Player* player);
 
         //mutex that should not allow changing private data, nor allowing to update Queue during private data change.
-        std::recursive_mutex  m_Lock;
+        ACE_Recursive_Thread_Mutex  m_Lock;
 
 
         typedef std::map<ObjectGuid, PlayerQueueInfo> QueuedPlayersMap;
@@ -295,7 +296,7 @@ class BattleGroundMgr
         void PlayerLoggedIn(Player* player);
         void PlayerLoggedOut(Player* player);
     private:
-        std::mutex    SchedulerLock;
+        ACE_Thread_Mutex    SchedulerLock;
         BattleMastersMap    mBattleMastersMap;
         CreatureBattleEventIndexesMap m_CreatureBattleEventIndexMap;
         GameObjectBattleEventIndexesMap m_GameObjectBattleEventIndexMap;

@@ -43,7 +43,7 @@ extern int m_ServiceStatus;
 #endif
 
 /// Heartbeat for the World
-void WorldRunnable::operator()()
+void WorldRunnable::run()
 {
     ///- Init new SQL thread for the world database
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests (one connection call enough)
@@ -95,7 +95,7 @@ void WorldRunnable::operator()()
         if (diff <= WORLD_SLEEP_CONST+prevSleepTime)
         {
             prevSleepTime = WORLD_SLEEP_CONST+prevSleepTime-diff;
-            std::this_thread::sleep_for(std::chrono::milliseconds(prevSleepTime));
+            ACE_Based::Thread::Sleep(prevSleepTime);
         }
         else
             prevSleepTime = 0;

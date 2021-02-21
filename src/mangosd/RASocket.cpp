@@ -103,7 +103,7 @@ int RASocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
     if(closing_)
         return -1;
     DEBUG_LOG("RASocket::handle_close");
-    std::unique_lock<std::mutex> lock (outBufferLock);
+    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
 
     closing_ = true;
 
@@ -115,7 +115,7 @@ int RASocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
 
 int RASocket::handle_output (ACE_HANDLE)
 {
-    std::unique_lock<std::mutex> lock (outBufferLock);
+    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
 
     if(closing_)
         return -1;
@@ -301,7 +301,7 @@ void RASocket::commandFinished(void* callbackArg, bool /*sucess*/)
 
 int RASocket::sendf(const char* msg)
 {
-    std::unique_lock<std::mutex> lock (outBufferLock);
+    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
 
     if(closing_)
         return -1;

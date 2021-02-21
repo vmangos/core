@@ -23,8 +23,8 @@
 #include "Database/SqlOperations.h"
 #include "DatabaseEnv.h"
 
-SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn)
-    : m_dbEngine(db), m_dbConnection(conn), m_running(true)
+SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn, int workerId)
+    : m_dbEngine(db), m_dbConnection(conn), m_running(true), m_workerId(workerId)
 {
 }
 
@@ -33,16 +33,6 @@ SqlDelayThread::~SqlDelayThread()
     //process all requests which might have been queued while thread was stopping
     ProcessRequests();
     delete m_dbConnection;
-}
-
-void SqlDelayThread::addSerialOperation(SqlOperation *op)
-{
-    m_serialDelayQueue.add(op);
-}
-
-bool SqlDelayThread::HasAsyncQuery()
-{
-    return !m_serialDelayQueue.empty_unsafe();
 }
 
 void SqlDelayThread::run()
@@ -60,7 +50,7 @@ void SqlDelayThread::run()
     {
         // if the running state gets turned off while sleeping
         // empty the queue before exiting
-        std::this_thread::sleep_for(std::chrono::milliseconds(loopSleepms));
+        ACE_Based::Thread::Sleep(loopSleepms);
 
         ProcessRequests();
 
@@ -93,7 +83,7 @@ void SqlDelayThread::ProcessRequests()
     }
 
     // Process any serial operations for this worker
-    while (m_serialDelayQueue.next(s))
+    while (m_dbEngine->NextSerialDelayedOperation(m_workerId, s))
     {
         s->Execute(m_dbConnection);
         delete s;
