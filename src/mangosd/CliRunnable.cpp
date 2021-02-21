@@ -112,7 +112,7 @@ void CliRunnable::operator()()
 
 #ifndef WIN32
 
-		int retval;
+        int retval;
         do
         {
             fd_set rfds;
@@ -159,10 +159,10 @@ void CliRunnable::operator()()
 
             sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, nullptr, command.c_str(), &utf8print, &commandFinished));
         }
-		else if (feof(stdin))
-		{
-			World::StopNow(SHUTDOWN_EXIT_CODE);
-		}
+        else if (feof(stdin))
+        {
+            World::StopNow(SHUTDOWN_EXIT_CODE);
+        }
     }
 
     ///- End the database thread
