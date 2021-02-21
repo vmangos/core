@@ -81,7 +81,7 @@ int kb_hit_return()
 #endif
 
 /// %Thread start
-void CliRunnable::run()
+void CliRunnable::operator()()
 {
     ///- Init new SQL thread for the world database (one connection call enough)
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests
@@ -109,6 +109,30 @@ void CliRunnable::run()
         if (World::IsStopped())
             break;
         #endif
+
+#ifndef WIN32
+
+        int retval;
+        do
+        {
+            fd_set rfds;
+            struct timeval tv;
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+
+            FD_ZERO(&rfds);
+            FD_SET(0, &rfds);
+
+            retval = select(1, &rfds, nullptr, nullptr, &tv);
+        } while (!retval);
+
+        if (retval == -1)
+        {
+            World::StopNow(SHUTDOWN_EXIT_CODE);
+            break;
+        }
+#endif
+
         char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
         if (command_str != nullptr)
         {

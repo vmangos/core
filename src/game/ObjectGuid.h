@@ -26,8 +26,6 @@
 #include <queue>
 #include <unordered_set>
 
-#include "ace/Thread_Mutex.h"
-
 #include "Common.h"
 #include "ByteBuffer.h"
 
@@ -322,8 +320,8 @@ public:
         ObjectGuidGenerator<high>::GenerateRange(first, last);
     }
 protected:
-    typedef ACE_Thread_Mutex LockType;
-    typedef MaNGOS::GeneralLock<LockType > Guard;
+    using LockType = std::mutex;
+    using Guard = MaNGOS::GeneralLock<LockType>;
     LockType lock;
 };
 

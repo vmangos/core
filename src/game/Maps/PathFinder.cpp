@@ -348,7 +348,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
         // free and invalidate old path data
         clear();
 
-        //unsigned int const threadId = (uintptr_t) ACE_Based::Thread::currentId();
+        // std::thread::id const threadId = std::this_thread::get_id();
 
         //if (threadId != m_navMeshQuery->m_owningThread)
             //sLog.outError("CRASH: We are using a dtNavMeshQuery from thread %u which belongs to thread %u!", threadId, m_navMeshQuery->m_owningThread);

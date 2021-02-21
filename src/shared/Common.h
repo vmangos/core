@@ -92,12 +92,9 @@ typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::millisec
 
 #include "Errors.h"
 #include "LockedQueue.h"
-#include "Threading.h"
 
 #include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/OS_NS_arpa_inet.h>
 
 // Old ACE versions (pre-ACE-5.5.4) not have this type (add for allow use at Unix side external old ACE versions)

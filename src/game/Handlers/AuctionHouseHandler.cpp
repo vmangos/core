@@ -638,13 +638,13 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
 }
 
 
-class AuctionHouseClientQueryTask : public AsyncTask, public AuctionHouseClientQuery
+class AuctionHouseClientQueryTask : public AuctionHouseClientQuery
 {
 public:
     AuctionHouseClientQueryTask(AuctionClientQueryType type) : _queryType(type)
     {
     }
-    void run()
+    void operator ()()
     {
         if (WorldSession* sess = sWorld.FindSession(accountId))
         {
@@ -739,20 +739,20 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
     if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask(AUCTION_QUERY_LIST_BIDDER);
-    task->auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
+    AuctionHouseClientQueryTask task(AUCTION_QUERY_LIST_BIDDER);
+    task.auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
     uint32 outbiddedAuctionId;
     for (int i = outbiddedCount; i > 0; --i)
     {
         recv_data >> outbiddedAuctionId;
-        task->outbiddedAuctionIds.push_back(outbiddedAuctionId);
+        task.outbiddedAuctionIds.push_back(outbiddedAuctionId);
     }
 
-    task->accountId = GetAccountId();
-    task->listfrom = listfrom;
-    task->outbiddedCount = outbiddedCount;
+    task.accountId = GetAccountId();
+    task.listfrom = listfrom;
+    task.outbiddedCount = outbiddedCount;
     SetReceivedAHListRequest(true);
-    sWorld.AddAsyncTask(task);
+    sWorld.AddAsyncTask(std::move(task));
 }
 
 // this void sends player info about his auctions
@@ -776,12 +776,12 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
     if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask(AUCTION_QUERY_LIST_OWNER);
-    task->auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);;
-    task->accountId = GetAccountId();
-    task->listfrom = listfrom;
+    AuctionHouseClientQueryTask task(AUCTION_QUERY_LIST_OWNER);
+    task.auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);;
+    task.accountId = GetAccountId();
+    task.listfrom = listfrom;
     SetReceivedAHListRequest(true);
-    sWorld.AddAsyncTask(task);
+    sWorld.AddAsyncTask({std::move(task)});
 }
 
 void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
@@ -792,26 +792,23 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
 
     ObjectGuid auctioneerGuid;
     std::string searchedname;
-    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask(AUCTION_QUERY_LIST);
-    task->accountId = GetAccountId();
+    AuctionHouseClientQueryTask task(AUCTION_QUERY_LIST);
+    task.accountId = GetAccountId();
 
     recv_data >> auctioneerGuid;
-    recv_data >> task->listfrom;                                  // start, used for page control listing by 50 elements
+    recv_data >> task.listfrom;                                  // start, used for page control listing by 50 elements
     recv_data >> searchedname;
 
-    recv_data >> task->levelmin >> task->levelmax;
-    recv_data >> task->auctionSlotID >> task->auctionMainCategory >> task->auctionSubCategory >> task->quality;
-    recv_data >> task->usable;
+    recv_data >> task.levelmin >> task.levelmax;
+    recv_data >> task.auctionSlotID >> task.auctionMainCategory >> task.auctionSubCategory >> task.quality;
+    recv_data >> task.usable;
 
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(auctioneerGuid);
     if (!auctionHouseEntry)
-    {
-        delete task;
         return;
-    }
 
     // always return pointer
-    task->auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
+    task.auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
 
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
@@ -821,13 +818,10 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
     //  auctioneerGuid.GetString().c_str(), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
 
     // converting string that we try to find to lower case
-    if (!Utf8toWStr(searchedname, task->wsearchedname))
-    {
-        delete task;
+    if (!Utf8toWStr(searchedname, task.wsearchedname))
         return;
-    }
 
-    wstrToLower(task->wsearchedname);
+    wstrToLower(task.wsearchedname);
     SetReceivedAHListRequest(true);
-    sWorld.AddAsyncTask(task);
+    sWorld.AddAsyncTask(std::move(task));
 }

@@ -16,17 +16,17 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 set(EXECUTABLE_NAME realmd)
-set (EXECUTABLE_SRCS 
-	AuthCodes.h
-	AuthSocket.h
-	BufferedSocket.h
-	PatchHandler.h
-	RealmList.h
-	AuthSocket.cpp
-	BufferedSocket.cpp
-	Main.cpp
-	PatchHandler.cpp
-	RealmList.cpp
+set(EXECUTABLE_SRCS 
+  AuthCodes.h
+  AuthSocket.h
+  BufferedSocket.h
+  PatchHandler.h
+  RealmList.h
+  AuthSocket.cpp
+  BufferedSocket.cpp
+  Main.cpp
+  PatchHandler.cpp
+  RealmList.cpp
 )
 
 

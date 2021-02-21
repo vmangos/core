@@ -23,17 +23,18 @@
 #define CONFIG_H
 
 #include "Common.h"
-#include <ace/Recursive_Thread_Mutex.h>
-#include <ace/Singleton.h>
 #include "Platform/Define.h"
 #include "ace/Configuration_Import_Export.h"
+#include "Policies/SingletonImp.h"
+#include "Policies/ThreadingModel.h"
+#include <shared_mutex>
 
 class ACE_Configuration_Heap;
 
 class Config
 {
-    friend class ACE_Singleton<Config, ACE_Recursive_Thread_Mutex>;
     public:
+        using Lock = MaNGOS::ClassLevelLockable<Config, std::shared_timed_mutex>;
 
         Config();
         ~Config();
@@ -50,18 +51,19 @@ class Config
         bool GetValueHelper(char const* name, ACE_TString &result);
 
     private:
+        friend class MaNGOS::Singleton<Config, Lock>;
 
         std::string mFilename;
         ACE_Configuration_Heap* mConf;
 
-        typedef ACE_Thread_Mutex LockType;
-        typedef ACE_Guard<LockType> GuardType;
+        using LockType = std::mutex;
+        using GuardType = std::unique_lock<LockType>;
 
         std::string _filename;
         LockType m_configLock;
 };
 
 // Nostalrius : multithreading lock
-#define sConfig (*ACE_Singleton<Config, ACE_Recursive_Thread_Mutex>::instance())
+#define sConfig (MaNGOS::Singleton<Config, Config::Lock>::Instance())
 
 #endif

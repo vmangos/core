@@ -36,9 +36,9 @@
 
 #include <cmath>
 
-typedef MaNGOS::ClassLevelLockable<ObjectAccessor, ACE_Thread_Mutex> ObjectAccessorLock;
+typedef MaNGOS::ClassLevelLockable<ObjectAccessor, std::mutex> ObjectAccessorLock;
 INSTANTIATE_SINGLETON_2(ObjectAccessor, ObjectAccessorLock);
-INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);
+INSTANTIATE_CLASS_MUTEX(ObjectAccessor, std::mutex);
 
 ObjectAccessor::ObjectAccessor() {}
 ObjectAccessor::~ObjectAccessor()
@@ -329,7 +329,7 @@ void ObjectAccessor::RemoveObject(MasterPlayer* player)
 /// Define the static member of HashMapHolder
 
 template <class T> typename HashMapHolder<T>::MapType HashMapHolder<T>::m_objectMap;
-template <class T> ACE_RW_Thread_Mutex HashMapHolder<T>::i_lock;
+template <class T> std::shared_timed_mutex HashMapHolder<T>::i_lock;
 
 /// Global definitions for the hashmap storage
 

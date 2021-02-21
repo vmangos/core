@@ -9,10 +9,9 @@
 #include <ace/SOCK_Connector.h>
 #include <ace/Acceptor.h>
 #include <ace/Connector.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/Guard_T.h>
 #include <ace/Unbounded_Queue.h>
 #include <ace/Message_Block.h>
+#include <mutex>
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 #pragma once
@@ -103,8 +102,8 @@ class MangosSocket : public WorldHandler
         friend class ACE_NonBlocking_Connect_Handler<SocketName>;
 
         /// Mutex type used for various synchronizations.
-        typedef ACE_Thread_Mutex LockType;
-        typedef ACE_Guard<LockType> GuardType;
+        using LockType = std::mutex;
+        typedef std::unique_lock<LockType> GuardType;
 
         /// Queue for storing packets for which there is no space.
         typedef ACE_Unbounded_Queue<WorldPacket*> PacketQueueT;

@@ -6,7 +6,6 @@
 #include "WorldSocket.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
-#include <ace/Thread_Mutex.h>
 #include <list>
 #include <vector>
 #include <cstddef>
@@ -30,8 +29,8 @@ class PlayerBroadcaster final
 
     std::map<ObjectGuid, std::shared_ptr<PlayerBroadcaster> > m_listeners;
     std::vector<BroadcastData> m_queue;
-    ACE_Thread_Mutex m_listeners_lock;
-    ACE_Thread_Mutex m_queue_lock;
+    std::mutex m_listeners_lock;
+    std::mutex m_queue_lock;
 
     void ProcessQueue(uint32& num_packets);
     void SendPacket(WorldPacket const& packet);

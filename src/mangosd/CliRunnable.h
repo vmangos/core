@@ -27,13 +27,12 @@
 #define __CLIRUNNABLE_H
 
 #include "Common.h"
-#include "Threading.h"
 
 /// Command Line Interface handling thread
-class CliRunnable : public ACE_Based::Runnable
+class CliRunnable
 {
-    public:
-        void run();
+public:
+    void operator()();
 };
 #endif
 /// @}

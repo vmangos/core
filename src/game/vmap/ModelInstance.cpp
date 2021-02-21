@@ -26,7 +26,7 @@ using G3D::Ray;
 
 namespace VMAP
 {
-ModelInstance::ModelInstance(ModelSpawn const& spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
+ModelInstance::ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel> model): ModelSpawn(spawn), iModel(model)
 {
     iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
     iInvScale = 1.f / iScale;

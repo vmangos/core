@@ -47,17 +47,17 @@ class GuildMgr
 
         void GuildMemberAdded(uint32 guildId, uint32 memberGuid)
         {
-            ACE_Guard<ACE_Thread_Mutex> guard(m_guid2GuildMutex);
+            std::lock_guard<std::mutex> guard(m_guid2GuildMutex);
             m_guid2guild[memberGuid] = guildId;
         }
         void GuildMemberRemoved(uint32 memberGuid)
         {
-            ACE_Guard<ACE_Thread_Mutex> guard(m_guid2GuildMutex);
+            std::lock_guard<std::mutex> guard(m_guid2GuildMutex);
             m_guid2guild.erase(memberGuid);
         }
         Guild* GetPlayerGuild(uint32 lowguid)
         {
-            ACE_Guard<ACE_Thread_Mutex> guard(m_guid2GuildMutex);
+            std::lock_guard<std::mutex> guard(m_guid2GuildMutex);
             std::map<uint32, uint32>::iterator it = m_guid2guild.find(lowguid);
             if (it != m_guid2guild.end())
                 return GetGuildById(it->second);
@@ -74,12 +74,12 @@ class GuildMgr
         void LoadPetitions();
     private:
         void CleanUpPetitions();
-        mutable ACE_Thread_Mutex m_guildMutex;
+        mutable std::mutex m_guildMutex;
         GuildMap m_GuildMap;
-        ACE_Thread_Mutex m_guid2GuildMutex;
+        std::mutex m_guid2GuildMutex;
         std::map<uint32, uint32> m_guid2guild;
 
-        ACE_Thread_Mutex m_petitionsMutex;
+        std::mutex m_petitionsMutex;
         PetitionMap m_petitionMap;
 };
 
