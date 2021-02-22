@@ -18,9 +18,13 @@ INSERT INTO `creature_template` VALUES (744, 0, 7903, 0, 0, 0, 0, 0, 0, 0, 1, 0,
 UPDATE `creature_template` SET `patch`='10' WHERE  `entry`=746 AND `patch`=0;
 INSERT INTO `creature_template` VALUES (746, 0, 625, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 'Elder Dragonkin', '', 0, 45, 45, 2217, 2217, 0, 0, 4059, 50, 0, 0.888888, 1.14286, 20, 5, 0, 1, 1, 269, 346, 0, 204, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 53.1456, 73.0752, 100, 2, 0, 746, 0, 746, 0, 0, 0, 0, 0, 0, 6306, 0, 0, 0, 7460, 0, 84, 115, 'EventAI', 0, 1, 0, 0, 0, 746, 0, 0, 0, 0, 0, '');
 
--- Green Wrymkin
+-- Green Wyrmkin
+UPDATE `creature_template` SET `patch`='10' WHERE  `entry`=742 AND `patch`=0;
+INSERT INTO `creature_template` VALUES (742, 0, 7863, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Green Wyrmkin', '', 0, 41, 42, 1902, 1981, 0, 0, 2246, 50, 0, 0.888888, 1.14286, 20, 5, 0, 1, 1, 269, 346, 0, 172, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 53.1456, 73.0752, 100, 2, 0, 742, 0, 742, 0, 0, 100, 0, 168, 0, 0, 0, 0, 0, 7420, 0, NULL, 76, 105, '', 0, 1, 0, 0, 3, 742, 0, 0, 0, 0, 0, '');
 
--- Wrymkin Dreamwalker
+-- Wyrmkin Dreamwalker
+UPDATE `creature_template` SET `patch`='10' WHERE  `entry`=743 AND `patch`=0;
+INSERT INTO `creature_template` VALUES (743, 0, 7974, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Wyrmkin Dreamwalker', '', 0, 42, 43, 1585, 1647, 1381, 1432, 1896, 50, 0, 0.888888, 1.14286, 20, 5, 0, 1, 1, 269, 346, 0, 182, 1, 2000, 2000, 2, 0, 0, 0, 0, 0, 0, 0, 53.1456, 73.0752, 100, 2, 0, 743, 0, 743, 0, 0, 100, 0, 0, 0, 15970, 7966, 20664, 0, 7430, 0, NULL, 69, 95, 'EventAI', 0, 1, 0, 0, 3, 743, 0, 0, 0, 0, 0, '');
 
 -- Scalebane Captain 
 UPDATE `creature_template` SET `patch`='10' WHERE  `entry`=745 AND `patch`=0;
