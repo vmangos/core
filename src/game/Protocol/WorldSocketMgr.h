@@ -29,6 +29,8 @@
 #define __WORLDSOCKETMGR_H
 
 #include "MangosSocketMgr.h"
+#include "ace/Singleton.h"
+#include "ace/Thread_Mutex.h"
 class WorldSocket;
 
 /// Manages all sockets connected to peers and network threads

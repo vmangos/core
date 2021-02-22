@@ -24,8 +24,8 @@
 #include "Policies/Singleton.h"
 #include "ObjectGuid.h"
 #include "DBCEnums.h"
+#include <atomic>
 #include "SpellDefines.h"
-#include "ace/Atomic_Op.h"
 
 struct AreaTriggerEntry;
 class Aura;
@@ -1432,7 +1432,7 @@ class ScriptMgr
         EscortDataMap   m_mEscortDataMap;                   // Des donnees pour les quetes d'escorte scriptees via la DB
 
         //atomic op counter for active scripts amount
-        ACE_Atomic_Op<ACE_Thread_Mutex, int> m_scheduledScripts;
+        std::atomic<int> m_scheduledScripts;
 };
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()

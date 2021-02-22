@@ -231,7 +231,7 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
         return;
 
     // Lock async updates for safety, see Unit::asyncMovesplineLock doc
-    ACE_Guard<ACE_Thread_Mutex> guard(owner.asyncMovesplineLock);
+    std::unique_lock<std::mutex> guard(owner.asyncMovesplineLock);
     _setTargetLocation(owner);
 }
 

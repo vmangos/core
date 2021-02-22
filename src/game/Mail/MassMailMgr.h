@@ -89,7 +89,7 @@ class MassMailMgr
          */
         ReceiversList& AddMassMailTask(MailDraft* mailProto, MailSender const& sender)
         {
-            m_massMails.push_back(MassMail(mailProto, sender));
+            m_massMails.emplace_back(mailProto, sender);
             return m_massMails.rbegin()->m_receivers;
         }
 

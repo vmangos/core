@@ -777,8 +777,8 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
     //  2017-09-16 02:06:32 Targeted UpdateAsync::Acquiring movespline lock for Unit Pet (Petnumber: 93 Guid: 22) in map (0, 6) thread 11156
     //  2017-09-16 02:06:32 MotionMaster::Acquiring movespline lock for Unit Pet (Petnumber: 87 Guid :21) in map (0, 6) thread 11156
 
-    ACE_Guard<ACE_Thread_Mutex> guard(m_owner->asyncMovesplineLock, false);
-    if (!guard.locked())
+    std::unique_lock<std::mutex> guard(m_owner->asyncMovesplineLock, std::try_to_lock);
+    if (!guard.owns_lock())
         return false;
 
     if (m_owner->movespline->Finalized())

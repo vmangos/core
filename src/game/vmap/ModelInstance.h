@@ -25,6 +25,7 @@
 #include <G3D/Ray.h>
 
 #include "Platform/Define.h"
+#include <memory>
 
 namespace VMAP
 {
@@ -66,7 +67,7 @@ namespace VMAP
     {
         public:
             ModelInstance(): iInvScale(0), iModel(nullptr) {}
-            ModelInstance(ModelSpawn const& spawn, WorldModel* model);
+            ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel> model);
             void setUnloaded() { iModel = nullptr; }
             bool intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit) const;
             void intersectPoint(G3D::Vector3 const& p, AreaInfo& info) const;
@@ -76,10 +77,11 @@ namespace VMAP
         protected:
             G3D::Matrix3 iInvRot;
             float iInvScale;
-            WorldModel* iModel;
+            std::shared_ptr<WorldModel> iModel;
 
         public:
-            WorldModel* getWorldModel() const  { return iModel; }
+            std::shared_ptr<WorldModel> getWorldModel() const  { return iModel; }
+            
             float getScale() const             { return iInvScale; }
             G3D::Matrix3 const& getRot() const { return iInvRot; }
     };

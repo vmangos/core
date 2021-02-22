@@ -106,7 +106,7 @@ int OfflineChatSocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
 {
     if(closing_)
         return -1;
-    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
+    std::unique_lock<std::mutex> lock (outBufferLock);
 
     closing_ = true;
 
@@ -118,7 +118,7 @@ int OfflineChatSocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
 
 int OfflineChatSocket::handle_output (ACE_HANDLE)
 {
-    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
+    std::unique_lock<std::mutex> lock (outBufferLock);
 
     if(closing_)
         return -1;
@@ -334,7 +334,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
 /// Output function
 int OfflineChatSocket::sendf(const char* msg)
 {
-    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
+    std::unique_lock<std::mutex> lock (outBufferLock);
 
     if (closing_)
         return -1;

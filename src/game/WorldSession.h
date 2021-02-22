@@ -911,7 +911,7 @@ class WorldSession
         uint32 m_latency;
         uint32 m_Tutorials[ACCOUNT_TUTORIALS_COUNT];
         TutorialDataState m_tutorialState;
-        ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue[PACKET_PROCESS_MAX_TYPE];
+        LockedQueue<WorldPacket*, std::mutex> _recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool _receivedPacketType[PACKET_PROCESS_MAX_TYPE];
 
         Warden* m_warden;

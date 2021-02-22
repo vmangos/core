@@ -5022,8 +5022,8 @@ void Aura::HandleRangedAmmoHaste(bool apply, bool /*Real*/)
 {
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
-	
-	// Quivers should not increase attack speed for ranged weapons which do not require any ammo.
+    
+    // Quivers should not increase attack speed for ranged weapons which do not require any ammo.
     Item* ranged_weapon = GetTarget()->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
     if (!ranged_weapon || ranged_weapon->GetProto()->AmmoType == 0)
         return;

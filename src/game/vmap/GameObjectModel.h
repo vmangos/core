@@ -43,7 +43,7 @@ class GameObjectModel
         //G3D::Vector3 iRot;
         float iInvScale;
         float iScale;
-        VMAP::WorldModel* iModel;
+        std::shared_ptr<VMAP::WorldModel> iModel;
 
         GameObjectModel() : collision_enabled(false), iInvScale(0), iScale(0), iModel(nullptr) {}
         bool initialize(GameObject const* const pGo, GameObjectDisplayInfoEntry const* pDisplayInfo);

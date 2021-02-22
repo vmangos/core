@@ -25,8 +25,6 @@
 #include "Common.h"
 #include "Platform/Define.h"
 #include "Policies/Singleton.h"
-#include <ace/Thread_Mutex.h>
-#include <ace/RW_Thread_Mutex.h>
 #include "Policies/ThreadingModel.h"
 
 #include "UpdateData.h"
@@ -52,9 +50,9 @@ class HashMapHolder
     public:
 
         typedef std::unordered_map<ObjectGuid, T*>   MapType;
-        typedef ACE_RW_Thread_Mutex LockType;
-        typedef ACE_Read_Guard<LockType> ReadGuard;
-        typedef ACE_Write_Guard<LockType> WriteGuard;
+        typedef std::shared_timed_mutex LockType;
+        typedef std::shared_lock<LockType> ReadGuard;
+        typedef std::unique_lock<LockType> WriteGuard;
 
         static void Insert(T* o)
         {
@@ -88,7 +86,7 @@ class HashMapHolder
         static MapType  m_objectMap;
 };
 
-class ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLevelLockable<ObjectAccessor, ACE_Thread_Mutex> >
+class ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLevelLockable<ObjectAccessor, std::mutex> >
 {
     friend class MaNGOS::OperatorNew<ObjectAccessor>;
 
@@ -159,8 +157,8 @@ class ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLev
     private:
         Player2CorpsesMapType   i_player2corpse;
 
-        typedef ACE_Thread_Mutex LockType;
-        typedef MaNGOS::GeneralLock<LockType > Guard;
+        using LockType = std::mutex;
+        using Guard = MaNGOS::GeneralLock<LockType>;
 
         LockType i_playerGuard;
         LockType i_corpseGuard;
