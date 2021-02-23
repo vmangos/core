@@ -959,10 +959,6 @@ void BattleGround::StartBattleGround()
 
 void BattleGround::AddPlayer(Player* pPlayer)
 {
-    // remove afk from player
-    if (pPlayer->IsAFK())
-        pPlayer->ToggleAFK();
-
     // score struct must be created in inherited class
 
     ObjectGuid guid = pPlayer->GetObjectGuid();

@@ -1394,14 +1394,18 @@ void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGr
     if (bg)
     {
         uint32 mapid = bg->GetMapId();
-        float x, y, z, O;
+        float x, y, z, o;
         Team team = pl->GetBGTeam();
         if (team == 0)
             team = pl->GetTeam();
-        bg->GetTeamStartLoc(team, x, y, z, O);
+        bg->GetTeamStartLoc(team, x, y, z, o);
 
-        DETAIL_LOG("BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", pl->GetName(), mapid, x, y, z, O);
-        pl->TeleportTo(mapid, x, y, z, O);
+        // Remove AFK from player before BG teleport
+        if (pl->IsAFK())
+            pl->ToggleAFK();
+
+        DETAIL_LOG("BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", pl->GetName(), mapid, x, y, z, o);
+        pl->TeleportTo(mapid, x, y, z, o);
     }
     else
         sLog.outError("player %u trying to port to nonexistent bg instance %u", pl->GetGUIDLow(), instanceId);
