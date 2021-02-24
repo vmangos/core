@@ -1155,19 +1155,28 @@ void Group::ClearTargetIcon(ObjectGuid targetGuid)
             return SetTargetIcon(i, ObjectGuid());
 }
 
-static void GetDataForXPAtKill_helper(Player* player, Unit const* victim, uint32& sum_level, Player* & member_with_max_level, Player* & not_gray_member_with_max_level)
+static void GetDataForXPAtKill_helper_helper(Unit* unit, Unit const* victim, Unit* & not_gray_member_with_max_level)
+{
+    uint32 gray_level = MaNGOS::XP::GetGrayLevel(unit->GetLevel());
+    if (victim->GetLevel() > gray_level && (!not_gray_member_with_max_level
+        || not_gray_member_with_max_level->GetLevel() < unit->GetLevel()))
+        not_gray_member_with_max_level = unit;
+}
+
+static void GetDataForXPAtKill_helper(Player* player, Unit const* victim, uint32& sum_level, Player* & member_with_max_level, Unit* & not_gray_member_with_max_level)
 {
     sum_level += player->GetLevel();
     if (!member_with_max_level || member_with_max_level->GetLevel() < player->GetLevel())
         member_with_max_level = player;
 
-    uint32 gray_level = MaNGOS::XP::GetGrayLevel(player->GetLevel());
-    if (victim->GetLevel() > gray_level && (!not_gray_member_with_max_level
-                                            || not_gray_member_with_max_level->GetLevel() < player->GetLevel()))
-        not_gray_member_with_max_level = player;
+    GetDataForXPAtKill_helper_helper(player, victim, not_gray_member_with_max_level);
+
+    if (Pet* pet = player->GetPet())
+        if (pet->getPetType() == HUNTER_PET)
+            GetDataForXPAtKill_helper_helper(pet, victim, not_gray_member_with_max_level);
 }
 
-void Group::GetDataForXPAtKill(Unit const* victim, uint32& count, uint32& sum_level, Player* & member_with_max_level, Player* & not_gray_member_with_max_level, Player* additional)
+void Group::GetDataForXPAtKill(Unit const* victim, uint32& count, uint32& sum_level, Player* & member_with_max_level, Unit* & not_gray_member_with_max_level, Player* additional)
 {
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -2082,7 +2091,7 @@ void Group::_homebindIfInstance(Player* player)
     }
 }
 
-static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 count, bool PvP, float group_rate, uint32 sum_level, bool is_dungeon, Player* not_gray_member_with_max_level, Player* member_with_max_level, uint32 xp)
+static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 count, bool PvP, float group_rate, uint32 sum_level, bool is_dungeon, Unit* not_gray_member_with_max_level, Player* member_with_max_level, uint32 xp)
 {
     // honor can be in PvP and !PvP (racial leader) cases (for alive)
     if (pGroupGuy->IsAlive())
@@ -2122,14 +2131,14 @@ static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 co
         pGroupGuy->RewardReputation(pVictim, 1.0f);
 
         // XP updated only for alive group member
-        if (pGroupGuy->IsAlive() && not_gray_member_with_max_level &&
-                pGroupGuy->GetLevel() <= not_gray_member_with_max_level->GetLevel())
+        if (pGroupGuy->IsAlive() && not_gray_member_with_max_level)
         {
             uint32 itr_xp = (member_with_max_level == not_gray_member_with_max_level) ? uint32(xp * rate) : uint32((xp * rate / 2) + 1);
-
-            pGroupGuy->GiveXP(itr_xp, pVictim);
+            if (pGroupGuy->GetLevel() <= not_gray_member_with_max_level->GetLevel())
+                pGroupGuy->GiveXP(itr_xp, pVictim);
             if (Pet* pet = pGroupGuy->GetPet())
-                pet->GivePetXP(itr_xp);
+                if (pet->GetLevel() <= not_gray_member_with_max_level->GetLevel())
+                    pet->GivePetXP(itr_xp);
         }
 
         // quest objectives updated only for alive group member or dead but with not released body
@@ -2159,7 +2168,7 @@ void Group::RewardGroupAtKill(Unit* pVictim, Player* pPlayerTap)
     uint32 count = 0;
     uint32 sum_level = 0;
     Player* member_with_max_level = nullptr;
-    Player* not_gray_member_with_max_level = nullptr;
+    Unit* not_gray_member_with_max_level = nullptr;
 
     GetDataForXPAtKill(pVictim, count, sum_level, member_with_max_level, not_gray_member_with_max_level, pPlayerTap);
 
