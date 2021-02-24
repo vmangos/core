@@ -41,11 +41,35 @@
 #include "AccountMgr.h"
 #include "Database/DatabaseImpl.h"
 
+void WorldSession::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
+{
+    WorldPacket data(SMSG_SEND_MAIL_RESULT, (4 + 4 + 4 + (mailError == MAIL_ERR_EQUIP_ERROR ? 4 : (mailAction == MAIL_ITEM_TAKEN ? 4 + 4 : 0))));
+    data << (uint32)mailId;
+    data << (uint32)mailAction;
+    data << (uint32)mailError;
+    if (mailError == MAIL_ERR_EQUIP_ERROR)
+        data << (uint32)equipError;
+    else if (mailAction == MAIL_ITEM_TAKEN)
+    {
+        data << (uint32)item_guid;                         // item guid low?
+        data << (uint32)item_count;                        // item count?
+    }
+    SendPacket(&data);
+}
+
+void WorldSession::SendNewMail()
+{
+    // deliver undelivered mail
+    WorldPacket data(SMSG_RECEIVED_MAIL, 4);
+    data << (uint32)0;
+    SendPacket(&data);
+}
+
 bool WorldSession::CheckMailBox(ObjectGuid guid)
 {
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_MAILBOX))
     {
-        DEBUG_LOG("Mailbox %s not found or you can't interact with him.", guid.GetString().c_str());
+        DEBUG_LOG("Mailbox %s not found or you can't interact with it.", guid.GetString().c_str());
         return false;
     }
 
@@ -151,6 +175,14 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
         return;
     }
 
+    // client interface limit
+    if (req->COD > 100000000)
+    {
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to send more than 10000g COD mail", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+        delete req;
+        return;
+    }
+
     if (req->COD && sWorld.getConfig(CONFIG_UINT32_COD_FORCE_TAG_MAX_LEVEL) &&
         sWorld.getConfig(CONFIG_UINT32_COD_FORCE_TAG_MAX_LEVEL) > GetAccountMaxLevel())
         req->subject = "(COD) " + req->subject;
@@ -180,7 +212,7 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     {
         DETAIL_LOG("%s is sending mail to %s (GUID: nonexistent!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
                    pl->GetGuidStr().c_str(), req->receiverName.c_str(), req->subject.c_str(), req->body.c_str(), req->itemGuid ? 1 : 0, req->money, req->COD, unk1, unk2);
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         delete req;
         return;
     }
@@ -190,7 +222,7 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
 
     if (pl->GetObjectGuid() == req->receiver)
     {
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANNOT_SEND_TO_SELF);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_CANNOT_SEND_TO_SELF);
         delete req;
         return;
     }
@@ -226,26 +258,26 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     if (reqmoney < req->money)
     {
         ProcessAnticheatAction("MailCheck", "Attempt to send free mails with money overflow", CHEAT_ACTION_LOG);
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
         return;
     }
     if (reqmoney && (!loadedPlayer || loadedPlayer->GetMoney() < reqmoney))
     {
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
         return;
     }
 
     // do not allow to have more than 100 mails in mailbox.. mails count is in opcode uint8!!! - so max can be 255..
     if (req->mailsCount > 100)
     {
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_CAP_REACHED);
         return;
     }
 
     // check the receiver's Faction...
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_MAIL) && pl->GetTeam() != req->rcTeam && GetSecurity() == SEC_PLAYER)
     {
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_YOUR_TEAM);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_YOUR_TEAM);
         return;
     }
 
@@ -260,26 +292,26 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to mail)
         if (!item || !item->IsInWorld())
         {
-            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
             return;
         }
 
         // prevent sending item from bank slot
         if (_player->IsBankPos(item->GetPos())) 
         {
-            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
             return;
         }
 
         if (!item->CanBeTraded())
         {
-            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
             return;
         }
 
         if ((item->GetProto()->Flags & ITEM_FLAG_CONJURED) || item->GetUInt32Value(ITEM_FIELD_DURATION))
         {
-            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+            SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
             return;
         }
     }
@@ -289,7 +321,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         req->money < sWorld.getConfig(CONFIG_UINT32_MAILSPAM_MONEY) &&
         (sWorld.getConfig(CONFIG_BOOL_MAILSPAM_ITEM) && !req->itemGuid))
     {
-        pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
+        SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
 
@@ -309,12 +341,12 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         std::stringstream oss;
         oss << "Mail limit reached (\"" << req->body.substr(0, 30) << "...\") [log #" << logId << "]";
         ProcessAnticheatAction("ChatSpam", oss.str().c_str(), CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
-        pl->SendMailResult(0, MAIL_SEND, MAIL_OK);
+        SendMailResult(0, MAIL_SEND, MAIL_OK);
         return;
     }
     data.JustMailed(rc_account);
 
-    pl->SendMailResult(0, MAIL_SEND, MAIL_OK);
+    SendMailResult(0, MAIL_SEND, MAIL_OK);
 
     loadedPlayer->ModifyMoney(-int32(reqmoney));
 
@@ -453,13 +485,13 @@ void WorldSession::HandleMailDelete(WorldPacket& recv_data)
         // delete shouldn't show up for COD mails
         if (m->COD)
         {
-            pl->SendMailResult(mailId, MAIL_DELETED, MAIL_ERR_INTERNAL_ERROR);
+            SendMailResult(mailId, MAIL_DELETED, MAIL_ERR_INTERNAL_ERROR);
             return;
         }
 
         m->state = MAIL_STATE_DELETED;
     }
-    pl->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
+    SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
 /**
  * Handles the Packet sent by the client when returning a mail to sender.
@@ -485,7 +517,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
     Mail *m = pl->GetMail(mailId);
     if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
-        pl->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
+        SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
 
@@ -522,7 +554,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
     }
 
     delete m;                                               // we can deallocate old mail
-    pl->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
+    SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
 }
 
 /**
@@ -545,28 +577,28 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recv_data)
     Mail* m = pl->GetMail(mailId);
     if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
-        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
 
     // Prevent spoofed packet accessing mail that doesn't actually have items
     if (!m->HasItems() || m->items.empty())
     {
-        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
 
     // prevent cheating with skip client money check
     if (loadedPlayer->GetMoney() < m->COD)
     {
-        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_NOT_ENOUGH_MONEY);
+        SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_NOT_ENOUGH_MONEY);
         return;
     }
 
     // Do not allow GMs to send COD
     if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && GetSecurity() > SEC_PLAYER && m->COD)
     {
-        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_NOT_ENOUGH_MONEY);
+        SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_NOT_ENOUGH_MONEY);
         return;
     }
 
@@ -649,10 +681,10 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recv_data)
         pl->SaveMails();
         CharacterDatabase.CommitTransaction();
 
-        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemId, count);
+        SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemId, count);
     }
     else
-        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
+        SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
 }
 /**
  * Handles the packet sent by the client when taking money from the mail.
@@ -674,11 +706,11 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recv_data)
     Mail* m = pl->GetMail(mailId);
     if (!m || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr))
     {
-        pl->SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
 
-    pl->SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_OK);
+    SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_OK);
 
     loadedPlayer->LogModifyMoney(m->money, "Mail", ObjectGuid(HIGHGUID_PLAYER, m->sender));
     m->money = 0;
@@ -846,7 +878,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recv_data)
     Mail* m = pl->GetMail(mailId);
     if (!m || (!m->itemTextId && !m->mailTemplateId) || m->state == MAIL_STATE_DELETED || m->deliver_time > time(nullptr) || m->checked & MAIL_CHECK_MASK_COPIED)
     {
-        pl->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
+        SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
 
@@ -873,11 +905,11 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recv_data)
         pl->MarkMailsUpdated();
 
         loadedPlayer->StoreItem(dest, bodyItem, true);
-        pl->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_OK);
+        SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_OK);
     }
     else
     {
-        pl->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_EQUIP_ERROR, msg);
+        SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_EQUIP_ERROR, msg);
         delete bodyItem;
     }
 }

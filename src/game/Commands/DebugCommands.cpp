@@ -334,7 +334,7 @@ bool ChatHandler::HandleDebugSendMailErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetMasterPlayer()->SendMailResult(mailId, MailResponseType(mailAction), MailResponseResult(mailError));
+    m_session->SendMailResult(mailId, MailResponseType(mailAction), MailResponseResult(mailError));
     return true;
 }
 
