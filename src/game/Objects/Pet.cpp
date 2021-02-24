@@ -1210,7 +1210,6 @@ void Pet::DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode)
 
 void Pet::GivePetXP(uint32 xp)
 {
-    printf("pet %u\n", xp);
     if (getPetType() != HUNTER_PET)
         return;
 
