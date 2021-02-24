@@ -491,7 +491,7 @@ void CreatureAI::TriggerAlert(Unit const* who)
         return;
 
     // only alert if target is within line of sight
-    if (!m_creature->IsWithinLOSInMap(who, true, true))
+    if (!m_creature->IsWithinLOSInMap(who))
         return;
 
     // Send alert sound (if any) for this creature
