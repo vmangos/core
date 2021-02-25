@@ -417,6 +417,26 @@ namespace Spells
 
         return false;
     }
+
+    // Effects whose execution will be delayed if Spell.EffectDelay config setting is non-zero.
+    inline bool IsDelayableEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_HEAL_MAX_HEALTH:
+            case SPELL_EFFECT_HEAL_MECHANICAL:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
 }
 
 class SpellEntry
@@ -665,6 +685,21 @@ class SpellEntry
         bool IsCustomSpell() const
         {
             return Internal & SPELL_INTERNAL_CUSTOM;
+        }
+
+        bool IsSpellWithDelayableEffects() const
+        {
+            return Internal & SPELL_INTERNAL_DELAYABLE_EFFECTS;
+        }
+
+        bool IsNextMeleeSwingSpell() const
+        {
+            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_1 | SPELL_ATTR_ON_NEXT_SWING_2);
+        }
+
+        bool IsRangedSpell() const
+        {
+            return Attributes & SPELL_ATTR_RANGED;
         }
 
         inline bool IsSealSpell() const

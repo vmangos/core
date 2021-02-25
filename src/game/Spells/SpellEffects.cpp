@@ -5135,7 +5135,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         case SPELLFAMILY_PALADIN:
         {
             // Flash of Light
-            if (m_spellInfo->SpellIconID  == 242)
+            if (m_spellInfo->SpellIconID == 242)
             {
                 if (!unitTarget || !unitTarget->IsAlive())
                     return;

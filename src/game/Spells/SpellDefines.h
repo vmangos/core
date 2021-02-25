@@ -942,6 +942,7 @@ enum SpellAttributesInternal
     SPELL_INTERNAL_CHARM                    = 0x0400,
     SPELL_INTERNAL_REFLECTABLE              = 0x0800,
     SPELL_INTERNAL_CUSTOM                   = 0x1000,
+    SPELL_INTERNAL_DELAYABLE_EFFECTS        = 0x2000,
 };
 
 // original names, do not edit
