@@ -528,7 +528,6 @@ class Unit : public WorldObject
         uint8 GetStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE); }
         bool IsSittingDown() const;
         bool IsStandingUp() const;
-        virtual bool IsStandingUpForProc() const; // takes not yet applied stand state change into account (for players to simulate batching)
         bool IsMounted() const { return (GetMountID() != 0); }
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
         virtual UnitMountResult Mount(uint32 mount, uint32 spellId = 0);

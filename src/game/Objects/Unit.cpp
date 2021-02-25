@@ -663,7 +663,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
         if (pVictim->IsPlayer() && !pVictim->IsMounted() && !pVictim->IsStandingUp())
-            pVictim->SetStandState(UNIT_STAND_STATE_STAND);
+            static_cast<Player*>(pVictim)->ScheduleStandUp();
     }
 
     if (!damage)
@@ -8470,11 +8470,6 @@ bool Unit::IsStandingUp() const
     return (s == UNIT_STAND_STATE_STAND) || (s == UNIT_STAND_STATE_DEAD);
 }
 
-bool Unit::IsStandingUpForProc() const
-{
-    return IsStandingUp();
-}
-
 void Unit::SetStandState(uint8 state)
 {
     if (GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE) == state)
@@ -8490,7 +8485,7 @@ void Unit::SetStandState(uint8 state)
         WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
         data << (uint8)state;
         ((Player*)this)->GetSession()->SendPacket(&data);
-        ((Player*)this)->ClearScheduledStandState();
+        ((Player*)this)->ClearScheduledStandUp();
     }
 }
 
