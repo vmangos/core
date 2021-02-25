@@ -707,6 +707,7 @@ class ChatHandler
 
         bool HandleUnitAIInfoCommand(char* args);
         bool HandleUnitInfoCommand(char* args);
+        bool HandleUnitSpeedInfoCommand(char* args);
         bool HandleUnitStatInfoCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);

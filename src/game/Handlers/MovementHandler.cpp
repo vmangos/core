@@ -464,11 +464,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
             _player->GetCheatData()->OnWrongAckData();
         return;
     }
-
-    // the client data has been verified, let's do the actual change now
-    float newSpeedRate = speedReceived / baseMoveSpeed[move_type];
-    pMover->SetSpeedRateReal(move_type, newSpeedRate);
-
+    
     // Use fake loop here to handle movement position checks separately from change ACK.
     do
     {
@@ -484,7 +480,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
         if (pPlayerMover)
         {
             if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
-                !_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode))
+                !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
                 break;
@@ -507,6 +503,9 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
         }
     } while (false);
 
+    // the client data has been verified, let's do the actual change now
+    float newSpeedRate = speedReceived / baseMoveSpeed[move_type];
+    pMover->SetSpeedRateReal(move_type, newSpeedRate);
     MovementPacketSender::SendSpeedChangeToObservers(pMover, move_type, speedReceived);
 }
 
