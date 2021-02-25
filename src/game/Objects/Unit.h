@@ -852,6 +852,7 @@ class Unit : public WorldObject
         bool IsEffectResist(SpellEntry const* spell, int eff) const; // SPELL_AURA_MOD_MECHANIC_RESISTANCE
         
         void ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, std::list<SpellModifier*> const& appliedSpellModifiers, bool isSpellTriggeredByAura);
+        void ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType);
         void HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, SpellEntry const* procSpell, ProcTriggeredList const& procTriggered);
 
         bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool dontTriggerSpecial) const;

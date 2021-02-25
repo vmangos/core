@@ -8063,7 +8063,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
     return procEx;
 }
 
-void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, std::list<SpellModifier*> const& appliedSpellModifiers, bool isSpellTriggeredByAura)
+void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType)
 {
     // For melee/ranged based attack need update skills and set some Aura states
     if (procFlag & MELEE_BASED_TRIGGER_MASK && pTarget)
@@ -8141,6 +8141,10 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
             }
         }
     }
+}
+
+void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, std::list<SpellModifier*> const& appliedSpellModifiers, bool isSpellTriggeredByAura)
+{
     DEBUG_UNIT(this, DEBUG_PROCS, "PROC: Flags 0x%.5x Ex 0x%.3x Spell %5u %s", procFlag, procExtra, procSpell ? procSpell->Id : 0, isVictim ? "[victim]" : "");
 
     // Fill triggeredList list

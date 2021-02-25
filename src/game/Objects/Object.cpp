@@ -3584,6 +3584,13 @@ void WorldObject::ProcDamageAndSpell(ProcSystemArguments&& data)
     if ((data.pVictim && !IsInMap(data.pVictim)) || !IsInWorld())
         return;
 
+    if (data.procFlagsAttacker)
+        if (Unit* pUnit = ToUnit())
+            pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType);
+
+    if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
+        data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
+
     if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
         ProcDamageAndSpell_real(data);
     else
