@@ -4118,22 +4118,6 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
                 GetHolder()->SetAuraCharges(6);
             break;
         }
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        // Seal of Command - Enable Seal Twisting
-        case 20375: // Rank 1
-        case 20915: // Rank 2
-        case 20918: // Rank 3
-        case 20919: // Rank 4
-        case 20920: // Rank 5
-        {
-            // Using custom copy of seal of commmand aura that will remain for 0.5 sec.
-            if (apply)
-                GetTarget()->RemoveAurasDueToSpell(33006);
-            else if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
-                GetTarget()->CastSpell(GetTarget(), 33006, true);
-            break;
-        }
-#endif
         default:
             break;
     }
