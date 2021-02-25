@@ -662,8 +662,9 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             if ((cheatFlags & (1 << CHEAT_TYPE_OVERSPEED_JUMP)) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
             {
-                if (float speed = GetSpeedForMovementInfo(GetLastMovementInfo()))
-                    MovementPacketSender::SendSpeedChangeToAll(me, GetMoveTypeForMovementInfo(GetLastMovementInfo()), speed);
+                UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
+                float speedRate = GetClientSpeed(moveType) / baseMoveSpeed[moveType];
+                MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
             }
 
             if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
