@@ -952,7 +952,7 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
             m_delayMoment = targetInfo.timeDelay;
     }
     else if (m_delayed)
-        m_delayMoment = targetInfo.timeDelay = sWorld.getConfig(CONFIG_UINT32_SPELLS_CCDELAY);
+        m_delayMoment = targetInfo.timeDelay = sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY);
     else
         targetInfo.timeDelay = uint64(0);
 
@@ -1047,7 +1047,7 @@ void Spell::AddGOTarget(GameObject* pTarget, SpellEffectIndex effIndex)
             m_delayMoment = targetInfo.timeDelay;
     }
     else if (m_delayed)
-        m_delayMoment = targetInfo.timeDelay = sWorld.getConfig(CONFIG_UINT32_SPELLS_CCDELAY);
+        m_delayMoment = targetInfo.timeDelay = sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY);
     else
         targetInfo.timeDelay = uint64(0);
 
@@ -1309,7 +1309,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 }
             }
 
-            pCaster->ProcDamageAndSpell(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, addhealth, m_attackType, spellInfo, this);
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, addhealth, m_attackType, spellInfo, this));
         }
 
         int32 gain = pCaster->DealHeal(unitTarget, addhealth, m_spellInfo, crit);
@@ -1393,7 +1393,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger)
-            pCaster->ProcDamageAndSpell(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, this);
+            pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, this));
         
         if (m_caster->IsPlayer())
         {
@@ -1507,7 +1507,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             }
         }
 
-        pCaster->ProcDamageAndSpell(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
+        pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this));
     }
 
     if (missInfo != SPELL_MISS_NONE)
@@ -3837,14 +3837,14 @@ void Spell::cast(bool skipCheck)
             if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
                 procAttackerFlags |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
         }
-        m_caster->ProcDamageAndSpell(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
+        m_caster->ProcDamageAndSpell(ProcSystemArguments(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this));
     }
 
     // Shaman totems. Trigger spell cast procs, but not others
     if (m_spellInfo->IsTotemSummonSpell() && m_canTrigger && m_casterUnit)
     {
         uint32 procAttackerFlags = PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
-        m_casterUnit->ProcDamageAndSpell(m_casterUnit, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
+        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(m_casterUnit, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this));
     }
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
@@ -8651,7 +8651,7 @@ void Spell::OnSpellLaunch()
     }
     
     bool triggerAutoAttack = unitTarget != m_casterUnit && !m_spellInfo->IsPositiveSpell() && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
-    m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, sWorld.getConfig(CONFIG_UINT32_SPELLS_CCDELAY), triggerAutoAttack);
+    m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY), triggerAutoAttack);
 }
 
 bool Spell::HasModifierApplied(SpellModifier* mod)

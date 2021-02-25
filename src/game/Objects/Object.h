@@ -467,6 +467,30 @@ class CooldownContainer
         categoryMap m_categoryMap;
 };
 
+// Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const* procSpell, bool dontTriggerSpecial
+
+// External struct for passing on data
+struct SpellModifier;
+struct ProcSystemArguments
+{
+    Unit* pVictim;
+    ObjectGuid victimGuid;
+
+    uint32 procFlagsAttacker;
+    uint32 procFlagsVictim;
+    uint32 procExtra;
+
+    uint32 amount; // contains full heal or full damage
+    SpellEntry const* procSpell;
+    WeaponAttackType attType;
+
+    std::list<SpellModifier*> appliedSpellModifiers; // don't dereference pointers
+    bool isSpellTriggeredByAura;
+
+    explicit ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_ = BASE_ATTACK,
+        SpellEntry const* procSpell_ = nullptr, Spell const* spell = nullptr);
+};
+
 class Object
 {
     public:
@@ -1224,7 +1248,10 @@ class WorldObject : public Object
         int32 MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
         float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
         SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
-        void ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const* procSpell = nullptr, Spell* spell = nullptr);
+        void UpdatePendingProcs(uint32 diff);
+        void ProcDamageAndSpell(ProcSystemArguments&& data);
+        void ProcDamageAndSpell_real(ProcSystemArguments& data);
+        void ProcDamageAndSpell_delayed(ProcSystemArguments& data);
         void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, int32 damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
         int32 CalculateSpellEffectValue(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr) const;
         int32 SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell = nullptr) const;
@@ -1309,6 +1336,8 @@ class WorldObject : public Object
         typedef std::list<ObjectGuid> DynObjectGUIDs;
         DynObjectGUIDs m_dynObjGUIDs;
 
+        uint32 m_procsUpdateTimer = 0;
+        std::vector<ProcSystemArguments> m_pendingProcChecks;
         std::array<Spell*, CURRENT_MAX_SPELL> m_currentSpells{};
         uint32 m_castCounter = 0;                           // count casts chain of triggered spells for prevent infinity cast crashes
     private:

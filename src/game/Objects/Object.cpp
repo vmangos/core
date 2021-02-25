@@ -3529,7 +3529,7 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-            ProcDamageAndSpell(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, spell);
+            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, spell));
             return SPELL_MISS_REFLECT;
         }
     }
@@ -3547,21 +3547,73 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     return SPELL_MISS_NONE;
 }
 
-void WorldObject::ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const* procSpell, Spell* spell)
+ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_,
+    SpellEntry const* procSpell_, Spell const* spell)
+    : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_),
+    attType(attType_), procSpell(procSpell_), isSpellTriggeredByAura(spell && spell->IsTriggeredByAura())
 {
-    if ((pVictim && !IsInMap(pVictim)) || !IsInWorld())
+    if (spell)
+        appliedSpellModifiers = spell->m_appliedMods;
+
+    if (pVictim_)
+        victimGuid = pVictim_->GetObjectGuid();
+}
+
+void WorldObject::UpdatePendingProcs(uint32 diff)
+{
+    if (sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) && IsInWorld())
+    {
+        if (m_procsUpdateTimer < diff)
+        {
+            m_procsUpdateTimer = sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY);
+            if (!m_pendingProcChecks.empty())
+            {
+                std::vector<ProcSystemArguments> procData = std::move(m_pendingProcChecks);
+                m_pendingProcChecks.clear();
+                for (auto& proc : procData)
+                    ProcDamageAndSpell_delayed(proc);
+            }
+        }
+        else
+            m_procsUpdateTimer -= diff;
+    }
+}
+
+void WorldObject::ProcDamageAndSpell(ProcSystemArguments&& data)
+{
+    if ((data.pVictim && !IsInMap(data.pVictim)) || !IsInWorld())
         return;
 
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
+        ProcDamageAndSpell_real(data);
+    else
+        m_pendingProcChecks.emplace_back(std::move(data));
+}
+
+void WorldObject::ProcDamageAndSpell_delayed(ProcSystemArguments& data)
+{
+    if (data.pVictim)
+    {
+        data.pVictim = GetMap()->GetUnit(data.victimGuid);
+        if (!data.pVictim)
+            return;
+    }
+
+    ProcDamageAndSpell_real(data);
+}
+
+void WorldObject::ProcDamageAndSpell_real(ProcSystemArguments& data)
+{
     ProcTriggeredList procTriggered;
 
     // Not much to do if no flags are set.
-    if (procAttacker)
+    if (data.procFlagsAttacker)
         if (Unit* pUnit = ToUnit())
-            pUnit->ProcDamageAndSpellFor(false, pVictim, procAttacker, procExtra, attType, procSpell, amount, procTriggered, spell);
+            pUnit->ProcDamageAndSpellFor(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    if (pVictim && pVictim->IsAlive() && procVictim)
+    if (data.pVictim && data.pVictim->IsAlive() && data.procFlagsVictim)
 
         // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
         // "Charges will not generate off auto attacks or npc attacks by trying"
@@ -3569,13 +3621,13 @@ void WorldObject::ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 
         // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
         // "etc will generate a charge if you're sitting."
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : pVictim, procVictim, !procSpell && !pVictim->IsStandingUpForProc() ? procExtra & ~PROC_EX_CRITICAL_HIT : procExtra, attType, procSpell, amount, procTriggered, spell);
+        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, !data.procSpell && !data.pVictim->IsStandingUpForProc() ? data.procExtra & ~PROC_EX_CRITICAL_HIT : data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
 #else
-        pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : pVictim, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
+        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
 #endif
 
     if (Unit* pUnit = ToUnit())
-        pUnit->HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
+        pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.procSpell, procTriggered);
 }
 
 // Melee based spells can be miss, parry or dodge on this step

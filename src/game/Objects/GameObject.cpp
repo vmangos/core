@@ -128,6 +128,9 @@ void GameObject::AddToWorld()
 
     if (!i_AI)
         AIM_Initialize();
+
+    if (sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
+        m_procsUpdateTimer = sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY));
 }
 
 void GameObject::AIM_Initialize()
@@ -304,6 +307,8 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
             m_currentSpells[i] = nullptr;                      // remove pointer
         }
     }
+
+    UpdatePendingProcs(update_diff);
 
     ///- UpdateAI
     if (i_AI)
