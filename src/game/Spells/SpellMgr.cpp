@@ -3319,9 +3319,9 @@ namespace SpellInternal
         if (spellInfo->IsChanneledSpell() || spellInfo->IsNextMeleeSwingSpell() || spellInfo->IsRangedSpell())
             return false;
 
-        for (auto effect : spellInfo->Effect)
+        for (auto i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            if (effect && !Spells::IsDelayableEffect(effect))
+            if (spellInfo->Effect[i] && !spellInfo->IsDelayableEffect(i))
                 return false;
         }
 

@@ -953,7 +953,7 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
     }
     else if (m_delayed)
         m_delayMoment = targetInfo.timeDelay = 
-        ((pTarget != m_casterUnit) ? 
+        ((sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) && pTarget != m_casterUnit) ?
         (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))) : 0);
     else
         targetInfo.timeDelay = uint64(0);
@@ -1050,7 +1050,7 @@ void Spell::AddGOTarget(GameObject* pTarget, SpellEffectIndex effIndex)
     }
     else if (m_delayed)
         m_delayMoment = targetInfo.timeDelay = 
-        ((pTarget != m_casterGo) ? 
+        ((sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) && pTarget != m_casterGo) ?
         (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))) : 0);
     else
         targetInfo.timeDelay = uint64(0);
