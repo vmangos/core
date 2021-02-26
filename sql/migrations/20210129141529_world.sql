@@ -152,6 +152,9 @@ INSERT INTO `creature_addon` (`guid`, `stand_state`, `sheath_state`, `auras`) VA
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (452, 3652, 0, 0, 0, 1, -621.612, -2270.82, 18.8419, 2.67112, 172800, 259200, 0, 100, 0, 0, 0, 0, 0, 10);
 
+-- remove Burning Key from creature 2760 loot table
+DELETE FROM `creature_loot_template` WHERE `item` = 4483 AND `entry` = 2760;
+
 
 -- End of migration.
 END IF;
