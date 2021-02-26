@@ -27,24 +27,25 @@ libmpq \- cross-platform C library for manipulating mpq archives.
 .B
 #include <mpq.h>
 .sp
-.BI "int32_t libmpq__file_blocks("
+.BI "int32_t libmpq__file_size_unpacked("
 .BI "        mpq_archive_s  *" "mpq_archive",
 .BI "        uint32_t        " "file_number",
-.BI "        uint32_t       *" "blocks"
+.BI "        off_t          *" "unpacked_size"
 .BI ");"
 .fi
 .SH DESCRIPTION
 .PP
-Call \fBlibmpq__file_blocks\fP() to get the number of blocks for a given file. It will count all blocks for files stored in multiple sectors or count one for files stored in single sector.
+Call \fBlibmpq__file_size_unpacked\fP() to get the unpacked size of a given file in the archive. It will return a valid size for compressed and imploded files as well as stored only.
 .LP
-The \fBlibmpq__file_blocks\fP() function takes as first argument the archive structure \fImpq_archive\fP which have to be allocated first and opened by \fBlibmpq__archive_open\fP(). The second argument \fIfile_number\fP is the number of file and the third argument is a reference to the number of \fIblocks\fP of the file.
+The \fBlibmpq__file_size_unpacked\fP() function takes as first argument the archive structure \fImpq_archive\fP which have to be allocated first and opened by \fBlibmpq__archive_open\fP(). The second argument \fIfile_number\fP is the number of file and the third argument is a reference to the uncompressed, exploded or stored size \fIunpacked_size\fP of file.
 .SH RETURN VALUE
 On success, a zero is returned and on error one of the following constants.
-.TP 
+.TP
 .B LIBMPQ_ERROR_EXIST
 File does not exist in archive.
 .SH SEE ALSO
-.BR libmpq__archive_files (3)
+.BR libmpq__archive_size_unpacked (3),
+.BR libmpq__block_size_unpacked (3)
 .SH AUTHOR
 Check documentation.
 .TP

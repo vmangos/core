@@ -27,24 +27,29 @@ libmpq \- cross-platform C library for manipulating mpq archives.
 .B
 #include <mpq.h>
 .sp
-.BI "int32_t libmpq__file_blocks("
+.BI "int32_t libmpq__block_size_unpacked("
 .BI "        mpq_archive_s  *" "mpq_archive",
 .BI "        uint32_t        " "file_number",
-.BI "        uint32_t       *" "blocks"
+.BI "        uint32_t        " "block_number",
+.BI "        off_t          *" "unpacked_size"
 .BI ");"
 .fi
 .SH DESCRIPTION
 .PP
-Call \fBlibmpq__file_blocks\fP() to get the number of blocks for a given file. It will count all blocks for files stored in multiple sectors or count one for files stored in single sector.
+Call \fBlibmpq__block_size_unpacked\fP() to get the unpacked size of a given block in the file. It will return a valid size for compressed and imploded blocks as well as stored only.
 .LP
-The \fBlibmpq__file_blocks\fP() function takes as first argument the archive structure \fImpq_archive\fP which have to be allocated first and opened by \fBlibmpq__archive_open\fP(). The second argument \fIfile_number\fP is the number of file and the third argument is a reference to the number of \fIblocks\fP of the file.
+The \fBlibmpq__block_size_unpacked\fP() function takes as first argument the archive structure \fImpq_archive\fP which have to be allocated first and opened by \fBlibmpq__archive_open\fP(). The second argument \fIfile_number\fP is the number of file, the third argument \fIblock_number\fP is the number of block and the fourth argument is a reference to the uncompressed, exploded or stored size \fIunpacked_size\fP of block.
 .SH RETURN VALUE
 On success, a zero is returned and on error one of the following constants.
-.TP 
+.TP
 .B LIBMPQ_ERROR_EXIST
-File does not exist in archive.
+File or block does not exist in archive.
+.TP
+.B LIBMPQ_ERROR_OPEN
+Block offset table was not opened by calling \fBlibmpq__block_open_offset\fP(), or it was closed by an \fBlibmpq__block_close_offset\fP() call.
 .SH SEE ALSO
-.BR libmpq__archive_files (3)
+.BR libmpq__archive_size_unpacked (3),
+.BR libmpq__file_size_unpacked (3)
 .SH AUTHOR
 Check documentation.
 .TP
