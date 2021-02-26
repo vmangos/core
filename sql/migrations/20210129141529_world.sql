@@ -163,6 +163,13 @@ DELETE FROM conditions WHERE condition_entry = 20264;
 INSERT INTO conditions (condition_entry, type, value1, value2, value3, value4) VALUES 
 (20264,1,1784,0,0,0);
 
+-- allow Dane Winslow to summon an imp
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 6373;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `event_type`, `event_chance`, `action1_script`, `comment`) VALUES
+(637301, 6373, 11, 100, 637301, 'Dane Winslow - Summon Imp on Spawn');
+INSERT INTO `creature_ai_scripts` (`id`, `command`, `datalong`, `data_flags`, `comments`) VALUES
+(637301, 15, 11939, 4, 'Dane Winslow - Summon Imp on Spawn');
+
 
 -- End of migration.
 END IF;
