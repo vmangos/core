@@ -154,6 +154,15 @@ UPDATE `creature` SET `position_x` = -10829.554688, `position_y` = 733.747437, `
 -- Troll Tribal Necklace should always drop as quest 2881 is repeatable
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 20 WHERE `item` = 9259;
 
+-- add Klaven Mortwake EAI (taken from https://github.com/cmangos/classic-db/commit/b69297f0c908f206b58cd9a2dacb1870f568f56a)
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(705301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3092, 0, 0, 0, 0, 0, 0, 0, 0, 'Klaven Mortwake - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (705301, 7053, 0, 10, 0, 100, 1, 0, 30, 60000, 60000, 705301, 0, 0, 'Klaven Mortwake - Say on LOS(q.2359)');
+-- Part of Klaven Mortwake EAI - aura check for LOS
+DELETE FROM conditions WHERE condition_entry = 20264;
+INSERT INTO conditions (condition_entry, type, value1, value2, value3, value4) VALUES 
+(20264,1,1784,0,0,0);
+
 
 -- End of migration.
 END IF;
