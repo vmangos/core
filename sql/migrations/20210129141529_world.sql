@@ -155,6 +155,10 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 -- remove Burning Key from creature 2760 loot table
 DELETE FROM `creature_loot_template` WHERE `item` = 4483 AND `entry` = 2760;
 
+-- Some Westfall duplicates
+DELETE FROM `creature` WHERE `guid` IN (90271,90014,90375,90216,89906,90434,90341);
+DELETE FROM `creature_addon` WHERE `guid` IN (90271,90014,90375,90216,89906,90434,90341);
+
 
 -- End of migration.
 END IF;
