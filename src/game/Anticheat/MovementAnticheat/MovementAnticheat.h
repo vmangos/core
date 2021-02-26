@@ -53,7 +53,6 @@ class MovementAnticheat
 
         void Init();
         void InitNewPlayer(Player* pPlayer);
-        void InitSpeeds(Unit* unit);
         void ResetJumpCounters();
 
         void AddCheats(uint32 cheats, uint32 count = 1);
@@ -66,7 +65,6 @@ class MovementAnticheat
 
         // Public methods called from the movement handler upon received a packet.
         bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
-        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode);
         bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
 
         bool IsInKnockBack() const { return m_knockBack; }
@@ -92,7 +90,6 @@ private:
 
         MovementInfo& GetLastMovementInfo() { return me->m_movementInfo; }
         MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
-        float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
         float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
         UnitMoveType GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const;
 
@@ -111,7 +108,6 @@ private:
         float m_jumpInitialSpeed = 0.0f;
         float m_overspeedDistance = 0.0f;
         float m_maxOverspeedDistance = 0.0f;
-        std::array<float, MAX_MOVE_TYPE> m_clientSpeeds = {};
 
         Player* me = nullptr; // current player object that checks run on, changes on mind control
         WorldSession* const m_session = nullptr; // session to which the cheat data belongs, does not change

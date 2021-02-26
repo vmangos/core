@@ -815,7 +815,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         }
 
         pPlayer->SetBattleGroundEntryPoint(pBgEntrance->exit_mapId, pBgEntrance->exit_X, pBgEntrance->exit_Y, pBgEntrance->exit_Z, pBgEntrance->exit_Orientation);
-        SendBattlegGroundList(pPlayer->GetObjectGuid(), pBgEntrance->bgTypeId);
+        SendBattleGroundList(pPlayer->GetObjectGuid(), pBgEntrance->bgTypeId);
         return;
     }
 

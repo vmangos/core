@@ -225,20 +225,24 @@ struct npc_obsidionAI : public ScriptedAI
                         dorius->UpdateEntry(NPC_LATHORIC_THE_BLACK);
             }
 
-            if (m_nextText >= SAY_LATHORIC2 && m_nextText <= SAY_DORIUS1)
+            if (m_nextText <= SAY_DORIUS6 && m_nextText >= SAY_LATHORIC1)
             {
                 if (m_uiTalkTimer < uiDiff)
                 {
                     if (Creature* dorius = m_creature->GetMap()->GetCreature(m_Dorius))
                         DoScriptText(m_nextText, dorius);
-                    m_nextText--;
+                    m_nextText++;
+                    if (m_nextText > SAY_DORIUS6)
+                        m_nextText = SAY_LATHORIC1;
+                    if (m_nextText == SAY_DORIUS1)
+                        m_nextText += 10; 
                     m_uiTalkTimer = 6000;
                 }
                 else
                     m_uiTalkTimer -= uiDiff;
             }
 
-            if (m_nextText < SAY_LATHORIC2) // finished talking, start fighting
+            if (m_nextText == SAY_LATHORIC2) // finished talking, start fighting
             {
                 for (const auto& guid : m_playerList)
                 {

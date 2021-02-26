@@ -297,7 +297,7 @@ bool RegisterPlayerToBG(WorldSession* sess, BattleGroundTypeId bgid)
     if (!pPlayer->GetBGAccessByLevel(bgid))
         return false;
     pPlayer->SetBattleGroundEntryPoint(pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation());
-    sess->SendBattlegGroundList(pPlayer->GetObjectGuid(), bgid);
+    sess->SendBattleGroundList(pPlayer->GetObjectGuid(), bgid);
     return true;
 }
 

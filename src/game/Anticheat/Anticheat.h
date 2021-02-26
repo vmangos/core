@@ -117,10 +117,8 @@ public:
     opcode - the packet we are checking
     */
     bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
-    bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) { return true; }
     bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
 
-    void InitSpeeds(Unit* unit) {}
     bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const { return true; }
 };
 #endif

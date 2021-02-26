@@ -2942,12 +2942,12 @@ void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId /*=0*/) const
 
 
 // NOSTALRIUS: GameObjectCollision
-bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos, bool includingM2Objects) const
+bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos) const
 {
     ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
     ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
 
-    return VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, includingM2Objects)
+    return VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2)
     && (!checkDynLos || CheckDynamicTreeLoS(x1, y1, z1, x2, y2, z2));
 }
 
