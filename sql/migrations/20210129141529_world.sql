@@ -158,6 +158,7 @@ DELETE FROM `creature_loot_template` WHERE `item` = 4483 AND `entry` = 2760;
 -- Some Westfall duplicates
 DELETE FROM `creature` WHERE `guid` IN (90271,90014,90375,90216,89906,90434,90341);
 DELETE FROM `creature_addon` WHERE `guid` IN (90271,90014,90375,90216,89906,90434,90341);
+UPDATE `creature` SET `position_x` = -10829.554688, `position_y` = 733.747437, `position_z` = 34.381603, `orientation` = 3.798669 WHERE `guid` = 90362;
 
 
 -- End of migration.
