@@ -58,7 +58,7 @@ static const char *__libmpq_error_strings[] = {
 const char *libmpq__version(void) {
 
 	/* return version information. */
-	return "4.3.4";
+	return "0.4.2";
 }
 
 /* this function returns a string message for a return code. */
