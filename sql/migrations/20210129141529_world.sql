@@ -180,6 +180,10 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 10, 39, 8134801, 0, 0, 0, 81348, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Start Script Eastvale Peasant 81348');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8134801, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 81348, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81348 - Start Waypoints - Started by Eastvale Peasant 81252');
 
+-- sognar cliffbeard should be holding his meat
+UPDATE `creature_template` SET `equipment_id` = 1106 WHERE `entry` = 5124;
+DELETE FROM `creature_addon` WHERE `guid` = (SELECT `guid` FROM `creature` WHERE `id` = 5124);
+
 
 -- End of migration.
 END IF;
