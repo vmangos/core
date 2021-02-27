@@ -133,9 +133,11 @@ uint32 GetFindersAmmount(Creature* shard)
         if (pfinder)
             finderCounter++;
 
+    /*
     std::ostringstream ss;
     ss << "Finders: " << finderCounter;
-    shard->MonsterSay(finderCounter);
+    shard->MonsterSay(ss.str().c_str());
+    */
 
     return finderCounter;
 }
