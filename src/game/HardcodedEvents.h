@@ -219,19 +219,20 @@ struct ScourgeInvasionEvent : WorldEvent
     uint32 GetNextUpdateDelay() override;
 
 private:
-    struct InvasionXYZ {
-        InvasionXYZ(float x, float y, float z)
-            : x(x), y(y), z(z) {}
-        float x, y, z;
+    struct InvasionXYZO {
+        InvasionXYZO(float x, float y, float z, float o)
+            : x(x), y(y), z(z), o(o) {}
+        float x, y, z, o;
     };
 
     struct InvasionNecropolis {
         InvasionNecropolis(float x, float y, float z, float o)
             : x(x), y(y), z(z), o(o) {}
         float x, y, z, o;
-        std::vector<InvasionXYZ> shards;
-
-        ObjectGuid relayGuid;
+        std::vector<InvasionXYZO> circles;
+        std::vector<InvasionXYZO> proxys;
+        uint32 necroID;
+        ObjectGuid necroGuid;
     };
 
     struct InvasionZone
