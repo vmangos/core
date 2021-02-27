@@ -19,7 +19,7 @@ UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy'
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE  `entry`=16386;
 
 -- Fix Camp Spawners
-UPDATE `creature_template` SET `unit_flags`='33554432', `base_attack_time`='2000', `ranged_attack_time`='2000', `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
+UPDATE `creature_template` SET `unit_flags`='33554432', `base_attack_time`='2000', `ranged_attack_time`='2000', `movement_type`='0', `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
 UPDATE `creature_template` SET `unit_flags`='33554432' WHERE `entry`=16356;
 UPDATE `creature_template` SET `level_min`='60', `health_min`='3052', `speed_walk`='1', `speed_run`='0.992063', `movement_type`='0', `unit_flags`='33555200' WHERE `entry`=16995;
 
