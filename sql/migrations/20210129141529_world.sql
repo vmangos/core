@@ -170,6 +170,16 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `event_type`, `event_chan
 INSERT INTO `creature_ai_scripts` (`id`, `command`, `datalong`, `data_flags`, `comments`) VALUES
 (637301, 15, 11939, 4, 'Dane Winslow - Summon Imp on Spawn');
 
+-- fix error in eastvale logging camp script
+DELETE FROM `creature_movement_scripts` WHERE `id`=8125203;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 1, 16, 6289, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Play Sound -  What');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 1, 35, 0, 0, 0, 0, 81251, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Face Target');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 2, 16, 6288, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Play Sound - More Work');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 4, 39, 1061601, 0, 0, 0, 81251, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Start Script Supervisor Raelene');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 8, 16, 6242, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Play Sound - No One Else Available');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 10, 39, 8134801, 0, 0, 0, 81348, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Start Script Eastvale Peasant 81348');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8134801, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 81348, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81348 - Start Waypoints - Started by Eastvale Peasant 81252');
+
 
 -- End of migration.
 END IF;
