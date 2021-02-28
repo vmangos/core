@@ -94,9 +94,7 @@ void Totem::Summon(Unit* owner)
     AIM_Initialize();
     owner->GetMap()->Add((Creature*)this);
 
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
-    data << GetObjectGuid();
-    SendObjectMessageToSet(&data, true);
+    SendObjectSpawnAnim();
 
     if (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->AI())
         ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
@@ -120,7 +118,7 @@ void Totem::Summon(Unit* owner)
 
 void Totem::UnSummon()
 {
-    SendObjectDeSpawnAnim(GetObjectGuid());
+    SendObjectDeSpawnAnim();
 
     CombatStop();
     RemoveAurasDueToSpell(GetSpell());

@@ -97,13 +97,62 @@ enum
     NPC_LADY_ONYXIA                 = 12756,
     NPC_ROWE                        = 17804,
 
+    FACTION_BOLVAR_COMBAT           = 11,
+    FACTION_BOLVAR_NORMAL           = 12,
+
     GOSSIP_ROWE_COMPLETED           = 9066,
     GOSSIP_ROWE_READY               = 9065,
     GOSSIP_ROWE_BUSY                = 9064,
     GOSSIP_ROWE_NOTHING             = 9063,
 
+    GO_FLARE_OF_JUSTICE             = 181987,
+
     SAY_SIGNAL_SENT                 = 14389,
     SAY_HISS                        = 8245,
+    SAY_WINDSOR1                    = 8091,
+    SAY_WINDSOR2                    = 8090,
+    SAY_WINDSOR3                    = 8107,
+    SAY_WINDSOR4                    = 8109,
+    SAY_ONYXIA1                     = 8119,
+    SAY_MARCUS1                     = 8121,
+    SAY_WINDSOR5                    = 8123,
+    SAY_WINDSOR6                    = 8133,
+    SAY_MARCUS2                     = 8124,
+    SAY_MARCUS3                     = 8125,
+    SAY_MARCUS4                     = 8132,
+    SAY_WINDSOR7                    = 8126,
+    SAY_WINDSOR8                    = 8134,
+    SAY_MARCUS5                     = 8127,
+    SAY_MARCUS6                     = 8128,
+    SAY_MARCUS7                     = 8129,
+    SAY_MARCUS8                     = 8130,
+    SAY_WINDSOR9                    = 8205,
+    SAY_WINDSOR10                   = 8206,
+    SAY_WINDSOR11                   = 8207,
+    SAY_WINDSOR12                   = 8208,
+    SAY_WINDSOR13                   = 8210,
+    SAY_BOLVAR1                     = 8212,
+    SAY_WINDSOR14                   = 8211,
+    SAY_ONYXIA2                     = 8214,
+    SAY_ONYXIA3                     = 8215,
+    SAY_ONYXIA4                     = 8216,
+    SAY_WINDSOR15                   = 8218,
+    SAY_WINDSOR16                   = 8226,
+    SAY_WINDSOR17                   = 8227,
+    SAY_WINDSOR18                   = 8219,
+    SAY_WINDSOR19                   = 8228,
+    SAY_BOLVAR2                     = 8236,
+    SAY_ONYXIA5                     = 8235,
+    SAY_BOLVAR3                     = 8237,
+    SAY_ONYXIA6                     = 8238,
+    SAY_ONYXIA7                     = 8239,
+    SAY_WINDSOR20                   = 8247,
+    SAY_ONYXIA8                     = 8246,
+    SAY_ONYXIA9                     = 8248,
+    SAY_BOVLAR4                     = 8266,
+    SAY_BOLVAR5                     = 8249,
+    SAY_WINDSOR21                   = 8250,
+    SAY_WINDSOR22                   = 8251,
 
     MOUNT_WINDSOR                   = 2410,
 
@@ -121,7 +170,6 @@ struct npc_reginald_windsorAI : ScriptedAI
 
     uint32 Timer;
     uint32 Tick;
-    uint32 IDSpeech;
     uint64 GuardsGUIDs[30];
     uint64 DragsGUIDs[10];
     uint64 playerGUID;
@@ -149,7 +197,6 @@ struct npc_reginald_windsorAI : ScriptedAI
     void ResetCreature() override;
     void JustDied(Unit* pKiller) override;
     void PokeRowe();
-    void AdvanceDialog(Unit* pWho, Unit* pTarget = nullptr);
     void CompleteQuest();
     void EndScene();
     void UpdateAI_corpse(uint32 const uiDiff) override;

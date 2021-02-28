@@ -1083,7 +1083,8 @@ class WorldObject : public Object
         void MonsterYellToZone(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
         void MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language = 0, Unit const* target = nullptr) const;
 
-        void SendObjectDeSpawnAnim(ObjectGuid guid) const;
+        void SendObjectSpawnAnim() const;
+        void SendObjectDeSpawnAnim() const;
 
         virtual bool IsHostileTo(WorldObject const* target) const =0;
         virtual bool IsFriendlyTo(WorldObject const* target) const =0;
