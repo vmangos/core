@@ -18584,6 +18584,10 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         {
             ObjectGuid t_guid = target->GetObjectGuid();
 
+            if (target->IsCreature() && IsInCombat() && !GetMap()->IsDungeon())
+                if (((Creature*)target)->IsInCombat())
+                    ((Creature*)target)->GetThreatManager().modifyThreatPercent(this, -101);
+
             target->BuildOutOfRangeUpdateBlock(&data);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
             m_visibleGUIDs.erase(t_guid);

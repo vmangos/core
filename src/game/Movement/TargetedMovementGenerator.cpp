@@ -107,10 +107,12 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 
     PathType pathType = path.getPathType();
     m_bReachable = pathType & PATHFIND_NORMAL;
+    
+    if (!petFollowing && pathType == PATHFIND_NOPATH)
+        return;    
+
     if (!m_bReachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH))
-    {
         m_bReachable = true;
-    }
 
     // Enforce stricter checking inside dungeons
     if (m_bReachable && owner.GetMap() && owner.GetMap()->IsDungeon())

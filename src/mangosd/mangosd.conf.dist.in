@@ -1170,7 +1170,7 @@ AllowTwoSide.AddFriend = 0
 #    ThreatRadius
 #        Radius for creature to evade after being pulled away from combat start point
 #        If ThreatRadius is less than creature aggro radius then aggro radius will be used
-#        Default: 100 yards
+#        Default: 50 yards
 #
 #    MaxCreaturesAttackRadius
 #        Creatures won't search for target farther than this.
@@ -1287,7 +1287,7 @@ AllowTwoSide.AddFriend = 0
 #
 ###################################################################################################################
 
-ThreatRadius = 100
+ThreatRadius = 50
 Rate.Creature.Aggro = 1
 MaxCreaturesAttackRadius = 40
 MaxPlayersStealthDetectRange = 40
