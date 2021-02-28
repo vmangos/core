@@ -823,6 +823,10 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 if (WorldTimer::tickTime() % 3000 <= update_diff)
                 {
+                    // Prevent mobs from evading while under crowd control.
+                    if (HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+                        UpdateLeashExtensionTime();
+
                     // Leash prevents mobs from chasing any further than specified range
                     if (m_leashDistance && !IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, m_leashDistance))
                         leash = true;
