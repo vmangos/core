@@ -181,7 +181,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/western_plaguelands/scholomance/boss_jandice_barov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_kormok.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_lord_alexei_barov.cpp
-    eastern_kingdoms/western_plaguelands/scholomance/boss_lord_blackwood.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_lorekeeper_polkelt.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_ras_frostwhisper.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_the_ravenian.cpp

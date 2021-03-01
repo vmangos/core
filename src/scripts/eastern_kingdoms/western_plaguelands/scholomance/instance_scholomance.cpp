@@ -273,88 +273,6 @@ bool GOOpen_brazier_herald(Player* pUser, GameObject *pGo)
 
     return true;
 }
-enum
-{
-    SPELL_MULTI_SHOT        = 20735,
-    SPELL_SHOOT             = 16100,//not used for now
-    SPELL_SHIELD_BASH       = 11972
-};
-struct Locations
-{
-    float x, y, z;
-};
-//tourne en rond.
-static Locations ronde[] =
-{
-    {221.356903f, 133.581757f, 109.640160f},
-    {221.075699f, 160.426987f, 109.640160f},
-    {181.770874f, 159.967178f, 109.604874f},
-    {181.937195f, 133.052261f, 109.602188f}
-};
-
-struct boss_lordblackwoodAI : public ScriptedAI
-{
-    boss_lordblackwoodAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        LastWayPoint = 0;
-        Reset();
-    }
-
-    uint32 ShieldBash_Timer;
-    uint32 MultiShot_Timer;
-    uint32 LastWayPoint;
-
-    void Reset() override
-    {
-        ShieldBash_Timer = 8000;
-        MultiShot_Timer = 1000;
-        m_creature->GetMotionMaster()->MovePoint(LastWayPoint, ronde[LastWayPoint].x, ronde[LastWayPoint].y, ronde[LastWayPoint].z);
-    }
-
-    void MovementInform(uint32 uiType, uint32 uiPointId) override
-    {
-        if (!m_creature->GetVictim())
-        {
-            m_creature->SetWalk(true);
-            if (uiPointId < 3)
-                m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, ronde[uiPointId + 1].x, ronde[uiPointId + 1].y, ronde[uiPointId + 1].z);
-            else if (uiPointId == 3)
-                m_creature->GetMotionMaster()->MovePoint(0, ronde[0].x, ronde[0].y, ronde[0].z);
-        }
-        if (uiPointId >= 0 && uiPointId < 4)
-            LastWayPoint = uiPointId;
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
-        {
-            if (MultiShot_Timer < diff)
-            {
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MULTI_SHOT) == CAST_OK)
-                    MultiShot_Timer = 2000;
-            }
-            else
-                MultiShot_Timer -= diff;
-        }
-        if (ShieldBash_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
-                ShieldBash_Timer = 8000;
-        }
-        else
-            ShieldBash_Timer -= diff;
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_boss_lordblackwood(Creature* pCreature)
-{
-    return new boss_lordblackwoodAI(pCreature);
-}
 
 struct go_viewing_room_door : public GameObjectAI
 {
@@ -385,11 +303,6 @@ void AddSC_instance_scholomance()
     newscript = new Script;
     newscript->Name = "go_brazier_herald";
     newscript->GOOpen = &GOOpen_brazier_herald;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "boss_lord_blackwood";
-    newscript->GetAI = &GetAI_boss_lordblackwood;
     newscript->RegisterSelf();
 
     newscript = new Script;
