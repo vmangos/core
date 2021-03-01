@@ -2023,10 +2023,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                     return;
                 }
-                case 10848: // Shroud of Death
-                case 27978: // Shroud of Death
-                    // Checked for in Unit::IsInvisibleForAlive()
-                    return;
             }
             break;
         }

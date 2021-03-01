@@ -7126,8 +7126,8 @@ bool Unit::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* 
 /// returns true if creature can't be seen by alive units
 bool Unit::IsInvisibleForAlive() const
 {
-    // Shroud of Death
-    if (HasAura(10848) || HasAura(27978))
+    // Ghost
+    if (HasAura(9036))
         return true;
 
     // TODO: maybe spiritservices also have just an aura
