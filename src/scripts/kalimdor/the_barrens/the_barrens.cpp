@@ -30,6 +30,15 @@ EndContentData */
 
 #include "scriptPCH.h"
 
+enum
+{
+    // TODO: implement random broadcast on spawn
+    //SAY_SPAWN_1 = 3164, 
+    //SAY_SPAWN_2 = 3170, 
+    SAY_CRACKER = 3167,
+    SAY_SQUAWK  = 3165
+};
+
 struct npc_pollyAI : public ScriptedAI
 {
     npc_pollyAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -48,8 +57,8 @@ struct npc_pollyAI : public ScriptedAI
     {
         if (!b_text)
         {
-            m_creature->MonsterSay("MmmmmMmmmm... Enormous chemically altered cracker...", 0, 0);
-            m_creature->MonsterSay("What the squawk? Squawk squawk, squawk? SQUAWK!", 0, 0);
+            DoScriptText(SAY_CRACKER, m_creature);
+            DoScriptText(SAY_SQUAWK, m_creature);
             b_text = true;
         }
     }
@@ -67,17 +76,17 @@ CreatureAI* GetAI_npc_polly(Creature* pCreature)
 
 enum
 {
-    SAY_GIL_START               = -1000370,
-    SAY_GIL_AT_LAST             = -1000371,
-    SAY_GIL_PROCEED             = -1000372,
-    SAY_GIL_FREEBOOTERS         = -1000373,
-    SAY_GIL_AGGRO_1             = -1000374,
-    SAY_GIL_AGGRO_2             = -1000375,
-    SAY_GIL_AGGRO_3             = -1000376,
-    SAY_GIL_AGGRO_4             = -1000377,
-    SAY_GIL_ALMOST              = -1000378,
-    SAY_GIL_SWEET               = -1000379,
-    SAY_GIL_FREED               = -1000380,
+    SAY_GIL_START               = 1065,
+    SAY_GIL_AT_LAST             = 1066, 
+    SAY_GIL_PROCEED             = 1067, 
+    SAY_GIL_FREEBOOTERS         = 1068, 
+    SAY_GIL_AGGRO_1             = 1074, 
+    SAY_GIL_AGGRO_2             = 1075, 
+    SAY_GIL_AGGRO_3             = 1072, 
+    SAY_GIL_AGGRO_4             = 1073, 
+    SAY_GIL_ALMOST              = 1069, 
+    SAY_GIL_SWEET               = 1070, 
+    SAY_GIL_FREED               = 1071, 
 
     QUEST_FREE_FROM_HOLD        = 898,
     AREA_MERCHANT_COAST         = 391
@@ -185,11 +194,12 @@ bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, Quest const
 
 enum
 {
-    SAY_BIG_WILL_READY = -1000123,
-    SAY_TWIGGY_BEGIN = -1000124,
-    SAY_TWIGGY_FRAY = -1000125,
-    SAY_TWIGGY_DOWN = -1000126,
-    SAY_TWIGGY_OVER = -1000127,
+    SAY_BIG_WILL_READY = 2421, 
+    SAY_TWIGGY_BEGIN   = 2310,  
+    SAY_TWIGGY_FRAY    = 2318,  
+    SAY_TWIGGY_DOWN    = 2355,  
+    SAY_TWIGGY_OVER    = 2320,  
+    SAY_QUEST_TURN_IN  = 2354, // TODO: implement Klannoc Macleod (id: 6236) yells after quest was turned in: Hail $n!  New Champion of The Affray!
 
     NPC_TWIGGY = 6248,
     NPC_BIG_WILL = 6238,
@@ -350,7 +360,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                     if (Unit *will = m_creature->GetMap()->GetUnit(BigWillGUID))
                     {
                         will->SetFactionTemplateId(FACTION_CREATURE);
-                        DoScriptText(SAY_BIG_WILL_READY, will, pPlayer);
+                        DoScriptText(SAY_BIG_WILL_READY, will);
                     }
                     Event_Timer = 5000;
                     ++Step;
@@ -428,14 +438,14 @@ bool AreaTrigger_at_twiggy_flathead(Player* pPlayer, AreaTriggerEntry const* pAt
 
 enum
 {
-    SAY_START           = -1000298,
-    SAY_STARTUP1        = -1000299,
-    SAY_STARTUP2        = -1000300,
-    SAY_MERCENARY       = -1000301,
-    SAY_PROGRESS_1      = -1000302,
-    SAY_PROGRESS_2      = -1000303,
-    SAY_PROGRESS_3      = -1000304,
-    SAY_END             = -1000305,
+    SAY_START           = 1031,
+    SAY_STARTUP1        = 1039, 
+    SAY_STARTUP2        = 1032, 
+    SAY_MERCENARY       = 1040, 
+    SAY_PROGRESS_1      = 1033, 
+    SAY_PROGRESS_2      = 1043, 
+    SAY_PROGRESS_3      = 1041, 
+    SAY_END             = 1044, 
 
     QUEST_ESCAPE        = 863,
     FACTION_RATCHET     = 637,
