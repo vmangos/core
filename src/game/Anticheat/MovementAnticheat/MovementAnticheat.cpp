@@ -136,8 +136,8 @@ void MovementAnticheat::AddCheats(uint32 cheats, uint32 count)
     {
         for (uint32 i = 0; i < CHEATS_COUNT; ++i)
         {
-            if (cheats & (1 << i))
-                ChatHandler(me).PSendSysMessage("[AntiCheat] Cheat : %s", GetMovementCheatName(CheatType(i)));
+            if ((cheats & (1 << i)) && m_session->GetPlayer())
+                ChatHandler(m_session->GetPlayer()).PSendSysMessage("[AntiCheat] Cheat : %s", GetMovementCheatName(CheatType(i)));
         }
     }
 

@@ -251,29 +251,40 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
             _player->GetName(), _player->GetSession()->GetAccountId(), movementCounter, pMover->GetMovementCounter());
     }
 
-    pPlayerMover->SetSemaphoreTeleportNear(false);
+    pPlayerMover->ExecuteTeleportNear();
+}
 
-    WorldLocation const& dest = pPlayerMover->GetTeleportDest();
-    pPlayerMover->TeleportPositionRelocation(dest);
-    MovementPacketSender::SendTeleportToObservers(pPlayerMover);
+void Player::ExecuteTeleportNear()
+{
+    if (!IsBeingTeleportedNear())
+    {
+        sLog.outInfo("Player::ExecuteNearTeleport called without near teleport scheduled!");
+        return;
+    }
+
+    SetSemaphoreTeleportNear(false);
+
+    WorldLocation const& dest = GetTeleportDest();
+    TeleportPositionRelocation(dest);
+    MovementPacketSender::SendTeleportToObservers(this);
 
     // resummon pet, if the destination is in another continent instance, let Player::SwitchInstance do it
     // because the client will request the name for the old pet guid and receive no answer
     // result would be a pet named "unknown"
-    if (pPlayerMover->GetTemporaryUnsummonedPetNumber())
+    if (GetTemporaryUnsummonedPetNumber())
     {
-        if (sWorld.getConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE) && pPlayerMover->GetMap()->IsContinent())
+        if (sWorld.getConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE) && GetMap()->IsContinent())
         {
             bool transition = false;
-            if (sMapMgr.GetContinentInstanceId(pPlayerMover->GetMap()->GetId(), dest.x, dest.y, &transition) == pPlayerMover->GetInstanceId())
-                pPlayerMover->ResummonPetTemporaryUnSummonedIfAny();
+            if (sMapMgr.GetContinentInstanceId(GetMap()->GetId(), dest.x, dest.y, &transition) == GetInstanceId())
+                ResummonPetTemporaryUnSummonedIfAny();
         }
         else
-            pPlayerMover->ResummonPetTemporaryUnSummonedIfAny();
+            ResummonPetTemporaryUnSummonedIfAny();
     }
 
-    //lets process all delayed operations on successful teleport
-    pPlayerMover->ProcessDelayedOperations();
+    // lets process all delayed operations on successful teleport
+    ProcessDelayedOperations();
 }
 
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)

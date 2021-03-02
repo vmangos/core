@@ -2174,7 +2174,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         //remove auras before removing from map...
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
         RemoveCharmAuras();
-        ResolvePendingMovementChanges(false);
+        ResolvePendingMovementChanges(false, false);
 
         if (!GetSession()->PlayerLogout())
         {

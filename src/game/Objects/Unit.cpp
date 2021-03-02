@@ -6132,62 +6132,82 @@ void Unit::CheckPendingMovementChanges()
     if (!HasPendingMovementChange())
         return;
 
+    Player* pPlayer = ToPlayer();
+    if (pPlayer && pPlayer->IsBeingTeleportedFar())
+            return;
+    
     Player* pController = GetPlayerMovingMe();
-    if (!pController || !pController->IsInWorld())
+    if (!pController || !pController->IsInWorld() || !pController->GetSession()->IsConnected())
     {
-        ResolvePendingMovementChanges(pController != this);
+        ResolvePendingMovementChanges(true, pPlayer != nullptr);
         return;
     }
 
-    PlayerMovementPendingChange& oldestChangeToAck = m_pendingMovementChanges.front();
-    if (WorldTimer::getMSTime() > oldestChangeToAck.time + sWorld.getConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME))
+    PlayerMovementPendingChange& oldestChange = m_pendingMovementChanges.front();
+    uint32 waitTimeMultiplier = pPlayer && pPlayer->IsBeingTeleported() || pController->IsBeingTeleported() ? 5 : 1;
+    if (WorldTimer::getMSTime() > oldestChange.time + sWorld.getConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME) * waitTimeMultiplier)
     {
-        // There is a new change for the same thing, don't resend old state.
-        if (oldestChangeToAck.movementCounter < GetLastCounterForMovementChangeType(oldestChangeToAck.movementChangeType))
+        // This shouldn't really happen but handle it anyway.
+        if (oldestChange.movementChangeType == INVALID)
         {
             PopPendingMovementChange();
             return;
         }
 
-        // Not resendable change.
-        if (oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == TELEPORT || oldestChangeToAck.movementChangeType == KNOCK_BACK)
+        // There is a new change for the same thing, don't resend old state.
+        if ((oldestChange.movementCounter < GetLastCounterForMovementChangeType(oldestChange.movementChangeType)))
         {
-            pController->GetCheatData()->OnFailedToAckChange();
             PopPendingMovementChange();
             return;
         }
 
         // Previous controller didn't ack a movement change. Not our fault.
-        if (oldestChangeToAck.controller != pController->GetObjectGuid())
+        if (oldestChange.controller != pController->GetObjectGuid())
         {
-            ResolvePendingMovementChange(oldestChangeToAck, true);
+            ResolvePendingMovementChange(oldestChange, true);
             PopPendingMovementChange();
             return;
         }
 
-        if (oldestChangeToAck.resent)
+        // Always resolve teleport, but don't apply penalty.
+        if (oldestChange.movementChangeType == TELEPORT)
+        {
+            ResolvePendingMovementChange(oldestChange, true);
+            PopPendingMovementChange();
+            return;
+        }
+
+        // Not resendable change.
+        if (oldestChange.movementChangeType == KNOCK_BACK)
+        {
+            pController->GetCheatData()->OnFailedToAckChange();
+            PopPendingMovementChange();
+            return;
+        }
+
+        if (oldestChange.resent)
         {
             // Change was resent but still no reply. Enforce the flags.
             pController->GetCheatData()->OnFailedToAckChange();
-            ResolvePendingMovementChange(oldestChangeToAck, true);
+            ResolvePendingMovementChange(oldestChange, true);
             PopPendingMovementChange();
         }
         else
         {
             // Send the change a second time and wait for reply.
-            oldestChangeToAck.resent = true;
-            oldestChangeToAck.time = WorldTimer::getMSTime();
+            oldestChange.resent = true;
+            oldestChange.time = WorldTimer::getMSTime();
 
-            if (oldestChangeToAck.movementCounter < GetMovementCounter())
-                oldestChangeToAck.movementCounter = GetMovementCounterAndInc();
+            if (oldestChange.movementCounter < GetMovementCounter())
+                oldestChange.movementCounter = GetMovementCounterAndInc();
 
-            switch (oldestChangeToAck.movementChangeType)
+            switch (oldestChange.movementChangeType)
             {
                 case ROOT:
                 case WATER_WALK:
                 case SET_HOVER:
                 case FEATHER_FALL:
-                    MovementPacketSender::SendMovementFlagChangeToController(this, pController, oldestChangeToAck);
+                    MovementPacketSender::SendMovementFlagChangeToController(this, pController, oldestChange);
                     return;
                 case SPEED_CHANGE_WALK:
                 case SPEED_CHANGE_RUN:
@@ -6195,7 +6215,10 @@ void Unit::CheckPendingMovementChanges()
                 case SPEED_CHANGE_SWIM:
                 case SPEED_CHANGE_SWIM_BACK:
                 case RATE_CHANGE_TURN:
-                    MovementPacketSender::SendSpeedChangeToController(this, pController, oldestChangeToAck);
+                    MovementPacketSender::SendSpeedChangeToController(this, pController, oldestChange);
+                    return;
+                default:
+                    sLog.outError("Unit::CheckPendingMovementChange - Unhandled resendable movement change type %u", oldestChange.movementChangeType);
                     return;
             }
         }
@@ -6224,12 +6247,14 @@ bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
     }) != m_pendingMovementChanges.end();
 }
 
-void Unit::ResolvePendingMovementChanges(bool sendToClient)
+void Unit::ResolvePendingMovementChanges(bool sendToClient, bool includingTeleport)
 {
     while (!m_pendingMovementChanges.empty())
     {
         auto change = m_pendingMovementChanges.begin();
-        ResolvePendingMovementChange(*change, sendToClient);
+        if ((change->movementChangeType != TELEPORT || includingTeleport) &&
+            change->movementCounter == GetLastCounterForMovementChangeType(change->movementChangeType))
+            ResolvePendingMovementChange(*change, sendToClient);
         m_pendingMovementChanges.erase(change);
     }
 }
@@ -6290,6 +6315,16 @@ void Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change, boo
             SetSpeedRateReal(MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
             if (sendToClient)
                 MovementPacketSender::SendSpeedChangeToAll(this, MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
+            break;
+        case TELEPORT:
+            if (Player* pPlayer = ToPlayer())
+            {
+                if (pPlayer->IsBeingTeleportedNear())
+                {
+                    pPlayer->ExecuteTeleportNear();
+                    SendHeartBeat(sendToClient);
+                }
+            }
             break;
     }
 }
