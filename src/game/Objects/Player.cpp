@@ -5121,7 +5121,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod)
 
 void Player::ScheduleRepopAtGraveyard()
 {
-    if (IsInWorld())
+    if (IsInWorld() && GetSession()->IsConnected())
         m_repopAtGraveyardPending = true;
     else
         RepopAtGraveyard();

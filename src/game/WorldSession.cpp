@@ -136,7 +136,6 @@ char const* WorldSession::GetPlayerName() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
-    printf("Send %s\n", LookupOpcodeName(packet->GetOpcode()));
     // There is a maximum size packet.
     if (packet->size() > 0x8000)
     {
@@ -244,7 +243,6 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 /// Add an incoming packet to the queue
 void WorldSession::QueuePacket(WorldPacket* newPacket)
 {
-    printf("Receive %s\n", LookupOpcodeName(newPacket->GetOpcode()));
     OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
     if (opHandle.packetProcessing >= PACKET_PROCESS_MAX_TYPE)
     {
