@@ -417,7 +417,7 @@ UpdateMask Player::updateVisualBits;
 
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this),
-    m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_castingSpell(0),
+    m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_castingSpell(0), m_repopAtGraveyardPending(false),
     m_honorMgr(this), m_bNextRelocationsIgnored(0), m_personalXpRate(-1.0f), m_standStateTimer(0), m_newStandState(MAX_UNIT_STAND_STATE), m_foodEmoteTimer(0)
 {
     m_objectType |= TYPEMASK_PLAYER;
@@ -1137,7 +1137,7 @@ void Player::HandleDrowning(uint32 time_diff)
                     EnvironmentalDamage(DAMAGE_EXHAUSTED, damage);
                 }
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
-                    RepopAtGraveyard();
+                    ScheduleRepopAtGraveyard();
             }
             else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
                 SendMirrorTimer(FATIGUE_TIMER, GetMaxTimer(FATIGUE_TIMER), m_MirrorTimer[FATIGUE_TIMER], -1);
@@ -1425,7 +1425,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         if (p_time >= m_deathTimer)
         {
             BuildPlayerRepop();
-            RepopAtGraveyard();
+            ScheduleRepopAtGraveyard();
         }
         else
             m_deathTimer -= p_time;
@@ -1456,6 +1456,12 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     }
     if (IsInWorld())
     {
+        if (m_repopAtGraveyardPending && !HasPendingMovementChange())
+        {
+            RepopAtGraveyard();
+            return;
+        }
+
         if (m_areaCheckTimer)
         {
             if (m_areaCheckTimer <= p_time)
@@ -2168,7 +2174,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         //remove auras before removing from map...
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
         RemoveCharmAuras();
-        ResolvePendingMovementChanges();
+        ResolvePendingMovementChanges(false);
 
         if (!GetSession()->PlayerLogout())
         {
@@ -4757,7 +4763,15 @@ void Player::BuildPlayerRepop()
     // to prevent cheating
     corpse->ResetGhostTime();
 
-    StopMirrorTimers();                                     //disable timers(bars)
+    // disable timers(bars)
+    StopMirrorTimers();
+
+    // interrupt resurrect spells
+    InterruptSpellsCastedOnMe(false, true);
+
+    // stop countdown until repop
+    m_deathTimer = 0;
+    SetDeathState(DEAD);
 }
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
@@ -5105,11 +5119,20 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod)
     return TotalCost;
 }
 
+void Player::ScheduleRepopAtGraveyard()
+{
+    if (IsInWorld() && GetSession()->IsConnected())
+        m_repopAtGraveyardPending = true;
+    else
+        RepopAtGraveyard();
+}
+
 void Player::RepopAtGraveyard()
 {
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
 
+    m_repopAtGraveyardPending = false;
     WorldSafeLocsEntry const* ClosestGrave = nullptr;
 
     // Special handle for battleground maps
@@ -5139,32 +5162,26 @@ void Player::RepopAtGraveyard()
     {
         if (ClosestGrave)
             TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, 0, std::move(recover));
-        return;
     }
-
-    // Interrupt resurrect spells
-    InterruptSpellsCastedOnMe(false, true);
-
-    // stop countdown until repop
-    m_deathTimer = 0;
-    SetDeathState(DEAD);
-
-    // if no grave found, stay at the current location
-    // and don't show spirit healer location
-    if (ClosestGrave)
+    else
     {
-        // Release spirit from transport => Teleport alive at nearest graveyard.
-        if (GetTransport())
+        // if no grave found, stay at the current location
+        // and don't show spirit healer location
+        if (ClosestGrave)
         {
-            GetTransport()->RemovePassenger(this);
-            ResurrectPlayer(1.0f);
+            // Release spirit from transport => Teleport alive at nearest graveyard.
+            if (GetTransport())
+            {
+                GetTransport()->RemovePassenger(this);
+                ResurrectPlayer(1.0f);
+            }
+            TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, 0, std::move(recover));
         }
-        TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, 0, std::move(recover));
-    }
 
-    // Fix invisible spirit healer if you die close to graveyard.
-    if (IsInWorld())
-        UpdateVisibilityAndView();
+        // Fix invisible spirit healer if you die close to graveyard.
+        if (IsInWorld())
+            UpdateVisibilityAndView();
+    }
 }
 
 void Player::JoinedChannel(Channel* c)
@@ -7672,7 +7689,7 @@ void Player::RemovedInsignia(Player* looterPlr, Corpse* corpse)
     if (GetDeathState() != DEAD)
     {
         BuildPlayerRepop();
-        RepopAtGraveyard();
+        ScheduleRepopAtGraveyard();
     }
 
     if (!corpse)

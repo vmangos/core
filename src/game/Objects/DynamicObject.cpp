@@ -225,7 +225,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 
 void DynamicObject::Delete()
 {
-    SendObjectDeSpawnAnim(GetObjectGuid());
+    SendObjectDeSpawnAnim();
     AddObjectToRemoveList();
 }
 

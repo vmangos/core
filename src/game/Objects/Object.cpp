@@ -2010,10 +2010,17 @@ void WorldObject::SendMessageToSetExcept(WorldPacket* data, Player const* skippe
     }
 }
 
-void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid) const
+void WorldObject::SendObjectSpawnAnim() const
+{
+    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
+    data << GetObjectGuid();
+    SendObjectMessageToSet(&data, true);
+}
+
+void WorldObject::SendObjectDeSpawnAnim() const
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << ObjectGuid(guid);
+    data << GetObjectGuid();
     SendObjectMessageToSet(&data, true);
 }
 

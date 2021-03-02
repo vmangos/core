@@ -585,7 +585,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
             // burning flags in some battlegrounds, if you find better condition, just add it
             if (GetGOInfo()->IsDespawnAtAction() || GetGoAnimProgress() > 0)
             {
-                SendObjectDeSpawnAnim(GetObjectGuid());
+                SendObjectDeSpawnAnim();
                 // reset flags
                 if (GetMap()->Instanceable())
                 {
@@ -784,7 +784,7 @@ void GameObject::Delete()
     // no despawn animation for not activated rituals
     if (GetGoType() != GAMEOBJECT_TYPE_SUMMONING_RITUAL ||
         GetGoState() == GO_STATE_ACTIVE)
-        SendObjectDeSpawnAnim(GetObjectGuid());
+        SendObjectDeSpawnAnim();
 
     if (!IsDeleted())
         AddObjectToRemoveList();
@@ -2386,7 +2386,7 @@ void GameObject::SendGameObjectReset()
 
 void GameObject::Despawn()
 {
-    SendObjectDeSpawnAnim(GetObjectGuid());
+    SendObjectDeSpawnAnim();
     if (GameObjectData const* data = GetGOData())
     {
         if (m_spawnedByDefault)

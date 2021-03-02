@@ -2098,7 +2098,8 @@ class Player final: public Unit
         void HandleSobering();
         uint32 m_deathTimer;
         time_t m_deathExpireTime;
-        ObjectGuid     m_selectedGobj; // For GM commands
+        bool m_repopAtGraveyardPending;
+        ObjectGuid m_selectedGobj; // For GM commands
         ObjectGuid m_escortingGuid;
 
         void SendMountResult(UnitMountResult result) const;
@@ -2155,6 +2156,7 @@ class Player final: public Unit
         void ResurrectPlayer(float restore_percent, bool applySickness = false);
         void BuildPlayerRepop();
         void RepopAtGraveyard();
+        void ScheduleRepopAtGraveyard();
 
         // Nostalrius : Phasing
         void SetWorldMask(uint32 newMask) override;
