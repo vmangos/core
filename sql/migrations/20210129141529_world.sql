@@ -184,6 +184,9 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 UPDATE `creature_template` SET `equipment_id` = 1106 WHERE `entry` = 5124;
 DELETE FROM `creature_addon` WHERE `guid` = (SELECT `guid` FROM `creature` WHERE `id` = 5124);
 
+-- remove incorrect quest text
+UPDATE `quest_template` SET `RequestItemsText` = '' WHERE  `entry` = 1679;
+
 
 -- End of migration.
 END IF;
