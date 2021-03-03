@@ -1058,7 +1058,14 @@ namespace MMAP
 
             if (m_debugOutput)
             {
+                //Generate 3D obj files
+                //VMAP
                 iv.generateObjFile(mapID, tileX, tileY, meshData);
+
+                //MMAP  
+                duDumpPolyMeshDetailToObj(*iv.polyMeshDetail, mapID, tileY, tileX);
+                duDumpPolyMeshToObj(*iv.polyMesh, mapID, tileY, tileX);
+
                 //iv.writeIV(mapID, tileX, tileY);
                 // Write navmesh data
                 char fname[256];
@@ -1451,6 +1458,99 @@ namespace MMAP
         // List here Transport gameobjects you want to extract.
         buildGameObject("Transportship.wmo.vmo", 3015);
         buildGameObject("Transport_Zeppelin.wmo.vmo", 3031);
+    }
+
+    bool MapBuilder::duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX)
+    {
+        char fname[256];
+        sprintf(fname, "meshes/map%03u%02u%02unavmesh.obj", mapID, tileY, tileX);
+        FILE* objFile = fopen(fname, "wb");
+        if (!objFile)
+        {
+            printf("duDumpPolyMeshToObj: Can't open file.\n");
+            return false;
+        }
+
+        const int nvp = pmesh.nvp;
+        const float cs = pmesh.cs;
+        const float ch = pmesh.ch;
+        const float* orig = pmesh.bmin;
+
+        fprintf(objFile, "# MMAP Navmesh\n");
+        fprintf(objFile, "o NavMesh\n");
+        //fprintf(objFile, "mltlib colors.mtl\n");//Load materials file for coloring the mesh - TODO: add coloring for climblimits etc 
+
+        fprintf(objFile, "\n");
+
+        for (int i = 0; i < pmesh.nverts; ++i)
+        {
+            const unsigned short* v = &pmesh.verts[i * 3];
+            const float x = orig[0] + v[0] * cs;
+            const float y = orig[1] + (v[1] + 1) * ch + 0.1f;
+            const float z = orig[2] + v[2] * cs;
+
+            fprintf(objFile, "v %f %f %f\n", x, y, z);
+        }
+
+        fprintf(objFile, "\n");
+
+        float norm[3];
+        for (int i = 0; i < pmesh.npolys; ++i)
+        {
+            const unsigned short* p = &pmesh.polys[i * nvp * 2];
+            for (int j = 2; j < nvp; ++j)
+            {
+                if (p[j] == RC_MESH_NULL_IDX) break;
+                fprintf(objFile, "f %d %d %d\n", p[0] + 1, p[j - 1] + 1, p[j] + 1);
+            }
+        }
+
+        return true;
+    }
+
+    bool MapBuilder::duDumpPolyMeshDetailToObj(rcPolyMeshDetail& dmesh, uint32 mapID, uint32 tileY, uint32 tileX)
+    {
+
+        char fname[256];
+        sprintf(fname, "meshes/map%03u%02u%02unavmeshdetail.obj", mapID, tileY, tileX);
+        FILE* objFile = fopen(fname, "wb");
+
+        if (!objFile)
+        {
+            printf("duDumpPolyMeshDetailToObj: Can't open file.\n");
+            return false;
+        }
+
+        fprintf(objFile, "# MMAP Navmesh\n");
+        fprintf(objFile, "o NavMesh\n");
+
+        fprintf(objFile, "\n");
+
+        for (int i = 0; i < dmesh.nverts; ++i)
+        {
+            const float* v = &dmesh.verts[i * 3];
+            fprintf(objFile, "v %f %f %f\n", v[0], v[1], v[2]);
+        }
+
+        fprintf(objFile, "\n");
+
+        for (int i = 0; i < dmesh.nmeshes; ++i)
+        {
+            const unsigned int* m = &dmesh.meshes[i * 4];
+            const unsigned int bverts = m[0];
+            const unsigned int btris = m[2];
+            const unsigned int ntris = m[3];
+            const unsigned char* tris = &dmesh.tris[btris * 4];
+            for (unsigned int j = 0; j < ntris; ++j)
+            {
+                fprintf(objFile, "f %d %d %d\n",
+                    (int)(bverts + tris[j * 4 + 0]) + 1,
+                    (int)(bverts + tris[j * 4 + 1]) + 1,
+                    (int)(bverts + tris[j * 4 + 2]) + 1);
+            }
+        }
+
+        return true;
     }
 
 }
