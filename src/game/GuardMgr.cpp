@@ -148,7 +148,6 @@ enum GuardIds
     NPC_MOONGLADE_WARDEN        = 11822,
     NPC_SHADOWGLEN_SENTINEL     = 12160,
     NPC_REVANTUSK_WATCHER       = 14730,
-    NPC_BOOTY_BAY_ELITE         = 15088,
     NPC_HAMERFALL_ELITE         = 15136,
     NPC_MENETHIL_ELITE          = 15137,
     NPC_SILVERPINE_ELITE        = 15138,
@@ -157,7 +156,7 @@ enum GuardIds
 
 GuardMgr::GuardMgr()
 {
-    // Area Id                               Alliance NPC                 Horde NPC
+    // Area Id                                                       Alliance NPC                 Horde NPC
     m_mAreaGuardInfo.insert({ AREA_STORMWIND,          AreaGuardInfo(NPC_STORMWIND_CITY_GUARD,    NPC_NONE) });
     m_mAreaGuardInfo.insert({ AREA_ASTRANAAR,          AreaGuardInfo(NPC_ASTRANAAR_SENTINEL,      NPC_NONE) });
     m_mAreaGuardInfo.insert({ AREA_AUBERDINE,          AreaGuardInfo(NPC_AUBERDINE_SENTINEL,      NPC_NONE) });
@@ -208,6 +207,7 @@ GuardMgr::GuardMgr()
     m_mAreaGuardInfo.insert({ AREA_NORTHSHIRE,         AreaGuardInfo(NPC_NORTHSHIRE_GUARD,        NPC_NONE) });
     m_mAreaGuardInfo.insert({ AREA_COLDRIDGE_VALLEY,   AreaGuardInfo(NPC_COLDRIDGE_MOUNTAINEER,   NPC_NONE) });
     m_mAreaGuardInfo.insert({ AREA_VALLEY_OF_TRIALS,   AreaGuardInfo(NPC_NONE,                    NPC_DEN_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY,          AreaGuardInfo(NPC_BOOTY_BAY_BRUISER,       NPC_BOOTY_BAY_BRUISER) });
     m_mAreaGuardInfo.insert({ AREA_EVERLOOK,           AreaGuardInfo(NPC_EVERLOOK_BRUISER,        NPC_EVERLOOK_BRUISER) });
     m_mAreaGuardInfo.insert({ AREA_GADGETZAN,          AreaGuardInfo(NPC_GADGETZAN_BRUISER,       NPC_GADGETZAN_BRUISER) });
     m_mAreaGuardInfo.insert({ AREA_RATCHET,            AreaGuardInfo(NPC_RATCHET_BRUISER,         NPC_RATCHET_BRUISER) });
@@ -217,14 +217,12 @@ GuardMgr::GuardMgr()
         m_mAreaGuardInfo.insert({ AREA_SEPULCHER, AreaGuardInfo(NPC_NONE, NPC_SILVERPINE_ELITE) });
         m_mAreaGuardInfo.insert({ AREA_MENETHIL,  AreaGuardInfo(NPC_MENETHIL_ELITE, NPC_NONE) });
         m_mAreaGuardInfo.insert({ AREA_HAMERFALL, AreaGuardInfo(NPC_NONE, NPC_HAMERFALL_ELITE) });
-        m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY, AreaGuardInfo(NPC_BOOTY_BAY_ELITE, NPC_BOOTY_BAY_ELITE) });
     }
     else
     {
         m_mAreaGuardInfo.insert({ AREA_SEPULCHER, AreaGuardInfo(NPC_NONE, NPC_SILVERPINE_DEATHGUARD) });
         m_mAreaGuardInfo.insert({ AREA_MENETHIL,  AreaGuardInfo(NPC_MENETHIL_GUARD, NPC_NONE) });
         m_mAreaGuardInfo.insert({ AREA_HAMERFALL, AreaGuardInfo(NPC_NONE, NPC_HAMERFALL_GUARDIAN) });
-        m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY, AreaGuardInfo(NPC_BOOTY_BAY_BRUISER, NPC_BOOTY_BAY_BRUISER) });
     }
 }
 
