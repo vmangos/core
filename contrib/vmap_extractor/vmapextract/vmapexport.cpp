@@ -135,7 +135,7 @@ bool ExtractWmo()
         for (vector<string>::iterator fname = filelist.begin(); fname != filelist.end() && success; ++fname)
         {
             if (fname->find(".wmo") != string::npos)
-                success = ExtractSingleWmo(*fname);
+                success = ExtractSingleWmoWithAllConfig(*fname);
         }
     }
 
@@ -165,14 +165,12 @@ void FixZepp(WMOGroup& g)
         ZeppFixVect(g.MOVT + 3 * i);
 }
 
-bool ExtractSingleWmo(std::string& fname)
+bool ExtractSingleWmoWithAllConfig(std::string& fname)
 {
     // Copy files from archive
 
     char szLocalFile[1024];
     const char* plain_name = GetPlainName(fname.c_str());
-    sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
-    fixnamen(szLocalFile, strlen(szLocalFile));
 
     //if (FileExists(szLocalFile))
     //    return true;
@@ -197,6 +195,49 @@ bool ExtractSingleWmo(std::string& fname)
 
     bool file_ok = true;
     std::cout << "Extracting " << fname << std::endl;
+    WMORoot froot(fname);
+    if (!froot.open())
+    {
+        printf("Couldn't open RootWmo!!!\n");
+        return true;
+    }
+
+    for (int i = 0; i < froot.nDoodadSets; i++)
+    {
+        //printf("Extracting wmo+doodadset %i\n", i);
+        ExtractSingleWmo(fname, i);
+    }
+}
+
+bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
+{
+    // Copy files from archive
+
+    char szLocalFile[1024];
+    const char* plain_name = GetPlainName(fname.c_str());
+    sprintf(szLocalFile, "%s/%s%i", szWorkDirWmo, plain_name, DoodadConfig);
+    fixnamen(szLocalFile, strlen(szLocalFile));
+
+    int p = 0;
+    //Select root wmo files
+    const char* rchr = strrchr(plain_name, '_');
+    if (rchr != NULL)
+    {
+        char cpy[4];
+        strncpy((char*)cpy, rchr, 4);
+        for (int i = 0; i < 4; ++i)
+        {
+            int m = cpy[i];
+            if (isdigit(m))
+                p++;
+        }
+    }
+
+    if (p == 3)
+        return true;
+
+    bool file_ok = true;
+
     WMORoot froot(fname);
     if (!froot.open())
     {
@@ -236,6 +277,7 @@ bool ExtractSingleWmo(std::string& fname)
             if (strcmp(szLocalFile, "./Buildings/Transport_Zeppelin.wmo") == 0)
                 FixZepp(fgroup);
 
+            fgroup.doodadset = DoodadConfig;
             Wmo_nVertices += fgroup.ConvertToVMAPGroupWmo(output, &froot, preciseVectorData);
         }
     }

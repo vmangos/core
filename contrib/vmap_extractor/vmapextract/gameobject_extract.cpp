@@ -56,6 +56,7 @@ void ExtractGameobjectModels()
 
     for (DBCFile::Iterator it = dbc.begin(); it != dbc.end(); ++it)
     {
+        bool isWmo = false;
         path = it->getString(1);
 
         if (path.length() < 4)
@@ -74,7 +75,8 @@ void ExtractGameobjectModels()
         bool result = false;
         if (!strcmp(ch_ext, ".wmo"))
         {
-            result = ExtractSingleWmo(path);
+            isWmo = true;
+            result = ExtractSingleWmo(path, 0);
         }
         else if (!strcmp(ch_ext, ".mdl"))
         {
@@ -92,8 +94,19 @@ void ExtractGameobjectModels()
             uint32 displayId = it->getUInt(0);
             uint32 path_length = strlen(name);
             fwrite(&displayId, sizeof(uint32), 1, model_list);
-            fwrite(&path_length, sizeof(uint32), 1, model_list);
-            fwrite(name, sizeof(char), path_length, model_list);
+            if (isWmo)
+            {
+                char tempname[512];
+                sprintf(tempname, "%s0", name);
+                path_length++;
+                fwrite(&path_length, sizeof(uint32), 1, model_list);
+                fwrite(tempname, sizeof(char), path_length, model_list);
+            }
+            else
+            {
+                fwrite(&path_length, sizeof(uint32), 1, model_list);
+                fwrite(name, sizeof(char), path_length, model_list);
+            }
         }
     }
 

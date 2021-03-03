@@ -32,7 +32,8 @@
 using namespace std;
 extern uint16* LiqType;
 
-WMORoot::WMORoot(std::string& filename) : filename(filename), modelis(NULL)
+WMORoot::WMORoot(std::string& filename) : filename(filename), modelis(NULL), nTextures(0), nGroups(0),
+nP(0), nLights(0), nModels(0), nDoodads(0), nDoodadSets(0), RootWMOID(0)
 {
 }
 
@@ -70,20 +71,20 @@ bool WMORoot::open()
 
         size_t nextpos = f.getPos() + size;
 
-        if (!strcmp(fourcc, "MOHD")) //header
+        if (!strcmp(fourcc, "MOHD"))    // Header for the map object. 64 bytes.
         {
-            f.read(&nTextures, 4);
-            f.read(&nGroups, 4);
-            f.read(&nP, 4);
-            f.read(&nLights, 4);
-            f.read(&nModels, 4);
-            f.read(&nDoodads, 4);
-            f.read(&nDoodadSets, 4);
-            f.read(&col, 4);
-            f.read(&RootWMOID, 4);
-            f.read(bbcorn1, 12);
-            f.read(bbcorn2, 12);
-            f.read(&liquidType, 4);
+            f.read(&nTextures, 4);      // number of materials
+            f.read(&nGroups, 4);        // number of WMO groups
+            f.read(&nP, 4);             // number of portals (doors windows etc) 
+            f.read(&nLights, 4);        // number of lights
+            f.read(&nModels, 4);        // number of M2 models imported
+            f.read(&nDoodads, 4);       // number of dedicated files 
+            f.read(&nDoodadSets, 4);    // number of doodad sets
+            f.read(&col, 4);            // ambient color?
+            f.read(&RootWMOID, 4);      // WMO ID (column 2 in WMOAreaTable.dbc)
+            f.read(bbcorn1, 12);        // Bounding box corner 1
+            f.read(bbcorn2, 12);        // Bounding box corner 2
+            f.read(&liquidType, 4);     // LiquidType related, see below in the MLIQ chunk.
             //break;
         }
         else if (!strcmp(fourcc,"MODN"))
@@ -123,11 +124,25 @@ bool WMORoot::open()
             // "Set_$DefaultGlobal", and have a horrible mess of abandoned broken things in another 
             // set called "Set_Abandoned01". The names are only informative.
             // The doodad set number for every WMO instance is specified in the ADT files.
+                        /*
+            Offset 	Type 		Description
+                0x00 	20 * char 	Set name
+                0x14 	uint32 		index of first doodad instance in this set
+                0x18 	uint32 		number of doodad instances in this set
+                0x1C 	uint32 		unused ? (always 0)
+                struct SMODoodadSet // --Schlumpf 17:03, 31 July 2007 (CEST)
+            {
+                000h  char   name[20];
+                014h  UINT32 firstinstanceindex;
+                018h  UINT32 numDoodads;
+                01Ch  UINT32 nulls;
+            }
+            */
             for (size_t i=0; i<nDoodadSets; i++)
             {
                 WMODoodadSet dds;
                 f.read(&dds, 32);
-                //doodadsets.push_back(dds);
+                doodadsets.push_back(dds);
                 //printf("|%u %s\n", dds.unused, dds.name);
             }
         }
@@ -160,6 +175,9 @@ bool WMORoot::open()
         /*
         else if (!strcmp(fourcc,"MOTX"))
         {
+            List of textures (BLP Files) used in this map object. 
+            A block that are complete filenames with paths. There will be further material information for each texture in the next chunk. The gaps between the filenames are padded with extra zeroes, but the material chunk does have some positional information for these strings.
+            The beginning of a string is always aligned to a 4Byte Adress. (0, 4, 8, C). The end of the string is Zero terminated and filled with zeros until the next aligment. Sometimes there also empty aligtments for no (it seems like no) real reason.
         }
         else if (!strcmp(fourcc,"MOMT"))
         {
@@ -354,6 +372,49 @@ void WMOGroup::WriteDoodadsTriangles(FILE* output, int indexShift)
     }
 }
 
+void WMOGroup::WriteDoodadsVertices(FILE* output, WMORoot* rootWMO)
+{
+    for (int i = 0; i < nDoodads; ++i) {
+        short dd = doodads[i];
+        bool inSet;
+        // doodadset #0 (defaultGlobal) should always be visible
+        inSet = (((dd >= rootWMO->doodadsets[doodadset].start) && (dd < (rootWMO->doodadsets[doodadset].start + rootWMO->doodadsets[doodadset].size)))
+            || ((dd >= rootWMO->doodadsets[0].start) && ((dd < (rootWMO->doodadsets[0].start + rootWMO->doodadsets[0].size)))));
+        if (inSet)
+        {
+            Model* doodadModel = root->GetDoodadModel(doodads[i]);
+            if (!doodadModel)
+                continue;
+            fwrite(doodadModel->vertices, sizeof(float) * 3, doodadModel->header.nBoundingVertices, output);
+        }
+    }
+}
+
+void WMOGroup::WriteDoodadsTriangles(FILE* output, int indexShift, WMORoot* rootWMO)
+{
+    for (int i = 0; i < nDoodads; ++i)
+    {
+        short dd = doodads[i];
+        bool inSet;
+        // doodadset #0 (defaultGlobal) should always be visible
+        inSet = (((dd >= rootWMO->doodadsets[doodadset].start) && (dd < (rootWMO->doodadsets[doodadset].start + rootWMO->doodadsets[doodadset].size)))
+            || ((dd >= rootWMO->doodadsets[0].start) && ((dd < (rootWMO->doodadsets[0].start + rootWMO->doodadsets[0].size)))));
+        if (inSet)
+        {
+            Model* doodadModel = root->GetDoodadModel(doodads[i]);
+            if (!doodadModel)
+                continue;
+            for (uint32 j = 0; j < doodadModel->nIndices; ++j)
+                doodadModel->indices[j] += indexShift;
+            fwrite(doodadModel->indices, sizeof(unsigned short), doodadModel->nIndices, output);
+            for (uint32 j = 0; j < doodadModel->nIndices; ++j)
+                doodadModel->indices[j] -= indexShift;
+            indexShift += doodadModel->header.nBoundingVertices;
+        }
+    }
+}
+
+
 int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPreciseVectorData)
 {
     fwrite(&mogpFlags, sizeof(uint32), 1, output);
@@ -368,16 +429,29 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
     fwrite(&liquflags, sizeof(uint32), 1, output);
 
     // Handle doodads spawn on WMO
-    // TODO: Filter used doodads depending on WMO configuration.
+    // Filter used doodads depending on WMO configuration.
     int doodadsVerticesCount = 0;
     int doodadsTriangleIndicesCount = 0;
-    for (int i = 0; i < nDoodads; ++i)
-    {
-        Model* doodadModel = root->GetDoodadModel(doodads[i]);
-        if (!doodadModel)
-            continue;
-        doodadsVerticesCount += doodadModel->header.nBoundingVertices;
-        doodadsTriangleIndicesCount += doodadModel->nIndices;
+  
+    for (int i = 0; i < nDoodads; i++) {
+        short dd = doodads[i];
+        bool inSet;
+        // apparently, doodadset #0 (defaultGlobal) should always be visible
+        inSet = (((dd >= rootWMO->doodadsets[doodadset].start) && (dd < (rootWMO->doodadsets[doodadset].start + rootWMO->doodadsets[doodadset].size)))
+            || ((dd >= rootWMO->doodadsets[0].start) && ((dd < (rootWMO->doodadsets[0].start + rootWMO->doodadsets[0].size)))));
+        if (inSet) {
+            //if ((dd >= wmo->doodadsets[doodadset].start) && (dd < (wmo->doodadsets[doodadset].start+wmo->doodadsets[doodadset].size))) {
+
+                //modelInstance &mi = rootWMO->modelis[dd];
+
+                //todo: make an array of doodads in this set, this would be helpfull later on and make the code more clean
+
+            Model* doodadModel = root->GetDoodadModel(doodads[i]);
+            if (!doodadModel)
+                continue;
+            doodadsVerticesCount += doodadModel->header.nBoundingVertices;
+            doodadsTriangleIndicesCount += doodadModel->nIndices;
+        }
     }
 
     int nColTriangles = 0;
@@ -515,7 +589,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
         int INDX[] = {0x58444E49, (nColTriangles + doodadsTriangleIndicesCount/3)* 6 + 4, (nColTriangles + doodadsTriangleIndicesCount/3)* 3};
         fwrite(INDX, 4, 3, output);
         fwrite(MoviEx, 2, nColTriangles * 3, output);
-        WriteDoodadsTriangles(output, nColVertices);
+        WriteDoodadsTriangles(output, nColVertices, rootWMO);
 
         // write vertices
         int VERT[] = {0x54524556, int((nColVertices + doodadsVerticesCount) * 3 * sizeof(float) + 4), nColVertices + doodadsVerticesCount}; // "VERT"
@@ -523,7 +597,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
         for (uint32 i = 0; i < nVertices; ++i)
             if (IndexRenum[i] >= 0)
                 fwrite(MOVT + 3 * i, sizeof(float), 3, output);
-        WriteDoodadsVertices(output);
+        WriteDoodadsVertices(output, rootWMO);
 
         delete [] MoviEx;
         delete [] IndexRenum;
@@ -635,22 +709,23 @@ WMOInstance::WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint
     pos2 = Vec3D(ff[0], ff[1], ff[2]);
     f.read(ff, 12);
     pos3 = Vec3D(ff[0], ff[1], ff[2]);
-    f.read(&d2, 4);
+    f.read(&d2, 2);         //flags ?
+    f.read(&doodadset, 2);  // the doodadset to use for this map location!
 
     uint16 trash, adtId;
-    f.read(&adtId, 2);
-    f.read(&trash, 2);
+    f.read(&adtId, 2); //nameset
+    f.read(&trash, 2); //scale -- not used for wmo's
 
     //-----------add_in _dir_file----------------
 
     char tempname[512];
-    sprintf(tempname, "%s/%s", szWorkDirWmo, WmoInstName);
+    sprintf(tempname, "%s/%s%i", szWorkDirWmo, WmoInstName, doodadset);
     FILE* input;
     input = fopen(tempname, "r+b");
 
     if (!input)
     {
-        printf("WMOInstance::WMOInstance: couldn't open %s\n", tempname);
+        printf("WMOInstance::WMOInstance: couldn't open %s - used in map %i tile %i,%i \n", tempname, mapID, tileX, tileY);
         return;
     }
 
@@ -658,6 +733,9 @@ WMOInstance::WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint
     int nVertices;
     fread(&nVertices, sizeof(int), 1, input);
     fclose(input);
+
+    //we need to change the name in the map to the new object!
+    sprintf(tempname, "%s%i", WmoInstName, doodadset);
 
     if (nVertices == 0)
         return;
@@ -693,8 +771,9 @@ WMOInstance::WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint
     fwrite(&pos2, sizeof(float), 3, pDirfile);
     fwrite(&pos3, sizeof(float), 3, pDirfile);
     uint32 nlen = strlen(WmoInstName);
+    nlen++; //we added a digit - todo: change the logic if we for some weird reason ever finds and wmo with more than 9 doodadsets
     fwrite(&nlen, sizeof(uint32), 1, pDirfile);
-    fwrite(WmoInstName, sizeof(char), nlen, pDirfile);
+    fwrite(tempname, sizeof(char), nlen, pDirfile);
 
     /* fprintf(pDirfile,"%s/%s %f,%f,%f_%f,%f,%f 1.0 %d %d %d,%d %d\n",
         MapName,
