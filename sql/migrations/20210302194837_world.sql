@@ -19,6 +19,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1248103, 39, 0, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1248104, -1, 85, 1248102, 1248103, 0, 0);
 
+-- The Scarlet Key should not drop from mobs
+DELETE FROM `creature_loot_template` WHERE `item` = 7146;
+
 
 -- End of migration.
 END IF;
