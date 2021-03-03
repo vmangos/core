@@ -9,40 +9,56 @@ INSERT INTO `migrations` VALUES ('20210129141529');
 -- Add your query below.
 
 
--- elwynn
+-- Remove wrong option from Innkeeper Farley's gossip menu.
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1291 AND `id` = 5;
 
--- dun morogh
+-- Remove wrong option from Innkeeper Belm's gossip menu.
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1297 AND `id` = 4;
 
--- teldrassil
+-- Correct gossip menu id for Innkeeper Hearthstove.
+UPDATE `creature_template` SET `gossip_menu_id`=345 WHERE `entry`=6734;
+
+-- Remove wrong option from Innkeeper Keldamyr's gossip menu.
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1293 AND `id` = 4;
 
--- mulgore
+-- Remove wrong option from Innkeeper Kauth's gossip menu.
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1294 AND `id` = 4;
 
--- tirisfal
-DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1296 AND `id` = 5;
-INSERT INTO `gossip_menu_option`(`menu_id`, `id`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`) VALUES
-(1296, 5, 'What can I do at an inn?', 4308, 1, 1, 1221);
+-- Gossip menu for Innkeeper Renee.
+DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1296;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+(1296, 0, 0, 'Trick or Treat!', 10693, 1, 1, -1, 0, 342, 0, 0, NULL, 0, 164),
+(1296, 1, 5, 'Make this inn your home.', 2822, 8, 128, 0, 0, 0, 0, 0, '', 0, 0),
+(1296, 2, 1, 'Let me browse your goods.', 8097, 3, 4, 1, 0, 0, 0, 0, '', 0, 0),
+(1296, 3, 0, 'What can I do at an inn?', 4308, 1, 1, 1221, 0, 0, 0, 0, NULL, 0, 0),
+(1296, 4, 0, 'Does that heart mean you\'re looking for love?', 11823, 1, 1, 5110, 0, 0, 0, 0, '', 0, 440),
+(1296, 5, 1, 'Let me browse your seasonal fare.', 8786, 3, 4, 2, 0, 0, 0, 0, '', 0, 440);
 
--- durotar
-DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1290 AND `id` = 5;
-INSERT INTO `gossip_menu_option`(`menu_id`, `id`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`) VALUES
-(1290, 5, 'What can I do at an inn?', 4308, 1, 1, 1221);
+-- Gossip menu for Innkeeper Grosk.
+DELETE FROM `gossip_menu_option` WHERE `menu_id` = 1290;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+(1290, 0, 0, 'Trick or Treat!', 10693, 1, 1, -1, 0, 342, 0, 0, NULL, 0, 164),
+(1290, 2, 5, 'Make this inn your home.', 2822, 8, 128, 0, 0, 0, 0, 0, '', 0, 0),
+(1290, 3, 0, 'What can I do at an inn?', 4308, 1, 1, 1221, 0, 0, 0, 0, NULL, 0, 0),
+(1290, 4, 1, 'I want to browse your goods.', 3370, 3, 4, 1, 0, 0, 0, 0, '', 0, 0),
+(1290, 5, 0, 'Does that heart mean you\'re looking for love?', 11823, 1, 1, 5110, 0, 0, 0, 0, '', 0, 440),
+(1290, 6, 1, 'Let me browse your seasonal fare.', 8786, 3, 4, 2, 0, 0, 0, 0, '', 0, 440);
+
+-- Correct gossip menu id for Innkeeper Karakul.
+UPDATE `creature_template` SET `gossip_menu_id`=441 WHERE `entry`=6930;
 
 -- fix erelas ambersky broken gossip menu option
 UPDATE `gossip_menu_option` SET `action_menu_id` = 1481 WHERE `menu_id` = 1482 AND `id` = 0;
 
 -- fix quest typo for trial of the lake
-UPDATE `quest_template` SET `OfferRewardText` = 'Well now. It looks like yet another $r has successfully completed the Trial of the Lake! Well done, my young friend - well done.$B$BAs I\'ve said, my name is Tajarri. It is my duty and my privilege to serve as a warden for Moonglade, and specifically this shrine. Keeper Remulos guides the Cenarion Circle in preservation of nature and balance, and his shrine serves as a lasting tribute to such. By using the bauble here, it serves as a nod to the importance of this place within the Circle.' WHERE `entry` IN (28, 29);
+UPDATE `quest_template` SET `OfferRewardText` = 'Well now. It looks like yet another druid has successfully completed the Trial of the Lake! Well done, my young friend - well done.$B$BAs I\'ve said, my name is Tajarri. It is my duty and my privilege to serve as a warden for Moonglade, and specifically this shrine. Keeper Remulos guides the Cenarion Circle in preservation of nature and balance, and his shrine serves as a lasting tribute to such. By using the bauble here, it serves as a nod to the importance of this place within the Circle.' WHERE `entry` IN (28, 29);
 
 -- Fix Lord Melenas spawn point. (Credit: Trinitycore)
 DELETE FROM `creature` WHERE `id` = 2038;
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `patch_max`) VALUES
-(1554, 2038, 1, 10107.08, 1206.241, 1311.55, 4.468043, 300, 300, 100, 100, 10),
-(1551, 2038, 1, 10127.8, 1202.00, 1323.30, 3.01113, 300, 300, 100, 100, 10),
-(1552, 2038, 1, 10127.3, 1125.23, 1338.11, 3.58055, 300, 300, 100, 100, 10);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `wander_distance`, `patch_max`) VALUES
+(1554, 2038, 1, 10107.08, 1206.241, 1311.55, 4.468043, 300, 300, 100, 100, 0, 10),
+(1551, 2038, 1, 10127.8, 1202.00, 1323.30, 3.01113, 300, 300, 100, 100, 0, 10),
+(1552, 2038, 1, 10126.5, 1124.8, 1338.02, 3.68265, 300, 300, 100, 100, 0, 10);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (108, 1, 'Lord Melenas (2038)', 10);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
@@ -53,7 +69,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 -- Fix Lady Sathra spawn point. (Credit: Trinitycore)
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `patch_max`) VALUES
 (12597, 7319, 1, 10950.3, 1397.79, 1311.63, 2.32941, 300, 300, 5, 100, 100, 1, 10),
-(73001, 7319, 1, 10980, 1731.3, 1303.1, 5.14113, 300, 300, 5, 100, 100, 1, 10);
+(73001, 7319, 1, 10980.6, 1699.2, 1298.57, 1.72064, 300, 300, 5, 100, 100, 1, 10);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (109, 1, 'Lady Sathra (7319)', 10);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
@@ -66,6 +82,11 @@ DELETE FROM `pool_template` WHERE `entry` = 14223;
 
 -- remove tome of fire blast from kireena
 DELETE FROM `npc_vendor` WHERE `entry` = 9636 AND `item` = 8878;
+
+-- Correct the meetingstone gossip menu ids.
+UPDATE `gossip_menu` SET `entry`=6025 WHERE `entry`=6029;
+UPDATE `gossip_menu_option` SET `menu_id`=6025 WHERE `menu_id`=6029;
+UPDATE `gossip_menu_option` SET `action_menu_id`=6025 WHERE `action_menu_id`=6029;
 
 -- q.1191 'Zamek's Distraction'
 -- Update End Script
@@ -108,7 +129,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (472002, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1543, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle Brassbolts - Talk');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (472003, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.38594, 0, 'Rizzle Brassbolts - Orientation');
 -- in case if object despawns before player accept next one
-UPDATE `quest_template` SET `RequiredCondition` = 20227 WHERE `entry` = 1191;
+UPDATE `quest_template` SET `RequiredCondition` = 20227, `PrevQuestId`=0 WHERE `entry` = 1191;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES 
 (20225, 9, 1190, 0),
 (20226, 19, 1194, 0),
@@ -141,7 +162,7 @@ INSERT INTO `creature_addon` (`guid`, `stand_state`, `sheath_state`, `auras`) VA
 
 -- add Trigore the Lasher spawn
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(452, 3652, 0, 0, 0, 1, -621.612, -2270.82, 18.8419, 2.67112, 172800, 259200, 0, 100, 0, 0, 0, 0, 0, 10);
+(452, 3652, 0, 0, 0, 1, -639.394, -2254.77, 13.2385, 2.51149, 172800, 259200, 2, 100, 0, 1, 0, 0, 0, 10);
 
 -- remove Burning Key from creature 2760 loot table
 DELETE FROM `creature_loot_template` WHERE `item` = 4483 AND `entry` = 2760;
@@ -152,15 +173,17 @@ DELETE FROM `creature_addon` WHERE `guid` IN (90271,90014,90375,90216,89906,9043
 UPDATE `creature` SET `position_x` = -10829.554688, `position_y` = 733.747437, `position_z` = 34.381603, `orientation` = 3.798669 WHERE `guid` = 90362;
 
 -- Troll Tribal Necklace should always drop as quest 2881 is repeatable
-UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 20 WHERE `item` = 9259;
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 40 WHERE `item` = 9259;
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `item` = 9259 && `entry` IN (8218, 8219, 8216, 7995);
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 20 WHERE `item` = 9259 && `entry` IN (8217, 10802, 7996);
 
 -- add Klaven Mortwake EAI (taken from https://github.com/cmangos/classic-db/commit/b69297f0c908f206b58cd9a2dacb1870f568f56a)
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (705301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3092, 0, 0, 0, 0, 0, 0, 0, 0, 'Klaven Mortwake - Say Text');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (705301, 7053, 0, 10, 0, 100, 1, 0, 30, 60000, 60000, 705301, 0, 0, 'Klaven Mortwake - Say on LOS(q.2359)');
 -- Part of Klaven Mortwake EAI - aura check for LOS
-DELETE FROM conditions WHERE condition_entry = 20264;
-INSERT INTO conditions (condition_entry, type, value1, value2, value3, value4) VALUES 
+DELETE FROM `conditions` WHERE `condition_entry` = 20264;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`) VALUES 
 (20264,1,1784,0,0,0);
 
 -- allow Dane Winslow to summon an imp
@@ -181,7 +204,6 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8134801, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 81348, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81348 - Start Waypoints - Started by Eastvale Peasant 81252');
 
 -- sognar cliffbeard should be holding his meat
-UPDATE `creature_template` SET `equipment_id` = 1106 WHERE `entry` = 5124;
 DELETE FROM `creature_addon` WHERE `guid` = (SELECT `guid` FROM `creature` WHERE `id` = 5124);
 
 -- remove incorrect quest text
