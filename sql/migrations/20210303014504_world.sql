@@ -24,7 +24,7 @@ UPDATE `creature` SET `position_x`=-14436.3, `position_y`=472.755, `position_z`=
 UPDATE `creature` SET `position_x`=-14438, `position_y`=474.425, `position_z`=16.005, `orientation`=3.71755 WHERE `id`=15077;
 
 -- Correct spawn position of Fishbot 5000.
-UPDATE `creature` SET `position_x`=-14438.7, `position_y`=476.31, `position_z`=15.3591, `orientation`=4.04916 WHERE `id`=15079
+UPDATE `creature` SET `position_x`=-14438.7, `position_y`=476.31, `position_z`=15.3591, `orientation`=4.04916 WHERE `id`=15079;
 
 -- Correct scale of Fishbot 5000.
 UPDATE `creature_template` SET `display_scale1`=0 WHERE `entry`=15079;
