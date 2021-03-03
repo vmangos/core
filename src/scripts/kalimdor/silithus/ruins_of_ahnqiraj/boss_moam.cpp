@@ -34,7 +34,7 @@ enum
     SPELL_ARCANEERUPTION    =  25672,
     SPELL_SUMMON_MANA_FIEND =  25681,                      //25682,25683
     SPELL_ENERGIZE          =  25685,
-    SPELL_DRAINMANA         =  26639,
+    SPELL_DRAINMANA         =  25676,
 
     // mana fiend
     NPC_MANA_FIEND          =  15527,
@@ -53,12 +53,8 @@ struct boss_moamAI : public ScriptedAI
     uint32 m_uiTrample_Timer;
     uint32 m_uiSummonManaFiend_Timer;
     uint32 m_uiTurnBackFromStone_Timer;
-    uint32 m_uiWait_Timer;
     uint32 m_uiArmorValue;
     uint32 m_uiDrainMana_Timer;
-    uint8 m_uiDrainCount;
-    uint8 m_uiFiendCount;
-    std::vector<Player*> PlayerList;
     ObjectGuid m_OGvictim;          // Memorize last target before turning into stone, then take it back.
     bool m_bIsInCombat;
 
@@ -67,13 +63,10 @@ struct boss_moamAI : public ScriptedAI
         m_uiTrample_Timer = 6000;
         m_uiSummonManaFiend_Timer = 90000;
         m_uiTurnBackFromStone_Timer = 90000;
-        m_uiWait_Timer = 20000;
         m_uiDrainMana_Timer = 5000;
 
-        m_uiDrainCount = 0;
-        m_uiFiendCount = 0;
         m_bIsInCombat = false;
-        m_uiArmorValue = m_creature->GetArmor();
+        m_uiArmorValue = m_creature->GetCreatureInfo()->armor;
 
         m_OGvictim.Clear();
 
@@ -104,7 +97,6 @@ struct boss_moamAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MOAM, DONE);
     }
 
-    /** This function seems to be unused, kept as it is in case of...*/
     void JustSummoned(Creature* pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
@@ -114,7 +106,8 @@ struct boss_moamAI : public ScriptedAI
                 pSummoned->AI()->AttackStart(pTarget);
                 if (pSummoned->GetEntry() == NPC_MANA_FIEND)
                 {
-                    ++m_uiFiendCount;
+                    // Create visual animation of the teleportation spell
+                    pSummoned->SendSpellGo(pSummoned, 25681);
                     return;
                 }
             }
@@ -128,16 +121,6 @@ struct boss_moamAI : public ScriptedAI
         pSummoned->AddObjectToRemoveList();
     }
 
-    void FillPlayerList()
-    {
-        Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto& i : liste)
-        {
-            if (i.getSource()->IsAlive() && i.getSource()->GetPowerType() == POWER_MANA)
-                PlayerList.push_back(i.getSource());
-        }
-    }
-
     void UpdateAI(uint32 const uiDiff) override
     {
         if ((!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
@@ -148,18 +131,18 @@ struct boss_moamAI : public ScriptedAI
         {
             m_uiTurnBackFromStone_Timer -= uiDiff;
             //m_creature->SetPower(POWER_MANA,0); /** Help to check stone form by setting mana to 0 */
-            if (m_creature->GetPower(POWER_MANA) == m_creature->GetMaxPower(POWER_MANA) ||
+            if (m_creature->GetPower(POWER_MANA) >= m_creature->GetMaxPower(POWER_MANA) ||
                     m_uiTurnBackFromStone_Timer == 0)
             {
                 //Check if a victim was memorize, in case of error, take a random one.
                 Unit * victim = m_creature->GetMap()->GetUnit(m_OGvictim);
-                if (victim != nullptr)
+                if (victim)
                     m_creature->AI()->AttackStart(victim);
                 else
                     m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
                 m_creature->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                DoCast(m_creature->GetVictim(), SPELL_ARCANEERUPTION);
+                DoCast(m_creature->GetVictim(), SPELL_ARCANEERUPTION, true);
                 DoScriptText(EMOTE_MANA_FULL, m_creature);
                 m_creature->SetArmor(m_uiArmorValue);
             }
@@ -180,20 +163,17 @@ struct boss_moamAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ENERGIZE) == CAST_OK)
             {
+                // TODO: Not sure if the armor increase is Blizzlike, please investigate.
                 m_creature->SetArmor(18000);
-                //DoCast(m_creature,SUMMON_MANA_FIEND); //summons only one
                 for (uint8 i = 0; i < 3; ++i)
                 {
-                    // Summon a Mana fiend which will disapear if Moam is reset
+                    // Summon a Mana fiend which will disappear if Moam is reset
                     m_creature->SummonCreature(NPC_MANA_FIEND,
                                                m_creature->GetPositionX() + 2,
                                                m_creature->GetPositionY(),
                                                m_creature->GetPositionZ(),
                                                m_creature->GetOrientation(),
                                                TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-
-                    // Create visual animation of the teleportation spell
-                    m_creature->SendSpellGo(m_creature, 25681);
                 }
 
                 m_uiSummonManaFiend_Timer = 90000;
@@ -202,7 +182,6 @@ struct boss_moamAI : public ScriptedAI
                                       once the end of SPELL_ENERGIZE */
                 m_creature->AttackStop();
                 DoScriptText(EMOTE_DRAIN, m_creature);
-                m_uiWait_Timer = 10000;
             }
         }
         else
@@ -212,49 +191,16 @@ struct boss_moamAI : public ScriptedAI
         if (m_uiTrample_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE) == CAST_OK)
-                m_uiTrample_Timer = 10000;
+                m_uiTrample_Timer = 15000;
         }
         else
             m_uiTrample_Timer -= uiDiff;
 
-        //m_uiDrainMana_Timer
+        // m_uiDrainMana_Timer
         if (m_uiDrainMana_Timer < uiDiff)
         {
-            if (!m_uiDrainCount)
-                FillPlayerList();
-            if (!PlayerList.empty() && m_uiDrainCount < 6)
-            {
-                uint32 Rand = urand(0, PlayerList.size() - 1);
-                Player *Plr = 0;
-                if ((Plr = PlayerList[Rand]))
-                {
-                    if (Plr->IsAlive())
-                    {
-                        m_uiDrainCount++;
-                        uint32 Mana = Plr->GetPower(POWER_MANA);
-                        if (Mana > 500)
-                        {
-                            Plr->SetPower(POWER_MANA, Plr->GetPower(POWER_MANA) - 500);
-                            Mana = 500;
-                        }
-                        else
-                            Plr->SetPower(POWER_MANA, 0);
-                        Mana *= 2;
-                        if (m_creature->GetPower(POWER_MANA) + Mana < m_creature->GetMaxPower(POWER_MANA))
-                            m_creature->SetPower(POWER_MANA, m_creature->GetPower(POWER_MANA) + Mana);
-                        else if (m_creature->GetPower(POWER_MANA) < m_creature->GetMaxPower(POWER_MANA))
-                            m_creature->SetPower(POWER_MANA, m_creature->GetMaxPower(POWER_MANA));
-                        Plr->CastSpell(m_creature, SPELL_DRAINMANA, true);
-                    }
-                }
-                PlayerList.erase(PlayerList.begin() + Rand);
-            }
-            else
-            {
-                PlayerList.clear();
-                m_uiDrainCount = 0;
-                m_uiDrainMana_Timer = 7000;
-            }
+            DoCast(m_creature, SPELL_DRAINMANA);
+            m_uiDrainMana_Timer = 7000;
         }
         else
             m_uiDrainMana_Timer -= uiDiff;

@@ -33,12 +33,11 @@ enum
     SPELL_FRENZY                =  8269,
     SPELL_LASH                  =  25852,
 
-    EMOTE_FRENZY                =  -1000002,
-
-    NPC_HIVEZARA_LARVA          =  15555,
+    EMOTE_FRENZY                =  10645,
 
     SPELL_FEED                  =  25721,
 
+    NPC_HIVEZARA_LARVA          =  15555,
     NPC_HIVEZARA_HORNET         =  15934,
     NPC_HIVEZARA_SWARMER        =  15546
 };
@@ -160,8 +159,6 @@ struct boss_ayamissAI : public ScriptedAI
             if (pCaster->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-//                    DoTeleportPlayer(pCaster, -9717.2, 1517.81, 27.4683, pCaster->GetOrientation());
-
             m_uiSacrificeGuid = pCaster->GetObjectGuid();
             m_fSacrificeAggro = m_creature->GetThreatManager().getThreat(pCaster);
             m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
@@ -195,7 +192,7 @@ struct boss_ayamissAI : public ScriptedAI
         else
             m_uiRelocate_Timer -= uiDiff;
 
-        if (!m_bIsInPhaseTwo && ((m_creature->GetHealth() * 100) / m_creature->GetMaxHealth()) < 70)
+        if (m_creature->GetHealthPercent() <= 70 && !m_bIsInPhaseTwo)
         {
             SetCombatMovement(true);
             m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
@@ -213,11 +210,13 @@ struct boss_ayamissAI : public ScriptedAI
             }
         }
 
-        if (!m_bIsEnraged && ((m_creature->GetHealth() * 100) / m_creature->GetMaxHealth()) < 20)
+        if (m_creature->GetHealthPercent() <= 20 && !m_bIsEnraged)
         {
-            DoCast(m_creature, SPELL_FRENZY);
-            DoScriptText(EMOTE_FRENZY, m_creature);
-            m_bIsEnraged = true;
+            if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+            {
+                DoScriptText(EMOTE_FRENZY, m_creature);
+                m_bIsEnraged = true;
+            }
         }
 
         if (m_uiSummonSwarmer_Timer < uiDiff)

@@ -29,8 +29,8 @@ enum
     TYPE_QIRAJI_GLADIATOR   = 8,
 };
 
-/* Ce type de data = le compte des mobs vivants dans chaque vague.
-    L'instance fait le décompte grace a OnCreatureDeath */
+/* This type of data = the count of living mobs in each wave.
+     The instance counts down thanks to OnCreatureDeath  */
 #define WAVE_MAX 7
 #define WAVE_OFFSET 10
 #define WAVE_MEMBERS_INIT_COUNT 7
@@ -197,7 +197,7 @@ enum
 #else
 enum
 {
-    AQ_RESPAWN_3_MINUTES    = 60,
+    AQ_RESPAWN_3_MINUTES    = 180,
     AQ_RESPAWN_5_MINUTES    = 300,
     AQ_RESPAWN_15_MINUTES   = 900,
     AQ_RESPAWN_FOUR_DAYS    = 345600
