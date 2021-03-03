@@ -13,6 +13,9 @@ INSERT INTO `migrations` VALUES ('20210303085717');
 DELETE FROM `gameobject` WHERE `id` = 19535;
 DELETE FROM `gameobject_template` WHERE `entry` = 19535;
 
+-- dropchance should be 100%
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`= -100 WHERE `entry` = 2772 AND `item` = 5339;
+
 
 -- End of migration.
 END IF;
