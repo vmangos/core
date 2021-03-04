@@ -114,7 +114,6 @@ void AddSC_boss_sapphiron();
 void AddSC_instance_naxxramas();
 void AddSC_boss_arcanist_doan();                     //scarlet_monastery
 //void AddSC_boss_azshir_the_sleepless();
-void AddSC_boss_bloodmage_thalnos();
 void AddSC_boss_herod();
 void AddSC_boss_high_inquisitor_fairbanks();
 void AddSC_boss_houndmaster_loksey();
@@ -362,7 +361,6 @@ void AddScripts()
     AddSC_instance_naxxramas();
     AddSC_boss_arcanist_doan();                             //scarlet_monastery
     //AddSC_boss_azshir_the_sleepless();
-    AddSC_boss_bloodmage_thalnos();
     AddSC_boss_herod();
     AddSC_boss_high_inquisitor_fairbanks();
     AddSC_boss_houndmaster_loksey();
