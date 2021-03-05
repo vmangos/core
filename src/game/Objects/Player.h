@@ -824,7 +824,7 @@ struct AuraSaveStruct
     uint32 spellid = 0;
     uint32 stackcount = 0;
     uint32 remaincharges = 0;
-    int32  damage[MAX_EFFECT_INDEX] = { 0 };
+    float  damage[MAX_EFFECT_INDEX] = { 0 };
     uint32 periodicTime[MAX_EFFECT_INDEX] = { 0 };
 
     int32 maxduration = 0;
@@ -2540,8 +2540,8 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo) return 0;
-    int32 totalpct = 0;
-    int32 totalflat = 0;
+    float totalpct = 0;
+    float totalflat = 0;
     for (const auto mod : m_spellMods[op])
     {
         if (!IsAffectedBySpellmod(spellInfo,mod,spell))

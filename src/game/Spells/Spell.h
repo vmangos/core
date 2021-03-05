@@ -360,7 +360,7 @@ class Spell
         SpellCastResult CheckPower() const;
         SpellCastResult CheckCasterAuras() const;
 
-        int32 CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
+        float CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
         static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr);
 
         bool HaveTargetsForEffect(SpellEffectIndex effect) const;
@@ -552,7 +552,7 @@ class Spell
         Corpse* corpseTarget = nullptr;
         GameObject* gameObjTarget = nullptr;
         SpellAuraHolder* m_spellAuraHolder = nullptr;       // spell aura holder for current target, created only if spell has aura applying effect
-        int32 damage = 0;
+        float damage = 0;
         bool isReflected = false;
 
         // this is set in Spell Hit, but used in Apply Aura handler
@@ -563,9 +563,8 @@ class Spell
         GameObject* focusObject = nullptr;
 
         // Damage and healing in effects need just calculate
-        int32 m_damage = 0;                                 // Damage   in effects count here
-        int32 m_healing = 0;                                // Healing in effects count here
-        int32 m_healthLeech = 0;                            // Health leech in effects for all targets count here
+        float m_damage = 0;                                 // Damage   in effects count here
+        float m_healing = 0;                                // Healing in effects count here
         int32 m_absorbed = 0;
 
         //******************************************

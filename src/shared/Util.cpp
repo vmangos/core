@@ -566,7 +566,16 @@ void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= fals
     }
 }
 
-uint32 dither(float v)
+template <typename T> int sign(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
+int32 dither(float v)
 {
-    return std::floor(v + frand(0,1));
+    return sign(v) * std::floor(std::abs(v) + frand(0,1));
+}
+
+uint32 ditheru(float v)
+{
+    return sign(v) * std::floor(std::abs(v) + frand(0,1));
 }

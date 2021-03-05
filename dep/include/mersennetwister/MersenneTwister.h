@@ -355,8 +355,8 @@ inline void MTRand::load( uint32 *const loadArray )
 /* Mangos not use streams for random values output
 inline std::ostream& operator<<( std::ostream& os, const MTRand& mtrand )
 {
-	register const MTRand::uint32 *s = mtrand.state;
-	register int i = mtrand.N;
+	 const MTRand::uint32 *s = mtrand.state;
+	 int i = mtrand.N;
 	for( ; i--; os << *s++ << "\t" ) {}
 	return os << mtrand.left;
 }
@@ -364,8 +364,8 @@ inline std::ostream& operator<<( std::ostream& os, const MTRand& mtrand )
 
 inline std::istream& operator>>( std::istream& is, MTRand& mtrand )
 {
-	register MTRand::uint32 *s = mtrand.state;
-	register int i = mtrand.N;
+	 MTRand::uint32 *s = mtrand.state;
+	 int i = mtrand.N;
 	for( ; i--; is >> *s++ ) {}
 	is >> mtrand.left;
 	mtrand.pNext = &mtrand.state[mtrand.N-mtrand.left];
