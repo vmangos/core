@@ -22,6 +22,17 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- The Scarlet Key should not drop from mobs
 DELETE FROM `creature_loot_template` WHERE `item` = 7146;
 
+-- add Baron Longshore spawns
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(563, 3467, 1, -1748.23, -3722.06, 14.1211, 4.65315, 413, 413, 100, 1, 3, 10),
+(564, 3467, 1, -1707.46, -3817.54, 13.3079, 5.51516, 413, 413, 100, 1, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(110, 1, 'Baron Longshore (3467)', 10);
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(15066, 110, 'Baron Longshore #1'),
+(563, 110, 'Baron Longshore #2'),
+(564, 110, 'Baron Longshore #3');
+
 
 -- End of migration.
 END IF;
