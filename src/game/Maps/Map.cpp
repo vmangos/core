@@ -2234,6 +2234,7 @@ BattleGroundMap::BattleGroundMap(uint32 id, time_t expiry, uint32 InstanceId)
 
 BattleGroundMap::~BattleGroundMap()
 {
+    UnloadAll(true);
 }
 
 void BattleGroundMap::Update(uint32 diff)
