@@ -5720,28 +5720,19 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 pdamage = pdamageReductedArmor;
             }
 
-            // TODO (Curse of Agony/Starshards):
-            // only base damage should be affected, not whole damage
+            // TODO: once dithering is implemented properly it should get removed from there
 
             // Curse of Agony damage-per-tick calculation
             if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
             {
-                // 1..4 ticks, 1/2 from normal tick damage
-                if (GetAuraTicks() <= 4)
-                    pdamage = pdamage / 2;
-                // 9..12 ticks, 3/2 from normal tick damage
-                else if (GetAuraTicks() >= 9)
-                    pdamage += (pdamage + 1) / 2;       // +1 prevent 0.5 damage possible lost at 1..4 ticks
-                // 5..8 ticks have normal tick damage
+                double d = ( -1 + ((int)GetAuraTicks() -1)/4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/2.0);
+                pdamage = dither(pdamage + d);
             }
+            // Starshards damage-per-tick calculation
             if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
             {
-                //ticks: 2/3, 2/3, 1, 1, 4/3, 4/3
-                float ticks[] = {0,.111f,.222f,.389f,.556f,.778f,1};
-                float dmg = ticks[GetAuraTicks() -1];
-                float ddone = ticks[GetAuraTicks()];
-                pdamage *= 6;
-                pdamage = std::round(std::round(pdamage * ddone) - pdamage * dmg);
+                double d = ( -1 + ((int)GetAuraTicks() -1)/2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/3.0);
+                pdamage = dither(pdamage + d);
             }
 
 
