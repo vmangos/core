@@ -360,7 +360,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     // percent from health with min
                     case 25599:                             // Thundercrash
                     {
-                        damage = unitTarget->GetHealth() / 2.;
+                        damage = unitTarget->GetHealth() / 2.F;
                         if (damage < 200)
                             damage = 200;
                         break;
