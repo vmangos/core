@@ -4456,7 +4456,7 @@ float WorldObject::SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellP
     }
 
     // Done fixed damage bonus auras
-    int32 DoneAdvertisedBenefit  = SpellBaseHealingBonusDone(spellProto->GetSpellSchoolMask());
+    float DoneAdvertisedBenefit  = SpellBaseHealingBonusDone(spellProto->GetSpellSchoolMask());
 
     // apply ap bonus and benefit affected by spell power implicit coeffs and spell level penalties
     DoneTotal = SpellBonusWithCoeffs(spellProto, effectIndex, DoneTotal, DoneAdvertisedBenefit, 0, damagetype, true, this, spell);
@@ -4475,9 +4475,9 @@ float WorldObject::SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellP
     return heal < 0 ? 0 : heal;
 }
 
-int32 WorldObject::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
+float WorldObject:: SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
 {
-    int32 AdvertisedBenefit = 0;
+    float AdvertisedBenefit = 0;
 
     if (Unit* pUnit = ToUnit())
     {
@@ -4495,7 +4495,7 @@ int32 WorldObject::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
             {
                 // 1.12.* have only 1 stat type support
                 Stats usedStat = STAT_SPIRIT;
-                AdvertisedBenefit += int32(pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f);
+                AdvertisedBenefit += pUnit->GetStat(usedStat) * i->GetModifier()->m_amount / 100.0f;
             }
         }
     }
