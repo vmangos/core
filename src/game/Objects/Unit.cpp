@@ -1348,7 +1348,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
         if (subDamage->damageSchoolMask == SPELL_SCHOOL_MASK_NORMAL)
         {
             damageInfo->cleanDamage += subDamage->damage;
-            subDamage->damage = CalcArmorReducedDamage(damageInfo->target, subDamage->damage);
+            subDamage->damage = ditheru(CalcArmorReducedDamage(damageInfo->target, subDamage->damage));
             damageInfo->cleanDamage -= subDamage->damage;
         }
 

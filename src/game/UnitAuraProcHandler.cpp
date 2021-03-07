@@ -577,7 +577,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                     {
                         if (pVictim->GetHealthPercent() <= 20.0f && target->GetHealthPercent() <= 20.0f)  // If Both Target A and target B is less or equal than 20% do full damage
                         {
-                            basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                            basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
                             triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                         else if (pVictim->GetHealthPercent() <= 20.0f)    // If only Target A is less or equal than 20% and target B is over 20% do Basic attack damage
@@ -586,14 +586,14 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         }
                         else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used less or equal than 20% anyway.
                         {
-                            basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                            basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
                             triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                     }
                     else // Full damage on anything else
 #endif
                     {
-                        basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                        basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
                         triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                     }
 
@@ -1006,7 +1006,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         return SPELL_AURA_PROC_FAILED;
 
                      // Reconstitute damage before armor reduction
-                    basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                    basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
 
                     triggered_spell_id = 22482;
                     break;

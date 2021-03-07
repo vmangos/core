@@ -5711,17 +5711,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 fdamage = target->MeleeDamageBonusTaken(pCaster, fdamage, attackType, spellProto, GetEffIndex(), DOT, GetStackAmount());
             }
 
-            // Calculate armor mitigation if it is a physical spell
-            // But not for bleed mechanic spells
-            if (spellProto->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_NORMAL && spellProto->GetEffectMechanic(m_effIndex) != MECHANIC_BLEED && !(spellProto->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
-            {
-                uint32 pdamageReductedArmor = pCaster->CalcArmorReducedDamage(target, fdamage);
-                cleanDamage.damage += fdamage - pdamageReductedArmor;
-                fdamage = pdamageReductedArmor;
-            }
-
-            // TODO: once dithering is implemented properly it should get removed from there
-
             // Curse of Agony damage-per-tick calculation
             if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
             {
@@ -5734,7 +5723,17 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 float d = ( -1 + ((int)GetAuraTicks() -1)/2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/3.0);
                 fdamage += fdamage + d;
             }
+
             uint32 pdamage = ditheru(fdamage);
+
+            // Calculate armor mitigation if it is a physical spell
+            // But not for bleed mechanic spells
+            if (spellProto->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_NORMAL && spellProto->GetEffectMechanic(m_effIndex) != MECHANIC_BLEED && !(spellProto->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
+            {
+                uint32 pdamageReductedArmor = ditheru(pCaster->CalcArmorReducedDamage(target, pdamage));
+                cleanDamage.damage += pdamage - pdamageReductedArmor;
+                pdamage = pdamageReductedArmor;
+            }
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
