@@ -1693,19 +1693,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 if (!m_casterUnit)
                     return;
 
-                int32 dmg = m_casterUnit->CalculateSpellEffectValue(m_casterUnit, m_spellInfo, eff_idx, &m_currentBasePoints[EFFECT_INDEX_0]);
+                float dmg = m_casterUnit->CalculateSpellEffectValue(m_casterUnit, m_spellInfo, eff_idx, &m_currentBasePoints[EFFECT_INDEX_0]);
                 if (Player* modOwner = m_casterUnit->GetSpellModOwner())
                     modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, dmg, this);
 
-                dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, eff_idx, uint32(dmg > 0 ? dmg : 0), SPELL_DIRECT_DAMAGE);
+                dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, eff_idx, dmg > 0 ? dmg : 0, SPELL_DIRECT_DAMAGE);
                 dmg = m_casterUnit->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, eff_idx, dmg, SPELL_DIRECT_DAMAGE);
+                int32 idmg = dither(dmg);
 
-                if (int32(m_casterUnit->GetHealth()) > dmg)
+                if (int32(m_casterUnit->GetHealth()) > idmg)
                 {
                     // Shouldn't Appear in Combat Log
-                    m_casterUnit->ModifyHealth(-dmg);
+                    m_casterUnit->ModifyHealth(-idmg);
 
-                    int32 mana = dmg;
+                    int32 mana = idmg;
 
                     Unit::AuraList const& auraDummy = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
                     for (const auto itr : auraDummy)
