@@ -6124,10 +6124,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (Player* modOwner = m_casterUnit->GetSpellModOwner())
                         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, cost, this);
 
-                    int32 dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, SpellEffectIndex(i), uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
+                    float dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, SpellEffectIndex(i), uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
                     dmg = m_casterUnit->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, SpellEffectIndex(i), dmg, SPELL_DIRECT_DAMAGE);
 
-                    if (int32(m_casterUnit->GetHealth()) <= dmg)
+                    // use cail as dithering might round up later.
+                    if (int32(m_casterUnit->GetHealth()) <= std::ceil(dmg))
                         return SPELL_FAILED_FIZZLE;
                 }
                 break;
