@@ -5713,16 +5713,11 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             // Curse of Agony damage-per-tick calculation
             if (spellProto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CURSE_OF_AGONY>())
-            {
-                float d = ( -1 + ((int)GetAuraTicks() -1)/4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/2.0);
-                fdamage += fdamage + d;
-            }
+                fdamage += ( -1 + ((int)GetAuraTicks() -1)/4) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/2.0);
+
             // Starshards damage-per-tick calculation
             if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
-            {
-                float d = ( -1 + ((int)GetAuraTicks() -1)/2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/3.0);
-                fdamage += fdamage + d;
-            }
+                fdamage += ( -1 + ((int)GetAuraTicks() -1)/2) * (spellProto->CalculateSimpleValue(EFFECT_INDEX_0)/3.0);
 
             uint32 pdamage = ditheru(fdamage);
 
