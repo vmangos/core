@@ -250,6 +250,9 @@ enum ScourgeInvasionNPCEvents
     EVENT_SPAWNER_SUMMON_MINION             = 3,
     EVENT_SHARD_FIND_DAMAGED_SHARD          = 4,
     EVENT_CULTIST_CHANNELING                = 5,
+    EVENT_MOUTH_OF_KELTHUZAD_YELL           = 6,
+    EVENT_MOUTH_OF_KELTHUZAD_ZONE_START     = 7,
+    EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP      = 8,
 
     // Shadow of Doom Events
     EVENT_DOOM_MINDFLAY                     = 20,
@@ -312,12 +315,6 @@ enum ScourgeInvasionQuests
     QUEST_UNDER_THE_SHADOW                      = 9153,
 };
 
-enum ScourgeInvasionEngineerAI
-{
-    ENGINEER_AI_ACTION_SET_PYLON,
-    ENGINEER_AI_ACTION_ATTACK_START,
-};
-
 enum ScourgeInvasionLang
 {
     LANG_CULTIST_ENGINEER_OPTION                        = 12112, // Use 8 necrotic runes and disrupt his ritual.
@@ -334,6 +331,15 @@ enum ScourgeInvasionLang
     LANG_SHADOW_OF_DOOM_TEXT_1                          = 12421, // 12421 - These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
     LANG_SHADOW_OF_DOOM_TEXT_2                          = 12422, // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
     LANG_SHADOW_OF_DOOM_TEXT_3                          = 12243, // 12243 - You will not stop our deepening shadow, $c.  Now... join us!  Join the ranks of the Chosen!
+    LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1         = 13121, // Spawn.
+    LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2         = 13125, // Spawn. 53 min between 2-3 in sniffs.
+    LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1          = 13165, // Despawn.
+    LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2          = 13164, // Despawn.
+    LANG_MOUTH_OF_KELTHUZAD_RANDOM_1                    = 13126, // Random.
+    LANG_MOUTH_OF_KELTHUZAD_RANDOM_2                    = 13124, // Random.
+    LANG_MOUTH_OF_KELTHUZAD_RANDOM_3                    = 13122, // 180 seconds between 5-6 in sniffs.
+    LANG_MOUTH_OF_KELTHUZAD_RANDOM_4                    = 13163, // Random.
+    LANG_MOUTH_OF_KELTHUZAD_RANDOM_5                    = 13123, // Random. 30 min between 8-2 in sniffs.
     LANG_ARGENT_EMISSARY_OPTION_0                       = 12176, // 12176 - What's happening?
     LANG_ARGENT_EMISSARY_OPTION_1                       = 12207, // 12207 - What can I do?
     LANG_ARGENT_EMISSARY_OPTION_2                       = 12434, // 12434 - Where are we battling the Scourge?

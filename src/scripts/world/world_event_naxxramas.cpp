@@ -103,10 +103,10 @@ bool UncommonMinionspawner(Creature* spawner) // Rare Minion Spawner.
 
     /*
     The chance or timer for a Rare minion spawn is unknown and i don't see an exact pattern for a spawn sequence.
-    Sniffed are: 13323 Minions and 56 Rares (Ratio: 100 to 0.42).
+    Sniffed are: 19669 Minions and 90 Rares (Ratio: 217 to 1).
     */
-    uint32 chance = urand(0, 19669);
-    if (chance > 90)
+    uint32 chance = urand(1, 217);
+    if (chance > 1)
         return false; // Above 56 = Minion, else Rare.
 
     return true;
@@ -199,8 +199,6 @@ public:
         me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
         me->CastSpell(me, SPELL_SUMMON_NECROPOLIS_CRITTERS, true);
-        // Change weather to storm.
-        me->GetMap()->SetWeather(me->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
     }
     void UpdateAI(uint32 const diff) override
     {
@@ -210,6 +208,68 @@ public:
 GameObjectAI* GetAI_GoNecropolis(GameObject* go)
 {
     return new GoNecropolis(go);
+}
+
+/*
+Mouth of Kel'Thuzad
+*/
+struct MouthAI : public ScriptedAI
+{
+    MouthAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_events.Reset();
+        switch (me->GetZoneId())
+        {
+        case 1637: // Orgrimmar
+        case 1519: // Stormwind
+        case 1657: // Darnassus
+        case 1638: // Thunderbluff
+        case 1537: // Ironforge
+        case 1497: // Undercity
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, 0);
+            break;
+        }
+    }
+
+    EventMap m_events;
+
+    void Reset() {}
+
+    void DoAction(uint32 action) override
+    {
+        switch (action)
+        {
+        case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
+            m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
+            me->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2));
+            break;
+        case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
+            m_events.Reset();
+            me->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2));
+            break;
+        }
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        m_events.Update(diff);
+
+        while (uint32 Events = m_events.ExecuteEvent())
+        {
+            switch (Events)
+            case EVENT_MOUTH_OF_KELTHUZAD_YELL:
+            {
+                me->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_RANDOM_1, LANG_MOUTH_OF_KELTHUZAD_RANDOM_2, LANG_MOUTH_OF_KELTHUZAD_RANDOM_3, LANG_MOUTH_OF_KELTHUZAD_RANDOM_4, LANG_MOUTH_OF_KELTHUZAD_RANDOM_5));
+                m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
+                break;
+            }
+        }
+    }
+};
+
+CreatureAI* GetAI_Mouth(Creature* pCreature)
+{
+    return new MouthAI(pCreature);
 }
 
 /*
@@ -716,10 +776,6 @@ bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint3
     {
         player->CLOSE_GOSSIP_MENU();
 
-        //player->CastSpell(creature, SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS, true);
-        //creature->CastSpell(player, SPELL_PH_KILL_SUMMONER_BUFF, true);
-        //player->SendSpellGo(player, SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS);
-
         // Player summons a Shadow of Doom for 1 hour.
         if (Creature* SHADOW_OF_DOOM = player->SummonCreature(NPC_SHADOW_OF_DOOM, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 5000))
         {
@@ -732,8 +788,6 @@ bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint3
         }
         player->SendSpellGo(player, SPELL_SUMMON_BOSS);
         creature->CastSpell(creature, SPELL_QUIET_SUICIDE, true);
-        //creature->CastSpell(player, SPELL_SUMMON_BOSS_BUFF, true);
-        //player->CastSpell(player, SPELL_SUMMON_BOSS, true);
     }
 
     return true;
@@ -890,41 +944,41 @@ struct ScourgeMinion : public ScriptedAI
             case EVENT_MINION_INFECTED_BITE:
                 if (!me->GetVictim()->HasAura(SPELL_INFECTED_BITE))
                     DoCastSpellIfCan(me->GetVictim(), SPELL_INFECTED_BITE);
-                m_events.ScheduleEvent(EVENT_MINION_INFECTED_BITE, 12000);
+                m_events.ScheduleEvent(EVENT_MINION_INFECTED_BITE, urand(6000, 12000));
                 break;
             case EVENT_MINION_DAZED:
                 if (!me->GetVictim()->HasAura(SPELL_DAZED))
                     DoCastSpellIfCan(me->GetVictim(), SPELL_DAZED);
-                m_events.ScheduleEvent(EVENT_MINION_DAZED, 1500); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_MINION_DAZED, urand(1500, 4500));
                 break;
             case EVENT_MINION_DEMORALIZING_SHOUT:
                 if (!me->GetVictim()->HasAura(SPELL_DEMORALIZING_SHOUT))
                     DoCastSpellIfCan(me->GetVictim(), SPELL_DEMORALIZING_SHOUT);
-                m_events.ScheduleEvent(EVENT_MINION_DEMORALIZING_SHOUT, 19000); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_MINION_DEMORALIZING_SHOUT, 19000);
                 break;
             case EVENT_MINION_SUNDER_ARMOR:
                 DoCastSpellIfCan(me->GetVictim(), SPELL_SUNDER_ARMOR);
-                m_events.ScheduleEvent(EVENT_MINION_SUNDER_ARMOR, 6000); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_MINION_SUNDER_ARMOR, urand(6000, 12000));
                 break;
             case EVENT_RARE_KNOCKDOWN:
                 DoCastSpellIfCan(me->GetVictim(), SPELL_KNOCKDOWN);
-                m_events.ScheduleEvent(EVENT_RARE_KNOCKDOWN, 17000); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_RARE_KNOCKDOWN, 17000);
                 break;
             case EVENT_RARE_TRAMPLE:
                 DoCastSpellIfCan(me->GetVictim(), SPELL_TRAMPLE);
-                m_events.ScheduleEvent(EVENT_RARE_TRAMPLE, 5000); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_RARE_TRAMPLE, urand(5000, 10000));
                 break;
             case EVENT_RARE_RIBBON_OF_SOULS:
                 DoCastSpellIfCan(me->GetVictim(), SPELL_RIBBON_OF_SOULS);
-                m_events.ScheduleEvent(EVENT_RARE_RIBBON_OF_SOULS, 1500); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_RARE_RIBBON_OF_SOULS, urand(1500, 4500));
                 break;
             case EVENT_DOOM_MINDFLAY:
                 DoCastSpellIfCan(me->GetVictim(), SPELL_MINDFLAY);
-                m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 6500); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, urand(6500, 13000));
                 break;
             case EVENT_DOOM_FEAR:
                 DoCastSpellIfCan(me->GetVictim(), SPELL_FEAR);
-                m_events.ScheduleEvent(EVENT_DOOM_FEAR, 14500); // Shortest sniffed cooldown.
+                m_events.ScheduleEvent(EVENT_DOOM_FEAR, 14500);
                 break;
             }
         }
@@ -1167,6 +1221,11 @@ void AddSC_world_event_naxxramas()
     newscript = new Script;
     newscript->Name = "scourge_invasion_necropolis";
     newscript->GetAI = &GetAI_Necropolis;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "scourge_invasion_mouth";
+    newscript->GetAI = &GetAI_Mouth;
     newscript->RegisterSelf();
 
     newscript = new Script;

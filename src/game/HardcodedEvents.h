@@ -239,6 +239,7 @@ private:
     {
         uint32 map;
         uint32 zoneId;
+        uint32 mouthGuid;
         uint32 remainingVar;
         std::vector<InvasionNecropolis> points;
     };

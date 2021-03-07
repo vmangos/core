@@ -605,6 +605,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         winterspring.map = 1;
         winterspring.zoneId = 618;
+        winterspring.mouthGuid = 701180;
         winterspring.remainingVar = VARIABLE_SI_WINTERSPRING_REMAINING;
         InvasionNecropolis winterspring_south(6184.28f, -4913.32f, 807.676f, 6.0912f);
         winterspring_south.necroID = GOBJ_NECROPOLIS_SMALL;
@@ -642,6 +643,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         tanaris.map = 1;
         tanaris.zoneId = 440;
+        tanaris.mouthGuid = 701176;
         tanaris.remainingVar = VARIABLE_SI_TANARIS_REMAINING;
         InvasionNecropolis tanaris_north(-7399.95f, -3733.06f, 61.0504f, 5.81195f);
         tanaris_north.necroID = GOBJ_NECROPOLIS_BIG;
@@ -679,6 +681,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         azshara.map = 1;
         azshara.zoneId = 16;
+        azshara.mouthGuid = 701179;
         azshara.remainingVar = VARIABLE_SI_AZSHARA_REMAINING;
         InvasionNecropolis azshara_west(3299.55f, -4301.3f, 177.808f, 5.81195f);
         azshara_west.necroID = GOBJ_NECROPOLIS_TINY;
@@ -706,6 +709,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         blasted_lands.map = 0;
         blasted_lands.zoneId = 4;
+        blasted_lands.mouthGuid = 701170;
         blasted_lands.remainingVar = VARIABLE_SI_BLASTED_LANDS_REMAINING;
         InvasionNecropolis blasted_lands_west(-11233.9f, -2841.77f, 185.603f, 4.45059f);
         blasted_lands_west.necroID = GOBJ_NECROPOLIS_MEDIUM;
@@ -733,6 +737,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         eastern_plaguelands.map = 0;
         eastern_plaguelands.zoneId = 139;
+        eastern_plaguelands.mouthGuid = 701175;
         eastern_plaguelands.remainingVar = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
         InvasionNecropolis eastern_plaguelands_east(2101.69f, -4930.03f, 168.281f, 1.0472f);
         eastern_plaguelands_east.necroID = GOBJ_NECROPOLIS_TINY;
@@ -760,6 +765,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         burning_steppes.map = 0;
         burning_steppes.zoneId = 46;
+        burning_steppes.mouthGuid = 701172;
         burning_steppes.remainingVar = VARIABLE_SI_BURNING_STEPPES_REMAINING;
         InvasionNecropolis burning_steppes_west(-8232.78f, -1099.86f, 201.488f, 5.18363f);
         burning_steppes_west.necroID = GOBJ_NECROPOLIS_TINY;
@@ -831,7 +837,6 @@ void ScourgeInvasionEvent::Update()
             else
                 ++numNecrosAlive;
         }
-
 
         // If this is an active invasion zone, and there are no necropolises alive,
         // we initialize the cooldown variable which will make a new zone active at
@@ -945,15 +950,13 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
         InvasionZone* zone = GetZone(zoneId);
         if (!zone) return;
 
-        for (auto& necro : zone->points)
-        {
-            Map* mapPtr = GetMap(zone->map, necro);
-            if (mapPtr)
-            {
-                // Change weather to normal.
-                mapPtr->SetWeather(zoneId, WEATHER_TYPE_FINE, 0.0f, false);
-            }
-        }
+        // Change weather to fine.
+        Map* pMap = sMapMgr.FindMap(zone->map);
+        pMap->SetWeather(zoneId, WEATHER_TYPE_RAIN, 0.0f, false);
+        if (Creature* mouth = pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, NPC_MOUTH_OF_KELTHUZAD, zone->mouthGuid)))
+            mouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
+        else
+            sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found", zone->mouthGuid);
     }
 }
 
@@ -1035,6 +1038,14 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
             ++num_necropolises_remaining;
     }
     
+    // Change weather to storm.
+    Map* pMap = sMapMgr.FindMap(zone->map);
+    pMap->SetWeather(zone->zoneId, WEATHER_TYPE_STORM, 0.25f, true);
+    if (Creature* mouth = pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, NPC_MOUTH_OF_KELTHUZAD, zone->mouthGuid)))
+        mouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+    else
+        sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found", zone->mouthGuid);
+
     // Setting num remaining directly
     sObjectMgr.SetSavedVariable(zone->remainingVar, num_necropolises_remaining, true);
 }
@@ -1082,6 +1093,16 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
 
         SummonNecropolis(mapPtr, necro);
     }
+
+    // Change weather to storm.
+    Map* pMap = sMapMgr.FindMap(zone->map);
+    pMap->SetWeather(zone->zoneId, WEATHER_TYPE_STORM, 0.25f, true);
+    if (Creature* mouth = pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, NPC_MOUTH_OF_KELTHUZAD, zone->mouthGuid)))
+        mouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+    else
+        sLog.outError("ScourgeInvasionEvent::ResumeInvasion ObjectGuid %d not found", zone->mouthGuid);
+
+
     return true;
 }
 
