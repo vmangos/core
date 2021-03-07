@@ -55,7 +55,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 
     PathFinder path(&owner);
     path.calculate(x, y, z, true);
-    if ((path.getPathType() & PATHFIND_NORMAL) && !((path.getPathType() & PATHFIND_NOT_USING_PATH) && (path.getPathType() & PATHFIND_DEST_FORCED)))
+    if (path.getPathType() & PATHFIND_NORMAL)
     {
         Movement::MoveSplineInit init(owner, "HomeMovementGenerator");
 

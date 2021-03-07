@@ -106,7 +106,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     path.calculate(x, y, z, petFollowing);
 
     PathType pathType = path.getPathType();
-    m_bReachable = pathType & PATHFIND_NORMAL;
+    m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
     
     if (!petFollowing && pathType == PATHFIND_NOPATH)
         return;    
