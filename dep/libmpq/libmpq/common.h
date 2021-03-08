@@ -1,7 +1,7 @@
 /*
  *  common.h -- header functions used by mpq-tools.
  *
- *  Copyright (c) 2003-2008 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (c) 2003-2011 Maik Broemme <mbroemme@libmpq.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@ int32_t libmpq__decrypt_block(
 int32_t libmpq__decrypt_key(
 	uint8_t		*in_buf,
 	uint32_t	in_size,
-	uint32_t	block_size
+	uint32_t	block_size,
+	uint32_t	*key
 );
 
 /* function to decompress or explode block from archive. */
