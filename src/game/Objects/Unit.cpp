@@ -6086,45 +6086,27 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 
     // set max distance
     float MaxStealthDetectRange = sWorld.getConfig(CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE);
-    float visibleDistance = IsPlayer() ? MaxStealthDetectRange : ((Creature*)this)->GetAttackDistance(target);
 
+    float visibleDistance = IsPlayer() ? 20.f : ((Creature*)this)->GetDetectionRange();
     //Always invisible from back (when stealth detection is on), also filter max distance cases
     bool isInFront = distance < visibleDistance && HasInArc(target);
     if (!isInFront)
         return false;
 
-    visibleDistance = 10.5f - target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) / 100.0f;
-
-    //Visible distance is modified by
-    //-Level Diff (every level diff = 1.0f in visible distance)
+    int32 stealthSkill = target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL) + target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH);
+    int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
     int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
-    if (abs(level_diff) > 3)
-        visibleDistance += level_diff;
-    else
-        visibleDistance += 0.5f * level_diff;
+    float c = std::abs(level_diff) > 3 ? 5.f : 10.f;
+    visibleDistance = std::min(visibleDistance/2.f + (detectSkill - stealthSkill)/c, MaxStealthDetectRange);
 
-    //This allows to check talent tree and will add addition stealth dependent on used points)
-    int32 stealthMod = target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
-    if (stealthMod < 0)
-        stealthMod = 0;
-
-    //-Stealth Mod(positive like Master of Deception) and Stealth Detection(negative like paranoia)
-    //based on wowwiki every 5 mod we have 1 more level diff in calculation
-    visibleDistance += (int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0)) - stealthMod) / 5.0f;
-    visibleDistance = visibleDistance > MaxStealthDetectRange ? MaxStealthDetectRange : visibleDistance;
+    int32 alertRange = visibleDistance;
+    visibleDistance = (visibleDistance - 1.5f) * 0.9f ;
 
     // recheck new distance
-    if (visibleDistance <= 0 || distance > visibleDistance)
-    {
-        if (alert && distance < 15.0f /*TODO: add MAX ALERT DISTANCE config*/)
-        {
-            visibleDistance = visibleDistance * 1.08f + 1.5f;
-            *alert = distance < visibleDistance;
-        }
-        return false;
-    }
+    if (alert)
+        *alert = distance <= alertRange && distance > visibleDistance;
 
-    return true;
+    return distance <= visibleDistance;
 }
 
 void Unit::CheckPendingMovementChanges()
