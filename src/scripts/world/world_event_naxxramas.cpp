@@ -24,7 +24,7 @@
 
 uint32 GetCampType(Creature* unit) { return unit->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON) || unit->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL) || unit->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON); };
 
-void SetObjectsVisibilty(Creature* shard, bool on)
+void DespawnObjects(Creature* shard)
 {
     if (!shard)
         return;
@@ -32,12 +32,12 @@ void SetObjectsVisibilty(Creature* shard, bool on)
     std::list<GameObject*> objectList;
     GetGameObjectListWithEntryInGrid(objectList, shard, { GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04 }, 60.0f);
     for (const auto pobject : objectList)
-    {
-        if (on)
-            pobject->SetVisible(true);
-        else
-            pobject->SetVisible(false);
-    }
+        pobject->Delete();
+
+    std::list<Creature*> finderList;
+    GetCreatureListWithEntryInGrid(finderList, shard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+    for (const auto pfinder : finderList)
+        pfinder->DespawnOrUnsummon();
 }
 
 void DespawnObjectNecropolis(Unit* despawner)
@@ -112,18 +112,6 @@ bool UncommonMinionspawner(Creature* spawner) // Rare Minion Spawner.
     return true;
 }
 
-void RespawnAllFinders(Creature* shard)
-{
-    if (!shard)
-        return;
-
-    std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, shard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
-    for (const auto pfinder : finderList)
-        if (!pfinder->IsAlive())
-            pfinder->SetDeathState(ALIVE);
-}
-
 uint32 GetFindersAmmount(Creature* shard)
 {
     uint32 finderCounter = NULL;
@@ -132,12 +120,6 @@ uint32 GetFindersAmmount(Creature* shard)
     for (const auto pfinder : finderList)
         if (pfinder)
             finderCounter++;
-
-    /*
-    std::ostringstream ss;
-    ss << "Finders: " << finderCounter;
-    shard->MonsterSay(ss.str().c_str());
-    */
 
     return finderCounter;
 }
@@ -165,6 +147,94 @@ void SpawnWholeCamp(GameObject* circle)
         float z = circle->GetPositionZ() + 5.0f;
         circle->UpdateGroundPositionZ(x, y, z);
         circle->SummonGameObject(PickRandomValue(GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04), x, y, z, angle - M_PI);
+    }
+}
+
+void StartZoneInvasion(Creature* mouth)
+{
+    if (!mouth)
+        return;
+
+    QueryResult* Cresult = WorldDatabase.PQuery("SELECT creature.guid, creature.id, creature.map, creature.position_x, creature.position_y, creature.position_z, creature.orientation, game_event_creature.event "
+        "FROM creature JOIN game_event_creature ON creature.guid = game_event_creature.guid WHERE game_event_creature.event='17'");
+
+    if (Cresult)
+    {
+        int counter = 0;
+        do
+        {
+            Field *fields = Cresult->Fetch();
+
+            uint32 guid         = fields[0].GetUInt32();
+            uint32 id           = fields[1].GetUInt32();
+            uint32 map          = fields[2].GetUInt32();
+            float position_x   = fields[3].GetFloat();
+            float position_y   = fields[4].GetFloat();
+            float position_z   = fields[5].GetFloat();
+            float orientation  = fields[6].GetFloat();
+
+            uint32 zone = sTerrainMgr.GetZoneId(map, position_x, position_y, position_z);
+
+            if (id == NPC_MOUTH_OF_KELTHUZAD)
+                continue;
+
+            if (!zone || mouth->GetZoneId() != zone)
+                continue;
+
+            if (Creature* pcreature = mouth->GetMap()->SummonCreature(id, position_x, position_y, position_z, orientation, TEMPSUMMON_MANUAL_DESPAWN))
+            {
+                pcreature->SetDeathState(JUST_ALIVED);
+                counter++;
+                sLog.outBasic("ScourgeInvasionEvent:SpawnWholeZone Summon %d. New Creature (%d) in Zone %d.", counter, id, zone);
+            }
+
+        } while (Cresult->NextRow());
+
+        delete Cresult;
+        sLog.outBasic("ScourgeInvasionEvent:SpawnWholeZone Summoned %d Creatures.", counter);
+    }
+
+    QueryResult* Oresult = WorldDatabase.PQuery("SELECT gameobject.guid, gameobject.id, gameobject.map, gameobject.position_x, gameobject.position_y, gameobject.position_z, gameobject.orientation, "
+        "gameobject.rotation0, gameobject.rotation1, gameobject.rotation2, gameobject.rotation3, game_event_gameobject.event "
+        "FROM gameobject JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid WHERE game_event_gameobject.event='17'");
+
+    if (Oresult)
+    {
+        int counter = 0;
+        do
+        {
+            Field *fields = Oresult->Fetch();
+
+            uint32 guid = fields[0].GetUInt32();
+            uint32 id = fields[1].GetUInt32();
+            uint32 map = fields[2].GetUInt32();
+            float position_x = fields[3].GetFloat();
+            float position_y = fields[4].GetFloat();
+            float position_z = fields[5].GetFloat();
+            float orientation = fields[6].GetFloat();
+            float rotation0 = fields[7].GetFloat();
+            float rotation1 = fields[8].GetFloat();
+            float rotation2 = fields[9].GetFloat();
+            float rotation3 = fields[10].GetFloat();
+
+            uint32 zone = sTerrainMgr.GetZoneId(map, position_x, position_y, position_z);
+
+            if (!zone || mouth->GetZoneId() != zone)
+                continue;
+
+            if (id == GOBJ_SKULLPILE_01 || id == GOBJ_SKULLPILE_02 || id == GOBJ_SKULLPILE_03 || id == GOBJ_SKULLPILE_04)
+                id = PickRandomValue(GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04);
+
+            if (Object* pobject = mouth->GetMap()->SummonGameObject(id, position_x, position_y, position_z, orientation, rotation0, rotation1, rotation2, rotation3, 0, mouth->GetWorldMask()))
+            {
+                counter++;
+                sLog.outBasic("ScourgeInvasionEvent:SpawnWholeZone Summon GameObject (%d) in Zone %d.", id, zone);
+            }
+
+        } while (Oresult->NextRow());
+
+        delete Oresult;
+        sLog.outBasic("ScourgeInvasionEvent:SpawnWholeZone Summoned %d GameObjects.", counter);
     }
 }
 
@@ -217,6 +287,8 @@ struct MouthAI : public ScriptedAI
 {
     MouthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        Reset();
+        me->GetMap()->SetWeather(me->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
         m_events.Reset();
         switch (me->GetZoneId())
         {
@@ -233,7 +305,11 @@ struct MouthAI : public ScriptedAI
 
     EventMap m_events;
 
-    void Reset() {}
+    void Reset()
+    {
+        StartZoneInvasion(me);
+        me->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2));
+    }
 
     void DoAction(uint32 action) override
     {
@@ -336,7 +412,7 @@ struct NecropolisHealthAI : public ScriptedAI
         {
             DespawnObjectNecropolis(target);
             target->RemoveFromWorld();
-            me->ForcedDespawn();
+            me->RemoveFromWorld();
         }
     }
 
@@ -383,7 +459,7 @@ struct NecropolisProxyAI : public ScriptedAI
     {
         // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            me->ForcedDespawn();
+            me->DespawnOrUnsummon();
     }
 
     void UpdateAI(uint32 const uiDiff) override {}
@@ -425,6 +501,13 @@ struct NecropolisRelayAI : public ScriptedAI
         }
     }
 
+    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
+    {
+        // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
+        if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
+            me->DespawnOrUnsummon();
+    }
+
     void UpdateAI(uint32 const uiDiff) override {}
 };
 
@@ -444,17 +527,11 @@ struct NecroticShard : public ScriptedAI
         me->SetVisibilityModifier(3000.0f);
         m_events.Reset();
         Reset();
-        switch (me->GetEntry())
+        if (me->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD)
         {
-        case NPC_NECROTIC_SHARD:
-            m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
-            SetObjectsVisibilty(me, true);
-            break;
-        case NPC_DAMAGED_NECROTIC_SHARD:
             m_finders = GetFindersAmmount(me);                              // Count all finders to limit Minions spawns.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, 0); // Spawn Cultists every 60 minutes.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
-            break;
         }
     }
 
@@ -486,10 +563,9 @@ struct NecroticShard : public ScriptedAI
         {
             if (!GetCampType(me) && me->GetEntry() == NPC_NECROTIC_SHARD)
             {
-                // Make sure every finder is alive on spawn.
-                RespawnAllFinders(me);
                 m_finders = GetFindersAmmount(me);
                 me->CastSpell(me, SPELL_CHOOSE_CAMP_TYPE, true);
+                m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
             }
             break;
         }
@@ -511,11 +587,11 @@ struct NecroticShard : public ScriptedAI
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
-        if (me->GetEntry() == !NPC_DAMAGED_NECROTIC_SHARD)
+        if (me->GetEntry() != NPC_DAMAGED_NECROTIC_SHARD)
             return;
 
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            me->ForcedDespawn();
+            me->DespawnOrUnsummon();
     }
 
     void DamageTaken(Unit* dealer, uint32& damage) override
@@ -534,7 +610,7 @@ struct NecroticShard : public ScriptedAI
             {
                 // Get the camp type from the Necrotic Shard.
                 DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, m_camptype, true);
-                me->ForcedDespawn();
+                me->DespawnOrUnsummon();
             }
             break;
         case NPC_DAMAGED_NECROTIC_SHARD:
@@ -545,8 +621,8 @@ struct NecroticShard : public ScriptedAI
                 SUMMON_CIRCLE->RemoveFromWorld();
             // Despawn remaining Cultists (should never happen).
             DespawnCultists(me);
-            // Set all Objects from the event around the Shard invisible.
-            SetObjectsVisibilty(me, false);
+            // Remove Objects from the event around the Shard.
+            DespawnObjects(me);
             break;
         }
     }
@@ -561,6 +637,7 @@ struct NecroticShard : public ScriptedAI
             {
             case EVENT_SHARD_MINION_SPAWNER_SMALL:
             {
+                sLog.outBasic("NecroticShard:EVENT_SHARD_MINION_SPAWNER_SMALL (%d)", me->GetGUIDLow());
                 /*
                 This is a placeholder for SPELL_MINION_SPAWNER_SMALL [27887] which also activates unknown, not sniffable objects, which possibly checks whether a minion is in his range
                 and happens every 15 seconds for both, Necrotic Shard and Damaged Necrotic Shard.
@@ -570,37 +647,35 @@ struct NecroticShard : public ScriptedAI
                 int finderAmount = urand(1, 3); // pick up to 3 spawns.
 
                 // Start spawning Minions near the Shard and then spread out to 60 yards.
-                for (uint32 i = 1; i <= 5; ++i)
+                std::list<Creature*> finderList;
+                GetCreatureListWithEntryInGrid(finderList, me, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+                if (finderList.empty())
+                    return;
+                
+                finderList.sort(ObjectDistanceOrder(m_creature));
+                
+                for (const auto& pfinder : finderList)
                 {
-                    float range = i * 12;
-                    std::list<Creature*> finderList;
-                    GetCreatureListWithEntryInGrid(finderList, me, { NPC_SCOURGE_INVASION_MINION_FINDER }, range);
-                    for (const auto pfinder : finderList)
+                    // Stop summoning Minions if we reached the max spawn amount.
+                    if (finderAmount == finderCounter)
+                        break;
+                
+                    // Skip dead finders.
+                    if (!pfinder->IsAlive())
+                        continue;
+                
+                    // Don't take finders with Minions.
+                    if (HasMinion(pfinder, ATTACK_DISTANCE))
+                        continue;
+                
+                    if (pfinder->AI()->DoCastSpellIfCan(me, SPELL_FIND_CAMP_TYPE, CF_TRIGGERED) == CAST_OK)
                     {
-                        if (finderCounter == finderAmount)
-                            break;
-
-                        if (!pfinder->IsAlive())
-                            continue; 
-
-                        // Don't take finders with Minions.
-                        if (HasMinion(pfinder, ATTACK_DISTANCE))
-                            continue;
-
-                        pfinder->CastSpell(me, SPELL_FIND_CAMP_TYPE, true);
-
-                        /*
-                        The finder disappears after spawning the spawner (which spawns the minion).
-                        after 160-185 seconds a new finder spawns on the same location.
-                        Instead of doing all this weird things Blizzard did, we just use the finder for all of the mechanics. You can't even reproduce the mechanics they did because we have some unknown Objects too.
-                        The Player won't notice any of this changes.
-                        */
                         pfinder->SetRespawnDelay(urand(150, 200)); // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
                         pfinder->DisappearAndDie();
-
                         finderCounter++;
                     }
                 }
+                sLog.outBasic("NecroticShard:EVENT_SHARD_MINION_SPAWNER_SMALL (%d) %d finders usable found", me->GetGUIDLow(), finderCounter);
                 m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 5000);
                 break;
             }
@@ -812,13 +887,6 @@ struct ScourgeMinion : public ScriptedAI
     {
         Reset();
         m_events.Reset();
-        if (me->GetEntry() == NPC_SHADOW_OF_DOOM)
-        {
-            m_events.ScheduleEvent(EVENT_DOOM_START_ATTACK, 5000); // Remove Flag (immune to Players) after 5 seconds.
-            // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
-            me->MonsterSay(PickRandomValue(LANG_SHADOW_OF_DOOM_TEXT_0, LANG_SHADOW_OF_DOOM_TEXT_1, LANG_SHADOW_OF_DOOM_TEXT_2, LANG_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, me->GetOwner());
-            me->CastSpell(me, SPELL_SPAWN_SMOKE, true);
-        }
     }
 
     EventMap m_events;                 
