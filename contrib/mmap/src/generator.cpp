@@ -45,7 +45,7 @@ bool checkDirectories(bool debugOutput)
         if (mkdir("mmaps",0777) != 0)
         {
             /* return error if operation fails */
-	    printf("'mmaps' directory does not exist, please create it\n");
+            printf("'mmaps' directory does not exist, please create it\n");
             return false;
         }
     }
