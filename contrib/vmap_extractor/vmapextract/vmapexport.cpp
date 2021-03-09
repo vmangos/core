@@ -207,6 +207,8 @@ bool ExtractSingleWmoWithAllConfig(std::string& fname)
         //printf("Extracting wmo+doodadset %i\n", i);
         ExtractSingleWmo(fname, i);
     }
+
+    return true;
 }
 
 bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
