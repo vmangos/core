@@ -6078,10 +6078,10 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     if (distance < 0.388f) //collision
         return true;
 
-    // Hunter mark functionality
+    // Hunter mark functionality. TODO: range cap at 60, actual range needs to be verified
     AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
     for (const auto& iter : auras)
-        if (iter->GetCasterGuid() == GetObjectGuid())
+        if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f);
             return true;
 
     // set max distance
