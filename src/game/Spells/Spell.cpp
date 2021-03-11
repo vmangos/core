@@ -7708,7 +7708,7 @@ SpellCastResult Spell::CheckItems()
         {
             case SPELL_EFFECT_CREATE_ITEM:
             {
-                if (i == EFFECT_INDEX_0)
+                if (!m_IsTriggeredSpell && i == EFFECT_INDEX_0)
                 {
                     if (Unit* target = m_targets.getUnitTarget())
                     {
