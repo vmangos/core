@@ -3076,6 +3076,15 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 float x, y, z;
                 m_caster->GetNearPoint(m_caster, x, y, z, 0.0f, radius, angle);
 
+                // Hacky fix in case we are inside a cave, because GetNearPoint will update Z to above the cave.
+                // Example case: trap for gobject 178325, spell 21078
+                if ((m_caster->GetDistance(x, y, z) > radius * 2) &&
+                    !m_caster->IsWithinLOS(x, y, z, false))
+                {
+                    m_caster->GetPosition(x, y, z);
+                    m_caster->GetNearPoint2D(x, y, radius, angle);
+                }
+
                 // For some reason all the creature Blink spells use this target type instead of the player one.
                 // Prevent them from teleporting to places that they can't normally walk to like under the map.
                 if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_LEAP)
