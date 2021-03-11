@@ -34,6 +34,10 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (563, 110, 'Baron Longshore #2'),
 (564, 110, 'Baron Longshore #3');
 
+-- correct quest chain for Mage's Wand (1952)
+UPDATE `quest_template` SET `PrevQuestId` = 1947, `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1948;
+UPDATE `quest_template` SET `NextQuestId` = 1952, `ExclusiveGroup` = -1948 =  WHERE `entry` = 1951;
+
 
 -- End of migration.
 END IF;
