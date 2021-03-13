@@ -29,14 +29,17 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (563, 110, 'Baron Longshore #2'),
 (564, 110, 'Baron Longshore #3');
 
--- correct quest chain for Mage's Wand (1952)
-UPDATE `quest_template` SET `PrevQuestId` = 1947, `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1948;
-UPDATE `quest_template` SET `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1951;
-
 -- Witherbark Bloodling, Serpentbloom Snake and Hazzali Parasite should not drop loot
 DELETE FROM `creature_loot_template` WHERE `entry` IN (7768, 3680
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7769;
 
+-- correct quest chain for Mage's Wand (1952)
+UPDATE `quest_template` SET `PrevQuestId` = 1947, `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1948;
+UPDATE `quest_template` SET `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1951;
+                                                       
+-- Peaceblooms should only drop in stacks of 3
+UPDATE `gameobject_loot_template` SET `maxcount` = 3 WHERE `entry` = 1415 AND `item` = 2447;
+     
                                                        
 -- End of migration.
 END IF;
