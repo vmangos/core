@@ -40,7 +40,11 @@ UPDATE `quest_template` SET `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE
 -- Peaceblooms should only drop in stacks of 3
 UPDATE `gameobject_loot_template` SET `maxcount` = 3 WHERE `entry` = 1415 AND `item` = 2447;
      
-                                                       
+-- Grim Reach should increase the range of Drain Soul (credit to jaywalker15262)
+UPDATE `spell_affect` SET `SpellFamilyMask` = 6447547418 WHERE `entry` = 18218; 
+UPDATE `spell_affect` SET `SpellFamilyMask` = 6447547418 WHERE `entry` = 18219;
+
+
 -- End of migration.
 END IF;
 END??
