@@ -225,23 +225,19 @@ private:
         float x, y, z, o;
     };
 
-    struct InvasionNecropolis {
-        InvasionNecropolis(float x, float y, float z, float o)
+    struct InvasionMouth {
+        InvasionMouth(float x, float y, float z, float o)
             : x(x), y(y), z(z), o(o) {}
         float x, y, z, o;
-        std::vector<InvasionXYZO> circles;
-        std::vector<InvasionXYZO> proxys;
-        uint32 necroID;
-        ObjectGuid necroGuid;
+        ObjectGuid mouthGuid;
     };
 
     struct InvasionZone
     {
         uint32 map;
         uint32 zoneId;
-        uint32 mouthGuid;
         uint32 remainingVar;
-        std::vector<InvasionNecropolis> points;
+        std::vector<InvasionMouth> points;
     };
 
     bool invasion1Loaded;
@@ -253,9 +249,9 @@ private:
 
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
-    bool SummonNecropolis(Map* pMap, InvasionNecropolis& point);
+    bool SummonMouth(Map* pMap, InvasionMouth& point);
 
-    Map* GetMap(uint32 mapId, InvasionNecropolis const& invZone);
+    Map* GetMap(uint32 mapId, InvasionMouth const& invZone);
     bool isValidZoneId(uint32 zoneId);
     InvasionZone* GetZone(uint32 zoneId);
     uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
