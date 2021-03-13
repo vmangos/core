@@ -37,6 +37,7 @@ UPDATE `quest_template` SET `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE
 DELETE FROM `creature_loot_template` WHERE `entry` IN (7768, 3680
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7769;
 
+                                                       
 -- End of migration.
 END IF;
 END??
