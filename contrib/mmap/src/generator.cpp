@@ -93,7 +93,8 @@ bool handleArgs(int argc, char** argv,
                 bool& silent,
                 bool& bigBaseUnit,
                 bool &quick,
-                char*& offMeshInputPath)
+                char*& offMeshInputPath,
+                char*& configInputPath)
 {
     char* param = nullptr;
     for (int i = 1; i < argc; ++i)
@@ -226,6 +227,14 @@ bool handleArgs(int argc, char** argv,
 
             offMeshInputPath = param;
         }
+        else if (strcmp(argv[i], "--configInputPath") == 0)
+        {
+            param = argv[++i];
+            if (!param)
+                return false;
+
+            configInputPath = param;
+        }
         else if ((strcmp(argv[i], "-?") == 0) || (strcmp(argv[i], "/?") == 0) || (strcmp(argv[i], "-h") == 0))
         {
             printUsage();
@@ -268,11 +277,12 @@ int main(int argc, char** argv)
          bigBaseUnit = false,
          quick = false;
     char* offMeshInputPath = nullptr;
+    char* configInputPath = "config.json";
 
     bool validParam = handleArgs(argc, argv, mapnum,
                                  tileX, tileY, maxAngle,
                                  skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds,
-                                 debugOutput, silent, bigBaseUnit, quick, offMeshInputPath);
+                                 debugOutput, silent, bigBaseUnit, quick, offMeshInputPath, configInputPath);
 
     if (!validParam)
         return silent ? -1 : finish("You have specified invalid parameters (use -? for more help)", -1);
@@ -293,7 +303,7 @@ int main(int argc, char** argv)
         return silent ? -3 : finish("Press any key to close...", -3);
 
     MapBuilder builder(skipLiquid, skipContinents, skipJunkMaps,
-                       skipBattlegrounds, debugOutput, bigBaseUnit, quick, offMeshInputPath);
+                       skipBattlegrounds, debugOutput, bigBaseUnit, quick, offMeshInputPath, configInputPath);
 
     if (tileX > -1 && tileY > -1 && mapnum >= 0)
         builder.buildSingleTile(mapnum, tileX, tileY);

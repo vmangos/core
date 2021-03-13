@@ -110,6 +110,7 @@ namespace MMAP
             static void cleanVertices(G3D::Array<float>& verts, G3D::Array<int>& tris);
             float getHeight(float x, float y) const;
             bool IsUnderMap(float* pos /* y,z,x */);
+            bool m_quick;
         private:
             /// Loads a portion of a map's terrain
             bool loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, Spot portion);
@@ -144,7 +145,6 @@ namespace MMAP
             TerrainBuilder(const TerrainBuilder& tb);
             float* m_V9;
             float* m_V8;
-            bool m_quick;
             uint32 m_mapId;
             VMAP::VMapManager2 vmapManager;
     };

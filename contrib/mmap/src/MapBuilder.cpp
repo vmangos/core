@@ -25,6 +25,28 @@
 #include "DetourNavMeshBuilder.h"
 #include "DetourCommon.h"
 
+#include <fstream>
+
+void from_json(const json& j, rcConfig& config)
+{
+    //config.tileSize = MMAP::VERTEX_PER_TILE;
+    //config.cs = MMAP::BASE_UNIT_DIM;
+    //config.ch = MMAP::BASE_UNIT_DIM;
+    //config.minRegionArea = rcSqr(j["minRegionArea"].get<int>());
+    //config.mergeRegionArea = rcSqr(j["mergeRegionArea"].get<int>());
+    //config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
+    config.borderSize = j["borderSize"].get<int>();
+    config.walkableSlopeAngle = j["walkableSlopeAngle"].get<float>();
+    config.walkableHeight = j["walkableHeight"].get<int>();
+    config.walkableClimb = j["walkableClimb"].get<int>();
+    config.walkableRadius = j["walkableRadius"].get<int>();
+    config.maxEdgeLen = j["maxEdgeLen"].get<int>();
+    config.maxSimplificationError = j["maxSimplificationError"].get<float>();
+    config.detailSampleDist = j["detailSampleDist"].get<float>();
+    config.detailSampleMaxError = j["detailSampleMaxError"].get<float>();
+
+}
+
 using namespace VMAP;
 
 inline void calcTriNormal(const float* v0, const float* v1, const float* v2, float* norm)
@@ -226,7 +248,7 @@ namespace MMAP
 {
     MapBuilder::MapBuilder(bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
-                           bool debugOutput, bool bigBaseUnit, bool quick, const char* offMeshFilePath) :
+                           bool debugOutput, bool bigBaseUnit, bool quick, const char* offMeshFilePath, const char* configInputPath) :
         m_terrainBuilder(nullptr),
         m_debugOutput(debugOutput),
         m_offMeshFilePath(offMeshFilePath),
@@ -237,6 +259,10 @@ namespace MMAP
         m_bigBaseUnit(bigBaseUnit),
         m_rcContext(nullptr)
     {
+        std::ifstream jsonConfig(configInputPath);
+        if (jsonConfig)
+            m_config = json::parse(jsonConfig);
+
         m_terrainBuilder = new TerrainBuilder(skipLiquid, quick);
 
         m_rcContext = new rcContext(false);
@@ -488,6 +514,11 @@ namespace MMAP
         TerrainBuilder::cleanVertices(meshData.solidVerts, meshData.solidTris);
         TerrainBuilder::cleanVertices(meshData.liquidVerts, meshData.liquidTris);
 
+        rcConfig config;
+        //check if there is there a quickmode option for this map
+        json j = getTileConfig(mapID, tileX, tileY, config);
+        m_terrainBuilder->m_quick = j["quickmode"].get<bool>();
+        
         m_terrainBuilder->loadVMap(mapID, tileX, tileY, meshData); // get model data
         //TerrainBuilder::cleanVertices(meshData.solidVerts, meshData.solidTris);
 
@@ -633,16 +664,15 @@ namespace MMAP
             config.ch = 0.25f;
         config.walkableSlopeAngle = 75.0f;
         config.walkableHeight = (int)ceilf(agentHeight / config.ch);
-        config.walkableClimb = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch); // For models
+        //config.walkableClimb = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch); // For models
+        config.walkableClimb = m_bigBaseUnit ? 2 : 4; // For models
         uint32 walkableClimbTerrain = (int)floorf(agentMaxClimbTerrain / config.ch);
         uint32 walkableClimbModelTransition = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch);
         config.walkableRadius = (int)ceilf(agentRadius / config.cs);
         config.maxEdgeLen = (int)(12 / config.cs);
         config.maxSimplificationError = 1.8f;       // eliminates most jagged edges (tinny polygons)
-        config.minRegionArea = (int)rcSqr(30);
-        config.mergeRegionArea = (int)rcSqr(10);
-        config.maxVertsPerPoly = DT_VERTS_PER_POLYGON; // = 6
-        config.tileSize = VERTEX_PER_TILE;
+
+  
         config.borderSize = config.walkableRadius + 3;
         config.width = config.tileSize + config.borderSize*2;
         config.height = config.tileSize + config.borderSize*2;
@@ -650,6 +680,27 @@ namespace MMAP
         config.detailSampleMaxError = 0.5f; // Vertical precision
         int inWaterGround = config.walkableHeight;
         int stepForGroundInheriteWater = (int)ceilf(30.0f / config.ch);
+
+        json j= getTileConfig(mapID, tileX, tileY, config);
+        m_quick_config = j["quickmode"].get<bool>();
+        config = j;
+        //Lets initialize rest of the config
+        //These options are not part of the json config.
+            //config.tileSize = MMAP::VERTEX_PER_TILE;
+    //config.cs = MMAP::BASE_UNIT_DIM;
+    //config.ch = MMAP::BASE_UNIT_DIM;
+    //config.minRegionArea = rcSqr(j["minRegionArea"].get<int>());
+    //config.mergeRegionArea = rcSqr(j["mergeRegionArea"].get<int>());
+    //config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
+        config.cs = BASE_UNIT_DIM;
+        config.ch = 0.1f;
+        if (continent)
+            config.ch = 0.25f;
+        config.minRegionArea = (int)rcSqr(30);
+        config.mergeRegionArea = (int)rcSqr(10);
+        config.maxVertsPerPoly = DT_VERTS_PER_POLYGON; // = 6
+        config.tileSize = VERTEX_PER_TILE;
+        //end json config stuff
 
         // allocate subregions : tiles
         Tile* tiles = new Tile[TILES_PER_MAP * TILES_PER_MAP];
@@ -739,7 +790,7 @@ namespace MMAP
                     }
                     // Now we remove underterrain triangles (actually set flags to 0)
                     // This prevents selecting wrong poly for a player in the server later.
-                    if (!terrain && areas[i] && !m_quick)
+                    if (!terrain && areas[i] && !m_quick_config)
                     {
                         // Get triangle corners (as usual, yzx positions)
                         // (actually we push these corners towards the center a bit to prevent collision with border models etc...)
@@ -1551,6 +1602,52 @@ namespace MMAP
         }
 
         return true;
+    }
+
+    json MapBuilder::getMapIdConfig(uint32 mapId, rcConfig defaultconfig)
+    {
+        std::string key = std::to_string(mapId);
+        json config;
+
+        //config.tileSize = MMAP::VERTEX_PER_TILE;
+        config["borderSize"] = defaultconfig.borderSize;// = j["borderSize"].get<int>();
+        //config.cs = MMAP::BASE_UNIT_DIM;
+        //config.ch = MMAP::BASE_UNIT_DIM;
+        config["walkableSlopeAngle"] = defaultconfig.walkableSlopeAngle;//.get<float>();
+        config["walkableHeight"] = defaultconfig.walkableHeight;// = .get<int>();
+        config["walkableClimb"] = defaultconfig.walkableClimb;//.get<int>();
+        config["walkableRadius"] = defaultconfig.walkableRadius;// .get<int>();
+        config["maxEdgeLen"] = defaultconfig.maxEdgeLen;// .get<int>();
+        config["maxSimplificationError"] = defaultconfig.maxSimplificationError;// .get<float>();
+        //config.minRegionArea = rcSqr(j["minRegionArea"].get<int>());
+        //config.mergeRegionArea = rcSqr(j["mergeRegionArea"].get<int>());
+        //config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
+        config["detailSampleDist"] = defaultconfig.detailSampleDist;// = .get<float>();
+        config["detailSampleMaxError"] = defaultconfig.detailSampleMaxError;// .get<float>();
+        config["quickmode"] = m_quick;
+
+        if (m_config.find(key) != m_config.end())
+            config.merge_patch(m_config.at(key));
+
+        return config;
+    }
+
+    json MapBuilder::getTileConfig(uint32 mapId, uint32 tileX, uint32 tileY, rcConfig defaultconfig)
+    {
+        std::string key = std::to_string(tileX) + std::to_string(tileY);
+
+        json config = getMapIdConfig(mapId, defaultconfig);
+        if (config.find(key) != config.end())
+            config.merge_patch(config.at(key));
+
+        for (json::iterator it = config.begin(); it != config.end();) {
+            if ((*it).is_object())
+                it = config.erase(it);
+            else
+                ++it;
+        }
+
+        return config;
     }
 
 }

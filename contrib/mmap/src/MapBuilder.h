@@ -32,7 +32,10 @@
 #include "Recast.h"
 #include "DetourNavMesh.h"
 
+#include "json391.hpp"
+
 using namespace VMAP;
+using json = nlohmann::json;
 // G3D namespace typedefs conflicts with ACE typedefs
 
 namespace MMAP
@@ -66,7 +69,8 @@ namespace MMAP
                        bool debugOutput         = false,
                        bool bigBaseUnit         = false,
                        bool quick               = false,
-                       const char* offMeshFilePath = nullptr);
+                       const char* offMeshFilePath = nullptr,
+                       const char* configInputPath = nullptr);
 
             ~MapBuilder();
 
@@ -85,6 +89,8 @@ namespace MMAP
             bool duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX);
             bool duDumpPolyMeshDetailToObj(rcPolyMeshDetail& dmesh, uint32 mapID, uint32 tileY, uint32 tileX);
 
+            json getMapIdConfig(uint32 mapId, rcConfig defaultconfig);
+            json getTileConfig(uint32 mapId, uint32 tileX, uint32 tileY, rcConfig defaultconfig);
         private:
             // detect maps and tiles
             void discoverTiles();
@@ -121,8 +127,10 @@ namespace MMAP
             bool m_skipContinents;
             bool m_skipJunkMaps;
             bool m_skipBattlegrounds;
-            bool m_quick;
+            bool m_quick;       //option set via commandline parameter
+            bool m_quick_config;//option set via json config file
             bool m_bigBaseUnit;
+            json m_config;
 
             // build performance - not really used for now
             rcContext* m_rcContext;
