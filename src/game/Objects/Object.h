@@ -59,6 +59,7 @@
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // currently used (correctly?) for any non Unit world objects. This is actually the bounding_radius, like player/creature from creature_model_data
 #define DEFAULT_OBJECT_SCALE        1.0f                    // player/item scale as default, npc/go from database, pets from dbc
+#define DEFAULT_GNOME_SCALE         1.15f
 #define DEFAULT_TAUREN_MALE_SCALE   1.35f                   // Tauren Male Player Scale by default
 #define DEFAULT_TAUREN_FEMALE_SCALE 1.25f                   // Tauren Female Player Scale by default
 
