@@ -12,7 +12,7 @@ INSERT INTO `migrations` VALUES ('20210303085717');
 -- allow serpentbloom gameobject to be interacted with
 UPDATE `gameobject_template` SET `flags` = 4 WHERE `entry` = 13891;
 
--- dropchance should be 100%
+-- serpentbloom dropchance should be 100%
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`= -100 WHERE `entry` = 2772 AND `item` = 5339;
 
 -- The Scarlet Key should not drop from mobs
