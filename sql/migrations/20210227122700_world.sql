@@ -51,18 +51,12 @@ DELETE FROM `spell_script_target` WHERE `entry` IN (28373,28351,28032,28365,2828
 
 -- Fix Spells.
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
-    (28351, 1, 16386, 0, 0, 5464, 5875),
     (28365, 1, 16398, 0, 0, 5464, 5875),
     (28281, 1, 16386, 0, 0, 5464, 5875),
     (28373, 1, 16398, 0, 0, 5464, 5875),
     (28373, 0, 181154, 0, 0, 5464, 5875),
-    (28349, 1, 16398, 0, 0, 5464, 5875),
-    (28349, 1, 16386, 0, 0, 5464, 5875),
-    (28349, 1, 16401, 0, 0, 5464, 5875),
     (31315, 1, 16230, 0, 0, 5464, 5875),
     (28056, 1, 16172, 0, 0, 5464, 5875),
-    (28351, 1, 16398, 0, 0, 5464, 5875),
-    (28351, 1, 16421, 0, 0, 5464, 5875),
     (28367, 1, 16401, 0, 0, 5464, 5875),
     (28326, 1, 16172, 0, 0, 5464, 5875),
     (28326, 1, 16136, 0, 0, 5464, 5875),
@@ -72,7 +66,6 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
     (28373, 0, 181223, 0, 0, 5464, 5875),
     (28373, 0, 181373, 0, 0, 5464, 5875),
     (28373, 0, 181374, 0, 0, 5464, 5875),
-    (28041, 1, 16172, 0, 0, 5464, 5875),
     (27894, 1, 16230, 0, 0, 5464, 5875);
 
 -- Fix GameObjects
@@ -81,14 +74,17 @@ UPDATE `gameobject_template` SET `faction`='114', `flags`='32' WHERE `entry` IN 
 UPDATE `gameobject_template` SET `script_name`='scourge_invasion_go_necropolis' WHERE `entry` IN (181154,181373,181374,181215,181223);
 
 -- Events
-DELETE FROM `game_event` WHERE `entry` IN (80,90,91,92,93,94,95);
+DELETE FROM `game_event` WHERE `entry` IN (80,90,91,92,93,94,95,96,97,98);
 INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES
     (90, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Winterspring', 1, 1, 9, 10),
     (91, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Tanaris', 1, 1, 9, 10),
     (92, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Azshara', 1, 1, 9, 10),
     (93, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Blasted Lands', 1, 1, 9, 10),
     (94, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Eastern Plaguelands', 1, 1, 9, 10),
-    (95, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Burning Steppes', 1, 1, 9, 10);
+    (95, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Burning Steppes', 1, 1, 9, 10),
+    (96, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 50 Invasions', 1, 1, 9, 10);
+    (97, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 100 Invasions', 1, 1, 9, 10);
+    (98, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 150 Invasions', 1, 1, 9, 10);
 
 SET @CGUID = 700000;
 SET @OGUID = 700000;
@@ -105,6 +101,12 @@ SET @EASTERN_PLAGUELANDS_EVENT = 94;
 SET @EASTERN_PLAGUELANDS_GUID = 940000;
 SET @BURNING_STEPPES_EVENT = 95;
 SET @BURNING_STEPPES_GUID = 950000;
+SET @FIFTY_INVASIONS_EVENT = 96;
+SET @FIFTY_INVASIONS_GUID = 960000;
+SET @HUNDRED_INVASIONS_EVENT = 97;
+SET @HUNDRED_INVASIONS_GUID = 970000;
+SET @HUNDREDFIFTY_INVASIONS_EVENT = 98;
+SET @HUNDREDFIFTY_INVASIONS_GUID = 980000;
 
 UPDATE `game_event` SET `disabled`=0 WHERE `entry` IN (@EVENT, 81, 129, 130);
 
@@ -113,8 +115,60 @@ DELETE FROM gameobject WHERE guid IN (1267,1268,1269,1270,1271,1272,1273,1274,12
 
 DELETE FROM `game_event_gameobject` WHERE `event` = 17;
 DELETE FROM `game_event_creature` WHERE `event` = 17;
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+9000;
-DELETE FROM `creature` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+9000;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+8;
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
+
+    -- Ally
+    (@FIFTY_INVASIONS_GUID+1, 16395, 0, -8834.53, 643.027, 95.2532, 4.32842),
+    (@FIFTY_INVASIONS_GUID+2, 16395, 0, -4888.24, -945.974, 501.549, 2.86191),
+    (@FIFTY_INVASIONS_GUID+3, 16395, 0, 2251.9, -5310.87, 82.2506, 2.37365),
+    (@FIFTY_INVASIONS_GUID+4, 16395, 1, 9908.96, 2521.1, 1316.48, 0.122173),
+    
+    -- Horde
+    (@FIFTY_INVASIONS_GUID+5, 16384, 0, 1584.52, 248.001, -61.994, 3.08923),
+    (@FIFTY_INVASIONS_GUID+6, 16384, 1, -1256.82, 75.1629, 127.892, 4.18879),
+    (@FIFTY_INVASIONS_GUID+7, 16384, 1, 1581.37, -4411.9, 7.4357, 2.47837),
+    (@FIFTY_INVASIONS_GUID+8, 16384, 1, 1581.67, -4411.95, 7.55935, 2.47837);
+
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+8 AND `event`=@FIFTY_INVASIONS_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @FIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+8;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+8;
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
+
+    -- Ally
+    (@HUNDRED_INVASIONS_GUID+1, 16433, 0, -8834.53, 643.027, 95.2532, 4.32842),
+    (@HUNDRED_INVASIONS_GUID+2, 16433, 0, -4888.24, -945.974, 501.549, 2.86191),
+    (@HUNDRED_INVASIONS_GUID+3, 16433, 0, 2251.9, -5310.87, 82.2506, 2.37365),
+    (@HUNDRED_INVASIONS_GUID+4, 16433, 1, 9908.96, 2521.1, 1316.48, 0.122173),
+    
+    -- Horde
+    (@HUNDRED_INVASIONS_GUID+5, 16435, 0, 1584.52, 248.001, -61.994, 3.08923),
+    (@HUNDRED_INVASIONS_GUID+6, 16435, 1, -1256.82, 75.1629, 127.892, 4.18879),
+    (@HUNDRED_INVASIONS_GUID+7, 16435, 1, 1581.37, -4411.9, 7.4357, 2.47837),
+    (@HUNDRED_INVASIONS_GUID+8, 16435, 1, 1581.67, -4411.95, 7.55935, 2.47837);
+
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+8 AND `event`=@HUNDRED_INVASIONS_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDRED_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+8;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+8;
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
+
+    -- Ally
+    (@HUNDREDFIFTY_INVASIONS_GUID+1, 16434, 0, -8834.53, 643.027, 95.2532, 4.32842),
+    (@HUNDREDFIFTY_INVASIONS_GUID+2, 16434, 0, -4888.24, -945.974, 501.549, 2.86191),
+    (@HUNDREDFIFTY_INVASIONS_GUID+3, 16434, 0, 2251.9, -5310.87, 82.2506, 2.37365),
+    (@HUNDREDFIFTY_INVASIONS_GUID+4, 16434, 1, 9908.96, 2521.1, 1316.48, 0.122173),
+    
+    -- Horde
+    (@HUNDREDFIFTY_INVASIONS_GUID+5, 16436, 0, 1584.52, 248.001, -61.994, 3.08923),
+    (@HUNDREDFIFTY_INVASIONS_GUID+6, 16436, 1, -1256.82, 75.1629, 127.892, 4.18879),
+    (@HUNDREDFIFTY_INVASIONS_GUID+7, 16436, 1, 1581.37, -4411.9, 7.4357, 2.47837),
+    (@HUNDREDFIFTY_INVASIONS_GUID+8, 16436, 1, 1581.67, -4411.95, 7.55935, 2.47837);
+
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+8 AND `event`=@HUNDREDFIFTY_INVASIONS_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDREDFIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+8;
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
@@ -625,7 +679,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+234 AND `event`=@WINTERSPRING_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+234;
-
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
