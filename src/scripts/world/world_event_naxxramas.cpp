@@ -116,15 +116,15 @@ void ChangeZoneEventStatus(Creature* mouth, bool on)
     }
 }
 
-void DespawnObjects(Creature* shard)
+void DespawnEventDoodads(Creature* shard)
 {
     if (!shard)
         return;
 
     std::list<GameObject*> objectList;
-    GetGameObjectListWithEntryInGrid(objectList, shard, { GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
+    GetGameObjectListWithEntryInGrid(objectList, shard, { GOBJ_SUMMON_CIRCLE, GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
     for (const auto pobject : objectList)
-        pobject->Delete();
+        pobject->RemoveFromWorld();
 
     std::list<Creature*> finderList;
     GetCreatureListWithEntryInGrid(finderList, shard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
@@ -132,7 +132,7 @@ void DespawnObjects(Creature* shard)
         pfinder->DespawnOrUnsummon();
 }
 
-void DespawnObjectNecropolis(Unit* despawner)
+void DespawnNecropolis(Unit* despawner)
 {
     if (!despawner)
         return;
@@ -141,6 +141,32 @@ void DespawnObjectNecropolis(Unit* despawner)
     GetGameObjectListWithEntryInGrid(objectList, despawner, { GOBJ_NECROPOLIS_TINY, GOBJ_NECROPOLIS_SMALL, GOBJ_NECROPOLIS_MEDIUM, GOBJ_NECROPOLIS_BIG, GOBJ_NECROPOLIS_HUGE }, ATTACK_DISTANCE);
     for (const auto pobject : objectList)
         pobject->Despawn();
+}
+
+void SummonCultists(Unit* shard)
+{
+    if (!shard)
+        return;
+
+    std::list<GameObject*> SUMMONER_SHIELD_List;
+    GetGameObjectListWithEntryInGrid(SUMMONER_SHIELD_List, shard, { GOBJ_SUMMONER_SHIELD }, INSPECT_DISTANCE);
+    for (const auto SUMMONER_SHIELD : SUMMONER_SHIELD_List)
+        SUMMONER_SHIELD->Despawn();
+
+    // We don't have all positions sniffed from the Cultists, so why not using this code which placing them almost perfectly into the circle while blizzards positions are some times way off?
+    if (GameObject* circle = shard->FindNearestGameObject(GOBJ_SUMMON_CIRCLE, CONTACT_DISTANCE))
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            float angle = (float(i) * (M_PI / 2)) + circle->GetOrientation();
+            float x = circle->GetPositionX() + 6.95f * cos(angle);
+            float y = circle->GetPositionY() + 6.75f * sin(angle);
+            float z = circle->GetPositionZ() + 5.0f;
+            shard->UpdateGroundPositionZ(x, y, z);
+            if (Creature* CULTIST_ENGINEER = shard->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                CULTIST_ENGINEER->AI()->DoAction(shard, NPC_CULTIST_ENGINEER);
+        }
+    }
 }
 
 void DespawnCultists(Unit* despawner)
@@ -280,17 +306,20 @@ struct MouthAI : public ScriptedAI
             {
             case EVENT_MOUTH_OF_KELTHUZAD_UPDATE:
             {
-                // Check how if there's a Circle left.
-                if (!sObjectMgr.GetOneCreatureInZone(NPC_NECROPOLIS, me->GetMap(), me->GetZoneId()))
+                // Check how if there's a Necropolis left.
+                int necroAlive = sObjectMgr.GetCreaturesInZone(NPC_NECROPOLIS, me->GetMap(), me->GetZoneId());
+                sObjectMgr.SetSavedVariable(me->GetZoneId(), necroAlive, true);
+                if (!necroAlive)
                 {
                     me->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2));
                     ChangeZoneEventStatus(m_creature, false);
                     m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
                     me->DespawnOrUnsummon();
-
                 }
                 else
                     m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, 5000);
+
+                sLog.outBasic("EVENT_MOUTH_OF_KELTHUZAD_UPDATE: %d necros found in %d", necroAlive, me->GetZoneId());
             }
             break;
             case EVENT_MOUTH_OF_KELTHUZAD_YELL:
@@ -367,7 +396,7 @@ struct NecropolisHealthAI : public ScriptedAI
         // Make sure we despawn after SPELL_DESPAWNER_OTHER triggered.
         if (spell->Id == SPELL_DESPAWNER_OTHER && target->GetEntry() == NPC_NECROPOLIS)
         {
-            DespawnObjectNecropolis(target);
+            DespawnNecropolis(target);
             target->ToCreature()->RemoveFromWorld();
             m_creature->RemoveFromWorld();
         }
@@ -478,12 +507,15 @@ Necrotic Shard
 */
 struct NecroticShard : public ScriptedAI
 {
+    EventMap m_events;
+    uint32 m_camptype = 0;
+    uint32 m_finders = 0;
+
     NecroticShard(Creature* creature) : ScriptedAI(creature)
     {
+        m_events.Reset();
         m_creature->SetActiveObjectState(true);
         m_creature->SetVisibilityModifier(3000.0f);
-        m_events.Reset();
-        Reset();
         if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD)
         {
             m_finders = GetFindersAmount(me);                              // Count all finders to limit Minions spawns.
@@ -492,13 +524,7 @@ struct NecroticShard : public ScriptedAI
         }
     }
 
-    EventMap m_events;
-    uint32 m_camptype;
-    uint32 m_finders;
-
-    void Reset() override
-    {
-    }
+    void Reset() override {}
 
     void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
@@ -571,15 +597,15 @@ struct NecroticShard : public ScriptedAI
             }
             break;
         case NPC_DAMAGED_NECROTIC_SHARD:
+            // Buff Players.
             m_creature->CastSpell(me, SPELL_SOUL_REVIVAL, true);
+            // Sending the Death Bolt.
             if (Creature* NECROPOLIS_RELAY = m_creature->FindNearestCreature(NPC_NECROPOLIS_RELAY, 200.0f))
                 m_creature->CastSpell(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
-            if (GameObject* SUMMON_CIRCLE = m_creature->FindNearestGameObject(GOBJ_SUMMON_CIRCLE, CONTACT_DISTANCE))
-                SUMMON_CIRCLE->RemoveFromWorld();
             // Despawn remaining Cultists (should never happen).
             DespawnCultists(me);
-            // Remove Objects from the event around the Shard.
-            DespawnObjects(me);
+            // Remove Objects from the event around the Shard (Yes this is Blizzlike).
+            DespawnEventDoodads(me);
             break;
         }
     }
@@ -594,7 +620,6 @@ struct NecroticShard : public ScriptedAI
             {
             case EVENT_SHARD_MINION_SPAWNER_SMALL:
             {
-                //sLog.outBasic("NecroticShard:EVENT_SHARD_MINION_SPAWNER_SMALL (%d)", m_creature->GetGUIDLow());
                 /*
                 This is a placeholder for SPELL_MINION_SPAWNER_SMALL [27887] which also activates unknown, not sniffable objects, which possibly checks whether a minion is in his range
                 and happens every 15 seconds for both, Necrotic Shard and Damaged Necrotic Shard.
@@ -636,7 +661,6 @@ struct NecroticShard : public ScriptedAI
                         finderCounter++;
                     }
                 }
-                //sLog.outBasic("NecroticShard:EVENT_SHARD_MINION_SPAWNER_SMALL (%d) %d finders usable found", m_creature->GetGUIDLow(), finderCounter);
                 m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 5000);
                 break;
             }
@@ -647,29 +671,11 @@ struct NecroticShard : public ScriptedAI
                 and happens every hour if a Damaged Necrotic Shard is activ. The Cultists despawning after 1 hour,
                 so this just resets everything and spawn them again and Refill the Health of the Shard.
                 */
-                m_creature->SetFullHealth();
+                me->SetFullHealth();
                 // Despawn all remaining Shadows before respawning the Cultists?
                 DespawnShadowsOfDoom(me);
-                // Remove all Summoner Shields
-                std::list<GameObject*> SUMMONER_SHIELD_List;
-                GetGameObjectListWithEntryInGrid(SUMMONER_SHIELD_List, me, { GOBJ_SUMMONER_SHIELD }, INSPECT_DISTANCE);
-                for (const auto SUMMONER_SHIELD : SUMMONER_SHIELD_List)
-                    SUMMONER_SHIELD->Delete();
-
-                // We don't have all positions sniffed from the Cultists, so why not using this code which placing them almost perfectly into the circle while blizzards positions are some times way off?
-                if (GameObject* circle = m_creature->FindNearestGameObject(GOBJ_SUMMON_CIRCLE, CONTACT_DISTANCE))
-                {
-                    for (int i = 0; i < 4; ++i)
-                    {
-                        float angle = (float(i) * (M_PI / 2)) + circle->GetOrientation();
-                        float x = circle->GetPositionX() + 6.95f * cos(angle);
-                        float y = circle->GetPositionY() + 6.75f * sin(angle);
-                        float z = circle->GetPositionZ() + 5.0f;
-                        m_creature->UpdateGroundPositionZ(x, y, z);
-                        if (Creature* CULTIST_ENGINEER = m_creature->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
-                            CULTIST_ENGINEER->AI()->DoAction(me, NPC_CULTIST_ENGINEER);
-                    }
-                }
+                // Respawn the Cultists.
+                SummonCultists(me);
 
                 m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, IN_MILLISECONDS * HOUR);
                 break;
@@ -743,7 +749,6 @@ struct npc_cultist_engineer : public ScriptedAI
 {
     npc_cultist_engineer(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        Reset();
         m_events.Reset();
         // He does not turn if you talk to him.
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);

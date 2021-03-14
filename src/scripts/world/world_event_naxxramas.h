@@ -224,6 +224,7 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_MEDIUM                  = 181374, // Necropolis (scale 2.0)
     GOBJ_NECROPOLIS_BIG                     = 181215, // Necropolis (scale 2.5)
     GOBJ_NECROPOLIS_HUGE                    = 181223, // Necropolis (scale 3.5)
+    GOBJ_NECROPOLIS_CITY                    = 181172, // Necropolis at the Citys (scale 2.5)
 
 //#ifdef DEBUG_WORLD_EVENT
 //    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 

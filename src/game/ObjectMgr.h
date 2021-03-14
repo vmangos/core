@@ -969,26 +969,26 @@ class ObjectMgr
             return ObjectGuid();
         }
 
-        ObjectGuid GetOneCreatureInZone(uint32 entry, Map* map, uint32 zoneid) const
+        uint32 GetCreaturesInZone(uint32 entry, Map* map, uint32 zoneid) const
         {
             int counter = 0;
-            auto itr = m_CreatureDataMap.begin();
-            for (; itr != m_CreatureDataMap.end(); ++itr)
+            for (auto itr = m_CreatureDataMap.begin(); itr != m_CreatureDataMap.end(); ++itr)
             {
                 if (itr->second.creature_id[0] != entry)
                     continue;
 
-                Creature* circle = map->GetCreature(ObjectGuid(HIGHGUID_UNIT, itr->second.creature_id[0], itr->first));
+                Creature* pCreature = map->GetCreature(ObjectGuid(HIGHGUID_UNIT, itr->second.creature_id[0], itr->first));
 
-                if (!circle)
+                if (!pCreature)
                     continue;
 
-                if (circle->GetZoneId() != zoneid)
+                if (pCreature->GetZoneId() != zoneid)
                     continue;
                 
-                return ObjectGuid(HIGHGUID_UNIT, itr->second.creature_id[0], itr->first);
+                counter++;
+                //return ObjectGuid(HIGHGUID_UNIT, itr->second.creature_id[0], itr->first);
             }
-            return ObjectGuid();
+            return counter;
         }
 
         CreatureData& NewOrExistCreatureData(uint32 guid) { return m_CreatureDataMap[guid]; }
