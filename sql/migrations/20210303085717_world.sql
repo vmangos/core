@@ -46,6 +46,7 @@ UPDATE `spell_affect` SET `SpellFamilyMask` = 6447547418 WHERE `entry` = 18219;
 
 -- Marsh Flesheater and Bloodscalp Berserker should not flee at low hp
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (59702, 75102);
+DELETE FROM `creature_ai_events` WHERE `id` IN (59702, 75102);
 
 
 -- End of migration.
