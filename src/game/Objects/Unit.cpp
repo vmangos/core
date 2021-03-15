@@ -8418,7 +8418,12 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
                 AttackedBy(caster);
 
             // restore appropriate movement generator
-            if (!SelectHostileTarget())
+            if (IsPet() && GetOwnerGuid().IsPlayer())
+            {
+                AttackStop();
+                return;
+            }
+            else if (!SelectHostileTarget())
                 return;
 
             if (GetVictim())
@@ -10079,7 +10084,8 @@ void Unit::RestoreMovement()
     // Need restore previous movement since we have no proper states system
     if (IsAlive() && !HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
     {
-        if (Unit* victim = GetVictim())
+        Unit* victim = GetCharmInfo() && GetCharmInfo()->IsAtStay() ? nullptr : GetVictim();
+        if (victim)
             GetMotionMaster()->MoveChase(victim);
         else
             GetMotionMaster()->Initialize();
