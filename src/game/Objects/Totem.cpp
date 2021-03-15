@@ -68,7 +68,7 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
 void Totem::Update(uint32 update_diff, uint32 time)
 {
     Unit* owner = GetOwner();
-    if (!owner || !owner->IsAlive() || !IsAlive())
+    if (!owner || !owner->IsAlive() || !IsAlive() || !isWithinVisibilityDistanceOf(owner, owner))
     {
         UnSummon();                                         // remove self
         return;
