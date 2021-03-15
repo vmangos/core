@@ -21,7 +21,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- creature 18396 
 UPDATE `creature` SET `position_x` = -9291.14, `position_y` = -2991.8, `position_z` = 121.398, `orientation` = 5.74213, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 18396;
 
--- creature 18396 
+-- creature 26171 
 UPDATE `creature` SET `position_x` = -9272.69, `position_y` = -2948.96, `position_z` = 128.702, `movement_type` = 2 WHERE `guid` = 26171;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (26171, 1, -9272.69, -2948.96, 128.702, 100, 0, 0, 0),
