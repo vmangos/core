@@ -42,10 +42,10 @@ void CreatureGroup::OnMemberAttackStart(Creature* member, Unit* target)
 
     for (const auto& itr : m_members)
         if (itr.first != member->GetObjectGuid())
-            MemberAssist(member->GetMap()->GetCreature(itr.first), target);
+            MemberAssist(member->GetMap()->GetCreature(itr.first), target, member);
 
     if (member->GetObjectGuid() != GetOriginalLeaderGuid())
-        MemberAssist(member->GetMap()->GetCreature(GetOriginalLeaderGuid()), target);
+        MemberAssist(member->GetMap()->GetCreature(GetOriginalLeaderGuid()), target, member);
 }
 
 void CreatureGroup::OnMemberDied(Creature* member)
@@ -194,8 +194,11 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
     m_respawnGuard = false;
 }
 
-void CreatureGroup::MemberAssist(Creature* member, Unit* target)
+void CreatureGroup::MemberAssist(Creature* member, Unit* target, Creature* alliedAttacker)
 {
+    if (m_assistGuard)
+        return;
+
     if (!member || !member->IsInWorld())
         return;
 
@@ -207,8 +210,12 @@ void CreatureGroup::MemberAssist(Creature* member, Unit* target)
 
     if (member->AI())
     {
+        m_assistGuard = true;
         member->SetNoCallAssistance(true);
         member->AI()->AttackedBy(target);
+        if (member->GetVictim())
+            member->SetLastLeashExtensionTimePtr(alliedAttacker->GetLastLeashExtensionTimePtr());
+        m_assistGuard = false;;
     }
 }
 

@@ -49,7 +49,7 @@ struct CreatureGroupMember
 class CreatureGroup
 {
     public:
-        CreatureGroup(ObjectGuid leader) : m_leaderGuid(leader), m_originalLeaderGuid(leader), m_options(0), m_respawnGuard(false), m_lastReachedWaypoint(0)
+        CreatureGroup(ObjectGuid leader) : m_leaderGuid(leader), m_originalLeaderGuid(leader), m_options(0), m_assistGuard(false), m_respawnGuard(false), m_lastReachedWaypoint(0)
         {
         }
         CreatureGroupMember* AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags = (OPTION_FORMATION_MOVE|OPTION_AGGRO_TOGETHER));
@@ -67,7 +67,7 @@ class CreatureGroup
         void SetLastReachedWaypoint(uint32 point) { m_lastReachedWaypoint = point; }
 
         void OnMemberAttackStart(Creature* member, Unit* target);
-        void MemberAssist(Creature* member, Unit* target);
+        void MemberAssist(Creature* member, Unit* target, Creature* alliedAttacker);
 
         void OnMemberDied(Creature* member);
         void OnLeaveCombat(Creature* creature);
@@ -78,7 +78,8 @@ class CreatureGroup
         ObjectGuid m_leaderGuid;
         ObjectGuid m_originalLeaderGuid;
         uint32 m_options;
-        bool    m_respawnGuard;
+        bool m_assistGuard;
+        bool m_respawnGuard;
         uint32 m_lastReachedWaypoint;
         std::map<ObjectGuid, CreatureGroupMember*> m_members;
 };
