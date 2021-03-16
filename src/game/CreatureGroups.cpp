@@ -179,7 +179,12 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
                     leader->GetPosition(x, y, z);
                 else
                     leader->ToCreature()->GetRespawnCoord(x, y, z);
+
+                float tmpx = x;
+                float tmpy = y;
                 memberEntry->ComputeRelativePosition(leader->GetOrientation(), x, y);
+                x += tmpx;
+                y += tmpy;
                 member->UpdateGroundPositionZ(x, y, z);
                 member->NearTeleportTo(x, y, z, leader->GetAngle(x, y) + M_PI);
             }
