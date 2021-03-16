@@ -24,16 +24,16 @@ PlayerBotMgr::PlayerBotMgr()
     totalChance = 0;
     _maxAccountId = 0;
 
-    /* Config */
-    confMinBots         = 4;
-    confMaxBots         = 8;
-    confBotsRefresh     = 30000;
+    // Config
+    confMinBots         = 3;
+    confMaxBots         = 10;
+    confBotsRefresh     = 60000;
     confUpdateDiff      = 10000;
     enable              = false;
     confDebug           = false;
     forceLogoutDelay    = true;
 
-    /* Time */
+    // Time
     m_elapsedTime = 0;
     m_lastBotsRefresh = 0;
     m_lastUpdate = 0;
@@ -46,13 +46,14 @@ PlayerBotMgr::~PlayerBotMgr()
 
 void PlayerBotMgr::LoadConfig()
 {
-    enable              = sConfig.GetBoolDefault("PlayerBot.Enable", false);
-    confMinBots         = sConfig.GetIntDefault("PlayerBot.MinBots", 3);
-    confMaxBots         = sConfig.GetIntDefault("PlayerBot.MaxBots", 10);
-    confBotsRefresh     = sConfig.GetIntDefault("PlayerBot.Refresh", 60000);
-    confDebug           = sConfig.GetBoolDefault("PlayerBot.Debug", false);
-    confUpdateDiff      = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
-    forceLogoutDelay    = sConfig.GetBoolDefault("PlayerBot.ForceLogoutDelay", true);
+    enable = sConfig.GetBoolDefault("PlayerBot.Enable", false);
+    confMinBots = sConfig.GetIntDefault("PlayerBot.MinBots", 3);
+    confMaxBots = sConfig.GetIntDefault("PlayerBot.MaxBots", 10);
+    confBotsRefresh = sConfig.GetIntDefault("PlayerBot.Refresh", 60000);
+    confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
+    confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
+    forceLogoutDelay = sConfig.GetBoolDefault("PlayerBot.ForceLogoutDelay", true);
+
     if (!forceLogoutDelay)
         m_tempBots.clear();
 }
@@ -323,8 +324,7 @@ bool PlayerBotMgr::AddBot(PlayerBotAI* ai)
     e->customBot = true;
     ai->botEntry = e;
     m_bots[e->playerGUID] = e;
-    AddBot(e->playerGUID, false);
-    return true;
+    return AddBot(e->playerGUID, false);
 }
 
 bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot)
@@ -747,6 +747,13 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     if (!pPlayer)
         return false;
 
+    if (pPlayer->GetGroup() && pPlayer->GetGroup()->GetMembersCount() >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0)
+    {
+        SendSysMessage("Can't add more bots to your group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (!PartyBotAddRequirementCheck(pPlayer, nullptr))
     {
         SetSentErrorMessage(true);
@@ -824,9 +831,14 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
     PartyBotAI* ai = new PartyBotAI(pPlayer, nullptr, botRole, botRace, botClass, botLevel, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
-    sPlayerBotMgr.AddBot(ai);
-    
-    SendSysMessage("New party bot added.");
+    if (sPlayerBotMgr.AddBot(ai))
+        SendSysMessage("New party bot added.");
+    else
+    {
+        SendSysMessage("Error spawning bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     return true;
 }
@@ -836,6 +848,13 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
+
+    if (pPlayer->GetGroup() && pPlayer->GetGroup()->GetMembersCount() >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0)
+    {
+        SendSysMessage("Can't add more bots to your group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
@@ -858,9 +877,14 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
     PartyBotAI* ai = new PartyBotAI(pPlayer, pTarget, ROLE_INVALID, botRace, botClass, pPlayer->GetLevel(), pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
-    sPlayerBotMgr.AddBot(ai);
-
-    SendSysMessage("New party bot clone added.");
+    if (sPlayerBotMgr.AddBot(ai))
+        SendSysMessage("New party bot added.");
+    else
+    {
+        SendSysMessage("Error spawning bot.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     return true;
 }

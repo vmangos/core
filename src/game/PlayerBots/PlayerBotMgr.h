@@ -96,7 +96,7 @@ class PlayerBotMgr
         PlayerBotStats& GetStats(){ return m_stats; }
         void Start() { enable = true; }
     protected:
-        /* Combien de temps depuis la derniere MaJ ?*/
+        // How long since last update?
         uint32 m_elapsedTime;
         uint32 m_lastBotsRefresh;
         uint32 m_lastUpdate;
