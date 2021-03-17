@@ -3024,6 +3024,113 @@ INSERT INTO `game_event_creature` SELECT creature.guid, @BURNING_STEPPES_EVENT F
 UPDATE `creature` SET `movement_type`='1' WHERE id IN (16438, 16437, 16422, 16423);
 UPDATE `creature` SET `wander_distance`='0' WHERE `movement_type`='0' AND `wander_distance`<>'0';
 
+-- DUNGEON BOSSES
+
+-- Prepare
+UPDATE `creature_template` SET `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (14684, 14695, 14690, 14693, 14682, 14686, 4543);
+
+-- Balzaphon
+UPDATE `creature_template` SET `faction`='21', `unit_flags`='64', `auras`='28126' WHERE `entry`=14684;
+UPDATE `creature` SET `position_x`='3733.27', `position_y`='-3480.11', `position_z`='131.04', `orientation`='3.05433' WHERE `guid`=2354;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146840, 'Stratholme - Balzaphon', 16799, 100, 1, 0, 0, 0, 2, 5, 2, 5, 0, 8398, 100, 4, 0, 0, 0, 2, 16, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+-- Lord Blackwood
+UPDATE `creature_template` SET `faction`='21', `auras`='28126', `spell_list_id`='146950' WHERE `entry`=14695;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146950, 'Scholomance - Lord Blackwood', 16496, 100, 4, 0, 0, 0, 3, 25, 3, 25, 0, 7964, 100, 1, 0, 0, 0, 20, 20, 20, 20, 0, 1604, 100, 1, 0, 0, 0, 20, 20, 20, 20, 0, 21390, 100, 4, 0, 0, 0, 10, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `creature` SET `position_x`='200.201', `position_y`='150.839', `position_z`='109.879', `orientation`='5.06145', `movement_type`='2' WHERE `guid`=2353;
+DELETE FROM `creature_movement` WHERE `id`=2353;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
+    (2353, 1, 248.659, 153.031, 109.788, 100),
+    (2353, 2, 200.116, 150.961, 109.909, 100),
+    (2353, 3, 199.948, 127.819, 109.922, 100),
+    (2353, 4, 200.223, 151.043, 109.91, 100),
+    (2353, 5, 174.822, 152.469, 109.696, 100),
+    (2353, 6, 199.917, 151.078, 109.908, 100),
+    (2353, 7, 224.709, 133.206, 109.722, 100),
+    (2353, 8, 200.7, 151.368, 109.915, 100),
+    (2353, 9, 222.267, 166.311, 109.784, 100),
+    (2353, 10, 222.267, 166.311, 109.784, 100),
+    (2353, 11, 200.7, 151.368, 109.915, 100),
+    (2353, 12, 224.709, 133.206, 109.722, 100),
+    (2353, 13, 199.917, 151.078, 109.908, 100),
+    (2353, 14, 174.822, 152.469, 109.696, 100),
+    (2353, 15, 200.223, 151.043, 109.91, 100),
+    (2353, 16, 199.948, 127.819, 109.922, 100),
+    (2353, 17, 200.116, 150.961, 109.909, 100);
+
+-- Revanchion
+UPDATE `creature_template` SET `display_scale1`='0', `faction`='21', `speed_walk`='1.11111', `unit_flags`='64', `auras`='28126 16331 12556' WHERE  `entry`=14690;
+UPDATE `creature` SET `position_x`='-112.776', `position_y`='583.823', `position_z`='-3.47887', `orientation`='5.60251' WHERE  `guid`=2352;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146900, 'Dire Maul - Revanchion', 6136, 100, 1, 0, 0, 0, 5, 6, 9, 10, 0, 14907, 100, 1, 0, 0, 0, 5, 33, 33, 33, 0, 15245, 100, 1, 0, 0, 0, 5, 16, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+-- Scorn: https://www.youtube.com/watch?v=wJ5nSn94wN0
+UPDATE `creature_template` SET `display_scale1`='0', `faction`='21', `unit_flags`='64', `spell_list_id`='146930', `auras`='28126', `movement_type`='2' WHERE `entry`=14693;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146930, 'Scarlet Monastery - Scorn', 22643, 100, 1, 0, 0, 64, 0, 3, 3, 10, 0, 17165, 100, 4, 0, 0, 0, 0, 5, 14, 40, 0, 15531, 100, 1, 0, 0, 0, 0, 5, 12, 20, 0, 28873, 100, 1, 0, 0, 0, 0, 5, 17, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+DELETE FROM `creature` WHERE `guid`=2350;
+DELETE FROM `creature_movement_template` WHERE `entry`=14693;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
+    (14693, 1, 1796.82, 1219.18, 18.2921, 100),
+    (14693, 2, 1797.05, 1255.55, 18.4921, 100),
+    (14693, 3, 1796.59, 1293.25, 18.6921, 100),
+    (14693, 4, 1795.52, 1313.36, 18.816, 100),
+    (14693, 5, 1788.83, 1324.41, 19.0199, 100),
+    (14693, 6, 1789.98, 1351.44, 18.9087, 100),
+    (14693, 7, 1798.52, 1381.8, 18.8921, 100),
+    (14693, 8, 1803.86, 1350.71, 18.9157, 100),
+    (14693, 9, 1805.17, 1324.8, 19.1097, 100),
+    (14693, 10, 1798.9, 1313.85, 18.8076, 100),
+    (14693, 11, 1798.07, 1293.78, 18.6921, 100),
+    (14693, 12, 1797.58, 1255.6, 18.4921, 100),
+    (14693, 13, 1798.01, 1219.71, 18.2921, 100),
+    (14693, 14, 1797.58, 1255.6, 18.4921, 100),
+    (14693, 15, 1798.07, 1293.78, 18.6921, 100),
+    (14693, 16, 1798.9, 1313.85, 18.8076, 100),
+    (14693, 17, 1805.14, 1324.75, 19.0921, 100),
+    (14693, 18, 1803.86, 1350.71, 18.9157, 100),
+    (14693, 19, 1798.52, 1381.8, 18.8921, 100),
+    (14693, 20, 1789.98, 1351.44, 18.9087, 100),
+    (14693, 21, 1788.83, 1324.41, 19.0199, 100),
+    (14693, 22, 1795.52, 1313.36, 18.816, 100),
+    (14693, 23, 1796.59, 1293.25, 18.6921, 100),
+    (14693, 24, 1797.05, 1255.55, 18.4921, 100);
+    
+-- Bloodmage Thalnos https://www.youtube.com/watch?v=7tB7oZNkiEU
+UPDATE `creature_template` SET `mana_min`='2518', `mana_max`='2518', `spell_list_id`='45430' WHERE `entry`=4543;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (45430, 'Scarlet Monastery - Bloodmage Thalnos', 8053, 100, 1, 0, 0, 0, 0, 16, 16, 60, 0, 8814, 100, 4, 0, 0, 0, 0, 8, 8, 16, 0, 9613, 100, 1, 0, 0, 12, 0, 3, 3, 5, 0, 12470, 100, 4, 0, 0, 64, 0, 9, 9, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=4543;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+    (45430, 4543, 0, 6, 0, 100, 0, 0, 0, 0, 0, 45430, 0, 0, 'Bloodmage Thalnos - On Death'),
+    (45431, 4543, 0, 2, 0, 100, 0, 50, 0, 0, 0, 45431, 0, 0, 'Bloodmage Thalnos - Below 35\% Health'),
+    (45432, 4543, 0, 5, 0, 100, 1, 0, 0, 0, 0, 45433, 0, 0, 'Bloodmage Thalnos - killed Unit'),
+    (45433, 4543, 0, 4, 0, 100, 0, 0, 0, 0, 0, 45432, 0, 0, 'Bloodmage Thalnos - On Aggro');
+DELETE FROM `creature_ai_scripts` WHERE `id`=45430;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45430, 0, 10, 14693, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 1798.01, 1223.17, 18.274, 4.71161, 14693, 'Summon Scorn after death.');
+DELETE FROM `creature_ai_scripts` WHERE `id`=45431;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45431, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6202, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Half health Yell');
+DELETE FROM `creature_ai_scripts` WHERE `id`=45432;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45432, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6201, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Aggro Yell');
+DELETE FROM `creature_ai_scripts` WHERE `id`=45433;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45433, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6203, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Killed Unit Yell');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (14693, 12, 81, 0, 0, 0, 0);
+
+-- Sever
+UPDATE `creature_template` SET `level_min`='25', `level_max`='25', `health_min`='6291', `health_max`='6291', `armor`='1026', `faction`='21', `unit_flags`='64', `dmg_min`='106', `dmg_max`='136', `display_scale1`='0', `attack_power`='106', `dmg_multiplier`='1', `ranged_dmg_min`='30.7968', `ranged_attack_power`='100', `ranged_dmg_max`='42.3456', `auras`='28126', `movement_type`='1' WHERE `entry`=14682;
+UPDATE `creature` SET `position_x`='-225.131', `position_y`='2302.95', `position_z`='94.7599', `orientation`='6.02139', `movement_type`='1' WHERE `guid`=2349;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146820, 'Shadowfang Keep - Sever', 16508, 100, 1, 0, 0, 0, 5, 20, 30, 60, 0, 17745, 100, 1, 0, 0, 0, 0, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+-- Lady Falther'ess: https://youtu.be/FAiC1wwQCuc?t=104
+UPDATE `creature_template` SET `display_scale1`='0', `level_min`='40', `level_max`='40', `health_min`='9808', `health_max`='9808', `mana_min`='5132', `mana_max`='5132', `faction`='35', `speed_walk`='1', `unit_flags`='64', `auras`='28533', `movement_type`='1' WHERE `entry`=14686;
+UPDATE `creature` SET `position_x`='2583.18', `position_y`='695.861', `position_z`='56.8033', `orientation`='1.8675', `movement_type`='1' WHERE `guid`=2351;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146860, 'Razorfen Downs - Lady Falther\'ess', 16838, 100, 1, 0, 0, 0, 0, 20, 20, 20, 0, 17105, 100, 1, 0, 0, 0, 0, 30, 12, 30, 0, 22743, 100, 4, 0, 0, 0, 0, 25, 5, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=14686;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (14686, 14686, 85, 10, 0, 100, 0, 1, 10, 1, 1, 14686, 0, 0, 'Lady Falther\'ess on LOS.');
+DELETE FROM `creature_ai_scripts` WHERE `id`=14686;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (14686, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12429, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess yelling'),
+    (14686, 0, 22, 21, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess faction change'),
+    (14686, 0, 14, 28533, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess Demorph'),
+    (14686, 0, 15, 28126, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess add purple aura');
+
 -- End of migration.
 END IF;
 END??
