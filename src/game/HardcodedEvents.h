@@ -214,6 +214,9 @@ struct ScourgeInvasionEvent : WorldEvent
     ScourgeInvasionEvent();
 
     void Update() override;
+    void EnableAndStartEvent(uint16 event_id);
+    void DisableAndStopEvent(uint16 event_id);
+    void HandleWins();
     void Enable() override;
     void Disable() override;
     uint32 GetNextUpdateDelay() override;
@@ -225,19 +228,15 @@ private:
         float x, y, z, o;
     };
 
-    struct InvasionMouth {
-        InvasionMouth(float x, float y, float z, float o)
-            : x(x), y(y), z(z), o(o) {}
-        float x, y, z, o;
-        ObjectGuid mouthGuid;
-    };
-
     struct InvasionZone
     {
         uint32 map;
         uint32 zoneId;
         uint32 remainingVar;
-        std::vector<InvasionMouth> points;
+        uint32 necroAmount;
+        ObjectGuid mouthGuid;
+        std::vector<InvasionXYZO> mouth;
+        //std::vector<InvasionMouth> points;
     };
 
     bool invasion1Loaded;
@@ -249,9 +248,9 @@ private:
 
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
-    bool SummonMouth(Map* pMap, InvasionMouth& point);
+    bool SummonMouth(Map* pMap, InvasionZone* zone,InvasionXYZO& point);
 
-    Map* GetMap(uint32 mapId, InvasionMouth const& invZone);
+    Map* GetMap(uint32 mapId, InvasionXYZO const& invZone);
     bool isValidZoneId(uint32 zoneId);
     InvasionZone* GetZone(uint32 zoneId);
     uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);

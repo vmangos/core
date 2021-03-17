@@ -107,11 +107,11 @@ void ChangeZoneEventStatus(Creature* mouth, bool on)
     case ZONEID_BURNING_STEPPES:
         if (on)
         {
-            if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES_EVENT))
-                sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES_EVENT, true);
+            if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES))
+                sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
         }
         else
-            sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES_EVENT, true);
+            sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
         break;
     }
 }
@@ -284,17 +284,33 @@ struct MouthAI : public ScriptedAI
 {
     MouthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        ChangeZoneEventStatus(m_creature, true);
         m_events.Reset();
         m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
-        m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
-        m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2));
-        m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, 5000);
     }
 
     EventMap m_events;
 
     void Reset() override {}
+
+    void DoAction(uint32 action) override
+    {
+        switch (action)
+        {
+        case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
+            ChangeZoneEventStatus(m_creature, true);
+            m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
+            m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2));
+            break;
+        case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
+        {
+            m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2));
+            ChangeZoneEventStatus(m_creature, false);
+            m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
+            m_creature->DespawnOrUnsummon();
+        }
+        break;
+        }
+    }
 
     void UpdateAI(uint32 const diff) override
     {
@@ -304,24 +320,6 @@ struct MouthAI : public ScriptedAI
         {
             switch (Events)
             {
-            case EVENT_MOUTH_OF_KELTHUZAD_UPDATE:
-            {
-                // Check how if there's a Necropolis left.
-                int necroAlive = sObjectMgr.GetCreaturesInZone(NPC_NECROPOLIS, me->GetMap(), me->GetZoneId());
-                sObjectMgr.SetSavedVariable(me->GetZoneId(), necroAlive, true);
-                if (!necroAlive)
-                {
-                    me->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2));
-                    ChangeZoneEventStatus(m_creature, false);
-                    m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
-                    me->DespawnOrUnsummon();
-                }
-                else
-                    m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_UPDATE, 5000);
-
-                sLog.outBasic("EVENT_MOUTH_OF_KELTHUZAD_UPDATE: %d necros found in %d", necroAlive, me->GetZoneId());
-            }
-            break;
             case EVENT_MOUTH_OF_KELTHUZAD_YELL:
                 m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_RANDOM_1, LANG_MOUTH_OF_KELTHUZAD_RANDOM_2, LANG_MOUTH_OF_KELTHUZAD_RANDOM_3, LANG_MOUTH_OF_KELTHUZAD_RANDOM_4, LANG_MOUTH_OF_KELTHUZAD_RANDOM_5));
                 m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
@@ -389,6 +387,10 @@ struct NecropolisHealthAI : public ScriptedAI
     {
         if (Creature* NECROPOLIS = m_creature->FindNearestCreature(NPC_NECROPOLIS, ATTACK_DISTANCE))
             m_creature->CastSpell(NECROPOLIS, SPELL_DESPAWNER_OTHER, true);
+
+        int numb = sObjectMgr.GetSavedVariable(me->GetZoneId());
+        if (numb > 0)
+            sObjectMgr.SetSavedVariable(m_creature->GetZoneId(), (numb - 1), true);
     }
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
@@ -582,6 +584,12 @@ struct NecroticShard : public ScriptedAI
         // Only Minions and the shard itself can deal damage.
         if (dealer->GetFactionTemplateId() != m_creature->GetFactionTemplateId())
             damage = 0;
+    }
+
+    // No healing possible.
+    void HealedBy(Unit* pHealer, uint32& uiHealedAmount) override
+    {
+        uiHealedAmount = 0;
     }
 
     void JustDied(Unit* pKiller) override
@@ -1027,45 +1035,7 @@ CreatureAI* GetAI_ScourgeMinion(Creature* pCreature)
     return new ScourgeMinion(pCreature);
 }
 
-/*
-naxx_event_rewards_giver
-*/
-struct naxx_event_rewards_giverAI : public ScriptedAI
-{
-    naxx_event_rewards_giverAI(Creature* c) : ScriptedAI(c)
-    {
-        if (c->GetEntry() == NPC_ARGENT_DAWN_REW_GIVER_1A)
-            _alliance = true;
-        Reset();
-    }
-
-    bool _alliance;
-
-    void Reset() override
-    {
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        uint32 newEntry = 0;
-        uint32 victories = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
-        if (victories < 50)
-            newEntry = _alliance ? NPC_ARGENT_DAWN_REW_GIVER_1A : NPC_ARGENT_DAWN_REW_GIVER_1H;
-        else if (victories < 100)
-            newEntry = _alliance ? NPC_ARGENT_DAWN_REW_GIVER_2A : NPC_ARGENT_DAWN_REW_GIVER_2H;
-        else
-            newEntry = _alliance ? NPC_ARGENT_DAWN_REW_GIVER_3A : NPC_ARGENT_DAWN_REW_GIVER_3H;
-        if (newEntry != m_creature->GetEntry())
-            m_creature->UpdateEntry(newEntry);
-    }
-};
-
-CreatureAI* GetAI_naxx_event_rewards_giverAI(Creature* c)
-{
-    return new naxx_event_rewards_giverAI(c);
-}
-
-bool GossipSelect_naxx_event_rewards_giver(Player* player, Creature* creature, uint32 sender, uint32 action)
+bool GossipSelect_scourge_invasion_rewards_giver(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
     if (action == GOSSIP_ACTION_INFO_DEF + 1)
     {
@@ -1093,7 +1063,7 @@ bool GossipSelect_naxx_event_rewards_giver(Player* player, Creature* creature, u
     return true;
 }
 
-bool GossipHello_naxx_event_rewards_giver(Player* player, Creature* creature)
+bool GossipHello_scourge_invasion_rewards_giver(Player* player, Creature* creature)
 {
     // Add Item
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -1296,6 +1266,12 @@ void AddSC_world_event_naxxramas()
     newscript->RegisterSelf();
 
     newscript = new Script;
+    newscript->Name = "scourge_invasion_rewards_giver";
+    newscript->pGossipHello = &GossipHello_scourge_invasion_rewards_giver;
+    newscript->pGossipSelect = &GossipSelect_scourge_invasion_rewards_giver;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
     newscript->Name = "scourge_invasion_minion";
     newscript->GetAI = &GetAI_ScourgeMinion;
     newscript->RegisterSelf();
@@ -1308,13 +1284,6 @@ void AddSC_world_event_naxxramas()
     newscript = new Script;
     newscript->Name = "scourge_invasion_go_necropolis";
     newscript->GOGetAI = &GetAI_GoNecropolis;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "naxx_event_rewards_giver";
-    newscript->GetAI = &GetAI_naxx_event_rewards_giverAI;
-    newscript->pGossipHello = &GossipHello_naxx_event_rewards_giver;
-    newscript->pGossipSelect = &GossipSelect_naxx_event_rewards_giver;
     newscript->RegisterSelf();
 
     newscript = new Script;

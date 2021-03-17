@@ -593,6 +593,13 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
 
+    sObjectMgr.InitSavedVariable(VARIABLE_AZSHARA_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_TANARIS_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING, 0);
+
     sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
@@ -600,14 +607,13 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0);
 
-    // All these are sniffed Positions.
     InvasionZone winterspring;
     {
         winterspring.map = 1;
         winterspring.zoneId = ZONEID_WINTERSPRING;
         winterspring.remainingVar = VARIABLE_SI_WINTERSPRING_REMAINING;
-        InvasionMouth winterspring_mouth(7736.56f, -4033.75f, 696.327f, 5.51524f);
-        winterspring.points.push_back(winterspring_mouth);
+        winterspring.necroAmount = 3;
+        winterspring.mouth.push_back(InvasionXYZO(7736.56f, -4033.75f, 696.327f, 5.51524f));
     }
 
     InvasionZone tanaris;
@@ -615,8 +621,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         tanaris.map = 1;
         tanaris.zoneId = ZONEID_TANARIS;
         tanaris.remainingVar = VARIABLE_SI_TANARIS_REMAINING;
-        InvasionMouth tanaris_mouth(-8352.68f, -3972.68f, 10.0753f, 2.14675f);
-        tanaris.points.push_back(tanaris_mouth);
+        tanaris.necroAmount = 3;
+        tanaris.mouth.push_back(InvasionXYZO(-8352.68f, -3972.68f, 10.0753f, 2.14675f));
     }
 
     InvasionZone azshara;
@@ -624,8 +630,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         azshara.map = 1;
         azshara.zoneId = ZONEID_AZSHARA;
         azshara.remainingVar = VARIABLE_SI_AZSHARA_REMAINING;
-        InvasionMouth azshara_mouth(3273.75f, -4276.98f, 125.509f, 5.44543f);
-        azshara.points.push_back(azshara_mouth);
+        azshara.necroAmount = 2;
+        azshara.mouth.push_back(InvasionXYZO(3273.75f, -4276.98f, 125.509f, 5.44543f));
     }
 
     InvasionZone blasted_lands;
@@ -633,8 +639,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         blasted_lands.map = 0;
         blasted_lands.zoneId = ZONEID_BLASTED_LANDS;
         blasted_lands.remainingVar = VARIABLE_SI_BLASTED_LANDS_REMAINING;
-        InvasionMouth blasted_lands_mouth(-11429.3f, -3327.82f, 7.73628f, 1.0821f);
-        blasted_lands.points.push_back(blasted_lands_mouth);
+        blasted_lands.necroAmount = 2;
+        blasted_lands.mouth.push_back(InvasionXYZO(-11429.3f, -3327.82f, 7.73628f, 1.0821f));
     }
 
     InvasionZone eastern_plaguelands;
@@ -642,8 +648,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         eastern_plaguelands.map = 0;
         eastern_plaguelands.zoneId = ZONEID_EASTERN_PLAGUELANDS;
         eastern_plaguelands.remainingVar = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
-        InvasionMouth eastern_plaguelands_mouth(2014.55f, -4934.52f, 73.9846f, 0.0698132f);
-        eastern_plaguelands.points.push_back(eastern_plaguelands_mouth);
+        eastern_plaguelands.necroAmount = 2;
+        eastern_plaguelands.mouth.push_back(InvasionXYZO(2014.55f, -4934.52f, 73.9846f, 0.0698132f));
     }
 
     InvasionZone burning_steppes;
@@ -651,8 +657,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         burning_steppes.map = 0;
         burning_steppes.zoneId = ZONEID_BURNING_STEPPES;
         burning_steppes.remainingVar = VARIABLE_SI_BURNING_STEPPES_REMAINING;
-        InvasionMouth burning_steppes_mouth(-8229.53f, -1118.11f, 144.012f, 6.17846f);
-        burning_steppes.points.push_back(burning_steppes_mouth);
+        burning_steppes.necroAmount = 2;
+        burning_steppes.mouth.push_back(InvasionXYZO(-8229.53f, -1118.11f, 144.012f, 6.17846f));
     }
 
     invasionPoints.push_back(winterspring);
@@ -661,6 +667,44 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     invasionPoints.push_back(blasted_lands);
     invasionPoints.push_back(eastern_plaguelands);
     invasionPoints.push_back(burning_steppes);
+}
+
+void ScourgeInvasionEvent::EnableAndStartEvent(uint16 event_id)
+{
+    if (!sGameEventMgr.IsActiveEvent(event_id))
+    {
+        if (!sGameEventMgr.IsEnabled(event_id))
+            sGameEventMgr.EnableEvent(event_id, true);
+
+        sGameEventMgr.StartEvent(event_id);
+    }
+}
+
+void ScourgeInvasionEvent::DisableAndStopEvent(uint16 event_id)
+{
+    if (sGameEventMgr.IsActiveEvent(event_id))
+        sGameEventMgr.StopEvent(event_id);
+
+    if (sGameEventMgr.IsEnabled(event_id))
+        sGameEventMgr.EnableEvent(event_id, false);
+}
+
+
+void ScourgeInvasionEvent::HandleWins()
+{
+    uint32 wins = 0;
+    wins = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+
+    if (wins >= 50 && wins < 100)
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
+    else if (wins >= 100 && wins < 150) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+    }
+    else if (wins >= 150) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
+    }
 }
 
 void ScourgeInvasionEvent::Update()
@@ -685,40 +729,39 @@ void ScourgeInvasionEvent::Update()
 
     time_t now = time(nullptr);
 
-    for (auto& invasionPoint : invasionPoints)
+    for (InvasionZone& zone : invasionPoints)
     {
         uint32 numMouthAlive = 0;
-        for (auto& point : invasionPoint.points)
-        {
-            Map* mapPtr = GetMap(invasionPoint.map, point);
-            if (!mapPtr)
-            {
-                sLog.outBasic("ScourgeInvasionEvent::Update no map for zone %d", invasionPoint.map);
-                continue;
-            }
+        
+        numMouthAlive = sObjectMgr.GetSavedVariable(zone.zoneId);
 
-            Creature* pNecropolis = mapPtr->GetCreature(point.mouthGuid);
-            if (!pNecropolis)
-                point.mouthGuid = 0;
-            else
-                ++numMouthAlive;
+        Map* mapPtr = GetMap(zone.map, zone.mouth[0]);
+        if (!mapPtr)
+        {
+            sLog.outBasic("ScourgeInvasionEvent::Update no map for zone %d", zone.map);
+            continue;
         }
+
+        Creature* pMouth = mapPtr->GetCreature(zone.mouthGuid);
+        if (!pMouth)
+            numMouthAlive = 0;
+
 
         // If this is an active invasion zone, and there are no necropolises alive,
         // we initialize the cooldown variable which will make a new zone active at
         // now + NECROPOLIS_ATTACK_TIMER
-        if (numMouthAlive == 0 && invasionPoint.zoneId == current1)
+        if (numMouthAlive == 0 && zone.zoneId == current1)
         {
-            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME1, VARIABLE_NAXX_ATTACK_ZONE1, invasionPoint.remainingVar, now, invasionPoint.zoneId);
+            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME1, VARIABLE_NAXX_ATTACK_ZONE1, zone.remainingVar, now, zone.zoneId);
         }
-        else if (numMouthAlive == 0 && invasionPoint.zoneId == current2)
+        else if (numMouthAlive == 0 && zone.zoneId == current2)
         {
-            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME2, VARIABLE_NAXX_ATTACK_ZONE2, invasionPoint.remainingVar, now, invasionPoint.zoneId);
+            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME2, VARIABLE_NAXX_ATTACK_ZONE2, zone.remainingVar, now, zone.zoneId);
         }
 
-        sObjectMgr.SetSavedVariable(invasionPoint.remainingVar, numMouthAlive, true);
+        sObjectMgr.SetSavedVariable(zone.remainingVar, numMouthAlive, true);
     }
-       
+
     UpdateWorldState();
 }
 
@@ -739,21 +782,18 @@ void ScourgeInvasionEvent::Disable()
 {
     for (InvasionZone& zone : invasionPoints)
     {
-        for (InvasionMouth& mouth : zone.points)
-        {
-            if (!mouth.mouthGuid)
-                continue;
-            Map* pMap = GetMap(zone.map, mouth);
-            if (!pMap)
-                continue;
-
-            Creature* pMouth = pMap->GetCreature(mouth.mouthGuid);
-
-            if (!pMouth)
-                continue;
-            
-            pMouth->DeleteLater();
-        }
+        if (!zone.mouthGuid)
+            continue;
+        Map* mapPtr = GetMap(zone.map, zone.mouth[0]);
+        if (!mapPtr)
+            continue;
+        
+        Creature* pMouth = mapPtr->GetCreature(zone.mouthGuid);
+        
+        if (!pMouth)
+            continue;
+        
+        pMouth->DeleteLater();
     }
     
     sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(nullptr), true);
@@ -771,12 +811,12 @@ void ScourgeInvasionEvent::Disable()
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS, true);
-    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES_EVENT, true);
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
 
     UpdateWorldState();
 }
 
-Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionMouth const& invZone)
+Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionXYZO const& invZone)
 {
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
@@ -802,6 +842,9 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
         sObjectMgr.SetSavedVariable(attackTimeVar, now + NECROPOLIS_ATTACK_TIMER, true);
         sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
 
+        HandleWins();
+
+        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT))
         sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next invasion starting in %d minutes", zoneId, uint32(timeToNextAttack/60));
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT));
 
@@ -809,14 +852,12 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
         if (!zone) return;
 
         // Change weather to fine.
-        /*
         Map* pMap = sMapMgr.FindMap(zone->map);
-        pMap->SetWeather(zoneId, WEATHER_TYPE_RAIN, 0.0f, false);
-        if (Creature* mouth = pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, NPC_MOUTH_OF_KELTHUZAD, zone->mouthGuid)))
-            mouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
+
+        if (Creature* pMouth = pMap->GetCreature(zone->mouthGuid))
+            pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
         else
             sLog.outBasic("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found", zone->mouthGuid);
-            */
     }
 }
 
@@ -825,6 +866,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
 bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
 {
     uint32 current1 = sObjectMgr.GetSavedVariable(attackZoneVar);
+    HandleWins();
 
     if (!isValidZoneId(current1))
     {
@@ -875,43 +917,26 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     InvasionZone* zone = GetZone(zoneId);
     if (!zone) return;
 
-    for (auto& mouth : zone->points)
+
+    Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
+    // If any of the required maps are not available we return. Will cause the invasion to be started
+    // on next update instead
+    if (!mapPtr)
     {
-        Map* mapPtr = GetMap(zone->map, mouth);
-        // If any of the required maps are not available we return. Will cause the invasion to be started
-        // on next update instead
-        if (!mapPtr)
-        {
-            sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
-            return;
-        }
-    }
-    uint32 num_necropolises_remaining = 0;
-    for (auto& mouth : zone->points)
-    {
-        Map* mapPtr = GetMap(zone->map, mouth);
-        if (!mapPtr) {
-            sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access map %d", zone->map);
-            continue;
-        }
-        if (mapPtr && SummonMouth(mapPtr, mouth))
-            ++num_necropolises_remaining;
-        else
-            sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d", zone->map);
+        sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
+        return;
     }
 
-    // Change weather to storm.
-    /*
-    Map* pMap = sMapMgr.FindMap(zone->map);
-    pMap->SetWeather(zone->zoneId, WEATHER_TYPE_STORM, 0.25f, true);
-    if (Creature* mouth = pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, NPC_MOUTH_OF_KELTHUZAD, zone->mouthGuid)))
-        mouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+    uint32 num_necropolises_remaining = 0;
+
+    if (mapPtr && SummonMouth(mapPtr, zone, zone->mouth[0]))
+        num_necropolises_remaining = zone->necroAmount;
     else
-        sLog.outBasic("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found", zone->mouthGuid);
-        */
+        sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d", zone->map);
 
     // Setting num remaining directly
     sObjectMgr.SetSavedVariable(zone->remainingVar, num_necropolises_remaining, true);
+    sObjectMgr.SetSavedVariable(zone->zoneId, num_necropolises_remaining, true);
 }
 
 // Will return false if a required map was not available. In all other cases returns true.
@@ -927,59 +952,41 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     }
     
     uint32 num_necropolises_remaining = sObjectMgr.GetSavedVariable(zone->remainingVar);
-    if (num_necropolises_remaining > zone->points.size())
-    {
-        sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion for zone %d had %d necropolises remaining, but zone only has %d points",
-            zone->zoneId, num_necropolises_remaining, zone->points.size());
-        num_necropolises_remaining = zone->points.size();
-    }
 
     // Just making sure we can access all maps before starting the invasion
     for (uint32 i = 0; i < num_necropolises_remaining; i++)
     {
-        InvasionMouth& necro = zone->points[i];
-        if (!GetMap(zone->map, necro))
+        if (!GetMap(zone->map, zone->mouth[0]))
         {
             sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update", zone->map);
             return false;
         }
     }
 
-    for (uint32 i = 0; i < num_necropolises_remaining; i++)
+    Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
+    if (!mapPtr)
     {
-        InvasionMouth& mouth = zone->points[i];
-        Map* mapPtr = GetMap(zone->map, mouth);
-        if (!mapPtr)
-        {
-            sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
-            continue;
-        }
-
-        SummonMouth(mapPtr, mouth);
+        sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
     }
-
-    // Change weather to storm.
-    /*
-    Map* pMap = sMapMgr.FindMap(zone->map);
-    pMap->SetWeather(zone->zoneId, WEATHER_TYPE_STORM, 0.25f, true);
-    if (Creature* mouth = pMap->GetCreature(ObjectGuid(HIGHGUID_UNIT, NPC_MOUTH_OF_KELTHUZAD, zone->mouthGuid)))
-        mouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
-    else
-        sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion ObjectGuid %d not found", zone->mouthGuid);
-        */
+    
+    SummonMouth(mapPtr, zone, zone->mouth[0]);
 
     return true;
 }
 
-bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionMouth& point)
+bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXYZO& point)
 {
-    Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true);
-    if (!pMouth) {
+    if (Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
+    {
+        pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+        zone->mouthGuid = pMouth->GetObjectGuid();
+    }
+    else
+    {
         sLog.outBasic("ScourgeInvasionEvent::SummonMouth failed summoning necropolis");
         return false;
     }
 
-    point.mouthGuid = pMouth->GetObjectGuid();
     sLog.outBasic("ScourgeInvasionEvent::SummonMouth at %f %f %f", point.x, point.y, point.z);
     return true;
 }
@@ -1477,7 +1484,6 @@ void WarEffortEvent::DisableAndStopEvent(uint16 event_id)
     if (sGameEventMgr.IsEnabled(event_id))
         sGameEventMgr.EnableEvent(event_id, false);
 }
-
 
 void WarEffortEvent::UpdateHiveColossusEvents()
 {
