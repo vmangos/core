@@ -279,7 +279,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (10214, 12, -9212.01, -2916.9, 112.982, 100, 0, 0, 0);
 
 UPDATE `creature_movement` SET `waittime` = 60000 WHERE `id` = 18451 AND `point` =10;
-
+UPDATE `creature` SET `wander_distance` = 0 WHERE `guid` IN (31824, 18377, 18394);
 
 -- End of migration.
 END IF;
