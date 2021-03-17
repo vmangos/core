@@ -86,18 +86,16 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1072103, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Novice Warrior - Set Phase 1');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1072104, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Novice Warrior - Set Phase 0');
 
-
--- ADD Thontek Rumblehoof Generic Script
+-- Add Thontek Rumblehoof Generic Script
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2478401, 0, 26, 0, 0, 0, 0, 24781, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thontek Rumblehoof - Start Attack');
 
--- ADD Hulfnar Stonetotem Generic Script
+-- Add Hulfnar Stonetotem Generic Script
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2478101, 0, 26, 0, 0, 0, 0, 24784, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hulfnar Stonetotem - Start Attack');
 
--- Removing unused script actions.
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (1060001);
-
--- Events list for Thontek Rumblehoof
-DELETE FROM `creature_ai_events` WHERE `creature_id`=10600;
+-- Remove Events list for Thontek Rumblehoof and Hulfnar Stonetotem
+UPDATE `creature_template` SET `ai_name` = '' WHERE `entry` IN (10600, 10599);
+DELETE FROM `creature_ai_events` WHERE `creature_id` IN (10600, 10599);
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1060001, 1059901);
 
 
 -- End of migration.
