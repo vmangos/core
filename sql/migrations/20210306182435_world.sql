@@ -93,6 +93,12 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 -- ADD Hulfnar Stonetotem Generic Script
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2478101, 0, 26, 0, 0, 0, 0, 24784, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hulfnar Stonetotem - Start Attack');
 
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1060001);
+
+-- Events list for Thontek Rumblehoof
+DELETE FROM `creature_ai_events` WHERE `creature_id`=10600;
+
 
 -- End of migration.
 END IF;
