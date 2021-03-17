@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20210317154702');
 -- Add your query below.
 
 
--- Fix wrong Rain of Fire spell used by the warlock's Doomguard.
-UPDATE `creature_template` SET `spell_id1`=19474 WHERE `entry`=11859;
+-- Fix wrong spells used by the warlock's Doomguard.
+UPDATE `creature_template` SET `spell_id1`=19474, `spell_id2`=19482, `spell_id3`=89 WHERE `entry`=11859;
 
 
 -- End of migration.
