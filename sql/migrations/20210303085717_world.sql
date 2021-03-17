@@ -31,6 +31,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 
 -- Witherbark Bloodling, Serpentbloom Snake and Hazzali Parasite should not drop loot
 DELETE FROM `creature_loot_template` WHERE `entry` IN (7768, 3680);
+UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` IN (3680, 7768);
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7769;
 
 -- correct quest chain for Mage's Wand (1952)
