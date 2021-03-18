@@ -785,8 +785,6 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
             botClass = CLASS_WARLOCK;
         else if (option == "druid")
             botClass = CLASS_DRUID;
-        else if (option == "hunter")
-            botClass = CLASS_HUNTER;
         else if (option == "dps")
         {
             botClass = PickRandomValue(CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK);
