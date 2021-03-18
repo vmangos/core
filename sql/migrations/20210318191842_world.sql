@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210318191842');
 
 UPDATE `locales_item` SET `description_loc1` = NULL, `description_loc2` = NULL, `description_loc3` = NULL,
 `description_loc4` = NULL, `description_loc5` = NULL, `description_loc6` = NULL, `description_loc7` = NULL,
-`description_loc8` = NULL WHERE `entry` in (728, 1132, 2406, 2407, 2408, 2409, 2411, 2414, 2553, 2555, 2598,
+`description_loc8` = NULL WHERE `entry` IN (728, 1132, 2406, 2407, 2408, 2409, 2411, 2414, 2553, 2555, 2598,
 2601, 2697, 2698, 2699, 2700, 2701, 2881, 2882, 2883, 2889, 3393, 3394, 3395, 3396, 3608, 3609, 3610, 3611,
 3612, 3678, 3679, 3680, 3681, 3682, 3683, 3734, 3735, 3736, 3737, 3830, 3831, 3832, 3866, 3867, 3868, 3869,
 3870, 3871, 3872, 3873, 3874, 3875, 4292, 4293, 4294, 4296, 4297, 4298, 4299, 4300, 4301, 4345, 4346, 4347,
