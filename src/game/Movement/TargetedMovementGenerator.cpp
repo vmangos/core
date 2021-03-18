@@ -59,8 +59,16 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
     if (isPet)
         transport = i_target.getTarget()->GetTransport();
+
     // prevent redundant micro-movement for pets, other followers.
-    if (!m_fOffset)
+    if (m_fOffset && !i_target->IsMoving() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
+    {
+        if (!owner.movespline->Finalized())
+            return;
+
+        owner.GetPosition(x, y, z);
+    }
+    else if (!m_fOffset)
     {
         if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
         {
@@ -684,6 +692,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     }
     else if (m_bRecalculateTravel)
         owner.GetMotionMaster()->SetNeedAsyncUpdate();
+        
     return true;
 }
 
