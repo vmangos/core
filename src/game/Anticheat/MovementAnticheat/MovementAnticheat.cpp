@@ -10,11 +10,6 @@
 #include "World.h"
 #include "MovementPacketSender.h"
 
-namespace Movement
-{
-extern float computeFallElevation(float time, bool safeFall, float initialSpeed);
-}
-
 const char* GetMovementCheatName(CheatType flagId)
 {
     switch (flagId)
@@ -234,7 +229,6 @@ void MovementAnticheat::Init()
     m_clientDesync    = 0;
     m_maxClientDesync = 0;
 
-    m_jumpInitialSpeed   = 0.f;
     m_jumpCount = 0;
     m_jumpFlagCount = 0;
     m_jumpFlagTime = 0;
@@ -247,7 +241,6 @@ void MovementAnticheat::InitNewPlayer(Player* pPlayer)
 {
     me = pPlayer;
     m_jumpCount = 0;
-    m_jumpInitialSpeed = 0.f;
     m_jumpFlagCount = 0;
     m_jumpFlagTime = 0;
     m_knockBack = false;
@@ -273,7 +266,6 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     GetLastMovementInfo().jump.sinAngle = sin;
     GetLastMovementInfo().jump.xyspeed = speedxy;
     GetLastMovementInfo().moveFlags = MOVEFLAG_JUMPING | (GetLastMovementInfo().moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN);
-    m_jumpInitialSpeed = speedz;
     m_knockBack = true;
 }
 
@@ -534,10 +526,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
         InitNewPlayer(pPlayer);
 
     if (opcode == CMSG_MOVE_FEATHER_FALL_ACK)
-    {
         GetLastMovementInfo().jump.startClientTime = movementInfo.jump.startClientTime = movementInfo.ctime;
-        m_jumpInitialSpeed = std::max(m_jumpInitialSpeed, 7.0f);
-    }
     
     // Do not accept position changes if player is dead and has not released spirit.
     if (me->GetDeathState() == CORPSE)
@@ -626,12 +615,6 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 cheatFlags |= flags;
         }
     }
-
-    // This is required for proper movement interpolation
-    if (opcode == MSG_MOVE_JUMP)
-        m_jumpInitialSpeed = 7.95797334f;
-    else if (opcode == MSG_MOVE_FALL_LAND)
-        m_jumpInitialSpeed = -9.645f;
 
     if (IsFallEndOpcode(opcode) || 
         movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
@@ -999,7 +982,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     {
         float intX, intY, intZ, intO;
 
-        if (ExtrapolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
+        if (me->ExtrapolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
         {
             auto const intDX = intX - movementInfo.pos.x;
             auto const intDY = intY - movementInfo.pos.y;
@@ -1031,110 +1014,6 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 
     return cheatFlags;
 #undef APPEND_CHEAT
-}
-
-bool MovementAnticheat::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &outOrientation) const
-{
-    // Not currently handled cases.
-    if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)) || 
-       (mi.moveFlags & MOVEFLAG_FALLINGFAR) ||
-       (!me->movespline->Finalized()) ||
-       (mi.ctime == 0))
-        return false;
-
-    x = mi.pos.x;
-    y = mi.pos.y;
-    z = mi.pos.z;
-    outOrientation = mi.pos.o;
-    float o = outOrientation;
-
-    if (mi.moveFlags & MOVEFLAG_ROOT)
-        return true;
-
-    float speed = GetSpeedForMovementInfo(mi);
-
-    if (mi.moveFlags & MOVEFLAG_BACKWARD)
-        o += M_PI_F;
-    else if (mi.moveFlags & MOVEFLAG_STRAFE_LEFT)
-    {
-        if (mi.moveFlags & MOVEFLAG_FORWARD)
-            o += M_PI_F / 4;
-        else
-            o += M_PI_F / 2;
-    }
-    else if (mi.moveFlags & MOVEFLAG_STRAFE_RIGHT)
-    {
-        if (mi.moveFlags & MOVEFLAG_FORWARD)
-            o -= M_PI_F / 4;
-        else
-            o -= M_PI_F / 2;
-    }
-    if (mi.moveFlags & MOVEFLAG_JUMPING)
-    {
-        float diffT = WorldTimer::getMSTimeDiff(mi.jump.startClientTime, diffMs + mi.ctime) / 1000.0f;
-        x = mi.jump.start.x;
-        y = mi.jump.start.y;
-        z = mi.jump.start.z;
-        // Fatal error. Avoid crashing here ...
-        if (!x || !y || !z || diffT > 10000.0f)
-            return false;
-        x += mi.jump.cosAngle * mi.jump.xyspeed * diffT;
-        y += mi.jump.sinAngle * mi.jump.xyspeed * diffT;
-        z -= Movement::computeFallElevation(diffT, mi.moveFlags & MOVEFLAG_SAFE_FALL, -m_jumpInitialSpeed);
-    }
-    else if (mi.moveFlags & (MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT))
-    {
-        if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
-        {
-            // Every 2 sec
-            float T = 0.75f * (me->GetSpeed(MOVE_TURN_RATE)) * (diffMs / 1000.0f);
-            float R = 1.295f * speed / M_PI * cos(mi.s_pitch);
-            z += diffMs * speed / 1000.0f * sin(mi.s_pitch);
-            // Find the center of the circle we are moving on
-            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
-            {
-                x += R * cos(o + M_PI / 2);
-                y += R * sin(o + M_PI / 2);
-                outOrientation += T;
-                T = T - M_PI / 2.0f;
-            }
-            else
-            {
-                x += R * cos(o - M_PI / 2);
-                y += R * sin(o - M_PI / 2);
-                outOrientation -= T;
-                T = -T + M_PI / 2.0f;
-            }
-            x += R * cos(o + T);
-            y += R * sin(o + T);
-        }
-        else
-        {
-            float diffO = me->GetSpeed(MOVE_TURN_RATE) * diffMs / 1000.0f;
-            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
-                outOrientation += diffO;
-            else
-                outOrientation -= diffO;
-            return true;
-        }
-    }
-    else if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
-    {
-        float dist = speed * diffMs / 1000.0f;
-        x += dist * cos(o) * cos(mi.s_pitch);
-        y += dist * sin(o) * cos(mi.s_pitch);
-        z += dist * sin(mi.s_pitch);
-    }
-    else // If we reach here, we did not move
-        return true;
-
-    if (!MaNGOS::IsValidMapCoord(x, y, z, o))
-        return false;
-
-    if (!(mi.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING)))
-        z = me->GetMap()->GetHeight(x, y, z);
-
-    return me->GetMap()->isInLineOfSight(mi.pos.x, mi.pos.y, mi.pos.z + 0.5f, x, y, z + 0.5f);
 }
 
 bool MovementAnticheat::CheckTeleportToTransport(MovementInfo const& movementInfo) const

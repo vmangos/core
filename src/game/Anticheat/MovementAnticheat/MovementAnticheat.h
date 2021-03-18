@@ -68,7 +68,6 @@ class MovementAnticheat
         bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
 
         bool IsInKnockBack() const { return m_knockBack; }
-        bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const;
 
         void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin);
         void OnUnreachable(Unit* attacker);
@@ -105,7 +104,6 @@ private:
         // Speed hack
         int32 m_clientDesync = 0;
         uint32 m_maxClientDesync = 0;
-        float m_jumpInitialSpeed = 0.0f;
         float m_overspeedDistance = 0.0f;
         float m_maxOverspeedDistance = 0.0f;
 

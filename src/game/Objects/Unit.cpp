@@ -2908,6 +2908,126 @@ bool Unit::IsUnderWater() const
     return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
+float Unit::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
+{
+    float speed = 0.0f;
+    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
+        speed = GetSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_SWIM_BACK : MOVE_SWIM);
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
+        speed = GetSpeed(MOVE_WALK);
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        speed = GetSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN);
+
+    return speed;
+}
+
+namespace Movement
+{
+    extern float computeFallElevation(float time, bool safeFall, float initialSpeed);
+}
+
+bool Unit::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &outOrientation) const
+{
+    // Not currently handled cases.
+    if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_FALLINGFAR | MOVEFLAG_ONTRANSPORT)) ||
+        !movespline->Finalized() || (mi.ctime == 0) || !IsMovedByPlayer())
+        return false;
+
+    x = mi.pos.x;
+    y = mi.pos.y;
+    z = mi.pos.z;
+    outOrientation = mi.pos.o;
+    float o = outOrientation;
+
+    if (mi.moveFlags & MOVEFLAG_ROOT)
+        return true;
+
+    float speed = GetSpeedForMovementInfo(mi);
+
+    if (mi.moveFlags & MOVEFLAG_BACKWARD)
+        o += M_PI_F;
+    else if (mi.moveFlags & MOVEFLAG_STRAFE_LEFT)
+    {
+        if (mi.moveFlags & MOVEFLAG_FORWARD)
+            o += M_PI_F / 4;
+        else
+            o += M_PI_F / 2;
+    }
+    else if (mi.moveFlags & MOVEFLAG_STRAFE_RIGHT)
+    {
+        if (mi.moveFlags & MOVEFLAG_FORWARD)
+            o -= M_PI_F / 4;
+        else
+            o -= M_PI_F / 2;
+    }
+    if (mi.moveFlags & MOVEFLAG_JUMPING)
+    {
+        float diffT = WorldTimer::getMSTimeDiff(mi.jump.startClientTime, diffMs + mi.ctime) / 1000.0f;
+        x = mi.jump.start.x;
+        y = mi.jump.start.y;
+        z = mi.jump.start.z;
+        // Fatal error. Avoid crashing here ...
+        if (!x || !y || !z || diffT > 10000.0f)
+            return false;
+        x += mi.jump.cosAngle * mi.jump.xyspeed * diffT;
+        y += mi.jump.sinAngle * mi.jump.xyspeed * diffT;
+        z -= Movement::computeFallElevation(diffT, mi.moveFlags & MOVEFLAG_SAFE_FALL, -m_jumpInitialSpeed);
+    }
+    else if (mi.moveFlags & (MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT))
+    {
+        if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
+        {
+            // Every 2 sec
+            float T = 0.75f * (GetSpeed(MOVE_TURN_RATE)) * (diffMs / 1000.0f);
+            float R = 1.295f * speed / M_PI * cos(mi.s_pitch);
+            z += diffMs * speed / 1000.0f * sin(mi.s_pitch);
+            // Find the center of the circle we are moving on
+            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
+            {
+                x += R * cos(o + M_PI / 2);
+                y += R * sin(o + M_PI / 2);
+                outOrientation += T;
+                T = T - M_PI / 2.0f;
+            }
+            else
+            {
+                x += R * cos(o - M_PI / 2);
+                y += R * sin(o - M_PI / 2);
+                outOrientation -= T;
+                T = -T + M_PI / 2.0f;
+            }
+            x += R * cos(o + T);
+            y += R * sin(o + T);
+        }
+        else
+        {
+            float diffO = GetSpeed(MOVE_TURN_RATE) * diffMs / 1000.0f;
+            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
+                outOrientation += diffO;
+            else
+                outOrientation -= diffO;
+            return true;
+        }
+    }
+    else if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
+    {
+        float dist = speed * diffMs / 1000.0f;
+        x += dist * cos(o) * cos(mi.s_pitch);
+        y += dist * sin(o) * cos(mi.s_pitch);
+        z += dist * sin(mi.s_pitch);
+    }
+    else // If we reach here, we did not move
+        return true;
+
+    if (!MaNGOS::IsValidMapCoord(x, y, z, o))
+        return false;
+
+    if (!(mi.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING)))
+        z = GetMap()->GetHeight(x, y, z);
+
+    return GetMap()->isInLineOfSight(mi.pos.x, mi.pos.y, mi.pos.z + 0.5f, x, y, z + 0.5f);
+}
+
 void Unit::DeMorph()
 {
     SetDisplayId(GetNativeDisplayId());
@@ -9151,6 +9271,8 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         float vcos = cos(angle);
         MovementPacketSender::SendKnockBackToController(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
 
+        SetJumpInitialSpeed(verticalSpeed);
+
         if (Player* pPlayer = ToPlayer())
             GetPlayerMovingMe()->GetCheatData()->OnKnockBack(pPlayer, horizontalSpeed, verticalSpeed, vcos, vsin);
     }
@@ -9472,7 +9594,7 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
 
     // Moving player: try to extrapolate movement a bit
     if (IsPlayer() && IsMoving())
-        if (!ToPlayer()->GetCheatData()->ExtrapolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
+        if (!ExtrapolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
             GetPosition(initialPosX, initialPosY, initialPosZ);
 
     float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +

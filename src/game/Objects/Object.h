@@ -902,6 +902,7 @@ class WorldObject : public Object
 
         void SetOrientation(float orientation);
 
+        void SetRawPosition(Position&& pos) { m_position = std::move(pos); }
         Position const& GetPosition() const { return m_position; }
         float GetPositionX() const { return m_position.x; }
         float GetPositionY() const { return m_position.y; }

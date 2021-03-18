@@ -1299,6 +1299,7 @@ class Unit : public WorldObject
         std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
         float m_casterChaseDistance;
         float m_speed_rate[MAX_MOVE_TYPE];
+        float m_jumpInitialSpeed = 0;
         void UpdateSplineMovement(uint32 t_diff);
     protected:
         MotionMaster i_motionMaster;
@@ -1362,6 +1363,10 @@ class Unit : public WorldObject
         float GetXZFlagBasedSpeed(uint32 moveFlags) const;
         float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
         void PropagateSpeedChange() { GetMotionMaster()->PropagateSpeedChange(); }
+        float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
+        bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const;
+        void SetJumpInitialSpeed(float speed) { m_jumpInitialSpeed = speed; }
+        float GetJumpInitialSpeed() const { return m_jumpInitialSpeed; }
 
         // Terrain checks
         virtual bool IsInWater() const;
