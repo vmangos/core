@@ -21,6 +21,9 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 (467, 0, 9, 332888, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Thunderhorn Cleansing - Respawn Water Well Cleansing Aura (GUID: 332888)"),
 (468, 0, 9, 332889, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Wildmane Cleansing - Respawn Water Well Cleansing Aura (GUID: 332889)");
 
+-- Fixed Okla position
+UPDATE `creature` SET `position_x` = 270.076, `position_y` = -3036.6, `position_z` = 97.6192 WHERE `id` = 14873;
+
 
 -- End of migration.
 END IF;
