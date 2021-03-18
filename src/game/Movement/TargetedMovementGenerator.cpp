@@ -640,7 +640,6 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         }
         else
         {
-            float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
             bool targetMoved = false;
             G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
             if (Transport* ownerTransport = owner.GetTransport())
@@ -652,13 +651,13 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             }
             else if (m_bTargetOnTransport)
                 targetMoved = true;
+            
+            if (!targetMoved)
+                targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.1f);
 
-            if (!targetMoved)
-                targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
-            // Chase movement may be interrupted
-            if (!targetMoved)
-                if (owner.movespline->Finalized())
-                    targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist - owner.GetObjectBoundingRadius());
+            // Follow movement may be interrupted
+            if (!targetMoved && owner.movespline->Finalized())
+                targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, m_fOffset + i_target->GetObjectBoundingRadius() + 0.5f); 
 
             if (targetMoved)
             {
