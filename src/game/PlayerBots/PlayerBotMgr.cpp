@@ -761,7 +761,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     }
 
     uint8 botClass = 0;
-    uint32 botLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+    uint32 botLevel = pPlayer->GetLevel();
     CombatBotRoles botRole = ROLE_INVALID;
 
     if (char* arg1 = ExtractArg(&args))
