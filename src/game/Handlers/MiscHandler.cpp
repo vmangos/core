@@ -98,7 +98,7 @@ public:
         Team const team = sess->GetPlayer()->GetTeam();
         AccountTypes const security = sess->GetSecurity();
         bool const allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
-        bool const showBotsInWhoList = sWorld.getConfig(CONFIG_BOOL_PLAYER_BOT_SHOW_IN_WHO_LIST);
+        bool const showBotsInWhoList = sWorld.getConfig(CONFIG_BOOL_BOT_SHOW_IN_WHO_LIST);
         AccountTypes const gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
         uint32 const zone = sess->GetPlayer()->GetCachedZoneId();
         bool const notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));

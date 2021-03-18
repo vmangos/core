@@ -2823,6 +2823,7 @@ PlayerBot.Refresh = 10000
 PlayerBot.ForceLogoutDelay = 1
 
 PartyBot.MaxBots = 0
+PartyBot.SkipChecks = 0
 
 Bot.ShowInWhoList = 0
 

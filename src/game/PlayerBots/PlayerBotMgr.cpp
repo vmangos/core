@@ -672,7 +672,7 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
         return false;
     }
 
-    if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
+    if (pPlayer->GetGroup() && (pPlayer->GetGroup()->IsFull() || pPlayer->GetGroup()->GetMembersCount() >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0))
     {
         SendSysMessage("Cannot add more bots. Group is full.");
         return false;
@@ -695,7 +695,7 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
     }
 
     // Restrictions when the command is made public to avoid abuse.
-    if (GetSession()->GetSecurity() <= SEC_PLAYER)
+    if (GetSession()->GetSecurity() <= SEC_PLAYER && !sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
     {
         if (pPlayer->IsDead())
         {
@@ -746,13 +746,6 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
-
-    if (pPlayer->GetGroup() && pPlayer->GetGroup()->GetMembersCount() >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0)
-    {
-        SendSysMessage("Can't add more bots to your group.");
-        SetSentErrorMessage(true);
-        return false;
-    }
 
     if (!PartyBotAddRequirementCheck(pPlayer, nullptr))
     {
@@ -848,13 +841,6 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
         return false;
-
-    if (pPlayer->GetGroup() && pPlayer->GetGroup()->GetMembersCount() >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0)
-    {
-        SendSysMessage("Can't add more bots to your group.");
-        SetSentErrorMessage(true);
-        return false;
-    }
 
     Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
