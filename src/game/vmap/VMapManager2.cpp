@@ -299,10 +299,7 @@ std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(std::string const
                             iLoadedModelFiles.erase(filename);
                         delete m;
                     });
-        model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(
-                                             filename,
-                                            {ret, getUseManagedPtrs()}
-                                             )).first;
+        model = iLoadedModelFiles.emplace(filename, ManagedModel{ret, getUseManagedPtrs()}).first;
         return ret;
     }
     ret = model->second.lock();
