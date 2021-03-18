@@ -329,7 +329,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
     }
 
-    // This is required for proper movement interpolation
+    // This is required for proper movement extrapolation
     if (opcode == MSG_MOVE_JUMP)
         pMover->SetJumpInitialSpeed(7.95797334f);
     else if (opcode == MSG_MOVE_FALL_LAND)

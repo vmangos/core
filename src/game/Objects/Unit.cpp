@@ -9143,7 +9143,7 @@ void Unit::NearLandTo(float x, float y, float z, float orientation)
     m_movementInfo.RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
     m_movementInfo.ChangePosition(x, y, z, orientation);
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-    m_movementInfo.ctime = 0; // Not a client packet. Pauses interpolation.
+    m_movementInfo.ctime = 0; // Not a client packet. Pauses extrapolation.
 
     WorldPacket data(MSG_MOVE_FALL_LAND, 41);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

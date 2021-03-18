@@ -309,9 +309,9 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
                     pathTravelTime = (uint32)(1000 * 2 * currDistance / m_speed);
 
                 pathTravelTime *= 0.45f; // Attenuation factor (empirical)
-                m_interpolateDelay = (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.time) + pathTravelTime;
-                if (m_interpolateDelay > 1500) m_interpolateDelay = 1500;
-                if (victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, m_interpolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
+                m_extrapolateDelay = (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.time) + pathTravelTime;
+                if (m_extrapolateDelay > 1500) m_extrapolateDelay = 1500;
+                if (victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, m_extrapolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
                 {
                     victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
                     path.calculate(victimPos.x, victimPos.y, victimPos.z, false);

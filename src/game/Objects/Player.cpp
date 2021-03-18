@@ -1442,7 +1442,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     if (IsHasDelayedTeleport())
         TeleportTo(m_teleport_dest, m_teleport_options, m_teleportRecoverDelayed);
-    // Movement interpolation & cheat computation - only if not already kicked!
+    // Movement extrapolation & cheat computation - only if not already kicked!
     if (!GetSession()->IsConnected())
         return;
 
@@ -2063,7 +2063,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 m_teleportRecover = wps;
             wps();
         }
-        m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For interpolation
+        m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For extrapolation
     }
     else
     {

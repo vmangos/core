@@ -342,19 +342,6 @@ void MovementAnticheat::OnFailedToAckChange()
     AddCheats(1 << CHEAT_TYPE_PENDING_ACK_DELAY);
 }
 
-float MovementAnticheat::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
-{
-    float speed = 0.0f;
-    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
-        speed = me->GetSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_SWIM_BACK : MOVE_SWIM);
-    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
-        speed = me->GetSpeed(MOVE_WALK);
-    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-        speed = me->GetSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN);
-
-    return speed;
-}
-
 UnitMoveType MovementAnticheat::GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const
 {
     UnitMoveType type = MOVE_RUN;
@@ -580,7 +567,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
 #endif
 
-        if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
+        if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
             APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
 
         if (CheckMultiJump(opcode))
@@ -651,7 +638,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 float const y = GetLastMovementInfo().pos.y;
                 float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
                 GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
-                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses interpolation.
+                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
                 me->TeleportPositionRelocation(x, y, z, 0);
             }
             me->SendHeartBeat(true);
