@@ -9,6 +9,7 @@ INSERT INTO `migrations` VALUES ('20210312231945');
 -- Add your query below.
 
 
+-- Quests: Winterhoof Cleansing, Thunderhorn Cleansing, Wildmane Cleansing
 DELETE FROM `gameobject` WHERE `guid` IN (332887, 332888, 332889) AND `id` = 2904;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `state`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES 
 (332887, 2904, 1, -2544.54, -712.088, -9.232, 0.767944, 1, -60, -60),
@@ -23,6 +24,20 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 
 -- Fixed Okla position
 UPDATE `creature` SET `position_x` = 270.076, `position_y` = -3036.6, `position_z` = 97.6192 WHERE `id` = 14873;
+
+-- Completion script for quest 'Call of Fire' (Part 3)
+UPDATE `quest_template` SET `CompleteScript` = 1525 WHERE `entry` = 1525;
+
+DELETE FROM `quest_end_scripts` WHERE `id` = 1525;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1525, 1, 15, 9200, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Telf Joolam - Cast Spell Create Sapta");
+
+-- Completion script for quest 'Call of Fire' (Part 5)
+UPDATE `quest_template` SET `CompleteScript` = 1527 WHERE `entry` = 1527;
+
+DELETE FROM `quest_end_scripts` WHERE `id` = 1527;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1527, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2181, 0, 0, 0, 0, 0, 0, 0, 0, "Kranal Fiss - Say Text");
 
 
 -- End of migration.
