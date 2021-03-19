@@ -85,6 +85,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7656, 31, -600.667, -4370, 39.3044, 100, 0, 0, 0),
 (7656, 32, -600.132, -4356.39, 38.4777, 100, 0, 0, 0);
 
+-- Defias Miners should not roam
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (79134, 79129, 79131);
+
 
 -- End of migration.
 END IF;
