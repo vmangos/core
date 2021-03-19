@@ -29,6 +29,7 @@
 #include "Transport.h"
 #include "TemporarySummon.h"
 #include "GameObjectAI.h"
+#include "Geometry.h"
 
 //-----------------------------------------------//
 template<class T, typename D>
@@ -51,15 +52,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if (isPet)
         transport = i_target.getTarget()->GetTransport();
 
-    // prevent redundant micro-movement for pets, other followers.
-    if (m_fOffset && !i_target->IsMoving() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
-    {
-        if (!owner.movespline->Finalized())
-            return;
-
-        owner.GetPosition(x, y, z);
-    }
-    else if (!m_fOffset)
+    if (!m_fOffset)
     {
         if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
         {
@@ -72,6 +65,11 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         // NOSTALRIUS: Eviter les collisions entre mobs.
         // Cette fonction prend un angle aleatoire.
         i_target->GetRandomAttackPoint(&owner, x, y, z);
+    }
+    // prevent redundant micro-movement for pets, other followers.
+    else if (!i_target->IsMoving() && owner.movespline->Finalized() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
+    {
+        owner.GetPosition(x, y, z);
     }
     else
     {
@@ -621,7 +619,11 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     {
         m_checkDistanceTimer.Reset(100);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
-        if (!owner.movespline->Finalized() && i_target->IsWithinDist(&owner, 0.0f) && !m_fOffset)
+        if (!owner.movespline->Finalized() && 
+                 ((!m_fOffset && i_target->IsWithinDist(&owner, 0.0f)) ||
+                 (i_target->IsPlayer() && !i_target->IsMoving() &&
+                 Geometry::GetDistance3D(owner.movespline->FinalDestination(), i_target->GetPosition()) > (m_fOffset + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius() + 0.5f) &&
+                 Geometry::GetDistance3D(owner.GetPosition(), i_target->GetPosition()) <= (m_fOffset + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius() + 0.5f))))
         {
             owner.movespline->_Interrupt();
             interrupted = true;
