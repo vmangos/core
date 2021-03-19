@@ -304,11 +304,15 @@ enum ScourgeInvasionWorldStatesVariables
     WORLDSTATE_SI_WINTERSPRING                  = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
 
     // Variables
-    VARIABLE_NAXX_ATTACK_ZONE1                  = 10,
-    VARIABLE_NAXX_ATTACK_ZONE2                  = 11,
-    VARIABLE_NAXX_ATTACK_TIME1                  = 12,
-    VARIABLE_NAXX_ATTACK_TIME2                  = 13,
-    VARIABLE_NAXX_ATTACK_COUNT                  = 14,
+    VARIABLE_NAXX_ATTACK_ZONE1                  = 110,
+    VARIABLE_NAXX_ATTACK_ZONE2                  = 111,
+    VARIABLE_NAXX_ATTACK_ZONE3                  = 112,
+    VARIABLE_NAXX_ATTACK_ZONE4                  = 113,
+    VARIABLE_NAXX_ATTACK_ZONE5                  = 114,
+    VARIABLE_NAXX_ATTACK_ZONE6                  = 115,
+    VARIABLE_NAXX_ATTACK_TIME1                  = 116,
+    VARIABLE_NAXX_ATTACK_TIME2                  = 117,
+    VARIABLE_NAXX_ATTACK_COUNT                  = 118,
 
     VARIABLE_NAXX_ELITE_ID                      = 20,
     VARIABLE_NAXX_ELITE_PYLON                   = 21,

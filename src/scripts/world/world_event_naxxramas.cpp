@@ -129,7 +129,7 @@ void DespawnEventDoodads(Creature* shard)
     std::list<Creature*> finderList;
     GetCreatureListWithEntryInGrid(finderList, shard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
     for (const auto pfinder : finderList)
-        pfinder->DespawnOrUnsummon();
+        pfinder->RemoveFromWorld();
 }
 
 void DespawnNecropolis(Unit* despawner)
@@ -306,7 +306,7 @@ struct MouthAI : public ScriptedAI
             m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2));
             ChangeZoneEventStatus(m_creature, false);
             m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
-            m_creature->DespawnOrUnsummon();
+            m_creature->RemoveFromWorld();
         }
         break;
         }
@@ -447,7 +447,7 @@ struct NecropolisProxyAI : public ScriptedAI
     {
         // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            m_creature->DespawnOrUnsummon();
+            m_creature->RemoveFromWorld();
     }
 
     void UpdateAI(uint32 const uiDiff) override {}
@@ -493,7 +493,7 @@ struct NecropolisRelayAI : public ScriptedAI
     {
         // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            m_creature->DespawnOrUnsummon();
+            m_creature->RemoveFromWorld();
     }
 
     void UpdateAI(uint32 const uiDiff) override {}
@@ -576,7 +576,7 @@ struct NecroticShard : public ScriptedAI
             return;
 
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            m_creature->DespawnOrUnsummon();
+            m_creature->RemoveFromWorld();
     }
 
     void DamageTaken(Unit* dealer, uint32& damage) override
@@ -601,7 +601,7 @@ struct NecroticShard : public ScriptedAI
             {
                 // Get the camp type from the Necrotic Shard.
                 DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, m_camptype, true);
-                m_creature->DespawnOrUnsummon();
+                m_creature->RemoveFromWorld();
             }
             break;
         case NPC_DAMAGED_NECROTIC_SHARD:

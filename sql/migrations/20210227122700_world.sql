@@ -17,8 +17,10 @@ UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis' WHERE
 UPDATE `creature_template` SET `regeneration`='0', `script_name`='scourge_invasion_necropolis_health' WHERE  `entry`=16421;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE  `entry`=16398;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE  `entry`=16386;
-UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `unit_flags`='512', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16395,16436,16434,16433,16435,16384,16787,16359,16255);
-UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver' WHERE entry IN (16395,16436,16434,16433,16384,16435);
+UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
+UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `unit_flags`='512' WHERE entry IN (16395,16436,16434,16433,16384,16435);
+UPDATE `creature_template` SET `unit_flags`='33280', `faction`='794', `npc_flags`='2' WHERE `entry`=16786;
+UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='2' WHERE `entry`=16787;
 
 -- Fix Camp Spawners
 UPDATE `creature_template` SET `unit_flags`='33554432', `base_attack_time`='2000', `ranged_attack_time`='2000', `movement_type`='0', `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
@@ -46,6 +48,24 @@ UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`=
 UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
 UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry` IN (16437,16423);
 UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
+
+-- Add Argent Outfitter Quests
+INSERT INTO `mangos`.`quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES ('16787', 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', '66');
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+    (16787, 9094, 9, 10),
+    (16787, 9317, 9, 10),
+    (16787, 9318, 9, 10),
+    (16787, 9320, 9, 10),
+    (16787, 9321, 9, 10),
+    (16787, 9341, 9, 10);
+
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+    (16787, 9094, 9, 10),
+    (16787, 9317, 9, 10),
+    (16787, 9318, 9, 10),
+    (16787, 9320, 9, 10),
+    (16787, 9321, 9, 10),
+    (16787, 9341, 9, 10);
 
 -- Remove wrong stuff.
 DELETE FROM `spell_effect_mod` WHERE `id` IN (28373,28351,28032,28365,28281,28349,31315,28056,28367,28326,28366,28041,27894);
@@ -86,8 +106,8 @@ INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `lengt
     (95, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Burning Steppes', 1, 1, 9, 10),
     (96, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 50 Invasions Done', 1, 1, 9, 10),
     (97, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 100 Invasions Done', 1, 1, 9, 10),
-    (98, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 150 Invasions Done', 1, 1, 9, 10),
-    (99, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Invasions Done', 1, 1, 9, 10);
+    (98, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 1814400, 0, 'Scourge Invasion - 150 Invasions Done', 1, 1, 9, 10),
+    (99, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 1814400, 0, 'Scourge Invasion - Invasions Done', 1, 1, 9, 10);
 
 SET @SCOURGE_INVASION_GUID = 700000;
 SET @SCOURGE_INVASION_EVENT = 17;
@@ -412,29 +432,31 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+54 AND `event`=@SCOURGE_INVASION_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @SCOURGE_INVASION_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+54;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+6;
+DELETE FROM `creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@INVASIONS_DONE_GUID+1 , 16787, 1, 1583.22, -4412.06, 7.73177, 2.37365),
     (@INVASIONS_DONE_GUID+2 , 16787, 0, 1585.96, 249.99, -61.994, 2.26893),
     (@INVASIONS_DONE_GUID+3 , 16787, 1, -1256.72, 76.7393, 128.049, 4.41568),
     (@INVASIONS_DONE_GUID+4 , 16786, 1, 9907.45, 2519.83, 1316.41, 0.15708),
     (@INVASIONS_DONE_GUID+5 , 16786, 0, -8836.57, 647.61, 96.3019, 3.90954),
-    (@INVASIONS_DONE_GUID+6 , 16786, 0, -4885.84, -945.795, 501.547, 2.72228);
+    (@INVASIONS_DONE_GUID+6 , 16786, 0, -4885.84, -945.795, 501.547, 2.72228),
+    (@INVASIONS_DONE_GUID+7 , 16786, 0, 2253.82, -5310.68, 82.2506, 1.8675);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+6 AND `event`=@INVASIONS_DONE_EVENT;
-INSERT INTO `game_event_creature` SELECT creature.guid, @INVASIONS_DONE_EVENT FROM `creature` WHERE creature.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+6;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7 AND `event`=@INVASIONS_DONE_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @INVASIONS_DONE_EVENT FROM `creature` WHERE creature.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+6;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@INVASIONS_DONE_GUID+1, 181256, 1, 1585.55, -4409.76, 7.27701, 3.03684, 0, 0, 0.998629, 0.0523532, 255, 1),
     (@INVASIONS_DONE_GUID+2, 181256, 0, 1584.6, 245.848, -62.0773, 3.12412, 0, 0, 0.999962, 0.00873464, 255, 1),
     (@INVASIONS_DONE_GUID+3, 181256, 1, -1258.73, 78.1247, 128.035, 4.62512, 0, 0, -0.737277, 0.675591, 255, 1),
     (@INVASIONS_DONE_GUID+4, 181256, 0, -4884.69, -943.904, 501.462, 1.83216, 0, 0, 0.793221, 0.608933, 255, 1),
     (@INVASIONS_DONE_GUID+5, 181256, 0, -8836.66, 644.879, 95.692, 3.9619, 0, 0, -0.91706, 0.39875, 255, 1),
-    (@INVASIONS_DONE_GUID+6, 181256, 1, 9909.79, 2516.55, 1316.68, 5.11382, 0, 0, -0.551936, 0.833886, 255, 1);
+    (@INVASIONS_DONE_GUID+6, 181256, 1, 9909.79, 2516.55, 1316.68, 5.11382, 0, 0, -0.551936, 0.833886, 255, 1),
+    (@INVASIONS_DONE_GUID+7, 181256, 0, 2250.87, -5312.69, 82.1539, 2.89724, 0, 0, 0.992546, 0.12187, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+6 AND `event`=@INVASIONS_DONE_EVENT;
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @INVASIONS_DONE_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+6;
+DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7 AND `event`=@INVASIONS_DONE_EVENT;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @INVASIONS_DONE_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
@@ -2359,7 +2381,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@EASTERN_PLAGUELANDS_GUID+71, 181255, 0, 2239.56, -5320.3, 82.1271, 4.15388, 0, 0, -0.874619, 0.48481, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+72, 181256, 0, 2238.91, -5318.67, 82.1523, 1.55334, 0, 0, 0.700909, 0.713251, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+73, 181256, 0, 2248.47, -5318.94, 82.1143, 1.5708, 0, 0, 0.707107, 0.707107, 255, 1),
-    (@EASTERN_PLAGUELANDS_GUID+74, 181256, 0, 2250.87, -5312.69, 82.1539, 2.89724, 0, 0, 0.992546, 0.12187, 255, 1),
+    -- (@EASTERN_PLAGUELANDS_GUID+74, 181256, 0, 2250.87, -5312.69, 82.1539, 2.89724, 0, 0, 0.992546, 0.12187, 255, 1), after event?
     (@EASTERN_PLAGUELANDS_GUID+75, 181194, 0, 1568.39, -3051.2, 78.6488, 2.44346, 0, 0, 0.939692, 0.342021, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+76, 181193, 0, 1569.98, -3050.95, 78.8824, 3.01941, 0, 0, 0.998135, 0.0610518, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+77, 181191, 0, 1585.78, -3039.62, 79.899, 3.31614, 0, 0, -0.996194, 0.087165, 255, 1),
@@ -2641,9 +2663,9 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+165, 16398, 0, 1833.31, -3066.72, 107.489, 4.10152),
     (@EASTERN_PLAGUELANDS_GUID+166, 16398, 0, 1776.76, -2966.79, 98.8574, 4.10152),
     (@EASTERN_PLAGUELANDS_GUID+167, 16398, 0, 1716.76, -3033.74, 108.011, 4.10152),
-    (@EASTERN_PLAGUELANDS_GUID+168, 16786, 0, 2253.82, -5310.68, 82.2506, 1.8675),
+    -- (@EASTERN_PLAGUELANDS_GUID+168, 16786, 0, 2253.82, -5310.68, 82.2506, 1.8675), after event?
     (@EASTERN_PLAGUELANDS_GUID+169, 16786, 0, 2257.84, -5322.27, 81.8893, 2.80998),
-    (@EASTERN_PLAGUELANDS_GUID+170, 16787, 0, 2244.35, -5267.91, 77.4334, 2.90723),
+    -- (@EASTERN_PLAGUELANDS_GUID+170, 16787, 0, 2244.35, -5267.91, 77.4334, 2.90723), invalid position
     (@EASTERN_PLAGUELANDS_GUID+171, 16787, 0, 2263.72, -5313.31, 81.9193, 3.52556),
     -- (@EASTERN_PLAGUELANDS_GUID+172, 16995, 0, 2014.55, -4934.52, 73.9846, 0.0698132),
     (@EASTERN_PLAGUELANDS_GUID+173, 16401, 0, 1766.67, -3033.34, 132.888, 5.18363),

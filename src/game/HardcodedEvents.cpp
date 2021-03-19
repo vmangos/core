@@ -587,6 +587,10 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
 
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE3, ZONEID_EASTERN_PLAGUELANDS);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE4, ZONEID_BURNING_STEPPES);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE5, ZONEID_WINTERSPRING);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE6, ZONEID_AZSHARA);
 
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
@@ -812,6 +816,13 @@ void ScourgeInvasionEvent::Disable()
     sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0, true);
+
+    sObjectMgr.SetSavedVariable(VARIABLE_AZSHARA_NECROPOLIS_REMAINING, 0, true);
+    sObjectMgr.SetSavedVariable(VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING, 0, true);
+    sObjectMgr.SetSavedVariable(VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING, 0, true);
+    sObjectMgr.SetSavedVariable(VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING, 0, true);
+    sObjectMgr.SetSavedVariable(VARIABLE_TANARIS_NECROPOLIS_REMAINING, 0, true);
+    sObjectMgr.SetSavedVariable(VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING, 0, true);
 
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
