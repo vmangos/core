@@ -911,8 +911,14 @@ class WorldObject : public Object
         void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
         void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
         float GetOrientation() const { return m_position.o; }
-        void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const;
+        void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const
+        {
+            GetNearPoint2DAroundPosition(GetPositionX(), GetPositionY(), x, y, distance, absAngle);
+        }
+        void GetNearPoint2DAroundPosition(float ownX, float ownY, float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
+        // x, y, z should be initialized to the position you want to search around
+        void GetNearPointAroundPosition(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
         void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, WorldObject const* obj = nullptr) const
         {
             // angle calculated from current orientation
@@ -999,7 +1005,11 @@ class WorldObject : public Object
         {
             return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
-        bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f) const;
+        bool IsWithinLOS(float targetX, float targetY, float targetZ, bool checkDynLos = true, float targetHeight = 2.f) const
+        {
+            return IsWithinLOSAtPosition(GetPositionX(), GetPositionY(), GetPositionZ(), targetX, targetY, targetZ, checkDynLos, targetHeight);
+        }
+        bool IsWithinLOSAtPosition(float ownX, float ownY, float ownZ, float targetX, float targetY, float targetZ, bool checkDynLos = true, float targetHeight = 2.f) const;
         bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
         bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;

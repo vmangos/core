@@ -9,6 +9,9 @@
 #include "MoveSpline.h"
 #include "World.h"
 #include "MovementPacketSender.h"
+#include "Geometry.h"
+
+using namespace Geometry;
 
 const char* GetMovementCheatName(CheatType flagId)
 {
@@ -456,25 +459,6 @@ bool ShouldRejectMovement(uint32 cheatFlags)
         return true;
 
     return false;
-}
-
-template<class T>
-float GetDistance3D(T const& from, T const& to)
-{
-    float dx = from.x - to.x;
-    float dy = from.y - to.y;
-    float dz = from.z - to.z;
-    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-    return (dist > 0 ? dist : 0);
-}
-
-template<class T>
-float GetDistance2D(T const& from, T const& to)
-{
-    float dx = from.x - to.x;
-    float dy = from.y - to.y;
-    float dist = sqrt((dx * dx) + (dy * dy));
-    return (dist > 0 ? dist : 0);
 }
 
 bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
@@ -1048,7 +1032,7 @@ bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) cons
         return true;
 
     float const distance = GetDistance3D(me->GetPosition(), movementInfo.pos);
-    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE);
+    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.1f);
 
     // Exclude elevators
     uint32 destZoneId = 0;

@@ -30,15 +30,6 @@
 #include "TemporarySummon.h"
 #include "GameObjectAI.h"
 
-// temp struct to hold original owner position for pet follow movement
-// we relocate the unit for a second to calculate offset from extrapolated position
-struct UnitPositionData
-{
-    UnitPositionData(Position const& pos, MovementInfo const& mi) : position(pos), movementInfo(mi) {}
-    Position position;
-    MovementInfo movementInfo;
-};
-
 //-----------------------------------------------//
 template<class T, typename D>
 void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
@@ -90,10 +81,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         if (transport)
             transport->CalculatePassengerPosition(srcX, srcY, srcZ);
 
-        // hold the original position, in case we need to relocate unit to extrapolate follow position offset
-        bool relocated = false;
-        std::unique_ptr<UnitPositionData> originalPosition = nullptr;
-
         // TRANSPORT_VMAPS
         if (transport)
         {
@@ -103,27 +90,19 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         else
         {
             float o;
-            if (sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
-                i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.time) + 500, x, y, z, o))
+            if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
+                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.time) + 500, x, y, z, o)))
             {
-                relocated = true;
-                originalPosition = std::make_unique<UnitPositionData>(i_target->GetPosition(), i_target->m_movementInfo);
-                i_target->Relocate(x, y, z, o);
+                i_target->GetPosition(x, y, z);
+                o = i_target->GetOrientation();
             }
             
-            i_target->GetClosePoint(x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, m_fAngle, &owner);
+            i_target->GetNearPointAroundPosition(&owner, x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, o + m_fAngle);
         }
 
         if (!i_target->m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && !i_target->IsInWater())
             if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
                 i_target->GetSafePosition(x, y, z);
-
-        // restore real position after calculations
-        if (relocated)
-        {
-            i_target->SetRawPosition(std::move(originalPosition->position));
-            i_target->m_movementInfo = originalPosition->movementInfo;
-        }
     }
 
     m_bTargetOnTransport = transport;
@@ -190,16 +169,17 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     {
         float dist = path.Length();
         init.SetWalk(false);
-        if (dist > 15.0f)
+        float speedupDistance = m_fOffset * 2.0f + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius();
+        if (dist > speedupDistance)
         {
             Unit* pOwner = owner.GetCharmerOrOwner();
             if (pOwner && !pOwner->IsInCombat() && !owner.IsInCombat())
             {
                 float distFactor = 1.0f;
                 if (pOwner->IsMounted())
-                    distFactor += 0.04 * (dist - 25.0f);
+                    distFactor += 0.04 * (dist - speedupDistance * 2);
                 else
-                    distFactor += 0.04 * (dist - 15.0f);
+                    distFactor += 0.04 * (dist - speedupDistance);
                 if (distFactor < 1.0f) distFactor = 1.0f;
                 if (distFactor > 2.1f) distFactor = 2.1f;
                 init.SetVelocity(distFactor * owner.GetSpeed(MOVE_RUN));
