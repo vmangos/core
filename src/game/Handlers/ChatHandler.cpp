@@ -175,8 +175,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             lang = LANG_UNIVERSAL;
         else
         {
-            // Send message in universal language if crossfaction chat is enabled and player is using default faction
-            // languages.
+            // Send message in universal language if crossfaction chat is enabled and player is using default faction languages.
             if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT) && (lang == LANG_COMMON || lang == LANG_ORCISH))
                 lang = LANG_UNIVERSAL;
             else
