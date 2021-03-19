@@ -216,7 +216,7 @@ struct ScourgeInvasionEvent : WorldEvent
     void Update() override;
     void EnableAndStartEvent(uint16 event_id);
     void DisableAndStopEvent(uint16 event_id);
-    void HandleWins();
+    void HandleDefendedZones();
     void Enable() override;
     void Disable() override;
     uint32 GetNextUpdateDelay() override;
@@ -236,7 +236,6 @@ private:
         uint32 necroAmount;
         ObjectGuid mouthGuid;
         std::vector<InvasionXYZO> mouth;
-        //std::vector<InvasionMouth> points;
     };
 
     bool invasion1Loaded;

@@ -690,19 +690,26 @@ void ScourgeInvasionEvent::DisableAndStopEvent(uint16 event_id)
 }
 
 
-void ScourgeInvasionEvent::HandleWins()
+void ScourgeInvasionEvent::HandleDefendedZones()
 {
     uint32 wins = 0;
     wins = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
 
-    if (wins >= 50 && wins < 100)
+    if (wins < 50) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
+    }
+    else if (wins >= 50 && wins < 100)
         EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
     else if (wins >= 100 && wins < 150) {
         DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
     }
     else if (wins >= 150) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION);
         DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
         EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
     }
 }
@@ -842,7 +849,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
         sObjectMgr.SetSavedVariable(attackTimeVar, now + NECROPOLIS_ATTACK_TIMER, true);
         sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
 
-        HandleWins();
+        HandleDefendedZones();
 
         if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT))
         sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next invasion starting in %d minutes", zoneId, uint32(timeToNextAttack/60));
@@ -866,7 +873,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
 bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
 {
     uint32 current1 = sObjectMgr.GetSavedVariable(attackZoneVar);
-    HandleWins();
+    HandleDefendedZones();
 
     if (!isValidZoneId(current1))
     {
