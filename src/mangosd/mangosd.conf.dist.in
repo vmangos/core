@@ -2812,7 +2812,7 @@ OfflineChat.IP     = 0.0.0.0
 OfflineChat.Password= "p8zqkt"
 
 ###################################################################################################################
-#    Bots
+#    PlayerBots
 ###################################################################################################################
 PlayerBot.Enable = 0
 PlayerBot.Debug = 0
@@ -2822,10 +2822,10 @@ PlayerBot.MaxBots = 0
 PlayerBot.Refresh = 10000
 PlayerBot.ForceLogoutDelay = 1
 
+PlayerBot.ShowInWhoList = 0
+
 PartyBot.MaxBots = 0
 PartyBot.SkipChecks = 0
-
-Bot.ShowInWhoList = 0
 
 ###################################################################################################################
 #    Mail flooding mitigation
