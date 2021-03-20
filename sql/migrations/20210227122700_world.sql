@@ -13,10 +13,10 @@ UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`=
 UPDATE `creature_template` SET `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `flags_extra`='64', `health_min`='42', `health_max`='42', `unit_flags`='33554432', `movement_type`='0', `level_min`='1', `level_max`='1' WHERE `entry` IN (16401,16421,16398,16386);
 UPDATE `creature_template` SET `speed_run`='0.992063' WHERE `entry`=16398;
 UPDATE `creature_template` SET `armor`='950' WHERE `entry`=16421;
-UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis' WHERE  `entry`=16401;
-UPDATE `creature_template` SET `regeneration`='0', `script_name`='scourge_invasion_necropolis_health' WHERE  `entry`=16421;
-UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE  `entry`=16398;
-UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE  `entry`=16386;
+UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis' WHERE `entry`=16401;
+UPDATE `creature_template` SET `regeneration`='0', `script_name`='scourge_invasion_necropolis_health' WHERE `entry`=16421;
+UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE `entry`=16398;
+UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE `entry`=16386;
 UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
 UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `unit_flags`='512' WHERE entry IN (16395,16436,16434,16433,16384,16435);
 UPDATE `creature_template` SET `unit_flags`='33280', `faction`='794', `npc_flags`='2' WHERE `entry`=16786;
@@ -48,6 +48,17 @@ UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`=
 UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
 UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry` IN (16437,16423);
 UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
+
+-- Argent NPC's do not have random emotes
+DELETE FROM `creature_ai_events` WHERE `id`=1624101;
+DELETE FROM `creature_ai_events` WHERE `id`=1624102;
+DELETE FROM `creature_ai_events` WHERE `id`=1625501;
+DELETE FROM `creature_ai_events` WHERE `id`=1625502;
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1624101 AND `delay`=0 AND `command`=1 AND `datalong`=11 AND `datalong2`=18 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Recruiter - Random Emote' LIMIT 1;
+DELETE FROM `creature_ai_scripts` WHERE `id`=1624102 AND `delay`=0 AND `command`=1 AND `datalong`=1 AND `datalong2`=0 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Recruiter - Emote 1' LIMIT 1;
+DELETE FROM `creature_ai_scripts` WHERE `id`=1625501 AND `delay`=0 AND `command`=1 AND `datalong`=11 AND `datalong2`=18 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Scout - Random Emote' LIMIT 1;
+DELETE FROM `creature_ai_scripts` WHERE `id`=1625502 AND `delay`=0 AND `command`=1 AND `datalong`=1 AND `datalong2`=0 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Scout - Emote 1' LIMIT 1;
 
 -- Add Argent Outfitter Quests
 INSERT INTO `mangos`.`quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES ('16787', 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', '66');
@@ -140,7 +151,7 @@ DELETE FROM gameobject WHERE guid IN (1267,1268,1269,1270,1271,1272,1273,1274,12
 DELETE FROM `game_event_gameobject` WHERE `event` = 17;
 DELETE FROM `game_event_creature` WHERE `event` = 17;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+226;
+DELETE FROM `creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@SCOURGE_INVASION_GUID+1, 16422, 0, -9226.02, 355.318, 73.5737, 2.4289),
     (@SCOURGE_INVASION_GUID+2, 16422, 0, -9224.34, 255.678, 72.4395, 5.62633),
@@ -367,12 +378,17 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@SCOURGE_INVASION_GUID+223, 16285, 1, 9918.94, 2518.57, 1317.64, 3.47321),
     (@SCOURGE_INVASION_GUID+224, 16495, 1, 9939.37, 2114.4, 1328.61, 6.10865),
     (@SCOURGE_INVASION_GUID+225, 16786, 1, 9917.67, 2524.46, 1317.53, 3.87463),
-    (@SCOURGE_INVASION_GUID+226, 16995, 1, 9952.88, 2246.56, 1334.5, 4.24115);
+    (@SCOURGE_INVASION_GUID+226, 16995, 1, 9952.88, 2246.56, 1334.5, 4.24115),
+    (@SCOURGE_INVASION_GUID+227, 16786, 0, 2257.84, -5322.27, 81.8893, 2.80998),
+    (@SCOURGE_INVASION_GUID+228, 16787, 0, 2263.72, -5313.31, 81.9193, 3.52556),
+    (@SCOURGE_INVASION_GUID+229, 16281, 0, 2242.44, -5317.31, 82.2506, 1.41372),
+    (@SCOURGE_INVASION_GUID+230, 16361, 0, 2240.87, -5317.26, 82.2506, 1.67552),
+    (@SCOURGE_INVASION_GUID+231, 16285, 0, 2247.79, -5317.31, 82.1935, 1.5708);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+226 AND `event`=@SCOURGE_INVASION_EVENT;
-INSERT INTO `game_event_creature` SELECT creature.guid, @SCOURGE_INVASION_EVENT FROM `creature` WHERE creature.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+226;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231 AND `event`=@SCOURGE_INVASION_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @SCOURGE_INVASION_EVENT FROM `creature` WHERE creature.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+54;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@SCOURGE_INVASION_GUID+1, 181172, 0, -5122.8, -725, 505.467, 0.0349062, 0, 0, 0.0174522, 0.999848, 255, 1),
     (@SCOURGE_INVASION_GUID+2, 181172, 0, 1852.46, 266.873, 114.815, 0.541051, 0, 0, 0.267238, 0.963631, 255, 1),
@@ -427,10 +443,13 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@SCOURGE_INVASION_GUID+51, 181256, 0, -4895.76, -953.432, 501.465, 2.61756, 0, 0, 0.96587, 0.259028, 255, 1),
     (@SCOURGE_INVASION_GUID+52, 181256, 0, -4925.42, -981.831, 501.466, 2.18166, 0, 0, 0.887011, 0.461749, 255, 1),
     (@SCOURGE_INVASION_GUID+53, 181256, 0, -4931.42, -986.271, 501.462, 2.23402, 0, 0, 0.898793, 0.438373, 255, 1),
-    (@SCOURGE_INVASION_GUID+54, 181256, 1, 9920.85, 2516.86, 1317.96, 4.10152, 0, 0, -0.887011, 0.461749, 255, 1);
+    (@SCOURGE_INVASION_GUID+54, 181256, 1, 9920.85, 2516.86, 1317.96, 4.10152, 0, 0, -0.887011, 0.461749, 255, 1),
+    (@SCOURGE_INVASION_GUID+55, 181256, 0, 2238.91, -5318.67, 82.1523, 1.55334, 0, 0, 0.700909, 0.713251, 255, 1),
+    (@SCOURGE_INVASION_GUID+56, 181256, 0, 2248.47, -5318.94, 82.1143, 1.5708, 0, 0, 0.707107, 0.707107, 255, 1),
+    (@SCOURGE_INVASION_GUID+57, 181254, 0, 2243.86, -5321.14, 82.1673, 1.48353, 0, 0, 0.67559, 0.737278, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+54 AND `event`=@SCOURGE_INVASION_EVENT;
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @SCOURGE_INVASION_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+54;
+DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57 AND `event`=@SCOURGE_INVASION_EVENT;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @SCOURGE_INVASION_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
@@ -2376,12 +2395,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@EASTERN_PLAGUELANDS_GUID+66, 181174, 0, 2320.43, -4951.71, 76.1494, 5.42798, 0, 0, -0.414693, 0.909962, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+67, 181174, 0, 2321.65, -4917.39, 84.3817, 1.44862, 0, 0, 0.66262, 0.748956, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+68, 181174, 0, 2333.07, -4938.58, 76.1625, 3.07177, 0, 0, 0.999391, 0.0349061, 255, 1),
-    (@EASTERN_PLAGUELANDS_GUID+69, 181254, 0, 2243.86, -5321.14, 82.1673, 1.48353, 0, 0, 0.67559, 0.737278, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+70, 181255, 0, 2239.47, -5320.43, 82.6284, 1.27409, 0, 0, 0.594822, 0.803857, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+71, 181255, 0, 2239.56, -5320.3, 82.1271, 4.15388, 0, 0, -0.874619, 0.48481, 255, 1),
-    (@EASTERN_PLAGUELANDS_GUID+72, 181256, 0, 2238.91, -5318.67, 82.1523, 1.55334, 0, 0, 0.700909, 0.713251, 255, 1),
-    (@EASTERN_PLAGUELANDS_GUID+73, 181256, 0, 2248.47, -5318.94, 82.1143, 1.5708, 0, 0, 0.707107, 0.707107, 255, 1),
-    -- (@EASTERN_PLAGUELANDS_GUID+74, 181256, 0, 2250.87, -5312.69, 82.1539, 2.89724, 0, 0, 0.992546, 0.12187, 255, 1), after event?
     (@EASTERN_PLAGUELANDS_GUID+75, 181194, 0, 1568.39, -3051.2, 78.6488, 2.44346, 0, 0, 0.939692, 0.342021, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+76, 181193, 0, 1569.98, -3050.95, 78.8824, 3.01941, 0, 0, 0.998135, 0.0610518, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+77, 181191, 0, 1585.78, -3039.62, 79.899, 3.31614, 0, 0, -0.996194, 0.087165, 255, 1),
@@ -2496,8 +2511,6 @@ INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EASTERN_PLAGUELANDS
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+176;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
-    (@EASTERN_PLAGUELANDS_GUID+1, 16281, 0, 2242.44, -5317.31, 82.2506, 1.41372),
-    (@EASTERN_PLAGUELANDS_GUID+2, 16285, 0, 2247.79, -5317.31, 82.1935, 1.5708),
     (@EASTERN_PLAGUELANDS_GUID+3, 16356, 0, 1966.54, -4717.01, 98.3666, 0.226893),
     (@EASTERN_PLAGUELANDS_GUID+4, 16356, 0, 1965.33, -5104.58, 84.9795, 3.26377),
     (@EASTERN_PLAGUELANDS_GUID+5, 16356, 0, 1965.17, -3119.4, 82.47, 4.04917),
@@ -2650,7 +2663,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+152, 16356, 0, 1910.36, -4804.91, 113.312, 3.23939),
     (@EASTERN_PLAGUELANDS_GUID+153, 16356, 0, 1908.37, -4756.09, 103.381, 1.95477),
     (@EASTERN_PLAGUELANDS_GUID+154, 16356, 0, 1901.73, -4804.16, 117.785, 5.81195),
-    (@EASTERN_PLAGUELANDS_GUID+155, 16361, 0, 2240.87, -5317.26, 82.2506, 1.67552),
     (@EASTERN_PLAGUELANDS_GUID+156, 16386, 0, 2233.62, -4933.13, 112.119, 2.60054),
     (@EASTERN_PLAGUELANDS_GUID+157, 16386, 0, 2006.85, -5044.05, 112.968, 2.60054),
     (@EASTERN_PLAGUELANDS_GUID+158, 16386, 0, 2000.8, -4824.39, 125.672, 2.60054),
@@ -2663,10 +2675,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+165, 16398, 0, 1833.31, -3066.72, 107.489, 4.10152),
     (@EASTERN_PLAGUELANDS_GUID+166, 16398, 0, 1776.76, -2966.79, 98.8574, 4.10152),
     (@EASTERN_PLAGUELANDS_GUID+167, 16398, 0, 1716.76, -3033.74, 108.011, 4.10152),
-    -- (@EASTERN_PLAGUELANDS_GUID+168, 16786, 0, 2253.82, -5310.68, 82.2506, 1.8675), after event?
-    (@EASTERN_PLAGUELANDS_GUID+169, 16786, 0, 2257.84, -5322.27, 81.8893, 2.80998),
-    -- (@EASTERN_PLAGUELANDS_GUID+170, 16787, 0, 2244.35, -5267.91, 77.4334, 2.90723), invalid position
-    (@EASTERN_PLAGUELANDS_GUID+171, 16787, 0, 2263.72, -5313.31, 81.9193, 3.52556),
     -- (@EASTERN_PLAGUELANDS_GUID+172, 16995, 0, 2014.55, -4934.52, 73.9846, 0.0698132),
     (@EASTERN_PLAGUELANDS_GUID+173, 16401, 0, 1766.67, -3033.34, 132.888, 5.18363),
     (@EASTERN_PLAGUELANDS_GUID+174, 16401, 0, 2101.69, -4930.03, 168.364, 1.0472),
@@ -3081,8 +3089,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
     (2353, 17, 200.116, 150.961, 109.909, 100);
 
 -- Revanchion
-UPDATE `creature_template` SET `display_scale1`='0', `faction`='21', `speed_walk`='1.11111', `unit_flags`='64', `auras`='28126 16331 12556' WHERE  `entry`=14690;
-UPDATE `creature` SET `position_x`='-112.776', `position_y`='583.823', `position_z`='-3.47887', `orientation`='5.60251' WHERE  `guid`=2352;
+UPDATE `creature_template` SET `display_scale1`='0', `faction`='21', `speed_walk`='1.11111', `unit_flags`='64', `auras`='28126 16331 12556' WHERE `entry`=14690;
+UPDATE `creature` SET `position_x`='-112.776', `position_y`='583.823', `position_z`='-3.47887', `orientation`='5.60251' WHERE `guid`=2352;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146900, 'Dire Maul - Revanchion', 6136, 100, 1, 0, 0, 0, 5, 6, 9, 10, 0, 14907, 100, 1, 0, 0, 0, 5, 33, 33, 33, 0, 15245, 100, 1, 0, 0, 0, 5, 16, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Scorn: https://www.youtube.com/watch?v=wJ5nSn94wN0
