@@ -17,10 +17,11 @@ UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis' WHERE
 UPDATE `creature_template` SET `regeneration`='0', `script_name`='scourge_invasion_necropolis_health' WHERE `entry`=16421;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE `entry`=16386;
-UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
+UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16285,16361,16281,16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
 UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `unit_flags`='512' WHERE entry IN (16395,16436,16434,16433,16384,16435);
 UPDATE `creature_template` SET `unit_flags`='33280', `faction`='794', `npc_flags`='2' WHERE `entry`=16786;
-UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='2' WHERE `entry`=16787;
+UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='2' WHERE `entry` IN (16787,16281,16361);
+UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='1' WHERE `entry`=16285;
 
 -- Fix Camp Spawners
 UPDATE `creature_template` SET `unit_flags`='33554432', `base_attack_time`='2000', `ranged_attack_time`='2000', `movement_type`='0', `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
@@ -61,7 +62,8 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1625501 AND `delay`=0 AND `command`
 DELETE FROM `creature_ai_scripts` WHERE `id`=1625502 AND `delay`=0 AND `command`=1 AND `datalong`=1 AND `datalong2`=0 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Scout - Emote 1' LIMIT 1;
 
 -- Add Argent Outfitter Quests
-INSERT INTO `mangos`.`quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES ('16787', 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', '66');
+INSERT INTO `quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES (16281, 'The Argent Dawn will turn away none who are willing to sacrifice for our cause.', 1);
+INSERT INTO `quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES (16787, 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', 66);
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
     (16787, 9094, 9, 10),
     (16787, 9317, 9, 10),
@@ -150,6 +152,8 @@ DELETE FROM gameobject WHERE guid IN (1267,1268,1269,1270,1271,1272,1273,1274,12
 
 DELETE FROM `game_event_gameobject` WHERE `event` = 17;
 DELETE FROM `game_event_creature` WHERE `event` = 17;
+DELETE FROM `game_event_gameobject` WHERE `event` = 80;
+DELETE FROM `game_event_creature` WHERE `event` = 80;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
@@ -395,7 +399,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@SCOURGE_INVASION_GUID+3, 181172, 1, -1511.83, 101.722, 108.569, 1.83259, 0, 0, 0.793353, 0.608762, 255, 1),
     (@SCOURGE_INVASION_GUID+4, 181172, 1, 9972.62, 1993.28, 1406.15, 4.34587, 0, 0, -0.824126, 0.566406, 255, 1),
     (@SCOURGE_INVASION_GUID+5, 181172, 0, -9159.77, 345.552, 156.401, 3.56047, 0, 0, -0.978148, 0.207912, 255, 1),
-    (@SCOURGE_INVASION_GUID+6, 181172, 0, -5122.8, -697.666, 505.467, 0.0349062, 0, 0, 0.0174522, 0.999848, 255, 1),
+    -- (@SCOURGE_INVASION_GUID+6, 181172, 0, -5122.8, -697.666, 505.467, 0.0349062, 0, 0, 0.0174522, 0.999848, 255, 1), There is already a necropolis on this position.
     (@SCOURGE_INVASION_GUID+7, 181172, 1, 1210.92, -4315.13, 88.0662, 3.80482, 0, 0, -0.945518, 0.325568, 255, 1),
     (@SCOURGE_INVASION_GUID+8, 181227, 0, -9183.83, 416.188, 89.9123, 0.401425, 0, 0, 0.199367, 0.979925, 255, 1),
     (@SCOURGE_INVASION_GUID+9, 181227, 1, 9948.02, 1932.39, 1328.69, 3.68265, 0, 0, -0.96363, 0.267241, 255, 1),

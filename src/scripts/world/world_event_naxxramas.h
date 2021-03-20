@@ -81,7 +81,7 @@ enum ScourgeInvasionSpells
     // Scourge Invasion Minion, spawner, Ghost/Skeleton
     SPELL_PH_SUMMON_MINION_PARENT_GHOST_SKELETON = 28184,
 
-    //Scourge Invasion Minion, spawner, Ghoul/Skeleton
+    // Scourge Invasion Minion, spawner, Ghoul/Skeleton
     SPELL_PH_SUMMON_MINION_PARENT_GHOUL_SKELETON = 28185,
 
     SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL     = 27883,
@@ -226,13 +226,12 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_HUGE                    = 181223, // Necropolis (scale 3.5)
     GOBJ_NECROPOLIS_CITY                    = 181172, // Necropolis at the Citys (scale 2.5)
 
-//#ifdef DEBUG_WORLD_EVENT
-//    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
-//#else
+#ifdef DEBUG_WORLD_EVENT
+    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
+#else
     // The change of zone takes 4 hours
-    //NECROPOLIS_ATTACK_TIMER     = 60 * 60, // 1 hour
-    NECROPOLIS_ATTACK_TIMER     = 60 * 5, // 5min from 
-//#endif
+    NECROPOLIS_ATTACK_TIMER     = 60 * 60, // 1 hour
+#endif
 
     ZONEID_WINTERSPRING         = 618,
     ZONEID_AZSHARA              = 16,

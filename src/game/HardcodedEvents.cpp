@@ -1540,5 +1540,3 @@ void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
     auto war_effort = new WarEffortEvent();
     eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
 }
-
-

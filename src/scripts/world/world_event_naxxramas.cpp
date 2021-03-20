@@ -24,34 +24,6 @@
 
 uint32 GetCampType(Creature* unit) { return unit->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON) || unit->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL) || unit->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON); };
 
-void LookForCreatureOnSameSpot(Unit* searcher)
-{
-    if (!searcher)
-        return;
-
-    uint32 counter = 0;
-    float x = searcher->GetPositionX();
-    float y = searcher->GetPositionY();
-
-        std::list<Creature*> cultistList;
-    GetCreatureListWithEntryInGrid(cultistList, searcher, { 16338, 16336, 16306, 16299, 16141, 16298, 14697, 16380, 16379 }, 0.1f);
-    for (const auto cultist : cultistList)
-    {
-        if (cultist != searcher && cultist->GetEntry() != NPC_SCOURGE_INVASION_MINION_FINDER && cultist->GetPositionX() == x && cultist->GetPositionY() == y)
-        {
-            QueryResult* founditem = WorldDatabase.PQuery("SELECT `id` FROM creature WHERE id='%u' AND map='%u' AND position_x='%f' AND position_y='%f'", NPC_SCOURGE_INVASION_MINION_FINDER, searcher->GetMapId(), searcher->GetPositionX(), searcher->GetPositionY());
-
-            if (!founditem)
-            {
-                searcher->MonsterSay("!founditem");
-                WorldDatabase.PExecute("INSERT INTO creature (`id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES ('%u', '%u', '%f', '%f', '%f', '%f');", NPC_SCOURGE_INVASION_MINION_FINDER, searcher->GetMapId(), searcher->GetPositionX(), searcher->GetPositionY(), searcher->GetPositionZ(), searcher->GetOrientation());
-            }
-            else
-                searcher->MonsterSay("founditem");
-        }
-    }
-}
-
 void ChangeZoneEventStatus(Creature* mouth, bool on)
 {
     if (!mouth)
@@ -240,6 +212,25 @@ uint32 GetFindersAmount(Creature* shard)
             finderCounter++;
 
     return finderCounter;
+}
+
+/*
+SkullPile unused
+*/
+class GoSkullPile : public GameObjectAI
+{
+public:
+    GoSkullPile(GameObject* go) : GameObjectAI(go)
+    {
+        // Skull piles are always random entries, UpdateEntry would be nice for gobjects.
+        me->SetEntry(PickRandomValue(GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04));
+        me->UpdateModel();
+    }
+};
+
+GameObjectAI* GetAI_GoSkullPile(GameObject* go)
+{
+    return new GoSkullPile(go);
 }
 
 /*
@@ -1274,6 +1265,11 @@ void AddSC_world_event_naxxramas()
     newscript = new Script;
     newscript->Name = "scourge_invasion_minion";
     newscript->GetAI = &GetAI_ScourgeMinion;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "scourge_invasion_go_skullpile";
+    newscript->GOGetAI = &GetAI_GoSkullPile;
     newscript->RegisterSelf();
 
     newscript = new Script;
