@@ -9,16 +9,16 @@ INSERT INTO `migrations` VALUES ('20210303085717');
 -- Add your query below.
 
 
--- allow serpentbloom gameobject to be interacted with
+-- Allow Serpentbloom Gameobject to be Interacted With
 UPDATE `gameobject_template` SET `flags` = 4 WHERE `entry` = 13891;
 
--- serpentbloom dropchance should be 100%
+-- Serpentbloom Dropchance Should be 100%
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`= -100 WHERE `entry` = 2772 AND `item` = 5339;
 
--- The Scarlet Key should not drop from mobs
+-- The Scarlet Key Should Not Drop From Mobs
 DELETE FROM `creature_loot_template` WHERE `item` = 7146;
 
--- add Baron Longshore spawns
+-- Add Baron Longshore Spawns
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (563, 3467, 1, -1748.23, -3722.06, 14.1211, 4.65315, 413, 413, 100, 1, 3, 10),
 (564, 3467, 1, -1707.46, -3817.54, 13.3079, 5.51516, 413, 413, 100, 1, 3, 10);
@@ -29,7 +29,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (563, 110, 'Baron Longshore #2'),
 (564, 110, 'Baron Longshore #3');
 
--- Witherbark Bloodling, Serpentbloom Snake and Hazzali Parasite should not drop loot
+-- Witherbark Bloodling, Serpentbloom Snake and Hazzali Parasite Should Not Drop Loot
 DELETE FROM `creature_loot_template` WHERE `entry` IN (7768, 3680);
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` IN (3680, 7768);
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7769;
@@ -454,6 +454,18 @@ UPDATE `quest_template` SET `PrevQuestId` = 5889 WHERE `entry` = 4110;
 UPDATE `quest_template` SET `PrevQuestId` = 5887 WHERE `entry` = 4108;
 UPDATE `quest_template` SET `PrevQuestId` = 5888 WHERE `entry` = 4109;
 UPDATE `quest_template` SET `PrevQuestId` = 5890 WHERE `entry` = 4111;
+
+-- Add Gazzus Spawns 
+UPDATE `creature` SET `position_x` = 1454.1995849609375, `position_y` = -4701.81787109375, `position_z` = -2.62193179130554199, `orientation` = 4.572762489318847656, `wander_distance` = 2, `movement_type` = 1 WHERE (`guid` = 6456);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(6501, 3204, 1, 1470.4882812500000, -4706.10791015625, 2.220372200012207031, 0.820304751396179199, 300, 300, 100, 100, 1, 2, 10),
+(6502, 3204, 1, 1497.5399169921875, -4744.13720703125, 18.01207923889160156, 6.037305831909179687, 300, 300, 100, 100, 1, 2, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(111, 1, 'Gazz\'uz (3204)', 10);
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(6456, 111, 'Gazz\'uz #1'),
+(6501, 111, 'Gazz\'uz #2'),
+(6502, 111, 'Gazz\'uz #3');
 
 
 -- End of migration.
