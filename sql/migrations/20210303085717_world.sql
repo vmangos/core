@@ -379,6 +379,82 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (39486, 23, 5711.56103515625, -716.31793212890625, 376.761322021484375, 100, 0, 0),
 (39486, 24, 5693.67089843750, -729.42089843750000, 376.707153320312500, 100, 0, 0);
 
+-- Correct Alliance Cleansing Felwood Quest Chains 
+DELETE FROM `creature_questrelation` WHERE `id` = 9528;
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_max`) VALUES 
+(9528, 4101, 10),
+(9528, 5886, 10),
+(9528, 4107, 10),
+(9528, 5884, 10),
+(9528, 4105, 10),
+(9528, 5882, 10),
+(9528, 4103, 10),
+(9528, 5883, 10),
+(9528, 4104, 10),
+(9528, 5885, 10),
+(9528, 4106, 10);
+
+DELETE FROM `creature_involvedrelation` WHERE `id` = 9528;
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_max`) VALUES 
+(9528, 4101, 10),
+(9528, 5886, 10),
+(9528, 4107, 10),
+(9528, 5884, 10),
+(9528, 4105, 10),
+(9528, 5882, 10),
+(9528, 4103, 10),
+(9528, 5883, 10),
+(9528, 4104, 10),
+(9528, 5885, 10),
+(9528, 4106, 10);
+
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (4101, 5886, 4107, 5884, 4105, 5882, 4103, 5883, 4104, 5885, 4106);
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` IN (4107, 4105, 4103, 4104, 4106);
+
+UPDATE `quest_template` SET `PrevQuestId` = 5886 WHERE `entry` = 4107;
+UPDATE `quest_template` SET `PrevQuestId` = 5884 WHERE `entry` = 4105;
+UPDATE `quest_template` SET `PrevQuestId` = 5882 WHERE `entry` = 4103;
+UPDATE `quest_template` SET `PrevQuestId` = 5883 WHERE `entry` = 4104;
+UPDATE `quest_template` SET `PrevQuestId` = 5885 WHERE `entry` = 4106;
+
+-- Correct Horde Cleansing Felwood Quest Chains 
+DELETE FROM `creature_questrelation` WHERE `id` = 9529;
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_max`) VALUES
+(9529, 4102, 10),
+(9529, 5891, 10),
+(9529, 4112, 10),
+(9529, 5889, 10),
+(9529, 4110, 10),
+(9529, 5887, 10),
+(9529, 4108, 10),
+(9529, 5888, 10),
+(9529, 4109, 10),
+(9529, 5890, 10),
+(9529, 4111, 10);
+
+DELETE FROM `creature_involvedrelation` WHERE `id` = 9529;
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_max`) VALUES
+(9529, 4102, 10),
+(9529, 5891, 10),
+(9529, 4112, 10),
+(9529, 5889, 10),
+(9529, 4110, 10),
+(9529, 5887, 10),
+(9529, 4108, 10),
+(9529, 5888, 10),
+(9529, 4109, 10),
+(9529, 5890, 10),
+(9529, 4111, 10);
+
+UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` IN (4102, 5891, 4112 ,5889, 4110 ,5887, 4108, 5888, 4109, 5890, 4111);
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` IN (4112, 4110, 4108, 4109, 4111);
+
+UPDATE `quest_template` SET `PrevQuestId` = 5891 WHERE `entry` = 4112;
+UPDATE `quest_template` SET `PrevQuestId` = 5889 WHERE `entry` = 4110;
+UPDATE `quest_template` SET `PrevQuestId` = 5887 WHERE `entry` = 4108;
+UPDATE `quest_template` SET `PrevQuestId` = 5888 WHERE `entry` = 4109;
+UPDATE `quest_template` SET `PrevQuestId` = 5890 WHERE `entry` = 4111;
+
 
 -- End of migration.
 END IF;
