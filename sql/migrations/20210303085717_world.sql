@@ -29,10 +29,11 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (563, 110, 'Baron Longshore #2'),
 (564, 110, 'Baron Longshore #3');
 
--- Witherbark Bloodling, Serpentbloom Snake and Hazzali Parasite Should Not Drop Loot
+-- Witherbark Bloodling, Rotting Worm, Serpentbloom Snake and Hazzali Parasite Should Not Drop Loot
 DELETE FROM `creature_loot_template` WHERE `entry` IN (7768, 3680);
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` IN (3680, 7768);
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7769;
+UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 10925;
 
 -- correct quest chain for Mage's Wand (1952)
 UPDATE `quest_template` SET `PrevQuestId` = 1947, `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1948;
