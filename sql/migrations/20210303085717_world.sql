@@ -449,6 +449,7 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_max`) VALUES
 
 UPDATE `quest_template` SET `PrevQuestId` = 4102 WHERE `entry` IN (5891, 5889, 5887, 5888, 5890);
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` IN (4102, 5891, 4112 ,5889, 4110 ,5887, 4108, 5888, 4109, 5890, 4111);
+UPDATE `quest_template` SET `SpecialFlags` = 0 WHERE `entry` IN (5890, 5888, 5887, 5889, 5891);
 UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` IN (4112, 4110, 4108, 4109, 4111);
 
 UPDATE `quest_template` SET `PrevQuestId` = 5891 WHERE `entry` = 4112;
