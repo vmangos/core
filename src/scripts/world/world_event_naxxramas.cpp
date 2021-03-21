@@ -913,7 +913,6 @@ struct ScourgeMinion : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        LookForCreatureOnSameSpot(m_creature);
         if (m_creature->GetEntry() == NPC_SHADOW_OF_DOOM)
             m_creature->CastSpell(me, SPELL_ZAP_CRYSTAL_CORPSE, true);
         else
