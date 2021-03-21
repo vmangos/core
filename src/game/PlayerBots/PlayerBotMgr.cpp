@@ -672,7 +672,7 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
         return false;
     }
 
-    if (pPlayer->GetGroup() && (pPlayer->GetGroup()->IsFull() || pPlayer->GetGroup()->GetMembersCount() >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0))
+    if (pPlayer->GetGroup() && (pPlayer->GetGroup()->IsFull() || pPlayer->GetGroup()->GetMembersCount() - 1 >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) > 0))
     {
         SendSysMessage("Cannot add more bots. Group is full.");
         return false;
