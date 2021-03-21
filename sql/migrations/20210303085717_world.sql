@@ -467,6 +467,9 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (6501, 111, 'Gazz\'uz #2'),
 (6502, 111, 'Gazz\'uz #3');
 
+-- Beached Sea Creature Quests are Alliance Only
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (4732, 4731, 4727, 4725, 4722, 4733, 4730, 4728, 4723);
+
 
 -- End of migration.
 END IF;
