@@ -254,14 +254,13 @@ set (SCRIPTS_SRCS
     kalimdor/winterspring/winterspring.cpp
     world/areatrigger_scripts.cpp
     world/elemental_invasions.cpp
-    world/event_scourge_invasion.cpp
     world/fireworks_show.cpp
     world/go_scripts.cpp
     world/npcs_special.cpp
     world/spell_scripts.cpp
     world/totems.cpp
-    world/world_event_naxxramas.cpp
-    world/world_event_naxxramas.h
+    world/scourge_invasion.cpp
+    world/scourge_invasion.h
     world/world_event_wareffort.cpp
     world/world_event_wareffort.h
     world/dragons_of_nightmare/boss_dragon_of_nightmare.cpp

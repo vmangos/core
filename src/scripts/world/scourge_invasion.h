@@ -25,6 +25,9 @@ enum ScourgeInvasionSpells
 {
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
 
+    // Mouth of Kel'Thuzad?
+    SPELL_CANCEL_MOUTH_SPAWNS                   = 29500, // Not sure what it does. Has todo with City attacks. its been casted on the position of 
+
     // Object 181214 Necropolis critter spawner
     SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
 
@@ -137,6 +140,21 @@ enum ScourgeInvasionSpells
     SPELL_MINDFLAY                              = 16568,
     SPELL_FEAR                                  = 12542,
 
+    // Pallid Horror - Patchwerk Terror
+    SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699,
+    //SPELL_AURA_OF_FEAR                        = 28315,
+    SPELL_DAMAGE_VS_GUARDS                      = 28364,
+    //SPELL_DAZED                               = 1604,  // [shortest sniff CD: 21 seconds]
+
+    // Flameshocker
+    //1604
+    //17680
+    //28234
+    SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 22 seconds]
+    SPELL_FLAMESHOCKERS_REVENGE                 = 28323, // [shortest sniff CD: 22 seconds]
+    SPELL_FLAMESHOCKERS_TOUCH2                  = 28329, // [shortest sniff CD: 22 seconds]
+    SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330,
+
     /*
     This spells are not ued by any NPC or object in the sniff files.
     The [PH] in the name means it's a placeholder. Blizzard often adds that to the names of things they add to the game but haven't finalized.
@@ -194,7 +212,16 @@ enum ScourgeInvasionNPC
     NPC_SKELETAL_TROOPER                                = 16438,
     NPC_SPECTRAL_SPIRIT                                 = 16437,
     NPC_SKELETAL_SOLDIER                                = 16422,
-    NPC_SPECTRAL_APPARITATION                           = 16423
+    NPC_SPECTRAL_APPARITATION                           = 16423,
+
+    // Stormwind - Undercity Attacks
+    NPC_PALLID_HORROR                                   = 16394,
+    NPC_PATCHWORK_TERROR                                = 16382,
+    CRACKED_NECROTIC_CRYSTAL                            = 16431,
+    FAINT_NECROTIC_CRYSTAL                              = 16531,
+    NPC_FLAMESHOCKER                                    = 16383,
+    NPC_STORMWIND_GARNISON_GUARD                        = 68,
+    NPC_UNDERCITY_GARNISON_GUARD                        = 5624
 };
 
 enum ScourgeInvasionMisc
@@ -225,6 +252,9 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_BIG                     = 181215, // Necropolis (scale 2.5)
     GOBJ_NECROPOLIS_HUGE                    = 181223, // Necropolis (scale 3.5)
     GOBJ_NECROPOLIS_CITY                    = 181172, // Necropolis at the Citys (scale 2.5)
+
+    QUEST_CRYSTAL_A                         = 9292,
+    QUEST_CRYSTAL_H                         = 9310,
 
 #ifdef DEBUG_WORLD_EVENT
     NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
@@ -339,16 +369,37 @@ enum ScourgeInvasionQuests
 
 enum ScourgeInvasionLang
 {
+    LANG_PALLID_HORROR_YELL1 = 12329, // What?  This not Naxxramas!  We not like this place... destroy!
+    LANG_PALLID_HORROR_YELL2 = 12327, // Raaarrrrggghhh!  We come for you!
+    LANG_PALLID_HORROR_YELL3 = 12326, // Kel'Thuzad say to tell you... DIE!
+    LANG_PALLID_HORROR_YELL4 = 12342, // Why you run away? We make your corpse into Scourge.
+    LANG_PALLID_HORROR_YELL5 = 12343, // No worry, we find you.
+    LANG_PALLID_HORROR_YELL6 = 12330, // You spare parts!  We make more Scourge in necropolis.
+    LANG_PALLID_HORROR_YELL7 = 12328, // Hahaha, your guards no match for Scourge!
+    LANG_PALLID_HORROR_YELL8 = 12325, // We come destroy puny ones!
+
+    LANG_UNDERCITY_GUARDIAN_1 = 12336, // Rogues' Quarter attacked by Scourge!  Help!
+    LANG_UNDERCITY_GUARDIAN_2 = 12353, // There Scourge outside Trade Quarter!
+    LANG_UNDERCITY_GUARDIAN_3 = 12354, // Scourge inside Trade Quarter!  Destroy!
+    LANG_UNDERCITY_GUARDIAN_4 = 12334, // Scourge in the Sewers! We need help!
+
+    LANG_UNDERCITY_RANDOM_1 = 12355, // Scourge spotted nearby!
+    LANG_UNDERCITY_RANDOM_2 = 12356, // I just saw a Scourge!  Kill it!
+    LANG_UNDERCITY_RANDOM_3 = 12357, // Did you see that?  There's a Scourge over there!
+    LANG_UNDERCITY_RANDOM_4 = 12358, // How can I get anything done with the Scourge running amok in here?!
+    LANG_UNDERCITY_RANDOM_5 = 12359, // There's one of the Scourge, right over there!
+    LANG_UNDERCITY_RANDOM_6 = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
+    LANG_UNDERCITY_RANDOM_7 = 12361, // Will these unrelenting Scourge attacks never end?
+
+    LANG_STORMWIND_CITY_GUARD_1 = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
+    LANG_STORMWIND_CITY_GUARD_2 = 12311, // Scourge in the Trade District!  Have at them!
+    LANG_STORMWIND_CITY_GUARD_3 = 12315, // Light help us... the Scourge are in the Park!
+    LANG_STORMWIND_CITY_GUARD_4 = 12316, // The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!
+    LANG_STORMWIND_CITY_GUARD_5 = 12317, // Hold the line!  Protect the King at all costs!
+    LANG_STORMWIND_CITY_GUARD_6 = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
+
     LANG_CULTIST_ENGINEER_OPTION                        = 12112, // Use 8 necrotic runes and disrupt his ritual.
     LANG_GIVE_MAGIC_ITEM_OPTION                         = 12302, // Give me one of your magic items.
-    //LANG_VICTORIES_COUNT_OPTION                       = NOST_TEXT(127), // Unused
-    //LANG_TANARIS_ATTACKED_OPTION                      = NOST_TEXT(128), // Unused
-    //LANG_AZSHARA_ATTACKED_OPTION                      = NOST_TEXT(129), // Unused
-    //LANG_EP_ATTACKED_OPTION                           = NOST_TEXT(130), // Unused
-    //LANG_WINTERSPRING_ATTACKED_OPTION                 = NOST_TEXT(131), // Unused
-    //LANG_BL_ATTACKED_OPTION                           = NOST_TEXT(132), // Unused
-    //LANG_BS_ATTACKED_OPTION                           = NOST_TEXT(133), // Unused
-    //LANG_NO_ATTACK_OPTION                             = NOST_TEXT(134), // Unused
     LANG_SHADOW_OF_DOOM_TEXT_0                          = 12420, // 12420 - Our dark master has noticed your trifling, and sends me to bring a message... of doom!
     LANG_SHADOW_OF_DOOM_TEXT_1                          = 12421, // 12421 - These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
     LANG_SHADOW_OF_DOOM_TEXT_2                          = 12422, // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!

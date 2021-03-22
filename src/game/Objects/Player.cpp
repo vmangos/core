@@ -80,7 +80,7 @@
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GameEventMgr.h"
-#include "world/world_event_naxxramas.h"
+#include "world/scourge_invasion.h"
 #include "world/world_event_wareffort.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
