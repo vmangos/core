@@ -9,16 +9,16 @@ INSERT INTO `migrations` VALUES ('20210303085717');
 -- Add your query below.
 
 
--- Allow Serpentbloom Gameobject to be Interacted With
+-- allow serpentbloom gameobject to be interacted with
 UPDATE `gameobject_template` SET `flags` = 4 WHERE `entry` = 13891;
 
--- Serpentbloom Dropchance Should be 100%
+-- serpentbloom dropchance should be 100%
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`= -100 WHERE `entry` = 2772 AND `item` = 5339;
 
--- The Scarlet Key Should Not Drop From Mobs
+-- scarlet key should not drop from mobs
 DELETE FROM `creature_loot_template` WHERE `item` = 7146;
 
--- Add Baron Longshore Spawns
+-- add baron longshore spawns
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (563, 3467, 1, -1748.23, -3722.06, 14.1211, 4.65315, 413, 413, 100, 1, 3, 10),
 (564, 3467, 1, -1707.46, -3817.54, 13.3079, 5.51516, 413, 413, 100, 1, 3, 10);
@@ -29,24 +29,24 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (563, 110, 'Baron Longshore #2'),
 (564, 110, 'Baron Longshore #3');
 
--- Witherbark Bloodling, Rotting Worm, Serpentbloom Snake and Hazzali Parasite Should Not Drop Loot
+-- witherbark bloodling, rotting worm, serpentbloom snake and hazzali parasite should not drop loot
 DELETE FROM `creature_loot_template` WHERE `entry` IN (7768, 3680);
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` IN (3680, 7768);
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7769;
 UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 10925;
 
--- correct quest chain for Mage's Wand (1952)
+-- correct quest chain for mage's wand (1952)
 UPDATE `quest_template` SET `PrevQuestId` = 1947, `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1948;
 UPDATE `quest_template` SET `NextQuestId` = 1952, `ExclusiveGroup` = -1948 WHERE `entry` = 1951;
                                                        
--- Peaceblooms should only drop in stacks of 3
+-- peaceblooms should only drop in stacks of 3
 UPDATE `gameobject_loot_template` SET `maxcount` = 3 WHERE `entry` = 1415 AND `item` = 2447;
      
--- Grim Reach should increase the range of Drain Soul (credit to jaywalker15262)
+-- grim reach should increase the range of drain soul (credit jaywalker15262)
 UPDATE `spell_affect` SET `SpellFamilyMask` = 6447547418 WHERE `entry` = 18218; 
 UPDATE `spell_affect` SET `SpellFamilyMask` = 6447547418 WHERE `entry` = 18219;
 
--- Marsh Flesheater and Bloodscalp Berserker should not flee at low hp
+-- marsh flesheater and bloodscalp berserker should not flee at low hp
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (59702, 75102);
 DELETE FROM `creature_ai_events` WHERE `id` IN (59702, 75102);
 
@@ -86,11 +86,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (7656, 31, -600.667, -4370, 39.3044, 100, 0, 0, 0),
 (7656, 32, -600.132, -4356.39, 38.4777, 100, 0, 0, 0);
 
--- Defias Miners should not roam
+-- defias miners should not roam
 UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (79134, 79129, 79131);
 
--- Misc Felwood Creature Waypoints (credits to cmangos)
--- Irontree Wanderer Waypoints
+-- misc felwood creature waypoints (credits cmangos)
+-- irontree wanderer waypoints
 UPDATE `creature` SET `position_x` = 6247.7353515625, `position_y` = -1428.4263916015625, `position_z` = 372.848388671875, `orientation` = 6.010545730590820312, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 40404);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (40404, 1, 6277.28759765625, -1430.1320800781250, 371.479583740234375, 100, 0, 0),
@@ -122,7 +122,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (40404, 27, 6227.54150390625, -1422.9505615234375, 374.079040527343750, 100, 0, 0),
 (40404, 28, 6251.54248046875, -1429.4932861328125, 372.512756347656250, 100, 0, 0);
 
--- Irontree Wanderer Waypoints
+-- irontree wanderer waypoints
 UPDATE `creature` SET `position_x` = 6222.74951171875, `position_y` = -1036.6822509765625, `position_z` = 384.851654052734375, `orientation` = 2.659259796142578125, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 40372);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (40372, 1, 6217.42626953125, -1033.8941650390625, 385.736602783203125, 100, 0, 0),
@@ -139,7 +139,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (40372, 12, 6274.65039062500, -1072.2760009765625, 373.657592773437500, 100, 0, 0),
 (40372, 13, 6252.39550781250, -1050.0996093750000, 377.647216796875000, 100, 0, 0);
 
--- Irontree Wanderer Waypoints
+-- irontree wanderer waypoints
 UPDATE `creature` SET `position_x` = 6351.22607421875, `position_y` = -1158.6322021484375, `position_z` = 378.2080078125, `orientation` = 2.893534421920776367, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 39403);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (39403, 1, 6320.44824218750, -1157.2048339843750, 373.125823974609375, 100, 0, 0),
@@ -159,7 +159,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (39403, 15, 6373.68603515625, -1162.7875976562500, 383.029968261718750, 100, 0, 0),
 (39403, 16, 6347.18652343750, -1157.6191406250000, 377.427490234375000, 100, 0, 0);
 
--- Withered Protector Waypoints
+-- withered protector waypoints
 DELETE FROM `creature_movement` WHERE `id` = 39489;
 UPDATE `creature` SET `position_x` = 6177.00244140625, `position_y` = -1322.4649658203125, `position_z` = 376.745574951171875, `orientation` = 5.712565422058105468, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 39489);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
@@ -242,7 +242,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (39489, 77, 6185.15234375000, -1343.7993164062500, 376.725067138671875, 100, 0, 0),
 (39489, 78, 6178.72363281250, -1323.5697021484375, 376.671417236328125, 100, 0, 0);
 
--- Infernal Sentry Waypoints
+-- infernal sentry waypoints
 UPDATE `creature` SET `position_x` = 5612.81103515625, `position_y` = -699.7501220703125, `position_z` = 344.02288818359375, `orientation` = 1.724764108657836914, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 39716);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (39716, 1, 5611.21777343750, -682.33380126953125, 343.048278808593750, 100, 0, 0),
@@ -287,7 +287,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (39716, 40, 5595.24511718750, -709.38085937500000, 342.095031738281250, 100, 0, 0),
 (39716, 41, 5612.57031250000, -698.19903564453125, 344.071960449218750, 100, 0, 0);
 
--- Infernal Sentry Waypoints
+-- infernal sentry waypoints
 UPDATE `creature` SET `position_x` = 5510.49462890625, `position_y` = -966.194580078125, `position_z` = 371.0830078125, `orientation` = 2.849052667617797851, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 40370);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (40370, 1, 5503.42480468750, -949.95532226562500, 368.177001953125000, 100, 0, 0),
@@ -320,7 +320,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (40370, 28, 5492.72021484375, -940.34582519531250, 365.442443847656250, 100, 0, 0),
 (40370, 29, 5508.80468750000, -965.65820312500000, 370.964233398437500, 100, 0, 0);
 
--- Infernal Sentry Waypoints
+-- infernal sentry waypoints
 UPDATE `creature` SET `position_x` = 5551.94677734375, `position_y` = -917.33270263671875, `position_z` = 377.82763671875, `orientation` = 4.6117706298828125, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 40176);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (40176, 1, 5550.12939453125, -942.60729980468750, 377.223968505859375, 100, 0, 0),
@@ -352,7 +352,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (40176, 27, 5559.97021484375, -907.02661132812500, 378.203796386718750, 100, 0, 0),
 (40176, 28, 5551.63720703125, -920.39898681640625, 377.914123535156250, 100, 0, 0);
 
--- Infernal Sentry Waypoints
+-- infernal sentry waypoints
 UPDATE `creature` SET `position_x` = 5693.01416015625, `position_y` = -726.32708740234375, `position_z` = 376.759002685546875, `orientation` = 4.921559333801269531, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 39486);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (39486, 1, 5682.47167968750, -745.25585937500000, 377.376403808593750, 100, 0, 0),
@@ -380,7 +380,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (39486, 23, 5711.56103515625, -716.31793212890625, 376.761322021484375, 100, 0, 0),
 (39486, 24, 5693.67089843750, -729.42089843750000, 376.707153320312500, 100, 0, 0);
 
--- Correct Alliance Cleansing Felwood Quest Chains 
+-- correct alliance cleansing felwood quest chains 
 DELETE FROM `creature_questrelation` WHERE `id` = 9528;
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_max`) VALUES 
 (9528, 4101, 10),
@@ -460,7 +460,7 @@ UPDATE `quest_template` SET `PrevQuestId` = 5887 WHERE `entry` = 4108;
 UPDATE `quest_template` SET `PrevQuestId` = 5888 WHERE `entry` = 4109;
 UPDATE `quest_template` SET `PrevQuestId` = 5890 WHERE `entry` = 4111;
 
--- Add Gazzus Spawns 
+-- add gazzus spawns (credit cmangos)
 UPDATE `creature` SET `position_x` = 1454.1995849609375, `position_y` = -4701.81787109375, `position_z` = -2.62193179130554199, `orientation` = 4.572762489318847656, `wander_distance` = 2, `movement_type` = 1 WHERE (`guid` = 6456);
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (6501, 3204, 1, 1470.4882812500000, -4706.10791015625, 2.220372200012207031, 0.820304751396179199, 300, 300, 100, 100, 1, 2, 10),
@@ -472,10 +472,10 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (6501, 111, 'Gazz\'uz #2'),
 (6502, 111, 'Gazz\'uz #3');
 
--- Beached Sea Creature Quests are Alliance Only
+-- beached sea creature quests are alliance only
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (4732, 4731, 4727, 4725, 4722, 4733, 4730, 4728, 4723);
 
--- Add Captain Ironhill Spawns
+-- add captain ironhill Spawns (credit cmangos)
 UPDATE `creature` SET `position_x` = -1302.0343017578125, `position_y` = -1220.4333496093750, `position_z` = 23.04082870483398437, `orientation` = 4.276056766510009765 WHERE (`guid` = 15850);
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (15938, 2304, 0, -1299.1328125000000, -1254.1907958984375, 32.20761871337890625, 3.019419670104980468, 300, 300, 100, 0, 0, 10),
@@ -483,7 +483,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (112, 1, 'Captain Ironhill (2304)', 10);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
-(15850, 110, 'Captain Ironhill #1'),
+(15850, 112, 'Captain Ironhill #1'),
 (15938, 112, 'Captain Ironhill #2'),
 (16192, 112, 'Captain Ironhill #3');
 
