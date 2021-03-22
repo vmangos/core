@@ -1012,12 +1012,12 @@ bool ScriptedEvent::UpdateEvent()
         if (!pObject || !pObject->IsInWorld())
             continue;
 
-        if (target.uiFailureCondition && sObjectMgr.IsConditionSatisfied(target.uiFailureCondition, pTarget, &m_Map, pObject, CONDITION_FROM_MAP_EVENT))
+        if (target.uiFailureCondition && sObjectMgr.IsConditionSatisfied(target.uiFailureCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(false);
             return true;
         }
-        else if (target.uiSuccessCondition && sObjectMgr.IsConditionSatisfied(target.uiSuccessCondition, pTarget, &m_Map, pObject, CONDITION_FROM_MAP_EVENT))
+        else if (target.uiSuccessCondition && sObjectMgr.IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(true);
             return true;

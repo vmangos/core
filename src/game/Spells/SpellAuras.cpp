@@ -3041,7 +3041,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         if (Player* pPlayerTarget = pTarget->ToPlayer())
         {
             pPlayerTarget->RemoveTemporaryAI();
-            pPlayerTarget->RelocateToLastClientPosition(); // Movement interpolation - prevent undermap.
+            pPlayerTarget->RelocateToLastClientPosition(); // Movement extrapolation - prevent undermap.
         }
 
         pTarget->RestoreFaction();

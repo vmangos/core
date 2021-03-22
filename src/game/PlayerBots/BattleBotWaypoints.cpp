@@ -6,6 +6,9 @@
 #include "Spell.h"
 #include "Battlegrounds/BattleGround.h"
 #include "BattleGroundAV.h"
+#include "Geometry.h"
+
+using namespace Geometry;
 
 enum GameObjectsAB
 {
@@ -1886,16 +1889,6 @@ void BattleBotAI::StartNewPathFromAnywhere()
     m_movingInReverse = false;
     m_currentPoint = closestPoint-1;
     MoveToNextPoint();
-}
-
-template<class A, class B>
-float GetDistance3D(A const& from, B const& to)
-{
-    float dx = from.x - to.x;
-    float dy = from.y - to.y;
-    float dz = from.z - to.z;
-    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-    return (dist > 0 ? dist : 0);
 }
 
 bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::vector<BattleBotPath*> const& vPaths)
