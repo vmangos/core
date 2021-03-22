@@ -26,7 +26,7 @@ enum ScourgeInvasionSpells
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
 
     // Mouth of Kel'Thuzad?
-    SPELL_CANCEL_MOUTH_SPAWNS                   = 29500, // Not sure what it does. Has todo with City attacks. its been casted on the position of 
+    SPELL_CANCEL_MOUTH_SPAWNS                   = 29500, // Not sure what it does.
 
     // Object 181214 Necropolis critter spawner
     SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
@@ -108,10 +108,10 @@ enum ScourgeInvasionSpells
     SPELL_DEMORALIZING_SHOUT                    = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier)
     SPELL_SUNDER_ARMOR                          = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier)
 
-    // naxx_event_rewards_giver
-    SPELL_CREATE_INF_MARK                       = 28319, // Create Lesser Mark of the Dawn
-    SPELL_CREATE_MARK                           = 28320, // Create Mark of the Dawn
-    SPELL_CREATE_SUP_MARK                       = 28321, // Create Greater Mark of the Dawn
+    // Marks of the Dawn
+    SPELL_CREATE_LESSER_MARK_OF_THE_DAWN        = 28319, // Create Lesser Mark of the Dawn
+    SPELL_CREATE_MARK_OF_THE_DAWN               = 28320, // Create Mark of the Dawn
+    SPELL_CREATE_GREATER_MARK_OF_THE_DAWN       = 28321, // Create Greater Mark of the Dawn
 
     // Rare Minions
     SPELL_KNOCKDOWN                             = 16790, // Used by 14697 (Lumbering Horror)
@@ -141,9 +141,10 @@ enum ScourgeInvasionSpells
     SPELL_FEAR                                  = 12542,
 
     // Pallid Horror - Patchwerk Terror
-    SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699,
+    SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL       = 28424, // Alliance.
+    SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699, // Horde.
     //SPELL_AURA_OF_FEAR                        = 28315,
-    SPELL_DAMAGE_VS_GUARDS                      = 28364,
+    SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard)
     //SPELL_DAZED                               = 1604,  // [shortest sniff CD: 21 seconds]
 
     // Flameshocker
@@ -201,12 +202,15 @@ enum ScourgeInvasionNPC
     NPC_BONE_WITCH                                      = 16380,
     NPC_SPIRIT_OF_THE_DAMNED                            = 16379,
 
-    NPC_ARGENT_DAWN_REW_GIVER_1H                        = 16384, // Argent Dawn Initiate <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_2H                        = 16435, // Argent Dawn Cleric <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_3H                        = 16436, // Argent Dawn Priest <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_1A                        = 16395, // Argent Dawn Paladin <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_2A                        = 16433, // Argent Dawn Crusader <The Argent Dawn>
-    NPC_ARGENT_DAWN_REW_GIVER_3A                        = 16434, // Argent Dawn Champion <The Argent Dawn>
+    // 50 Zones cleared
+    NPC_ARGENT_DAWN_INITIATE                            = 16384,
+    NPC_ARGENT_DAWN_CLERIC                              = 16435,
+    // 100 Zones cleared
+    NPC_ARGENT_DAWN_PRIEST                              = 16436,
+    NPC_ARGENT_DAWN_PALADIN                             = 16395,
+    // 150 Zones cleared
+    NPC_ARGENT_DAWN_CRUSADER                            = 16433,
+    NPC_ARGENT_DAWN_CHAMPION                            = 16434,
 
     // Low level Minions
     NPC_SKELETAL_TROOPER                                = 16438,
@@ -214,11 +218,11 @@ enum ScourgeInvasionNPC
     NPC_SKELETAL_SOLDIER                                = 16422,
     NPC_SPECTRAL_APPARITATION                           = 16423,
 
-    // Stormwind - Undercity Attacks
+    // Stormwind - Undercity Attacks https://www.youtube.com/watch?v=c0QjLqHVPRU&t=17s
     NPC_PALLID_HORROR                                   = 16394,
     NPC_PATCHWORK_TERROR                                = 16382,
-    CRACKED_NECROTIC_CRYSTAL                            = 16431,
-    FAINT_NECROTIC_CRYSTAL                              = 16531,
+    NPC_CRACKED_NECROTIC_CRYSTAL                        = 16431,
+    NPC_FAINT_NECROTIC_CRYSTAL                          = 16531,
     NPC_FLAMESHOCKER                                    = 16383,
     NPC_STORMWIND_GARNISON_GUARD                        = 68,
     NPC_UNDERCITY_GARNISON_GUARD                        = 5624
@@ -252,9 +256,6 @@ enum ScourgeInvasionMisc
     GOBJ_NECROPOLIS_BIG                     = 181215, // Necropolis (scale 2.5)
     GOBJ_NECROPOLIS_HUGE                    = 181223, // Necropolis (scale 3.5)
     GOBJ_NECROPOLIS_CITY                    = 181172, // Necropolis at the Citys (scale 2.5)
-
-    QUEST_CRYSTAL_A                         = 9292,
-    QUEST_CRYSTAL_H                         = 9310,
 
 #ifdef DEBUG_WORLD_EVENT
     NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
@@ -343,10 +344,6 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_NAXX_ATTACK_TIME2                  = 117,
     VARIABLE_NAXX_ATTACK_COUNT                  = 118,
 
-    VARIABLE_NAXX_ELITE_ID                      = 20,
-    VARIABLE_NAXX_ELITE_PYLON                   = 21,
-    VARIABLE_NAXX_ELITE_SPAWNTIME               = 22,
-
     VARIABLE_SI_WINTERSPRING_REMAINING          = 30,
     VARIABLE_SI_AZSHARA_REMAINING               = 31,
     VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING   = 32,
@@ -354,49 +351,53 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_SI_BURNING_STEPPES_REMAINING       = 34,
     VARIABLE_SI_TANARIS_REMAINING               = 35,
 
+    /*
     VARIABLE_AZSHARA_NECROPOLIS_REMAINING               = 16,
     VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING         = 4,
     VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING       = 46,
     VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING   = 139,
     VARIABLE_TANARIS_NECROPOLIS_REMAINING               = 440,
     VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING          = 618,
+    */
 };
 
 enum ScourgeInvasionQuests
 {
     QUEST_UNDER_THE_SHADOW                      = 9153,
+    QUEST_CRACKED_NECROTIC_CRYSTAL              = 9292,
+    QUEST_FAINT_NECROTIC_CRYSTAL                = 9310,
 };
 
 enum ScourgeInvasionLang
 {
-    LANG_PALLID_HORROR_YELL1 = 12329, // What?  This not Naxxramas!  We not like this place... destroy!
-    LANG_PALLID_HORROR_YELL2 = 12327, // Raaarrrrggghhh!  We come for you!
-    LANG_PALLID_HORROR_YELL3 = 12326, // Kel'Thuzad say to tell you... DIE!
-    LANG_PALLID_HORROR_YELL4 = 12342, // Why you run away? We make your corpse into Scourge.
-    LANG_PALLID_HORROR_YELL5 = 12343, // No worry, we find you.
-    LANG_PALLID_HORROR_YELL6 = 12330, // You spare parts!  We make more Scourge in necropolis.
-    LANG_PALLID_HORROR_YELL7 = 12328, // Hahaha, your guards no match for Scourge!
-    LANG_PALLID_HORROR_YELL8 = 12325, // We come destroy puny ones!
+    LANG_PALLID_HORROR_YELL1                    = 12329, // What?  This not Naxxramas!  We not like this place... destroy!
+    LANG_PALLID_HORROR_YELL2                    = 12327, // Raaarrrrggghhh!  We come for you!
+    LANG_PALLID_HORROR_YELL3                    = 12326, // Kel'Thuzad say to tell you... DIE!
+    LANG_PALLID_HORROR_YELL4                    = 12342, // Why you run away? We make your corpse into Scourge.
+    LANG_PALLID_HORROR_YELL5                    = 12343, // No worry, we find you.
+    LANG_PALLID_HORROR_YELL6                    = 12330, // You spare parts!  We make more Scourge in necropolis.
+    LANG_PALLID_HORROR_YELL7                    = 12328, // Hahaha, your guards no match for Scourge!
+    LANG_PALLID_HORROR_YELL8                    = 12325, // We come destroy puny ones!
 
-    LANG_UNDERCITY_GUARDIAN_1 = 12336, // Rogues' Quarter attacked by Scourge!  Help!
-    LANG_UNDERCITY_GUARDIAN_2 = 12353, // There Scourge outside Trade Quarter!
-    LANG_UNDERCITY_GUARDIAN_3 = 12354, // Scourge inside Trade Quarter!  Destroy!
-    LANG_UNDERCITY_GUARDIAN_4 = 12334, // Scourge in the Sewers! We need help!
+    LANG_UNDERCITY_GUARDIAN_1                   = 12336, // Rogues' Quarter attacked by Scourge!  Help!
+    LANG_UNDERCITY_GUARDIAN_2                   = 12353, // There Scourge outside Trade Quarter!
+    LANG_UNDERCITY_GUARDIAN_3                   = 12354, // Scourge inside Trade Quarter!  Destroy!
+    LANG_UNDERCITY_GUARDIAN_4                   = 12334, // Scourge in the Sewers! We need help!
 
-    LANG_UNDERCITY_RANDOM_1 = 12355, // Scourge spotted nearby!
-    LANG_UNDERCITY_RANDOM_2 = 12356, // I just saw a Scourge!  Kill it!
-    LANG_UNDERCITY_RANDOM_3 = 12357, // Did you see that?  There's a Scourge over there!
-    LANG_UNDERCITY_RANDOM_4 = 12358, // How can I get anything done with the Scourge running amok in here?!
-    LANG_UNDERCITY_RANDOM_5 = 12359, // There's one of the Scourge, right over there!
-    LANG_UNDERCITY_RANDOM_6 = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
-    LANG_UNDERCITY_RANDOM_7 = 12361, // Will these unrelenting Scourge attacks never end?
+    LANG_UNDERCITY_RANDOM_1                     = 12355, // Scourge spotted nearby!
+    LANG_UNDERCITY_RANDOM_2                     = 12356, // I just saw a Scourge!  Kill it!
+    LANG_UNDERCITY_RANDOM_3                     = 12357, // Did you see that?  There's a Scourge over there!
+    LANG_UNDERCITY_RANDOM_4                     = 12358, // How can I get anything done with the Scourge running amok in here?!
+    LANG_UNDERCITY_RANDOM_5                     = 12359, // There's one of the Scourge, right over there!
+    LANG_UNDERCITY_RANDOM_6                     = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
+    LANG_UNDERCITY_RANDOM_7                     = 12361, // Will these unrelenting Scourge attacks never end?
 
-    LANG_STORMWIND_CITY_GUARD_1 = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
-    LANG_STORMWIND_CITY_GUARD_2 = 12311, // Scourge in the Trade District!  Have at them!
-    LANG_STORMWIND_CITY_GUARD_3 = 12315, // Light help us... the Scourge are in the Park!
-    LANG_STORMWIND_CITY_GUARD_4 = 12316, // The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!
-    LANG_STORMWIND_CITY_GUARD_5 = 12317, // Hold the line!  Protect the King at all costs!
-    LANG_STORMWIND_CITY_GUARD_6 = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
+    LANG_STORMWIND_CITY_GUARD_1                 = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
+    LANG_STORMWIND_CITY_GUARD_2                 = 12311, // Scourge in the Trade District!  Have at them!
+    LANG_STORMWIND_CITY_GUARD_3                 = 12315, // Light help us... the Scourge are in the Park!
+    LANG_STORMWIND_CITY_GUARD_4                 = 12316, // The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!
+    LANG_STORMWIND_CITY_GUARD_5                 = 12317, // Hold the line!  Protect the King at all costs!
+    LANG_STORMWIND_CITY_GUARD_6                 = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
 
     LANG_CULTIST_ENGINEER_OPTION                        = 12112, // Use 8 necrotic runes and disrupt his ritual.
     LANG_GIVE_MAGIC_ITEM_OPTION                         = 12302, // Give me one of your magic items.

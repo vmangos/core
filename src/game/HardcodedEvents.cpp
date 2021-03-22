@@ -593,17 +593,15 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE6, ZONEID_AZSHARA);
 
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
 
+    /*
     sObjectMgr.InitSavedVariable(VARIABLE_AZSHARA_NECROPOLIS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_TANARIS_NECROPOLIS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING, 0);
-
+    */
     sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
@@ -816,13 +814,14 @@ void ScourgeInvasionEvent::Disable()
     sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0, true);
 
+    /*
     sObjectMgr.SetSavedVariable(VARIABLE_AZSHARA_NECROPOLIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_TANARIS_NECROPOLIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING, 0, true);
-
+    */
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);

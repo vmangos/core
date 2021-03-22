@@ -1032,17 +1032,17 @@ bool GossipSelect_scourge_invasion_rewards_giver(Player* player, Creature* creat
         uint32 spellId = 0;
         switch (creature->GetEntry())
         {
-            case NPC_ARGENT_DAWN_REW_GIVER_1H:
-            case NPC_ARGENT_DAWN_REW_GIVER_1A:
-                spellId = SPELL_CREATE_INF_MARK;
+            case NPC_ARGENT_DAWN_CLERIC:
+            case NPC_ARGENT_DAWN_INITIATE:
+                spellId = SPELL_CREATE_LESSER_MARK_OF_THE_DAWN;
                 break;
-            case NPC_ARGENT_DAWN_REW_GIVER_2H:
-            case NPC_ARGENT_DAWN_REW_GIVER_2A:
-                spellId = SPELL_CREATE_MARK;
+            case NPC_ARGENT_DAWN_PRIEST:
+            case NPC_ARGENT_DAWN_PALADIN:
+                spellId = SPELL_CREATE_MARK_OF_THE_DAWN;
                 break;
-            case NPC_ARGENT_DAWN_REW_GIVER_3H:
-            case NPC_ARGENT_DAWN_REW_GIVER_3A:
-                spellId = SPELL_CREATE_SUP_MARK;
+            case NPC_ARGENT_DAWN_CHAMPION:
+            case NPC_ARGENT_DAWN_CRUSADER:
+                spellId = SPELL_CREATE_GREATER_MARK_OF_THE_DAWN;
                 break;
             default:
                 return false;
@@ -1210,89 +1210,6 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
 
 // todo:
 
-
-struct npc_flameshocker_spawn_pointAI : public ScriptedAI
-{
-    npc_flameshocker_spawn_pointAI(Creature* crea) : ScriptedAI(crea)
-    {
-        Reset();
-    }
-
-    ObjectGuid _myMonster;
-    uint32 _checkTimer;
-
-    void Reset() override
-    {
-        _checkTimer = urand(2000, 5000);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (_checkTimer < diff)
-        {
-            Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster);
-            if (!myMonster || !myMonster->IsAlive())
-                if (Creature* spawn = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
-                    _myMonster = spawn->GetObjectGuid();
-            _checkTimer = urand(2 * 60, 3 * 60) * 1000;
-        }
-        else
-            _checkTimer -= diff;
-    }
-    void OnRemoveFromWorld() override
-    {
-        if (Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster))
-            myMonster->AddObjectToRemoveList();
-    }
-};
-
-CreatureAI* GetAI_npc_flameshocker_spawn_point(Creature* pCreature)
-{
-    return new npc_flameshocker_spawn_pointAI(pCreature);
-}
-
-
-struct npc_horror_pallid_spawn_pointAI : public ScriptedAI
-{
-    npc_horror_pallid_spawn_pointAI(Creature* crea) : ScriptedAI(crea)
-    {
-        Reset();
-    }
-
-    ObjectGuid _myMonster;
-    uint32 _checkTimer;
-
-    void Reset() override
-    {
-        _checkTimer = urand(12000, 30000);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (_checkTimer < diff)
-        {
-            uint32 entry = urand(0, 1) ? NPC_PATCHWORK_TERROR : NPC_PALLID_HORROR;
-            Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster);
-            if (!myMonster || !myMonster->IsAlive())
-                if (Creature* spawn = m_creature->SummonCreature(entry, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
-                    _myMonster = spawn->GetObjectGuid();
-            _checkTimer = urand(15 * 60, 17 * 60) * 1000;
-        }
-        else
-            _checkTimer -= diff;
-    }
-    void OnRemoveFromWorld() override
-    {
-        if (Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster))
-            myMonster->AddObjectToRemoveList();
-    }
-};
-
-CreatureAI* GetAI_npc_horror_pallid_spawn_point(Creature* pCreature)
-{
-    return new npc_horror_pallid_spawn_pointAI(pCreature);
-}
-
 class TriggerGuardsReactions
 {
 public:
@@ -1433,7 +1350,6 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
     }
 };
 
-
 struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
 {
     FlameshockerAI(Creature* crea) : ScourgeInvasion_RandomAttackerAI(crea)
@@ -1544,11 +1460,11 @@ struct PallidHorrorAI : public ScourgeInvasion_RandomAttackerAI
 
     void JustDied(Unit* killer) override
     {
-        // Stormwind
-        if (m_creature->GetZoneId() == 1519)
-            m_creature->SummonCreature(CRACKED_NECROTIC_CRYSTAL, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
-        else
-            m_creature->SummonCreature(FAINT_NECROTIC_CRYSTAL, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        if (m_creature->GetZoneId() == 1519) // Stormwind
+            me->CastSpell(me, SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL, true);
+        else if (m_creature->GetZoneId() == 1497) // Undercity
+            me->CastSpell(me, SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL, true);
+
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
     }
 };
@@ -1558,34 +1474,11 @@ CreatureAI* GetAI_PallidHorrorAI(Creature* pCreature)
     return new PallidHorrorAI(pCreature);
 }
 
-struct QuestGiverCrystalAI : public ScriptedAI
+bool GossipHello_NecroticCrystal(Player* player, Creature* creature)
 {
-    QuestGiverCrystalAI(Creature* crea) : ScriptedAI(crea)
-    {
-        _dieTimer = 30000;
-    }
-
-    uint32 _dieTimer;
-    void Reset() override {}
-    void UpdateAI(uint32 const diff) override
-    {
-        if (_dieTimer < diff)
-            m_creature->DoKillUnit();
-        else
-            _dieTimer -= diff;
-    }
-};
-
-CreatureAI* GetAI_npc_faint_necrotic_crystal(Creature* pCreature)
-{
-    return new QuestGiverCrystalAI(pCreature);
-}
-
-bool GossipHello_npc_faint_necrotic_crystal(Player* player, Creature* creature)
-{
-    uint32 questId = QUEST_CRYSTAL_A;
-    if (creature->GetEntry() == FAINT_NECROTIC_CRYSTAL)
-        questId = QUEST_CRYSTAL_H;
+    uint32 questId = QUEST_CRACKED_NECROTIC_CRYSTAL;
+    if (creature->GetEntry() == NPC_FAINT_NECROTIC_CRYSTAL)
+        questId = QUEST_FAINT_NECROTIC_CRYSTAL;
     if (Quest const* quest = sObjectMgr.GetQuestTemplate(questId))
         if (player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE &&
             player->CanTakeQuest(quest, false))
@@ -1682,19 +1575,8 @@ void AddSC_scourge_invasion()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_horror_pallid_spawn_point";
-    newscript->GetAI = &GetAI_npc_horror_pallid_spawn_point;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_faint_necrotic_crystal";
-    newscript->GetAI = &GetAI_npc_faint_necrotic_crystal;
-    newscript->pGossipHello = &GossipHello_npc_faint_necrotic_crystal;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_flameshocker_spawn_point";
-    newscript->GetAI = &GetAI_npc_flameshocker_spawn_point;
+    newscript->Name = "scourge_invasion_necrotic_crystal";
+    newscript->pGossipHello = &GossipHello_NecroticCrystal;
     newscript->RegisterSelf();
 
     // At start up
@@ -1702,11 +1584,7 @@ void AddSC_scourge_invasion()
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);

@@ -22,6 +22,12 @@ UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `
 UPDATE `creature_template` SET `unit_flags`='33280', `faction`='794', `npc_flags`='2' WHERE `entry`=16786;
 UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='2' WHERE `entry` IN (16787,16281,16361);
 UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='1' WHERE `entry`=16285;
+UPDATE `creature_template` SET `display_scale1`='0', `level_min`='60', `level_max`='60', `health_min`='91560', `health_max`='91560', `faction`='1634', `speed_walk`='0.8', `speed_run`='1.14286', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='64', `auras`='28126 28313' WHERE `entry` IN (16394,16382);
+UPDATE `creature_template` SET `health_min`='3052', `health_max`='3052', `npc_flags`='2', `speed_run`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='262400', `auras`='29826', `civilian`='1', `flags_extra`='198658', `script_name`='scourge_invasion_necrotic_crystal' WHERE `entry` IN (16531,16431);
+UPDATE `creature_template` SET `level_min`='53', `level_max`='55', `health_min`='24530', `health_max`='26140', `faction`='1634', `base_attack_time`='2000', `ranged_attack_time`='2000', `auras`='28330' WHERE `entry`=16383;
+
+-- Delete some Nost waypoint npcs
+DELETE FROM `creature_template` WHERE `entry` IN (20099,20100,20101,20102);
 
 -- Fix Camp Spawners
 UPDATE `creature_template` SET `unit_flags`='33554432', `base_attack_time`='2000', `ranged_attack_time`='2000', `movement_type`='0', `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
@@ -147,6 +153,10 @@ SET @INVASIONS_DONE_GUID = 990000;
 
 UPDATE `game_event` SET `disabled`=0 WHERE `entry` IN (@EVENT, 81, 129, 130);
 
+DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=129);
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=129);
+DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=130);
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=130);
 DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=80);
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=80);
 DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=17);
