@@ -475,6 +475,18 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 -- Beached Sea Creature Quests are Alliance Only
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (4732, 4731, 4727, 4725, 4722, 4733, 4730, 4728, 4723);
 
+-- Add Captain Ironhill Spawns
+UPDATE `creature` SET `position_x` = -1302.0343017578125, `position_y` = -1220.4333496093750, `position_z` = 23.04082870483398437, `orientation` = 4.276056766510009765 WHERE (`guid` = 15850);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(15938, 2304, 0, -1299.1328125000000, -1254.1907958984375, 32.20761871337890625, 3.019419670104980468, 300, 300, 100, 0, 0, 10),
+(16192, 2304, 0, -1307.1950683593750, -1255.8428955078125, 49.98796463012695312, 5.131268024444580078, 300, 300, 100, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(112, 1, 'Captain Ironhill (2304)', 10);
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(15850, 110, 'Captain Ironhill #1'),
+(15938, 112, 'Captain Ironhill #2'),
+(16192, 112, 'Captain Ironhill #3');
+
 
 -- End of migration.
 END IF;
