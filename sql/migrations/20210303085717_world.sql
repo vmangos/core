@@ -477,7 +477,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 -- beached sea creature quests are alliance only
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (4732, 4731, 4727, 4725, 4722, 4733, 4730, 4728, 4723);
 
--- add captain ironhill Spawns (credit cmangos)
+-- add captain ironhill spawns (credit cmangos)
 UPDATE `creature` SET `position_x` = -1302.0343017578125, `position_y` = -1220.4333496093750, `position_z` = 23.04082870483398437, `orientation` = 4.276056766510009765 WHERE (`guid` = 15850);
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (15938, 2304, 0, -1299.1328125000000, -1254.1907958984375, 32.20761871337890625, 3.019419670104980468, 300, 300, 100, 0, 0, 10),
@@ -488,6 +488,42 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (15850, 112, 'Captain Ironhill #1'),
 (15938, 112, 'Captain Ironhill #2'),
 (16192, 112, 'Captain Ironhill #3');
+
+-- add felweaver scornn spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = 1492.4405517578125, `position_y` = -4753.36767578125, `position_z` = 21.102783203125, `orientation` = 4.049163818359375 WHERE (`guid` = 12209);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(12234, 5822, 1, 1470.1867675781250, -4695.2880859375, 6.530092716217041015, 4.153883457183837890, 19800, 19800, 100, 100, 0, 0, 10),
+(12235, 5822, 1, 1552.7408447265625, -4767.2910156250, 12.93703556060791015, 3.752457857131958007, 19800, 19800, 100, 100, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(113, 1, 'Felweaver Scornn (5822)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(12209, 113, 'Felweaver Scornn #1'),
+(12234, 113, 'Felweaver Scornn #2'),
+(12235, 113, 'Felweaver Scornn #3');
+
+-- add warlord kolkanis spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = -918.927978515625, `position_y` = -4494.03173828125, `position_z` = 29.67312431335449218, `orientation` = 3.019419670104980468 WHERE (`guid` = 12260);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(12268, 5808, 1, -918.928, -4494.03, 29.6457, 3.01942, 9000, 9000, 100, 0, 1, 5, 10),
+(12269, 5808, 1, -918.928, -4494.03, 29.6457, 3.01942, 9000, 9000, 100, 0, 1, 5, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(114, 1, 'Warlord Kolkanis (5808)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(12260, 114, 'Warlord Kolkanis #1'),
+(12268, 114, 'Warlord Kolkanis #2'),
+(12269, 114, 'Warlord Kolkanis #3');
+
+-- add captain flat tusk spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = '432.488067626953125', `position_y` = '-4213.39990234375', `position_z` = '24.5885009765625', `orientation` = '5.288347721099853515' WHERE (`guid` = '12218');
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(12236, 5824, 1, -94.3403, -4010.99, 62.5894, 0.418879, 19800, 19800, 100, 0, 0, 0, 10),
+(12270, 5824, 1, -94.3403, -4010.99, 62.5894, 0.418879, 19800, 19800, 100, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(115, 1, 'Captain Flat Tusk (5824)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(12218, 115, 'Captain Flat Tusk #1'),
+(12236, 115, 'Captain Flat Tusk #2'),
+(12270, 115, 'Captain Flat Tusk #3');
 
 
 -- End of migration.
