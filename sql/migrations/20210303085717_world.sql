@@ -464,13 +464,15 @@ UPDATE `quest_template` SET `PrevQuestId` = 5890 WHERE `entry` = 4111;
 UPDATE `creature` SET `position_x` = 1454.1995849609375, `position_y` = -4701.81787109375, `position_z` = -2.62193179130554199, `orientation` = 4.572762489318847656, `wander_distance` = 2, `movement_type` = 1 WHERE (`guid` = 6456);
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (6501, 3204, 1, 1470.4882812500000, -4706.10791015625, 2.220372200012207031, 0.820304751396179199, 300, 300, 100, 100, 1, 2, 10),
+(6503, 3204, 1, 1465.775390625, -4683.74462890625, 6.625988483428955078, 5.715672969818115234, 300, 300, 100, 100, 1, 2, 10),
 (6502, 3204, 1, 1497.5399169921875, -4744.13720703125, 18.01207923889160156, 6.037305831909179687, 300, 300, 100, 100, 1, 2, 10);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (111, 1, 'Gazz\'uz (3204)', 10);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (6456, 111, 'Gazz\'uz #1'),
 (6501, 111, 'Gazz\'uz #2'),
-(6502, 111, 'Gazz\'uz #3');
+(6502, 111, 'Gazz\'uz #3'),
+(6503, 111, 'Gazz\'uz #4');
 
 -- beached sea creature quests are alliance only
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (4732, 4731, 4727, 4725, 4722, 4733, 4730, 4728, 4723);
