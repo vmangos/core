@@ -39,6 +39,26 @@ DELETE FROM `quest_end_scripts` WHERE `id` = 1527;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1527, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2181, 0, 0, 0, 0, 0, 0, 0, 0, "Kranal Fiss - Say Text");
 
+-- Quest Greets Rus Locales
+UPDATE `quest_greeting` SET `content_loc8` = "Чтобы выжить, мы должны следовать путям природы и постигать ее тайны." WHERE `entry` = 3419;
+
+-- The Stagnant Oasis
+DELETE FROM `event_scripts` WHERE `id` = 525;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(525, 0, 9, 332890, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332890)"),
+(525, 0, 9, 332891, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332891)"),
+(525, 0, 9, 332892, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332892)"),
+(525, 0, 9, 332893, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332893)"),
+(525, 0, 9, 332894, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332894)");
+
+DELETE FROM `gameobject` WHERE `guid` IN (332890, 332891, 332892, 332893, 332894) AND `id` = 3743;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `state`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES 
+(332890, 3743, 1, -1278.97, -3008.1, 72.0716, 0.86185, 1, -62, -62),
+(332891, 3743, 1, -1275.4, -3006.46, 72.5618, 1.29382, 1, -62, -62),
+(332892, 3743, 1, -1279.63, -3014.32, 71.7535, 0.539832, 1, -62, -62),
+(332893, 3743, 1, -1277.91, -3016.5, 72.699, 0.889334, 1, -62, -62),
+(332894, 3743, 1, -1274.86, -3016.2, 72.6146, 1.63939, 1, -62, -62);
+
 
 -- End of migration.
 END IF;
