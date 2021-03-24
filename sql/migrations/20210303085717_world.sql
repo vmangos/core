@@ -586,6 +586,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5823, 55, 40.79492187500000000, -3898.705078125000, 43.28938293457031250, 100, 0, 0),
 (5823, 56, 52.67296218872070312, -3894.565185546875, 42.69953918457031250, 100, 0, 0);
 
+- remove duplicate dael dun officer
+DELETE FROM `creature` WHERE `guid` = 49109;
+
 
 -- End of migration.
 END IF;
