@@ -586,8 +586,33 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5823, 55, 40.79492187500000000, -3898.705078125000, 43.28938293457031250, 100, 0, 0),
 (5823, 56, 52.67296218872070312, -3894.565185546875, 42.69953918457031250, 100, 0, 0);
 
-- remove duplicate bael dun officer
+-- remove duplicate bael dun officer
 DELETE FROM `creature` WHERE `guid` = 49109;
+
+-- malgin barleybrew should not have a mug 
+UPDATE `creature_equip_template` SET `equipentry2` = 0 WHERE (`entry` = 5848);
+
+-- add geolord mottle spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = 424.3211975097656250, `position_y` = -4245.12597656250, `position_z` = 26.34619140625000000, `orientation` = 1.745329260826110839 WHERE (`guid` = 12384);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(12396, 5826, 1, 29.72135353088378906, -4278.99414062500, 69.91001129150390625, 0.785398185253143310, 9000, 9000, 100, 100, 0, 0, 10),
+(12401, 5826, 1, 50.82291793823242187, -4457.18603515625, 48.42325592041015625, 5.585053443908691406, 9000, 9000, 100, 100, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(116, 1, 'Geolord Mottle (5826)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(12384, 116, 'Geolord Mottle #1'),
+(12396, 116, 'Geolord Mottle #2'),
+(12401, 116, 'Geolord Mottle #3');
+
+-- add watch commander zalaphil spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = -254.435760498046875, `position_y` = -5094.49462890625, `position_z` = 41.23545074462890625, `orientation` = 6.230825424194335937 WHERE (`guid` = 51807);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(51857, 5809, 1, -272.182525634765625, -5131.390625, 24.23000526428222656, 1.029744267463684082, 9000, 9000, 100, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(117, 1, 'Watch Commander Zalaphil (5809)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(51807, 117, 'Watch Commander Zalaphil #1'),
+(51857, 117, 'Watch Commander Zalaphil #2');
 
 
 -- End of migration.
