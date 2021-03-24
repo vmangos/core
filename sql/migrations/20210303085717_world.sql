@@ -722,7 +722,21 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (20950, 13, -4481.68945312500, -1772.7467041015625, 86.23331451416015625, 100, 0, 0),
 (20950, 14, -4480.81054687500, -1789.6469726562500, 86.23331451416015625, 100, 0, 0);
 
+-- add prospector khazgorm spawns (credit cmangos)                                         
+UPDATE `creature` SET `position_x` = -4181.31298828125, `position_y` = -2184.32763671875, `position_z` = 50.26645278930664062, `orientation` = 0.292324692010879516, `wander_distance` = 5, `movement_type` = 1 WHERE (`guid` = 13984);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(14324, 3392, 1, -4212.91, -2274.4, 50.3081, 3.14864, 240, 240, 100, 100, 1, 5, 10),
+(14325, 3392, 1, -4212.91, -2274.4, 50.3081, 3.14864, 240, 240, 100, 100, 1, 5, 10),
+(14326, 3392, 1, -4212.91, -2274.4, 50.3081, 3.14864, 240, 240, 100, 100, 1, 5, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(118, 1, 'Prospector Khazgorm (3392)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(13984, 118, 'Prospector Khazgorm #1'),
+(14324, 118, 'Prospector Khazgorm #2'),
+(14325, 118, 'Prospector Khazgorm #3'),
+(14326, 118, 'Prospector Khazgorm #4');
 
+                        
 -- End of migration.
 END IF;
 END??
