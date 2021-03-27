@@ -850,6 +850,14 @@ INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 (8929, 12554, 0, 1, 1, 1, 952, 0, 10),
 (8929, 12556, 0, 1, 1, 1, 952, 0, 10),
 (8929, 12557, 0, 1, 1, 1, 952, 0, 10);
+       
+-- update rejolds new brew quest chain
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(1378, 415, 0, 10);
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry`= 415;
+UPDATE `quest_template` SET `NextQuestId` = 0, `PrevQuestId` = -415 WHERE `entry` = 315;
+UPDATE `quest_template` SET `PrevQuestId` = 415 WHERE `entry` = 413;
+          
                                                 
 -- End of migration.
 END IF;
