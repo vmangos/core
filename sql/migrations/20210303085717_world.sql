@@ -829,6 +829,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (51816, 49, -3761.487548828125, -2255.792236328125, 93.09268951416015625, 100, 0, 0),
 (51816, 50, -3780.075439453125, -2250.961181640625, 94.94611358642578125, 100, 0, 0);
      
+-- update quest 2280 quest chain
+UPDATE quest_template SET NextQuestId=2440 WHERE entry=2280;
+        
                                                 
 -- End of migration.
 END IF;
