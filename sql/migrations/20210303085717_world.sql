@@ -857,7 +857,19 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry`= 415;
 UPDATE `quest_template` SET `NextQuestId` = 0, `PrevQuestId` = -415 WHERE `entry` = 315;
 UPDATE `quest_template` SET `PrevQuestId` = 415 WHERE `entry` = 413;
-          
+                          
+-- quest 6382 doesnt have a pre-quest
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 6382;
+
+-- correct nathanos blightcaller quest chain
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (525, 8, 6022, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (526, 8, 6042, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (527, 8, 6133, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (528, -1, 525, 526, 527, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6135;
+UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6136;
+UPDATE `quest_template` SET `ExclusiveGroup`= 0 WHERE `entry` IN (6022, 6042, 6133);
+                 
                                                 
 -- End of migration.
 END IF;
