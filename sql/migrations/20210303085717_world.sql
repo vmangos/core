@@ -832,6 +832,24 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- update quest 2280 quest chain
 UPDATE `quest_template` SET `NextQuestId` = 2440 WHERE `entry` = 2280;
         
+-- princess moira bronzebeard should only drop loot if her quest chains are complete 
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (950, 8, 4004, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (951, 8, 4363, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (952, -2, 950, 951, 0, 0, 0);
+DELETE FROM `creature_loot_template` WHERE `entry` = 8929;
+DELETE FROM `reference_loot_template` WHERE `entry` = 30224;
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
+(8929, 22206, 100, 0, 1, 1, 440, 0, 10),
+(8929, 11446, 25, 0, 1, 1, 16, 0, 10),
+(8929, 11078, 2, 0, 1, 1, 952, 0, 10),
+(8929, 11468, -80, 0, 1, 1, 952, 0, 10),
+(8929, 14047, 20, 0, 1, 4, 952, 0, 10),
+(8929, 18945, 10, 0, 1, 10, 952, 0, 10),
+(8929, 22528, 8, 0, 1, 4, 952, 0, 10),
+(8929, 12553, 0, 1, 1, 1, 952, 0, 10),
+(8929, 12554, 0, 1, 1, 1, 952, 0, 10),
+(8929, 12556, 0, 1, 1, 1, 952, 0, 10),
+(8929, 12557, 0, 1, 1, 1, 952, 0, 10);
                                                 
 -- End of migration.
 END IF;
