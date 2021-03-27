@@ -921,7 +921,13 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5834, 46, -2712.690185546875, -1893.892333984375, 91.79166412353515625, 100, 0, 0),
 (5834, 47, -2721.41064453125, -1909.021240234375, 91.79166412353515625, 100, 0, 0),
 (5834, 48, -2717.085693359375, -1919.9310302734375, 92.50821685791015625, 100, 0, 0);
-                                                
+                   
+-- add animations to quest 924 the demon seed
+UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 120 WHERE `id` IN (3523, 3524);
+UPDATE `gameobject_template` SET `data3` = 65536, `data5` = 1 WHERE `entry` = 3524;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (510, 1, 13, 0, 0, 0, 0, 3524, 30, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Activate Demon Seed');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (510, 2, 81, 15128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Despawn Circle of Flame');
+
                                                 
 -- End of migration.
 END IF;
