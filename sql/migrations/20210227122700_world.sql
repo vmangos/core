@@ -38,23 +38,26 @@ UPDATE `creature_template` SET `level_min`='60', `health_min`='3052', `speed_wal
 UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `detection_range`='3', `call_for_help_range`='0', `spell_id1`='', `spell_id2`='', `spell_id3`='', `spell_id4`='', `spell_list_id`='', `script_name`='scourge_invasion_minion' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
 UPDATE `creature_template` SET `unit_flags`='0', `auras`='28090 28126' WHERE `entry` IN (16299,16141,16298);
 UPDATE `creature_template` SET `unit_flags`='64', `auras`='28292 28126' WHERE `entry` IN (14697,16380,16379);
-
+UPDATE `creature_template` SET `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16380;
 UPDATE `creature_template` SET `health_min`='8489', `health_max`='8489' WHERE `entry`=14697;
-UPDATE `creature_template` SET `speed_run`='0.992063' WHERE `entry`=16379;
+UPDATE `creature_template` SET `speed_run`='0.992063', `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16379;
 UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry`=16298;
-UPDATE `creature_template` SET `speed_walk`='0.777776' WHERE `entry`=16141;
-UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='1.19048' WHERE `entry`=16299;
+UPDATE `creature_template` SET `speed_walk`='0.777776', `armor`='3791', `dmg_min`='102', `dmg_max`='138' WHERE `entry`=16141;
+UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='1.19048', `armor`='3791', `dmg_min`='101', `dmg_max`='137' WHERE `entry`=16299;
 
 -- Fix Cultist Engineer
-UPDATE `creature_template` SET `gossip_menu_id`='7166', `health_min`='3052', `health_max`='3052', `faction`='190', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='768', `script_name`='scourge_invasion_cultist_engineer' WHERE `entry`=16230;
+UPDATE `creature_template` SET `gossip_menu_id`='7166', `health_min`='3052', `health_max`='3052', `faction`='190', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='768', `auras`='29826', `flags_extra`='198658', `script_name`='scourge_invasion_cultist_engineer' WHERE `entry`=16230;
 
 -- Fix Shadow of Doom
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='48840', `health_max`='48840', `mana_min`='2434', `mana_max`='2434', `faction`='1630', `unit_flags`='320', `auras`='28126', `movement_type`='0', `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
+UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='48840', `health_max`='48840', `mana_min`='2434', `mana_max`='2434', `faction`='1630', `armor`='3075', `dmg_min`='871', `dmg_max`='1153', `unit_flags`='320', `auras`='28126', `movement_type`='0', `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
 
 -- Fix Low level Minions
 UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
 UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry` IN (16437,16423);
 UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
+UPDATE `creature_template` SET `armor`='426', `dmg_min`='11', `dmg_max`='16', `spell_id2`='0' WHERE `entry`=16438;
+UPDATE `creature_template` SET `armor`='239', `dmg_min`='7', `dmg_max`='12', `spell_id1`='0' WHERE `entry`=16422;
+UPDATE `creature_template` SET `armor`='239', `dmg_min`='8', `dmg_max`='13' WHERE `entry`=16423;
 
 -- Argent NPC's do not have random emotes
 DELETE FROM `creature_ai_events` WHERE `id`=1624101;
@@ -162,6 +165,10 @@ DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobj
 DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=17);
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=17);
 
+DELETE FROM `game_event_gameobject` WHERE `event` = 129;
+DELETE FROM `game_event_creature` WHERE `event` = 129;
+DELETE FROM `game_event_gameobject` WHERE `event` = 130;
+DELETE FROM `game_event_creature` WHERE `event` = 130;
 DELETE FROM `game_event_gameobject` WHERE `event` = 17;
 DELETE FROM `game_event_creature` WHERE `event` = 17;
 DELETE FROM `game_event_gameobject` WHERE `event` = 80;
@@ -3076,7 +3083,8 @@ UPDATE `creature` SET `wander_distance`='0' WHERE `movement_type`='0' AND `wande
 UPDATE `creature_template` SET `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (14684, 14695, 14690, 14693, 14682, 14686, 4543);
 
 -- Balzaphon
-UPDATE `creature_template` SET `faction`='21', `unit_flags`='64', `auras`='28126' WHERE `entry`=14684;
+-- todo: spells not sniffed: cone of cold: 12557, 12611, 15244, 20828, 22746, 30095 Fear: 26580?
+UPDATE `creature_template` SET `faction`='21', `unit_flags`='64', `auras`='28126', `dmg_min`='418', `dmg_max`='481' WHERE `entry`=14684;
 UPDATE `creature` SET `position_x`='3733.27', `position_y`='-3480.11', `position_z`='131.04', `orientation`='3.05433' WHERE `guid`=2354;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146840, 'Stratholme - Balzaphon', 16799, 100, 1, 0, 0, 0, 2, 5, 2, 5, 0, 8398, 100, 4, 0, 0, 0, 2, 16, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 

@@ -93,20 +93,22 @@ enum ScourgeInvasionSpells
 
     // Minions Spells
     SPELL_ZAP_CRYSTAL                           = 28032, // 15 damage to a Necrotic Shard on death.
-    SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
     SPELL_MINION_SPAWN_IN                       = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                      = 17680, // Makes invisible.
     SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
     SPELL_CONTROLLER_TIMER                      = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (We don't know who is casting this yet)
     SPELL_DESPAWNER_SELF                        = 28091, // Trigger from Spell above.
 
-    // Minion abilities
+    // Minion Abilities
+    SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
     SPELL_ENRAGE                                = 8599,  // Used by 16141 (Ghoul Berserker)
     SPELL_BONE_SHARDS                           = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper)
     SPELL_INFECTED_BITE                         = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker)
-    SPELL_DAZED                                 = 1604,  // [shortest sniff CD: 1,965 seconds] Used by 16141 (Ghoul Berserker), 16299 (Skeletal Shocktrooper)
+    // SPELL_DAZED                                 = 1604,  // [shortest sniff CD: 1,965 seconds] Used by 16141 (Ghoul Berserker), 16299 (Skeletal Shocktrooper)
     SPELL_DEMORALIZING_SHOUT                    = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier)
     SPELL_SUNDER_ARMOR                          = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier)
+    SPELL_SHADOW_WORD_PAIN                      = 589,  // Used by 16438 (Skeletal Trooper)
+    SPELL_DUAL_WIELD                            = 674,
 
     // Marks of the Dawn
     SPELL_CREATE_LESSER_MARK_OF_THE_DAWN        = 28319, // Create Lesser Mark of the Dawn
@@ -118,7 +120,12 @@ enum ScourgeInvasionSpells
     SPELL_TRAMPLE                               = 5568,  // Used by 14697 (Lumbering Horror)
     SPELL_AURA_OF_FEAR                          = 28313, // Used by 14697 (Lumbering Horror)
     SPELL_RIBBON_OF_SOULS                       = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned)
+    SPELL_PSYCHIC_SCREAM                        = 22884, // or 26042, used by 16379 (Spirit of the Damned)
     SPELL_MINION_DESPAWN_TIMER_UNCOMMON         = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
+    SPELL_ARCANE_BOLT                           = 20720, /* 20720 Used by 16380 (Bone Witch)
+                                                         https://classicdb.ch/?npc=16380#abilities says 13748 but 20720 is the only spell without requiring mana.
+                                                         Spell description in the Bestiary is: Hurls a magical bolt at an enemy, inflicting Arcane damage.
+                                                         */
 
     // Cultist Engineer
     SPELL_CREATE_SUMMONER_SHIELD                = 28132, // Summon Object - Temporary (181142),
@@ -127,7 +134,7 @@ enum ScourgeInvasionSpells
     SPELL_BUTTRESS_TRAP                         = 28054, // Unknown.
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
                                                          
-    // Probably spells used to spawn Shadow of Doom.        Casting sequence (All those spells are casted within 1-2 seconds):
+    // Probably spells used to spawn Shadow of Doom.        Casting sequence (All those [x] spells are casted within 1-2 seconds):
     SPELL_PH_KILL_SUMMONER_BUFF                 = 27852, // [1] Casted by Cultist on Player.
     SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS    = 27894, // [2] Casted by Player on Cultist.
     SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
@@ -143,16 +150,16 @@ enum ScourgeInvasionSpells
     // Pallid Horror - Patchwerk Terror
     SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL       = 28424, // Alliance.
     SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699, // Horde.
-    //SPELL_AURA_OF_FEAR                        = 28315,
+    // SPELL_AURA_OF_FEAR                        = 28315,
     SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard)
-    //SPELL_DAZED                               = 1604,  // [shortest sniff CD: 21 seconds]
+    // SPELL_DAZED                               = 1604,  // [shortest sniff CD: 21 seconds]
 
     // Flameshocker
     //1604
     //17680
     //28234
     SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 22 seconds]
-    SPELL_FLAMESHOCKERS_REVENGE                 = 28323, // [shortest sniff CD: 22 seconds]
+    SPELL_FLAMESHOCKERS_REVENGE                 = 28323, // On death. 
     SPELL_FLAMESHOCKERS_TOUCH2                  = 28329, // [shortest sniff CD: 22 seconds]
     SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330,
 
@@ -313,6 +320,8 @@ enum ScourgeInvasionNPCEvents
     EVENT_MINION_DAZED                      = 43,
     EVENT_MINION_DEMORALIZING_SHOUT         = 44,
     EVENT_MINION_SUNDER_ARMOR               = 45,
+    EVENT_MINION_ARCANE_BOLT                = 46,
+    EVENT_MINION_PSYCHIC_SCREAM             = 47,
 };
 
 enum ScourgeInvasionWorldStatesVariables
@@ -370,6 +379,7 @@ enum ScourgeInvasionQuests
 
 enum ScourgeInvasionLang
 {
+    // Pallid Horror random yelling every 65-300 seconds.
     LANG_PALLID_HORROR_YELL1                    = 12329, // What?  This not Naxxramas!  We not like this place... destroy!
     LANG_PALLID_HORROR_YELL2                    = 12327, // Raaarrrrggghhh!  We come for you!
     LANG_PALLID_HORROR_YELL3                    = 12326, // Kel'Thuzad say to tell you... DIE!
