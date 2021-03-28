@@ -1163,7 +1163,15 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (15145, 226, -3830.4970703125, -2247.6513671875, 93.0533447265625, 100, 0, 0),
 (15145, 227, -3797.142333984375, -2262.053466796875, 94.44342803955078125, 100, 0, 0),
 (15145, 228, -3769.873291015625, -2291.641845703125, 91.79166412353515625, 100, 0, 0);     
-                                                
+           
+-- update to yell text for quests 5343 and 5341
+DELETE FROM `quest_end_scripts` WHERE `id`=5343;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5343, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6555, 0, 0, 0, 0, 0, 0, 0, 0, 'Barov Family Fortune - Weldon Barov: Say text 1');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5343, 1, 1, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Barov Family Fortune - Weldon Barov: Emote laugh');
+DELETE FROM `quest_end_scripts` WHERE `id`=5341;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5341, 1, 1, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Barov Family Fortune - Alexi Barov: Emote laugh');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5341, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6554, 0, 0, 0, 0, 0, 0, 0, 0, 'Barov Family Fortune - Alexi Barov: Say text 1');
+
                                                 
 -- End of migration.
 END IF;
