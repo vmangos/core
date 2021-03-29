@@ -1191,6 +1191,10 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 -- update kagoro unit flags (credit cmangos)
 UPDATE `creature_template` SET `unit_flags` = 768 WHERE `entry` = 4972;
  
+-- magrin rivermane is not a vendor
+DELETE FROM `npc_vendor` WHERE `entry` = 6776;
+UPDATE `creature_template` SET `npc_flags` = 2, `vendor_id` = 0 WHERE `entry` = 6776;
+          
                                                 
 -- End of migration.
 END IF;
