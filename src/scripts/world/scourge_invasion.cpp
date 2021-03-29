@@ -591,7 +591,11 @@ struct NecroticShard : public ScriptedAI
             if (Creature* DAMAGED_NECROTIC_SHARD = m_creature->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
             {
                 // Get the camp type from the Necrotic Shard.
-                DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, m_camptype, true);
+                if (m_camptype)
+                    DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, m_camptype, true);
+                else
+                    DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, SPELL_CHOOSE_CAMP_TYPE, true);
+
                 m_creature->RemoveFromWorld();
             }
             break;
@@ -879,6 +883,7 @@ struct ScourgeMinion : public ScriptedAI
         {
         case NPC_GHOUL_BERSERKER:
             m_events.ScheduleEvent(EVENT_MINION_INFECTED_BITE, 2000);
+            m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 2000);
             break;
         case NPC_SKELETAL_SHOCKTROOPER:
             m_events.ScheduleEvent(EVENT_MINION_BONE_SHARDS, 2000);
@@ -924,12 +929,6 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* dealer, uint32& damage) override
-    {
-        if (m_creature->GetEntry() == NPC_GHOUL_BERSERKER && m_creature->GetHealthPercent() < 20 && !m_creature->HasAura(SPELL_ENRAGE))
-            m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 0);
-    }
-
     void UpdateAI(uint32 const diff) override
     {
         m_events.Update(diff);
@@ -939,6 +938,7 @@ struct ScourgeMinion : public ScriptedAI
             switch (Events)
             {
             case EVENT_DOOM_START_ATTACK:
+            {
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 // Shadow of Doom seems to attack the Summoner here.
                 if (Player* Summoner = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
@@ -948,22 +948,12 @@ struct ScourgeMinion : public ScriptedAI
                         m_creature->SetDetectionDistance(2.0f);
                         m_creature->SetOwnerGuid(NULL); // Make it attackable for the summoner.
                     }
-                break;
             }
-
-            // Combat Abilities.
-            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-                return;
-
-            // Instakill every trash nearby, but no Players, Pets or NPCs with the same faction.
-            if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f))
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
-
-            switch (Events)
-            {
+                break;
             case EVENT_MINION_ENRAGE:
-                if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
-                    m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 60000);
+                if (m_creature->GetHealthPercent() < 20 && m_creature->GetVictim())
+                    DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_AURA_NOT_PRESENT);
+                m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 2000);
                 break;
             case EVENT_MINION_BONE_SHARDS:
                 DoCastSpellIfCan(m_creature, SPELL_BONE_SHARDS);
@@ -974,18 +964,15 @@ struct ScourgeMinion : public ScriptedAI
                 m_events.ScheduleEvent(EVENT_MINION_ARCANE_BOLT, urand(6000, 12000));
                 break;
             case EVENT_MINION_INFECTED_BITE:
-                if (!m_creature->GetVictim()->HasAura(SPELL_INFECTED_BITE))
-                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INFECTED_BITE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INFECTED_BITE, CF_AURA_NOT_PRESENT);
                 m_events.ScheduleEvent(EVENT_MINION_INFECTED_BITE, urand(6000, 12000));
                 break;
             case EVENT_MINION_PSYCHIC_SCREAM:
-                if (!m_creature->GetVictim()->HasAura(SPELL_PSYCHIC_SCREAM))
-                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PSYCHIC_SCREAM);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PSYCHIC_SCREAM, CF_AURA_NOT_PRESENT);
                 m_events.ScheduleEvent(EVENT_MINION_PSYCHIC_SCREAM, urand(6000, 12000));
                 break;
             case EVENT_MINION_DEMORALIZING_SHOUT:
-                if (!m_creature->GetVictim()->HasAura(SPELL_DEMORALIZING_SHOUT))
-                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DEMORALIZING_SHOUT);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DEMORALIZING_SHOUT, CF_AURA_NOT_PRESENT);
                 m_events.ScheduleEvent(EVENT_MINION_DEMORALIZING_SHOUT, 19000);
                 break;
             case EVENT_MINION_SUNDER_ARMOR:
@@ -1014,6 +1001,14 @@ struct ScourgeMinion : public ScriptedAI
                 break;
             }
         }
+
+        // Combat Abilities.
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
+        // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
+        if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f))
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
     }
