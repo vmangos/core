@@ -1179,7 +1179,16 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
 (13625, 3374, 1, -4137.572265625, -2216.4453125, 50.56214523315429687, 2.365756988525390625, 413, 413, 100, 0, 1, 2, 10);
 
-                                                
+-- add heggin stonewhisker spawns (credit cmangos)                                         
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(51859, 5847, 1, -4071.817626953125, -2163.270751953125, 50.65045928955078125, 3.089232683181762695, 19800, 19800, 100, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(119, 1, 'Heggin Stonewhisker (5847)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(51817, 119, 'Heggin Stonewhisker #1'),
+(51859, 119, 'Heggin Stonewhisker #2');
+ 
+ 
 -- End of migration.
 END IF;
 END??
