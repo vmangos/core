@@ -1188,7 +1188,10 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (51817, 119, 'Heggin Stonewhisker #1'),
 (51859, 119, 'Heggin Stonewhisker #2');
  
+-- update kagoro unit flags (credit cmangos)
+UPDATE `creature_template` SET `unit_flags` = 768 WHERE `entry` = 4972;
  
+                                                
 -- End of migration.
 END IF;
 END??
