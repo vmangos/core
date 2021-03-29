@@ -511,7 +511,7 @@ struct NecroticShard : public ScriptedAI
         m_creature->SetVisibilityModifier(3000.0f);
         if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD)
         {
-            m_finders = GetFindersAmount(me);                              // Count all finders to limit Minions spawns.
+            m_finders = GetFindersAmount(m_creature);                       // Count all finders to limit Minions spawns.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, 0); // Spawn Cultists every 60 minutes.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
         }
@@ -537,9 +537,9 @@ struct NecroticShard : public ScriptedAI
         }
         case SPELL_CAMP_RECEIVES_COMMUNIQUE:
         {
-            if (!GetCampType(me) && m_creature->GetEntry() == NPC_NECROTIC_SHARD)
+            if (!GetCampType(m_creature) && m_creature->GetEntry() == NPC_NECROTIC_SHARD)
             {
-                m_finders = GetFindersAmount(me);
+                m_finders = GetFindersAmount(m_creature);
                 m_creature->CastSpell(m_creature, SPELL_CHOOSE_CAMP_TYPE, true);
                 m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
             }
@@ -602,9 +602,9 @@ struct NecroticShard : public ScriptedAI
             if (Creature* NECROPOLIS_RELAY = m_creature->FindNearestCreature(NPC_NECROPOLIS_RELAY, 200.0f))
                 m_creature->CastSpell(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
             // Despawn remaining Cultists (should never happen).
-            DespawnCultists(me);
+            DespawnCultists(m_creature);
             // Remove Objects from the event around the Shard (Yes this is Blizzlike).
-            DespawnEventDoodads(me);
+            DespawnEventDoodads(m_creature);
             break;
         }
     }
@@ -625,7 +625,7 @@ struct NecroticShard : public ScriptedAI
                 */
 
                 int finderCounter = 0;
-                int finderAmount = urand(1, 3); // pick up to 3 spawns.
+                int finderAmount = urand(1, 3); // Up to 3 spawns.
 
                 std::list<Creature*> finderList;
                 GetCreatureListWithEntryInGrid(finderList, m_creature, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
@@ -633,7 +633,7 @@ struct NecroticShard : public ScriptedAI
                     return;
                 
                 // On a fresh camp, first the minions are spawned close to the shard and then further and further out.
-                finderList.sort(ObjectDistanceOrder(me));
+                finderList.sort(ObjectDistanceOrder(m_creature));
                 
                 for (const auto& pfinder : finderList)
                 {
@@ -672,9 +672,9 @@ struct NecroticShard : public ScriptedAI
                 */
                 m_creature->SetFullHealth();
                 // Despawn all remaining Shadows before respawning the Cultists?
-                DespawnShadowsOfDoom(me);
+                DespawnShadowsOfDoom(m_creature);
                 // Respawn the Cultists.
-                SummonCultists(me);
+                SummonCultists(m_creature);
 
                 m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, IN_MILLISECONDS * HOUR);
                 break;
@@ -719,13 +719,13 @@ struct MinionspawnerAI : public ScriptedAI
                 switch (m_creature->GetEntry())
                 {
                 case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL:
-                    Spawn = UncommonMinionspawner(me) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_LUMBERING_HORROR) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER);
+                    Spawn = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_LUMBERING_HORROR) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER);
                     break;
                 case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON:
-                    Spawn = UncommonMinionspawner(me) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_BONE_WITCH) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_SKELETAL_SHOCKTROOPER);
+                    Spawn = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_BONE_WITCH) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_SKELETAL_SHOCKTROOPER);
                     break;
                 case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON:
-                    Spawn = UncommonMinionspawner(me) ? PickRandomValue(NPC_LUMBERING_HORROR, NPC_BONE_WITCH) : PickRandomValue(NPC_GHOUL_BERSERKER, NPC_SKELETAL_SHOCKTROOPER);
+                    Spawn = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_LUMBERING_HORROR, NPC_BONE_WITCH) : PickRandomValue(NPC_GHOUL_BERSERKER, NPC_SKELETAL_SHOCKTROOPER);
                     break;
                 }
                 if (Creature* MINION = m_creature->SummonCreature(Spawn, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
@@ -772,7 +772,7 @@ struct npc_cultist_engineer : public ScriptedAI
     {
         if (action == NPC_CULTIST_ENGINEER)
         {
-            m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after Doom spawn.
+            m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
             m_creature->CastSpell(m_creature, SPELL_CREATE_SUMMONER_SHIELD, true);
             m_creature->CastSpell(m_creature, SPELL_MINION_SPAWN_IN, true);
             m_events.ScheduleEvent(EVENT_CULTIST_CHANNELING, 1000);
@@ -817,7 +817,6 @@ bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint3
         // Player summons a Shadow of Doom for 1 hour.
         if (Creature* SHADOW_OF_DOOM = player->SummonCreature(NPC_SHADOW_OF_DOOM, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 5000))
         {
-            //SHADOW_OF_DOOM->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             SHADOW_OF_DOOM->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
             SHADOW_OF_DOOM->SetOwnerGuid(player->GetObjectGuid());
             SHADOW_OF_DOOM->SetFacingToObject(player);
@@ -857,7 +856,7 @@ struct ScourgeMinion : public ScriptedAI
     void Reset() override
     {
         if (m_creature->GetEntry() != NPC_SHADOW_OF_DOOM)
-            m_creature->SetWanderDistance(1.0f);    // Seems to be correct.
+            m_creature->SetWanderDistance(1.0f);    // Seems to be very low.
     }
 
     void DoAction(Unit* unit, uint32 action) override
@@ -943,7 +942,7 @@ struct ScourgeMinion : public ScriptedAI
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 // Shadow of Doom seems to attack the Summoner here.
                 if (Player* Summoner = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
-                    if (Summoner->IsWithinLOSInMap(me))
+                    if (Summoner->IsWithinLOSInMap(m_creature))
                     {
                         m_creature->SetInCombatWith(Summoner);
                         m_creature->SetDetectionDistance(2.0f);
@@ -957,8 +956,8 @@ struct ScourgeMinion : public ScriptedAI
                 return;
 
             // Instakill every trash nearby, but no Players, Pets or NPCs with the same faction.
-            if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 15.0f))
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE);
+            if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f))
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
             switch (Events)
             {
@@ -971,7 +970,7 @@ struct ScourgeMinion : public ScriptedAI
                 m_events.ScheduleEvent(EVENT_MINION_BONE_SHARDS, 16000);
                 break;
             case EVENT_MINION_ARCANE_BOLT:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_BOLT, CF_MAIN_RANGED_SPELL);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_BOLT, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
                 m_events.ScheduleEvent(EVENT_MINION_ARCANE_BOLT, urand(6000, 12000));
                 break;
             case EVENT_MINION_INFECTED_BITE:

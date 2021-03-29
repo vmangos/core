@@ -122,8 +122,9 @@ enum ScourgeInvasionSpells
     SPELL_RIBBON_OF_SOULS                       = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned)
     SPELL_PSYCHIC_SCREAM                        = 22884, // or 26042, used by 16379 (Spirit of the Damned)
     SPELL_MINION_DESPAWN_TIMER_UNCOMMON         = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    SPELL_ARCANE_BOLT                           = 20720, /* 20720 Used by 16380 (Bone Witch)
-                                                         https://classicdb.ch/?npc=16380#abilities says 13748 but 20720 is the only spell without requiring mana.
+    SPELL_ARCANE_BOLT                           = 13748, /* 20720 Used by 16380 (Bone Witch)
+                                                         https://classicdb.ch/?npc=16380#abilities says 13748 but 20720 is the only "Arcane Bolt" whichs requires no mana.
+                                                         Danage is very high, so i guess it has a very long cd.
                                                          Spell description in the Bestiary is: Hurls a magical bolt at an enemy, inflicting Arcane damage.
                                                          */
 
