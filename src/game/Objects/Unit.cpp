@@ -168,7 +168,7 @@ Unit::Unit()
     //m_victimThreat = 0.0f;
     for (float & threatMod : m_threatModifier)
         threatMod = 1.0f;
-    
+
     for (float & speed : m_speed_rate)
         speed = 1.0f;
 
@@ -443,9 +443,9 @@ bool Unit::UpdateMeleeAttackingState()
             break;
         }
     }
-        
+
     if (pPlayer)
-        pPlayer->SetSwingErrorMsg(swingError); 
+        pPlayer->SetSwingErrorMsg(swingError);
 
     return swingError == ATTACK_RESULT_OK;
 }
@@ -591,8 +591,8 @@ void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, D
     if (IsPlayer())
 #else
     // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-    // - Fear: The calculations to determine if Fear effects should break due 
-    //   to receiving damage have been changed. In addition, Intimidating 
+    // - Fear: The calculations to determine if Fear effects should break due
+    //   to receiving damage have been changed. In addition, Intimidating
     //   Shout now follows that player versus non - player distinction, while
     //   previously it did not.
     if (IsPlayer() && !HasAura(5246))
@@ -600,8 +600,8 @@ void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, D
         max_dmg *= 0.333f;
 
     // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-    // - Fear: The calculations to determine if Fear effects should break due 
-    //   to receiving damage have been changed. In addition, the chance for a 
+    // - Fear: The calculations to determine if Fear effects should break due
+    //   to receiving damage have been changed. In addition, the chance for a
     //   damage over time spell to break Fear is now significantly lower.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // DOT spells are 3x less likely to break fears after 1.11
@@ -1015,7 +1015,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                             pGroupTap->SendUpdate();
                         }
                     }
-                    
+
                     if (looter)
                     {
                         pCreatureVictim->SetLootRecipient(looter);   // update pCreatureVictim loot recipient to the allowed looter.
@@ -1596,7 +1596,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     // Hmmmm dont like this emotes client must by self do all animations
     if (damageInfo->totalDamage && (damageInfo->HitInfo & HITINFO_CRITICALHIT))
     {
-        if (!(pVictim->IsCreature() && 
+        if (!(pVictim->IsCreature() &&
            (static_cast<Creature*>(pVictim)->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_NO_WOUND_ANIM)))
             pVictim->HandleEmoteCommand(EMOTE_ONESHOT_WOUNDCRITICAL);
     }
@@ -1692,7 +1692,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             {
                 alreadyDone.insert(*i);
                 SpellEntry const* pSpellProto = (*i)->GetSpellProto();
-                
+
                 // Damage shield can be resisted...
                 if (SpellMissInfo missInfo = pVictim->SpellHitResult(this, pSpellProto, (*i)->GetEffIndex()))
                 {
@@ -1948,30 +1948,30 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
 
         RemainingDamage -= currentAbsorb;
     }
-    
+
     AuraList const& vSplitDamageFlat = GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_FLAT);
     for (AuraList::const_iterator i = vSplitDamageFlat.begin(), next; i != vSplitDamageFlat.end() && RemainingDamage >= 0; i = next)
     {
         next = i;
         ++next;
-        
+
         // check damage school mask
         if (((*i)->GetModifier()->m_miscvalue & schoolMask) == 0)
             continue;
-        
+
         // Damage can be splitted only if aura has an alive caster
         Unit* reflectTo = (*i)->GetCaster();
         if (!reflectTo || reflectTo == this || !reflectTo->IsInWorld() || !reflectTo->IsAlive())
             continue;
-        
+
         int32 currentAbsorb;
         if (RemainingDamage >= (*i)->GetModifier()->m_amount)
             currentAbsorb = (*i)->GetModifier()->m_amount;
         else
             currentAbsorb = RemainingDamage;
-        
+
         RemainingDamage -= currentAbsorb;
-        
+
         uint32 splitted = currentAbsorb;
         uint32 splitted_absorb = 0;
         // Nostalrius : la reflection (bene de sacrifice par exemple) ne fait pas forcement des degats (si pala sous bouclier divin)
@@ -1986,26 +1986,26 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
         CleanDamage cleanDamage = CleanDamage(splitted, BASE_ATTACK, MELEE_HIT_NORMAL, reflectAbsorb, reflectResist);
         pCaster->DealDamage(reflectTo, splitted, &cleanDamage, DOT, schoolMask, (*i)->GetSpellProto(), false);
     }
-    
+
     AuraList const& vSplitDamagePct = GetAurasByType(SPELL_AURA_SPLIT_DAMAGE_PCT);
     for (AuraList::const_iterator i = vSplitDamagePct.begin(), next; i != vSplitDamagePct.end() && RemainingDamage >= 0; i = next)
     {
         next = i;
         ++next;
-        
+
         // check damage school mask
         if (((*i)->GetModifier()->m_miscvalue & schoolMask) == 0)
             continue;
-        
+
         // Damage can be splitted only if aura has an alive caster
         Unit* caster = (*i)->GetCaster();
         if (!caster || caster == this || !caster->IsInWorld() || !caster->IsAlive())
             continue;
-        
+
         uint32 splitted = uint32(RemainingDamage * (*i)->GetModifier()->m_amount / 100.0f);
-        
+
         RemainingDamage -=  int32(splitted);
-        
+
         uint32 split_absorb = 0;
         pCaster->DealDamageMods(caster, splitted, &split_absorb);
 
@@ -2040,7 +2040,7 @@ void Unit::CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage*
             damageInfo->blocked = damageInfo->damage;
         damageInfo->damage -= damageInfo->blocked;
     }
-    
+
     CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), SPELL_DIRECT_DAMAGE, damageInfo->damage, &damageInfo->absorb, &damageInfo->resist, spellProto, spell);
     uint32 const bonus = (damageInfo->resist < 0 ? uint32(std::abs(damageInfo->resist)) : 0);
     damageInfo->damage += bonus;
@@ -2567,7 +2567,7 @@ float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) c
         hitChance -= 1.0f;
 
     // World of Warcraft Client Patch 1.8.0 (2005-10-11)
-    // - Items which provide +hit chance will now be allowed to counteract the 
+    // - Items which provide +hit chance will now be allowed to counteract the
     //   increased miss chance penalty of dual - wielding.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
     float const missChanceWithoutDualWieldPenalty = (5.0f - skillDiffBonus) * levelDiffMultiplier;
@@ -3042,8 +3042,12 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
     {
         // Exception for stealth detection, remove hidden trap detection (id:2836) from stealth modifier (should not be taken into account)
         // If it was the cast, rogue will see others rogue at 40 meters
-        if (i->GetId() != 2836)
-            modifier += i->GetModifier()->m_amount;
+        if (i->GetId() != 2836) {
+            if (auratype == SPELL_AURA_MOD_STEALTH)
+                modifier = std::max (modifier, i->GetModifier()->m_amount);
+            else
+                modifier += i->GetModifier()->m_amount;
+        }
     }
 
 
@@ -4147,7 +4151,7 @@ void Unit::RemoveGameObject(GameObject* pGo, bool del)
                 // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existing cases)
                 AddCooldown(*pCreateBySpell);
         }
-        
+
     }
 
     m_gameObj.remove(pGo);
@@ -4549,7 +4553,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // player cannot attack in mount state
     if (IsPlayer() && IsMounted())
         return false;
-    
+
     if (IsCreature() && !((Creature*)this)->CanHaveTarget())
         return false;
 
@@ -4746,9 +4750,9 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
                         CastSpell(this, itr.first, true, nullptr);
                 }
             }
-            else 
+            else
             {
-                switch (flag) 
+                switch (flag)
                 {
                     case AURA_STATE_HEALTHLESS_15_PERCENT:
                     case AURA_STATE_HEALTHLESS_10_PERCENT:
@@ -4780,10 +4784,10 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
                         ++itr;
                 }
             }
-            
+
             if (IsCreature())
             {
-                switch (flag) 
+                switch (flag)
                 {
                     case AURA_STATE_HEALTHLESS_15_PERCENT:
                     case AURA_STATE_HEALTHLESS_10_PERCENT:
@@ -5381,7 +5385,7 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         {
             if (iter->GetModifier()->m_miscvalue & mask)
                 return true;
-        }      
+        }
     }
 
     return false;
@@ -5419,7 +5423,7 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
     }
 
     // Mechanical units are immune to normal heal effects. There is a separate one for them.
-    if ((effect == SPELL_EFFECT_HEAL || effect == SPELL_EFFECT_HEAL_MAX_HEALTH) && 
+    if ((effect == SPELL_EFFECT_HEAL || effect == SPELL_EFFECT_HEAL_MAX_HEALTH) &&
         (GetCreatureType() == CREATURE_TYPE_MECHANICAL))
         return true;
 
@@ -6033,7 +6037,7 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
         if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY) &&
             !pCreature->IsFriendlyTo(pDetector))
             return false;
-    } 
+    }
 
     // Visible units are always visible for all units
     if (m_Visibility == VISIBILITY_ON)
@@ -6104,7 +6108,7 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
         return pDetectorPlayer ? pDetectorPlayer->IsInVisibleList(this) : false;
 
     // Special cases
-    if (pDetectorUnit && !pDetectorUnit->CanDetectStealthOf(this, GetDistance(viewPoint), alert))
+    if (pDetectorUnit && !pDetectorUnit->CanDetectStealthOf(this, GetDistance3dToCenter(viewPoint), alert))
          return false;
 
     // Now check if target is visible with LoS
@@ -6204,23 +6208,27 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
         if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f);
             return true;
 
-    // set max distance
-    float MaxStealthDetectRange = sWorld.getConfig(CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE);
-
-    float visibleDistance = IsPlayer() ? 20.f : ((Creature*)this)->GetDetectionRange();
+    float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : ((Creature*)this)->GetDetectionRange()/2.f;
     //Always invisible from back (when stealth detection is on), also filter max distance cases
-    bool isInFront = distance < visibleDistance && HasInArc(target);
+    bool isInFront = (IsPlayer() || distance < visibleDistance) && HasInArc(target);
     if (!isInFront)
         return false;
 
-    int32 stealthSkill = target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL) + target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH);
+    int32 stealthSkill = target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH);
+    stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
     int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
-    float c = std::abs(level_diff) > 3 ? 5.f : 10.f;
-    visibleDistance = std::min(visibleDistance/2.f + (detectSkill - stealthSkill)/c, MaxStealthDetectRange);
 
-    int32 alertRange = visibleDistance;
-    visibleDistance = (visibleDistance - 1.5f) * 0.9f ;
+    // stealth level: 3 points -> 1 yd, 2x if level diff > 3
+    if (target->IsPlayer())
+        visibleDistance += (detectSkill - stealthSkill) / (std::abs(level_diff) > 3 ? 6.f : 3.f);
+    else
+        visibleDistance += level_diff / (std::abs(level_diff) > 3 ? 6.f : 3.f);
+
+    visibleDistance = std::min(visibleDistance, 26.f);
+
+
+    int32 alertRange = (visibleDistance + 1.5f) * 1.1f ;
 
     // recheck new distance
     if (alert)
@@ -6237,7 +6245,7 @@ void Unit::CheckPendingMovementChanges()
     Player* pPlayer = ToPlayer();
     if (pPlayer && pPlayer->IsBeingTeleportedFar())
             return;
-    
+
     Player* pController = GetPlayerMovingMe();
     if (!pController || !pController->IsInWorld() || !pController->GetSession()->IsConnected())
     {
@@ -6398,7 +6406,7 @@ void Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change, boo
             if (sendToClient)
                 MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
             break;
-        case SPEED_CHANGE_RUN_BACK: 
+        case SPEED_CHANGE_RUN_BACK:
             SetSpeedRateReal(MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
             if (sendToClient)
                 MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
@@ -6664,7 +6672,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
     {
         // Before patch 1.9 pets should retain their wild speed, after that they are normalised
         Creature* pCreature = (Creature*)this;
-        if (!(pCreature->IsPet() && pCreature->GetOwnerGuid().IsPlayer()) || 
+        if (!(pCreature->IsPet() && pCreature->GetOwnerGuid().IsPlayer()) ||
             (sWorld.GetWowPatch() < WOW_PATCH_109 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS)))
         {
             switch (mtype)
@@ -6771,10 +6779,10 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
     }
 
     // explaination of (1):
-    // If the player is not in the world yet, it won't reply to the packets requiring an ack. And once the player is in the world, next time a movement 
-    // packet which requires an ack is sent to the client (change of speed for example), the client is kicked from the 
-    // server on the ground that it should have replied to the first packet first. That line is a hacky fix 
-    // in the sense that it doesn't work like that in retail since buffs are applied only after the player has been 
+    // If the player is not in the world yet, it won't reply to the packets requiring an ack. And once the player is in the world, next time a movement
+    // packet which requires an ack is sent to the client (change of speed for example), the client is kicked from the
+    // server on the ground that it should have replied to the first packet first. That line is a hacky fix
+    // in the sense that it doesn't work like that in retail since buffs are applied only after the player has been
     // initialized in the world. cf description of PR #18771
 }
 
@@ -6793,7 +6801,7 @@ void Unit::SetRooted(bool apply)
 
     if (apply)
         StopMoving(); // @todo: this method needs a rework to work well with players.
-    
+
     if (IsMovedByPlayer() && IsInWorld())
         MovementPacketSender::AddMovementFlagChangeToController(this, MOVEFLAG_ROOT, apply);
     else if (IsMovedByPlayer() && !IsInWorld())
@@ -7170,7 +7178,7 @@ bool Unit::SelectHostileTarget()
 
     // enter in evade mode in other case
     OnLeaveCombat();
-    
+
     if (m_isCreatureLinkingTrigger)
         GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
 
@@ -7449,7 +7457,7 @@ int32 Unit::GetTotalResistanceValue(SpellSchools school) const
     value *= m_auraModifiersGroup[unitMod][TOTAL_PCT];
 
     // World of Warcraft Client Patch 1.9.0 (2006-01-03)
-    // - Curse of Shadow and Curse of the Elements - These curses can no 
+    // - Curse of Shadow and Curse of the Elements - These curses can no
     //   longer cause resistance to become negative.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // Auras can't cause resistances to dip below 0 since early vanilla
@@ -7882,7 +7890,7 @@ void CharmInfo::InitPossessCreateSpells()
 
     // possessed players don't have spells, keep the action bar empty
     Creature* pCreature = m_unit->ToCreature();
-    if (!pCreature)                                         
+    if (!pCreature)
         return;
 
     for (uint32 spell : pCreature->m_spells)
@@ -8565,7 +8573,7 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
 
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-        
+
         // prevent interrupt message
         if (casterGuid == GetObjectGuid())
             FinishSpell(CURRENT_GENERIC_SPELL, false);
