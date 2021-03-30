@@ -6205,7 +6205,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     // Hunter mark functionality. TODO: range cap at 60, actual range needs to be verified
     AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
     for (const auto& iter : auras)
-        if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f);
+        if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f)
             return true;
 
     float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : ((Creature*)this)->GetDetectionRange()/2.f;
