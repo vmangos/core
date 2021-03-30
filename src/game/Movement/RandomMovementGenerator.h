@@ -44,8 +44,14 @@ class RandomMovementGenerator
         bool Update(Creature&, uint32 const&);
         void UpdateAsync(Creature&, uint32 diff);
         MovementGeneratorType GetMovementGeneratorType() const { return RANDOM_MOTION_TYPE; }
-
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
+
+        void AddPauseTime(int32 waitTimeDiff)
+        {
+            if (i_nextMoveTime.GetExpiry() < waitTimeDiff)
+                i_nextMoveTime.Reset(waitTimeDiff);
+        }
+        
     private:
         ShortTimeTracker i_nextMoveTime;
         float i_positionX;
