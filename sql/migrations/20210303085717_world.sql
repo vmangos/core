@@ -866,10 +866,15 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (526, 8, 6042, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (527, 8, 6133, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (528, -1, 525, 526, 527, 0, 0);
-UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6135;
-UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6144;
+UPDATE `quest_template` SET `PrevQuestId`= 0, `ExclusiveGroup`= 0, `RequiredCondition` = 528 WHERE entry = 6135;
+UPDATE `quest_template` SET `PrevQuestId`= 0, `ExclusiveGroup`= 0, `RequiredCondition` = 528 WHERE entry = 6136;
 UPDATE `quest_template` SET `ExclusiveGroup`= 0 WHERE `entry` IN (6022, 6042, 6133);
-                 
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (529, 8, 6135, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (530, 8, 6136, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (531, -1, 529, 530, 0, 0, 0);
+UPDATE `quest_template` SET `PrevQuestId`= 0 , `RequiredCondition` = 531 WHERE `entry` = 6163;
+UPDATE `quest_template` SET `PrevQuestId`= 0 , `RequiredCondition` = 531 WHERE `entry` = 6144;
+                                                    
 -- add azzere the skyblade waypoints (credit cmangos)
 UPDATE `creature` SET `position_x` = -2718.01220703125, `position_y` = -1919.480224609375, `position_z` = 92.39141845703125, `orientation` = 5.830346584320068359, `wander_distance` = 0, `movement_type` = 2 WHERE (`guid` = 51813);
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
