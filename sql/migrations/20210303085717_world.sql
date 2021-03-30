@@ -867,7 +867,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (527, 8, 6133, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (528, -1, 525, 526, 527, 0, 0);
 UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6135;
-UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6136;
+UPDATE `quest_template` SET `RequiredCondition` = 528 WHERE entry = 6144;
 UPDATE `quest_template` SET `ExclusiveGroup`= 0 WHERE `entry` IN (6022, 6042, 6133);
                  
 -- add azzere the skyblade waypoints (credit cmangos)
