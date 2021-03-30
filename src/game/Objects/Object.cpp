@@ -4244,7 +4244,7 @@ void WorldObject::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
  * Calculates caster part of melee damage bonuses,
  * also includes different bonuses dependent from target auras
  */
-uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAttackType attType, SpellEntry const* spellProto, SpellEffectIndex effectIndex, DamageEffectType damagetype, uint32 stack, Spell* spell, bool flat)
+float WorldObject::MeleeDamageBonusDone(Unit* pVictim, float pdamage, WeaponAttackType attType, SpellEntry const* spellProto, SpellEffectIndex effectIndex, DamageEffectType damagetype, uint32 stack, Spell* spell, bool flat)
 {
     if (!pVictim)
         return pdamage;
@@ -4260,8 +4260,8 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
 
     // FLAT damage bonus auras
     // =======================
-    int32 DoneFlat  = 0;
-    int32 APbonus   = 0;
+    float DoneFlat  = 0;
+    float APbonus   = 0;
 
     Unit* pUnit = ToUnit();
 
@@ -4356,7 +4356,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
     else if (APbonus || DoneFlat)
     {
         bool normalized = spellProto ? spellProto->HasEffect(SPELL_EFFECT_NORMALIZED_WEAPON_DMG) : false;
-        DoneTotal += int32(APbonus / 14.0f * GetAPMultiplier(attType, normalized));
+        DoneTotal += APbonus / 14.0f * GetAPMultiplier(attType, normalized);
 
         // for weapon damage based spells we still have to apply damage done percent mods
         // (that are already included into pdamage) to not-yet included DoneFlat
@@ -4385,7 +4385,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
     if (!flat)
         DoneTotal = 0.0f;
 
-    float tmpDamage = float(int32(pdamage) + DoneTotal * int32(stack)) * DonePercent;
+    float tmpDamage = pdamage + DoneTotal * int32(stack) * DonePercent;
 
     // apply spellmod to Done damage
     if (spellProto && pUnit)
@@ -4395,7 +4395,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
     }
 
     // bonus result can be negative
-    return tmpDamage > 0 ? uint32(tmpDamage) : 0;
+    return tmpDamage > 0 ? tmpDamage : 0;
 }
 
 /**
