@@ -1199,6 +1199,10 @@ UPDATE `creature_template` SET `unit_flags` = 768 WHERE `entry` = 4972;
 -- magrin rivermane is not a vendor
 DELETE FROM `npc_vendor` WHERE `entry` = 6776;
 UPDATE `creature_template` SET `npc_flags` = 2, `vendor_id` = 0 WHERE `entry` = 6776;
+                                                
+-- add quest start script for 2841
+UPDATE `quest_template` SET `StartScript` = 2841 WHERE `entry` = 2841;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2841, 1, 0, 0, 0, 0, 0, 7968, 0, 9, 3, 3903, 0, 0, 0, 0, 0, 0, 0, 0, 'Sovik - Talk');
           
                                                 
 -- End of migration.
