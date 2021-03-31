@@ -1205,6 +1205,7 @@ UPDATE `quest_template` SET `StartScript` = 2841 WHERE `entry` = 2841;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2841, 1, 0, 0, 0, 0, 0, 7968, 0, 9, 3, 3903, 0, 0, 0, 0, 0, 0, 0, 0, 'Sovik - Talk');
           
 -- wandering forest walker (credit cmangos)
+DELETE FROM `creature_movement` WHERE `guid` IN (50797, 50800);
 UPDATE `creature` SET `wander_distance` = 0, `movement_type` = 2 WHERE `guid` IN (50797, 50800);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (50797, 1, -3444.82, 2379.06, 45.5005, 100, 0, 0), 
