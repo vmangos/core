@@ -6208,7 +6208,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
         if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f)
             return true;
 
-    float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : ((Creature*)this)->GetDetectionRange()/2.f;
+    float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : (((Creature*)this)->GetDetectionRange() + GetObjectBoundingRadius() + target->GetObjectBoundingRadius());
     //Always invisible from back (when stealth detection is on), also filter max distance cases
     bool isInFront = (IsPlayer() || distance < visibleDistance) && HasInArc(target);
     if (!isInFront)
@@ -6218,6 +6218,9 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
     int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
+
+    if (IsCreature())
+        visibleDistance /= 2.f;
 
     // stealth level: 3 points -> 1 yd, 2x if level diff > 3
     if (target->IsPlayer())
