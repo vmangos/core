@@ -4066,7 +4066,8 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
     // Also use this effect to set the taunter's threat to the taunted creature's highest value
     if (unitTarget->CanHaveThreatList() && unitTarget->GetThreatManager().getCurrentVictim())
     {
-        unitTarget->GetThreatManager().addThreat(m_casterUnit, unitTarget->GetThreatManager().getCurrentVictim()->getThreat());
+        // Add the difference of the current highest value threat and the taunter's threat
+        unitTarget->GetThreatManager().addThreat(m_casterUnit, unitTarget->GetThreatManager().getCurrentVictim()->getThreat()-unitTarget->GetThreatManager().getThreat(m_casterUnit, false));
 
         // Patch 1.11 notes
         // https://web.archive.org/web/20061109034626/http://evilempireguild.org:80/guides/kenco2.php
