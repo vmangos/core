@@ -3036,9 +3036,9 @@ void Unit::DeMorph()
     SetDisplayId(GetNativeDisplayId());
 }
 
-int32 Unit::GetTotalAuraModifier(AuraType auratype) const
+float Unit::GetTotalAuraModifier(AuraType auratype) const
 {
-    int32 modifier = 0;
+    float modifier = 0.f;
 
     AuraList const& mTotalAuraList = GetAurasByType(auratype);
     for (const auto& i : mTotalAuraList)

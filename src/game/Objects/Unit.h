@@ -795,7 +795,7 @@ class Unit : public WorldObject
         void DelaySpellAuraHolder(uint32 spellId, int32 delaytime, ObjectGuid casterGuid);
         AuraList const& GetAurasByType(AuraType type) const { return m_modAuras[type]; }
 
-        int32 GetTotalAuraModifier(AuraType auratype) const;
+        float GetTotalAuraModifier(AuraType auratype) const;
         float GetTotalAuraMultiplier(AuraType auratype) const;
         int32 GetMaxPositiveAuraModifier(AuraType auratype) const;
         int32 GetMaxNegativeAuraModifier(AuraType auratype) const;
