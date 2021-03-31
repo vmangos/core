@@ -633,6 +633,7 @@ class Spell
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
+        uint32 GetSpellBatchingEffectDelay(WorldObject const* pTarget) const;
         // -------------------------------------------
 
         //List For Triggered Spells

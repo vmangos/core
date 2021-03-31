@@ -894,6 +894,14 @@ void Spell::CleanupTargetList()
     m_delayMoment = 0;
 }
 
+uint32 Spell::GetSpellBatchingEffectDelay(WorldObject const* pTarget) const
+{
+    // This tries to recreate the feeling of spell effect execution being done in batches,
+    // by syncing the delay of effects to the world timer so they happen simultaneously.
+    return ((sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) && pTarget != m_casterUnit) ?
+           (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))) : 0);
+}
+
 void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
 {
     if (m_spellInfo->Effect[effIndex] == 0)
@@ -952,9 +960,7 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
             m_delayMoment = targetInfo.timeDelay;
     }
     else if (m_delayed)
-        m_delayMoment = targetInfo.timeDelay = 
-        ((sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) && pTarget != m_casterUnit) ?
-        (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))) : 0);
+        m_delayMoment = targetInfo.timeDelay = GetSpellBatchingEffectDelay(pTarget);
     else
         targetInfo.timeDelay = uint64(0);
 
@@ -1049,9 +1055,7 @@ void Spell::AddGOTarget(GameObject* pTarget, SpellEffectIndex effIndex)
             m_delayMoment = targetInfo.timeDelay;
     }
     else if (m_delayed)
-        m_delayMoment = targetInfo.timeDelay = 
-        ((sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) && pTarget != m_casterGo) ?
-        (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))) : 0);
+        m_delayMoment = targetInfo.timeDelay = GetSpellBatchingEffectDelay(pTarget);
     else
         targetInfo.timeDelay = uint64(0);
 
@@ -8655,7 +8659,7 @@ void Spell::OnSpellLaunch()
     }
     
     bool triggerAutoAttack = unitTarget != m_casterUnit && !m_spellInfo->IsPositiveSpell() && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
-    m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY))), triggerAutoAttack);
+    m_casterUnit->GetMotionMaster()->MoveCharge(unitTarget, GetSpellBatchingEffectDelay(unitTarget), triggerAutoAttack);
 }
 
 bool Spell::HasModifierApplied(SpellModifier* mod)
