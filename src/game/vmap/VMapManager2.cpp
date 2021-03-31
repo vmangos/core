@@ -295,13 +295,11 @@ std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(std::string const
                     worldmodel,
                     [this, filename](WorldModel* m){
                         std::unique_lock<std::shared_timed_mutex> lock(m_modelsLock);
-                        iLoadedModelFiles.erase(filename);
+                        if (!getUseManagedPtrs())
+                            iLoadedModelFiles.erase(filename);
                         delete m;
                     });
-        model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(
-                                             filename,
-                                            {ret, getUseManagedPtrs()}
-                                             )).first;
+        model = iLoadedModelFiles.emplace(filename, ManagedModel{ret, getUseManagedPtrs()}).first;
         return ret;
     }
     ret = model->second.lock();

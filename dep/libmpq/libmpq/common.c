@@ -1,7 +1,7 @@
 /*
  *  common.c -- shared functions used by mpq-tools.
  *
- *  Copyright (c) 2003-2008 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (c) 2003-2011 Maik Broemme <mbroemme@libmpq.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 
 /* generic includes. */
 #include <ctype.h>
-//#include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -101,7 +100,7 @@ int32_t libmpq__decrypt_block(uint32_t *in_buf, uint32_t in_size, uint32_t seed)
 }
 
 /* function to detect decryption key. */
-int32_t libmpq__decrypt_key(uint8_t *in_buf, uint32_t in_size, uint32_t block_size) {
+int32_t libmpq__decrypt_key(uint8_t *in_buf, uint32_t in_size, uint32_t block_size, uint32_t *key) {
 
 	/* some common variables. */
 	uint32_t saveseed1;
@@ -149,7 +148,8 @@ int32_t libmpq__decrypt_key(uint8_t *in_buf, uint32_t in_size, uint32_t block_si
 		if ((ch - ch2) <= block_size) {
 
 			/* file seed found, so return it. */
-			return saveseed1;
+			*key = saveseed1;
+			return LIBMPQ_SUCCESS;
 		}
 	}
 
@@ -175,7 +175,7 @@ int32_t libmpq__decompress_block(uint8_t *in_buf, uint32_t in_size, uint8_t *out
 
 	/* check if one compression mode is used. */
 	else if (compression_type == LIBMPQ_FLAG_COMPRESS_PKZIP ||
-	    compression_type == LIBMPQ_FLAG_COMPRESS_MULTI) {
+	         compression_type == LIBMPQ_FLAG_COMPRESS_MULTI) {
 
 		/* check if block is really compressed, some blocks have set the compression flag, but are not compressed. */
 		if (in_size < out_size) {

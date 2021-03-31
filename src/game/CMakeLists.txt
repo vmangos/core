@@ -220,6 +220,7 @@ set (game_SRCS
     CreatureGroups.h
     Formulas.h
     GameEventMgr.h
+    Geometry.h
     GuardMgr.h
     GMTicketMgr.h
     GossipDef.h

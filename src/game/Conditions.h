@@ -177,7 +177,7 @@ enum ConditionType
                                                             // Value1: event_id
     CONDITION_LINE_OF_SIGHT         = 37,                   // Returns true if the source and target are in line of sight of one another.
                                                             // Requirement: WorldObject Source, WorldObject Target
-    CONDITION_DISTANCE              = 38,                   // Checks the distance between the provided source and target.
+    CONDITION_DISTANCE_TO_TARGET    = 38,                   // Checks the distance between the provided source and target.
                                                             // Requirement: WorldObject Source, WorldObject Target
                                                             // Value1: distance
                                                             // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
@@ -230,6 +230,12 @@ enum ConditionType
                                                             // Value2: start_minutes
                                                             // Value3: end_hour
                                                             // Value4: end_minutes
+    CONDITION_DISTANCE_TO_POSITION  = 54,                   // Checks if the target is within distance of the provided coordinates.
+                                                            // Requirement: WorldObject Target
+                                                            // Value1: x
+                                                            // Value2: y
+                                                            // Value3: z
+                                                            // Value4: distance
 };
 
 enum ConditionFlags
@@ -287,7 +293,7 @@ class ConditionEntry
         // Default constructor, required for SQL Storage (Will give errors if used elsewise)
         ConditionEntry() : m_entry(0), m_condition(CONDITION_AND), m_value1(0), m_value2(0), m_value3(0), m_value4(0), m_flags(0) {}
 
-        ConditionEntry(uint32 _entry, int16 _condition, uint32 _value1, uint32 _value2, uint32 _value3, uint32 _value4, uint8 _flags)
+        ConditionEntry(uint32 _entry, int16 _condition, int32 _value1, int32 _value2, int32 _value3, int32 _value4, uint8 _flags)
             : m_entry(_entry), m_condition(ConditionType(_condition)), m_value1(_value1), m_value2(_value2), m_value3(_value3), m_value4(_value4), m_flags(_flags) {}
 
         // Checks correctness of values
@@ -307,10 +313,10 @@ class ConditionEntry
         bool inline Evaluate(WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
         uint32 m_entry;                                     // entry of the condition
         ConditionType m_condition;                          // additional condition type
-        uint32 m_value1;                                    // data for the condition - see ConditionType definition
-        uint32 m_value2;
-        uint32 m_value3;
-        uint32 m_value4;
+        int32 m_value1;                                     // data for the condition - see ConditionType definition
+        int32 m_value2;
+        int32 m_value3;
+        int32 m_value4;
         uint8 m_flags;
 };
 

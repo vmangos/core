@@ -60,6 +60,7 @@
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // currently used (correctly?) for any non Unit world objects. This is actually the bounding_radius, like player/creature from creature_model_data
 #define DEFAULT_OBJECT_SCALE        1.0f                    // player/item scale as default, npc/go from database, pets from dbc
+#define DEFAULT_GNOME_SCALE         1.15f
 #define DEFAULT_TAUREN_MALE_SCALE   1.35f                   // Tauren Male Player Scale by default
 #define DEFAULT_TAUREN_FEMALE_SCALE 1.25f                   // Tauren Female Player Scale by default
 
@@ -466,6 +467,30 @@ class CooldownContainer
     private:
         spellIdMap m_spellIdMap;
         categoryMap m_categoryMap;
+};
+
+// Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const* procSpell, bool dontTriggerSpecial
+
+// External struct for passing on data
+struct SpellModifier;
+struct ProcSystemArguments
+{
+    Unit* pVictim;
+    ObjectGuid victimGuid;
+
+    uint32 procFlagsAttacker;
+    uint32 procFlagsVictim;
+    uint32 procExtra;
+
+    uint32 amount; // contains full heal or full damage
+    SpellEntry const* procSpell;
+    WeaponAttackType attType;
+
+    std::list<SpellModifier*> appliedSpellModifiers; // don't dereference pointers
+    bool isSpellTriggeredByAura;
+
+    explicit ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_ = BASE_ATTACK,
+        SpellEntry const* procSpell_ = nullptr, Spell const* spell = nullptr);
 };
 
 class Object
@@ -902,6 +927,7 @@ class WorldObject : public Object
 
         void SetOrientation(float orientation);
 
+        void SetRawPosition(Position&& pos) { m_position = std::move(pos); }
         Position const& GetPosition() const { return m_position; }
         float GetPositionX() const { return m_position.x; }
         float GetPositionY() const { return m_position.y; }
@@ -910,8 +936,14 @@ class WorldObject : public Object
         void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
         void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
         float GetOrientation() const { return m_position.o; }
-        void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const;
+        void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const
+        {
+            GetNearPoint2DAroundPosition(GetPositionX(), GetPositionY(), x, y, distance, absAngle);
+        }
+        void GetNearPoint2DAroundPosition(float ownX, float ownY, float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
+        // x, y, z should be initialized to the position you want to search around
+        void GetNearPointAroundPosition(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
         void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, WorldObject const* obj = nullptr) const
         {
             // angle calculated from current orientation
@@ -998,7 +1030,11 @@ class WorldObject : public Object
         {
             return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
-        bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f) const;
+        bool IsWithinLOS(float targetX, float targetY, float targetZ, bool checkDynLos = true, float targetHeight = 2.f) const
+        {
+            return IsWithinLOSAtPosition(GetPositionX(), GetPositionY(), GetPositionZ(), targetX, targetY, targetZ, checkDynLos, targetHeight);
+        }
+        bool IsWithinLOSAtPosition(float ownX, float ownY, float ownZ, float targetX, float targetY, float targetZ, bool checkDynLos = true, float targetHeight = 2.f) const;
         bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
         bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
@@ -1226,10 +1262,13 @@ class WorldObject : public Object
         int32 MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
         float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
         SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
-        void ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const* procSpell = nullptr, Spell* spell = nullptr);
+        void UpdatePendingProcs(uint32 diff);
+        void ProcDamageAndSpell(ProcSystemArguments&& data);
+        void ProcDamageAndSpell_real(ProcSystemArguments& data);
+        void ProcDamageAndSpell_delayed(ProcSystemArguments& data);
         void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
         float CalculateSpellEffectValue(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr) const;
-        float SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, float total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell = nullptr) const;
+        float SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, float total, float benefit, float ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell = nullptr) const;
         static float CalculateLevelPenalty(SpellEntry const* spellProto);
         float SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
@@ -1311,6 +1350,8 @@ class WorldObject : public Object
         typedef std::list<ObjectGuid> DynObjectGUIDs;
         DynObjectGUIDs m_dynObjGUIDs;
 
+        uint32 m_procsUpdateTimer = 0;
+        std::vector<ProcSystemArguments> m_pendingProcChecks;
         std::array<Spell*, CURRENT_MAX_SPELL> m_currentSpells{};
         uint32 m_castCounter = 0;                           // count casts chain of triggered spells for prevent infinity cast crashes
     private:

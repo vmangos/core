@@ -2809,15 +2809,27 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
 
 bool Creature::IsInEvadeMode() const
 {
+    if (IsEvadeBecauseTargetNotReachable())
+        return true;
+
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE)
+        return true;
+
     if (IsPet())
         if (Creature const* pOwner = GetOwnerCreature())
             if (pOwner->IsInEvadeMode())
                 return true;
 
-    if (IsEvadeBecauseTargetNotReachable())
-        return true;
+    if (!IsInCombat() && GetMotionMaster()->GetCurrentMovementGeneratorType() == PATROL_MOTION_TYPE)
+    {
+        if (CreatureGroup* pGroup = GetCreatureGroup())
+            if (pGroup->IsFormation() && pGroup->GetLeaderGuid() != GetObjectGuid())
+                if (Creature* pLeader = GetMap()->GetCreature(pGroup->GetLeaderGuid()))
+                    if (pLeader->IsInEvadeMode())
+                        return true;
+    }
 
-    return !i_motionMaster.empty() && i_motionMaster.GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE;
+    return false;
 }
 
 bool Creature::HasSpell(uint32 spellId) const

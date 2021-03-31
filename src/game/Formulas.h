@@ -91,10 +91,11 @@ namespace MaNGOS
             }
             return 0;
         }
-        inline uint32 BaseGain(uint32 pl_level, uint32 mob_level)
+
+        inline uint32 BaseGain(uint32 ownerLevel, uint32 unitLevel, uint32 mob_level)
         {
             uint32 const nBaseExp = 45;
-            return (pl_level * 5 + nBaseExp) * BaseGainLevelFactor(pl_level, mob_level);
+            return (ownerLevel * 5 + nBaseExp) * BaseGainLevelFactor(unitLevel, mob_level);
         }
 
         inline uint32 Gain(Unit* pUnit, Creature* pCreature)
@@ -109,7 +110,27 @@ namespace MaNGOS
             if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
                 return 0;
 
-            float xp_gain = BaseGain(pUnit->GetLevel(), pCreature->GetLevel());
+            
+            uint32 ownerLevel = pUnit->GetLevel();
+            uint32 unitLevel = pUnit->GetLevel();
+            if (pUnit->IsPet())
+            {
+                if (Unit* pOwner = pUnit->GetOwner())
+                {
+                    ownerLevel = pOwner->GetLevel();
+
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // - Hunter pets now gain experience based on the level difference between
+                    //   them and their target rather than the difference between the Hunters
+                    //   and their target.This will make it much easier to level up a low
+                    //   level pet.Keep in mind that the Hunter must still kill creatures
+                    //   from which he / she will gain experience.
+                    if (sWorld.GetWowPatch() < WOW_PATCH_107)
+                        unitLevel = pOwner->GetLevel();
+                }
+            }
+
+            float xp_gain = BaseGain(ownerLevel, unitLevel, pCreature->GetLevel());
             if (!xp_gain)
                 return 0;
 

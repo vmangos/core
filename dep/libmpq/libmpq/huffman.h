@@ -1,7 +1,7 @@
 /*
  *  huffman.h -- structures used for huffman compression.
  *
- *  Copyright (c) 2003-2008 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (c) 2003-2011 Maik Broemme <mbroemme@libmpq.org>
  *
  *  This source was adepted from the C++ version of huffman.h included
  *  in stormlib. The C++ version belongs to the following authors:
@@ -31,9 +31,9 @@
 #define LIBMPQ_HUFF_DECOMPRESS			0		/* we want to decompress using huffman trees. */
 
 /* define pointer conversions. */
-#define PTR_NOT(ptr)				(struct huffman_tree_item_s *)(~(unsigned long long)(ptr))
+#define PTR_NOT(ptr)				(struct huffman_tree_item_s *)(~(unsigned long)(ptr))
 #define PTR_PTR(ptr)				((struct huffman_tree_item_s *)(ptr))
-#define PTR_INT(ptr)				(long long)(ptr)
+#define PTR_INT(ptr)				(long)(ptr)
 
 /* define item handling. */
 #define INSERT_ITEM				1		/* insert item into huffman tree. */

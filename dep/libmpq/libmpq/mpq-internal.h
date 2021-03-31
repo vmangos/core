@@ -2,7 +2,7 @@
  *  mpq-internal.h -- some default types and defines, but only required for
  *                    compilation of the library.
  *
- *  Copyright (c) 2003-2008 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (c) 2003-2011 Maik Broemme <mbroemme@libmpq.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define LIBMPQ_FLAG_COMPRESS_MULTI		0x00000200	/* multiple compressions. */
 #define LIBMPQ_FLAG_COMPRESS_NONE		0x00000300	/* no compression (no blizzard flag used by myself). */
 #define LIBMPQ_FLAG_SINGLE			0x01000000	/* file is stored in one single sector, first seen in world of warcraft. */
-#define LIBMPQ_FLAG_EXTRA			0x04000000	/* compressed block offset table has one extra entry. */
+#define LIBMPQ_FLAG_CRC				0x04000000	/* compressed block offset table has CRC checksum. */
 
 /* define generic hash values. */
 #define LIBMPQ_HASH_FREE			0xFFFFFFFF	/* hash table entry is empty and has always been empty. */

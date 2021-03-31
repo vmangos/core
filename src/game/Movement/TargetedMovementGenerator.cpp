@@ -29,6 +29,7 @@
 #include "Transport.h"
 #include "TemporarySummon.h"
 #include "GameObjectAI.h"
+#include "Geometry.h"
 
 //-----------------------------------------------//
 template<class T, typename D>
@@ -50,15 +51,8 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
     if (isPet)
         transport = i_target.getTarget()->GetTransport();
-    // prevent redundant micro-movement for pets, other followers.
-    if (m_fOffset && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
-    {
-        if (!owner.movespline->Finalized())
-            return;
 
-        owner.GetPosition(x, y, z);
-    }
-    else if (!m_fOffset)
+    if (!m_fOffset)
     {
         if (owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
         {
@@ -71,6 +65,11 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         // NOSTALRIUS: Eviter les collisions entre mobs.
         // Cette fonction prend un angle aleatoire.
         i_target->GetRandomAttackPoint(&owner, x, y, z);
+    }
+    // prevent redundant micro-movement for pets, other followers.
+    else if (!i_target->IsMoving() && owner.movespline->Finalized() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))
+    {
+        owner.GetPosition(x, y, z);
     }
     else
     {
@@ -87,7 +86,17 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             z = srcZ;
         }
         else
-            i_target->GetClosePoint(x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, m_fAngle, &owner);
+        {
+            float o;
+            if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
+                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.time) + 500, x, y, z, o)))
+            {
+                i_target->GetPosition(x, y, z);
+                o = i_target->GetOrientation();
+            }
+            
+            i_target->GetNearPointAroundPosition(&owner, x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, o + m_fAngle);
+        }
 
         if (!i_target->m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && !i_target->IsInWater())
             if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
@@ -106,7 +115,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     path.calculate(x, y, z, petFollowing);
 
     PathType pathType = path.getPathType();
-    m_bReachable = pathType & PATHFIND_NORMAL;
+    m_bReachable = pathType & (PATHFIND_NORMAL | PATHFIND_DEST_FORCED);
     
     if (!petFollowing && pathType == PATHFIND_NOPATH)
         return;    
@@ -158,16 +167,17 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     {
         float dist = path.Length();
         init.SetWalk(false);
-        if (dist > 15.0f)
+        float speedupDistance = m_fOffset * 2.0f + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius();
+        if (dist > speedupDistance)
         {
             Unit* pOwner = owner.GetCharmerOrOwner();
             if (pOwner && !pOwner->IsInCombat() && !owner.IsInCombat())
             {
                 float distFactor = 1.0f;
                 if (pOwner->IsMounted())
-                    distFactor += 0.04 * (dist - 25.0f);
+                    distFactor += 0.04 * (dist - speedupDistance * 2);
                 else
-                    distFactor += 0.04 * (dist - 15.0f);
+                    distFactor += 0.04 * (dist - speedupDistance);
                 if (distFactor < 1.0f) distFactor = 1.0f;
                 if (distFactor > 2.1f) distFactor = 2.1f;
                 init.SetVelocity(distFactor * owner.GetSpeed(MOVE_RUN));
@@ -609,14 +619,17 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     {
         m_checkDistanceTimer.Reset(100);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
-        if (!owner.movespline->Finalized() && i_target->IsWithinDist(&owner, 0.0f) && !m_fOffset)
+        if (!owner.movespline->Finalized() && 
+                 ((!m_fOffset && i_target->IsWithinDist(&owner, 0.0f)) ||
+                 (i_target->IsPlayer() && !i_target->IsMoving() &&
+                 Geometry::GetDistance3D(owner.movespline->FinalDestination(), i_target->GetPosition()) > (m_fOffset + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius() + 0.5f) &&
+                 Geometry::GetDistance3D(owner.GetPosition(), i_target->GetPosition()) <= (m_fOffset + owner.GetObjectBoundingRadius() + i_target->GetObjectBoundingRadius() + 0.5f))))
         {
             owner.movespline->_Interrupt();
             interrupted = true;
         }
         else
         {
-            float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
             bool targetMoved = false;
             G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
             if (Transport* ownerTransport = owner.GetTransport())
@@ -628,13 +641,13 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             }
             else if (m_bTargetOnTransport)
                 targetMoved = true;
+            
+            if (!targetMoved)
+                targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.1f);
 
-            if (!targetMoved)
-                targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
-            // Chase movement may be interrupted
-            if (!targetMoved)
-                if (owner.movespline->Finalized())
-                    targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist - owner.GetObjectBoundingRadius());
+            // Follow movement may be interrupted
+            if (!targetMoved && owner.movespline->Finalized())
+                targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, m_fOffset + i_target->GetObjectBoundingRadius() + 0.5f); 
 
             if (targetMoved)
             {
@@ -661,6 +674,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
     }
     else if (m_bRecalculateTravel)
         owner.GetMotionMaster()->SetNeedAsyncUpdate();
+        
     return true;
 }
 

@@ -43,7 +43,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
-
+#include "Geometry.h"
 #include "ObjectPosSelector.h"
 
 #include "TemporarySummon.h"
@@ -1553,12 +1553,12 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos) con
     return (IsWithinLOS(ox, oy, oz, checkDynLos, targetHeight));
 }
 
-bool WorldObject::IsWithinLOS(float ox, float oy, float oz, bool checkDynLos, float targetHeight) const
+bool WorldObject::IsWithinLOSAtPosition(float ownX, float ownY, float ownZ, float targetX, float targetY, float targetZ, bool checkDynLos, float targetHeight) const
 {
     if (IsInWorld())
     {
         float height = IsUnit() ? ToUnit()->GetCollisionHeight() : 2.f;
-        return GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ() + height, ox, oy, oz + targetHeight, checkDynLos);
+        return GetMap()->isInLineOfSight(ownX, ownY, ownZ + height, targetX, targetY, targetZ + targetHeight, checkDynLos);
     }
 
     return true;
@@ -2300,8 +2300,8 @@ namespace MaNGOS
 class NearUsedPosDo
 {
 public:
-    NearUsedPosDo(WorldObject const& obj, WorldObject const* searcher, float angle, ObjectPosSelector& selector)
-        : i_object(obj), i_searcher(searcher), i_angle(angle), i_selector(selector) {}
+    NearUsedPosDo(WorldObject const& obj, float objX, float objY, WorldObject const* searcher, float angle, ObjectPosSelector& selector)
+        : i_object(obj), i_objectX(objX), i_objectY(objY), i_searcher(searcher), i_angle(angle), i_selector(selector) {}
 
     void operator()(Corpse*) const {}
     void operator()(DynamicObject*) const {}
@@ -2315,7 +2315,7 @@ public:
         float x, y, z;
 
         if (!c->IsAlive() || c->HasUnitState(UNIT_STAT_NOT_MOVE) ||
-                !c->GetMotionMaster()->GetDestination(x, y, z))
+            !c->GetMotionMaster()->GetDestination(x, y, z))
         {
             x = c->GetPositionX();
             y = c->GetPositionY();
@@ -2343,20 +2343,22 @@ public:
     void add(WorldObject* u, float x, float y) const
     {
         // u is too nearest/far away to i_object
-        if (!i_object.IsInRange2d(x, y, i_selector.m_dist - i_selector.m_size, i_selector.m_dist + i_selector.m_size))
+        if (!Geometry::IsInRange2D(i_objectX, i_objectY, x, y, i_selector.m_dist - i_selector.m_size + i_object.GetObjectBoundingRadius(), i_selector.m_dist + i_selector.m_size + i_object.GetObjectBoundingRadius()))
             return;
 
-        float angle = i_object.GetAngle(u) - i_angle;
+        float angle = Geometry::GetAngle(i_objectX, i_objectY, u->GetPositionX(), u->GetPositionY()) - i_angle;
 
         // move angle to range -pi ... +pi
         angle = MapManager::NormalizeOrientation(angle);
 
         // dist include size of u
-        float dist2d = i_object.GetDistance2d(x, y);
+        float dist2d = std::max(Geometry::GetDistance2D(i_objectX, i_objectY, x, y) - i_object.GetObjectBoundingRadius(), 0.0f);
         i_selector.AddUsedPos(u->GetObjectBoundingRadius(), angle, dist2d + i_object.GetObjectBoundingRadius());
     }
 private:
     WorldObject const& i_object;
+    float i_objectX;
+    float i_objectY;
     WorldObject const* i_searcher;
     float              i_angle;
     ObjectPosSelector& i_selector;
@@ -2365,21 +2367,29 @@ private:
 
 //===================================================================================================
 
-void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2DAroundPosition(float ownX, float ownY, float &x, float &y, float distance2d, float absAngle) const
 {
-    x = GetPositionX() + (GetObjectBoundingRadius() + distance2d) * cos(absAngle);
-    y = GetPositionY() + (GetObjectBoundingRadius() + distance2d) * sin(absAngle);
+    x = ownX + (GetObjectBoundingRadius() + distance2d) * cos(absAngle);
+    y = ownY + (GetObjectBoundingRadius() + distance2d) * sin(absAngle);
 
     MaNGOS::NormalizeMapCoord(x);
     MaNGOS::NormalizeMapCoord(y);
 }
 
+
 void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const
 {
     GetPosition(x, y, z);
+    GetNearPointAroundPosition(searcher, x, y, z, searcher_bounding_radius, distance2d, absAngle);
+}
 
-    GetNearPoint2D(x, y, distance2d + searcher_bounding_radius, absAngle);
-    z = GetPositionZ();
+void WorldObject::GetNearPointAroundPosition(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const
+{
+    float startX = x;
+    float startY = y;
+    float startZ = z;
+
+    GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d + searcher_bounding_radius, absAngle);
 
     // if detection disabled, return first point
     if (!sWorld.getConfig(CONFIG_BOOL_DETECT_POS_COLLISION))
@@ -2396,12 +2406,12 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     float first_y = y;
     bool first_los_conflict = false;                        // first point LOS problems
 
-    // prepare selector for work
-    ObjectPosSelector selector(GetPositionX(), GetPositionY(), GetObjectBoundingRadius(), distance2d + searcher_bounding_radius);
+                                                            // prepare selector for work
+    ObjectPosSelector selector(startX, startY, GetObjectBoundingRadius(), distance2d + searcher_bounding_radius);
 
     // adding used positions around object
     {
-        MaNGOS::NearUsedPosDo u_do(*this, searcher, absAngle, selector);
+        MaNGOS::NearUsedPosDo u_do(*this, startX, startY, searcher, absAngle, selector);
         MaNGOS::WorldObjectWorker<MaNGOS::NearUsedPosDo> worker(u_do);
 
         Cell::VisitAllObjects(this, worker, distance2d);
@@ -2415,7 +2425,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
         else
             UpdateGroundPositionZ(x, y, z);
 
-        if (IsWithinLOS(x, y, z))
+        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
 
         first_los_conflict = true;                          // first point have LOS problems
@@ -2423,18 +2433,18 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
 
     float angle;                                            // candidate of angle for free pos
 
-    // special case when one from list empty and then empty side preferred
+                                                            // special case when one from list empty and then empty side preferred
     if (selector.FirstAngle(angle))
     {
-        GetNearPoint2D(x, y, distance2d, absAngle + angle);
-        z = GetPositionZ();
+        GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
+        z = startZ;
 
         if (searcher)
             searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
         else
             UpdateGroundPositionZ(x, y, z);
 
-        if (IsWithinLOS(x, y, z))
+        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
     }
 
@@ -2444,15 +2454,15 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     // select in positions after current nodes (selection one by one)
     while (selector.NextAngle(angle))                       // angle for free pos
     {
-        GetNearPoint2D(x, y, distance2d, absAngle + angle);
-        z = GetPositionZ();
+        GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
+        z = startZ;
 
         if (searcher)
             searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
         else
             UpdateGroundPositionZ(x, y, z);
 
-        if (IsWithinLOS(x, y, z))
+        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
     }
 
@@ -2477,15 +2487,15 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     {
         if (!selector.FirstAngle(angle))                    // _used_ pos
         {
-            GetNearPoint2D(x, y, distance2d, absAngle + angle);
-            z = GetPositionZ();
+            GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
+            z = startZ;
 
             if (searcher)
                 searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
             else
                 UpdateGroundPositionZ(x, y, z);
 
-            if (IsWithinLOS(x, y, z))
+            if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
                 return;
         }
     }
@@ -2496,15 +2506,15 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     // select in positions after current nodes (selection one by one)
     while (selector.NextUsedAngle(angle))                   // angle for used pos but maybe without LOS problem
     {
-        GetNearPoint2D(x, y, distance2d, absAngle + angle);
-        z = GetPositionZ();
+        GetNearPoint2DAroundPosition(startX, startY, x, y, distance2d, absAngle + angle);
+        z = startZ;
 
         if (searcher)
             searcher->UpdateAllowedPositionZ(x, y, z);      // update to LOS height if available
         else
             UpdateGroundPositionZ(x, y, z);
 
-        if (IsWithinLOS(x, y, z))
+        if (IsWithinLOSAtPosition(startX, startY, startZ, x, y, z))
             return;
     }
 
@@ -3536,7 +3546,7 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-            ProcDamageAndSpell(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, spell);
+            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, spell));
             return SPELL_MISS_REFLECT;
         }
     }
@@ -3554,35 +3564,100 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     return SPELL_MISS_NONE;
 }
 
-void WorldObject::ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const* procSpell, Spell* spell)
+ProcSystemArguments::ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_,
+    SpellEntry const* procSpell_, Spell const* spell)
+    : pVictim(pVictim_), procFlagsAttacker(procFlagsAttacker_), procFlagsVictim(procFlagsVictim_), procExtra(procExtra_), amount(amount_),
+    attType(attType_), procSpell(procSpell_), isSpellTriggeredByAura(spell && spell->IsTriggeredByAura())
 {
-    if ((pVictim && !IsInMap(pVictim)) || !IsInWorld())
+    if (spell)
+        appliedSpellModifiers = spell->m_appliedMods;
+
+    if (pVictim_)
+        victimGuid = pVictim_->GetObjectGuid();
+}
+
+void WorldObject::UpdatePendingProcs(uint32 diff)
+{
+    if (sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) && IsInWorld())
+    {
+        if (m_procsUpdateTimer < diff)
+        {
+            m_procsUpdateTimer = sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY);
+            if (!m_pendingProcChecks.empty())
+            {
+                std::vector<ProcSystemArguments> procData = std::move(m_pendingProcChecks);
+                m_pendingProcChecks.clear();
+                for (auto& proc : procData)
+                    ProcDamageAndSpell_delayed(proc);
+            }
+        }
+        else
+            m_procsUpdateTimer -= diff;
+    }
+}
+
+void WorldObject::ProcDamageAndSpell(ProcSystemArguments&& data)
+{
+    if ((data.pVictim && !IsInMap(data.pVictim)) || !IsInWorld())
         return;
 
+    if (data.procFlagsAttacker)
+        if (Unit* pUnit = ToUnit())
+            pUnit->ProcSkillsAndReactives(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType);
+
+    if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
+        data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
+
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
+        ProcDamageAndSpell_real(data);
+    else
+        m_pendingProcChecks.emplace_back(std::move(data));
+}
+
+void WorldObject::ProcDamageAndSpell_delayed(ProcSystemArguments& data)
+{
+    if (data.pVictim)
+    {
+        data.pVictim = GetMap()->GetUnit(data.victimGuid);
+        if (!data.pVictim)
+            return;
+    }
+
+    ProcDamageAndSpell_real(data);
+}
+
+void WorldObject::ProcDamageAndSpell_real(ProcSystemArguments& data)
+{
     ProcTriggeredList procTriggered;
 
     // Not much to do if no flags are set.
-    if (procAttacker)
+    if (data.procFlagsAttacker)
         if (Unit* pUnit = ToUnit())
-            pUnit->ProcDamageAndSpellFor(false, pVictim, procAttacker, procExtra, attType, procSpell, amount, procTriggered, spell);
+            pUnit->ProcDamageAndSpellFor(false, data.pVictim, data.procFlagsAttacker, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    if (pVictim && pVictim->IsAlive() && procVictim)
-
+    if (data.pVictim && data.pVictim->IsAlive() && data.procFlagsVictim)
+    {
         // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
         // "Charges will not generate off auto attacks or npc attacks by trying"
         // "to sit down and force a crit. However, ability crits from physical"
         // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
         // "etc will generate a charge if you're sitting."
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : pVictim, procVictim, !procSpell && !pVictim->IsStandingUpForProc() ? procExtra & ~PROC_EX_CRITICAL_HIT : procExtra, attType, procSpell, amount, procTriggered, spell);
+        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, !data.procSpell && !data.pVictim->IsStandingUp() ? data.procExtra & ~PROC_EX_CRITICAL_HIT : data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
 #else
-        pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : pVictim, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
+        data.pVictim->ProcDamageAndSpellFor(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType, data.procSpell, data.amount, procTriggered, data.appliedSpellModifiers, data.isSpellTriggeredByAura);
 #endif
+    
+        // Standing up on damage taken must happen after proc checks.
+        if (Player* pVictimPlayer = data.pVictim->ToPlayer())
+            if (pVictimPlayer->IsStandUpScheduled())
+                pVictimPlayer->SetStandState(UNIT_STAND_STATE_STAND);
+    }
 
     if (Unit* pUnit = ToUnit())
-        pUnit->HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
+        pUnit->HandleTriggers(data.pVictim, data.procExtra, data.amount, data.procSpell, procTriggered);
 }
 
 // Melee based spells can be miss, parry or dodge on this step
@@ -4669,7 +4744,7 @@ int32 WorldObject::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     return DoneAdvertisedBenefit;
 }
 
-float WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, float total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell) const
+float WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, float total, float benefit, float ap_benefit,  DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell) const
 {
     // Distribute Damage over multiple effects, reduce by AoE
     float coeff = 0.0f;
@@ -4972,7 +5047,7 @@ bool WorldObject::IsNonMeleeSpellCasted(bool withDelayed, bool skipChanneled, bo
 
 bool WorldObject::IsNextSwingSpellCasted() const
 {
-    if (m_currentSpells[CURRENT_MELEE_SPELL] && m_currentSpells[CURRENT_MELEE_SPELL]->IsNextMeleeSwingSpell())
+    if (m_currentSpells[CURRENT_MELEE_SPELL] && m_currentSpells[CURRENT_MELEE_SPELL]->m_spellInfo->IsNextMeleeSwingSpell())
         return (true);
 
     return (false);
@@ -4999,7 +5074,7 @@ void WorldObject::InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except)
     for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
         if (Spell* spell = GetCurrentSpell(CurrentSpellTypes(i)))
             if (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime())
-                if (!spell->IsNextMeleeSwingSpell() && !spell->IsAutoRepeat() && !spell->IsTriggered() && (spell->m_spellInfo->InterruptFlags & flags) && spell->m_spellInfo->Id != except)
+                if (!spell->m_spellInfo->IsNextMeleeSwingSpell() && !spell->IsAutoRepeat() && !spell->IsTriggered() && (spell->m_spellInfo->InterruptFlags & flags) && spell->m_spellInfo->Id != except)
                     InterruptSpell(CurrentSpellTypes(i));
 }
 

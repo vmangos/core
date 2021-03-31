@@ -86,9 +86,14 @@ class WaypointMovementGenerator<Creature>
         uint32 getLastReachedWaypoint() const { return m_lastReachedWaypoint; }
         void GetPathInformation(WaypointPathOrigin& wpOrigin) const { wpOrigin = m_PathOrigin; }
         void GetPathInformation(std::ostringstream& oss) const;
-
-        void AddToWaypointPauseTime(int32 waitTimeDiff);
         bool SetNextWaypoint(uint32 pointId);
+
+        void AddPauseTime(int32 waitTimeDiff)
+        {
+            if (i_nextMoveTime.GetExpiry() < waitTimeDiff)
+                i_nextMoveTime.Reset(waitTimeDiff);
+        }
+        
     protected:
         void LoadPath(uint32 guid, uint32 entry, WaypointPathOrigin wpOrigin);
         void Stop(int32 time) { i_nextMoveTime.Reset(time);}
