@@ -565,3 +565,8 @@ void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= fals
         out[j++] = strtoul(buffer, nullptr, 16);
     }
 }
+
+uint32 dither(float v)
+{
+    return std::floor(v + frand(0,1));
+}

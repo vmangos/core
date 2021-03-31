@@ -550,6 +550,19 @@ void Spell::FillTargetMap()
                                         ++itr;
                                 }
                                 break;
+                            case 25676:                                         // Drain Mana
+                            case 25754:
+                            case 26457:
+                            case 26559:
+                                // Avoid targeting players with no mana
+                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
+                                {
+                                    if ((*itr)->GetPowerType() != POWER_MANA || (*itr)->GetPowerPercent(POWER_MANA) < 1.0f)
+                                        itr = tmpUnitMap.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+                                break;
                             case 27831:
                                 // Shadow Bolt volley which should only target players with the Shadow Mark debuff
                                 for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
@@ -2067,6 +2080,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 //case 28560:                                 // Summon Blizzard (Naxx, Sapphiron)
                     unMaxTargets = 1;
                     break;
+                case 25676:                                 // Drain Mana
+                case 25754:
+                    unMaxTargets = 6;
+                    break;
+                case 26457:                                 // Drain Mana
+                case 26559:
+                    unMaxTargets = 12;
+                    break;
                 case 10258:                                 // Awaken Vault Warder (Uldaman)
                     unMaxTargets = 2;
                     break;
@@ -3062,6 +3083,15 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                 float x, y, z;
                 m_caster->GetNearPoint(m_caster, x, y, z, 0.0f, radius, angle);
+
+                // Hacky fix in case we are inside a cave, because GetNearPoint will update Z to above the cave.
+                // Example case: trap for gobject 178325, spell 21078
+                if ((m_caster->GetDistance(x, y, z) > radius * 2) &&
+                    !m_caster->IsWithinLOS(x, y, z, false))
+                {
+                    m_caster->GetPosition(x, y, z);
+                    m_caster->GetNearPoint2D(x, y, radius, angle);
+                }
 
                 // For some reason all the creature Blink spells use this target type instead of the player one.
                 // Prevent them from teleporting to places that they can't normally walk to like under the map.
@@ -6554,10 +6584,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     {
                         if (m_caster->GetMap() != target->GetMap())
                             return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
-                        if (mapEntry->levelMin > target->GetLevel())
-                            return SPELL_FAILED_LOWLEVEL;
-                        if (mapEntry->levelMax && mapEntry->levelMax < target->GetLevel())
-                            return SPELL_FAILED_HIGHLEVEL;
                     }
                     else if (m_caster->ToPlayer()->InBattleGround())
                         return SPELL_FAILED_NOT_HERE;
@@ -6583,10 +6609,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     if (m_caster->GetMap() != target->GetMap())
                         return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
-                    if (mapEntry->levelMin > target->GetLevel())
-                        return SPELL_FAILED_LOWLEVEL;
-                    if (mapEntry->levelMax && mapEntry->levelMax < target->GetLevel())
-                        return SPELL_FAILED_HIGHLEVEL;
                 }
                 else if (m_caster->ToPlayer()->InBattleGround())
                     return SPELL_FAILED_NOT_HERE;
@@ -7703,7 +7725,7 @@ SpellCastResult Spell::CheckItems()
         {
             case SPELL_EFFECT_CREATE_ITEM:
             {
-                if (i == EFFECT_INDEX_0)
+                if (!m_IsTriggeredSpell && i == EFFECT_INDEX_0)
                 {
                     if (Unit* target = m_targets.getUnitTarget())
                     {

@@ -35,7 +35,7 @@ Generator command line args
 
                                     false: skip battlegrounds (default)
 
---debugOutput       [true|false]    create debugging files for use with RecastDemo
+--debugOutput       [true|false]    create debugging files for use with RecastDemo and Wavefront obj files of the navmesh
                                     if you are only creating mmaps for use with MaNGOS,
                                     you don't want debugging files
 
@@ -48,7 +48,9 @@ Generator command line args
 
                     [#]             Build only the map specified by #
                                     this command will build the map regardless of --skip* option settings
-                                    if you do not specify a map number, builds all maps that pass the filters specified by --skip* options
+
+                                    If you do not specify a map number, builds all maps that pass the filters specified by --skip* options
+                                    Maps that only consists of a wmo and no terrain will not be built unless specified with ID. Ex. Ragefire Chasm
 
 
 examples:

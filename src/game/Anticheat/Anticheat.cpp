@@ -52,7 +52,6 @@ MovementAnticheat* AnticheatManager::CreateAnticheatFor(Player* player)
 {
     MovementAnticheat* cd = new MovementAnticheat(player);
     cd->Init();
-    cd->InitSpeeds(player);
     return cd;
 }
 

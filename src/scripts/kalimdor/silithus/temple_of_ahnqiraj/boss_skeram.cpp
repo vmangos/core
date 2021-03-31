@@ -67,6 +67,7 @@ struct boss_skeramAI : public ScriptedAI
     }
 
     ScriptedInstance* m_pInstance;
+    uint32 m_maxMeleeAllowed;
 
     uint32 ArcaneExplosion_Timer;
     uint32 EarthShock_Timer;
@@ -83,7 +84,7 @@ struct boss_skeramAI : public ScriptedAI
     void Reset() override
     {
         ArcaneExplosion_Timer = urand(6000, 8000);
-        EarthShock_Timer = 1000;
+        EarthShock_Timer = 2000;
         FullFillment_Timer = urand(10000, 15000);
         Blink_Timer = urand(15000, 20000);
 
@@ -171,6 +172,14 @@ struct boss_skeramAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SKERAM, IN_PROGRESS);
+
+        // Prophet Skeram will only cast Arcane Explosion if a given number of players are in melee range
+        // Initial value was 4+ but it was changed in patch 1.12 to be less dependant on raid
+        // We assume value is number of players / 10 (raid of 40 people in Classic -> value of 4)
+        if (sWorld.GetWowPatch() >= WOW_PATCH_112)
+            m_maxMeleeAllowed = m_pInstance->GetMap()->GetPlayersCountExceptGMs() / 10;
+        else
+            m_maxMeleeAllowed = 4;
     }
 
     void JustReachedHome() override
@@ -200,15 +209,19 @@ struct boss_skeramAI : public ScriptedAI
             std::list<Player*> players;
             GetPlayersWithinRange(players, m_creature->GetMeleeReach());
 
-            if (players.size() > 4)
+            if (players.size() > m_maxMeleeAllowed)
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
                     ArcaneExplosion_Timer = urand(6000, 14000);
             }
+            // Recheck in 1 second
+            else
+                ArcaneExplosion_Timer = 1000;
         }
-        else ArcaneExplosion_Timer -= diff;
+        else
+            ArcaneExplosion_Timer -= diff;
 
-        //If we are within range, melee the target
+        // If we are within range, melee the target
         if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             DoMeleeAttackIfReady();
         else
@@ -217,7 +230,7 @@ struct boss_skeramAI : public ScriptedAI
             if (EarthShock_Timer < diff)
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
-                    EarthShock_Timer = 1000;
+                    EarthShock_Timer = 2000;
             }
             else
                 EarthShock_Timer -= diff;
@@ -272,19 +285,22 @@ struct boss_skeramAI : public ScriptedAI
         if (boss_skeramAI* imageAI = dynamic_cast<boss_skeramAI*>(skeramImage->AI()))
             imageAI->IsImage = true;
 
-        float skeramPercent = m_creature->GetHealthPercent()/100.0f;
+        float healthPct = m_creature->GetHealthPercent();
+        float maxHealthPct;
 
-        // Set health to look like the True Prophet. Will have 12.5%, 15% and 17.5% of max Skeram HP.
-        float percent = 0.2 * (1 - skeramPercent) + 0.1 * skeramPercent;
-        float maxHealth = m_creature->GetMaxHealth() * percent / skeramPercent;
+        // The max health depends on the split phase. It's percent * original boss health
+        if (healthPct < 25.0f)
+            maxHealthPct = 0.50f;
+        else if (healthPct < 50.0f)
+            maxHealthPct = 0.20f;
+        else
+            maxHealthPct = 0.10f;
 
-        skeramImage->SetMaxHealth(maxHealth);
-        skeramImage->SetHealthPercent(skeramPercent*100.0f);
+        // Set the same health percent as the original boss
+        skeramImage->SetMaxHealth(skeramImage->GetMaxHealth() * maxHealthPct);;
+        skeramImage->SetHealthPercent(healthPct);
         skeramImage->SetInCombatWithZone();
         skeramImage->SetVisibility(VISIBILITY_OFF);
-
-        // Set illusion mana to be the same as the real one
-        skeramImage->SetPower(POWER_MANA, m_creature->GetPower(POWER_MANA));
 
         if (!ImageA)
             ImageA = skeramImage;
@@ -348,6 +364,8 @@ struct boss_skeramAI : public ScriptedAI
         }
 
         DoResetThreat();
+        // Reset Earthshock timer on blink.
+        static_cast<boss_skeramAI*>(caster->AI())->EarthShock_Timer = 2000;
         caster->SetVisibility(VISIBILITY_ON);
     }
 

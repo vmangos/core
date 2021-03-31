@@ -87,9 +87,19 @@ VisibleNotifier::Notify()
     std::unique_lock<std::shared_timed_mutex> lock(player.m_visibleGUIDs_lock);
     for (ObjectGuidSet::iterator itr = i_clientGUIDs.begin(); itr != i_clientGUIDs.end(); ++itr)
     {
-        if (Player* targetPlayer = player.GetMap()->GetPlayer(*itr))
-            if (targetPlayer->m_broadcaster)
-                targetPlayer->m_broadcaster->RemoveListener(&player);
+        if ((*itr).IsPlayer())
+        {
+            if (Player* targetPlayer = player.GetMap()->GetPlayer(*itr))
+                if (targetPlayer->m_broadcaster)
+                    targetPlayer->m_broadcaster->RemoveListener(&player);
+        }
+        else if ((*itr).IsCreature() && player.IsInCombat() && !player.GetMap()->IsDungeon())
+        {
+            // Make sure mobs who become out of range leave combat before grid unload.
+            if (Creature* targetCreature = player.GetMap()->GetCreature(*itr))
+                if (targetCreature->IsInCombat())
+                    targetCreature->GetThreatManager().modifyThreatPercent(&player, -101);
+        }
 
         player.m_visibleGUIDs.erase(*itr);
 

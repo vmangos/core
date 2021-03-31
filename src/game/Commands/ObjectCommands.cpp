@@ -399,6 +399,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     {
         SendSysMessage(LANG_NO_FREE_STATIC_GUID_FOR_SPAWN);
         SetSentErrorMessage(true);
+        delete pGameObj;
         return false;
     }
 
@@ -745,6 +746,64 @@ bool ChatHandler::HandleGameObjectSendCustomAnimCommand(char* args)
 
     pGameObject->SendGameObjectCustomAnim(uiAnim);
     PSendSysMessage("Playing custom anim %u for %s (GUID %u).", uiAnim, pGameObject->GetName(), pGameObject->GetGUIDLow());
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectSendSpawnAnimCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pGameObject->SendObjectSpawnAnim();
+    PSendSysMessage("Playing spawn anim for %s (GUID %u).", pGameObject->GetName(), pGameObject->GetGUIDLow());
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectSendDespawnAnimCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pGameObject->SendObjectDeSpawnAnim();
+    PSendSysMessage("Playing despawn anim for %s (GUID %u).", pGameObject->GetName(), pGameObject->GetGUIDLow());
 
     return true;
 }

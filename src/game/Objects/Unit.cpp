@@ -2910,6 +2910,126 @@ bool Unit::IsUnderWater() const
     return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
+float Unit::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
+{
+    float speed = 0.0f;
+    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
+        speed = GetSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_SWIM_BACK : MOVE_SWIM);
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
+        speed = GetSpeed(MOVE_WALK);
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        speed = GetSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN);
+
+    return speed;
+}
+
+namespace Movement
+{
+    extern float computeFallElevation(float time, bool safeFall, float initialSpeed);
+}
+
+bool Unit::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &outOrientation) const
+{
+    // Not currently handled cases.
+    if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_FALLINGFAR | MOVEFLAG_ONTRANSPORT)) ||
+        !movespline->Finalized() || (mi.ctime == 0) || !IsMovedByPlayer())
+        return false;
+
+    x = mi.pos.x;
+    y = mi.pos.y;
+    z = mi.pos.z;
+    outOrientation = mi.pos.o;
+    float o = outOrientation;
+
+    if (mi.moveFlags & MOVEFLAG_ROOT)
+        return true;
+
+    float speed = GetSpeedForMovementInfo(mi);
+
+    if (mi.moveFlags & MOVEFLAG_BACKWARD)
+        o += M_PI_F;
+    else if (mi.moveFlags & MOVEFLAG_STRAFE_LEFT)
+    {
+        if (mi.moveFlags & MOVEFLAG_FORWARD)
+            o += M_PI_F / 4;
+        else
+            o += M_PI_F / 2;
+    }
+    else if (mi.moveFlags & MOVEFLAG_STRAFE_RIGHT)
+    {
+        if (mi.moveFlags & MOVEFLAG_FORWARD)
+            o -= M_PI_F / 4;
+        else
+            o -= M_PI_F / 2;
+    }
+    if (mi.moveFlags & MOVEFLAG_JUMPING)
+    {
+        float diffT = WorldTimer::getMSTimeDiff(mi.jump.startClientTime, diffMs + mi.ctime) / 1000.0f;
+        x = mi.jump.start.x;
+        y = mi.jump.start.y;
+        z = mi.jump.start.z;
+        // Fatal error. Avoid crashing here ...
+        if (!x || !y || !z || diffT > 10000.0f)
+            return false;
+        x += mi.jump.cosAngle * mi.jump.xyspeed * diffT;
+        y += mi.jump.sinAngle * mi.jump.xyspeed * diffT;
+        z -= Movement::computeFallElevation(diffT, mi.moveFlags & MOVEFLAG_SAFE_FALL, -m_jumpInitialSpeed);
+    }
+    else if (mi.moveFlags & (MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT))
+    {
+        if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
+        {
+            // Every 2 sec
+            float T = 0.75f * (GetSpeed(MOVE_TURN_RATE)) * (diffMs / 1000.0f);
+            float R = 1.295f * speed / M_PI * cos(mi.s_pitch);
+            z += diffMs * speed / 1000.0f * sin(mi.s_pitch);
+            // Find the center of the circle we are moving on
+            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
+            {
+                x += R * cos(o + M_PI / 2);
+                y += R * sin(o + M_PI / 2);
+                outOrientation += T;
+                T = T - M_PI / 2.0f;
+            }
+            else
+            {
+                x += R * cos(o - M_PI / 2);
+                y += R * sin(o - M_PI / 2);
+                outOrientation -= T;
+                T = -T + M_PI / 2.0f;
+            }
+            x += R * cos(o + T);
+            y += R * sin(o + T);
+        }
+        else
+        {
+            float diffO = GetSpeed(MOVE_TURN_RATE) * diffMs / 1000.0f;
+            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
+                outOrientation += diffO;
+            else
+                outOrientation -= diffO;
+            return true;
+        }
+    }
+    else if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
+    {
+        float dist = speed * diffMs / 1000.0f;
+        x += dist * cos(o) * cos(mi.s_pitch);
+        y += dist * sin(o) * cos(mi.s_pitch);
+        z += dist * sin(mi.s_pitch);
+    }
+    else // If we reach here, we did not move
+        return true;
+
+    if (!MaNGOS::IsValidMapCoord(x, y, z, o))
+        return false;
+
+    if (!(mi.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING)))
+        z = GetMap()->GetHeight(x, y, z);
+
+    return GetMap()->isInLineOfSight(mi.pos.x, mi.pos.y, mi.pos.z + 0.5f, x, y, z + 0.5f);
+}
+
 void Unit::DeMorph()
 {
     SetDisplayId(GetNativeDisplayId());
@@ -6134,67 +6254,82 @@ void Unit::CheckPendingMovementChanges()
     if (!HasPendingMovementChange())
         return;
 
+    Player* pPlayer = ToPlayer();
+    if (pPlayer && pPlayer->IsBeingTeleportedFar())
+            return;
+    
     Player* pController = GetPlayerMovingMe();
-    if (!pController || !pController->IsInWorld() || pController->IsBeingTeleportedFar())
+    if (!pController || !pController->IsInWorld() || !pController->GetSession()->IsConnected())
     {
-        if (ResolvePendingMovementChanges() && pController != this)
-            SendHeartBeat(true);
+        ResolvePendingMovementChanges(true, pPlayer != nullptr);
         return;
     }
 
-    PlayerMovementPendingChange& oldestChangeToAck = m_pendingMovementChanges.front();
-    if (WorldTimer::getMSTime() > oldestChangeToAck.time + sWorld.getConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME))
+    PlayerMovementPendingChange& oldestChange = m_pendingMovementChanges.front();
+    uint32 waitTimeMultiplier = pPlayer && pPlayer->IsBeingTeleported() || pController->IsBeingTeleported() ? 5 : 1;
+    if (WorldTimer::getMSTime() > oldestChange.time + sWorld.getConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME) * waitTimeMultiplier)
     {
-        // There is a new change for the same thing, don't resend old state.
-        if (oldestChangeToAck.movementCounter < GetLastCounterForMovementChangeType(oldestChangeToAck.movementChangeType))
+        // This shouldn't really happen but handle it anyway.
+        if (oldestChange.movementChangeType == INVALID)
         {
             PopPendingMovementChange();
             return;
         }
 
-        // Not resendable change.
-        if (oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == TELEPORT || oldestChangeToAck.movementChangeType == KNOCK_BACK)
+        // There is a new change for the same thing, don't resend old state.
+        if ((oldestChange.movementCounter < GetLastCounterForMovementChangeType(oldestChange.movementChangeType)))
         {
-            pController->GetCheatData()->OnFailedToAckChange();
             PopPendingMovementChange();
             return;
         }
 
         // Previous controller didn't ack a movement change. Not our fault.
-        if (oldestChangeToAck.controller != pController->GetObjectGuid())
+        if (oldestChange.controller != pController->GetObjectGuid())
         {
-            bool const needHeartBeat = ResolvePendingMovementChange(oldestChangeToAck);
+            ResolvePendingMovementChange(oldestChange, true);
             PopPendingMovementChange();
-            if (needHeartBeat)
-                SendHeartBeat(true);
             return;
         }
 
-        if (oldestChangeToAck.resent)
+        // Always resolve teleport, but don't apply penalty.
+        if (oldestChange.movementChangeType == TELEPORT)
+        {
+            ResolvePendingMovementChange(oldestChange, true);
+            PopPendingMovementChange();
+            return;
+        }
+
+        // Not resendable change.
+        if (oldestChange.movementChangeType == KNOCK_BACK)
+        {
+            pController->GetCheatData()->OnFailedToAckChange();
+            PopPendingMovementChange();
+            return;
+        }
+
+        if (oldestChange.resent)
         {
             // Change was resent but still no reply. Enforce the flags.
             pController->GetCheatData()->OnFailedToAckChange();
-            bool const needHeartBeat = ResolvePendingMovementChange(oldestChangeToAck);
+            ResolvePendingMovementChange(oldestChange, true);
             PopPendingMovementChange();
-            if (needHeartBeat)
-                SendHeartBeat(true);
         }
         else
         {
             // Send the change a second time and wait for reply.
-            oldestChangeToAck.resent = true;
-            oldestChangeToAck.time = WorldTimer::getMSTime();
+            oldestChange.resent = true;
+            oldestChange.time = WorldTimer::getMSTime();
 
-            if (oldestChangeToAck.movementCounter < GetMovementCounter())
-                oldestChangeToAck.movementCounter = GetMovementCounterAndInc();
+            if (oldestChange.movementCounter < GetMovementCounter())
+                oldestChange.movementCounter = GetMovementCounterAndInc();
 
-            switch (oldestChangeToAck.movementChangeType)
+            switch (oldestChange.movementChangeType)
             {
                 case ROOT:
                 case WATER_WALK:
                 case SET_HOVER:
                 case FEATHER_FALL:
-                    MovementPacketSender::SendMovementFlagChangeToController(this, pController, oldestChangeToAck);
+                    MovementPacketSender::SendMovementFlagChangeToController(this, pController, oldestChange);
                     return;
                 case SPEED_CHANGE_WALK:
                 case SPEED_CHANGE_RUN:
@@ -6202,7 +6337,10 @@ void Unit::CheckPendingMovementChanges()
                 case SPEED_CHANGE_SWIM:
                 case SPEED_CHANGE_SWIM_BACK:
                 case RATE_CHANGE_TURN:
-                    MovementPacketSender::SendSpeedChangeToController(this, pController, oldestChangeToAck);
+                    MovementPacketSender::SendSpeedChangeToController(this, pController, oldestChange);
+                    return;
+                default:
+                    sLog.outError("Unit::CheckPendingMovementChange - Unhandled resendable movement change type %u", oldestChange.movementChangeType);
                     return;
             }
         }
@@ -6231,20 +6369,19 @@ bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
     }) != m_pendingMovementChanges.end();
 }
 
-bool Unit::ResolvePendingMovementChanges()
+void Unit::ResolvePendingMovementChanges(bool sendToClient, bool includingTeleport)
 {
-    bool needHeartBeat = false;
     while (!m_pendingMovementChanges.empty())
     {
         auto change = m_pendingMovementChanges.begin();
-        if (ResolvePendingMovementChange(*change))
-            needHeartBeat = true;
+        if ((change->movementChangeType != TELEPORT || includingTeleport) &&
+            change->movementCounter == GetLastCounterForMovementChangeType(change->movementChangeType))
+            ResolvePendingMovementChange(*change, sendToClient);
         m_pendingMovementChanges.erase(change);
     }
-    return needHeartBeat;
 }
 
-bool Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change)
+void Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change, bool sendToClient)
 {
     // returns true if heartbeat required
     switch (change.movementChangeType)
@@ -6253,42 +6390,65 @@ bool Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change)
             if (change.apply)
                 RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
             SetRootedReal(change.apply);
-            return true;
+            if (sendToClient)
+                MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_ROOT, change.apply);
+            break;
         case WATER_WALK:
             SetWaterWalkingReal(change.apply);
-            return true;
+            if (sendToClient)
+                MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_WATERWALKING, change.apply);
+            break;
         case SET_HOVER:
             SetHoverReal(change.apply);
-            return true;
+            if (sendToClient)
+                MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_HOVER, change.apply);
+            break;
         case FEATHER_FALL:
             SetFeatherFallReal(change.apply);
-            return true;
+            if (sendToClient)
+                MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_SAFE_FALL, change.apply);
+            break;
         case SPEED_CHANGE_WALK:
-            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_WALK, change.newValue / baseMoveSpeed[MOVE_WALK]);
             SetSpeedRateReal(MOVE_WALK, change.newValue / baseMoveSpeed[MOVE_WALK]);
-            return false;
+            if (sendToClient)
+                MovementPacketSender::SendSpeedChangeToAll(this, MOVE_WALK, change.newValue / baseMoveSpeed[MOVE_WALK]);
+            break;
         case SPEED_CHANGE_RUN:
-            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
             SetSpeedRateReal(MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
-            return false;;
-        case SPEED_CHANGE_RUN_BACK:
-            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
+            if (sendToClient)
+                MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
+            break;
+        case SPEED_CHANGE_RUN_BACK: 
             SetSpeedRateReal(MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
-            return false;;
+            if (sendToClient)
+                MovementPacketSender::SendSpeedChangeToAll(this, MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
+            break;
         case SPEED_CHANGE_SWIM:
-            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_SWIM, change.newValue / baseMoveSpeed[MOVE_SWIM]);
             SetSpeedRateReal(MOVE_SWIM, change.newValue / baseMoveSpeed[MOVE_SWIM]);
-            return false;;
+            if (sendToClient)
+                MovementPacketSender::SendSpeedChangeToAll(this, MOVE_SWIM, change.newValue / baseMoveSpeed[MOVE_SWIM]);
+            break;
         case SPEED_CHANGE_SWIM_BACK:
-            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_SWIM_BACK, change.newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
             SetSpeedRateReal(MOVE_SWIM_BACK, change.newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
-            return false;;
+            if (sendToClient)
+                MovementPacketSender::SendSpeedChangeToAll(this, MOVE_SWIM_BACK, change.newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
+            break;
         case RATE_CHANGE_TURN:
-            MovementPacketSender::SendSpeedChangeToAll(this, MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
             SetSpeedRateReal(MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
-            return false;;
+            if (sendToClient)
+                MovementPacketSender::SendSpeedChangeToAll(this, MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
+            break;
+        case TELEPORT:
+            if (Player* pPlayer = ToPlayer())
+            {
+                if (pPlayer->IsBeingTeleportedNear())
+                {
+                    pPlayer->ExecuteTeleportNear();
+                    SendHeartBeat(sendToClient);
+                }
+            }
+            break;
     }
-    return false;
 }
 
 bool Unit::FindPendingMovementFlagChange(uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived)
@@ -7128,8 +7288,8 @@ bool Unit::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* 
 /// returns true if creature can't be seen by alive units
 bool Unit::IsInvisibleForAlive() const
 {
-    // Shroud of Death
-    if (HasAura(10848) || HasAura(27978))
+    // Ghost
+    if (HasAura(9036))
         return true;
 
     // TODO: maybe spiritservices also have just an aura
@@ -8393,7 +8553,12 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
                 AttackedBy(caster);
 
             // restore appropriate movement generator
-            if (!SelectHostileTarget())
+            if (IsPet() && GetOwnerGuid().IsPlayer())
+            {
+                AttackStop();
+                return;
+            }
+            else if (!SelectHostileTarget())
                 return;
 
             if (GetVictim())
@@ -8536,7 +8701,7 @@ void Unit::UpdateModelData()
                     break;
                 case 1563: // Gnome Male
                 case 1564: // Gnome Female
-                    nativeScale = DEFAULT_OBJECT_SCALE;
+                    nativeScale = DEFAULT_GNOME_SCALE;
                     break;
             }
         }
@@ -8988,7 +9153,7 @@ void Unit::NearLandTo(float x, float y, float z, float orientation)
     m_movementInfo.RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
     m_movementInfo.ChangePosition(x, y, z, orientation);
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-    m_movementInfo.ctime = 0; // Not a client packet. Pauses interpolation.
+    m_movementInfo.ctime = 0; // Not a client packet. Pauses extrapolation.
 
     WorldPacket data(MSG_MOVE_FALL_LAND, 41);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -9115,6 +9280,8 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         float vsin = sin(angle);
         float vcos = cos(angle);
         MovementPacketSender::SendKnockBackToController(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
+
+        SetJumpInitialSpeed(verticalSpeed);
 
         if (Player* pPlayer = ToPlayer())
             GetPlayerMovingMe()->GetCheatData()->OnKnockBack(pPlayer, horizontalSpeed, verticalSpeed, vcos, vsin);
@@ -9437,7 +9604,7 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
 
     // Moving player: try to extrapolate movement a bit
     if (IsPlayer() && IsMoving())
-        if (!ToPlayer()->GetCheatData()->ExtrapolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
+        if (!ExtrapolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
             GetPosition(initialPosX, initialPosY, initialPosZ);
 
     float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +
@@ -10049,7 +10216,8 @@ void Unit::RestoreMovement()
     // Need restore previous movement since we have no proper states system
     if (IsAlive() && !HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
     {
-        if (Unit* victim = GetVictim())
+        Unit* victim = GetCharmInfo() && GetCharmInfo()->IsAtStay() ? nullptr : GetVictim();
+        if (victim)
             GetMotionMaster()->MoveChase(victim);
         else
             GetMotionMaster()->Initialize();
@@ -10120,6 +10288,15 @@ void Unit::WritePetSpellsCooldown(WorldPacket& data) const
     data.put<uint16>(cdCountPos, cdCount);
 }
 
+inline float GetDefaultPlayerScale(uint8 race, uint8 gender)
+{
+    if (race == RACE_TAUREN)
+        return (gender == GENDER_FEMALE ? DEFAULT_TAUREN_FEMALE_SCALE : DEFAULT_TAUREN_MALE_SCALE);
+    if (race == RACE_GNOME)
+        return DEFAULT_GNOME_SCALE;
+    return DEFAULT_OBJECT_SCALE;
+}
+
 void Unit::InitPlayerDisplayIds()
 {
     PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass());
@@ -10128,23 +10305,16 @@ void Unit::InitPlayerDisplayIds()
 
     uint8 gender = GetGender();
 
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
+    SetObjectScale(GetDefaultPlayerScale(GetRace(), gender));
     switch (gender)
     {
         case GENDER_FEMALE:
             SetNativeDisplayId(info->displayId_f);
             SetDisplayId(info->displayId_f);
-            if (GetRace() == RACE_TAUREN)
-                SetNativeScale(DEFAULT_TAUREN_FEMALE_SCALE);
             break;
         case GENDER_MALE:
             SetNativeDisplayId(info->displayId_m);
             SetDisplayId(info->displayId_m);
-            if (GetRace() == RACE_TAUREN)
-                SetNativeScale(DEFAULT_TAUREN_MALE_SCALE);
             break;
-        default:
-            return;
     }
-
 }

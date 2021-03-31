@@ -231,6 +231,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             if (!pCharmedUnit->IsSpellReady(*spellInfo))
                 return;
 
+            // Why is this here?
             for (uint32 i : spellInfo->EffectImplicitTargetA)
             {
                 if (i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC || i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC || i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC)

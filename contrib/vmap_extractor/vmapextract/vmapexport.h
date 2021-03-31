@@ -56,7 +56,8 @@ extern const char* szRawVMAPMagic;                          // vmap magic string
 bool FileExists(const char* file);
 void strToLower(char* str);
 
-bool ExtractSingleWmo(std::string& fname);
+bool ExtractSingleWmoWithAllConfig(std::string& fname);     //iterates thru all config variants and extract ALL - even unused doodadset configurations 
+bool ExtractSingleWmo(std::string& fname, int DoodadConfig);//Extracts WMO with specified doodadset
 
 /* @param origPath = original path of the model, cleaned with fixnamen and fixname2
  * @param fixedName = will store the translated name (if changed)

@@ -293,14 +293,13 @@ std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(std::string const
         //DEBUG_FILTER_LOG(LOG_FILTER_MAP_LOADING, "VMapManager2: loading file '%s%s'.", basepath.c_str(), filename.c_str());
         ret = std::shared_ptr<WorldModel>(
                     worldmodel,
-                    [this, filename](WorldModel*){
+                    [this, filename](WorldModel* m){
                         std::unique_lock<std::shared_timed_mutex> lock(m_modelsLock);
-                        iLoadedModelFiles.erase(filename);
+                        if (!getUseManagedPtrs())
+                            iLoadedModelFiles.erase(filename);
+                        delete m;
                     });
-        model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(
-                                             filename,
-                                            {ret, getUseManagedPtrs()}
-                                             )).first;
+        model = iLoadedModelFiles.emplace(filename, ManagedModel{ret, getUseManagedPtrs()}).first;
         return ret;
     }
     ret = model->second.lock();

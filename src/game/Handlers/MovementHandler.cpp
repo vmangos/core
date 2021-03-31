@@ -251,29 +251,40 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
             _player->GetName(), _player->GetSession()->GetAccountId(), movementCounter, pMover->GetMovementCounter());
     }
 
-    pPlayerMover->SetSemaphoreTeleportNear(false);
+    pPlayerMover->ExecuteTeleportNear();
+}
 
-    WorldLocation const& dest = pPlayerMover->GetTeleportDest();
-    pPlayerMover->TeleportPositionRelocation(dest);
-    MovementPacketSender::SendTeleportToObservers(pPlayerMover);
+void Player::ExecuteTeleportNear()
+{
+    if (!IsBeingTeleportedNear())
+    {
+        sLog.outInfo("Player::ExecuteNearTeleport called without near teleport scheduled!");
+        return;
+    }
+
+    SetSemaphoreTeleportNear(false);
+
+    WorldLocation const& dest = GetTeleportDest();
+    TeleportPositionRelocation(dest);
+    MovementPacketSender::SendTeleportToObservers(this);
 
     // resummon pet, if the destination is in another continent instance, let Player::SwitchInstance do it
     // because the client will request the name for the old pet guid and receive no answer
     // result would be a pet named "unknown"
-    if (pPlayerMover->GetTemporaryUnsummonedPetNumber())
+    if (GetTemporaryUnsummonedPetNumber())
     {
-        if (sWorld.getConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE) && pPlayerMover->GetMap()->IsContinent())
+        if (sWorld.getConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE) && GetMap()->IsContinent())
         {
             bool transition = false;
-            if (sMapMgr.GetContinentInstanceId(pPlayerMover->GetMap()->GetId(), dest.x, dest.y, &transition) == pPlayerMover->GetInstanceId())
-                pPlayerMover->ResummonPetTemporaryUnSummonedIfAny();
+            if (sMapMgr.GetContinentInstanceId(GetMap()->GetId(), dest.x, dest.y, &transition) == GetInstanceId())
+                ResummonPetTemporaryUnSummonedIfAny();
         }
         else
-            pPlayerMover->ResummonPetTemporaryUnSummonedIfAny();
+            ResummonPetTemporaryUnSummonedIfAny();
     }
 
-    //lets process all delayed operations on successful teleport
-    pPlayerMover->ProcessDelayedOperations();
+    // lets process all delayed operations on successful teleport
+    ProcessDelayedOperations();
 }
 
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
@@ -317,6 +328,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             return;
         }
     }
+
+    // This is required for proper movement extrapolation
+    if (opcode == MSG_MOVE_JUMP)
+        pMover->SetJumpInitialSpeed(7.95797334f);
+    else if (opcode == MSG_MOVE_FALL_LAND)
+        pMover->SetJumpInitialSpeed(-9.645f);
 
     // Interrupt spell cast at move
     if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
@@ -464,11 +481,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
             _player->GetCheatData()->OnWrongAckData();
         return;
     }
-
-    // the client data has been verified, let's do the actual change now
-    float newSpeedRate = speedReceived / baseMoveSpeed[move_type];
-    pMover->SetSpeedRateReal(move_type, newSpeedRate);
-
+    
     // Use fake loop here to handle movement position checks separately from change ACK.
     do
     {
@@ -484,7 +497,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
         if (pPlayerMover)
         {
             if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
-                !_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode))
+                !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
                 break;
@@ -507,6 +520,9 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
         }
     } while (false);
 
+    // the client data has been verified, let's do the actual change now
+    float newSpeedRate = speedReceived / baseMoveSpeed[move_type];
+    pMover->SetSpeedRateReal(move_type, newSpeedRate);
     MovementPacketSender::SendSpeedChangeToObservers(pMover, move_type, speedReceived);
 }
 
@@ -576,6 +592,9 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
             _player->GetCheatData()->OnWrongAckData();
         return;
     }
+
+    if (opcode == CMSG_MOVE_FEATHER_FALL_ACK)
+        pMover->SetJumpInitialSpeed(std::max(pMover->GetJumpInitialSpeed(), 7.0f));
 
     // Use fake loop here to handle movement position checks separately from change ACK.
     do

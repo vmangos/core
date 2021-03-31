@@ -103,6 +103,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_PLAYER,      //  51
     CONDITION_REQ_SOURCE_WORLDOBJECT, //  52
     CONDITION_REQ_NONE,               //  53
+    CONDITION_REQ_TARGET_WORLDOBJECT, //  54
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -429,7 +430,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             return source->IsWithinLOSInMap(target);
         }
-        case CONDITION_DISTANCE:
+        case CONDITION_DISTANCE_TO_TARGET:
         {
             uint32 distance = source->GetDistance(target);
 
@@ -537,7 +538,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             Map* pMap = const_cast<Map*>(map ? map : (source ? source->GetMap() : target->GetMap()));
             if (GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(m_value1))
-                if (GameObject* pGameObject = pMap->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, m_value1)))
+                if (GameObject* pGameObject = pMap->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, uint32(m_value1))))
                     return sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(pGameObject, map, source, conditionSourceType);
             return false;
         }
@@ -578,6 +579,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             timeinfo = localtime(&rawtime);
 
             return (timeinfo->tm_hour >= m_value1) && (timeinfo->tm_min >= m_value2) && (timeinfo->tm_hour <= m_value3) && (timeinfo->tm_min <= m_value4);
+        }
+        case CONDITION_DISTANCE_TO_POSITION:
+        {
+            return target->GetDistance3dToCenter(m_value1, m_value2, m_value3) <= m_value4;
         }
     }
     return false;
@@ -1069,11 +1074,11 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
-        case CONDITION_DISTANCE:
+        case CONDITION_DISTANCE_TO_TARGET:
         {
             if (m_value2 > 2)
             {
-                sLog.outErrorDb("Distance condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
+                sLog.outErrorDb("Distance to target condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
                 return false;
             }
             break;
@@ -1176,6 +1181,20 @@ bool ConditionEntry::IsValid()
             if (m_value4 > 59)
             {
                 sLog.outErrorDb("CONDITION_LOCAL_TIME (entry %u, type %d) has value4 greater than 59 minutes (%u), skipped", m_entry, m_condition, m_value4);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_DISTANCE_TO_POSITION:
+        {
+            if (!MaNGOS::IsValidMapCoord(m_value1, m_value2, m_value3))
+            {
+                sLog.outErrorDb("CONDITION_DISTANCE_TO_POSITION (entry %u, type %d) has invalid coordinates, skipped", m_entry, m_condition);
+                return false;
+            }
+            if (m_value4 <= 0)
+            {
+                sLog.outErrorDb("CONDITION_DISTANCE_TO_POSITION (entry %u, type %d) does not have max distance set in value4, skipped", m_entry, m_condition);
                 return false;
             }
             break;

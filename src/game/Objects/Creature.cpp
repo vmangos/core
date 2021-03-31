@@ -823,6 +823,10 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 if (WorldTimer::tickTime() % 3000 <= update_diff)
                 {
+                    // Prevent mobs from evading while under crowd control.
+                    if (HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+                        UpdateLeashExtensionTime();
+
                     // Leash prevents mobs from chasing any further than specified range
                     if (m_leashDistance && !IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, m_leashDistance))
                         leash = true;
@@ -2349,12 +2353,9 @@ bool Creature::IsOutOfThreatArea(Unit* pVictim) const
 
     if (pVictim->IsInMap(this))
     {
-        float AttackDist = GetAttackDistance(pVictim);
-        float ThreatRadius = sWorld.getConfig(CONFIG_FLOAT_THREAT_RADIUS);
-
-        //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
-        float threatAreaDistance = ThreatRadius > AttackDist ? ThreatRadius : AttackDist;
-        bool inThreatArea = pVictim->IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, threatAreaDistance);
+        // Use attack distance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
+        float threatAreaDistance = std::max(GetAttackDistance(pVictim) * 1.5f, sWorld.getConfig(CONFIG_FLOAT_THREAT_RADIUS));
+        bool inThreatArea = IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, threatAreaDistance) || pVictim->IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, threatAreaDistance);
         if (!inThreatArea && (GetLastLeashExtensionTime() + 12 < time(nullptr)))
             return true;
     }
@@ -2808,15 +2809,27 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
 
 bool Creature::IsInEvadeMode() const
 {
+    if (IsEvadeBecauseTargetNotReachable())
+        return true;
+
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE)
+        return true;
+
     if (IsPet())
         if (Creature const* pOwner = GetOwnerCreature())
             if (pOwner->IsInEvadeMode())
                 return true;
 
-    if (IsEvadeBecauseTargetNotReachable())
-        return true;
+    if (!IsInCombat() && GetMotionMaster()->GetCurrentMovementGeneratorType() == PATROL_MOTION_TYPE)
+    {
+        if (CreatureGroup* pGroup = GetCreatureGroup())
+            if (pGroup->IsFormation() && pGroup->GetLeaderGuid() != GetObjectGuid())
+                if (Creature* pLeader = GetMap()->GetCreature(pGroup->GetLeaderGuid()))
+                    if (pLeader->IsInEvadeMode())
+                        return true;
+    }
 
-    return !i_motionMaster.empty() && i_motionMaster.GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE;
+    return false;
 }
 
 bool Creature::HasSpell(uint32 spellId) const

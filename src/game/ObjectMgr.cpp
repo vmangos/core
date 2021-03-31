@@ -2234,6 +2234,12 @@ void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
     if ((itemSpell.SpellId == 23194) && (itemId == 18715))
         itemSpell.SpellId = 0;
 #endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_2_4
+    // Goblin Rocket Helmet and Horned Viking Helmet
+    // Charge effect was removed from spell 13327 and moved to 22641 in 1.3.
+    if (itemSpell.SpellId == 13327 && (itemId == 9394 || itemId == 10588))
+        itemSpell.SpellId = 22641;
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     // Bonereaver's Edge
     // The spell data was changed in 1.10, so use a substitute spell id before content patch 1.10 when playing with a newer client.

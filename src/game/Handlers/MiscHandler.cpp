@@ -74,7 +74,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& /*recv_data*/)
     }
 
     player->BuildPlayerRepop();
-    player->RepopAtGraveyard();
+    player->ScheduleRepopAtGraveyard();
 }
 
 class WhoListClientQueryTask

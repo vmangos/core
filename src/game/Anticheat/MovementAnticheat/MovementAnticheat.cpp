@@ -9,11 +9,9 @@
 #include "MoveSpline.h"
 #include "World.h"
 #include "MovementPacketSender.h"
+#include "Geometry.h"
 
-namespace Movement
-{
-extern float computeFallElevation(float time, bool safeFall, float initialSpeed);
-}
+using namespace Geometry;
 
 const char* GetMovementCheatName(CheatType flagId)
 {
@@ -136,8 +134,8 @@ void MovementAnticheat::AddCheats(uint32 cheats, uint32 count)
     {
         for (uint32 i = 0; i < CHEATS_COUNT; ++i)
         {
-            if (cheats & (1 << i))
-                ChatHandler(me).PSendSysMessage("[AntiCheat] Cheat : %s", GetMovementCheatName(CheatType(i)));
+            if ((cheats & (1 << i)) && m_session->GetPlayer())
+                ChatHandler(m_session->GetPlayer()).PSendSysMessage("[AntiCheat] Cheat : %s", GetMovementCheatName(CheatType(i)));
         }
     }
 
@@ -234,7 +232,6 @@ void MovementAnticheat::Init()
     m_clientDesync    = 0;
     m_maxClientDesync = 0;
 
-    m_jumpInitialSpeed   = 0.f;
     m_jumpCount = 0;
     m_jumpFlagCount = 0;
     m_jumpFlagTime = 0;
@@ -247,17 +244,9 @@ void MovementAnticheat::InitNewPlayer(Player* pPlayer)
 {
     me = pPlayer;
     m_jumpCount = 0;
-    m_jumpInitialSpeed = 0.f;
     m_jumpFlagCount = 0;
     m_jumpFlagTime = 0;
     m_knockBack = false;
-    InitSpeeds(pPlayer);
-}
-
-void MovementAnticheat::InitSpeeds(Unit* unit)
-{
-    for (int i = 0; i < MAX_MOVE_TYPE; ++i)
-        m_clientSpeeds[i] = unit->GetSpeed(UnitMoveType(i));
 }
 
 void MovementAnticheat::ResetJumpCounters()
@@ -280,7 +269,6 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     GetLastMovementInfo().jump.sinAngle = sin;
     GetLastMovementInfo().jump.xyspeed = speedxy;
     GetLastMovementInfo().moveFlags = MOVEFLAG_JUMPING | (GetLastMovementInfo().moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN);
-    m_jumpInitialSpeed = speedz;
     m_knockBack = true;
 }
 
@@ -355,19 +343,6 @@ void MovementAnticheat::OnFailedToAckChange()
         return;
 
     AddCheats(1 << CHEAT_TYPE_PENDING_ACK_DELAY);
-}
-
-float MovementAnticheat::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
-{
-    float speed = 0.0f;
-    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
-        speed = GetClientSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_SWIM_BACK : MOVE_SWIM);
-    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
-        speed = GetClientSpeed(MOVE_WALK);
-    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-        speed = GetClientSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN);
-
-    return speed;
 }
 
 UnitMoveType MovementAnticheat::GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const
@@ -486,25 +461,6 @@ bool ShouldRejectMovement(uint32 cheatFlags)
     return false;
 }
 
-template<class T>
-float GetDistance3D(T const& from, T const& to)
-{
-    float dx = from.x - to.x;
-    float dy = from.y - to.y;
-    float dz = from.z - to.z;
-    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-    return (dist > 0 ? dist : 0);
-}
-
-template<class T>
-float GetDistance2D(T const& from, T const& to)
-{
-    float dx = from.x - to.x;
-    float dy = from.y - to.y;
-    float dist = sqrt((dx * dx) + (dy * dy));
-    return (dist > 0 ? dist : 0);
-}
-
 bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     // Server controlled movement.
@@ -541,10 +497,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
         InitNewPlayer(pPlayer);
 
     if (opcode == CMSG_MOVE_FEATHER_FALL_ACK)
-    {
         GetLastMovementInfo().jump.startClientTime = movementInfo.jump.startClientTime = movementInfo.ctime;
-        m_jumpInitialSpeed = std::max(m_jumpInitialSpeed, 7.0f);
-    }
     
     // Do not accept position changes if player is dead and has not released spirit.
     if (me->GetDeathState() == CORPSE)
@@ -598,7 +551,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
 #endif
 
-        if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
+        if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
             APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
 
         if (CheckMultiJump(opcode))
@@ -634,12 +587,6 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
         }
     }
 
-    // This is required for proper movement interpolation
-    if (opcode == MSG_MOVE_JUMP)
-        m_jumpInitialSpeed = 7.95797334f;
-    else if (opcode == MSG_MOVE_FALL_LAND)
-        m_jumpInitialSpeed = -9.645f;
-
     if (IsFallEndOpcode(opcode) || 
         movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         m_knockBack = false;
@@ -662,8 +609,9 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             if ((cheatFlags & (1 << CHEAT_TYPE_OVERSPEED_JUMP)) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
             {
-                if (float speed = GetSpeedForMovementInfo(GetLastMovementInfo()))
-                    MovementPacketSender::SendSpeedChangeToAll(me, GetMoveTypeForMovementInfo(GetLastMovementInfo()), speed);
+                UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
+                float speedRate = me->GetSpeed(moveType) / baseMoveSpeed[moveType];
+                MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
             }
 
             if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
@@ -674,7 +622,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 float const y = GetLastMovementInfo().pos.y;
                 float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
                 GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
-                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses interpolation.
+                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
                 me->TeleportPositionRelocation(x, y, z, 0);
             }
             me->SendHeartBeat(true);
@@ -685,17 +633,6 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
     return true;
 #undef APPEND_CHEAT
-}
-
-bool MovementAnticheat::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode)
-{
-    if (me != pPlayer)
-        InitNewPlayer(pPlayer);
-
-    // Compute anticheat generic checks - with old speed.
-    bool result = HandlePositionTests(pPlayer, movementInfo, opcode);
-    m_clientSpeeds[moveType] = speedReceived;
-    return result;
 }
 
 bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
@@ -1016,7 +953,7 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     {
         float intX, intY, intZ, intO;
 
-        if (ExtrapolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
+        if (me->ExtrapolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
         {
             auto const intDX = intX - movementInfo.pos.x;
             auto const intDY = intY - movementInfo.pos.y;
@@ -1048,110 +985,6 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 
     return cheatFlags;
 #undef APPEND_CHEAT
-}
-
-bool MovementAnticheat::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &outOrientation) const
-{
-    // Not currently handled cases.
-    if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)) || 
-       (mi.moveFlags & MOVEFLAG_FALLINGFAR) ||
-       (!me->movespline->Finalized()) ||
-       (mi.ctime == 0))
-        return false;
-
-    x = mi.pos.x;
-    y = mi.pos.y;
-    z = mi.pos.z;
-    outOrientation = mi.pos.o;
-    float o = outOrientation;
-
-    if (mi.moveFlags & MOVEFLAG_ROOT)
-        return true;
-
-    float speed = GetSpeedForMovementInfo(mi);
-
-    if (mi.moveFlags & MOVEFLAG_BACKWARD)
-        o += M_PI_F;
-    else if (mi.moveFlags & MOVEFLAG_STRAFE_LEFT)
-    {
-        if (mi.moveFlags & MOVEFLAG_FORWARD)
-            o += M_PI_F / 4;
-        else
-            o += M_PI_F / 2;
-    }
-    else if (mi.moveFlags & MOVEFLAG_STRAFE_RIGHT)
-    {
-        if (mi.moveFlags & MOVEFLAG_FORWARD)
-            o -= M_PI_F / 4;
-        else
-            o -= M_PI_F / 2;
-    }
-    if (mi.moveFlags & MOVEFLAG_JUMPING)
-    {
-        float diffT = WorldTimer::getMSTimeDiff(mi.jump.startClientTime, diffMs + mi.ctime) / 1000.0f;
-        x = mi.jump.start.x;
-        y = mi.jump.start.y;
-        z = mi.jump.start.z;
-        // Fatal error. Avoid crashing here ...
-        if (!x || !y || !z || diffT > 10000.0f)
-            return false;
-        x += mi.jump.cosAngle * mi.jump.xyspeed * diffT;
-        y += mi.jump.sinAngle * mi.jump.xyspeed * diffT;
-        z -= Movement::computeFallElevation(diffT, mi.moveFlags & MOVEFLAG_SAFE_FALL, -m_jumpInitialSpeed);
-    }
-    else if (mi.moveFlags & (MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT))
-    {
-        if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
-        {
-            // Every 2 sec
-            float T = 0.75f * (GetClientSpeed(MOVE_TURN_RATE)) * (diffMs / 1000.0f);
-            float R = 1.295f * speed / M_PI * cos(mi.s_pitch);
-            z += diffMs * speed / 1000.0f * sin(mi.s_pitch);
-            // Find the center of the circle we are moving on
-            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
-            {
-                x += R * cos(o + M_PI / 2);
-                y += R * sin(o + M_PI / 2);
-                outOrientation += T;
-                T = T - M_PI / 2.0f;
-            }
-            else
-            {
-                x += R * cos(o - M_PI / 2);
-                y += R * sin(o - M_PI / 2);
-                outOrientation -= T;
-                T = -T + M_PI / 2.0f;
-            }
-            x += R * cos(o + T);
-            y += R * sin(o + T);
-        }
-        else
-        {
-            float diffO = GetClientSpeed(MOVE_TURN_RATE) * diffMs / 1000.0f;
-            if (mi.moveFlags & MOVEFLAG_TURN_LEFT)
-                outOrientation += diffO;
-            else
-                outOrientation -= diffO;
-            return true;
-        }
-    }
-    else if (mi.moveFlags & MOVEFLAG_MASK_MOVING)
-    {
-        float dist = speed * diffMs / 1000.0f;
-        x += dist * cos(o) * cos(mi.s_pitch);
-        y += dist * sin(o) * cos(mi.s_pitch);
-        z += dist * sin(mi.s_pitch);
-    }
-    else // If we reach here, we did not move
-        return true;
-
-    if (!MaNGOS::IsValidMapCoord(x, y, z, o))
-        return false;
-
-    if (!(mi.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING)))
-        z = me->GetMap()->GetHeight(x, y, z);
-
-    return me->GetMap()->isInLineOfSight(mi.pos.x, mi.pos.y, mi.pos.z + 0.5f, x, y, z + 0.5f);
 }
 
 bool MovementAnticheat::CheckTeleportToTransport(MovementInfo const& movementInfo) const
@@ -1199,7 +1032,7 @@ bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) cons
         return true;
 
     float const distance = GetDistance3D(me->GetPosition(), movementInfo.pos);
-    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE);
+    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.1f);
 
     // Exclude elevators
     uint32 destZoneId = 0;

@@ -120,25 +120,32 @@ typedef struct
     uint16  unk4[20];
 }  sAuthLogonProofKey_C;
 */
-typedef struct AUTH_LOGON_PROOF_S
+typedef struct AUTH_LOGON_PROOF_S_BUILD_8089
 {
     uint8   cmd;
     uint8   error;
     uint8   M2[20];
     uint32  accountFlags;                                   // see enum AccountFlags
     uint32  surveyId;                                       // SurveyId
-    uint16  LoginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
-} sAuthLogonProof_S;
+    uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
+} sAuthLogonProof_S_BUILD_8089;
 
-typedef struct AUTH_LOGON_PROOF_S_BUILD_6005
+typedef struct AUTH_LOGON_PROOF_S_BUILD_6299
 {
     uint8   cmd;
     uint8   error;
     uint8   M2[20];
-    //uint32  unk1;
-    uint32  unk2;
-    //uint16  unk3;
-} sAuthLogonProof_S_BUILD_6005;
+    uint32  surveyId;                                       // SurveyId
+    uint16  loginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
+} sAuthLogonProof_S_BUILD_6299;
+
+typedef struct AUTH_LOGON_PROOF_S
+{
+    uint8   cmd;
+    uint8   error;
+    uint8   M2[20];
+    uint32  surveyId;                                       // SurveyId
+} sAuthLogonProof_S;
 
 typedef struct AUTH_RECONNECT_PROOF_C
 {
@@ -304,25 +311,36 @@ void AuthSocket::_SetVSFields(const std::string& rI)
 
 void AuthSocket::SendProof(Sha1Hash sha)
 {
-    if (_build < 6080)        // before version 2.0.0 (exclusive)
-    {
-        sAuthLogonProof_S_BUILD_6005 proof;
-        memcpy(proof.M2, sha.GetDigest(), 20);
-        proof.cmd = CMD_AUTH_LOGON_PROOF;
-        proof.error = 0;
-        proof.unk2 = 0x00;
-
-        send((char *)&proof, sizeof(proof));
-    }
-    else
+    if (_build < 6299)  // before version 2.0.3 (exclusive)
     {
         sAuthLogonProof_S proof;
         memcpy(proof.M2, sha.GetDigest(), 20);
         proof.cmd = CMD_AUTH_LOGON_PROOF;
         proof.error = 0;
+        proof.surveyId = 0x00000000;
+
+        send((char *)&proof, sizeof(proof));
+    }
+    else if (_build < 8089) // before version 2.4.0 (exclusive)
+    {
+        sAuthLogonProof_S_BUILD_6299 proof;
+        memcpy(proof.M2, sha.GetDigest(), 20);
+        proof.cmd = CMD_AUTH_LOGON_PROOF;
+        proof.error = 0;
+        proof.surveyId = 0x00000000;
+        proof.loginFlags = 0x0000;
+
+        send((char *)&proof, sizeof(proof));
+    }
+    else
+    {
+        sAuthLogonProof_S_BUILD_8089 proof;
+        memcpy(proof.M2, sha.GetDigest(), 20);
+        proof.cmd = CMD_AUTH_LOGON_PROOF;
+        proof.error = 0;
         proof.accountFlags = ACCOUNT_FLAG_PROPASS;
         proof.surveyId = 0x00000000;
-        proof.LoginFlags = 0x0000;
+        proof.loginFlags = 0x0000;
 
         send((char *)&proof, sizeof(proof));
     }
@@ -1100,7 +1118,7 @@ bool AuthSocket::_HandleRealmList()
 
 void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
-    if (_build < 6080)        // before version 2.0.0 (exclusive)
+    if (_build < 6299)        // before version 2.0.3 (exclusive)
     {
         pkt << uint32(0);                               // unused value
         pkt << uint8(sRealmList.size());
