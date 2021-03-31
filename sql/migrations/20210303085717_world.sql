@@ -1333,7 +1333,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (50797, 123, -3418.06, 2385.54, 40.7661, 100, 0, 0),
 (50797, 124, -3431.35, 2383.14, 43.6883, 100, 0, 0),
 
--- wandering forest walker 50797 (credit cmangos)
+-- wandering forest walker (credit cmangos)
 (50800, 1, -5776.78, 1439.23, 54.5482, 100, 0, 0),
 (50800, 2, -5784.15, 1430.67, 52.3479, 100, 0, 0),
 (50800, 3, -5776.18, 1439.83, 54.7064, 100, 0, 0),
@@ -1481,7 +1481,7 @@ UPDATE `creature_template` SET `faction` = 132 WHERE `entry` = 5723;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Warug - Modify Flags');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.4279, 0, 'Warug - Orientation');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2045, 0, 0, 0, 0, 0, 0, 0, 0, 'Warug - Talk');
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 2, 10, 5723, 20000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, -1587.371, 857.9429, 112.2158, 2.042, 0, 'Warug - Summon Creature');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 2, 10, 5723, 20000, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, -1587.37, 857.943, 112.216, 2.042, 0, 'Warug - Summon Creature');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2047, 0, 0, 0, 0, 0, 0, 0, 0, 'Warug - Talk');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 7, 1, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Warug - Emote');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1371, 8, 15, 8329, 0, 0, 0, 5723, 30, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Warug - Cast Spell');
