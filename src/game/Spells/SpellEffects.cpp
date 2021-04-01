@@ -648,6 +648,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 6655: // Force Target - Bow
+                {
+                    if (unitTarget)
+                        unitTarget->HandleEmote(EMOTE_ONESHOT_BOW);
+                    return;
+                }
                 case 25716: // Force Self - Bow
                 {
                     if (m_casterUnit)
