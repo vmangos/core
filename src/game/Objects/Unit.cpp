@@ -6199,7 +6199,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 {
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
         return false;
-    if (distance < 0.388f) //collision
+    if (distance < 1.f) //collision
         return true;
 
     // Hunter mark functionality. TODO: range cap at 60, actual range needs to be verified
@@ -6208,7 +6208,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
         if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f)
             return true;
 
-    float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : (((Creature*)this)->GetDetectionRange() + GetObjectBoundingRadius() + target->GetObjectBoundingRadius());
+    float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : ((Creature*)this)->GetDetectionRange();
     //Always invisible from back (when stealth detection is on), also filter max distance cases
     bool isInFront = (IsPlayer() || distance < visibleDistance) && HasInArc(target);
     if (!isInFront)
@@ -6220,18 +6220,20 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
 
     if (IsCreature())
-        visibleDistance /= 2.f;
+        visibleDistance -= 9.5f;
 
-    // stealth level: 3 points -> 1 yd, 2x if level diff > 3
+    // stealth level: 5 points ~= .8333 yd = 5/6 yd -> 1 points = 1/6 yd
     if (target->IsPlayer())
-        visibleDistance += (detectSkill - stealthSkill) / (std::abs(level_diff) > 3 ? 6.f : 3.f);
+        visibleDistance += (detectSkill - stealthSkill) / 6.f;
     else
-        visibleDistance += level_diff / (std::abs(level_diff) > 3 ? 6.f : 3.f);
+        visibleDistance += level_diff * 5.f / 6.f;
 
-    visibleDistance = std::min(visibleDistance, 26.f);
+    visibleDistance = std::min(visibleDistance, 23.f);
 
+    visibleDistance = std::max(visibleDistance, 1.f);
+    int32 alertRange = visibleDistance + 5.f;
+    visibleDistance = std::max(visibleDistance, GetCombatReach());
 
-    int32 alertRange = (visibleDistance + 1.5f) * 1.1f ;
 
     // recheck new distance
     if (alert)
