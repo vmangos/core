@@ -414,17 +414,9 @@ class Spell
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
         void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
-        bool IsNextMeleeSwingSpell() const
-        {
-            return m_spellInfo->Attributes & (SPELL_ATTR_ON_NEXT_SWING_1|SPELL_ATTR_ON_NEXT_SWING_2);
-        }
-        bool IsRangedSpell() const
-        {
-            return  m_spellInfo->Attributes & SPELL_ATTR_RANGED;
-        }
         bool IsChannelActive() const { return m_casterUnit ? m_casterUnit->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0 : false; }
         bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK);  }
-        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
+        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && m_spellInfo->IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
 
         bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executeStack; }
         void SetReferencedFromCurrent(bool yes) { m_referencedFromCurrentSpell = yes; }
@@ -641,6 +633,7 @@ class Spell
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
+        uint32 GetSpellBatchingEffectDelay(WorldObject const* pTarget) const;
         // -------------------------------------------
 
         //List For Triggered Spells
