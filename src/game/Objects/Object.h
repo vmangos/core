@@ -1013,17 +1013,17 @@ class WorldObject : public Object
         template <class T >
         bool IsWithinDist2d(T const& position, float dist2compare) const { return IsWithinDist2d(position.x, position.y, dist2compare); }
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
-        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
+        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius = true) const;
 
         // use only if you will sure about placing both object at same map
-        bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true) const
+        bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const
         {
-            return obj && _IsWithinDist(obj,dist2compare,is3D);
+            return obj && _IsWithinDist(obj, dist2compare, is3D, useBoundingRadius);
         }
 
-        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
+        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const
         {
-            return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D);
+            return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D, useBoundingRadius);
         }
         bool IsWithinCombatDistInMap(WorldObject const* obj, float dist2compare) const
         {
