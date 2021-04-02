@@ -196,6 +196,29 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (10881, 68, -1297.5516, 61.62397, 128.66028, 100, 0, 0),
 (10881, 69, -1271.4805, 63.266655, 127.550415, 100, 0, 0);
 
+-- make some of npcs walk correctly on theirs path (credit cmangos)
+-- chepi 8361
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` = 8361;
+
+-- bluff runner windstrider 10881
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` = 10881;
+
+-- hunter sagewind 14440
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` = 14440;
+
+-- hunter ragetotem 14441
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` = 14441; 
+
+-- add some details to searing gorge elementals (credit cmangos)
+UPDATE `creature_template` SET `auras` = '11966' WHERE  `entry` = 5850;
+UPDATE `creature_template` SET `school_immune_mask`= 8 WHERE `entry` = 5855;
+
+-- make weaver immune to nature (credit cmangos)
+UPDATE `creature_template` SET `school_immune_mask` = 8 WHERE `entry` = 5720;
+
+-- add SrcSpell to bring the light (credit cmangos)
+UPDATE `quest_template` SET `SrcSpell` = 2791 WHERE `entry` = 3636;
+
 
 -- End of migration.
 END IF;
