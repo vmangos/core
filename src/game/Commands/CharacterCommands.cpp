@@ -2168,8 +2168,8 @@ bool ChatHandler::HandleHonorShow(char* /*args*/)
         target = m_session->GetPlayer();
 
     int8 highest_rank               = target->GetHonorMgr().GetHighestRank().visualRank;
-    uint32 dishonorable_kills       = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS);
-    uint32 honorable_kills          = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
+    uint32 dishonorable_kills       = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+    uint32 honorable_kills          = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
     uint32 today_honorable_kills    = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0);
     uint32 today_dishonorable_kills = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 1);
     uint32 yesterday_kills          = target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS);
