@@ -59,6 +59,20 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (46825, 31, 8647.808, 868.63934, 23.212633, 100, 0, 0),
 (46825, 32, 8644.208, 853.2105, 22.355267, 100, 0, 0);
 
+-- add hagg taurenbane spawns (credit cmangos)                                         
+UPDATE `creature` SET `position_x` = -4006.34375, `position_y` = -1752.7042236328125, `position_z` = 97.34051513671875, `orientation` = 5.724679946899414062 WHERE (`guid` = 20877);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(20941, 5859, 1, -4212.91, -2274.4, 50.3081, 3.14864, 19800, 19800, 100, 0, 0, 0, 10),
+(20942, 5859, 1, -4212.91, -2274.4, 50.3081, 3.14864, 19800, 19800, 100, 0, 0, 0, 10),
+(20943, 5859, 1, -4212.91, -2274.4, 50.3081, 3.14864, 19800, 19800, 100, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(120, 1, 'Hagg Taurenbane (5859)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(20877, 120, 'Hagg Taurenbane #1'),
+(20941, 120, 'Hagg Taurenbane #2'),
+(20942, 120, 'Hagg Taurenbane #3'),
+(20943, 120, 'Hagg Taurenbane #4');
+
 
 -- End of migration.
 END IF;
