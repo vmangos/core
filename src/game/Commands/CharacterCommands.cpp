@@ -2354,9 +2354,9 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     else if (hasStringAbbr(field, "lastweekstanding"))
         target->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK, (uint32)amount);
     else if (hasStringAbbr(field, "lifetimedishonorablekills"))
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS, (uint32)amount);
+        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, (uint32)amount);
     else if (hasStringAbbr(field, "lifetimehonorablekills"))
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, (uint32)amount);
+        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, (uint32)amount);
 
     PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, field, target->GetName(), hasStringAbbr(field, "rank") ? amount : (uint32)amount);
 
