@@ -6201,7 +6201,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 {
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
         return false;
-    if (distance < 1.f) //collision
+    if (distance < 1.5f) //collision
         return true;
 
     // Hunter mark functionality. TODO: range cap at 60, actual range needs to be verified
@@ -6210,31 +6210,36 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
         if (iter->GetCasterGuid() == GetObjectGuid() && distance <= 60.f)
             return true;
 
-    float visibleDistance = IsPlayer() ? (target->IsPlayer() ? 9.f : 23.f) : ((Creature*)this)->GetDetectionRange();
-    //Always invisible from back (when stealth detection is on), also filter max distance cases
-    bool isInFront = (IsPlayer() || distance < visibleDistance) && HasInArc(target);
-    if (!isInFront)
+    if (IsCreature() && distance > ((Creature*)this)->GetDetectionRange())
         return false;
 
+    float visibleDistance = IsPlayer() ? 9.f : 0.f;
+    //Always invisible from back (when stealth detection is on), also filter max distance cases
+    float yardsPerLevel = 0.84f;
     int32 stealthSkill = target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH);
     stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
     int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
 
-    if (IsCreature())
-        visibleDistance -= 9.5f;
+    if (level_diff > 3)
+        yardsPerLevel *= 2;
 
-    // stealth level: 5 points ~= .8333 yd = 5/6 yd -> 1 points = 1/6 yd
+    // stealth level: 5 points -> 1 level
     if (target->IsPlayer())
-        visibleDistance += (detectSkill - stealthSkill) / 6.f;
+        visibleDistance += ((detectSkill - stealthSkill) + 5) * yardsPerLevel / 5.f;
     else
-        visibleDistance += level_diff * 5.f / 6.f;
+        visibleDistance += (level_diff + 1) * yardsPerLevel;
+
+    if (!HasInArc(target)) {
+        visibleDistance -= yardsPerLevel * 5.f;
+        if (visibleDistance <= 0.f)
+            return false;
+    }
 
     visibleDistance = std::min(visibleDistance, 23.f);
 
     visibleDistance = std::max(visibleDistance, 1.f);
-    int32 alertRange = visibleDistance + 5.f;
-    visibleDistance = std::max(visibleDistance, GetCombatReach());
+    float alertRange = visibleDistance + 5.f;
 
 
     // recheck new distance
