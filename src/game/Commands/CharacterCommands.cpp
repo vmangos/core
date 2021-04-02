@@ -2168,8 +2168,8 @@ bool ChatHandler::HandleHonorShow(char* /*args*/)
         target = m_session->GetPlayer();
 
     int8 highest_rank               = target->GetHonorMgr().GetHighestRank().visualRank;
-    uint32 dishonorable_kills       = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
-    uint32 honorable_kills          = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+    uint32 dishonorable_kills       = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS);
+    uint32 honorable_kills          = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
     uint32 today_honorable_kills    = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0);
     uint32 today_dishonorable_kills = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 1);
     uint32 yesterday_kills          = target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS);
@@ -2354,9 +2354,9 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     else if (hasStringAbbr(field, "lastweekstanding"))
         target->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK, (uint32)amount);
     else if (hasStringAbbr(field, "lifetimedishonorablekills"))
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, (uint32)amount);
+        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS, (uint32)amount);
     else if (hasStringAbbr(field, "lifetimehonorablekills"))
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, (uint32)amount);
+        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, (uint32)amount);
 
     PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, field, target->GetName(), hasStringAbbr(field, "rank") ? amount : (uint32)amount);
 
@@ -3510,8 +3510,10 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
 
     player->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     //-1 is default value
     player->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, -1);
+#endif
 
     //player->SetUInt32Value(PLAYER_FIELD_BYTES, 0xEEE00000);
     return true;

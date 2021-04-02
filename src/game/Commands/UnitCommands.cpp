@@ -362,7 +362,7 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Happiness: %u", pTarget->GetPower(POWER_HAPPINESS));
     PSendSysMessage("Max Happiness: %u", pTarget->GetMaxPower(POWER_HAPPINESS));
     PSendSysMessage("Base attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_BASEATTACKTIME));
-    PSendSysMessage("Off hand attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_OFFHANDATTACKTIME));
+    PSendSysMessage("Off hand attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_BASEATTACKTIME+1));
     PSendSysMessage("Ranged attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_RANGEDATTACKTIME));
     PSendSysMessage("Min damage: %g", pTarget->GetFloatValue(UNIT_FIELD_MINDAMAGE));
     PSendSysMessage("Max damage: %g", pTarget->GetFloatValue(UNIT_FIELD_MAXDAMAGE));
@@ -1109,7 +1109,7 @@ bool ChatHandler::HandleModifyHolyCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_01, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+1, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_HOLY, pTarget->GetName(), amount);
 
@@ -1137,7 +1137,7 @@ bool ChatHandler::HandleModifyFireCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_02, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+2, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_FIRE, pTarget->GetName(), amount);
 
@@ -1165,7 +1165,7 @@ bool ChatHandler::HandleModifyNatureCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_03, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+3, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_NATURE, pTarget->GetName(), amount);
 
@@ -1193,7 +1193,7 @@ bool ChatHandler::HandleModifyFrostCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_04, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+4, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_FROST, pTarget->GetName(), amount);
 
@@ -1221,7 +1221,7 @@ bool ChatHandler::HandleModifyShadowCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_05, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+5, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_SHADOW, pTarget->GetName(), amount);
 
@@ -1249,7 +1249,7 @@ bool ChatHandler::HandleModifyArcaneCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_06, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+6, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_ARCANE, pTarget->GetName(), amount);
 
@@ -1429,7 +1429,7 @@ bool ChatHandler::HandleModifyOffSpeedCommand(char *args)
         return false;
     }
 
-    pTarget->SetFloatValue(UNIT_FIELD_OFFHANDATTACKTIME, (float) amount);
+    pTarget->SetFloatValue(UNIT_FIELD_BASEATTACKTIME+1, (float) amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_OHSPD, pTarget->GetName(), amount);
 

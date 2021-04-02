@@ -1057,10 +1057,10 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     data << (uint16)0;
 
     // Lifetime Honorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
 
     // Lifetime Dishonorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS);
 
     // Yesterday Honor
     data << pTarget->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
