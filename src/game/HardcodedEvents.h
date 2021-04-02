@@ -245,12 +245,15 @@ private:
 
     bool OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
 
+    void StartNewInvasion(uint32 zoneVariable, uint32 zoneid);
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
     bool SummonMouth(Map* pMap, InvasionZone* zone,InvasionXYZO& point);
 
     Map* GetMap(uint32 mapId, InvasionXYZO const& invZone);
     bool isValidZoneId(uint32 zoneId);
+    bool isActiveZone(uint32 zoneId);
+    uint32 GetActiveZones();
     InvasionZone* GetZone(uint32 zoneId);
     uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
 

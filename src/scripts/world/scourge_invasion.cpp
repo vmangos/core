@@ -294,7 +294,7 @@ struct MouthAI : public ScriptedAI
             break;
         case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
         {
-            m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2));
+            m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_3));
             ChangeZoneEventStatus(m_creature, false);
             m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
             m_creature->RemoveFromWorld();
@@ -312,7 +312,7 @@ struct MouthAI : public ScriptedAI
             switch (Events)
             {
             case EVENT_MOUTH_OF_KELTHUZAD_YELL:
-                m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_RANDOM_1, LANG_MOUTH_OF_KELTHUZAD_RANDOM_2, LANG_MOUTH_OF_KELTHUZAD_RANDOM_3, LANG_MOUTH_OF_KELTHUZAD_RANDOM_4, LANG_MOUTH_OF_KELTHUZAD_RANDOM_5));
+                m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_RANDOM_1, LANG_MOUTH_OF_KELTHUZAD_RANDOM_2, LANG_MOUTH_OF_KELTHUZAD_RANDOM_3, LANG_MOUTH_OF_KELTHUZAD_RANDOM_4));
                 m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
             break;
             }
@@ -436,7 +436,7 @@ struct NecropolisProxyAI : public ScriptedAI
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
-        // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
+        // Make sure we despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->RemoveFromWorld();
     }
@@ -514,6 +514,14 @@ struct NecroticShard : public ScriptedAI
             m_finders = GetFindersAmount(m_creature);                       // Count all finders to limit Minions spawns.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_BUTTRESS, 0); // Spawn Cultists every 60 minutes.
             m_events.ScheduleEvent(EVENT_SHARD_MINION_SPAWNER_SMALL, 0);    // Spawn Minions every 5 seconds.
+        }
+        else
+        {
+            // Just in case.
+            std::list<Creature*> shardList;
+            GetCreatureListWithEntryInGrid(shardList, m_creature, { NPC_NECROTIC_SHARD, NPC_DAMAGED_NECROTIC_SHARD }, CONTACT_DISTANCE);
+            for (const auto pshard : shardList)
+                pshard->RemoveFromWorld();
         }
     }
 
@@ -670,7 +678,7 @@ struct NecroticShard : public ScriptedAI
             case EVENT_SHARD_MINION_SPAWNER_BUTTRESS:
             {
                 /*
-                This is a placeholder for SPELL_MINION_SPAWNER_BUTTRESS [27888] which also activates unknown, not sniffable objects
+                This is a placeholder for SPELL_MINION_SPAWNER_BUTTRESS [27888] which also activates unknown, not sniffable gamebjects
                 and happens every hour if a Damaged Necrotic Shard is activ. The Cultists despawning after 1 hour,
                 so this just resets everything and spawn them again and Refill the Health of the Shard.
                 */
@@ -956,7 +964,8 @@ struct ScourgeMinion : public ScriptedAI
                 m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 2000);
                 break;
             case EVENT_MINION_BONE_SHARDS:
-                DoCastSpellIfCan(m_creature, SPELL_BONE_SHARDS);
+                if (m_creature->IsInCombat())
+                    DoCastSpellIfCan(m_creature, SPELL_BONE_SHARDS, CF_AURA_NOT_PRESENT);
                 m_events.ScheduleEvent(EVENT_MINION_BONE_SHARDS, 16000);
                 break;
             case EVENT_MINION_ARCANE_BOLT:
@@ -1054,10 +1063,10 @@ bool GossipHello_scourge_invasion_rewards_giver(Player* player, Creature* creatu
 
     uint32 attacked1 = 0;
     uint32 attacked2 = 0;
-    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < time(nullptr))
-        attacked1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < time(nullptr))
-        attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+    if (sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_TIME1) < time(nullptr))
+        attacked1 = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_ZONE1);
+    if (sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_TIME2) < time(nullptr))
+        attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_ZONE2);
 
     // No invasion happening
     if (!attacked1 && !attacked2)
@@ -1174,7 +1183,7 @@ bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32
 bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
 {
     // Get current values
-    uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+    uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
     uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
     uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
     uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
@@ -1383,17 +1392,4 @@ void AddSC_scourge_invasion()
     newscript->Name = "scourge_invasion_necrotic_crystal";
     newscript->pGossipHello = &GossipHello_NecroticCrystal;
     newscript->RegisterSelf();
-
-    // At start up
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(nullptr));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0);
 }

@@ -104,16 +104,15 @@ enum ScourgeInvasionSpells
     SPELL_ENRAGE                                = 8599,  // Used by 16141 (Ghoul Berserker)
     SPELL_BONE_SHARDS                           = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper)
     SPELL_INFECTED_BITE                         = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker)
-    // SPELL_DAZED                                 = 1604,  // [shortest sniff CD: 1,965 seconds] Used by 16141 (Ghoul Berserker), 16299 (Skeletal Shocktrooper)
     SPELL_DEMORALIZING_SHOUT                    = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier)
     SPELL_SUNDER_ARMOR                          = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier)
-    SPELL_SHADOW_WORD_PAIN                      = 589,  // Used by 16438 (Skeletal Trooper)
-    SPELL_DUAL_WIELD                            = 674,
+    SPELL_SHADOW_WORD_PAIN                      = 589,   // Used by 16438 (Skeletal Trooper)
+    SPELL_DUAL_WIELD                            = 674,   // Used by Skeletal Soldier and Skeletal Shocktrooper.
 
     // Marks of the Dawn
-    SPELL_CREATE_LESSER_MARK_OF_THE_DAWN        = 28319, // Create Lesser Mark of the Dawn
-    SPELL_CREATE_MARK_OF_THE_DAWN               = 28320, // Create Mark of the Dawn
-    SPELL_CREATE_GREATER_MARK_OF_THE_DAWN       = 28321, // Create Greater Mark of the Dawn
+    SPELL_CREATE_LESSER_MARK_OF_THE_DAWN        = 28319, // Create Lesser Mark of the Dawn.
+    SPELL_CREATE_MARK_OF_THE_DAWN               = 28320, // Create Mark of the Dawn.
+    SPELL_CREATE_GREATER_MARK_OF_THE_DAWN       = 28321, // Create Greater Mark of the Dawn.
 
     // Rare Minions
     SPELL_KNOCKDOWN                             = 16790, // Used by 14697 (Lumbering Horror)
@@ -135,7 +134,7 @@ enum ScourgeInvasionSpells
     SPELL_BUTTRESS_TRAP                         = 28054, // Unknown.
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
                                                          
-    // Probably spells used to spawn Shadow of Doom.        Casting sequence (All those [x] spells are casted within 1-2 seconds):
+    // Probably used to spawn Shadow of Doom.        Casting sequence (All those [x] spells are casted within 1-2 seconds):
     SPELL_PH_KILL_SUMMONER_BUFF                 = 27852, // [1] Casted by Cultist on Player.
     SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS    = 27894, // [2] Casted by Player on Cultist.
     SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
@@ -153,10 +152,8 @@ enum ScourgeInvasionSpells
     SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699, // Horde.
     // SPELL_AURA_OF_FEAR                        = 28315,
     SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard)
-    // SPELL_DAZED                               = 1604,  // [shortest sniff CD: 21 seconds]
 
     // Flameshocker
-    //1604
     //17680
     //28234
     SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 22 seconds]
@@ -165,7 +162,7 @@ enum ScourgeInvasionSpells
     SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330,
 
     /*
-    This spells are not ued by any NPC or object in the sniff files.
+    These spells are not used by any NPCs or GameObjects.
     The [PH] in the name means it's a placeholder. Blizzard often adds that to the names of things they add to the game but haven't finalized.
     The fact that the [PH] is still there means the quest was never finished. (Google)
         SPELL_PH_GET_TOKEN                          = 27922, // Create Item "Necrotic Rune".
@@ -241,7 +238,7 @@ enum ScourgeInvasionMisc
     ITEM_NECROTIC_RUNE                      = 22484,
 
     // Invisible Objects
-    GOBJ_BUTTRESS_TRAP                      = 181112, // [Guessed] Object is not in Sniffs or any Database such as WoWHead.
+    GOBJ_BUTTRESS_TRAP                      = 181112, // [Guessed] These Objects can not get sniffed neither exist any Database.
 
     GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL     = 181111, // Object is not in Sniffs or any Database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) summons it.
     GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON  = 181155, // ""
@@ -269,7 +266,8 @@ enum ScourgeInvasionMisc
     NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
 #else
     // The change of zone takes 4 hours
-    NECROPOLIS_ATTACK_TIMER     = 60 * 60, // 1 hour
+    //NECROPOLIS_ATTACK_TIMER     = 60 * 60, // 1 hour
+    NECROPOLIS_ATTACK_TIMER = 60 * 1, // 5min from 
 #endif
 
     ZONEID_WINTERSPRING         = 618,
@@ -337,22 +335,26 @@ enum ScourgeInvasionWorldStatesVariables
 
     WORLDSTATE_SI_BATTLES_WON                   = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
     WORLDSTATE_SI_AZSHARA_REMAINING             = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
-    WORLDSTATE_SI_BLASTED_LANDS_REMAINING       = 2280,// The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
+    WORLDSTATE_SI_BLASTED_LANDS_REMAINING       = 2280, // The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
     WORLDSTATE_SI_BURNING_STEPPES_REMAINING     = 2281, // If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
     WORLDSTATE_SI_EASTERN_PLAGUELANDS           = 2282, // The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
     WORLDSTATE_SI_TANARIS                       = 2283, // It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
     WORLDSTATE_SI_WINTERSPRING                  = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
 
     // Variables
-    VARIABLE_NAXX_ATTACK_ZONE1                  = 110,
-    VARIABLE_NAXX_ATTACK_ZONE2                  = 111,
-    VARIABLE_NAXX_ATTACK_ZONE3                  = 112,
-    VARIABLE_NAXX_ATTACK_ZONE4                  = 113,
-    VARIABLE_NAXX_ATTACK_ZONE5                  = 114,
-    VARIABLE_NAXX_ATTACK_ZONE6                  = 115,
-    VARIABLE_NAXX_ATTACK_TIME1                  = 116,
-    VARIABLE_NAXX_ATTACK_TIME2                  = 117,
-    VARIABLE_NAXX_ATTACK_COUNT                  = 118,
+    VARIABLE_SI_ATTACK_ZONE1                  = 110,
+    VARIABLE_SI_ATTACK_ZONE2                  = 111,
+    VARIABLE_SI_ATTACK_ZONE3                  = 112,
+    VARIABLE_SI_ATTACK_ZONE4                  = 113,
+    VARIABLE_SI_ATTACK_ZONE5                  = 114,
+    VARIABLE_SI_ATTACK_ZONE6                  = 115,
+    VARIABLE_SI_ATTACK_TIME1                  = 116,
+    VARIABLE_SI_ATTACK_TIME2                  = 117,
+    VARIABLE_SI_ATTACK_TIME3                  = 118,
+    VARIABLE_SI_ATTACK_TIME4                  = 119,
+    VARIABLE_SI_ATTACK_TIME5                  = 120,
+    VARIABLE_SI_ATTACK_TIME6                  = 121,
+    VARIABLE_SI_ATTACK_COUNT                  = 122,
 
     VARIABLE_SI_WINTERSPRING_REMAINING          = 30,
     VARIABLE_SI_AZSHARA_REMAINING               = 31,
@@ -420,11 +422,11 @@ enum ScourgeInvasionLang
     LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2         = 13125, // Spawn. 53 min between 2-3 in sniffs.
     LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1          = 13165, // Despawn.
     LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2          = 13164, // Despawn.
+    LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_3          = 13163, // Despawn.
     LANG_MOUTH_OF_KELTHUZAD_RANDOM_1                    = 13126, // Random.
     LANG_MOUTH_OF_KELTHUZAD_RANDOM_2                    = 13124, // Random.
     LANG_MOUTH_OF_KELTHUZAD_RANDOM_3                    = 13122, // 180 seconds between 5-6 in sniffs.
-    LANG_MOUTH_OF_KELTHUZAD_RANDOM_4                    = 13163, // Random.
-    LANG_MOUTH_OF_KELTHUZAD_RANDOM_5                    = 13123, // Random. 30 min between 8-2 in sniffs.
+    LANG_MOUTH_OF_KELTHUZAD_RANDOM_4                    = 13123, // Random. 30 min between 8-2 in sniffs.
     LANG_ARGENT_EMISSARY_OPTION_0                       = 12176, // 12176 - What's happening?
     LANG_ARGENT_EMISSARY_OPTION_1                       = 12207, // 12207 - What can I do?
     LANG_ARGENT_EMISSARY_OPTION_2                       = 12434, // 12434 - Where are we battling the Scourge?

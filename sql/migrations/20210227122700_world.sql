@@ -36,12 +36,12 @@ UPDATE `creature_template` SET `level_min`='60', `health_min`='3052', `speed_wal
 
 -- Fix Minions
 UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `detection_range`='3', `call_for_help_range`='0', `spell_id1`='', `spell_id2`='', `spell_id3`='', `spell_id4`='', `spell_list_id`='', `script_name`='scourge_invasion_minion' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
-UPDATE `creature_template` SET `unit_flags`='0', `auras`='28090 28126' WHERE `entry` IN (16299,16141,16298);
+UPDATE `creature_template` SET `unit_flags`='0', `auras`='28090 28126' WHERE `entry` IN (16299,16141);
 UPDATE `creature_template` SET `unit_flags`='64', `auras`='28292 28126' WHERE `entry` IN (14697,16380,16379);
 UPDATE `creature_template` SET `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16380;
 UPDATE `creature_template` SET `health_min`='8489', `health_max`='8489', `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=14697;
 UPDATE `creature_template` SET `speed_run`='0.992063', `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16379;
-UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry`=16298;
+UPDATE `creature_template` SET `speed_walk`='1.11111', `unit_flags`='0', `auras`='28090 28126 674' WHERE `entry`=16298;
 UPDATE `creature_template` SET `speed_walk`='0.777776', `armor`='3791', `dmg_min`='102', `dmg_max`='138' WHERE `entry`=16141;
 UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='1.19048', `armor`='3791', `dmg_min`='101', `dmg_max`='137' WHERE `entry`=16299;
 
@@ -56,7 +56,7 @@ UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `aur
 UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry` IN (16437,16423);
 UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
 UPDATE `creature_template` SET `armor`='426', `dmg_min`='11', `dmg_max`='16', `spell_id2`='0' WHERE `entry`=16438;
-UPDATE `creature_template` SET `armor`='239', `dmg_min`='7', `dmg_max`='12', `spell_id1`='0' WHERE `entry`=16422;
+UPDATE `creature_template` SET `armor`='239', `dmg_min`='7', `dmg_max`='12', `auras`='28126 674', `spell_id1`='0' WHERE `entry`=16422;
 UPDATE `creature_template` SET `armor`='239', `dmg_min`='8', `dmg_max`='13' WHERE `entry`=16423;
 
 -- Argent NPC's do not have random emotes
@@ -128,6 +128,7 @@ INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `lengt
     (95, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Burning Steppes', 1, 1, 9, 10),
     (96, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 50 Invasions Done', 1, 1, 9, 10),
     (97, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 100 Invasions Done', 1, 1, 9, 10),
+    -- following events should stay for (1814400 / 60 / 60 / 24) = 21 days - 3 weeks
     (98, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 1814400, 0, 'Scourge Invasion - 150 Invasions Done', 1, 1, 9, 10),
     (99, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 1814400, 0, 'Scourge Invasion - Invasions Done', 1, 1, 9, 10);
 
