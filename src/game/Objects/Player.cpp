@@ -5610,7 +5610,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         return;
 
     // Calculate base chance to increase
-    float chance;
+    float chance = 0.0f;
     if (defence) // TODO: more research needed. Seems to increase slower than weapon skill. Using old formula:
     {
         uint32 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
@@ -5619,7 +5619,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         if (mobLevel > playerLevel + 5)
             mobLevel = playerLevel + 5;
 
-        uint32 lvldif = mobLevel - greylevel;
+        int32 lvldif = mobLevel - greylevel;
         if (lvldif < 3)
             lvldif = 3;
 
@@ -5635,7 +5635,9 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         else
         {
             // Skill progress: 90% - 100% - chance decreases from 50% to a minimum which is level dependent
-            chance = float(50 - 1.7f * currenSkillValue * (300.0f / currentSkillMax) + 1.53f * currentSkillMax * (300.0f / currentSkillMax));
+            chance = (0.5f - 0.0168966f * currenSkillValue * (300.0f / currentSkillMax) + 0.0152069f * currentSkillMax * (300.0f / currentSkillMax)) * 100.0f;
+            if (skillDiff <= 3)
+                chance *= (0.5f / (4 - skillDiff));
         }      
 
         // Add intellect bonus (capped at 10% - guessed)
