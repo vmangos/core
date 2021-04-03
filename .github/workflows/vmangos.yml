@@ -8,9 +8,9 @@ name: vmangos CI build
 
 on:
   push:
-    branches: [ patch-9 ]
+    branches: [ development ]
   pull_request:
-    branches: [ patch-9 ]
+    branches: [ development ]
 
 jobs:
   build:
