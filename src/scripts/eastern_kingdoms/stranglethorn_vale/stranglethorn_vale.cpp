@@ -289,7 +289,7 @@ bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, Quest const
 
     if (pQuest->GetQuestId() == QUEST_THE_HEART_OF_HAKKAR && molthorAI)
     {
-        molthorAI->Start(false, pPlayer->GetObjectGuid(), nullptr, true);
+        molthorAI->Start(true, pPlayer->GetObjectGuid(), nullptr, true);
         pCreature->MonsterSay(SAY_MOLTHOR_1);
     }
 
