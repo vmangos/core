@@ -54,7 +54,7 @@ bool checkDirectories(bool debugOutput)
 #ifndef _WIN32
             , 0777
 #endif
-	    ) != 0)
+            ) != 0)
         {
             /* return error if operation fails */
             printf("'mmaps' directory does not exist, please create it\n");
