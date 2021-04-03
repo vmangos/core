@@ -18,6 +18,14 @@
 
 #include "MMapCommon.h"
 #include "MapBuilder.h"
+#ifdef _WIN32
+#include <Windows.h>
+#include <sys/stat.h>
+#include <direct.h>
+#define mkdir _mkdir
+#else
+#include <sys/stat.h>
+#endif
 
 using namespace MMAP;
 
