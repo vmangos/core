@@ -1359,7 +1359,7 @@ bool ChatHandler::HandleModifySpellPowerCommand(char *args)
 
     // dunno where spell power is stored so using a custom spell
     pTarget->RemoveAurasDueToSpell(18058);
-    pTarget->CastCustomSpell(pTarget, 18058, &amount, &amount, nullptr, true);
+    pTarget->CastCustomSpell(pTarget, 18058, amount, amount, {}, true);
 
     PSendSysMessage(LANG_YOU_CHANGE_SP, pTarget->GetName(), amount);
 
@@ -1897,7 +1897,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
     SpellSchoolMask schoolmask = GetSchoolMask(school);
 
     if (schoolmask & SPELL_SCHOOL_MASK_NORMAL)
-        damage = player->CalcArmorReducedDamage(target, damage);
+        damage = ditheru(player->CalcArmorReducedDamage(target, damage));
 
     // melee damage by specific school
     if (!*args)

@@ -486,9 +486,9 @@ SpellAuraProcResult Unit::TriggerProccedSpell(Unit* target, int32* basepoints, S
 
     if (basepoints && (basepoints[EFFECT_INDEX_0] || basepoints[EFFECT_INDEX_1] || basepoints[EFFECT_INDEX_2]))
         CastCustomSpell(target, spellInfo,
-            basepoints[EFFECT_INDEX_0] ? &basepoints[EFFECT_INDEX_0] : nullptr,
-            basepoints[EFFECT_INDEX_1] ? &basepoints[EFFECT_INDEX_1] : nullptr,
-            basepoints[EFFECT_INDEX_2] ? &basepoints[EFFECT_INDEX_2] : nullptr,
+            basepoints[EFFECT_INDEX_0] ? basepoints[EFFECT_INDEX_0] : 0,
+            basepoints[EFFECT_INDEX_1] ? basepoints[EFFECT_INDEX_1] : 0,
+            basepoints[EFFECT_INDEX_2] ? basepoints[EFFECT_INDEX_2] : 0,
             true, castItem, triggeredByAura);
     else
         CastSpell(target, spellInfo, true, castItem, triggeredByAura, originalCaster, nullptr, triggeredByParent);
@@ -514,7 +514,7 @@ SpellAuraProcResult Unit::HandleHasteAuraProc(Unit* pVictim, uint32 damage, Aura
 SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
 {
     SpellEntry const* dummySpell = triggeredByAura->GetSpellProto();
-    int32  triggerAmount = triggeredByAura->GetModifier()->m_amount;
+    float  triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
     Item* castItem = triggeredByAura->GetCastItemGuid() && GetTypeId() == TYPEID_PLAYER
                      ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGuid()) : nullptr;
@@ -540,7 +540,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         return SPELL_AURA_PROC_FAILED;
 
                     // return damage % to attacker but < 50% own total health
-                    basepoints[0] = triggerAmount * int32(damage) / 100;
+                    basepoints[0] = dither(triggerAmount * int32(damage) / 100);
                     if (basepoints[0] > (int32)GetMaxHealth() / 2)
                         basepoints[0] = (int32)GetMaxHealth() / 2;
 
@@ -577,7 +577,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                     {
                         if (pVictim->GetHealthPercent() <= 20.0f && target->GetHealthPercent() <= 20.0f)  // If Both Target A and target B is less or equal than 20% do full damage
                         {
-                            basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                            basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
                             triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                         else if (pVictim->GetHealthPercent() <= 20.0f)    // If only Target A is less or equal than 20% and target B is over 20% do Basic attack damage
@@ -586,14 +586,14 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         }
                         else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used less or equal than 20% anyway.
                         {
-                            basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                            basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
                             triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                     }
                     else // Full damage on anything else
 #endif
                     {
-                        basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                        basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
                         triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                     }
 
@@ -775,7 +775,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                     return SPELL_AURA_PROC_FAILED;
 
                 // mana reward
-                basepoints[0] = (triggerAmount * GetMaxPower(POWER_MANA) / 100);
+                basepoints[0] = dither(triggerAmount * GetMaxPower(POWER_MANA) / 100);
                 target = this;
                 triggered_spell_id = 29442;
                 break;
@@ -788,7 +788,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
 
                 // mana cost save
                 int32 cost = procSpell->manaCost + procSpell->ManaCostPercentage * GetCreateMana() / 100;
-                basepoints[0] = cost * triggerAmount / 100;
+                basepoints[0] = dither(cost * triggerAmount / 100);
                 if (basepoints[0] <= 0)
                     return SPELL_AURA_PROC_FAILED;
 
@@ -936,8 +936,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         return SPELL_AURA_PROC_FAILED;
 
                     // heal amount
-                    basepoints[0] = triggerAmount * damage / 100;
-                    pVictim->CastCustomSpell(pVictim, 15290, &basepoints[0], nullptr, nullptr, true, castItem, triggeredByAura);
+                    basepoints[0] = dither(triggerAmount * damage / 100);
+                    pVictim->CastCustomSpell(pVictim, 15290, basepoints[0], {}, {}, true, castItem, triggeredByAura);
                     return SPELL_AURA_PROC_OK;                                // no hidden cooldown
                 }
                 // Oracle Healing Bonus ("Garments of the Oracle" set)
@@ -1006,7 +1006,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         return SPELL_AURA_PROC_FAILED;
 
                      // Reconstitute damage before armor reduction
-                    basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                    basepoints[0] = ditheru(damage * 100 / CalcArmorReducedDamage(pVictim, 100));
 
                     triggered_spell_id = 22482;
                     break;
@@ -1076,7 +1076,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         damageBasePoints += damageBasePoints*(float)mod->value / 100.0f;
                 }
 
-                int32 damagePoint = urand(0, 1) ? floor(damageBasePoints) : ceil(damageBasePoints);
+                float damagePoint = damageBasePoints;
 
                 // apply damage bonuses manually
                 if (damagePoint >= 0)
@@ -1085,7 +1085,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                     damagePoint = pVictim->SpellDamageBonusTaken(this, dummySpell, EFFECT_INDEX_0, damagePoint, SPELL_DIRECT_DAMAGE);
                 }
 
-                CastCustomSpell(pVictim, spellId, &damagePoint, nullptr, nullptr, true, nullptr, triggeredByAura);
+                CastCustomSpell(pVictim, spellId, dither(damagePoint), {}, {}, true, nullptr, triggeredByAura);
                 // Seal of Righteousness can proc weapon enchants. mechanic removed in 2.1.0
                 ((Player*)this)->CastItemCombatSpell(pVictim, BASE_ATTACK);
                 return SPELL_AURA_PROC_OK;                                // no hidden cooldown
@@ -1189,7 +1189,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
     SpellEntry const* auraSpellInfo = triggeredByAura->GetSpellProto();
 
     // Basepoints of trigger aura
-    int32 triggerAmount = triggeredByAura->GetModifier()->m_amount;
+    float triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
     // Set trigger spell id, target, custom basepoints
     uint32 trigger_spell_id = auraSpellInfo->EffectTriggerSpell[triggeredByAura->GetEffIndex()];
@@ -1368,7 +1368,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                         sLog.outError("Unit::HandleProcTriggerSpell: Spell %u not handled in BR", auraSpellInfo->Id);
                         return SPELL_AURA_PROC_FAILED;
                 }
-                basepoints[0] = damage * triggerAmount / 100 / 3;
+                basepoints[0] = dither(damage * triggerAmount / 100 / 3);
                 target = this;
             }
             break;
@@ -1442,7 +1442,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                             damageBasePoints += damageBasePoints*(float)mod->value / 100.0f;
                     }
 
-                    int32 damagePoint = urand(0, 1) ? floor(damageBasePoints) : ceil(damageBasePoints);
+                    float damagePoint = damageBasePoints;
 
                     // apply damage bonuses manually
                     if (damagePoint >= 0)
@@ -1451,7 +1451,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                         damagePoint = pVictim->SpellDamageBonusTaken(this, auraSpellInfo, triggeredByAura->GetEffIndex(), damagePoint, SPELL_DIRECT_DAMAGE);
                     }
 
-                    CastCustomSpell(pVictim, spellId, &damagePoint, nullptr, nullptr, true, nullptr, triggeredByAura);
+                    CastCustomSpell(pVictim, spellId, dither(damagePoint), nullptr, nullptr, true, nullptr, triggeredByAura);
                     // Seal of Righteousness can proc weapon enchants. mechanic removed in 2.1.0
                     static_cast<Player*>(this)->CastItemCombatSpell(pVictim, BASE_ATTACK);
                     return SPELL_AURA_PROC_OK;                                // no hidden cooldown
@@ -1662,9 +1662,10 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit* pVictim, uint32 
 #endif
 
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
-    damageInfo.damage = CalculateSpellEffectValue(pVictim, spellInfo, triggeredByAura->GetEffIndex());
-    damageInfo.damage = SpellDamageBonusDone(pVictim, spellInfo, triggeredByAura->GetEffIndex(), damageInfo.damage, SPELL_DIRECT_DAMAGE);
-    damageInfo.damage = pVictim->SpellDamageBonusTaken(this, spellInfo, triggeredByAura->GetEffIndex(), damageInfo.damage, SPELL_DIRECT_DAMAGE);
+    float fdamage = CalculateSpellEffectValue(pVictim, spellInfo, triggeredByAura->GetEffIndex());
+    fdamage = SpellDamageBonusDone(pVictim, spellInfo, triggeredByAura->GetEffIndex(), damageInfo.damage, SPELL_DIRECT_DAMAGE);
+    fdamage = pVictim->SpellDamageBonusTaken(this, spellInfo, triggeredByAura->GetEffIndex(), damageInfo.damage, SPELL_DIRECT_DAMAGE);
+    damageInfo.damage = ditheru(fdamage);
     damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
     DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
     SendSpellNonMeleeDamageLog(&damageInfo);
@@ -1683,7 +1684,7 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit* pVictim, uint3
                      ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGuid()) : nullptr;
 
     // Basepoints of trigger aura
-    int32 triggerAmount = triggeredByAura->GetModifier()->m_amount;
+    float triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
     uint32 triggered_spell_id = 0;
 

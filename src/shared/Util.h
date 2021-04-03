@@ -409,5 +409,40 @@ void hexEncodeByteArray(uint8* bytes, uint32 arrayLen, std::string& result);
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
 void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
 
-uint32 dither(float v);
+uint32 ditheru(float v);
+int32 dither(float v);
+
+#if false //__cplusplus >= 201703L
+
+#include <optional>
+
+template<class t>
+using optional = optional<t>;
+
+#else
+
+template <typename T>
+class optional {
+    T stored;
+    bool hasValue = false;
+
+public:
+    constexpr optional() noexcept = default;
+    constexpr optional(const optional &other) = default;
+    constexpr optional(optional &&other) noexcept = default;
+    template<typename U>
+    constexpr optional(const optional<U> &other) : stored(other.stored), hasValue(other.hasValue) {}
+    template<typename U>
+    constexpr optional(optional<U> &&other) : stored(std::move(other.stored)), hasValue(std::move(other.hasValue)) {}
+    constexpr optional(T v) : stored(v), hasValue(true) {};
+
+    constexpr const T& operator*() const& { return stored;}
+    constexpr T& operator*() & { return stored;}
+    constexpr const T&& operator*() const&& { return std::move(stored);}
+    constexpr T&& operator*() && { return std::move(stored);}
+    constexpr explicit operator bool() const noexcept { return has_value(); }
+    constexpr bool has_value() const noexcept { return hasValue; };
+};
+
+#endif
 #endif
