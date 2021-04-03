@@ -219,6 +219,51 @@ UPDATE `creature_template` SET `school_immune_mask` = 8 WHERE `entry` = 5720;
 -- add SrcSpell to bring the light (credit cmangos)
 UPDATE `quest_template` SET `SrcSpell` = 2791 WHERE `entry` = 3636;
 
+-- add washte pawne spawns (credit cmangos)
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(15215, 3472, 1, -3716.850830078125, -1917.6165771484375, 91.7601318359375, 5.458455085754394531, 413, 413, 100, 0, 1, 40, 10),
+(15217, 3472, 1, -3449.927001953125, -1917.60009765625, 95.30474090576171875, 1.559170365333557128, 413, 413, 100, 0, 1, 40, 10),
+(15222, 3472, 1, -3783.507080078125, -2184.351318359375, 93.82526397705078125, 0.88516998291015625, 413, 413, 100, 0, 1, 40, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(121, 1, 'Washte Pawne (3472)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(15215, 121, 'Washte Pawne #1'),
+(15217, 121, 'Washte Pawne #2'),
+(15222, 121, 'Washte Pawne #3'),
+(15081, 121, 'Washte Pawne #4');
+
+-- add owatanka spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = -2515.481689453125, `position_y` = -2383.766845703125, `position_z` = 92.19029998779296875, `orientation` = 2.392263174057006835, `wander_distance` = 40, `movement_type` = 1 WHERE (`guid` = 15082);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(15223, 3473, 1, -2379.904052734375, -2383.2734375, 91.75, 5.385590076446533203, 413, 413, 100, 0, 1, 40, 10),
+(15224, 3473, 1, -2616.596435546875, -2017.2301025390625, 93.0281982421875, 2.328437089920043945, 413, 413, 100, 0, 1, 40, 10),
+(15225, 3473, 1, -2584.930908203125, -1849.863525390625, 91.9208984375, 5.536968708038330078, 413, 413, 100, 0, 1, 40, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(122, 1, 'Owatanka (3473)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(15082, 122, 'Owatanka #1'),
+(15223, 122, 'Owatanka #2'),
+(15224, 122, 'Owatanka #3'),
+(15225, 122, 'Owatanka #4');
+
+-- add lakota mani spawns (credit cmangos)
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(15318, 3474, 1, -1950.4051513671875, -1949.997802734375, 92.8021087646484375, 5.445427417755126953, 413, 413, 100, 0, 0, 0, 10),
+(15540, 3474, 1, -1981.5889892578125, -2452.464111328125, 93.39815521240234375, 3.926990747451782226, 413, 413, 100, 0, 0, 0, 10),
+(15576, 3474, 1, -1716.923583984375, -2051.568603515625, 91.8554840087890625, 0.872664630413055419, 413, 413, 100, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(123, 1, 'Lakota\'mani (3474)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(15083, 123, 'Lakota\'mani #1'),
+(15318, 123, 'Lakota\'mani #2'),
+(15540, 123, 'Lakota\'mani #3'),
+(15576, 123, 'Lakota\'mani #4');
+
+-- add mising gobject gossip (credit cmangos)
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(2985, 3677),
+(6030,7181);
+
 
 -- End of migration.
 END IF;
