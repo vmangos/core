@@ -6162,13 +6162,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
         }
         case SPELL_AURA_MOD_REGEN:
         {
-            // don't heal target if not alive, possible death persistent effects
-            if (!target->IsAlive())
-                return;
-
-            int32 gain = target->ModifyHealth(dither(m_modifier.m_amount));
-            if (Unit* caster = GetCaster())
-                target->GetHostileRefManager().threatAssist(caster, float(gain) * 0.5f  * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             // Eating anim
             if (spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
                 target->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
