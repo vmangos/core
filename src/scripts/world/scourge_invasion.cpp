@@ -919,17 +919,6 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        // Instakill every mob nearby, except Players, Pets.
-        if (m_creature->IsWithinDistInMap(pWho, 25.0f) && m_creature->IsWithinLOSInMap(pWho))
-            if (pWho->GetFactionTemplateEntry() != m_creature->GetFactionTemplateEntry() && pWho->GetFactionTemplateId() != 35)
-                if (!pWho->IsCharmerOrOwnerPlayerOrPlayerItself())
-                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_TRIGGERED);
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
     void JustDied(Unit* pKiller) override
     {
         if (m_creature->GetEntry() == NPC_SHADOW_OF_DOOM)
@@ -1029,6 +1018,10 @@ struct ScourgeMinion : public ScriptedAI
         // Combat Abilities.
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
+        // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
+        if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f))
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
     }
