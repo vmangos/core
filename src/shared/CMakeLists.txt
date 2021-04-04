@@ -63,6 +63,7 @@ set (shared_SRCS
     Database/SqlPreparedStatement.h
     Database/SQLStorage.h
     Database/SQLStorageImpl.h
+    nonstd/optional.hpp
     Common.cpp
     DelayExecutor.cpp
     Log.cpp

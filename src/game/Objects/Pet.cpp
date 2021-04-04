@@ -1740,7 +1740,7 @@ void Pet::_LoadAuras(uint32 timediff)
 
             uint32 stackcount   = it.stackcount;
             int32 remaincharges = (int32)it.remaincharges;
-            int32 damage[MAX_EFFECT_INDEX];
+            float damage[MAX_EFFECT_INDEX];
             int32 periodicTime[MAX_EFFECT_INDEX];
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -2326,7 +2326,7 @@ void Pet::CastPetAura(PetAura const* aura)
     if (auraId == 35696)                                      // Demonic Knowledge
     {
         int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
-        CastCustomSpell(this, auraId, &basePoints, nullptr, nullptr, true);
+        CastCustomSpell(this, auraId, basePoints, {}, {}, true);
     }
     else
         CastSpell(this, auraId, true);

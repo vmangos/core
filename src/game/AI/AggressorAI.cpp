@@ -36,7 +36,8 @@ void AggressorAI::MoveInLineOfSight(Unit* u)
     // Check this now to prevent calling expensive functions (IsInAccessablePlaceFor / IsWithinLOSInMap)
     if (m_creature->GetVictim() && !m_creature->GetMap()->IsDungeon())
         return;
-    if (!m_creature->IsWithinDistInMap(u, m_creature->GetAttackDistance(u)))
+
+    if (!m_creature->IsWithinDistInMap(u, m_creature->GetAttackDistance(u), true, false))
         return;
 
     if (m_creature->CanInitiateAttack() && u->IsTargetable(true, false) && m_creature->IsHostileTo(u) &&

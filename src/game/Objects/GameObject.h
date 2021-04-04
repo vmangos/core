@@ -696,6 +696,7 @@ class GameObject : public WorldObject
         bool LoadFromDB(uint32 guid, Map* map);
         void DeleteFromDB() const;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2
         void SetOwnerGuid(ObjectGuid ownerGuid)
         {
             m_spawnedByDefault = false;                     // all object with owner is despawned after delay
@@ -703,6 +704,16 @@ class GameObject : public WorldObject
         }
 
         ObjectGuid const& GetOwnerGuid() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+#else
+        ObjectGuid m_ownerGuid;
+        void SetOwnerGuid(ObjectGuid ownerGuid)
+        {
+            m_spawnedByDefault = false;                     // all object with owner is despawned after delay
+            m_ownerGuid = ownerGuid;
+        }
+
+        ObjectGuid const& GetOwnerGuid() const { return m_ownerGuid; }
+#endif
         Unit* GetOwner() const;
         Player* GetAffectingPlayer() const final;
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const final { return GetOwnerGuid().IsPlayer(); }

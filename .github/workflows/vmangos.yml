@@ -77,7 +77,7 @@ jobs:
         mkdir build
         mkdir _install
         cd build
-        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DSERVERS=1 -DTOOLS=1 -DSCRIPTS=1 -DWITH_DOCS=1 -DWITH_WARNINGS=0 -DELUNA=0 -DWITH_COREDEBUG=0
+        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DSERVERS=1 -DTOOLS=1 -DSCRIPTS=1 -DWITH_DOCS=1 -DWITH_WARNINGS=0 -DELUNA=0 -DWITH_COREDEBUG=0 -DUSE_EXTRACTORS=1
         make -j2
         make install
     #windows 
@@ -91,7 +91,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         mkdir build
         cd build
-        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -G "Visual Studio 16 2019" -A x64 ..
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DSERVERS=1 -DTOOLS=1 -DSCRIPTS=1 -DWITH_DOCS=1 -DWITH_WARNINGS=0 -DELUNA=0 -DWITH_COREDEBUG=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
         /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash

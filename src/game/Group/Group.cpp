@@ -1155,13 +1155,6 @@ void Group::ClearTargetIcon(ObjectGuid targetGuid)
             return SetTargetIcon(i, ObjectGuid());
 }
 
-static void GetDataForXPAtKill_helper_helper(Unit* unit, Unit const* victim, Unit* & not_gray_member_with_max_level)
-{
-    uint32 gray_level = MaNGOS::XP::GetGrayLevel(unit->GetLevel());
-    if (victim->GetLevel() > gray_level && (!not_gray_member_with_max_level
-        || not_gray_member_with_max_level->GetLevel() < unit->GetLevel()))
-        not_gray_member_with_max_level = unit;
-}
 
 static void GetDataForXPAtKill_helper(Player* player, Unit const* victim, uint32& sum_level, Player* & member_with_max_level, Unit* & not_gray_member_with_max_level)
 {
@@ -1169,11 +1162,10 @@ static void GetDataForXPAtKill_helper(Player* player, Unit const* victim, uint32
     if (!member_with_max_level || member_with_max_level->GetLevel() < player->GetLevel())
         member_with_max_level = player;
 
-    GetDataForXPAtKill_helper_helper(player, victim, not_gray_member_with_max_level);
-
-    if (Pet* pet = player->GetPet())
-        if (pet->getPetType() == HUNTER_PET)
-            GetDataForXPAtKill_helper_helper(pet, victim, not_gray_member_with_max_level);
+    uint32 gray_level = MaNGOS::XP::GetGrayLevel(player->GetLevel());
+    if (victim->GetLevel() > gray_level && (!not_gray_member_with_max_level
+        || not_gray_member_with_max_level->GetLevel() < player->GetLevel()))
+        not_gray_member_with_max_level = player;
 }
 
 void Group::GetDataForXPAtKill(Unit const* victim, uint32& count, uint32& sum_level, Player* & member_with_max_level, Unit* & not_gray_member_with_max_level, Player* additional)

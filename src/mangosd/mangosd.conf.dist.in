@@ -1038,6 +1038,14 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Server autobroadcast interval set in miliseconds.
 #        Default: 1800000 = 30 min
 #
+#    Spell.EffectDelay
+#        Delay in milliseconds before most spell effects are processed.
+#        Default: 400
+#
+#    Spell.ProcDelay
+#        Delay in milliseconds before processing procs.
+#        Default: 400
+#
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
 #        Default: 1 (true)
@@ -1116,6 +1124,8 @@ PetDefaultLoyalty = 1
 PlayerCommands = 1
 Event.Announce = 0
 AutoBroadcast.Timer = 1800000
+Spell.EffectDelay = 400
+Spell.ProcDelay = 400
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
@@ -2844,10 +2854,4 @@ DynamicRespawn.AffectRespawnTimeBelow   = 0
 DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
-
-###################################################################################################################
-#    Others settings
-###################################################################################################################
-
-Spells.CCDelay = 200
 

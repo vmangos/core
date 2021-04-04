@@ -69,6 +69,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
     {
         Target->Initialize(SMSG_ADDON_INFO);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
 
         unsigned char tdata[256] =
         {
@@ -122,6 +123,38 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
                 // String, 256
             }
         }
+#else
+        uint32 Unknown1;
+        uint8 Unknown0;
+
+        AddOnPacked >> Unknown0;
+        AddOnPacked >> Unknown1;
+        while (AddOnPacked.rpos() < AddOnPacked.size())
+        {
+            std::string AddonNames;
+            uint8 unk6;
+            uint64 crc;
+
+            AddOnPacked >> AddonNames;
+
+            AddOnPacked >> crc >> unk6;
+
+            //DEBUG_LOG("ADDON: Name:%s CRC:%llx Unknown1 :%x", AddonNames.c_str(), crc, unk6);
+
+            if (crc == 0x4C1C776D01LL)  // standard addon CRC
+            {
+                *Target << uint8(0) << uint8(2) << uint8(1) << uint8(0) << uint32(0);
+            }
+            else // if addon is custom
+            {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+                *Target << uint8(0x00) << uint8(0x01) << uint8(0x00) << uint8(0x01);
+#else
+                *Target << uint8(0x00) << uint8(0x0) << uint8(0x00) << uint8(0x0);
+#endif
+            }
+        }
+#endif
     }
     else
     {
