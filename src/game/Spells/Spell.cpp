@@ -1687,6 +1687,11 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                     pRealUnitCaster->SetOutOfCombatWithVictim(unit);
                 }
             }
+            else if (pRealUnitCaster)
+            {
+                // make sure caster is flagged in pvp case
+                pRealUnitCaster->SetOutOfCombatWithVictim(unit);
+            }
         }
         else
         {
