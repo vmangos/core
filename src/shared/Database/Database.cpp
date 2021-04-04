@@ -553,7 +553,7 @@ bool Database::HasAsyncQuery()
 {
     bool hasQuery = !m_delayQueue->empty_unsafe();
 
-    for (int i = 0; i < m_numAsyncWorkers && !hasQuery; ++i)
+    for (uint32 i = 0; i < m_numAsyncWorkers && !hasQuery; ++i)
         hasQuery = m_threadsBodies[i]->HasAsyncQuery();
 
     return hasQuery;

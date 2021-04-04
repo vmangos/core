@@ -335,9 +335,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     else if (opcode == MSG_MOVE_FALL_LAND)
         pMover->SetJumpInitialSpeed(-9.645f);
 
-    // Interrupt spell cast at move
     if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+    {
+        // Interrupt spell cast at move
         pMover->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+        // Fix bug after 1.11 where client doesn't send stand state update while casting.
+        // Test case: Begin eating or drinking, then start casting Hearthstone and run.
+        pMover->SetStandState(UNIT_STAND_STATE_STAND);
+    }
 
     HandleMoverRelocation(pMover, movementInfo);
 

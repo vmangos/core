@@ -516,9 +516,7 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
             return;
     }
 
-    // Delay stand state changes to recreate the retail trick which let
-    // things like Reckoning proc while sitting if you spam the X button.
-    _player->ScheduleStandStateChange(animstate);
+    _player->SetStandState(animstate);
 }
 
 void WorldSession::HandleFriendListOpcode(WorldPacket& recv_data)
@@ -1059,10 +1057,10 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     data << (uint16)0;
 
     // Lifetime Honorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
 
     // Lifetime Dishonorable Kills
-    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS);
 
     // Yesterday Honor
     data << pTarget->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);

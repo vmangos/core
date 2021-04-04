@@ -18,6 +18,14 @@
 
 #include "MMapCommon.h"
 #include "MapBuilder.h"
+#ifdef _WIN32
+#include <Windows.h>
+#include <sys/stat.h>
+#include <direct.h>
+#define mkdir _mkdir
+#else
+#include <sys/stat.h>
+#endif
 
 using namespace MMAP;
 
@@ -41,8 +49,17 @@ bool checkDirectories(bool debugOutput)
     dirFiles.clear();
     if (getDirContents(dirFiles, "mmaps") == LISTFILE_DIRECTORY_NOT_FOUND)
     {
-        printf("'mmaps' directory does not exist, please create it\n");
-        return false;
+        /* create mmaps directory */
+        if (mkdir("mmaps"
+#ifndef _WIN32
+            , 0777
+#endif
+            ) != 0)
+        {
+            /* return error if operation fails */
+            printf("'mmaps' directory does not exist, please create it\n");
+            return false;
+        }
     }
 
     dirFiles.clear();

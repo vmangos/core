@@ -575,7 +575,7 @@ struct npc_corrupted_totemAI : ScriptedAI
                         if (!curr->HasAura(uiSpellId))
                         {
                             if (damage)
-                                curr->CastCustomSpell(curr, uiSpellId, &damage, nullptr, nullptr, true);
+                                curr->CastCustomSpell(curr, uiSpellId, damage, {}, {}, true);
                             else
                                 curr->AddAura(uiSpellId);
                         }
