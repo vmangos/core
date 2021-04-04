@@ -342,6 +342,21 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (20298, 24, -4639.78125, -2447.902099609375, 90.9450836181640625, 100, 0, 0),
 (20298, 25, -4633.26171875, -2451.2822265625, 90.18062591552734375, 100, 0, 0);
 
+-- Events list for Venture Co. Drudger
+DELETE FROM `creature_ai_events` WHERE `creature_id`=3284;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (328401, 3284, 0, 2, 0, 100, 0, 20, 0, 0, 0, 328401, 0, 0, 'Venture Co. Drudger - Flee at 20\% HP');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (328401, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Venture Co. Drudger - Flee');
+
+-- Events list for Venture Co. Peon
+DELETE FROM `creature_ai_events` WHERE `creature_id`=3285;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (328501, 3285, 0, 2, 0, 100, 0, 20, 0, 0, 0, 328501, 0, 0, 'Venture Co. Peon - Flee at 20\% HP');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (328501, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Venture Co. Peon - Flee');
+
+-- Events list for  Theramore Marine
+DELETE FROM `creature_ai_events` WHERE `creature_id`=3385;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (338501, 3385, 0, 2, 0, 100, 0, 20, 0, 0, 0, 338501, 0, 0, 'Theramore Marine - Flee at 20\% HP');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (338501, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Marine - Flee');
+
 
 -- End of migration.
 END IF;
