@@ -38,6 +38,9 @@
 #include <string>
 #include <array>
 #include <memory>
+#include "nonstd/optional.hpp"
+
+using namespace nonstd;
 
 #define CONTACT_DISTANCE            0.5f
 #define INTERACTION_DISTANCE        5.0f

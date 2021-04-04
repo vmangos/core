@@ -1741,7 +1741,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     int32 damagePoint = m_triggeredByAuraBasePoints;
                     damagePoint = pCaster->SpellDamageBonusDone(unitTarget, pSpellEntry, EFFECT_INDEX_0, damagePoint, DOT);
-                    pCaster->CastCustomSpell(unitTarget, 18277, &damagePoint, nullptr, nullptr, true);
+                    pCaster->CastCustomSpell(unitTarget, 18277, damagePoint, {}, {}, true);
                 }
                 return;
             }
