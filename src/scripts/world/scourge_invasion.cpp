@@ -859,17 +859,14 @@ struct ScourgeMinion : public ScriptedAI
 {
     ScourgeMinion(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        Reset();
         m_events.Reset();
+        if (m_creature->GetEntry() != NPC_SHADOW_OF_DOOM)
+            m_creature->SetWanderDistance(1.0f);    // Seems to be very low.
     }
 
     EventMap m_events;                 
 
-    void Reset() override
-    {
-        if (m_creature->GetEntry() != NPC_SHADOW_OF_DOOM)
-            m_creature->SetWanderDistance(1.0f);    // Seems to be very low.
-    }
+    void Reset() {}
 
     void DoAction(Unit* unit, uint32 action) override
     {
@@ -916,7 +913,21 @@ struct ScourgeMinion : public ScriptedAI
             m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
             m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
             break;
+        case NPC_SKELETAL_TROOPER:
+            m_events.ScheduleEvent(EVENT_MINION_SHADOW_WORD_PAIN, 2000);
+            break;
         }
+    }
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        // Instakill every mob nearby, except Players, Pets.
+        if (m_creature->IsWithinDistInMap(pWho, 25.0f) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->GetFactionTemplateEntry() != m_creature->GetFactionTemplateEntry() && pWho->GetFactionTemplateId() != 35)
+                if (!pWho->IsCharmerOrOwnerPlayerOrPlayerItself())
+                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_TRIGGERED);
+
+        ScriptedAI::MoveInLineOfSight(pWho);
     }
 
     void JustDied(Unit* pKiller) override
@@ -1008,16 +1019,16 @@ struct ScourgeMinion : public ScriptedAI
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
                 m_events.ScheduleEvent(EVENT_DOOM_FEAR, 14500);
                 break;
+            case EVENT_MINION_SHADOW_WORD_PAIN:
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_WORD_PAIN, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
+                m_events.ScheduleEvent(EVENT_MINION_SHADOW_WORD_PAIN, urand(9000, 18000));
+                break;
             }
         }
 
         // Combat Abilities.
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-
-        // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
-        if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f))
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
     }

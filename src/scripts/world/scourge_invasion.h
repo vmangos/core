@@ -28,7 +28,7 @@ enum ScourgeInvasionSpells
     // Mouth of Kel'Thuzad?
     SPELL_CANCEL_MOUTH_SPAWNS                   = 29500, // Not sure what it does.
 
-    // Object 181214 Necropolis critter spawner
+    // GameObject Necropolis
     SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
 
     // Necropolis Health -> Necropolis
@@ -134,7 +134,7 @@ enum ScourgeInvasionSpells
     SPELL_BUTTRESS_TRAP                         = 28054, // Unknown.
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
                                                          
-    // Probably used to spawn Shadow of Doom.        Casting sequence (All those [x] spells are casted within 1-2 seconds):
+    // Probably used to spawn Shadow of Doom.   Casting sequence (All those [x] spells are casted within 1-2 seconds):
     SPELL_PH_KILL_SUMMONER_BUFF                 = 27852, // [1] Casted by Cultist on Player.
     SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS    = 27894, // [2] Casted by Player on Cultist.
     SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
@@ -147,19 +147,16 @@ enum ScourgeInvasionSpells
     SPELL_MINDFLAY                              = 16568,
     SPELL_FEAR                                  = 12542,
 
-    // Pallid Horror - Patchwerk Terror
+    // Pallid Horror - Patchwerk Terror (also uses: 28315)
     SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL       = 28424, // Alliance.
     SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699, // Horde.
-    // SPELL_AURA_OF_FEAR                        = 28315,
     SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard)
 
-    // Flameshocker
-    //17680
-    //28234
+    // Flameshocker (also uses: 28234, 17680)
     SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 22 seconds]
     SPELL_FLAMESHOCKERS_REVENGE                 = 28323, // On death. 
     SPELL_FLAMESHOCKERS_TOUCH2                  = 28329, // [shortest sniff CD: 22 seconds]
-    SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330,
+    SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330
 
     /*
     These spells are not used by any NPCs or GameObjects.
@@ -238,9 +235,9 @@ enum ScourgeInvasionMisc
     ITEM_NECROTIC_RUNE                      = 22484,
 
     // Invisible Objects
-    GOBJ_BUTTRESS_TRAP                      = 181112, // [Guessed] These Objects can not get sniffed neither exist any Database.
+    GOBJ_BUTTRESS_TRAP                      = 181112, // [Guessed] These objects cannot be sniffed and are not available in any database.
 
-    GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL     = 181111, // Object is not in Sniffs or any Database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) summons it.
+    GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL     = 181111, // Object is not in sniffed files or any database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) should probably summon them.
     GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON  = 181155, // ""
     GOBJ_SUMMON_MINION_TRAP_GHOUL_SKELETON  = 181156, // ""
 
@@ -287,7 +284,7 @@ enum ScourgeInvasionMisc
     GAME_EVENT_SCOURGE_INVASION_50_INVASIONS            = 96,
     GAME_EVENT_SCOURGE_INVASION_100_INVASIONS           = 97,
     GAME_EVENT_SCOURGE_INVASION_150_INVASIONS           = 98,
-    GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE          = 99,
+    GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE          = 99
 };
 
 enum ScourgeInvasionNPCEvents
@@ -321,6 +318,8 @@ enum ScourgeInvasionNPCEvents
     EVENT_MINION_SUNDER_ARMOR               = 45,
     EVENT_MINION_ARCANE_BOLT                = 46,
     EVENT_MINION_PSYCHIC_SCREAM             = 47,
+    EVENT_MINION_SCOURGE_STRIKE             = 48,
+    EVENT_MINION_SHADOW_WORD_PAIN           = 49
 };
 
 enum ScourgeInvasionWorldStatesVariables
@@ -361,7 +360,7 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING   = 32,
     VARIABLE_SI_BLASTED_LANDS_REMAINING         = 33,
     VARIABLE_SI_BURNING_STEPPES_REMAINING       = 34,
-    VARIABLE_SI_TANARIS_REMAINING               = 35,
+    VARIABLE_SI_TANARIS_REMAINING               = 35
 
     /*
     VARIABLE_AZSHARA_NECROPOLIS_REMAINING               = 16,
@@ -377,7 +376,7 @@ enum ScourgeInvasionQuests
 {
     QUEST_UNDER_THE_SHADOW                      = 9153,
     QUEST_CRACKED_NECROTIC_CRYSTAL              = 9292,
-    QUEST_FAINT_NECROTIC_CRYSTAL                = 9310,
+    QUEST_FAINT_NECROTIC_CRYSTAL                = 9310
 };
 
 enum ScourgeInvasionLang
@@ -456,5 +455,5 @@ enum ScourgeInvasionLang
     LANG_ARGENT_EMISSARY_AWBSER_3_0                     = 8551, // 12399 - We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over.
     LANG_ARGENT_EMISSARY_AWBSER_3_1                     = 8554, // 12402 - We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.
     LANG_ARGENT_EMISSARY_AWBSER_3_2                     = 8555, // 12403 - We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
-    LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE                = 8481, // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
+    LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE                = 8481  // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
 };
