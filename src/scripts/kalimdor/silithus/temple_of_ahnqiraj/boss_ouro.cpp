@@ -67,17 +67,17 @@ enum
 };
 
 /*
- * Sand Blast timers are based on June 2006 values (15-20s) as shown in
- * https://www.youtube.com/watch?v=REmX3uRTFkQ and further reduced to account
- * for April 2006 nerfs (http://blue.cardplace.com/cache/wow-dungeons/481724.htm &
- * http://blue.cardplace.com/cache/wow-general/7950998.htm
- * Sweep timers based on the same video. No known nerfs.
+ * Sand Blast timers are based on June 2006 values (17-22s) as shown in
+ * https://www.youtube.com/watch?v=REmX3uRTFkQ Sweep timers based on the
+ * same video. No known nerfs.
  */
 const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
 const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
-const uint32_t SANDBLAST_TIMER_MIN         = 12000;
-const uint32_t SANDBLAST_TIMER_MAX         = 17000;
-const uint32_t SUBMERGE_TIMER              = 90000;
+// Take nerfs into account http://blue.cardplace.com/cache/wow-dungeons/481724.htm for content patch progression
+// Note: Investigate if these timers are 100% accurate.
+const uint32_t SANDBLAST_TIMER_MIN         = sWorld.GetWowPatch() >= WOW_PATCH_110 ? 17000 : 12000;
+const uint32_t SANDBLAST_TIMER_MAX         = sWorld.GetWowPatch() >= WOW_PATCH_110 ? 22000 : 17000;
+const uint32_t SUBMERGE_TIMER              = sWorld.GetWowPatch() >= WOW_PATCH_110 ? 90000 : 60000;
 const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
 const uint32_t SWEEP_TIMER                 = 15000;
 
