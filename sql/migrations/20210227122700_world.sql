@@ -18,7 +18,7 @@ UPDATE `creature_template` SET `regeneration`='0', `script_name`='scourge_invasi
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE `entry`=16386;
 UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16285,16361,16281,16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
-UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `unit_flags`='512' WHERE entry IN (16395,16436,16434,16433,16384,16435);
+UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `movement_type`='0', `unit_flags`='512' WHERE entry IN (16395,16436,16434,16433,16384,16435);
 UPDATE `creature_template` SET `unit_flags`='33280', `faction`='794', `npc_flags`='2' WHERE `entry`=16786;
 UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='2' WHERE `entry` IN (16787,16281,16361);
 UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='1' WHERE `entry`=16285;

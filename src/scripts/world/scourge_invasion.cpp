@@ -1065,26 +1065,22 @@ bool GossipHello_scourge_invasion_rewards_giver(Player* player, Creature* creatu
     // Add Item
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-    uint32 attacked1 = 0;
-    uint32 attacked2 = 0;
-    if (sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_TIME1) < time(nullptr))
-        attacked1 = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_ZONE1);
-    if (sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_TIME2) < time(nullptr))
-        attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_ZONE2);
+    switch (creature->GetEntry())
+    {
+    case NPC_ARGENT_DAWN_INITIATE:
+    case NPC_ARGENT_DAWN_CLERIC:
+        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_50_WINS, creature->GetGUID());
+        break;
+    case NPC_ARGENT_DAWN_PRIEST:
+    case NPC_ARGENT_DAWN_PALADIN:
+        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_100_WINS, creature->GetGUID());
+        break;
+    case NPC_ARGENT_DAWN_CRUSADER:
+    case NPC_ARGENT_DAWN_CHAMPION:
+        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_150_WINS, creature->GetGUID());
+        break;
+    }
 
-    // No invasion happening
-    if (!attacked1 && !attacked2)
-    {
-        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_0, creature->GetGUID());
-    }
-    else
-    {
-        uint32 rnd = urand(0, 1); // Random text selection
-        if (rnd)
-            player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_1, creature->GetGUID());
-        else
-            player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_2, creature->GetGUID());
-    }
     return true;
 }
 
@@ -1261,29 +1257,30 @@ struct PallidHorrorAI : public ScriptedAI
     PallidHorrorAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
-        switch (urand(0, 1))
-        {
-        case 0:
-            m_creature->MonsterYell(LANG_PALLID_HORROR_YELL1);
-            break;
-        case 1:
-            m_creature->MonsterYell(LANG_PALLID_HORROR_YELL2);
-            break;
-        }
+        _yellTimer = 5000;
     }
 
-    void Reset() override
-    {
-    }
+    uint32 _yellTimer;
+
+    void Reset() override {}
 
     void JustDied(Unit* killer) override
     {
-        if (m_creature->GetZoneId() == 1519) // Stormwind
-            m_creature->CastSpell(m_creature, SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL, true);
-        else if (m_creature->GetZoneId() == 1497) // Undercity
-            m_creature->CastSpell(m_creature, SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL, true);
-
+        // Yes they really did create a random crystal on death (in 2006 and in classic sniffs): http://casualwow.blogspot.com/2006/07/pallid-horror.html
+        m_creature->CastSpell(m_creature, PickRandomValue(SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL, SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL), true);
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (_yellTimer < diff)
+        {
+            m_creature->MonsterYell(PickRandomValue(LANG_PALLID_HORROR_YELL1, LANG_PALLID_HORROR_YELL2, LANG_PALLID_HORROR_YELL3, LANG_PALLID_HORROR_YELL4,
+                                                    LANG_PALLID_HORROR_YELL5, LANG_PALLID_HORROR_YELL6, LANG_PALLID_HORROR_YELL7, LANG_PALLID_HORROR_YELL8));
+            _yellTimer = urand(IN_MILLISECONDS * 65, IN_MILLISECONDS * 300); 
+        }
+        else
+            _yellTimer -= diff;
     }
 };
 

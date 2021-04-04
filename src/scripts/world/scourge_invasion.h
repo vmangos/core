@@ -381,42 +381,74 @@ enum ScourgeInvasionQuests
 
 enum ScourgeInvasionLang
 {
-    // Pallid Horror random yelling every 65-300 seconds.
-    LANG_PALLID_HORROR_YELL1                    = 12329, // What?  This not Naxxramas!  We not like this place... destroy!
-    LANG_PALLID_HORROR_YELL2                    = 12327, // Raaarrrrggghhh!  We come for you!
-    LANG_PALLID_HORROR_YELL3                    = 12326, // Kel'Thuzad say to tell you... DIE!
-    LANG_PALLID_HORROR_YELL4                    = 12342, // Why you run away? We make your corpse into Scourge.
-    LANG_PALLID_HORROR_YELL5                    = 12343, // No worry, we find you.
-    LANG_PALLID_HORROR_YELL6                    = 12330, // You spare parts!  We make more Scourge in necropolis.
-    LANG_PALLID_HORROR_YELL7                    = 12328, // Hahaha, your guards no match for Scourge!
-    LANG_PALLID_HORROR_YELL8                    = 12325, // We come destroy puny ones!
+    // Pallid Horror random yelling every 65-300 seconds
+    LANG_PALLID_HORROR_YELL1                            = 12329, // What?  This not Naxxramas!  We not like this place... destroy!
+    LANG_PALLID_HORROR_YELL2                            = 12327, // Raaarrrrggghhh!  We come for you!
+    LANG_PALLID_HORROR_YELL3                            = 12326, // Kel'Thuzad say to tell you... DIE!
+    LANG_PALLID_HORROR_YELL4                            = 12342, // Why you run away? We make your corpse into Scourge.
+    LANG_PALLID_HORROR_YELL5                            = 12343, // No worry, we find you.
+    LANG_PALLID_HORROR_YELL6                            = 12330, // You spare parts!  We make more Scourge in necropolis.
+    LANG_PALLID_HORROR_YELL7                            = 12328, // Hahaha, your guards no match for Scourge!
+    LANG_PALLID_HORROR_YELL8                            = 12325, // We come destroy puny ones!
 
-    LANG_UNDERCITY_GUARDIAN_1                   = 12336, // Rogues' Quarter attacked by Scourge!  Help!
-    LANG_UNDERCITY_GUARDIAN_2                   = 12353, // There Scourge outside Trade Quarter!
-    LANG_UNDERCITY_GUARDIAN_3                   = 12354, // Scourge inside Trade Quarter!  Destroy!
-    LANG_UNDERCITY_GUARDIAN_4                   = 12334, // Scourge in the Sewers! We need help!
+    // Undercity Guardian -> Pallid Horror
+    LANG_UNDERCITY_GUARDIAN_1                           = 12336, // Rogues' Quarter attacked by Scourge!  Help!
+    LANG_UNDERCITY_GUARDIAN_2                           = 12335, // Scourge attack Magic Quarter!
+    LANG_UNDERCITY_GUARDIAN_3                           = 12353, // There Scourge outside Trade Quarter!
+    LANG_UNDERCITY_GUARDIAN_4                           = 12334, // Scourge in sewers!  We need help!
 
-    LANG_UNDERCITY_RANDOM_1                     = 12355, // Scourge spotted nearby!
-    LANG_UNDERCITY_RANDOM_2                     = 12356, // I just saw a Scourge!  Kill it!
-    LANG_UNDERCITY_RANDOM_3                     = 12357, // Did you see that?  There's a Scourge over there!
-    LANG_UNDERCITY_RANDOM_4                     = 12358, // How can I get anything done with the Scourge running amok in here?!
-    LANG_UNDERCITY_RANDOM_5                     = 12359, // There's one of the Scourge, right over there!
-    LANG_UNDERCITY_RANDOM_6                     = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
-    LANG_UNDERCITY_RANDOM_7                     = 12361, // Will these unrelenting Scourge attacks never end?
+    // Undercity Elite Guardian -> Pallid Horror
+    LANG_UNDERCITY_ELITE_GUARDIAN_1                     = 12354, // Scourge inside Trade Quarter!  Destroy!
 
-    LANG_STORMWIND_CITY_GUARD_1                 = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
-    LANG_STORMWIND_CITY_GUARD_2                 = 12311, // Scourge in the Trade District!  Have at them!
-    LANG_STORMWIND_CITY_GUARD_3                 = 12315, // Light help us... the Scourge are in the Park!
-    LANG_STORMWIND_CITY_GUARD_4                 = 12316, // The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!
-    LANG_STORMWIND_CITY_GUARD_5                 = 12317, // Hold the line!  Protect the King at all costs!
-    LANG_STORMWIND_CITY_GUARD_6                 = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
+    // Royal Dreadguard -> Pallid Horror
+    LANG_UNDERCITY_ROYAL_DREADGUARD_1                   = 12337, // The Scourge are at the entrance to the Royal Quarter!  Kill them!!
 
+    // Varimathras -> Pallid Horror
+    LANG_UNDERCITY_VARIMATHRAS_1                        = 12333, // Dreadguard, hold your line.  Halt the advance of those Scourge!
+
+    // Lady Sylvanas Windrunner
+    LANG_UNDERCITY_SYLVANAS_1                           = 12331, // The Scourge attack against my court has been eliminated.  You may go about your business.
+    LANG_UNDERCITY_SYLVANAS_2                           = 12332, // My Royal Dreadguard, you will deal with this matter as befits your station.  That, or you will wish that you had.
+
+    // Civilian -> Pallid Horror
+    LANG_UNDERCITY_RANDOM_1                             = 12355, // Scourge spotted nearby!
+    LANG_STORMWIND_RANDOM_1                             = 12366, // Scourge spotted nearby!
+    LANG_UNDERCITY_RANDOM_2                             = 12356, // I just saw a Scourge!  Kill it!
+    LANG_STORMWIND_RANDOM_2                             = 12367, // I just saw a Scourge!  Kill it!
+    LANG_UNDERCITY_RANDOM_3                             = 12357, // Did you see that?  There's a Scourge over there!
+    LANG_STORMWIND_RANDOM_3                             = 12368, // Did you see that?  There's a Scourge over there!
+    LANG_UNDERCITY_RANDOM_4                             = 12359, // There's one of the Scourge, right over there!
+    LANG_STORMWIND_RANDOM_4                             = 12370, // There's one of the Scourge, right over there!
+    LANG_UNDERCITY_RANDOM_5                             = 12357, // Did you see that?  There's a Scourge over there!
+    LANG_STORMWIND_RANDOM_5                             = 12368, // Did you see that?  There's a Scourge over there!
+    LANG_UNDERCITY_RANDOM_6                             = 12361, // Will these unrelenting Scourge attacks never end?
+    LANG_STORMWIND_RANDOM_6                             = 12372, // Will these unrelenting Scourge attacks never end?
+    LANG_UNDERCITY_RANDOM_7                             = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
+    LANG_STORMWIND_RANDOM_7                             = 12371, // This has gone too far.  How dare the Scourge attack Stormwind!  Destroy it before more come!
+    LANG_UNDERCITY_RANDOM_8                             = 12362, // Destroy the Scourge invader now, before it's too late!
+    LANG_STORMWIND_RANDOM_8                             = 12373, // Destroy the Scourge invader now, before it's too late!
+    LANG_UNDERCITY_RANDOM_9                             = 12358, // How can I get anything done with the Scourge running amok in here?!
+    LANG_STORMWIND_RANDOM_9                             = 12369, // How can I get anything done with the Scourge running amok around here?!
+
+    // Stormwind City Guard -> Pallid Horror
+    LANG_STORMWIND_CITY_GUARD_1                         = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
+    LANG_STORMWIND_CITY_GUARD_2                         = 12311, // Scourge in the Trade District!  Have at them!
+    LANG_STORMWIND_CITY_GUARD_3                         = 12315, // Light help us... the Scourge are in the Park!
+
+    // Stormwind Royal Guard -> Pallid Horror
+    LANG_STORMWIND_CITY_GUARD_4                         = 12316, // The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!
+
+    // Highlord Bolvar Fordragon -> Pallid Horror
+    LANG_STORMWIND_BOLVAR_1                             = 12317, // Hold the line!  Protect the King at all costs!
+    LANG_STORMWIND_BOLVAR_2                             = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
+
+    // Misc
     LANG_CULTIST_ENGINEER_OPTION                        = 12112, // Use 8 necrotic runes and disrupt his ritual.
     LANG_GIVE_MAGIC_ITEM_OPTION                         = 12302, // Give me one of your magic items.
-    LANG_SHADOW_OF_DOOM_TEXT_0                          = 12420, // 12420 - Our dark master has noticed your trifling, and sends me to bring a message... of doom!
-    LANG_SHADOW_OF_DOOM_TEXT_1                          = 12421, // 12421 - These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
-    LANG_SHADOW_OF_DOOM_TEXT_2                          = 12422, // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
-    LANG_SHADOW_OF_DOOM_TEXT_3                          = 12243, // 12243 - You will not stop our deepening shadow, $c.  Now... join us!  Join the ranks of the Chosen!
+    LANG_SHADOW_OF_DOOM_TEXT_0                          = 12420, // Our dark master has noticed your trifling, and sends me to bring a message... of doom!
+    LANG_SHADOW_OF_DOOM_TEXT_1                          = 12421, // These heroics mean nothing, $c.  Your future is sealed and your soul is doomed to servitude!
+    LANG_SHADOW_OF_DOOM_TEXT_2                          = 12422, // Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
+    LANG_SHADOW_OF_DOOM_TEXT_3                          = 12243, // You will not stop our deepening shadow, $c.  Now... join us!  Join the ranks of the Chosen!
     LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1         = 13121, // Spawn.
     LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2         = 13125, // Spawn. 53 min between 2-3 in sniffs.
     LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1          = 13165, // Despawn.
@@ -426,26 +458,26 @@ enum ScourgeInvasionLang
     LANG_MOUTH_OF_KELTHUZAD_RANDOM_2                    = 13124, // Random.
     LANG_MOUTH_OF_KELTHUZAD_RANDOM_3                    = 13122, // 180 seconds between 5-6 in sniffs.
     LANG_MOUTH_OF_KELTHUZAD_RANDOM_4                    = 13123, // Random. 30 min between 8-2 in sniffs.
-    LANG_ARGENT_EMISSARY_OPTION_0                       = 12176, // 12176 - What's happening?
-    LANG_ARGENT_EMISSARY_OPTION_1                       = 12207, // 12207 - What can I do?
-    LANG_ARGENT_EMISSARY_OPTION_2                       = 12434, // 12434 - Where are we battling the Scourge?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0          = 12198, // 12198 - Is Winterspring currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1          = 12201, // 12201 - Is Tanaris currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2          = 12203, // 12203 - Are the Blasted Lands currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3          = 12205, // 12205 - Are the Burning Steppes currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4          = 12476, // 12476 - Is Azshara currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5          = 12477, // 12477 - Are the Eastern Plaguelands currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_3                       = 12398, // 12398 - How many battles have we won?
-    LANG_ARGENT_EMISSARY_OPTION                         = 12478, // 12478 - I have another question.
+    LANG_ARGENT_EMISSARY_OPTION_0                       = 12176, // What's happening?
+    LANG_ARGENT_EMISSARY_OPTION_1                       = 12207, // What can I do?
+    LANG_ARGENT_EMISSARY_OPTION_2                       = 12434, // Where are we battling the Scourge?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0          = 12198, // Is Winterspring currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1          = 12201, // Is Tanaris currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2          = 12203, // Are the Blasted Lands currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3          = 12205, // Are the Burning Steppes currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4          = 12476, // Is Azshara currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5          = 12477, // Are the Eastern Plaguelands currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_3                       = 12398, // How many battles have we won?
+    LANG_ARGENT_EMISSARY_OPTION                         = 12478, // I have another question.
 
     LANG_CULTIST_ENGINEER_GOSSIP                        = 8436, // 12111 - This cultist is in a deep trance...
-    LANG_ARGENT_DAWN_GOSSIP_0                           = 8525, // 12299 - The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
-    LANG_ARGENT_DAWN_GOSSIP_1                           = 8526, // 12300 - The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
-    LANG_ARGENT_DAWN_GOSSIP_2                           = 8527, // 12301 - The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
+    LANG_ARGENT_DAWN_GOSSIP_150_WINS                    = 8525, // 12299 - The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
+    LANG_ARGENT_DAWN_GOSSIP_100_WINS                    = 8526, // 12300 - The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
+    LANG_ARGENT_DAWN_GOSSIP_50_WINS                     = 8527, // 12301 - The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
     LANG_ARGENT_EMISSARY_GOSSIP                         = 8434, // 12109 - The time has come for Horde and Alliance to look towards Northrend and the invasion of the Lich King. In recent days, territories across Kalimdor and the Eastern Kingdoms have come under attack. Will you take up arms to save your land from destruction at their hands?
     LANG_ARGENT_EMISSARY_AWNSER_0                       = 8471, // 12180 - The tides of war have come again. From the cold north, the Lich King's necropolises have laid siege to
     LANG_ARGENT_EMISSARY_AWNSER_1                       = 8486, // 12209 - The Scourge are establishing small staging points in the places under attack, receiving communications and other assistance from the necropolises that fly overhead. From what we can tell, the only way to root them out is by killing the ground forces that surround the points.
-    LANG_ARGENT_EMISSARY_AWNSER_2                       = 8573,  // 12435 - The Lich King brought only small forces to bear against each of Azeroth's capital cities, while their main forces periodically attack the following lands:$B$BAzshara, the Blasted Lands, the Burning Steppes, the Tanaris Desert, the Eastern Plaguelands and Winterspring.
+    LANG_ARGENT_EMISSARY_AWNSER_2                       = 8573, // 12435 - The Lich King brought only small forces to bear against each of Azeroth's capital cities, while their main forces periodically attack the following lands:$B$BAzshara, the Blasted Lands, the Burning Steppes, the Tanaris Desert, the Eastern Plaguelands and Winterspring.
     LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0          = 8480, // 12199 - Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault.Your assistance would help them greatly.$B$BNumber of Necropolises remaining : $2284W
     LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1          = 8482, // 12202 - It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
     LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2          = 8483, // 12204 - The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
