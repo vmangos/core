@@ -329,10 +329,10 @@ enum HeartOfHakkarData
 static float const heartPosition[4] = { -11818.35, 1344.856, 4.266753, 0.0 };
 static int const servantCount = 4;
 static float const servantPositions[servantCount][4] = {
-    {-11817.5f, 1325.0f, 1.46f, 1.58f},
-    {-11831.3f, 1331.3f, 1.84f, 0.75f},
-    {-11834.8f, 1349.4f, 2.01f, 6.00f},
-    {-11800.9f, 1335.2f, 1.26f, 2.65f}
+    { -11817.91, 1325.021, 1.559013, 1.518436 },
+    { -11831.73, 1331.291, 1.938519, 0.9424778 },
+    { -11835.16, 1349.36, 2.110108, 6.056293 },
+    { -11801.4, 1335.381, 1.36269, 2.617994 }
 };
 
 struct npc_heart_of_hakkarAI : public ScriptedAI
