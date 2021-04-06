@@ -357,6 +357,19 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=3385;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (338501, 3385, 0, 2, 0, 100, 0, 20, 0, 0, 0, 338501, 0, 0, 'Theramore Marine - Flee at 20\% HP');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (338501, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Theramore Marine - Flee');
 
+-- add keg of shindigger stout spawns (credit cmangos)
+UPDATE `gameobject` SET `position_x` = -1327.418701171875, `position_y` = -1223.4053955078125, `position_z` = 38.79104995727539062, `orientation` = 4.607671737670898437, `rotation2` = -0.74314403533935546, `rotation3` = 0.669131457805633544 WHERE (`guid` = 30028);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES
+(1046, 1727, 0, -1309.9664306640625, -1225.2359619140625, 22.95736122131347656, 2.094393253326416015, 0, 0, 0.866024971008300781, 0.50000077486038208, 2, 2, 100, 1),
+(1132, 1727, 0, -1331.35595703125, -1238.0267333984375, 32.1243743896484375, 1.972219824790954589, 0, 0, 0.83388519287109375, 0.55193793773651123, 2, 2, 100, 1),
+(1167, 1727, 0, -1325.471435546875, -1222.341064453125, 32.12459182739257812, 5.532694816589355468, 0, 0, -0.3665008544921875, 0.93041771650314331, 2, 2, 100, 1),
+(1181, 1727, 0, -1308.4083251953125, -1259.481689453125, 38.79087448120117187, 3.926995515823364257, 0, 0, -0.92387866973876953, 0.38268551230430603, 2, 2, 100, 1),
+(1200, 1727, 0, -1302.0880126953125, -1251.3330078125, 32.12409591674804687, 4.537858963012695312, 0, 0, -0.76604366302490234, 0.642788589000701904, 2, 2, 100, 1);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`) VALUES
+(1727, 1264, 0, 'Hillsbrad Foothills - Dun Garok - Keg of Shindigger Stout (1727)');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(1264, 1, 'Hillsbrad Foothills - Dun Garok - Keg of Shindigger Stout (1727)');
+
 
 -- End of migration.
 END IF;
