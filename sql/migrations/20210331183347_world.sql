@@ -65,7 +65,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1052, 31, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout - Modify Flags');
 DELETE FROM `gameobject` WHERE `guid` = 20263;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES
-(133, 19534, 0, 3235.7976, -4263.0615, 100.51884, -0.6981315, 0, 0, -0.34202003, 0.9396927, -30, -30, 100, 1);
+(133, 19534, 0, -848.559, -576.3889, 19.670116, -0.31415844, 0, 0, -0.15643406, 0.98768836, -18, -18, 100, 1);
 
 -- add quest end script for captain vimes (credit cmangos)
 UPDATE `quest_template` SET `CompleteScript` = 1220 WHERE `entry` = 1220;
