@@ -39,7 +39,6 @@ void AddSC_npcs_special();
 void AddSC_Totems();
 void AddSC_world_event_naxxramas();
 void AddSC_event_scourge_invasion();
-void AddSC_spell_scripts();
 
 //eastern kingdoms
 void AddSC_instance_blackrock_spire();
@@ -289,7 +288,6 @@ void AddScripts()
     AddSC_Totems();
     AddSC_world_event_naxxramas();
     AddSC_event_scourge_invasion();
-    AddSC_spell_scripts();
 
     AddSC_war_effort();
 
