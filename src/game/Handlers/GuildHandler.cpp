@@ -722,7 +722,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     DEBUG_LOG("WORLD: Received MSG_SAVE_GUILD_EMBLEM");
 
     ObjectGuid vendorGuid;
-    uint32 EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor;
+    int32 EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor;
 
     recvPacket >> vendorGuid;
     recvPacket >> EmblemStyle >> EmblemColor >> BorderStyle >> BorderColor >> BackgroundColor;
