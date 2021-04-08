@@ -370,6 +370,9 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `descripti
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (1264, 1, 'Hillsbrad Foothills - Dun Garok - Keg of Shindigger Stout (1727)');
 
+-- correct scale for novice warriors
+UPDATE `creature_template` SET `display_scale1` = 1.35, `display_scale2` = 1.35 WHERE `entry` = 10721;
+
 
 -- End of migration.
 END IF;
