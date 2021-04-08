@@ -271,7 +271,7 @@ void Spell::EffectResurrectNew(SpellEffectIndex eff_idx)
 
 void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 {
-    if (!unitTarget || !unitTarget->IsAlive())
+    if (!unitTarget)
         return;
 
     // Demonic Sacrifice
@@ -300,6 +300,11 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 
         m_casterUnit->CastSpell(m_casterUnit, spellId, true);
     }
+
+    // The alive check should be after the Demonic Sacrifice code to allow warlock to get
+    // both shields if he uses it at the same time as Voidwalker's Sacrifice.
+    if (!unitTarget->IsAlive())
+        return;
 
     if (m_caster == unitTarget)                             // prevent interrupt message
         finish();

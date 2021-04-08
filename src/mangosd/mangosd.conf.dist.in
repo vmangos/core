@@ -1043,8 +1043,9 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 400
 #
 #    Spell.ProcDelay
-#        Delay in milliseconds before processing procs.
-#        Default: 400
+#        Delay in milliseconds before processing procs. Spells triggered by aura procs also seem
+#        to be subject to a batching delay, so we double the procs delay to recreate the effect.
+#        Default: 800
 #
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
@@ -1125,7 +1126,7 @@ PlayerCommands = 1
 Event.Announce = 0
 AutoBroadcast.Timer = 1800000
 Spell.EffectDelay = 400
-Spell.ProcDelay = 400
+Spell.ProcDelay = 800
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
