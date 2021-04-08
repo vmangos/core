@@ -10,7 +10,6 @@ INSERT INTO `migrations` VALUES ('20210312231945');
 
 
 -- Quests: Winterhoof Cleansing, Thunderhorn Cleansing, Wildmane Cleansing
-DELETE FROM `gameobject` WHERE `guid` IN (332887, 332888, 332889) AND `id` = 2904;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `state`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES 
 (332887, 2904, 1, -2544.54, -712.088, -9.232, 0.767944, 1, -60, -60),
 (332888, 2904, 1, -1823.85, -237.555, -9.42485, 0.069812, 1, -60, -60),
@@ -51,7 +50,6 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 (525, 0, 9, 332893, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332893)"),
 (525, 0, 9, 332894, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "The Stagnant Oasis - Respawn Fissure Plant (GUID: 332894)");
 
-DELETE FROM `gameobject` WHERE `guid` IN (332890, 332891, 332892, 332893, 332894) AND `id` = 3743;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `state`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES 
 (332890, 3743, 1, -1278.97, -3008.1, 72.0716, 0.86185, 1, -62, -62),
 (332891, 3743, 1, -1275.4, -3006.46, 72.5618, 1.29382, 1, -62, -62),
