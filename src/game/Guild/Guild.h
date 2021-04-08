@@ -245,7 +245,7 @@ class Guild
 
         void SetMOTD(std::string motd);
         void SetGINFO(std::string ginfo);
-        void SetEmblem(int emblemStyle, int emblemColor, int borderStyle, int borderColor, int backgroundColor);
+        void SetEmblem(int32 emblemStyle, int32 emblemColor, int32 borderStyle, int32 borderColor, int32 backgroundColor);
 
         uint32 GetMemberSize() const { return members.size(); }
         uint32 GetAccountsNumber();
