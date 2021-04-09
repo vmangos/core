@@ -997,8 +997,8 @@ struct ScourgeMinion : public ScriptedAI
                 m_events.ScheduleEvent(EVENT_RARE_TRAMPLE, urand(5000, 10000));
                 break;
             case EVENT_RARE_RIBBON_OF_SOULS:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RIBBON_OF_SOULS);
-                m_events.ScheduleEvent(EVENT_RARE_RIBBON_OF_SOULS, urand(1500, 4500));
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RIBBON_OF_SOULS, CF_MAIN_RANGED_SPELL);
+                m_events.ScheduleEvent(EVENT_RARE_RIBBON_OF_SOULS, urand(2500, 6500));
                 break;
             case EVENT_DOOM_MINDFLAY:
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDFLAY);

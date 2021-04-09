@@ -341,19 +341,19 @@ enum ScourgeInvasionWorldStatesVariables
     WORLDSTATE_SI_WINTERSPRING                  = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
 
     // Variables
-    VARIABLE_SI_ATTACK_ZONE1                  = 110,
-    VARIABLE_SI_ATTACK_ZONE2                  = 111,
-    VARIABLE_SI_ATTACK_ZONE3                  = 112,
-    VARIABLE_SI_ATTACK_ZONE4                  = 113,
-    VARIABLE_SI_ATTACK_ZONE5                  = 114,
-    VARIABLE_SI_ATTACK_ZONE6                  = 115,
-    VARIABLE_SI_ATTACK_TIME1                  = 116,
-    VARIABLE_SI_ATTACK_TIME2                  = 117,
-    VARIABLE_SI_ATTACK_TIME3                  = 118,
-    VARIABLE_SI_ATTACK_TIME4                  = 119,
-    VARIABLE_SI_ATTACK_TIME5                  = 120,
-    VARIABLE_SI_ATTACK_TIME6                  = 121,
-    VARIABLE_SI_ATTACK_COUNT                  = 122,
+    VARIABLE_SI_ATTACK_ZONE1                    = 110,
+    VARIABLE_SI_ATTACK_ZONE2                    = 111,
+    VARIABLE_SI_ATTACK_ZONE3                    = 112,
+    VARIABLE_SI_ATTACK_ZONE4                    = 113,
+    VARIABLE_SI_ATTACK_ZONE5                    = 114,
+    VARIABLE_SI_ATTACK_ZONE6                    = 115,
+    VARIABLE_SI_ATTACK_TIME1                    = 116,
+    VARIABLE_SI_ATTACK_TIME2                    = 117,
+    VARIABLE_SI_ATTACK_TIME3                    = 118,
+    VARIABLE_SI_ATTACK_TIME4                    = 119,
+    VARIABLE_SI_ATTACK_TIME5                    = 120,
+    VARIABLE_SI_ATTACK_TIME6                    = 121,
+    VARIABLE_SI_ATTACK_COUNT                    = 122,
 
     VARIABLE_SI_WINTERSPRING_REMAINING          = 30,
     VARIABLE_SI_AZSHARA_REMAINING               = 31,
@@ -391,26 +391,26 @@ enum ScourgeInvasionLang
     LANG_PALLID_HORROR_YELL7                            = 12328, // Hahaha, your guards no match for Scourge!
     LANG_PALLID_HORROR_YELL8                            = 12325, // We come destroy puny ones!
 
-    // Undercity Guardian -> Pallid Horror
+    // Undercity Guardian
     LANG_UNDERCITY_GUARDIAN_1                           = 12336, // Rogues' Quarter attacked by Scourge!  Help!
     LANG_UNDERCITY_GUARDIAN_2                           = 12335, // Scourge attack Magic Quarter!
     LANG_UNDERCITY_GUARDIAN_3                           = 12353, // There Scourge outside Trade Quarter!
     LANG_UNDERCITY_GUARDIAN_4                           = 12334, // Scourge in sewers!  We need help!
 
-    // Undercity Elite Guardian -> Pallid Horror
+    // Undercity Elite Guardian
     LANG_UNDERCITY_ELITE_GUARDIAN_1                     = 12354, // Scourge inside Trade Quarter!  Destroy!
 
-    // Royal Dreadguard -> Pallid Horror
+    // Royal Dreadguard
     LANG_UNDERCITY_ROYAL_DREADGUARD_1                   = 12337, // The Scourge are at the entrance to the Royal Quarter!  Kill them!!
 
-    // Varimathras -> Pallid Horror
+    // Varimathras
     LANG_UNDERCITY_VARIMATHRAS_1                        = 12333, // Dreadguard, hold your line.  Halt the advance of those Scourge!
 
     // Lady Sylvanas Windrunner
     LANG_UNDERCITY_SYLVANAS_1                           = 12331, // The Scourge attack against my court has been eliminated.  You may go about your business.
     LANG_UNDERCITY_SYLVANAS_2                           = 12332, // My Royal Dreadguard, you will deal with this matter as befits your station.  That, or you will wish that you had.
 
-    // Civilian -> Pallid Horror
+    // Civilian
     LANG_UNDERCITY_RANDOM_1                             = 12355, // Scourge spotted nearby!
     LANG_STORMWIND_RANDOM_1                             = 12366, // Scourge spotted nearby!
     LANG_UNDERCITY_RANDOM_2                             = 12356, // I just saw a Scourge!  Kill it!
@@ -430,15 +430,15 @@ enum ScourgeInvasionLang
     LANG_UNDERCITY_RANDOM_9                             = 12358, // How can I get anything done with the Scourge running amok in here?!
     LANG_STORMWIND_RANDOM_9                             = 12369, // How can I get anything done with the Scourge running amok around here?!
 
-    // Stormwind City Guard -> Pallid Horror
+    // Stormwind City Guard
     LANG_STORMWIND_CITY_GUARD_1                         = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
     LANG_STORMWIND_CITY_GUARD_2                         = 12311, // Scourge in the Trade District!  Have at them!
     LANG_STORMWIND_CITY_GUARD_3                         = 12315, // Light help us... the Scourge are in the Park!
 
-    // Stormwind Royal Guard -> Pallid Horror
+    // Stormwind Royal Guard
     LANG_STORMWIND_CITY_GUARD_4                         = 12316, // The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!
 
-    // Highlord Bolvar Fordragon -> Pallid Horror
+    // Highlord Bolvar Fordragon?
     LANG_STORMWIND_BOLVAR_1                             = 12317, // Hold the line!  Protect the King at all costs!
     LANG_STORMWIND_BOLVAR_2                             = 12318, // Good work, one and all!  The Scourge at the castle have been defeated.
 
