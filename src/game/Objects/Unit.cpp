@@ -1871,7 +1871,8 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
         if (!(mod->m_miscvalue & schoolMask))
             continue;
 
-        assert(mod->m_amount - floor(mod->m_amount) == 0);
+        MANGOS_DEBUG_ASSERT((mod->m_amount - floor(mod->m_amount)) == 0.f);
+
         // Max Amount can be absorbed by this aura
         int32  currentAbsorb = mod->m_amount;
 
