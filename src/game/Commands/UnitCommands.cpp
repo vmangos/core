@@ -697,6 +697,29 @@ bool ChatHandler::HandleListMoveGensCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleListHostileRefsCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("List of hostile references for %s:", pUnit->GetObjectGuid().GetString().c_str());
+    HostileReference* pReference = pUnit->GetHostileRefManager().getFirst();
+    uint32 counter = 1;
+    while (pReference)
+    {
+        if (Unit* pTarget = pReference->getSourceUnit())
+            PSendSysMessage("%u. %s", counter++, pTarget->GetGuidStr().c_str());
+        pReference = pReference->next();
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleCastCommand(char* args)
 {
     if (!*args)
