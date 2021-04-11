@@ -25,7 +25,6 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake
 )
 
-option(DEBUG "Debug mode" OFF)
 set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
 option(USE_STD_MALLOC "Use standard malloc instead of TBB" OFF)
 option(TBB_DEBUG "Use TBB debug librairies" OFF)
@@ -87,17 +86,12 @@ message(STATUS
   Options that can be used in order to configure the process:
     PREFIX: Path where the server should be installed to
     USE_PCH: Use precompiled headers
-    DEBUG: Debug mode
   To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
-  For example: cmake .. -DDEBUG=1 -DPREFIX=/opt/mangos\n"
+  For example: cmake .. -DPREFIX=/opt/mangos\n"
 ) # TODO: PLATFORM: Sets the architecture for compile (X86,X64)
 
-# Override configuration-types - we don't use anything else than debug and release
-if(CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_CONFIGURATION_TYPES Release Debug)
-  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-    "Reset the configurations to what we need"
-    FORCE)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
 
 # Find out what system we use to include the needed libs
@@ -313,25 +307,19 @@ endif()
 message(STATUS "Memory allocation     : ${ALLOC_LIB_INFO_STRING} ${TBB_LIBRARIES}")
 message(STATUS "Detected compiler     : ${CMAKE_CXX_COMPILER_ID}")
 
-if(DEBUG)
-  message(STATUS "Build in debug-mode   : Yes")
-  set(CMAKE_BUILD_TYPE Debug)
-else()
-  set(CMAKE_BUILD_TYPE Release)
-  message(STATUS "Build in debug-mode   : No  (default)")
-endif()
+message(STATUS "Build type            : ${CMAKE_BUILD_TYPE}")
 
 if(USE_ANTICHEAT)
-  message(STATUS "Use anticheat    : Yes")
+  message(STATUS "Use anticheat         : Yes")
   set(DEFINITIONS ${DEFINITIONS} USE_ANTICHEAT)
 else()
-  message(STATUS "Use anticheat    : No  (default)")
+  message(STATUS "Use anticheat         : No  (default)")
 endif()
 
 if(USE_SCRIPTS)
-  message(STATUS "Build scripts    : Yes (default)")
+  message(STATUS "Build scripts         : Yes (default)")
 else()
-  message(STATUS "Build scripts    : No")
+  message(STATUS "Build scripts         : No")
 endif()
 
 if(UNIX)
@@ -356,7 +344,7 @@ if(UNIX)
     #set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=unsigned-integer-overflow")
   endif()
 
-  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} --no-warnings -fexceptions -fnon-call-exceptions -march=native -O3 -pipe ")
+  set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} --no-warnings -fexceptions -fnon-call-exceptions -march=native -pipe ")
   set(CMAKE_CXX_STANDARD 14)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     if(PROFILE_GENERATE)
@@ -386,8 +374,8 @@ elseif(WIN32)
   endif()
 endif()
 
-set(DEFINITIONS_RELEASE ${DEFINITIONS_RELEASE} NDEBUG MANGOS_BUILD_OPTIONS="${CMAKE_CXX_FLAGS_RELEASE}")
-set(DEFINITIONS_DEBUG ${DEFINITIONS_DEBUG} _DEBUG MANGOS_BUILD_OPTIONS="${CMAKE_CXX_FLAGS_DEBUG}")
+set(DEFINITIONS_RELEASE ${DEFINITIONS_RELEASE} NDEBUG)
+set(DEFINITIONS_DEBUG ${DEFINITIONS_DEBUG} _DEBUG MANGOS_DEBUG)
 
 # Some small tweaks for Visual Studio 7 and above.
 if(MSVC)
@@ -444,16 +432,10 @@ if(XCODE)
   endif()
 endif()
 
-add_subdirectory(dep)
-
-if (USE_EXTRACTORS)
-    add_subdirectory(contrib)
-endif()
 
 # Add definitions for all build types
 # Don't place this above 'dep' subdirectory! Because of defines build will crash.
 set(DEFINITIONS
-  ${DEFINITIONS}
   DO_MYSQL
 )
 
@@ -472,11 +454,20 @@ if (USE_LIBCURL)
   set(DEFINITIONS ${DEFINITIONS} USE_SENDGRID)
 endif()
 
-set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${DEFINITIONS}")
-set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_RELEASE "${DEFINITIONS_RELEASE}")
-set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG "${DEFINITIONS_DEBUG}")
+set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ${DEFINITIONS})
+set_property(DIRECTORY APPEND PROPERTY
+  COMPILE_DEFINITIONS $<$<CONFIG:Debug>:${DEFINITIONS_DEBUG}>
+)
+set_property(DIRECTORY APPEND PROPERTY
+  COMPILE_DEFINITIONS $<$<CONFIG:Release>:${DEFINITIONS_RELEASE}>
+)
 
 message(STATUS "Build flags (RELEASE) : ${CMAKE_CXX_FLAGS_RELEASE}")
 message(STATUS "Build flags (DEBUG)   : ${CMAKE_CXX_FLAGS_DEBUG}")
 
 add_subdirectory(src)
+add_subdirectory(dep)
+
+if (USE_EXTRACTORS)
+    add_subdirectory(contrib)
+endif()
