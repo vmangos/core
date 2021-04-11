@@ -1871,8 +1871,9 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
         if (!(mod->m_miscvalue & schoolMask))
             continue;
 
+        assert(mod->m_amount - floor(mod->m_amount) == 0);
         // Max Amount can be absorbed by this aura
-        int32  currentAbsorb = dither(mod->m_amount);
+        int32  currentAbsorb = mod->m_amount;
 
         // Found empty aura (impossible but..)
         if (currentAbsorb <= 0)
