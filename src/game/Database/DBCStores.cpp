@@ -18,13 +18,10 @@
  */
 
 #include "DBCStores.h"
-#include "Policies/SingletonImp.h"
 #include "Log.h"
 #include "ProgressBar.h"
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
-#include "Map.h"
-#include "SQLStorages.h"
 #include "DBCfmt.h"
 #include "SpellMgr.h"
 #include "ObjectMgr.h"

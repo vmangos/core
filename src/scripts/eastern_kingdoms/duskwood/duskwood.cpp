@@ -14,6 +14,7 @@ npc_lord_ello_ebonlocke
 EndContentData */
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
 
 enum NightmareCorruptionData
 {

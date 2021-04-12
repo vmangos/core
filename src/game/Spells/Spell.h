@@ -23,7 +23,6 @@
 #define __SPELL_H
 
 #include "Common.h"
-#include "GridDefines.h"
 #include "SharedDefines.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"

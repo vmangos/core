@@ -23,21 +23,16 @@
 #define _PLAYER_H
 
 #include "Common.h"
-#include "ItemPrototype.h"
 #include "Unit.h"
-#include "Item.h"
 #include "Database/DatabaseEnv.h"
-#include "NPCHandler.h"
-#include "QuestDef.h"
-#include "Group.h"
-#include "Bag.h"
+#include "GroupReference.h"
 #include "WorldSession.h"
 #include "Pet.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "ReputationMgr.h"
 #include "BattleGround.h"
-#include "DBCStores.h"
 #include "SharedDefines.h"
+#include "GameObjectDefines.h"
 #include "SpellMgr.h"
 #include "HonorMgr.h"
 
@@ -46,6 +41,8 @@
 #include <functional>
 
 struct Mail;
+struct ItemPrototype;
+class Group;
 class Channel;
 class Creature;
 class PlayerMenu;

@@ -266,117 +266,6 @@ enum DamageEffectType
     SELF_DAMAGE             = 5,
 };
 
-enum GameobjectTypes
-{
-    GAMEOBJECT_TYPE_DOOR                   = 0,
-    GAMEOBJECT_TYPE_BUTTON                 = 1,
-    GAMEOBJECT_TYPE_QUESTGIVER             = 2,
-    GAMEOBJECT_TYPE_CHEST                  = 3,
-    GAMEOBJECT_TYPE_BINDER                 = 4,
-    GAMEOBJECT_TYPE_GENERIC                = 5,
-    GAMEOBJECT_TYPE_TRAP                   = 6,
-    GAMEOBJECT_TYPE_CHAIR                  = 7,
-    GAMEOBJECT_TYPE_SPELL_FOCUS            = 8,
-    GAMEOBJECT_TYPE_TEXT                   = 9,
-    GAMEOBJECT_TYPE_GOOBER                 = 10,
-    GAMEOBJECT_TYPE_TRANSPORT              = 11,
-    GAMEOBJECT_TYPE_AREADAMAGE             = 12,
-    GAMEOBJECT_TYPE_CAMERA                 = 13,
-    GAMEOBJECT_TYPE_MAP_OBJECT             = 14,
-    GAMEOBJECT_TYPE_MO_TRANSPORT           = 15,
-    GAMEOBJECT_TYPE_DUEL_ARBITER           = 16,
-    GAMEOBJECT_TYPE_FISHINGNODE            = 17,
-    GAMEOBJECT_TYPE_SUMMONING_RITUAL       = 18,
-    GAMEOBJECT_TYPE_MAILBOX                = 19,
-    GAMEOBJECT_TYPE_AUCTIONHOUSE           = 20,
-    GAMEOBJECT_TYPE_GUARDPOST              = 21,
-    GAMEOBJECT_TYPE_SPELLCASTER            = 22,
-    GAMEOBJECT_TYPE_MEETINGSTONE           = 23,
-    GAMEOBJECT_TYPE_FLAGSTAND              = 24,
-    GAMEOBJECT_TYPE_FISHINGHOLE            = 25,
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-    GAMEOBJECT_TYPE_FLAGDROP               = 26,
-#endif
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    GAMEOBJECT_TYPE_MINI_GAME              = 27,
-    GAMEOBJECT_TYPE_LOTTERY_KIOSK          = 28,
-#endif
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-    GAMEOBJECT_TYPE_CAPTURE_POINT          = 29,
-    GAMEOBJECT_TYPE_AURA_GENERATOR         = 30,
-#endif
-    GAMEOBJECT_TYPE_MAX
-};
-
-#define MAX_GAMEOBJECT_TYPE                  31             // sending to client this or greater value can crash client.
-
-enum GameObjectFlags
-{
-    GO_FLAG_IN_USE          = 0x00000001,                   //disables interaction while animated
-    GO_FLAG_LOCKED          = 0x00000002,                   //require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
-    GO_FLAG_INTERACT_COND   = 0x00000004,                   //cannot interact (condition to interact)
-    GO_FLAG_TRANSPORT       = 0x00000008,                   //any kind of transport? Object can transport (elevator, boat, car)
-    GO_FLAG_NO_INTERACT     = 0x00000010,                   //players cannot interact with this go (often need to remove flag in event)
-    GO_FLAG_NODESPAWN       = 0x00000020,                   //never despawn, typically for doors, they just change state
-    GO_FLAG_TRIGGERED       = 0x00000040                    //typically, summoned objects. Triggered by spell or other events
-};
-
-enum GameObjectDynamicLowFlags
-{
-    GO_DYNFLAG_LO_ACTIVATE          = 0x01,                 // enables interaction with GO
-    GO_DYNFLAG_LO_ANIMATE           = 0x02,                 // possibly more distinct animation of GO
-    GO_DYNFLAG_LO_NO_INTERACT       = 0x04,                 // appears to disable interaction (not fully verified)
-};
-
-enum class GameObjectActions : uint32
-{                                   // Name from client executable      // Comments
-    None,                           // -NONE-
-    AnimateCustom0,                 // Animate Custom0
-    AnimateCustom1,                 // Animate Custom1
-    AnimateCustom2,                 // Animate Custom2
-    AnimateCustom3,                 // Animate Custom3
-    Disturb,                        // Disturb                          // Triggers trap
-    Unlock,                         // Unlock                           // Resets GO_FLAG_LOCKED
-    Lock,                           // Lock                             // Sets GO_FLAG_LOCKED
-    Open,                           // Open                             // Sets GO_STATE_ACTIVE
-    OpenAndUnlock,                  // Open + Unlock                    // Sets GO_STATE_ACTIVE and resets GO_FLAG_LOCKED
-    Close,                          // Close                            // Sets GO_STATE_READY
-    ToggleOpen,                     // Toggle Open
-    Destroy,                        // Destroy                          // Sets GO_STATE_DESTROYED
-    Rebuild,                        // Rebuild                          // Resets from GO_STATE_DESTROYED
-    Creation,                       // Creation
-    Despawn,                        // Despawn
-    MakeInert,                      // Make Inert                       // Disables interactions
-    MakeActive,                     // Make Active                      // Enables interactions
-    CloseAndLock,                   // Close + Lock                     // Sets GO_STATE_READY and sets GO_FLAG_LOCKED
-    UseArtKit0,                     // Use ArtKit0                      // 46904: 121
-    UseArtKit1,                     // Use ArtKit1                      // 36639: 81, 46903: 122
-    UseArtKit2,                     // Use ArtKit2
-    UseArtKit3,                     // Use ArtKit3
-    SetTapList,                     // Set Tap List
-    GoTo1stFloor,                   // Go to 1st floor
-    GoTo2ndFloor,                   // Go to 2nd floor
-    GoTo3rdFloor,                   // Go to 3rd floor
-    GoTo4thFloor,                   // Go to 4th floor
-    GoTo5thFloor,                   // Go to 5th floor
-    GoTo6thFloor,                   // Go to 6th floor
-    GoTo7thFloor,                   // Go to 7th floor
-    GoTo8thFloor,                   // Go to 8th floor
-    GoTo9thFloor,                   // Go to 9th floor
-    GoTo10thFloor,                  // Go to 10th floor
-    UseArtKit4,                     // Use ArtKit4
-    PlayAnimKit,                    // Play Anim Kit "%s"               // MiscValueB -> Anim Kit ID
-    OpenAndPlayAnimKit,             // Open + Play Anim Kit "%s"        // MiscValueB -> Anim Kit ID
-    CloseAndPlayAnimKit,            // Close + Play Anim Kit "%s"       // MiscValueB -> Anim Kit ID
-    PlayOneshotAnimKit,             // Play One-shot Anim Kit "%s"      // MiscValueB -> Anim Kit ID
-    StopAnimKit,                    // Stop Anim Kit
-    OpenAndStopAnimKit,             // Open + Stop Anim Kit
-    CloseAndStopAnimKit,            // Close + Stop Anim Kit
-    PlaySpellVisual,                // Play Spell Visual "%s"           // MiscValueB -> Spell Visual ID
-    StopSpellVisual,                // Stop Spell Visual
-    SetTappedToChallengePlayers,    // Set Tapped to Challenge Players
-};
-
 enum TextEmotes
 {
     TEXTEMOTE_AGREE                = 1,
@@ -934,85 +823,6 @@ enum LockType
     LOCKTYPE_FISHING               = 19
 };
 
-enum TrainerType                                            // this is important type for npcs!
-{
-    TRAINER_TYPE_CLASS             = 0,
-    TRAINER_TYPE_MOUNTS            = 1,                     // on blizz it's 2
-    TRAINER_TYPE_TRADESKILLS       = 2,
-    TRAINER_TYPE_PETS              = 3
-};
-
-#define MAX_TRAINER_TYPE 4
-
-// CreatureType.dbc
-enum CreatureType
-{
-    CREATURE_TYPE_BEAST            = 1,
-    CREATURE_TYPE_DRAGONKIN        = 2,
-    CREATURE_TYPE_DEMON            = 3,
-    CREATURE_TYPE_ELEMENTAL        = 4,
-    CREATURE_TYPE_GIANT            = 5,
-    CREATURE_TYPE_UNDEAD           = 6,
-    CREATURE_TYPE_HUMANOID         = 7,
-    CREATURE_TYPE_CRITTER          = 8,
-    CREATURE_TYPE_MECHANICAL       = 9,
-    CREATURE_TYPE_NOT_SPECIFIED    = 10,
-    CREATURE_TYPE_TOTEM            = 11,
-};
-
-uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
-uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL - 1)) | (1 << (CREATURE_TYPE_ELEMENTAL - 1));
-
-// CreatureFamily.dbc
-enum CreatureFamily
-{
-    CREATURE_FAMILY_WOLF           = 1,
-    CREATURE_FAMILY_CAT            = 2,
-    CREATURE_FAMILY_SPIDER         = 3,
-    CREATURE_FAMILY_BEAR           = 4,
-    CREATURE_FAMILY_BOAR           = 5,
-    CREATURE_FAMILY_CROCOLISK      = 6,
-    CREATURE_FAMILY_CARRION_BIRD   = 7,
-    CREATURE_FAMILY_CRAB           = 8,
-    CREATURE_FAMILY_GORILLA        = 9,
-    CREATURE_FAMILY_HORSE_CUSTOM   = 10,                    // not exist in DBC but used for horse like beasts in DB
-    CREATURE_FAMILY_RAPTOR         = 11,
-    CREATURE_FAMILY_TALLSTRIDER    = 12,
-    CREATURE_FAMILY_FELHUNTER      = 15,
-    CREATURE_FAMILY_VOIDWALKER     = 16,
-    CREATURE_FAMILY_SUCCUBUS       = 17,
-    CREATURE_FAMILY_DOOMGUARD      = 19,
-    CREATURE_FAMILY_SCORPID        = 20,
-    CREATURE_FAMILY_TURTLE         = 21,
-    CREATURE_FAMILY_IMP            = 23,
-    CREATURE_FAMILY_BAT            = 24,
-    CREATURE_FAMILY_HYENA          = 25,
-    CREATURE_FAMILY_OWL            = 26,
-    CREATURE_FAMILY_WIND_SERPENT   = 27,
-    CREATURE_FAMILY_REMOTE_CONTROL = 28,
-};
-
-enum CreatureTypeFlags
-{
-    CREATURE_TYPEFLAGS_TAMEABLE             = 0x00000001,       // Tameable by any hunter
-    CREATURE_TYPEFLAGS_GHOST_VISIBLE        = 0x00000002,       // Creatures which can _also_ be seen when player is a ghost, used in CanInteract function by client, can't be attacked
-    CREATURE_TYPEFLAGS_BOSS                 = 0x00000004,       // Changes creature's visible level to "??" in the creature's portrait
-    CREATURE_TYPEFLAGS_NO_WOUND_ANIM        = 0x00000008,       // Disables "wounded" animations at spell taken
-    CREATURE_TYPEFLAGS_HIDE_FACTION_TOOLTIP = 0x00000010,       // Controls something in client tooltip related to creature faction
-    CREATURE_TYPEFLAGS_UNK6                 = 0x00000020,       // May be sound related
-    CREATURE_TYPEFLAGS_SPELL_ATTACKABLE     = 0x00000040,       // May be related to attackable / not attackable creatures with spells, used together with lua_IsHelpfulSpell/lua_IsHarmfulSpell
-};
-
-enum CreatureEliteType
-{
-    CREATURE_ELITE_NORMAL          = 0,
-    CREATURE_ELITE_ELITE           = 1,
-    CREATURE_ELITE_RAREELITE       = 2,
-    CREATURE_ELITE_WORLDBOSS       = 3,
-    CREATURE_ELITE_RARE            = 4,
-    CREATURE_UNKNOWN               = 5                      // found in 2.2.3 for 2 mobs
-};
-
 enum HolidayIds
 {
     HOLIDAY_NONE                     = 0,
@@ -1305,7 +1115,7 @@ enum UnitDynFlags
     UNIT_DYNFLAG_NONE                       = 0x0000,
     UNIT_DYNFLAG_LOOTABLE                   = 0x0001,
     UNIT_DYNFLAG_TRACK_UNIT                 = 0x0002,
-    UNIT_DYNFLAG_TAPPED                     = 0x0004,       // Lua_UnitIsTapped
+    UNIT_DYNFLAG_TAPPED                     = 0x0004, // Lua_UnitIsTapped
     UNIT_DYNFLAG_TAPPED_BY_PLAYER           = 0x0008, // Et non *_ROOTED !
     UNIT_DYNFLAG_SPECIALINFO                = 0x0010,
     UNIT_DYNFLAG_DEAD                       = 0x0020,

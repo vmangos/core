@@ -16,6 +16,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "Opcodes.h"
 #include "World.h"
 #include "Player.h"
 #include "Chat.h"
@@ -38,6 +39,7 @@
 #include "AuraRemovalMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
+#include "CreatureGroups.h"
 
 bool ChatHandler::HandleAnnounceCommand(char* args)
 {

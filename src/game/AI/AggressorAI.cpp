@@ -21,6 +21,7 @@
 
 #include "AggressorAI.h"
 #include "Creature.h"
+#include "Map.h"
 
 int AggressorAI::Permissible(Creature const* creature)
 {

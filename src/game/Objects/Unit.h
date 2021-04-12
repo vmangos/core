@@ -23,21 +23,18 @@
 #define __UNIT_H
 
 #include "Common.h"
+#include "SharedDefines.h"
+#include "ItemPrototype.h"
 #include "Object.h"
 #include "UnitDefines.h"
-#include "Opcodes.h"
 #include "SpellAuraDefines.h"
 #include "UpdateFields.h"
-#include "SharedDefines.h"
 #include "ThreatManager.h"
 #include "HostileRefManager.h"
 #include "FollowerReference.h"
 #include "FollowerRefManager.h"
 #include "MotionMaster.h"
-#include "DBCStructure.h"
-#include "Timer.h"
 #include <list>
-
 
 struct FactionTemplateEntry;
 struct Modifier;
@@ -1182,13 +1179,7 @@ class Unit : public WorldObject
         bool IsHostileToPlayers() const;
         bool IsFriendlyTo(WorldObject const* target) const override;
         bool IsNeutralToAll() const;
-        bool IsContestedGuard() const
-        {
-            if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
-                return entry->IsContestedGuardFaction();
-
-            return false;
-        }
+        bool IsContestedGuard() const;
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
 

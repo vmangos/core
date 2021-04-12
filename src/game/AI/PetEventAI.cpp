@@ -18,7 +18,7 @@
 
 #include "PetEventAI.h"
 #include "Pet.h"
-#include "CreatureEventAI.h"
+#include "Player.h"
 
 PetEventAI::PetEventAI(Creature* pCreature) : CreatureEventAI(pCreature)
 {}

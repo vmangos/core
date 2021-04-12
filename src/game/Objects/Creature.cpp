@@ -27,9 +27,9 @@
 #include "ScriptMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
-#include "QuestDef.h"
 #include "GossipDef.h"
 #include "Player.h"
+#include "Group.h"
 #include "GameEventMgr.h"
 #include "PoolManager.h"
 #include "Opcodes.h"
@@ -38,18 +38,13 @@
 #include "MapManager.h"
 #include "CreatureAI.h"
 #include "CreatureAISelector.h"
-#include "Formulas.h"
-#include "WaypointMovementGenerator.h"
-#include "InstanceData.h"
+#include "MovementGenerator.h"
 #include "MapPersistentStateMgr.h"
 #include "BattleGroundMgr.h"
-#include "Spell.h"
 #include "Util.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "Language.h"
-
 #include "CreatureGroups.h"
 #include "ZoneScript.h"
 #include "MoveSplineInit.h"
@@ -57,12 +52,7 @@
 #include "Anticheat.h"
 #include "CreatureLinkingMgr.h"
 #include "TemporarySummon.h"
-#include "ScriptedEscortAI.h"
 #include "GuardMgr.h"
-
-// apply implementation of the singletons
-#include "Policies/SingletonImp.h"
-
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {

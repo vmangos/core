@@ -24,7 +24,14 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "Totem.h"
-#include "GridSearchers.h"
+#include "ObjectMgr.h"
+#include "ScriptMgr.h"
+#include "Group.h"
+
+CreatureAI::CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
+{
+    SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
+}
 
 CreatureAI::~CreatureAI()
 {

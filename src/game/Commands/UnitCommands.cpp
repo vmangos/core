@@ -15,14 +15,11 @@
  */
 
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"

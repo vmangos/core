@@ -19,15 +19,16 @@
 #include "Common.h"
 #include "GMTicketMgr.h"
 #include "Database/DatabaseEnv.h"
+#include "Database/DatabaseImpl.h"
 #include "Log.h"
 #include "Language.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Chat.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
-#include "Database/DatabaseImpl.h"
+#include "ObjectMgr.h"
 
 inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
 
@@ -225,6 +226,26 @@ char const* GmTicket::GetTicketCategoryName(TicketType category) const
     }
 
     return "Unknown";
+}
+
+Player* GmTicket::GetPlayer() const
+{
+    return ObjectAccessor::FindPlayer(_playerGuid);
+}
+
+Player* GmTicket::GetAssignedPlayer() const
+{
+    return ObjectAccessor::FindPlayer(_assignedTo);
+}
+
+std::string GmTicket::GetAssignedToName() const
+{
+    std::string name;
+    // save queries if ticket is not assigned
+    if (_assignedTo)
+        sObjectMgr.GetPlayerNameByGUID(_assignedTo, name);
+
+    return name;
 }
 
 void GmTicket::SetUnassigned()

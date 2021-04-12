@@ -41,6 +41,7 @@ go_darkmoon_faire_music
 EndContentData */
 
 #include "scriptPCH.h"
+#include "Utilities/EventMap.h"
 
 /*######
 ## go_cat_figurine

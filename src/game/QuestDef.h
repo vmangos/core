@@ -23,13 +23,12 @@
 #define MANGOSSERVER_QUEST_H
 
 #include "Platform/Define.h"
-#include "Database/DatabaseEnv.h"
 
 #include <string>
 #include <vector>
 
+class Field;
 class Player;
-
 class ObjectMgr;
 
 #define MAX_QUEST_LOG_SIZE 20

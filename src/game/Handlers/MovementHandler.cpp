@@ -24,20 +24,15 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
-#include "Corpse.h"
 #include "Player.h"
 #include "MapManager.h"
 #include "Transport.h"
 #include "BattleGround.h"
 #include "WaypointMovementGenerator.h"
 #include "MapPersistentStateMgr.h"
-#include "ObjectMgr.h"
-
 #include "World.h"
 #include "Anticheat.h"
 #include "packet_builder.h"
-#include "MoveSpline.h"
-#include "MovementBroadcaster.h"
 #include "MovementPacketSender.h"
 
 

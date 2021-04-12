@@ -1,6 +1,7 @@
 #include "PlayerBroadcaster.h"
 #include "MovementBroadcaster.h"
-#include "World.h"
+#include "WorldSocket.h"
+#include "WorldPacket.h"
 #include "Player.h"
 
 uint32 PlayerBroadcaster::num_bcaster_created = 0;

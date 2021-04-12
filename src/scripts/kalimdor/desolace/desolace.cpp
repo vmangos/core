@@ -28,6 +28,7 @@ EndContentData */
 
 #include "scriptPCH.h"
 #include "MoveMapSharedDefines.h"
+#include "CreatureGroups.h"
 
 /*######
 ## go_hand_of_iruxos_crystal

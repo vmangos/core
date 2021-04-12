@@ -20,8 +20,10 @@
  */
 
 #include "Pet.h"
+#include "Group.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"

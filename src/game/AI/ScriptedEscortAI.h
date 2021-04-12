@@ -6,8 +6,8 @@
 #define SC_ESCORTAI_H
 
 #include "ScriptedAI.h"
-#include "QuestDef.h"
-#include "Player.h"
+
+class Quest;
 
 struct Escort_Waypoint
 {
@@ -102,7 +102,7 @@ struct npc_escortAI : ScriptedAI
         void GetCombatStartPosition(float &x, float &y, float &z) const { x = m_combatStartX; y = m_combatStartY; z = m_combatStartZ; }
 
     protected:
-        Player* GetPlayerForEscort() const { return m_creature->GetMap()->GetPlayer(m_uiPlayerGUID); }
+        Player* GetPlayerForEscort() const;
         virtual void JustStartedEscort() {}
 
     private:

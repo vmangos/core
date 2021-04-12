@@ -318,7 +318,7 @@ AsyncTasks.Threads                      = 1
 AsyncQueriesTickTimeout = 0
 
 # Movement extrapolation system - not stable now
-Movement.ExtrapolatePlayerPosition = 0
+Movement.ExtrapolateChargePosition = 1
 Movement.ExtrapolatePetPosition = 1
 
 # Delayed repositionning checks (mounts inside / swimming ...). 0 to disable.

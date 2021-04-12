@@ -23,14 +23,12 @@
 #include "DBCStores.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Spell.h"
-#include "ScriptMgr.h"
-#include "Totem.h"
 #include "SpellAuras.h"
+#include "GameObject.h"
 
 using namespace Spells;
 
