@@ -19,6 +19,7 @@
 #include "Database/DatabaseImpl.h"
 #include "World.h"
 #include "Player.h"
+#include "PlayerAI.h"
 #include "Group.h"
 #include "Bag.h"
 #include "Opcodes.h"
