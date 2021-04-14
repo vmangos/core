@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <memory>
 #include <thread>
+#include <functional>
 
 class PlayerBroadcaster;
 class MovementBroadcaster;
