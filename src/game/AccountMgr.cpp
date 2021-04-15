@@ -200,7 +200,7 @@ void AccountMgr::Load()
         case SEC_TICKETMASTER:
         case SEC_GAMEMASTER:
         case SEC_BASIC_ADMIN:
-        case SEC_DEVELOPPER:
+        case SEC_DEVELOPER:
         case SEC_ADMINISTRATOR:
             // Peut etre deja dans la liste ? On prend le plus haut gmlevel.
             if (m_accountSecurity.find(accountId) == m_accountSecurity.end() ||
