@@ -110,7 +110,7 @@ class SpellAuraHolder
         Aura* GetAuraByEffectIndex(SpellEffectIndex index) const { return m_auras[index]; }
         uint32 GetAuraPeriodicTickTimer(SpellEffectIndex index) const;
 
-        uint32 GetId() const { return m_spellProto->Id; }
+        uint32 GetId() const;
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
 
         ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
@@ -225,7 +225,7 @@ class SpellAuraHolder
 
         void UpdateAuraDuration() const;
 
-        void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
+        void SetAura(uint32 slot, bool remove);
         void SetAuraFlag(uint32 slot, bool add);
         void SetAuraLevel(uint32 slot, uint32 level);
 
@@ -434,10 +434,10 @@ class Aura
         void SetModifier(AuraType t, float a, uint32 pt, int32 miscValue);
         Modifier*       GetModifier()       { return &m_modifier; }
         Modifier const* GetModifier() const { return &m_modifier; }
-        int32 GetMiscValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValue[m_effIndex]; }
+        int32 GetMiscValue() const;
 
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
-        uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
+        uint32 GetId() const{ return GetHolder()->GetId(); }
         ObjectGuid const& GetCastItemGuid() const { return GetHolder()->GetCastItemGuid(); }
         ObjectGuid const& GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
         ObjectGuid const& GetRealCasterGuid() const { return GetHolder()->GetRealCasterGuid(); }

@@ -19,8 +19,6 @@
 #ifndef _SPELL_CLASS_MASK_H
 #define _SPELL_CLASS_MASK_H
 
-#include "Platform/Define.h"
-
 enum ClassFlag
 {
     // -- Mage (3)

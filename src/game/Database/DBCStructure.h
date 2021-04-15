@@ -25,7 +25,6 @@
 #include "Common.h"
 #include "DBCEnums.h"
 #include "Path.h"
-#include "Platform/Define.h"
 #include "SpellClassMask.h"
 
 #include <map>

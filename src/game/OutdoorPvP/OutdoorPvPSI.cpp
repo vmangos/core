@@ -18,8 +18,6 @@
 #include "OutdoorPvP/OutdoorPvPSI.h"
 #include "WorldPacket.h"
 #include "Player.h"
-#include "GameObject.h"
-#include "MapManager.h"
 #include "ObjectMgr.h"
 #include "ZoneScriptMgr.h"
 #include "Language.h"

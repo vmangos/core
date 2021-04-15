@@ -6,8 +6,6 @@
 #define SC_CREATURE_H
 
 #include "CreatureAI.h"
-#include "Creature.h"
-#include "ScriptMgr.h"
 
 #define CAST_AI(a,b)    (dynamic_cast<a*>(b))
 

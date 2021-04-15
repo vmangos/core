@@ -24,7 +24,6 @@
 #include "Database/DatabaseImpl.h"
 #include "Database/SQLStorageImpl.h"
 #include "Policies/SingletonImp.h"
-
 #include "SQLStorages.h"
 #include "Log.h"
 #include "MapManager.h"
@@ -34,6 +33,7 @@
 #include "UpdateMask.h"
 #include "World.h"
 #include "Group.h"
+#include "Bag.h"
 #include "Transport.h"
 #include "ProgressBar.h"
 #include "Language.h"
@@ -52,6 +52,7 @@
 #include "InstanceData.h"
 #include "CharacterDatabaseCache.h"
 #include "HardcodedEvents.h"
+#include "Conditions.h"
 
 #include <limits>
 
@@ -10785,16 +10786,6 @@ void ObjectMgr::LoadConditions()
 
     sLog.outString(">> Loaded %u Condition definitions", sConditionStorage.GetRecordCount());
     sLog.outString();
-}
-
-
-// Check if a player meets condition conditionId
-bool ObjectMgr::IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const
-{
-    if (ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
-        return condition->Meets(target, map, source, conditionSourceType);
-
-    return false;
 }
 
 uint32 ObjectMgr::GenerateAuctionID()

@@ -20,8 +20,10 @@
  */
 
 #include <unordered_map>
+#include <cmath>
 
 #include "Player.h"
+#include "Bag.h"
 #include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
@@ -38,13 +40,11 @@
 #include "ChannelMgr.h"
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
-#include "InstanceData.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
-#include "CreatureAI.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Guild.h"
@@ -66,16 +66,12 @@
 #include "GMTicketMgr.h"
 #include "MasterPlayer.h"
 #include "MovementPacketSender.h"
-
-/* Nostalrius */
 #include "Config/Config.h"
-#include <cmath>
 #include "ZoneScript.h"
 #include "ZoneScriptMgr.h"
 #include "PlayerBotMgr.h"
 #include "PlayerBotAI.h"
 #include "AccountMgr.h"
-#include "MoveSpline.h"
 #include "Anticheat.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
@@ -1475,16 +1471,6 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             }
             else
                 m_areaCheckTimer -= p_time;
-        }
-
-        float x, y, z, o;
-        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PLAYER) && movespline->Finalized() && ExtrapolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time,  x, y, z, o))
-        {
-            GetMap()->DoPlayerGridRelocation(this, x, y, z, o);
-            m_position.x = x;
-            m_position.y = y;
-            m_position.z = z;
-            m_position.o = o;
         }
 
         // Anticheat sanction
@@ -12171,7 +12157,7 @@ void Player::PrepareGossipMenu(WorldObject* pSource, uint32 menuId)
         bool hasMenuItem = true;
         bool isGMSkipConditionCheck = false;
 
-        if (itr->second.condition_id && !sObjectMgr.IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_OPTION))
+        if (itr->second.condition_id && !IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_OPTION))
         {
             if (IsGameMaster())                             // Let GM always see menu items regardless of conditions
                 isGMSkipConditionCheck = true;
@@ -12515,7 +12501,7 @@ uint32 Player::GetGossipTextId(uint32 menuId, WorldObject* pSource)
         // Take the text that has the highest conditionId of all fitting
         // No condition and no text with condition found OR higher and fitting condition found
         if ((!itr->second.condition_id && !lastConditionId) ||
-                (itr->second.condition_id > lastConditionId && sObjectMgr.IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_MENU)))
+                (itr->second.condition_id > lastConditionId && IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_MENU)))
         {
             lastConditionId = itr->second.condition_id;
             textId = itr->second.text_id;
@@ -13471,7 +13457,7 @@ bool Player::SatisfyQuestCondition(Quest const* qInfo, bool msg) const
 {
     if (uint32 conditionId = qInfo->GetRequiredCondition())
     {
-        bool result = sObjectMgr.IsConditionSatisfied(conditionId, this, GetMap(), nullptr, CONDITION_FROM_QUEST);
+        bool result = IsConditionSatisfied(conditionId, this, GetMap(), nullptr, CONDITION_FROM_QUEST);
 
         if (!result && msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
@@ -18194,7 +18180,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    if (crItem->conditionId && !IsGameMaster() && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+    if (crItem->conditionId && !IsGameMaster() && !IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;

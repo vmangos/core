@@ -1,7 +1,7 @@
-#include "ProgressBar.h"
-#include "SpellMgr.h"
 #include "ScriptedAI.h"
-#include "ScriptedInstance.h"
+#include "Creature.h"
+#include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "Util.h"
 
 #define DEFAULT_MIN_CD 5000
@@ -74,11 +74,8 @@ struct GenericSpellMob : public ScriptedAI
 {
     GenericSpellMob(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
-
-    ScriptedInstance* m_pInstance;
 
     std::vector<GenericAISpell> m_uiSpells;
 

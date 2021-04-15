@@ -20,8 +20,10 @@
  */
 
 #include "Item.h"
+#include "Bag.h"
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "Database/DatabaseEnv.h"
 #include "ItemEnchantmentMgr.h"

@@ -258,7 +258,6 @@ set (SCRIPTS_SRCS
     world/fireworks_show.cpp
     world/go_scripts.cpp
     world/npcs_special.cpp
-    world/spell_scripts.cpp
     world/totems.cpp
     world/world_event_naxxramas.cpp
     world/world_event_naxxramas.h
@@ -370,7 +369,6 @@ if((${CMAKE_VERSION} VERSION_LESS "3.16") OR USE_PCH_OLD)
 else()
   set(PCHS
       ../game/Mail/Mail.h
-      ../game/Commands/Nostalrius.h
       ../game/ScriptMgr.h
       ../game/Objects/Object.h
       ../game/ObjectMgr.h

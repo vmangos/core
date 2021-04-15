@@ -23,6 +23,9 @@
 
 #include "SharedDefines.h"
 
+class Map;
+class WorldObject;
+
 enum ConditionType
 {
     //                                                      // Legend:

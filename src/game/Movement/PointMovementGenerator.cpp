@@ -289,8 +289,9 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     // Improved path to victim future estimated position
     if (Player* victimPlayer = victim.ToPlayer())
     {
-        if ((victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o)) &&
-            (victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o)))
+        if (sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE) && 
+            victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o) &&
+            victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o))
         {
             // Victim speed per sec.
             victimSpd -= victimPos;

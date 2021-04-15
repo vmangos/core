@@ -24,10 +24,10 @@
 #include "DBCStores.h"
 #include "WorldPacket.h"
 #include "Player.h"
+#include "Bag.h"
 #include "Opcodes.h"
 #include "Chat.h"
 #include "Log.h"
-#include "GossipDef.h"
 #include "Language.h"
 #include "BattleGroundMgr.h"
 #include <fstream>
@@ -36,6 +36,8 @@
 #include "SpellMgr.h"
 #include "SpellModMgr.h"
 #include "World.h"
+#include "ScriptMgr.h"
+#include "Conditions.h"
  // VMAPS
 #include "VMapFactory.h"
 #include "ModelInstance.h"
@@ -584,7 +586,7 @@ bool ChatHandler::HandleDebugConditionCommand(char* args)
 
     if (pSource && pTarget)
     {
-        if (sObjectMgr.IsConditionSatisfied(conditionId, pTarget, pSource->GetMap(), pSource, CONDITION_FROM_DBSCRIPTS))
+        if (IsConditionSatisfied(conditionId, pTarget, pSource->GetMap(), pSource, CONDITION_FROM_DBSCRIPTS))
             SendSysMessage("Condition is satisfied.");
         else
             SendSysMessage("Condition is not satisfied.");

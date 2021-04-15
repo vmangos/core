@@ -15,14 +15,11 @@
  */
 
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
@@ -693,6 +690,29 @@ bool ChatHandler::HandleListMoveGensCommand(char* /*args*/)
     unit->GetMotionMaster()->GetUsedMovementGeneratorsList(generators);
     for (uint32 i = 0; i < generators.size(); i++)
         PSendSysMessage("%u. %s (%u)", (i+1), MotionMaster::GetMovementGeneratorTypeName(generators[i]), generators[i]);
+
+    return true;
+}
+
+bool ChatHandler::HandleListHostileRefsCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("List of hostile references for %s:", pUnit->GetObjectGuid().GetString().c_str());
+    HostileReference* pReference = pUnit->GetHostileRefManager().getFirst();
+    uint32 counter = 1;
+    while (pReference)
+    {
+        if (Unit* pTarget = pReference->getSourceUnit())
+            PSendSysMessage("%u. %s", counter++, pTarget->GetGuidStr().c_str());
+        pReference = pReference->next();
+    }
 
     return true;
 }

@@ -19,11 +19,12 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "packet_builder.h"
+#include "Opcodes.h"
+#include "WorldPacket.h"
 #include "Unit.h"
 #include "Transport.h"
 #include "ObjectAccessor.h"
 #include "Anticheat.h"
-#include "WorldPacket.h"
 
 namespace Movement
 {

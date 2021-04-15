@@ -24,11 +24,13 @@
 
 #include "CreatureAI.h"
 
+class Creature;
+
 class ReactorAI : public CreatureAI
 {
     public:
 
-        explicit ReactorAI(Creature* c) : CreatureAI(c), m_bCanSummonGuards(c->CanSummonGuards()) {}
+        explicit ReactorAI(Creature* c);
 
         void MoveInLineOfSight(Unit*) override;
         void AttackStart(Unit*) override;

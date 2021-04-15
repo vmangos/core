@@ -3,13 +3,12 @@
 
 #include "ObjectGuid.h"
 #include "WorldPacket.h"
-#include "WorldSocket.h"
-#include "WorldPacket.h"
 #include "Opcodes.h"
 #include <list>
 #include <vector>
 #include <cstddef>
 
+class WorldSocket;
 class MovementBroadcaster;
 class Player;
 

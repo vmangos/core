@@ -34,10 +34,8 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "MapManager.h"
-#include "Log.h"
 #include "Transport.h"
-#include "TargetedMovementGenerator.h"
-#include "WaypointMovementGenerator.h"
+#include "MotionMaster.h"
 #include "VMapFactory.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
@@ -45,12 +43,11 @@
 #include "Language.h"
 #include "Geometry.h"
 #include "ObjectPosSelector.h"
-
+#include "MoveMapSharedDefines.h"
 #include "TemporarySummon.h"
 #include "ZoneScriptMgr.h"
 #include "InstanceData.h"
 #include "Chat.h"
-#include "Anticheat.h"
 
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
@@ -4203,11 +4200,11 @@ float WorldObject::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
     int32 baseDice = int32(spellProto->EffectBaseDice[effect_index]);
     float basePointsPerLevel = spellProto->EffectRealPointsPerLevel[effect_index];
     float randomPointsPerLevel = spellProto->EffectDicePerLevel[effect_index];
-    int32 basePoints = effBasePoints
+    float value = effBasePoints
                        ? *effBasePoints - baseDice
                        : spellProto->EffectBasePoints[effect_index];
 
-    basePoints += int32(level * basePointsPerLevel);
+    value += level * basePointsPerLevel;
     int32 randomPoints = int32(spellProto->EffectDieSides[effect_index] + level * randomPointsPerLevel);
     float comboDamage = spellProto->EffectPointsPerComboPoint[effect_index];
 
@@ -4215,7 +4212,7 @@ float WorldObject::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
     {
         case 0:
         case 1:
-            basePoints += baseDice;
+            value += baseDice;
             break;              // range 1..1
         default:
         {
@@ -4224,12 +4221,10 @@ float WorldObject::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
                               ? irand(randomPoints, baseDice)
                               : irand(baseDice, randomPoints);
 
-            basePoints += randvalue;
+            value += randvalue;
             break;
         }
     }
-
-    float value = basePoints;
 
     // random damage
     if (comboDamage != 0 && pPlayer && target && (target->GetObjectGuid() == pPlayer->GetComboTargetGuid()))
@@ -4754,7 +4749,7 @@ float WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffec
     //if (GetTypeId()==TYPEID_UNIT && !((Creature*)this)->IsPet())
     //    coeff = 1.0f;
     // Check for table values
-    if (spellProto->EffectBonusCoefficient[effectIndex] >= 0)
+    if (spellProto->EffectBonusCoefficient[effectIndex] >= 0.0f)
         coeff = spellProto->EffectBonusCoefficient[effectIndex];
     // Calculate default coefficient
     else if (benefit)
@@ -4762,14 +4757,9 @@ float WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffec
 
     if (benefit)
     {
-        // Calculate level penalty
-        float LvlPenalty = CalculateLevelPenalty(spellProto);
-
-        // Flame Wrath (16560) scales at 100% without any penalty, yet spell level is 1.
-        // Damage shield auras must not be subject to level penalty.
-        if ((spellProto->Effect[effectIndex] == SPELL_EFFECT_APPLY_AURA) &&
-            (spellProto->EffectApplyAuraName[effectIndex] == SPELL_AURA_DAMAGE_SHIELD))
-            LvlPenalty = 1.0f;
+        // Calculate level penalty only if spell does not have coefficient set in template,
+        // since the coefficients already have the level penalty accounted for.
+        float LvlPenalty = (spellProto->EffectBonusCoefficient[effectIndex] >= 0.0f) ? 1.0f : CalculateLevelPenalty(spellProto);
 
         // Calculate custom coefficient
         coeff = spellProto->CalculateCustomCoefficient(pCaster, damagetype, coeff, spell, donePart);

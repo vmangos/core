@@ -19,6 +19,10 @@
  */
 
 #include "Unit.h"
+#include "Creature.h"
+#include "Pet.h"
+#include "Totem.h"
+#include "Player.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -27,41 +31,28 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
-#include "QuestDef.h"
-#include "Player.h"
-#include "Creature.h"
 #include "Spell.h"
 #include "Group.h"
 #include "SpellAuras.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
 #include "TemporarySummon.h"
 #include "Formulas.h"
-#include "Pet.h"
 #include "Util.h"
-#include "Totem.h"
 #include "BattleGround.h"
-#include "InstanceData.h"
-#include "MapPersistentStateMgr.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "DBCStores.h"
 #include "VMapFactory.h"
 #include "MovementGenerator.h"
 #include "Transport.h"
-
+#include "CreatureGroups.h"
 #include "ZoneScript.h"
-#include "Nostalrius.h"
-#include "InstanceData.h"
-
-#include "PathFinder.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "packet_builder.h"
 #include "Chat.h"
 #include "Anticheat.h"
-#include "CreatureLinkingMgr.h"
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
@@ -1871,8 +1862,10 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
         if (!(mod->m_miscvalue & schoolMask))
             continue;
 
+        MANGOS_DEBUG_ASSERT((mod->m_amount - floor(mod->m_amount)) == 0.f);
+
         // Max Amount can be absorbed by this aura
-        int32  currentAbsorb = dither(mod->m_amount);
+        int32  currentAbsorb = mod->m_amount;
 
         // Found empty aura (impossible but..)
         if (currentAbsorb <= 0)
@@ -4534,6 +4527,14 @@ bool Unit::IsNeutralToAll() const
         return false;
 
     return my_faction->IsNeutralToAll();
+}
+
+bool Unit::IsContestedGuard() const
+{
+    if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
+        return entry->IsContestedGuardFaction();
+
+    return false;
 }
 
 bool Unit::Attack(Unit* victim, bool meleeAttack)

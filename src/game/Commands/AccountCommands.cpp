@@ -26,7 +26,6 @@
 #include "AccountMgr.h"
 #include "ObjectMgr.h"
 #include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "AsyncCommandHandlers.h"
 #include "Anticheat.h"

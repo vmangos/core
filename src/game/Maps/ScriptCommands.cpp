@@ -24,6 +24,8 @@
 #include "CreatureAIImpl.h"
 #include "NullCreatureAI.h"
 #include "GameEventMgr.h"
+#include "ObjectMgr.h"
+#include "Group.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
@@ -1024,7 +1026,7 @@ bool Map::ScriptCommand_TerminateCondition(ScriptInfo const& script, WorldObject
     WorldObject* pSource = source;
     WorldObject* pTarget = target;
 
-    bool terminateResult = sObjectMgr.IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
+    bool terminateResult = IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
     
     if (script.terminateCond.flags & SF_TERMINATECONDITION_WHEN_FALSE)
         terminateResult = !terminateResult;
@@ -1774,7 +1776,7 @@ bool Map::ScriptCommand_RemoveMapEventTarget(ScriptInfo const& script, WorldObje
             {
                 if (WorldObject* pObject = GetWorldObject(itr->target))
                 {
-                    if (sObjectMgr.IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
+                    if (IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
                     {
                         itr = pEvent->m_vTargets.erase(itr);
                         if (script.removeMapEventTarget.targets == SO_REMOVETARGET_ONE_FIT_CONDITION)

@@ -26,8 +26,6 @@
 #include "Database/SqlOperations.h"
 #include "Language.h"
 #include "Chat.h"
-#include "GameEventMgr.h"
-#include "ScriptMgr.h"
 #include "AccountMgr.h"
 #include "DBCStores.h"
 #include "Util.h"
