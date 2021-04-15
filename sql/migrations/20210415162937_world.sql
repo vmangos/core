@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20210415162937');
 -- Add your query below.
 
 -- Shadowforge Commander shouldn't drop Blue Pearls (it was obviously an error since the Giant Clam gameobject has the
--- same entry as this NPC.
+-- same entry as this NPC).
 DELETE FROM `creature_loot_template` WHERE `item` = 4611 AND `entry` = 2744;
 
 -- Fix loot template of Giant Clam gameobject
