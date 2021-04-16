@@ -373,6 +373,23 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 -- correct scale for novice warriors
 UPDATE `creature_template` SET `display_scale1` = 1.35, `display_scale2` = 1.35 WHERE `entry` = 10721;
 
+-- add defias raider - talk on aggro
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (618004, 6180, 0, 4, 0, 100, 0, 0, 0, 0, 0, 618004, 0, 0, 'Defias Raider - Talk on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (618004, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1867, 1866, 1865, 0, 0, 0, 0, 0, 0, 'Defias Raider - Talk on Aggro');
+
+-- add tamra stormpike spawns (credit cmangos)
+UPDATE `creature` SET `position_x` = -1265.12255859375, `position_y` = -1195.08447265625, `position_z` = 40.0485687255859375, `orientation` = 3.393389225006103515, `wander_distance` = 3, `movement_type` = 1 WHERE (`guid` = 90783);
+UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`Entry` = 14275);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `movement_type`, `wander_distance`, `patch_max`) VALUES
+(90784, 14275, 0, -1329.939453125, -1277.459228515625, 49.98560333251953125, 2.301288127899169921, 27000, 27000, 100, 100, 1, 3, 10),
+(90786, 14275, 0, -1356.63818359375, -1247.211669921875, 49.98707962036132812, 3.446519136428833007, 27000, 27000, 100, 100, 1, 3, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(124, 1, 'Tamra Stormpike (14275)');
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(90783, 124, 'Tamra Stormpike #1'),
+(90784, 124, 'Tamra Stormpike #2'),
+(90786, 124, 'Tamra Stormpike #3');
+
 
 -- End of migration.
 END IF;
