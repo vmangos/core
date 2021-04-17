@@ -390,6 +390,9 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 (90784, 124, 'Tamra Stormpike #2'),
 (90786, 124, 'Tamra Stormpike #3');
 
+-- quest 813 should be repeatable
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 813;
+
 
 -- End of migration.
 END IF;
