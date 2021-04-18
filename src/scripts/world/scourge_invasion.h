@@ -227,7 +227,13 @@ enum ScourgeInvasionNPC
     NPC_FAINT_NECROTIC_CRYSTAL                          = 16531,
     NPC_FLAMESHOCKER                                    = 16383,
     NPC_STORMWIND_GARNISON_GUARD                        = 68,
-    NPC_UNDERCITY_GARNISON_GUARD                        = 5624
+    NPC_UNDERCITY_GARNISON_GUARD                        = 5624,
+    NPC_HIGHLORD_BOLVAR_FORDRAGON                       = 1748,
+    NPC_LADY_SYLVANAS_WINDRUNNER                        = 10181,
+    NPC_VARIMATHRAS                                     = 2425,
+    NPC_ROYAL_DREADGUARD                                = 13839,
+    NPC_STORMWIND_ROYAL_GUARD                           = 1756,
+    NPC_UNDERCITY_ELITE_GUARDIAN                        = 16432
 };
 
 enum ScourgeInvasionMisc
@@ -263,16 +269,19 @@ enum ScourgeInvasionMisc
     NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
 #else
     // The change of zone takes 4 hours
-    //NECROPOLIS_ATTACK_TIMER     = 60 * 60, // 1 hour
-    NECROPOLIS_ATTACK_TIMER = 60 * 1, // 5min from 
+    //NECROPOLIS_ATTACK_TIMER                           = 60 * 60, // 1 hour
+    NECROPOLIS_ATTACK_TIMER                             = 60 * 1, // 5min from 
+    CITY_ATTACK_TIMER                                   = 60 * 1, // 5min from 
 #endif
 
-    ZONEID_WINTERSPRING         = 618,
-    ZONEID_AZSHARA              = 16,
-    ZONEID_EASTERN_PLAGUELANDS  = 139,
-    ZONEID_BLASTED_LANDS        = 4,
-    ZONEID_BURNING_STEPPES      = 46,
-    ZONEID_TANARIS              = 440,
+    ZONEID_WINTERSPRING                                 = 618,
+    ZONEID_AZSHARA                                      = 16,
+    ZONEID_EASTERN_PLAGUELANDS                          = 139,
+    ZONEID_BLASTED_LANDS                                = 4,
+    ZONEID_BURNING_STEPPES                              = 46,
+    ZONEID_TANARIS                                      = 440,
+    ZONEID_UNDERCITY                                    = 1497,
+    ZONEID_STORMWIND                                    = 1519,
 
     GAME_EVENT_SCOURGE_INVASION                         = 17,
     GAME_EVENT_SCOURGE_INVASION_WINTERSPRING            = 90,
@@ -354,6 +363,8 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_SI_ATTACK_TIME5                    = 120,
     VARIABLE_SI_ATTACK_TIME6                    = 121,
     VARIABLE_SI_ATTACK_COUNT                    = 122,
+    VARIABLE_SI_UNDERCITY_TIME                  = 123,
+    VARIABLE_SI_STORMWIND_TIME                  = 124,
 
     VARIABLE_SI_WINTERSPRING_REMAINING          = 30,
     VARIABLE_SI_AZSHARA_REMAINING               = 31,

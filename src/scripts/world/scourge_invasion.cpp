@@ -197,7 +197,7 @@ bool UncommonMinionspawner(Creature* spawner) // Rare Minion Spawner.
     */
     uint32 chance = urand(1, 217);
     if (chance > 1)
-        return false; // Above 56 = Minion, else Rare.
+        return false; // Above 1 = Minion, else Rare.
 
     return true;
 }
@@ -386,7 +386,7 @@ struct NecropolisHealthAI : public ScriptedAI
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
-        // Make sure we despawn after SPELL_DESPAWNER_OTHER triggered.
+        // Make sure m_creature despawn after SPELL_DESPAWNER_OTHER triggered.
         if (spell->Id == SPELL_DESPAWNER_OTHER && target->GetEntry() == NPC_NECROPOLIS)
         {
             DespawnNecropolis(target);
@@ -436,7 +436,7 @@ struct NecropolisProxyAI : public ScriptedAI
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
-        // Make sure we despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
+        // Make sure m_creature despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->RemoveFromWorld();
     }
@@ -482,7 +482,7 @@ struct NecropolisRelayAI : public ScriptedAI
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
-        // Make sure we this despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
+        // Make sure m_creature despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->RemoveFromWorld();
     }
@@ -1020,7 +1020,7 @@ struct ScourgeMinion : public ScriptedAI
             return;
 
         // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
-        if (!m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId() && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f))
+        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId())
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
@@ -1244,6 +1244,8 @@ struct FlameshockerAI : public ScriptedAI
         }
         else
             _touchTimer -= diff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1252,27 +1254,138 @@ CreatureAI* GetAI_Flameshocker(Creature* pCreature)
     return new FlameshockerAI(pCreature);
 }
 
+struct Locations
+{
+    float x, y, z, o;
+};
+static Locations UC_ROYAL_QUARTER[] =
+{
+    {1596.79, 423.485, -46.373, 4.68793},
+    {1575.38, 423.265, -55.1711, 3.20745},
+    {1551.91, 414.219, -61.62, 3.44307},
+    {1526.11, 402.61, -62.2181, 3.63157},
+    {1509.03, 393.058, -57.1532, 3.65513},
+    {1491.3, 382.658, -62.1935, 3.80043},
+    {1472.06, 366.101, -62.1867, 2.34351},
+    {1453.99, 385.253, -58.9882, 2.30032},
+    {1427.73, 413.614, -56.939, 2.31995},
+    {1397.96, 435.014, -54.192, 2.87758},
+    {1361.99, 437.33, -54.0778, 3.447},
+    {1330.35, 421.182, -58.3072, 3.91431},
+    {1311.12, 392.783, -63.6373, 4.44838},
+    {1302.86, 361.266, -67.2948, 4.40911},
+    {1290.15, 349.635, -65.0273, 3.27813},
+    {1267.87, 346.501, -65.0273, 3.57265},
+    {1261.73, 331.556, -65.0273, 6.10162},
+    {1274.19, 329.355, -60.083, 6.09377},
+    {1293.56, 335.19, -60.083, 0.0147824},
+    {1292.17, 320.795, -57.326, 4.35019}
+};
+
 struct PallidHorrorAI : public ScriptedAI
 {
     PallidHorrorAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        int amountShockers = urand(5, 9); // sniffed are group sizes of 5-9 shockers on spawn.
+
+        if (m_creature->GetHealthPercent() == 100.0f)
+        {
+            for (int i = 0; i < amountShockers; ++i)
+                if (Creature* flame = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0, true))
+                {
+                    float angle = (float(i) * (M_PI / (amountShockers / 2))) + m_creature->GetOrientation();
+                    flame->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE);
+                    _flameshockers.insert(flame->GetObjectGuid());
+                    flame->AI()->InformGuid(m_creature->GetObjectGuid(), 0);
+                }
+        }
+
         Reset();
         _yellTimer = 5000;
+        LastWayPoint = 0;
     }
 
+    std::set<ObjectGuid> _flameshockers;
+    std::set<ObjectGuid> _guards;
     uint32 _yellTimer;
+    uint32 LastWayPoint;
+    bool guards1 = false;
+    bool guards2 = false;
+    bool guards3 = false;
+    bool guards4 = false;
 
-    void Reset() override {}
-
-    void JustDied(Unit* killer) override
+    void Reset() override
     {
-        // Yes they really did create a random crystal on death (in 2006 and in classic sniffs): http://casualwow.blogspot.com/2006/07/pallid-horror.html
+        if (LastWayPoint < 20)
+            m_creature->GetMotionMaster()->MovePoint(LastWayPoint + 1, UC_ROYAL_QUARTER[LastWayPoint].x + 1, UC_ROYAL_QUARTER[LastWayPoint].y + 1, UC_ROYAL_QUARTER[LastWayPoint].z + 1, MOVE_PATHFINDING, UC_ROYAL_QUARTER[LastWayPoint].o + 1);
+    }
+
+    void JustDied(Unit* killer) override    
+    {
+        if (Creature* HIGHLORD_BOLVAR_FORDRAGON = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_GIGANTIC))
+            HIGHLORD_BOLVAR_FORDRAGON->MonsterYellToZone(LANG_STORMWIND_BOLVAR_2);
+
+        if (Creature* LADY_SYLVANAS_WINDRUNNER = m_creature->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_GIGANTIC))
+            LADY_SYLVANAS_WINDRUNNER->MonsterYellToZone(LANG_UNDERCITY_SYLVANAS_1);
+
+        // Remove all custom summoned Flameshockers.
+        for (const auto& guid : _flameshockers)
+            if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
+                FLAMESHOCKER->DoKillUnit(FLAMESHOCKER);
+
+        // Remove all custom summoned Guards.
+        for (const auto& guid : _guards)
+            if (Creature* ROYAL_GUARD = m_creature->GetMap()->GetCreature(guid))
+                ROYAL_GUARD->RemoveFromWorld();
+
+        // Yes it really did create a random crystal on death (in 2006 and also in classic sniffs): http://casualwow.blogspot.com/2006/07/pallid-horror.html
         m_creature->CastSpell(m_creature, PickRandomValue(SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL, SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL), true);
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
     }
 
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
+    {
+        if (!m_creature->GetVictim())
+        {
+            m_creature->SetWalk(true);
+
+            if (uiPointId < 20)
+                m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, UC_ROYAL_QUARTER[uiPointId + 1].x, UC_ROYAL_QUARTER[uiPointId + 1].y, UC_ROYAL_QUARTER[uiPointId + 1].z, MOVE_PATHFINDING, UC_ROYAL_QUARTER[LastWayPoint].o);
+
+            if (uiPointId >= 5 && !guards1)
+                if (Creature* ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, 1466.95, 369.392, -59.3685, 4.41568, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                {
+                    ROYAL_GUARD->MonsterYellToZone(LANG_UNDERCITY_ROYAL_DREADGUARD_1, 1, m_creature);
+                    _guards.insert(ROYAL_GUARD->GetObjectGuid());
+                    guards1 = true;
+                }
+
+            if (uiPointId >= 12 && !guards2)
+            {
+                if (Creature* ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, 1305.82, 351.934, -65.8778, 1.69297, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                    _guards.insert(ROYAL_GUARD->GetObjectGuid());
+                if (Creature* ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, 1302.63, 352.871, -65.9109, 1.309, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                    _guards.insert(ROYAL_GUARD->GetObjectGuid());
+                if (Creature* ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, 1299.49, 353.789, -65.9394, 1.16937, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                    _guards.insert(ROYAL_GUARD->GetObjectGuid());
+                if (Creature* ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, 1295.97, 354.728, -65.9162, 0.907571, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                    _guards.insert(ROYAL_GUARD->GetObjectGuid());
+
+                if (Creature* VARIMATHRAS = m_creature->FindNearestCreature(NPC_VARIMATHRAS, VISIBILITY_DISTANCE_GIGANTIC))
+                    VARIMATHRAS->MonsterYellToZone(LANG_UNDERCITY_VARIMATHRAS_1, 1, m_creature);
+
+                guards2 = true;
+            }
+        }
+        if (uiPointId >= 0 && uiPointId < 20)
+            LastWayPoint = uiPointId;
+    }
+
     void UpdateAI(uint32 const diff) override
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
         if (_yellTimer < diff)
         {
             m_creature->MonsterYell(PickRandomValue(LANG_PALLID_HORROR_YELL1, LANG_PALLID_HORROR_YELL2, LANG_PALLID_HORROR_YELL3, LANG_PALLID_HORROR_YELL4,
@@ -1281,6 +1394,8 @@ struct PallidHorrorAI : public ScriptedAI
         }
         else
             _yellTimer -= diff;
+
+        DoMeleeAttackIfReady();
     }
 };
 

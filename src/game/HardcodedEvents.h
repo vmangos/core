@@ -238,28 +238,44 @@ private:
         std::vector<InvasionXYZO> mouth;
     };
 
+    struct CityAttack
+    {
+        uint32 map;
+        uint32 zoneId;
+        ObjectGuid pallidGuid;
+        std::vector<InvasionXYZO> pallid;
+    };
+
     bool invasion1Loaded;
     bool invasion2Loaded;
 
+    bool undercityLoaded;
+    bool stormwindLoaded;
+
     void HandleActiveZone(uint32 attackTimeVar, uint32 attackZoneVar, uint32 remainingVar, time_t now, uint32 zoneId);
+    void HandleActiveCity(uint32 attackTimeVar, time_t now, uint32 zoneId);
 
     bool OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
 
     void StartNewInvasion(uint32 zoneVariable, uint32 zoneid);
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
+    void StartNewCityAttackIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
-    bool SummonMouth(Map* pMap, InvasionZone* zone,InvasionXYZO& point);
+    bool SummonMouth(Map* pMap, InvasionZone* zone, InvasionXYZO& point);
+    bool SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point);
 
     Map* GetMap(uint32 mapId, InvasionXYZO const& invZone);
     bool isValidZoneId(uint32 zoneId);
     bool isActiveZone(uint32 zoneId);
     uint32 GetActiveZones();
     InvasionZone* GetZone(uint32 zoneId);
+    CityAttack* GetZones(uint32 zoneId);
     uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
 
     void UpdateWorldState();
 
     std::vector<InvasionZone> invasionPoints;
+    std::vector<CityAttack> attackPoints;
     int previousRemainingCounts[6];
 };
 

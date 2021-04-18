@@ -587,6 +587,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_TIME4, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_TIME5, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_TIME6, time(nullptr));
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_UNDERCITY_TIME, time(nullptr));
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_STORMWIND_TIME, time(nullptr));
 
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_ZONE1, ZONEID_TANARIS);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
@@ -672,6 +674,23 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     invasionPoints.push_back(blasted_lands);
     invasionPoints.push_back(eastern_plaguelands);
     invasionPoints.push_back(burning_steppes);
+
+    CityAttack undercity;
+    {
+        undercity.map = 0;
+        undercity.zoneId = ZONEID_UNDERCITY;
+        undercity.pallid.push_back(InvasionXYZO(1596.66f, 438.885f, -46.3348f, 4.75028f));
+    }
+
+    CityAttack stormwind;
+    {
+        stormwind.map = 0;
+        stormwind.zoneId = ZONEID_STORMWIND;
+        stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f));
+    }
+
+    attackPoints.push_back(undercity);
+    attackPoints.push_back(stormwind);
 }
 
 void ScourgeInvasionEvent::EnableAndStartEvent(uint16 event_id)
@@ -694,7 +713,6 @@ void ScourgeInvasionEvent::DisableAndStopEvent(uint16 event_id)
         sGameEventMgr.EnableEvent(event_id, false);
 }
 
-
 void ScourgeInvasionEvent::HandleDefendedZones()
 {
     uint32 wins = 0;
@@ -713,6 +731,7 @@ void ScourgeInvasionEvent::HandleDefendedZones()
     }
     else if (wins >= 150) {
         DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION);
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
         EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
@@ -750,6 +769,22 @@ void ScourgeInvasionEvent::Update()
         return;
 
     time_t now = time(nullptr);
+
+    for (CityAttack& zone : attackPoints)
+    {
+        uint32 PallidAlive = 0;
+
+        Map* mapPtr = GetMap(zone.map, zone.pallid[0]);
+
+        Creature* pPallid = mapPtr->GetCreature(zone.pallidGuid);
+        if (!pPallid)
+            PallidAlive = 0;
+
+        if (PallidAlive == 0 && zone.zoneId == ZONEID_UNDERCITY)
+            HandleActiveCity(VARIABLE_SI_UNDERCITY_TIME, now, zone.zoneId);
+        else if (PallidAlive == 0 && zone.zoneId == ZONEID_STORMWIND)
+            HandleActiveCity(VARIABLE_SI_STORMWIND_TIME, now, zone.zoneId);
+    }
 
     for (InvasionZone& zone : invasionPoints)
     {
@@ -921,6 +956,34 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
     }
 }
 
+void ScourgeInvasionEvent::HandleActiveCity(uint32 attackTimeVar, time_t now, uint32 zoneId)
+{
+    uint32 t = sObjectMgr.GetSavedVariable(attackTimeVar);
+    // if this zone remaining var is already 0, it means we are waiting for the time to start a new event
+    CityAttack* zone = GetZones(zoneId);
+    if (!zone) return;
+
+    // Change weather to fine.
+    Map* pMap = sMapMgr.FindMap(zone->map);
+
+    Creature* pPallid = pMap->GetCreature(zone->pallidGuid);
+
+    if (!pPallid)
+    {
+        StartNewCityAttackIfTime(attackTimeVar, zoneId);
+    }
+    // if previous remaining variable for this zone was not already 0, and the timer for next
+    // attack is less than now, its time to set it for next attack
+    else if (t < now && !pPallid)
+    {
+        time_t next_attack = now + CITY_ATTACK_TIMER;
+        time_t timeToNextAttack = next_attack - now;
+        sObjectMgr.SetSavedVariable(attackTimeVar, now + CITY_ATTACK_TIMER, true);
+
+        sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next city attack starting in %d minutes", zoneId, uint32(timeToNextAttack / 60));
+    }
+}
+
 // Will return false if we were supposed to resume an invasion, but ResumeInvasion() returned false.
 // In all other cases returns true
 bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
@@ -951,6 +1014,41 @@ bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
         }
     }
     return true;
+}
+
+void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 zoneID)
+{
+    time_t now = time(nullptr);
+
+    // Not yet time
+    if (now < sObjectMgr.GetSavedVariable(timeVariable))
+        return;
+
+    uint32 zoneId = zoneID;
+
+    sLog.outBasic("[Scourge Invasion Event] Starting new invasion in zone %d", zoneId);
+
+    CityAttack* zone = GetZones(zoneId);
+
+    if (!zone)
+        return;
+
+    uint32 spawnLoc = (urand(0, zone->pallid.size() - 1));
+
+    Map* mapPtr = GetMap(zone->map, zone->pallid[spawnLoc]);
+
+    // If any of the required maps are not available we return. Will cause the invasion to be started
+    // on next update instead
+    if (!mapPtr)
+    {
+        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to access required map (%d). Retrying next update", zone->map);
+        return;
+    }
+
+    if (mapPtr && SummonPallid(mapPtr, zone, zone->pallid[spawnLoc]))
+        sLog.outBasic("[Scourge Invasion Event] Pallid Horror summoned in zone %d", zoneId);
+    else
+        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in %d", zone->map);
 }
 
 // Will initialize an invasion in a new, random, zone if the cooldown is up. If somehow the maps for the
@@ -1084,6 +1182,29 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     return true;
 }
 
+bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point)
+{
+    // Remove old pallid if required.
+    Creature* pPallid = pMap->GetCreature(zone->pallidGuid);
+
+    if (pPallid)
+        pPallid->RemoveFromWorld();
+
+    if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
+    {
+        pPallid->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+        zone->pallidGuid = pPallid->GetObjectGuid();
+    }
+    else
+    {
+        sLog.outError("ScourgeInvasionEvent::SummonPallid failed summoning Pallid Horror");
+        return false;
+    }
+
+    sLog.outError("ScourgeInvasionEvent::SummonPallid at %f %f %f", point.x, point.y, point.z);
+    return true;
+}
+
 bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXYZO& point)
 {
     // Remove old mouth if required.
@@ -1099,7 +1220,7 @@ bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXY
     }
     else
     {
-        sLog.outError("ScourgeInvasionEvent::SummonMouth failed summoning necropolis");
+        sLog.outError("ScourgeInvasionEvent::SummonMouth failed summoning Mouth of Kel'Thuzad");
         return false;
     }
 
@@ -1154,6 +1275,17 @@ uint32 ScourgeInvasionEvent::GetActiveZones()
             activeInvasions++;
     }
     return activeInvasions;
+}
+
+ScourgeInvasionEvent::CityAttack* ScourgeInvasionEvent::GetZones(uint32 zoneId)
+{
+    for (auto& attackPoint : attackPoints)
+    {
+        if (attackPoint.zoneId == zoneId)
+            return &attackPoint;
+    }
+    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
+    return nullptr;
 }
 
 ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
