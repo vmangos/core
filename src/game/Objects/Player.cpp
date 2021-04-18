@@ -5605,38 +5605,24 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     // Calculate base chance to increase
     float chance = 0.0f;
-    if (defence) // TODO: more research needed. Seems to increase slower than weapon skill. Using old formula:
+
+    // weapon skill https://classic.wowhead.com/guides/classic-wow-weapon-skills
+    if (currentSkillMax * 0.9f > currenSkillValue)
     {
-        uint32 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
-        uint32 mobLevel = pVictim->GetLevelForTarget(this);
-
-        if (mobLevel > playerLevel + 5)
-            mobLevel = playerLevel + 5;
-
-        int32 lvldif = mobLevel - greylevel;
-        if (lvldif < 3)
-            lvldif = 3;
-
-        chance = float(3 * lvldif * skillDiff) / playerLevel;
+        // Skill progress: 1% - 90% - chance decreases from 100% to 50%
+         chance = std::min(100.0f, float(currentSkillMax * 0.9f * 50) / currenSkillValue);
     }
-    else // weapon skill https://classic.wowhead.com/guides/classic-wow-weapon-skills
+    else
     {
-        if (currentSkillMax * 0.9f > currenSkillValue)
-        {
-            // Skill progress: 1% - 90% - chance decreases from 100% to 50%
-            chance = std::min(100.0f, float(currentSkillMax * 0.9f * 50) / currenSkillValue);
-        }
-        else
-        {
-            // Skill progress: 90% - 100% - chance decreases from 50% to a minimum which is level dependent
-            chance = (0.5f - 0.0168966f * currenSkillValue * (300.0f / currentSkillMax) + 0.0152069f * currentSkillMax * (300.0f / currentSkillMax)) * 100.0f;
-            if (skillDiff <= 3)
-                chance *= (0.5f / (4 - skillDiff));
-        }      
+        // Skill progress: 90% - 100% - chance decreases from 50% to a minimum which is level dependent
+        chance = (0.5f - 0.0168966f * currenSkillValue * (300.0f / currentSkillMax) + 0.0152069f * currentSkillMax * (300.0f / currentSkillMax)) * 100.0f;
+        if (skillDiff <= 3)
+            chance *= (0.5f / (4 - skillDiff));
+    }      
 
-        // Add intellect bonus (capped at 10% - guessed)
+    // Add intellect bonus (capped at 10% - guessed)
+    if (!defence)
         chance += std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
-    }
 
     chance = std::min(100.0f, chance);
 
