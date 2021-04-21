@@ -875,6 +875,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
 #        Default: 1 (Mods/GMs/Admins)
 #
+#    ForceLogoutDelay
+#        Keep player characters ingame for some time after a client disconnects unexpectedly.
+#        Default: 1 (true)
+#                 0 (false)
+#
 #    AutoHonorRestart
 #        Server will schedule a restart on its own when it's time to perform PvP rank calculations.
 #        Default: 1
@@ -1091,6 +1096,7 @@ StartPlayerMoney = 0
 MinHonorKills = 15
 MaintenanceDay = 3
 InstantLogout = 1
+ForceLogoutDelay = 0
 AutoHonorRestart = 1
 AllFlightPaths = 0
 AlwaysMaxSkillForLevel = 0
@@ -2816,24 +2822,66 @@ AHBot.itemcount = 50
 #AHBot.bot.account = 32377
 
 ###################################################################################################################
+# PLAYER BOTS
+#
+#    RandomBot.Enable
+#        Enables automatic spawning of random bots. These bots have no AI. You have to code one and assign it.
+#        Default: 0 - off
+#                 1 - on
+#
+#    RandomBot.MinBots
+#        Minimum amount of random bots the server will try to spawn.
+#        Default: 0
+#
+#    RandomBot.MaxBots
+#        Maximum amount of random bots the server will try to spawn.
+#        Default: 0
+#
+#    RandomBot.Refresh
+#        How often the the server will check if there are enough bots spawned.
+#        Default: 60000 (1 minute)
+#
+#    PlayerBot.Debug
+#        Enables additional debugging information about bots that is printed in the console.
+#        Default: 0 - off
+#                 1 - on
+#
+#    PlayerBot.UpdateMs
+#        How often the AI of bots will be updated. A bigger delay will make them less responsive.
+#        Default: 1000 (1 second)
+#
+#    PlayerBot.ShowInWhoList
+#        Enables displaying characters controlled by bots in /who results.
+#        Default: 0 - off
+#                 1 - on
+#
+#    PlayerBot.MaxBots
+#        Maximum number of party bots that normal players are allowed to summon.
+#        Default: 0 (no limit)
+#
+#    PlayerBot.SkipChecks
+#        Disables the additional restrictions that apply when a normal player tries to summon a party bot.
+#        Default: 0 (restricted)
+#                 1 (no restrictions)
+#
+###################################################################################################################
+RandomBot.Enable = 0
+RandomBot.MinBots = 0
+RandomBot.MaxBots = 0
+RandomBot.Refresh = 60000
+PlayerBot.Debug = 0
+PlayerBot.UpdateMs = 1000
+PlayerBot.ShowInWhoList = 0
+PartyBot.MaxBots = 0
+PartyBot.SkipChecks = 0
+
+###################################################################################################################
 #    Database-based chat
 ###################################################################################################################
 OfflineChat.Enable = 0
 OfflineChat.Port   = 3444
 OfflineChat.IP     = 0.0.0.0
 OfflineChat.Password= "p8zqkt"
-
-###################################################################################################################
-#    Player bots
-###################################################################################################################
-PlayerBot.Enable = 1
-PlayerBot.Debug = 0
-PlayerBot.UpdateMs = 1000
-PlayerBot.MinBots = 0
-PlayerBot.MaxBots = 0
-PlayerBot.Refresh = 10000
-PlayerBot.ForceLogoutDelay = 1
-PlayerBot.ShowInWhoList = 0
 
 ###################################################################################################################
 #    Mail flooding mitigation
