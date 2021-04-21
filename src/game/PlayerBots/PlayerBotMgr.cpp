@@ -21,17 +21,16 @@ INSTANTIATE_SINGLETON_1(PlayerBotMgr);
 
 PlayerBotMgr::PlayerBotMgr()
 {
-    totalChance = 0;
-    _maxAccountId = 0;
+    m_totalChance = 0;
+    m_maxAccountId = 0;
 
     // Config
-    confMinBots         = 3;
-    confMaxBots         = 10;
-    confBotsRefresh     = 60000;
-    confUpdateDiff      = 10000;
-    enable              = false;
-    confDebug           = false;
-    forceLogoutDelay    = true;
+    m_confMinRandomBots         = 3;
+    m_confMaxRandomBots         = 10;
+    m_confRandomBotsRefresh     = 60000;
+    m_confUpdateDiff            = 10000;
+    m_enableRandomBots          = false;
+    m_confDebug                 = false;
 
     // Time
     m_elapsedTime = 0;
@@ -46,15 +45,14 @@ PlayerBotMgr::~PlayerBotMgr()
 
 void PlayerBotMgr::LoadConfig()
 {
-    enable = sConfig.GetBoolDefault("PlayerBot.Enable", false);
-    confMinBots = sConfig.GetIntDefault("PlayerBot.MinBots", 3);
-    confMaxBots = sConfig.GetIntDefault("PlayerBot.MaxBots", 10);
-    confBotsRefresh = sConfig.GetIntDefault("PlayerBot.Refresh", 60000);
-    confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
-    confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
-    forceLogoutDelay = sConfig.GetBoolDefault("PlayerBot.ForceLogoutDelay", true);
+    m_enableRandomBots = sConfig.GetBoolDefault("RandomBot.Enable", false);
+    m_confMinRandomBots = sConfig.GetIntDefault("RandomBot.MinBots", 3);
+    m_confMaxRandomBots = sConfig.GetIntDefault("RandomBot.MaxBots", 10);
+    m_confRandomBotsRefresh = sConfig.GetIntDefault("RandomBot.Refresh", 60000);
+    m_confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
+    m_confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
 
-    if (!forceLogoutDelay)
+    if (!sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
         m_tempBots.clear();
 }
 
@@ -64,7 +62,7 @@ void PlayerBotMgr::Load()
     DeleteAll();
     m_bots.clear();
     m_tempBots.clear();
-    totalChance = 0;
+    m_totalChance = 0;
 
     // 2- Configuration
     LoadConfig();
@@ -79,7 +77,7 @@ void PlayerBotMgr::Load()
         return;
     }
     Field* fields = result->Fetch();
-    _maxAccountId = fields[0].GetUInt32() + 10000;
+    m_maxAccountId = fields[0].GetUInt32() + 10000;
     delete result;
 
     // 4- LoadFromDB
@@ -106,7 +104,7 @@ void PlayerBotMgr::Load()
                 entry->name = "<Unknown>";
             entry->ai->OnBotEntryLoad(entry);
             m_bots[entry->playerGUID] = entry;
-            totalChance += chance;
+            m_totalChance += chance;
         }
         while (result->NextRow());
         delete result;
@@ -114,31 +112,31 @@ void PlayerBotMgr::Load()
     }
 
     // 5- Check config/DB
-    if (confMinBots >= m_bots.size() && !m_bots.empty())
-        confMinBots = m_bots.size() - 1;
-    if (confMaxBots > m_bots.size())
-        confMaxBots = m_bots.size();
-    if (confMaxBots <= confMinBots)
-        confMaxBots = confMinBots + 1;
+    if (m_confMinRandomBots >= m_bots.size() && !m_bots.empty())
+        m_confMinRandomBots = m_bots.size() - 1;
+    if (m_confMaxRandomBots > m_bots.size())
+        m_confMaxRandomBots = m_bots.size();
+    if (m_confMaxRandomBots <= m_confMinRandomBots)
+        m_confMaxRandomBots = m_confMinRandomBots + 1;
 
     // 6- Start initial bots
-    if (enable)
+    if (m_enableRandomBots)
     {
-        for (uint32 i = 0; i < confMinBots; i++)
+        for (uint32 i = 0; i < m_confMinRandomBots; i++)
             AddRandomBot();
     }
 
     // 7- Fill stats info
-    m_stats.confMaxOnline = confMaxBots;
-    m_stats.confMinOnline = confMinBots;
+    m_stats.confMaxOnline = m_confMaxRandomBots;
+    m_stats.confMinOnline = m_confMinRandomBots;
     m_stats.totalBots = m_bots.size();
-    m_stats.confBotsRefresh = confBotsRefresh;
-    m_stats.confUpdateDiff = confUpdateDiff;
+    m_stats.confRandomBotsRefresh = m_confRandomBotsRefresh;
+    m_stats.confUpdateDiff = m_confUpdateDiff;
 
     // 8- Show stats if debug
-    if (confDebug)
+    if (m_confDebug)
     {
-        sLog.outString("[PlayerBotMgr] Between %u and %u bots online", confMinBots, confMaxBots);
+        sLog.outString("[PlayerBotMgr] Between %u and %u bots online", m_confMinRandomBots, m_confMaxRandomBots);
         sLog.outString("[PlayerBotMgr] %u now loading", m_stats.loadingCount);
     }
 }
@@ -154,25 +152,25 @@ void PlayerBotMgr::DeleteAll()
         if (i->second->state != PB_STATE_OFFLINE)
         {
             OnBotLogout(i->second);
-            totalChance += i->second->chance;
+            m_totalChance += i->second->chance;
         }
     }
     m_tempBots.clear();
 
-    if (confDebug)
+    if (m_confDebug)
         sLog.outString("[PlayerBotMgr] Deleting all bots [OK]");
 }
 
 void PlayerBotMgr::OnBotLogin(PlayerBotEntry *e)
 {
     e->state = PB_STATE_ONLINE;
-    if (confDebug)
+    if (m_confDebug)
         sLog.outString("[PlayerBot][Login]  '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
 }
 void PlayerBotMgr::OnBotLogout(PlayerBotEntry *e)
 {
     e->state = PB_STATE_OFFLINE;
-    if (confDebug)
+    if (m_confDebug)
         sLog.outString("[PlayerBot][Logout] '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
 }
 
@@ -218,14 +216,14 @@ void PlayerBotMgr::Update(uint32 diff)
     }
 
     m_elapsedTime += diff;
-    if (!((m_elapsedTime - m_lastUpdate) > confUpdateDiff))
+    if (!((m_elapsedTime - m_lastUpdate) > m_confUpdateDiff))
         return; // No need to update
     m_lastUpdate = m_elapsedTime;
 
     std::map<uint32, PlayerBotEntry*>::iterator iter;
     for (iter = m_bots.begin(); iter != m_bots.end(); ++iter)
     {
-        if (!enable && !iter->second->customBot)
+        if (!m_enableRandomBots && !iter->second->customBot)
             continue;
 
         if (iter->second->state == PB_STATE_ONLINE)
@@ -285,14 +283,14 @@ void PlayerBotMgr::Update(uint32 diff)
         }
     }
 
-    if (!enable)
+    if (!m_enableRandomBots)
         return;
 
-    uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / confBotsRefresh;
+    uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / m_confRandomBotsRefresh;
     for (uint32 i = 0; i < updatesCount; ++i)
     {
         AddOrRemoveBot();
-        m_lastBotsRefresh += confBotsRefresh;
+        m_lastBotsRefresh += m_confRandomBotsRefresh;
     }
 }
 
@@ -301,7 +299,7 @@ Toutes les X minutes, ajoute ou enleve un bot.
 */
 bool PlayerBotMgr::AddOrRemoveBot()
 {
-    uint32 alea = urand(confMinBots, confMaxBots);
+    uint32 alea = urand(m_confMinRandomBots, m_confMaxRandomBots);
     /*
     10 --- --- --- --- --- --- --- --- --- --- 20 bots
                 NumActuel
@@ -369,7 +367,7 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot)
 
 bool PlayerBotMgr::AddRandomBot()
 {
-    uint32 alea = urand(0, totalChance);
+    uint32 alea = urand(0, m_totalChance);
     std::map<uint32, PlayerBotEntry*>::iterator it;
     bool done = false;
     for (it = m_bots.begin(); it != m_bots.end() && !done; it++)
