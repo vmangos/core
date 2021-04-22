@@ -6236,7 +6236,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
             return false;
     }
 
-    visibleDistance = std::min(visibleDistance, 23.f);
+    visibleDistance = std::min(visibleDistance, 27.f);
 
     visibleDistance = std::max(visibleDistance, 1.f);
     float alertRange = visibleDistance + 5.f;
