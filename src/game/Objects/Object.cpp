@@ -2899,21 +2899,6 @@ void WorldObject::GetFirstCollision(float dist, float angle, float &x, float &y,
     UpdateGroundPositionZ(x, y, z);
 }
 
-bool Object::IsPet() const
-{
-    return IsCreature() && static_cast<Creature const*>(this)->IsPet();
-}
-
-Pet const* Object::ToPet() const
-{
-    return IsPet() ? static_cast<Pet const*>(this) : nullptr;
-}
-
-Pet* Object::ToPet()
-{
-    return IsPet() ? static_cast<Pet*>(this) : nullptr;
-}
-
 bool WorldObject::IsLikePlayer() const
 {
     if (IsPlayer())

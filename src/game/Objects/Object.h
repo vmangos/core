@@ -694,32 +694,32 @@ class Object
 
         // Convertions
         inline bool IsWorldObject() const { return isType(TYPEMASK_WORLDOBJECT); }
-        WorldObject* ToWorldObject() { if (IsWorldObject()) return reinterpret_cast<WorldObject*>(this); else return nullptr; }
-        WorldObject const* ToWorldObject() const { if (IsWorldObject()) return reinterpret_cast<WorldObject const*>(this); else return nullptr; }
+        WorldObject* ToWorldObject();
+        WorldObject const* ToWorldObject() const;
 
         inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
-        Player* ToPlayer() { if (IsPlayer()) return reinterpret_cast<Player*>(this); else return nullptr; }
-        Player const* ToPlayer() const { if (IsPlayer()) return reinterpret_cast<Player const*>(this); else return nullptr; }
+        Player* ToPlayer();
+        Player const* ToPlayer() const;
 
         inline bool IsCreature() const { return GetTypeId() == TYPEID_UNIT; }
-        Creature* ToCreature() { if (IsCreature()) return reinterpret_cast<Creature*>(this); else return nullptr; }
-        Creature const* ToCreature() const { if (IsCreature()) return reinterpret_cast<Creature const*>(this); else return nullptr; }
+        Creature* ToCreature();
+        Creature const* ToCreature() const;
 
         inline bool IsUnit() const { return isType(TYPEMASK_UNIT); }
-        Unit* ToUnit() { if (IsUnit()) return reinterpret_cast<Unit*>(this); else return nullptr; }
-        Unit const* ToUnit() const { if (IsUnit()) return reinterpret_cast<Unit const*>(this); else return nullptr; }
+        Unit* ToUnit();
+        Unit const* ToUnit() const;
 
         inline bool IsGameObject() const { return GetTypeId() == TYPEID_GAMEOBJECT; }
-        GameObject* ToGameObject() { if (IsGameObject()) return reinterpret_cast<GameObject*>(this); else return nullptr; }
-        GameObject const* ToGameObject() const { if (IsGameObject()) return reinterpret_cast<GameObject const*>(this); else return nullptr; }
+        GameObject* ToGameObject();
+        GameObject const* ToGameObject() const;
 
         inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
-        Corpse* ToCorpse() { if (IsCorpse()) return reinterpret_cast<Corpse*>(this); else return nullptr; }
-        Corpse const* ToCorpse() const { if (IsCorpse()) return reinterpret_cast<Corpse const*>(this); else return nullptr; }
+        Corpse* ToCorpse();
+        Corpse const* ToCorpse() const;
 
-        bool IsPet()      const;
-        Pet const* ToPet() const;
+        bool IsPet() const;
         Pet* ToPet();
+        Pet const* ToPet() const;
 
         virtual bool HasQuest(uint32 /* quest_id */) const { return false; }
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
@@ -1317,55 +1317,25 @@ class WorldObject : public Object
         SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
 
+inline WorldObject* Object::ToWorldObject()
+{
+    return IsWorldObject() ? static_cast<WorldObject*>(this) : nullptr;
+}
+
+inline WorldObject const* Object::ToWorldObject() const
+{
+    return IsWorldObject() ? static_cast<WorldObject const*>(this) : nullptr;
+}
+
 // Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.
 inline WorldObject* ToWorldObject(Object* object)
 {
-    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject*>(object) : nullptr;
+    return object && object->IsWorldObject() ? static_cast<WorldObject*>(object) : nullptr;
 }
 
 inline WorldObject const* ToWorldObject(Object const* object)
 {
-    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject const*>(object) : nullptr;
-}
-
-inline GameObject* ToGameObject(Object* object)
-{
-    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject*>(object) : nullptr;
-}
-
-inline GameObject const* ToGameObject(Object const* object)
-{
-    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject const*>(object) : nullptr;
-}
-
-inline Unit* ToUnit(Object* object)
-{
-    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit*>(object) : nullptr;
-}
-
-inline Unit const* ToUnit(Object const* object)
-{
-    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit const*>(object) : nullptr;
-}
-
-inline Creature* ToCreature(Object* object)
-{
-    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature*>(object) : nullptr;
-}
-
-inline Creature const* ToCreature(Object const* object)
-{
-    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature const*>(object) : nullptr;
-}
-
-inline Player* ToPlayer(Object* object)
-{
-    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player*>(object) : nullptr;
-}
-
-inline Player const* ToPlayer(Object const* object)
-{
-    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player const*>(object) : nullptr;
+    return object && object->IsWorldObject() ? static_cast<WorldObject const*>(object) : nullptr;
 }
 
 #endif

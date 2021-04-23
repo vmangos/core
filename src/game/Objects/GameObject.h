@@ -276,4 +276,25 @@ class GameObject : public WorldObject
 
         GridReference<GameObject> m_gridRef;
 };
+
+inline GameObject* Object::ToGameObject()
+{
+    return IsGameObject() ? static_cast<GameObject*>(this) : nullptr;
+}
+
+inline GameObject const* Object::ToGameObject() const
+{
+    return IsGameObject() ? static_cast<GameObject const*>(this) : nullptr;
+}
+
+inline GameObject* ToGameObject(Object* object)
+{
+    return object && object->IsGameObject() ? static_cast<GameObject*>(object) : nullptr;
+}
+
+inline GameObject const* ToGameObject(Object const* object)
+{
+    return object && object->IsGameObject() ? static_cast<GameObject const*>(object) : nullptr;
+}
+
 #endif

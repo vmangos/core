@@ -102,4 +102,15 @@ class Corpse : public WorldObject
         time_t m_time;
         GridPair m_grid;                                    // gride for corpse position for fast search
 };
+
+inline Corpse* Object::ToCorpse()
+{
+    return IsCorpse() ? static_cast<Corpse*>(this) : nullptr;
+}
+
+inline Corpse const* Object::ToCorpse() const
+{
+    return IsCorpse() ? static_cast<Corpse const*>(this) : nullptr;
+}
+
 #endif

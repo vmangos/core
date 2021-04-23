@@ -2528,6 +2528,26 @@ class Player final: public Unit
         static void RemovePetitionsAndSigns(ObjectGuid guid);
 };
 
+inline Player* Object::ToPlayer()
+{
+    return IsPlayer() ? static_cast<Player*>(this) : nullptr;
+}
+
+inline Player const* Object::ToPlayer() const
+{
+    return IsPlayer() ? static_cast<Player const*>(this) : nullptr;
+}
+
+inline Player* ToPlayer(Object* object)
+{
+    return object && object->IsPlayer() ? static_cast<Player*>(object) : nullptr;
+}
+
+inline Player const* ToPlayer(Object const* object)
+{
+    return object && object->IsPlayer() ? static_cast<Player const*>(object) : nullptr;
+}
+
 void AddItemsSetItem(Player*player,Item* item);
 void RemoveItemsSetItem(Player*player,ItemPrototype const* proto);
 

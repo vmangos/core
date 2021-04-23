@@ -1416,6 +1416,26 @@ class Unit : public WorldObject
         explicit Unit ();     
 };
 
+inline Unit* Object::ToUnit()
+{
+    return IsUnit() ? static_cast<Unit*>(this) : nullptr;
+}
+
+inline Unit const* Object::ToUnit() const
+{
+    return IsUnit() ? static_cast<Unit const*>(this) : nullptr;
+}
+
+inline Unit* ToUnit(Object* object)
+{
+    return object && object->IsUnit() ? static_cast<Unit*>(object) : nullptr;
+}
+
+inline Unit const* ToUnit(Object const* object)
+{
+    return object && object->IsUnit() ? static_cast<Unit const*>(object) : nullptr;
+}
+
 template<typename Func>
 void Unit::CallForAllControlledUnits(Func const& func, uint32 controlledMask)
 {
