@@ -2855,11 +2855,11 @@ AHBot.itemcount = 50
 #        Default: 0 - off
 #                 1 - on
 #
-#    PlayerBot.MaxBots
+#    PartyBot.MaxBots
 #        Maximum number of party bots that normal players are allowed to summon.
 #        Default: 0 (no limit)
 #
-#    PlayerBot.SkipChecks
+#    PartyBot.SkipChecks
 #        Disables the additional restrictions that apply when a normal player tries to summon a party bot.
 #        Default: 0 (restricted)
 #                 1 (no restrictions)
