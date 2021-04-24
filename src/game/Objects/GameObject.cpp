@@ -64,7 +64,7 @@ QuaternionData QuaternionData::fromEulerAnglesZYX(float Z, float Y, float X)
     return QuaternionData(quat.x, quat.y, quat.z, quat.w);
 }
 
-GameObject::GameObject() : WorldObject(),
+GameObject::GameObject() : SpellCaster(),
     loot(this),
     m_visible(true),
     m_goInfo(nullptr)

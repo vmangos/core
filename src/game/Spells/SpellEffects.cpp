@@ -1732,7 +1732,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
             {
                 if (SpellEntry const* pSpellEntry = m_triggeredByAuraSpell)
                 {
-                    WorldObject* pCaster = m_caster;
+                    SpellCaster* pCaster = m_caster;
                     if (SpellAuraHolder const* pAuraHolder = unitTarget->GetSpellAuraHolder(pSpellEntry->Id))
                         if (Unit* pAuraCaster = pAuraHolder->GetCaster())
                             pCaster = pAuraCaster;
@@ -2102,7 +2102,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
     }
 
     // select formal caster for triggered spell
-    WorldObject* caster = m_caster;
+    SpellCaster* caster = m_caster;
 
     // some triggered spells require specific equipment
     if (spellInfo->EquippedItemClass >= 0 && m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -2399,7 +2399,7 @@ void Spell::EffectHeal(SpellEffectIndex eff_idx)
     if (unitTarget && unitTarget->IsAlive() && damage >= 0)
     {
         // Try to get original caster
-        WorldObject* caster = GetAffectiveCasterObject();
+        SpellCaster* caster = GetAffectiveCasterObject();
         if (!caster)
             return;
 
@@ -2474,7 +2474,7 @@ void Spell::EffectHealMechanical(SpellEffectIndex eff_idx)
     if (unitTarget && unitTarget->IsAlive() && damage >= 0)
     {
         // Try to get original caster
-        WorldObject* caster = GetAffectiveCasterObject();
+        SpellCaster* caster = GetAffectiveCasterObject();
         if (!caster)
             return;
 
@@ -2631,7 +2631,7 @@ void Spell::EffectCreateItem(SpellEffectIndex eff_idx)
 
 void Spell::EffectPersistentAA(SpellEffectIndex eff_idx)
 {
-    WorldObject* pCaster = GetAffectiveCasterObject();
+    SpellCaster* pCaster = GetAffectiveCasterObject();
 
     if (GameObject* pGo = ToGameObject(pCaster))
         if (Unit* pOwner = pGo->GetOwner())
@@ -3690,7 +3690,7 @@ void Spell::EffectLearnSkill(SpellEffectIndex eff_idx)
     uint16 max = (step * 75);
     target->SetSkill(skillid, current, max, step);
 
-    if (WorldObject const* caster = GetCastingObject())
+    if (SpellCaster const* caster = GetCastingObject())
         DEBUG_LOG("Spell: %s has learned skill %u (to maxlevel %u) from %s", target->GetGuidStr().c_str(), skillid, max, caster->GetGuidStr().c_str());
 }
 
@@ -5467,7 +5467,7 @@ void Spell::EffectSummonPlayer(SpellEffectIndex /*eff_idx*/)
         return;
 
     float x, y, z;
-    WorldObject* landingObject = m_caster;
+    SpellCaster* landingObject = m_caster;
     // summon to the ritual go location if any
     if (GameObject* pGo = m_targets.getGOTarget())
         if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL)

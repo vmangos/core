@@ -25,7 +25,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "GameObjectDefines.h"
-#include "Object.h"
+#include "SpellCaster.h"
 #include "LootMgr.h"
 #include "Util.h"
 
@@ -36,7 +36,7 @@ class Transport;
 
 struct GameObjectDisplayInfoEntry;
 
-class GameObject : public WorldObject
+class GameObject : public SpellCaster
 {
     public:
         explicit GameObject();

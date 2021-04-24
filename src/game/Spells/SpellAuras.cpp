@@ -825,7 +825,7 @@ void PersistentAreaAura::Update(uint32 diff)
     if (spellId != 13812 && spellId != 14314 && spellId != 14315)
     {
         remove = true;
-        if (WorldObject* caster = GetRealCaster())
+        if (SpellCaster* caster = GetRealCaster())
         {
             std::vector<DynamicObject*> dynObjs;
             caster->GetDynObjects(spellId, GetEffIndex(), dynObjs);
@@ -6563,7 +6563,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
 
     if (IsPersistent())
     {
-        if (WorldObject* realCaster = GetRealCaster())
+        if (SpellCaster* realCaster = GetRealCaster())
         {
             DynamicObject *dynObj = realCaster->GetDynObject(GetId());
             if (dynObj)
@@ -6742,7 +6742,7 @@ Unit* SpellAuraHolder::GetCaster() const
     return ObjectAccessor::GetUnit(*m_target, GetCasterGuid());// player will search at any maps
 }
 
-WorldObject* SpellAuraHolder::GetRealCaster() const
+SpellCaster* SpellAuraHolder::GetRealCaster() const
 {
     if (GetRealCasterGuid() == GetCasterGuid())
         return GetCaster();
@@ -6750,8 +6750,8 @@ WorldObject* SpellAuraHolder::GetRealCaster() const
     if (GetRealCasterGuid().IsUnit())
         return ObjectAccessor::GetUnit(*m_target, GetRealCasterGuid());
 
-    if (m_target->FindMap())
-        return m_target->FindMap()->GetWorldObject(GetRealCasterGuid());
+    if (GetRealCasterGuid().IsGameObject() && m_target->FindMap())
+        return m_target->FindMap()->GetGameObject(GetRealCasterGuid());
 
     return nullptr;
 }
