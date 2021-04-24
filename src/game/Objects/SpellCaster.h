@@ -20,11 +20,11 @@
 #include "Object.h"
 #include "SpellDefines.h"
 #include "Utilities/EventProcessor.h"
-#include "nonstd/optional.hpp"
+#include "nonstd/optional.h"
 #include <array>
 #include <memory>
 
-using namespace nonstd;
+using nonstd::optional;
 
 class Aura;
 class ChatHandler;
