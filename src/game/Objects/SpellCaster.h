@@ -20,7 +20,7 @@
 #include "Object.h"
 #include "SpellDefines.h"
 #include "Utilities/EventProcessor.h"
-#include "nonstd/optional.h"
+#include "nonstd/optional.hpp"
 #include <array>
 #include <memory>
 
