@@ -2221,6 +2221,7 @@ class Player final: public Unit
 
 #ifdef ENABLE_ELUNA
         void Whisper(const std::string& text, const uint32 language, ObjectGuid receiver);
+		void RemoveAllSpellCooldown();
 #endif
 
         /*********************************************************/

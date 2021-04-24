@@ -5563,6 +5563,29 @@ bool WorldObject::CheckLockout(SpellSchoolMask schoolMask) const
     return false;
 }
 
+#ifdef ENABLE_ELUNA
+
+time_t WorldObject::GetSpellCooldownDelay(uint32 spellId)
+{
+	SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
+	TimePoint expireTime;
+	bool isInfinite;
+	bool spellCDFound = GetExpireTime(*spellEntry, expireTime, isInfinite);
+
+	auto currTime = sWorld.GetCurrentClockTime();
+	std::chrono::milliseconds& duration = expireTime - currTime;
+	return expireTime > currTime ? duration.count() : 0;
+}
+
+bool WorldObject::HasSpellCategoryCooldown(uint32 spellCategory)
+{
+	if (spellCategory && m_cooldownMap.FindByCategory(spellCategory) != m_cooldownMap.end())
+		return false;
+	return true;
+}
+
+#endif /* ENABLE_ELUNA */
+
 bool WorldObject::GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const
 {
     auto spellItr = m_cooldownMap.FindBySpellId(spellEntry.Id);

@@ -1266,6 +1266,8 @@ class WorldObject : public Object
 		
 #ifdef ENABLE_ELUNA
 		ElunaEventProcessor* elunaEvents;
+		time_t GetSpellCooldownDelay(uint32 spellId);
+		bool HasSpellCategoryCooldown(uint32 spellCategory);
 #endif /* ENABLE_ELUNA */  
     protected:
         explicit WorldObject();

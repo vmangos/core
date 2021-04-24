@@ -29,6 +29,8 @@
 #include "ScriptLoader.h"
 #include "Conditions.h"
 #include "GameEventMgr.h"
+#include "CreatureGroups.h"
+
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
 #endif /* ENABLE_ELUNA */

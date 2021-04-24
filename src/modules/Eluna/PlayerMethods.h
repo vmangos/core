@@ -7,6 +7,7 @@
 #ifndef PLAYERMETHODS_H
 #define PLAYERMETHODS_H
 
+
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
  */
@@ -221,7 +222,7 @@ namespace LuaPlayer
 #ifdef TRINITY
         Eluna::Push(L, player->GetSpellHistory()->HasCooldown(spellId));
 #else
-        Eluna::Push(L, player->HasSpellCooldown(spellId));
+        Eluna::Push(L, player->IsSpellReady(spellId));
 #endif
         return 1;
     }
@@ -1612,7 +1613,7 @@ namespace LuaPlayer
     int GetLifetimeKills(lua_State* L, Player* player)
     {
         Eluna::Push(L, player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
-        return 1;
+        return 1; 
     }
 
     /**
@@ -3662,7 +3663,8 @@ namespace LuaPlayer
 #ifdef TRINITY
         player->GetSpellHistory()->ResetCooldown(spellId, update);
 #else
-        player->RemoveSpellCooldown(spellId, update);
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
+        player->RemoveSpellCooldown(*spellEntry, update);
 #endif
         return 0;
     }

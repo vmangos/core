@@ -1527,7 +1527,7 @@ namespace LuaGlobalFunctions
                     return 1;
                 }
 
-                if (!pCreature->Create(lowguid, pos, cinfo,TEAM_NONE,cinfo->entry))
+                if (!pCreature->Create(lowguid, pos, cinfo,cinfo->entry))
                 {
                     delete pCreature;
                     Eluna::Push(L);
@@ -1570,7 +1570,7 @@ namespace LuaGlobalFunctions
                 CreatureCreatePos pos(map, x, y, z, o, phase);
 #endif
 
-                if (!pCreature->Create(map->GenerateLocalLowGuid(cinfo->GetHighGuid()), pos, cinfo, TEAM_NONE,cinfo->entry))
+                if (!pCreature->Create(map->GenerateLocalLowGuid(cinfo->GetHighGuid()), pos, cinfo, cinfo->entry))
                 {
                     delete pCreature;
                     {

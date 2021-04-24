@@ -64,6 +64,9 @@
 #else
 #include "AggressorAI.h"
 #endif
+    #ifdef VMANGOS
+        #include "Bag.h"
+    #endif
 #include "BattleGroundMgr.h"
 #include "SQLStorages.h"
 #include "revision.h"
@@ -151,7 +154,7 @@ typedef Opcodes                 OpcodesList;
 #ifndef VMANGOS
 #define TEAM_NEUTRAL            TEAM_INDEX_NEUTRAL
 #endif
-#if defined(TBC) || defined(WOTLK) || defined(CATA)
+#if defined(TBC) || defined(WOTLK) || defined(CATA)|| defined(VMANGOS)
 #define PLAYER_FIELD_LIFETIME_HONORABLE_KILLS   PLAYER_FIELD_LIFETIME_HONORBALE_KILLS
 #endif
 

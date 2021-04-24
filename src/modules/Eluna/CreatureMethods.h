@@ -59,7 +59,7 @@ namespace LuaCreature
 #ifdef MANGOS
         Eluna::Push(L, creature->IsTargetableForAttack(mustBeDead));
 #else
-        Eluna::Push(L, creature->IsTargetableForAttack(mustBeDead));
+        Eluna::Push(L, creature->IsTargetable(true,false,false,mustBeDead));
 #endif
         return 1;
     }
@@ -141,7 +141,7 @@ namespace LuaCreature
         Eluna::Push(L, !creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC));
 #else
         // Eluna::Push(L, creature->CanInitiateAttack());
-        Eluna::Push(L, !creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE));
+        Eluna::Push(L, !creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC));
 #endif
         return 1;
     }
@@ -330,7 +330,7 @@ namespace LuaCreature
 #ifdef TRINITY
         Eluna::Push(L, creature->GetSpellHistory()->HasCooldown(spellId));
 #else
-        Eluna::Push(L, creature->HasSpellCooldown(spellId));
+        Eluna::Push(L, creature->IsSpellReady(spellId));
 #endif
         return 1;
     }
@@ -1014,9 +1014,9 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
             creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 #else
         if (allow)
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         else
-            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 #endif
 
         return 0;
@@ -1280,7 +1280,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
 #if defined TRINITY || AZEROTHCORE
         creature->UpdateEntry(entry, dataGuidLow ? eObjectMgr->GetCreatureData(dataGuidLow) : NULL);
 #else
-        creature->UpdateEntry(entry, ALLIANCE, dataGuidLow ? eObjectMgr->GetCreatureData(dataGuidLow) : NULL);
+        creature->UpdateEntry(entry, dataGuidLow ? eObjectMgr->GetCreatureData(dataGuidLow) : NULL);
 #endif
         return 0;
     }

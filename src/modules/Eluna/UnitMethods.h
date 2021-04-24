@@ -2450,7 +2450,7 @@ namespace LuaUnit
             args.SetOriginalCaster(ObjectGuid(originalCaster));
         unit->CastSpell(target, spell, args);
 #else
-        unit->CastCustomSpell(target, spell, has_bp0 ? &bp0 : NULL, has_bp1 ? &bp1 : NULL, has_bp2 ? &bp2 : NULL, triggered, castItem, NULL, ObjectGuid(originalCaster));
+        unit->CastCustomSpell(target, spell, has_bp0 ? bp0 : NULL, has_bp1 ? bp1 : NULL, has_bp2 ? bp2 : NULL, triggered, castItem, NULL, ObjectGuid(originalCaster));
 #endif
         return 0;
     }

@@ -17219,6 +17219,19 @@ void Player::Whisper(const std::string& text, uint32 language, ObjectGuid receiv
 	ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
 	rPlayer->GetSession()->SendPacket(&data);
 }
+/* removed from v18,but need's in eluna */
+void Player::RemoveAllSpellCooldown()
+{
+	if (!m_cooldownMap.IsEmpty())
+	{
+		if (Player* player = GetAffectingPlayer())
+			for (CooldownContainer::ConstIterator itr = m_cooldownMap.begin(); itr != m_cooldownMap.end(); ++itr)
+				player->SendClearCooldown(itr->first, this);
+
+		m_cooldownMap.clear();
+	}
+}
+
 #endif /* ENABLE_ELUNA */
 
 void Player::PetSpellInitialize()
