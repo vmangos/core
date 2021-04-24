@@ -20,7 +20,6 @@
  */
 
 #include "Common.h"
-#include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/DatabaseImpl.h"
 #include "WorldPacket.h"
@@ -31,10 +30,6 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "Player.h"
-#include "UpdateMask.h"
-#include "NPCHandler.h"
-#include "Pet.h"
-#include "MapManager.h"
 
 void WorldSession::SendNameQueryOpcode(Player* p)
 {
@@ -211,7 +206,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         if (unit)
             data << unit->GetUInt32Value(UNIT_FIELD_DISPLAYID); //DisplayID      wdbFeild13
         else
-            data << uint32(Creature::ChooseDisplayId(ci));  // workaround, way to manage models must be fixed
+            data << uint32(ci->display_id[0]);
 
         data << uint8(ci->civilian);                       //wdbFeild14
         data << uint8(ci->racial_leader);

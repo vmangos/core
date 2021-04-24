@@ -16,14 +16,12 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "World.h"
 #include "Player.h"
+#include "Group.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 
 bool ChatHandler::HandleTeleCommand(char* args)
@@ -1071,7 +1069,7 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
     if (!pPlayer)
         return false;
 
-    if (pPlayer->IsInCombat() || pPlayer->InBattleGround() || pPlayer->IsTaxiFlying() || pPlayer->HasSpellCooldown(20939) || (pPlayer->GetDeathState() == CORPSE) || (pPlayer->GetLevel() < 10))
+    if (pPlayer->IsInCombat() || pPlayer->InBattleGround() || pPlayer->IsTaxiFlying() || !pPlayer->IsSpellReady(20939) || (pPlayer->GetDeathState() == CORPSE) || (pPlayer->GetLevel() < 10))
     {
         SendSysMessage(LANG_UNSTUCK_UNAVAILABLE);
         return false;
@@ -1085,7 +1083,8 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
     else
     {
         pPlayer->AddAura(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS); // Add Resurrection Sickness
-        pPlayer->AddSpellCooldown(20939, 0, time(nullptr) + 3600000); // Trigger 1 Hour Cooldown
+        if (SpellEntry const* pSpellEntry= sSpellMgr.GetSpellEntry(20939))
+            pPlayer->AddCooldown(*pSpellEntry, nullptr, false, HOUR * IN_MILLISECONDS); // Trigger 1 Hour Cooldown
         // Get nearest graveyard.
         WorldSafeLocsEntry const* ClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
         if (!ClosestGrave) //No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.

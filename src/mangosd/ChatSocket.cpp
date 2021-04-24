@@ -28,7 +28,6 @@
 #include "Log.h"
 #include "ChatSocket.h"
 #include "World.h"
-#include "Config/Config.h"
 #include "Util.h"
 #include "SharedDefines.h"
 #include "ObjectAccessor.h"
@@ -36,6 +35,7 @@
 #include "ObjectMgr.h"
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "Opcodes.h"
 
 #define DEBUG_OUT_CHAT(...) //sLog.outString(__VA_ARGS__)
 
@@ -106,7 +106,7 @@ int OfflineChatSocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
 {
     if(closing_)
         return -1;
-    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
+    std::unique_lock<std::mutex> lock (outBufferLock);
 
     closing_ = true;
 
@@ -118,7 +118,7 @@ int OfflineChatSocket::handle_close (ACE_HANDLE h, ACE_Reactor_Mask)
 
 int OfflineChatSocket::handle_output (ACE_HANDLE)
 {
-    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
+    std::unique_lock<std::mutex> lock (outBufferLock);
 
     if(closing_)
         return -1;
@@ -231,7 +231,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
 
     // Let's login the player, if not already online
     uint32 acc = sObjectMgr.GetPlayerAccountIdByGUID(playerGuid);
-    QueryResult* auth = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id=%u AND sessionkey=\"%s\"", acc, sessionKey.c_str());
+    QueryResult* auth = LoginDatabase.PQuery("SELECT 1 FROM `account` WHERE `id`=%u AND `sessionkey`=\"%s\"", acc, sessionKey.c_str());
     if (!auth)
     {
         sendf("err_auth\n");
@@ -334,7 +334,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
 /// Output function
 int OfflineChatSocket::sendf(const char* msg)
 {
-    ACE_GUARD_RETURN (ACE_Thread_Mutex, Guard, outBufferLock, -1);
+    std::unique_lock<std::mutex> lock (outBufferLock);
 
     if (closing_)
         return -1;

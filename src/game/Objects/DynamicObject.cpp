@@ -20,11 +20,8 @@
  */
 
 #include "Common.h"
-#include "UpdateMask.h"
-#include "Opcodes.h"
 #include "World.h"
 #include "ObjectAccessor.h"
-#include "Database/DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
@@ -225,7 +222,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 
 void DynamicObject::Delete()
 {
-    SendObjectDeSpawnAnim(GetObjectGuid());
+    SendObjectDeSpawnAnim();
     AddObjectToRemoveList();
 }
 

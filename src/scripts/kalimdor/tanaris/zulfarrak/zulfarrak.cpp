@@ -369,7 +369,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         else
             Bomb_Timer -= diff;
 
-        if (m_creature->IsAttackReady() && !m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+        if (m_creature->IsAttackReady() && !m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
             m_creature->SetSheath(SHEATH_STATE_RANGED);
@@ -577,11 +577,14 @@ bool OnTrigger_at_zumrah(Player* pPlayer, AreaTriggerEntry const *at)
 {
     Creature* pZumrah = pPlayer->FindNearestCreature(NPC_WITCH_DOCTOR_ZUMRAH, 30.0f);
 
-    if (!pZumrah)
+    if (!pZumrah || !pZumrah->IsAlive())
         return false;
 
     if (pZumrah->GetFactionTemplateId() != ZUMRAH_HOSTILE_FACTION)
     {
+        if (InstanceData* pInstance = pZumrah->GetInstanceData())
+            pInstance->SetData(EVENT_ZUMRAH, IN_PROGRESS);
+
         pZumrah->SetFactionTemplateId(ZUMRAH_HOSTILE_FACTION);
         DoScriptText(SAY_ZUMRAH_TRIGGER, pZumrah);
     }

@@ -23,15 +23,13 @@
 #include "Errors.h"
 #include "Pet.h"
 #include "Player.h"
-#include "DBCStores.h"
 #include "Spell.h"
-#include "ObjectAccessor.h"
 #include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "Creature.h"
-#include "World.h"
 #include "Util.h"
 #include "Group.h"
-#include "SpellAuras.h"
+#include "SpellAuraDefines.h"
 
 int PetAI::Permissible(Creature const* creature)
 {
@@ -59,12 +57,24 @@ bool PetAI::_needToStop() const
         return true;
 
     Unit* pOwner = m_creature->GetCharmerOrOwnerOrSelf();
+    Creature* pOwnerCreature = pOwner->ToCreature();
 
     // Prevent creature pets from chasing forever
-    if (pOwner->IsCreature() && !pOwner->IsInCombat() && m_creature->IsOutOfThreatArea(m_creature->GetVictim()))
-        return true;
+    if (pOwnerCreature && !pOwnerCreature->IsInCombat())
+    {
+        if (pOwnerCreature->IsAlive())
+        {
+            if (pOwnerCreature->IsInEvadeMode())
+                return true;
+        }
+        else
+        {
+            if (m_creature->IsOutOfThreatArea(m_creature->GetVictim()))
+                return true;
+        }
+    }
 
-    return !m_creature->GetVictim()->IsTargetableForAttack(false, pOwner->IsPlayer());
+    return !m_creature->IsValidAttackTarget(m_creature->GetVictim());
 }
 
 void PetAI::_stopAttack()
@@ -88,7 +98,7 @@ void PetAI::_stopAttack()
 
 void PetAI::UpdateAI(uint32 const diff)
 {
-    if (!m_creature->IsAlive() || !m_creature->GetCharmInfo())
+    if (!m_creature->IsAlive() || !m_creature->GetCharmInfo() || m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT))
         return;
 
     // part of it must run during eyes of the Beast to update melee hits
@@ -123,7 +133,7 @@ void PetAI::UpdateAI(uint32 const diff)
             {
                 if (m_creature->GetCharmInfo()->IsCommandAttack() || (m_creature->GetCharmInfo()->IsAtStay() && m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim())))
                 {
-                    if (!m_creature->HasInArc(M_PI_F, m_creature->GetVictim()))
+                    if (!m_creature->HasInArc(m_creature->GetVictim()))
                         m_creature->SetInFront(m_creature->GetVictim());
                     attacked = DoMeleeAttackIfReady();
                 }
@@ -190,11 +200,11 @@ void PetAI::UpdateAI(uint32 const diff)
             if (!spellInfo)
                 continue;
 
-            if (m_creature->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+            if (m_creature->HasGCD(spellInfo))
                 continue;
 
             // check spell cooldown
-            if (m_creature->HasSpellCooldown(spellInfo->Id))
+            if (!m_creature->IsSpellReady(spellInfo->Id))
                 continue;
 
             if (spellInfo->IsPositiveSpell())
@@ -298,7 +308,7 @@ void PetAI::UpdateAI(uint32 const diff)
             SpellCastTargets targets;
             targets.setUnitTarget(target);
 
-            if (!m_creature->HasInArc(M_PI_F, target))
+            if (!m_creature->HasInArc(target))
             {
                 m_creature->SetInFront(target);
                 if (target->GetTypeId() == TYPEID_PLAYER)
@@ -439,6 +449,10 @@ void PetAI::OwnerAttackedBy(Unit* attacker)
     if (m_creature->HasReactState(REACT_PASSIVE))
         return;
 
+    // In crowd control
+    if (m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT))
+        return;
+
     // Prevent pet from disengaging from current target
     if (m_creature->GetVictim() && m_creature->GetVictim()->IsAlive())
         return;
@@ -473,6 +487,10 @@ void PetAI::OwnerAttacked(Unit* target)
     if (m_creature->HasReactState(REACT_PASSIVE))
         return;
 
+    // In crowd control
+    if (m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT))
+        return;
+
     // Prevent pet from disengaging from current target
     if (m_creature->GetVictim() && m_creature->GetVictim()->IsAlive())
         return;
@@ -500,6 +518,11 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget(bool allowAutoS
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
         return std::make_pair(nullptr, PSTR_FAIL_NO_OWNER);
+
+    // Owner is creature and is evading. We must not re-aggro.
+    if (Creature const* pOwnerCreature = owner->ToCreature())
+        if (pOwnerCreature->IsInEvadeMode())
+            return std::make_pair(nullptr, PSTR_FAIL_NOT_ENABLED);
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->GetAttackerForHelper())
@@ -585,6 +608,10 @@ void PetAI::DoAttack(Unit* target, bool chase)
         if (m_creature->HasReactState(REACT_AGGRESSIVE) && !m_creature->GetCharmInfo()->IsCommandAttack())
             m_creature->SendPetAIReaction();
 
+        // Imp pets have a small chance to say one of these texts on aggro.
+        if ((m_creature->GetEntry() == 416 || m_creature->GetEntry() == 12922) && !m_creature->IsInCombat() && roll_chance_u(5))
+            DoScriptText(PickRandomValue(746, 747, 749, 750, 751, 752, 753, 754), m_creature, target);
+
         if (chase)
         {
             bool oldCmdAttack = m_creature->GetCharmInfo()->IsCommandAttack(); // This needs to be reset after other flags are cleared
@@ -603,11 +630,22 @@ void PetAI::DoAttack(Unit* target, bool chase)
             m_creature->GetMotionMaster()->MoveIdle();
         }
 
-        // Flag owner for PvP if owner is player and target is flagged
         Unit* pOwner = m_creature->GetCharmerOrOwner();
-        if (pOwner && pOwner->IsPlayer() && !pOwner->IsPvP())
+        if (pOwner)
         {
-            pOwner->TogglePlayerPvPFlagOnAttackVictim(target);
+            if (pOwner->IsPlayer())
+            {
+                // Flag owner for PvP if owner is player and target is flagged
+                if (!pOwner->IsPvP())
+                    pOwner->TogglePlayerPvPFlagOnAttackVictim(target);
+            }
+            else
+            {
+                // Creature pet should instantly enter combat with target
+                m_creature->AddThreat(target);
+                m_creature->SetInCombatWith(target);
+                target->SetInCombatWith(m_creature);
+            }
         }
     }
 }
@@ -655,7 +693,7 @@ bool PetAI::CanAttack(Unit* target)
     if (!target)
         return false;
 
-    if (!m_creature->IsValidAttackTarget(target))
+    if (!m_creature->IsValidAttackTarget(target, false))
         return false;
 
     if (!target->IsAlive())
@@ -685,7 +723,7 @@ bool PetAI::CanAttack(Unit* target)
 
     // Stay - can attack if target is within range or commanded to
     if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_STAY))
-        return (m_creature->IsWithinMeleeRange(target) || m_creature->GetCharmInfo()->IsCommandAttack());
+        return (m_creature->CanReachWithMeleeAutoAttack(target) || m_creature->GetCharmInfo()->IsCommandAttack());
 
     //  Pets attacking something (or chasing) should only switch targets if owner tells them to
     if (m_creature->GetVictim() && m_creature->GetVictim() != target)

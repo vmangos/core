@@ -9,20 +9,22 @@
 
 enum
 {
-    TYPE_ANACONDRA						= 0,
-	TYPE_COBRAHN						= 1,
-	TYPE_PYTHAS							= 2,
-	TYPE_SERPENTIS						= 3,
-	TYPE_DISCIPLE						= 4,
+    TYPE_ANACONDRA                      = 0,
+    TYPE_COBRAHN                        = 1,
+    TYPE_PYTHAS                         = 2,
+    TYPE_SERPENTIS                      = 3,
+    TYPE_DISCIPLE                       = 4,
     TYPE_MUTANUS                        = 5,
     WAILING_CAVERNS_MAX_ENCOUNTER       = 6,
 
     DATA_NARALEX                        = 6,
 
-    YELL_AFTER_GOSSIP                   = -1614999,
-    SERPENTIS_YELL                      = -1614981,
+    YELL_AFTER_GOSSIP                   = 2101,
+    SERPENTIS_YELL                      = 2102,
 
     GO_DMF_CHEST                        = 180055,
+
+    GOSSIP_DISCIPLE_SPECIAL             = 202,
 
     QUEST_FORTUNE_AWAITS                = 7944
 };

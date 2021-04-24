@@ -631,48 +631,14 @@ CreatureAI* GetAI_boss_victor_nefarius(Creature* creature)
         return new boss_victor_nefariusAI(creature);
 
     // UBRS
-    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
     return new NullCreatureAI(creature);
 }
 
-bool GossipHello_boss_victor_nefarius(Player* pPlayer, Creature* pCreature)
+void NefariusGossipOptionClicked(Creature* pCreature)
 {
-    auto m_pInstance = static_cast<ScriptedInstance*>(pCreature->GetInstanceData());
-
-    if (m_pInstance && m_pInstance->GetData(TYPE_CHROMAGGUS) == DONE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I've made no mistakes." ,GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXT_NEFARIUS_1, pCreature->GetObjectGuid());
-
-    return true;
-}
-
-bool GossipSelect_boss_victor_nefarius(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "You have lost your mind. You speak in riddles.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXT_NEFARIUS_2, pCreature->GetObjectGuid());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Please do.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXT_NEFARIUS_3, pCreature->GetObjectGuid());
-            //DoScriptText(SAY_GAMESBEGIN_1, pCreature);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            //DoScriptText(SAY_GAMESBEGIN_2, pCreature);
-            // remove gossip, set hostile and attack
-            pCreature->SetStandState(UNIT_STAND_STATE_STAND);
-            pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
-            if (auto pNefarius = dynamic_cast<boss_victor_nefariusAI*>(pCreature->AI()))
-                pNefarius->NefaEventStart = true;
-            break;
-    }
-    return true;
+    if (auto pNefarius = dynamic_cast<boss_victor_nefariusAI*>(pCreature->AI()))
+        pNefarius->NefaEventStart = true;
 }
 
 void AddSC_boss_victor_nefarius()
@@ -682,7 +648,5 @@ void AddSC_boss_victor_nefarius()
     pNewScript = new Script;
     pNewScript->Name = "boss_victor_nefarius";
     pNewScript->GetAI = &GetAI_boss_victor_nefarius;
-    pNewScript->pGossipHello = &GossipHello_boss_victor_nefarius;
-    pNewScript->pGossipSelect = &GossipSelect_boss_victor_nefarius;
     pNewScript->RegisterSelf();
 }

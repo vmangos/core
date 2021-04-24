@@ -22,38 +22,38 @@
 #ifndef __SQLDELAYTHREAD_H
 #define __SQLDELAYTHREAD_H
 
-#include "ace/Thread_Mutex.h"
 #include "LockedQueue.h"
-#include "Threading.h"
 
 
 class Database;
 class SqlOperation;
 class SqlConnection;
 
-class SqlDelayThread : public ACE_Based::Runnable
+class SqlDelayThread
 {
-    typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
+    typedef LockedQueue<SqlOperation*, std::mutex> SqlQueue;
 
     private:
         SqlQueue m_sqlQueue;                                ///< Queue of SQL statements
-        Database* m_dbEngine;                               ///< Pointer to used Database engine
-        SqlConnection* m_dbConnection;                     ///< Pointer to DB connection
+        Database *m_dbEngine;                               ///< Pointer to used Database engine
+        SqlQueue m_serialDelayQueue;
+        SqlConnection *m_dbConnection;                     ///< Pointer to DB connection
         volatile bool m_running;
 
-        int m_workerId;
 
         //process all enqueued requests
         void ProcessRequests();
 
     public:
-        SqlDelayThread(Database* db, SqlConnection* conn, int workerId);
-        ~SqlDelayThread() override;
+        SqlDelayThread(Database* db, SqlConnection* conn);
+        ~SqlDelayThread();
 
         ///< Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }
+        void addSerialOperation(SqlOperation *op);
+        bool HasAsyncQuery();
 
         virtual void Stop();                                ///< Stop event
-        void run() override;                                 ///< Main Thread loop
+        void run();                                 ///< Main Thread loop
 };
 #endif                                                      //__SQLDELAYTHREAD_H

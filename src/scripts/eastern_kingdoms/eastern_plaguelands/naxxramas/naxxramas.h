@@ -5,6 +5,9 @@
 #ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
+#include "scriptPCH.h"
+#include "Utilities/EventMap.h"
+
 enum NAXX_ENCOUNTERS_TYPES
 {
     TYPE_ANUB_REKHAN            = 0,
@@ -27,7 +30,7 @@ enum NAXX_ENCOUNTERS_TYPES
     TYPE_SAPPHIRON              = 13,
     TYPE_KELTHUZAD              = 14,
 
-    MAX_ENCOUNTER               = 15,
+    MAX_ENCOUNTER               = 15
 };
 
 enum NaxxNPCs : uint32
@@ -77,66 +80,65 @@ enum NaxxNPCs : uint32
     NPC_MR_BIGGLESWORTH         = 16998,
     NPC_LICH_KING               = 16980,
 
-    NPC_PatchworkGolem	        = 16017,
-    NPC_BileRetcher	            = 16018,
-    NPC_SludgeBelcher	        = 16029,
-    NPC_EmbalmingSlime	        = 16024,
-    NPC_LivingMonstrosity	    = 16021,
-    NPC_SurgicalAssistant	    = 16022,
-    NPC_MadScientist	        = 16020,
+    NPC_PatchworkGolem          = 16017,
+    NPC_BileRetcher             = 16018,
+    NPC_SludgeBelcher           = 16029,
+    NPC_EmbalmingSlime          = 16024,
+    NPC_LivingMonstrosity       = 16021,
+    NPC_SurgicalAssistant       = 16022,
+    NPC_MadScientist            = 16020,
 
-    NPC_NaxxramasFollower	    = 16505,
-    NPC_NaxxramasWorshipper	    = 16506,
-    NPC_ZombieChow	            = 16360,
-    NPC_DeathKnightCaptain	    = 16145,
-    NPC_DeathKnightUnderstudy	= 16803,
-    NPC_StitchedGiant	        = 16025,
-    NPC_SewageSlime	            = 16375,
-    NPC_LivingPoison	        = 16027,
-    NPC_DeathchargerSteed	    = 16067,
-    NPC_DeathKnight	            = 16146,
-    NPC_RisenSquire	            = 16154,
-    NPC_DarkTouchedWarrior	    = 16156,
-    NPC_DoomTouchedWarrior	    = 16157,
-    NPC_DeathTouchedWarrior	    = 16158,
-    NPC_DeathKnightCavalier	    = 16163,
-    NPC_BonyConstruct	        = 16167,
-    NPC_SkeletalSmith	        = 16193,
-    NPC_DeathknightVindicator	= 16451,
-    NPC_NecroKnightGuardian	    = 16452,
-    NPC_DeathLord	            = 16861,
-    NPC_StoneskinGargoyle	    = 16168,
-    NPC_PlagueBeast	            = 16034,
+    NPC_NaxxramasFollower       = 16505,
+    NPC_NaxxramasWorshipper     = 16506,
+    NPC_ZombieChow              = 16360,
+    NPC_DeathKnightCaptain      = 16145,
+    NPC_DeathKnightUnderstudy   = 16803,
+    NPC_StitchedGiant           = 16025,
+    NPC_SewageSlime             = 16375,
+    NPC_LivingPoison            = 16027,
+    NPC_DeathchargerSteed       = 16067,
+    NPC_DeathKnight             = 16146,
+    NPC_RisenSquire             = 16154,
+    NPC_DarkTouchedWarrior      = 16156,
+    NPC_DoomTouchedWarrior      = 16157,
+    NPC_DeathTouchedWarrior     = 16158,
+    NPC_DeathKnightCavalier     = 16163,
+    NPC_BonyConstruct           = 16167,
+    NPC_SkeletalSmith           = 16193,
+    NPC_DeathknightVindicator   = 16451,
+    NPC_NecroKnightGuardian     = 16452,
+    NPC_DeathLord               = 16861,
+    NPC_StoneskinGargoyle       = 16168,
+    NPC_PlagueBeast             = 16034,
     NPC_FrenziedBat             = 16036,
-    NPC_PlaguedBat	            = 16037,
-    NPC_DreadCreeper	        = 15974,
-    NPC_CarrionSpinner	        = 15975,
-    NPC_VenomStalker	        = 15976,
-    NPC_PoisonousSkitterer	    = 15977,
-    NPC_CryptReaver	            = 15978,
-    NPC_NaxxramasCultist	    = 15980,
-    NPC_NaxxramasAcolyte	    = 15981,
-    NPC_PlaguedGhoul	        = 16447,
-    NPC_NecroStalker	        = 16453,
-    NPC_SpiritOfNaxxramas	    = 16449,
-    NPC_PlaguedGargoyle	        = 16446,
-    NPC_ShadeOfNaxxramas	    = 16164,
-    NPC_NecroKnight	            = 16165,
-    NPC_PlagueSlime	            = 16243,
-    NPC_InfectiousGhoul	        = 16244,
-    NPC_FalloutSlime	        = 16290,
-    NPC_MutatedGrub	            = 16297,
-    NPC_NecropolisAcolyte	    = 16368,
-    NPC_BileSludge	            = 16142,
-    NPC_UnholyAxe	            = 16194,
-    NPC_UnholyStaff	            = 16215,
-    NPC_UnholySwords	        = 16216,
-    NPC_LightningTotem	        = 16385,
-    NPC_PlaguedDeathhound	    = 16448,
+    NPC_PlaguedBat              = 16037,
+    NPC_DreadCreeper            = 15974,
+    NPC_CarrionSpinner          = 15975,
+    NPC_VenomStalker            = 15976,
+    NPC_PoisonousSkitterer      = 15977,
+    NPC_CryptReaver             = 15978,
+    NPC_NaxxramasCultist        = 15980,
+    NPC_NaxxramasAcolyte        = 15981,
+    NPC_PlaguedGhoul            = 16447,
+    NPC_NecroStalker            = 16453,
+    NPC_SpiritOfNaxxramas       = 16449,
+    NPC_PlaguedGargoyle         = 16446,
+    NPC_ShadeOfNaxxramas        = 16164,
+    NPC_NecroKnight             = 16165,
+    NPC_PlagueSlime             = 16243,
+    NPC_InfectiousGhoul         = 16244,
+    NPC_FalloutSlime            = 16290,
+    NPC_MutatedGrub             = 16297,
+    NPC_NecropolisAcolyte       = 16368,
+    NPC_BileSludge              = 16142,
+    NPC_UnholyAxe               = 16194,
+    NPC_UnholyStaff             = 16215,
+    NPC_UnholySwords            = 16216,
+    NPC_LightningTotem          = 16385,
+    NPC_PlaguedDeathhound       = 16448,
 
     NPC_EyeStalk                = 16236,
-    NPC_ArchmageTarsis          = 16381,
-
+    NPC_ArchmageTarsis          = 16381
 };
 
 enum NaxxAreaTriggers : uint32
@@ -153,8 +155,7 @@ enum NaxxAreaTriggers : uint32
 
     AREATRIGGER_THADDIUS_ENTRANCE   = 4113,
 
-    AREATRIGGER_START_DK_WING       = 4117,
-
+    AREATRIGGER_START_DK_WING       = 4117
 };
 
 static const WorldLocation toFrostwyrmTPPos(533, 3498.13f, -5349.6f, 144.967f, 1.48353f);
@@ -226,41 +227,49 @@ enum NaxxGOs : uint32
     GO_KT_WINDOW_4              = 181405,
 
     GO_CONS_NOX_TESLA_FEUGEN    = 181477,
-    GO_CONS_NOX_TESLA_STALAGG   = 181478,
+    GO_CONS_NOX_TESLA_STALAGG   = 181478
 };
 
 enum NaxxZoneScriptTexts
 {
     // Background screams in Instance if Thaddius still alive
-    THADDIUS_SAY_SCREAM1 = -1533036, // todo: add use
-    THADDIUS_SAY_SCREAM2 = -1533037, // todo: add use
-    THADDIUS_SAY_SCREAM3 = -1533038, // todo: add use
-    THADDIUS_SAY_SCREAM4 = -1533039, // todo: add use
+    THADDIUS_SAY_SCREAM1 = 13092, // todo: add use
+    THADDIUS_SAY_SCREAM2 = 13093, // todo: add use
+    THADDIUS_SAY_SCREAM3 = 13094, // todo: add use
+    THADDIUS_SAY_SCREAM4 = 13095, // todo: add use
 
     //when each of the 4 wing bosses dies
-    KELTHUZAD_SAY_TAUNT1 = -1533090,
-    KELTHUZAD_SAY_TAUNT2 = -1533091,
-    KELTHUZAD_SAY_TAUNT3 = -1533092,
-    KELTHUZAD_SAY_TAUNT4 = -1533093,
+    KELTHUZAD_SAY_TAUNT1 = 12984,
+    KELTHUZAD_SAY_TAUNT2 = 12985,
+    KELTHUZAD_SAY_TAUNT3 = 12986,
+    KELTHUZAD_SAY_TAUNT4 = 12987,
 
     // when bigglesworth dies, rip
-    KELTHUZAD_SAY_CAT_DIED = -1533089,
+    KELTHUZAD_SAY_CAT_DIED = 13150,
 
     //when shappiron dies. dialog between kel and lich king (in this order)
-    SAY_SAPP_DIALOG1        = -1533084,
-    SAY_SAPP_DIALOG2_LICH   = -1533085,
-    SAY_SAPP_DIALOG3        = -1533086,
-    SAY_SAPP_DIALOG4_LICH   = -1533087,
-    SAY_SAPP_DIALOG5        = -1533088,
+    SAY_SAPP_DIALOG1        = 12990,
+    SAY_SAPP_DIALOG2_LICH   = 12988,
+    SAY_SAPP_DIALOG3        = 12991,
+    SAY_SAPP_DIALOG4_LICH   = 12989,
+    SAY_SAPP_DIALOG5        = 12992,
 
     // greets used on areatriggers
-    SAY_FAERLINA_GREET      = -1533009,
-    SAY_THADDIUS_GREET      = -1533029,
+    SAY_FAERLINA_GREET      = 12852,
+    SAY_THADDIUS_GREET      = 13091,
 
-    SAY_KORT_TAUNT1         = -1533052, // To arms, ye roustabouts! We've got company!
-    SAY_ZELI_TAUNT3         = -1533061, // Do not continue! Turn back while there's still time!
-    SAY_MOG_TAUNT3          = -1533073, // Life is meaningless. It is in death that we are truly tested.
-    SAY_BLAU_TAUNT3         = -1533047, // The first kill goes to me! Anyone care to wager?
+    SAY_KORT_TAUNT1         = 13038, // To arms, ye roustabouts! We've got company!
+    SAY_ZELI_TAUNT3         = 13103, // Do not continue! Turn back while there's still time!
+    SAY_MOG_TAUNT3          = 13060, // Life is meaningless. It is in death that we are truly tested.
+    SAY_BLAU_TAUNT3         = 13016, // The first kill goes to me! Anyone care to wager?
+
+    SAY_4HM_DIALOGUE_1      = 13101,
+    SAY_4HM_DIALOGUE_2      = 13014,
+    SAY_4HM_DIALOGUE_3      = 13058,
+    SAY_4HM_DIALOGUE_4      = 13015,
+    SAY_4HM_DIALOGUE_5      = 13102,
+    SAY_4HM_DIALOGUE_6      = 13039,
+    SAY_4HM_DIALOGUE_7      = 13059
 };
 
 struct GothTrigger
@@ -298,7 +307,7 @@ class instance_naxxramas : public ScriptedInstance
 {
 public:
     instance_naxxramas(Map* pMap);
-    ~instance_naxxramas() override {}
+    ~instance_naxxramas() override { }
 
     void Initialize() override;
 

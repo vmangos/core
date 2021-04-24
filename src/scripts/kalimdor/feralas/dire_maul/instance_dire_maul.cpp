@@ -11,7 +11,7 @@ void EnableCreature(Creature* pCreature)
 {
     pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 }
 
 instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
@@ -25,6 +25,8 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiForceFieldGUID(0),
     m_uiImmolTharGUID(0),
     m_uiTortheldrinGUID(0),
+    m_uiRitualCandleAuraGUID(0),
+    m_uiRitualPlayerGUID(0),
     
     // North
     m_uiGuardAliveCount(6),
@@ -161,6 +163,9 @@ void instance_dire_maul::OnObjectCreate(GameObject* pGo)
         case GO_BROKEN_TRAP:
             m_uiBrokenTrapGUID = pGo->GetGUID();
             break;
+        case GO_RITUAL_CANDLE_AURA:
+            m_uiRitualCandleAuraGUID = pGo->GetGUID();
+            break;
         default:
             break;
     }
@@ -190,7 +195,7 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
                 SetData(TYPE_GORDOK_TRIBUTE, SPECIAL);
             break;
         case NPC_KING_GORDOK:
-            GetMap()->SummonCreature(NPC_MIZZLE_THE_CRAFTY, 693.44f, 480.806f, 28.175f, 0.02757f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3000000);
+            GetMap()->SummonCreature(NPC_MIZZLE_THE_CRAFTY, 693.44f, 480.806f, 28.175f, 0.02757f, TEMPSUMMON_DEAD_DESPAWN, 3000000);
 
             if (Creature* pChorush = instance->GetCreature(m_uiChoRushTheObserverGUID))
             {
@@ -312,13 +317,12 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
             {
                 if (Creature* tortheldrin = instance->GetCreature(m_uiTortheldrinGUID))
                 {
-                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
-                    sLog.outString("Tortheldrin (%u) rendu attaquable.", tortheldrin->GetGUIDLow());
+                    tortheldrin->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                    tortheldrin->SetFactionTemporary(14, TEMPFACTION_RESTORE_RESPAWN);
+                    sLog.outString("Tortheldrin (%u) made attackable.", tortheldrin->GetGUIDLow());
                 }
                 else
-                    sLog.outError("Tortheldrin introuvable !! GUID %u", m_uiTortheldrinGUID);
+                    sLog.outError("Tortheldrin not found!");
             }
             m_auiEncounter[TYPE_IMMOL_THAR] = uiData;
             break;
@@ -452,6 +456,7 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
 #ifdef DEBUG_ON
     sLog.outString("SetData64(%u, %u) data is %u", uiType, uiData, GetData(TYPE_CRISTAL_EVENT));
 #endif
+
     if (uiType == TYPE_CRISTAL_EVENT && GetData(TYPE_CRISTAL_EVENT) == NOT_STARTED)
         DoSortCristalsEventMobs();
 
@@ -478,6 +483,9 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
         if (!uiNotEmptyRoomsCount)
             SetData(TYPE_CRISTAL_EVENT, DONE);
     }
+
+    if (uiType == DATA_DREADSTEED_RITUAL_PLAYER)
+        m_uiRitualPlayerGUID = uiData;
 }
 
 void instance_dire_maul::Load(char const* chrIn)
@@ -529,6 +537,10 @@ uint64 instance_dire_maul::GetData64(uint32 uiType)
             return m_uiForceFieldGUID;
         case GO_MAGIC_VORTEX:
             return m_uiMagicVortexGUID;
+        case GO_RITUAL_CANDLE_AURA:
+            return m_uiRitualCandleAuraGUID;
+        case DATA_DREADSTEED_RITUAL_PLAYER:
+            return m_uiRitualPlayerGUID;
     }
     return 0;
 }
@@ -894,50 +906,6 @@ struct npc_mizzle_the_craftyAI : public ScriptedAI
 CreatureAI* GetAI_npc_mizzle_the_crafty(Creature* pCreature)
 {
     return new npc_mizzle_the_craftyAI(pCreature);
-}
-
-bool GossipHello_npc_mizzle_the_crafty(Player* pPlayer, Creature* pCreature)
-{
-
-    uint32 menuItem = 0;
-    if (pPlayer->HasAura(SPELL_KING_OF_GORDOK))
-        menuItem = 2;
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sMizzleGossips[menuItem].m_chItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-    pPlayer->SEND_GOSSIP_MENU(sMizzleGossips[menuItem].m_uiMenu, pCreature->GetObjectGuid());
-
-    return true;
-}
-
-bool GossipSelect_npc_mizzle_the_crafty(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    uint32 menuItem = 1;
-    if (pPlayer->HasAura(SPELL_KING_OF_GORDOK))
-        menuItem = 3;
-
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sMizzleGossips[menuItem].m_chItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->SEND_GOSSIP_MENU(sMizzleGossips[menuItem].m_uiMenu, pCreature->GetObjectGuid());
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            if (menuItem == 3)
-            {
-                if (instance_dire_maul* pInstance = (instance_dire_maul*)pPlayer->GetInstanceData())
-                {
-                    if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) != DONE)
-                        pInstance->SetData(TYPE_GORDOK_TRIBUTE, DONE);
-                }
-            }
-            else
-                if (!pPlayer->IsInCombat())
-                    pCreature->CastSpell(pPlayer, SPELL_KING_OF_GORDOK, true);
-    }
-    return true;
 }
 
 /*######
@@ -1355,70 +1323,6 @@ struct boss_guardsAI : public ScriptedAI
     }
 };
 
-enum
-{
-    GOSSIP_MENU_MOLDAR_1                    = 6907,
-    GOSSIP_MENU_MOLDAR_2                    = 6908,    
-    GOSSIP_ITEM_MOLDAR                      = 9401,
-    
-    GOSSIP_MENU_FENGUS_1                    = 6903,
-    GOSSIP_MENU_FENGUS_2                    = 6904, 
-    GOSSIP_ITEM_FENGUS                      = 9394,
-    
-    GOSSIP_MENU_SLIPKIK_1                   = 6905,
-    GOSSIP_MENU_SLIPKIK_2                   = 6906,
-    GOSSIP_ITEM_SLIPKIK                     = 9398
-};
-
-bool GossipHello_boss_guards(Player* pPlayer, Creature * pCreature) 
-{
-    if (pPlayer) 
-    {
-        switch(pCreature->GetEntry())
-        {
-            case NPC_GUARD_MOLDAR:
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_MOLDAR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_MOLDAR_1, pCreature->GetObjectGuid());
-                break;          
-            case NPC_GUARD_FENGUS:
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_FENGUS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_FENGUS_1, pCreature->GetObjectGuid());
-                break;
-            case NPC_GUARD_SLIPKIK:
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_SLIPKIK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_SLIPKIK_1, pCreature->GetObjectGuid());
-                break;
-        }
-        return true;
-    }
-    return false;
-}
-
-bool GossipSelect_boss_guards(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction) 
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1) 
-    {       
-        pPlayer->PlayerTalkClass->ClearMenus();
-        switch (pCreature->GetEntry())
-        {
-            case NPC_GUARD_MOLDAR:
-                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_MOLDAR_2, pCreature->GetObjectGuid());
-                pCreature->CastSpell(pPlayer, SPELL_MOLDAR_MOXIE, true);
-                break;
-            case NPC_GUARD_FENGUS:
-                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_FENGUS_2, pCreature->GetObjectGuid());
-                pCreature->CastSpell(pPlayer, SPELL_FENGUS_FEROCITY, true);
-                break;
-            case NPC_GUARD_SLIPKIK:
-                pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_SLIPKIK_2, pCreature->GetObjectGuid());
-                pCreature->CastSpell(pPlayer, SPELL_SLIPKIKS_SAVVY, true);
-                break;
-        }
-    }    
-    return true;
-}
-
-
 CreatureAI* GetAI_boss_guards(Creature* pCreature)
 {
     return new boss_guardsAI(pCreature);
@@ -1445,7 +1349,7 @@ struct go_fixed_trap : public GameObjectAI
             {
                 pSlipkik->CombatStop(true);
                 pSlipkik->DeleteThreatList();
-                pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, nullptr);
@@ -2196,7 +2100,7 @@ struct npc_alzzins_minionAI : ScriptedAI
     {
         if (!m_creature->IsInCombat())
         {
-            if (pWho->IsPlayer() && pWho->IsTargetableForAttack() && m_creature->IsWithinDistInMap(pWho, 30.0f) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsPlayer() && pWho->IsTargetable(true, false) && m_creature->IsWithinDistInMap(pWho, 30.0f) && m_creature->IsWithinLOSInMap(pWho))
                 m_creature->AttackedBy(pWho);
         }
     }
@@ -2218,13 +2122,13 @@ CreatureAI* GetAI_boss_alzzin_the_wildshaper(Creature* pCreature)
 
 CreatureAI* GetAI_npc_alzzins_minion(Creature* pCreature)
 {
-	return new npc_alzzins_minionAI(pCreature);
+    return new npc_alzzins_minionAI(pCreature);
 }
 
 enum
 {
-	SPELL_CHARGE = 22911,
-	SPELL_MAUL = 17156
+    SPELL_CHARGE = 22911,
+    SPELL_MAUL = 17156
 };
 
 struct boss_ferraAI : public ScriptedAI
@@ -2245,7 +2149,7 @@ struct boss_ferraAI : public ScriptedAI
         m_uiCharge_Timer        = 0;
         m_uiMaul_Timer          = urand(5000, 10000);
 
-		m_creature->SetNoCallAssistance(true);
+        m_creature->SetNoCallAssistance(true);
     }   
 
     void MoveInLineOfSight(Unit *pWho) override
@@ -2253,7 +2157,7 @@ struct boss_ferraAI : public ScriptedAI
         if (!m_creature->IsInCombat()) 
         {
             if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 80.0f) && m_creature->IsWithinLOSInMap(pWho)
-            &&  pWho->IsTargetableForAttack())
+            &&  pWho->IsTargetable(true, false))
             {
                 // don't aggro people through the floor, ever!
                 if ((m_creature->GetPositionZ() - pWho->GetPositionZ()) < 10.0f)
@@ -2464,8 +2368,6 @@ void AddSC_instance_dire_maul()
     pNewScript = new Script;
     pNewScript->Name = "npc_mizzle_the_crafty";
     pNewScript->GetAI = &GetAI_npc_mizzle_the_crafty;
-    pNewScript->pGossipHello = &GossipHello_npc_mizzle_the_crafty;
-    pNewScript->pGossipSelect = &GossipSelect_npc_mizzle_the_crafty;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -2479,8 +2381,6 @@ void AddSC_instance_dire_maul()
     pNewScript = new Script;
     pNewScript->Name = "boss_guards";
     pNewScript->GetAI = &GetAI_boss_guards;
-    pNewScript->pGossipHello = &GossipHello_boss_guards;
-    pNewScript->pGossipSelect = &GossipSelect_boss_guards;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

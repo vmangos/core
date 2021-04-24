@@ -200,8 +200,8 @@ enum ItemLootUpdateState
 // masks for ITEM_FIELD_FLAGS field
 enum ItemDynFlags
 {
-    ITEM_DYNFLAG_BINDED                       = 0x00000001, // set in game at binding
-    ITEM_DYNFLAG_UNK1                         = 0x00000002,
+    ITEM_DYNFLAG_BOUND                        = 0x00000001, // set in game at binding
+    ITEM_DYNFLAG_TRANSLATED                   = 0x00000002,
     ITEM_DYNFLAG_UNLOCKED                     = 0x00000004, // have meaning only for item with proto->LockId, if not set show as "Locked, req. lockpicking N"
     ITEM_DYNFLAG_WRAPPED                      = 0x00000008, // mark item as wrapped into wrapper container
     ITEM_DYNFLAG_UNK4                         = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
@@ -258,8 +258,8 @@ class Item : public Object
         void SetOwnerGuid(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner()const;
 
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED,val); }
-        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED); }
+        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND, val); }
+        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOUND); }
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
         virtual void SaveToDB();

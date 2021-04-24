@@ -26,6 +26,7 @@ npc_blastmaster_emi_shortfuse
 EndContentData */
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
 #include "gnomeregan.h"
 
 /*######
@@ -678,6 +679,12 @@ struct npc_kernobeeAI : public FollowerAI
 
     void Reset() override {}
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
+    }
+
     void UpdateFollowerAI(uint32 const uiDiff) override
     {
         FollowerAI::UpdateFollowerAI(uiDiff);               // Do combat handling
@@ -839,6 +846,7 @@ struct npc_kernobeeAI : public FollowerAI
     {
         DoScriptText(SAY_KERNOBEE_START, m_creature);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         StartFollow(pPlayer, 0/*FACTION_ESCORT_N_FRIEND_PASSIVE*/, pQuest);
         if (bombGuid = ((instance_gnomeregan*)m_creature->GetInstanceData())->GetData64(NPC_ALARM_A_BOMB_2600))
         {

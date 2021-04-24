@@ -125,7 +125,7 @@ struct instance_blackrock_depths : ScriptedInstance
     {
         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void Initialize() override
@@ -1164,14 +1164,14 @@ struct instance_blackrock_depths : ScriptedInstance
 
 InstanceData* GetInstanceData_instance_blackrock_depths(Map* pMap)
 {
-	return new instance_blackrock_depths(pMap);
+    return new instance_blackrock_depths(pMap);
 }
 
 void AddSC_instance_blackrock_depths()
 {
-	Script* newscript;
-	newscript = new Script;
-	newscript->Name = "instance_blackrock_depths";
-	newscript->GetInstanceData = &GetInstanceData_instance_blackrock_depths;
-	newscript->RegisterSelf();
+    Script* newscript;
+    newscript = new Script;
+    newscript->Name = "instance_blackrock_depths";
+    newscript->GetInstanceData = &GetInstanceData_instance_blackrock_depths;
+    newscript->RegisterSelf();
 }

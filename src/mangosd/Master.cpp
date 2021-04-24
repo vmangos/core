@@ -64,187 +64,136 @@ INSTANTIATE_SINGLETON_1( Master );
 volatile uint32 Master::m_masterLoopCounter = 0;
 volatile bool Master::m_handleSigvSignals = false;
 
-class FreezeDetectorRunnable : public ACE_Based::Runnable
+void freezeDetector(uint32 _delaytime)
 {
-public:
-    FreezeDetectorRunnable() { _delaytime = 0; }
-    uint32 m_loops, m_lastchange;
-    uint32 w_loops, w_lastchange;
-    uint32 _delaytime;
-    void SetDelayTime(uint32 t) { _delaytime = t; }
-    void run(void)
+    if(!_delaytime)
+        return;
+    sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
+    uint32 loops = 0;
+    uint32 lastchange = 0;
+    while(!World::IsStopped())
     {
-        if(!_delaytime)
-            return;
-        sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
-        m_loops = 0;
-        w_loops = 0;
-        m_lastchange = 0;
-        w_lastchange = 0;
-        while(!World::IsStopped())
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        uint32 curtime = WorldTimer::getMSTime();
+        //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
+
+        // normal work
+        if (loops != World::m_worldLoopCounter)
         {
-            ACE_Based::Thread::Sleep(1000);
-
-            uint32 curtime = WorldTimer::getMSTime();
-            //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
-
-            // normal work
-            if (w_loops != World::m_worldLoopCounter)
-            {
-                w_lastchange = curtime;
-                w_loops = World::m_worldLoopCounter;
-            }
-            // possible freeze
+            lastchange = curtime;
+            loops = World::m_worldLoopCounter;
+        }
+        // possible freeze
 #ifdef NDEBUG
-            else if (WorldTimer::getMSTimeDiff(w_lastchange, curtime) > _delaytime)
-            {
-                sLog.outError("World Thread hangs, kicking out server!");
-                signal(SIGSEGV, 0);
-                Master::m_handleSigvSignals = false;        // disable anticrash
-                *((uint32 volatile*)nullptr) = 0;              // bang crash
-            }
+        else if (WorldTimer::getMSTimeDiff(lastchange, curtime) > _delaytime)
+        {
+            sLog.outError("World Thread hangs, kicking out server!");
+            std::terminate();              // bang crash
+        }
 #endif
-        }
-        // Fix crash au shutdown du serv. sLog n'existe plus ici.
-        //sLog.outString("Anti-freeze thread exiting without problems.");
     }
-};
+    // Fix crash au shutdown du serv. sLog n'existe plus ici.
+    //sLog.outString("Anti-freeze thread exiting without problems.");
+}
 
-class RARunnable : public ACE_Based::Runnable
+void remoteAccess()
 {
-private:
-    ACE_Reactor *m_Reactor;
-    RASocket::Acceptor *m_Acceptor;
-public:
-    RARunnable()
+    #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
+
+    ACE_Dev_Poll_Reactor imp;
+
+    imp.max_notify_iterations (128);
+    imp.restart (1);
+
+    #else
+
+    ACE_TP_Reactor imp;
+    imp.max_notify_iterations (128);
+
+    #endif
+
+    ACE_Reactor reactor(&imp, 1 /* 1= delete implementation so we don't have to care */);
+
+    RASocket::Acceptor acceptor;
+
+    uint16 raport = sConfig.GetIntDefault ("Ra.Port", 3443);
+    std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
+
+    ACE_INET_Addr listen_addr(raport, stringip.c_str());
+
+    if (acceptor.open (listen_addr, &reactor, ACE_NONBLOCK) == -1)
     {
-        ACE_Reactor_Impl* imp = 0;
-
-        #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-
-        imp = new ACE_Dev_Poll_Reactor ();
-
-        imp->max_notify_iterations (128);
-        imp->restart (1);
-
-        #else
-
-        imp = new ACE_TP_Reactor ();
-        imp->max_notify_iterations (128);
-
-        #endif
-
-        m_Reactor = new ACE_Reactor (imp, 1 /* 1= delete implementation so we don't have to care */);
-
-        m_Acceptor = new RASocket::Acceptor;
-
+        sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
-    ~RARunnable()
+    sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
+
+    while (!reactor.reactor_event_loop_done())
     {
-        delete m_Reactor;
-        delete m_Acceptor;
-    }
+        ACE_Time_Value interval (0, 10000);
 
-    void run ()
-    {
-        uint16 raport = sConfig.GetIntDefault ("Ra.Port", 3443);
-        std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
+        if (reactor.run_reactor_event_loop (interval) == -1)
+            break;
 
-        ACE_INET_Addr listen_addr(raport, stringip.c_str());
-
-        if (m_Acceptor->open (listen_addr, m_Reactor, ACE_NONBLOCK) == -1)
+        if(World::IsStopped())
         {
-            sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+            acceptor.close();
+            break;
         }
-
-        sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
-
-        while (!m_Reactor->reactor_event_loop_done())
-        {
-            ACE_Time_Value interval (0, 10000);
-
-            if (m_Reactor->run_reactor_event_loop (interval) == -1)
-                break;
-
-            if(World::IsStopped())
-            {
-                m_Acceptor->close();
-                break;
-            }
-        }
-        sLog.outString("RARunnable thread ended");
     }
-};
+    sLog.outString("RARunnable thread ended");
+}
 
-class OfflineChatRunnable : public ACE_Based::Runnable
+void offlineChat()
 {
-private:
-    ACE_Reactor *m_Reactor;
-    OfflineChatSocket::Acceptor *m_Acceptor;
-public:
-    OfflineChatRunnable()
+#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
+
+    ACE_Dev_Poll_Reactor imp;
+
+    imp.max_notify_iterations(128);
+    imp.restart(1);
+
+#else
+
+    ACE_TP_Reactor imp;
+    imp.max_notify_iterations(128);
+
+#endif
+
+    ACE_Reactor m_Reactor(&imp);
+
+    OfflineChatSocket::Acceptor m_Acceptor;
+
+    LoginDatabase.ThreadStart();
+    uint16 raport = sConfig.GetIntDefault ("OfflineChat.Port", 3444);
+    std::string stringip = sConfig.GetStringDefault ("OfflineChat.IP", "0.0.0.0");
+
+    ACE_INET_Addr listen_addr(raport, stringip.c_str());
+
+    if (m_Acceptor.open (listen_addr, &m_Reactor, ACE_NONBLOCK) == -1)
     {
-        ACE_Reactor_Impl* imp = 0;
-
-        #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-
-        imp = new ACE_Dev_Poll_Reactor ();
-
-        imp->max_notify_iterations (128);
-        imp->restart (1);
-
-        #else
-
-        imp = new ACE_TP_Reactor ();
-        imp->max_notify_iterations (128);
-
-        #endif
-
-        m_Reactor = new ACE_Reactor (imp, 1 /* 1= delete implementation so we don't have to care */);
-
-        m_Acceptor = new OfflineChatSocket::Acceptor;
-
+        sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
-    ~OfflineChatRunnable()
+    sLog.outString ("Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
+
+    while (!m_Reactor.reactor_event_loop_done())
     {
-        delete m_Reactor;
-        delete m_Acceptor;
-    }
+        ACE_Time_Value interval (0, 10000);
 
-    void run ()
-    {
-        LoginDatabase.ThreadStart();
-        uint16 raport = sConfig.GetIntDefault ("OfflineChat.Port", 3444);
-        std::string stringip = sConfig.GetStringDefault ("OfflineChat.IP", "0.0.0.0");
+        if (m_Reactor.run_reactor_event_loop (interval) == -1)
+            break;
 
-        ACE_INET_Addr listen_addr(raport, stringip.c_str());
-
-        if (m_Acceptor->open (listen_addr, m_Reactor, ACE_NONBLOCK) == -1)
+        if (World::IsStopped())
         {
-            sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+            m_Acceptor.close();
+            break;
         }
-
-        sLog.outString ("Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
-
-        while (!m_Reactor->reactor_event_loop_done())
-        {
-            ACE_Time_Value interval (0, 10000);
-
-            if (m_Reactor->run_reactor_event_loop (interval) == -1)
-                break;
-
-            if (World::IsStopped())
-            {
-                m_Acceptor->close();
-                break;
-            }
-        }
-        LoginDatabase.ThreadEnd();
-        sLog.outString("OfflineChatRunnable thread ended");
     }
-};
+    LoginDatabase.ThreadEnd();
+    sLog.outString("OfflineChatRunnable thread ended");
+}
 
 Master::Master()
 {
@@ -296,18 +245,18 @@ int Master::Run()
     _HookSignals();
 
     ///- Launch WorldRunnable thread
-    ACE_Based::Thread world_thread(new WorldRunnable);
-    world_thread.setPriority(ACE_Based::Highest);
+    std::thread world_thread{WorldRunnable()};
+   // world_thread.setPriority(ACE_Based::Highest);
 
     // set realmbuilds depend on mangosd expected builds, and set server online
     {
         std::string builds = AcceptableClientBuildsListStr();
         LoginDatabase.escape_string(builds);
 
-        LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
+        LoginDatabase.PExecute("UPDATE `realmlist` SET `realmflags` = `realmflags` & ~(%u), `population` = 0, `realmbuilds` = '%s'  WHERE `id` = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
     }
 
-    ACE_Based::Thread* cliThread = nullptr;
+    std::thread* cliThread = nullptr;
 
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -316,15 +265,15 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new ACE_Based::Thread(new CliRunnable);
+        cliThread = new std::thread(CliRunnable());
     }
 
-    ACE_Based::Thread* rar_thread = nullptr;
+    std::thread* rar_thread = nullptr;
     if (sConfig.GetBoolDefault ("Ra.Enable", false))
-        rar_thread = new ACE_Based::Thread(new RARunnable);
-    ACE_Based::Thread* offlinechat_thread = nullptr;
+        rar_thread = new std::thread(&remoteAccess);
+    std::thread* offlinechat_thread = nullptr;
     if (sConfig.GetBoolDefault ("OfflineChat.Enable", false))
-        offlinechat_thread = new ACE_Based::Thread(new OfflineChatRunnable);
+        offlinechat_thread = new std::thread(&offlineChat);
 
     ///- Handle affinity for multiple processors and process priority on Windows
     #ifdef WIN32
@@ -370,24 +319,23 @@ int Master::Run()
     #endif
 
     ///- Start soap serving thread
-    ACE_Based::Thread* soap_thread = nullptr;
+    std::thread* soap_thread = nullptr;
 
     if(sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
-        MaNGOSsoapRunnable *runnable = new MaNGOSsoapRunnable();
-
-        runnable->setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
-        soap_thread = new ACE_Based::Thread(runnable);
+        soap_thread = new std::thread([](){
+            MaNGOSsoapRunnable runnable;
+            runnable.setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
+            runnable.run();
+        });
     }
 
     ///- Start up freeze catcher thread
-    ACE_Based::Thread* freeze_thread = nullptr;
+    std::thread* freeze_thread = nullptr;
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
-        FreezeDetectorRunnable *fdr = new FreezeDetectorRunnable();
-        fdr->SetDelayTime(freeze_delay*1000);
-        freeze_thread = new ACE_Based::Thread(fdr);
-        freeze_thread->setPriority(ACE_Based::Highest);
+        freeze_thread = new std::thread(std::bind(&freezeDetector,freeze_delay*1000));
+        //freeze_thread->setPriority(ACE_Based::Highest);
     }
 
     // Wait for clients ?
@@ -414,15 +362,14 @@ int Master::Run()
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)
     {
-        freeze_thread->destroy();
+        freeze_thread->join();
         delete freeze_thread;
     }
 
     ///- Stop soap thread
     if(soap_thread)
     {
-        soap_thread->wait();
-        soap_thread->destroy();
+        soap_thread->join();
         delete soap_thread;
     }
 
@@ -434,40 +381,41 @@ int Master::Run()
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
-    world_thread.wait();
+    world_thread.join();
 
     if(rar_thread)
     {
-        rar_thread->wait();
-        rar_thread->destroy();
+        rar_thread->join();
         delete rar_thread;
     }
 
     if (offlinechat_thread)
     {
-        offlinechat_thread->wait();
-        offlinechat_thread->destroy();
+        offlinechat_thread->join();
         delete offlinechat_thread;
     }
 
     ///- Clean account database before leaving
+    sLog.outString("Cleaning character database...");
     clearOnlineAccounts();
 
     // send all still queued mass mails (before DB connections shutdown)
+    sLog.outString("Sending queued mail...");
     sMassMailMgr.Update(true);
 
     ///- Wait for DB delay threads to end
+    sLog.outString("Closing database connections...");
     CharacterDatabase.StopServer();
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
 
-    sLog.outString( "Halting process..." );
+    sLog.outString("Halting process...");
 
     if (cliThread)
     {
-        #ifdef WIN32
 
+#ifdef WIN32
         // this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
         //_exit(1);
         // send keyboard input to safely unblock the CLI thread
@@ -502,14 +450,11 @@ int Master::Run()
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
         WriteConsoleInput(hStdIn, b, 4, &numb);
-
-        cliThread->wait();
-
-        #else
-
-        cliThread->destroy();
-
-        #endif
+#else
+        fclose(stdin);
+#endif
+        if (cliThread->joinable())
+            cliThread->join();
 
         delete cliThread;
     }
@@ -611,12 +556,12 @@ void Master::clearOnlineAccounts()
 {
     // Cleanup online status for characters hosted at current realm
     /// \todo Only accounts with characters logged on *this* realm should have online status reset. Move the online column from 'account' to 'realmcharacters'?
-    LoginDatabase.PExecute("UPDATE account SET current_realm = 0 WHERE current_realm = '%u'", realmID);
+    LoginDatabase.PExecute("UPDATE `account` SET `current_realm` = 0 WHERE `current_realm` = '%u'", realmID);
 
-    CharacterDatabase.Execute("UPDATE characters SET online = 0 WHERE online<>0");
+    CharacterDatabase.Execute("UPDATE `characters` SET `online` = 0 WHERE `online`<>0");
 
     // Battleground instance ids reset at server restart
-    CharacterDatabase.Execute("UPDATE character_battleground_data SET instance_id = 0");
+    CharacterDatabase.Execute("UPDATE `character_battleground_data` SET `instance_id` = 0");
 }
 
 #include "ObjectAccessor.h"
@@ -629,7 +574,7 @@ void createdump(void)
         abort();
     }
 #endif
-    
+
 }
 /// Handle termination signals
 void Master::SigvSignalHandler()
@@ -655,6 +600,7 @@ void Master::_OnSignal(int s)
             signal(SIGSEGV, 0);
             if (!m_handleSigvSignals)
                 return;
+            std::exception_ptr exc = std::current_exception();
             m_handleSigvSignals = false; // Desarm anticrash
             sWorld.SetAnticrashRearmTimer(sWorld.getConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER));
             uint32 anticrashOptions = sWorld.getConfig(CONFIG_UINT32_ANTICRASH_OPTIONS);
@@ -670,15 +616,15 @@ void Master::_OnSignal(int s)
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Server has crashed. Now saving online players ...");
                 else
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Crash server occurred :(");
-                ACE_Based::Thread::Sleep(500);
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
             if (anticrashOptions & ANTICRASH_OPTION_SAVEALL)
             {
                 CharacterDatabase.ThreadStart();
                 sObjectAccessor.SaveAllPlayers();
-                ACE_Based::Thread::Sleep(25000); // Wait enough time to execute the SQL queries.
+                std::this_thread::sleep_for(std::chrono::seconds(25));
             }
-            *((volatile int*)nullptr) = 42; // Crash for real now.
+            std::rethrow_exception(exc); // Crash for real now.
             return;
     }
 

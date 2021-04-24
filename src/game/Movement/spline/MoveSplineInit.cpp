@@ -19,11 +19,12 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "packet_builder.h"
+#include "Opcodes.h"
+#include "WorldPacket.h"
 #include "Unit.h"
 #include "Transport.h"
 #include "ObjectAccessor.h"
 #include "Anticheat.h"
-#include "WorldPacket.h"
 
 namespace Movement
 {
@@ -56,6 +57,8 @@ void MoveSplineInit::Move(PathFinder const* pfinder)
     if (pfinder->getPathType() & PATHFIND_FLYPATH)
         SetFly();
 }
+
+static thread_local uint32 splineCounter = 1;
 
 int32 MoveSplineInit::Launch()
 {
@@ -117,6 +120,8 @@ int32 MoveSplineInit::Launch()
 
     if (!args.Validate(&unit))
         return 0;
+
+    args.splineId = splineCounter++;
 
     if (Player* pPlayer = unit.ToPlayer())
         pPlayer->GetCheatData()->ResetJumpCounters();

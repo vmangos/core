@@ -24,19 +24,19 @@
 #include "Database/SQLStorageImpl.h"
 #include "Database/DatabaseEnv.h"
 
-char const CreatureInfosrcfmt[] = "iiiiissiiiiiiiiiiffffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiiisiiiliiiiiiis";
-char const CreatureInfodstfmt[] = "iiiiissiiiiiiiiiiffffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiiisiiiliiiiiiii";
-char const CreatureDataAddonInfofmt[] = "iiibbiis";
-char const CreatureModelfmt[] = "iffbi";
-char const CreatureInfoAddonInfofmt[] = "iiibbiis";
+char const CreatureInfosrcfmt[] = "iiiiiffffiiiiiissiiiiiiiiiifffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiisiisiiiliiiiiiis";
+char const CreatureInfodstfmt[] = "iiiiiffffiiiiiissiiiiiiiiiifffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiisiisiiiliiiiiiii";
+char const CreatureDataAddonInfofmt[] = "iiiibbis";
+char const CreatureDisplayInfoAddonfmt[] = "iffbi";
+char const GameObjectDisplayInfoAddonfmt[] = "iffffff";
 char const EquipmentInfofmt[] = "iiii";
 char const GameObjectInfosrcfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiis";
 char const GameObjectInfodstfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiii";
 char const ItemPrototypesrcfmt[] = "iiissiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiififfiffiffiffiffiiiiiiiiiiiifiiiiiifiiiiiifiiiiiifiiiiiifiiiiiiiiiiiiiiiiiiiiiiii";
 char const ItemPrototypedstfmt[] = "iiissiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiififfiffiffiffiffiiiiiiiiiiiifiiiiiifiiiiiifiiiiiifiiiiiifiiiiiiiiiiiiiiiiiiiiiiiix";
 char const PageTextfmt[] = "isi";
-char const MapEntrysrcfmt[] = "iiiiiiiiiffss";
-char const MapEntrydstfmt[] = "iiiiiiiiiffsi";
+char const MapEntrysrcfmt[] = "iiiiiiiffss";
+char const MapEntrydstfmt[] = "iiiiiiiffsi";
 char const ConditionsSrcFmt[] = "iiiiiii";
 char const ConditionsDstFmt[] = "iiiiiii";
 char const AreaEntryfmt[] = "iiiiiisii";
@@ -45,8 +45,8 @@ char const CreatureSpellDatafmt[] = "iiiii";
 
 SQLStorage sCreatureStorage(CreatureInfosrcfmt, CreatureInfodstfmt, "entry", "creature_template");
 SQLStorage sCreatureDataAddonStorage(CreatureDataAddonInfofmt, "guid", "creature_addon");
-SQLStorage sCreatureDisplayInfoAddonStorage(CreatureModelfmt, "display_id", "creature_display_info_addon");
-SQLStorage sCreatureInfoAddonStorage(CreatureInfoAddonInfofmt, "entry", "creature_template_addon");
+SQLStorage sCreatureDisplayInfoAddonStorage(CreatureDisplayInfoAddonfmt, "display_id", "creature_display_info_addon");
+SQLStorage sGameObjectDisplayInfoAddonStorage(GameObjectDisplayInfoAddonfmt, "display_id", "gameobject_display_info_addon");
 SQLStorage sEquipmentStorage(EquipmentInfofmt, "entry", "creature_equip_template");
 SQLStorage sItemStorage(ItemPrototypesrcfmt, ItemPrototypedstfmt, "entry", "item_template");
 SQLStorage sPageTextStore(PageTextfmt, "entry", "page_text");

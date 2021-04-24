@@ -16,17 +16,14 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "Creature.h"
-#include "CreatureAI.h"
+#include "CreatureGroups.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "GridNotifiers.h"
@@ -37,6 +34,62 @@
 #include "TargetedMovementGenerator.h"
 
 #include <fstream>
+
+bool ChatHandler::HandleNpcSpawnInfoCommand(char* /*args*/)
+{
+    Creature* target = GetSelectedCreature();
+
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData const* pData = target->GetCreatureData();
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Spawn info for %s", target->GetObjectGuid().GetString().c_str());
+    std::string creatureIds;
+    for (uint32 i = 0; i < MAX_CREATURE_IDS_PER_SPAWN; i++)
+    {
+        if (!pData->creature_id[i])
+            break;
+
+        if (!creatureIds.empty())
+            creatureIds += ", ";
+
+        creatureIds += std::to_string(pData->creature_id[i]);
+    }
+    PSendSysMessage("Creature Ids: %s", creatureIds.c_str());
+    PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
+    PSendSysMessage("Orientation: %g", pData->position.o);
+    PSendSysMessage("Respawn Time Min: %s", secsToTimeString(pData->spawntimesecsmin, true).c_str());
+    PSendSysMessage("Respawn Time Max: %s", secsToTimeString(pData->spawntimesecsmax, true).c_str());
+    std::string movementType;
+    switch (pData->movement_type)
+    {
+        case IDLE_MOTION_TYPE:
+            movementType = "Idle";
+            break;
+        case RANDOM_MOTION_TYPE:
+            movementType = "Random";
+            break;
+        case WAYPOINT_MOTION_TYPE:
+            movementType = "Waypoints";
+            break;
+    }
+    PSendSysMessage("Movement Type: %s", movementType.c_str());
+    PSendSysMessage("Wander Distance: %g", pData->wander_distance);
+    PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->isActiveObject(), target->GetVisibilityModifier());
+    ShowNpcOrGoSpawnInformation<Creature>(target->GetGUIDLow());
+
+    return true;
+}
 
 bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
 {
@@ -111,43 +164,71 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
                     strScript.empty() ? " - " : strScript.c_str());
     PSendSysMessage(LANG_NPC_AI_MOVE, GetOnOffStr(pTarget->AI()->IsCombatMovementEnabled()));
     PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
-    PSendSysMessage(LANG_NPC_MOTION_TYPE, pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType());
+    MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
+    PSendSysMessage(LANG_NPC_MOTION_TYPE, MotionMaster::GetMovementGeneratorTypeName(moveType), moveType);
     pTarget->AI()->GetAIInformation(*this);
 
     return true;
 }
 
-bool ChatHandler::HandleNpcChangeEntryCommand(char *args)
+bool ChatHandler::HandleNpcSpawnSetEntryCommand(char *args)
 {
-    if (!*args)
+    uint32 creatureId;
+    if (!ExtractUInt32(&args, creatureId))
         return false;
 
-    uint32 newEntryNum = atoi(args);
-    if (!newEntryNum)
-        return false;
-
-    Unit* unit = GetSelectedUnit();
-    if (!unit || unit->GetTypeId() != TYPEID_UNIT)
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
-    Creature* creature = (Creature*)unit;
-    if (creature->UpdateEntry(newEntryNum))
-        SendSysMessage(LANG_DONE);
-    else
-        SendSysMessage(LANG_ERROR);
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pData->creature_id[0] = creatureId;
+    pCreature->UpdateEntry(creatureId);
+    WorldDatabase.PExecuteLog("UPDATE `creature` SET `id`=%u WHERE `guid`=%u", creatureId, pCreature->GetDBTableGUIDLow());
+
+    PSendSysMessage("Entry for guid %u updated to %u.", pCreature->GetDBTableGUIDLow(), creatureId);
     return true;
 }
 
-bool ChatHandler::HandleNpcChangeLevelCommand(char* args)
+bool ChatHandler::HandleNpcSetEntryCommand(char *args)
+{
+    uint32 creatureId;
+    if (!ExtractUInt32(&args, creatureId))
+        return false;
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pCreature->UpdateEntry(creatureId))
+        SendSysMessage(LANG_DONE);
+    else
+        SendSysMessage(LANG_ERROR);
+
+    return true;
+}
+
+bool ChatHandler::HandleNpcSetLevelCommand(char* args)
 {
     if (!*args)
         return false;
 
     uint8 lvl = (uint8) atoi(args);
-    if (lvl < 1 || lvl > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) + 3)
+    if (lvl < 1)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);
@@ -169,23 +250,63 @@ bool ChatHandler::HandleNpcChangeLevelCommand(char* args)
         pCreature->SetMaxHealth(100 + 30 * lvl);
         pCreature->SetHealth(100 + 30 * lvl);
         pCreature->SetLevel(lvl);
-
-        if (pCreature->HasStaticDBSpawnData())
-            pCreature->SaveToDB();
     }
 
     return true;
 }
 
-bool ChatHandler::HandleNpcSetModelCommand(char* args)
+bool ChatHandler::HandleNpcSpawnSetDisplayIdCommand(char* args)
 {
-    if (!*args)
+    uint32 displayId;
+    if (!ExtractUInt32(&args, displayId))
         return false;
 
-    uint32 displayId = (uint32) atoi(args);
+    if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+    {
+        PSendSysMessage("Display Id %u does not exist.", displayId);
+        return false;
+    }
 
     Creature* pCreature = GetSelectedCreature();
+    if (!pCreature || pCreature->IsPet())
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
 
+    pCreature->SetDisplayId(displayId);
+    pCreature->SetNativeDisplayId(displayId);
+
+    if (pCreature->GetCreatureAddon())
+        WorldDatabase.PExecuteLog("UPDATE `creature_addon` SET `display_id`=%u WHERE `guid`=%u", displayId, pCreature->GetDBTableGUIDLow());
+    else
+        WorldDatabase.PExecuteLog("REPLACE INTO `creature_addon` (`guid`, `display_id`) VALUES (%u, %u)", pCreature->GetDBTableGUIDLow(), displayId);
+
+    PSendSysMessage("Display Id for guid %u updated to %u.", pCreature->GetDBTableGUIDLow(), displayId);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSetDisplayIdCommand(char* args)
+{
+    uint32 displayId;
+    if (!ExtractUInt32(&args, displayId))
+        return false;
+
+    if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+    {
+        PSendSysMessage("Display Id %u does not exist.", displayId);
+        return false;
+    }
+
+    Creature* pCreature = GetSelectedCreature();
     if (!pCreature || pCreature->IsPet())
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -196,18 +317,15 @@ bool ChatHandler::HandleNpcSetModelCommand(char* args)
     pCreature->SetDisplayId(displayId);
     pCreature->SetNativeDisplayId(displayId);
 
-    if (pCreature->HasStaticDBSpawnData())
-        pCreature->SaveToDB();
-
+    PSendSysMessage("Display Id updated to %u.", displayId);
     return true;
 }
 
-bool ChatHandler::HandleNpcFactionIdCommand(char* args)
+bool ChatHandler::HandleNpcSetFactionIdCommand(char* args)
 {
-    if (!*args)
+    uint32 factionId;
+    if (!ExtractUInt32(&args, factionId))
         return false;
-
-    uint32 factionId = (uint32) atoi(args);
 
     if (!sObjectMgr.GetFactionTemplateEntry(factionId))
     {
@@ -217,7 +335,6 @@ bool ChatHandler::HandleNpcFactionIdCommand(char* args)
     }
 
     Creature* pCreature = GetSelectedCreature();
-
     if (!pCreature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -225,31 +342,19 @@ bool ChatHandler::HandleNpcFactionIdCommand(char* args)
         return false;
     }
 
-    pCreature->SetFactionTemplateId(factionId);
+    pCreature->SetFactionTemporary(factionId, 0);
 
-    // faction is set in creature_template - not inside creature
-
-    // update in memory
-    if (CreatureInfo const* cinfo = pCreature->GetCreatureInfo())
-    {
-        const_cast<CreatureInfo*>(cinfo)->faction = factionId;
-    }
-
-    // and DB
-    WorldDatabase.PExecuteLog("UPDATE creature_template SET faction = '%u' WHERE entry = '%u'", factionId, pCreature->GetEntry());
-
+    PSendSysMessage("Faction updated to %u.", factionId);
     return true;
 }
 
-bool ChatHandler::HandleNpcFlagCommand(char* args)
+bool ChatHandler::HandleNpcSetFlagCommand(char* args)
 {
-    if (!*args)
+    uint32 npcFlags;
+    if (!ExtractUInt32(&args, npcFlags))
         return false;
 
-    uint32 npcFlags = (uint32) atoi(args);
-
     Creature* pCreature = GetSelectedCreature();
-
     if (!pCreature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -259,10 +364,7 @@ bool ChatHandler::HandleNpcFlagCommand(char* args)
 
     pCreature->SetUInt32Value(UNIT_NPC_FLAGS, npcFlags);
 
-    WorldDatabase.PExecuteLog("UPDATE creature_template SET npc_flags = '%u' WHERE entry = '%u'", npcFlags, pCreature->GetEntry());
-
-    SendSysMessage(LANG_VALUE_SAVED_REJOIN);
-
+    PSendSysMessage("Npc flags updated to %u.", npcFlags);
     return true;
 }
 
@@ -363,45 +465,108 @@ bool ChatHandler::HandleRespawnCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleNpcSpawnDistCommand(char* args)
+bool ChatHandler::HandleNpcSpawnWanderDistCommand(char* args)
 {
-    if (!*args)
+    float wanderDistance;
+    if (!ExtractFloat(&args, wanderDistance))
         return false;
 
-    float option = (float)atof(args);
-    if (option < 0.0f)
+    if (wanderDistance < 0.0f)
+    {
+        SendSysMessage(LANG_BAD_VALUE);
+        return false;
+    }
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pData->wander_distance = wanderDistance;
+    pCreature->SetWanderDistance(wanderDistance);
+    pCreature->GetMotionMaster()->Initialize();
+
+    WorldDatabase.PExecuteLog("UPDATE `creature` SET `wander_distance`=%f WHERE `guid`=%u", wanderDistance, pCreature->GetDBTableGUIDLow());
+    PSendSysMessage("Wander distance for guid %u updated to %g.", pCreature->GetDBTableGUIDLow(), wanderDistance);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSetWanderDistCommand(char* args)
+{
+    float wanderDistance;
+    if (!ExtractFloat(&args, wanderDistance))
+        return false;
+
+    if (wanderDistance < 0.0f)
     {
         SendSysMessage(LANG_BAD_VALUE);
         return false;
     }
 
     MovementGeneratorType mtype = IDLE_MOTION_TYPE;
-    if (option > 0.0f)
+    if (wanderDistance > 0.0f)
         mtype = RANDOM_MOTION_TYPE;
 
     Creature* pCreature = GetSelectedCreature();
-    uint32 u_guidlow = 0;
-
-    if (pCreature)
-        u_guidlow = pCreature->GetGUIDLow();
-    else
-        return false;
-
-    pCreature->SetWanderDistance((float)option);
-    pCreature->SetDefaultMovementType(mtype);
-    pCreature->GetMotionMaster()->Initialize();
-    if (pCreature->IsAlive())                               // dead creature will reset movement generator at respawn
+    if (!pCreature)
     {
-        pCreature->SetDeathState(JUST_DIED);
-        pCreature->Respawn();
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
     }
 
-    WorldDatabase.PExecuteLog("UPDATE creature SET spawndist=%f, MovementType=%i WHERE guid=%u", option, mtype, u_guidlow);
-    PSendSysMessage(LANG_COMMAND_SPAWNDIST, option);
+    pCreature->SetWanderDistance(wanderDistance);
+    pCreature->SetDefaultMovementType(mtype);
+    pCreature->GetMotionMaster()->Initialize();
+
+    PSendSysMessage(LANG_COMMAND_SPAWNDIST, wanderDistance);
     return true;
 }
 
-bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
+bool ChatHandler::HandleNpcSpawnSpawnTimeCommand(char* args)
+{
+    uint32 timeMin;
+    if (!ExtractUInt32(&args, timeMin))
+        return false;
+    uint32 timeMax;
+    if (!ExtractUInt32(&args, timeMax))
+        timeMax = timeMin;
+
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature)
+    {
+        PSendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pData->spawntimesecsmin = timeMin;
+    pData->spawntimesecsmax = timeMax;
+    pCreature->SetRespawnDelay((timeMin + timeMax) / 2);
+    WorldDatabase.PExecuteLog("UPDATE `creature` SET `spawntimesecsmin`=%u, `spawntimesecsmax`=%u WHERE `guid`=%u", timeMin, timeMax, pCreature->GetDBTableGUIDLow());
+    
+    PSendSysMessage("Respawn time for guid %u updated to %u-%u.", pCreature->GetDBTableGUIDLow(), timeMin, timeMax);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSetSpawnTimeCommand(char* args)
 {
     uint32 stime;
     if (!ExtractUInt32(&args, stime))
@@ -415,9 +580,6 @@ bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
         return false;
     }
 
-    uint32 u_guidlow = pCreature->GetGUIDLow();
-
-    WorldDatabase.PExecuteLog("UPDATE creature SET spawntimesecsmin=%i WHERE guid=%u", stime, u_guidlow);
     pCreature->SetRespawnDelay(stime);
     PSendSysMessage(LANG_COMMAND_SPAWNTIME, stime);
 
@@ -566,10 +728,11 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
     {
         SendSysMessage(LANG_NO_FREE_STATIC_GUID_FOR_SPAWN);
         SetSentErrorMessage(true);
+        delete pCreature;
         return false;
     }
 
-    if (!pCreature->Create(lowguid, pos, cinfo, TEAM_NONE, id))
+    if (!pCreature->Create(lowguid, pos, cinfo, id))
     {
         delete pCreature;
         return false;
@@ -848,7 +1011,17 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleNpcSpawnMoveCommand(char* args)
+{
+    return HandleNpcMoveHelperCommand(args, true);
+}
+
 bool ChatHandler::HandleNpcMoveCommand(char* args)
+{
+    return HandleNpcMoveHelperCommand(args, false);
+}
+
+bool ChatHandler::HandleNpcMoveHelperCommand(char* args, bool save)
 {
     uint32 lowguid = 0;
     Player* pPlayer = m_session->GetPlayer();
@@ -895,62 +1068,35 @@ bool ChatHandler::HandleNpcMoveCommand(char* args)
         }
     }
 
-    WorldDatabase.PExecuteLog("UPDATE creature SET position_x = '%f', position_y = '%f', position_z = '%f', orientation = '%f' WHERE guid = '%u'", x, y, z, o, lowguid);
+    if (save)
+        WorldDatabase.PExecuteLog("UPDATE `creature` SET `position_x` = %f, `position_y` = %f, `position_z` = %f, `orientation` = %f WHERE `guid` = %u", x, y, z, o, lowguid);
+    
     PSendSysMessage(LANG_COMMAND_CREATUREMOVED);
     return true;
 }
 
-/**HandleNpcSetMoveTypeCommand
- * Set the movement type for an NPC.<br/>
- * <br/>
- * Valid movement types are:
- * <ul>
- * <li> stay - NPC wont move </li>
- * <li> random - NPC will move randomly according to the spawndist </li>
- * <li> way - NPC will move with given waypoints set </li>
- * </ul>
- * additional parameter: NODEL - so no waypoints are deleted, if you
- *                       change the movement type
- */
-bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
+bool ChatHandler::HandleNpcSpawnSetMoveTypeCommand(char* args)
 {
-    // 3 arguments:
-    // GUID (optional - you can also select the creature)
+    // 2 arguments:
     // stay|random|way (determines the kind of movement)
     // NODEL (optional - tells the system NOT to delete any waypoints)
     //        this is very handy if you want to do waypoints, that are
     //        later switched on/off according to special events (like escort
     //        quests, etc)
 
-    uint32 lowguid;
-    Creature* pCreature;
-    if (!ExtractUInt32(&args, lowguid))                     // case .setmovetype $move_type (with selected creature)
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature)
     {
-        pCreature = GetSelectedCreature();
-        if (!pCreature || !pCreature->HasStaticDBSpawnData())
-            return false;
-        lowguid = pCreature->GetGUIDLow();
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
     }
-    else                                                    // case .setmovetype #creature_guid $move_type (with guid)
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
     {
-        CreatureData const* data = sObjectMgr.GetCreatureData(lowguid);
-        if (!data)
-        {
-            PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        Player* player = m_session->GetPlayer();
-
-        if (player->GetMapId() != data->position.mapId)
-        {
-            PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        pCreature = player->GetMap()->GetCreature(data->GetObjectGuid(lowguid));
+        SendSysMessage("This creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
     }
 
     MovementGeneratorType move_type;
@@ -971,29 +1117,47 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
     if (!doNotDelete && *args)                              // need fail if false in result wrong literal
         return false;
 
-    // now lowguid is low guid really existing creature
-    // and pCreature point (maybe) to this creature or nullptr
-
     // update movement type
     if (!doNotDelete)
-        sWaypointMgr.DeletePath(lowguid);
+        sWaypointMgr.DeletePath(pCreature->GetDBTableGUIDLow());
 
-    if (pCreature)
+    pData->movement_type = move_type;
+    pCreature->SetDefaultMovementType(move_type);
+    pCreature->GetMotionMaster()->Initialize();
+
+    WorldDatabase.PExecuteLog("UPDATE `creature` SET `movement_type`=%u WHERE `guid`=%u", move_type, pCreature->GetDBTableGUIDLow());
+
+    PSendSysMessage("Movement for guid %u updated to %s.", pCreature->GetDBTableGUIDLow(), type_str);
+    return true;
+}
+
+bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
+{
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature)
     {
-        pCreature->SetDefaultMovementType(move_type);
-        pCreature->GetMotionMaster()->Initialize();
-        if (pCreature->IsAlive())                           // dead creature will reset movement generator at respawn
-        {
-            pCreature->SetDeathState(JUST_DIED);
-            pCreature->Respawn();
-        }
-        pCreature->SaveToDB();
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
     }
 
-    if (doNotDelete)
-        PSendSysMessage(LANG_MOVE_TYPE_SET_NODEL, type_str);
+    MovementGeneratorType move_type;
+    char* type_str = ExtractLiteralArg(&args);
+    if (!type_str)
+        return false;
+
+    if (strncmp(type_str, "idle", strlen(type_str)) == 0)
+        move_type = IDLE_MOTION_TYPE;
+    else if (strncmp(type_str, "random", strlen(type_str)) == 0)
+        move_type = RANDOM_MOTION_TYPE;
+    else if (strncmp(type_str, "waypoint", strlen(type_str)) == 0)
+        move_type = WAYPOINT_MOTION_TYPE;
     else
-        PSendSysMessage(LANG_MOVE_TYPE_SET, type_str);
+        return false;
+
+    pCreature->SetDefaultMovementType(move_type);
+    pCreature->GetMotionMaster()->Initialize();
+    PSendSysMessage(LANG_MOVE_TYPE_SET, type_str);
 
     return true;
 }
@@ -1238,9 +1402,18 @@ bool ChatHandler::HandleNpcGroupDelCommand(char *args)
         return false;
     }
 
-    g->RemoveMember(target->GetObjectGuid());
-    g->SaveToDb();
-    target->SetCreatureGroup(nullptr);
+    if (g->GetOriginalLeaderGuid() == target->GetObjectGuid())
+    {
+        g->DeleteFromDb();
+        target->LeaveCreatureGroup(); // group is deleted
+        g = nullptr;
+    }
+    else
+    {
+        target->LeaveCreatureGroup();
+        g->SaveToDb();
+    }
+
     target->GetMotionMaster()->Initialize();
     return true;
 }
@@ -1288,7 +1461,7 @@ inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin 
 
     CreatureCreatePos pos(wpOwner->GetMap(), wpNode->x, wpNode->y, wpNode->z, wpNode->orientation != 100.0f ? wpNode->orientation : 0.0f);
 
-    if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
+    if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, waypointInfo->entry))
     {
         delete wpCreature;
         return nullptr;
@@ -1298,6 +1471,7 @@ inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin 
     wpCreature->SetSummonPoint(pos);
     wpCreature->SetUInt32Value(UNIT_FIELD_LEVEL, wpId+1);
     wpCreature->SetActiveObjectState(true);
+    wpCreature->AddUnitMovementFlag(MOVEFLAG_FIXED_Z);
 
     wpCreature->Summon(TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS); // Also initializes the AI and MMGen
     return wpCreature;
@@ -1436,7 +1610,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         {
             if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
                 if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
-                    wpMMGen->GetPathInformation(wpPathId, wpDestination);
+                    wpMMGen->GetPathInformation(wpDestination);
 
             // Get information about default path if no current path. If no default path, prepare data dependendy on uniqueness
             if (wpDestination == PATH_NO_PATH && !sWaypointMgr.GetDefaultPath(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), &wpDestination))
@@ -1624,7 +1798,7 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
     {
         if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
             if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
-                wpMMGen->GetPathInformation(wpPathId, wpSource);
+                wpMMGen->GetPathInformation(wpSource);
 
         if (wpSource == PATH_NO_PATH)
             sWaypointMgr.GetDefaultPath(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), &wpSource);
@@ -1847,7 +2021,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
         if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
             if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
             {
-                wpMMGen->GetPathInformation(wpPathId, wpOrigin);
+                wpMMGen->GetPathInformation(wpOrigin);
                 wpPath = sWaypointMgr.GetPathFromOrigin(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpPathId, wpOrigin);
             }
 
@@ -2036,7 +2210,7 @@ bool ChatHandler::HandleWpExportCommand(char* args)
         {
             if (wpOwner->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
                 if (WaypointMovementGenerator<Creature> const* wpMMGen = dynamic_cast<WaypointMovementGenerator<Creature> const*>(wpOwner->GetMotionMaster()->GetCurrent()))
-                    wpMMGen->GetPathInformation(wpPathId, wpOrigin);
+                    wpMMGen->GetPathInformation(wpOrigin);
             if (wpOrigin == PATH_NO_PATH)
                 sWaypointMgr.GetDefaultPath(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), &wpOrigin);
         }
@@ -2138,7 +2312,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
         CreatureCreatePos pos{map, wp.fX, wp.fY, wp.fZ, pPlayer->GetOrientation()};
         Creature* wpCreature = new Creature;
 
-        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
+        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, waypointInfo->entry))
         {
             PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
             delete wpCreature;

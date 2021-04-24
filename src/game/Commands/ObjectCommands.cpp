@@ -16,14 +16,11 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
@@ -173,7 +170,7 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         return false;
     }
     
-    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
+    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u, Flags: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
     if (pGameObject->isSpawned())
         SendSysMessage("Object is spawned.");
     else
@@ -399,6 +396,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     {
         SendSysMessage(LANG_NO_FREE_STATIC_GUID_FOR_SPAWN);
         SetSentErrorMessage(true);
+        delete pGameObj;
         return false;
     }
 
@@ -631,6 +629,20 @@ bool ChatHandler::HandleGameObjectResetCommand(char*)
     return true;
 }
 
+bool ChatHandler::HandleGameObjectUseCommand(char*)
+{
+    GameObject* go = getSelectedGameObject();
+    if (!go)
+    {
+        SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+
+    go->Use(m_session->GetPlayer());
+    PSendSysMessage("You have used %s.", go->GetGuidStr().c_str());
+    return true;
+}
+
 bool ChatHandler::HandleGameObjectSetGoStateCommand(char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
@@ -699,6 +711,96 @@ bool ChatHandler::HandleGameObjectSetLootStateCommand(char* args)
 
     pGameObject->SetLootState(LootState(uiLootState));
     PSendSysMessage("You changed Loot State of %s (GUID %u) to %u.", pGameObject->GetName(), pGameObject->GetGUIDLow(), uiLootState);
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectSendCustomAnimCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 uiAnim = 0;
+    ExtractUInt32(&args, uiAnim);
+
+    pGameObject->SendGameObjectCustomAnim(uiAnim);
+    PSendSysMessage("Playing custom anim %u for %s (GUID %u).", uiAnim, pGameObject->GetName(), pGameObject->GetGUIDLow());
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectSendSpawnAnimCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pGameObject->SendObjectSpawnAnim();
+    PSendSysMessage("Playing spawn anim for %s (GUID %u).", pGameObject->GetName(), pGameObject->GetGUIDLow());
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectSendDespawnAnimCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pGameObject->SendObjectDeSpawnAnim();
+    PSendSysMessage("Playing despawn anim for %s (GUID %u).", pGameObject->GetName(), pGameObject->GetGUIDLow());
 
     return true;
 }

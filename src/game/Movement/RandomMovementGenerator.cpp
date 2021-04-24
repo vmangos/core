@@ -17,9 +17,7 @@
  */
 
 #include "Creature.h"
-#include "MapManager.h"
 #include "RandomMovementGenerator.h"
-#include "Map.h"
 #include "Util.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
@@ -55,7 +53,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
     init.MoveTo(destX, destY, destZ, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
-    init.SetWalk(true);
+    init.SetWalk(!creature.HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN));
     init.Launch();
 
     if (i_wanderSteps) // Creature has yet to do steps before pausing
@@ -114,7 +112,7 @@ bool RandomMovementGenerator::Update(Creature &creature, uint32 const& diff)
 void RandomMovementGenerator::UpdateAsync(Creature &creature, uint32 diff)
 {
     // Lock async updates for safety, see Unit::asyncMovesplineLock doc
-    ACE_Guard<ACE_Thread_Mutex> guard(creature.asyncMovesplineLock);
+    std::unique_lock<std::mutex> guard(creature.asyncMovesplineLock);
     if (creature.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_DISTRACTED))
     {
         i_nextMoveTime.Reset(0);  // Expire the timer

@@ -62,6 +62,11 @@ callgrind.out.*
 patches-*
 
 #
+# Github stuff
+#
+!.github/
+
+#
 # VS binaries output
 #
 bin/*
@@ -99,6 +104,10 @@ patch
 php
 
 sql/migrations/*.py
+sql/migrations/characters_db_updates.sql
+sql/migrations/logon_db_updates.sql
+sql/migrations/logs_db_updates.sql
+sql/migrations/world_db_updates.sql
 
 # Generating by CMake
 revision.h

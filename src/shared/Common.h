@@ -85,15 +85,16 @@
 #include <queue>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
+
+typedef std::chrono::system_clock Clock;
+typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> TimePoint;
 
 #include "Errors.h"
 #include "LockedQueue.h"
-#include "Threading.h"
 
 #include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/OS_NS_arpa_inet.h>
 
 // Old ACE versions (pre-ACE-5.5.4) not have this type (add for allow use at Unix side external old ACE versions)
@@ -185,7 +186,7 @@ enum AccountTypes
     SEC_TICKETMASTER   = 2,
     SEC_GAMEMASTER     = 3,
     SEC_BASIC_ADMIN    = 4,
-    SEC_DEVELOPPER     = 5,
+    SEC_DEVELOPER      = 5,
     SEC_ADMINISTRATOR  = 6,
     SEC_CONSOLE        = 7                                  // must be always last in list, accounts must have less security level always also
 };

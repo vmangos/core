@@ -84,19 +84,29 @@ VisibleNotifier::Notify()
 
     // generate outOfRange for not iterate objects
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
-    player.m_visibleGUIDs_lock.acquire_write();
+    std::unique_lock<std::shared_timed_mutex> lock(player.m_visibleGUIDs_lock);
     for (ObjectGuidSet::iterator itr = i_clientGUIDs.begin(); itr != i_clientGUIDs.end(); ++itr)
     {
-        if (Player* targetPlayer = player.GetMap()->GetPlayer(*itr))
-            if (targetPlayer->m_broadcaster)
-                targetPlayer->m_broadcaster->RemoveListener(&player);
+        if ((*itr).IsPlayer())
+        {
+            if (Player* targetPlayer = player.GetMap()->GetPlayer(*itr))
+                if (targetPlayer->m_broadcaster)
+                    targetPlayer->m_broadcaster->RemoveListener(&player);
+        }
+        else if ((*itr).IsCreature() && player.IsInCombat() && !player.GetMap()->IsDungeon())
+        {
+            // Make sure mobs who become out of range leave combat before grid unload.
+            if (Creature* targetCreature = player.GetMap()->GetCreature(*itr))
+                if (targetCreature->IsInCombat())
+                    targetCreature->GetThreatManager().modifyThreatPercent(&player, -101);
+        }
 
         player.m_visibleGUIDs.erase(*itr);
 
         DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "%s is out of range (no in active cells set) now for %s",
                          itr->GetString().c_str(), player.GetGuidStr().c_str());
     }
-    player.m_visibleGUIDs_lock.release();
+    lock.unlock();
 
     if (i_data.HasData())
     {
@@ -114,18 +124,6 @@ VisibleNotifier::Notify()
                 plr->UpdateVisibilityOf(plr->GetCamera().GetBody(), &player);
         }
     }
-
-    // for every new visible unit send attack stance if needed
-    for (Object const* obj : i_visibleNow)
-        if (Unit const* unit = obj->ToUnit())
-            if (unit->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
-                if (Unit const* victim = unit->GetVictim())
-                {
-                    WorldPacket data(SMSG_ATTACKSTART, 8 + 8);
-                    data << unit->GetObjectGuid();
-                    data << victim->GetObjectGuid();
-                    player.SendDirectMessage(&data);
-                }
 }
 
 void

@@ -21,7 +21,9 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "Group.h"
 #include "BattleGroundMgr.h"
 #include "BattleGroundAV.h"
 #include "BattleGroundAB.h"
@@ -301,7 +303,7 @@ void BattleGroundQueue::LogQueueInscription(Player* plr, BattleGroundTypeId BgTy
 
     CharacterDatabase.escape_string(sPName);
     CharacterDatabase.escape_string(last_ip);
-    CharacterDatabase.PExecute("INSERT INTO character_bgqueue (playerGUID, playerName, playerIP, BGtype, action, time) "
+    CharacterDatabase.PExecute("INSERT INTO `character_bgqueue` (`playerGUID`, `playerName`, `playerIP`, `BGtype`, `action`, `time`) "
                                " VALUES ('%u', '%s', '%s', '%u', '%u', '%u')",
                                plr->GetGUIDLow(), sPName.c_str(), last_ip.c_str(), BgTypeId, uiAction, queuing_time);
     // CharacterDatabase.CommitTransaction(); // Pas de commit de transaction sans un BeginTransaction avant.
@@ -1025,7 +1027,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround *bg)
     else
     {
         *data << uint8(1);                                  // bg ended
-        *data << uint8(bg->GetWinner());                    // who win
+        *data << uint8(bg->GetWinner());                    // who wins
     }
 
     uint32 count = bg->GetPlayerScoresSize();
@@ -1394,14 +1396,18 @@ void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGr
     if (bg)
     {
         uint32 mapid = bg->GetMapId();
-        float x, y, z, O;
+        float x, y, z, o;
         Team team = pl->GetBGTeam();
         if (team == 0)
             team = pl->GetTeam();
-        bg->GetTeamStartLoc(team, x, y, z, O);
+        bg->GetTeamStartLoc(team, x, y, z, o);
 
-        DETAIL_LOG("BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", pl->GetName(), mapid, x, y, z, O);
-        pl->TeleportTo(mapid, x, y, z, O);
+        // Remove AFK from player before BG teleport
+        if (pl->IsAFK())
+            pl->ToggleAFK();
+
+        DETAIL_LOG("BATTLEGROUND: Sending %s to map %u, X %f, Y %f, Z %f, O %f", pl->GetName(), mapid, x, y, z, o);
+        pl->TeleportTo(mapid, x, y, z, o);
     }
     else
         sLog.outError("player %u trying to port to nonexistent bg instance %u", pl->GetGUIDLow(), instanceId);

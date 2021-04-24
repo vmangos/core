@@ -32,20 +32,21 @@ EndContentData */
 ## npc_rinji
 ######*/
 
-enum
+enum RinjiData
 {
-    SAY_RIN_FREE            = -1000403,
-    SAY_RIN_BY_OUTRUNNER    = -1000404,
-    SAY_RIN_HELP_1          = -1000405,
-    SAY_RIN_HELP_2          = -1000406,
-    SAY_RIN_COMPLETE        = -1000407,
-    SAY_RIN_PROGRESS_1      = -1000408,
-    SAY_RIN_PROGRESS_2      = -1000409,
+    SAY_RIN_FREE            = 3787,
+    SAY_RIN_BY_OUTRUNNER    = 3827,
+    SAY_RIN_HELP_1          = 3862,
+    SAY_RIN_HELP_2          = 3861,
+    SAY_RIN_COMPLETE        = 3790,
+    SAY_RIN_PROGRESS_1      = 3817,
+    SAY_RIN_PROGRESS_2      = 3818,
 
     QUEST_RINJI_TRAPPED     = 2742,
     NPC_RANGER              = 2694,
     NPC_OUTRUNNER           = 2691,
-    GO_RINJI_CAGE           = 142036
+    GO_RINJI_CAGE           = 142036,
+    FACTION_ESCORTEE        = 33,
 };
 
 struct Location
@@ -89,7 +90,7 @@ struct npc_rinjiAI : public npc_escortAI
     {
         m_bIsByOutrunner = false;
         m_iSpawnId = 0;
-
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         npc_escortAI::JustRespawned();
     }
 
@@ -210,6 +211,9 @@ bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, Quest const* pQ
         if (GameObject* pGo = GetClosestGameObjectWithEntry(pCreature, GO_RINJI_CAGE, INTERACTION_DISTANCE))
             pGo->UseDoorOrButton();
 
+        pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
         if (npc_rinjiAI* pEscortAI = dynamic_cast<npc_rinjiAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
     }
@@ -225,10 +229,11 @@ CreatureAI* GetAI_npc_rinji(Creature* pCreature)
 ## go_lards_picnic_basket
 ######*/
 
-enum
+enum LardsPicnicBasketData
 {
-    NPC_KIDNAPPEUR_VILEBRANCH     = 14748,
+    NPC_KIDNAPPEUR_VILEBRANCH     = 14748
 };
+
 struct go_lards_picnic_basketAI: public GameObjectAI
 {
     go_lards_picnic_basketAI(GameObject* pGo) : GameObjectAI(pGo)
@@ -253,6 +258,7 @@ struct go_lards_picnic_basketAI: public GameObjectAI
                 timer -= uiDiff;
         }
     }
+
     bool CheckCanStartEvent()
     {
         return !state;
@@ -266,10 +272,12 @@ struct go_lards_picnic_basketAI: public GameObjectAI
         timer = 300000;
     }
 };
+
 GameObjectAI* GetAIgo_lards_picnic_basket(GameObject *pGo)
 {
     return new go_lards_picnic_basketAI(pGo);
 }
+
 bool GOHello_go_lards_picnic_basket(Player* pPlayer, GameObject* pGO)
 {
     if (pGO->GetGoType() == GAMEOBJECT_TYPE_GOOBER)

@@ -178,7 +178,5 @@ void PacketBuilder::WriteCreate(MoveSpline const& move_spline, ByteBuffer& data)
         data.append<Vector3>(&move_spline.getPath()[0], nodes);
         data << (move_spline.isCyclic() ? Vector3::zero() : move_spline.FinalDestination());
     }
-
-
 }
 }

@@ -24,15 +24,15 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum PatchwerkData
 {
-    SAY_AGGRO1            = -1533017,
-    SAY_AGGRO2            = -1533018,
-    SAY_SLAY              = -1533019,
-    SAY_DEATH             = -1533020,
+    SAY_AGGRO1            = 13068,
+    SAY_AGGRO2            = 13069,
+    SAY_SLAY              = 13071,
+    SAY_DEATH             = 13070,
 
-    EMOTE_BERSERK         = -1533021,
-    EMOTE_ENRAGE          = -1533022,
+    EMOTE_BERSERK         = 4428,
+    EMOTE_ENRAGE          = 2384,
 
     SPELL_HATEFULSTRIKE   = 28308,
     SPELL_ENRAGE          = 28131, // 5% enrage soft enrage
@@ -133,34 +133,47 @@ struct boss_patchwerkAI : public ScriptedAI
 
         Unit* pTarget = nullptr;
         uint32 uiHighestHP = 0;
+        uint8 threatListPosition = 0;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (const auto iter : tList)
         {
-            // Skipping maintank, only using him if there is no other viable target todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
-            if (iter->getUnitGuid() == mainTankGuid)
-                continue;
+            // Only top 4 players on threat in melee range are targetted.
+            if (threatListPosition > 3)
+                break;
+
             if (!iter->getUnitGuid().IsPlayer())
                 continue;
+            
+            Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid());
+            if (!pTempTarget)
+                continue;
 
-            if (Unit* pTempTarget = m_creature->GetMap()->GetUnit(iter->getUnitGuid()))
+            if (!m_creature->IsInMap(pTempTarget))
+                continue;
+
+            if (!m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
+                continue;
+
+            // Skipping maintank, only using him if there is no other viable target 
+            // todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
+            if (iter->getUnitGuid() != mainTankGuid)
             {
                 // target has higher hp than anyone checked so far
                 if (pTempTarget->GetHealth() > uiHighestHP)
                 {
-                    // target is in melee range, 2d distance will do
-                    if (m_creature->IsInMap(pTempTarget) && m_creature->GetDistance2d(pTempTarget) < MELEE_DISTANCE)
-                    {
-                        pTarget = pTempTarget;
-                        uiHighestHP = pTarget->GetHealth();
-                    }
+                    pTarget = pTempTarget;
+                    uiHighestHP = pTarget->GetHealth();
                 }
             }
+
+            threatListPosition++;
         }
 
         // If we found no viable target, we choose the maintank
         if (!pTarget)
             pTarget = mainTank;
+
         if (pTarget->GetObjectGuid() != previousTarget)
         {
             m_creature->SetInFront(pTarget);
@@ -187,8 +200,7 @@ struct boss_patchwerkAI : public ScriptedAI
             if (!m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
                 && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
             {
-                
-                if (!m_creature->IsAttackReady(BASE_ATTACK) && m_creature->IsWithinMeleeRange(target)) // he does not have offhand attack
+                if (!m_creature->IsAttackReady(BASE_ATTACK) && m_creature->CanReachWithMeleeAutoAttack(target)) // he does not have offhand attack
                     return true;
 
                 if (target->GetObjectGuid() != previousTarget)
@@ -214,7 +226,7 @@ struct boss_patchwerkAI : public ScriptedAI
         {
             for (const auto itr : m_creature->GetAttackers())
             {
-                if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack())
+                if (itr->IsInMap(m_creature) && itr->IsTargetable(true, false))
                     return false;
             }
         }
@@ -239,31 +251,31 @@ struct boss_patchwerkAI : public ScriptedAI
                 m_bEnraged = true;
             }
         }
-        
+
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
             switch (l_EventId)
             {
-            case EVENT_BERSERK:
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                {
-                    DoScriptText(EMOTE_BERSERK, m_creature);
-                    m_bBerserk = true;
-                }
-                else
-                    m_events.Repeat(100);
-                break;
-            case EVENT_HATEFULSTRIKE:
-                DoHatefulStrike();
-                m_events.Repeat(HATEFUL_CD);
-                break;
-            case EVENT_SLIMEBOLT:
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIMEBOLT) == CAST_OK)
-                    m_events.Repeat(SLIMEBOLT_REPEAT_CD);
-                else
-                    m_events.Repeat(100);
-                break;
+                case EVENT_BERSERK:
+                    if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                    {
+                        DoScriptText(EMOTE_BERSERK, m_creature);
+                        m_bBerserk = true;
+                    }
+                    else
+                        m_events.Repeat(100);
+                    break;
+                case EVENT_HATEFULSTRIKE:
+                    DoHatefulStrike();
+                    m_events.Repeat(HATEFUL_CD);
+                    break;
+                case EVENT_SLIMEBOLT:
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIMEBOLT) == CAST_OK)
+                        m_events.Repeat(SLIMEBOLT_REPEAT_CD);
+                    else
+                        m_events.Repeat(100);
+                    break;
             }
         }
 

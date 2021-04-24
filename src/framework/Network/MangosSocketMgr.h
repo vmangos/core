@@ -2,11 +2,11 @@
 #define MANGOSSOCKETMGR_H
 
 #include <ace/Basic_Types.h>
-#include <ace/Singleton.h>
-#include <ace/Thread_Mutex.h>
 
 #include <string>
 
+template <typename T>
+class MangosSocketAcceptor;
 template <typename T>
 class ReactorRunnable;
 class ACE_Event_Handler;
@@ -52,7 +52,7 @@ class MangosSocketMgr
         std::string m_addr;
         ACE_UINT16 m_port;
 
-        ACE_Event_Handler* m_Acceptor;
+        MangosSocketAcceptor<SocketType>* m_Acceptor;
 };
 
 #endif // MANGOSSOCKETMGR_H

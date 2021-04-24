@@ -145,16 +145,7 @@ struct SpellProcEventEntry
     uint32      cooldown;                                   // hidden cooldown used for some spell proc events, applied to _triggered_spell_
 };
 
-struct SpellBonusEntry
-{
-    float  direct_damage;
-    float  dot_damage;
-    float  ap_bonus;
-    float  ap_dot_bonus;
-};
-
 typedef std::unordered_map<uint32, SpellProcEventEntry> SpellProcEventMap;
-typedef std::unordered_map<uint32, SpellBonusEntry>     SpellBonusMap;
 
 //==========================
 // Spell Groups (TC)
@@ -217,10 +208,13 @@ enum SpellTargetType
 
 struct SpellTargetEntry
 {
-    SpellTargetEntry(SpellTargetType type_, uint32 targetEntry_, uint32 conditionId_) : type(type_), targetEntry(targetEntry_), conditionId(conditionId_) {}
+    SpellTargetEntry(SpellTargetType type_, uint32 targetEntry_, uint32 conditionId_, uint32 inverseEffectMask_) : type(type_), targetEntry(targetEntry_), conditionId(conditionId_), inverseEffectMask(inverseEffectMask_) {}
     SpellTargetType type;
     uint32 targetEntry;
     uint32 conditionId;
+    uint32 inverseEffectMask;
+
+    bool CanNotHitWithSpellEffect(SpellEffectIndex effect) const { return (inverseEffectMask & (1 << effect)) != 0; }
 };
 
 typedef std::multimap<uint32,SpellTargetEntry> SpellScriptTarget;
@@ -570,17 +564,6 @@ class SpellMgr
 
         static bool IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellEntry const* procSpell, uint32 procFlags, uint32 procExtra);
 
-        // Spell bonus data
-        SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const
-        {
-            // Lookup data
-            SpellBonusMap::const_iterator itr = mSpellBonusMap.find(spellId);
-            if (itr != mSpellBonusMap.end())
-                return &itr->second;
-
-            return nullptr;
-        }
-
         // Spell target coordinates
         SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id) const
         {
@@ -794,7 +777,6 @@ class SpellMgr
         void LoadSpellElixirs();
         void LoadSpellProcEvents();
         void LoadSpellProcItemEnchant();
-        void LoadSpellBonuses();
         void LoadSpellTargetPositions();
         void LoadSpellThreats();
         void LoadSkillLineAbilityMaps();
@@ -820,6 +802,7 @@ class SpellMgr
             if (id < GetMaxSpellId())
             {
                 std::unique_ptr<SpellEntry> newSpell = std::make_unique<SpellEntry>();
+                newSpell->Internal |= SPELL_INTERNAL_CUSTOM;
                 for (uint32 i = 0; i < 8; ++i)
                 {
                     newSpell->SpellName[i] = "CustomSpell";
@@ -843,7 +826,6 @@ class SpellMgr
         SpellProcEventMap  mSpellProcEventMap;
         SpellProcItemEnchantMap mSpellProcItemEnchantMap;
         SpellEnchantChargesMap mSpellEnchantChargesMap;
-        SpellBonusMap      mSpellBonusMap;
         SkillLineAbilityMap mSkillLineAbilityMapBySpellId;
         SkillLineAbilityMap mSkillLineAbilityMapBySkillId;
         SkillRaceClassInfoMap mSkillRaceClassInfoMap;

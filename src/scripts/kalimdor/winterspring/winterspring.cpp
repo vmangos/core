@@ -103,37 +103,6 @@ bool GossipSelect_npc_rivern_frostwind(Player* pPlayer, Creature* pCreature, uin
     return true;
 }
 
-/*######
-## npc_witch_doctor_mauari
-######*/
-
-bool GossipHello_npc_witch_doctor_mauari(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestRewardStatus(975))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'd like you to make me a new Cache of Mau'ari please.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(3377, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(3375, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_witch_doctor_mauari(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, 16351, false);
-    }
-
-    return true;
-}
-
 enum
 {
     SPELL_FOOLS_PLIGHT              = 23504,
@@ -224,7 +193,7 @@ struct npc_artoriusAI : public ScriptedAI
     
     void BeginEvent(ObjectGuid playerGuid)
     {
-		m_hunterGuid = playerGuid;
+        m_hunterGuid = playerGuid;
         m_creature->GetMotionMaster()->Clear(false);
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -551,14 +520,11 @@ struct npc_ranshallaAI : public npc_escortAI
                 pPriestess2->GetMotionMaster()->MovePoint(1, 5515.654297f, -4900.294922f, 846.531982f);
                 //m_creature->MonsterSay("The priestesses have been invoked.");//test
             }
-            else
-                m_creature->MonsterSay("Navr�, les pr�tresses n'en font qu'a leur t�te...");
         }
         else
         {
             wpInvoqueAtteint = 0;
             pretressesInvoque = 0;
-            m_creature->MonsterSay("Navr�, les pretresses ne veulent pas pop...");
         }
 
         return invoked;
@@ -617,7 +583,7 @@ struct npc_ranshallaAI : public npc_escortAI
         switch (i)
         {
             case 0:
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                 if (pretressesRepartent != 0 ||  wpInvoqueAtteint != 0 || guidPriestess1 != 0 || guidPriestess2 != 0 ||  guidMoonkin != 0 ||  guidVoice != 0 || pretressesInvoque != 0)
                     m_creature->MonsterSay("WTF values have not been reset properly !");
                 DoScriptText(RANSHALLA_BEGIN, m_creature, pPlayer);
@@ -794,7 +760,7 @@ struct npc_ranshallaAI : public npc_escortAI
 
     void Reset() override
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -927,12 +893,6 @@ void AddSC_winterspring()
     newscript->Name = "npc_rivern_frostwind";
     newscript->pGossipHello =  &GossipHello_npc_rivern_frostwind;
     newscript->pGossipSelect = &GossipSelect_npc_rivern_frostwind;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_witch_doctor_mauari";
-    newscript->pGossipHello =  &GossipHello_npc_witch_doctor_mauari;
-    newscript->pGossipSelect = &GossipSelect_npc_witch_doctor_mauari;
     newscript->RegisterSelf();
 
     newscript = new Script;

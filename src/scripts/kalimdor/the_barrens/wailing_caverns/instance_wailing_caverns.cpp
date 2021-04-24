@@ -80,7 +80,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     break;*/
         }
         if ((pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER) &&
@@ -182,7 +182,10 @@ struct instance_wailing_caverns : public ScriptedInstance
             sLog.outDebug("Debug:Wailing Caverns encounters done");
             SetData(TYPE_DISCIPLE, SPECIAL);
             if (Creature* pDisciple = instance->GetCreature(m_uiDiscipleGUID))
+            {
+                pDisciple->SetDefaultGossipMenuId(GOSSIP_DISCIPLE_SPECIAL);
                 DoScriptText(YELL_AFTER_GOSSIP, pDisciple);
+            } 
         }
 
         if (uiData == DONE)

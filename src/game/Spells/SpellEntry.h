@@ -243,6 +243,18 @@ namespace Spells
         return false;
     }
 
+    inline bool IsIgnoreLosTarget(uint32 target)
+    {
+        switch (target)
+        {
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_UNIT_RAID_AND_CLASS:
+                return true;
+        }
+
+        return false;
+    }
+
     bool IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2);
 
     inline bool IsCasterSourceTarget(uint32 target)
@@ -367,6 +379,44 @@ namespace Spells
 
         return false;
     }
+
+    // Spell deals damage directly and could kill target instantly.
+    inline bool IsDirectDamageEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_INSTAKILL:
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
+
+    // Spell deals damage directly and can benefit from bonuses (spell power, attack power).
+    inline bool IsDirectDamageWithBonusEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
 }
 
 class SpellEntry
@@ -429,50 +479,51 @@ class SpellEntry
         uint32    EffectBaseDice[MAX_EFFECT_INDEX] = {};           // 67-69
         float     EffectDicePerLevel[MAX_EFFECT_INDEX] = {};       // 70-72
         float     EffectRealPointsPerLevel[MAX_EFFECT_INDEX] = {}; // 73-75
-        int32     EffectBasePoints[MAX_EFFECT_INDEX] = {};         // 76-78 
-        uint32    EffectMechanic[MAX_EFFECT_INDEX] = {};           // 79-81
-        uint32    EffectImplicitTargetA[MAX_EFFECT_INDEX] = {};    // 82-84
-        uint32    EffectImplicitTargetB[MAX_EFFECT_INDEX] = {};    // 85-87
-        uint32    EffectRadiusIndex[MAX_EFFECT_INDEX] = {};        // 88-90
-        uint32    EffectApplyAuraName[MAX_EFFECT_INDEX] = {};      // 91-93
-        uint32    EffectAmplitude[MAX_EFFECT_INDEX] = {};          // 94-96
-        float     EffectMultipleValue[MAX_EFFECT_INDEX] = {};      // 97-99
-        uint32    EffectChainTarget[MAX_EFFECT_INDEX] = {};        // 100-102
-        uint32    EffectItemType[MAX_EFFECT_INDEX] = {};           // 103-105
-        int32     EffectMiscValue[MAX_EFFECT_INDEX] = {};          // 106-108
-        uint32    EffectTriggerSpell[MAX_EFFECT_INDEX] = {};       // 109-111
-        float     EffectPointsPerComboPoint[MAX_EFFECT_INDEX] = {};// 112-114
-        uint32    SpellVisual = 0;                                 // 115
-      //uint32    SpellVisual2;                                    // 116 not used
-        uint32    SpellIconID = 0;                                 // 117
-        uint32    activeIconID = 0;                                // 118
-        uint32    spellPriority = 0;                               // 119
-        std::array<std::string, MAX_DBC_LOCALE> SpellName{};       // 120-127
-      //uint32    SpellNameFlag;                                   // 128     not used
-        std::array<std::string, MAX_DBC_LOCALE> Rank{};            // 129-136
-      //uint32    RankFlags;                                       // 137     not used
-      //char*     Description[8];                                  // 138-145 not used
-      //uint32    DescriptionFlags;                                // 146     not used
-      //char*     ToolTip[8];                                      // 147-154 not used
-      //uint32    ToolTipFlags;                                    // 155     not used
-        uint32    ManaCostPercentage = 0;                          // 156
-        uint32    StartRecoveryCategory = 0;                       // 157
-        uint32    StartRecoveryTime = 0;                           // 158
-        uint32    MaxTargetLevel = 0;                              // 160
-        uint32    SpellFamilyName = 0;                             // 161
-        uint64    SpellFamilyFlags = 0;                            // 162
-        uint32    MaxAffectedTargets = 0;                          // 163
-        uint32    DmgClass = 0;                                    // 164
-        uint32    PreventionType = 0;                              // 165
-      //int32     StanceBarOrder;                                  // 166 not used
-        float     DmgMultiplier[MAX_EFFECT_INDEX] = {};            // 167-169
-      //uint32    MinFactionId;                                    // 170 not used
-      //uint32    MinReputation;                                   // 171 not used
-      //uint32    RequiredAuraVision;                              // 172 not used
+        int32     EffectBasePoints[MAX_EFFECT_INDEX] = {};         // 76-78
+        float     EffectBonusCoefficient[MAX_EFFECT_INDEX] = {};   // 79-81 
+        uint32    EffectMechanic[MAX_EFFECT_INDEX] = {};           // 82-84
+        uint32    EffectImplicitTargetA[MAX_EFFECT_INDEX] = {};    // 85-87
+        uint32    EffectImplicitTargetB[MAX_EFFECT_INDEX] = {};    // 88-90
+        uint32    EffectRadiusIndex[MAX_EFFECT_INDEX] = {};        // 91-93
+        uint32    EffectApplyAuraName[MAX_EFFECT_INDEX] = {};      // 94-96
+        uint32    EffectAmplitude[MAX_EFFECT_INDEX] = {};          // 97-99
+        float     EffectMultipleValue[MAX_EFFECT_INDEX] = {};      // 100-102
+        uint32    EffectChainTarget[MAX_EFFECT_INDEX] = {};        // 103-105
+        uint32    EffectItemType[MAX_EFFECT_INDEX] = {};           // 106-108
+        int32     EffectMiscValue[MAX_EFFECT_INDEX] = {};          // 109-111
+        uint32    EffectTriggerSpell[MAX_EFFECT_INDEX] = {};       // 112-114
+        float     EffectPointsPerComboPoint[MAX_EFFECT_INDEX] = {};// 115-117
+        uint32    SpellVisual = 0;                                 // 118
+      //uint32    SpellVisual2;                                    // 119 not used
+        uint32    SpellIconID = 0;                                 // 120
+        uint32    activeIconID = 0;                                // 121
+        uint32    spellPriority = 0;                               // 122
+        std::array<std::string, MAX_DBC_LOCALE> SpellName{};       // 123-130
+      //uint32    SpellNameFlag;                                   // 131     not used
+        std::array<std::string, MAX_DBC_LOCALE> Rank{};            // 132-139
+      //uint32    RankFlags;                                       // 140     not used
+      //char*     Description[8];                                  // 141-148 not used
+      //uint32    DescriptionFlags;                                // 149     not used
+      //char*     ToolTip[8];                                      // 150-157 not used
+      //uint32    ToolTipFlags;                                    // 158     not used
+        uint32    ManaCostPercentage = 0;                          // 159
+        uint32    StartRecoveryCategory = 0;                       // 160
+        uint32    StartRecoveryTime = 0;                           // 161
+        uint32    MaxTargetLevel = 0;                              // 163
+        uint32    SpellFamilyName = 0;                             // 164
+        uint64    SpellFamilyFlags = 0;                            // 165
+        uint32    MaxAffectedTargets = 0;                          // 166
+        uint32    DmgClass = 0;                                    // 167
+        uint32    PreventionType = 0;                              // 168
+      //int32     StanceBarOrder;                                  // 169 not used
+        float     DmgMultiplier[MAX_EFFECT_INDEX] = {};            // 170-172
+      //uint32    MinFactionId;                                    // 173 not used
+      //uint32    MinReputation;                                   // 174 not used
+      //uint32    RequiredAuraVision;                              // 175 not used
 
         /// CUSTOM FIELDS:
-        uint32 MinTargetLevel = 0;                                 // 159
-        uint32 Custom = 0;                                         // 173
+        uint32 MinTargetLevel = 0;                                 // 162
+        uint32 Custom = 0;                                         // 176
         uint32 Internal = 0;                                       // Assigned by the core.
     protected:
         bool _isBinary = false;
@@ -579,6 +630,44 @@ class SpellEntry
             }
         }
 
+        // Effects whose execution will be delayed if Spell.EffectDelay config setting is non-zero.
+        inline bool IsDelayableEffect(uint32 effecIdx) const
+        {
+            switch (Effect[effecIdx])
+            {
+                case SPELL_EFFECT_SCHOOL_DAMAGE:
+                case SPELL_EFFECT_HEALTH_LEECH:
+                case SPELL_EFFECT_HEAL:
+                case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+                case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+                case SPELL_EFFECT_WEAPON_DAMAGE:
+                case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                case SPELL_EFFECT_HEAL_MECHANICAL:
+                case SPELL_EFFECT_ATTACK_ME:
+                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                    return true;
+                case SPELL_EFFECT_APPLY_AURA:
+                {
+                    switch (EffectApplyAuraName[effecIdx])
+                    {
+                        case SPELL_AURA_MOD_CONFUSE:
+                        case SPELL_AURA_MOD_FEAR:
+                        case SPELL_AURA_MOD_TAUNT:
+                        case SPELL_AURA_MOD_STUN:
+                        case SPELL_AURA_MOD_PACIFY:
+                        case SPELL_AURA_MOD_ROOT:
+                        case SPELL_AURA_MOD_DECREASE_SPEED:
+                        case SPELL_AURA_SCHOOL_IMMUNITY:
+                        case SPELL_AURA_MOD_HEALING_PCT:
+                            return true;
+                    }
+                    break;
+                }
+            }
+
+            return false;
+        }
+
         inline bool IsPeriodicRegenerateEffect(SpellEffectIndex effecIdx) const
         {
             switch (AuraType(EffectApplyAuraName[effecIdx]))
@@ -609,6 +698,26 @@ class SpellEntry
                 else if (Effect[i] == SPELL_EFFECT_APPLY_AURA)
                     return false;
             return hasAura;
+        }
+
+        bool IsCustomSpell() const
+        {
+            return Internal & SPELL_INTERNAL_CUSTOM;
+        }
+
+        bool IsSpellWithDelayableEffects() const
+        {
+            return Internal & SPELL_INTERNAL_DELAYABLE_EFFECTS;
+        }
+
+        bool IsNextMeleeSwingSpell() const
+        {
+            return Attributes & (SPELL_ATTR_ON_NEXT_SWING_1 | SPELL_ATTR_ON_NEXT_SWING_2);
+        }
+
+        bool IsRangedSpell() const
+        {
+            return Attributes & SPELL_ATTR_RANGED;
         }
 
         inline bool IsSealSpell() const
@@ -642,6 +751,19 @@ class SpellEntry
         inline bool IsDeathOnlySpell() const
         {
             return (AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD) || (Id == 2584);
+        }
+
+        inline bool CanTargetDeadTarget() const
+        {
+            return HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD) || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
+        }
+
+        inline bool CanTargetAliveState(bool alive) const
+        {
+            if (HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD))
+                return !alive;
+
+            return alive || HasAttribute(SPELL_ATTR_EX2_CAN_TARGET_DEAD);
         }
 
         inline bool IsDeathPersistentSpell() const
@@ -854,6 +976,7 @@ class SpellEntry
         float CalculateDefaultCoefficient(DamageEffectType const damagetype) const;
         float CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
         SpellCastResult GetErrorAtShapeshiftedCast(uint32 form) const;
+        bool IsTargetInRange(WorldObject const* pCaster, WorldObject const* pTarget) const; // to be used in scripts for simple pre-cast range checks
         uint32 GetMechanic() const { return Mechanic; }
         uint32 GetManaCost() const { return manaCost; }
         uint32 GetSpellFamilyName() const { return SpellFamilyName; }

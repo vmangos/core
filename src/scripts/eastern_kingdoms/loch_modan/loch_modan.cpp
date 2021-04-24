@@ -31,14 +31,14 @@ EndContentData */
 ## npc_miran
 ######*/
 
-enum
+enum MiranData
 {
     QUEST_PROTECTING_THE_SHIPMENT = 309,
 
-    SAY_MIRAN_1           = -1000571,
-    SAY_DARK_IRON_DWARF   = -1000572,
-    SAY_MIRAN_2           = -1000573,
-    SAY_MIRAN_3           = -1000574,
+    SAY_MIRAN_1           = 510,
+    SAY_DARK_IRON_DWARF   = 1936,
+    SAY_MIRAN_2           = 511,
+    SAY_MIRAN_3           = 498,
 
     NPC_DARK_IRON_DWARF   = 2149
 };
@@ -128,7 +128,7 @@ CreatureAI* GetAI_npc_miran(Creature* pCreature)
 // Author: Kampeador
 //-----------------------------------------------------------------------------
 
-enum
+enum SaeanData
 {
     QUEST_RESUPPLYING_THE_EXCAVATION = 273,
  
@@ -239,11 +239,10 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     else
         return false;
 
-    
     // minor optimization: Quest NPCs are already in combat with someone, so skip further checks.
     if (miran->IsInCombat() || huldar->IsInCombat())
         return true;
-    
+
     // Check if Saean is available.
     Creature* saean = GetClosestCreatureWithEntry(pPlayer, NPC_SAEAN, 60.0f);
     if (saean)
@@ -305,4 +304,3 @@ void AddSC_loch_modan()
     newscript->pAreaTrigger = &AreaTrigger_at_huldar_miran;
     newscript->RegisterSelf();
 }
-

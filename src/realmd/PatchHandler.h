@@ -26,12 +26,14 @@
 #ifndef _PATCHHANDLER_H_
 #define _PATCHHANDLER_H_
 
+#include "Config/Config.h"
+
 #include <ace/Basic_Types.h>
 #include <ace/Synch_Traits.h>
 #include <ace/Svc_Handler.h>
 #include <ace/SOCK_Stream.h>
 #include <ace/Message_Block.h>
-#include <ace/Auto_Ptr.h>
+#include <string>
 #include <map>
 
 #include <openssl/bn.h>

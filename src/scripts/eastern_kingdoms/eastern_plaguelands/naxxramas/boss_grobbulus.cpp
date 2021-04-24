@@ -32,13 +32,12 @@ Fallout slime 28218
 Mutating Injection 28169
 Enrages 26527*/
 
-
 #include "naxxramas.h"
 
-enum
+enum GrobbulusData
 {
-    EMOTE_SPRAY_SLIME   = -1533021, // todo: not working, should it?
-    EMOTE_INJECTION     = -1533158, // todo: not working, should it?
+    // EMOTE_SPRAY_SLIME   = -1533021, // todo: not working, should it?
+    // EMOTE_INJECTION     = -1533158, // todo: not working, should it?
 
     SPELL_SLIME_STREAM = 28137,
     SPELL_MUTATING_INJECTION = 28169,
@@ -49,11 +48,11 @@ enum
     SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
     //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
-    
+
     SPELL_BOMBARD_SLIME = 28280, // todo: should spawn a slime at the room before patch every patroll round, if any are dead.
-    
+
     NPC_FALLOUT_SLIME   = 16290,
-    NPC_POISON_CLOUD    = 16363,
+    NPC_POISON_CLOUD    = 16363
 };
 
 enum eGrobbulusEvents
@@ -61,13 +60,12 @@ enum eGrobbulusEvents
     EVENT_MUTATING_INJECTION = 1,
     EVENT_POISON_CLOUD,
     EVENT_SLIME_SPRAY,
-    EVENT_BERSERK,
+    EVENT_BERSERK
 };
 
-
-static uint32 POISONCLOUD_CD()            { return 15000; } //return urand(20000, 25000); }
+static uint32 POISONCLOUD_CD() { return 15000; } //return urand(20000, 25000); }
 static uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000): urand(30000,35000); }
-static constexpr uint32 BERSERK_TIMER           = 12 * 60 * 1000; // 12 minute enrage
+static constexpr uint32 BERSERK_TIMER = 12 * 60 * 1000; // 12 minute enrage
 
 static constexpr uint32 SLIMESTREAM_REPEAT_CD   = 1500; // used every 1500ms if current target is out of melee range
 
@@ -237,7 +235,9 @@ struct grob_poison_cloud : public ScriptedAI
     {
         Reset();
     }
+
     uint32 untilDespawn;
+
     void Reset() override
     {
         m_creature->AddUnitState(UNIT_STAT_ROOT);

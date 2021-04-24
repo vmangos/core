@@ -9,10 +9,9 @@
 #include <ace/SOCK_Connector.h>
 #include <ace/Acceptor.h>
 #include <ace/Connector.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/Guard_T.h>
 #include <ace/Unbounded_Queue.h>
 #include <ace/Message_Block.h>
+#include <mutex>
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 #pragma once
@@ -89,20 +88,22 @@ typedef ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH> WorldHandler;
  *
  */
 template <typename SessionType, typename SocketName, typename Crypt>
-class MangosSocket : protected WorldHandler
+class MangosSocket : public WorldHandler
 {
     public:
+        /// things called by ACE framework.
+        MangosSocket();
+        virtual ~MangosSocket(void);
+
         /// Declare the acceptor for this class
-        typedef ACE_Acceptor<SocketName, ACE_SOCK_ACCEPTOR> Acceptor;
         typedef ACE_Connector<SocketName,ACE_SOCK_CONNECTOR> Connector;
         /// Declare some friends
-        friend class ACE_Acceptor<SocketName, ACE_SOCK_ACCEPTOR>;
         friend class ACE_Connector<SocketName, ACE_SOCK_CONNECTOR>;
         friend class ACE_NonBlocking_Connect_Handler<SocketName>;
 
         /// Mutex type used for various synchronizations.
-        typedef ACE_Thread_Mutex LockType;
-        typedef ACE_Guard<LockType> GuardType;
+        using LockType = std::mutex;
+        typedef std::unique_lock<LockType> GuardType;
 
         /// Queue for storing packets for which there is no space.
         typedef ACE_Unbounded_Queue<WorldPacket*> PacketQueueT;
@@ -112,6 +113,12 @@ class MangosSocket : protected WorldHandler
 
         /// Close the socket.
         void CloseSocket (void);
+
+        /// Called on open ,the void* is the acceptor.
+        virtual int open(void *);
+
+        /// Called on failures inside of the acceptor, don't call from your code.
+        virtual int close(int);
 
         /// Get address of connected peer.
         const std::string& GetRemoteAddress () const { return m_Address; }
@@ -134,20 +141,10 @@ class MangosSocket : protected WorldHandler
          */
         bool IsServerSide() { return m_isServerSocket; }
     protected:
-        /// things called by ACE framework.
-        MangosSocket();
-        virtual ~MangosSocket (void);
-
         /// process one incoming packet.
         /// @param new_pct received packet ,note that you need to delete it.
         int ProcessIncoming (WorldPacket* new_pct) { delete new_pct; return 0; }
         int OnSocketOpen() { return 0; }
-
-        /// Called on open ,the void* is the acceptor.
-        virtual int open (void *);
-
-        /// Called on failures inside of the acceptor, don't call from your code.
-        virtual int close (int);
 
         /// Called when we can read from the socket.
         virtual int handle_input (ACE_HANDLE = ACE_INVALID_HANDLE);

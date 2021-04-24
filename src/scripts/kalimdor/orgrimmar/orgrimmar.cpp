@@ -17,13 +17,12 @@
 /* ScriptData
 SDName: Orgrimmar
 SD%Complete: 100
-SDComment: Quest support: 2460, 6566
+SDComment: Quest support: 2460
 SDCategory: Orgrimmar
 EndScriptData */
 
 /* ContentData
 npc_shenthul
-npc_thrall_warchief
 EndContentData */
 
 #include "scriptPCH.h"
@@ -120,18 +119,6 @@ bool QuestAccept_npc_shenthul(Player* pPlayer, Creature* pCreature, Quest const*
     return true;
 }
 
-bool GossipHello_npc_eitrigg(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(4941) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4941);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    return true;
-}
-
 void AddSC_orgrimmar()
 {
     Script* newscript;
@@ -140,10 +127,5 @@ void AddSC_orgrimmar()
     newscript->Name = "npc_shenthul";
     newscript->GetAI = &GetAI_npc_shenthul;
     newscript->pQuestAcceptNPC =  &QuestAccept_npc_shenthul;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_eitrigg";
-    newscript->pGossipHello =  &GossipHello_npc_eitrigg;
     newscript->RegisterSelf();
 }

@@ -24,9 +24,8 @@
 #include "BattleGround.h"
 #include "BattleGroundMgr.h"
 #include "Creature.h"
-#include "MapManager.h"
 #include "Language.h"
-#include "SpellAuras.h"
+#include "SpellAuraDefines.h"
 #include "World.h"
 #include "Group.h"
 #include "ObjectGuid.h"
@@ -170,14 +169,14 @@ void BattleGround::BroadcastWorker(Do& _do)
 
 BattleGround::BattleGround()
 {
-    m_TypeID            = BattleGroundTypeId(0);
+    m_TypeID            = BATTLEGROUND_TYPE_NONE;
     m_Status            = STATUS_NONE;
     m_ClientInstanceID  = 0;
     m_EndTime           = 0;
     m_BracketId         = BG_BRACKET_ID_NONE;        // use as mark bg template
     m_InvitedAlliance   = 0;
     m_InvitedHorde      = 0;
-    m_Winner            = 2;
+    m_Winner            = WINNER_NONE;
     m_StartTime         = 0;
     m_Events            = 0;
     m_BuffChange        = false;
@@ -606,7 +605,7 @@ void BattleGround::EndBattleGround(Team winner)
         SetWinner(WINNER_HORDE);
     }
     else
-        SetWinner(3);
+        SetWinner(WINNER_NONE);
 
     SetStatus(STATUS_WAIT_LEAVE);
     //we must set it this way, because end time is sent in packet!
@@ -721,6 +720,9 @@ uint32 BattleGround::GetBattlemasterEntry() const
 
 void BattleGround::RewardMark(Player* pPlayer, bool winner)
 {
+    if (pPlayer->IsBot())
+        return;
+
     if (winner)
         RewardSpellCast(pPlayer, pPlayer->GetTeamId() ? GetHordeWinSpell() : GetAllianceWinSpell());
     else
@@ -965,10 +967,6 @@ void BattleGround::StartBattleGround()
 
 void BattleGround::AddPlayer(Player* pPlayer)
 {
-    // remove afk from player
-    if (pPlayer->IsAFK())
-        pPlayer->ToggleAFK();
-
     // score struct must be created in inherited class
 
     ObjectGuid guid = pPlayer->GetObjectGuid();

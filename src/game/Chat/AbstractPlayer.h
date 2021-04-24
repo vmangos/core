@@ -20,7 +20,8 @@ enum PlayerExtraFlags
 
     // other states
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
-    PLAYER_EXTRA_WHISP_RESTRICTION  = 0x0200
+    PLAYER_EXTRA_WHISP_RESTRICTION  = 0x0200,
+    PLAYER_EXTRA_CITY_PROTECTOR     = 0x0400
 };
 
 class MasterPlayer;
@@ -61,10 +62,10 @@ template <typename T>
 class PlayerWrapper final: public AbstractPlayer
 {
 public:
-    PlayerWrapper(T& pl) : player(pl) {}
-    PlayerWrapper(T* pl) : player(*pl) {}
-    PlayerWrapper() : player(*((T*)nullptr)) {}
-    PlayerWrapper(PlayerWrapper<T> const& other) : player(other.player) {}
+    PlayerWrapper(T& pl);
+    PlayerWrapper(T* pl);
+    PlayerWrapper();
+    PlayerWrapper(PlayerWrapper<T> const& other);
 
     ObjectGuid GetObjectGuid() const override;
     Team GetTeam() const override;
@@ -92,5 +93,15 @@ public:
 protected:
     T& player;
 };
+
+template <>
+Player* PlayerWrapper<Player>::ToPlayer() const;
+template <>
+MasterPlayer* PlayerWrapper<Player>::ToMasterPlayer() const;
+
+template <>
+Player* PlayerWrapper<MasterPlayer>::ToPlayer() const;
+template <>
+MasterPlayer* PlayerWrapper<MasterPlayer>::ToMasterPlayer() const;
 
 typedef std::shared_ptr<AbstractPlayer> PlayerPointer;

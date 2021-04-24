@@ -62,6 +62,11 @@ public:
         m_uiShootTimer = 10000;
     }
 
+    void EnterCombat(Unit* enemy) override
+    {
+        me->PlayDistanceSound(5886);
+    }
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiFadedTimer)

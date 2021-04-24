@@ -29,10 +29,9 @@
 #include "Database/DatabaseEnv.h"
 #include "Database/Database.h"
 #include "Database/SqlOperations.h"
-#include "WorldSession.h"
-#include "World.h"
 
-enum {
+enum
+{
     PINFO_QUERY_GOLD_SENT = 0,
     PINFO_QUERY_GOLD_RECEIVED,
     PINFO_QUERY_ACCOUNT_INFO,
@@ -62,6 +61,8 @@ struct PInfoData
     std::string last_login;
     std::string target_name;
 };
+
+class WorldSession;
 
 /**
 Chain query handling for PInfo. It uses a long blocking query (select from characters)
@@ -122,26 +123,27 @@ private:
 };
 
 /* Run the display in an async task inside the main update, safe for session consistency */
-class PlayerAccountSearchDisplayTask : public AsyncTask
+class PlayerAccountSearchDisplayTask
 {
 public:
+
     PlayerAccountSearchDisplayTask(PlayerSearchQueryHolder* queryHolder)
         : holder(queryHolder) {}
 
-    void run() override;
+    void operator()();
 
 private:
     PlayerSearchQueryHolder* holder;
 };
 
 /* Run the display in an async task inside the main update, safe for session consistency */
-class PlayerCharacterLookupDisplayTask : public AsyncTask
+class PlayerCharacterLookupDisplayTask
 {
 public:
     PlayerCharacterLookupDisplayTask(QueryResult* result, uint32 accountId, uint32 limit)
         : query(result), accountId(accountId), limit(limit) {}
 
-    void run() override;
+    void operator ()();
 
 private:
     QueryResult* query;
@@ -149,13 +151,13 @@ private:
     uint32 limit;
 };
 
-class AccountSearchDisplayTask : public AsyncTask
+class AccountSearchDisplayTask
 {
 public:
     AccountSearchDisplayTask(QueryResult* result, uint32 accountId, uint32 limit)
         : query(result), accountId(accountId), limit(limit) {}
 
-    void run() override;
+    void operator ()();
 
 private:
     QueryResult* query;

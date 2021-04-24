@@ -16,24 +16,24 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 set(EXECUTABLE_NAME mangosd)
-set (EXECUTABLE_SRCS 
-	ChatSocket.h
-	CliRunnable.h
-	MaNGOSsoap.h
-	Master.h
-	RASocket.h
-	soapH.h
-	soapStub.h
-	WorldRunnable.h
-	ChatSocket.cpp
-	CliRunnable.cpp
-	Main.cpp
-	MaNGOSsoap.cpp
-	Master.cpp
-	RASocket.cpp
-	soapC.cpp
-	soapServer.cpp
-	WorldRunnable.cpp
+set(EXECUTABLE_SRCS 
+  ChatSocket.h
+  CliRunnable.h
+  MaNGOSsoap.h
+  Master.h
+  RASocket.h
+  soapH.h
+  soapStub.h
+  WorldRunnable.h
+  ChatSocket.cpp
+  CliRunnable.cpp
+  Main.cpp
+  MaNGOSsoap.cpp
+  Master.cpp
+  RASocket.cpp
+  soapC.cpp
+  soapServer.cpp
+  WorldRunnable.cpp
 
 )
 
@@ -86,7 +86,7 @@ include_directories(
 
 if(WIN32)
   include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/include-windows
+    ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
 endif()
 
@@ -101,7 +101,7 @@ add_executable(${EXECUTABLE_NAME}
   ${EXECUTABLE_SRCS}
 )
 
-if(SCRIPTS)
+if(USE_SCRIPTS)
   target_link_libraries(${EXECUTABLE_NAME}
     game
     scripts
@@ -170,5 +170,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mangosd.conf.dist.in ${CMAKE_CURRENT_
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mangosd.conf.dist DESTINATION ${CONF_DIR})
 
 if(WIN32 AND MSVC)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/\${BUILD_TYPE}/${EXECUTABLE_NAME}.pdb DESTINATION ${BIN_DIR} CONFIGURATIONS Debug)
+  install(FILES ${CMAKE_SOURCE_DIR}/bin/Debug/${EXECUTABLE_NAME}.pdb DESTINATION ${BIN_DIR} CONFIGURATIONS Debug)
 endif()

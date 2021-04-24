@@ -258,7 +258,7 @@ extern int main(int argc, char **argv)
     // Ensure the table used for geolocking has some data in it, if enabled
     if (sConfig.GetBoolDefault("GeoLocking", false))
     {
-        auto result = std::unique_ptr<QueryResult>(LoginDatabase.Query("SELECT 1 FROM geoip LIMIT 1"));
+        auto result = std::unique_ptr<QueryResult>(LoginDatabase.Query("SELECT 1 FROM `geoip` LIMIT 1"));
 
         if (!result)
         {
@@ -279,8 +279,8 @@ extern int main(int argc, char **argv)
     // cleanup query
     // set expired bans to inactive
     LoginDatabase.BeginTransaction();
-    LoginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
-    LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    LoginDatabase.Execute("UPDATE `account_banned` SET `active` = 0 WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
+    LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");
     LoginDatabase.CommitTransaction();
 
     ///- Launch the listening network socket

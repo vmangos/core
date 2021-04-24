@@ -22,14 +22,14 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include "Threading.h"
 #include <unordered_map>
 #include "Database/SqlDelayThread.h"
-#include <ace/Recursive_Thread_Mutex.h>
 #include "Policies/ThreadingModel.h"
 #include <ace/TSS_T.h>
-#include <ace/Atomic_Op.h>
 #include "SqlPreparedStatement.h"
+#include <memory>
+#include <thread>
+#include <atomic>
 
 class SqlTransaction;
 class SqlResultQueue;
@@ -40,7 +40,7 @@ class Database;
 
 #define MAX_QUERY_LEN   (32*1024)
 
-typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
+using SqlQueue = LockedQueue<SqlOperation*, std::mutex>;
 
 //
 class SqlConnection
@@ -75,13 +75,13 @@ class SqlConnection
         class Lock
         {
             public:
-                Lock(SqlConnection* conn) : m_pConn(conn) { m_pConn->m_mutex.acquire(); }
-                ~Lock() { m_pConn->m_mutex.release(); }
+                Lock(SqlConnection * conn) : m_pConn(conn) {}
 
                 SqlConnection* operator->() const { return m_pConn; }
 
             private:
-                SqlConnection* const m_pConn;
+                SqlConnection * const m_pConn;
+                std::unique_lock<std::recursive_mutex> m_lock{m_pConn->m_mutex};
         };
 
         //get DB object
@@ -108,7 +108,7 @@ class SqlConnection
         std::string m_database;
 
     private:
-        typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
+        using LOCK_TYPE = std::recursive_mutex;
         LOCK_TYPE m_mutex;
 
         typedef std::vector<SqlPreparedStatement*> StmtHolder;
@@ -122,7 +122,7 @@ class Database
 
         virtual bool Initialize(char const* infoString, int nConns = 1, int nWorkers = 1);
         //start worker thread for async DB request execution
-        virtual bool InitDelayThread(int i, std::string const& infoString);
+        virtual bool InitDelayThread(std::string const& infoString);
         //stop worker thread
         virtual void HaltDelayThread();
 
@@ -264,7 +264,7 @@ class Database
         inline void AddToDelayQueue(SqlOperation* op) { m_delayQueue->add(op); }
         inline bool NextDelayedOperation(SqlOperation*& op) { return m_delayQueue->next(op); }
 
-        inline void AddToSerialDelayQueue(int workerId, SqlOperation* op) { m_serialDelayQueue[workerId]->add(op); }
+        inline void AddToSerialDelayQueue(int workerId, SqlOperation* op) { m_threadsBodies[workerId]->addSerialOperation(op); }
         bool NextSerialDelayedOperation(int workerId, SqlOperation*& op);
 
         bool HasAsyncQuery();
@@ -274,8 +274,8 @@ class Database
         // Frees data, cancels scheduled queries, closes connection
         void StopServer();
     protected:
-        Database() : m_nQueryConnPoolSize(1), m_delayQueue(new SqlQueue()), m_serialDelayQueue(nullptr), m_pAsyncConn(nullptr), 
-                     m_pResultQueue(nullptr), m_numAsyncWorkers(0), m_threadsBodies(nullptr), m_delayThreads(nullptr),
+        Database() : m_nQueryConnPoolSize(1), m_delayQueue(new SqlQueue()), m_pAsyncConn(nullptr),
+                     m_pResultQueue(nullptr), m_numAsyncWorkers(0),
                      m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervallms(0)
         {
             m_nQueryCounter = -1;
@@ -324,27 +324,26 @@ class Database
 
         //connection helper counters
         int m_nQueryConnPoolSize;                               //current size of query connection pool
-        ACE_Atomic_Op<ACE_Thread_Mutex, int> m_nQueryCounter;  //counter for connection selection
+        std::atomic<int> m_nQueryCounter;  //counter for connection selection
 
         //lets use pool of connections for sync queries
         typedef std::vector< SqlConnection* > SqlConnectionContainer;
         SqlConnectionContainer m_pQueryConnections;
 
         SqlQueue* m_delayQueue;
-        SqlQueue** m_serialDelayQueue; // simple mapping for worker ID -> serialized queue (only executed in set worker thread)
 
         SqlConnection* m_pAsyncConn;
 
         SqlResultQueue*     m_pResultQueue;                  ///< Transaction queues from diff. threads
         uint32              m_numAsyncWorkers;
-        SqlDelayThread**    m_threadsBodies;                  ///< Pointer to delay sql executer (owned by m_delayThread)
-        ACE_Based::Thread** m_delayThreads;                   ///< Pointer to executer thread
+        std::vector<std::shared_ptr<SqlDelayThread>>    m_threadsBodies;                  ///< Pointer to delay sql executer (owned by m_delayThread)
+        std::vector<std::thread> m_delayThreads;                   ///< Pointer to executer thread
 
         bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
 
         //PREPARED STATEMENT REGISTRY
-        typedef ACE_Thread_Mutex LOCK_TYPE;
-        typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
+        using LOCK_TYPE = std::mutex;
+        using LOCK_GUARD = std::unique_lock<LOCK_TYPE> ;
 
         mutable LOCK_TYPE m_stmtGuard;
 

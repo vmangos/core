@@ -26,14 +26,10 @@ EndScriptData */
 #include <random>
 #include <algorithm>
 #include <array>
-enum
-{
-    // from cmangos, unimplemented
-    //EMOTE_SPIN_WEB              = -1533146, // Not in vanilla?
-    //EMOTE_SPIDERLING            = -1533147, // Not in vanilla?
-    //EMOTE_SPRAY                 = -1533148, // Not in vanilla?
-    EMOTE_BOSS_GENERIC_ENRAGE   = -1000003,
 
+enum MaexxnaData
+{
+    EMOTE_BOSS_GENERIC_ENRAGE   = 2384,
 
     SPELL_WEBWRAP               = 28622,    
 
@@ -43,9 +39,6 @@ enum
     SPELL_ENRAGE                = 28747,    // 30% enrage
 
     SPELL_SUMMON_SPIDERLING     = 29434,
-
-
-
 
     SPELL_DOUBLE_ATTACK = 19818,            // seems it adds an aura, must be removed manually?
 
@@ -71,7 +64,7 @@ enum
     */
 
     MAX_SPIDERLINGS         = 10, // 8 in cmangos, should be 10 
-    MAX_WEB_WRAP_POSITIONS  = 3,
+    MAX_WEB_WRAP_POSITIONS  = 3
 };
 
 static float WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
@@ -80,24 +73,25 @@ static float WebSprayCooldown(bool initial = false)           { return initial ?
 static float PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
 static float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
 
-
 struct mob_webwrapAI : public ScriptedAI
 {
-    mob_webwrapAI(Creature* pCreature) : ScriptedAI(pCreature) {
+    mob_webwrapAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
         Reset(); 
     }
 
     ObjectGuid m_victimGuid;
     uint32 m_uiWebWrapTimer;
     bool webWrapDone;
+
     void Reset() override
     {
         m_uiWebWrapTimer = 0;
         webWrapDone = false;
     }
 
-    void MoveInLineOfSight(Unit* /*pWho*/) override {}
-    void AttackStart(Unit* /*pWho*/) override {}
+    void MoveInLineOfSight(Unit* /*pWho*/) override { }
+    void AttackStart(Unit* /*pWho*/) override { }
 
     void SetVictim(Unit* pVictim)
     {
@@ -106,11 +100,12 @@ struct mob_webwrapAI : public ScriptedAI
             sLog.outError("mob_webwrapAI::SetVictim called for non-player");
             return;
         }
+
         pVictim->AddAura(SPELL_SUMMON_WEB_WRAP);
         m_victimGuid = pVictim->GetObjectGuid();
         m_creature->GetMotionMaster()->MovePoint(0, pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ(),
             MOVE_FLY_MODE | MOVE_CYCLIC, 0.0f, 0);
-   }
+    }
 
     void JustDied(Unit* /*pKiller*/) override
     {
@@ -118,7 +113,8 @@ struct mob_webwrapAI : public ScriptedAI
         {
             if (Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid))
             {
-                if (pVictim->IsAlive()) {
+                if (pVictim->IsAlive())
+                {
                     pVictim->RemoveAurasDueToSpell(SPELL_WEBWRAP);
                     pVictim->RemoveAurasDueToSpell(SPELL_SUMMON_WEB_WRAP);
                 }
@@ -133,7 +129,8 @@ struct mob_webwrapAI : public ScriptedAI
             return;
 
         Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid);
-        if (!pVictim || pVictim->IsDead()) {
+        if (!pVictim || pVictim->IsDead())
+        {
             m_creature->Kill(m_creature, nullptr);
             // ((TemporarySummon*)m_creature)->UnSummon();
             return;
@@ -160,9 +157,9 @@ struct boss_maexxnaAI : public ScriptedAI
     uint32 m_uiPoisonShockTimer;
     uint32 m_uiNecroticPoisonTimer;
     uint32 m_uiSummonSpiderlingTimer;
-    bool   m_bEnraged;
+    bool m_bEnraged;
     std::random_device m_randDevice;
-    std::mt19937 m_random{ m_randDevice() };
+    std::mt19937 m_random { m_randDevice() };
 
     std::vector<std::pair<uint32, ObjectGuid>> wraps;
     std::vector<std::pair<uint32, ObjectGuid>> wraps2;
@@ -183,11 +180,11 @@ struct boss_maexxnaAI : public ScriptedAI
 
     void Reset() override
     {
-        m_uiWebWrapTimer            = WebWrapCooldown(true);
-        m_uiWebSprayTimer           = WebSprayCooldown(true);
-        m_uiPoisonShockTimer        = PoisonShockCooldown(true);
-        m_uiNecroticPoisonTimer     = NecroticPoisonCooldown(true);
-        m_uiSummonSpiderlingTimer   = SummonSpiderlingsCooldown(true);
+        m_uiWebWrapTimer = WebWrapCooldown(true);
+        m_uiWebSprayTimer = WebSprayCooldown(true);
+        m_uiPoisonShockTimer = PoisonShockCooldown(true);
+        m_uiNecroticPoisonTimer = NecroticPoisonCooldown(true);
+        m_uiSummonSpiderlingTimer = SummonSpiderlingsCooldown(true);
         m_bEnraged = false;
         wraps.clear();
         wraps2.clear();
@@ -210,7 +207,7 @@ struct boss_maexxnaAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 40.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false) && m_creature->IsHostileTo(pWho))
         {
             if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
@@ -244,7 +241,8 @@ struct boss_maexxnaAI : public ScriptedAI
         std::list<Player*> candidates;
         ThreatList::const_iterator it = tList.begin();
         ++it;
-        for (it; it != tList.end(); ++it) {
+        for (it; it != tList.end(); ++it)
+        {
             Player* pPlayer = m_creature->GetMap()->GetPlayer((*it)->getUnitGuid());
             if (!pPlayer) continue;
 
@@ -257,7 +255,6 @@ struct boss_maexxnaAI : public ScriptedAI
                 candidates.push_back(pPlayer);
             }
         }
-        
 
         if (candidates.empty())
             return false;
@@ -272,7 +269,7 @@ struct boss_maexxnaAI : public ScriptedAI
 
             if(candidates.size() > 1)
                 std::advance(candIt, urand(0, candidates.size() - 1));
-            
+
             Unit* pTarget = *candIt;
             candIt = candidates.erase(candIt);
 
@@ -290,7 +287,7 @@ struct boss_maexxnaAI : public ScriptedAI
             float horizontalSpeed = dist/1.5f;
             float verticalSpeed = 20.0f + (yDist*0.5f);
             float angle = pTarget->GetAngle(wepWrapLoc[i][0], wepWrapLoc[i][1]);
-                
+
             // set immune anticheat and calculate speed
             if (Player* plr = pTarget->ToPlayer())
             {
@@ -314,7 +311,6 @@ struct boss_maexxnaAI : public ScriptedAI
                 pSummoned->AddThreat(pTarget, 100);
                 pSummoned->AI()->AttackStart(pTarget);
             }
-            
         }
     }
 
@@ -340,6 +336,7 @@ struct boss_maexxnaAI : public ScriptedAI
             else
                 p.first -= uiDiff;
         }
+
         if (wdone)
             wraps2.clear();
 
@@ -366,7 +363,7 @@ struct boss_maexxnaAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        
+
         UpdateWraps(uiDiff);
 
         // Web Wrap
@@ -423,7 +420,7 @@ struct boss_maexxnaAI : public ScriptedAI
                 DoScriptText(EMOTE_BOSS_GENERIC_ENRAGE, m_creature);
             }
         }
-        
+
         DoMeleeAttackIfReady();
     }
 };

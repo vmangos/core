@@ -1,16 +1,35 @@
+/*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
 #include "Player.h"
+#include "Group.h"
+#include "CreatureAI.h"
 #include "Log.h"
 #include "MotionMaster.h"
 #include "ObjectMgr.h"
 #include "PlayerBotMgr.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
+#include "World.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
 #include "TargetedMovementGenerator.h"
-#include <random>
 
 enum BattleBotSpells
 {
@@ -18,12 +37,6 @@ enum BattleBotSpells
     BB_SPELL_DRINK = 1137,
     BB_SPELL_AUTO_SHOT = 75,
     BB_SPELL_SHOOT_WAND = 5019,
-    BB_SPELL_TAME_BEAST = 13481,
-
-    BB_SPELL_SUMMON_IMP = 688,
-    BB_SPELL_SUMMON_VOIDWALKER = 697,
-    BB_SPELL_SUMMON_FELHUNTER = 691,
-    BB_SPELL_SUMMON_SUCCUBUS = 712,
 
     BB_SPELL_MOUNT_40_HUMAN = 470,
     BB_SPELL_MOUNT_40_NELF = 10787,
@@ -49,24 +62,6 @@ enum BattleBotSpells
     BB_SPELL_MOUNT_40_WARLOCK = 5784,
     BB_SPELL_MOUNT_60_WARLOCK = 23161,
 
-    BB_PET_WOLF    = 565,
-    BB_PET_CAT     = 681,
-    BB_PET_BEAR    = 822,
-    BB_PET_CRAB    = 831,
-    BB_PET_GORILLA = 1108,
-    BB_PET_BIRD    = 1109,
-    BB_PET_BOAR    = 1190,
-    BB_PET_BAT     = 1554,
-    BB_PET_CROC    = 1693,
-    BB_PET_SPIDER  = 1781,
-    BB_PET_OWL     = 1997,
-    BB_PET_STRIDER = 2322,
-    BB_PET_SCORPID = 3127,
-    BB_PET_SERPENT = 3247,
-    BB_PET_RAPTOR  = 3254,
-    BB_PET_TURTLE  = 3461,
-    BB_PET_HYENA   = 4127,
-
     BB_ITEM_ARROW  = 2512,
     BB_ITEM_BULLET = 2516,
 };
@@ -78,23 +73,69 @@ enum BattleBotSpells
 
 void BattleBotAI::AddPremadeGearAndSpells()
 {
-    std::vector<uint32> vSpecs;
+    uint8 const level = m_level ? m_level : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+
+    std::vector<PlayerPremadeSpecTemplate const*> vSpecs;
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
     {
-        if (itr.second.requiredClass == me->GetClass())
-            vSpecs.push_back(itr.first);
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == level)
+            vSpecs.push_back(&itr.second);
+    }
+    // Use lower level spec template if there are no templates for the current level.
+    if (vSpecs.empty())
+    {
+        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass() &&
+                itr.second.level < level)
+                vSpecs.push_back(&itr.second);
+        }
     }
     if (!vSpecs.empty())
-        sObjectMgr.ApplyPremadeSpecTemplateToPlayer(SelectRandomContainerElement(vSpecs), me);
+    {
+        PlayerPremadeSpecTemplate const* pSpec = SelectRandomContainerElement(vSpecs);
+        sObjectMgr.ApplyPremadeSpecTemplateToPlayer(pSpec->entry, me);
+        m_role = pSpec->role;
+    }
 
-    std::vector<uint32> vGear;
+    if (m_role == ROLE_INVALID)
+        AutoAssignRole();
+
+    std::vector<PlayerPremadeGearTemplate const*> vGear;
     for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
     {
-        if (itr.second.requiredClass == me->GetClass())
-            vGear.push_back(itr.first);
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == level)
+            vGear.push_back(&itr.second);
+    }
+    // Use lower level gear template if there are no templates for the current level.
+    if (vGear.empty())
+    {
+        for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass() &&
+                itr.second.level < level)
+                vGear.push_back(&itr.second);
+        }
     }
     if (!vGear.empty())
-        sObjectMgr.ApplyPremadeGearTemplateToPlayer(SelectRandomContainerElement(vGear), me);
+    {
+        uint32 gearId = 0;
+        // Try to find a role appropriate gear template.
+        for (const auto itr : vGear)
+        {
+            if (itr->role == m_role)
+            {
+                gearId = itr->entry;
+                break;
+            }
+        }
+        // There is no gear template for this role, pick randomly.
+        if (!gearId)
+            gearId = SelectRandomContainerElement(vGear)->entry;
+        sObjectMgr.ApplyPremadeGearTemplateToPlayer(gearId, me);
+    } 
 
     switch (me->GetClass())
     {
@@ -109,6 +150,14 @@ void BattleBotAI::AddPremadeGearAndSpells()
             }
             break;
         }
+    }
+
+    if (level != me->GetLevel())
+    {
+        sLog.outError("BattleBotAI::AddPremadeGearAndSpells - No level %u templates found!", level);
+        me->GiveLevel(level);
+        me->InitTalentForLevel();
+        me->SetUInt32Value(PLAYER_XP, 0);
     }
 }
 
@@ -239,7 +288,11 @@ bool BattleBotAI::DrinkAndEat()
             ClearPath();
             StopMoving();
         }
-        me->CastSpell(me, BB_SPELL_FOOD, true);
+        if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_SPELL_FOOD))
+        {
+            me->CastSpell(me, pSpellEntry, true);
+            me->RemoveSpellCooldown(*pSpellEntry);
+        }
         return true;
     }
 
@@ -250,7 +303,11 @@ bool BattleBotAI::DrinkAndEat()
             ClearPath();
             StopMoving();
         }
-        me->CastSpell(me, BB_SPELL_DRINK, true);
+        if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(BB_SPELL_DRINK))
+        {
+            me->CastSpell(me, pSpellEntry, true);
+            me->RemoveSpellCooldown(*pSpellEntry);
+        }
         return true;
     }
 
@@ -397,6 +454,10 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 
 Unit* BattleBotAI::SelectFollowTarget() const
 {
+    if (me->HasAura(AURA_WARSONG_FLAG) ||
+        me->HasAura(AURA_SILVERWING_FLAG))
+        return nullptr;
+
     std::list<Player*> players;
     me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
     Player* pHealerFollowTarget = nullptr;
@@ -702,7 +763,6 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     {
         ResetSpellData();
         AddPremadeGearAndSpells();
-        AutoAssignRole();
         PopulateSpellData();
         AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
@@ -926,7 +986,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
     else
     {
-        if (!me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
+        if (!me->HasInArc(pVictim, 2 * M_PI_F / 3) && !me->IsMoving())
         {
             me->SetInFront(pVictim);
             me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
@@ -1056,7 +1116,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Paladin()
 
     if (m_isBuffing &&
        (!m_spells.paladin.pBlessingBuff ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.paladin.pBlessingBuff)))
+        !me->HasGCD(m_spells.paladin.pBlessingBuff)))
     {
         m_isBuffing = false;
     }
@@ -1469,8 +1529,8 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
             if (!me->IsStopped())
                 me->StopMoving();
             me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
-            return;
+            if (me->GetMotionMaster()->MoveDistance(pVictim, 25.0f))
+                return;
         }
 
         if (me->HasSpell(BB_SPELL_AUTO_SHOT) &&
@@ -1594,9 +1654,8 @@ void BattleBotAI::UpdateInCombatAI_Mage()
                     DoCastSpell(me, m_spells.mage.pFrostNova);
                 }
 
-                me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
-
-                return;
+                if (me->GetMotionMaster()->MoveDistance(pVictim, 25.0f))
+                    return;
             }
         }
 
@@ -1790,7 +1849,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
 
     if (m_isBuffing &&
        (!m_spells.priest.pPowerWordFortitude ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.priest.pPowerWordFortitude)))
+        !me->HasGCD(m_spells.priest.pPowerWordFortitude)))
     {
         m_isBuffing = false;
     }
@@ -1989,7 +2048,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Warlock()
 
     if (m_isBuffing &&
        (!m_spells.warlock.pDetectInvisibility ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.warlock.pDetectInvisibility)))
+        !me->HasGCD(m_spells.warlock.pDetectInvisibility)))
     {
         m_isBuffing = false;
     }
@@ -2491,7 +2550,7 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
                 (me->GetHealthPercent() < 10.0f))
             {
                 if (m_spells.rogue.pPreparation &&
-                    me->HasSpellCooldown(m_spells.rogue.pVanish->Id) &&
+                    !me->IsSpellReady(m_spells.rogue.pVanish->Id) &&
                     CanTryToCastSpell(me, m_spells.rogue.pPreparation))
                 {
                     if (DoCastSpell(me, m_spells.rogue.pPreparation) == SPELL_CAST_OK)
@@ -2502,8 +2561,8 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
                 {
                     if (DoCastSpell(me, m_spells.rogue.pVanish) == SPELL_CAST_OK)
                     {
-                        me->GetMotionMaster()->MoveDistance(pVictim, 40.0f);
-                        return;
+                        if (me->GetMotionMaster()->MoveDistance(pVictim, 40.0f))
+                            return;
                     }
                 }
             }
@@ -2703,7 +2762,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
 
     if (m_isBuffing &&
        (!m_spells.druid.pMarkoftheWild ||
-        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.druid.pMarkoftheWild)))
+        !me->HasGCD(m_spells.druid.pMarkoftheWild)))
     {
         m_isBuffing = false;
     }
@@ -3058,8 +3117,8 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                             return;
                     }
                     me->SetCasterChaseDistance(25.0f);
-                    me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
-                    return;
+                    if (me->GetMotionMaster()->MoveDistance(pVictim, 25.0f))
+                        return;
                 }
 
                 if (m_spells.druid.pFaerieFire &&

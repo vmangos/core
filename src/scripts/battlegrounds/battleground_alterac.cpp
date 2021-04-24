@@ -6,6 +6,7 @@ SDCategory: BG
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
 
 /*
 Vanndar: Thunderclap (about 200-300 nature damage per player in range not been upgraded since vanilla, Time between attacks increased by 33%, movement speed reduced by 40%.) Storm Bolt (about 450 nature damage, stuns for 8 seconds, dispellable, used on non tanks) Avatar (50% increased damage and armor, up for 15 seconds, comes back up about 15-20 seconds later) Drek'thar: Whirlwind (2 second cast time, weapon damage to all in range) Frenzy (167% damage increase and attack speed increase by 50%, lasts 2 minutes, goes up after about 15-20 seconds from the start of fight) Knockdown (Infli
@@ -1256,7 +1257,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 
         if (m_uiShoot_Timer < diff)
         {
-            if (!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT) == CAST_OK)
                     m_uiShoot_Timer = SHOOT_SPEED;
@@ -2679,7 +2680,7 @@ struct AV_NpcEventAI : public npc_escortAI
                     checkTroopsStatus(uiDiff, AV_NPC_QUARTERMASTER);
                 break;
             case AV_NPC_QUARTERMASTER_A:
-                if (b_isTroopsSpawned)
+                if (!b_isTroopsSpawned)
                     checkTroopsStatus(uiDiff, AV_NPC_QUARTERMASTER_A);
                 break;
 
@@ -5133,28 +5134,6 @@ class npc_av_battle_npc_summoner: public ScriptedAI
             m_despawnAfterTime = t;
         }
 
-        uint32 Rand3(uint32 a, uint32 b, uint32 c) const
-        {
-            switch (urand(0, 2))
-            {
-                case 0:
-                    return a;
-                case 1:
-                    return b;
-                default:
-                    return c;
-            }
-        }
-        uint32 Rand2(uint32 a, uint32 b) const
-        {
-            switch (urand(0, 1))
-            {
-                case 0:
-                    return a;
-                default:
-                    return b;
-            }
-        }
         uint32 SelectCreatureEntry() const
         {
             Map* m = m_creature->GetMap();
@@ -5167,26 +5146,26 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                     switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
                     {
                         case AV_NPC_BASIC:
-                            return Rand3(12048, 12127, 12047);
+                            return PickRandomValue(12048, 12127, 12047);
                         case AV_NPC_SEASONED:
-                            return Rand3(13327, 13324, 13325);
+                            return PickRandomValue(13327, 13324, 13325);
                         case AV_NPC_VETERAN:
-                            return Rand3(13336, 13333, 13335);
+                            return PickRandomValue(13336, 13333, 13335);
                         case AV_NPC_CHAMPION:
-                            return Rand3(13427, 13424, 13426);
+                            return PickRandomValue(13427, 13424, 13426);
                     }
                     return 0;
                 case BG_TEAM_HORDE:
                     switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
                     {
                         case AV_NPC_BASIC:
-                            return Rand2(12052, 12051);
+                            return PickRandomValue(12052, 12051);
                         case AV_NPC_SEASONED:
-                            return Rand2(13330, 13329);
+                            return PickRandomValue(13330, 13329);
                         case AV_NPC_VETERAN:
-                            return Rand2(13337, 13334);
+                            return PickRandomValue(13337, 13334);
                         case AV_NPC_CHAMPION:
-                            return Rand2(13428, 13425);
+                            return PickRandomValue(13428, 13425);
                     }
                     return 0;
                 default: // Trolls

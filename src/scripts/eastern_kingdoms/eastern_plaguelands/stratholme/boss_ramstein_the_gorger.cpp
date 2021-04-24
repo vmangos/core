@@ -24,10 +24,11 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "stratholme.h"
 
-#define SPELL_TRAMPLE       5568
-#define SPELL_KNOCKOUT      17307
-
-#define C_MINDLESS_UNDEAD   11030
+enum
+{
+    SPELL_TRAMPLE = 5568,
+    SPELL_KNOCKOUT = 17307,
+};
 
 struct boss_ramstein_the_gorgerAI : public ScriptedAI
 {
@@ -62,15 +63,6 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
 
     void JustDied(Unit* Killer) override
     {
-        for (uint8 i = 0; i < 25; ++i)
-        {
-            if (Creature* temp_skeleton =  m_creature->SummonCreature(C_MINDLESS_UNDEAD, 3969.35f + float(urand(1, 15)), -3391.87f + float(urand(1, 15)), 119.11f, 5.91f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-            {
-                temp_skeleton->GetMotionMaster()->MovePoint(0, 4033.34f, -3419.75f, 116.35f);
-                temp_skeleton->SetHomePosition(4033.34f, -3419.75f, 116.35f, 4.80f);
-            }
-        }
-
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAMSTEIN, DONE);
     }

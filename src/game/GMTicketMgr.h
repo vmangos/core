@@ -18,13 +18,16 @@
 #ifndef _TICKETMGR_H
 #define _TICKETMGR_H
 
+#include "SharedDefines.h"
+#include "ObjectGuid.h"
 #include <string>
 
-#include "ObjectMgr.h"
-#include "SharedDefines.h"
-
+class Player;
 class ChatHandler;
+class Field;
 class QueryResult;
+class WorldPacket;
+class WorldSession;
 
 // from blizzard lua
 enum GMTicketSystemStatus
@@ -94,20 +97,12 @@ public:
     bool IsAssignedNotTo(ObjectGuid guid) const { return IsAssigned() && !IsAssignedTo(guid); }
 
     uint32 GetId() const { return _id; }
-    Player* GetPlayer() const { return ObjectAccessor::FindPlayer(_playerGuid); }
+    Player* GetPlayer() const;
     std::string const& GetPlayerName() const { return _playerName; }
     std::string const& GetMessage() const { return _message; }
-    Player* GetAssignedPlayer() const { return ObjectAccessor::FindPlayer(_assignedTo); }
+    Player* GetAssignedPlayer() const;
     ObjectGuid GetAssignedToGUID() const { return _assignedTo; }
-    std::string GetAssignedToName() const
-    {
-        std::string name;
-        // save queries if ticket is not assigned
-        if (_assignedTo)
-            sObjectMgr.GetPlayerNameByGUID(_assignedTo, name);
-
-        return name;
-    }
+    std::string GetAssignedToName() const;
     uint64 GetLastModifiedTime() const { return _lastModifiedTime; }
     GMTicketEscalationStatus GetEscalatedStatus() const { return _escalatedStatus; }
 

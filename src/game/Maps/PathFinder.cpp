@@ -158,20 +158,21 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     float startPoint[VERTEX_SIZE] = {startPos.y, startPos.z, startPos.x};
     float endPoint[VERTEX_SIZE] = {endPos.y, endPos.z, endPos.x};
 
+    bool const canSwimToDestination = m_sourceUnit->CanSwim() &&
+                                      m_sourceUnit->GetTerrain()->IsSwimmable(startPos.x, startPos.y, startPos.z) &&
+                                      m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z);
+
     // First case : easy flying / swimming
-    if ((m_sourceUnit->CanSwim() && m_sourceUnit->GetTerrain()->IsSwimmable(endPos.x, endPos.y, endPos.z)) ||
-            m_sourceUnit->CanFly())
+    if (canSwimToDestination || m_sourceUnit->CanFly())
     {
         if (!m_sourceUnit->GetMap()->FindCollisionModel(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z))
         {
-            if (m_sourceUnit->CanSwim())
+            if (canSwimToDestination)
                 BuildUnderwaterPath();
             else
             {
                 BuildShortcut();
-                m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
-                if (m_sourceUnit->CanFly())
-                    m_type |= PATHFIND_FLYPATH;
+                m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH | PATHFIND_FLYPATH);
             }
             return;
         }
@@ -203,37 +204,29 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
     if (farFromPoly)
     {
         //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ BuildPolyPath :: farFromPoly distToStartPoly=%.3f distToEndPoly=%.3f\n", distToStartPoly, distToEndPoly);
-        bool buildShortcut = false;
-        Vector3 p = (distToStartPoly > 7.0f) ? startPos : endPos;
-        if (m_sourceUnit->GetTerrain()->IsInWater(p.x, p.y, p.z))
+        if (canSwimToDestination)
         {
             //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ BuildPolyPath :: underWater case\n");
-            if (m_sourceUnit->CanSwim())
-            {
-                BuildUnderwaterPath();
-                return;
-            }
+            BuildUnderwaterPath();
+            return;
         }
-        if (m_sourceUnit->CanFly())
-            buildShortcut = true;
 
-        if (buildShortcut)
+        if (m_sourceUnit->CanFly())
         {
             BuildShortcut();
             m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
             return;
         }
-        else
+        
+        float closestPoint[VERTEX_SIZE];
+        if (dtStatusSucceed(m_navMeshQuery->closestPointOnPolyBoundary(endPoly, endPoint, closestPoint)))
         {
-            float closestPoint[VERTEX_SIZE];
-            if (dtStatusSucceed(m_navMeshQuery->closestPointOnPolyBoundary(endPoly, endPoint, closestPoint)))
-            {
-                dtVcopy(endPoint, closestPoint);
-                setActualEndPosition(Vector3(endPoint[2], endPoint[0], endPoint[1]));
-            }
-
-            m_type = PATHFIND_INCOMPLETE;
+            dtVcopy(endPoint, closestPoint);
+            setActualEndPosition(Vector3(endPoint[2], endPoint[0], endPoint[1]));
         }
+
+        if (!(m_sourceUnit->CanSwim() && m_sourceUnit->GetTerrain()->IsSwimmable(m_actualEndPosition.x, m_actualEndPosition.y, m_actualEndPosition.z)))
+            m_type = PATHFIND_INCOMPLETE;
     }
 
     // *** poly path generating logic ***
@@ -353,7 +346,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
         // free and invalidate old path data
         clear();
 
-        //unsigned int const threadId = (uintptr_t) ACE_Based::Thread::currentId();
+        // std::thread::id const threadId = std::this_thread::get_id();
 
         //if (threadId != m_navMeshQuery->m_owningThread)
             //sLog.outError("CRASH: We are using a dtNavMeshQuery from thread %u which belongs to thread %u!", threadId, m_navMeshQuery->m_owningThread);
@@ -453,7 +446,8 @@ void PathInfo::BuildPointPath(float const* startPoint, float const* endPoint, fl
             BuildShortcut();
         }
 
-        m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH | PATHFIND_DEST_FORCED);
+        
+        m_type |= PATHFIND_DEST_FORCED;
         if (m_sourceUnit->CanFly())
             m_type |= PATHFIND_FLYPATH;
     }

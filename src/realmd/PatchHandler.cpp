@@ -35,6 +35,9 @@
 
 #include <ace/os_include/netinet/os_tcp.h>
 
+#include "Policies/SingletonImp.h"
+#include "Policies/ThreadingModel.h"
+
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
 #endif
@@ -145,18 +148,22 @@ PatchCache::PatchCache()
     LoadPatchesInfo();
 }
 
+
+using PatchCacheLock = MaNGOS::ClassLevelLockable<PatchCache, std::mutex>;
+INSTANTIATE_SINGLETON_2(PatchCache, PatchCacheLock);
+INSTANTIATE_CLASS_MUTEX(PatchCache, std::mutex);
+
 PatchCache* PatchCache::instance()
 {
-    return ACE_Singleton<PatchCache, ACE_Thread_Mutex>::instance();
+    return &MaNGOS::Singleton<PatchCache, PatchCacheLock>::Instance();
 }
 
 void PatchCache::LoadPatchMD5(const char* szFileName)
 {
     // Try to open the patch file
-    std::string path = "./patches/";
-    path += szFileName;
+    std::string path = szFileName;
     FILE* pPatch = fopen(path.c_str (), "rb");
-    DEBUG_LOG("Loading patch info from %s", path.c_str());
+    DEBUG_LOG("Loading patch info from file %s", path.c_str());
 
     if(!pPatch)
         return;
@@ -196,22 +203,31 @@ bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
 
 void PatchCache::LoadPatchesInfo()
 {
-    ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT("./patches/"));
+    std::string path = sConfig.GetStringDefault("PatchesDir", "./patches") + "/";
+    std::string fullpath;
+    ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT(path.c_str()));
+    DEBUG_LOG("Loading patch info from folder %s", path.c_str());
 
-    if(!dirp)
+    if (!dirp)
         return;
 
     ACE_DIRENT* dp;
 
-    while((dp = ACE_OS::readdir(dirp)) != nullptr)
+    while ((dp = ACE_OS::readdir(dirp)) != nullptr)
     {
         int l = strlen(dp->d_name);
         if (l < 8)
             continue;
 
-        if(!memcmp(&dp->d_name[l - 4], ".mpq", 4))
-            LoadPatchMD5(dp->d_name);
+        if (!memcmp(&dp->d_name[l - 4], ".mpq", 4))
+        {
+            fullpath = path + dp->d_name;
+            LoadPatchMD5(fullpath.c_str());
+        }
     }
 
+    // causes crash on windows
+#ifndef _WIN32
     ACE_OS::closedir(dirp);
+#endif
 }

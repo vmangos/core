@@ -17,32 +17,31 @@
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum KelthuzadData
 {
-    SAY_SUMMON_MINIONS                  = -1533105,         //start of phase 1
+    SAY_SUMMON_MINIONS                  = 12999,         // start of phase 1
 
-    EMOTE_PHASE2                        = -1533135,         // %s strikes!, cant find use of it in vanilla
-    SAY_AGGRO1                          = -1533094,         // pray for mercy
-    SAY_AGGRO2                          = -1533095,         // Scream your dying breath!
-    SAY_AGGRO3                          = -1533096,         // The end is upon you!
+    SAY_AGGRO1                          = 12995,         // pray for mercy
+    SAY_AGGRO2                          = 12996,         // Scream your dying breath!
+    SAY_AGGRO3                          = 12997,         // The end is upon you!
 
-    SAY_SLAY1                           = -1533097,
-    SAY_SLAY2                           = -1533098,
+    SAY_SLAY1                           = 13021,
+    EMOTE_SLAY                          = 13022,
 
-    SAY_DEATH                           = -1533099,
+    SAY_DEATH                           = 13019,
 
-    SAY_CHAIN1                          = -1533100,         // Your soul, is bound to me now!
-    SAY_CHAIN2                          = -1533101,         // there will be  no escape
-    SAY_FROST_BLAST                     = -1533102,         // I will freeze the blood in your veins!
+    SAY_CHAIN1                          = 13017,         // Your soul, is bound to me now!
+    SAY_CHAIN2                          = 13018,         // there will be  no escape
+    SAY_FROST_BLAST                     = 13020,         // I will freeze the blood in your veins!
 
-    SAY_REQUEST_AID                     = -1533103,         // Master! I require aid! 
-    SAY_ANSWER_REQUEST                  = -1533104,         // Very well... warriors of the frozen wastes, rise up! I command you to fight, kill, and die for your master. Let none survive...
+    SAY_REQUEST_AID                     = 12998,         // Master! I require aid! 
+    SAY_ANSWER_REQUEST                  = 12994,         // Very well... warriors of the frozen wastes, rise up! I command you to fight, kill, and die for your master. Let none survive...
 
-    SAY_SPECIAL1_MANA_DET               = -1533106,         // Your petty magics are no challenge to the might of the Scourge! 
-    SAY_SPECIAL3_MANA_DET               = -1533107,         // Enough! I grow tired of these distractions! 
-    SAY_SPECIAL2_DISPELL                = -1533108,         // Fools, you have spread your powers too thin. Be free, my minions!
-        
-    EMOTE_GUARDIAN                      = -1533134,         // at each guardian summon, cant see that it's used in vanilla
+    SAY_SPECIAL1_MANA_DET               = -1533106,         // (need find correct bct id!) Your petty magics are no challenge to the might of the Scourge! 
+    SAY_SPECIAL3_MANA_DET               = -1533107,         // (need find correct bct id!) Enough! I grow tired of these distractions! 
+    SAY_SPECIAL2_DISPELL                = -1533108,         // (need find correct bct id!) Fools, you have spread your powers too thin. Be free, my minions!
+
+    EMOTE_GUARDIAN                      = -1533134,         // (need find correct bct id!) at each guardian summon, cant see that it's used in vanilla
 
     SPELL_VISUAL_CHANNEL                = 29423,            // channeled throughout phase one
 
@@ -60,7 +59,7 @@ enum
     SPELL_FROST_BLAST                   = 27808,
     SPELL_BERSERK                       = 28498,
 
-    SPELL_DISPELL_SHACKLES              = 28471,            // not used, doing it "manually"
+    SPELL_DISPELL_SHACKLES              = 28471             // not used, doing it "manually"
 };
 
 enum AddSpells
@@ -76,7 +75,7 @@ enum AddSpells
     SPELL_DARK_BLAST_TRIG = 28457,
 
     // Abomination
-    SPELL_MORTAL_WOUND = 28467,
+    SPELL_MORTAL_WOUND = 28467
 };
 
 enum Events
@@ -100,7 +99,7 @@ enum Events
 
     // phase three
     EVENT_REQUEST_REPLY,
-    EVENT_SUMMON_GUARDIAN,
+    EVENT_SUMMON_GUARDIAN
 };
 
 // the shiny thing in center that despawns after pull
@@ -135,6 +134,7 @@ static constexpr float soulweaverPos[NUM_SOULWEAVER][2] =
     {3730.87f, -5035.93f},
     {3774.78f, -5067.68f},
 };
+
 // number of abominations, 3 in each alcove
 static constexpr uint32 NUM_ABOM = 21;
 // each abomination position
@@ -229,18 +229,23 @@ struct kt_p1AddAI : public ScriptedAI
         me->SetNoSearchAssistance(true);
         hasAggroed = false;
     }
+
     bool hasAggroed;
+
     void Reset() override = 0;
+
     void ActualAttack(Unit* target)
     {
         m_creature->AddThreat(target, 300.0f);
         ScriptedAI::AttackStart(target);
         hasAggroed = true;
     }
+
     void Aggro(Unit* pWho) override
     {
         // want to prevent the creature from aggroing unless we explicitly do it through base class
     }
+
     void AttackStart(Unit* pWho) override
     {
         if (hasAggroed)
@@ -251,6 +256,7 @@ struct kt_p1AddAI : public ScriptedAI
             ActualAttack(pWho);
         }
     }
+
     void MoveInLineOfSight(Unit* pWho) override
     {
         if (hasAggroed)
@@ -262,6 +268,7 @@ struct kt_p1AddAI : public ScriptedAI
             ScriptedAI::MoveInLineOfSight(pWho);
         }
     }
+
     void SpellHit(Unit* unit, SpellEntry const*) override 
     {
         if(!hasAggroed)
@@ -341,7 +348,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     {
         if (!killSayTimer)
         {
-            DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
+            DoScriptText(urand(0, 1) ? SAY_SLAY1 : EMOTE_SLAY, m_creature);
             killSayTimer = 5000;
         }
     }
@@ -355,7 +362,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         EvadeAllGuardians();
     }
 
-    void MoveInLineOfSight(Unit* /*pWho*/) override {}
+    void MoveInLineOfSight(Unit* /*pWho*/) override { }
 
     void AttackStart(Unit* who) override
     {
@@ -404,7 +411,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         }
         p1_adds.clear();
     }
-  
+
     void StartEncounter()
     {
         m_pInstance->ToggleKelThuzadWindows(false);
@@ -418,7 +425,6 @@ struct boss_kelthuzadAI : public ScriptedAI
         m_pInstance->SetData(TYPE_KELTHUZAD, IN_PROGRESS);
         DoScriptText(SAY_SUMMON_MINIONS, m_creature);
         DoCastAOE(SPELL_VISUAL_CHANNEL);
-
 
         events.ScheduleEvent(EVENT_DESPAWN_PORTAL,  Seconds(7));
         events.ScheduleEvent(EVENT_PUT_IN_COMBAT,   Seconds(20));
@@ -498,104 +504,104 @@ struct boss_kelthuzadAI : public ScriptedAI
     {
         if (m_pInstance->GetData(TYPE_KELTHUZAD) != IN_PROGRESS)
             return;
-        
+
         p1Timer -= diff;
 
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
             {
-            case EVENT_DESPAWN_PORTAL:
-                if (GameObject* pGO = m_pInstance->GetGameObject(pullPortalGuid))
-                {
-                    pullPortalGuid = 0;
-                    pGO->Delete();
-                }
-                break;
-            case EVENT_PUT_IN_COMBAT:
-                m_creature->SetInCombatState(false);
-                m_creature->SetInCombatWithZone();
-                hasPutInCombat = true;
-                break;
-            case EVENT_SKELETON:
-            {
-                if (numSkeletons < 120)
-                {
-                    if (SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN))
+                case EVENT_DESPAWN_PORTAL:
+                    if (GameObject* pGO = m_pInstance->GetGameObject(pullPortalGuid))
                     {
-                        uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
-                        events.Repeat(repeat_next);
-                        ++numSkeletons;
-                        //sLog.outBasic("[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
+                        pullPortalGuid = 0;
+                        pGO->Delete();
                     }
-                    else
-                        events.Repeat(100);
-                }
-                break;
-            }
-            case EVENT_ABOMINATION:
-            {
-                SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
-                ++numAboms;
-                //sLog.outBasic("[%d] Spawn ABOM #%d", p1Timer, numAboms);
-                break;
-            }
-            case EVENT_SOUL_WEAVER:
-            {
-                SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
-                ++numBanshees;
-                //sLog.outBasic("[%d] Spawn SOUL #%d", p1Timer, numBanshees);
-                break;
-            }
-            case EVENT_PHASE_TWO_INTRO:
-            {
-                // ToDo: slightly hard to figure the exact delay between this event (the yell and despawn of adds)
-                // until he engages. Most vanilla timers say 20 seconds, but he always engages earlier than that.
-                // Seen it at around 10 seconds in a german video (https://www.youtube.com/watch?v=QafmVXupeHc),
-                // and as late as ~17-18 sec in another one (https://www.youtube.com/watch?v=6RpqjIFbQYw https://www.youtube.com/watch?v=wSQtlvVebm0)
-                events.Reset();
-                events.ScheduleEvent(EVENT_PHASE_TWO_START, Seconds(15));
-                if (numBanshees < 14)
+                    break;
+                case EVENT_PUT_IN_COMBAT:
+                    m_creature->SetInCombatState(false);
+                    m_creature->SetInCombatWithZone();
+                    hasPutInCombat = true;
+                    break;
+                case EVENT_SKELETON:
                 {
-                    SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
-                    sLog.outBasic("(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
+                    if (numSkeletons < 120)
+                    {
+                        if (SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN))
+                        {
+                            uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
+                            events.Repeat(repeat_next);
+                            ++numSkeletons;
+                            //sLog.outBasic("[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
+                        }
+                        else
+                            events.Repeat(100);
+                    }
+                    break;
                 }
-                if (numAboms < 14)
+                case EVENT_ABOMINATION:
                 {
                     SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
-                    sLog.outBasic("(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
+                    ++numAboms;
+                    //sLog.outBasic("[%d] Spawn ABOM #%d", p1Timer, numAboms);
+                    break;
                 }
-                if (numSkeletons < 120)
+                case EVENT_SOUL_WEAVER:
                 {
-                    SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN);
-                    sLog.outBasic("(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
+                    SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
+                    ++numBanshees;
+                    //sLog.outBasic("[%d] Spawn SOUL #%d", p1Timer, numBanshees);
+                    break;
                 }
+                case EVENT_PHASE_TWO_INTRO:
+                {
+                    // ToDo: slightly hard to figure the exact delay between this event (the yell and despawn of adds)
+                    // until he engages. Most vanilla timers say 20 seconds, but he always engages earlier than that.
+                    // Seen it at around 10 seconds in a german video (https://www.youtube.com/watch?v=QafmVXupeHc),
+                    // and as late as ~17-18 sec in another one (https://www.youtube.com/watch?v=6RpqjIFbQYw https://www.youtube.com/watch?v=wSQtlvVebm0)
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_PHASE_TWO_START, Seconds(15));
+                    if (numBanshees < 14)
+                    {
+                        SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
+                        sLog.outBasic("(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
+                    }
+                    if (numAboms < 14)
+                    {
+                        SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
+                        sLog.outBasic("(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
+                    }
+                    if (numSkeletons < 120)
+                    {
+                        SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN);
+                        sLog.outBasic("(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
+                    }
 
-                DoScriptText(irand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
-                m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
-                DespawnAllIntroCreatures();
-                break;
-            }
-            case EVENT_PHASE_TWO_START:
-                // engage!
-                events.Reset();
-                events.ScheduleEvent(EVENT_FROSTBOLT,        Seconds(10));
-                events.ScheduleEvent(EVENT_SHADOW_FISSURE,   Seconds(14));
-                events.ScheduleEvent(EVENT_DETONATE_MANA,    Seconds(20));
-                events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, Seconds(30));
-                events.ScheduleEvent(EVENT_FROST_BLAST,      Seconds(50));
-                events.ScheduleEvent(EVENT_CHAINS,           Seconds(60));
-                m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                //m_creature->CastStop();
-                m_creature->InterruptNonMeleeSpells(true);
-                
-                DoResetThreat();
-                m_creature->SetInCombatWithZone();
-                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
-                    AttackStart(pUnit);
+                    DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
+                    m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
+                    DespawnAllIntroCreatures();
+                    break;
+                }
+                case EVENT_PHASE_TWO_START:
+                    // engage!
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_FROSTBOLT,        Seconds(10));
+                    events.ScheduleEvent(EVENT_SHADOW_FISSURE,   Seconds(14));
+                    events.ScheduleEvent(EVENT_DETONATE_MANA,    Seconds(20));
+                    events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, Seconds(30));
+                    events.ScheduleEvent(EVENT_FROST_BLAST,      Seconds(50));
+                    events.ScheduleEvent(EVENT_CHAINS,           Seconds(60));
+                    m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    //m_creature->CastStop();
+                    m_creature->InterruptNonMeleeSpells(true);
 
-                break;
+                    DoResetThreat();
+                    m_creature->SetInCombatWithZone();
+                    if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+                        AttackStart(pUnit);
+
+                    break;
             }
         }
     }
@@ -607,6 +613,7 @@ struct boss_kelthuzadAI : public ScriptedAI
             events.Repeat(Seconds(2));
             return;
         }
+
         DoResetThreat();
         DoScriptText(urand(0, 1) ? SAY_CHAIN1 : SAY_CHAIN2, m_creature);
         // Wowwiki the useless has this on 60sec cd,
@@ -614,6 +621,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         // Setting this to 60-75 as a slight buff
         events.Repeat(Seconds(urand(60, 75)));
     }
+
     void UpdateP2P3(uint32 diff)
     {
         timeSinceLastFrostBlast += diff;
@@ -636,140 +644,142 @@ struct boss_kelthuzadAI : public ScriptedAI
         {
             switch (eventId)
             {
-            case EVENT_REQUEST_REPLY:
-                m_pInstance->DoOrSimulateScriptTextForThisInstance(SAY_ANSWER_REQUEST, NPC_LICH_KING);
-                break;
-            case EVENT_SUMMON_GUARDIAN:
-            {
-                // Can be seen in videos they spawn with some delay between eachother.
-                // Not found a clear pattern, but a good guess is one spawn every 5 sec until all 5 has spawned.
-                if (numSummonedGuardians < 5)
+                case EVENT_REQUEST_REPLY:
+                    m_pInstance->DoOrSimulateScriptTextForThisInstance(SAY_ANSWER_REQUEST, NPC_LICH_KING);
+                    break;
+                case EVENT_SUMMON_GUARDIAN:
                 {
-                    // we can re-use the soulweave positions for where to spawn the guardians
-                    // todo: is it completely random, or do we avoid re-using the same alcove twize?
-                    int portalIndex = urand(0, NUM_WINDOW_PORTALS - 1);
-                    float const* pos = windowPortals[portalIndex];
-
-                    if (Creature* pCreature = m_creature->SummonCreature(NPC_GUARDIAN, pos[0], pos[1], alcoveZ, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
+                    // Can be seen in videos they spawn with some delay between eachother.
+                    // Not found a clear pattern, but a good guess is one spawn every 5 sec until all 5 has spawned.
+                    if (numSummonedGuardians < 5)
                     {
-                        guardians.push_back(std::make_pair(pCreature->GetObjectGuid(), portalIndex));
-                        ++numSummonedGuardians;
-                        events.Repeat(Seconds(7));
-                        pCreature->SetInCombatWithZone();
-                        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                        // we can re-use the soulweave positions for where to spawn the guardians
+                        // todo: is it completely random, or do we avoid re-using the same alcove twize?
+                        int portalIndex = urand(0, NUM_WINDOW_PORTALS - 1);
+                        float const* pos = windowPortals[portalIndex];
+
+                        if (Creature* pCreature = m_creature->SummonCreature(NPC_GUARDIAN, pos[0], pos[1], alcoveZ, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
                         {
-                            pCreature->AI()->AttackStart(pTarget);
+                            guardians.push_back(std::make_pair(pCreature->GetObjectGuid(), portalIndex));
+                            ++numSummonedGuardians;
+                            events.Repeat(Seconds(7));
+                            pCreature->SetInCombatWithZone();
+                            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                            {
+                                pCreature->AI()->AttackStart(pTarget);
+                            }
+                        }
+                        else
+                            events.Repeat(100);
+                    }
+                    break;
+                }
+                case EVENT_FROSTBOLT_VOLLEY:
+                {
+                    if (timeSinceLastFrostBlast < 5000)
+                    {
+                        events.Repeat(5000 - timeSinceLastFrostBlast);
+                        break;
+                    }
+                    if (DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
+                    {
+                        events.Repeat(Seconds(urand(15, 17)));
+                        timeSinceLastAEFrostBolt = 0;
+                    }
+                    else
+                        events.Repeat(Seconds(1));
+                    break;
+                }
+                case EVENT_FROST_BLAST:
+                {
+                    if (timeSinceLastShadowFissure < 4000)
+                    {
+                        events.Repeat(4000 - timeSinceLastShadowFissure);
+                        break;
+                    }
+                    else if (timeSinceLastAEFrostBolt < 5000)
+                    {
+                        events.Repeat(5000 - timeSinceLastAEFrostBolt);
+                        break;
+                    }
+                    if (m_creature->IsNonMeleeSpellCasted())
+                    {
+                        events.Repeat(Seconds(1));
+                        break;
+                    }
+                    if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                    {
+                        if (DoCastSpellIfCan(pUnit, SPELL_FROST_BLAST) == CAST_OK)
+                        {
+                            events.Repeat(Seconds(urand(30, 60)));
+                            timeSinceLastFrostBlast = 0;
+                            if (urand(0, 1))
+                                DoScriptText(SAY_FROST_BLAST, m_creature);
+                            break;
+                        }
+                        else
+                            events.Repeat(Seconds(1));
+                    }
+                    else
+                        events.Repeat(Seconds(1));
+                    break;
+                }
+                case EVENT_FROSTBOLT:
+                {
+                    events.Repeat(Seconds(urand(5, 7))); // todo: this is guesswork
+                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_BOLT);
+                    break;
+                }
+                case EVENT_SHADOW_FISSURE:
+                {
+                    if (timeSinceLastFrostBlast < 4000)
+                    {
+                        events.Repeat(4000 - timeSinceLastFrostBlast);
+                        break;
+                    }
+                    if (m_creature->IsNonMeleeSpellCasted())
+                    {
+                        events.Repeat(Seconds(2));
+                        break;
+                    }
+                    if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                    {
+                        if (DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
+                        {
+                            events.Repeat(Seconds(urand(10, 20)));
+                            timeSinceLastShadowFissure = 0;
+                        }
+                        else
+                            events.Repeat(Seconds(1));
+                    }
+                    else
+                        events.Repeat(Seconds(1));
+                    break;
+                }
+                case EVENT_DETONATE_MANA:
+                {
+                    if (m_creature->IsNonMeleeSpellCasted())
+                    {
+                        events.Repeat(Seconds(2));
+                        break;
+                    }
+
+                    events.Repeat(Seconds(urand(20,25)));
+
+                    if(Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_MANA_DETONATION, SELECT_FLAG_POWER_MANA|SELECT_FLAG_PLAYER))
+                    {
+                        if (DoCastSpellIfCan(pUnit, SPELL_MANA_DETONATION) == CAST_OK)
+                        {
+                            if (urand(0, 1))
+                                DoScriptText(SAY_SPECIAL1_MANA_DET, m_creature);
+                            break;
                         }
                     }
-                    else
-                        events.Repeat(100);
-                }
-                break;
-            }
-            case EVENT_FROSTBOLT_VOLLEY:
-            {
-                if (timeSinceLastFrostBlast < 5000)
-                {
-                    events.Repeat(5000 - timeSinceLastFrostBlast);
                     break;
                 }
-                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
-                {
-                    events.Repeat(Seconds(urand(15, 17)));
-                    timeSinceLastAEFrostBolt = 0;
-                }
-                else
-                    events.Repeat(Seconds(1));
-                break;
-            }
-            case EVENT_FROST_BLAST:
-            {
-                if (timeSinceLastShadowFissure < 4000)
-                {
-                    events.Repeat(4000 - timeSinceLastShadowFissure);
+                case EVENT_CHAINS:
+                    DoChains();
                     break;
-                }
-                else if (timeSinceLastAEFrostBolt < 5000) 
-                {
-                    events.Repeat(5000 - timeSinceLastAEFrostBolt);
-                    break;
-                }
-                if (m_creature->IsNonMeleeSpellCasted())
-                {
-                    events.Repeat(Seconds(1));
-                    break;
-                }
-                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                {
-                    if (DoCastSpellIfCan(pUnit, SPELL_FROST_BLAST) == CAST_OK)
-                    {
-                        events.Repeat(Seconds(urand(30, 60)));
-                        timeSinceLastFrostBlast = 0;
-                        if (urand(0, 1))
-                            DoScriptText(SAY_FROST_BLAST, m_creature);
-                        break;
-                    }
-                    else
-                        events.Repeat(Seconds(1));
-                }
-                else
-                    events.Repeat(Seconds(1));
-                break;
-            }
-            case EVENT_FROSTBOLT:
-            {
-                events.Repeat(Seconds(urand(5, 7))); // todo: this is guesswork
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_BOLT);
-                break;
-            }
-            case EVENT_SHADOW_FISSURE:
-            {
-                if (timeSinceLastFrostBlast < 4000)
-                {
-                    events.Repeat(4000 - timeSinceLastFrostBlast);
-                    break;
-                }
-                if (m_creature->IsNonMeleeSpellCasted())
-                {
-                    events.Repeat(Seconds(2));
-                    break;
-                }
-                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                {
-                    if (DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
-                    {
-                        events.Repeat(Seconds(urand(10, 20)));
-                        timeSinceLastShadowFissure = 0;
-                    }
-                    else
-                        events.Repeat(Seconds(1));
-                }
-                else
-                    events.Repeat(Seconds(1));
-                break;
-            }
-            case EVENT_DETONATE_MANA:
-            {
-                if (m_creature->IsNonMeleeSpellCasted())
-                {
-                    events.Repeat(Seconds(2));
-                    break;
-                }
-                events.Repeat(Seconds(urand(20,25)));
-                if(Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_MANA_DETONATION, SELECT_FLAG_POWER_MANA|SELECT_FLAG_PLAYER))
-                {
-                    if (DoCastSpellIfCan(pUnit, SPELL_MANA_DETONATION) == CAST_OK)
-                    {
-                        if (urand(0, 1))
-                            DoScriptText(SAY_SPECIAL1_MANA_DET, m_creature);
-                        break;
-                    }
-                }
-                break;
-            }
-            case EVENT_CHAINS:
-                DoChains();
-                break;
             }
         }
 
@@ -787,10 +797,10 @@ struct boss_kelthuzadAI : public ScriptedAI
             if (!m_creature->SelectHostileTarget() || (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && !m_creature->GetVictim()))
                 return;
         }
-        
+
         if (m_pInstance->GetData(TYPE_KELTHUZAD) != IN_PROGRESS)
             return;
-        
+
         killSayTimer -= std::min(killSayTimer, diff);
 
         if (enrageTimer < diff)
@@ -807,13 +817,11 @@ struct boss_kelthuzadAI : public ScriptedAI
             UpdateP1(diff);
         else
         {
-
             if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
                 return;
             UpdateP2P3(diff);
         }
     }
-
 };
 
 struct mob_abomAI : public kt_p1AddAI
@@ -822,11 +830,14 @@ struct mob_abomAI : public kt_p1AddAI
     {
         Reset();
     }
+
     uint32 mortalWoundTimer;
+
     void Reset() override
     {
         mortalWoundTimer = 7500;
     }
+
     void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -834,7 +845,7 @@ struct mob_abomAI : public kt_p1AddAI
 
         if (mortalWoundTimer < diff)
         {
-            if(m_creature->GetVictim() && m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+            if(m_creature->GetVictim() && m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
                 if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
                     mortalWoundTimer = 7500;
         }
@@ -844,19 +855,21 @@ struct mob_abomAI : public kt_p1AddAI
         DoMeleeAttackIfReady();
     }
 };
+
 struct mob_soldierAI : public kt_p1AddAI
 {
     mob_soldierAI(Creature* pCreature) : kt_p1AddAI(pCreature)
     {
         Reset();
     }
-    void Reset() override
-    {
-    }
+
+    void Reset() override { }
+
     void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
         if (!m_creature->HasAura(SPELL_DARK_BLAST_AUR))
             m_creature->CastSpell(m_creature, SPELL_DARK_BLAST_AUR, true);
 
@@ -875,23 +888,27 @@ struct mob_soldierAI : public kt_p1AddAI
                 ScriptedAI::AttackStart(pNearest);
             }
         }
+
         DoMeleeAttackIfReady();
     }
 };
+
 struct mob_soulweaverAI : public kt_p1AddAI
 {
-    mob_soulweaverAI(Creature* pCreature) : kt_p1AddAI(pCreature)
-    {
-    }
+    mob_soulweaverAI(Creature* pCreature) : kt_p1AddAI(pCreature) { }
+
     bool hasHitSomeone;
+
     void Reset() override
     {
         hasHitSomeone = false;
     }
+
     void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
         if (!m_creature->HasAura(SPELL_WAIL_SOULS_AUR))
             m_creature->CastSpell(m_creature, SPELL_WAIL_SOULS_AUR, true);
 
@@ -903,9 +920,11 @@ struct mob_soulweaverAI : public kt_p1AddAI
                 ScriptedAI::AttackStart(pNearest);
             }
         }
+
         DoMeleeAttackIfReady();
     }
 };
+
 struct mob_guardian_icecrownAI : public ScriptedAI
 {
     mob_guardian_icecrownAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -913,20 +932,23 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
     }
+
     instance_naxxramas* m_pInstance;
     uint32 bloodTapTimer;
+
     void Reset() override
     {
         // Not sure if this was 18 or 15sec cd in vanilla, was 15 in wotlk. But making it 15 as we already
         // overpower last phase anyway
         bloodTapTimer = 15000;
     }
+
     void JustReachedHome() override
     {
         m_creature->DeleteLater();
         ///m_creature->ForcedDespawn(1);
     }
-    
+
     void DispellShackle(Creature* pC)
     {
         if (pC->HasAura(9484))
@@ -943,33 +965,33 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         // If more than 3, we release everyone.
         switch (spell->Id)
         {
-        case 10955:
-        case 9485:
-        case 9484:
-        {
-            std::list<Creature*> guardians;
-            GetCreatureListWithEntryInGrid(guardians, m_creature, NPC_GUARDIAN, 130.0f);
-            uint32 numShackled = 0;
-            for (Creature* pC : guardians)
+            case 10955:
+            case 9485:
+            case 9484:
             {
-                if (pC->HasAura(9484) || pC->HasAura(9485) || pC->HasAura(10955))
-                    ++numShackled;
-            }
-                
-            if (numShackled > 3)
-            {
-                if (m_pInstance)
-                {
-                    if (Creature* pKT = m_pInstance->GetSingleCreatureFromStorage(NPC_KELTHUZAD))
-                        DoScriptText(SAY_SPECIAL2_DISPELL, pKT);
-                }
+                std::list<Creature*> guardians;
+                GetCreatureListWithEntryInGrid(guardians, m_creature, NPC_GUARDIAN, 130.0f);
+                uint32 numShackled = 0;
                 for (Creature* pC : guardians)
                 {
-                    DispellShackle(pC);
+                    if (pC->HasAura(9484) || pC->HasAura(9485) || pC->HasAura(10955))
+                        ++numShackled;
                 }
+
+                if (numShackled > 3)
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature* pKT = m_pInstance->GetSingleCreatureFromStorage(NPC_KELTHUZAD))
+                            DoScriptText(SAY_SPECIAL2_DISPELL, pKT);
+                    }
+                    for (Creature* pC : guardians)
+                    {
+                        DispellShackle(pC);
+                    }
+                }
+                break;
             }
-            break;
-        }
         }
     }
 
@@ -995,28 +1017,25 @@ struct mob_shadow_fissureAI : public ScriptedAI
     {
         Reset();
     }
+
     uint32 timer;
     bool haveCasted;
+
     void Reset() override
     {
         timer = 3000;
         haveCasted = false;
     }
 
-    void Aggro(Unit*) override
-    {
-    }
-    void AttackStart(Unit*) override
-    {
-    }
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-    }
+    void Aggro(Unit*) override { }
+    void AttackStart(Unit*) override { }
+    void MoveInLineOfSight(Unit* pWho) override { }
 
     void UpdateAI(uint32 const diff) override
     {
         if (haveCasted)
             return;
+
         if (timer < diff)
         {
             m_creature->CastSpell(m_creature, SPELL_VOID_BLAST, true);

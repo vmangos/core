@@ -24,20 +24,27 @@
 
 enum OutdoorPvPSISpells
 {
-    SI_SILITHYST_FLAG_GO_SPELL       = 29518,
-    SI_SILITHYST_FLAG                = 29519,
-    SI_TRACES_OF_SILITHYST           = 29534,
-    SI_CENARION_FAVOR                = 30754
+    SI_SILITHYST_FLAG_GO_SPELL          = 29518,
+    SI_SILITHYST_FLAG                   = 29519,
+    SI_TRACES_OF_SILITHYST              = 29534,
+    SI_CENARION_FAVOR                   = 30754,
+    SILLITHUS_FLAG_HORDE_SPEED_LIMIT    = 29895,
+    SILLITHUS_FLAG_ALLIANCE_SPEED_LIMIT = 29894,
+    SILLITHUS_FLAG_CAPTURE_TEST         = 29530,
+    SILLITHUS_FLAG_DROP                 = 29533,
+    HONOR_POINTS_199                    = 31420,
+    SILITHYST_CAP_REWARD                = 31247
 };
 
 uint32 const SI_MAX_RESOURCES_DEFAULT = 200;
 uint8 const OutdoorPvPSIBuffZonesNum = 3;
 uint32 const OutdoorPvPSIBuffZones[OutdoorPvPSIBuffZonesNum] = { 1377, 3428, 3429 };
-uint32 const SI_AREATRIGGER_H        = 4168;
-uint32 const SI_AREATRIGGER_A        = 4162;
-uint32 const SI_TURNIN_QUEST_CM_A    = 17090;
-uint32 const SI_TURNIN_QUEST_CM_H    = 18199;
-uint32 const SI_SILITHYST_MOUND      = 181597;
+uint32 const SI_AREATRIGGER_H       = 4168;
+uint32 const SI_AREATRIGGER_A       = 4162;
+uint32 const SI_TURNIN_QUEST_CM_A   = 17090;
+uint32 const SI_TURNIN_QUEST_CM_H   = 18199;
+uint32 const SI_SILITHYST_MOUND     = 181597;
+uint32 const SI_SILITHYST_GEYSER    = 181598;
 
 enum SI_WorldStates
 {
@@ -66,8 +73,6 @@ class OutdoorPvPSI : public OutdoorPvP
         bool HandleAreaTrigger(Player* plr, uint32 trigger);
 
         bool HandleDropFlag(Player* plr, uint32 spellId);
-
-        bool HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go);
 
         void UpdateWorldState();
 

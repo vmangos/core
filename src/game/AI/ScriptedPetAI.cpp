@@ -31,7 +31,7 @@ void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->CanFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
         return;
 
-    if (m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho)) && m_creature->IsWithinLOSInMap(pWho))
+    if (m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho), true, false) && m_creature->IsWithinLOSInMap(pWho))
     {
         //pWho->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         AttackStart(pWho);
@@ -98,7 +98,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
 
     if (Unit* const pTarget = m_creature->GetVictim())                            // in combat
     {
-        if (!pTarget->IsTargetableForAttack())
+        if (!pTarget->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()))
         {
             // target no longer valid for pet, so either attack stops or new target are selected
             // doesn't normally reach this, because of how petAi is designed in Mangos. CombatStop
@@ -137,7 +137,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
                     // Main target is CC-ed, so pick another attacker.
                     for (const auto pAttacker : pOwner->GetAttackers())
                     {
-                        if (pAttacker->IsInMap(m_creature) && pAttacker->IsTargetableForAttack() && !pAttacker->HasAuraPetShouldAvoidBreaking())
+                        if (pAttacker->IsInMap(m_creature) && pAttacker->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()) && !pAttacker->HasAuraPetShouldAvoidBreaking())
                         { 
                             AttackStart(pAttacker);
                             return;

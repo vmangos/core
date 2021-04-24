@@ -83,7 +83,7 @@ enum GossipOptionIcon
 
 inline bool IsValidGossipOptionIconForBuild(uint8 icon)
 {
-#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_1
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_2
     switch (icon)
     {
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_7_1
@@ -93,9 +93,7 @@ inline bool IsValidGossipOptionIconForBuild(uint8 icon)
     case GOSSIP_ICON_DOT:
         return false;
     }
-#endif
 
-#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_1
     if (icon > GOSSIP_ICON_DOT_13)
         return false;
 #endif

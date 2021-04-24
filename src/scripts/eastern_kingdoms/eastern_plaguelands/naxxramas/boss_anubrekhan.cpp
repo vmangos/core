@@ -32,32 +32,28 @@ EndScriptData */
 /*
 Armor check:
 https://www.youtube.com/watch?v=rmowgw2SZCA&t=60s
-
 */
-enum
+
+enum AnubrekhanData
 {
-    SAY_GREET                   = -1533000,
-    SAY_AGGRO1                  = -1533001,
-    SAY_AGGRO2                  = -1533002,
-    SAY_AGGRO3                  = -1533003,
-    SAY_TAUNT1                  = -1533004,
-    SAY_TAUNT2                  = -1533005,
-    SAY_TAUNT3                  = -1533006,
-    SAY_TAUNT4                  = -1533007,
-    SAY_SLAY                    = -1533008,
+    SAY_GREET                   = 13004,
+    SAY_AGGRO1                  = 13000,
+    SAY_AGGRO2                  = 13002,
+    SAY_AGGRO3                  = 13003,
+    SAY_TAUNT1                  = 13006,
+    SAY_TAUNT2                  = 13007,
+    SAY_TAUNT3                  = 13008,
+    SAY_TAUNT4                  = 13009,
+    SAY_SLAY                    = 13005,
 
-    EMOTE_GENERIC_ENRAGE        = -1000003, // used by crypt guards
-    //EMOTE_CORPSE_SCARABS        = -1533155, // Does not look like it's used in vanilla
-    //EMOTE_INSECT_SWARM          = -1533154, // Does not look like it's used in vanilla
-    //EMOTE_CRYPTGUARD_JOINS      = -1533153, // Does not look like it's used in vanilla
-
+    EMOTE_GENERIC_ENRAGE        = 7798, // used by crypt guards
 
     SPELL_IMPALE                = 28783,        //May be wrong spell id. Causes more dmg than I expect
     SPELL_LOCUSTSWARM           = 28785,        //This is a self buff that triggers the dmg debuff
 
     SPELL_SELF_SPAWN_5          = 29105,        // These spells should spawn corpse scarabs, but only show the explosion anim.
     SPELL_SELF_SPAWN_10         = 28864,        // If we fix them to spawn scarbs, code must be changed to not manually spawn them too.
-    
+
     SPELL_CRYPTGUARD_ENRAGE     = 28747,        // 50% attackspeed increase and 100 extra dmg on attack. PROBABLY WRONG SPELL!!!
     SPELL_CRYPTGUARD_CLEAVE     = 26350,        // could be wrong spell. 
     SPELL_CRYPTGUARD_WEB        = 28991,
@@ -65,7 +61,6 @@ enum
 
     MOB_CRYPT_GUARD             = 16573,
     MOB_CORPSE_SCARAB           = 16698
-    
 };
 
 static float const CGs[3][4] = 
@@ -124,8 +119,8 @@ Watch his stopatch in center of screen.
 Best guess so far is random between 12 and 18 seconds based on this video.
 Timer does not seem to reset after locust swarm, but rather continue from whatever it was when locust started.
 */
-static uint32 IMPALE_CD() { return urand(12000, 18000); }
 
+static uint32 IMPALE_CD() { return urand(12000, 18000); }
 
 /*
 Locust Swarm - Every 70-120 seconds, Anub'rekhan casts a spell that causes AoE damage in a wide radius (30 yards) around him
@@ -170,13 +165,13 @@ Watch his stopatch in center of screen.
 Based on those values, 90-110 or something like that does not seem far fetched as a cooldown.
 Cast time is 3 seconds. Duration is 20 seconds.
 */
-static uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
+static uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
 struct boss_anubrekhanAI : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
-    
+
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
     uint32 m_uiCorpseExplosionTimer;
@@ -186,7 +181,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     std::vector<ObjectGuid> deadCryptGuards;
     std::vector<ObjectGuid> summonedCryptGuards;
-    
+
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
@@ -207,8 +202,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             // While the crypt guard will be despawned manually after CRYPTGUARD_DESPAWN time, when it explodes,
             // we make it a TEMPSUMMON_CORPSE_TIMED_DESPAWN with a slightly longer duration, because if anub is killed
             // before the last crypt guard dies, anubs updateAI will not be able to manually explode and despawn it.
-            if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], 
-                TEMPSUMMON_MANUAL_DESPAWN))
+            if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], TEMPSUMMON_MANUAL_DESPAWN))
             {
                 summonedCryptGuards.push_back(c->GetObjectGuid());
             }
@@ -250,7 +244,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANUB_REKHAN, FAIL);
-        
+
         // despawn any summoned cryptguards that stil exist
         for (auto it = summonedCryptGuards.begin(); it != summonedCryptGuards.end();)
         {
@@ -284,7 +278,6 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         // Scarabs are summoned by instance script when a player dies.
         // See instance_naxxramas::OnPlayerDeath(Player*)
-        
         if (pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
 
@@ -297,7 +290,6 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         if (urand(0, 4))
             return;
-
     }
 
     void Aggro(Unit* pWho) override
@@ -317,7 +309,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             }
         }
 
-        DoScriptText(SAY_AGGRO3 + urand(0, 2), m_creature);
+        DoScriptText(PickRandomValue(SAY_AGGRO1, SAY_AGGRO2, SAY_AGGRO3), m_creature);
     }
 
     void JustDied(Unit* pKiller) override
@@ -338,17 +330,17 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         ScriptedAI::MoveInLineOfSight(pWho);
     }
-    
+
     bool ExplodeOneDeadCryptGuard()
     {
         if (deadCryptGuards.empty())
             return false;
-         
+
         int idx = urand(0, deadCryptGuards.size() - 1);
         ObjectGuid deadCryptGuard = deadCryptGuards[idx];
         auto it = deadCryptGuards.begin() + idx;
         deadCryptGuards.erase(it);
-     
+
         if (Creature* cg = m_pInstance->GetCreature(deadCryptGuard))
         {
             // The cryptguard casts SPELL_SELF_SPAWN_10 on itself. The spell is bugged and
@@ -361,8 +353,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                 // The summoned corpse scarab will attack a random target, and add 5k threat to it.
                 // The threat amount is a guess, but it can be seen in videos, and it's mentioned on wowhead,
                 // that the scarab will "stick" to it's chosen target for quite a while, if not until dead.
-                if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, cg->GetPositionX(), cg->GetPositionY(), cg->GetPositionZ(), 0,
-                    TEMPSUMMON_CORPSE_DESPAWN))
+                if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, cg->GetPositionX(), cg->GetPositionY(), cg->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN))
                 {
                     cs->SetInCombatWithZone();
                     if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -372,7 +363,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     }
                 }
             }
-                    
+
             // Despawning the Crypt guard
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
                 tmpSumm->UnSummon(250);
@@ -386,7 +377,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        
+
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
 
@@ -418,7 +409,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     m_creature->SetTargetGuid(target->GetObjectGuid());
                     m_uiRestoreTargetTimer = 1000;
                     m_uiImpaleTimer = IMPALE_CD();
-                    
+
                     if (Creature* pC = m_creature->SummonCreature(533003, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(target),
                         TEMPSUMMON_TIMED_DESPAWN, 4000))
                     {
@@ -471,7 +462,6 @@ struct boss_anubrekhanAI : public ScriptedAI
         else
             m_uiLocustSwarmTimer -= uiDiff;
 
-
         DoMeleeAttackIfReady();
     }
 };
@@ -502,7 +492,6 @@ struct mob_cryptguardsAI : public ScriptedAI
     void Aggro(Unit* pWho) override
     {
         // Make sure anub is pulled too. Anub will take care of pulling the other crypt-guard
-        
         if (Creature* anub = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
             anub->AI()->AttackStart(pWho);
@@ -513,40 +502,51 @@ struct mob_cryptguardsAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        
+
         // Crypt guards enrage at 50%
-        if (!isEnraged && m_creature->GetHealthPercent() <= 50.0f) {
-            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == CanCastResult::CAST_OK) {
+        if (!isEnraged && m_creature->GetHealthPercent() <= 50.0f)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == CanCastResult::CAST_OK)
+            {
                 DoScriptText(EMOTE_GENERIC_ENRAGE, m_creature);
                 isEnraged = true;
             }
         }
 
-        if (webTimer < diff) {
-            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_WEB) == CanCastResult::CAST_OK) {
+        if (webTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_WEB) == CanCastResult::CAST_OK)
+            {
                 DoResetThreat();
                 webTimer = CRYPTGUARD_WEB_CD;
             }
         }
-        else {
+        else
+        {
             webTimer -= diff;
         }
 
-        if (cleaveTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK) {
+        if (cleaveTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK)
+            {
                 cleaveTimer = CRYPTGUARD_CLEAVE_CD;
             }
         }
-        else {
+        else
+        {
             cleaveTimer -= diff;
         }
 
-        if (acidSpitTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK) {
+        if (acidSpitTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK)
+            {
                 acidSpitTimer = CRYPTGUARD_ACID_CD;
             }
         }
-        else {
+        else
+        {
             acidSpitTimer -= diff;
         }
 
@@ -559,9 +559,7 @@ struct anub_doorAI : public GameObjectAI
     bool haveDoneIntro;
     instance_naxxramas* m_pInstance;
 
-    anub_doorAI(GameObject* pGo) :
-        GameObjectAI(pGo),
-        haveDoneIntro(false)
+    anub_doorAI(GameObject* pGo) : GameObjectAI(pGo), haveDoneIntro(false)
     {
         m_pInstance = (instance_naxxramas*)me->GetInstanceData();
         if (!m_pInstance)
@@ -572,7 +570,7 @@ struct anub_doorAI : public GameObjectAI
     {
         if (haveDoneIntro)
             return false;
-        
+
         haveDoneIntro = true;
 
         if (!m_pInstance)
@@ -586,31 +584,12 @@ struct anub_doorAI : public GameObjectAI
         // on door open, while the rest are said at random points during the fight?
         if (Creature* anubRekhan = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
-            if (anubRekhan->IsAlive()) {
-                switch (urand(0, 4))
-                {
-                case 0:
-                    DoScriptText(SAY_GREET, anubRekhan);
-                    break;
-                case 1:
-                    DoScriptText(SAY_TAUNT1, anubRekhan);
-                    break;
-                case 2:
-                    DoScriptText(SAY_TAUNT2, anubRekhan);
-                    break;
-                case 3:
-                    DoScriptText(SAY_TAUNT3, anubRekhan);
-                    break;
-                case 4:
-                    DoScriptText(SAY_TAUNT4, anubRekhan);
-                    break;
-                }
-            }
+            if (anubRekhan->IsAlive())
+                DoScriptText(PickRandomValue(SAY_GREET, SAY_TAUNT1, SAY_TAUNT2, SAY_TAUNT3, SAY_TAUNT4), anubRekhan);
         }
         me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         return false;
     }
-
 };
 
 CreatureAI* GetAI_boss_anubrekhan(Creature* pCreature)

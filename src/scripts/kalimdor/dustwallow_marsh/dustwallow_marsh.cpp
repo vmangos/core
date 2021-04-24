@@ -86,8 +86,8 @@ struct point3o { float x, y, z, o; };
 // sentry guards spawn points(taken from DB)
 static const point3o guardsSpawn[] =
 {
-    { -2890.5f,	-3344.49f, 32.3878f, 2.15425f },
-    { -2889.18f, -3337.46f,	32.5128f, 3.67612f }
+    { -2890.5f, -3344.49f, 32.3878f, 2.15425f },
+    { -2889.18f, -3337.46f, 32.5128f, 3.67612f }
 };
 
 // ally spawn struct
@@ -194,7 +194,7 @@ struct npc_private_hendelAI : public ScriptedAI
         // case: When NPC respawns after previous event and looses quest giver flag for some players, so they need to relog to talk to him again.
         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         // reset unattackable flag from previous event
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void AttackedBy(Unit* pAttacker) override
@@ -255,7 +255,7 @@ struct npc_private_hendelAI : public ScriptedAI
                         m_allies[i]->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
                     // rare case: horde players attack NPC during event so make them unattackable for them
-                    m_allies[i]->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+                    m_allies[i]->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
                     // visual teleport spell
                     m_allies[i]->CastSpell(m_allies[i], TELEPORT_VISUAL, false);
                     // move allies to the destination points
@@ -849,7 +849,7 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
             return false;
 
         // rare case: players from the opposite faction can attack the NPC during event. Set him unattackable like on official.
-        tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+        tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
             tervoshAI->m_eventStarted = true;
@@ -872,7 +872,7 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
             // something weird happened
             if (!tervosh)
                 return false;
-            tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+            tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
             tervosh->SetVisibility(VISIBILITY_OFF);
             // start the event.
             if (npc_archmage_tervoshAI* tervoshNewAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
@@ -921,6 +921,11 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
     {
         m_uiSpellTimer = 3000;
         m_uiSpecialTimer = 15000;
+    }
+
+    void EnterCombat(Unit* enemy) override
+    {
+        me->PlayDistanceSound(5882);
     }
 
     void UpdateAI(uint32 const uiDiff) override
@@ -1194,175 +1199,6 @@ CreatureAI* GetAI_npc_stinky_ignatz(Creature* pCreature)
 }
 
 /*
- * Tabetha
- */
-
-enum
-{
-    GO_MANA_RIFT = 103680,
-
-    NPC_MANA_SURGE = 6550
-};
-
-static float const ManaSurgesSpawnPoint[3] =
-{
-    -4019.22f,	-3383.91f,	38.2265f
-};
-
-struct npc_tabethaAI : ScriptedAI
-{
-    explicit npc_tabethaAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_tabethaAI::Reset();
-    }
-
-    uint32  m_uiManaSurgeSpawnTimer;
-    uint32  m_uiManaSurgesEventTimer;
-    uint8   m_uiWaveCount;
-    uint8   m_uiManaSurgesCount;
-
-    bool m_uiManaSurgesInProcess;
-    bool m_uiManaRiftRespawned;
-
-    void Reset() override
-    {
-        m_uiManaSurgeSpawnTimer = urand(1000, 5000);
-        m_uiManaSurgesEventTimer = 10 * MINUTE*IN_MILLISECONDS + 100;
-        m_uiWaveCount = 1;
-        m_uiManaSurgesCount = 0;
-
-        m_uiManaSurgesInProcess = false;
-        m_uiManaRiftRespawned = false;
-    }
-
-    void StartManaSurges()
-    {
-        if (!m_uiManaSurgesInProcess)
-        {
-            m_uiManaSurgesInProcess = true;
-        }
-    }
-
-    void SummonedCreatureJustDied(Creature* pSummoned) override
-    {
-        if (pSummoned && pSummoned->GetEntry() == NPC_MANA_SURGE)
-            --m_uiManaSurgesCount;
-    }
-
-    void SpawnManaSurge(uint8 count)
-    {
-        for (uint8 i = 0; i < count; ++i)
-        {
-            if (Creature* pManaSurge =
-                m_creature->SummonCreature(
-                    NPC_MANA_SURGE,
-                    ManaSurgesSpawnPoint[0] + frand(-3, 3),
-                    ManaSurgesSpawnPoint[1] + frand(-3, 3),
-                    ManaSurgesSpawnPoint[2],
-                    frand(0, 10),
-                    TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,
-                    10 * MINUTE*IN_MILLISECONDS))
-            {
-                ++m_uiManaSurgesCount;
-            }
-        }
-    }
-
-    void DespawnManaSurges() const
-    {
-        std::list<Creature*> manaSurges;
-        GetCreatureListWithEntryInGrid(manaSurges, m_creature, NPC_MANA_SURGE, 75.0f);
-
-        if (manaSurges.empty()) return;
-
-        for (const auto& manaSurge : manaSurges)
-            if (manaSurge->IsAlive())
-                manaSurge->ForcedDespawn();
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_uiManaSurgesInProcess) return;
-
-        // respawn Mana Rift
-        if (!m_uiManaRiftRespawned)
-        {
-            if (GameObject* pManaRift = GetClosestGameObjectWithEntry(m_creature, GO_MANA_RIFT, 50.0f))
-            {
-                pManaRift->SetLootState(GO_READY);
-                pManaRift->SetRespawnTime(10 * MINUTE);
-                pManaRift->Refresh();
-
-                m_uiManaRiftRespawned = true;
-            }
-        }
-
-        // spawn Mana Surges
-        if (m_uiManaSurgesCount == 0)
-        {
-            if (m_uiManaSurgeSpawnTimer < uiDiff)
-            {
-                switch (m_uiWaveCount)
-                {
-                case 1:
-                case 2:
-                    SpawnManaSurge(2);
-                    break;
-                case 3:
-                case 4:
-                    SpawnManaSurge(3);
-                    break;
-                case 5:
-                case 6:
-                    SpawnManaSurge(4);
-                    break;
-                default:
-                    SpawnManaSurge(5);
-                    break;
-                }
-
-                ++m_uiWaveCount;
-                m_uiManaSurgeSpawnTimer = urand(1000, 5000);
-            }
-            else
-                m_uiManaSurgeSpawnTimer -= uiDiff;
-        }
-
-        // reset event
-        if (m_uiManaSurgesEventTimer < uiDiff)
-        {
-            DespawnManaSurges();
-            Reset();
-        }
-        else
-            m_uiManaSurgesEventTimer -= uiDiff;
-    }
-};
-
-CreatureAI* GetAI_npc_tabetha(Creature* pCreature)
-{
-    return new npc_tabethaAI(pCreature);
-}
-
-enum
-{
-    QUEST_MANA_SURGES = 1957
-};
-
-bool QuestAccept_npc_tabetha(Player* pPlayer, Creature* pCreature, Quest const *pQuest)
-{
-    if (pPlayer && pCreature && pQuest->GetQuestId() == QUEST_MANA_SURGES)
-    {
-        if (auto pTabethaAI = dynamic_cast<npc_tabethaAI*>(pCreature->AI()))
-        {
-            pTabethaAI->StartManaSurges();
-        }
-    }
-
-    return true;
-}
-
-/*
  * Emberstrife
  */
 
@@ -1547,12 +1383,6 @@ void AddSC_dustwallow_marsh()
     newscript->Name = "npc_stinky_ignatz";
     newscript->GetAI = &GetAI_npc_stinky_ignatz;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_stinky_ignatz;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_tabetha";
-    newscript->GetAI = &GetAI_npc_tabetha;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_tabetha;
     newscript->RegisterSelf();
 
     newscript = new Script;

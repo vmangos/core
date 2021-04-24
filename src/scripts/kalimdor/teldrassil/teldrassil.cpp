@@ -49,6 +49,12 @@ struct npc_mistAI : public FollowerAI
 
     void Reset() override { }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
+    }
+
     void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
@@ -133,99 +139,12 @@ bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, Quest const* pQu
         if (npc_mistAI* pMistAI = dynamic_cast<npc_mistAI*>(pCreature->AI()))
         {
             pCreature->SetFactionTemporary(FACTION_DARNASSUS, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pMistAI->StartFollow(pPlayer, FACTION_DARNASSUS, pQuest);
         } 
     }
 
     return true;
-}
-
-enum FandralStaghelmData
-{
-    SPELL_WRATH        = 20698,
-    SPELL_AE_ROOT      = 20699,
-    SPELL_REJUVENATION = 20701,
-    SPELL_SUMM_TREANT  = 20702,
-    SPELL_HURRICANE    = 27530
-};
-
-struct boss_fandral_staghelmAI : public ScriptedAI
-{
-public:
-    boss_fandral_staghelmAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        m_uiWrathTimer = 0;
-        m_uiRootTimer = 25000;
-        m_uiRejuvenationTimer = 5000;
-        m_uiTreantTimer = 15000;
-        m_uiHurricaneTimer = 27000;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_uiWrathTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WRATH) == CAST_OK)
-                m_uiWrathTimer = urand(1, 5) * 1000;
-        }
-        else
-            m_uiWrathTimer -= uiDiff;
-
-        if (m_uiRootTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_AE_ROOT) == CAST_OK)
-                m_uiRootTimer = 30000;
-        }
-        else
-            m_uiRootTimer -= uiDiff;
-
-        if (m_uiRejuvenationTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_REJUVENATION) == CAST_OK)
-                m_uiRejuvenationTimer = 15000;
-        }
-        else
-            m_uiRejuvenationTimer -= uiDiff;
-
-        if (m_uiTreantTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_SUMM_TREANT) == CAST_OK)
-                m_uiTreantTimer = 25000;
-        }
-        else
-            m_uiTreantTimer -= uiDiff;
-
-        if (m_uiHurricaneTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_HURRICANE) == CAST_OK)
-                m_uiHurricaneTimer = 30000;
-        }
-        else
-            m_uiHurricaneTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-        EnterEvadeIfOutOfCombatArea(uiDiff);
-    }
-
-private:
-    uint32 m_uiWrathTimer;
-    uint32 m_uiRootTimer;
-    uint32 m_uiRejuvenationTimer;
-    uint32 m_uiTreantTimer;
-    uint32 m_uiHurricaneTimer;
-};
-
-CreatureAI* GetAI_boss_fandral_staghelm(Creature* pCreature)
-{
-    return new boss_fandral_staghelmAI(pCreature);
 }
 
 //Alita
@@ -258,11 +177,6 @@ void AddSC_teldrassil()
     newscript = new Script;
     newscript->Name = "npc_sethir";
     newscript->GetAI = &GetAI_npc_sethir;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "boss_fandral_staghelm";
-    newscript->GetAI = &GetAI_boss_fandral_staghelm;
     newscript->RegisterSelf();
 
     newscript = new Script;

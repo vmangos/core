@@ -23,24 +23,22 @@
 #define __UNIT_H
 
 #include "Common.h"
+#include "SharedDefines.h"
+#include "ItemPrototype.h"
 #include "Object.h"
 #include "UnitDefines.h"
-#include "Opcodes.h"
 #include "SpellAuraDefines.h"
 #include "UpdateFields.h"
-#include "SharedDefines.h"
 #include "ThreatManager.h"
 #include "HostileRefManager.h"
 #include "FollowerReference.h"
 #include "FollowerRefManager.h"
 #include "MotionMaster.h"
-#include "DBCStructure.h"
-#include "Timer.h"
 #include <list>
-
 
 struct FactionTemplateEntry;
 struct Modifier;
+struct SpellModifier;
 
 class WorldPacket;
 class SpellEntry;
@@ -180,40 +178,6 @@ typedef SpellAuraProcResult(Unit::*pAuraProcHandler)(Unit* pVictim, uint32 damag
 extern pAuraProcHandler AuraProcHandler[TOTAL_AURAS];
 
 #define UNIT_SPELL_UPDATE_TIME_BUFFER 60
-
-struct GlobalCooldown
-{
-    explicit GlobalCooldown(uint32 dur = 0, uint32 time = 0) : duration(dur), cast_time(time) {}
-
-    uint32 duration;
-    uint32 cast_time;
-};
-
-typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
-
-class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
-{
-    public:
-        GlobalCooldownMgr() {}
-
-    public:
-        bool HasGlobalCooldown(SpellEntry const* spellInfo) const;
-        void AddGlobalCooldown(SpellEntry const* spellInfo, uint32 gcd);
-        void CancelGlobalCooldown(SpellEntry const* spellInfo);
-
-    private:
-        GlobalCooldownList m_GlobalCooldowns;
-};
-
-struct SpellCooldown
-{
-    time_t end;
-    uint32 cat;
-    time_t categoryEnd;
-    uint16 itemid;
-};
-
-typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 
 struct SpellImmune
 {
@@ -449,7 +413,7 @@ class Unit : public WorldObject
 
         void SetFullHealth() { SetHealth(GetMaxHealth()); }
 
-        Powers GetPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
+        Powers GetPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE)); }
         void SetPowerType(Powers power);
         void SetInitCreaturePowerType();
         uint32 GetPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_POWER1   +power); }
@@ -559,24 +523,24 @@ class Unit : public WorldObject
         virtual void SetDeathState(DeathState s);           // overwritten in Creature/Player/Pet
         uint32 GetLevel() const final { return GetUInt32Value(UNIT_FIELD_LEVEL); }
         void SetLevel(uint32 lvl);
-        uint8 GetRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
+        uint8 GetRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_RACE); }
         uint32 GetRaceMask() const { return GetRace() ? 1 << (GetRace()-1) : 0x0; }
-        uint8 GetClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
+        uint8 GetClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS); }
         uint32 GetClassMask() const { return GetClass() ? 1 << (GetClass()-1) : 0x0; }
-        uint8 GetGender() const final { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
-        SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_BYTES_2, 0)); }
-        virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
+        uint8 GetGender() const final { return GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER); }
+        SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_SHEATH_STATE)); }
+        virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_SHEATH_STATE, sheathed); }
         void SetStandState(uint8 state);
-        uint8 GetStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
+        uint8 GetStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE); }
         bool IsSittingDown() const;
         bool IsStandingUp() const;
-        virtual bool IsStandingUpForProc() const; // takes not yet applied stand state change into account (for players to simulate batching)
         bool IsMounted() const { return (GetMountID() != 0); }
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
         virtual UnitMountResult Mount(uint32 mount, uint32 spellId = 0);
         virtual UnitDismountResult Unmount(bool from_aura = false);
-        ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, 2)); }
-        void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, 2, form); }
+        ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM)); }
+        void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM, form); }
+        bool IsShapeShifted() const; // mirrors clientside logic, moonkin form not counted as shapeshift
         bool IsInFeralForm() const
         {
             ShapeshiftForm form = GetShapeshiftForm();
@@ -691,8 +655,6 @@ class Unit : public WorldObject
         uint32 m_lastManaUseSpellId;
         uint32 m_lastManaUseTimer;
         uint32 m_spellUpdateTimeBuffer;
-        SpellCooldowns m_spellCooldowns;
-        GlobalCooldownMgr m_GlobalCooldownMgr;
 
         void _UpdateSpells(uint32 time);
         void _UpdateAutoRepeatSpell();
@@ -746,6 +708,7 @@ class Unit : public WorldObject
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE) const;
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
         uint32 SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage);
+        void WritePetSpellsCooldown(WorldPacket& data) const;
 
         SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
         SpellAuraHolder* RefreshAura(uint32 spellId, int32 duration);
@@ -785,8 +748,9 @@ class Unit : public WorldObject
         void RemoveNotOwnSingleTargetAuras();
         void RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive = false);
         void RemoveSpellsCausingAura(AuraType auraType);
-        void RemoveNonPassiveSpellsCausingAura(AuraType auraType);
         void RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except);
+        void RemoveNegativeSpellsCausingAura(AuraType auraType);
+        void RemoveNonPassiveSpellsCausingAura(AuraType auraType);
         bool RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder);
         void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false);
         void RemoveAurasWithAttribute(uint32 flags);
@@ -837,7 +801,7 @@ class Unit : public WorldObject
         void DelaySpellAuraHolder(uint32 spellId, int32 delaytime, ObjectGuid casterGuid);
         AuraList const& GetAurasByType(AuraType type) const { return m_modAuras[type]; }
 
-        int32 GetTotalAuraModifier(AuraType auratype) const;
+        float GetTotalAuraModifier(AuraType auratype) const;
         float GetTotalAuraMultiplier(AuraType auratype) const;
         int32 GetMaxPositiveAuraModifier(AuraType auratype) const;
         int32 GetMaxNegativeAuraModifier(AuraType auratype) const;
@@ -883,17 +847,24 @@ class Unit : public WorldObject
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1 << (flag - 1)); }
 
         int32 SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask) const;
-        uint32 SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr) const;
+        float SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr) const;
         int32 SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask) const;
-        uint32 SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr) const;
+        float SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr) const;
         void CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32* absorb, int32* resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
         void CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage* damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
         float RollMagicResistanceMultiplierOutcomeAgainst(float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
         bool IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const* spellProto, WeaponAttackType attackType = BASE_ATTACK) const;
         bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final;
         bool IsEffectResist(SpellEntry const* spell, int eff) const; // SPELL_AURA_MOD_MECHANIC_RESISTANCE
-        bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent) const;
+        
+        void ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, std::list<SpellModifier*> const& appliedSpellModifiers, bool isSpellTriggeredByAura);
+        void ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType);
+        void HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, SpellEntry const* procSpell, ProcTriggeredList const& procTriggered);
 
+        bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent, bool dontTriggerSpecial) const;
+        // only to be used in proc handlers - basepoints is expected to be a MAX_EFFECT_INDEX sized array
+        SpellAuraProcResult TriggerProccedSpell(Unit* target, int32* basepoints, uint32 triggeredSpellId, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredByParent = nullptr);
+        SpellAuraProcResult TriggerProccedSpell(Unit* target, int32* basepoints, SpellEntry const* spellInfo, Item* castItem, Aura* triggeredByAura, uint32 cooldown, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredByParent = nullptr);
         // Aura proc handlers
         SpellAuraProcResult HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         SpellAuraProcResult HandleHasteAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
@@ -935,38 +906,6 @@ class Unit : public WorldObject
         void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0, uint32 time = 0);/*DEPRECATED METHOD*/
         void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0);/*DEPRECATED METHOD*/
         void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid(), bool success = true);
-
-        // Cooldown management
-        SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
-        static uint32 const infinityCooldownDelay = MONTH;  // used for set "infinity cooldowns" for spells and check
-        static uint32 const infinityCooldownDelayCheck = MONTH / 2;
-
-        bool HasSpellCategoryCooldown(uint32 category) const;
-        bool HasSpellCooldown(uint32 spell_id) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            return itr != m_spellCooldowns.end() && itr->second.end > time(nullptr);
-        }
-        time_t GetSpellCooldownDelay(uint32 spell_id) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            time_t t = time(nullptr);
-            return itr != m_spellCooldowns.end() && itr->second.end > t ? itr->second.end - t : 0;
-        }
-        void CooldownEvent(SpellEntry const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr);
-        void AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
-        void RemoveSpellCooldown(uint32 spell_id, bool update = false);
-		void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
-        void RemoveAllSpellCooldown();
-        void WritePetSpellsCooldown(WorldPacket& data) const;
-        GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
-        void AddSpellCooldown(uint32 spell_id, uint32 itemid, time_t endTime, time_t categoryEndTime = 0, uint32 cat = 0);
-
-        virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
-        bool IsSpellProhibited(SpellEntry const* pSpell) const;
-    protected:
-        typedef std::list<ProhibitSpellInfo> ProhibitSpellList;
-        ProhibitSpellList m_prohibitSpell;
 
         /*********************************************************/
         /***                  COMBAT SYSTEM                    ***/
@@ -1067,8 +1006,6 @@ class Unit : public WorldObject
         void SendMeleeAttackStop(Unit* victim) const;
         void SendMeleeAttackStart(Unit* pVictim) const;
 
-        void ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, Spell* spell = nullptr);
-        void HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, SpellEntry const* procSpell, ProcTriggeredList const& procTriggered);
         void ClearAllReactives();
         void StartReactiveTimer(ReactiveType reactive, ObjectGuid target) { m_reactiveTimer[reactive] = REACTIVE_TIMER_START; m_reactiveTarget[reactive] = target; }
         ObjectGuid const& GetReactiveTarget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
@@ -1078,8 +1015,8 @@ class Unit : public WorldObject
         void CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK);
         void UnitDamaged(ObjectGuid from, uint32 damage) { m_damageTakenHistory[from] += damage; m_lastDamageTaken = 0; }
         void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
-        uint32 CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0) const;
-        uint32 MeleeDamageBonusTaken(WorldObject* pCaster, uint32 pdamage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
+        float CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0) const;
+        float MeleeDamageBonusTaken(WorldObject* pCaster, float pdamage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, SpellEffectIndex effectIndex = EFFECT_INDEX_0, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
         MeleeHitOutcome RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackType attType) const;
         MeleeHitOutcome RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance, bool SpellCasted) const;
 
@@ -1093,11 +1030,8 @@ class Unit : public WorldObject
         void AddExtraAttackOnUpdate() { m_doExtraAttacks = true; };
 
         bool CanAttack(Unit const* target, bool force = false) const;
-        bool IsValidAttackTarget(Unit const* target) const final;
-        bool IsTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
-        bool IsAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
+        bool IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE = false, bool checkAlive = true) const;
 
-        bool IsWithinMeleeRange(Unit const* obj, float dist = 0.0f) const;
         bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
         float GetMeleeReach() const;
@@ -1179,7 +1113,7 @@ class Unit : public WorldObject
         Unit* GetTauntTarget() const;
         void TauntApply(Unit* pVictim);
         void TauntFadeOut(Unit* taunter);
-
+        
         // Threat related methods
         bool CanHaveThreatList() const;
         bool IsSecondaryThreatTarget() const;
@@ -1264,13 +1198,7 @@ class Unit : public WorldObject
         bool IsHostileToPlayers() const;
         bool IsFriendlyTo(WorldObject const* target) const override;
         bool IsNeutralToAll() const;
-        bool IsContestedGuard() const
-        {
-            if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
-                return entry->IsContestedGuardFaction();
-
-            return false;
-        }
+        bool IsContestedGuard() const;
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
 
@@ -1278,7 +1206,7 @@ class Unit : public WorldObject
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
-        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
+        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC); }
 
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
         ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }
@@ -1290,6 +1218,7 @@ class Unit : public WorldObject
         CharmInfo* InitCharmInfo(Unit* charm);
 
         Unit* GetOwner() const;
+        Creature* GetOwnerCreature() const;
         ObjectGuid const& GetOwnerGuid() const { return  GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
         void SetOwnerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_SUMMONEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
         ObjectGuid const& GetCreatorGuid() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
@@ -1326,8 +1255,7 @@ class Unit : public WorldObject
         ObjectGuid const& GetCharmerGuid() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
         void SetCharmerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
         bool IsCharmed() const { return !GetCharmerGuid().IsEmpty(); }
-        bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
-        bool IsCharmedOwnedByPlayerOrPlayer() const { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
+        bool IsCharmerOrOwnerPlayerOrPlayerItself() const final { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {
@@ -1383,6 +1311,7 @@ class Unit : public WorldObject
         std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
         float m_casterChaseDistance;
         float m_speed_rate[MAX_MOVE_TYPE];
+        float m_jumpInitialSpeed = 0;
         void UpdateSplineMovement(uint32 t_diff);
     protected:
         MotionMaster i_motionMaster;
@@ -1428,8 +1357,8 @@ class Unit : public WorldObject
         void PushPendingMovementChange(PlayerMovementPendingChange newChange);
         bool HasPendingMovementChange() const { return !m_pendingMovementChanges.empty(); }
         bool HasPendingMovementChange(MovementChangeType changeType) const;
-        void ResolvePendingMovementChanges();
-        void ResolvePendingMovementChange(PlayerMovementPendingChange& change);
+        void ResolvePendingMovementChanges(bool sendToClient, bool includingTeleport);
+        void ResolvePendingMovementChange(PlayerMovementPendingChange& change, bool sendToClient);
         bool FindPendingMovementFlagChange(uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived);
         bool FindPendingMovementRootChange(uint32 movementCounter, bool applyReceived);
         bool FindPendingMovementTeleportChange(uint32 movementCounter);
@@ -1446,6 +1375,10 @@ class Unit : public WorldObject
         float GetXZFlagBasedSpeed(uint32 moveFlags) const;
         float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
         void PropagateSpeedChange() { GetMotionMaster()->PropagateSpeedChange(); }
+        float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
+        bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const;
+        void SetJumpInitialSpeed(float speed) { m_jumpInitialSpeed = speed; }
+        float GetJumpInitialSpeed() const { return m_jumpInitialSpeed; }
 
         // Terrain checks
         virtual bool IsInWater() const;
@@ -1492,7 +1425,7 @@ class Unit : public WorldObject
         // Serialize access to the movespline to prevent thread race conditions in async
         // move spline updates (one thread updates a spline, while another checks the
         // spline for end point with targeted move gen)
-        ACE_Thread_Mutex asyncMovesplineLock;
+        std::mutex asyncMovesplineLock;
 
         void OnRelocated();
         void ProcessRelocationVisibilityUpdates();

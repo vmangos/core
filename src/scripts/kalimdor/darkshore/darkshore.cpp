@@ -72,6 +72,12 @@ struct npc_kerlonianAI : public FollowerAI
         m_uiFallAsleepTimer = urand(10000, 45000);
     }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        FollowerAI::JustRespawned();
+    }
+
     void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
@@ -183,6 +189,7 @@ bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, Quest const
         if (npc_kerlonianAI* pKerlonianAI = dynamic_cast<npc_kerlonianAI*>(pCreature->AI()))
         {
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             DoScriptText(SAY_KER_START, pCreature, pPlayer);
             pKerlonianAI->StartFollow(pPlayer, FACTION_ESCORT_N_FRIEND_PASSIVE, pQuest);
         }
@@ -223,6 +230,12 @@ struct npc_prospector_remtravelAI : public npc_escortAI
     npc_prospector_remtravelAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
         Reset();
+    }
+
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
     }
 
     void WaypointReached(uint32 i) override
@@ -315,6 +328,7 @@ bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, 
         {
             DoScriptText(SAY_REM_START, pCreature, pPlayer);
             pCreature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest, true);
         }
     }
@@ -424,6 +438,12 @@ struct npc_theryluneAI : public npc_escortAI
 
     void Reset() override { }
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
@@ -455,6 +475,7 @@ bool QuestAccept_npc_therylune(Player* pPlayer, Creature* pCreature, Quest const
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_THERYLUNE_START, pCreature, pPlayer);
             pCreature->SetFactionTemporary(79, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 
@@ -561,6 +582,7 @@ struct npc_volcorAI : public npc_escortAI
 
     void JustRespawned() override
     {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
         m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
 
@@ -623,6 +645,7 @@ struct npc_volcorAI : public npc_escortAI
             ForceDialogueStep = 0;
             ForceDialogueTimer = 0;
             Start(false, pPlayer->GetGUID(), pQuest);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 
@@ -1043,196 +1066,6 @@ bool QuestComplete_npc_terenthis(Player* pPlayer, Creature* pQuestGiver, Quest c
     return false;
 }
 
-/*####
-# npc_sentinel_aynasha
-####*/
-
-enum SentinelAynashaData
-{
-    SAY_AYNASHA_START  = 7200,
-    SAY_AYNASHA_ARROWS = 7199,
-    SAY_AYNASHA_END1   = 7201,
-    SAY_AYNASHA_END2   = 7202,
-    SAY_AYNASHA_END3   = 7328,
-
-    SPELL_AYNASHAS_BOW      = 19767,
-    QUEST_ONE_SHOT_ONE_KILL = 5713,
-    NPC_BLACKWOOD_TRACKER   = 11713,
-    NPC_MAROSH_THE_DEVIOUS  = 11714
-};
-
-struct npc_sentinel_aynashaAI : public Scripted_NoMovementAI
-{
-    npc_sentinel_aynashaAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
-    {
-        m_uiPlayerGUID = 0;
-        m_uiWaveTimer = 0;
-        WaveNB = 0;
-        Reset();
-    }
-
-    uint32 m_uiWaveTimer;
-    uint8 WaveNB;
-    uint32 m_uiSpell_AynashasBowTimer;
-    uint64 m_uiPlayerGUID;
-
-    void Reset() override
-    {
-        m_uiSpell_AynashasBowTimer = 0;
-    }
-
-    void JustDied(Unit* pKiller) override
-    {
-        if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
-        {
-            if (pPlayer->GetQuestStatus(QUEST_ONE_SHOT_ONE_KILL) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->SetQuestStatus(QUEST_ONE_SHOT_ONE_KILL, QUEST_STATUS_FAILED);
-        }
-        QuestEnded();
-    }
-
-    void SummonedCreatureJustDied(Creature* pSummoned) override
-    {
-        if (WaveNB == 4 && pSummoned->GetEntry() == NPC_MAROSH_THE_DEVIOUS)
-        {
-            m_uiWaveTimer = 20000;
-            if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
-                DoScriptText(SAY_AYNASHA_END1, m_creature, pPlayer);
-            WaveNB++;
-        }
-    }
-
-    void CallWave()
-    {
-        Creature* pSummoned = nullptr;
-        switch (WaveNB)
-        {
-            case 1:
-                for (int i = 0; i < 2; i++)
-                {
-                    if (pSummoned = m_creature->SummonCreature(NPC_BLACKWOOD_TRACKER, 4369.772949f, -10.731376f, 67.225563f, 4.52f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 360000))
-                    {
-                        pSummoned->GetMotionMaster()->MovePoint(0, 4386.507324f, -62.792439f, 86.935783f, true);
-                        pSummoned->SetHomePosition(4386.507324f, -62.792439f, 86.935783f, 2.32f);
-                    }
-                }
-                DoScriptText(SAY_AYNASHA_START, m_creature);
-                break;
-            case 2:
-                for (int i = 0; i < 3; i++)
-                {
-                    if (pSummoned = m_creature->SummonCreature(NPC_BLACKWOOD_TRACKER, 4369.772949f, -10.731376f, 67.225563f, 4.52f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 360000))
-                    {
-                        pSummoned->GetMotionMaster()->MovePoint(0, 4386.507324f, -62.792439f, 86.935783f, true);
-                        pSummoned->SetHomePosition(4386.507324f, -62.792439f, 86.935783f, 2.32f);
-                    }
-                }
-                break;
-            case 3:
-                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
-                    DoScriptText(SAY_AYNASHA_ARROWS, m_creature, pPlayer);
-                m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
-                if (pSummoned = m_creature->SummonCreature(NPC_MAROSH_THE_DEVIOUS, 4391.23584f, -8.533378f, 69.560616f, 4.516503f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 360000))
-                {
-                    pSummoned->GetMotionMaster()->MovePoint(0, 4386.507324f, -62.792439f, 86.935783f, true);
-                    pSummoned->SetHomePosition(4386.507324f, -62.792439f, 86.935783f, 2.32f);
-                }
-                break;
-            default:
-                sLog.outDebug("Sentinel Aynasha wants to have an extra wave.");
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (WaveNB > 0 && WaveNB < 4)
-        {
-            if (m_uiWaveTimer < uiDiff)
-            {
-                CallWave();
-                m_uiWaveTimer = 60000;
-                WaveNB++;
-            }
-            else
-                m_uiWaveTimer -= uiDiff;
-        }
-        else if (WaveNB == 5)
-        {
-            Player* pPlayer = nullptr;
-            if (m_uiWaveTimer < uiDiff)
-            {
-                if (pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
-                {
-                    if (pPlayer->GetQuestStatus(QUEST_ONE_SHOT_ONE_KILL) == QUEST_STATUS_INCOMPLETE)
-                        pPlayer->GroupEventHappens(QUEST_ONE_SHOT_ONE_KILL, m_creature);
-                }
-                QuestEnded();
-            }
-            else
-            {
-                if (m_uiWaveTimer >= 5000 && m_uiWaveTimer < 5000 + uiDiff)
-                {
-                    DoScriptText(SAY_AYNASHA_END2, m_creature);
-                    m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                }
-                else if (m_uiWaveTimer >= 2000 && m_uiWaveTimer < 2000 + uiDiff)
-                {
-                    if (pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
-                        DoScriptText(SAY_AYNASHA_END3, m_creature, pPlayer);
-                }
-
-                m_uiWaveTimer -= uiDiff;
-            }
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (WaveNB < 4)
-        {
-            if (m_uiSpell_AynashasBowTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AYNASHAS_BOW) == CAST_OK)
-                    m_uiSpell_AynashasBowTimer = 2000;
-            }
-            else
-                m_uiSpell_AynashasBowTimer -= uiDiff;
-        }
-    }
-
-    void QuestStarted(Player* pPlayer)
-    {
-        m_uiPlayerGUID = pPlayer->GetGUID();
-        WaveNB = 1;
-        m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-        m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-    }
-
-    void QuestEnded()
-    {
-        m_uiPlayerGUID = 0;
-        m_uiWaveTimer = 0;
-        WaveNB = 0;
-        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-    }
-};
-
-CreatureAI* GetAI_npc_sentinel_aynasha(Creature* pCreature)
-{
-    return new npc_sentinel_aynashaAI(pCreature);
-}
-
-bool QuestAccept_npc_sentinel_aynasha(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_ONE_SHOT_ONE_KILL)
-    {
-        if (npc_sentinel_aynashaAI* pSentinelAynashaAI = dynamic_cast<npc_sentinel_aynashaAI*>(pCreature->AI()))
-            pSentinelAynashaAI->QuestStarted(pPlayer);
-    }
-
-    return true;
-}
-
 //would have thought taking it out of quest_template would have been necessary
 //but turns out the quest adds the item afterwards with its check(so never adds),
 //so it's fine to leave it in quest_template.
@@ -1297,7 +1130,7 @@ struct npc_murkdeepAI : public ScriptedAI
         npc_murkdeepAI::Reset();
 
         m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     ObjectGuid m_playerGuid;
@@ -1460,7 +1293,7 @@ struct npc_murkdeepAI : public ScriptedAI
                     case 3:
                         DoSummon();
                         m_creature->SetVisibility(VISIBILITY_ON);
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
                         Player* player = GetPlayer();
                         if (player)
@@ -1575,12 +1408,6 @@ void AddSC_darkshore()
     newscript = new Script;
     newscript->Name = "npc_terenthis";
     newscript->pQuestRewardedNPC = &QuestComplete_npc_terenthis;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_sentinel_aynasha";
-    newscript->GetAI = &GetAI_npc_sentinel_aynasha;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_sentinel_aynasha;
     newscript->RegisterSelf();
 
     newscript = new Script;

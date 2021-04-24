@@ -30,13 +30,10 @@
 #include "SpellMgr.h"
 #include "Player.h"
 #include "GossipDef.h"
-#include "UpdateMask.h"
 #include "ScriptMgr.h"
 #include "Creature.h"
 #include "Pet.h"
-#include "Guild.h"
 #include "Spell.h"
-#include "GuildMgr.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
 #ifdef ENABLE_ELUNA
@@ -378,15 +375,15 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recv_data)
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
 
-    if (!pCreature->IsStopped())
-        pCreature->StopMoving();
+    if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
+        pCreature->PauseOutOfCombatMovement();
 
     if (pCreature->IsSpiritGuide())
         pCreature->SendAreaSpiritHealerQueryOpcode(_player);
 
     if (!sScriptMgr.OnGossipHello(_player, pCreature))
     {
-        _player->PrepareGossipMenu(pCreature, pCreature->GetCreatureInfo()->gossip_menu_id);
+        _player->PrepareGossipMenu(pCreature, pCreature->GetDefaultGossipMenuId());
         _player->SendPreparedGossip(pCreature);
     }
 }
@@ -422,12 +419,8 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             return;
         }
 
-        // Clear possible StopMoving motion
-        if (pCreature->IsStopped())        
-            pCreature->GetMotionMaster()->Clear();
-            
-        pCreature->StopMoving();
-        
+        if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
+            pCreature->PauseOutOfCombatMovement();
 
         if (!sScriptMgr.OnGossipSelect(_player, pCreature, sender, action, code.empty() ? nullptr : code.c_str()))
             _player->OnGossipSelect(pCreature, gossipListId);

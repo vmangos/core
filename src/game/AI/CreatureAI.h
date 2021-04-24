@@ -23,14 +23,10 @@
 #define MANGOS_CREATUREAI_H
 
 #include "Common.h"
-#include "Platform/Define.h"
-#include "Policies/Singleton.h"
 #include "Dynamic/ObjectRegistry.h"
 #include "Dynamic/FactoryHolder.h"
 #include "ObjectGuid.h"
-#include "ObjectMgr.h"
-
-#include "Utilities/EventMap.h"
+#include "CreatureDefines.h"
 
 class WorldObject;
 class GameObject;
@@ -66,10 +62,7 @@ struct CreatureAISpellsEntry : CreatureSpellsEntry
 class CreatureAI
 {
     public:
-        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
-        {
-            SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
-        }
+        explicit CreatureAI(Creature* creature);
 
         virtual ~CreatureAI();
         virtual void OnRemoveFromWorld() {}
@@ -172,8 +165,8 @@ class CreatureAI
         // Like UpdateAI, but only when the creature is a dead corpse
         virtual void UpdateAI_corpse(uint32 const /*uiDiff*/) {}
 
-        // Called by scripted map events
-        virtual void MapScriptEventHappened(ScriptedEvent* /*pEvent*/, uint32 /*uiData*/) {};
+        // Called by another script
+        virtual void OnScriptEventHappened(uint32 /*uiEvent*/, uint32 /*uiData*/, WorldObject* /*pInvoker*/) {};
 
         ///== State checks =================================
 

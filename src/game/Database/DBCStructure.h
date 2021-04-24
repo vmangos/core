@@ -25,7 +25,6 @@
 #include "Common.h"
 #include "DBCEnums.h"
 #include "Path.h"
-#include "Platform/Define.h"
 #include "SpellClassMask.h"
 
 #include <map>
@@ -97,6 +96,41 @@ struct ChatChannelsEntry
                                                             // 11 string flags
     //char*       name[8];                                  // 12-19    m_shortcut_lang
                                                             // 20 string flag
+};
+
+struct CharacterFacialHairStylesEntry
+{
+    uint32 RaceID;                                          // 0
+    uint32 SexID;                                           // 1
+    uint32 VariationID;                                     // 2
+  //uint32 Geoset[6];                                       // 3-8
+};
+
+enum CharSectionFlags
+{
+    SECTION_FLAG_UNAVAILABLE = 0x01,
+};
+
+enum CharSectionType
+{
+    SECTION_TYPE_SKIN = 0,
+    SECTION_TYPE_FACE = 1,
+    SECTION_TYPE_FACIAL_HAIR = 2,
+    SECTION_TYPE_HAIR = 3,
+    SECTION_TYPE_UNDERWEAR = 4
+};
+
+struct CharSectionsEntry
+{
+    //uint32 Id;
+    uint32 Race;
+    uint32 Gender;
+    uint32 BaseSection;
+    uint32 VariationIndex;
+    uint32 ColorIndex;
+    //char* TexturePath[3];
+    uint32 Flags;
+    inline bool HasFlag(CharSectionFlags flag) const { return (Flags & flag) != 0; }
 };
 
 struct ChrClassesEntry
@@ -446,6 +480,18 @@ struct MailTemplateEntry
     uint32      ID;                                         // 0        m_ID
     char*       subject[8];                                 // 1-8      m_subject_lang
                                                             // 9 string flags
+};
+
+struct NamesProfanityEntry
+{
+    //uint32    ID;                                         // 0
+    char const* Name;                                       // 1
+};
+
+struct NamesReservedEntry
+{
+    //uint32    ID;                                         // 0
+    char const* Name;                                       // 1
 };
 
 struct QuestSortEntry

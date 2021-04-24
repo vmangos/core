@@ -4,8 +4,10 @@
 #include "SocialMgr.h"
 #include "Item.h"
 #include "Mail.h"
+#include "Bag.h"
 #include "ObjectAccessor.h"
 #include "WorldPacket.h"
+#include "Opcodes.h"
 
 MasterPlayer::MasterPlayer(WorldSession* s):
     m_speakTime(0), m_speakCount(0), m_social(nullptr), 
@@ -67,7 +69,7 @@ void MasterPlayer::Update()
     // undelivered mail
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(nullptr))
     {
-        SendNewMail();
+        GetSession()->SendNewMail();
         ++unReadMails;
 
         // It will be recalculate at mailbox open (for unReadMails important non-0 until mailbox open, it also will be recalculated)
@@ -174,30 +176,6 @@ void MasterPlayer::RemoveMail(uint32 id)
     }
 }
 
-void MasterPlayer::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
-{
-    WorldPacket data(SMSG_SEND_MAIL_RESULT, (4 + 4 + 4 + (mailError == MAIL_ERR_EQUIP_ERROR ? 4 : (mailAction == MAIL_ITEM_TAKEN ? 4 + 4 : 0))));
-    data << (uint32) mailId;
-    data << (uint32) mailAction;
-    data << (uint32) mailError;
-    if (mailError == MAIL_ERR_EQUIP_ERROR)
-        data << (uint32) equipError;
-    else if (mailAction == MAIL_ITEM_TAKEN)
-    {
-        data << (uint32) item_guid;                         // item guid low?
-        data << (uint32) item_count;                        // item count?
-    }
-    GetSession()->SendPacket(&data);
-}
-
-void MasterPlayer::SendNewMail()
-{
-    // deliver undelivered mail
-    WorldPacket data(SMSG_RECEIVED_MAIL, 4);
-    data << (uint32) 0;
-    GetSession()->SendPacket(&data);
-}
-
 void MasterPlayer::UpdateNextMailTimeAndUnreads()
 {
     // calculate next delivery time (min. from non-delivered mails
@@ -222,7 +200,7 @@ void MasterPlayer::AddNewMailDeliverTime(time_t deliver_time)
     if (deliver_time <= time(nullptr))                         // ready now
     {
         ++unReadMails;
-        SendNewMail();
+        GetSession()->SendNewMail();
     }
     else                                                    // not ready and no have ready mails
     {
@@ -421,7 +399,7 @@ void MasterPlayer::SaveActions()
         {
             case ACTIONBUTTON_NEW:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insertAction, "INSERT INTO character_action (guid,button,action,type) VALUES (?, ?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insertAction, "INSERT INTO `character_action` (`guid`, `button`, `action`, `type`) VALUES (?, ?, ?, ?)");
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(uint32(itr->first));
                 stmt.addUInt32(itr->second.GetAction());
@@ -433,7 +411,7 @@ void MasterPlayer::SaveActions()
             break;
             case ACTIONBUTTON_CHANGED:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(updateAction, "UPDATE character_action  SET action = ?, type = ? WHERE guid = ? AND button = ?");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(updateAction, "UPDATE `character_action`  SET `action` = ?, `type` = ? WHERE `guid` = ? AND `button` = ?");
                 stmt.addUInt32(itr->second.GetAction());
                 stmt.addUInt32(uint32(itr->second.GetType()));
                 stmt.addUInt32(GetGUIDLow());
@@ -445,7 +423,7 @@ void MasterPlayer::SaveActions()
             break;
             case ACTIONBUTTON_DELETED:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(deleteAction, "DELETE FROM character_action WHERE guid = ? AND button = ?");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(deleteAction, "DELETE FROM `character_action` WHERE `guid` = ? AND `button` = ?");
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(uint32(itr->first));
                 stmt.Execute();

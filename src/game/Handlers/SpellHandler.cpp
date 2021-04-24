@@ -23,14 +23,12 @@
 #include "DBCStores.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Spell.h"
-#include "ScriptMgr.h"
-#include "Totem.h"
 #include "SpellAuras.h"
+#include "GameObject.h"
 
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
@@ -133,7 +131,20 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     targets.Update(pUser);
 
+    SpellCastResult itemCastCheckResult = SPELL_CAST_OK;
     if (!pItem->IsTargetValidForItemUse(targets.getUnitTarget()))
+        itemCastCheckResult = SPELL_FAILED_BAD_TARGETS;
+    else if (pUser->IsShapeShifted())
+    {
+        // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+        // - All shapeshift forms can now use equipped items.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        if (!(bagIndex == INVENTORY_SLOT_BAG_0 && slot < EQUIPMENT_SLOT_END))
+#endif
+        itemCastCheckResult = SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+    }
+
+    if (itemCastCheckResult != SPELL_CAST_OK)
     {
         // free gray item after use fail
         pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
@@ -151,7 +162,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
         // send spell error
         if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid))
-            Spell::SendCastResult(_player, spellInfo, SPELL_FAILED_BAD_TARGETS);
+            Spell::SendCastResult(_player, spellInfo, itemCastCheckResult);
         return;
     }
 
@@ -168,12 +179,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 
 }
-
-#define OPEN_CHEST 11437
-#define OPEN_SAFE 11535
-#define OPEN_CAGE 11792
-#define OPEN_BOOTY_CHEST 5107
-#define OPEN_STRONGBOX 8517
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
@@ -205,6 +210,18 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (pUser->IsTaxiFlying())
+    {
+        pUser->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pItem, nullptr);
+        return;
+    }
+
+    if (!pUser->IsAlive())
+    {
+        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pItem, nullptr);
+        return;
+    }
+
     // locked item
     uint32 lockId = proto->LockID;
     if (lockId && !pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNLOCKED))
@@ -225,6 +242,9 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
             return;
         }
     }
+
+    if (_player->IsNonMeleeSpellCasted())
+        _player->InterruptNonMeleeSpells(false);
 
     if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))// wrapped?
     {
@@ -283,6 +303,9 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
 
     // Never expect this opcode for non intractable GO's
     if (obj->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT))
+        return;
+
+    if (!obj->IsAtInteractDistance(_player))
         return;
 
     // Nostalrius
@@ -356,6 +379,13 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         // if rank not found then function return nullptr but in explicit cast case original spell can be casted and later failed with appropriate error message
         if (SpellEntry const* actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->GetLevel()))
             spellInfo = actualSpellInfo;
+    }
+
+    // Casting spells interrupts looting
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING))
+    {
+        if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
+            DoLootRelease(lootGuid);
     }
 
     // World of Warcraft Client Patch 1.10.0 (2006-03-28)

@@ -296,7 +296,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
                     m_creature->HandleEmoteCommand(EMOTE_STATE_DANCE);
                 break;
             case TEXTEMOTE_RUDE:
-                if (m_creature->IsWithinMeleeRange(pPlayer))
+                if (m_creature->CanReachWithMeleeAutoAttack(pPlayer))
                     m_creature->CastSpell(pPlayer, SPELL_SLAP, false);
                 else
                     m_creature->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
@@ -653,163 +653,6 @@ CreatureAI* GetAI_mobs_rat_pestifere(Creature* pCreature)
 }
 
 /*######
-## npc_Aurius
-######*/
-
-#define QUEST_AURIUSRECKONING 5125
-#define QUEST_THEMEDALLIONOFFAITH 5122
-#define NPC_AURIUS_1 10917
-#define NPC_AURIUS_2 10931
-
-struct npc_auriusAI : public ScriptedAI
-{
-    npc_auriusAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 ui_entry;
-    bool bIsFakeDead;
-
-    void Reset() override
-    {
-        if (!m_pInstance)
-            return;
-        ui_entry = (m_creature->GetCreatureInfo()->entry);
-        if (ui_entry == NPC_AURIUS_1)
-            m_pInstance->SetData(TYPE_EVENT_AURIUS, NOT_STARTED);
-        bIsFakeDead = false;
-    }
-
-    void FakeDeath()
-    {
-        if (!bIsFakeDead)
-        {
-            bIsFakeDead = true;
-            m_creature->StopMoving();
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-            m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-            m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-            m_creature->AddUnitState(UNIT_STAT_DIED);
-            m_creature->CombatStop();
-            //m_creature->RemoveAllAuras();
-            //m_creature->DeleteThreatList();
-            //m_creature->LoadCreatureAddon();
-            //m_creature->GetMotionMaster()->MovementExpired();
-            //m_creature->GetMotionMaster()->MoveIdle();
-            m_creature->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
-            m_creature->InterruptNonMeleeSpells(true);
-            m_creature->GetHostileRefManager().deleteReferences();
-        }
-    }
-
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
-    {
-        if (uiDamage >= m_creature->GetHealth())
-        {
-            if (m_creature->GetHealth() > 1)
-                uiDamage = m_creature->GetHealth() - 1;
-            else
-                uiDamage = 0;
-            FakeDeath();
-        }
-    }
-
-    void QuestCompleted(Player* pPlayer, Quest const* pQuest)
-    {
-        if ((ui_entry == NPC_AURIUS_1) && (pQuest->GetQuestId() == QUEST_THEMEDALLIONOFFAITH))
-        {
-            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            m_pInstance->SetData64(DATA_QUESTPLAYER, pPlayer->GetGUID());
-            m_pInstance->SetData(TYPE_EVENT_AURIUS, SPECIAL);
-        }
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        switch (ui_entry)
-        {
-            case NPC_AURIUS_1:
-            {
-                switch (m_pInstance->GetData(TYPE_BARON))
-                {
-                    case IN_PROGRESS :
-                    case FAIL :
-                    case DONE :
-                    {
-                        if ((m_pInstance->GetData(TYPE_EVENT_AURIUS)) != NOT_STARTED)
-                            m_creature->SetVisibility(VISIBILITY_OFF);
-                        break;
-                    }
-                }
-                break;
-            }
-            case NPC_AURIUS_2:
-            {
-                switch (m_pInstance->GetData(TYPE_BARON))
-                {
-                    case IN_PROGRESS :
-                    {
-                        if (((m_pInstance->GetData(TYPE_EVENT_AURIUS)) == IN_PROGRESS) && (m_creature->GetStandState() != UNIT_STAND_STATE_DEAD))
-                        {
-                            if (Creature* pTarget = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_BARON)))
-                            {
-                                if (pTarget->GetHealthPercent() <= 20.0f)
-                                    FakeDeath();
-                                else
-                                    m_creature->AI()->AttackStart(pTarget);
-                            }
-
-                        }
-                        break;
-                    }
-                    case FAIL :
-                    {
-                        if ((m_pInstance->GetData(TYPE_EVENT_AURIUS)) == IN_PROGRESS)
-                        {
-                            FakeDeath();
-                            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            m_pInstance->SetData(TYPE_EVENT_AURIUS, FAIL);
-                        }
-                        break;
-                    }
-                    case DONE :
-                    {
-                        if ((m_pInstance->GetData(TYPE_EVENT_AURIUS)) == IN_PROGRESS)
-                        {
-                            FakeDeath();
-                            m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            m_pInstance->SetData(TYPE_EVENT_AURIUS, DONE);
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_aurius(Creature* pCreature)
-{
-    return new npc_auriusAI(pCreature);
-}
-
-bool QuestComplete_npc_aurius(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (npc_auriusAI* pScriptedAI = dynamic_cast<npc_auriusAI*>(pCreature->AI()))
-    {
-        pScriptedAI->QuestCompleted(pPlayer, pQuest);
-        return true;
-    }
-    return false;
-}
-
-
-/*######
 ## EVENT POP MOBS FIN DE COULOIRS
 ######*/
 
@@ -1098,125 +941,6 @@ GameObjectAI* GetAIgo_supply_crate(GameObject *pGo)
     return new go_supply_crateAI(pGo);
 }
 
-/*######
-## PIEGES GRILLES
-######*/
-
-struct npc_piege_grille1AI : public ScriptedAI
-{
-    npc_piege_grille1AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 4.0f))
-        {
-            if (GameObject* pGrille = m_creature->FindNearestGameObject(175355, 20.0f)) // GO_PORT_PIEGE_RAT1 c�t� baron
-                pGrille->UseDoorOrButton();
-            if (GameObject* pGrille = m_creature->FindNearestGameObject(175354, 20.0f)) // GO_PORT_PIEGE_RAT2 c�t� baron
-                pGrille->UseDoorOrButton();
-
-            uint32 maxplagued = urand(8, 10);
-
-            switch (urand(0, 2))
-            {
-                case 0: // Plagued Rat
-                {
-                    for (uint8 i = 0; i < maxplagued; ++i)
-                        m_creature->SummonCreature(10441, m_creature->GetPositionX() - 3.0f + float(urand(0, 6)),
-                                                   m_creature->GetPositionY() - 3.0f + float(urand(0, 6)), m_creature->GetPositionZ() + 0.7f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    break;
-                }
-                case 1: // Plagued Insect
-                {
-                    for (uint8 i = 0; i < maxplagued; ++i)
-                        m_creature->SummonCreature(10461, m_creature->GetPositionX() - 3.0f + float(urand(0, 6)),
-                                                   m_creature->GetPositionY() - 3.0f + float(urand(0, 6)), m_creature->GetPositionZ() + 0.7f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    break;
-                }
-                case 2: // Plagued Maggot
-                {
-                    for (uint8 i = 0; i < maxplagued; ++i)
-                        m_creature->SummonCreature(10536, m_creature->GetPositionX() - 3.0f + float(urand(0, 6)),
-                                                   m_creature->GetPositionY() - 3.0f + float(urand(0, 6)), m_creature->GetPositionZ() + 0.7f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    break;
-                }
-            }
-
-            m_creature->ForcedDespawn();
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_piege_grille1(Creature* pCreature)
-{
-    return new npc_piege_grille1AI(pCreature);
-}
-
-struct npc_piege_grille2AI : public ScriptedAI
-{
-    npc_piege_grille2AI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 3.0f))
-        {
-            if (GameObject* pGrille = m_creature->FindNearestGameObject(175351, 20.0f)) // GO_PORT_PIEGE_RAT3 c�t� �carlate
-                pGrille->UseDoorOrButton();
-            if (GameObject* pGrille = m_creature->FindNearestGameObject(175350, 20.0f)) // GO_PORT_PIEGE_RAT4 c�t� �carlate
-                pGrille->UseDoorOrButton();
-
-            uint32 maxplagued = urand(8, 10);
-
-            switch (urand(0, 2))
-            {
-                case 0: // Plagued Rat
-                {
-                    for (uint8 i = 0; i < maxplagued; ++i)
-                        m_creature->SummonCreature(10441, m_creature->GetPositionX() - 3.0f + float(urand(0, 6)),
-                                                   m_creature->GetPositionY() - 3.0f + float(urand(0, 6)), m_creature->GetPositionZ() + 0.7f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    break;
-                }
-                case 1: // Plagued Insect
-                {
-                    for (uint8 i = 0; i < maxplagued; ++i)
-                        m_creature->SummonCreature(10461, m_creature->GetPositionX() - 3.0f + float(urand(0, 6)),
-                                                   m_creature->GetPositionY() - 3.0f + float(urand(0, 6)), m_creature->GetPositionZ() + 0.7f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    break;
-                }
-                case 2: // Plagued Maggot
-                {
-                    for (uint8 i = 0; i < maxplagued; ++i)
-                        m_creature->SummonCreature(10536, m_creature->GetPositionX() - 3.0f + float(urand(0, 6)),
-                                                   m_creature->GetPositionY() - 3.0f + float(urand(0, 6)), m_creature->GetPositionZ() + 0.7f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                    break;
-                }
-            }
-
-            m_creature->ForcedDespawn();
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_piege_grille2(Creature* pCreature)
-{
-    return new npc_piege_grille2AI(pCreature);
-}
-
-
 void AddSC_stratholme()
 {
     Script* newscript;
@@ -1261,11 +985,6 @@ void AddSC_stratholme()
     newscript->GetAI = &GetAI_mobs_rat_pestifere;
     newscript->RegisterSelf();
     */
-    newscript = new Script;
-    newscript->Name = "npc_Aurius";
-    newscript->GetAI = &GetAI_npc_aurius;
-    newscript->pQuestRewardedNPC = &QuestComplete_npc_aurius;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_couloir_trigger1";
@@ -1285,16 +1004,6 @@ void AddSC_stratholme()
     newscript = new Script;
     newscript->Name = "go_supply_crate";
     newscript->GOGetAI = &GetAIgo_supply_crate;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_piege_grille1";
-    newscript->GetAI = &GetAI_npc_piege_grille1;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_piege_grille2";
-    newscript->GetAI = &GetAI_npc_piege_grille2;
     newscript->RegisterSelf();
 
     newscript = new Script;

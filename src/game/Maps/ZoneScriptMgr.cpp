@@ -16,9 +16,6 @@
  */
 
 #include "ZoneScriptMgr.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "ScriptMgr.h"
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1(ZoneScriptMgr);
@@ -87,7 +84,7 @@ void ZoneScriptMgr::HandlePlayerEnterZone(Player* plr, uint32 zoneid)
         return;
 
     itr->second->OnPlayerEnter(plr);
-    DEBUG_LOG("Player %u entered ZoneScript", plr->GetGUIDLow());
+    //DEBUG_LOG("Player %u entered ZoneScript", plr->GetGUIDLow());
 }
 
 void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
@@ -101,7 +98,7 @@ void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
         return;
 
     itr->second->OnPlayerLeave(plr);
-    DEBUG_LOG("Player %u left ZoneScript", plr->GetGUIDLow());
+    //DEBUG_LOG("Player %u left ZoneScript", plr->GetGUIDLow());
 }
 
 ZoneScript * ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)

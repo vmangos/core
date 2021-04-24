@@ -23,7 +23,6 @@
 #define MANGOSSERVER_PET_H
 
 #include "Common.h"
-#include "ObjectGuid.h"
 #include "Creature.h"
 
 enum PetType
@@ -186,7 +185,7 @@ class Pet : public Creature
         uint32 GetMaxLoyaltyPoints(uint32 level);
         uint32 GetStartLoyaltyPoints(uint32 level);
         void KillLoyaltyBonus(uint32 level);
-        uint32 GetLoyaltyLevel() const { return GetByteValue(UNIT_FIELD_BYTES_1, 1); }
+        uint32 GetLoyaltyLevel() const { return GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_LOYALTY); }
         void SetLoyaltyLevel(LoyaltyLevel level);
         void GivePetXP(uint32 xp);
         void GivePetLevel(uint32 level);
@@ -223,7 +222,6 @@ class Pet : public Creature
         void CastPetAuras(bool current);
         void CastPetAura(PetAura const* aura);
 
-        void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();
         void _LoadAuras(uint32 timediff);

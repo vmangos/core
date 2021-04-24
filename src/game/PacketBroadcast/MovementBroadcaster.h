@@ -1,23 +1,20 @@
 #ifndef MANGOS_MOVEMENT_BROADCASTER_H
 #define MANGOS_MOVEMENT_BROADCASTER_H
 
-#include "Log.h"
-#include "ObjectGuid.h"
-#include "Threading.h"
-#include <array>
+#include "Platform/Define.h"
+
 #include <atomic>
-#include <array>
 #include <chrono>
-#include <unordered_map>
-#include <list>
 #include <vector>
 #include <cstddef>
 #include <memory>
+#include <thread>
+#include <functional>
 
 class PlayerBroadcaster;
 class MovementBroadcaster;
 
-class MovementBroadcasterWorker : public ACE_Based::Runnable
+class MovementBroadcasterWorker
 {
 public:
     MovementBroadcasterWorker(int threadId, MovementBroadcaster* broadcaster) : m_threadId(threadId), m_broadcaster(broadcaster) {};
@@ -34,11 +31,11 @@ class MovementBroadcaster final
     std::size_t m_num_threads;
 
     std::atomic_bool m_stop;
-    std::vector<ACE_Based::Thread*> m_threads;
+    std::vector<std::unique_ptr<std::thread, std::function<void(std::thread *)>>> m_threads;
     std::chrono::milliseconds m_sleep_timer;
 
     std::vector<PlayersBCastSet> m_thread_players;
-    std::vector<ACE_Thread_Mutex> m_thread_locks;
+    std::vector<std::mutex> m_thread_locks;
 
     void Work(std::size_t thread_id);
     void BroadcastPackets(std::size_t index, uint32& num_packets);

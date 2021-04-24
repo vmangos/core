@@ -142,7 +142,7 @@ struct NecropolisRelayAI : public ScriptedAI
                     if (SpawnedShards.empty())
                     {
                         despawnTimer = 20000;
-                        necropolis->SendObjectDeSpawnAnim(necropolis->GetObjectGuid());
+                        necropolis->SendObjectDeSpawnAnim();
                     }
                     else
                         necropolis->SendGameObjectCustomAnim();

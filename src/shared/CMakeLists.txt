@@ -30,7 +30,7 @@ set (shared_SRCS
     revision.h
     ServiceWin32.h
     SystemConfig.h
-    Threading.h
+    ThreadPool.h
     Timer.h
     Util.h
     WheatyExceptionReport.h
@@ -63,13 +63,14 @@ set (shared_SRCS
     Database/SqlPreparedStatement.h
     Database/SQLStorage.h
     Database/SQLStorageImpl.h
+    nonstd/optional.hpp
     Common.cpp
     DelayExecutor.cpp
     Log.cpp
     PosixDaemon.cpp
     ProgressBar.cpp
     ServiceWin32.cpp
-    Threading.cpp
+    ThreadPool.cpp
     Util.cpp
     Duration.h
     WheatyExceptionReport.cpp
@@ -166,7 +167,7 @@ include_directories(
 
 if(WIN32)
   include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/include-windows
+    ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
 endif()
 

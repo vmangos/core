@@ -33,7 +33,6 @@ class GuardAI : public CreatureAI
 
         void MoveInLineOfSight(Unit*) override;
         void AttackStart(Unit*) override;
-        void JustDied(Unit*) override;
         void EnterCombat(Unit*) override;
         void UpdateAI(uint32 const) override;
         static int Permissible(Creature const*);

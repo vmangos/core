@@ -18,18 +18,17 @@
  */
 
 #include "DBCStores.h"
-#include "Policies/SingletonImp.h"
 #include "Log.h"
 #include "ProgressBar.h"
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
-#include "Map.h"
-#include "SQLStorages.h"
 #include "DBCfmt.h"
 #include "SpellMgr.h"
 #include "ObjectMgr.h"
 
 #include <map>
+#include <vector>
+#include <regex>
 
 struct WMOAreaTableTripple
 {
@@ -48,13 +47,13 @@ struct WMOAreaTableTripple
     int32 adtId;
 };
 
-typedef std::map<WMOAreaTableTripple, WMOAreaTableEntry const* > WMOAreaInfoByTripple;
-
-static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
-
 DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
+DBCStorage <CharacterFacialHairStylesEntry> sCharacterFacialHairStylesStore(CharacterFacialHairStylesfmt);
+std::unordered_map<uint32, CharacterFacialHairStylesEntry const*> sCharFacialHairMap;
+DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
+std::multimap<uint32, CharSectionsEntry const*> sCharSectionMap;
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
@@ -63,33 +62,31 @@ DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore(Creatu
 DBCStorage <CreatureModelDataEntry> sCreatureModelDataStore(CreatureModelDatafmt);
 DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
 DBCStorage <CreatureTypeEntry> sCreatureTypeStore(CreatureTypefmt);
-
 DBCStorage <DurabilityQualityEntry> sDurabilityQualityStore(DurabilityQualityfmt);
 DBCStorage <DurabilityCostsEntry> sDurabilityCostsStore(DurabilityCostsfmt);
-
 DBCStorage <EmotesEntry> sEmotesStore(EmotesEntryfmt);
 DBCStorage <EmotesTextEntry> sEmotesTextStore(EmotesTextEntryfmt);
-
 DBCStorage <GameObjectDisplayInfoEntry> sGameObjectDisplayInfoStore(GameObjectDisplayInfofmt);
-
 DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 //DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt); -- not used currently
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
 DBCStorage <LockEntry> sLockStore(LockEntryfmt);
-
+DBCStorage<NamesProfanityEntry> sNamesProfanityStore(NamesProfanityEntryfmt);
+DBCStorage<NamesReservedEntry> sNamesReservedStore(NamesReservedEntryfmt);
+static std::wstring const emacsStartOfLineToken = L"\\<"; // equivalent to ^
+static std::wstring const emacsEndOfLineToken = L"\\>";   // equivalent to $
+typedef std::vector<std::wregex> NameValidationRegexContainer;
+NameValidationRegexContainer NamesProfaneValidators;
+NameValidationRegexContainer NamesReservedValidators;
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
-
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
 SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
-
 DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
 DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
-
 SpellCategoriesStore sSpellCategoriesStore;
 PetFamilySpellsStore sPetFamilySpellsStore;
-
 DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
 DBCStorage <SpellDurationEntry> sSpellDurationStore(SpellDurationfmt);
 DBCStorage <SpellFocusObjectEntry> sSpellFocusObjectStore(SpellFocusObjectfmt);
@@ -97,28 +94,21 @@ DBCStorage <SpellRadiusEntry> sSpellRadiusStore(SpellRadiusfmt);
 DBCStorage <SpellRangeEntry> sSpellRangeStore(SpellRangefmt);
 DBCStorage <SpellShapeshiftFormEntry> sSpellShapeshiftFormStore(SpellShapeshiftfmt);
 DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
-//DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
 DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
 TalentSpellPosMap sTalentSpellPosMap;
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
-// store absolute bit position for first rank for talent inspect
-typedef std::map<uint32, uint32> TalentInspectMap;
-static TalentInspectMap sTalentPosInInspect;
-static TalentInspectMap sTalentTabSizeInInspect;
-static uint32 sTalentTabPages[12/*MAX_CLASSES*/][3];
-
 TaxiMask sTaxiNodesMask;
-
 // DBC used only for initialization sTaxiPathSetBySource at startup.
 TaxiPathSetBySource sTaxiPathSetBySource;
 DBCStorage <TaxiPathEntry> sTaxiPathStore(TaxiPathEntryfmt);
 
 // DBC store data but sTaxiPathNodesByPath used for fast access to entries (it's not owner pointed data).
 TaxiPathNodesByPath sTaxiPathNodesByPath;
-static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
+DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
 
 DBCStorage <WMOAreaTableEntry>  sWMOAreaTableStore(WMOAreaTableEntryfmt);
+std::map<WMOAreaTableTripple, WMOAreaTableEntry const*> sWMOAreaInfoByTripple;
 DBCStorage <WorldMapAreaEntry>  sWorldMapAreaStore(WorldMapAreaEntryfmt);
 //DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
 DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
@@ -192,7 +182,7 @@ void LoadDBCStores(std::string const& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    uint32 const DBCFilesCount = 39;
+    uint32 const DBCFilesCount = 43;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -205,6 +195,19 @@ void LoadDBCStores(std::string const& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sBankBagSlotPricesStore,   dbcPath, "BankBagSlotPrices.dbc");
 
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sChatChannelsStore,        dbcPath, "ChatChannels.dbc");
+
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sCharacterFacialHairStylesStore, dbcPath, "CharacterFacialHairStyles.dbc");
+    for (uint32 i = 0; i < sCharacterFacialHairStylesStore.GetNumRows(); ++i)
+        if (CharacterFacialHairStylesEntry const* entry = sCharacterFacialHairStylesStore.LookupEntry(i))
+            if (entry->RaceID && ((1 << (entry->RaceID - 1)) & RACEMASK_ALL_PLAYABLE) != 0) // ignore nonplayable races
+                sCharFacialHairMap.insert({ entry->RaceID | (entry->SexID << 8) | (entry->VariationID << 16), entry });
+
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sCharSectionsStore,        dbcPath, "CharSections.dbc");
+    for (uint32 i = 0; i < sCharSectionsStore.GetNumRows(); ++i)
+        if (CharSectionsEntry const* entry = sCharSectionsStore.LookupEntry(i))
+            if (entry->Race && ((1 << (entry->Race - 1)) & RACEMASK_ALL_PLAYABLE) != 0) //ignore Nonplayable races
+                sCharSectionMap.emplace(uint8(entry->BaseSection) | (uint8(entry->Gender) << 8) | (uint8(entry->Race) << 16), entry);
+
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sChrClassesStore,          dbcPath, "ChrClasses.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sChrRacesStore,            dbcPath, "ChrRaces.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sCinematicSequencesStore,  dbcPath, "CinematicSequences.dbc");
@@ -225,6 +228,50 @@ void LoadDBCStores(std::string const& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemRandomPropertiesStore, dbcPath, "ItemRandomProperties.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemSetStore,             dbcPath, "ItemSet.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sLockStore,                dbcPath, "Lock.dbc");
+
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sNamesProfanityStore,      dbcPath, "NamesProfanity.dbc");
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sNamesReservedStore,       dbcPath, "NamesReserved.dbc");
+    for (uint32 i = 0; i < sNamesProfanityStore.GetNumRows(); ++i)
+    {
+        NamesProfanityEntry const* namesProfanity = sNamesProfanityStore.LookupEntry(i);
+        if (!namesProfanity)
+            continue;
+
+        std::wstring wname;
+        ASSERT(Utf8toWStr(namesProfanity->Name, wname));
+
+        // the dbc uses emacs regex syntax
+        auto index = wname.find(emacsStartOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsStartOfLineToken.length(), L"^");
+
+        index = wname.find(emacsEndOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsEndOfLineToken.length(), L"$");
+
+        NamesProfaneValidators.emplace_back(wname, std::regex::icase | std::regex::optimize);
+    }
+    for (uint32 i = 0; i < sNamesReservedStore.GetNumRows(); ++i)
+    {
+        NamesReservedEntry const* namesReserved = sNamesReservedStore.LookupEntry(i);
+        if (!namesReserved)
+            continue;
+
+        std::wstring wname;
+        ASSERT(Utf8toWStr(namesReserved->Name, wname));
+
+        // the dbc uses emacs regex syntax
+        auto index = wname.find(emacsStartOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsStartOfLineToken.length(), L"^");
+
+        index = wname.find(emacsEndOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsEndOfLineToken.length(), L"$");
+
+        NamesReservedValidators.emplace_back(wname, std::regex::icase | std::regex::optimize);
+    }
+
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sQuestSortStore,           dbcPath, "QuestSort.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillLineStore,           dbcPath, "SkillLine.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillRaceClassInfoStore,  dbcPath, "SkillRaceClassInfo.dbc");
@@ -283,71 +330,6 @@ void LoadDBCStores(std::string const& dataPath)
     }
 
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sTalentTabStore,           dbcPath, "TalentTab.dbc");
-
-    // prepare fast data access to bit pos of talent ranks for use at inspecting
-    {
-        // fill table by amount of talent ranks and fill sTalentTabBitSizeInInspect
-        // store in with (row,col,talent)->size key for correct sorting by (row,col)
-        typedef std::map<uint32, uint32> TalentBitSize;
-        TalentBitSize sTalentBitSize;
-        for (uint32 i = 1; i < sTalentStore.GetNumRows(); ++i)
-        {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-            if (!talentInfo) continue;
-
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-            if (!talentTabInfo)
-                continue;
-
-            // find talent rank
-            uint32 curtalent_maxrank = 0;
-            for (uint32 k = 5; k > 0; --k)
-            {
-                if (talentInfo->RankID[k - 1])
-                {
-                    curtalent_maxrank = k;
-                    break;
-                }
-            }
-
-            sTalentBitSize[(talentInfo->Row << 24) + (talentInfo->Col << 16) + talentInfo->TalentID] = curtalent_maxrank;
-            sTalentTabSizeInInspect[talentInfo->TalentTab] += curtalent_maxrank;
-        }
-
-        // now have all max ranks (and then bit amount used for store talent ranks in inspect)
-        for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
-        {
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
-            if (!talentTabInfo)
-                continue;
-
-            // prevent memory corruption; otherwise cls will become 12 below
-            if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE) == 0)
-                continue;
-
-            // store class talent tab pages
-            uint32 cls = 1;
-            for (uint32 m = 1; !(m & talentTabInfo->ClassMask) && cls < MAX_CLASSES; m <<= 1, ++cls) {}
-
-            sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabId;
-
-            // add total amount bits for first rank starting from talent tab first talent rank pos.
-            uint32 pos = 0;
-            for (const auto& itr : sTalentBitSize)
-            {
-                uint32 talentId = itr.first & 0xFFFF;
-                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-                if (!talentInfo)
-                    continue;
-
-                if (talentInfo->TalentTab != talentTabId)
-                    continue;
-
-                sTalentPosInInspect[talentId] = pos;
-                pos += itr.second;
-            }
-        }
-    }
 
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sTaxiPathStore,            dbcPath, "TaxiPath.dbc");
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
@@ -422,7 +404,7 @@ void LoadDBCStores(std::string const& dataPath)
     for (uint32 i = 0; i < sWMOAreaTableStore.GetNumRows(); ++i)
     {
         if (WMOAreaTableEntry const* entry = sWMOAreaTableStore.LookupEntry(i))
-            sWMOAreaInfoByTripple.insert(WMOAreaInfoByTripple::value_type(WMOAreaTableTripple(entry->rootId, entry->adtId, entry->groupId), entry));
+            sWMOAreaInfoByTripple.insert({ WMOAreaTableTripple(entry->rootId, entry->adtId, entry->groupId), entry });
     }
     //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sWorldMapOverlayStore,     dbcPath,"WorldMapOverlay.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sWorldSafeLocsStore,       dbcPath, "WorldSafeLocs.dbc");
@@ -488,11 +470,32 @@ uint32 GetTalentSpellCost(uint32 spellId)
 
 WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)
 {
-    WMOAreaInfoByTripple::iterator i = sWMOAreaInfoByTripple.find(WMOAreaTableTripple(rootid, adtid, groupid));
+    auto i = sWMOAreaInfoByTripple.find(WMOAreaTableTripple(rootid, adtid, groupid));
     if (i == sWMOAreaInfoByTripple.end())
         return nullptr;
     return i->second;
 
+}
+
+CharacterFacialHairStylesEntry const* GetCharFacialHairEntry(uint8 race, uint8 gender, uint8 facialHairId)
+{
+    auto itr = sCharFacialHairMap.find(uint32(race) | uint32(gender << 8) | uint32(facialHairId << 16));
+    if (itr == sCharFacialHairMap.end())
+        return nullptr;
+
+    return itr->second;
+}
+
+CharSectionsEntry const* GetCharSectionEntry(uint8 race, CharSectionType genType, uint8 gender, uint8 type, uint8 color)
+{
+    auto eqr = sCharSectionMap.equal_range(uint32(genType) | uint32(gender << 8) | uint32(race << 16));
+    for (auto itr = eqr.first; itr != eqr.second; ++itr)
+    {
+        if (itr->second->VariationIndex == type && itr->second->ColorIndex == color && !itr->second->HasFlag(SECTION_FLAG_UNAVAILABLE))
+            return itr->second;
+    }
+
+    return nullptr;
 }
 
 ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id)
@@ -534,27 +537,7 @@ ChatChannelsEntry const* GetChannelEntryFor(std::string const& name)
     }
     return nullptr;
 }
-/*[-ZERO]
-bool IsTotemCategoryCompatiableWith(uint32 itemTotemCategoryId, uint32 requiredTotemCategoryId)
-{
-    if (requiredTotemCategoryId==0)
-        return true;
-    if (itemTotemCategoryId==0)
-        return false;
 
-    TotemCategoryEntry const* itemEntry = sTotemCategoryStore.LookupEntry(itemTotemCategoryId);
-    if (!itemEntry)
-        return false;
-    TotemCategoryEntry const* reqEntry = sTotemCategoryStore.LookupEntry(requiredTotemCategoryId);
-    if (!reqEntry)
-        return false;
-
-    if (itemEntry->categoryType!=reqEntry->categoryType)
-        return false;
-
-    return (itemEntry->categoryMask & reqEntry->categoryMask)==reqEntry->categoryMask;
-}
-*/
 bool Zone2MapCoordinates(float& x, float& y, uint32 zone)
 {
     WorldMapAreaEntry const* maEntry = sWorldMapAreaStore.LookupEntry(zone);
@@ -583,29 +566,6 @@ bool Map2ZoneCoordinates(float& x, float& y, uint32 zone)
     std::swap(x, y);                                        // client have map coords swapped
 
     return true;
-}
-
-uint32 GetTalentInspectBitPosInTab(uint32 talentId)
-{
-    TalentInspectMap::const_iterator itr = sTalentPosInInspect.find(talentId);
-    if (itr == sTalentPosInInspect.end())
-        return 0;
-
-    return itr->second;
-}
-
-uint32 GetTalentTabInspectBitSize(uint32 talentTabId)
-{
-    TalentInspectMap::const_iterator itr = sTalentTabSizeInInspect.find(talentTabId);
-    if (itr == sTalentTabSizeInInspect.end())
-        return 0;
-
-    return itr->second;
-}
-
-uint32 const* GetTalentTabPages(uint32 cls)
-{
-    return sTalentTabPages[cls];
 }
 
 bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, float x, float y, float z, float delta)
@@ -667,14 +627,27 @@ SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, u
     return nullptr;
 }
 
-char const* GetRaceName(uint8 race, uint8 locale)
+char const* GetUnitRaceName(uint8 race, uint8 locale)
 {
     ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
     return raceEntry ? raceEntry->name[locale] : nullptr;
 }
 
-char const* GetClassName(uint8 class_, uint8 locale)
+char const* GetUnitClassName(uint8 class_, uint8 locale)
 {
     ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(class_);
     return classEntry ? classEntry->name[locale] : nullptr;
+}
+
+uint8 ValidateName(std::wstring const& name)
+{
+    for (std::wregex const& regex : NamesProfaneValidators)
+        if (std::regex_search(name, regex))
+            return CHAR_NAME_PROFANE;
+
+    for (std::wregex const& regex : NamesReservedValidators)
+        if (std::regex_search(name, regex))
+            return CHAR_NAME_RESERVED;       
+
+    return CHAR_NAME_SUCCESS;
 }

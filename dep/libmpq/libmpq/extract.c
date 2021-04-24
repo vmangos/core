@@ -2,7 +2,7 @@
  *  extract.c -- global extracting function for all known file compressions
  *               in a mpq archive.
  *
- *  Copyright (c) 2003-2008 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (c) 2003-2011 Maik Broemme <mbroemme@libmpq.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -52,16 +52,14 @@ int32_t libmpq__decompress_huffman(uint8_t *in_buf, uint32_t in_size, uint8_t *o
 	/* TODO: make typdefs of this structs? */
 	/* some common variables. */
 	int32_t tb     = 0;
-	struct huffman_tree_s *ht = NULL;
-	struct huffman_input_stream_s *is = NULL;
+	struct huffman_tree_s *ht;
+	struct huffman_input_stream_s *is;
 
 	/* allocate memory for the huffman tree. */
 	if ((ht = malloc(sizeof(struct huffman_tree_s))) == NULL ||
 	    (is = malloc(sizeof(struct huffman_input_stream_s))) == NULL) {
 
 		/* memory allocation problem. */
-        free(ht);
-        free(is);
 		return LIBMPQ_ERROR_MALLOC;
 	}
 

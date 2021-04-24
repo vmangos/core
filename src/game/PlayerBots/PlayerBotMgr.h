@@ -49,12 +49,12 @@ struct PlayerBotStats
     /* Config */
     uint32 confMaxOnline;
     uint32 confMinOnline;
-    uint32 confBotsRefresh;
+    uint32 confRandomBotsRefresh;
     uint32 confUpdateDiff;
 
     PlayerBotStats() 
     : onlineCount(0), loadingCount(0), totalBots(0), onlineChat(0),
-    confMaxOnline(0), confMinOnline(0), confBotsRefresh(0), confUpdateDiff(0) {}
+    confMaxOnline(0), confMinOnline(0), confRandomBotsRefresh(0), confUpdateDiff(0) {}
 };
 
 
@@ -90,31 +90,28 @@ class PlayerBotMgr
         bool ForceAccountConnection(WorldSession* sess);
         bool IsPermanentBot(uint32 playerGuid);
         bool IsChatBot(uint32 playerGuid);
-        bool ForceLogoutDelay() const { return forceLogoutDelay; }
 
-        uint32 GenBotAccountId() { return ++_maxAccountId; }
+        uint32 GenBotAccountId() { return ++m_maxAccountId; }
         PlayerBotStats& GetStats(){ return m_stats; }
-        void Start() { enable = true; }
+        void Start() { m_enableRandomBots = true; }
     protected:
-        /* Combien de temps depuis la derniere MaJ ?*/
+        // How long since last update?
         uint32 m_elapsedTime;
         uint32 m_lastBotsRefresh;
         uint32 m_lastUpdate;
-        uint32 totalChance;
-        uint32 _maxAccountId;
+        uint32 m_totalChance;
+        uint32 m_maxAccountId;
 
         std::map<uint32 /*pl guid*/, PlayerBotEntry*> m_bots;
         std::map<uint32 /*account*/, uint32> m_tempBots;
         PlayerBotStats m_stats;
 
-        uint32 confMinBots;
-        uint32 confMaxBots;
-        uint32 confBotsRefresh;
-        uint32 confUpdateDiff;
-        bool confDebug;
-        bool forceLogoutDelay;
-
-        bool enable;
+        uint32 m_confMinRandomBots;
+        uint32 m_confMaxRandomBots;
+        uint32 m_confRandomBotsRefresh;
+        uint32 m_confUpdateDiff;
+        bool m_confDebug;
+        bool m_enableRandomBots;
 };
 
 #define sPlayerBotMgr MaNGOS::Singleton<PlayerBotMgr>::Instance()

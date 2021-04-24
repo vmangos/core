@@ -24,7 +24,6 @@
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include "DBCStructure.h"
-#include "GameObject.h"
 
 #include "Platform/Define.h"
 
@@ -33,6 +32,7 @@ namespace VMAP
     class WorldModel;
 }
 
+class GameObject;
 
 class GameObjectModel
 {
@@ -43,7 +43,7 @@ class GameObjectModel
         //G3D::Vector3 iRot;
         float iInvScale;
         float iScale;
-        VMAP::WorldModel* iModel;
+        std::shared_ptr<VMAP::WorldModel> iModel;
 
         GameObjectModel() : collision_enabled(false), iInvScale(0), iScale(0), iModel(nullptr) {}
         bool initialize(GameObject const* const pGo, GameObjectDisplayInfoEntry const* pDisplayInfo);

@@ -26,6 +26,8 @@ char const AreaTableEntryfmt[]="niiiixxxxxissssssssxixxxi";
 char const AreaTriggerEntryfmt[]="niffffffff";
 char const AuctionHouseEntryfmt[]="niiixxxxxxxxx";
 char const BankBagSlotPricesEntryfmt[]="ni";
+char const CharSectionsEntryfmt[] = "diiiiixxxi";
+char const CharacterFacialHairStylesfmt[] = "iiixxxxxx";
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
 char const ChrClassesEntryfmt[]="nxxixssssssssxxix";
 #else
@@ -59,6 +61,8 @@ char const LiquidTypefmt[]="niii";
 char const LockEntryfmt[]="niiiiiiiiiiiiiiiiiiiiiiiixxxxxxxx";
 char const MailTemplateEntryfmt[]="nxxxxxxxxx";
 char const MapEntryfmt[]="nxixssssssssxxxxxxxixxxxxxxxxxxxxxxxxxixxx";
+char const NamesProfanityEntryfmt[] = "ds";
+char const NamesReservedEntryfmt[] = "ds";
 char const QuestSortEntryfmt[]="nxxxxxxxxx";
 char const SkillLinefmt[]="nixssssssssxxxxxxxxxxi";
 char const SkillLineAbilityfmt[]="niiiixxiiiiixxi";

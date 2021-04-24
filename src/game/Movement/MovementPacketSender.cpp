@@ -17,6 +17,7 @@
 
 #include "MovementPacketSender.h"
 #include "Player.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Anticheat.h"
@@ -112,7 +113,7 @@ UnitMoveType MovementPacketSender::GetMoveTypeByChangeType(MovementChangeType mo
     }
 }
 
-void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType mtype, float newRate)
+void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType mtype, float newSpeed)
 {
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
@@ -129,7 +130,7 @@ void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType m
     data << unit->GetGUID();
 #endif
     data << unit->m_movementInfo;
-    data << float(newRate);
+    data << float(newSpeed);
     unit->SendMovementMessageToSet(std::move(data), true, mover);
 }
 

@@ -21,24 +21,19 @@
 #define _OBJECTMGR_H
 
 #include "Common.h"
-#include "Log.h"
 #include "Object.h"
-#include "Bag.h"
-#include "Creature.h"
-#include "Player.h"
+#include "CreatureDefines.h"
 #include "GameObject.h"
 #include "Corpse.h"
 #include "QuestDef.h"
 #include "ItemPrototype.h"
 #include "NPCHandler.h"
 #include "Database/DatabaseEnv.h"
-#include "Map.h"
 #include "MapPersistentStateMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "Policies/Singleton.h"
 #include "SQLStorages.h"
-#include "Conditions.h"
 
 #include <string>
 #include <map>
@@ -129,29 +124,6 @@ struct SoundEntriesEntry
     uint32          Id;
     std::string     Name;
 };
-
-// Number of spells in one template
-#define CREATURE_SPELLS_MAX_SPELLS 8
-// Columns in the db for each spell
-#define CREATURE_SPELLS_MAX_COLUMNS 11
-
-struct CreatureSpellsEntry
-{
-    uint16 const spellId;
-    uint8 const  probability;
-    uint8 const  castTarget;
-    uint32 const targetParam1;
-    uint32 const targetParam2;
-    uint8 const  castFlags;
-    uint32 const delayInitialMin;
-    uint32 const delayInitialMax;
-    uint32 const delayRepeatMin;
-    uint32 const delayRepeatMax;
-    uint32 const scriptId;
-    CreatureSpellsEntry(uint16 Id, uint8 Probability, uint8 CastTarget, uint32 TargetParam1, uint32 TargetParam2, uint8 CastFlags, uint32 InitialMin, uint32 InitialMax, uint32 RepeatMin, uint32 RepeatMax, uint32 ScriptId) : spellId(Id), probability(Probability), castTarget(CastTarget), targetParam1(TargetParam1), targetParam2(TargetParam2), castFlags(CastFlags), delayInitialMin(InitialMin), delayInitialMax(InitialMax), delayRepeatMin(RepeatMin), delayRepeatMax(RepeatMax), scriptId(ScriptId) {}
-};
-
-typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 
 typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
 
@@ -311,38 +283,39 @@ struct RepSpilloverTemplate
 
 struct PointOfInterest
 {
-    uint32 entry;
-    float x;
-    float y;
-    uint32 icon;
-    uint32 flags;
-    uint32 data;
+    uint32 entry = 0;
+    float x = 0.0f;
+    float y = 0.0f;
+    uint32 icon = 0;
+    uint32 flags = 0;
+    uint32 data = 0;
     std::string icon_name;
 };
 
 struct GossipMenuItems
 {
-    uint32          menu_id;
-    uint32          id;
-    uint8           option_icon;
+    uint32          menu_id = 0;
+    uint32          id = 0;
+    uint8           option_icon = 0;
     std::string     option_text;
-    uint32          OptionBroadcastTextID;
-    uint32          option_id;
-    uint32          npc_option_npcflag;
-    int32           action_menu_id;
-    uint32          action_poi_id;
-    uint32          action_script_id;
-    bool            box_coded;
+    uint32          option_broadcast_text = 0;
+    uint32          option_id = 0;
+    uint32          npc_option_npcflag = 0;
+    int32           action_menu_id = 0;
+    uint32          action_poi_id = 0;
+    uint32          action_script_id = 0;
+    bool            box_coded = false;
     std::string     box_text;
-    uint32          BoxBroadcastTextID;
-    uint16          conditionId;
+    uint32          box_broadcast_text = 0;
+    uint32          condition_id = 0;
 };
 
 struct GossipMenus
 {
-    uint32          entry;
-    uint32          text_id;
-    uint16          conditionId;
+    uint32          entry = 0;
+    uint32          text_id = 0;
+    uint32          script_id = 0;
+    uint32          condition_id = 0;
 };
 
 typedef std::multimap<uint32,GossipMenus> GossipMenusMap;
@@ -602,6 +575,7 @@ class ObjectMgr
         bool IsExistingAreaTriggerId(uint32 id) const { return (m_AreaTriggerIdSet.find(id) != m_AreaTriggerIdSet.end()); }
         bool IsExistingCreatureSpellsId(uint32 id) const { return (m_CreatureSpellsIdSet.find(id) != m_CreatureSpellsIdSet.end()); }
         bool IsExistingVendorTemplateId(uint32 id) const { return (m_VendorTemplateIdSet.find(id) != m_VendorTemplateIdSet.end()); }
+        bool IsExistingGossipMenuId(uint32 id) const { return (m_GossipMenuIdSet.find(id) != m_GossipMenuIdSet.end()); }
 
         typedef std::unordered_map<uint32, Item*> ItemMap;
 
@@ -629,6 +603,7 @@ class ObjectMgr
         void LoadGameobjectInfo();
         void CheckGameObjectInfos();
         void AddGameobjectInfo(GameObjectInfo* goinfo);
+        void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();
         GameObjectUseRequirement const* GetGameObjectUseRequirement(ObjectGuid guid) const;
         std::map<uint32, GameObjectUseRequirement> _gobjRequirements;
@@ -649,11 +624,6 @@ class ObjectMgr
         static CreatureDataAddon const* GetCreatureAddon(uint32 lowguid)
         {
             return sCreatureDataAddonStorage.LookupEntry<CreatureDataAddon>(lowguid);
-        }
-
-        static CreatureDataAddon const* GetCreatureTemplateAddon(uint32 entry)
-        {
-            return sCreatureInfoAddonStorage.LookupEntry<CreatureDataAddon>(entry);
         }
 
         static ItemPrototype const* GetItemPrototype(uint32 id) { return sItemStorage.LookupEntry<ItemPrototype>(id); }
@@ -893,8 +863,9 @@ class ObjectMgr
 
         void LoadNpcGossips();
 
-        void LoadGossipMenu();
-        void LoadGossipMenuItems();
+        void LoadGossipMenus();
+        void LoadGossipMenu(std::set<uint32>& gossipScriptSet);
+        void LoadGossipMenuItems(std::set<uint32>& gossipScriptSet);
 
         void LoadVendorTemplates();
         void LoadVendors() { LoadVendors("npc_vendor", false); }
@@ -1120,12 +1091,11 @@ class ObjectMgr
         // global grid objects state (static DB spawns, global spawn mods from gameevent system)
         CellObjectGuids const& GetCellObjectGuids(uint16 mapid, uint32 cell_id)
         {
-            m_MapObjectGuids_lock.acquire();
+            std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
             CellObjectGuids const& guids = m_MapObjectGuids[mapid][cell_id];
-            m_MapObjectGuids_lock.release();
             return guids;
         }
-        ACE_Thread_Mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
+        std::mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
         {
             return m_MapObjectGuids_lock;
         }
@@ -1150,8 +1120,6 @@ class ObjectMgr
 
         int GetIndexForLocale(LocaleConstant loc);
         LocaleConstant GetLocaleForIndex(int i);
-
-        bool IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
 
         GameTele const* GetGameTele(uint32 id) const
         {
@@ -1474,7 +1442,6 @@ class ObjectMgr
 
     private:
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
-        void ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
         void LoadVendors(char const* tableName, bool isTemplates);
         void LoadTrainers(char const* tableName, bool isTemplates);
@@ -1489,6 +1456,7 @@ class ObjectMgr
         std::set<uint32> m_AreaTriggerIdSet;
         std::set<uint32> m_CreatureSpellsIdSet;
         std::set<uint32> m_VendorTemplateIdSet;
+        std::set<uint32> m_GossipMenuIdSet;
 
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
         // PetLevelInfoMap[creature_id][level]
@@ -1509,11 +1477,12 @@ class ObjectMgr
         FishingBaseSkillMap m_FishingBaseSkillMap;
 
         typedef std::map<uint32,std::vector<std::string> > HalfNameMap;
+
         HalfNameMap m_PetHalfNameMap0;
         HalfNameMap m_PetHalfNameMap1;
 
         MapObjectGuids m_MapObjectGuids;
-        ACE_Thread_Mutex m_MapObjectGuids_lock;
+        std::mutex m_MapObjectGuids_lock;
 
         CreatureDataMap m_CreatureDataMap;
         CreatureLocaleMap m_CreatureLocaleMap;

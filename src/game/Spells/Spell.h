@@ -23,7 +23,6 @@
 #define __SPELL_H
 
 #include "Common.h"
-#include "GridDefines.h"
 #include "SharedDefines.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
@@ -360,7 +359,7 @@ class Spell
         SpellCastResult CheckPower() const;
         SpellCastResult CheckCasterAuras() const;
 
-        int32 CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellDamage(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
+        float CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellEffectValue(target, m_spellInfo, i, &m_currentBasePoints[i], this); }
         static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell* spell = nullptr, Item* castItem = nullptr);
 
         bool HaveTargetsForEffect(SpellEffectIndex effect) const;
@@ -393,7 +392,7 @@ class Spell
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);
-        void SendChannelUpdate(uint32 time);
+        void SendChannelUpdate(uint32 time, bool interrupted = false);
         void SendChannelStart(uint32 duration);
         void SendResurrectRequest(Player* target);
 
@@ -414,17 +413,9 @@ class Spell
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
         void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
-        bool IsNextMeleeSwingSpell() const
-        {
-            return m_spellInfo->Attributes & (SPELL_ATTR_ON_NEXT_SWING_1|SPELL_ATTR_ON_NEXT_SWING_2);
-        }
-        bool IsRangedSpell() const
-        {
-            return  m_spellInfo->Attributes & SPELL_ATTR_RANGED;
-        }
         bool IsChannelActive() const { return m_casterUnit ? m_casterUnit->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0 : false; }
         bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK);  }
-        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
+        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && m_spellInfo->IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
         const SpellEntry* GetSpellInfo() const { return m_spellInfo; }
 
         bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executeStack; }
@@ -496,10 +487,6 @@ class Spell
 
         int32 GetAbsorbedDamage() const { return m_absorbed; }
     protected:
-        bool HasGlobalCooldown() const;
-        void TriggerGlobalCooldown();
-        void CancelGlobalCooldown();
-
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
@@ -557,7 +544,7 @@ class Spell
         Corpse* corpseTarget = nullptr;
         GameObject* gameObjTarget = nullptr;
         SpellAuraHolder* m_spellAuraHolder = nullptr;       // spell aura holder for current target, created only if spell has aura applying effect
-        int32 damage = 0;
+        float damage = 0;
         bool isReflected = false;
 
         // this is set in Spell Hit, but used in Apply Aura handler
@@ -568,9 +555,8 @@ class Spell
         GameObject* focusObject = nullptr;
 
         // Damage and healing in effects need just calculate
-        int32 m_damage = 0;                                 // Damage   in effects count here
-        int32 m_healing = 0;                                // Healing in effects count here
-        int32 m_healthLeech = 0;                            // Health leech in effects for all targets count here
+        float m_damage = 0;                                 // Damage   in effects count here
+        float m_healing = 0;                                // Healing in effects count here
         int32 m_absorbed = 0;
 
         //******************************************
@@ -646,6 +632,7 @@ class Spell
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
+        uint32 GetSpellBatchingEffectDelay(WorldObject const* pTarget) const;
         // -------------------------------------------
 
         //List For Triggered Spells

@@ -30,6 +30,7 @@
 // or multiple of the same mob in different locations with the same spell. However
 // our core does not support multiple spell target coordinates due to limitations with the DB, so 
 // we have to use the spells which summon a single creature.
+
 enum eSpell
 {
     SPELL_TP_CENTER           = 29231,
@@ -64,7 +65,7 @@ enum eSpell
     SPELL_SUM_GUARD_NE = 29226,
     SPELL_SUM_GUARD_NW = 29239,
     SPELL_SUM_GUARD_SW1 = 29256,
-    SPELL_SUM_GUARD_SW2 = 29268,
+    SPELL_SUM_GUARD_SW2 = 29268
 };
 
 static uint32 const ChampionSpells[10] =
@@ -81,7 +82,7 @@ static uint32 const ChampionSpells[10] =
     SPELL_SUM_CHAMP_NW3,
     //g3
     SPELL_SUM_CHAMP_NE1,
-    SPELL_SUM_CHAMP_NE2,
+    SPELL_SUM_CHAMP_NE2
 };
 
 static uint8 const g1_start = 0, g1_size = 4;
@@ -90,20 +91,14 @@ static uint8 const g3_start = 8, g3_size = 2;
 
 enum eScriptText
 {
-    SAY_AGGRO1                          = -1533075,
-    SAY_AGGRO2                          = -1533076,
-    SAY_AGGRO3                          = -1533077,
-    SAY_SUMMON                          = -1533078,
+    SAY_AGGRO1                          = 13061,
+    SAY_AGGRO2                          = 13062,
+    SAY_AGGRO3                          = 13063,
+    SAY_SUMMON                          = 13067,
 
-    SAY_SLAY1                           = -1533079,
-    SAY_SLAY2                           = -1533080,
-    SAY_DEATH                           = -1533081,
-
-    // Emotes probably only wotlk
-    //EMOTE_WARRIOR                       = -1533130,
-    //EMOTE_SKELETON                      = -1533131,
-    //EMOTE_TELEPORT                      = -1533132,
-    //EMOTE_TELEPORT_RETURN               = -1533133,
+    SAY_SLAY1                           = 13065,
+    SAY_SLAY2                           = 13066,
+    SAY_DEATH                           = 13064
 };
 
 enum eNPCs
@@ -111,7 +106,7 @@ enum eNPCs
     NPC_PLAGUED_GUARDIAN  = 16981,
     NPC_PLAGUED_CONSTRUCT = 16982, // unknown if this was ever used
     NPC_PLAGUED_CHAMPION  = 16983,
-    NPC_PLAGUED_WARRIOR   = 16984,
+    NPC_PLAGUED_WARRIOR   = 16984
 };
 
 enum eEvents
@@ -138,6 +133,7 @@ struct boss_nothAI : public ScriptedAI
     uint32 killSayCooldown;
     EventMap m_events;
     bool isOnBalc;
+
     void Reset() override
     {
         isOnBalc = false;
@@ -145,7 +141,7 @@ struct boss_nothAI : public ScriptedAI
         m_events.Reset();
         killSayCooldown = 5000;
     }
-    
+
     void JustReachedHome() override
     {
         if (m_pInstance)
@@ -168,7 +164,7 @@ struct boss_nothAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_WARRIORS, Seconds(10));
         m_events.ScheduleEvent(EVENT_TP_BALC,  Seconds(90));
 
-        DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
+        DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_NOTH, IN_PROGRESS);
@@ -210,7 +206,8 @@ struct boss_nothAI : public ScriptedAI
             m_events.Repeat(Seconds(urand(50,60))); //It's somewhere around 50seconds+
 
         }
-        else {
+        else
+        {
             m_events.Repeat(100);
         }
     }
@@ -232,15 +229,15 @@ struct boss_nothAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn);
         switch (phaseCounter)
         {
-        case 0:
-            m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(25 + urand(0,5)));
-            break;
-        case 1:
-            m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(44 + urand(0, 5)));
-            break;
-        case 2:
-            m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(57 + urand(0, 5)));
-            break;
+            case 0:
+                m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(25 + urand(0,5)));
+                break;
+            case 1:
+                m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(44 + urand(0, 5)));
+                break;
+            case 2:
+                m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(57 + urand(0, 5)));
+                break;
         }
 
         m_creature->CastSpell(m_creature, SPELL_IMMUNE_ALL, true);
@@ -306,18 +303,18 @@ struct boss_nothAI : public ScriptedAI
         DoScriptText(SAY_SUMMON, m_creature);
         switch (phaseCounter)
         {
-        case 0:
-            Summon4Champions();
-            break;
-        case 1:
-            Summon4Champions();
-            Summon2Guardians();
-            break;
-        default: // third balc phase and onwards
-            Summon4Champions();
-            Summon2Guardians();
-            Summon3Constructs();
-            break;
+            case 0:
+                Summon4Champions();
+                break;
+            case 1:
+                Summon4Champions();
+                Summon2Guardians();
+                break;
+            default: // third balc phase and onwards
+                Summon4Champions();
+                Summon2Guardians();
+                Summon3Constructs();
+                break;
         }
     }
 
@@ -326,8 +323,8 @@ struct boss_nothAI : public ScriptedAI
         isOnBalc = false;
 
         m_events.Reset();
-        m_events.ScheduleEvent(EVENT_BLINK,    Seconds(urand(2, 10)));
-        m_events.ScheduleEvent(EVENT_CURSE,    Seconds(urand(2, 10)));
+        m_events.ScheduleEvent(EVENT_BLINK, Seconds(urand(2, 10)));
+        m_events.ScheduleEvent(EVENT_CURSE, Seconds(urand(2, 10)));
         m_events.ScheduleEvent(EVENT_WARRIORS, Seconds(urand(2,10)));
         m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_ALL);
 
@@ -338,19 +335,19 @@ struct boss_nothAI : public ScriptedAI
         // note that we increment phaseCounter here
         switch (++phaseCounter) 
         {
-        // case 0: won't happen, its initialized from Aggro()
-        case 1:
-            m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(110));
-            break;
-        case 2:
-            m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
-            break;
-        default:
-            // No good sources on duration of 4th ground phase, all guides explain it as a wipe
-            // if you don't kill him during the 3rd ground phase. We'll just repeat previous phase logic
-            // after this. It's highly unlikely that any guild get to this stage without killing him or wiping.
-            m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
-            //sLog.outError("boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
+            // case 0: won't happen, its initialized from Aggro()
+            case 1:
+                m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(110));
+                break;
+            case 2:
+                m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
+                break;
+            default:
+                // No good sources on duration of 4th ground phase, all guides explain it as a wipe
+                // if you don't kill him during the 3rd ground phase. We'll just repeat previous phase logic
+                // after this. It's highly unlikely that any guild get to this stage without killing him or wiping.
+                m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
+                //sLog.outError("boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
         }
     }
 
@@ -386,11 +383,13 @@ struct boss_nothAI : public ScriptedAI
         if (!isOnBalc)
             ScriptedAI::AttackStart(pWho);
     }
+
     void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage) override 
     {
         if (isOnBalc && uiDamage > 0)
             uiDamage = 0;
     }
+
     void UpdateAI(uint32 const uiDiff) override
     {
         if (!isOnBalc)
@@ -418,29 +417,30 @@ struct boss_nothAI : public ScriptedAI
         {
             switch (l_EventId)
             {
-            case EVENT_BLINK:
-                BlinkAndRepeatEvent();
-                break;
-            case EVENT_CURSE:
-                CurseAndRepeatEvent();
-                break;
-            case EVENT_TP_BALC:
-                TeleportToBalc();
-                break;
-            case EVENT_TP_GROUND:
-                TeleportFromBalc();
-                break;
-            case EVENT_RMV_INVULN:
-                OnRemoveVulnerability();
-                break;
-            case EVENT_BALC_ADDS:
-                SpawnBalcAdds();
-                break;
-            case EVENT_WARRIORS:
-                SpawnWarriorsAndRepeatEvent();
-                break;
+                case EVENT_BLINK:
+                    BlinkAndRepeatEvent();
+                    break;
+                case EVENT_CURSE:
+                    CurseAndRepeatEvent();
+                    break;
+                case EVENT_TP_BALC:
+                    TeleportToBalc();
+                    break;
+                case EVENT_TP_GROUND:
+                    TeleportFromBalc();
+                    break;
+                case EVENT_RMV_INVULN:
+                    OnRemoveVulnerability();
+                    break;
+                case EVENT_BALC_ADDS:
+                    SpawnBalcAdds();
+                    break;
+                case EVENT_WARRIORS:
+                    SpawnWarriorsAndRepeatEvent();
+                    break;
             }
         }
+
         if (!isOnBalc)
             DoMeleeAttackIfReady();
     }

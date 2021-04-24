@@ -313,14 +313,11 @@ struct mob_buru_eggAI : public ScriptedAI
 
     void Reset() override
     {
-        // Empêche les oeufs d'aggro et de tourner
-        SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
-        // Aggro de Buru quand on tape un oeuf
+        // Aggro Buru on taking damage
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
         {
             if (!pBuru->IsInCombat())
@@ -333,24 +330,13 @@ struct mob_buru_eggAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        // Explose et fait pop une creature quand il meurs
+        // Explodes and spawns a creature when it dies
         m_creature->CastSpell(m_creature, SPELL_EXPLODE, false);
 
         if (Creature* add = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, m_creature->GetPositionX(), m_creature->GetPositionY(),
             m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
         {
             add->SetInCombatWithZone();
-        }
-
-        // Si Buru est a portee, il inflige des degats a celui-ci et changement de cible
-        if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
-        {
-            if (pBuru->IsAlive() && pBuru->GetDistance2d(m_creature) < 5.0f && pBuru->GetHealthPercent() >= 20)
-            {
-                pBuru->GetThreatManager().modifyThreatPercent(pBuru->GetVictim(), -100);
-
-                pBuru->SetHealth(pBuru->GetHealth() - 45000);
-            }
         }
     }
 

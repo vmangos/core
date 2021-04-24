@@ -70,6 +70,12 @@ struct npc_willix_the_importerAI : public npc_escortAI
 
     void Reset() override {}
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        npc_escortAI::JustRespawned();
+    }
+
     // Exact use of these texts remains unknown, it seems that he should only talk when he initiates the attack or he is the first who is attacked by a npc
     void Aggro(Unit* pWho) override
     {
@@ -153,6 +159,7 @@ bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, Q
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_WILLIX_READY, pCreature, pPlayer);
             pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
     }
 

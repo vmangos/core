@@ -317,8 +317,9 @@ Continents.MotionUpdate.Threads         = 0
 AsyncTasks.Threads                      = 1
 AsyncQueriesTickTimeout = 0
 
-# Movement interpolation system - not stable now
-Movement.Interpolation = 0
+# Movement extrapolation system - not stable now
+Movement.ExtrapolateChargePosition = 1
+Movement.ExtrapolatePetPosition = 1
 
 # Delayed repositionning checks (mounts inside / swimming ...). 0 to disable.
 Movement.RelocationVmapsCheckDelay = 0
@@ -382,6 +383,10 @@ Anticrash.Rearm.Timer = 60000
 #    PvP.DishonorableKills
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
+#  
+#    PvP.CityProtector
+#        Whether to assign City Protector titles on honor update or not.
+#        Default: 0
 #
 #    Progression.AccuratePetStatistics
 #        Whether to allow Blizzlike pet statistic (damage, speed, resists) progression.
@@ -434,6 +439,7 @@ PvP.AccuratePurchaseRequirements = 1
 PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
+PvP.CityProtector = 0
 
 Progression.RestoreDeletedItems = 1
 Progression.AccuratePetStatistics = 1
@@ -800,6 +806,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Minimal name length (1..12)
 #        Default: 2
 #
+#    WorldAvailable
+#        If players are allowed to enter the world. Character creation will still be possible if world is disabled.
+#        Default: 1 (Enabled)
+#                 0 (Disabled)
+#
 #    CharactersCreatingDisabled
 #        Disable characters creating for specific team or any (non-player accounts not affected)
 #        Default: 0 - enabled
@@ -863,6 +874,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #    InstantLogout
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
 #        Default: 1 (Mods/GMs/Admins)
+#
+#    ForceLogoutDelay
+#        Keep player characters ingame for some time after a client disconnects unexpectedly.
+#        Default: 1 (true)
+#                 0 (false)
 #
 #    AutoHonorRestart
 #        Server will schedule a restart on its own when it's time to perform PvP rank calculations.
@@ -1027,6 +1043,15 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Server autobroadcast interval set in miliseconds.
 #        Default: 1800000 = 30 min
 #
+#    Spell.EffectDelay
+#        Delay in milliseconds before most spell effects are processed.
+#        Default: 400
+#
+#    Spell.ProcDelay
+#        Delay in milliseconds before processing procs. Spells triggered by aura procs also seem
+#        to be subject to a batching delay, so we double the procs delay to recreate the effect.
+#        Default: 800
+#
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
 #        Default: 1 (true)
@@ -1059,6 +1084,7 @@ StrictPetNames = 0
 MinPlayerName = 2
 MinCharterName = 2
 MinPetName = 2
+WorldAvailable = 1
 CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
@@ -1070,6 +1096,7 @@ StartPlayerMoney = 0
 MinHonorKills = 15
 MaintenanceDay = 3
 InstantLogout = 1
+ForceLogoutDelay = 0
 AutoHonorRestart = 1
 AllFlightPaths = 0
 AlwaysMaxSkillForLevel = 0
@@ -1104,6 +1131,8 @@ PetDefaultLoyalty = 1
 PlayerCommands = 1
 Event.Announce = 0
 AutoBroadcast.Timer = 1800000
+Spell.EffectDelay = 400
+Spell.ProcDelay = 800
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
@@ -1159,7 +1188,7 @@ AllowTwoSide.AddFriend = 0
 #    ThreatRadius
 #        Radius for creature to evade after being pulled away from combat start point
 #        If ThreatRadius is less than creature aggro radius then aggro radius will be used
-#        Default: 100 yards
+#        Default: 50 yards
 #
 #    MaxCreaturesAttackRadius
 #        Creatures won't search for target farther than this.
@@ -1276,7 +1305,7 @@ AllowTwoSide.AddFriend = 0
 #
 ###################################################################################################################
 
-ThreatRadius = 100
+ThreatRadius = 50
 Rate.Creature.Aggro = 1
 MaxCreaturesAttackRadius = 40
 MaxPlayersStealthDetectRange = 40
@@ -1550,7 +1579,7 @@ Warden.ModuleDir             = "warden_modules"
 #                     1 - (Enabled)
 #
 #    Anticheat.MaxAllowedDesync
-#        Description: Client time desynchronization allowed when doing movement interpolation.
+#        Description: Client time desynchronization allowed when doing movement extrapolation.
 #        Default:     0
 #
 #    Anticheat.ReverseTime.Enable
@@ -2793,24 +2822,66 @@ AHBot.itemcount = 50
 #AHBot.bot.account = 32377
 
 ###################################################################################################################
+# PLAYER BOTS
+#
+#    RandomBot.Enable
+#        Enables automatic spawning of random bots. These bots have no AI. You have to code one and assign it.
+#        Default: 0 - off
+#                 1 - on
+#
+#    RandomBot.MinBots
+#        Minimum amount of random bots the server will try to spawn.
+#        Default: 0
+#
+#    RandomBot.MaxBots
+#        Maximum amount of random bots the server will try to spawn.
+#        Default: 0
+#
+#    RandomBot.Refresh
+#        How often the the server will check if there are enough bots spawned.
+#        Default: 60000 (1 minute)
+#
+#    PlayerBot.Debug
+#        Enables additional debugging information about bots that is printed in the console.
+#        Default: 0 - off
+#                 1 - on
+#
+#    PlayerBot.UpdateMs
+#        How often the AI of bots will be updated. A bigger delay will make them less responsive.
+#        Default: 1000 (1 second)
+#
+#    PlayerBot.ShowInWhoList
+#        Enables displaying characters controlled by bots in /who results.
+#        Default: 0 - off
+#                 1 - on
+#
+#    PlayerBot.MaxBots
+#        Maximum number of party bots that normal players are allowed to summon.
+#        Default: 0 (no limit)
+#
+#    PlayerBot.SkipChecks
+#        Disables the additional restrictions that apply when a normal player tries to summon a party bot.
+#        Default: 0 (restricted)
+#                 1 (no restrictions)
+#
+###################################################################################################################
+RandomBot.Enable = 0
+RandomBot.MinBots = 0
+RandomBot.MaxBots = 0
+RandomBot.Refresh = 60000
+PlayerBot.Debug = 0
+PlayerBot.UpdateMs = 1000
+PlayerBot.ShowInWhoList = 0
+PartyBot.MaxBots = 0
+PartyBot.SkipChecks = 0
+
+###################################################################################################################
 #    Database-based chat
 ###################################################################################################################
 OfflineChat.Enable = 0
 OfflineChat.Port   = 3444
 OfflineChat.IP     = 0.0.0.0
 OfflineChat.Password= "p8zqkt"
-
-###################################################################################################################
-#    Player bots
-###################################################################################################################
-PlayerBot.Enable = 1
-PlayerBot.Debug = 0
-PlayerBot.UpdateMs = 1000
-PlayerBot.MinBots = 0
-PlayerBot.MaxBots = 0
-PlayerBot.Refresh = 10000
-PlayerBot.ForceLogoutDelay = 1
-PlayerBot.ShowInWhoList = 0
 
 ###################################################################################################################
 #    Mail flooding mitigation
@@ -2832,10 +2903,4 @@ DynamicRespawn.AffectRespawnTimeBelow   = 0
 DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
-
-###################################################################################################################
-#    Others settings
-###################################################################################################################
-
-Spells.CCDelay = 200
 

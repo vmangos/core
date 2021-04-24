@@ -15,14 +15,11 @@
  */
 
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
@@ -294,7 +291,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Mount display id: %u", pTarget->GetMountID());
     PSendSysMessage("Stand state: %hhu", pTarget->GetStandState());
     PSendSysMessage("Shapeshift form: %hhu", pTarget->GetShapeshiftForm());
-    PSendSysMessage("Byte flags: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_1, 3));
+    PSendSysMessage("Vis flags: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG));
     PSendSysMessage("Dynamic flags: %u", pTarget->GetUInt32Value(UNIT_DYNAMIC_FLAGS));
     if (auto pSpellEntry = sSpellMgr.GetSpellEntry(pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL)))
         PSendSysMessage("Channel spell: %u - %s", pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL), pSpellEntry->SpellName[0].c_str());
@@ -309,7 +306,29 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Unit state flags: %u", pTarget->GetUnitState());
     PSendSysMessage("Death state: %hhu", pTarget->GetDeathState());
     PSendSysMessage("Sheath state: %hhu", pTarget->GetSheath());
-    PSendSysMessage("Byte flags 2: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_2, 1));
+    PSendSysMessage("Byte flags 2: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS));
+
+    return true;
+}
+
+bool ChatHandler::HandleUnitSpeedInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Speed info for %s", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Walk: %g", pTarget->GetSpeed(MOVE_WALK));
+    PSendSysMessage("Run: %g", pTarget->GetSpeed(MOVE_RUN));
+    PSendSysMessage("Run Back: %g", pTarget->GetSpeed(MOVE_RUN_BACK));
+    PSendSysMessage("Swim: %g", pTarget->GetSpeed(MOVE_SWIM));
+    PSendSysMessage("Swim Back: %g", pTarget->GetSpeed(MOVE_SWIM_BACK));
+    PSendSysMessage("Turn: %g", pTarget->GetSpeed(MOVE_TURN_RATE));
 
     return true;
 }
@@ -340,7 +359,7 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Happiness: %u", pTarget->GetPower(POWER_HAPPINESS));
     PSendSysMessage("Max Happiness: %u", pTarget->GetMaxPower(POWER_HAPPINESS));
     PSendSysMessage("Base attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_BASEATTACKTIME));
-    PSendSysMessage("Off hand attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_OFFHANDATTACKTIME));
+    PSendSysMessage("Off hand attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_BASEATTACKTIME+1));
     PSendSysMessage("Ranged attack time: %g", pTarget->GetFloatValue(UNIT_FIELD_RANGEDATTACKTIME));
     PSendSysMessage("Min damage: %g", pTarget->GetFloatValue(UNIT_FIELD_MINDAMAGE));
     PSendSysMessage("Max damage: %g", pTarget->GetFloatValue(UNIT_FIELD_MAXDAMAGE));
@@ -651,6 +670,48 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
                     holder->GetCasterGuid().GetString().c_str());
             }
         }
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleListMoveGensCommand(char* /*args*/)
+{
+    Unit* unit = GetSelectedUnit();
+    if (!unit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("List of move gens for %s:", unit->GetObjectGuid().GetString().c_str());
+    std::vector<MovementGeneratorType> generators;
+    unit->GetMotionMaster()->GetUsedMovementGeneratorsList(generators);
+    for (uint32 i = 0; i < generators.size(); i++)
+        PSendSysMessage("%u. %s (%u)", (i+1), MotionMaster::GetMovementGeneratorTypeName(generators[i]), generators[i]);
+
+    return true;
+}
+
+bool ChatHandler::HandleListHostileRefsCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("List of hostile references for %s:", pUnit->GetObjectGuid().GetString().c_str());
+    HostileReference* pReference = pUnit->GetHostileRefManager().getFirst();
+    uint32 counter = 1;
+    while (pReference)
+    {
+        if (Unit* pTarget = pReference->getSourceUnit())
+            PSendSysMessage("%u. %s", counter++, pTarget->GetGuidStr().c_str());
+        pReference = pReference->next();
     }
 
     return true;
@@ -1068,7 +1129,7 @@ bool ChatHandler::HandleModifyHolyCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_01, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+1, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_HOLY, pTarget->GetName(), amount);
 
@@ -1096,7 +1157,7 @@ bool ChatHandler::HandleModifyFireCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_02, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+2, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_FIRE, pTarget->GetName(), amount);
 
@@ -1124,7 +1185,7 @@ bool ChatHandler::HandleModifyNatureCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_03, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+3, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_NATURE, pTarget->GetName(), amount);
 
@@ -1152,7 +1213,7 @@ bool ChatHandler::HandleModifyFrostCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_04, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+4, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_FROST, pTarget->GetName(), amount);
 
@@ -1180,7 +1241,7 @@ bool ChatHandler::HandleModifyShadowCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_05, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+5, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_SHADOW, pTarget->GetName(), amount);
 
@@ -1208,7 +1269,7 @@ bool ChatHandler::HandleModifyArcaneCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_06, amount);
+    pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES+6, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_ARCANE, pTarget->GetName(), amount);
 
@@ -1318,7 +1379,7 @@ bool ChatHandler::HandleModifySpellPowerCommand(char *args)
 
     // dunno where spell power is stored so using a custom spell
     pTarget->RemoveAurasDueToSpell(18058);
-    pTarget->CastCustomSpell(pTarget, 18058, &amount, &amount, nullptr, true);
+    pTarget->CastCustomSpell(pTarget, 18058, amount, amount, {}, true);
 
     PSendSysMessage(LANG_YOU_CHANGE_SP, pTarget->GetName(), amount);
 
@@ -1388,7 +1449,7 @@ bool ChatHandler::HandleModifyOffSpeedCommand(char *args)
         return false;
     }
 
-    pTarget->SetFloatValue(UNIT_FIELD_OFFHANDATTACKTIME, (float) amount);
+    pTarget->SetFloatValue(UNIT_FIELD_BASEATTACKTIME+1, (float) amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_OHSPD, pTarget->GetName(), amount);
 
@@ -1856,7 +1917,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
     SpellSchoolMask schoolmask = GetSchoolMask(school);
 
     if (schoolmask & SPELL_SCHOOL_MASK_NORMAL)
-        damage = player->CalcArmorReducedDamage(target, damage);
+        damage = ditheru(player->CalcArmorReducedDamage(target, damage));
 
     // melee damage by specific school
     if (!*args)
@@ -2016,16 +2077,65 @@ bool ChatHandler::HandleMovegensCommand(char* /*args*/)
     return true;
 }
 
-// .cooldown <spell_id_or_0> <name>
-bool ChatHandler::HandleCooldownCommand(char* args)
+bool ChatHandler::HandleCooldownListCommand(char* /*args*/)
 {
-    uint32 spell_id = ExtractSpellIdFromLink(&args);   
-    std::string name = ExtractPlayerNameFromLink(&args);
     Unit* target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
 
-    if (!name.empty())
-        target = sObjectMgr.GetPlayer(name.c_str());
+    target->PrintCooldownList(*this);
+    return true;
+}
 
+bool ChatHandler::HandleCooldownClearCommand(char* args)
+{
+    Unit* target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::string tNameLink = "Unknown";
+    if (target->GetTypeId() == TYPEID_PLAYER)
+        tNameLink = GetNameLink(static_cast<Player*>(target));
+    else
+        tNameLink = target->GetName();
+
+    if (!*args)
+    {
+        target->RemoveAllCooldowns();
+        PSendSysMessage(LANG_REMOVEALL_COOLDOWN, tNameLink.c_str());
+    }
+    else
+    {
+        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+        uint32 spell_id = ExtractSpellIdFromLink(&args);
+        if (!spell_id)
+            return false;
+
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spell_id);
+        if (!spellEntry)
+        {
+            PSendSysMessage(LANG_UNKNOWN_SPELL, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        target->RemoveSpellCooldown(*spellEntry);
+        PSendSysMessage(LANG_REMOVE_COOLDOWN, spell_id, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
+    }
+    return true;
+}
+
+bool ChatHandler::HandleCooldownClearClientSideCommand(char*)
+{
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2033,23 +2143,10 @@ bool ChatHandler::HandleCooldownCommand(char* args)
         return false;
     }
 
-    std::string tNameLink = target->ToPlayer() ? GetNameLink(target->ToPlayer()) : target->GetName();
+    std::string tNameLink = GetNameLink(target);
 
-    if (!spell_id) {
-        target->RemoveAllSpellCooldown();
-        PSendSysMessage(LANG_REMOVEALL_COOLDOWN, tNameLink.c_str());
-        return true;
-    }
-
-    if (!sSpellMgr.GetSpellEntry(spell_id))
-    {
-        PSendSysMessage(LANG_UNKNOWN_SPELL, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    target->RemoveSpellCooldown(spell_id, true);
-    PSendSysMessage(LANG_REMOVE_COOLDOWN, spell_id, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
+    target->RemoveAllCooldowns(true);
+    PSendSysMessage(LANG_REMOVEALL_COOLDOWN, tNameLink.c_str());
     return true;
 }
 

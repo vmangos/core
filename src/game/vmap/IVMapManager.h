@@ -48,10 +48,10 @@ namespace VMAP
         private:
             bool iEnableLineOfSightCalc;
             bool iEnableHeightCalc;
-            bool iDisableModelUnloads;
+            bool m_useManagedPtrs;
 
         public:
-            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false) {}
+            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), m_useManagedPtrs(true) {}
 
             virtual ~IVMapManager(void) {}
 
@@ -89,12 +89,10 @@ namespace VMAP
             Enable/disable model unloading
             It is disabled by default. If it is enabled the manager will no longer process unload requests on reference clear
             */
-            void setDisableModelUnload(bool pVal) { iDisableModelUnloads = pVal; }
 
             bool isLineOfSightCalcEnabled() const { return iEnableLineOfSightCalc; }
             bool isHeightCalcEnabled() const { return iEnableHeightCalc; }
             bool isMapLoadingEnabled() const { return iEnableLineOfSightCalc || iEnableHeightCalc; }
-            bool isModelUnloadDisabled() const { return iDisableModelUnloads; }
 
             virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
             /**
@@ -104,6 +102,13 @@ namespace VMAP
             virtual bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const = 0;
             virtual bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = nullptr, float* inDist = nullptr) const = 0;
             virtual bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const = 0;
+            bool getUseManagedPtrs() const { return m_useManagedPtrs; }
+            void setUseManagedPtrs(bool managedPtrs) { m_useManagedPtrs = managedPtrs; }
     };
+
+
+
+
+
 }
 #endif

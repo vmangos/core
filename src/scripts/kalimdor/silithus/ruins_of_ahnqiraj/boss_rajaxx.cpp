@@ -23,6 +23,8 @@ EndScriptData */
 
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
+#include "Group.h"
 #include "ruins_of_ahnqiraj.h"
 
 #define GOSSIP_START  "Let's find out."
@@ -81,19 +83,7 @@ enum
 #endif
 
 #define ANDOROV_WAYPOINT_MAX  7
-#define OOC_BETWEEN_WAVE 1000
-
-struct RespawnAndEvadeHelper
-{
-    explicit RespawnAndEvadeHelper(Creature* _pCreature) : pCreature(_pCreature) {}
-    void operator()() const
-    {
-        if (!pCreature->IsAlive())
-            pCreature->Respawn();
-        pCreature->AI()->EnterEvadeMode();
-    }
-    Creature* pCreature;
-};
+#define OOC_BETWEEN_WAVE 5000
 
 struct boss_rajaxxAI : public ScriptedAI
 {
@@ -143,7 +133,6 @@ struct boss_rajaxxAI : public ScriptedAI
         if (waveIndex >= WAVE_MAX)
             return;
 
-        DEBUG_EMOTE_YELL(m_creature, "DEBUG : Wave Reset");
         uint64 leaderGUID = GetLeaderGuidFromWaveIndex(waveIndex);
         if (Creature* pLeader = m_pInstance->GetCreature(leaderGUID))
             if (CreatureGroup* group = pLeader->GetCreatureGroup())
@@ -319,14 +308,13 @@ struct boss_rajaxxAI : public ScriptedAI
         {
             if (IsCurrentWaveDead())
                 m_uiNextWave_Timer += uiDiff;
-            else
-                m_uiNextWave_Timer = 0;
 
             if (m_uiNextWaveIndex < WAVE_MAX)
             {
-                if ((m_uiWave_Timer < uiDiff) || (m_uiNextWave_Timer > OOC_BETWEEN_WAVE))
+                if (m_uiWave_Timer < uiDiff || m_uiNextWave_Timer > OOC_BETWEEN_WAVE)
                 {
                     StartWave(m_uiNextWaveIndex);
+                    m_uiNextWave_Timer = 0;
                     m_uiNextWaveIndex++;
                     m_uiWave_Timer = DELAY_BETWEEN_WAVE;
                 }
@@ -397,7 +385,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
 {
     boss_rajaxxAQWarAI(Creature* pCreature) : boss_rajaxxAI(pCreature)
     {
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
 
         DoScriptText(SAY_AQ_WAR_START, m_creature);
     }
@@ -542,33 +530,13 @@ struct npc_andorovAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-};
 
-bool GossipHello_npc_andorov(Player* pPlayer, Creature* pCreature)
-{
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->SEND_GOSSIP_MENU(14442, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_andorov(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        case GOSSIP_ACTION_INFO_DEF + 1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            ((npc_andorovAI*)pCreature->AI())->StartEvent();
-            break;
-        case GOSSIP_ACTION_TRADE:
-            pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-            break;
-        default:
-            break;
+        if (pInvoker && pInvoker->IsPlayer())
+            StartEvent();
     }
-
-    return true;
-}
+};
 
 CreatureAI* GetAI_boss_rajaxx(Creature* pCreature)
 {
@@ -590,8 +558,6 @@ void AddSC_boss_rajaxx()
     newscript = new Script;
     newscript->Name = "npc_andorov";
     newscript->GetAI = &GetAI_npc_andorov;
-    newscript->pGossipHello = &GossipHello_npc_andorov;
-    newscript->pGossipSelect = &GossipSelect_npc_andorov;
     newscript->RegisterSelf();
 
     newscript = new Script;

@@ -27,8 +27,9 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Item.h"
-#include "UpdateData.h"
+#include "Bag.h"
 #include "Chat.h"
+#include "Conditions.h"
 #include "Anticheat.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recv_data)
@@ -771,8 +772,8 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     // Stop the npc if moving
-    if (!pCreature->IsStopped())
-        pCreature->StopMoving();
+    if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
+        pCreature->PauseOutOfCombatMovement();
 
     VendorItemData const* vItems = menu_type & VENDOR_MENU_NORMAL ? pCreature->GetVendorItems() : nullptr;
     VendorItemData const* tItems = menu_type & VENDOR_MENU_TEMPLATE ? pCreature->GetVendorTemplateItems() : nullptr;
@@ -823,7 +824,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                             ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->getFactionTemplateEntry()->faction))
                         continue;
 
-                    if (crItem->conditionId && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+                    if (crItem->conditionId && !IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
                         continue;
                 }
 

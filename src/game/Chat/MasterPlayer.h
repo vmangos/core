@@ -62,8 +62,6 @@ public:
     void LoadMailedItems(QueryResult* result);
     void LoadMails(QueryResult* result);
     void SaveMails();
-    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
-    void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
     void RemoveMail(uint32 id);

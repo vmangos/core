@@ -1,11 +1,12 @@
 #ifndef _HEADER_CHEATS
 #define _HEADER_CHEATS
 
-#include <array>
-
 #include "Common.h"
-#include "Player.h"
+#include "UnitDefines.h"
 #include "Anticheat.h"
+
+#include <array>
+#include <sstream>
 
 enum CheatType
 {
@@ -42,6 +43,8 @@ enum CheatType
 #define CHEATS_UPDATE_INTERVAL      4000
 const char* GetMovementCheatName(CheatType type);
 
+class Player;
+class MovementInfo;
 class ChatHandler;
 class WorldSession;
 class WorldPacket;
@@ -49,11 +52,10 @@ class WorldPacket;
 class MovementAnticheat
 {
     public:
-        explicit MovementAnticheat(Player* _me) : me(_me), m_session(_me->GetSession()) {}
+        explicit MovementAnticheat(Player* _me);
 
         void Init();
         void InitNewPlayer(Player* pPlayer);
-        void InitSpeeds(Unit* unit);
         void ResetJumpCounters();
 
         void AddCheats(uint32 cheats, uint32 count = 1);
@@ -66,11 +68,9 @@ class MovementAnticheat
 
         // Public methods called from the movement handler upon received a packet.
         bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
-        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode);
         bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
 
         bool IsInKnockBack() const { return m_knockBack; }
-        bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const;
 
         void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin);
         void OnUnreachable(Unit* attacker);
@@ -90,11 +90,10 @@ private:
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
         uint32 CheckTimeDesync(MovementInfo const& movementInfo);
 
-        MovementInfo& GetLastMovementInfo() { return me->m_movementInfo; }
-        MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
-        float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
-        float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
-        
+        MovementInfo& GetLastMovementInfo();
+        MovementInfo const& GetLastMovementInfo() const;
+        UnitMoveType GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const;
+
         bool m_knockBack = false;
 
         // Multi jump
@@ -107,10 +106,8 @@ private:
         // Speed hack
         int32 m_clientDesync = 0;
         uint32 m_maxClientDesync = 0;
-        float m_jumpInitialSpeed = 0.0f;
         float m_overspeedDistance = 0.0f;
         float m_maxOverspeedDistance = 0.0f;
-        std::array<float, MAX_MOVE_TYPE> m_clientSpeeds = {};
 
         Player* me = nullptr; // current player object that checks run on, changes on mind control
         WorldSession* const m_session = nullptr; // session to which the cheat data belongs, does not change

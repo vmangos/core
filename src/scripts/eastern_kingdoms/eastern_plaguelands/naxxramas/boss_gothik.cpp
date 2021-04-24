@@ -24,19 +24,19 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-enum
+enum GothikData
 {
-    SAY_SPEECH_1                = -1533040,
-    SAY_SPEECH_2                = -1533140,
-    SAY_SPEECH_3                = -1533141,
-    SAY_SPEECH_4                = -1533142,
+    SAY_SPEECH_1                = 13029,
+    SAY_SPEECH_2                = 13031,
+    SAY_SPEECH_3                = 13032,
+    SAY_SPEECH_4                = 13033,
 
-    SAY_KILL                    = -1533041,
-    SAY_DEATH                   = -1533042,
-    SAY_TELEPORT                = -1533043,
+    SAY_KILL                    = 13027,
+    SAY_DEATH                   = 13026,
+    SAY_TELEPORT                = 13028,
 
-    EMOTE_TO_FRAY               = -1533138,
-    EMOTE_GATE                  = -1533139,
+    EMOTE_TO_FRAY               = -1533138, // bct need!
+    EMOTE_GATE                  = -1533139, // bct need!
 
     PHASE_SPEECH                = 0,
     PHASE_BALCONY               = 1,
@@ -71,7 +71,6 @@ enum eSpellDummy
 
 struct boss_gothikAI : public ScriptedAI
 {
-
     boss_gothikAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
@@ -204,28 +203,29 @@ struct boss_gothikAI : public ScriptedAI
                     bool isRightSide = m_pInstance->IsInRightSideGothArea(p);
                     switch (entry)
                     {
-                    case NPC_UNREL_RIDER:
-                    case NPC_UNREL_DEATH_KNIGHT:
-                    case NPC_UNREL_TRAINEE:
-                        if (isRightSide)
-                        {
-                            pCreature->SetInCombatWith(p);
-                            pCreature->AddThreat(p, 100);
-                        }
-                        break;
-                    case NPC_SPECT_DEATH_KNIGTH:
-                    case NPC_SPECT_HORSE:
-                    case NPC_SPECT_RIDER:
-                    case NPC_SPECT_TRAINEE:
-                        if (!isRightSide)
-                        {
-                            pCreature->SetInCombatWith(p);
-                            pCreature->AddThreat(p, 100);
-                        }
-                        break;
+                        case NPC_UNREL_RIDER:
+                        case NPC_UNREL_DEATH_KNIGHT:
+                        case NPC_UNREL_TRAINEE:
+                            if (isRightSide)
+                            {
+                                pCreature->SetInCombatWith(p);
+                                pCreature->AddThreat(p, 100);
+                            }
+                            break;
+                        case NPC_SPECT_DEATH_KNIGTH:
+                        case NPC_SPECT_HORSE:
+                        case NPC_SPECT_RIDER:
+                        case NPC_SPECT_TRAINEE:
+                            if (!isRightSide)
+                            {
+                                pCreature->SetInCombatWith(p);
+                                pCreature->AddThreat(p, 100);
+                            }
+                            break;
                     }
                 }
             }
+
             if (Unit* pTar = pCreature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
             {
                 pCreature->AI()->AttackStart(pTar);
@@ -273,14 +273,15 @@ struct boss_gothikAI : public ScriptedAI
 
         switch (pSummoned->GetEntry())
         {
-        case NPC_SPECT_DEATH_KNIGTH:
-        case NPC_SPECT_HORSE:
-        case NPC_SPECT_RIDER:
-        case NPC_SPECT_TRAINEE:
-            return;
+            case NPC_SPECT_DEATH_KNIGTH:
+            case NPC_SPECT_HORSE:
+            case NPC_SPECT_RIDER:
+            case NPC_SPECT_TRAINEE:
+                return;
         }
 
         Creature* pAnchor = m_pInstance->GetClosestAnchorForGoth(pSummoned, true);
+
         if (!pAnchor)
             return;
 
@@ -302,15 +303,15 @@ struct boss_gothikAI : public ScriptedAI
         // Elysium: we use a temp creature to handle this issue
         switch (pSummoned->GetEntry())
         {
-        case NPC_UNREL_TRAINEE:
-            pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
-            break;
-        case NPC_UNREL_DEATH_KNIGHT:
-            pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
-            break;
-        case NPC_UNREL_RIDER:
-            pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
-            break;
+            case NPC_UNREL_TRAINEE:
+                pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
+                break;
+            case NPC_UNREL_DEATH_KNIGHT:
+                pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
+                break;
+            case NPC_UNREL_RIDER:
+                pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
+                break;
         }
     }
 
@@ -678,21 +679,19 @@ bool EffectDummyCreature_spell_anchor(WorldObject* /*pCaster*/, uint32 uiSpellId
 
 struct gothikTriggerAI : public ScriptedAI
 {
-    gothikTriggerAI(Creature* pCreature) 
-        : ScriptedAI(pCreature)
-    {
+    gothikTriggerAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
-    }
     void Reset() override 
     {
         m_creature->SetWanderDistance(0.01f);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         m_creature->GetMotionMaster()->Initialize();
     }
-    void MoveInLineOfSight(Unit*) override {}
-    void Aggro(Unit*) override {}
-    void AttackStart(Unit*) override {}
-    void UpdateAI(uint32 const diff) override {}
+
+    void MoveInLineOfSight(Unit*) override { }
+    void Aggro(Unit*) override { }
+    void AttackStart(Unit*) override { }
+    void UpdateAI(uint32 const diff) override { }
 };
 
 CreatureAI* GetAI_GothikTrigger(Creature* pCreature)

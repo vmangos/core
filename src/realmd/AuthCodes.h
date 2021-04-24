@@ -76,19 +76,20 @@ enum AuthResult
     WOW_FAIL_FAIL_NOACCESS          = 0x0D,                 ///< Unable to connect
     WOW_SUCCESS_SURVEY              = 0x0E,                 ///< Connected.
     WOW_FAIL_PARENTCONTROL          = 0x0F,                 ///< Access to this account has been blocked by parental controls. Your settings may be changed in your account preferences at <site>
+    // TBC+
     WOW_FAIL_LOCKED_ENFORCED        = 0x10,                 ///< You have applied a lock to your account. You can change your locked status by calling your account lock phone number.
+    // WOTLK+
     WOW_FAIL_TRIAL_ENDED            = 0x11,                 ///< Your trial subscription has expired. Please visit <site> to upgrade your account.
-    WOW_FAIL_USE_BATTLENET          = 0x12,                 ///< WOW_FAIL_OTHER This account is now attached to a Battle.net account. Please login with your Battle.net account email address and password.
-    //WOW_FAIL_OVERMIND_CONVERTED
-    //WOW_FAIL_ANTI_INDULGENCE
-    //WOW_FAIL_EXPIRED
-    //WOW_FAIL_NO_GAME_ACCOUNT
-    //WOW_FAIL_BILLING_LOCK
-    //WOW_FAIL_IGR_WITHOUT_BNET
-    //WOW_FAIL_AA_LOCK
-    //WOW_FAIL_UNLOCKABLE_LOCK
-    //WOW_FAIL_MUST_USE_BNET
-    //WOW_FAIL_OTHER
+    WOW_FAIL_USE_BATTLENET          = 0x12,                 ///< This account is now attached to a Battle.net account. Please login with your Battle.net account email address and password.
+    WOW_FAIL_ANTI_INDULGENCE        = 0x13,                 ///< Unable to connect
+    WOW_FAIL_EXPIRED                = 0x14,                 ///< Unable to connect
+    WOW_FAIL_NO_GAME_ACCOUNT        = 0x15,                 ///< Unable to connect
+    WOW_FAIL_CHARGEBACK             = 0x16,                 ///< This World of Warcraft account has been temporary closed due to a chargeback on its subscription. Please refer to this <site> for further information.
+    WOW_FAIL_IGR_WITHOUT_BNET       = 0x17,                 ///< In order to log in to World of Warcraft using IGR time, this World of Warcraft account must first be merged with a Battle.net account. Please visit <site> to merge this account.
+    WOW_FAIL_GAME_ACCOUNT_LOCKED    = 0x18,                 ///< Access to your account has been temporarily disabled.
+    WOW_FAIL_UNLOCKABLE_LOCK        = 0x19,                 ///< Your account has been locked but can be unlocked.
+    WOW_FAIL_CONVERSION_REQUIRED    = 0x20,                 ///< This account needs to be converted to a Battle.net account. Please [Click Here] or go to: <site> to begin conversion.
+    WOW_FAIL_DISCONNECTED           = 0xFF
 };
 
 #endif

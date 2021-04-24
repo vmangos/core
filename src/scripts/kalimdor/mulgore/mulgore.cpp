@@ -17,40 +17,13 @@
 /* ScriptData
 SDName: Mulgore
 SD%Complete: 100
-SDComment: Quest support: Skorn Whitecloud: Just a story if not rewarded for quest
 SDCategory: Mulgore
 EndScriptData */
 
 /* ContentData
-npc_skorn_whitecloud
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-# npc_skorn_whitecloud
-######*/
-
-bool GossipHello_npc_skorn_whitecloud(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (!pPlayer->GetQuestRewardStatus(770))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Tell me a story, Skorn.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(522, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_skorn_whitecloud(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-        pPlayer->SEND_GOSSIP_MENU(523, pCreature->GetGUID());
-
-    return true;
-}
 
 struct plainVisionAI : public npc_escortAI
 {
@@ -93,11 +66,5 @@ void AddSC_mulgore()
     newscript = new Script;
     newscript->Name = "npc_plains_vision";
     newscript->GetAI = &GetAI_plainVision;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_skorn_whitecloud";
-    newscript->pGossipHello = &GossipHello_npc_skorn_whitecloud;
-    newscript->pGossipSelect = &GossipSelect_npc_skorn_whitecloud;
     newscript->RegisterSelf();
 }

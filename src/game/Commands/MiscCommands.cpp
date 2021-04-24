@@ -16,15 +16,14 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "Opcodes.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
+#include "Group.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -202,8 +201,8 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
     ///- Get the accounts with GM Level >0
-    QueryResult* result = LoginDatabase.PQuery("SELECT username, account_access.gmlevel FROM account, account_access "
-        "WHERE account_access.id = account.id AND account_access.gmlevel > 0 AND RealmID=%u", realmID);
+    QueryResult* result = LoginDatabase.PQuery("SELECT `username`, `account_access`.`gmlevel` FROM `account`, `account_access` "
+        "WHERE `account_access`.`id` = `account`.`id` AND `account_access`.`gmlevel` > 0 AND `RealmID`=%u", realmID);
     if (result)
     {
         SendSysMessage(LANG_GMLIST);
@@ -297,7 +296,7 @@ bool RegisterPlayerToBG(WorldSession* sess, BattleGroundTypeId bgid)
     if (!pPlayer->GetBGAccessByLevel(bgid))
         return false;
     pPlayer->SetBattleGroundEntryPoint(pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation());
-    sess->SendBattlegGroundList(pPlayer->GetObjectGuid(), bgid);
+    sess->SendBattleGroundList(pPlayer->GetObjectGuid(), bgid);
     return true;
 }
 
@@ -614,6 +613,25 @@ bool ChatHandler::HandleInstanceContinentsCommand(char*)
     return true;
 }
 
+bool ChatHandler::HandleInstanceGetDataCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    if (!pPlayer)
+        return false;
+    Map* pMap = pPlayer->FindMap();
+    if (!pMap)
+        return false;
+    InstanceData* pData = pMap->GetInstanceData();
+    if (!pData)
+        return false;
+    uint32 index = 0;
+    if (!ExtractUInt32(&args, index))
+        return false;
+
+    PSendSysMessage("Data[%u] = %u", index, pData->GetData(index));
+    return true;
+}
+
 bool ChatHandler::HandleInstancePerfInfosCommand(char* args)
 {
     Player* player = GetSession()->GetPlayer();
@@ -694,27 +712,12 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleInstanceUnbindCommand(char* args)
+void ChatHandler::HandleInstanceUnbindHelper(Player* player, bool got_map, uint32 mapid)
 {
-    if (!*args)
-        return false;
+    if (!player || !player->IsInWorld())
+        return;
 
-    Player* player = GetSelectedPlayer();
-    if (!player || GetAccessLevel() < SEC_BASIC_ADMIN)
-        player = m_session->GetPlayer();
     uint32 counter = 0;
-    uint32 mapid = 0;
-    bool got_map = false;
-
-    if (strncmp(args, "all", strlen(args)) != 0)
-    {
-        if (!isNumeric(args[0]))
-            return false;
-
-        got_map = true;
-        mapid = atoi(args);
-    }
-
     Player::BoundInstancesMap &binds = player->GetBoundInstances();
     for (Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)
     {
@@ -730,20 +733,91 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
 
             if (MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
             {
-                PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
-                                itr->first, entry->name, save->GetInstanceId(), itr->second.perm ? "yes" : "no",
-                                save->CanReset() ? "yes" : "no", timeleft.c_str());
+                ChatHandler(player).PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
+                    itr->first, entry->name, save->GetInstanceId(), itr->second.perm ? "yes" : "no",
+                    save->CanReset() ? "yes" : "no", timeleft.c_str());
             }
             else
-                PSendSysMessage("bound for a nonexistent map %u", itr->first);
+                ChatHandler(player).PSendSysMessage("bound for a nonexistent map %u", itr->first);
             player->UnbindInstance(itr);
             counter++;
         }
         else
             ++itr;
     }
-    PSendSysMessage("instances unbound: %d", counter);
+    ChatHandler(player).PSendSysMessage("instances unbound: %d", counter);
+}
 
+bool ChatHandler::HandleInstanceUnbindCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Player* player = GetSelectedPlayer();
+    if (!player || GetAccessLevel() < SEC_BASIC_ADMIN)
+        player = m_session->GetPlayer();
+   
+    uint32 mapid = 0;
+    bool got_map = false;
+
+    if (strncmp(args, "all", strlen(args)) != 0)
+    {
+        if (!isNumeric(args[0]))
+            return false;
+
+        got_map = true;
+        mapid = atoi(args);
+    }
+
+    HandleInstanceUnbindHelper(player, got_map, mapid);
+
+    return true;
+}
+
+bool ChatHandler::HandleInstanceGroupUnbindCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Player* player = player = GetSelectedPlayer();
+    if (!player || player->InBattleGround())
+        return false;
+
+    uint32 mapid = 0;
+    bool got_map = false;
+
+    if (strncmp(args, "all", strlen(args)) != 0)
+    {
+        if (!isNumeric(args[0]))
+            return false;
+
+        got_map = true;
+        mapid = atoi(args);
+    }
+
+    Group* pGroup = player->GetGroup();
+    if (!pGroup)
+    {
+        std::string nameLink = GetNameLink(player);
+        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (!pMember->IsInWorld())
+                continue;
+
+            HandleInstanceUnbindHelper(pMember, got_map, mapid);
+        }
+    }
+
+    pGroup->Disband();
+
+    SendSysMessage("Group unbound. Disbanding.");
     return true;
 }
 

@@ -25,8 +25,6 @@
 #include "Common.h"
 #include "Database.h"
 #include "Policies/Singleton.h"
-#include "ace/Thread_Mutex.h"
-#include "ace/Guard_T.h"
 #include <stdarg.h>
 
 #ifdef WIN32

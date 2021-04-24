@@ -20,8 +20,10 @@
  */
 
 #include "Pet.h"
+#include "Group.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
@@ -398,7 +400,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     if (getPetType() == HUNTER_PET)
     {
-        SetByteValue(UNIT_FIELD_BYTES_1, 1, m_pTmpCache->loyalty);
+        SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_LOYALTY, m_pTmpCache->loyalty);
 
         SetUInt32Value(UNIT_FIELD_FLAGS, m_pTmpCache->renamed ? UNIT_FLAG_PET_ABANDON : UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
 
@@ -446,7 +448,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         return;
 
     // Do not save bot pets.
-    if (pOwner->GetSession()->GetBot())
+    if (pOwner->IsBot())
         return;
 
     // current/stable/not_in_slot
@@ -888,7 +890,7 @@ HappinessState Pet::GetHappinessState() const
 
 void Pet::SetLoyaltyLevel(LoyaltyLevel level)
 {
-    SetByteValue(UNIT_FIELD_BYTES_1, 1, level);
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_LOYALTY, level);
 }
 
 bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
@@ -1308,11 +1310,11 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     m_loyaltyPoints = 1000;
     if (cinfo->type == CREATURE_TYPE_BEAST)
     {
-        SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_WARRIOR);
-        SetByteValue(UNIT_FIELD_BYTES_0, 2, GENDER_NONE);
-        SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_FOCUS);
+        SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, CLASS_WARRIOR);
+        SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, GENDER_NONE);
+        SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, POWER_FOCUS);
         SetSheath(SHEATH_STATE_MELEE);
-        SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
+        SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
         SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
@@ -1349,10 +1351,10 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NONE);
             break;
         case HUNTER_PET:
-            SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_WARRIOR);
-            SetByteValue(UNIT_FIELD_BYTES_0, 2, GENDER_NONE);
+            SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, CLASS_WARRIOR);
+            SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, GENDER_NONE);
             SetSheath(SHEATH_STATE_MELEE);
-            SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
+            SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
 
             // this enables popup window (pet abandon, cancel), original value set in CreateBaseAtCreature
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_ABANDON);
@@ -1410,20 +1412,23 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         SetCreateResistance(SPELL_SCHOOL_ARCANE, cinfo->arcane_res);
     }
 
+    float healthMod = owner->IsPlayer() ? 1.0f : _GetHealthMod(cinfo->rank);
+    float damageMod = owner->IsPlayer() ? 1.0f : _GetDamageMod(cinfo->rank);
+
     switch (getPetType())
     {
         case SUMMON_PET:
         {
             // Formulas reviewed by Clank <Nostalrius>, from vanilla hunter pet tab screenshots.
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(damageMod * (petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(damageMod * (petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
 
             //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if (pInfo)                                      // exist in DB
             {
-                SetCreateHealth(pInfo->health);
+                SetCreateHealth(pInfo->health * healthMod);
                 SetCreateMana(pInfo->mana);
 
                 if (pInfo->armor > 0)
@@ -1439,8 +1444,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->entry);
 
                 // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
-                SetCreateMana(uint32(((float(cinfo->mana_max)   / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel * healthMod));
+                SetCreateMana(uint32(((float(cinfo->mana_max)   / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel * healthMod));
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1454,14 +1459,14 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         {
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(petlevel));
             // Formulas reviewed by Clank <Nostalrius>, from vanilla pet tab screenshots.
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(damageMod * (petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(damageMod * (petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
 
             //stored standard pet stats are entry 1 in pet_levelinfo
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if (pInfo)                                      // exist in DB
             {
-                SetCreateHealth(pInfo->health);
+                SetCreateHealth(pInfo->health * healthMod);
                 SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
                 //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
@@ -1473,7 +1478,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 sLog.outErrorDb("Hunter pet levelstats missing in DB");
 
                 // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel * healthMod));
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1491,14 +1496,14 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
 
             SetCreateMana(cinfo->mana_max);
-            SetCreateHealth(cinfo->health_max);
+            SetCreateHealth(cinfo->health_max * healthMod);
 
             SetAttackTime(BASE_ATTACK, cinfo->base_attack_time);
             SetAttackTime(OFF_ATTACK, cinfo->base_attack_time);
             SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time);
 
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min);
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max);
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, damageMod * cinfo->dmg_min);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, damageMod * cinfo->dmg_max);
             break;
         }
         default:
@@ -1556,88 +1561,61 @@ uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
     //food too low level
 }
 
-void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
-{
-    // last check 1.12
-    WorldPacket data(SMSG_SPELL_COOLDOWN, 8);
-    data << GetObjectGuid();
-    time_t curTime = time(nullptr);
-    for (const auto& itr : m_petSpells)
-    {
-        if (itr.second.state == PETSPELL_REMOVED)
-            continue;
-        uint32 unSpellId = itr.first;
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(unSpellId);
-        if (!spellInfo)
-        {
-            MANGOS_ASSERT(spellInfo);
-            continue;
-        }
-
-        // Not send cooldown for this spells
-        if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
-            continue;
-
-        if ((idSchoolMask & spellInfo->GetSpellSchoolMask()) && GetSpellCooldownDelay(unSpellId) < unTimeMs)
-        {
-            data << uint32(unSpellId);
-            data << uint32(unTimeMs);                       // in m.secs
-            AddSpellCooldown(unSpellId, 0, curTime + unTimeMs / IN_MILLISECONDS);
-        }
-    }
-    if (Player* player = GetAffectingPlayer())
-        player->GetSession()->SendPacket(&data);
-    Unit::ProhibitSpellSchool(idSchoolMask, unTimeMs);
-}
-
 void Pet::_LoadSpellCooldowns()
 {
     //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
 
     if (m_pTmpCache)
     {
-        time_t curTime = time(nullptr);
-        bool empty = true;
-
-        WorldPacket data(SMSG_SPELL_COOLDOWN, (8 + size_t(m_pTmpCache->spellCooldown.size()) * 8));
-        data << ObjectGuid(GetObjectGuid());
-        //[-ZERO] data << uint8(0x0);                                 // flags (0x1, 0x2)
+        ByteBuffer cdData;
+        uint32 cdCount = 0;
+        auto curTime = sWorld.GetCurrentClockTime();
 
         for (const auto& it : m_pTmpCache->spellCooldown)
         {
             //Field* fields = result->Fetch();
 
-            uint32 spell_id = it.spell;//fields[0].GetUInt32();
-            time_t db_time  = (time_t)it.time;//fields[1].GetUInt64();
-            time_t db_cat_time = 0; // TODO ?
-            SpellEntry const* spell = sSpellMgr.GetSpellEntry(spell_id);
+            uint32 spell_id = it.spell; //fields[0].GetUInt32();
+            uint64 spell_time = it.time; //fields[1].GetUInt64();
 
-            if (!spell)
+            SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spell_id);
+            if (!spellEntry)
             {
-                sLog.outError("Pet %u have unknown spell %u in `pet_spell_cooldown`, skipping.", m_charmInfo->GetPetNumber(), spell_id);
+                sLog.outError("%s has unknown spell %u in `character_spell_cooldown`, skipping.", GetGuidStr().c_str(), spell_id);
                 continue;
             }
 
+            TimePoint spellExpireTime = std::chrono::time_point_cast<std::chrono::milliseconds>(Clock::from_time_t(spell_time));
+            std::chrono::milliseconds spellRecTime = std::chrono::milliseconds::zero();
+            if (spellExpireTime > curTime)
+                spellRecTime = std::chrono::duration_cast<std::chrono::milliseconds>(spellExpireTime - curTime);
+
             // skip outdated cooldown
-            if (db_time <= curTime)
+            if (spellRecTime == std::chrono::milliseconds::zero())
                 continue;
 
-            data << uint32(spell_id);
-            data << uint32(uint32(db_time - curTime)*IN_MILLISECONDS);
+            cdData << uint32(spell_id);
+            cdData << uint32(uint32(spellRecTime.count()));
+            ++cdCount;
 
-            AddSpellCooldown(spell_id, 0, db_time, db_cat_time, spell->Category);
-            empty = false;
-
-            DEBUG_LOG("Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time - curTime));
+            m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spell_id, uint32(spellRecTime.count()));
+#ifdef _DEBUG
+            uint32 spellCDDuration = std::chrono::duration_cast<std::chrono::seconds>(spellRecTime).count();
+            sLog.outDebug("Adding spell cooldown to %s, SpellID(%u), recDuration(%us).", GetGuidStr().c_str(), spell_id, spellCDDuration);
+#endif
         }
         //while (result->NextRow());
 
         //delete result;
 
-        if (!empty)
-            if (Unit* owner = GetOwner())
-                if (owner->ToPlayer())
-                    owner->ToPlayer()->GetSession()->SendPacket(&data);
+        if (cdCount && GetOwner() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
+        {
+            WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + cdData.size());
+            data << GetObjectGuid();
+            //data << uint8(0x0);                                     // flags (0x1, 0x2)
+            data.append(cdData);
+            static_cast<Player*>(GetOwner())->GetSession()->SendPacket(&data);
+        }
     }
 }
 
@@ -1646,35 +1624,34 @@ void Pet::_SaveSpellCooldowns()
     if (m_pTmpCache)
         m_pTmpCache->spellCooldown.clear();
 
-    static SqlStatementID delSpellCD ;
-    static SqlStatementID insSpellCD ;
+    static SqlStatementID delSpellCD;
+    static SqlStatementID insSpellCD;
 
     SqlStatement stmt = CharacterDatabase.CreateStatement(delSpellCD, "DELETE FROM pet_spell_cooldown WHERE guid = ?");
     stmt.PExecute(m_charmInfo->GetPetNumber());
 
-    time_t curTime = time(nullptr);
-    time_t infTime = curTime + infinityCooldownDelayCheck;
+    TimePoint currTime = sWorld.GetCurrentClockTime();
 
-    // remove outdated and save active
-    for (SpellCooldowns::iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end();)
+    for (auto& cdItr : m_cooldownMap)
     {
-        if (itr->second.end <= curTime)
-            m_spellCooldowns.erase(itr++);
-        else if (itr->second.end <= infTime)                // not save locked cooldowns, it will be reset or set at reload
+        auto& cdData = cdItr.second;
+        if (!cdData->IsPermanent())
         {
+            TimePoint sTime = currTime;
+            cdData->GetSpellCDExpireTime(sTime);
+            uint64 spellExpireTime = uint64(Clock::to_time_t(sTime));
+
             if (m_pTmpCache)
             {
                 PetSpellCoodown cd;
-                cd.spell = itr->first;
-                cd.time  = itr->second.end;
+                cd.spell = cdItr.first;
+                cd.time = spellExpireTime;
                 m_pTmpCache->spellCooldown.push_back(cd);
             }
-            stmt = CharacterDatabase.CreateStatement(insSpellCD, "INSERT INTO pet_spell_cooldown (guid, spell, time) VALUES( ?, ?, ?)");
-            stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first, uint64(itr->second.end));
-            ++itr;
+
+            stmt = CharacterDatabase.CreateStatement(insSpellCD, "INSERT INTO pet_spell_cooldown (guid,spell,time) VALUES (?, ?, ?)");
+            stmt.PExecute(m_charmInfo->GetPetNumber(), cdItr.first, spellExpireTime);
         }
-        else
-            ++itr;
     }
 }
 
@@ -1731,13 +1708,13 @@ void Pet::_SaveSpells()
                 SqlStatement stmt = CharacterDatabase.CreateStatement(delSpell, "DELETE FROM pet_spell WHERE guid = ? and spell = ?");
                 stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first);
 
-                stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO pet_spell (guid,spell,active) VALUES (?, ?, ?)");
+                stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO `pet_spell` (`guid`, `spell`, `active`) VALUES (?, ?, ?)");
                 stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first, uint32(itr->second.active));
             }
             break;
             case PETSPELL_NEW:
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO pet_spell (guid,spell,active) VALUES (?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insSpell, "INSERT INTO `pet_spell` (`guid`, `spell`, `active`) VALUES (?, ?, ?)");
                 stmt.PExecute(m_charmInfo->GetPetNumber(), itr->first, uint32(itr->second.active));
             }
             break;
@@ -1768,7 +1745,7 @@ void Pet::_LoadAuras(uint32 timediff)
 
             uint32 stackcount   = it.stackcount;
             int32 remaincharges = (int32)it.remaincharges;
-            int32 damage[MAX_EFFECT_INDEX];
+            float damage[MAX_EFFECT_INDEX];
             int32 periodicTime[MAX_EFFECT_INDEX];
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -2291,7 +2268,7 @@ bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* ci
         return false;
 
     SetSheath(SHEATH_STATE_MELEE);
-    SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
+    SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
 
     if (getPetType() == MINI_PET)                           // always non-attackable
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -2354,7 +2331,7 @@ void Pet::CastPetAura(PetAura const* aura)
     if (auraId == 35696)                                      // Demonic Knowledge
     {
         int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
-        CastCustomSpell(this, auraId, &basePoints, nullptr, nullptr, true);
+        CastCustomSpell(this, auraId, basePoints, {}, {}, true);
     }
     else
         CastSpell(this, auraId, true);

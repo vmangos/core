@@ -34,10 +34,9 @@
 #include <ace/Task.h>
 
 
-class MaNGOSsoapRunnable: public ACE_Based::Runnable
+class MaNGOSsoapRunnable
 {
     public:
-        MaNGOSsoapRunnable() { }
         void run();
         void setListenArguments(std::string host, uint16 port)
         {

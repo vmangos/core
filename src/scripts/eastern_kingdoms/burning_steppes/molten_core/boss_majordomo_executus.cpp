@@ -254,7 +254,7 @@ struct boss_majordomoAI : public ScriptedAI
     {
         if (Creature* Domo = m_creature->SummonCreature(m_creature->GetEntry(), 847.103f, -816.153f, -229.775f, 4.344f, TEMPSUMMON_TIMED_DESPAWN, (2 * 60 * 60 * 1000)))
         {
-            Domo->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+            Domo->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             Domo->SetFactionTemplateId(35);
             Domo->SetHealth(35);
             Domo->SetMaxHealth(35);
@@ -412,47 +412,16 @@ struct boss_majordomoAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-};
 
-bool GossipSelect_event_domo(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
     {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DOMO_2, pCreature->GetGUID());
-    }
-    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DOMO_3, pCreature->GetGUID());
-    }
-    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 3)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-
-        if (boss_majordomoAI* pDomoEventAI = dynamic_cast<boss_majordomoAI*>(pCreature->AI()))
+        if (pInvoker && pInvoker->IsPlayer())
         {
-            pDomoEventAI->RagnarosEventStart = true;
-            pCreature->SetUInt32Value(UNIT_NPC_FLAGS, 0);            // disable gossip
-            char sMessage[200];
-            sprintf(sMessage, "Very well, %s.", pPlayer->GetName());
-            pCreature->MonsterSay(sMessage, 0, 0);
-
-            if (boss_majordomoAI* pDomoEventAI = dynamic_cast<boss_majordomoAI*>(pCreature->AI()))
-                pDomoEventAI->RagnarosEventStart = true;
+            RagnarosEventStart = true;
+            m_creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
         }
     }
-
-    return true;
-}
-
-bool GossipHello_event_domo(Player* pPlayer, Creature* pCreature)
-{
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DOMO_1, pCreature->GetGUID());
-
-    return true;
-}
+};
 
 CreatureAI* GetAI_boss_majordomo(Creature* pCreature)
 {
@@ -465,7 +434,5 @@ void AddSC_boss_majordomo()
     newscript = new Script;
     newscript->Name = "boss_majordomo";
     newscript->GetAI = &GetAI_boss_majordomo;
-    newscript->pGossipHello = &GossipHello_event_domo;
-    newscript->pGossipSelect = &GossipSelect_event_domo;
     newscript->RegisterSelf();
 }

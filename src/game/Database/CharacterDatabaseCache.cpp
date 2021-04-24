@@ -29,19 +29,19 @@ void CharacterDatabaseCache::LoadCharacterPet(uint32 singlePetId)
     if (singlePetId)
     {
         result.reset(CharacterDatabase.PQuery(
-                     "SELECT id, entry, owner, modelid, level, exp, Reactstate, loyaltypoints, loyalty, trainpoint, "
-                     "slot, name, renamed, curhealth, curmana, curhappiness, abdata, TeachSpelldata, savetime, resettalents_cost, "
-                     "resettalents_time, CreatedBySpell, PetType FROM character_pet WHERE id=%u", singlePetId
+                     "SELECT `id`, `entry`, `owner`, `modelid`, `level`, `exp`, `Reactstate`, `loyaltypoints`, `loyalty`, `trainpoint`, "
+                     "`slot`, `name`, `renamed`, `curhealth`, `curmana`, `curhappiness`, `abdata`, `TeachSpelldata`, `savetime`, `resettalents_cost`, "
+                     "`resettalents_time`, `CreatedBySpell`, `PetType` FROM `character_pet` WHERE `id`=%u", singlePetId
                  ));
     }
     else if (!singlePetId)
     {
         m_petsByCharacter.clear();
-        sLog.outString("* Loading de `character_pet`");
+        sLog.outString("* Loading table `character_pet`");
         result.reset(CharacterDatabase.Query(
-                     "SELECT id, entry, owner, modelid, level, exp, Reactstate, loyaltypoints, loyalty, trainpoint, "
-                     "slot, name, renamed, curhealth, curmana, curhappiness, abdata, TeachSpelldata, savetime, resettalents_cost, "
-                     "resettalents_time, CreatedBySpell, PetType FROM character_pet"
+                     "SELECT `id`, `entry`, `owner`, `modelid`, `level`, `exp`, `Reactstate`, `loyaltypoints`, `loyalty`, `trainpoint`, "
+                     "`slot`, `name`, `renamed`, `curhealth`, `curmana`, `curhappiness`, `abdata`, `TeachSpelldata`, `savetime`, `resettalents_cost`, "
+                     "`resettalents_time`, `CreatedBySpell`, `PetType` FROM `character_pet`"
                  ));
     }
 
@@ -91,8 +91,8 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
     if (singlePetId)
     {
         result.reset(CharacterDatabase.PQuery(
-                     "SELECT guid,spell,active "
-                     "FROM pet_spell WHERE guid=%u", singlePetId
+                     "SELECT `guid`, `spell`, `active` "
+                     "FROM `pet_spell` WHERE `guid`=%u", singlePetId
                  ));
     }
     else
@@ -103,8 +103,8 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
 
         sLog.outString("* Loading `pet_spell`");
         result.reset(CharacterDatabase.Query(
-                     "SELECT guid,spell,active "
-                     "FROM pet_spell ORDER BY guid ASC"
+                     "SELECT `guid`, `spell`, `active` "
+                     "FROM `pet_spell` ORDER BY `guid` ASC"
                  ));
     }
 
@@ -141,8 +141,8 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
     if (singlePetId)
     {
         result.reset(CharacterDatabase.PQuery(
-                     "SELECT guid,spell,time "
-                     "FROM pet_spell_cooldown WHERE guid=%u", singlePetId
+                     "SELECT `guid`, `spell`, `time` "
+                     "FROM `pet_spell_cooldown` WHERE `guid`=%u", singlePetId
                  ));
     }
     else
@@ -153,8 +153,8 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
 
         sLog.outString("* Loading `pet_spell_cooldown`");
         result.reset(CharacterDatabase.Query(
-                     "SELECT guid,spell,time "
-                     "FROM pet_spell_cooldown ORDER BY guid ASC"
+                     "SELECT `guid`, `spell`, `time` "
+                     "FROM `pet_spell_cooldown` ORDER BY `guid` ASC"
                  ));
     }
 
@@ -192,9 +192,9 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
     if (singlePetId)
     {
         result.reset(CharacterDatabase.PQuery(
-                     "SELECT guid, caster_guid, item_guid, spell, stackcount, remaincharges, maxduration, remaintime, effIndexMask, "
-                     "basepoints0, basepoints1, basepoints2, periodictime0, periodictime1, periodictime2 "
-                     "FROM pet_aura WHERE guid=%u", singlePetId
+                     "SELECT `guid`, `caster_guid`, `item_guid`, `spell`, `stackcount`, `remaincharges`, `maxduration`, `remaintime`, `effIndexMask`, "
+                     "`basepoints0`, `basepoints1`, `basepoints2`, `periodictime0`, `periodictime1`, `periodictime2` "
+                     "FROM `pet_aura` WHERE `guid`=%u", singlePetId
                  ));
     }
     else
@@ -205,11 +205,11 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
 
         sLog.outString("* Loading table `pet_aura`");
         result.reset(CharacterDatabase.Query(
-                                  //          0     1             2           3    4           5              6            7              8
-                                  "SELECT guid, caster_guid, item_guid, spell, stackcount, remaincharges, maxduration, remaintime, effIndexMask, "
-                                  // 9 -> 11                              12 -> 14
-                                  "basepoints0, basepoints1, basepoints2, periodictime0, periodictime1, periodictime2 "
-                                  "FROM pet_aura ORDER BY guid ASC"
+                                  //          0     1             2            3         4                 5              6            7              8
+                                  "SELECT `guid`, `caster_guid`, `item_guid`, `spell`, `stackcount`, `remaincharges`, `maxduration`, `remaintime`, `effIndexMask`, "
+                                  // 9 -> 11                                     12 -> 14
+                                  "`basepoints0`, `basepoints1`, `basepoints2`, `periodictime0`, `periodictime1`, `periodictime2` "
+                                  "FROM `pet_aura` ORDER BY `guid` ASC"
                               ));
     }
 

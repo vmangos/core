@@ -328,6 +328,7 @@ struct Loot
     void NotifyMoneyRemoved();
     void AddLooter(ObjectGuid guid) { m_playersLooting.insert(guid); }
     void RemoveLooter(ObjectGuid guid) { m_playersLooting.erase(guid); }
+    bool HasPlayersLooting() const { return !m_playersLooting.empty(); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
     bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);

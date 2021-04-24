@@ -44,7 +44,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     MANGOS_ASSERT(new_pct);
 
     // manage memory ;)
-    ACE_Auto_Ptr<WorldPacket> aptr(new_pct);
+    std::unique_ptr<WorldPacket> aptr(new_pct);
 
     const ACE_UINT16 opcode = new_pct->GetOpcode();
 
@@ -84,7 +84,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 return HandleAuthSession(*new_pct);
             default:
             {
-                ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+                GuardType lock(m_SessionLock);
 
                 if (m_Session != nullptr)
                 {
@@ -171,9 +171,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, aa.gmLevel, a.sessionkey, a.last_ip, a.locked, a.v, a.s, a.mutetime, a.locale, a.os, a.flags, "
-        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate FROM account a LEFT JOIN account_access aa ON a.id = aa.id AND aa.RealmID IN (-1, %u) "
-        "LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 WHERE a.username = '%s' ORDER BY aa.RealmID DESC LIMIT 1", realmID, safe_account.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.`id`, aa.`gmLevel`, a.`sessionkey`, a.`last_ip`, a.`locked`, a.`v`, a.`s`, a.`mutetime`, a.`locale`, a.`os`, a.`flags`, "
+        "ab.`unbandate` > UNIX_TIMESTAMP() OR ab.`unbandate` = ab.`bandate` FROM `account` a LEFT JOIN `account_access` aa ON a.`id` = aa.`id` AND aa.`RealmID` IN (-1, %u) "
+        "LEFT JOIN `account_banned` ab ON a.`id` = ab.`id` AND ab.`active` = 1 WHERE a.`username` = '%s' ORDER BY aa.`RealmID` DESC LIMIT 1", realmID, safe_account.c_str());
 
     // Stop if the account is not found
     if (!result)
@@ -302,7 +302,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // No SQL injection, username escaped.
     static SqlStatementID updAccount;
 
-    SqlStatement stmt = LoginDatabase.CreateStatement(updAccount, "UPDATE account SET last_ip = ? WHERE username = ?");
+    SqlStatement stmt = LoginDatabase.CreateStatement(updAccount, "UPDATE `account` SET `last_ip` = ? WHERE `username` = ?");
     stmt.PExecute(address.c_str(), account.c_str());
 
     ClientOSType clientOs;
@@ -371,7 +371,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
             if (max_count && m_OverSpeedPings > max_count)
             {
-                ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+                GuardType lock(m_SessionLock);
 
                 if (m_Session && m_Session->GetSecurity() == SEC_PLAYER)
                 {
@@ -389,7 +389,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
     // critical section
     {
-        ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+        GuardType lock(m_SessionLock);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         if (m_Session)

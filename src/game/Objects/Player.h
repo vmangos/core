@@ -23,21 +23,16 @@
 #define _PLAYER_H
 
 #include "Common.h"
-#include "ItemPrototype.h"
 #include "Unit.h"
-#include "Item.h"
 #include "Database/DatabaseEnv.h"
-#include "NPCHandler.h"
-#include "QuestDef.h"
-#include "Group.h"
-#include "Bag.h"
+#include "GroupReference.h"
 #include "WorldSession.h"
 #include "Pet.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "ReputationMgr.h"
 #include "BattleGround.h"
-#include "DBCStores.h"
 #include "SharedDefines.h"
+#include "GameObjectDefines.h"
 #include "SpellMgr.h"
 #include "HonorMgr.h"
 
@@ -46,6 +41,8 @@
 #include <functional>
 
 struct Mail;
+struct ItemPrototype;
+class Group;
 class Channel;
 class Creature;
 class PlayerMenu;
@@ -517,6 +514,8 @@ enum KeyRingSlots                                           // 32 slots
     KEYRING_SLOT_END            = 97
 };
 
+#define MAX_KEYRING_SLOTS 32
+
 struct ItemPosCount
 {
     ItemPosCount(uint16 _pos, uint8 _count) : pos(_pos), count(_count) {}
@@ -824,7 +823,7 @@ struct AuraSaveStruct
     uint32 spellid = 0;
     uint32 stackcount = 0;
     uint32 remaincharges = 0;
-    int32  damage[MAX_EFFECT_INDEX] = { 0 };
+    float  damage[MAX_EFFECT_INDEX] = { 0 };
     uint32 periodicTime[MAX_EFFECT_INDEX] = { 0 };
 
     int32 maxduration = 0;
@@ -1049,6 +1048,7 @@ class Player final: public Unit
         void AutoUnequipWeaponsIfNeed();
         void AutoUnequipOffhandIfNeed();
         void AutoUnequipItemFromSlot(uint32 slot);
+        void SatisfyItemRequirements(ItemPrototype const* pItem);
         bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count, uint32 enchantId = 0);
         Item* StoreNewItemInInventorySlot(uint32 itemEntry, uint32 amount);
         void AutoStoreLoot(Loot& loot, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
@@ -1160,7 +1160,7 @@ class Player final: public Unit
         void SendPreparedGossip(WorldObject* pSource);
         void OnGossipSelect(WorldObject* pSource, uint32 gossipListId);
 
-        uint32 GetGossipTextId(uint32 menuId, WorldObject const* source) const;
+        uint32 GetGossipTextId(uint32 menuId, WorldObject* pSource);
         static uint32 GetGossipTextId(WorldObject* pSource);
         PlayerMenu* PlayerTalkClass;
 
@@ -1221,6 +1221,7 @@ class Player final: public Unit
         void RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questGiver, bool announce = true);
         void FailQuest(uint32 quest_id);
         bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
+        bool SatisfyQuestCondition(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestLog(bool msg) const;
         bool SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const;
@@ -1328,6 +1329,7 @@ class Player final: public Unit
         bool HasAtLoginFlag(AtLoginFlags f) const { return m_atLoginFlags & f; }
         void SetAtLoginFlag(AtLoginFlags f) { m_atLoginFlags |= f; }
         void RemoveAtLoginFlag(AtLoginFlags f, bool in_db_also = false);
+        static bool ValidateAppearance(uint8 race, uint8 class_, uint8 gender, uint8 hairID, uint8 hairColor, uint8 faceID, uint8 facialHair, uint8 skinColor, bool create = false);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -1405,9 +1407,8 @@ class Player final: public Unit
         float m_auraBaseMod[BASEMOD_END][MOD_END];
         SpellModList m_spellMods[MAX_SPELLMOD];
         uint32 m_lastFromClientCastedSpellID;
-        void _LoadSpellCooldowns(QueryResult* result);
-        void _SaveSpellCooldowns();
-
+        
+        
         bool IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const;
         void SendInitialSpells() const;
         bool AddSpell(uint32 spell_id, bool active, bool learning, bool dependent, bool disabled);
@@ -1417,12 +1418,7 @@ class Player final: public Unit
         TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
         bool IsSpellFitByClassAndRace(uint32 spell_id, uint32* pReqlevel = nullptr) const;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
-        void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
-        void SendClearCooldown(uint32 spell_id, Unit* target) const;
-        void SendClearAllCooldowns(Unit* target) const;
-        void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
         void SendSpellRemoved(uint32 spell_id) const;
-
         void LearnSpell(uint32 spell_id, bool dependent, bool talent = false);
         void RemoveSpell(uint32 spell_id, bool disabled = false, bool learn_low_rank = true);
         void ResetSpells();
@@ -1447,6 +1443,37 @@ class Player final: public Unit
         void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = nullptr);
         void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = nullptr);
         void DropModCharge(SpellModifier* mod, Spell* spell);
+
+        // cooldown system
+        virtual void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false) override;
+        virtual void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) override;
+        virtual void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true) override;
+        virtual void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true) override;
+        virtual void RemoveAllCooldowns(bool sendOnly = false);
+        virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) override;
+        void RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent = nullptr);
+        void SendClearCooldown(uint32 spell_id, Unit* target) const;
+        void SendClearAllCooldowns(Unit* target) const;
+        void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
+        void _LoadSpellCooldowns(QueryResult* result);
+        void _SaveSpellCooldowns();
+
+        template <typename F>
+        void RemoveSomeCooldown(F check)
+        {
+            auto spellCDItr = m_cooldownMap.begin();
+            while (spellCDItr != m_cooldownMap.end())
+            {
+                SpellEntry const* entry = sSpellMgr.GetSpellEntry(spellCDItr->first);
+                if (entry && check(*entry))
+                {
+                    SendClearCooldown(spellCDItr->first, this);
+                    spellCDItr = m_cooldownMap.erase(spellCDItr);
+                }
+                else
+                    ++spellCDItr;
+            }
+        }
 
         std::vector<ItemSetEffect*> m_ItemSetEff;
         uint32 m_castingSpell; // Last spell cast by client, or combo points if player is rogue
@@ -1565,10 +1592,10 @@ class Player final: public Unit
         }
         float GetPosStat(Stats stat) const { return GetFloatValue(PLAYER_FIELD_POSSTAT0 + stat); }
         float GetNegStat(Stats stat) const { return GetFloatValue(PLAYER_FIELD_NEGSTAT0 + stat); }
-        float GetResistanceBuffMods(SpellSchools school, bool positive) const { return GetFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE + school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE + school); }
-        void SetResistanceBuffMods(SpellSchools school, bool positive, float val) { SetFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE + school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE + school, val); }
-        void ApplyResistanceBuffModsMod(SpellSchools school, bool positive, float val, bool apply) { ApplyModSignedFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE + school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE + school, val, apply); }
-        void ApplyResistanceBuffModsPercentMod(SpellSchools school, bool positive, float val, bool apply) { ApplyPercentModFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE + school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE + school, val, apply); }
+        float GetResistanceBuffMods(SpellSchools school, bool positive) const { return GetFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE + school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE + school); }
+        void SetResistanceBuffMods(SpellSchools school, bool positive, float val) { SetFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE + school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE + school, val); }
+        void ApplyResistanceBuffModsMod(SpellSchools school, bool positive, float val, bool apply) { ApplyModSignedFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE + school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE + school, val, apply); }
+        void ApplyResistanceBuffModsPercentMod(SpellSchools school, bool positive, float val, bool apply) { ApplyPercentModFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE + school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE + school, val, apply); }
 
         float GetAmmoDPS() const { return m_ammoDPS; }
         void SetRegularAttackTime(bool resetTimer = true);
@@ -1624,8 +1651,6 @@ class Player final: public Unit
         uint32 GetBaseDefenseSkillValue() const { return GetSkillValueBase(SKILL_DEFENSE); }
         uint32 GetBaseWeaponSkillValue(WeaponAttackType attType) const;
 
-        void UpdateDefense();
-        void UpdateWeaponSkill(WeaponAttackType attType);
         void UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence);
 
         void SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step = 0);
@@ -1782,6 +1807,7 @@ class Player final: public Unit
         void SetSemaphoreTeleportNear(bool semphsetting);
         void SetSemaphoreTeleportFar(bool semphsetting);
         void SetPendingFarTeleport(bool pending) { mPendingFarTeleport = pending; }
+        void ExecuteTeleportNear();
         void ProcessDelayedOperations();
 
         bool HasMovementFlag(MovementFlags f) const;        // for script access to m_movementInfo.HasMovementFlag
@@ -1821,9 +1847,9 @@ class Player final: public Unit
 
         // currently visible objects at player client
         ObjectGuidSet m_visibleGUIDs;
-        mutable ACE_Thread_Mutex m_visibleGUIDs_lock;
+        mutable std::shared_timed_mutex m_visibleGUIDs_lock;
         std::map<ObjectGuid, bool> m_visibleGobjQuestActivated;
-        mutable ACE_Thread_Mutex m_visibleGobjsQuestAct_lock;
+        mutable std::mutex m_visibleGobjsQuestAct_lock;
 
         bool IsInVisibleList(WorldObject const* u) const;
         bool IsInVisibleList_Unsafe(WorldObject const* u) const { return this == u || m_visibleGUIDs.find(u->GetObjectGuid()) != m_visibleGUIDs.end(); }
@@ -1873,6 +1899,7 @@ class Player final: public Unit
         uint32 GetHomeBindMap() const { return m_homebindMapId; }
         uint16 GetHomeBindAreaId() const { return m_homebindAreaId; }
 
+        void SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zoneId, float x, float y, float z);
         void SetSummonPoint(uint32 mapid, float x, float y, float z)
         {
             m_summon_expire = time(nullptr) + MAX_PLAYER_SUMMON_DELAY;
@@ -2017,13 +2044,13 @@ class Player final: public Unit
         void SetCannotBeDetectedTimer(uint32 milliseconds) { m_cannotBeDetectedTimer = milliseconds; };
         bool CanBeDetected() const override { return m_cannotBeDetectedTimer <= 0; }
 
-        // Nostalrius
-        // Gestion des PlayerAI
+        // PlayerAI management
         PlayerAI* i_AI;
         PlayerAI* AI() { return i_AI; }
-        void setAI(PlayerAI* otherAI) { i_AI = otherAI; }
+        void SetAI(PlayerAI* otherAI) { i_AI = otherAI; }
         void SetControlledBy(Unit* Who);
         void RemoveAI();
+        void RemoveTemporaryAI(); // will restore player bot AI if needed
         void ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
 
         void SetDeathState(DeathState s) override;                   // overwrite Unit::SetDeathState
@@ -2041,6 +2068,7 @@ class Player final: public Unit
     public:
         WorldSession* GetSession() const { return m_session; }
         void SetSession(WorldSession* s);
+        bool IsBot() const { return m_session->GetBot() != nullptr; }
 
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
         void DestroyForPlayer(Player* target) const override;
@@ -2065,8 +2093,7 @@ class Player final: public Unit
         /*********************************************************/
 
     private:
-        uint8 m_newStandState;
-        uint32 m_standStateTimer;
+        bool m_isStandUpScheduled;
         uint32 m_DetectInvTimer;
         uint32 m_ExtraFlags;
         ObjectGuid m_curSelectionGuid;
@@ -2079,16 +2106,17 @@ class Player final: public Unit
         void HandleSobering();
         uint32 m_deathTimer;
         time_t m_deathExpireTime;
-        ObjectGuid     m_selectedGobj; // For GM commands
+        bool m_repopAtGraveyardPending;
+        ObjectGuid m_selectedGobj; // For GM commands
         ObjectGuid m_escortingGuid;
 
         void SendMountResult(UnitMountResult result) const;
         void SendDismountResult(UnitDismountResult result) const;
         void UpdateCorpseReclaimDelay();
     public:
-        void ScheduleStandStateChange(uint8 state);
-        void ClearScheduledStandState() { m_newStandState = MAX_UNIT_STAND_STATE; m_standStateTimer = 0; }
-        bool IsStandingUpForProc() const override;
+        void ScheduleStandUp();
+        bool IsStandUpScheduled() const { return m_isStandUpScheduled; }
+        void ClearScheduledStandUp() { m_isStandUpScheduled = false; }
         UnitMountResult Mount(uint32 mount, uint32 spellId = 0) override;
         UnitDismountResult Unmount(bool from_aura = false) override;
 
@@ -2136,6 +2164,7 @@ class Player final: public Unit
         void ResurrectPlayer(float restore_percent, bool applySickness = false);
         void BuildPlayerRepop();
         void RepopAtGraveyard();
+        void ScheduleRepopAtGraveyard();
 
         // Nostalrius : Phasing
         void SetWorldMask(uint32 newMask) override;
@@ -2251,6 +2280,9 @@ class Player final: public Unit
         void RewardHonor(Unit* uVictim, uint32 groupSize);
         void RewardHonorOnDeath();
         bool IsHonorOrXPTarget(Unit* pVictim) const;
+        bool IsCityProtector();
+        void SetCityTitle();
+        void RemoveCityTitle();
 
         HonorMgr&       GetHonorMgr() { return m_honorMgr; }
         HonorMgr const& GetHonorMgr() const { return m_honorMgr; }
@@ -2519,8 +2551,8 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo) return 0;
-    int32 totalpct = 0;
-    int32 totalflat = 0;
+    float totalpct = 0;
+    float totalflat = 0;
     for (const auto mod : m_spellMods[op])
     {
         if (!IsAffectedBySpellmod(spellInfo,mod,spell))

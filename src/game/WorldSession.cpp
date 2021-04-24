@@ -36,7 +36,6 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "World.h"
-#include "ObjectAccessor.h"
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "SocialMgr.h"
@@ -45,10 +44,7 @@
 #include "Anticheat.h"
 #include "Language.h"
 #include "Auth/Sha1.h"
-#include "ChannelMgr.h"
 #include "Chat.h"
-#include "Channel.h"
-#include "AccountMgr.h"
 #include "MasterPlayer.h"
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
@@ -280,7 +276,7 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 
 bool WorldSession::ForcePlayerLogoutDelay()
 {
-    if (!sWorld.IsStopped() && GetPlayer() && GetPlayer()->FindMap() && GetPlayer()->IsInWorld() && sPlayerBotMgr.ForceLogoutDelay())
+    if (!sWorld.IsStopped() && GetPlayer() && GetPlayer()->FindMap() && GetPlayer()->IsInWorld() && sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
     {
         sLog.out(LOG_CHAR, "Account: %d (IP: %s) Lost socket for character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
         sWorld.LogCharacter(GetPlayer(), "LostSocket");
@@ -672,7 +668,7 @@ void WorldSession::LogoutPlayer(bool Save)
         // No SQL injection as AccountID is uint32
         static SqlStatementID id;
 
-        SqlStatement stmt = LoginDatabase.CreateStatement(id, "UPDATE account SET current_realm = ?, online = 0 WHERE id = ?");
+        SqlStatement stmt = LoginDatabase.CreateStatement(id, "UPDATE `account` SET `current_realm` = ?, `online` = 0 WHERE `id` = ?");
         stmt.PExecute(uint32(0), GetAccountId());
 
         ///- If the player is in a guild, update the guild roster and broadcast a logout message to other guild members
@@ -897,7 +893,7 @@ void WorldSession::LoadTutorialsData()
     for (uint32 & tutorial : m_Tutorials)
         tutorial = 0;
 
-    QueryResult* result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u'", GetAccountId());
+    QueryResult* result = CharacterDatabase.PQuery("SELECT `tut0`, `tut1`, `tut2`, `tut3`, `tut4`, `tut5`, `tut6`, `tut7` FROM `character_tutorial` WHERE `account` = '%u'", GetAccountId());
 
     if (!result)
     {
@@ -936,7 +932,7 @@ void WorldSession::SaveTutorialsData()
     {
         case TUTORIALDATA_CHANGED:
         {
-            SqlStatement stmt = CharacterDatabase.CreateStatement(updTutorial, "UPDATE character_tutorial SET tut0=?, tut1=?, tut2=?, tut3=?, tut4=?, tut5=?, tut6=?, tut7=? WHERE account = ?");
+            SqlStatement stmt = CharacterDatabase.CreateStatement(updTutorial, "UPDATE `character_tutorial` SET `tut0`=?, `tut1`=?, `tut2`=?, `tut3`=?, `tut4`=?, `tut5`=?, `tut6`=?, `tut7`=? WHERE `account` = ?");
             for (uint32 tutorial : m_Tutorials)
                 stmt.addUInt32(tutorial);
 
@@ -947,7 +943,7 @@ void WorldSession::SaveTutorialsData()
 
         case TUTORIALDATA_NEW:
         {
-            SqlStatement stmt = CharacterDatabase.CreateStatement(insTutorial, "INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            SqlStatement stmt = CharacterDatabase.CreateStatement(insTutorial, "INSERT INTO `character_tutorial` (`account`, `tut0`, `tut1`, `tut2`, `tut3`, `tut4`, `tut5`, `tut6`, `tut7`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             stmt.addUInt32(GetAccountId());
             for (uint32 tutorial : m_Tutorials)
@@ -1109,7 +1105,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
         action = "Muted from public channels.";
         if (GetSecurity() == SEC_PLAYER)
         {
-            LoginDatabase.PExecute("UPDATE account SET flags = flags | 0x%x WHERE id = %u", ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS, GetAccountId());
+            LoginDatabase.PExecute("UPDATE `account` SET `flags` = `flags` | 0x%x WHERE `id` = %u", ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS, GetAccountId());
             SetAccountFlags(GetAccountFlags() | ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS);
         }
     }

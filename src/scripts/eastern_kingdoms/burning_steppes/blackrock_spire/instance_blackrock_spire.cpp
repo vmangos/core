@@ -23,13 +23,40 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "blackrock_spire.h"
+#include "WaypointManager.h"
+#include "CreatureGroups.h"
 
 //#define DEBUG_ON
 
 enum
 {
     AREATRIGGER_ENTER_UBRS      = 2046,
-    AREATRIGGER_STADIUM         = 2026
+    AREATRIGGER_STADIUM         = 2026,
+
+    // Arena event dialogue intro and outro - handled by instance
+    SAY_NEFARIUS_INTRO_1        = 5635,
+    SAY_NEFARIUS_INTRO_2        = 5640,
+    SAY_NEFARIUS_LOSE1          = 5709,
+    SAY_REND_ATTACK             = 5722,
+    SAY_NEFARIUS_WARCHIEF       = 5720,
+    SAY_NEFARIUS_PACING         = 5721,
+    SAY_NEFARIUS_VICTORY        = 5824,
+
+    // Arena event random taunt - handled on creature death
+    SAY_NEFARIUS_TAUNT1         = 5665,
+    SAY_NEFARIUS_TAUNT2         = 5671,
+    SAY_NEFARIUS_TAUNT3         = 5666,
+    SAY_NEFARIUS_TAUNT4         = 5667,
+    SAY_NEFARIUS_TAUNT5         = 5668,
+    SAY_NEFARIUS_TAUNT6         = 5669,
+    SAY_NEFARIUS_TAUNT7         = 5664,
+    SAY_NEFARIUS_TAUNT8         = 5719,
+    SAY_REND_TAUNT1             = 5672,
+    SAY_REND_TAUNT2             = 5678,
+    SAY_REND_TAUNT3             = 5673,
+    SAY_REND_TAUNT4             = 5674,
+
+    WAYPOINT_ID_STADIUM         = 10442,
 };
 
 /* Areatrigger
@@ -46,9 +73,86 @@ enum
 3726 UBRS, entrance to BWL
 */
 
-instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance(pMap),
+static const uint32 aStadiumSpectators[12] =
+{
+    NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_ELITE, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN,
+    NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_ELITE, NPC_BLACKHAND_VETERAN, NPC_BLACKHAND_VETERAN
+};
+
+static const Position aSpectatorsSpawnLocs[12] =
+{
+    { 163.3209f, -340.9818f, 111.0216f, 4.818223f },
+    { 164.2471f, -339.0313f, 111.0368f, 1.413717f },
+    { 161.124f, -339.5178f, 111.0381f, 3.001966f },
+    { 162.5045f, -337.8101f, 111.0367f, 4.13643f },
+    { 160.9896f, -337.7715f, 111.0368f, 1.117011f },
+    { 161.8347f, -335.7923f, 111.0352f, 2.286381f },
+    { 113.9726f, -366.0805f, 116.9195f, 6.252025f },
+    { 112.7245f, -368.9635f, 116.9307f, 4.677482f },
+    { 110.5757f, -368.2123f, 116.9278f, 4.310963f },
+    { 109.3343f, -366.4785f, 116.9261f, 2.740167f },
+    { 110.1331f, -363.9824f, 116.9272f, 0.5235988f },
+    { 111.9971f, -363.0948f, 116.929f, 5.951573f },
+};
+
+static const Position aSpectatorsTargetLocs[12] =
+{
+    { 160.619f, -395.826f, 121.9752f, -1.502597f },
+    { 162.1428f, -395.1175f, 121.9751f, -1.67753f },
+    { 158.6822f, -395.7097f, 121.9753f, -1.787977f },
+    { 164.384f, -395.3787f, 121.9751f, -1.502597f },
+    { 156.9669f, -395.2188f, 121.9752f, -1.678662f },
+    { 166.2515f, -395.0366f, 121.975f, -1.791467f },
+    { 143.814f, -396.7092f, 121.9753f, -1.40136f },
+    { 145.3893f, -396.1959f, 121.9752f, -1.419479f },
+    { 142.1598f, -396.0284f, 121.9752f, -1.661444f },
+    { 147.7274f, -396.3042f, 121.9753f, -1.40136f },
+    { 139.9446f, -396.7277f, 121.9753f, -1.428414f },
+    { 149.3754f, -395.7497f, 121.9753f, -1.714769f },
+};
+
+static const Position aStadiumLocs[7] =
+{
+    {210.00f, -420.30f, 110.94f, 3.14f},                    // dragons summon location
+    {211.762f,-397.58f, 111.18f, 4.74f},                    // Gyth summon location
+    {163.62f, -420.33f, 110.47f, 0.0f},                     // center of the stadium location (for movement)
+    {164.63f, -444.04f, 121.97f, 3.22f},                    // Lord Nefarius summon position
+    {161.01f, -443.73f, 121.97f, 6.26f},                    // Rend summon position
+    {164.64f, -443.30f, 121.97f, 1.61f},                    // Nefarius move position
+    {165.74f, -466.46f, 116.80f, 0.0f},                     // Rend move position
+};
+
+// Stadium event description
+static const uint32 aStadiumEventNpcs[MAX_STADIUM_WAVES][MAX_STADIUM_MOBS_PER_WAVE] =
+{
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, 0},
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, 0},
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, NPC_BLACKHAND_HANDLER, 0},
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, NPC_BLACKHAND_HANDLER, 0},
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, NPC_BLACKHAND_HANDLER},
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, NPC_CHROMATIC_DRAGON, NPC_BLACKHAND_HANDLER},
+    {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, NPC_CHROMATIC_DRAGON, NPC_BLACKHAND_HANDLER},
+};
+
+static const SIDialogueEntry aStadiumDialogue[] =
+{
+    {NPC_LORD_VICTOR_NEFARIUS,  0,                          1000},
+    {SAY_NEFARIUS_INTRO_1,      NPC_LORD_VICTOR_NEFARIUS,   7000},
+    {SAY_NEFARIUS_INTRO_2,      NPC_LORD_VICTOR_NEFARIUS,   5000},
+    {NPC_BLACKHAND_HANDLER,     0,                          0},
+    {SAY_NEFARIUS_LOSE1,        NPC_LORD_VICTOR_NEFARIUS,   3000},
+    {SAY_REND_ATTACK,           NPC_REND_BLACKHAND,         2000},
+    {SAY_NEFARIUS_WARCHIEF,     NPC_LORD_VICTOR_NEFARIUS,   3000},
+    {SAY_NEFARIUS_PACING,       NPC_LORD_VICTOR_NEFARIUS,   0},
+    {SAY_NEFARIUS_VICTORY,      NPC_LORD_VICTOR_NEFARIUS,   5000},
+    {NPC_REND_BLACKHAND,        0,                          0},
+    {0, 0, 0},
+};
+
+instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance(pMap), DialogueHelper(aStadiumDialogue), 
     m_uiEmberseerGUID(0),
     m_uiNefariusGUID(0),
+    m_uiRendGUID(0),
     m_uiGythGUID(0),
     m_uiInfiltratorGUID(0),
     m_uiDrakkisathGUID(0),
@@ -86,6 +190,10 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
 
     m_uiUBRSDoor_Timer(0),
     m_uiUBRSDoor_Step(0),
+
+    m_uiStadiumEventTimer(0),
+    m_uiStadiumWaves(0),
+    m_uiStadiumMobsAlive(0),
 
     m_bBannokSpawned(false)
 
@@ -130,7 +238,7 @@ void instance_blackrock_spire::OnObjectCreate(GameObject* pGo)
             break;
         case GO_GYTH_EXIT_DOOR:
             m_uiGythExitDoorGUID = pGo->GetGUID();
-            if (GetData(TYPE_GYTH) == DONE)
+            if (GetData(TYPE_STADIUM) == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
@@ -235,6 +343,10 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
         case NPC_LORD_VICTOR_NEFARIUS:
             m_uiNefariusGUID = pCreature->GetGUID();
             break;
+        case NPC_REND_BLACKHAND:
+            if (!m_uiRendGUID) // only save the original Rend
+                m_uiRendGUID = pCreature->GetGUID();
+            break;
         case NPC_GYTH:
             m_uiGythGUID = pCreature->GetGUID();
             break;
@@ -304,15 +416,37 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
         case TYPE_FLAMEWREATH:
             m_auiEncounter[TYPE_FLAMEWREATH] = uiData;
             break;
-        case TYPE_GYTH:
-            if (uiData == IN_PROGRESS || uiData == FAIL)
-                DoUseDoorOrButton(m_uiGythEntryDoorGUID);
+        case TYPE_STADIUM:
+            // Don't set the same data twice
+            if (m_auiEncounter[uiType] == uiData)
+                break;
+            // Combat door
+            DoUseDoorOrButton(m_uiGythEntryDoorGUID);
+            // Start event
+            if (uiData == IN_PROGRESS)
+                StartNextDialogueText(SAY_NEFARIUS_INTRO_1);
             else if (uiData == DONE)
             {
-                DoUseDoorOrButton(m_uiGythEntryDoorGUID);
+                // Event complete: remove the summoned spectators
+                DespawnStadiumSpectators();
                 DoUseDoorOrButton(m_uiGythExitDoorGUID);
             }
-            m_auiEncounter[TYPE_GYTH] = uiData;
+            else if (uiData == FAIL)
+            {
+                // Despawn Nefarius, Rend and the spectators on fail (the others are despawned OnCreatureEvade())
+                if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+                    pNefarius->DespawnOrUnsummon();
+                if (Creature* pRend = GetCreature(m_uiRendGUID))
+                    pRend->DespawnOrUnsummon();
+                if (Creature* pGyth = GetCreature(m_uiGythGUID))
+                    pGyth->DespawnOrUnsummon();
+                DespawnStadiumSpectators();
+
+                m_uiStadiumEventTimer = 0;
+                m_uiStadiumMobsAlive = 0;
+                m_uiStadiumWaves = 0;
+            }
+            m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_VALTHALAK:
             m_auiEncounter[TYPE_VALTHALAK] = uiData;
@@ -350,6 +484,214 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
+void instance_blackrock_spire::OnCreatureDeath(Creature* pCreature)
+{
+    switch (pCreature->GetEntry())
+    {
+        case NPC_CHROMATIC_WHELP:
+        case NPC_CHROMATIC_DRAGON:
+        case NPC_BLACKHAND_HANDLER:
+            // check if it's summoned - some npcs with the same entry are already spawned in the instance
+            if (!pCreature->IsTemporarySummon())
+                break;
+
+            // 5% chance for Rend or Lord Victor Nefarius to taunt players when one of the creature is killed (% is guesswork)
+            // Lord Victor Nefarius
+            if (urand(0, 100) < 5)
+            {
+                if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+                {
+                    uint32 const textId = PickRandomValue(SAY_NEFARIUS_TAUNT1, SAY_NEFARIUS_TAUNT2, SAY_NEFARIUS_TAUNT3,
+                                                          SAY_NEFARIUS_TAUNT4, SAY_NEFARIUS_TAUNT5, SAY_NEFARIUS_TAUNT6,
+                                                          SAY_NEFARIUS_TAUNT7, SAY_NEFARIUS_TAUNT8);
+                    DoScriptText(textId, pNefarius);
+                }
+            }
+            // Warchief Rend Blackhand
+            if (urand(0, 100) < 5)
+            {
+                if (Creature* pRend = GetCreature(m_uiRendGUID))
+                {
+                    uint32 const textId = PickRandomValue(SAY_REND_TAUNT1, SAY_REND_TAUNT2, SAY_REND_TAUNT3, SAY_REND_TAUNT4);
+                    DoScriptText(textId, pRend);
+                }
+            }
+            --m_uiStadiumMobsAlive;
+            if (!m_uiStadiumMobsAlive && (m_uiStadiumWaves == MAX_STADIUM_WAVES))
+                DoSendNextStadiumWave();
+            break;
+        case NPC_GYTH:
+        case NPC_REND_BLACKHAND:
+            --m_uiStadiumMobsAlive;
+            if (m_uiStadiumMobsAlive == 0)
+                StartNextDialogueText(SAY_NEFARIUS_VICTORY);
+            break;
+    }
+}
+
+void instance_blackrock_spire::OnCreatureEvade(Creature* pCreature)
+{
+    switch (pCreature->GetEntry())
+    {
+        case NPC_CHROMATIC_WHELP:
+        case NPC_CHROMATIC_DRAGON:
+        case NPC_BLACKHAND_HANDLER:
+        case NPC_GYTH:
+        case NPC_REND_BLACKHAND:
+            // check if it's summoned - some npcs with the same entry are already spawned in the instance
+            if (!pCreature->IsTemporarySummon())
+                break;
+            SetData(TYPE_STADIUM, FAIL);
+            pCreature->DespawnOrUnsummon();
+            break;
+    }
+}
+
+Creature* instance_blackrock_spire::GetSpeakerByEntry(uint32 uiEntry)
+{
+    switch (uiEntry)
+    {
+        case NPC_LORD_VICTOR_NEFARIUS:
+            return GetCreature(m_uiNefariusGUID);
+        case NPC_REND_BLACKHAND:
+            return GetCreature(m_uiRendGUID);
+    }
+
+    return nullptr;
+}
+
+void instance_blackrock_spire::JustDidDialogueStep(int32 iEntry)
+{
+    switch (iEntry)
+    {
+        case NPC_BLACKHAND_HANDLER:
+            m_uiStadiumEventTimer = 1000;
+            // Move the two near the balcony
+            if (Creature* pRend = GetCreature(m_uiRendGUID))
+                pRend->SetFacingTo(aStadiumLocs[5].o);
+            if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+            {
+                pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z, 0, 0.0f, aStadiumLocs[5].o);
+                // Summon the spectators and move them to the western balcony
+                for (uint8 i = 0; i < 12; i++)
+                {
+                    if (Creature* pSpectator = pNefarius->SummonCreature(aStadiumSpectators[i], aSpectatorsSpawnLocs[i].x, aSpectatorsSpawnLocs[i].y, aSpectatorsSpawnLocs[i].z, aSpectatorsSpawnLocs[i].o, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    {
+                        pSpectator->SetDetectionDistance(1.0f);
+                        pSpectator->SetNoCallAssistance(true);
+                        pSpectator->SetWalk(false);
+                        pSpectator->SetHomePosition(aSpectatorsTargetLocs[i].x, aSpectatorsTargetLocs[i].y, aSpectatorsTargetLocs[i].z, aSpectatorsTargetLocs[i].o);
+                        pSpectator->GetMotionMaster()->MovePoint(0, aSpectatorsTargetLocs[i].x, aSpectatorsTargetLocs[i].y, aSpectatorsTargetLocs[i].z, 0, 0.0f, aSpectatorsTargetLocs[i].o);
+                        m_lStadiumSpectatorsGUIDList.push_back(pSpectator->GetObjectGuid());
+                    }
+                }
+            }
+            break;
+        case SAY_NEFARIUS_WARCHIEF:
+            // Prepare for Gyth
+            if (Creature* pRend = GetCreature(m_uiRendGUID))
+            {
+                pRend->ForcedDespawn(5000);
+                pRend->SetWalk(false);
+                pRend->GetMotionMaster()->MovePoint(0, aStadiumLocs[6].x, aStadiumLocs[6].y, aStadiumLocs[6].z);
+            }
+            m_uiStadiumEventTimer = 30000;
+            break;
+        case SAY_NEFARIUS_PACING:
+            // Make Lord Nefarius walk back and forth while Rend is preparing Glyth
+            if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+                pNefarius->GetMotionMaster()->MoveWaypoint();
+            break;
+        case SAY_NEFARIUS_VICTORY:
+            SetData(TYPE_STADIUM, DONE);
+            break;
+        case NPC_REND_BLACKHAND:
+            // Despawn Nefarius
+            if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+            {
+                pNefarius->ForcedDespawn(5000);
+                pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[6].x, aStadiumLocs[6].y, aStadiumLocs[6].z);
+            }
+            break;
+    }
+}
+
+void instance_blackrock_spire::DespawnStadiumSpectators()
+{
+    for (const auto& itr : m_lStadiumSpectatorsGUIDList)
+    {
+        if (Creature* pSpectator = instance->GetCreature(itr))
+            pSpectator->DespawnOrUnsummon();
+    }
+    m_lStadiumSpectatorsGUIDList.clear();
+}
+
+void instance_blackrock_spire::DoSendNextStadiumWave()
+{
+    if (m_uiStadiumWaves < MAX_STADIUM_WAVES)
+    {
+        // Send current wave mobs
+        if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+        {
+            float fX, fY, fZ;
+            Creature* pFirstMob = nullptr;
+            for (uint8 i = 0; i < MAX_STADIUM_MOBS_PER_WAVE; ++i)
+            {
+                if (aStadiumEventNpcs[m_uiStadiumWaves][i] == 0)
+                    continue;
+
+                pNefarius->GetRandomPoint(aStadiumLocs[0].x, aStadiumLocs[0].y, aStadiumLocs[0].z, 7.0f, fX, fY, fZ);
+                fX = std::min(aStadiumLocs[0].x, fX);    // Halfcircle - suits better the rectangular form
+                if (Creature* pTemp = pNefarius->SummonCreature(aStadiumEventNpcs[m_uiStadiumWaves][i], fX, fY, fZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+                {
+                    if (!pFirstMob)
+                        pFirstMob = pTemp;
+                    else
+                        pTemp->JoinCreatureGroup(pFirstMob, frand(3.0f, 5.0f), i, OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER);
+                    ++m_uiStadiumMobsAlive;
+                }
+            }
+
+            if (pFirstMob)
+                pFirstMob->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, WAYPOINT_ID_STADIUM, true);
+        }
+
+        DoUseDoorOrButton(m_uiGythCombatDoorGUID);
+    }
+    // All waves are cleared - start Gyth intro
+    else if (m_uiStadiumWaves == MAX_STADIUM_WAVES)
+        StartNextDialogueText(SAY_NEFARIUS_LOSE1);
+    else
+    {
+        // Send Gyth
+        if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
+        {
+            // Stop Lord Nefarius from moving and put him back in place
+            pNefarius->GetMotionMaster()->MoveIdle();
+            pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z, 0, 0.0f, aStadiumLocs[5].o);
+
+            if (Creature* pGyth = pNefarius->SummonCreature(NPC_GYTH, aStadiumLocs[1].x, aStadiumLocs[1].y, aStadiumLocs[1].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+            {
+                pGyth->SetWalk(false);
+                pGyth->GetMotionMaster()->MoveWaypoint();
+            }
+        }
+
+        // Set this to 2, because Rend will be summoned later during the fight
+        m_uiStadiumMobsAlive = 2;
+
+        DoUseDoorOrButton(m_uiGythCombatDoorGUID);
+    }
+
+    ++m_uiStadiumWaves;
+
+    // Stop the timer when all the waves have been sent
+    if (m_uiStadiumWaves >= MAX_STADIUM_WAVES)
+        m_uiStadiumEventTimer = 0;
+    else
+        m_uiStadiumEventTimer = 60000;
+}
+
 enum
 {
     SAY_ROOKERY_EVENT_START = -1229020
@@ -357,6 +699,16 @@ enum
 
 void instance_blackrock_spire::Update(uint32 uiDiff)
 {
+    DialogueUpdate(uiDiff);
+
+    if (m_uiStadiumEventTimer)
+    {
+        if (m_uiStadiumEventTimer <= uiDiff)
+            DoSendNextStadiumWave();
+        else
+            m_uiStadiumEventTimer -= uiDiff;
+    }
+
     if (m_uiUBRSDoor_Timer)
     {
         if (m_uiUBRSDoor_Timer <= uiDiff)
@@ -499,7 +851,7 @@ uint32 instance_blackrock_spire::GetData(uint32 uiType)
         case TYPE_ROOM_EVENT:
         case TYPE_EMBERSEER:
         case TYPE_FLAMEWREATH:
-        case TYPE_GYTH:
+        case TYPE_STADIUM:
         case TYPE_VALTHALAK:
         case TYPE_EVENT_DOOR_UBRS:
         case TYPE_SOLAKAR:
@@ -518,6 +870,8 @@ uint64 instance_blackrock_spire::GetData64(uint32 uiType)
             return m_uiEmberseerGUID;
         case NPC_LORD_VICTOR_NEFARIUS:
             return m_uiNefariusGUID;
+        case NPC_REND_BLACKHAND:
+            return m_uiRendGUID;
         case NPC_GYTH:
             return m_uiGythGUID;
         case NPC_SCARSHIELD_INFILTRATOR:
@@ -567,7 +921,7 @@ InstanceData* GetInstanceData_instance_blackrock_spire(Map* pMap)
 
 bool AreaTrigger_at_blackrock_spire(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    if (pPlayer->IsDead())
+    if (pPlayer->IsDead() || pPlayer->IsGameMaster())
         return false;
 
     switch (pAt->id)
@@ -582,15 +936,25 @@ bool AreaTrigger_at_blackrock_spire(Player* pPlayer, AreaTriggerEntry const* pAt
             }
             break;
         case AREATRIGGER_STADIUM:
-            if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*) pPlayer->GetInstanceData())
-                if (Creature* pGyth = pInstance->instance->GetCreature(pInstance->GetData64(NPC_GYTH)))
-                    if (pGyth->IsAlive() && !pGyth->IsInCombat())
-                        pGyth->AI()->AttackStart(pPlayer);
+            if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*)pPlayer->GetInstanceData())
+            {
+                if (pInstance->GetData(TYPE_STADIUM) == IN_PROGRESS || pInstance->GetData(TYPE_STADIUM) == DONE)
+                    return false;
+
+                // Respawn Nefarius and Rend for the dialogue event if they are not spawned already.
+                if (Creature* pNefarius = pInstance->GetCreature(pInstance->GetData64(NPC_LORD_VICTOR_NEFARIUS)))
+                    if (!pNefarius->IsAlive())
+                        pNefarius->Respawn();
+                if (Creature* pRend = pInstance->GetCreature(pInstance->GetData64(NPC_REND_BLACKHAND)))
+                    if (!pRend->IsAlive())
+                        pRend->Respawn();
+
+                pInstance->SetData(TYPE_STADIUM, IN_PROGRESS);
+            }
             break;
     }
     return false;
 }
-
 
 struct go_father_flameAI: public GameObjectAI
 {
@@ -700,7 +1064,6 @@ struct npc_rookery_hatcherAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SOLAKAR, FAIL);
         m_creature->ForcedDespawn();
     }
-
 
     void MoveInLineOfSight(Unit* pWho) override
     {

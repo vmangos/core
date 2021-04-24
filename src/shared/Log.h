@@ -117,7 +117,7 @@ enum LogType
 
 int const Color_count = int(WHITE)+1;
 
-class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Thread_Mutex> >
+class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::mutex> >
 {
     friend class MaNGOS::OperatorNew<Log>;
     Log();

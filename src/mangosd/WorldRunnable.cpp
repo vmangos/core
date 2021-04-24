@@ -47,7 +47,7 @@ extern int m_ServiceStatus;
 #endif
 
 /// Heartbeat for the World
-void WorldRunnable::run()
+void WorldRunnable::operator()()
 {
     ///- Init new SQL thread for the world database
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests (one connection call enough)
@@ -103,7 +103,7 @@ void WorldRunnable::run()
         if (diff <= WORLD_SLEEP_CONST+prevSleepTime)
         {
             prevSleepTime = WORLD_SLEEP_CONST+prevSleepTime-diff;
-            ACE_Based::Thread::Sleep(prevSleepTime);
+            std::this_thread::sleep_for(std::chrono::milliseconds(prevSleepTime));
         }
         else
             prevSleepTime = 0;
@@ -118,13 +118,16 @@ void WorldRunnable::run()
     sEluna->OnShutdown();
 #endif /* ENABLE_ELUNA */
 
+    sLog.outString("Shutting down world...");
     sWorld.Shutdown();
 
     // unload battleground templates before different singletons destroyed
     sBattleGroundMgr.DeleteAllBattleGrounds();
 
+    sLog.outString("Stopping network threads...");
     sWorldSocketMgr->StopNetwork();
 
+    sLog.outString("Unloading all maps...");
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)
 
 #ifdef ENABLE_ELUNA

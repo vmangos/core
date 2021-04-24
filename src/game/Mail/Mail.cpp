@@ -29,7 +29,6 @@
  */
 
 #include "Mail.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
@@ -37,10 +36,6 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "Player.h"
-#include "UpdateMask.h"
-#include "Language.h"
-#include "DBCStores.h"
-#include "BattleGroundMgr.h"
 #include "Item.h"
 #include "AuctionHouseMgr.h"
 #include "MasterPlayer.h"

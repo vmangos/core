@@ -23,11 +23,8 @@
 #define MANGOSSERVER_GUILD_H
 
 #include "Common.h"
-#include "Item.h"
 #include "ObjectAccessor.h"
-#include "SharedDefines.h"
 
-class Item;
 class Petition;
 
 #define GUILD_RANKS_MIN_COUNT   5
@@ -42,9 +39,7 @@ enum
     GUILD_NOTE_MAX_LENGTH       = 31,
     GUILD_INFO_MAX_LENGTH       = 500,
     GUILD_MOTD_MAX_LENGTH       = 128,
-    // 0x8000 is client max accepted packet size.
-    // Set a limit so that SMSG_GUILD_ROSTER size is never over this size.
-    GUILD_MAX_MEMBERS           = (0x8000 - 10 - GUILD_RANKS_MAX_COUNT - GUILD_INFO_MAX_LENGTH - GUILD_MOTD_MAX_LENGTH) / 100,
+    GUILD_ROSTER_MAX_LENGTH     = 0x8000, // max packet size accepted by client
 };
 
 enum GuildDefaultRanks

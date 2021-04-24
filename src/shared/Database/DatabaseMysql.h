@@ -27,14 +27,20 @@
 //#include "Common.h"
 #include "Database.h"
 #include "Policies/Singleton.h"
-#include "ace/Thread_Mutex.h"
-#include "ace/Guard_T.h"
 
 #ifdef WIN32
 #include <winsock2.h>
-#include <mysql/mysql.h>
-#else
+#endif
 #include <mysql.h>
+
+// my_bool declaration is removed in 8.0
+#if MYSQL_VERSION_ID >= 80000
+typedef char my_bool;
+#ifdef _MSC_VER
+#pragma message("You are using an incompatible mysql version!")
+#else
+#warning "You are using an incompatible mysql version!"
+#endif
 #endif
 
 //MySQL prepared statement class

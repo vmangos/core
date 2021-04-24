@@ -20,8 +20,8 @@
  */
 
 #include "ReputationMgr.h"
-#include "DBCStores.h"
 #include "Player.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include <numeric>

@@ -39,7 +39,7 @@ struct npc_primordial_behemothAI : ScriptedAI
 
         auto pMainTarget = m_creature->GetVictim();
 
-        if (pMainTarget->IsWithinMeleeRange(m_creature) && pMainTarget->IsWithinLOSInMap(m_creature))
+        if (pMainTarget->CanReachWithMeleeAutoAttack(m_creature) && pMainTarget->IsWithinLOSInMap(m_creature))
         {
             m_creature->SetCasterChaseDistance(0.0f);
 

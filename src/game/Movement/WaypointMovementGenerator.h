@@ -77,20 +77,25 @@ class WaypointMovementGenerator<Creature>
         void Finalize(Creature &);
         void Reset(Creature &u);
         bool Update(Creature &u, uint32 const& diff);
-        void InitializeWaypointPath(Creature& u, int32 id, uint32 startPoint, WaypointPathOrigin wpSource, uint32 initialDelay, uint32 overwriteEntry, bool repeat);
+        void InitializeWaypointPath(Creature& creature, uint32 startPoint, WaypointPathOrigin wpSource, uint32 initialDelay, uint32 overwriteGuid, uint32 overwriteEntry, bool repeat);
 
         MovementGeneratorType GetMovementGeneratorType() const { return WAYPOINT_MOTION_TYPE; }
 
         // now path movement implementation
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
         uint32 getLastReachedWaypoint() const { return m_lastReachedWaypoint; }
-        void GetPathInformation(int32& pathId, WaypointPathOrigin& wpOrigin) const { pathId = m_pathId; wpOrigin = m_PathOrigin; }
+        void GetPathInformation(WaypointPathOrigin& wpOrigin) const { wpOrigin = m_PathOrigin; }
         void GetPathInformation(std::ostringstream& oss) const;
-
-        void AddToWaypointPauseTime(int32 waitTimeDiff);
         bool SetNextWaypoint(uint32 pointId);
+
+        void AddPauseTime(int32 waitTimeDiff)
+        {
+            if (i_nextMoveTime.GetExpiry() < waitTimeDiff)
+                i_nextMoveTime.Reset(waitTimeDiff);
+        }
+        
     protected:
-        void LoadPath(Creature& c, int32 id, WaypointPathOrigin wpOrigin, uint32 overwriteEntry);
+        void LoadPath(uint32 guid, uint32 entry, WaypointPathOrigin wpOrigin);
         void Stop(int32 time) { i_nextMoveTime.Reset(time);}
 
         bool Stopped() { return !i_nextMoveTime.Passed();}
@@ -116,7 +121,6 @@ class WaypointMovementGenerator<Creature>
         bool m_isWandering;
         uint32 m_lastReachedWaypoint;
 
-        int32 m_pathId;
         WaypointPathOrigin m_PathOrigin;
 };
 

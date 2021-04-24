@@ -48,7 +48,7 @@ struct Modifier
      * be reduced by 27% if the earlier mentioned AuraType
      * would have been used. And 27 would increase the value by 27%
      */
-    int32 m_amount;
+    float m_amount;
     /**
      * A miscvalue that is dependent on what the aura will do, this
      * is usually decided by the AuraType, ie:
@@ -110,7 +110,7 @@ class SpellAuraHolder
         Aura* GetAuraByEffectIndex(SpellEffectIndex index) const { return m_auras[index]; }
         uint32 GetAuraPeriodicTickTimer(SpellEffectIndex index) const;
 
-        uint32 GetId() const { return m_spellProto->Id; }
+        uint32 GetId() const;
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
 
         ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
@@ -225,7 +225,7 @@ class SpellAuraHolder
 
         void UpdateAuraDuration() const;
 
-        void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
+        void SetAura(uint32 slot, bool remove);
         void SetAuraFlag(uint32 slot, bool add);
         void SetAuraLevel(uint32 slot, uint32 level);
 
@@ -431,13 +431,13 @@ class Aura
 
         virtual ~Aura();
 
-        void SetModifier(AuraType t, int32 a, uint32 pt, int32 miscValue);
+        void SetModifier(AuraType t, float a, uint32 pt, int32 miscValue);
         Modifier*       GetModifier()       { return &m_modifier; }
         Modifier const* GetModifier() const { return &m_modifier; }
-        int32 GetMiscValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValue[m_effIndex]; }
+        int32 GetMiscValue() const;
 
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
-        uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
+        uint32 GetId() const{ return GetHolder()->GetId(); }
         ObjectGuid const& GetCastItemGuid() const { return GetHolder()->GetCastItemGuid(); }
         ObjectGuid const& GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
         ObjectGuid const& GetRealCasterGuid() const { return GetHolder()->GetRealCasterGuid(); }
@@ -461,7 +461,7 @@ class Aura
         uint32 GetStackAmount() const { return GetHolder()->GetStackAmount(); }
 
         void CalculatePeriodic(Player* modOwner, bool create);
-        void SetLoadedState(int32 damage, uint32 periodicTime)
+        void SetLoadedState(float damage, uint32 periodicTime)
         {
             m_modifier.m_amount = damage;
             m_modifier.periodictime = periodicTime;
@@ -470,7 +470,7 @@ class Aura
                 m_periodicTick = maxticks - GetAuraDuration() / m_modifier.periodictime;
         }
 
-        bool IsPositive() { return m_positive; }
+        bool IsPositive() const { return m_positive; }
         bool IsPersistent() const { return m_isPersistent; }
         bool IsAreaAura() const { return m_isAreaAura; }
         bool IsPeriodic() const { return m_isPeriodic; }
@@ -485,10 +485,10 @@ class Aura
         void ComputeExclusive();
         bool IsExclusive() const { return m_exclusive; }
         bool IsApplied() const { return m_applied; }
-        // Resultat :
-        // - 0 : pas dans la meme categorie.
-        // - 1 : je suis plus important. Je m'applique.
-        // - 2 : il est plus important. Il s'applique.
+        // Results :
+        // - 0 : Not in the same category.
+        // - 1 : I am more important. I apply myself. 
+        // - 2 : Other aura is more important. It applies. 
         int CheckExclusiveWith(Aura const* other) const;
         bool ExclusiveAuraCanApply();
         void ExclusiveAuraUnapply();
@@ -541,7 +541,7 @@ class Aura
         void PeriodicTick(SpellEntry const* sProto = nullptr, AuraType auraType = SPELL_AURA_NONE, uint32 data = 0);
         void PeriodicDummyTick();
 
-        uint32 CalculateDotDamage() const;
+        float CalculateDotDamage() const;
         void ReapplyAffectedPassiveAuras();
 
         Modifier m_modifier;

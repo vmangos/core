@@ -2,6 +2,8 @@
 #define MANGOS_COMBAT_BOT_BASE_H
 
 #include "PlayerBotAI.h"
+#include "SpellEntry.h"
+#include "Player.h"
 
 struct HealSpellCompare
 {
@@ -104,6 +106,7 @@ public:
     bool HealInjuredTargetPeriodic(Unit* pTarget);
     template <class T>
     SpellEntry const* SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const;
+    bool AreOthersOnSameTarget(ObjectGuid guid, bool checkMelee = true, bool checkSpells = true) const;
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
@@ -189,6 +192,17 @@ public:
         }
         return false;
     }
+    static bool IsTankClass(uint8 playerClass)
+    {
+        switch (playerClass)
+        {
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
+            case CLASS_DRUID:
+                return true;
+        }
+        return false;
+    }
     static bool IsHealerClass(uint8 playerClass)
     {
         switch (playerClass)
@@ -210,6 +224,26 @@ public:
                 return true;
         }
         return false;
+    }
+
+    SpellEntry const* GetCrowdControlSpell() const
+    {
+        switch (me->GetClass())
+        {
+            case CLASS_PALADIN:
+                return m_spells.paladin.pHammerOfJustice;
+            case CLASS_MAGE:
+                return m_spells.mage.pPolymorph;
+            case CLASS_PRIEST:
+                return m_spells.priest.pShackleUndead;
+            case CLASS_WARLOCK:
+                return m_spells.warlock.pBanish;
+            case CLASS_ROGUE:
+                return m_spells.rogue.pBlind;
+            case CLASS_DRUID:
+                return m_spells.druid.pHibernate;
+        }
+        return nullptr;
     }
 
     SpellEntry const* m_resurrectionSpell = nullptr;
