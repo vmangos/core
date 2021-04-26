@@ -438,7 +438,7 @@ bool AuthSocket::_HandleLogonChallenge()
             if (requireEmailSince > 0)
             {
                 uint32 t = (*result)[10].GetUInt32();
-                requireVerification = requireVerification && (t >= requireEmailSince);
+                requireVerification = requireVerification && (t >= uint32(requireEmailSince));
             }
 
             if (requireVerification && !verified)

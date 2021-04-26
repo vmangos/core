@@ -20,8 +20,10 @@
  */
 
 #include <unordered_map>
+#include <cmath>
 
 #include "Player.h"
+#include "Bag.h"
 #include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
@@ -38,13 +40,11 @@
 #include "ChannelMgr.h"
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
-#include "InstanceData.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
-#include "CreatureAI.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Guild.h"
@@ -66,16 +66,12 @@
 #include "GMTicketMgr.h"
 #include "MasterPlayer.h"
 #include "MovementPacketSender.h"
-
-/* Nostalrius */
 #include "Config/Config.h"
-#include <cmath>
 #include "ZoneScript.h"
 #include "ZoneScriptMgr.h"
 #include "PlayerBotMgr.h"
 #include "PlayerBotAI.h"
 #include "AccountMgr.h"
-#include "MoveSpline.h"
 #include "Anticheat.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
@@ -745,7 +741,9 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
 #endif
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, -1);  // -1 is default value
+#endif
 
     SetByteValue(PLAYER_BYTES, 0, skin);
     SetByteValue(PLAYER_BYTES, 1, face);
@@ -1473,16 +1471,6 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             }
             else
                 m_areaCheckTimer -= p_time;
-        }
-
-        float x, y, z, o;
-        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PLAYER) && movespline->Finalized() && ExtrapolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time,  x, y, z, o))
-        {
-            GetMap()->DoPlayerGridRelocation(this, x, y, z, o);
-            m_position.x = x;
-            m_position.y = y;
-            m_position.z = z;
-            m_position.o = o;
         }
 
         // Anticheat sanction
@@ -2510,6 +2498,14 @@ void Player::RegenerateHealth()
 
         if (!IsStandingUp())
             addvalue *= 1.5;
+
+        // Food
+        if (!IsInCombat())
+        {
+            AuraList const& lModHealthRegen = GetAurasByType(SPELL_AURA_MOD_REGEN);
+            for (const auto i : lModHealthRegen)
+                addvalue += i->GetModifier()->m_amount * (float(REGEN_TIME_FULL) / float(i->GetModifier()->periodictime));
+        }
     }
 
     // always regeneration bonus (including combat)
@@ -4271,8 +4267,8 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
 
     // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
-    for (uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_LAST_3; i += MAX_QUEST_OFFSET)
-        updateVisualBits.SetBit(i);
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; i++)
+        updateVisualBits.SetBit(PLAYER_QUEST_LOG_1_1 + i*MAX_QUEST_OFFSET);
 
     //Players visible items are not inventory stuff
     //431) = 884 (0x374) = main weapon
@@ -5209,17 +5205,6 @@ void Player::LeaveLFGChannel()
     }
 }
 
-void Player::UpdateDefense()
-{
-    uint32 defense_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE);
-
-    if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
-    {
-        // update dependent from defense skill part
-        UpdateDefenseBonusesMod();
-    }
-}
-
 void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
 {
     if (modGroup >= BASEMOD_END || modType >= MOD_END)
@@ -5465,19 +5450,16 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
     if ((!max) || (!value) || (value >= max))
         return false;
 
-    if (value * 512 < max * urand(0, 512))
-    {
-        uint32 new_value = value + step;
-        if (new_value > max)
-            new_value = max;
+   uint32 new_value = value + step;
 
-        SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, max));
-        if (itr->second.uState != SKILL_NEW)
-            itr->second.uState = SKILL_CHANGED;
-        return true;
-    }
+   if (new_value > max)
+       new_value = max;
 
-    return false;
+    SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, max));
+    if (itr->second.uState != SKILL_NEW)
+        itr->second.uState = SKILL_CHANGED;
+
+    return true;
 }
 
 inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel, uint32 YellowLevel)
@@ -5598,89 +5580,107 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return true;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
-{
-    // no skill gain in pvp
-    Unit* pVictim = GetVictim();
-    if (pVictim && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
-        return;
-
-    if (IsInFeralForm())
-        return;                                             // always maximized SKILL_FERAL_COMBAT in fact
-
-    if (GetShapeshiftForm() == FORM_TREE)
-        return;                                             // use weapon but not skill up
-
-    uint32 weapon_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
-
-    switch (attType)
-    {
-        case BASE_ATTACK:
-        {
-            Item* tmpitem = GetWeaponForAttack(attType, true, true);
-
-            if (!tmpitem)
-                UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-            else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-                UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
-            break;
-        }
-        case OFF_ATTACK:
-        case RANGED_ATTACK:
-        {
-            Item* tmpitem = GetWeaponForAttack(attType, true, true);
-            if (tmpitem)
-                UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
-            break;
-        }
-    }
-    UpdateAllCritPercentages();
-}
-
 void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence)
 {
-    uint32 plevel = GetLevel();                             // if defense than pVictim == attacker
-    uint32 greylevel = MaNGOS::XP::GetGrayLevel(plevel);
-    uint32 moblevel = pVictim->GetLevelForTarget(this);
-
-    if (defence && moblevel < greylevel)
+    if (!pVictim)
         return;
-    if (!defence) //Alita, pour pas qu'on monte notre dernier point sur un sanglier de durotar...
-    {
-        uint32 weaponSkillGraylvl = MaNGOS::XP::GetGrayLevel(GetBaseWeaponSkillValue(attType) / 5);
-        if (moblevel + 5 < weaponSkillGraylvl)
-            return;
-    }
-    if (moblevel > plevel + 5)
-        moblevel = plevel + 5;
 
-    int32 lvldif = moblevel - greylevel;
-    if (lvldif < 3)
-        lvldif = 3;
+    // No skill gain in pvp
+    if (pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
+        return;
 
-    int32 skilldif = 5 * plevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
+    // No weapon skill gain while in tree/feral form
+    if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
+        return; 
+
+    int32 playerLevel      = GetLevel();
+    int32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
+    int32 currentSkillMax  = 5 * playerLevel;
+    int32 skillDiff        = currentSkillMax - currenSkillValue;
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (skilldif <= 0)
+    if (skillDiff <= 0)
         return;
-    if (skilldif < 2)//Alita, pour aider pour le dernier point de comp du level
-        skilldif = 2;
 
-    float chance = float(3 * lvldif * skilldif) / plevel;
-    if (!defence)
-        chance *= 0.1f * GetStat(STAT_INTELLECT);
+    // Calculate base chance to increase
+    float chance = 0.0f;
+    if (defence) // TODO: more research needed. Seems to increase slower than weapon skill. Using old formula:
+    {
+        uint32 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
+        uint32 mobLevel = pVictim->GetLevelForTarget(this);
 
-    chance = chance < 1.0f ? 1.0f : chance;                 //minimum chance to increase skill is 1%
+        if (mobLevel > playerLevel + 5)
+            mobLevel = playerLevel + 5;
+
+        int32 lvldif = mobLevel - greylevel;
+        if (lvldif < 3)
+            lvldif = 3;
+
+        chance = float(3 * lvldif * skillDiff) / playerLevel;
+    }
+    else // weapon skill https://classic.wowhead.com/guides/classic-wow-weapon-skills
+    {
+        if (currentSkillMax * 0.9f > currenSkillValue)
+        {
+            // Skill progress: 1% - 90% - chance decreases from 100% to 50%
+            chance = std::min(100.0f, float(currentSkillMax * 0.9f * 50) / currenSkillValue);
+        }
+        else
+        {
+            // Skill progress: 90% - 100% - chance decreases from 50% to a minimum which is level dependent
+            chance = (0.5f - 0.0168966f * currenSkillValue * (300.0f / currentSkillMax) + 0.0152069f * currentSkillMax * (300.0f / currentSkillMax)) * 100.0f;
+            if (skillDiff <= 3)
+                chance *= (0.5f / (4 - skillDiff));
+        }      
+
+        // Add intellect bonus (capped at 10% - guessed)
+        chance += std::min(10.0f, 0.02f * GetStat(STAT_INTELLECT));
+    }
+
+    chance = std::min(100.0f, chance);
+
+    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, currenSkillValue, currentSkillMax, chance);
+
     if (roll_chance_f(chance))
     {
         if (defence)
-            UpdateDefense();
-        else
-            UpdateWeaponSkill(attType);
+        {
+            uint32 defense_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE);
+
+            if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
+            {
+                // Update values related to defense skill 
+                UpdateDefenseBonusesMod();
+            }
+        }
+        else // Weapon
+        {
+            uint32 weapon_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
+            Item* tmpitem = GetWeaponForAttack(attType, true, true);
+
+            switch (attType)
+            {
+                case BASE_ATTACK:
+                {
+                    if (!tmpitem)
+                        UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
+                    else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
+                        UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
+                    break;
+                }
+                case OFF_ATTACK:
+                case RANGED_ATTACK:
+                {
+                    if (tmpitem)
+                        UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
+                    break;
+                }
+            }
+            // Update values related to weapon skill 
+            UpdateAllCritPercentages();
+        }
     }
-    else
-        return;
 }
 
 void Player::UpdateSkillsForLevel()
@@ -7201,7 +7201,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
     }
 
     if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
-        HandleBaseModValue(mod, FLAT_MOD, float(aura->GetModifier()->m_amount), apply);
+        HandleBaseModValue(mod, FLAT_MOD, aura->GetModifier()->m_amount, apply);
 }
 
 void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply)
@@ -7245,7 +7245,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType att
     }
 
     if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
-        HandleStatModifier(unitMod, unitModType, float(modifier->m_amount), apply);
+        HandleStatModifier(unitMod, unitModType, modifier->m_amount, apply);
 }
 
 void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
@@ -9254,9 +9254,11 @@ InventoryResult Player::_CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 s
 }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-#define LAST_ITEM_SLOT_FIELD PLAYER_FIELD_KEYRING_SLOT_LAST
+#define LAST_ITEM_SLOT_FIELD (PLAYER_FIELD_KEYRING_SLOT_1 + (MAX_KEYRING_SLOTS - 1) * 2)
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+#define LAST_ITEM_SLOT_FIELD (PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (BUYBACK_SLOT_END - BUYBACK_SLOT_START - 1) * 2)
 #else
-#define LAST_ITEM_SLOT_FIELD PLAYER_FIELD_VENDORBUYBACK_SLOT_LAST
+#define LAST_ITEM_SLOT_FIELD PLAYER_FIELD_VENDORBUYBACK_SLOT
 #endif
 
 InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec &dest, uint32 entry, uint32 count, Item* pItem, bool swap, uint32* no_space_count) const
@@ -11671,7 +11673,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem, uint32 money, ObjectGuid vendorGu
     RemoveItemFromBuyBackSlot(slot, true);
     DEBUG_LOG("STORAGE: AddItemToBuyBackSlot item = %u, slot = %u", pItem->GetEntry(), slot);
     m_items[slot] = pItem;
-    SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1, pItem->GetObjectGuid());
+    SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT, pItem->GetObjectGuid());
     SetUInt32Value(PLAYER_FIELD_BUYBACK_ITEM_ID, pItem->GetEntry());
     SetUInt32Value(PLAYER_FIELD_BUYBACK_RANDOM_PROPERTIES_ID, pItem->GetItemRandomPropertyId());
     SetUInt32Value(PLAYER_FIELD_BUYBACK_SEED, pItem->GetItemSuffixFactor());
@@ -11711,7 +11713,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
         SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, 0);
         SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + eslot, 0);
 #else
-        SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1, ObjectGuid());
+        SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT, ObjectGuid());
         SetUInt32Value(PLAYER_FIELD_BUYBACK_ITEM_ID, 0);
         SetUInt32Value(PLAYER_FIELD_BUYBACK_RANDOM_PROPERTIES_ID, 0);
         SetUInt32Value(PLAYER_FIELD_BUYBACK_SEED, 0);
@@ -12155,7 +12157,7 @@ void Player::PrepareGossipMenu(WorldObject* pSource, uint32 menuId)
         bool hasMenuItem = true;
         bool isGMSkipConditionCheck = false;
 
-        if (itr->second.condition_id && !sObjectMgr.IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_OPTION))
+        if (itr->second.condition_id && !IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_OPTION))
         {
             if (IsGameMaster())                             // Let GM always see menu items regardless of conditions
                 isGMSkipConditionCheck = true;
@@ -12499,7 +12501,7 @@ uint32 Player::GetGossipTextId(uint32 menuId, WorldObject* pSource)
         // Take the text that has the highest conditionId of all fitting
         // No condition and no text with condition found OR higher and fitting condition found
         if ((!itr->second.condition_id && !lastConditionId) ||
-                (itr->second.condition_id > lastConditionId && sObjectMgr.IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_MENU)))
+                (itr->second.condition_id > lastConditionId && IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_MENU)))
         {
             lastConditionId = itr->second.condition_id;
             textId = itr->second.text_id;
@@ -13205,6 +13207,19 @@ void Player::RemoveQuestAtSlot(uint32 slot)
             {
                 if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
                     RemoveTimedQuest(quest);
+
+                // Destroying items on abandoning quest was added in 1.12.1.
+                // https://www.engadget.com/2006-10-10-quest-items-disappear-when-abandoning-quests.html
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+                for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
+                {
+                    if (uint32 itemId = pQuest->ReqItemId[i])
+                        if (ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(itemId))
+                            if (pItem->Bonding == BIND_QUEST_ITEM || pItem->Bonding == BIND_QUEST_ITEM1)
+                                if (uint32 count = GetItemCount(itemId, true))
+                                    DestroyItemCount(itemId, count, true, false, true);
+                }
+#endif
             }
 
             SetQuestStatus(quest, QUEST_STATUS_NONE);
@@ -13442,7 +13457,7 @@ bool Player::SatisfyQuestCondition(Quest const* qInfo, bool msg) const
 {
     if (uint32 conditionId = qInfo->GetRequiredCondition())
     {
-        bool result = sObjectMgr.IsConditionSatisfied(conditionId, this, GetMap(), nullptr, CONDITION_FROM_QUEST);
+        bool result = IsConditionSatisfied(conditionId, this, GetMap(), nullptr, CONDITION_FROM_QUEST);
 
         if (!result && msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
@@ -14750,7 +14765,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED);
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[45].GetInt32());
+#endif
 
     SetUInt32Value(PLAYER_AMMO_ID, fields[55].GetUInt32());
 
@@ -15366,7 +15383,7 @@ void Player::_LoadAuras(QueryResult* result, uint32 timediff)
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
-                s.damage[i] = fields[i + 5].GetInt32();
+                s.damage[i] = fields[i + 5].GetFloat();
                 s.periodicTime[i] = fields[i + 8].GetUInt32();
             }
 
@@ -16338,7 +16355,11 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(m_honorMgr.GetStoredDK());
 
     // FIXME: at this moment send to DB as unsigned, including unit32(-1)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     uberInsert.addUInt32(GetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX));
+#else
+    uberInsert.addUInt32(0);
+#endif
 
     uberInsert.addUInt16(uint16(GetUInt32Value(PLAYER_BYTES_3) & 0xFFFE));
 
@@ -16466,8 +16487,8 @@ void Player::_SaveAuras()
         stmt.addUInt32(s.stackcount);
         stmt.addUInt8(s.remaincharges);
 
-        for (int32 i : s.damage)
-            stmt.addInt32(i);
+        for (float i : s.damage)
+            stmt.addFloat(i);
 
         for (uint32 i : s.periodicTime)
             stmt.addUInt32(i);
@@ -18159,7 +18180,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    if (crItem->conditionId && !IsGameMaster() && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+    if (crItem->conditionId && !IsGameMaster() && !IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
@@ -21618,7 +21639,7 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
         gcdDuration -= sWorld.GetCurrentDiff() > 200 ? 200 : sWorld.GetCurrentDiff();
     }
 
-    WorldObject::AddGCD(spellEntry, gcdDuration);
+    SpellCaster::AddGCD(spellEntry, gcdDuration);
 
     if (!updateClient)
         return;
@@ -21796,7 +21817,7 @@ void Player::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     GetSession()->SendPacket(&data);
 
     // store lockout
-    WorldObject::LockOutSpells(schoolMask, duration);
+    SpellCaster::LockOutSpells(schoolMask, duration);
 }
 
 void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent /*= nullptr*/)

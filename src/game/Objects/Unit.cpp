@@ -19,6 +19,10 @@
  */
 
 #include "Unit.h"
+#include "Creature.h"
+#include "Pet.h"
+#include "Totem.h"
+#include "Player.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -27,41 +31,28 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
-#include "QuestDef.h"
-#include "Player.h"
-#include "Creature.h"
 #include "Spell.h"
 #include "Group.h"
 #include "SpellAuras.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
 #include "TemporarySummon.h"
 #include "Formulas.h"
-#include "Pet.h"
 #include "Util.h"
-#include "Totem.h"
 #include "BattleGround.h"
-#include "InstanceData.h"
-#include "MapPersistentStateMgr.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "DBCStores.h"
 #include "VMapFactory.h"
 #include "MovementGenerator.h"
 #include "Transport.h"
-
+#include "CreatureGroups.h"
 #include "ZoneScript.h"
-#include "Nostalrius.h"
-#include "InstanceData.h"
-
-#include "PathFinder.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "packet_builder.h"
 #include "Chat.h"
 #include "Anticheat.h"
-#include "CreatureLinkingMgr.h"
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
@@ -84,7 +75,7 @@ float baseMoveSpeed[MAX_MOVE_TYPE] =
 // Methods of class Unit
 
 Unit::Unit()
-    : WorldObject(), i_motionMaster(this), m_ThreatManager(this), m_HostileRefManager(this),
+    : SpellCaster(), i_motionMaster(this), m_ThreatManager(this), m_HostileRefManager(this),
       movespline(new Movement::MoveSpline()), m_debugFlags(0), m_needUpdateVisibility(false),
       m_AutoRepeatFirstCast(true), m_regenTimer(0), m_lastDamageTaken(0),
       m_meleeZLimit(UNIT_DEFAULT_MELEE_Z_LIMIT), m_meleeZReach(UNIT_DEFAULT_MELEE_Z_LIMIT), m_lastSanctuaryTime(0)
@@ -1341,16 +1332,16 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
         else
             immune = false;
 
-        subDamage->damage = CalculateDamage(damageInfo->attackType, false, i);
+        float fdamage = CalculateDamage(damageInfo->attackType, false, i);
         // Add melee damage bonus
-        subDamage->damage = MeleeDamageBonusDone(damageInfo->target, subDamage->damage, damageInfo->attackType, nullptr, EFFECT_INDEX_0, DIRECT_DAMAGE, 1, nullptr, i == 0);
-        subDamage->damage = damageInfo->target->MeleeDamageBonusTaken(this, subDamage->damage, damageInfo->attackType, nullptr, EFFECT_INDEX_0, DIRECT_DAMAGE, 1, nullptr, i == 0);
+        fdamage = MeleeDamageBonusDone(damageInfo->target, fdamage, damageInfo->attackType, nullptr, EFFECT_INDEX_0, DIRECT_DAMAGE, 1, nullptr, i == 0);
+        subDamage->damage = dither(damageInfo->target->MeleeDamageBonusTaken(this, dither(fdamage), damageInfo->attackType, nullptr, EFFECT_INDEX_0, DIRECT_DAMAGE, 1, nullptr, i == 0));
 
         // Calculate armor reduction
         if (subDamage->damageSchoolMask == SPELL_SCHOOL_MASK_NORMAL)
         {
             damageInfo->cleanDamage += subDamage->damage;
-            subDamage->damage = CalcArmorReducedDamage(damageInfo->target, subDamage->damage);
+            subDamage->damage = ditheru(CalcArmorReducedDamage(damageInfo->target, subDamage->damage));
             damageInfo->cleanDamage -= subDamage->damage;
         }
 
@@ -1709,11 +1700,11 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                     continue;
                 }
 
-                uint32 damage = (*i)->GetModifier()->m_amount;
+                float fdamage = (*i)->GetModifier()->m_amount;
 
                 // Damage shield effects do benefit from damage done bonuses, including spell power if bonus coefficient is set.
                 // For example Flame Wrath has a coefficient of 1, making it scale with 100% of spell power.
-                damage = pVictim->SpellDamageBonusDone(this, pSpellProto, (*i)->GetEffIndex(), damage, SPELL_DIRECT_DAMAGE, (*i)->GetStackAmount());
+                fdamage = pVictim->SpellDamageBonusDone(this, pSpellProto, (*i)->GetEffIndex(), fdamage, SPELL_DIRECT_DAMAGE, (*i)->GetStackAmount());
 
                 // apply SpellBaseDamageBonusTaken for mobs only
                 // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
@@ -1721,7 +1712,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                 {
                     int32 spellDmgTakenBonus = this->SpellBaseDamageBonusTaken(pSpellProto->GetSpellSchoolMask());
                     // don't allow damage shields to be reduced by Blessing of Sanctuary, etc.
-                    if (spellDmgTakenBonus > 0) damage += spellDmgTakenBonus;
+                    if (spellDmgTakenBonus > 0) fdamage += spellDmgTakenBonus;
                 }
 
                 //Calculate absorb resist ??? no data in opcode for this possibly unable to absorb or resist?
@@ -1730,6 +1721,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                 //CalcAbsorbResist(pVictim, SpellSchools(spellProto->School), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
                 //damage-=absorb + resist;
 
+                uint32 damage = ditheru(fdamage);
                 pVictim->DealDamageMods(this, damage, nullptr);
 
                 WorldPacket data(SMSG_SPELLDAMAGESHIELD, (8 + 8 + 4 + 4));
@@ -1821,7 +1813,7 @@ static ResistanceValues resistValues[] =
     {25, 55, 16, 3, 1, 75} // 300
 };
 
-void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32* absorb, int32* resist, SpellEntry const* spellProto, Spell* spell)
+void Unit::CalculateDamageAbsorbAndResist(SpellCaster* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32* absorb, int32* resist, SpellEntry const* spellProto, Spell* spell)
 {
     if (!pCaster || !IsAlive() || !damage)
         return;
@@ -1853,7 +1845,7 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
     if (canResist || (resistanceChance < 0))
     {
         float const multiplier = RollMagicResistanceMultiplierOutcomeAgainst(resistanceChance, schoolMask, damagetype, spellProto);
-        *resist = int32(int64(damage) * multiplier);
+        *resist = dither(int64(damage) * multiplier);
         RemainingDamage -= *resist;
     }
     else
@@ -1869,6 +1861,8 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
         Modifier* mod = (*i)->GetModifier();
         if (!(mod->m_miscvalue & schoolMask))
             continue;
+
+        MANGOS_DEBUG_ASSERT((mod->m_amount - floor(mod->m_amount)) == 0.f);
 
         // Max Amount can be absorbed by this aura
         int32  currentAbsorb = mod->m_amount;
@@ -1933,11 +1927,11 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
             if (Player* modOwner = GetSpellModOwner())
                 modOwner->ApplySpellMod((*i)->GetId(), SPELLMOD_MULTIPLE_VALUE, manaMultiplier, spell);
 
-            int32 maxAbsorb = int32(GetPower(POWER_MANA) / manaMultiplier);
+            int32 maxAbsorb = dither(GetPower(POWER_MANA) / manaMultiplier);
             if (currentAbsorb > maxAbsorb)
                 currentAbsorb = maxAbsorb;
 
-            int32 manaReduction = int32(currentAbsorb * manaMultiplier);
+            int32 manaReduction = dither(currentAbsorb * manaMultiplier);
             ApplyPowerMod(POWER_MANA, manaReduction, false);
         }
 
@@ -2020,7 +2014,7 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
     *absorb = damage - RemainingDamage - *resist;
 }
 
-void Unit::CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage* damageInfo, SpellEntry const* spellProto, WeaponAttackType attType, Spell* spell)
+void Unit::CalculateAbsorbResistBlock(SpellCaster* pCaster, SpellNonMeleeDamage* damageInfo, SpellEntry const* spellProto, WeaponAttackType attType, Spell* spell)
 {
     bool blocked = false;
     // Get blocked status
@@ -2165,7 +2159,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
     }
 
     // always crit against a sitting target (except 0 crit chance)
-    if (pVictim->IsPlayer() && crit_chance > 0 && !pVictim->IsStandingUp())
+    if (pVictim->IsPlayer() && (crit_chance > 0 || IsCreature()) && !pVictim->IsStandingUp())
     {
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRIT (sitting victim)");
         return MELEE_HIT_CRIT;
@@ -2325,7 +2319,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
     return MELEE_HIT_NORMAL;
 }
 
-uint32 Unit::CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index) const
+float Unit::CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index) const
 {
     float min_damage, max_damage;
 
@@ -2367,7 +2361,7 @@ uint32 Unit::CalculateDamage(WeaponAttackType attType, bool normalized, uint8 in
     if (max_damage == 0.0f)
         max_damage = 5.0f;
 
-    return urand((uint32)min_damage, (uint32)max_damage);
+    return frand(min_damage, max_damage);
 }
 
 void Unit::SendMeleeAttackStart(Unit* pVictim) const
@@ -2398,7 +2392,7 @@ void Unit::SendMeleeAttackStop(Unit* pVictim) const
     DETAIL_FILTER_LOG(LOG_FILTER_COMBAT, "%s %u stopped attacking %s %u", (IsPlayer() ? "player" : "creature"), GetGUIDLow(), (pVictim->IsPlayer() ? "player" : "creature"), pVictim->GetGUIDLow());
 }
 
-bool Unit::IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const* spellEntry, WeaponAttackType attackType) const
+bool Unit::IsSpellBlocked(SpellCaster* pCaster, Unit* pVictim, SpellEntry const* spellEntry, WeaponAttackType attackType) const
 {
     if (!HasInArc(pCaster))
         return false;
@@ -3035,9 +3029,9 @@ void Unit::DeMorph()
     SetDisplayId(GetNativeDisplayId());
 }
 
-int32 Unit::GetTotalAuraModifier(AuraType auratype) const
+float Unit::GetTotalAuraModifier(AuraType auratype) const
 {
-    int32 modifier = 0;
+    float modifier = 0.f;
 
     AuraList const& mTotalAuraList = GetAurasByType(auratype);
     for (const auto& i : mTotalAuraList)
@@ -3866,7 +3860,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
 {
     // Statue unsummoned at holder remove
     Totem* statue = nullptr;
-    WorldObject* caster = holder->GetRealCaster();
+    SpellCaster* caster = holder->GetRealCaster();
     bool isChanneled = holder->IsChanneled(); // cache for after the holder is deleted
     if (isChanneled && caster)
         if (caster->IsCreature() && ((Creature*)caster)->IsTotem() && ((Totem*)caster)->GetTotemType() == TOTEM_STATUE)
@@ -4539,6 +4533,14 @@ bool Unit::IsNeutralToAll() const
     return my_faction->IsNeutralToAll();
 }
 
+bool Unit::IsContestedGuard() const
+{
+    if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
+        return entry->IsContestedGuardFaction();
+
+    return false;
+}
+
 bool Unit::Attack(Unit* victim, bool meleeAttack)
 {
     if (!victim || victim == this)
@@ -5106,7 +5108,7 @@ void Unit::SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, 
  * Calculates target part of spell damage bonuses,
  * will be called on each tick for periodic damage over time auras
  */
-uint32 Unit::SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, uint32 pdamage, DamageEffectType damagetype, uint32 stack, Spell* spell) const
+float Unit::SpellDamageBonusTaken(SpellCaster* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float pdamage, DamageEffectType damagetype, uint32 stack, Spell* spell) const
 {
     if (!spellProto || !pCaster || damagetype == DIRECT_DAMAGE)
         return pdamage;
@@ -5115,7 +5117,7 @@ uint32 Unit::SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spell
 
     // Taken total percent damage auras
     float TakenTotalMod = 1.0f;
-    int32 TakenTotal = 0;
+    float TakenTotal = 0;
 
     // ..taken
     TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
@@ -5126,9 +5128,9 @@ uint32 Unit::SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spell
     // apply benefit affected by spell power implicit coeffs and spell level penalties
     TakenTotal = SpellBonusWithCoeffs(spellProto, effectIndex, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, pCaster, spell);
 
-    float tmpDamage = (int32(pdamage) + TakenTotal * int32(stack)) * TakenTotalMod;
+    float tmpDamage = (pdamage + TakenTotal * int32(stack)) * TakenTotalMod;
 
-    return tmpDamage > 0 ? uint32(tmpDamage) : 0;
+    return tmpDamage > 0 ? tmpDamage : 0;
 }
 
 int32 Unit::SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask) const
@@ -5249,7 +5251,7 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
  * Calculates target part of healing spell bonuses,
  * will be called on each tick for periodic damage over time auras
  */
-uint32 Unit::SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, int32 healamount, DamageEffectType damagetype, uint32 stack, Spell* spell) const
+float Unit::SpellHealingBonusTaken(SpellCaster* pCaster, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float healamount, DamageEffectType damagetype, uint32 stack, Spell* spell) const
 {
     float  TakenTotalMod = 1.0f;
 
@@ -5265,16 +5267,16 @@ uint32 Unit::SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spel
     // No heal amount for this class spells
     if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE)
     {
-        healamount = int32(healamount * TakenTotalMod);
+        healamount = healamount * TakenTotalMod;
         return healamount < 0 ? 0 : healamount;
     }
 
     // Healing Done
     // Done total percent damage auras
-    int32  TakenTotal = 0;
+    float  TakenTotal = 0;
 
     // Taken fixed damage bonus auras
-    int32 TakenAdvertisedBenefit = SpellBaseHealingBonusTaken(spellProto->GetSpellSchoolMask());
+    float TakenAdvertisedBenefit = SpellBaseHealingBonusTaken(spellProto->GetSpellSchoolMask());
 
     // Blessing of Light dummy effects healing taken from Holy Light and Flash of Light
     if (spellProto->IsFitToFamily<SPELLFAMILY_PALADIN, CF_PALADIN_FLASH_OF_LIGHT1, CF_PALADIN_HOLY_LIGHT2>())
@@ -5311,7 +5313,7 @@ uint32 Unit::SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spel
     // use float as more appropriate for negative values and percent applying
     float heal = (healamount + TakenTotal * int32(stack)) * TakenTotalMod;
 
-    return heal < 0 ? 0 : uint32(heal);
+    return heal < 0 ? 0 : heal;
 }
 
 int32 Unit::SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask) const
@@ -5456,7 +5458,7 @@ bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
  * Calculates target part of melee damage bonuses,
  * will be called on each tick for periodic damage over time auras
  */
-uint32 Unit::MeleeDamageBonusTaken(WorldObject* pCaster, uint32 pdamage, WeaponAttackType attType, SpellEntry const* spellProto, SpellEffectIndex effectIndex, DamageEffectType damagetype, uint32 stack, Spell* spell, bool flat)
+float Unit::MeleeDamageBonusTaken(SpellCaster* pCaster, float pdamage, WeaponAttackType attType, SpellEntry const* spellProto, SpellEffectIndex effectIndex, DamageEffectType damagetype, uint32 stack, Spell* spell, bool flat)
 {
     if (!pCaster)
         return pdamage;
@@ -5476,7 +5478,7 @@ uint32 Unit::MeleeDamageBonusTaken(WorldObject* pCaster, uint32 pdamage, WeaponA
 
     // FLAT damage bonus auras
     // =======================
-    int32 TakenFlat = 0;
+    float TakenFlat = 0;
 
     // ..taken flat (base at attack power for marked target and base at attack power for creature type)
     if (attType == RANGED_ATTACK)
@@ -5513,10 +5515,10 @@ uint32 Unit::MeleeDamageBonusTaken(WorldObject* pCaster, uint32 pdamage, WeaponA
     if (!flat)
         TakenFlat = 0.0f;
 
-    float tmpDamage = float(int32(pdamage) + TakenFlat * int32(stack)) * TakenPercent;
+    float tmpDamage = (pdamage + TakenFlat * int32(stack)) * TakenPercent;
 
     // bonus result can be negative
-    return tmpDamage > 0 ? uint32(tmpDamage) : 0;
+    return tmpDamage > 0 ? tmpDamage : 0;
 }
 
 void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
@@ -8234,13 +8236,11 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag,
         {
             // On melee based hit/miss/resist need update skill (for victim and attacker)
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT | PROC_EX_MISS | PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK | PROC_EX_RESIST))
-            {
-                if (!pTarget->IsPlayer() && pTarget->GetCreatureType() != CREATURE_TYPE_CRITTER)
-                    ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
-            }
+                ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
+
             // Update defence if player is victim and parry/dodge/block
             if (isVictim && procExtra & (PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK))
-                ((Player*)this)->UpdateDefense();
+                ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))

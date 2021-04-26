@@ -31,7 +31,6 @@
 #include "Player.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "UpdateMask.h"
 #include "Auth/md5.h"
 #include "ObjectAccessor.h"
 #include "Group.h"
@@ -833,10 +832,12 @@ void WorldSession::HandleTutorialResetOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     DEBUG_LOG("WORLD: Received CMSG_SET_WATCHED_FACTION");
     int32 repId;
     recv_data >> repId;
     GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
+#endif
 }
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)

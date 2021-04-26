@@ -30,7 +30,7 @@
 #include "CreatureAI.h"
 #include "Util.h"
 #include "Pet.h"
-#include "World.h"
+#include "Group.h"
 
 void WorldSession::HandlePetAction(WorldPacket& recv_data)
 {

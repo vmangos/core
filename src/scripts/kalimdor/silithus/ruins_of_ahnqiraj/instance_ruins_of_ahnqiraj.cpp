@@ -22,6 +22,7 @@ SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
 #include "ruins_of_ahnqiraj.h"
 
 instance_ruins_of_ahnqiraj::instance_ruins_of_ahnqiraj(Map* pMap) : ScriptedInstance(pMap)

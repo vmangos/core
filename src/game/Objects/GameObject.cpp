@@ -25,7 +25,7 @@
 #include "PoolManager.h"
 #include "SpellMgr.h"
 #include "Spell.h"
-#include "UpdateMask.h"
+#include "Group.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
 #include "World.h"
@@ -34,13 +34,11 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "InstanceData.h"
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
 #include "BattleGround.h"
 #include "BattleGroundAV.h"
 #include "Util.h"
-
 #include "GameObjectAI.h"
 #include "ScriptMgr.h"
 #include "ZoneScript.h"
@@ -66,7 +64,7 @@ QuaternionData QuaternionData::fromEulerAnglesZYX(float Z, float Y, float X)
     return QuaternionData(quat.x, quat.y, quat.z, quat.w);
 }
 
-GameObject::GameObject() : WorldObject(),
+GameObject::GameObject() : SpellCaster(),
     loot(this),
     m_visible(true),
     m_goInfo(nullptr)

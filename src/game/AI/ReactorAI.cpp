@@ -21,7 +21,11 @@
 
 #include "ReactorAI.h"
 #include "Creature.h"
+#include "Player.h"
 #include "GuardMgr.h"
+
+ReactorAI::ReactorAI(Creature* c) : CreatureAI(c), m_bCanSummonGuards(c->CanSummonGuards())
+{}
 
 int ReactorAI::Permissible(Creature const* creature)
 {

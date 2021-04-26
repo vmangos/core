@@ -21,8 +21,6 @@
 
 #include "Bag.h"
 #include "ObjectMgr.h"
-#include "Database/DatabaseEnv.h"
-#include "Log.h"
 #include "UpdateData.h"
 
 Bag::Bag(): Item()

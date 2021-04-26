@@ -11,6 +11,8 @@
 #include "Database/DatabaseEnv.h"
 #include "Policies/SingletonImp.h"
 #include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
 
 #include <fstream>
 
@@ -696,8 +698,8 @@ void HonorMgr::Save()
     ss << "INSERT INTO `character_honor_static` (`guid`, `hk`, `dk`, `today_hk`, `today_dk`, "
         "`yesterday_kills`, `yesterday_cp`, `thisWeek_kills`, `thisWeek_cp`, `lastWeek_kills`, `lastWeek_cp`) VALUES ("
         << m_owner->GetGUIDLow() << ", "
-        << m_owner->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS) << ", "
-        << m_owner->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS) << ", "
+        << m_owner->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS) << ", "
+        << m_owner->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS) << ", "
         << m_owner->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0) << ", "
         << m_owner->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 1) << ", "
         << m_owner->GetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS) << ", "
@@ -884,8 +886,8 @@ void HonorMgr::Update()
     m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK, m_standing);
 
     // LIFE TIME
-    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, m_totalHK);
-    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, m_totalDK);
+    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, m_totalHK);
+    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS, m_totalDK);
 }
 
 void HonorMgr::InitRankInfo(HonorRankInfo &prk)

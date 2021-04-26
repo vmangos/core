@@ -643,6 +643,7 @@ class SpellEntry
                 case SPELL_EFFECT_WEAPON_DAMAGE:
                 case SPELL_EFFECT_HEAL_MAX_HEALTH:
                 case SPELL_EFFECT_HEAL_MECHANICAL:
+                case SPELL_EFFECT_ATTACK_ME:
                 case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
                     return true;
                 case SPELL_EFFECT_APPLY_AURA:
@@ -651,6 +652,7 @@ class SpellEntry
                     {
                         case SPELL_AURA_MOD_CONFUSE:
                         case SPELL_AURA_MOD_FEAR:
+                        case SPELL_AURA_MOD_TAUNT:
                         case SPELL_AURA_MOD_STUN:
                         case SPELL_AURA_MOD_PACIFY:
                         case SPELL_AURA_MOD_ROOT:

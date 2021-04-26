@@ -21,7 +21,6 @@
 
 #include "GuardAI.h"
 #include "Creature.h"
-#include "Player.h"
 
 int GuardAI::Permissible(Creature const* creature)
 {
@@ -71,7 +70,7 @@ void GuardAI::MoveInLineOfSight(Unit* pWho)
                 attackRadius = 30.0f;
     }
 
-    if (!m_creature->IsWithinDistInMap(pWho, attackRadius))
+    if (!m_creature->IsWithinDistInMap(pWho, attackRadius, true, false))
         return;
 
     if (m_creature->CanInitiateAttack() && m_creature->IsValidAttackTarget(pWho) &&

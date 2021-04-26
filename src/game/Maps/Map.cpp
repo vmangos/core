@@ -52,9 +52,7 @@
 #include "GridSearchers.h"
 #include "ThreadPool.h"
 #include "AuraRemovalMgr.h"
-#include "GameEventMgr.h"
 #include "world/world_event_wareffort.h"
-#include "LFGMgr.h"
 
 Map::~Map()
 {
@@ -994,12 +992,12 @@ bool ScriptedEvent::UpdateEvent()
     WorldObject* pSource = GetSourceObject();
     WorldObject* pTarget = GetTargetObject();
 
-    if (m_uiFailureCondition && sObjectMgr.IsConditionSatisfied(m_uiFailureCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+    if (m_uiFailureCondition && IsConditionSatisfied(m_uiFailureCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(false);
         return true;
     }
-    else if (m_uiSuccessCondition && sObjectMgr.IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+    else if (m_uiSuccessCondition && IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(true);
         return true;
@@ -1012,12 +1010,12 @@ bool ScriptedEvent::UpdateEvent()
         if (!pObject || !pObject->IsInWorld())
             continue;
 
-        if (target.uiFailureCondition && sObjectMgr.IsConditionSatisfied(target.uiFailureCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+        if (target.uiFailureCondition && IsConditionSatisfied(target.uiFailureCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(false);
             return true;
         }
-        else if (target.uiSuccessCondition && sObjectMgr.IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+        else if (target.uiSuccessCondition && IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(true);
             return true;
@@ -2359,7 +2357,7 @@ void Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source
 {
     if ((script.command != SCRIPT_COMMAND_DISABLED) && 
         FindScriptFinalTargets(source, target, script) && 
-        (!script.condition || sObjectMgr.IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
+        (!script.condition || IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
         (this->*(m_ScriptCommands[script.command]))(script, source, target);
 }
 
@@ -2457,7 +2455,7 @@ void Map::ScriptsProcess()
         bool scriptResultOk = (step.script->command != SCRIPT_COMMAND_DISABLED) &&
                               FindScriptInitialTargets(source, target, step) &&
                               FindScriptFinalTargets(source, target, *step.script) &&
-                              (!step.script->condition || sObjectMgr.IsConditionSatisfied(step.script->condition, target, this, source, CONDITION_FROM_DBSCRIPTS));
+                              (!step.script->condition || IsConditionSatisfied(step.script->condition, target, this, source, CONDITION_FROM_DBSCRIPTS));
 
         if (scriptResultOk)
             scriptResultOk = (this->*(m_ScriptCommands[step.script->command]))(*step.script, source, target);

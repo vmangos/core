@@ -20,7 +20,6 @@
  */
 
 #include "Common.h"
-#include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/DatabaseImpl.h"
 #include "WorldPacket.h"
@@ -31,10 +30,6 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "Player.h"
-#include "UpdateMask.h"
-#include "NPCHandler.h"
-#include "Pet.h"
-#include "MapManager.h"
 
 void WorldSession::SendNameQueryOpcode(Player* p)
 {

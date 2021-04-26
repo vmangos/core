@@ -24,6 +24,8 @@
 #include "CreatureAIImpl.h"
 #include "NullCreatureAI.h"
 #include "GameEventMgr.h"
+#include "ObjectMgr.h"
+#include "Group.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
@@ -553,27 +555,34 @@ bool Map::ScriptCommand_RemoveAura(ScriptInfo const& script, WorldObject* source
 // SCRIPT_COMMAND_CAST_SPELL (15)
 bool Map::ScriptCommand_CastSpell(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    Unit* pUnitSource = ToUnit(source);
-    Unit* pUnitTarget = ToUnit(target);
-    
+    SpellCaster* pTarget = ToSpellCaster(target);
+
     if (!source)
     {
         sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a nullptr source, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 
-    if (!pUnitTarget)
+    SpellCaster* pSource = source->ToSpellCaster();
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a non-unit and non-gameobject source, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    if (!pTarget)
         return ShouldAbortScript(script);
 
-    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pUnitSource && pUnitSource->IsNonMeleeSpellCasted(false))
-        pUnitSource->InterruptNonMeleeSpells(false);
+    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pSource->IsNonMeleeSpellCasted(false))
+        pSource->InterruptNonMeleeSpells(false);
 
+    Unit* pUnitTarget = pTarget->ToUnit();
     Creature* pCreatureSource = source->ToCreature();
 
-    if (pCreatureSource)
+    if (pCreatureSource && pUnitTarget)
         pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
     else
-        source->CastSpell(pUnitTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
+        pSource->CastSpell(pTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
 
     return false;
 }
@@ -1024,7 +1033,7 @@ bool Map::ScriptCommand_TerminateCondition(ScriptInfo const& script, WorldObject
     WorldObject* pSource = source;
     WorldObject* pTarget = target;
 
-    bool terminateResult = sObjectMgr.IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
+    bool terminateResult = IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
     
     if (script.terminateCond.flags & SF_TERMINATECONDITION_WHEN_FALSE)
         terminateResult = !terminateResult;
@@ -1774,7 +1783,7 @@ bool Map::ScriptCommand_RemoveMapEventTarget(ScriptInfo const& script, WorldObje
             {
                 if (WorldObject* pObject = GetWorldObject(itr->target))
                 {
-                    if (sObjectMgr.IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
+                    if (IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
                     {
                         itr = pEvent->m_vTargets.erase(itr);
                         if (script.removeMapEventTarget.targets == SO_REMOVETARGET_ONE_FIT_CONDITION)

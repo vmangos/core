@@ -11,6 +11,8 @@ EndScriptData */
 
 #include "ScriptedFollowerAI.h"
 #include "Chat.h"
+#include "Player.h"
+#include "Group.h"
 
 float const MAX_PLAYER_DISTANCE = 100.0f;
 
@@ -103,7 +105,7 @@ void FollowerAI::MoveInLineOfSight(Unit* pWho)
         if (m_creature->IsHostileTo(pWho))
         {
             float fAttackRadius = m_creature->GetAttackDistance(pWho);
-            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius) && m_creature->IsWithinLOSInMap(pWho))
+            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius, true, false) && m_creature->IsWithinLOSInMap(pWho))
             {
                 if (!m_creature->GetVictim())
                 {

@@ -19,7 +19,6 @@
 #include <ctime>
 
 #include "WaypointMovementGenerator.h"
-#include "ObjectMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "WaypointManager.h"

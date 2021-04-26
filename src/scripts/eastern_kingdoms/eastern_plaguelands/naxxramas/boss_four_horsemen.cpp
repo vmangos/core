@@ -329,7 +329,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
                     break;
             }
 
-            m_creature->CastCustomSpell(pTarget, SPELL_MARK, &damage, nullptr, nullptr, true, nullptr, holder->GetAuraByEffectIndex(EFFECT_INDEX_0), m_creature->GetObjectGuid(), pSpell);
+            m_creature->CastCustomSpell(pTarget, SPELL_MARK, damage, {}, {}, true, nullptr, holder->GetAuraByEffectIndex(EFFECT_INDEX_0), m_creature->GetObjectGuid(), pSpell);
         }
     }
 

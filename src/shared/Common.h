@@ -186,7 +186,7 @@ enum AccountTypes
     SEC_TICKETMASTER   = 2,
     SEC_GAMEMASTER     = 3,
     SEC_BASIC_ADMIN    = 4,
-    SEC_DEVELOPPER     = 5,
+    SEC_DEVELOPER      = 5,
     SEC_ADMINISTRATOR  = 6,
     SEC_CONSOLE        = 7                                  // must be always last in list, accounts must have less security level always also
 };

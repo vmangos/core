@@ -20,10 +20,12 @@
  */
 
 #include "Common.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "Log.h"
 #include "Corpse.h"
 #include "GameObject.h"
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
@@ -31,8 +33,8 @@
 #include "LootMgr.h"
 #include "Object.h"
 #include "Group.h"
-#include "GameObjectAI.h"
 #include "World.h"
+#include "ScriptMgr.h"
 #include "Util.h"
 #include "Anticheat.h"
 

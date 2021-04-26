@@ -23,24 +23,20 @@
 #define MANGOS_MAP_H
 
 #include "Common.h"
-#include "Platform/Define.h"
 #include "Policies/ThreadingModel.h"
-
-#include "DBCStructure.h"
+#include "SharedDefines.h"
 #include "GridDefines.h"
 #include "Cell.h"
 #include "Object.h"
-#include "Timer.h"
-#include "SharedDefines.h"
 #include "GridMap.h"
 #include "GameSystem/GridRefManager.h"
 #include "MapRefManager.h"
 #include "Utilities/TypeList.h"
-#include "ScriptMgr.h"
 #include "vmap/DynamicTree.h"
 #include "MoveSplineInitArgs.h"
 #include "WorldSession.h"
 #include "SQLStorages.h"
+#include "ScriptCommands.h"
 #include "CreatureLinkingMgr.h"
 
 #include <bitset>
@@ -56,19 +52,13 @@ class Creature;
 class Unit;
 class WorldPacket;
 class InstanceData;
-class Group;
-
 class CreatureGroup;
-
 class MapPersistentState;
 class WorldPersistentState;
 class DungeonPersistentState;
 class BattleGroundPersistentState;
 class ChatHandler;
-
-struct ScriptInfo;
 class BattleGround;
-class GridMap;
 class WeatherSystem;
 class Transport;
 
