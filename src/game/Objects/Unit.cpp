@@ -6212,7 +6212,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
         if (iter->GetCasterGuid() == GetObjectGuid())
             return true;
 
-    if (distance > sWorld.getConfig(IsPlayer()?CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE:CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE) ||  IsCreature() && distance > ((Creature*)this)->GetDetectionRange())
+    if (distance > sWorld.getConfig(IsPlayer()?CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE:CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
         return false;
 
     float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.f : 21.f) : 0.f;
@@ -6234,11 +6234,8 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 
     visibleDistance = std::min(visibleDistance, 30.f);
 
-    if (!HasInArc(target)) {
-        visibleDistance -= yardsPerLevel * (IsPlayer() ? 9.f : 5.f);
-        if (visibleDistance <= 0.f)
-            return false;
-    }
+    if (!HasInArc(target))
+        visibleDistance -= IsPlayer() ? 9.f : 5.f;
 
 
     visibleDistance = std::max(visibleDistance, 1.f);
