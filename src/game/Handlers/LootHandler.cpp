@@ -377,7 +377,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                         DEBUG_LOG("Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetGUIDLow());
 
                         if (!sScriptMgr.OnProcessEvent(go->GetGOInfo()->chest.eventId, _player, go, true))
-                            go->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, _player, go);
+                            go->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, _player->GetObjectGuid(), go->GetObjectGuid());
                     }
 
                     // only vein pass this check

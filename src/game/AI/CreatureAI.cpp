@@ -249,7 +249,7 @@ void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
 
                     // If there is a script for this spell, run it.
                     if (spell.scriptId)
-                        m_creature->GetMap()->ScriptsStart(sCreatureSpellScripts, spell.scriptId, m_creature, pTarget);
+                        m_creature->GetMap()->ScriptsStart(sCreatureSpellScripts, spell.scriptId, m_creature->GetObjectGuid(), pTarget->GetObjectGuid());
                     break;
                 }
                 case SPELL_FAILED_FLEEING:

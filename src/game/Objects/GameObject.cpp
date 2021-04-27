@@ -1373,7 +1373,7 @@ void GameObject::Use(Unit* user)
             UseDoorOrButton();
 
             // activate script
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
             return;
         }
         case GAMEOBJECT_TYPE_BUTTON:                        // 1
@@ -1387,7 +1387,7 @@ void GameObject::Use(Unit* user)
             UseDoorOrButton();
 
             // activate script
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
 
             TriggerLinkedGameObject(user);
             return;
@@ -1412,7 +1412,7 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
             TriggerLinkedGameObject(user);
             return;
         }
@@ -1557,10 +1557,10 @@ void GameObject::Use(Unit* user)
                     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetGUIDLow());
 
                     if (!sScriptMgr.OnProcessEvent(info->goober.eventId, player, this, true))
-                        GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
+                        GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player->GetObjectGuid(), GetObjectGuid());
                 }
                 else
-                    GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
+                    GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
 
                 // possible quest objective for active quests
                 if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
@@ -1610,7 +1610,7 @@ void GameObject::Use(Unit* user)
             if (info->camera.eventID)
             {
                 if (!sScriptMgr.OnProcessEvent(info->camera.eventID, player, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player->GetObjectGuid(), GetObjectGuid());
             }
 
             return;
@@ -1878,7 +1878,7 @@ void GameObject::Use(Unit* user)
                     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "FlagDrop ScriptStart id %u for GO entry %u (GUID %u).", info->flagdrop.eventID, GetEntry(), GetGUIDLow());
 
                     if (!sScriptMgr.OnProcessEvent(info->flagdrop.eventID, player, this, true))
-                        GetMap()->ScriptsStart(sEventScripts, info->flagdrop.eventID, player, this);
+                        GetMap()->ScriptsStart(sEventScripts, info->flagdrop.eventID, player->GetObjectGuid(), GetObjectGuid());
                 }
                 
                 spellId = info->flagdrop.pickupSpell;
@@ -1916,45 +1916,45 @@ void GameObject::Use(Unit* user)
             if (info->capturePoint.winEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.winEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID1, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID1, user->GetObjectGuid(), GetObjectGuid());
             }
             if (info->capturePoint.winEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.winEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID2, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID2, user->GetObjectGuid(), GetObjectGuid());
             }
 
             if (info->capturePoint.contestedEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.contestedEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID1, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID1, user->GetObjectGuid(), GetObjectGuid());
             }
             if (info->capturePoint.contestedEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.contestedEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID2, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID2, user->GetObjectGuid(), GetObjectGuid());
             }
 
             if (info->capturePoint.progressEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.progressEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID1, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID1, user->GetObjectGuid(), GetObjectGuid());
             }
             if (info->capturePoint.progressEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.progressEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID2, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID2, user->GetObjectGuid(), GetObjectGuid());
             }
 
             if (info->capturePoint.neutralEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.neutralEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID1, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID1, user->GetObjectGuid(), GetObjectGuid());
             }
             if (info->capturePoint.neutralEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.neutralEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID2, user, this);
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID2, user->GetObjectGuid(), GetObjectGuid());
             }
 
             // Some has spell, need to process those further.

@@ -470,9 +470,9 @@ class Map : public GridRefManager<NGridType>
         ScriptedEvent* StartScriptedEvent(uint32 id, WorldObject* source, WorldObject* target, uint32 timelimit, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript);
 
         // Adds all commands that are part of the provided script id to the queue.
-        void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, WorldObject* source, WorldObject* target);
+        void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid);
         // Adds the provided command to the queue. Will be handled by ScriptsProcess.
-        void ScriptCommandStart(ScriptInfo const& script, uint32 delay, WorldObject* source, WorldObject* target);
+        void ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid);
         // Immediately executes the provided command.
         void ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         // Removes all parts of script from the queue.

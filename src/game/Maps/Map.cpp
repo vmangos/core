@@ -1030,9 +1030,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
     m_bEnded = true;
 
     if (bSuccess && m_uiSuccessScript)
-        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, m_Source, m_Target);
     else if (!bSuccess && m_uiFailureScript)
-        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, m_Source, m_Target);
 
     for (const auto& target : m_vTargets)
     {
@@ -1042,9 +1042,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
             continue;
 
         if (bSuccess && target.uiSuccessScript)
-            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, target.target, m_Target);
         else if (!bSuccess && target.uiFailureScript)
-            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, target.target, m_Target);
     }
 }
 
@@ -2304,16 +2304,12 @@ void BattleGroundMap::UnloadAll(bool pForce)
 }
 
 /// Put scripts in the execution queue
-void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, WorldObject* source, WorldObject* target)
+void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid)
 {
     ///- Find the script map
     ScriptMapMap::const_iterator s = scripts.find(id);
     if (s == scripts.end())
         return;
-
-    // prepare static data
-    ObjectGuid sourceGuid = source->GetObjectGuid();
-    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
 
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
@@ -2335,13 +2331,9 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, WorldObject* sour
     }
 }
 
-void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, WorldObject* source, WorldObject* target)
+void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid)
 {
     // NOTE: script record _must_ exist until command executed
-
-    // prepare static data
-    ObjectGuid sourceGuid = source->GetObjectGuid();
-    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
 
     ScriptAction sa;
     sa.sourceGuid = sourceGuid;
@@ -2446,7 +2438,7 @@ void Map::ScriptsProcess()
     // ok as multimap is a *sorted* associative container
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
-         ScriptAction const step = iter->second;
+        ScriptAction const step = iter->second;
         lock.unlock();
 
         WorldObject* source = nullptr;

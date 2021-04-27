@@ -556,7 +556,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         scriptSetPhase.command = SCRIPT_COMMAND_SET_PHASE;
                         scriptSetPhase.setPhase.phase = 2;
                         scriptSetPhase.setPhase.mode = SO_SETPHASE_RAW;
-                        unitTarget->GetMap()->ScriptCommandStart(scriptSetPhase, 0, unitTarget, unitTarget);
+                        unitTarget->GetMap()->ScriptCommandStart(scriptSetPhase, 0, unitTarget->GetObjectGuid(), unitTarget->GetObjectGuid());
 
                         // Prevent further interaction with Naga Brazier.
                         if (GameObject* pGo = m_caster->FindNearestGameObject(178247, 30.0f))
@@ -2358,7 +2358,7 @@ void Spell::EffectSendEvent(SpellEffectIndex eff_idx)
     GameObject* gObject = focusObject ? focusObject : m_targets.getGOTarget();
 
     if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[eff_idx], m_caster, gObject, true))
-        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[eff_idx], m_caster, gObject);
+        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[eff_idx], m_caster->GetObjectGuid(), gObject ? gObject->GetObjectGuid() : ObjectGuid());
 }
 
 void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
@@ -5237,7 +5237,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         return;
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart spellid %u in EffectScriptEffect ", m_spellInfo->Id);
-    m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster, unitTarget);
+    m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster->GetObjectGuid(), unitTarget->GetObjectGuid());
 }
 
 void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
