@@ -826,6 +826,7 @@ enum OpcodesList
     SMSG_CHARACTER_PROFILE                          = 0x338,
     SMSG_CHARACTER_PROFILE_REALM_CONNECTED          = 0x339,
     SMSG_DEFENSE_MESSAGE                            = 0x33A,
+    SMSG_OFFENSE_MESSAGE                            = 0x33B,
     MSG_GM_RESETINSTANCELIMIT                       = 0x33C,
     //SMSG_MOTD                                       = 0x33D,
     SMSG_MOVE_SET_FLIGHT                            = 0x33E,
