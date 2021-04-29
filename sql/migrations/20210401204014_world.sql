@@ -393,6 +393,9 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
 -- quest 813 should be repeatable
 UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 813;
 
+-- Witherbark Bloodling should not drop loot
+UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0 WHERE `entry`= 7768;
+
 
 -- End of migration.
 END IF;
