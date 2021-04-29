@@ -6217,7 +6217,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 
     float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.f : 21.f) : 0.f;
     //Always invisible from back (when stealth detection is on), also filter max distance cases
-    float yardsPerLevel = 0.84f;
+    float yardsPerLevel = 5.f/6.f;
     int32 stealthSkill = target->IsPlayer() ? target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) : target->GetLevelForTarget(this) * 5;
     stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
