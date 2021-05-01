@@ -6231,11 +6231,12 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 
     visibleDistance = std::min(visibleDistance, 30.f);
 
-    if (!HasInArc(target))
-        visibleDistance -= IsPlayer() ? 9.f : 5.f;
-
-
     visibleDistance = std::max(visibleDistance, 1.f);
+
+    if (!HasInArc(target))
+        visibleDistance -= 9.f;
+
+
     float alertRange = visibleDistance + 5.f;
 
 
