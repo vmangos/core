@@ -352,6 +352,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
+    LIGHTHOUSEFOFHORN  = 7197, // Westfall Lighthouse
 };
 
 enum BellHourlySoundZones
@@ -365,6 +366,7 @@ enum BellHourlySoundZones
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
     ASHENVALE_ZONE           = 331,
+    WESTFALL_ZONE            = 40,
 };
 
 enum BellHourlyObjects
@@ -418,6 +420,9 @@ struct go_bells : public GameObjectAI
                     case DARNASSUS_ZONE:
                     case ASHENVALE_ZONE:
                         _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
+                        break;
+                    case WESTFALL_ZONE:
+                        _soundId = LIGHTHOUSEFOFHORN;   // light house fog horn
                         break;
                     default:
                         _soundId = BELLTOLLALLIANCE;   // human bell sound
