@@ -248,7 +248,7 @@ void DragonsOfNightmare::Update()
     // Get Dragon GUIDs, these should always be available if the unit exists
     if (!LoadDragons(dragonGUIDs))
     {
-        sLog.outError("[Dragons of Nightmare] Only %u nightmare dragons exist in the database, there should be 4", dragonGUIDs.size());
+        sLog.outBasic("[Dragons of Nightmare] Only %u nightmare dragons exist in the database, there should be 4", dragonGUIDs.size());
         return;
     }
 
@@ -322,7 +322,7 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
 
     if (!variableExists)
     {
-        sLog.outError("GameEventMgr: [Dragons of Nightmare] variable does not exist! Setting default.");
+        sLog.outBasic("GameEventMgr: [Dragons of Nightmare] variable does not exist! Setting default.");
         sObjectMgr.SetSavedVariable(idx, value, true);
     }
     else
@@ -339,7 +339,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
         if (!cData)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
+            sLog.outBasic("GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
             continue;
         }
 
@@ -350,7 +350,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
         if (!map)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
+            sLog.outBasic("GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
             continue;
         }
 
@@ -358,7 +358,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
         if (!pCreature)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
+            sLog.outBasic("GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
             continue;
         }
 
@@ -378,7 +378,7 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
 
         if (dCreatureGuid.IsEmpty())
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
+            sLog.outBasic("GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
             return false;
         }
 
@@ -593,6 +593,13 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
 
+    sObjectMgr.InitSavedVariable(VARIABLE_AZSHARA_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_TANARIS_NECROPOLIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING, 0);
+
     sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
@@ -603,127 +610,108 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     InvasionZone winterspring;
     {
         winterspring.map = 1;
-        winterspring.zoneId = 618;
+        winterspring.zoneId = ZONEID_WINTERSPRING;
         winterspring.remainingVar = VARIABLE_SI_WINTERSPRING_REMAINING;
-        InvasionNecropolis winterspring_south(6239.81f, -4686.73f, 836.33f, 4.54077f);
-        winterspring_south.shards.push_back(InvasionXYZ(6103.85f, -4866.65f, 751.32f));
-
-        InvasionNecropolis winterspring_west(6556.0f, -3543.0f, 802.0f, 4.98462f);
-        winterspring_west.shards.push_back(InvasionXYZ(6713.51f, -3469.41f, 677.56f));
-
-        InvasionNecropolis winterspring_north(7719.0f, -3986.0f, 800.0f, 0.418224f);
-        winterspring_north.shards.push_back(InvasionXYZ(7923.70f, -3876.93f, 695.59f));
-
-        winterspring.points.push_back(winterspring_south);
-        winterspring.points.push_back(winterspring_west);
-        winterspring.points.push_back(winterspring_north);
+        winterspring.necroAmount = 3;
+        winterspring.mouth.push_back(InvasionXYZO(7736.56f, -4033.75f, 696.327f, 5.51524f));
     }
 
     InvasionZone tanaris;
     {
         tanaris.map = 1;
-        tanaris.zoneId = 440;
+        tanaris.zoneId = ZONEID_TANARIS;
         tanaris.remainingVar = VARIABLE_SI_TANARIS_REMAINING;
-        InvasionNecropolis tanaris_north(-7340.0f, -3650.0f, 80.0f, 1.06578f);
-        tanaris_north.shards.push_back(InvasionXYZ(-7303.60f, -3955.87f, 11.22f));
-        tanaris_north.shards.push_back(InvasionXYZ(-7433.11f, -3775.77f, 11.00f));
-        tanaris_north.shards.push_back(InvasionXYZ(-7256.72f, -3560.59f, 11.01f));
-
-        InvasionNecropolis tanaris_se(-8371.75f, -3905.45f, 89.935f, 2.56196f);
-        tanaris_se.shards.push_back(InvasionXYZ(-8221.29f, -3856.80f, 12.70f));
-        tanaris_se.shards.push_back(InvasionXYZ(-8490.22f, -3978.88f, 22.50f));
-        tanaris_se.shards.push_back(InvasionXYZ(-8337.22f, -4042.02f, 9.60f));
-
-        InvasionNecropolis tanaris_sw(-8634.0f, -2457.0f, 110.0f, 3.98353f);
-        tanaris_sw.shards.push_back(InvasionXYZ(-8804.99f, -2568.08f, 12.13f));
-        tanaris_sw.shards.push_back(InvasionXYZ(-8434.97f, -2308.05f, 22.07f));
-        tanaris_sw.shards.push_back(InvasionXYZ(-8503.57f, -2652.94f, 35.16f));
-        
-        tanaris.points.push_back(tanaris_north);
-        tanaris.points.push_back(tanaris_se);
-        tanaris.points.push_back(tanaris_sw);
+        tanaris.necroAmount = 3;
+        tanaris.mouth.push_back(InvasionXYZO(-8352.68f, -3972.68f, 10.0753f, 2.14675f));
     }
 
     InvasionZone azshara;
     {
         azshara.map = 1;
-        azshara.zoneId = 16;
+        azshara.zoneId = ZONEID_AZSHARA;
         azshara.remainingVar = VARIABLE_SI_AZSHARA_REMAINING;
-        InvasionNecropolis azshara_west(3312.67f, -4222.19f, 189.273f, 4.46068f);
-        azshara_west.shards.push_back(InvasionXYZ(3301.32f, -4412.29f, 106.27f));
-        azshara_west.shards.push_back(InvasionXYZ(3597.53f, -4130.86f, 103.94f));
-        azshara_west.shards.push_back(InvasionXYZ(3012.86f, -4129.63f, 101.63f));
-
-        InvasionNecropolis azshara_east(3476.38f, -5894.99f, 65.3272f, 3.13728f);
-        azshara_east.shards.push_back(InvasionXYZ(3493.62f, -5714.52f, 6.25f));
-        
-        azshara.points.push_back(azshara_west);
-        azshara.points.push_back(azshara_east);
+        azshara.necroAmount = 2;
+        azshara.mouth.push_back(InvasionXYZO(3273.75f, -4276.98f, 125.509f, 5.44543f));
     }
 
     InvasionZone blasted_lands;
     {
         blasted_lands.map = 0;
-        blasted_lands.zoneId = 4;
+        blasted_lands.zoneId = ZONEID_BLASTED_LANDS;
         blasted_lands.remainingVar = VARIABLE_SI_BLASTED_LANDS_REMAINING;
-        InvasionNecropolis west(-11165.0f, -2754.0f, 184.0f, 3.7687f);
-        west.shards.push_back(InvasionXYZ(-11023.10f, -2783.82f, 4.45f));
-        west.shards.push_back(InvasionXYZ(-11209.70f, -2996.59f, 3.60f));
-        west.shards.push_back(InvasionXYZ(-11392.05f, -2828.37f, -2.26f));
-
-        InvasionNecropolis east(-11405.4f, -3309.0f, 109.0f, 5.54368f);
-        east.shards.push_back(InvasionXYZ(-11524.50f, -3283.21f, 8.67f));
-        east.shards.push_back(InvasionXYZ(-11212.70f, -3350.82f, 5.10f));
-        east.shards.push_back(InvasionXYZ(-11255.01f, -3141.52f, 3.42f));
-
-        blasted_lands.points.push_back(west);
-        blasted_lands.points.push_back(east);
+        blasted_lands.necroAmount = 2;
+        blasted_lands.mouth.push_back(InvasionXYZO(-11429.3f, -3327.82f, 7.73628f, 1.0821f));
     }
 
-    InvasionZone epl;
+    InvasionZone eastern_plaguelands;
     {
-        epl.map = 0;
-        epl.zoneId = 139;
-        epl.remainingVar = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
-        InvasionNecropolis east(2137.01f, -4965.35f, 155.75f, 5.45317f);
-        east.shards.push_back(InvasionXYZ(2074.32f, -5136.34f, 82.55f));
-        east.shards.push_back(InvasionXYZ(2340.41f, -4965.81f, 70.44f));
-        east.shards.push_back(InvasionXYZ(1974.08f, -4731.53f, 98.30f));
-
-        InvasionNecropolis west(1862.4f, -2973.06f, 139.255f, 2.49221f);
-        west.shards.push_back(InvasionXYZ(1727.18f, -3000.94f, 74.75f));
-        west.shards.push_back(InvasionXYZ(1844.59f, -2841.12f, 78.61f));
-        west.shards.push_back(InvasionXYZ(1931.41f, -3108.38f, 87.80f));
-
-        epl.points.push_back(east);
-        epl.points.push_back(west);
+        eastern_plaguelands.map = 0;
+        eastern_plaguelands.zoneId = ZONEID_EASTERN_PLAGUELANDS;
+        eastern_plaguelands.remainingVar = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
+        eastern_plaguelands.necroAmount = 2;
+        eastern_plaguelands.mouth.push_back(InvasionXYZO(2014.55f, -4934.52f, 73.9846f, 0.0698132f));
     }
 
     InvasionZone burning_steppes;
     {
         burning_steppes.map = 0;
-        burning_steppes.zoneId = 46;
+        burning_steppes.zoneId = ZONEID_BURNING_STEPPES;
         burning_steppes.remainingVar = VARIABLE_SI_BURNING_STEPPES_REMAINING;
-        InvasionNecropolis west(-8164.61f, -1080.49f, 214.897f, 3.19532f);
-        west.shards.push_back(InvasionXYZ(-8361.96f, -1229.09f, 189.17f));
-        west.shards.push_back(InvasionXYZ(-7976.42f, -980.56f, 130.40f));
-        west.shards.push_back(InvasionXYZ(-8406.90f, -987.45f, 190.22f));
-
-        InvasionNecropolis east(-7768.16f, -2474.53f, 208.228f, 5.58291f);
-        east.shards.push_back(InvasionXYZ(-7698.81f, -2245.05f, 140.10f));
-        east.shards.push_back(InvasionXYZ(-7573.12f, -2594.49f, 138.48f));
-        east.shards.push_back(InvasionXYZ(-7978.83f, -2389.21f, 123.36f));
-        
-        burning_steppes.points.push_back(west);
-        burning_steppes.points.push_back(east);
+        burning_steppes.necroAmount = 2;
+        burning_steppes.mouth.push_back(InvasionXYZO(-8229.53f, -1118.11f, 144.012f, 6.17846f));
     }
 
     invasionPoints.push_back(winterspring);
     invasionPoints.push_back(tanaris);
     invasionPoints.push_back(azshara);
     invasionPoints.push_back(blasted_lands);
-    invasionPoints.push_back(epl);
+    invasionPoints.push_back(eastern_plaguelands);
     invasionPoints.push_back(burning_steppes);
+}
+
+void ScourgeInvasionEvent::EnableAndStartEvent(uint16 event_id)
+{
+    if (!sGameEventMgr.IsActiveEvent(event_id))
+    {
+        if (!sGameEventMgr.IsEnabled(event_id))
+            sGameEventMgr.EnableEvent(event_id, true);
+
+        sGameEventMgr.StartEvent(event_id);
+    }
+}
+
+void ScourgeInvasionEvent::DisableAndStopEvent(uint16 event_id)
+{
+    if (sGameEventMgr.IsActiveEvent(event_id))
+        sGameEventMgr.StopEvent(event_id);
+
+    if (sGameEventMgr.IsEnabled(event_id))
+        sGameEventMgr.EnableEvent(event_id, false);
+}
+
+
+void ScourgeInvasionEvent::HandleDefendedZones()
+{
+    uint32 wins = 0;
+    wins = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+
+    if (wins < 50) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
+    }
+    else if (wins >= 50 && wins < 100)
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
+    else if (wins >= 100 && wins < 150) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+    }
+    else if (wins >= 150) {
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION);
+        DisableAndStopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
+        EnableAndStartEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
+    }
 }
 
 void ScourgeInvasionEvent::Update()
@@ -748,41 +736,39 @@ void ScourgeInvasionEvent::Update()
 
     time_t now = time(nullptr);
 
-    for (auto& invasionPoint : invasionPoints)
+    for (InvasionZone& zone : invasionPoints)
     {
-        uint32 numNecrosAlive = 0;
-        for (auto& point : invasionPoint.points)
-        {
-            Map* mapPtr = GetMap(invasionPoint.map, point);
-            if (!mapPtr)
-            {
-                sLog.outError("ScourgeInvasionEvent::Update no map for zone %d", invasionPoint.map);
-                continue;
-            }
+        uint32 numMouthAlive = 0;
+        
+        numMouthAlive = sObjectMgr.GetSavedVariable(zone.zoneId);
 
-            Creature* pRelay = mapPtr->GetCreature(point.relayGuid);
-            if (!pRelay)
-                point.relayGuid = 0;
-            else
-                ++numNecrosAlive;
+        Map* mapPtr = GetMap(zone.map, zone.mouth[0]);
+        if (!mapPtr)
+        {
+            sLog.outBasic("ScourgeInvasionEvent::Update no map for zone %d", zone.map);
+            continue;
         }
+
+        Creature* pMouth = mapPtr->GetCreature(zone.mouthGuid);
+        if (!pMouth)
+            numMouthAlive = 0;
 
 
         // If this is an active invasion zone, and there are no necropolises alive,
         // we initialize the cooldown variable which will make a new zone active at
         // now + NECROPOLIS_ATTACK_TIMER
-        if (numNecrosAlive == 0 && invasionPoint.zoneId == current1)
+        if (numMouthAlive == 0 && zone.zoneId == current1)
         {
-            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME1, VARIABLE_NAXX_ATTACK_ZONE1, invasionPoint.remainingVar, now, invasionPoint.zoneId);
+            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME1, VARIABLE_NAXX_ATTACK_ZONE1, zone.remainingVar, now, zone.zoneId);
         }
-        else if (numNecrosAlive == 0 && invasionPoint.zoneId == current2)
+        else if (numMouthAlive == 0 && zone.zoneId == current2)
         {
-            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME2, VARIABLE_NAXX_ATTACK_ZONE2, invasionPoint.remainingVar, now, invasionPoint.zoneId);
+            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME2, VARIABLE_NAXX_ATTACK_ZONE2, zone.remainingVar, now, zone.zoneId);
         }
 
-        sObjectMgr.SetSavedVariable(invasionPoint.remainingVar, numNecrosAlive, true);
+        sObjectMgr.SetSavedVariable(zone.remainingVar, numMouthAlive, true);
     }
-       
+
     UpdateWorldState();
 }
 
@@ -803,35 +789,18 @@ void ScourgeInvasionEvent::Disable()
 {
     for (InvasionZone& zone : invasionPoints)
     {
-        for (InvasionNecropolis& necro : zone.points)
-        {
-            if (!necro.relayGuid)
-                continue;
-            Map* pMap = GetMap(zone.map, necro);
-            if (!pMap)
-                continue;
-
-            Creature* pRelay = pMap->GetCreature(necro.relayGuid);
-            if (!pRelay)
-                continue;
-            std::list<Creature*> shardList;
-            GetCreatureListWithEntryInGrid(shardList, pRelay, { NPC_NECROTIC_SHARD, NPC_DAMAGED_NECROTIC_SHARD }, 400.0f);
-            for (Creature* pShard : shardList)
-                pShard->DeleteLater();
-            std::list<GameObject*> necropolisList;
-            GetGameObjectListWithEntryInGrid(necropolisList, pRelay, GOBJ_NECROPOLIS, 100.0f);
-            for (GameObject* pNecro : necropolisList)
-                pNecro->DeleteLater();
-            
-            // Getting list of relays as well, in case there's been some double enable/disabling going on 
-            // and we have more than one relay alive
-            std::list<Creature*> relayList;
-            GetCreatureListWithEntryInGrid(relayList, pRelay, NPC_NECROPOLIS_RELAY, 100.0f);
-            for (Creature* p2Relay : relayList)
-                p2Relay->DeleteLater();
-            
-            necro.relayGuid = 0;
-        }
+        if (!zone.mouthGuid)
+            continue;
+        Map* mapPtr = GetMap(zone.map, zone.mouth[0]);
+        if (!mapPtr)
+            continue;
+        
+        Creature* pMouth = mapPtr->GetCreature(zone.mouthGuid);
+        
+        if (!pMouth)
+            continue;
+        
+        pMouth->DeleteLater();
     }
     
     sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(nullptr), true);
@@ -844,15 +813,22 @@ void ScourgeInvasionEvent::Disable()
     sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0, true);
 
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS, true);
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS, true);
+    sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
+
     UpdateWorldState();
 }
 
-Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionNecropolis const& invZone)
+Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionXYZO const& invZone)
 {
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
     if (!pMap)
-        sLog.outError("ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d", mapId, invZone.x, invZone.y);
+        sLog.outBasic("ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d", mapId, invZone.x, invZone.y);
     return pMap;
 }
 
@@ -873,8 +849,22 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
         sObjectMgr.SetSavedVariable(attackTimeVar, now + NECROPOLIS_ATTACK_TIMER, true);
         sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
 
+        HandleDefendedZones();
+
+        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT))
         sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next invasion starting in %d minutes", zoneId, uint32(timeToNextAttack/60));
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT));
+
+        InvasionZone* zone = GetZone(zoneId);
+        if (!zone) return;
+
+        // Change weather to fine.
+        Map* pMap = sMapMgr.FindMap(zone->map);
+
+        if (Creature* pMouth = pMap->GetCreature(zone->mouthGuid))
+            pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
+        else
+            sLog.outBasic("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found", zone->mouthGuid);
     }
 }
 
@@ -883,6 +873,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
 bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
 {
     uint32 current1 = sObjectMgr.GetSavedVariable(attackZoneVar);
+    HandleDefendedZones();
 
     if (!isValidZoneId(current1))
     {
@@ -899,10 +890,10 @@ bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
             return ResumeInvasion(current1);
         }
         // Otherwise we start a new Invasion
-        else 
+        else
         {
             if (!oldZone)
-                sLog.outError("ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found");
+                sLog.outBasic("ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found");
             StartNewInvasionIfTime(attackTimeVar, attackZoneVar);
         }
     }
@@ -923,7 +914,7 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
 
     if (!isValidZoneId(zoneId))
     {
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime with invalid zoneID: %d", zoneId);
+        sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime with invalid zoneID: %d", zoneId);
         return;
     }
 
@@ -933,32 +924,26 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     InvasionZone* zone = GetZone(zoneId);
     if (!zone) return;
 
-    for (auto& necro : zone->points)
+
+    Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
+    // If any of the required maps are not available we return. Will cause the invasion to be started
+    // on next update instead
+    if (!mapPtr)
     {
-        Map* mapPtr = GetMap(zone->map, necro);
-        // If any of the required maps are not available we return. Will cause the invasion to be started
-        // on next update instead
-        if (!mapPtr)
-        {
-            sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
-            return;
-        }
+        sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
+        return;
     }
 
     uint32 num_necropolises_remaining = 0;
-    for (auto& necro : zone->points)
-    {
-        Map* mapPtr = GetMap(zone->map, necro);
-        if (!mapPtr) {
-            sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access map %d", zone->map);
-            continue;
-        }
-        if (mapPtr && SummonNecropolis(mapPtr, necro))
-            ++num_necropolises_remaining;
-    }
-    
+
+    if (mapPtr && SummonMouth(mapPtr, zone, zone->mouth[0]))
+        num_necropolises_remaining = zone->necroAmount;
+    else
+        sLog.outBasic("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d", zone->map);
+
     // Setting num remaining directly
     sObjectMgr.SetSavedVariable(zone->remainingVar, num_necropolises_remaining, true);
+    sObjectMgr.SetSavedVariable(zone->zoneId, num_necropolises_remaining, true);
 }
 
 // Will return false if a required map was not available. In all other cases returns true.
@@ -969,64 +954,47 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     sLog.outBasic("Resuming Scourge invasion in zone %d", zoneId);
     InvasionZone* zone = GetZone(zoneId);
     if (!zone) {
-        sLog.outError("ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d", zoneId);
+        sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d", zoneId);
         return false;
     }
     
     uint32 num_necropolises_remaining = sObjectMgr.GetSavedVariable(zone->remainingVar);
-    if (num_necropolises_remaining > zone->points.size())
-    {
-        sLog.outError("ScourgeInvasionEvent::ResumeInvasion for zone %d had %d necropolises remaining, but zone only has %d points",
-            zone->zoneId, num_necropolises_remaining, zone->points.size());
-        num_necropolises_remaining = zone->points.size();
-    }
 
     // Just making sure we can access all maps before starting the invasion
     for (uint32 i = 0; i < num_necropolises_remaining; i++)
     {
-        InvasionNecropolis& necro = zone->points[i];
-        if (!GetMap(zone->map, necro))
+        if (!GetMap(zone->map, zone->mouth[0]))
         {
-            sLog.outError("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update", zone->map);
+            sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update", zone->map);
             return false;
         }
     }
 
-    for (uint32 i = 0; i < num_necropolises_remaining; i++)
+    Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
+    if (!mapPtr)
     {
-        InvasionNecropolis& necro = zone->points[i];
-        Map* mapPtr = GetMap(zone->map, necro);
-        if (!mapPtr)
-        {
-            sLog.outError("ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
-            continue;
-        }
-
-        SummonNecropolis(mapPtr, necro);
+        sLog.outBasic("ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
     }
+    
+    SummonMouth(mapPtr, zone, zone->mouth[0]);
+
     return true;
 }
 
-bool ScourgeInvasionEvent::SummonNecropolis(Map* pMap, InvasionNecropolis& point)
+bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXYZO& point)
 {
-    Creature* pRelay = pMap->SummonCreature(NPC_NECROPOLIS_RELAY, point.x, point.y, point.z - 11.5f, point.o, TEMPSUMMON_MANUAL_DESPAWN, 0, true);
-    if (!pRelay) {
-        sLog.outError("ScourgeInvasionEvent::SummonNecropolis failed summoning relay");
-        return false;
-    }
-    point.relayGuid = pRelay->GetObjectGuid();
-
-    GameObject* pNecropolis = pRelay->SummonGameObject(GOBJ_NECROPOLIS, point.x, point.y, point.z, point.o);
-    if (!pNecropolis) {
-        sLog.outError("ScourgeInvasionEvent::SummonNecropolis failed summoning necropolis");
-        return false;
-    }
-
-    for (const auto& shard : point.shards)
+    if (Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
-        pRelay->SummonCreature(NPC_NECROTIC_SHARD, shard.x, shard.y, shard.z, 0,
-            TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000, true);
+        pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+        zone->mouthGuid = pMouth->GetObjectGuid();
     }
+    else
+    {
+        sLog.outBasic("ScourgeInvasionEvent::SummonMouth failed summoning necropolis");
+        return false;
+    }
+
+    sLog.outBasic("ScourgeInvasionEvent::SummonMouth at %f %f %f", point.x, point.y, point.z);
     return true;
 }
 
@@ -1046,7 +1014,7 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
         if (invasionPoint.zoneId == zoneId)
             return &invasionPoint;
     }
-    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
+    sLog.outBasic("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
     return nullptr;
 }
 
@@ -1061,7 +1029,7 @@ uint32 ScourgeInvasionEvent::GetNewRandomZone(uint32 curr1, uint32 curr2)
 
     if (validZones.empty())
     {
-        sLog.outError("ScourgeInvasionEvent::GetNewRandomZone no valid zones");
+        sLog.outBasic("ScourgeInvasionEvent::GetNewRandomZone no valid zones");
         return 0;
     }
     
@@ -1302,7 +1270,7 @@ void WarEffortEvent::Update()
         // case WAR_EFFORT_STAGE_COMPLETE: handled above
         default:
         {
-            sLog.outError("[WarEffortEvent] Stuck in invalid stage %u", stage);
+            sLog.outBasic("[WarEffortEvent] Stuck in invalid stage %u", stage);
             break;
         }
     }
@@ -1472,7 +1440,7 @@ void WarEffortEvent::UpdateStageEvents()
             EnableAndStartEvent(iter);
         else
         {
-            sLog.outError("[WarEffortEvent] Event %u is already active for stage %u, but not defined in overall event list",
+            sLog.outBasic("[WarEffortEvent] Event %u is already active for stage %u, but not defined in overall event list",
                 iter, stage);
         }
     }
@@ -1523,7 +1491,6 @@ void WarEffortEvent::DisableAndStopEvent(uint16 event_id)
     if (sGameEventMgr.IsEnabled(event_id))
         sGameEventMgr.EnableEvent(event_id, false);
 }
-
 
 void WarEffortEvent::UpdateHiveColossusEvents()
 {
