@@ -161,6 +161,14 @@ void BattleBotAI::AddPremadeGearAndSpells()
     }
 }
 
+void BattleBotAI::AddHKRanks()
+{
+    uint32 hk_values [] = { 25,2000,5000,10000,15000,20000,25000,30000,35000,40000,45000,50000,55000,60000 };
+
+    me->GetHonorMgr().SetRankPoints(hk_values[urand(0, 14)]);
+    me->GetHonorMgr().Update();
+}
+
 uint32 BattleBotAI::GetMountSpellId() const
 {
     if (me->GetLevel() >= 60)
@@ -766,6 +774,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         PopulateSpellData();
         AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
+        AddHKRanks();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SummonPetIfNeeded();
         me->SetHealthPercent(100.0f);
