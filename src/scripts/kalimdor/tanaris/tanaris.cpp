@@ -287,7 +287,7 @@ struct npc_toogaAI : public FollowerAI
 
     void Reset() override
     {
-        m_uiCheckSpeechTimer = 2500;
+        m_uiCheckSpeechTimer = urand(30000, 60000);
         m_uiPostEventTimer = 1000;
         m_uiPhasePostEvent = 0;
 
@@ -377,7 +377,7 @@ struct npc_toogaAI : public FollowerAI
             {
                 if (m_uiCheckSpeechTimer < uiDiff)
                 {
-                    m_uiCheckSpeechTimer = urand(5000, 60000);
+                    m_uiCheckSpeechTimer = urand(30000, 60000);
 
                     if (Player* pPlayer = GetLeaderForFollower())
                         DoScriptText(urand(SAY_TOOGA_RANDOM_START, SAY_TOOGA_RANDOM_END), m_creature, pPlayer);
