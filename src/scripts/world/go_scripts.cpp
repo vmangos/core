@@ -429,7 +429,7 @@ struct go_bells : public GameObjectAI
                         if (me->GetAreaId() == 2079) // Alcaz Island - lighhouse fog horn
                             _soundId = LIGHTHOUSEFOFHORN;  
                         else
-                            _soundId = BELLTOLLALLIANCE; // Menethil - human bell sound
+                            _soundId = BELLTOLLALLIANCE; // Theramore - human bell sound
                         break;
                     default:
                         _soundId = BELLTOLLALLIANCE;   // human bell sound
