@@ -367,6 +367,7 @@ enum BellHourlySoundZones
     DARNASSUS_ZONE           = 1657,
     ASHENVALE_ZONE           = 331,
     WESTFALL_ZONE            = 40,
+    DUSTWALLOW_MARSH_ZONE    = 15,
 };
 
 enum BellHourlyObjects
@@ -422,7 +423,13 @@ struct go_bells : public GameObjectAI
                         _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
                         break;
                     case WESTFALL_ZONE:
-                        _soundId = LIGHTHOUSEFOFHORN;   // light house fog horn
+                        _soundId = LIGHTHOUSEFOFHORN;   // lighthouse fog horn
+                        break;
+                    case DUSTWALLOW_MARSH_ZONE:
+                        if(me->GetAreaId() == 2079) // Alcaz Island - lighhouse fog horn
+                            _soundId = LIGHTHOUSEFOFHORN;  
+                        else
+                            _soundId = BELLTOLLALLIANCE; // Menethil - human bell sound
                         break;
                     default:
                         _soundId = BELLTOLLALLIANCE;   // human bell sound
