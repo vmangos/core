@@ -352,7 +352,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
-    LIGHTHOUSEFOFHORN  = 7197, // Westfall Lighthouse
+    LIGHTHOUSEFOFHORN  = 7197, // Lighthouse
 };
 
 enum BellHourlySoundZones
