@@ -426,7 +426,7 @@ struct go_bells : public GameObjectAI
                         _soundId = LIGHTHOUSEFOFHORN;   // lighthouse fog horn
                         break;
                     case DUSTWALLOW_MARSH_ZONE:
-                        if(me->GetAreaId() == 2079) // Alcaz Island - lighhouse fog horn
+                        if (me->GetAreaId() == 2079) // Alcaz Island - lighhouse fog horn
                             _soundId = LIGHTHOUSEFOFHORN;  
                         else
                             _soundId = BELLTOLLALLIANCE; // Menethil - human bell sound
