@@ -2348,3 +2348,18 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
 
     return false;
 }
+
+// SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (87)
+bool Map::ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    GameObject* pGo = nullptr;
+
+    if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
+    {
+        sLog.outError("SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (script id %u) call for a nullptr gameobject, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    pGo->ResetDoorOrButton();
+    return false;
+}
