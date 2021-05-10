@@ -1345,11 +1345,11 @@ void ObjectMgr::CheckCreatureTemplates()
         }
 
         // must exist or used hidden but used in data horse case
-        if (cInfo->beast_family && !sCreatureFamilyStore.LookupEntry(cInfo->beast_family) && cInfo->beast_family != CREATURE_FAMILY_HORSE_CUSTOM)
+        if (cInfo->pet_family && !sCreatureFamilyStore.LookupEntry(cInfo->pet_family) && cInfo->pet_family != CREATURE_FAMILY_HORSE_CUSTOM)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has invalid creature family (%u) in `beast_family`", cInfo->entry, cInfo->beast_family);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `beast_family`=%u WHERE entry=%u;", 0, cInfo->entry);
-            const_cast<CreatureInfo*>(cInfo)->beast_family = 0;
+            sLog.outErrorDb("Creature (Entry: %u) has invalid creature family (%u) in `pet_family`", cInfo->entry, cInfo->pet_family);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `pet_family`=%u WHERE entry=%u;", 0, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->pet_family = 0;
         }
 
         if (cInfo->inhabit_type <= 0 || cInfo->inhabit_type > INHABIT_ANYWHERE)
@@ -7425,7 +7425,7 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
     if (list0.empty() || list1.empty())
     {
         CreatureInfo const* cinfo = GetCreatureTemplate(entry);
-        char const* petname = GetPetName(cinfo->beast_family, sWorld.GetDefaultDbcLocale());
+        char const* petname = GetPetName(cinfo->pet_family, sWorld.GetDefaultDbcLocale());
         if (!petname)
             petname = cinfo->name;
         return std::string(petname);
