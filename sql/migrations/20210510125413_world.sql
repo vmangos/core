@@ -37,23 +37,23 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN (3308, 3743);
 
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (561, 1080);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (562, 1079);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (563, 1081);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (564, 1082);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (565, 1083);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (566, 1084);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (567, 1085);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (568, 1086);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (569, 1087);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (570, 1088);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (571, 1089);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (572, 1090);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (573, 1091);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (574, 1092);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (575, 1093);
-REPLACE INTO `gossip_menu` (`entry`, `text_id`) VALUES (576, 1094);
-REPLACE INTO `gossip_menu_option` VALUES
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (561, 1080);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (562, 1079);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (563, 1081);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (564, 1082);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (565, 1083);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (566, 1084);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (567, 1085);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (568, 1086);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (569, 1087);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (570, 1088);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (571, 1089);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (572, 1090);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (573, 1091);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (574, 1092);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (575, 1093);
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES (576, 1094);
+INSERT INTO `gossip_menu_option` VALUES
 (561,0,0,'What is a \"subterranean being matrix\"?',3189,1,1,563,0,0,0,0,NULL,0,0),
 (562,0,0,'Who are the Earthen?',3188,1,1,561,0,0,0,0,NULL,0,0),
 (563,0,0,'What are the anomalies you speak of?',3190,1,1,564,0,0,0,0,NULL,0,0),
