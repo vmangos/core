@@ -5593,15 +5593,16 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
         return; 
 
-    int32 playerLevel      = GetLevel();
-    int32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
-    int32 currentSkillMax  = 5 * playerLevel;
-    int32 skillDiff        = currentSkillMax - currenSkillValue;
+    uint32 playerLevel      = GetLevel();
+    uint32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
+    uint32 currentSkillMax  = 5 * playerLevel;
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (skillDiff <= 0)
+    if (currentSkillMax <= currenSkillValue)
         return;
+
+    uint32 skillDiff = currentSkillMax - currenSkillValue;
 
     // Calculate base chance to increase
     float chance = 0.0f;
