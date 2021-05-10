@@ -255,24 +255,32 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 class HunterTrapTargetSelectorCheck
 {
 public:
-    HunterTrapTargetSelectorCheck(GameObject const* obj, Unit const* funit, float range) : i_trap(obj), i_trapOwner(funit), i_range(range) {}
+    HunterTrapTargetSelectorCheck(GameObject const* pTrap, Unit const* pOwner, float range) : i_trap(pTrap), i_trapOwner(pOwner), i_range(range) {}
     WorldObject const& GetFocusObject() const
     {
         return *i_trap;
     }
-    bool operator()(Unit* u)
+    bool operator()(Unit* pTarget)
     {
-        if (!i_trap->CanSeeInWorld(u))
+        if (!i_trap->CanSeeInWorld(pTarget))
             return false;
 
-        if (i_trapOwner->IsPlayer() && u->IsPlayer() && !i_trapOwner->IsPvP() && !i_trapOwner->ToPlayer()->IsInDuelWith(u->ToPlayer()))
-            return false;
-
-        bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
-        if (u->IsAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
-            (u->IsInCombat() || i_trapOwner->IsHostileTo(u)))
+        // don't trigger on enemy player if our owner is not flagged for pvp
+        if (Player const* pOwnerPlayer = i_trapOwner->ToPlayer())
         {
-            i_range = i_trap->GetDistance(u);
+            if (Player const* pTargetPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (!pOwnerPlayer->IsPvP() && !(pOwnerPlayer->IsFFAPvP() && pTargetPlayer->IsFFAPvP()) && !pOwnerPlayer->IsInDuelWith(pTargetPlayer))
+                    return false;
+            }
+        }
+
+        bool isTotem = pTarget->IsCreature() && ((Creature*)pTarget)->IsTotem();
+        if (i_trap->IsWithinDistInMap(pTarget, isTotem ? i_range / 3.0f : i_range) &&
+            i_trapOwner->IsValidAttackTarget(pTarget) &&
+            (pTarget->IsInCombat() || i_trapOwner->IsHostileTo(pTarget)))
+        {
+            i_range = i_trap->GetDistance(pTarget);
             return true;
         }
         return false;
