@@ -1053,9 +1053,7 @@ class Player final: public Unit
         void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask) const;
         Item* BankItem(ItemPosCountVec const& dest, Item* pItem, bool update)
         {
-            Item* storedItem = StoreItem(dest, pItem, update);
-            ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
-            return storedItem;
+            return StoreItem(dest, pItem, update);
         }
         void RemoveItem(uint8 bag, uint8 slot, bool update);
         void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
