@@ -1170,7 +1170,7 @@ bool ChatHandler::HandleDebugSetValueByNameCommand(char* args)
                     return false;
 
                 target->SetUInt16Value(pField->offset, 0, value1);
-                target->SetUInt16Value(pField->offset, 0, value2);
+                target->SetUInt16Value(pField->offset, 1, value2);
                 PSendSysMessage("Field %s of %s set to %u/%u.", pField->name, target->GetName(), value1, value2);
                 break;
             }
@@ -1204,9 +1204,9 @@ bool ChatHandler::HandleDebugSetValueByNameCommand(char* args)
                     return false;
 
                 target->SetByteValue(pField->offset, 0, value1);
-                target->SetByteValue(pField->offset, 0, value2);
-                target->SetByteValue(pField->offset, 0, value3);
-                target->SetByteValue(pField->offset, 0, value4);
+                target->SetByteValue(pField->offset, 1, value2);
+                target->SetByteValue(pField->offset, 2, value3);
+                target->SetByteValue(pField->offset, 3, value4);
                 PSendSysMessage("Field %s of %s set to %u/%u/%u/%u.", pField->name, target->GetName(), value1, value2, value3, value4);
                 break;
             }
