@@ -79,16 +79,12 @@ enum ScourgeInvasionSpells
     SPELL_FIND_CAMP_TYPE                        = 28203, // casted by Scourge Invasion Minion, finder.
 
     // Scourge Invasion Minion, spawner, Ghost/Ghoul
-    SPELL_PH_SUMMON_MINION_PARENT_GHOST_GHOUL   = 28183,
+    SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL     = 27883,
 
     // Scourge Invasion Minion, spawner, Ghost/Skeleton
-    SPELL_PH_SUMMON_MINION_PARENT_GHOST_SKELETON = 28184,
+    SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON  = 28186,
 
     // Scourge Invasion Minion, spawner, Ghoul/Skeleton
-    SPELL_PH_SUMMON_MINION_PARENT_GHOUL_SKELETON = 28185,
-
-    SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL     = 27883,
-    SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON  = 28186,
     SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON  = 28187,
 
     // Minions Spells
@@ -134,12 +130,16 @@ enum ScourgeInvasionSpells
     SPELL_BUTTRESS_TRAP                         = 28054, // Unknown.
     SPELL_KILL_SUMMONER_SUMMON_BOSS             = 28250, // Reagents, 1 Necrotic Rune
                                                          
-    // Probably used to spawn Shadow of Doom.   Casting sequence (All those [x] spells are casted within 1-2 seconds):
+    // Probably used to spawn Shadow of Doom.   Casting sequence (All these [x] spells are being casted the following order within 1-2 seconds):
     SPELL_PH_KILL_SUMMONER_BUFF                 = 27852, // [1] Casted by Cultist on Player.
     SPELL_KILL_SUMMONER_WHO_WILL_SUMMON_BOSS    = 27894, // [2] Casted by Player on Cultist.
     SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
     SPELL_SUMMON_BOSS_BUFF                      = 31316, // [4] Summon Boss Buff, casted on Player
-    SPELL_SUMMON_BOSS                           = 31315, // [5] Reagents, 8 Necrotic Rune, Summon (Shadow of Doom) for 1 hour.
+    SPELL_SUMMON_BOSS                           = 31315, /* [5] Reagents, 8 Necrotic Rune, Summon (Shadow of Doom) for 1 hour.
+                                                             The question is: What happens after this hour if the shadow despawns?
+                                                             Do the cultists respawn and channeling again on the damaged shard or
+                                                             Does the Necrotic crystal respawn with no cultists / shadows?
+                                                             */
 
     // Shadow of Doom
     SPELL_SPAWN_SMOKE                           = 10389, // Spawning Visual.
@@ -153,21 +153,24 @@ enum ScourgeInvasionSpells
     SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard)
 
     // Flameshocker (also uses: 28234, 17680)
-    SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 22 seconds]
+    SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 30 seconds]
     SPELL_FLAMESHOCKERS_REVENGE                 = 28323, // On death. 
-    SPELL_FLAMESHOCKERS_TOUCH2                  = 28329, // [shortest sniff CD: 22 seconds]
+    SPELL_FLAMESHOCKERS_TOUCH2                  = 28329, // [shortest sniff CD: 30 seconds]
     SPELL_FLAMESHOCKER_IMMOLATE_VISUAL          = 28330
 
     /*
     These spells are not used by any NPCs or GameObjects.
     The [PH] in the name means it's a placeholder. Blizzard often adds that to the names of things they add to the game but haven't finalized.
     The fact that the [PH] is still there means the quest was never finished. (Google)
-        SPELL_PH_GET_TOKEN                          = 27922, // Create Item "Necrotic Rune".
-        SPELL_PH_BUTTRESS_ACTIVATOR                 = 28086,
-        SPELL_PH_CRYSTAL_CORPSE_DESPAWN             = 28020,
-        SPELL_PH_CRYSTAL_CORPSE_TIMER               = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
-        SPELL_PH_CYSTAL_BAZOOKA                     = 27849,
-        SPELL_PH_SUMMON_BUTTRESS                    = 28024, // Summon (Cultist Engineer) for 1 hour.
+        SPELL_PH_SUMMON_MINION_PARENT_GHOST_GHOUL       = 28183,
+        SPELL_PH_SUMMON_MINION_PARENT_GHOST_SKELETON    = 28184,
+        SPELL_PH_SUMMON_MINION_PARENT_GHOUL_SKELETON    = 28185,
+        SPELL_PH_GET_TOKEN                              = 27922, // Create Item "Necrotic Rune".
+        SPELL_PH_BUTTRESS_ACTIVATOR                     = 28086,
+        SPELL_PH_CRYSTAL_CORPSE_DESPAWN                 = 28020,
+        SPELL_PH_CRYSTAL_CORPSE_TIMER                   = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
+        SPELL_PH_CYSTAL_BAZOOKA                         = 27849,
+        SPELL_PH_SUMMON_BUTTRESS                        = 28024, // Summon (Cultist Engineer) for 1 hour.
     */
 };
 
@@ -233,7 +236,8 @@ enum ScourgeInvasionNPC
     NPC_VARIMATHRAS                                     = 2425,
     NPC_ROYAL_DREADGUARD                                = 13839,
     NPC_STORMWIND_ROYAL_GUARD                           = 1756,
-    NPC_UNDERCITY_ELITE_GUARDIAN                        = 16432
+    NPC_UNDERCITY_ELITE_GUARDIAN                        = 16432,
+    NPC_UNDERCITY_GUARDIAN                              = 5624
 };
 
 enum ScourgeInvasionMisc
@@ -270,8 +274,8 @@ enum ScourgeInvasionMisc
 #else
     // The change of zone takes 4 hours
     //NECROPOLIS_ATTACK_TIMER                           = 60 * 60, // 1 hour
-    NECROPOLIS_ATTACK_TIMER                             = 60 * 1, // 5min from 
-    CITY_ATTACK_TIMER                                   = 60 * 1, // 5min from 
+    NECROPOLIS_ATTACK_TIMER                             = 60 * 1, // 5 min
+    CITY_ATTACK_TIMER                                   = 60 * 1, // 5 min
 #endif
 
     ZONEID_WINTERSPRING                                 = 618,
@@ -328,7 +332,12 @@ enum ScourgeInvasionNPCEvents
     EVENT_MINION_ARCANE_BOLT                = 46,
     EVENT_MINION_PSYCHIC_SCREAM             = 47,
     EVENT_MINION_SCOURGE_STRIKE             = 48,
-    EVENT_MINION_SHADOW_WORD_PAIN           = 49
+    EVENT_MINION_SHADOW_WORD_PAIN           = 49,
+
+    // Pallid Horror Events 
+    EVENT_PALLID_RANDOM_YELL                = 50,
+    EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 51,
+    EVENT_SYLVANAS_ANSWER_YELL              = 52
 };
 
 enum ScourgeInvasionWorldStatesVariables
@@ -372,15 +381,6 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_SI_BLASTED_LANDS_REMAINING         = 33,
     VARIABLE_SI_BURNING_STEPPES_REMAINING       = 34,
     VARIABLE_SI_TANARIS_REMAINING               = 35
-
-    /*
-    VARIABLE_AZSHARA_NECROPOLIS_REMAINING               = 16,
-    VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING         = 4,
-    VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING       = 46,
-    VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING   = 139,
-    VARIABLE_TANARIS_NECROPOLIS_REMAINING               = 440,
-    VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING          = 618,
-    */
 };
 
 enum ScourgeInvasionQuests
@@ -403,10 +403,10 @@ enum ScourgeInvasionLang
     LANG_PALLID_HORROR_YELL8                            = 12325, // We come destroy puny ones!
 
     // Undercity Guardian
-    LANG_UNDERCITY_GUARDIAN_1                           = 12336, // Rogues' Quarter attacked by Scourge!  Help!
-    LANG_UNDERCITY_GUARDIAN_2                           = 12335, // Scourge attack Magic Quarter!
-    LANG_UNDERCITY_GUARDIAN_3                           = 12353, // There Scourge outside Trade Quarter!
-    LANG_UNDERCITY_GUARDIAN_4                           = 12334, // Scourge in sewers!  We need help!
+    LANG_UNDERCITY_GUARDIAN_ROGUES_QUARTER              = 12336, // Rogues' Quarter attacked by Scourge!  Help!
+    LANG_UNDERCITY_GUARDIAN_MAGIC_QUARTER               = 12335, // Scourge attack Magic Quarter!
+    LANG_UNDERCITY_GUARDIAN_TRADE_QUARTER               = 12353, // There Scourge outside Trade Quarter!
+    LANG_UNDERCITY_GUARDIAN_SEWERS                      = 12334, // Scourge in sewers!  We need help!
 
     // Undercity Elite Guardian
     LANG_UNDERCITY_ELITE_GUARDIAN_1                     = 12354, // Scourge inside Trade Quarter!  Destroy!

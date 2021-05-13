@@ -262,14 +262,14 @@ private:
     void StartNewCityAttackIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
     bool SummonMouth(Map* pMap, InvasionZone* zone, InvasionXYZO& point);
-    bool SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point);
+    bool SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point, uint32 spawnLoc);
 
     Map* GetMap(uint32 mapId, InvasionXYZO const& invZone);
     bool isValidZoneId(uint32 zoneId);
     bool isActiveZone(uint32 zoneId);
     uint32 GetActiveZones();
-    InvasionZone* GetZone(uint32 zoneId);
-    CityAttack* GetZones(uint32 zoneId);
+    InvasionZone* GetInvasionZone(uint32 zoneId);
+    CityAttack* GetCityZone(uint32 zoneId);
     uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
 
     void UpdateWorldState();
