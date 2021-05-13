@@ -160,6 +160,7 @@ Player* PartyBotAI::GetPartyLeader()
                 {
                     m_leaderGuid = leaderGuid;
                     lastLeaderFound = true;
+                    break;
                 }
             }
         }
