@@ -54,7 +54,7 @@ public:
     void AddToPlayerGroup();
     void LearnPremadeSpecForClass();
 
-    Player* GetPartyLeader() const;
+    Player* GetPartyLeader();
     bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectPartyAttackTarget() const;
