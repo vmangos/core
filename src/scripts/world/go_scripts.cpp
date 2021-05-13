@@ -353,7 +353,7 @@ enum BellHourlySoundFX
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
 
-    LIGHTHOUSEFOFHORN  = 7197, // Lighthouse
+    LIGHTHOUSEFOGHORN  = 7197, // Lighthouse
 };
 
 enum BellHourlySoundZones
@@ -395,15 +395,11 @@ struct go_bells : public GameObjectAI
 {
     bool IsLighHouseHorn()
     {
+        // GO_ALLIANCE_BELL is used for both hourly bell and lighhouse horn -> distiguish by guid
         if (uint32 guidLow = me->GetGUIDLow())
-        {
-            // GO_ALLIANCE_BELL is used for both hourly bell and lighhouse horn -> distiguish by guid
             return (guidLow == WESTFALL_LIGHTHOUSE_HORN_GUID_LOW || guidLow == ALCAZ_LIGHTHOUSE_HORN_GUID_LOW || guidLow == THERAMORE_LIGHTHOUSE_HORN_GUID_LOW);
-        }
         else
-        {
             return false;
-        }
     }
 
     uint32 FindSoundByZone(uint32 zoneId)
@@ -448,14 +444,7 @@ struct go_bells : public GameObjectAI
 
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
-        if (IsLighHouseHorn())
-        {
-            _soundId = LIGHTHOUSEFOFHORN;
-        }
-        else
-        {
-            _soundId = FindSoundByZone(me->GetZoneId());
-        }
+        _soundId = IsLighHouseHorn() ? LIGHTHOUSEFOGHORN : FindSoundByZone(me->GetZoneId());
     }
 
     void UpdateAI(uint32 const diff) override
