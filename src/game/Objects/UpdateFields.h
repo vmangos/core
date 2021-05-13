@@ -23,8 +23,6 @@
 #define _UPDATEFIELDS_AUTO_H
 
 #include "Common.h"
-#include <array>
-#include <vector>
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
 #include "UpdateFields_1_12_1.h"
@@ -150,10 +148,7 @@ struct UpdateFieldData
 
 namespace UpdateFields
 {
-    extern std::vector<UpdateFieldData> const g_updateFieldsData;
-
     void InitializeUpdateFieldFlags();
-    uint16 GetUpdateFieldFlags(uint8 objectTypeId, uint16 offset);
     uint16 const* GetUpdateFieldFlagsArray(uint8 objectTypeId);
     UpdateFieldData const* GetUpdateFieldDataByName(char const* name);
     UpdateFieldData const* GetUpdateFieldDataByTypeMaskAndOffset(uint8 objectTypeMask, uint16 offset);

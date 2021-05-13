@@ -2,7 +2,7 @@
 // Patch: 1.10.2
 // Build: 5302
 
-std::vector<UpdateFieldData> const UpdateFields::g_updateFieldsData =
+static std::vector<UpdateFieldData> const g_updateFieldsData =
 {
     // enum EObjectFields
     { TYPEMASK_OBJECT       , "OBJECT_FIELD_GUID"                               , 0x0  , 2  , UF_TYPE_GUID     , UF_FLAG_PUBLIC },

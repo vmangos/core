@@ -16,6 +16,8 @@
 
 #include "UpdateFields.h"
 #include "Log.h"
+#include <array>
+#include <vector>
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
 #include "UpdateFields_1_12_1.cpp"
@@ -50,7 +52,7 @@ static std::array<uint16, CORPSE_END> g_corpseUpdateFieldFlags = {};
 template<std::size_t SIZE>
 static void SetupUpdateFieldFlagsArray(uint8 objectTypeMask, std::array<uint16, SIZE>& flagsVector)
 {
-    for (auto const& itr : UpdateFields::g_updateFieldsData)
+    for (auto const& itr : g_updateFieldsData)
     {
         if ((itr.objectTypeMask & objectTypeMask) == 0)
             continue;
@@ -69,37 +71,6 @@ void UpdateFields::InitializeUpdateFieldFlags()
     SetupUpdateFieldFlagsArray(TYPEMASK_OBJECT | TYPEMASK_GAMEOBJECT, g_gameObjectUpdateFieldFlags);
     SetupUpdateFieldFlagsArray(TYPEMASK_OBJECT | TYPEMASK_DYNAMICOBJECT, g_dynamicObjectUpdateFieldFlags);
     SetupUpdateFieldFlagsArray(TYPEMASK_OBJECT | TYPEMASK_CORPSE, g_corpseUpdateFieldFlags);
-}
-
-uint16 UpdateFields::GetUpdateFieldFlags(uint8 objectTypeId, uint16 offset)
-{
-    switch (objectTypeId)
-    {
-        case TYPEID_ITEM:
-        case TYPEID_CONTAINER:
-        {
-            return g_containerUpdateFieldFlags.at(offset);
-        }
-        case TYPEID_UNIT:
-        case TYPEID_PLAYER:
-        {
-            return g_playerUpdateFieldFlags.at(offset);
-        }
-        case TYPEID_GAMEOBJECT:
-        {
-            return g_gameObjectUpdateFieldFlags.at(offset);
-        }
-        case TYPEID_DYNAMICOBJECT:
-        {
-            return g_dynamicObjectUpdateFieldFlags.at(offset);
-        }
-        case TYPEID_CORPSE:
-        {
-            return g_corpseUpdateFieldFlags.at(offset);
-        }
-    }
-    sLog.outError("Unhandled object type id (%hhu) in GetUpdateFieldFlags!", objectTypeId);
-    return 0;
 }
 
 uint16 const* UpdateFields::GetUpdateFieldFlagsArray(uint8 objectTypeId)
