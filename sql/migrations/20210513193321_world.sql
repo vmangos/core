@@ -9,7 +9,8 @@ INSERT INTO `migrations` VALUES ('20210513193321');
 -- Add your query below.
 
 -- Fix damage and armor of starting mobs.
-UPDATE `creature_template` SET `dmg_min` = 1, `dmg_max` = 2, `armor` = 16 WHERE `entry` IN (6, 1501, 707, 1512, 2955, 3098);
+UPDATE `creature_template` SET `dmg_min` = 1, `dmg_max` = 2, `armor` = 16 WHERE `entry` IN (6, 707, 1512, 2955, 3098);
+UPDATE `creature_template` SET `dmg_min` = 1, `dmg_max` = 2, `armor` = 15 WHERE `entry` = 1501;
 
 -- End of migration.
 END IF;
