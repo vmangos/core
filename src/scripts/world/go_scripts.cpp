@@ -352,6 +352,7 @@ enum BellHourlySoundFX
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
+
     LIGHTHOUSEFOFHORN  = 7197, // Lighthouse
 };
 
@@ -366,8 +367,6 @@ enum BellHourlySoundZones
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
     ASHENVALE_ZONE           = 331,
-    WESTFALL_ZONE            = 40,
-    DUSTWALLOW_MARSH_ZONE    = 15,
 };
 
 enum BellHourlyObjects
@@ -375,6 +374,12 @@ enum BellHourlyObjects
     // bell gameobjects
     GO_HORDE_BELL = 175885,
     GO_ALLIANCE_BELL = 176573,
+};
+
+enum LightHouseBellObjectGuids
+{
+    WESTFALL_LIGHHOUSE_GUID_LOW = 42666,
+    ALCAZ_LIGHHOUSE_GUID_LOW    = 9104,
 };
 
 enum BellHourlyMisc
@@ -387,10 +392,21 @@ enum BellHourlyMisc
 
 struct go_bells : public GameObjectAI
 {
-    go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+    bool IsLighHouseHorn()
     {
-        uint32 zoneId = me->GetZoneId();
+        if (uint32 guidLow = me->GetGUIDLow())
+        {
+            // GO_ALLIANCE_BELL is used for both hourly bell and lighhouse horn -> distiguish by guid
+            return (guidLow == WESTFALL_LIGHHOUSE_GUID_LOW || guidLow == ALCAZ_LIGHHOUSE_GUID_LOW);
+        }
+        else
+        {
+            return false;
+        }
+    }
 
+    uint32 FindSoundByZone(uint32 zoneId)
+    {
         switch (me->GetEntry())
         {
             case GO_HORDE_BELL:
@@ -401,13 +417,11 @@ struct go_bells : public GameObjectAI
                     case UNDERCITY_ZONE:
                     case HILLSBRAD_FOOTHILLS_ZONE:
                     case DUSKWOOD_ZONE:
-                         _soundId = BELLTOLLHORDE;  // undead bell sound 
-                         break;
+                        return BELLTOLLHORDE;  // undead bell sound 
                     default:
-                        _soundId = BELLTOLLTRIBAL; // drum sound
-                        break;
+                        return BELLTOLLTRIBAL; // drum sound
                 }
-            break;
+                break;
             }
             case GO_ALLIANCE_BELL:
             {
@@ -415,30 +429,31 @@ struct go_bells : public GameObjectAI
                 {
                     case IRONFORGE_ZONE:
                     case DUN_MOROGH_ZONE:
-                        _soundId = BELLTOLLDWARFGNOME; // horn sound
-                        break;
+                        return BELLTOLLDWARFGNOME; // horn sound
                     case TELDRASSIL_ZONE:
                     case DARNASSUS_ZONE:
                     case ASHENVALE_ZONE:
-                        _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
-                        break;
-                    case WESTFALL_ZONE:
-                        _soundId = LIGHTHOUSEFOFHORN;   // lighthouse fog horn
-                        break;
-                    case DUSTWALLOW_MARSH_ZONE:
-                        if (me->GetAreaId() == 2079) // Alcaz Island - lighhouse fog horn
-                            _soundId = LIGHTHOUSEFOFHORN;  
-                        else
-                            _soundId = BELLTOLLALLIANCE; // Theramore - human bell sound
-                        break;
+                        return BELLTOLLNIGHTELF;   // nightelf bell sound 
                     default:
-                        _soundId = BELLTOLLALLIANCE;   // human bell sound
-                        break;
+                        return BELLTOLLALLIANCE;   // human bell sound
                 }
-            break;
+                break;
             }
         default:
             sLog.outError("go_bells() called with invalid object, ID: %u", me->GetEntry());
+            return 0;
+        }
+    }
+
+    go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+    {
+        if (IsLighHouseHorn())
+        {
+            _soundId = LIGHTHOUSEFOFHORN;
+        }
+        else
+        {
+            _soundId = FindSoundByZone(me->GetZoneId());
         }
     }
 
@@ -467,6 +482,10 @@ struct go_bells : public GameObjectAI
                     if (_rings == 0) // 00:00 and 12:00
                     {
                         _rings = 12;
+                    }
+                    if (IsLighHouseHorn())
+                    {
+                        _rings = 1; // TODO: lighthouse sound should be played once every two minutes 
                     }
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
