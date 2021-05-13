@@ -378,8 +378,9 @@ enum BellHourlyObjects
 
 enum LightHouseBellObjectGuids
 {
-    WESTFALL_LIGHHOUSE_GUID_LOW = 42666,
-    ALCAZ_LIGHHOUSE_GUID_LOW    = 9104,
+    WESTFALL_LIGHTHOUSE_HORN_GUID_LOW  = 42666,
+    ALCAZ_LIGHTHOUSE_HORN_GUID_LOW     = 9104,
+    THERAMORE_LIGHTHOUSE_HORN_GUID_LOW = 87737
 };
 
 enum BellHourlyMisc
@@ -397,7 +398,7 @@ struct go_bells : public GameObjectAI
         if (uint32 guidLow = me->GetGUIDLow())
         {
             // GO_ALLIANCE_BELL is used for both hourly bell and lighhouse horn -> distiguish by guid
-            return (guidLow == WESTFALL_LIGHHOUSE_GUID_LOW || guidLow == ALCAZ_LIGHHOUSE_GUID_LOW);
+            return (guidLow == WESTFALL_LIGHTHOUSE_HORN_GUID_LOW || guidLow == ALCAZ_LIGHTHOUSE_HORN_GUID_LOW || guidLow == THERAMORE_LIGHTHOUSE_HORN_GUID_LOW);
         }
         else
         {
