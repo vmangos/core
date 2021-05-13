@@ -1446,7 +1446,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                         damagePoint = pVictim->SpellDamageBonusTaken(this, auraSpellInfo, triggeredByAura->GetEffIndex(), damagePoint, SPELL_DIRECT_DAMAGE);
                     }
 
-                    CastCustomSpell(pVictim, spellId, dither(damagePoint), nullptr, nullptr, true, nullptr, triggeredByAura);
+                    CastCustomSpell(pVictim, spellId, dither(damagePoint), {}, {}, true, nullptr, triggeredByAura);
                     // Seal of Righteousness can proc weapon enchants. mechanic removed in 2.1.0
                     static_cast<Player*>(this)->CastItemCombatSpell(pVictim, BASE_ATTACK);
                     return SPELL_AURA_PROC_OK;                                // no hidden cooldown

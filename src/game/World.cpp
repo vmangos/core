@@ -1222,6 +1222,8 @@ void World::SetInitialWorldSettings()
         exit(1);
     }
 
+    UpdateFields::InitializeUpdateFieldFlags();
+
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
     sLog.outString();
     sLog.outString("Loading MaNGOS strings...");
@@ -1682,7 +1684,6 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize static helper structures
     AIRegistry::Initialize();
-    Player::InitVisibleBits();
 
     sLog.outString("Loading GameObject models ...");
     LoadGameObjectModelList();

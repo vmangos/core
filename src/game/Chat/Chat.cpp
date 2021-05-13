@@ -312,14 +312,16 @@ ChatCommand * ChatHandler::getCommandTable()
         { "getitemstate",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetItemStateCommand,        "", nullptr },
         { "lrecipient",     SEC_GAMEMASTER,     false, &ChatHandler::HandleDebugGetLootRecipientCommand,    "", nullptr },
         { "getitemvalue",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetItemValueCommand,        "", nullptr },
-        { "getvalue",       SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetValueCommand,            "", nullptr },
+        { "getvaluebyindex",SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetValueByIndexCommand,     "", nullptr },
+        { "getvaluebyname", SEC_DEVELOPER,      false, &ChatHandler::HandleDebugGetValueByNameCommand,      "", nullptr },
         { "moditemvalue",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugModItemValueCommand,        "", nullptr },
         { "modvalue",       SEC_DEVELOPER,      false, &ChatHandler::HandleDebugModValueCommand,            "", nullptr },
         { "play",           SEC_TICKETMASTER,   false, nullptr,                                             "", debugPlayCommandTable },
         { "send",           SEC_GAMEMASTER,     false, nullptr,                                             "", debugSendCommandTable },
         { "setaurastate",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetAuraStateCommand,        "", nullptr },
         { "setitemvalue",   SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetItemValueCommand,        "", nullptr },
-        { "setvalue",       SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetValueCommand,            "", nullptr },
+        { "setvaluebyindex",SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetValueByIndexCommand,     "", nullptr },
+        { "setvaluebyname", SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSetValueByNameCommand,     "", nullptr },
         { "spellcheck",     SEC_CONSOLE,        true,  &ChatHandler::HandleDebugSpellCheckCommand,          "", nullptr },
         { "spellcoefs",     SEC_DEVELOPER,      true,  &ChatHandler::HandleDebugSpellCoefsCommand,          "", nullptr },
         { "spellmods",      SEC_DEVELOPER,      false, &ChatHandler::HandleDebugSpellModsCommand,           "", nullptr },
@@ -405,6 +407,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "target",         SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectTargetCommand,    "", nullptr },
         { "turn",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectTurnCommand,      "", nullptr },
         { "info",           SEC_TICKETMASTER,   false, &ChatHandler::HandleGameObjectInfoCommand,      "", nullptr },
+        { "ufinfo",         SEC_DEVELOPER,      false, &ChatHandler::HandleGameObjectUpdateFieldsInfoCommand, "", nullptr },
         { "select",         SEC_TICKETMASTER,   false, &ChatHandler::HandleGameObjectSelectCommand,    "", nullptr },
         { "despawn",        SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectDespawnCommand,   "", nullptr },
         { "toggle",         SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectToggleCommand,    "", nullptr },
@@ -677,8 +680,9 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "aiinfo",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitAIInfoCommand,          "", nullptr },
         { "info",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitInfoCommand,            "", nullptr },
-        { "speedinfo",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitSpeedInfoCommand,        "", nullptr },
+        { "speedinfo",      SEC_MODERATOR,      false, &ChatHandler::HandleUnitSpeedInfoCommand,       "", nullptr },
         { "statinfo",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitStatInfoCommand,        "", nullptr },
+        { "ufinfo",         SEC_DEVELOPER,      false, &ChatHandler::HandleUnitUpdateFieldsInfoCommand,"", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 

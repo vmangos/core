@@ -29,6 +29,7 @@
 #include "SpellMgr.h"
 #include "Player.h"
 #include "PlayerAI.h"
+#include "UpdateMask.h"
 #include "Spell.h"
 #include "DynamicObject.h"
 #include "Group.h"
@@ -2926,6 +2927,25 @@ void Aura::HandleModPossess(bool apply, bool Real)
 #endif
     {
         pCaster->ModPossess(pTarget, apply, m_removeMode);
+        if (apply && pCaster->IsPlayer())
+        {
+            Player* pPlayerCaster = static_cast<Player*>(pCaster);
+            UpdateMask updateMask;
+            updateMask.SetCount(pTarget->GetValuesCount());
+            pTarget->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
+            if (updateMask.HasData())
+            {
+                UpdateData newData;
+                pTarget->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
+
+                if (newData.HasData())
+                {
+                    WorldPacket newDataPacket;
+                    newData.BuildPacket(&newDataPacket);
+                    pPlayerCaster->SendDirectMessage(&newDataPacket);
+                }
+            }
+        }
         pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
     }
 
@@ -3255,8 +3275,26 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         target->UpdateControl();
 
-        if (caster->IsPlayer())
-            static_cast<Player*>(caster)->CharmSpellInitialize();
+        if (Player* pPlayerCaster = caster->ToPlayer())
+        {
+            pPlayerCaster->CharmSpellInitialize();
+            
+            UpdateMask updateMask;
+            updateMask.SetCount(target->GetValuesCount());
+            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
+            if (updateMask.HasData())
+            {
+                UpdateData newData;
+                target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
+
+                if (newData.HasData())
+                {
+                    WorldPacket newDataPacket;
+                    newData.BuildPacket(&newDataPacket);
+                    pPlayerCaster->SendDirectMessage(&newDataPacket);
+                }
+            }
+        }
     }
     else
     {
@@ -5041,7 +5079,7 @@ void Aura::HandleAuraModAttackPower(bool apply, bool /*Real*/)
         {
             int32 attackPower = -25 * (target->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
             if (attackPower < 0)
-                target->CastCustomSpell(target, 23230, &attackPower, nullptr, nullptr, true, nullptr);
+                target->CastCustomSpell(target, 23230, attackPower, {}, {}, true, nullptr);
         }, 1);
     }
 #endif
@@ -5437,8 +5475,27 @@ void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
     if (ci && ci->type == CREATURE_TYPE_BEAST)
         target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
 
-    target->ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH);
-    target->ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH);
+    if (apply)
+    {
+        if (Player* pPlayerCaster = ToPlayer(GetCaster()))
+        {
+            UpdateMask updateMask;
+            updateMask.SetCount(target->GetValuesCount());
+            updateMask.SetBit(UNIT_FIELD_HEALTH);
+            updateMask.SetBit(UNIT_FIELD_MAXHEALTH);
+            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_SPECIAL_INFO);
+
+            UpdateData newData;
+            target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
+
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                pPlayerCaster->SendDirectMessage(&newDataPacket);
+            }
+        }
+    }
 }
 
 void Aura::HandleAuraUntrackable(bool apply, bool /*Real*/)

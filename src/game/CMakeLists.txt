@@ -179,6 +179,7 @@ set (game_SRCS
     Objects/Totem.cpp
     Objects/Unit.cpp
     Objects/UpdateData.cpp
+    Objects/UpdateFields.cpp
     OutdoorPvP/OutdoorPvPEP.cpp
     OutdoorPvP/OutdoorPvPSI.cpp
     OutdoorPvP/Register.cpp

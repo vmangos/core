@@ -19,11 +19,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
-
 #ifndef _UPDATEFIELDS_AUTO_H
 #define _UPDATEFIELDS_AUTO_H
 
+#include "Common.h"
+#include <array>
+#include <vector>
 
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
 #include "UpdateFields_1_12_1.h"
@@ -108,5 +109,54 @@ inline uint32 GetIndexOfUpdateFieldForCurrentBuild(uint32 db_index)
 
     return db_index;
 }
+
+enum UpdateFieldValueTypes
+{
+	UF_TYPE_NONE      = 0,
+	UF_TYPE_INT       = 1,
+	UF_TYPE_TWO_SHORT = 2,
+	UF_TYPE_FLOAT     = 3,
+	UF_TYPE_GUID      = 4,
+	UF_TYPE_BYTES     = 5,
+	UF_TYPE_BYTES2    = 6
+};
+
+enum UpdateFieldFlags
+{
+	UF_FLAG_NONE         = 0x000,
+	UF_FLAG_PUBLIC       = 0x001,
+	UF_FLAG_PRIVATE      = 0x002,
+	UF_FLAG_OWNER_ONLY   = 0x004,
+	UF_FLAG_UNK1         = 0x008,
+	UF_FLAG_UNK2         = 0x010,
+	UF_FLAG_SPECIAL_INFO = 0x020,
+	UF_FLAG_GROUP_ONLY   = 0x040,
+	UF_FLAG_UNK5         = 0x080,
+	UF_FLAG_DYNAMIC      = 0x100,
+};
+
+struct UpdateFieldData
+{
+    UpdateFieldData() = default;
+    UpdateFieldData(uint8 objectTypeMask_, const char* name_, uint16 offset_, uint16 size_, UpdateFieldValueTypes valueType_, uint16 flags_) :
+        objectTypeMask(objectTypeMask_), name(name_), offset(offset_), size(size_), valueType(valueType_), flags(flags_) {}
+    uint8 objectTypeMask = 0;
+    const char* name = "";
+    uint16 offset = 0;
+    uint16 size = 0;
+    UpdateFieldValueTypes valueType = UF_TYPE_NONE;
+    uint16 flags = UF_FLAG_NONE;
+};
+
+namespace UpdateFields
+{
+    extern std::vector<UpdateFieldData> const g_updateFieldsData;
+
+    void InitializeUpdateFieldFlags();
+    uint16 GetUpdateFieldFlags(uint8 objectTypeId, uint16 offset);
+    uint16 const* GetUpdateFieldFlagsArray(uint8 objectTypeId);
+    UpdateFieldData const* GetUpdateFieldDataByName(char const* name);
+    UpdateFieldData const* GetUpdateFieldDataByTypeMaskAndOffset(uint8 objectTypeMask, uint16 offset);
+};
 
 #endif

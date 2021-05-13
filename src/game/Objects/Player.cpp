@@ -409,8 +409,6 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 
 //== Player ====================================================
 
-UpdateMask Player::updateVisualBits;
-
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this),
     m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_castingSpell(0), m_repopAtGraveyardPending(false),
@@ -2667,6 +2665,11 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
         return true;
 
     // Beast Lore
+    return CanSeeSpecialInfoOf(pTarget);
+}
+
+bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
+{
     for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
     {
         if (aura->GetCasterGuid() == this->GetObjectGuid())
@@ -4168,132 +4171,7 @@ bool Player::ResetTalents(bool no_cost)
     return true;
 }
 
-void Player::_SetCreateBits(UpdateMask* updateMask, Player* target) const
-{
-    if (target == this)
-        Object::_SetCreateBits(updateMask, target);
-    else
-    {
-        for (uint16 index = 0; index < m_valuesCount; index++)
-        {
-            if (GetUInt32Value(index) != 0 && updateVisualBits.GetBit(index))
-                updateMask->SetBit(index);
-        }
-    }
-}
-
-void Player::_SetUpdateBits(UpdateMask* updateMask, Player* target) const
-{
-    if (target == this)
-        Object::_SetUpdateBits(updateMask, target);
-    else
-    {
-        Object::_SetUpdateBits(updateMask, target);
-        *updateMask &= updateVisualBits;
-    }
-}
-
-void Player::InitVisibleBits()
-{
-    updateVisualBits.SetCount(PLAYER_END);
-
-    // TODO: really implement OWNER_ONLY and GROUP_ONLY. Flags can be found in UpdateFields.h
-
-    updateVisualBits.SetBit(OBJECT_FIELD_GUID);
-    updateVisualBits.SetBit(OBJECT_FIELD_TYPE);
-    updateVisualBits.SetBit(OBJECT_FIELD_SCALE_X);
-
-    updateVisualBits.SetBit(UNIT_FIELD_CHARM);
-    updateVisualBits.SetBit(UNIT_FIELD_CHARM + 1);
-
-    updateVisualBits.SetBit(UNIT_FIELD_SUMMON);
-    updateVisualBits.SetBit(UNIT_FIELD_SUMMON + 1);
-
-    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY);
-    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY + 1);
-
-    updateVisualBits.SetBit(UNIT_FIELD_TARGET);
-    updateVisualBits.SetBit(UNIT_FIELD_TARGET + 1);
-
-    updateVisualBits.SetBit(UNIT_FIELD_CHANNEL_OBJECT);
-    updateVisualBits.SetBit(UNIT_FIELD_CHANNEL_OBJECT + 1);
-
-    updateVisualBits.SetBit(UNIT_FIELD_HEALTH);
-    updateVisualBits.SetBit(UNIT_FIELD_POWER1);
-    updateVisualBits.SetBit(UNIT_FIELD_POWER2);
-    updateVisualBits.SetBit(UNIT_FIELD_POWER3);
-    updateVisualBits.SetBit(UNIT_FIELD_POWER4);
-    updateVisualBits.SetBit(UNIT_FIELD_POWER5);
-
-    updateVisualBits.SetBit(UNIT_FIELD_MAXHEALTH);
-    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER1);
-    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER2);
-    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER3);
-    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER4);
-    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER5);
-
-    updateVisualBits.SetBit(UNIT_FIELD_LEVEL);
-    updateVisualBits.SetBit(UNIT_FIELD_FACTIONTEMPLATE);
-    updateVisualBits.SetBit(UNIT_FIELD_BYTES_0);
-    updateVisualBits.SetBit(UNIT_FIELD_FLAGS);
-    //[-ZERO] updateVisualBits.SetBit(UNIT_FIELD_FLAGS_2);
-    for (uint16 i = UNIT_FIELD_AURA; i < UNIT_FIELD_AURASTATE; ++i)
-        updateVisualBits.SetBit(i);
-    updateVisualBits.SetBit(UNIT_FIELD_AURASTATE);
-    updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME);
-    updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME + 1);
-    updateVisualBits.SetBit(UNIT_FIELD_BOUNDINGRADIUS);
-    updateVisualBits.SetBit(UNIT_FIELD_COMBATREACH);
-    updateVisualBits.SetBit(UNIT_FIELD_DISPLAYID);
-    updateVisualBits.SetBit(UNIT_FIELD_NATIVEDISPLAYID);
-    updateVisualBits.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
-    updateVisualBits.SetBit(UNIT_FIELD_BYTES_1);
-    updateVisualBits.SetBit(UNIT_FIELD_PETNUMBER);
-    updateVisualBits.SetBit(UNIT_FIELD_PET_NAME_TIMESTAMP);
-    updateVisualBits.SetBit(UNIT_DYNAMIC_FLAGS);
-    updateVisualBits.SetBit(UNIT_CHANNEL_SPELL);
-    updateVisualBits.SetBit(UNIT_MOD_CAST_SPEED);
-    updateVisualBits.SetBit(UNIT_FIELD_BYTES_2);
-
-    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER);
-    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER + 1);
-    updateVisualBits.SetBit(PLAYER_FLAGS);
-    updateVisualBits.SetBit(PLAYER_GUILDID);
-    updateVisualBits.SetBit(PLAYER_GUILDRANK);
-    updateVisualBits.SetBit(PLAYER_BYTES);
-    updateVisualBits.SetBit(PLAYER_BYTES_2);
-    updateVisualBits.SetBit(PLAYER_BYTES_3);
-    updateVisualBits.SetBit(PLAYER_DUEL_TEAM);
-    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
-
-    // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
-    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; i++)
-        updateVisualBits.SetBit(PLAYER_QUEST_LOG_1_1 + i*MAX_QUEST_OFFSET);
-
-    //Players visible items are not inventory stuff
-    //431) = 884 (0x374) = main weapon
-    for (uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
-    {
-        // item creator
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 0);
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 1);
-
-        uint16 visual_base = PLAYER_VISIBLE_ITEM_1_0 + (i * MAX_VISIBLE_ITEM_OFFSET);
-
-        // item entry
-        updateVisualBits.SetBit(visual_base + 0);
-
-        // item enchantment IDs
-        for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
-            updateVisualBits.SetBit(visual_base + 1 + j);
-
-        // random properties
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 0 + (i * MAX_VISIBLE_ITEM_OFFSET));
-        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 1 + (i * MAX_VISIBLE_ITEM_OFFSET));
-    }
-}
-
-void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Player::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const
 {
     if (target == this)
     {
@@ -18603,7 +18481,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
                 if (((Creature*)target)->IsInCombat())
                     ((Creature*)target)->GetThreatManager().modifyThreatPercent(this, -101);
 
-            target->BuildOutOfRangeUpdateBlock(&data);
+            target->BuildOutOfRangeUpdateBlock(data);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
             m_visibleGUIDs.erase(t_guid);
             lock.unlock();
@@ -18617,7 +18495,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         if (target->FindMap() && target->isWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) && target->IsVisibleForInState(this, viewPoint, false))
         {
             visibleNow.insert(target);
-            target->BuildCreateUpdateBlockForPlayer(&data, this);
+            target->BuildCreateUpdateBlockForPlayer(data, this);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
             UpdateVisibilityOf_helper(m_visibleGUIDs, target);
             lock.unlock();
@@ -19260,7 +19138,7 @@ void Player::UpdateForQuestWorldObjects()
                     if (m_visibleGobjQuestActivated[obj->GetObjectGuid()] != obj->ActivateToQuest(this))
                     {
                         ++count;
-                        obj->BuildCreateUpdateBlockForPlayer(&upd, this); //[-ZERO] we must send create packet because of GAMEOBJECT_FLAGS change (not dynamic) - probably incorrect
+                        obj->BuildCreateUpdateBlockForPlayer(upd, this); //[-ZERO] we must send create packet because of GAMEOBJECT_FLAGS change (not dynamic) - probably incorrect
                     }
         }
     }
