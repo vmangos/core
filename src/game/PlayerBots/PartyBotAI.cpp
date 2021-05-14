@@ -146,26 +146,25 @@ Player* PartyBotAI::GetPartyLeader()
         return nullptr;
 
     ObjectGuid leaderGuid = pGroup->GetLeaderGuid();
-    // In case the current leader is not the same as the last leader.
+    // In case the original leader is not the same as the last leader.
     if (leaderGuid != m_leaderGuid)
     {
-        // Check if the last leader is still in the party.
+        // Check if the original leader is still in the party.
         bool lastLeaderFound = false;
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             if (Player* pMember = itr->getSource())
             {
-                // Last leader found in the party, update leader to the current one.
+                // Original leader found in the party, update leader to the current one.
                 if (pMember->GetObjectGuid() == m_leaderGuid)
                 {
-                    m_leaderGuid = leaderGuid;
                     lastLeaderFound = true;
                     break;
                 }
             }
         }
 
-        // If the last leader is not in the party anymore, return null.
+        // If the original leader is not in the party anymore, return null.
         if (!lastLeaderFound)
             return nullptr;
     }
