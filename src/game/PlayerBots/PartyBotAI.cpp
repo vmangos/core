@@ -139,7 +139,7 @@ void PartyBotAI::LearnPremadeSpecForClass()
     }
 }
 
-Player* PartyBotAI::GetPartyLeader()
+Player* PartyBotAI::GetPartyLeader() const
 {
     Group* pGroup = me->GetGroup();
     if (!pGroup)
