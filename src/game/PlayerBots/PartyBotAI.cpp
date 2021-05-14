@@ -145,35 +145,20 @@ Player* PartyBotAI::GetPartyLeader() const
     if (!pGroup)
         return nullptr;
 
-    ObjectGuid leaderGuid = pGroup->GetLeaderGuid();
-    // In case the original leader is not the same as the current leader.
-    if (leaderGuid != m_leaderGuid)
+    if (Player* originalLeader = ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid))
     {
-        // Check if the original leader is still in the party.
-        bool originalLeaderFound = false;
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* pMember = itr->getSource())
-            {
-                // Original leader found in the party, bots can stay.
-                if (pMember->GetObjectGuid() == m_leaderGuid)
-                {
-                    originalLeaderFound = true;
-                    break;
-                }
-            }
-        }
-
-        // If the original leader is not in the party anymore, return null.
-        if (!originalLeaderFound)
+        // In case the original spawner is not in the same group as the bots anymore.
+        if (pGroup != originalLeader->GetGroup())
             return nullptr;
+
+        // In case the current leader is the bot itself and it's not inside a Battleground.
+        ObjectGuid currentLeaderGuid = pGroup->GetLeaderGuid();
+        if (currentLeaderGuid == me->GetObjectGuid() && !me->InBattleGround())
+            return nullptr;
+
+        return originalLeader;
     }
-
-    // In case the current leader is the bot itself and it's not inside a Battleground.
-    if (leaderGuid == me->GetObjectGuid() && !me->InBattleGround())
-        return nullptr;
-
-    return ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid);
+    return nullptr;
 }
 
 bool PartyBotAI::RunAwayFromTarget(Unit* pTarget)
