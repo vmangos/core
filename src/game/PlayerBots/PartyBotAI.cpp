@@ -150,7 +150,7 @@ Player* PartyBotAI::GetPartyLeader() const
     if (leaderGuid != m_leaderGuid)
     {
         // Check if the original leader is still in the party.
-        bool lastLeaderFound = false;
+        bool originalLeaderFound = false;
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             if (Player* pMember = itr->getSource())
@@ -158,14 +158,14 @@ Player* PartyBotAI::GetPartyLeader() const
                 // Original leader found in the party, bots can stay.
                 if (pMember->GetObjectGuid() == m_leaderGuid)
                 {
-                    lastLeaderFound = true;
+                    originalLeaderFound = true;
                     break;
                 }
             }
         }
 
         // If the original leader is not in the party anymore, return null.
-        if (!lastLeaderFound)
+        if (!originalLeaderFound)
             return nullptr;
     }
 
