@@ -146,7 +146,7 @@ Player* PartyBotAI::GetPartyLeader() const
         return nullptr;
 
     ObjectGuid leaderGuid = pGroup->GetLeaderGuid();
-    // In case the original leader is not the same as the last leader.
+    // In case the original leader is not the same as the current leader.
     if (leaderGuid != m_leaderGuid)
     {
         // Check if the original leader is still in the party.
@@ -155,7 +155,7 @@ Player* PartyBotAI::GetPartyLeader() const
         {
             if (Player* pMember = itr->getSource())
             {
-                // Original leader found in the party, update leader to the current one.
+                // Original leader found in the party, bots can stay.
                 if (pMember->GetObjectGuid() == m_leaderGuid)
                 {
                     lastLeaderFound = true;
