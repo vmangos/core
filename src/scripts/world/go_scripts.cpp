@@ -345,14 +345,13 @@ bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 s
 ## go_bells
 ####*/
 
-enum BellHourlySoundFX
+enum BellSoundFX
 {
     BELLTOLLHORDE      = 6595, // Undercity
     BELLTOLLTRIBAL     = 6675, // Orgrimma/Thunderbluff
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
-
     LIGHTHOUSEFOGHORN  = 7197, // Lighthouse
 };
 
@@ -369,23 +368,22 @@ enum BellHourlySoundZones
     ASHENVALE_ZONE           = 331,
 };
 
-enum BellHourlyObjects
+enum BellObjects
 {
-    // bell gameobjects
     GO_HORDE_BELL = 175885,
     GO_ALLIANCE_BELL = 176573,
 };
 
 enum LightHouseBellObjectGuids
 {
-    WESTFALL_LIGHTHOUSE_HORN_GUID_LOW  = 42666,
-    ALCAZ_LIGHTHOUSE_HORN_GUID_LOW     = 9104,
-    THERAMORE_LIGHTHOUSE_HORN_GUID_LOW = 87737
+    WESTFALL_LIGHTHOUSE_SPAWN  = 42666,
+    ALCAZ_LIGHTHOUSE_SPAWN     = 9104,
+    THERAMORE_LIGHTHOUSE_SPAWN = 87737
 };
 
-enum BellHourlyMisc
+enum BellEventMisc
 {
-    GAME_EVENT_HOURLY_BELLS = 78,
+    GAME_EVENT_RING_BELLS = 78,
     EVENT_RING_BELL = 1,
     EVENT_RESET = 2,
     EVENT_TIME = 3
@@ -393,13 +391,37 @@ enum BellHourlyMisc
 
 struct go_bells : public GameObjectAI
 {
+    /*
+    * GO_ALLIANCE_BELL object is used for both hourly bell and lighhouse horn -> distiguish them by guid
+    */
     bool IsLighHouseHorn()
     {
-        // GO_ALLIANCE_BELL is used for both hourly bell and lighhouse horn -> distiguish by guid
         if (uint32 guidLow = me->GetGUIDLow())
-            return (guidLow == WESTFALL_LIGHTHOUSE_HORN_GUID_LOW || guidLow == ALCAZ_LIGHTHOUSE_HORN_GUID_LOW || guidLow == THERAMORE_LIGHTHOUSE_HORN_GUID_LOW);
+            return (guidLow == WESTFALL_LIGHTHOUSE_SPAWN || guidLow == ALCAZ_LIGHTHOUSE_SPAWN || guidLow == THERAMORE_LIGHTHOUSE_SPAWN);
         else
             return false;
+    }
+
+    /*
+    * Event 78 is scheduled every two minutes and lasts 1 minute
+    * return true if current time is within 1 minute after a full hour
+    */
+    bool RingHourlyBell() {
+        time_t rawtime;
+        time(&rawtime);
+        struct tm* timeinfo = localtime(&rawtime);
+        return timeinfo->tm_min < 1;
+    }
+
+    /*
+    * Hourly bell ring amount is determined by the current hour
+    */
+    uint8 GetHourlyBellRingAmount() {
+        time_t rawtime;
+        time(&rawtime);
+        struct tm* timeinfo = localtime(&rawtime);
+        uint8 _rings = (timeinfo->tm_hour) % 12;
+        return (_rings == 0) ? 12 : _rings;
     }
 
     uint32 FindSoundByZone(uint32 zoneId)
@@ -442,7 +464,7 @@ struct go_bells : public GameObjectAI
         }
     }
 
-    go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+    go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), shouldRun(true)
     {
         _soundId = IsLighHouseHorn() ? LIGHTHOUSEFOGHORN : FindSoundByZone(me->GetZoneId());
     }
@@ -451,11 +473,17 @@ struct go_bells : public GameObjectAI
     {
         _events.Update(diff);
 
-        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
+        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_RING_BELLS) && shouldRun)
         {
-            // Reset
-            once = false;
-            _events.ScheduleEvent(EVENT_TIME, Seconds(1));
+            shouldRun = false; // Event lasts one minute but should get triggered only once
+
+            if (IsLighHouseHorn()) {
+                me->PlayDirectSound(_soundId);
+            }
+            else if(RingHourlyBell())
+            {
+                _events.ScheduleEvent(EVENT_RING_BELL, Seconds(1));
+            }
         }
 
         while (uint32 eventId = _events.ExecuteEvent())
@@ -464,19 +492,7 @@ struct go_bells : public GameObjectAI
             {
                 case EVENT_TIME:
                 {
-                    // Get how many times it should ring
-                    time_t rawtime;
-                    time(&rawtime);
-                    struct tm * timeinfo = localtime(&rawtime);
-                    uint8 _rings = (timeinfo->tm_hour) % 12;
-                    if (_rings == 0) // 00:00 and 12:00
-                    {
-                        _rings = 12;
-                    }
-                    if (IsLighHouseHorn())
-                    {
-                        _rings = 1; // TODO: lighthouse sound should be played once every two minutes 
-                    }
+                    uint8 _rings = GetHourlyBellRingAmount();
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                         _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
@@ -494,7 +510,7 @@ struct go_bells : public GameObjectAI
 private:
     EventMap _events;
     uint32 _soundId;
-    bool once;
+    bool shouldRun;
 };
 
 GameObjectAI* GetAI_go_bells(GameObject* gameobject)
