@@ -25,7 +25,7 @@ UPDATE `creature_template` SET `dmg_school` = 5 WHERE `entry` = 3470;
 UPDATE `creature` SET `position_x` = -9733.9384765625, `position_y` = 115.4759368896484375, `position_z` = 24.58680152893066406, `orientation` = 1.514374375343322753, `wander_distance` = 1, `movement_type` = 1 WHERE `guid` = 80647;
 UPDATE `creature` SET `position_x` = -9745.591796875, `position_y` = 87.60213470458984375, `position_z` = 12.82021617889404296, `orientation` = 1.686997294425964355, `wander_distance` = 1, `movement_type` = 1 WHERE `guid` = 80644;
 
--- Westfall - Dust Devil 
+-- Westfall - Dust Devil (credit cmangos)
 UPDATE `creature` SET `position_x` = -11115.1083984375, `position_y` = 617.48870849609375, `position_z` = 37.60480499267578125, `orientation` = 4.004544258117675781, `wander_distance` = 45 WHERE `guid` = 48554;
 UPDATE `creature` SET `position_x` = -10853.8818359375, `position_y` = 1680.4129638671875, `position_z` = 38.925048828125, `orientation` = 0.142995312809944152, `wander_distance` = 45 WHERE `guid` = 48555;
 UPDATE `creature` SET `position_x` = -10617.1201171875, `position_y` = 818.68927001953125, `position_z` = 52.3733062744140625, `orientation` = 5.45745706558227539, `wander_distance` = 45 WHERE `guid` = 48556;
