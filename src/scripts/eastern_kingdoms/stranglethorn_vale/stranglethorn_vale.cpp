@@ -169,17 +169,19 @@ enum MolthorData
 
     QUEST_THE_HEART_OF_HAKKAR           = 8183,
 
+    SPELL_MOLTHOR_HEART_THROW           = 24214,
+
     SAY_MOLTHOR_1                       = 10473,
     SAY_MOLTHOR_2                       = 10474,
     SAY_MOLTHOR_3                       = 10537
 };
 
-static float const heartPosition[4] = { -11818.55f, 1344.4f, 7.93f, 0.0f };
+static float const riftHeartPosition[4] = { -11818.29, 1345.13, 8.014503, 1.32645 };
 static int const emitterCount = 5;
 static float const emitterPositions[emitterCount][4] = {
-    { -11818.55f, 1344.40f,  7.93f, 0.0f }, // Zandalar Isle
+    { -11800.26, 1233.462, -0.576672, 3.665196 }, // Yojamba Isle (verified by sniff)
     { -11771.92f, 1273.80f,  3.96f, 0.0f },
-    { -11881.53f, 1250.42f,  6.72f, 0.0f },
+    { -11866.68, 1233.164, 3.900817, 2.111848 },  // Yojamba Isle (verified by sniff)
     { -14335.85f,  513.95f,  8.86f, 0.0f }, // Booty Bay
     { -14421.20f,  475.50f, 11.54f, 0.0f }
 };
@@ -200,22 +202,21 @@ struct npc_molthorAI : public npc_escortAI
         m_uiPhase = 0;
     }
 
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    {
+        if (pSpell->Id == SPELL_MOLTHOR_HEART_THROW)
+        {
+            m_uiTimer = 2000;
+            m_uiPhase = 1;
+        }
+    }
+
     void WaypointReached(uint32 uiPointId) override
     {
         if (uiPointId == 7)
         {
             SetEscortPaused(true);
-            m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
-            DoScriptText(SAY_MOLTHOR_2, m_creature);
-
-            float x = heartPosition[0];
-            float y = heartPosition[1];
-            float z = heartPosition[2];
-            float o = heartPosition[3];
-            m_creature->SummonCreature(NPC_HEART_OF_HAKKAR, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30000);
-
-            m_uiTimer = 20000;
-            m_uiPhase = 1;
+            m_creature->CastSpell(m_creature, SPELL_MOLTHOR_HEART_THROW, false);
         }
     }
 
@@ -232,12 +233,9 @@ struct npc_molthorAI : public npc_escortAI
             float z = emitterPosition[2];
             float o = emitterPosition[3];
 
-            GameObject *emitter = m_creature->SummonGameObject(GO_HEART_OF_HAKKAR_SPELL_EMITTER, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 5000);
-            if (emitter) {
-                emitter->SetOwnerGuid(ObjectGuid()); // FIXME
+            if (GameObject *emitter = m_creature->SummonGameObject(GO_HEART_OF_HAKKAR_SPELL_EMITTER, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 5000))
+                // Why?
                 emitter->Use(player);
-                emitter->SetOwnerGuid(m_creature->GetObjectGuid());
-            }
         }
     }
 
@@ -250,14 +248,28 @@ struct npc_molthorAI : public npc_escortAI
                 switch (m_uiPhase)
                 {
                     case 1:
+                        m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        DoScriptText(SAY_MOLTHOR_2, m_creature);
+
+                        m_creature->SummonCreature(NPC_HEART_OF_HAKKAR,
+                                riftHeartPosition[0],
+                                riftHeartPosition[1],
+                                riftHeartPosition[2],
+                                riftHeartPosition[3],
+                                TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30000);
+
+                        m_uiTimer = 20000;
+                        m_uiPhase = 2;
+                        break;
+                    case 2:
                         m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
                         m_creature->MonsterYellToZone(SAY_MOLTHOR_3, 0, GetPlayerForEscort());
                         SummonSpellEmitters();
 
                         m_uiTimer = 5000;
-                        m_uiPhase = 2;
+                        m_uiPhase = 3;
                         break;
-                    case 2:
+                    case 3:
                         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
                         m_creature->SetWalk(false);
                         SetEscortPaused(false);
@@ -289,7 +301,7 @@ bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, Quest const
 
     if (pQuest->GetQuestId() == QUEST_THE_HEART_OF_HAKKAR && molthorAI)
     {
-        molthorAI->Start(false, pPlayer->GetObjectGuid(), nullptr, true);
+        molthorAI->Start(true, pPlayer->GetObjectGuid(), nullptr, true);
         pCreature->MonsterSay(SAY_MOLTHOR_1);
     }
 
@@ -314,12 +326,13 @@ enum HeartOfHakkarData
     GO_HEART_OF_HAKKAR_OBJECT                   = 180402
 };
 
+static float const heartPosition[4] = { -11818.35, 1344.856, 4.266753, 0.0 };
 static int const servantCount = 4;
 static float const servantPositions[servantCount][4] = {
-    {-11817.5f, 1325.0f, 1.46f, 1.58f},
-    {-11831.3f, 1331.3f, 1.84f, 0.75f},
-    {-11834.8f, 1349.4f, 2.01f, 6.00f},
-    {-11800.9f, 1335.2f, 1.26f, 2.65f}
+    { -11817.91, 1325.021, 1.559013, 1.518436 },
+    { -11831.73, 1331.291, 1.938519, 0.9424778 },
+    { -11835.16, 1349.36, 2.110108, 6.056293 },
+    { -11801.4, 1335.381, 1.36269, 2.617994 }
 };
 
 struct npc_heart_of_hakkarAI : public ScriptedAI
@@ -364,9 +377,10 @@ struct npc_heart_of_hakkarAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_CREATE_HEART_OF_HAKKAR_RIFT, true);
             m_creature->CastSpell(m_creature, SPELL_HEART_OF_HAKKAR_BANNING, true);
 
-            float x, y, z;
-            m_creature->GetPosition(x, y, z);
-            float o = m_creature->GetOrientation();
+            float x = heartPosition[0];
+            float y = heartPosition[1];
+            float z = heartPosition[2];
+            float o = heartPosition[3];
             m_creature->SummonGameObject(GO_HEART_OF_HAKKAR_OBJECT, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 30000);
 
             SummonServants();
