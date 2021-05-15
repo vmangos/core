@@ -470,33 +470,21 @@ struct go_bells : public GameObjectAI
             shouldRun = false; // Event lasts one minute but should get triggered only once
 
             if (IsLighHouseHorn()) {
-                me->PlayDirectSound(_soundId);
+                _events.ScheduleEvent(EVENT_RING_BELL, Seconds(1));
             }
             else if (RingHourlyBell())
             {
-                _events.ScheduleEvent(EVENT_RING_BELL, Seconds(1));
+                uint8 _rings = GetHourlyBellRingAmount();
+                // Schedule ring event
+                for (auto i = 0; i < _rings; ++i)
+                    _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
             }
         }
 
         while (uint32 eventId = _events.ExecuteEvent())
         {
-            switch (eventId)
-            {
-                case EVENT_TIME:
-                {
-                    uint8 _rings = GetHourlyBellRingAmount();
-                    // Schedule ring event
-                    for (auto i = 0; i < _rings; ++i)
-                        _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
-
-                    break;
-                }
-                case EVENT_RING_BELL:
-                    me->PlayDirectSound(_soundId);
-                    break;
-                default:
-                    break;
-            }
+            if (eventId == EVENT_RING_BELL)
+                me->PlayDirectSound(_soundId);
         }
     }
 private:
