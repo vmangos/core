@@ -10,6 +10,7 @@ INSERT INTO `migrations` VALUES ('20210513142444');
  
 UPDATE `game_event` SET `occurence`=2, `description`='Go Bells' WHERE `entry`=78; 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('87737','176573','1','-3667.09','-4754','1.80047','2.26892','0','0','0.906307','0.422619','900','900','100','1','0','0','0','10');
+INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES ('87737','78');
 
 -- End of migration.
 END IF;
