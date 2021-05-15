@@ -13818,12 +13818,12 @@ void Player::AdjustQuestReqItemCount(Quest const* pQuest, QuestStatusData& quest
     {
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
-            uint32 reqitemcount = pQuest->ReqItemCount[i];
-            if (reqitemcount != 0)
+            uint32 reqItemCount = pQuest->ReqItemCount[i];
+            if (reqItemCount != 0)
             {
-                uint32 curitemcount = GetItemCount(pQuest->ReqItemId[i], true);
+                uint32 curItemCount = GetItemCount(pQuest->ReqItemId[i], true);
 
-                questStatusData.m_itemcount[i] = std::min(curitemcount, reqitemcount);
+                questStatusData.m_itemcount[i] = std::min(curItemCount, reqItemCount);
                 if (questStatusData.uState != QUEST_NEW) questStatusData.uState = QUEST_CHANGED;
             }
         }
@@ -13920,18 +13920,19 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
             uint32 reqitem = qInfo->ReqItemId[j];
             if (reqitem == entry)
             {
-                uint32 reqitemcount = qInfo->ReqItemCount[j];
-                uint32 curitemcount = q_status.m_itemcount[j];
-                if (curitemcount < reqitemcount)
+                uint32 reqItemCount = qInfo->ReqItemCount[j];
+                uint32 curItemCount = q_status.m_itemcount[j];
+                if (curItemCount < reqItemCount)
                 {
-                    uint32 additemcount = (curitemcount + count <= reqitemcount ? count : reqitemcount - curitemcount);
-                    q_status.m_itemcount[j] += additemcount;
+                    uint16 newItemCount = std::min<uint16>(q_status.m_itemcount[j] + count, reqItemCount);
+                    q_status.m_itemcount[j] = newItemCount;
                     if (q_status.uState != QUEST_NEW)
                         q_status.uState = QUEST_CHANGED;
 
                     if (entry != qInfo->GetSrcItemId())
-                        SendQuestUpdateAddItem(qInfo, j, curitemcount, additemcount);
+                        SendQuestUpdateAddItem(qInfo, j, curItemCount, newItemCount - curItemCount);
                 }
+
                 if (CanCompleteQuest(questid))
                     CompleteQuest(questid);
                 break;
@@ -13970,8 +13971,9 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     curItemCount = GetItemCount(entry, false);
 
                 uint16 newItemCount = (count > curItemCount) ? 0 : curItemCount - count;
+                newItemCount = std::min<uint16>(newItemCount, reqItemCount);
 
-                if (newItemCount < reqItemCount)
+                if (newItemCount != reqItemCount)
                 {
                     q_status.m_itemcount[j] = newItemCount;
                     if (q_status.uState != QUEST_NEW)
