@@ -345,18 +345,17 @@ bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 s
 ## go_bells
 ####*/
 
-enum BellSoundFX
+enum
 {
+    // Sounds
     BELLTOLLHORDE      = 6595, // Undercity
     BELLTOLLTRIBAL     = 6675, // Orgrimma/Thunderbluff
     BELLTOLLALLIANCE   = 6594, // Stormwind
     BELLTOLLNIGHTELF   = 6674, // Darnassus
     BELLTOLLDWARFGNOME = 7234, // Ironforge
     LIGHTHOUSEFOGHORN  = 7197, // Lighthouse
-};
 
-enum BellHourlySoundZones
-{
+    // Zones
     TIRISFAL_ZONE            = 85,
     UNDERCITY_ZONE           = 1497,
     HILLSBRAD_FOOTHILLS_ZONE = 267,
@@ -366,27 +365,20 @@ enum BellHourlySoundZones
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
     ASHENVALE_ZONE           = 331,
-};
 
-enum BellObjects
-{
-    GO_HORDE_BELL = 175885,
+    // Gameobjects
+    GO_HORDE_BELL    = 175885,
     GO_ALLIANCE_BELL = 176573,
-};
 
-enum LightHouseBellObjectGuids
-{
+    // Lighthouse spawns (objects guids)
     WESTFALL_LIGHTHOUSE_SPAWN  = 42666,
     ALCAZ_LIGHTHOUSE_SPAWN     = 9104,
-    THERAMORE_LIGHTHOUSE_SPAWN = 87737
-};
+    THERAMORE_LIGHTHOUSE_SPAWN = 87737,
 
-enum BellEventMisc
-{
+    // Event 
     GAME_EVENT_RING_BELLS = 78,
-    EVENT_RING_BELL = 1,
-    EVENT_RESET = 2,
-    EVENT_TIME = 3
+    EVENT_RING_BELL       = 1,
+    EVENT_TIME            = 2
 };
 
 struct go_bells : public GameObjectAI
@@ -480,7 +472,7 @@ struct go_bells : public GameObjectAI
             if (IsLighHouseHorn()) {
                 me->PlayDirectSound(_soundId);
             }
-            else if(RingHourlyBell())
+            else if (RingHourlyBell())
             {
                 _events.ScheduleEvent(EVENT_RING_BELL, Seconds(1));
             }
