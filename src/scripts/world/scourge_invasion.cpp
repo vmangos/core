@@ -1223,68 +1223,31 @@ struct FlameshockerAI : public ScriptedAI
     FlameshockerAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
-        _touchTimer = 5000;
+        t_touchTimer = 5000;
         m_creature->CastSpell(m_creature, SPELL_MINION_SPAWN_IN, true);
     }
 
-    uint32 _touchTimer;
-    int _pos;
-    ObjectGuid _pallidHorror;
-    bool _enableAutoMove;
+    uint32 t_touchTimer;
 
-    void Reset() override
-    {
-    }
-
-    void InformGuid(ObjectGuid const guid, uint32 type) override
-    {
-        _enableAutoMove = false;
-        _pallidHorror = guid;
-        _pos = type;
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (m_creature->GetLevel() > who->GetLevel())
-            return;
-
-        ScriptedAI::MoveInLineOfSight(who);
-    }
+    void Reset() override {}
 
     void JustDied(Unit* killer) override
     {
-        m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, false);
+        m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
     }
 
     void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-        {
-            if (!_enableAutoMove && _pos)
-            {
-                if (Creature* pallid = m_creature->GetMap()->GetCreature(_pallidHorror))
-                {
-                    if (!pallid->IsAlive())
-                        _enableAutoMove = true;
-
-                    else if (pallid->GetVictim())
-                        AttackStart(pallid->GetVictim());
-                    else if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                        //m_creature->GetMotionMaster()->MoveFollow(pallid, 7.0f + float(_pos), pallid->GetOrientation() - float(_pos));
-                        m_creature->GetMotionMaster()->MoveFollow(pallid, rand_norm_f() * 7.0f, rand_norm_f() * pallid->GetOrientation());
-                }
-                else
-                    _enableAutoMove = true;
-            }
             return;
-        }
-        if (_touchTimer < diff)
+
+        if (t_touchTimer < diff)
         {
             m_creature->CastSpell(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), false);
-            _touchTimer = urand(30000, 45000);
+            t_touchTimer = urand(30000, 45000);
         }
         else
-            _touchTimer -= diff;
+            t_touchTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -1294,256 +1257,6 @@ CreatureAI* GetAI_Flameshocker(Creature* pCreature)
 {
     return new FlameshockerAI(pCreature);
 }
-
-struct Waypoint
-{
-    float x, y, z;
-};
-
-/*
-UNDERCITY:
-    We have tons of sniffs from Undercity attacks but none of them provided a fully useful path.
-    It was so buggy on Classic, they sometimes walked through the slime/walls or was being teleported.
-    I just used existing points and made a smoother path out from them to avoid glitches.
-    Even do the guard spawns are all sniffed positions.
-
-STORMWIND:
-    Only 2 sniffs: One contains the spawning in the cathedral 
-*/
-
-static Waypoint UC_ROYAL_QUARTER[84] =
-{
-    { 1595.87f, 440.539f, -46.3349f },
-    { 1596.31f, 423.029f, -46.3778f },
-    { 1610.27f, 423.259f, -50.0263f }, // Point 3: Undercity Guardian yell.
-    { 1629.88f, 418.703f, -62.177f },
-    { 1650.95f, 411.419f, -62.1831f },
-    { 1670.03f, 404.699f, -62.2483f },
-    { 1687.78f, 396.745f, -62.2617f },
-    { 1703.4f, 386.384f, -62.2505f },
-    { 1717.13f, 374.997f, -60.4845f },
-    { 1725.13f, 361.133f, -60.4557f },
-    { 1735.44f, 346.68f, -55.3936f },
-    { 1721.12f, 335.477f, -49.1034f },
-    { 1706.4f, 323.993f, -55.3924f },
-    { 1713.81f, 314.246f, -60.4844f },
-    { 1722.32f, 295.352f, -62.1798f },
-    { 1728.37f, 272.866f, -61.6201f },
-    { 1730.86f, 250.549f, -62.1777f },
-    { 1729.47f, 230.14f, -62.1777f }, // Point 18: Undercity Guardian spawn at Magic Quarter.
-    { 1728.91f, 211.987f, -62.1777f },
-    { 1724.01f, 196.06f, -62.1673f },
-    { 1715.0f, 183.91f, -60.7465f },
-    { 1705.2f, 166.123f, -60.7537f },
-    { 1693.06f, 152.059f, -60.4587f },
-    { 1680.31f, 139.585f, -60.4733f },
-    { 1666.97f, 127.432f, -61.4838f },
-    { 1651.3f, 118.051f, -62.1852f },
-    { 1634.15f, 110.304f, -62.176f },
-    { 1615.89f, 107.167f, -62.1777f },
-    { 1595.27f, 105.904f, -62.1777f },
-    { 1576.85f, 106.54f, -62.1777f },
-    { 1558.62f, 109.038f, -61.6201f },
-    { 1540.96f, 112.373f, -62.1617f },
-    { 1524.37f, 120.455f, -57.152f },
-    { 1515.42f, 104.457f, -50.8842f },
-    { 1507.07f, 89.634f, -57.1527f },
-    { 1520.19f, 81.4421f, -62.2815f },
-    { 1521.56f, 76.7099f, -62.2471f },
-    { 1506.54f, 73.0501f, -62.3003f }, // Point 38: Undercity Guardian spawn at Rogues' Quarter.
-    { 1490.78f, 67.2422f, -62.2974f },
-    { 1472.25f, 63.311f, -62.293f },
-    { 1457.8f, 61.1015f, -62.2885f },
-    { 1447.28f, 73.729f, -62.2809f },
-    { 1442.61f, 89.6069f, -62.2834f },
-    { 1432.86f, 103.294f, -62.2842f },
-    { 1427.36f, 117.403f, -62.2877f },
-    { 1426.9f, 132.98f, -62.2903f },
-    { 1430.89f, 149.441f, -62.2896f },
-    { 1430.33f, 165.852f, -62.281f },
-    { 1425.32f, 183.38f, -62.1718f },
-    { 1420.61f, 200.958f, -62.1764f },
-    { 1417.63f, 217.744f, -62.1757f },
-    { 1419.21f, 234.299f, -62.1757f },
-    { 1418.15f, 251.79f, -62.1757f },
-    { 1418.42f, 270.026f, -62.1759f },
-    { 1423.11f, 289.095f, -61.6205f },
-    { 1428.88f, 307.508f, -62.1991f },
-    { 1431.87f, 324.341f, -62.2013f },
-    { 1432.94f, 338.861f, -62.1865f },
-    { 1443.0f, 344.618f, -62.1865f }, // Point 59: Royal Dreadguard spawn at Royal Quarter.
-    { 1456.11f, 350.818f, -62.1865f },
-    { 1470.17f, 365.817f, -61.4033f },
-    { 1461.28f, 377.181f, -59.4519f },
-    { 1449.48f, 389.736f, -58.5778f },
-    { 1437.61f, 402.807f, -57.8187f },
-    { 1425.36f, 414.954f, -56.6535f },
-    { 1412.12f, 427.158f, -54.9935f },
-    { 1398.2f, 433.61f, -54.243f },
-    { 1384.36f, 437.955f, -53.0123f },
-    { 1365.92f, 437.861f, -53.5641f },
-    { 1348.95f, 433.379f, -55.8545f },
-    { 1334.71f, 424.774f, -57.0933f },
-    { 1322.35f, 413.715f, -60.6617f },
-    { 1313.64f, 399.056f, -62.1902f }, // Point 73: Royal Dreadguards spawn at Royal Quarter.
-    { 1308.34f, 383.882f, -65.6439f },
-    { 1304.13f, 366.352f, -67.2922f },
-    { 1300.04f, 350.397f, -65.0273f },
-    { 1289.35f, 351.013f, -65.0278f },
-    { 1273.67f, 349.216f, -65.0273f },
-    { 1262.04f, 342.62f, -65.0273f },
-    { 1260.69f, 332.208f, -65.0273f },
-    { 1272.49f, 329.424f, -60.7714f },
-    { 1280.7f, 326.63f, -60.083f },
-    { 1292.7f, 323.681f, -58.1936f },
-    { 1290.89f, 318.135f, -57.3209f }
-};
-
-static Waypoint UC_TRADE_QUARTER[25] =
-{
-    { 1660.98f, 257.238f, -62.1777f },
-    { 1659.01f, 234.474f, -62.1776f },
-    { 1657.83f, 213.584f, -62.179f }, // guard spawn 1
-    { 1643.68f, 189.256f, -62.1817f },
-    { 1614.92f, 175.086f, -62.1779f },
-    { 1582.18f, 171.914f, -62.1777f },
-    { 1554.78f, 185.782f, -62.1812f },
-    { 1555.19f, 199.377f, -60.7729f },
-    { 1572.48f, 216.876f, -58.8445f }, // guard spawn 2 & 3
-    { 1583.42f, 229.032f, -62.0874f },
-    { 1579.97f, 239.346f, -62.0773f },
-    { 1593.38f, 260.254f, -57.1617f },
-    { 1595.97f, 250.856f, -52.3559f },
-    { 1603.33f, 248.817f, -52.1495f },
-    { 1629.47f, 238.688f, -43.1705f },
-    { 1632.91f, 233.36f, -43.1027f }, // repeat route start
-    { 1608.15f, 202.839f, -43.1027f }, // point not sniffed i made it.
-    { 1581.31f, 204.956f, -43.1025f },
-    { 1560.33f, 225.354f, -43.1026f },
-    { 1558.61f, 241.44f, -43.1027f },
-    { 1561.27f, 255.781f, -43.1027f },
-    { 1568.61f, 264.061f, -43.1027f },
-    { 1578.92f, 273.572f, -43.1027f },
-    { 1585.38f, 276.608f, -43.1027f },
-    { 1605.34f, 276.451f, -43.1027f }
-};
-
-static Waypoint SW_STORMWIND_KEEP[63] =
-{
-    { -8578.15f, 886.382f, 87.3148f },
-    { -8572.33f, 891.446f, 90.5657f },
-    { -8563.04f, 899.269f, 96.6788f },
-    { -8555.95f, 884.783f, 96.6783f },
-    { -8542.66f, 867.854f, 96.6783f },
-    { -8537.06f, 874.458f, 99.2625f },
-    { -8542.93f, 880.46f, 104.552f },
-    { -8548.92f, 876.704f, 106.524f },
-    { -8542.38f, 867.274f, 106.512f },
-    { -8536.41f, 859.488f, 106.517f },
-    { -8529.11f, 848.891f, 106.518f },
-    { -8543.21f, 837.751f, 106.519f },
-    { -8565.04f, 820.213f, 106.519f },
-    { -8571.91f, 826.202f, 106.519f },
-    { -8586.11f, 815.583f, 106.519f },
-    { -8580.93f, 808.041f, 106.519f },
-    { -8601.33f, 791.578f, 102.811f },
-    { -8621.13f, 776.266f, 96.6547f },
-    { -8610.31f, 762.295f, 96.715f },
-    { -8624.94f, 749.4f, 96.7828f },
-    { -8639.49f, 738.36f, 96.7414f },
-    { -8655.86f, 746.781f, 96.7052f },
-    { -8671.82f, 736.17f, 97.0165f },
-    { -8685.05f, 725.799f, 97.0165f },
-    { -8699.54f, 714.53f, 97.0165f },
-    { -8714.11f, 733.96f, 97.813f },
-    { -8731.33f, 722.331f, 101.63f },
-    { -8744.25f, 711.71f, 98.1549f },
-    { -8735.21f, 700.475f, 98.6702f },
-    { -8753.96f, 686.319f, 100.684f },
-    { -8776.11f, 669.285f, 103.093f },
-    { -8768.78f, 658.575f, 103.625f },
-    { -8760.37f, 643.272f, 103.653f },
-    { -8758.75f, 626.728f, 101.694f },
-    { -8769.92f, 610.26f, 97.2663f },
-    { -8758.94f, 596.89f, 97.1478f },
-    { -8747.9f, 586.275f, 97.3992f },
-    { -8736.55f, 575.225f, 97.4031f },
-    { -8748.02f, 562.574f, 97.3997f },
-    { -8739.89f, 550.461f, 99.9476f },
-    { -8730.44f, 540.375f, 101.111f },
-    { -8713.66f, 519.654f, 97.1521f },
-    { -8700.01f, 530.227f, 97.6974f },
-    { -8686.61f, 542.933f, 97.7601f },
-    { -8672.39f, 551.799f, 97.2354f },
-    { -8657.3f, 553.295f, 96.9416f },
-    { -8643.34f, 542.019f, 98.7145f },
-    { -8627.36f, 527.206f, 101.369f },
-    { -8611.94f, 511.795f, 103.528f },
-    { -8596.38f, 497.495f, 103.833f },
-    { -8582.07f, 482.163f, 104.213f },
-    { -8568.19f, 469.161f, 104.477f },
-    { -8551.41f, 468.726f, 104.482f },
-    { -8543.94f, 462.434f, 104.357f },
-    { -8532.42f, 447.647f, 104.917f },
-    { -8519.31f, 431.264f, 106.434f },
-    { -8505.21f, 413.217f, 108.386f },
-    { -8491.85f, 396.662f, 108.386f },
-    { -8477.43f, 378.41f, 112.22f },
-    { -8464.87f, 362.768f, 117.234f },
-    { -8454.62f, 350.008f, 120.886f },
-    { -8446.94f, 340.441f, 121.329f },
-    { -8440.03f, 331.669f, 122.579f }
-};
-
-enum CityAttack
-{
-    MAX_UNDERCITY_GUARDIANS = 3,
-    MAX_UNDERCITY_ELITE_GUARDIANS = 6,
-    MAX_ROYAL_DREADGUARDS_ENTRANCE = 1,
-    MAX_ROYAL_DREADGUARDS_THRONE_ROOM = 4,
-    MAX_UNDERCITY_GUARDIANS_MAGIC_QUARTER = 1,
-    MAX_UNDERCITY_GUARDIANS_ROGUE_QUARTER = 1
-};
-
-static const Position UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[MAX_UNDERCITY_GUARDIANS_MAGIC_QUARTER] =
-{
-    { 1720.11f, 191.195f, -62.0651f, 1.02974f }
-};
-
-static const Position UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[MAX_UNDERCITY_GUARDIANS_ROGUE_QUARTER] =
-{
-    { 1472.94f, 63.9248f, -62.2098f, 0.401426f }
-};
-
-static const Position UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[MAX_ROYAL_DREADGUARDS_ENTRANCE] =
-{
-    { 1466.95f, 369.392f, -59.3685f, 4.41568f }
-};
-
-static const Position UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[MAX_ROYAL_DREADGUARDS_THRONE_ROOM] =
-{
-    { 1305.82f, 351.934f, -65.8778f, 1.69297f },
-    { 1302.63f, 352.871f, -65.9109f, 1.309f },
-    { 1299.49f, 353.789f, -65.9394f, 1.16937f },
-    { 1295.97f, 354.728f, -65.9162f, 0.907571f }
-};
-
-static const Position UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[MAX_UNDERCITY_GUARDIANS] =
-{
-    { 1649.6f, 197.414f, -62.0981f, 1.06465f },
-    { 1651.49f, 192.836f, -62.0972f, 1.20428f },
-    { 1645.86f, 196.746f, -62.0994f, 1.01229f }
-};
-
-static const Position UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[MAX_UNDERCITY_ELITE_GUARDIANS] =
-{
-    { 1632.55f, 233.419f, -43.0193f, 2.6529f },
-    { 1633.06f, 246.891f, -43.0193f, 3.59538f },
-    { 1576.53f, 243.989f, -61.994f, 4.76475f },
-    { 1578.96f, 237.109f, -61.994f, 4.53786f },
-    { 1635.93f, 240.378f, -43.0193f, 3.24631f },
-    { 1583.21f, 241.365f, -61.994f, 4.45059f }
-};
 
 struct PallidHorrorAI : public ScriptedAI
 {
@@ -1556,48 +1269,76 @@ struct PallidHorrorAI : public ScriptedAI
             for (int i = 0; i < amountShockers; ++i)
                 if (Creature* flame = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0, true))
                 {
-                    //float angle = (float(i) * (M_PI / (amountShockers / 2))) + m_creature->GetOrientation();
-                    //flame->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
-                    _flameshockers.insert(flame->GetObjectGuid());
-                    flame->AI()->InformGuid(m_creature->GetObjectGuid(), i);
+                    float angle = (float(i) * (M_PI / (amountShockers / 2))) + m_creature->GetOrientation();
+                    flame->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
+                    m_flameshockers.insert(flame->GetObjectGuid());
+                    //flame->AI()->InformGuid(m_creature->GetObjectGuid(), i);
                 }
         }
 
         m_events.Reset();
-        LastWayPoint = 0;
         m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after a crystal spawns.
         m_events.ScheduleEvent(EVENT_PALLID_RANDOM_YELL, 5000);
+        m_events.ScheduleEvent(EVENT_PALLID_RANDOM_SAY, 5000);
         m_events.ScheduleEvent(EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS, 5000);
+        Reset();
     }
 
     EventMap m_events;
 
-    std::set<ObjectGuid> _flameshockers;
-    std::set<ObjectGuid> _magic_quarter_undercity_guardians;
-    std::set<ObjectGuid> _rogue_quarter_undercity_guardians;
-    std::set<ObjectGuid> _outside_trade_quarter_undercity_guardians;
-    std::set<ObjectGuid> _undercity_elite_guardians;
-    std::set<ObjectGuid> _royal_dreadguards_entrance;
-    std::set<ObjectGuid> _royal_dreadguards_throne_room;
+    bool b_citizens = false;
+    bool b_bolvar = false;
+    std::set<ObjectGuid> m_flameshockers;
+    std::set<ObjectGuid> m_magic_quarter_undercity_guardians;
+    std::set<ObjectGuid> m_rogue_quarter_undercity_guardians;
+    std::set<ObjectGuid> m_outside_trade_quarter_undercity_guardians;
+    std::set<ObjectGuid> m_inside_trade_quarter_undercity_elite_guardians;
+    std::set<ObjectGuid> m_royal_quarter_royal_dreadguards_entrance;
+    std::set<ObjectGuid> m_royal_quarter_royal_dreadguards_throne_room;
+    std::set<ObjectGuid> m_cathedral_stormwind_city_guard;
+    std::set<ObjectGuid> m_trade_district_stormwind_elite_guards;
 
-    uint32 _yellTimer = 5000;
-    uint32 _damage_vs_guards_timer = 5000;
-    uint32 LastWayPoint = 1;
-    uint32 Route = 0;
+    uint32 LastWayPoint;
+    uint32 Route;
+    uint32 MaxWayPoints;
 
     void Reset() override
     {
+        sLog.outBasic("[PallidHorrorAI:Reset] LastWayPoint: %d", LastWayPoint);
+
         m_creature->AddAura(SPELL_AURA_OF_FEAR);
 
-        if (Route == 0)
+        if (m_creature->GetZoneId() == ZONEID_UNDERCITY)
         {
-            if (LastWayPoint < 84)
-                m_creature->GetMotionMaster()->MovePoint(LastWayPoint + 1, UC_ROYAL_QUARTER[LastWayPoint + 1].x, UC_ROYAL_QUARTER[LastWayPoint + 1].y, UC_ROYAL_QUARTER[LastWayPoint + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
+            if (Route == 0)
+            {
+                MaxWayPoints = 82;
+                if (LastWayPoint < MaxWayPoints)
+                    m_creature->GetMotionMaster()->MovePoint(LastWayPoint, UC_ROYAL_QUARTER[LastWayPoint].x, UC_ROYAL_QUARTER[LastWayPoint].y, UC_ROYAL_QUARTER[LastWayPoint].z, MOVE_PATHFINDING + MOVE_RUN_MODE);
+            }
+            else if (Route == 1)
+            {
+                MaxWayPoints = 25;
+                if (LastWayPoint < MaxWayPoints)
+                    m_creature->GetMotionMaster()->MovePoint(LastWayPoint, UC_TRADE_QUARTER[LastWayPoint].x, UC_TRADE_QUARTER[LastWayPoint].y, UC_TRADE_QUARTER[LastWayPoint].z, MOVE_PATHFINDING + MOVE_RUN_MODE);
+            }
         }
-        else if (Route == 1)
+        else if (m_creature->GetZoneId() == ZONEID_STORMWIND)
         {
-            if (LastWayPoint < 25)
-                m_creature->GetMotionMaster()->MovePoint(LastWayPoint + 1, UC_TRADE_QUARTER[LastWayPoint + 1].x, UC_TRADE_QUARTER[LastWayPoint + 1].y, UC_TRADE_QUARTER[LastWayPoint + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
+            if (Route == 0)
+            {
+                MaxWayPoints = 36;
+                if (LastWayPoint < MaxWayPoints)
+                    m_creature->GetMotionMaster()->MovePoint(LastWayPoint, SW_STORMWIND_KEEP[LastWayPoint].x, SW_STORMWIND_KEEP[LastWayPoint].y, SW_STORMWIND_KEEP[LastWayPoint].z, MOVE_PATHFINDING + MOVE_RUN_MODE);
+            }
+            /*
+            else if (Route == 1)
+            {
+                MaxWayPoints = 25;
+                if (LastWayPoint < MaxWayPoints)
+                    m_creature->GetMotionMaster()->MovePoint(LastWayPoint + 1, UC_TRADE_QUARTER[LastWayPoint + 1].x, UC_TRADE_QUARTER[LastWayPoint + 1].y, UC_TRADE_QUARTER[LastWayPoint + 1].z, MOVE_PATHFINDING);
+            }
+            */
         }
     }
 
@@ -1607,29 +1348,37 @@ struct PallidHorrorAI : public ScriptedAI
         Reset();
     }
 
-    void MoveInLineOfSight(Unit* who) override
+    void MoveInLineOfSight(Unit* pWho) override
     {
-        if (who->GetEntry() == NPC_UNDERCITY_GUARDIAN || who->GetEntry() == NPC_STORMWIND_GARNISON_GUARD)
-            if (m_creature->IsWithinDist(who, VISIBILITY_DISTANCE_TINY))
-                who->SetInCombatWith(m_creature);
+        if (pWho->GetEntry() == NPC_ROYAL_DREADGUARD || pWho->GetEntry() == NPC_STORMWIND_ROYAL_GUARD || pWho->GetEntry() == NPC_UNDERCITY_ELITE_GUARDIAN || pWho->GetEntry() == NPC_UNDERCITY_GUARDIAN || pWho->GetEntry() == NPC_DEATHGUARD_ELITE || pWho->GetEntry() == NPC_STORMWIND_CITY_GUARD)
+            if (m_creature->IsWithinDistInMap(pWho, 15.0f) && m_creature->IsWithinLOSInMap(pWho))
+                pWho->SetInCombatWith(m_creature);
 
-        // low levels seems to be ignored.
-        if (55 > who->GetLevel())
-            return;
+        // Every NPC who is saysing a random text in LoS has the UNIT_FLAG_IMMUNE_TO_NPC flag.
+        if (b_citizens && m_creature->IsWithinDistInMap(pWho, VISIBILITY_DISTANCE_TINY) && pWho->GetCreatureType() == CREATURE_TYPE_HUMANOID && pWho->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+        {
+            if (pWho->GetZoneId() == ZONEID_UNDERCITY)
+                DoScriptText(PickRandomValue(LANG_UNDERCITY_RANDOM_1, LANG_UNDERCITY_RANDOM_2, LANG_UNDERCITY_RANDOM_3, LANG_UNDERCITY_RANDOM_4, LANG_UNDERCITY_RANDOM_5, LANG_UNDERCITY_RANDOM_6, LANG_UNDERCITY_RANDOM_7, LANG_UNDERCITY_RANDOM_8, LANG_UNDERCITY_RANDOM_9), pWho, m_creature);
 
-        ScriptedAI::MoveInLineOfSight(who);
+            if (pWho->GetZoneId() == ZONEID_STORMWIND)
+                DoScriptText(PickRandomValue(LANG_STORMWIND_RANDOM_1, LANG_STORMWIND_RANDOM_2, LANG_STORMWIND_RANDOM_3, LANG_STORMWIND_RANDOM_4, LANG_STORMWIND_RANDOM_5, LANG_STORMWIND_RANDOM_6, LANG_STORMWIND_RANDOM_7, LANG_STORMWIND_RANDOM_8, LANG_STORMWIND_RANDOM_9), pWho, m_creature);
+
+            b_citizens = false;
+        }
+
+        ScriptedAI::MoveInLineOfSight(pWho);
     }
 
     void JustDied(Unit* killer) override
     {
         if (Creature* HIGHLORD_BOLVAR_FORDRAGON = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
-            HIGHLORD_BOLVAR_FORDRAGON->MonsterYellToZone(LANG_STORMWIND_BOLVAR_2);
+            DoScriptText(LANG_STORMWIND_BOLVAR_2, HIGHLORD_BOLVAR_FORDRAGON, m_creature);
 
         if (Creature* LADY_SYLVANAS_WINDRUNNER = m_creature->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
-            LADY_SYLVANAS_WINDRUNNER->MonsterYellToZone(LANG_UNDERCITY_SYLVANAS_1);
+            DoScriptText(LANG_UNDERCITY_SYLVANAS_1, LADY_SYLVANAS_WINDRUNNER, m_creature);
 
         // Remove all custom summoned Flameshockers.
-        for (const auto& guid : _flameshockers)
+        for (const auto& guid : m_flameshockers)
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->DoKillUnit(FLAMESHOCKER);
 
@@ -1641,26 +1390,26 @@ struct PallidHorrorAI : public ScriptedAI
     void OnRemoveFromWorld() override
     {
         // Remove all custom summoned Guards.
-        for (const auto& guid : _magic_quarter_undercity_guardians)
+        for (const auto& guid : m_magic_quarter_undercity_guardians)
             if (Creature* UNDERCITY_GUARDIAN = m_creature->GetMap()->GetCreature(guid))
                 UNDERCITY_GUARDIAN->AddObjectToRemoveList();
-        for (const auto& guid : _rogue_quarter_undercity_guardians)
+        for (const auto& guid : m_rogue_quarter_undercity_guardians)
             if (Creature* UNDERCITY_GUARDIAN = m_creature->GetMap()->GetCreature(guid))
                 UNDERCITY_GUARDIAN->AddObjectToRemoveList();
-        for (const auto& guid : _outside_trade_quarter_undercity_guardians)
+        for (const auto& guid : m_outside_trade_quarter_undercity_guardians)
             if (Creature* UNDERCITY_GUARDIAN = m_creature->GetMap()->GetCreature(guid))
                 UNDERCITY_GUARDIAN->AddObjectToRemoveList();
-        for (const auto& guid : _undercity_elite_guardians)
+        for (const auto& guid : m_inside_trade_quarter_undercity_elite_guardians)
             if (Creature* UNDERCITY_ELITE_GUARDIAN = m_creature->GetMap()->GetCreature(guid))
                 UNDERCITY_ELITE_GUARDIAN->AddObjectToRemoveList();
-        for (const auto& guid : _royal_dreadguards_entrance)
+        for (const auto& guid : m_royal_quarter_royal_dreadguards_entrance)
             if (Creature* ROYAL_GUARD = m_creature->GetMap()->GetCreature(guid))
                 ROYAL_GUARD->AddObjectToRemoveList();
-        for (const auto& guid : _royal_dreadguards_throne_room)
+        for (const auto& guid : m_royal_quarter_royal_dreadguards_throne_room)
             if (Creature* ROYAL_GUARD = m_creature->GetMap()->GetCreature(guid))
                 ROYAL_GUARD->AddObjectToRemoveList();
         // Remove all custom summoned Flameshockers.
-        for (const auto& guid : _flameshockers)
+        for (const auto& guid : m_flameshockers)
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->AddObjectToRemoveList();
     }
@@ -1668,121 +1417,149 @@ struct PallidHorrorAI : public ScriptedAI
     void SummonedCreatureDespawn(Creature* pSummoned) override
     {
         // Remove despawned guards here to respawn them if needed.
-        if (_undercity_elite_guardians.find(pSummoned->GetObjectGuid()) != _undercity_elite_guardians.end())
-            _undercity_elite_guardians.erase(pSummoned->GetObjectGuid());
+        if (m_inside_trade_quarter_undercity_elite_guardians.find(pSummoned->GetObjectGuid()) != m_inside_trade_quarter_undercity_elite_guardians.end())
+            m_inside_trade_quarter_undercity_elite_guardians.erase(pSummoned->GetObjectGuid());
     }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
-        if (!m_creature->GetVictim())
+        if (!m_creature->GetVictim() && !m_creature->IsInCombat())
         {
-            /*
-            -8578.15 886.382 87.3148 0.586275
-            stormwind cathedral Stormwind City Guard 68
-             -8534.62  854.091 106.601 2.09439 -> To arms!  Scourge spotted in the Cathedral of Light!
-
-            */
-
-            if (Route == 0)
+            if (m_creature->GetZoneId() == ZONEID_UNDERCITY)
             {
-                if (uiPointId < 84)
-                    m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, UC_ROYAL_QUARTER[uiPointId + 1].x, UC_ROYAL_QUARTER[uiPointId + 1].y, UC_ROYAL_QUARTER[uiPointId + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
-
-                if (uiPointId == 1)
-                    if (Creature* UNDERCITY_GUARDIAN = m_creature->FindNearestCreature(NPC_UNDERCITY_GUARDIAN, VISIBILITY_DISTANCE_NORMAL))
-                        UNDERCITY_GUARDIAN->MonsterYellToZone(LANG_UNDERCITY_GUARDIAN_SEWERS);
-
-                if (uiPointId >= 18 && _magic_quarter_undercity_guardians.empty())
+                if (Route == 0)
                 {
-                    Creature* UNDERCITY_GUARDIAN = nullptr;
+                    if (uiPointId < 82)
+                        m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, UC_ROYAL_QUARTER[uiPointId + 1].x, UC_ROYAL_QUARTER[uiPointId + 1].y, UC_ROYAL_QUARTER[uiPointId + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
 
-                    for (auto i = 0; i < MAX_UNDERCITY_GUARDIANS_MAGIC_QUARTER; i++)
-                        if (UNDERCITY_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_GUARDIAN, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].x, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].y, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].z, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            _magic_quarter_undercity_guardians.insert(UNDERCITY_GUARDIAN->GetObjectGuid());
+                    if (uiPointId == 1)
+                        if (Creature* UNDERCITY_GUARDIAN = m_creature->FindNearestCreature(NPC_UNDERCITY_GUARDIAN, VISIBILITY_DISTANCE_NORMAL))
+                            DoScriptText(LANG_UNDERCITY_GUARDIAN_SEWERS, UNDERCITY_GUARDIAN, m_creature);
 
-                    if (UNDERCITY_GUARDIAN)
-                        UNDERCITY_GUARDIAN->MonsterYellToZone(LANG_UNDERCITY_GUARDIAN_MAGIC_QUARTER, 1, m_creature);
+                    if (uiPointId >= 19 && m_magic_quarter_undercity_guardians.empty())
+                    {
+                        Creature* UNDERCITY_GUARDIAN = nullptr;
+
+                        for (auto i = 0; i < MAX_UNDERCITY_GUARDIANS_MAGIC_QUARTER; i++)
+                            if (UNDERCITY_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_GUARDIAN, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].x, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].y, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].z, UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_magic_quarter_undercity_guardians.insert(UNDERCITY_GUARDIAN->GetObjectGuid());
+
+                        if (UNDERCITY_GUARDIAN)
+                            DoScriptText(LANG_UNDERCITY_GUARDIAN_MAGIC_QUARTER, UNDERCITY_GUARDIAN, m_creature);
+                    }
+
+                    if (uiPointId >= 41 && m_rogue_quarter_undercity_guardians.empty())
+                    {
+                        Creature* UNDERCITY_GUARDIAN = nullptr;
+
+                        for (auto i = 0; i < MAX_UNDERCITY_GUARDIANS_ROGUE_QUARTER; i++)
+                            if (UNDERCITY_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_GUARDIAN, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].x, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].y, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].z, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_rogue_quarter_undercity_guardians.insert(UNDERCITY_GUARDIAN->GetObjectGuid());
+
+                        if (UNDERCITY_GUARDIAN)
+                            DoScriptText(LANG_UNDERCITY_GUARDIAN_ROGUES_QUARTER, UNDERCITY_GUARDIAN, m_creature);
+                    }
+
+                    if (uiPointId >= 59 && m_royal_quarter_royal_dreadguards_entrance.empty())
+                    {
+                        Creature* ROYAL_GUARD = nullptr;
+
+                        for (auto i = 0; i < MAX_ROYAL_DREADGUARDS_ENTRANCE; i++)
+                            if (ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].x, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].y, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].z, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_royal_quarter_royal_dreadguards_entrance.insert(ROYAL_GUARD->GetObjectGuid());
+
+                        if (ROYAL_GUARD)
+                            DoScriptText(LANG_UNDERCITY_ROYAL_DREADGUARD_1, ROYAL_GUARD, m_creature);
+
+                        // Sylvanas answer after 10 seconds.
+                        m_events.ScheduleEvent(EVENT_SYLVANAS_ANSWER_YELL, 10000);
+                    }
+
+                    if (uiPointId >= 72 && m_royal_quarter_royal_dreadguards_throne_room.empty())
+                    {
+                        Creature* ROYAL_GUARD = nullptr;
+
+                        for (auto i = 0; i < MAX_ROYAL_DREADGUARDS_THRONE_ROOM; i++)
+                            if (ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].x, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].y, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].z, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_royal_quarter_royal_dreadguards_throne_room.insert(ROYAL_GUARD->GetObjectGuid());
+
+                        if (Creature* VARIMATHRAS = m_creature->FindNearestCreature(NPC_VARIMATHRAS, VISIBILITY_DISTANCE_GIGANTIC))
+                            DoScriptText(LANG_UNDERCITY_VARIMATHRAS_1, VARIMATHRAS, m_creature);
+                    }
                 }
-
-                if (uiPointId >= 38 && _rogue_quarter_undercity_guardians.empty())
+                else if (Route == 1) // Undercity Trade Quarter
                 {
-                    Creature* UNDERCITY_GUARDIAN = nullptr;
+                    // Keep moving until reached the last waypoint.
+                    if (uiPointId < 25)
+                        m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, UC_TRADE_QUARTER[uiPointId + 1].x, UC_TRADE_QUARTER[uiPointId + 1].y, UC_TRADE_QUARTER[uiPointId + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
 
-                    for (auto i = 0; i < MAX_UNDERCITY_GUARDIANS_ROGUE_QUARTER; i++)
-                        if (UNDERCITY_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_GUARDIAN, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].x, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].y, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].z, UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            _rogue_quarter_undercity_guardians.insert(UNDERCITY_GUARDIAN->GetObjectGuid());
+                    // Summon guardians.
+                    if (uiPointId >= 1 && uiPointId < 7 && m_outside_trade_quarter_undercity_guardians.empty())
+                    {
+                        Creature* UNDERCITY_GUARDIAN = nullptr;
 
-                    if (UNDERCITY_GUARDIAN)
-                        UNDERCITY_GUARDIAN->MonsterYellToZone(LANG_UNDERCITY_GUARDIAN_ROGUES_QUARTER, 1, m_creature);
-                }
+                        for (auto i = 0; i < MAX_UNDERCITY_GUARDIANS; i++)
+                            if (UNDERCITY_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_GUARDIAN, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].x, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].y, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].z, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_outside_trade_quarter_undercity_guardians.insert(UNDERCITY_GUARDIAN->GetObjectGuid());
 
-                if (uiPointId >= 59 && _royal_dreadguards_entrance.empty())
-                {
-                    Creature* ROYAL_GUARD = nullptr;
+                        if (UNDERCITY_GUARDIAN)
+                            DoScriptText(LANG_UNDERCITY_GUARDIAN_TRADE_QUARTER, UNDERCITY_GUARDIAN, m_creature);
+                    }
 
-                    for (auto i = 0; i < MAX_ROYAL_DREADGUARDS_ENTRANCE; i++)
-                        if (ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].x, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].y, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].z, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            _royal_dreadguards_entrance.insert(ROYAL_GUARD->GetObjectGuid());
+                    // Summon elite guardians.
+                    if (uiPointId >= 7 && m_inside_trade_quarter_undercity_elite_guardians.empty())
+                    {
+                        Creature* UNDERCITY_ELITE_GUARDIAN = nullptr;
 
-                    if (ROYAL_GUARD)
-                        ROYAL_GUARD->MonsterYellToZone(LANG_UNDERCITY_ROYAL_DREADGUARD_1, 1, m_creature);
+                        for (auto i = 0; i < MAX_UNDERCITY_ELITE_GUARDIANS; i++)
+                            if (UNDERCITY_ELITE_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_ELITE_GUARDIAN, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].x, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].y, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].z, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_inside_trade_quarter_undercity_elite_guardians.insert(UNDERCITY_ELITE_GUARDIAN->GetObjectGuid());
 
-                    // Sylvanas answer after 10 seconds.
-                    m_events.ScheduleEvent(EVENT_SYLVANAS_ANSWER_YELL, 10000);
-                }
+                        if (UNDERCITY_ELITE_GUARDIAN)
+                            DoScriptText(LANG_UNDERCITY_ELITE_GUARDIAN_1, UNDERCITY_ELITE_GUARDIAN, m_creature);
+                    }
 
-                if (uiPointId >= 73 && _royal_dreadguards_throne_room.empty())
-                {
-                    Creature* ROYAL_GUARD = nullptr;
-
-                    for (auto i = 0; i < MAX_ROYAL_DREADGUARDS_THRONE_ROOM; i++)
-                        if (ROYAL_GUARD = m_creature->SummonCreature(NPC_ROYAL_DREADGUARD, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].x, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].y, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].z, UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            _royal_dreadguards_throne_room.insert(ROYAL_GUARD->GetObjectGuid());
-
-                    if (Creature* VARIMATHRAS = m_creature->FindNearestCreature(NPC_VARIMATHRAS, VISIBILITY_DISTANCE_GIGANTIC))
-                        VARIMATHRAS->MonsterYellToZone(LANG_UNDERCITY_VARIMATHRAS_1, 1, m_creature);
+                    // Walk in a circle on upper trading quarter.
+                    if (uiPointId == 24)
+                        m_creature->GetMotionMaster()->MovePoint(15, UC_TRADE_QUARTER[15].x, UC_TRADE_QUARTER[15].y, UC_TRADE_QUARTER[15].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
                 }
             }
-            else if (Route == 1) // Undercity Trade Quarter
+            if (m_creature->GetZoneId() == ZONEID_STORMWIND)
             {
-                // Keep moving until reached the last waypoint.
-                if (uiPointId < 25)
-                    m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, UC_TRADE_QUARTER[uiPointId + 1].x, UC_TRADE_QUARTER[uiPointId + 1].y, UC_TRADE_QUARTER[uiPointId + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
-
-                // Summon guardians.
-                if (uiPointId >= 1 && uiPointId < 7 && _outside_trade_quarter_undercity_guardians.empty())
+                if (Route == 0) // Stormwind Keep
                 {
-                    Creature* UNDERCITY_GUARDIAN = nullptr;
+                    if (uiPointId < 36)
+                        m_creature->GetMotionMaster()->MovePoint(uiPointId + 1, SW_STORMWIND_KEEP[uiPointId + 1].x, SW_STORMWIND_KEEP[uiPointId + 1].y, SW_STORMWIND_KEEP[uiPointId + 1].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
 
-                    for (auto i = 0; i < MAX_UNDERCITY_GUARDIANS; i++)
-                        if (UNDERCITY_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_GUARDIAN, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].x, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].y, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].z, UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            _outside_trade_quarter_undercity_guardians.insert(UNDERCITY_GUARDIAN->GetObjectGuid());
+                    if (uiPointId >= 4 && m_cathedral_stormwind_city_guard.empty())
+                    {
+                        Creature* STORMWIND_CITY_GUARD = nullptr;
 
-                    if (UNDERCITY_GUARDIAN)
-                        UNDERCITY_GUARDIAN->MonsterYellToZone(LANG_UNDERCITY_GUARDIAN_TRADE_QUARTER, 1, m_creature);
+                        for (auto i = 0; i < MAX_STORMWIND_CITY_GUARD_CATHEDRAL; i++)
+                            if (STORMWIND_CITY_GUARD = m_creature->SummonCreature(NPC_STORMWIND_CITY_GUARD, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].x, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].y, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].z, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
+                                m_cathedral_stormwind_city_guard.insert(STORMWIND_CITY_GUARD->GetObjectGuid());
+
+                        if (STORMWIND_CITY_GUARD)
+                            DoScriptText(LANG_STORMWIND_CITY_GUARD_1, STORMWIND_CITY_GUARD, m_creature);
+                    }
+
+                    if (uiPointId >= 32 && !b_bolvar)
+                    {
+                        if (Creature* HIGHLORD_BOLVAR_FORDRAGON = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_GIGANTIC))
+                            DoScriptText(LANG_STORMWIND_BOLVAR_1, HIGHLORD_BOLVAR_FORDRAGON, m_creature);
+
+                        b_bolvar = true;
+                    }
                 }
-
-                // Summon elite guardians.
-                if (uiPointId >= 7 && _undercity_elite_guardians.empty())
+                else if (Route == 1) // Stormwind Trade District
                 {
-                    Creature* UNDERCITY_ELITE_GUARDIAN = nullptr;
-
-                    for (auto i = 0; i < MAX_UNDERCITY_ELITE_GUARDIANS; i++)
-                        if (UNDERCITY_ELITE_GUARDIAN = m_creature->SummonCreature(NPC_UNDERCITY_ELITE_GUARDIAN, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].x, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].y, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].z, UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            _undercity_elite_guardians.insert(UNDERCITY_ELITE_GUARDIAN->GetObjectGuid());
-
-                    if (UNDERCITY_ELITE_GUARDIAN)
-                        UNDERCITY_ELITE_GUARDIAN->MonsterYellToZone(LANG_UNDERCITY_ELITE_GUARDIAN_1, 1, m_creature);
                 }
-
-                // Walk in a circle on upper trading quarter.
-                if (uiPointId == 24)
-                    m_creature->GetMotionMaster()->MovePoint(15, UC_TRADE_QUARTER[15].x, UC_TRADE_QUARTER[15].y, UC_TRADE_QUARTER[15].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
             }
+            if (uiPointId)
+                LastWayPoint = uiPointId;
+
+            sLog.outBasic("[PallidHorrorAI:MovementInform] LastWayPoint: %d", LastWayPoint);
         }
-
-        if (uiPointId)
-            LastWayPoint = uiPointId;
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1794,8 +1571,8 @@ struct PallidHorrorAI : public ScriptedAI
             switch (Events)
             {
             case EVENT_PALLID_RANDOM_YELL:
-                m_creature->MonsterYell(PickRandomValue(LANG_PALLID_HORROR_YELL1, LANG_PALLID_HORROR_YELL2, LANG_PALLID_HORROR_YELL3, LANG_PALLID_HORROR_YELL4,
-                    LANG_PALLID_HORROR_YELL5, LANG_PALLID_HORROR_YELL6, LANG_PALLID_HORROR_YELL7, LANG_PALLID_HORROR_YELL8));
+                DoScriptText(PickRandomValue(LANG_PALLID_HORROR_YELL1, LANG_PALLID_HORROR_YELL2, LANG_PALLID_HORROR_YELL3, LANG_PALLID_HORROR_YELL4,
+                    LANG_PALLID_HORROR_YELL5, LANG_PALLID_HORROR_YELL6, LANG_PALLID_HORROR_YELL7, LANG_PALLID_HORROR_YELL8), m_creature);
                 m_events.ScheduleEvent(EVENT_PALLID_RANDOM_YELL, urand(IN_MILLISECONDS * 65, IN_MILLISECONDS * 300));
                 break;
             case EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS:
@@ -1804,7 +1581,11 @@ struct PallidHorrorAI : public ScriptedAI
                 break;
             case EVENT_SYLVANAS_ANSWER_YELL:
                 if (Creature* LADY_SYLVANAS_WINDRUNNER = m_creature->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_GIGANTIC))
-                    LADY_SYLVANAS_WINDRUNNER->MonsterYellToZone(LANG_UNDERCITY_SYLVANAS_2);
+                    DoScriptText(LANG_UNDERCITY_SYLVANAS_2, LADY_SYLVANAS_WINDRUNNER, m_creature);
+                break;
+            case EVENT_PALLID_RANDOM_SAY:
+                b_citizens = true;
+                m_events.ScheduleEvent(EVENT_PALLID_RANDOM_SAY, urand(30000, 60000));
                 break;
             }
         }

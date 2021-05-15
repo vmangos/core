@@ -229,15 +229,25 @@ enum ScourgeInvasionNPC
     NPC_CRACKED_NECROTIC_CRYSTAL                        = 16431,
     NPC_FAINT_NECROTIC_CRYSTAL                          = 16531,
     NPC_FLAMESHOCKER                                    = 16383,
-    NPC_STORMWIND_GARNISON_GUARD                        = 68,
-    NPC_UNDERCITY_GARNISON_GUARD                        = 5624,
     NPC_HIGHLORD_BOLVAR_FORDRAGON                       = 1748,
     NPC_LADY_SYLVANAS_WINDRUNNER                        = 10181,
     NPC_VARIMATHRAS                                     = 2425,
     NPC_ROYAL_DREADGUARD                                = 13839,
     NPC_STORMWIND_ROYAL_GUARD                           = 1756,
     NPC_UNDERCITY_ELITE_GUARDIAN                        = 16432,
-    NPC_UNDERCITY_GUARDIAN                              = 5624
+    NPC_UNDERCITY_GUARDIAN                              = 5624,
+    NPC_DEATHGUARD_ELITE                                = 7980,
+    NPC_STORMWIND_CITY_GUARD                            = 68,
+    NPC_STORMWIND_ELITE_GUARD                           = 16396,
+
+    // Citizens
+    NPC_MICHAEL_GARRETT                                 = 4551,
+    NPC_HANNAH_AKELEY                                   = 4575,
+    NPC_INNKEEPER_NORMAN                                = 6741,
+    NPC_OFFICER_MALOOF                                  = 15766,
+    NPC_STEPHANIE_TURNER                                = 6174,
+    NPC_THOMAS_MILLER                                   = 3518,
+    NPC_WILLIAM_MONTAGUE                                = 4549
 };
 
 enum ScourgeInvasionMisc
@@ -337,7 +347,8 @@ enum ScourgeInvasionNPCEvents
     // Pallid Horror Events 
     EVENT_PALLID_RANDOM_YELL                = 50,
     EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 51,
-    EVENT_SYLVANAS_ANSWER_YELL              = 52
+    EVENT_SYLVANAS_ANSWER_YELL              = 52,
+    EVENT_PALLID_RANDOM_SAY                 = 53
 };
 
 enum ScourgeInvasionWorldStatesVariables
@@ -421,25 +432,25 @@ enum ScourgeInvasionLang
     LANG_UNDERCITY_SYLVANAS_1                           = 12331, // The Scourge attack against my court has been eliminated.  You may go about your business.
     LANG_UNDERCITY_SYLVANAS_2                           = 12332, // My Royal Dreadguard, you will deal with this matter as befits your station.  That, or you will wish that you had.
 
-    // Civilian
+    // Citizens
     LANG_UNDERCITY_RANDOM_1                             = 12355, // Scourge spotted nearby!
-    LANG_STORMWIND_RANDOM_1                             = 12366, // Scourge spotted nearby!
+    LANG_STORMWIND_RANDOM_1                             = 12366, // Scourge spotted nearby! Renato Gallina
     LANG_UNDERCITY_RANDOM_2                             = 12356, // I just saw a Scourge!  Kill it!
-    LANG_STORMWIND_RANDOM_2                             = 12367, // I just saw a Scourge!  Kill it!
-    LANG_UNDERCITY_RANDOM_3                             = 12357, // Did you see that?  There's a Scourge over there!
-    LANG_STORMWIND_RANDOM_3                             = 12368, // Did you see that?  There's a Scourge over there!
-    LANG_UNDERCITY_RANDOM_4                             = 12359, // There's one of the Scourge, right over there!
+    LANG_STORMWIND_RANDOM_2                             = 12367, // I just saw a Scourge!  Kill it! Thomas Miller
+    LANG_UNDERCITY_RANDOM_3                             = 12357, // Did you see that?  There's a Scourge over there! Michael Garrett, Hannah Akeley
+    LANG_STORMWIND_RANDOM_3                             = 12368, // Did you see that?  There's a Scourge over there! Thomas Miller
+    LANG_UNDERCITY_RANDOM_4                             = 12359, // There's one of the Scourge, right over there! Innkeeper Norman, Michael Garrett
     LANG_STORMWIND_RANDOM_4                             = 12370, // There's one of the Scourge, right over there!
-    LANG_UNDERCITY_RANDOM_5                             = 12357, // Did you see that?  There's a Scourge over there!
-    LANG_STORMWIND_RANDOM_5                             = 12368, // Did you see that?  There's a Scourge over there!
-    LANG_UNDERCITY_RANDOM_6                             = 12361, // Will these unrelenting Scourge attacks never end?
+    LANG_UNDERCITY_RANDOM_5                             = 12357, // Did you see that?  There's a Scourge over there! Michael Garrett, Hannah Akeley
+    LANG_STORMWIND_RANDOM_5                             = 12368, // Did you see that?  There's a Scourge over there! Thomas Miller
+    LANG_UNDERCITY_RANDOM_6                             = 12361, // Will these unrelenting Scourge attacks never end? Innkeeper Norman, William Montague
     LANG_STORMWIND_RANDOM_6                             = 12372, // Will these unrelenting Scourge attacks never end?
-    LANG_UNDERCITY_RANDOM_7                             = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come!
-    LANG_STORMWIND_RANDOM_7                             = 12371, // This has gone too far.  How dare the Scourge attack Stormwind!  Destroy it before more come!
-    LANG_UNDERCITY_RANDOM_8                             = 12362, // Destroy the Scourge invader now, before it's too late!
-    LANG_STORMWIND_RANDOM_8                             = 12373, // Destroy the Scourge invader now, before it's too late!
-    LANG_UNDERCITY_RANDOM_9                             = 12358, // How can I get anything done with the Scourge running amok in here?!
-    LANG_STORMWIND_RANDOM_9                             = 12369, // How can I get anything done with the Scourge running amok around here?!
+    LANG_UNDERCITY_RANDOM_7                             = 12360, // This has gone too far.  How dare the Scourge attack Undercity!  Destroy it before more come! Innkeeper Norman
+    LANG_STORMWIND_RANDOM_7                             = 12371, // This has gone too far.  How dare the Scourge attack Stormwind!  Destroy it before more come! Stephanie Turner
+    LANG_UNDERCITY_RANDOM_8                             = 12362, // Destroy the Scourge invader now, before it's too late! Michael Garrett
+    LANG_STORMWIND_RANDOM_8                             = 12373, // Destroy the Scourge invader now, before it's too late! Officer Maloof
+    LANG_UNDERCITY_RANDOM_9                             = 12358, // How can I get anything done with the Scourge running amok in here?! Innkeeper Norman
+    LANG_STORMWIND_RANDOM_9                             = 12369, // How can I get anything done with the Scourge running amok around here?! Stephanie Turner
 
     // Stormwind City Guard
     LANG_STORMWIND_CITY_GUARD_1                         = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
@@ -499,4 +510,247 @@ enum ScourgeInvasionLang
     LANG_ARGENT_EMISSARY_AWBSER_3_1                     = 8554, // 12402 - We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.
     LANG_ARGENT_EMISSARY_AWBSER_3_2                     = 8555, // 12403 - We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
     LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE                = 8481  // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
+};
+
+struct Waypoint
+{
+    float x, y, z;
+};
+
+/*
+UNDERCITY:
+    We have tons of sniffs from Undercity attacks but none of them provided a fully useful path.
+    It was so buggy on Classic, they sometimes walked through the slime/walls or was being teleported.
+    I just used existing points and made a smoother path out from them to avoid glitches.
+    Even do the guard spawns are all sniffed positions.
+
+STORMWIND:
+    Only 2 sniffs: One contains the spawning in the cathedral
+*/
+
+static Waypoint UC_ROYAL_QUARTER[82] =
+{
+    { 1596.72f, 423.488f, -46.3713f },
+    { 1603.8f, 423.409f, -46.3814f },
+    { 1615.01f, 423.43f, -53.2855f },
+    { 1630.79f, 417.648f, -62.1775f },
+    { 1642.62f, 413.764f, -61.6205f },
+    { 1663.95f, 406.928f, -62.2001f },
+    { 1679.64f, 402.133f, -62.2674f },
+    { 1693.81f, 396.803f, -62.2956f },
+    { 1703.9f, 384.448f, -62.2338f },
+    { 1716.81f, 374.437f, -60.4845f },
+    { 1725.09f, 361.466f, -60.4561f },
+    { 1734.98f, 346.717f, -55.3936f },
+    { 1720.8f, 335.518f, -49.0941f },
+    { 1706.42f, 324.186f, -55.3923f },
+    { 1715.06f, 313.223f, -60.4836f },
+    { 1722.2f, 293.859f, -62.1816f },
+    { 1726.99f, 277.646f, -61.6201f },
+    { 1731.56f, 258.869f, -62.1777f },
+    { 1730.53f, 236.534f, -62.1777f },
+    { 1730.45f, 221.129f, -62.1777f },
+    { 1727.79f, 206.641f, -61.6201f },
+    { 1721.55f, 192.245f, -62.1567f },
+    { 1710.23f, 174.474f, -60.748f },
+    { 1703.03f, 162.592f, -60.7572f },
+    { 1703.7f, 151.978f, -60.4547f },
+    { 1693.09f, 140.75f, -55.2145f },
+    { 1705.39f, 128.363f, -48.9765f },
+    { 1718.51f, 115.25f, -55.2142f },
+    { 1730.88f, 126.046f, -60.2606f },
+    { 1730.82f, 115.161f, -60.183f },
+    { 1716.92f, 103.729f, -60.2008f },
+    { 1701.28f, 95.534f, -62.2142f },
+    { 1693.78f, 80.3089f, -62.2901f },
+    { 1675.76f, 75.0983f, -62.2695f },
+    { 1641.9f, 66.6623f, -61.6205f },
+    { 1621.2f, 62.7971f, -62.1758f },
+    { 1606.1f, 64.2477f, -62.1757f },
+    { 1585.06f, 65.8815f, -62.1757f },
+    { 1566.75f, 63.2784f, -62.1759f },
+    { 1549.34f, 66.7444f, -61.6205f },
+    { 1528.12f, 75.3463f, -62.1931f },
+    { 1515.81f, 76.2727f, -62.312f },
+    { 1498.46f, 72.9253f, -62.2988f },
+    { 1481.09f, 65.1825f, -62.2955f },
+    { 1464.11f, 62.5269f, -62.2894f },
+    { 1450.53f, 63.8461f, -62.2829f },
+    { 1443.4f, 77.7421f, -62.281f },
+    { 1437.17f, 95.2736f, -62.2835f },
+    { 1431.24f, 109.49f, -62.2855f },
+    { 1425.46f, 126.738f, -62.2903f },
+    { 1428.19f, 147.362f, -62.2883f },
+    { 1430.87f, 165.485f, -62.2873f },
+    { 1422.51f, 193.802f, -61.6205f },
+    { 1418.04f, 221.338f, -62.1757f },
+    { 1417.87f, 250.625f, -62.1757f },
+    { 1422.36f, 287.308f, -61.6205f },
+    { 1431.02f, 310.52f, -62.1858f },
+    { 1431.11f, 329.137f, -62.1858f },
+    { 1431.76f, 340.716f, -62.1858f },
+    { 1446.93f, 345.408f, -62.2555f },
+    { 1457.68f, 352.131f, -62.1858f },
+    { 1468.25f, 368.539f, -59.4315f },
+    { 1456.45f, 382.704f, -59.2146f },
+    { 1438.56f, 402.152f, -57.8187f },
+    { 1425.19f, 415.942f, -56.564f },
+    { 1412.51f, 427.689f, -54.9935f },
+    { 1398.04f, 434.394f, -54.2124f },
+    { 1377.36f, 438.503f, -52.7816f },
+    { 1362.51f, 436.662f, -54.0348f },
+    { 1343.87f, 430.783f, -56.1263f },
+    { 1329.61f, 420.568f, -58.5133f },
+    { 1317.72f, 406.919f, -61.6818f },
+    { 1310.81f, 390.742f, -64.0786f },
+    { 1305.81f, 371.942f, -67.2921f },
+    { 1300.8f, 353.982f, -66.3732f },
+    { 1287.07f, 349.808f, -65.0277f },
+    { 1271.03f, 348.118f, -65.0273f },
+    { 1260.78f, 335.246f, -65.0273f },
+    { 1271.79f, 330.043f, -61.2514f },
+    { 1285.68f, 329.953f, -60.0831f },
+    { 1296.77f, 326.485f, -59.4742f },
+    { 1293.68f, 320.572f, -57.4819f }
+};
+
+static Waypoint UC_TRADE_QUARTER[25] =
+{
+    { 1660.98f, 257.238f, -62.1777f },
+    { 1659.01f, 234.474f, -62.1776f },
+    { 1657.83f, 213.584f, -62.179f },
+    { 1643.68f, 189.256f, -62.1817f },
+    { 1614.92f, 175.086f, -62.1779f },
+    { 1582.18f, 171.914f, -62.1777f },
+    { 1554.78f, 185.782f, -62.1812f },
+    { 1555.19f, 199.377f, -60.7729f },
+    { 1572.48f, 216.876f, -58.8445f },
+    { 1583.42f, 229.032f, -62.0874f },
+    { 1579.97f, 239.346f, -62.0773f },
+    { 1593.38f, 260.254f, -57.1617f },
+    { 1595.97f, 250.856f, -52.3559f },
+    { 1603.33f, 248.817f, -52.1495f },
+    { 1629.47f, 238.688f, -43.1705f },
+    { 1632.91f, 233.36f, -43.1027f },
+    { 1608.15f, 202.839f, -43.1027f },
+    { 1581.31f, 204.956f, -43.1025f },
+    { 1560.33f, 225.354f, -43.1026f },
+    { 1558.61f, 241.44f, -43.1027f },
+    { 1561.27f, 255.781f, -43.1027f },
+    { 1568.61f, 264.061f, -43.1027f },
+    { 1578.92f, 273.572f, -43.1027f },
+    { 1585.38f, 276.608f, -43.1027f },
+    { 1605.34f, 276.451f, -43.1027f }
+};
+
+static Waypoint SW_STORMWIND_KEEP[36] =
+{
+    { -8571.98f, 891.327f, 90.7048f },
+    { -8564.43f, 897.362f, 96.6816f },
+    { -8543.69f, 868.857f, 96.678f },
+    { -8537.53f, 877.229f, 100.872f },
+    { -8549.34f, 876.808f, 106.524f },
+    { -8528.83f, 850.217f, 106.519f },
+    { -8566.04f, 819.702f, 106.519f },
+    { -8561.33f, 812.55f, 106.519f },
+    { -8574.4f, 801.162f, 106.519f },
+    { -8581.51f, 807.43f, 106.519f },
+    { -8621.97f, 775.794f, 96.6517f },
+    { -8591.07f, 756.628f, 96.6506f },
+    { -8580.26f, 738.55f, 96.7067f },
+    { -8596.12f, 719.753f, 96.6506f },
+    { -8578.3f, 693.895f, 97.0165f },
+    { -8562.46f, 674.137f, 97.0165f },
+    { -8537.19f, 689.571f, 97.6661f },
+    { -8522.15f, 670.014f, 102.774f },
+    { -8510.12f, 652.249f, 100.292f },
+    { -8533.99f, 634.753f, 100.251f },
+    { -8551.84f, 617.816f, 101.984f },
+    { -8566.02f, 614.139f, 102.349f },
+    { -8575.44f, 602.488f, 103.243f },
+    { -8584.68f, 581.049f, 103.347f },
+    { -8578.33f, 547.375f, 101.777f },
+    { -8559.37f, 524.217f, 100.483f },
+    { -8544.85f, 502.583f, 98.5454f },
+    { -8535.21f, 487.29f, 101.279f },
+    { -8539.38f, 477.864f, 102.922f },
+    { -8548.45f, 468.814f, 104.483f },
+    { -8533.58f, 448.952f, 104.917f },
+    { -8518.46f, 430.065f, 106.586f },
+    { -8497.76f, 404.19f, 108.386f },
+    { -8477.23f, 378.372f, 112.258f },
+    { -8457.71f, 353.894f, 120.084f },
+    { -8441.52f, 333.366f, 122.579f }
+};
+
+enum CityAttack
+{
+    MAX_UNDERCITY_GUARDIANS = 3,
+    MAX_UNDERCITY_ELITE_GUARDIANS = 6,
+    MAX_ROYAL_DREADGUARDS_ENTRANCE = 1,
+    MAX_ROYAL_DREADGUARDS_THRONE_ROOM = 4,
+    MAX_UNDERCITY_GUARDIANS_MAGIC_QUARTER = 1,
+    MAX_UNDERCITY_GUARDIANS_ROGUE_QUARTER = 1,
+    MAX_STORMWIND_ELITE_GUARDS_TRADE_DISTRICT = 8,
+    MAX_STORMWIND_CITY_GUARD_CATHEDRAL = 1,
+};
+
+// NPC positions are all sniffed.
+
+static const Position UC_MAGIC_QUARTER_UNDERCITY_GUARDIANS[MAX_UNDERCITY_GUARDIANS_MAGIC_QUARTER] =
+{
+    { 1720.11f, 191.195f, -62.0651f, 1.02974f }
+};
+
+static const Position UC_ROGUE_QUARTER_UNDERCITY_GUARDIANS[MAX_UNDERCITY_GUARDIANS_ROGUE_QUARTER] =
+{
+    { 1472.94f, 63.9248f, -62.2098f, 0.401426f }
+};
+
+static const Position UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_ENTRANCE[MAX_ROYAL_DREADGUARDS_ENTRANCE] =
+{
+    { 1466.95f, 369.392f, -59.3685f, 4.41568f }
+};
+
+static const Position UC_ROYAL_QUARTER_ROYAL_DREADGUARDS_THRONE_ROOM[MAX_ROYAL_DREADGUARDS_THRONE_ROOM] =
+{
+    { 1305.82f, 351.934f, -65.8778f, 1.69297f },
+    { 1302.63f, 352.871f, -65.9109f, 1.309f },
+    { 1299.49f, 353.789f, -65.9394f, 1.16937f },
+    { 1295.97f, 354.728f, -65.9162f, 0.907571f }
+};
+
+static const Position UC_TRADE_QUARTER_UNDERCITY_GUARDIANS[MAX_UNDERCITY_GUARDIANS] =
+{
+    { 1649.6f, 197.414f, -62.0981f, 1.06465f },
+    { 1651.49f, 192.836f, -62.0972f, 1.20428f },
+    { 1645.86f, 196.746f, -62.0994f, 1.01229f }
+};
+
+// Some of them spawn in the Argent Dawn Tent.
+static const Position UC_TRADE_QUARTER_UNDERCITY_ELITE_GUARDIANS[MAX_UNDERCITY_ELITE_GUARDIANS] =
+{
+    { 1632.55f, 233.419f, -43.0193f, 2.6529f },
+    { 1633.06f, 246.891f, -43.0193f, 3.59538f },
+    { 1576.53f, 243.989f, -61.994f, 4.76475f },
+    { 1578.96f, 237.109f, -61.994f, 4.53786f },
+    { 1635.93f, 240.378f, -43.0193f, 3.24631f },
+    { 1583.21f, 241.365f, -61.994f, 4.45059f }
+};
+
+static const Position SW_CATHEDRAL_STORMWIND_CITY_GUARD[MAX_STORMWIND_CITY_GUARD_CATHEDRAL] =
+{
+    { -8534.62f, 854.091f, 106.601f, 2.09439f }
+};
+
+static const Position SW_TRADE_DISTRICT_STORMWIND_ELITE_GUARDS[MAX_STORMWIND_ELITE_GUARDS_TRADE_DISTRICT] =
+{
+    { -8828.65f, 640.132f, 94.4273f, 3.28122f },
+    { -8837.81f, 628.258f, 94.0939f, 1.67552f },
+    { -8832.66f, 629.215f, 94.1206f, 2.09439f },
+    { -8827.45f, 633.287f, 94.3621f, 2.87979f },
+    { -8841.72f, 631.157f, 94.6496f, 1.41372f },
+    { -8844.74f, 635.272f, 95.2692f, 1.37881f },
+    { -8845.08f, 614.403f, 93.0201f, 5.18363f },
+    { -8848.65f, 612.322f, 93.0186f, 5.42797f }
 };

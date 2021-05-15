@@ -8,6 +8,9 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210227122700');
 -- Add your query below.
 
+-- BroadcastText
+UPDATE `broadcast_text` SET `chat_type`='6' WHERE `entry` IN (12329,12327,12326,12342,12343,12330,12328,12325,12336,12335,12353,12334,12354,12337,12333,12331,12332,12310,12311,12315,12316,12317,12318);
+
 -- Fix some Creatures.
 UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='3052', `health_max`='3052', `detection_range`='0', `call_for_help_range`='0', `unit_flags`='256', `faction`='1630', `speed_run`='1', `auras`='28346', `flags_extra`='198658', `script_name`='scourge_invasion_necrotic_shard' WHERE `entry` IN (16172,16136);
 UPDATE `creature_template` SET `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `flags_extra`='64', `health_min`='42', `health_max`='42', `unit_flags`='33554432', `movement_type`='0', `level_min`='1', `level_max`='1' WHERE `entry` IN (16401,16421,16398,16386);
@@ -49,11 +52,19 @@ UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='1.19048', `armor`=
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (138390, 'Undercity - Royal Dreadguard', 11972, 100, 1, 0, 0, 0, 0, 0, 8, 12, 0, 14516, 100, 1, 0, 0, 0, 7, 10, 7, 10, 0, 9080, 100, 1, 0, 0, 32, 0, 0, 6, 9, 0, 16100, 100, 1, 0, 0, 14, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 UPDATE `creature_template` SET `npc_flags`='0', `unit_flags`='0' WHERE  `entry`=13839;
 
+-- Stormwind Elite Guard
+UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='11', `dmg_min`='417', `dmg_max`='551', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='32768', `spell_list_id`='163960' WHERE `entry`=16396;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (163960, 'Stormwind Elite Guard', 14516, 100, 1, 0, 0, 0, 0, 10, 10, 10, 0, 9080, 100, 1, 0, 0, 32, 0, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
 -- Undercity Elite Guardian
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='71', `dmg_min`='417', `dmg_max`='551', `unit_flags`='32768', `auras`='18951', `flags_extra`='524288' WHERE `entry`=16432;
+UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='71', `dmg_min`='417', `dmg_max`='551', `unit_flags`='32768', `auras`='18951', `spell_list_id`='164320', `flags_extra`='524288' WHERE `entry`=16432;
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (164320, 'Undercity Elite Guardian', 7160, 100, 1, 0, 0, 0, 0, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Undercity Guardian
 UPDATE `creature_template` SET `dmg_min`='95', `dmg_max`='123' WHERE `entry`=5624;
+
+-- Deathguard Elite
+UPDATE `creature_template` SET `dmg_min`='188', `dmg_max`='249' WHERE `entry`=7980;
 
 -- Fix Cultist Engineer
 UPDATE `creature_template` SET `gossip_menu_id`='7166', `health_min`='3052', `health_max`='3052', `faction`='190', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='768', `auras`='29826', `flags_extra`='198658', `script_name`='scourge_invasion_cultist_engineer' WHERE `entry`=16230;
@@ -87,8 +98,13 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1625501 AND `delay`=0 AND `command`
 DELETE FROM `creature_ai_scripts` WHERE `id`=1625502 AND `delay`=0 AND `command`=1 AND `datalong`=1 AND `datalong2`=0 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Scout - Emote 1' LIMIT 1;
 
 -- Add Argent Outfitter Quests
+DELETE FROM `quest_greeting` WHERE `entry` IN (16281,16787);
+
 INSERT INTO `quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES (16281, 'The Argent Dawn will turn away none who are willing to sacrifice for our cause.', 1);
 INSERT INTO `quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES (16787, 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', 66);
+
+DELETE FROM `creature_involvedrelation` WHERE `id`=16787;
+
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
     (16787, 9094, 9, 10),
     (16787, 9317, 9, 10),
@@ -96,6 +112,8 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`
     (16787, 9320, 9, 10),
     (16787, 9321, 9, 10),
     (16787, 9341, 9, 10);
+
+DELETE FROM `creature_questrelation` WHERE `id`=16787;
 
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
     (16787, 9094, 9, 10),
@@ -107,7 +125,7 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 
 -- Remove wrong stuff.
 DELETE FROM `spell_effect_mod` WHERE `id` IN (28373,28351,28032,28365,28281,28349,31315,28056,28367,28326,28366,28041,27894);
-DELETE FROM `spell_script_target` WHERE `entry` IN (28373,28351,28032,28365,28281,28349,31315,28056,28367,28326,28366,28041,27894);
+DELETE FROM `spell_script_target` WHERE `entry` IN (28373,28351,28032,28365,28281,28349,31315,28056,28367,28326,28366,28041,27894,28364);
 
 -- Fix Spells.
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
@@ -3184,7 +3202,8 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=45432;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45432, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6201, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Aggro Yell');
 DELETE FROM `creature_ai_scripts` WHERE `id`=45433;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45433, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6203, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Killed Unit Yell');
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (14693, 12, 81, 0, 0, 0, 0);
+DELETE FROM `conditions` WHERE `condition_entry`=14693;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (14693, 12, 17, 0, 0, 0, 0);
 
 -- Sever
 UPDATE `creature_template` SET `level_min`='25', `level_max`='25', `health_min`='6291', `health_max`='6291', `armor`='1026', `faction`='21', `unit_flags`='64', `dmg_min`='193', `dmg_max`='271', `display_scale1`='0', `dmg_multiplier`='1', `auras`='28126', `movement_type`='0' WHERE `entry`=14682;
