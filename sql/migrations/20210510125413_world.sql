@@ -8,10 +8,6 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210510125413');
 -- Add your query below.
 
--- Theramore Deserters that were added in TBC.
-DELETE FROM `creature` WHERE `guid` IN (30741, 30769, 30770, 30742, 30772, 30773, 30771, 30774, 30776);
-DELETE FROM `creature_addon` WHERE `guid` = 30741;
-
 -- Stone Watcher of Norgannon, should be only spawned by script.
 DELETE FROM `creature` WHERE `guid` = 301766;
 DELETE FROM `quest_end_scripts` WHERE `id`=2966;
