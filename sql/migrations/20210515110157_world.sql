@@ -339,6 +339,8 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 
 -- Fix Gnomish Battle Chicken (credit cmangos)
 UPDATE `spell_template` SET `effect1`= 42 WHERE `entry` = 31366;
+                                                
+UPDATE `creature` SET `movement_type` = 1 WHERE `guid` = 20299;
 
                                                 
 -- End of migration.
