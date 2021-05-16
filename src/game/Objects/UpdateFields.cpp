@@ -16,6 +16,7 @@
 
 #include "UpdateFields.h"
 #include "Log.h"
+#include "ObjectGuid.h"
 #include <array>
 #include <vector>
 
