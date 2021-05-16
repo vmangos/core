@@ -6551,25 +6551,29 @@ void Spell::EffectSummonDemon(SpellEffectIndex eff_idx)
         if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
             pGo->GetPosition(px, py, pz);
 
-    Creature* Charmed = m_caster->SummonCreature(m_spellInfo->EffectMiscValue[eff_idx], px, py, pz, m_caster->GetOrientation(), TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3600000);
-    if (!Charmed)
+    uint32 const summonDuration = m_duration > 0 ? m_duration : 3600000;
+    Creature* pSummon = m_caster->SummonCreature(m_spellInfo->EffectMiscValue[eff_idx], px, py, pz, m_caster->GetOrientation(), TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, summonDuration);
+    if (!pSummon)
         return;
 
     // might not always work correctly, maybe the creature that dies from CoD casts the effect on itself and is therefore the caster?
-    Charmed->SetLevel(m_caster->GetLevel());
+    pSummon->SetLevel(m_caster->GetLevel());
 
     // TODO: Add damage/mana/hp according to level
 
     if (m_spellInfo->EffectMiscValue[eff_idx] == 89)        // Inferno summon
     {
         // Enslave demon effect, without mana cost and cooldown
-        m_caster->CastSpell(Charmed, 20882, true);          // FIXME: enslave does not scale with level, level 62+ minions cannot be enslaved
+        m_caster->CastSpell(pSummon, 20882, true);          // FIXME: enslave does not scale with level, level 62+ minions cannot be enslaved
+
+        // Short root spell on infernal from sniffs
+        pSummon->CastSpell(pSummon, 22707, true);
 
         // Inferno effect
-        Charmed->CastSpell(Charmed, 22703, true, nullptr);
+        pSummon->CastSpell(pSummon, 22703, true);
     }
 
-    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(Charmed->GetObjectGuid()));
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pSummon->GetObjectGuid()));
 }
 
 void Spell::EffectSpiritHeal(SpellEffectIndex /*eff_idx*/)
