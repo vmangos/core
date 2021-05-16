@@ -53,7 +53,7 @@ void MotionMaster::Initialize()
     Clear(false, true);
 
     // set new default movement generator
-    if (m_owner->IsCreature() && !m_owner->HasUnitState(UNIT_STAT_POSSESSED))
+    if (m_owner->IsCreature() && m_owner->IsAlive() && !m_owner->HasUnitState(UNIT_STAT_POSSESSED))
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(static_cast<Creature*>(m_owner));
         push(movement == nullptr ? &si_idleMovement : movement);
