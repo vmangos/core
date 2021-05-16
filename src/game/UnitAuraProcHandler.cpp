@@ -27,6 +27,7 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "Util.h"
+#include "World.h"
 
 pAuraProcHandler AuraProcHandler[TOTAL_AURAS] =
 {
