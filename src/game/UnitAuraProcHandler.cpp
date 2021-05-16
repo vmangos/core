@@ -1610,12 +1610,16 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
         case 14157: // Ruthlessness
         {
             // Need add combopoint AFTER finishing move (or they get dropped in finish phase)
-            if (Spell* spell = GetCurrentSpell(CURRENT_GENERIC_SPELL))
+            if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
             {
-                spell->AddTriggeredSpell(trigger_spell_id);
-                return SPELL_AURA_PROC_OK;
+                if (Spell* spell = GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                {
+                    spell->AddTriggeredSpell(trigger_spell_id);
+                    return SPELL_AURA_PROC_OK;
+                }
+                return SPELL_AURA_PROC_FAILED;
             }
-            return SPELL_AURA_PROC_FAILED;
+            break;
         }
     }
 
