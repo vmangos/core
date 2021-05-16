@@ -176,12 +176,12 @@ enum MolthorData
     SAY_MOLTHOR_3                       = 10537
 };
 
-static float const riftHeartPosition[4] = { -11818.29, 1345.13, 8.014503, 1.32645 };
+static float const riftHeartPosition[4] = { -11818.29f, 1345.13f, 8.014503f, 1.32645f };
 static int const emitterCount = 5;
 static float const emitterPositions[emitterCount][4] = {
-    { -11800.26, 1233.462, -0.576672, 3.665196 }, // Yojamba Isle (verified by sniff)
+    { -11800.26f, 1233.462f, -0.576672f, 3.665196f }, // Yojamba Isle (verified by sniff)
     { -11771.92f, 1273.80f,  3.96f, 0.0f },
-    { -11866.68, 1233.164, 3.900817, 2.111848 },  // Yojamba Isle (verified by sniff)
+    { -11866.68f, 1233.164f, 3.900817f, 2.111848f },  // Yojamba Isle (verified by sniff)
     { -14335.85f,  513.95f,  8.86f, 0.0f }, // Booty Bay
     { -14421.20f,  475.50f, 11.54f, 0.0f }
 };
@@ -326,13 +326,13 @@ enum HeartOfHakkarData
     GO_HEART_OF_HAKKAR_OBJECT                   = 180402
 };
 
-static float const heartPosition[4] = { -11818.35, 1344.856, 4.266753, 0.0 };
+static float const heartPosition[4] = { -11818.35f, 1344.856f, 4.266753f, 0.0f };
 static int const servantCount = 4;
 static float const servantPositions[servantCount][4] = {
-    { -11817.91, 1325.021, 1.559013, 1.518436 },
-    { -11831.73, 1331.291, 1.938519, 0.9424778 },
-    { -11835.16, 1349.36, 2.110108, 6.056293 },
-    { -11801.4, 1335.381, 1.36269, 2.617994 }
+    { -11817.91f, 1325.021f, 1.559013f, 1.518436f },
+    { -11831.73f, 1331.291f, 1.938519f, 0.9424778f },
+    { -11835.16f, 1349.36f, 2.110108f, 6.056293f },
+    { -11801.4f, 1335.381f, 1.36269f, 2.617994f }
 };
 
 struct npc_heart_of_hakkarAI : public ScriptedAI
