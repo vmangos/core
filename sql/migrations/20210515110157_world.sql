@@ -341,6 +341,9 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 UPDATE `spell_template` SET `effect1`= 42 WHERE `entry` = 31366;
                                                 
 UPDATE `creature` SET `movement_type` = 1 WHERE `guid` = 20299;
+                                                
+-- Kodo Hide Bag is a Leatherworking Quest
+UPDATE `quest_template` SET `RequiredSkill` = 165 WHERE `entry` = 769;
 
                                                 
 -- End of migration.
