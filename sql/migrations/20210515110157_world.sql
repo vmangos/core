@@ -343,7 +343,7 @@ UPDATE `spell_template` SET `effect1`= 42 WHERE `entry` = 31366;
 UPDATE `creature` SET `movement_type` = 1 WHERE `guid` = 20299;
                                                 
 -- Kodo Hide Bag is a Leatherworking Quest
-UPDATE `quest_template` SET `RequiredSkill` = 165, `PrevQuestId` = 0 WHERE `entry` = 769;
+UPDATE `quest_template` SET `RequiredSkill` = 165, `RequiredSkillValue` = 1, `PrevQuestId` = 0 WHERE `entry` = 769;
 
                                                 
 -- End of migration.
