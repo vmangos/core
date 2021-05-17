@@ -257,8 +257,9 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
 
     if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
         data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
-
-    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
+    
+    // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) || (data.procFlagsAttacker & PROC_FLAG_KILL))
         ProcDamageAndSpell_real(data);
     else
         m_pendingProcChecks.emplace_back(std::move(data));
