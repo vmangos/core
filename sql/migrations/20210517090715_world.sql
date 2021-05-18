@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210517090715');
 
 
 -- Remove no longer needed charges hack for Drain Soul.
-DELETE FROM `spell_mod` WHERE `Id` IN (1120, 8288, 8289, 11675)
+DELETE FROM `spell_mod` WHERE `Id` IN (1120, 8288, 8289, 11675);
 
 
 -- End of migration.
