@@ -345,7 +345,10 @@ UPDATE `creature` SET `movement_type` = 1 WHERE `guid` = 20299;
 -- Kodo Hide Bag is a Leatherworking Quest
 UPDATE `quest_template` SET `RequiredSkill` = 165, `RequiredSkillValue` = 1, `PrevQuestId` = 0 WHERE `entry` = 769;
 
-                                                
+-- Gordok Courtyard Key should not drop from trash mobs                                            
+DELETE FROM `creature_loot_template` WHERE `item` = 18266;
+
+
 -- End of migration.
 END IF;
 END??
