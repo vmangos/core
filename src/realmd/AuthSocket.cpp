@@ -186,8 +186,6 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 /// Constructor - set the N and g values for SRP6
 AuthSocket::AuthSocket() : promptPin(false), gridSeed(0), _geoUnlockPIN(0), _accountId(0), _lastRealmListRequest(0)
 {
-    N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
-    g.SetDword(7);
     _status = STATUS_CHALLENGE;
 
     _accountDefaultSecurityLevel = SEC_PLAYER;
@@ -275,38 +273,6 @@ void AuthSocket::OnRead()
             return;
         }
     }
-}
-
-/// Make the SRP6 calculation from hash in dB
-void AuthSocket::_SetVSFields(const std::string& rI)
-{
-    s.SetRand(s_BYTE_SIZE * 8);
-
-    BigNumber I;
-    I.SetHexStr(rI.c_str());
-
-    // In case of leading zeros in the rI hash, restore them
-    uint8 mDigest[SHA_DIGEST_LENGTH];
-    memset(mDigest, 0, SHA_DIGEST_LENGTH);
-    if (I.GetNumBytes() <= SHA_DIGEST_LENGTH)
-        memcpy(mDigest, I.AsByteArray().data(), I.GetNumBytes());
-
-    std::reverse(mDigest, mDigest + SHA_DIGEST_LENGTH);
-
-    Sha1Hash sha;
-    sha.UpdateData(s.AsByteArray());
-    sha.UpdateData(mDigest, SHA_DIGEST_LENGTH);
-    sha.Finalize();
-    BigNumber x;
-    x.SetBinary(sha.GetDigest(), sha.GetLength());
-    v = g.ModExp(x, N);
-    // No SQL injection (username escaped)
-    const char *v_hex, *s_hex;
-    v_hex = v.AsHexStr();
-    s_hex = s.AsHexStr();
-    LoginDatabase.PExecute("UPDATE `account` SET `v` = '%s', `s` = '%s' WHERE `username` = '%s'", v_hex, s_hex, _safelogin.c_str() );
-    OPENSSL_free((void*)v_hex);
-    OPENSSL_free((void*)s_hex);
 }
 
 void AuthSocket::SendProof(Sha1Hash sha)
@@ -424,7 +390,8 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         ///- Get the account details from the account table
         // No SQL injection (escaped user name)
-        result = LoginDatabase.PQuery("SELECT `sha_pass_hash`, `id`, `locked`, `last_ip`, `v`, `s`, `security`, `email_verif`, `geolock_pin`, `email`, UNIX_TIMESTAMP(`joindate`) FROM `account` WHERE `username` = '%s'",_safelogin.c_str ());
+        //                                     0     1         2          3    4    5           6              7              8       9
+        result = LoginDatabase.PQuery("SELECT `id`, `locked`, `last_ip`, `v`, `s`, `security`, `email_verif`, `geolock_pin`, `email`, UNIX_TIMESTAMP(`joindate`) FROM `account` WHERE `username` = '%s'",_safelogin.c_str ());
         if (result)
         {
             Field* fields = result->Fetch();
@@ -432,12 +399,12 @@ bool AuthSocket::_HandleLogonChallenge()
             // Prevent login if the user's email address has not been verified
             bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
             int32 requireEmailSince = sConfig.GetIntDefault("ReqEmailSince", 0);
-            bool verified = (*result)[7].GetBool();
+            bool verified = (*result)[6].GetBool();
             
             // Prevent login if the user's join date is bigger than the timestamp in configuration
             if (requireEmailSince > 0)
             {
-                uint32 t = (*result)[10].GetUInt32();
+                uint32 t = (*result)[9].GetUInt32();
                 requireVerification = requireVerification && (t >= uint32(requireEmailSince));
             }
 
@@ -451,11 +418,11 @@ bool AuthSocket::_HandleLogonChallenge()
 
             ///- If the IP is 'locked', check that the player comes indeed from the correct IP address
             bool locked = false;
-            lockFlags = (LockFlag)(*result)[2].GetUInt32();
-            securityInfo = (*result)[6].GetCppString();
-            _lastIP = fields[3].GetString();
-            _geoUnlockPIN = fields[8].GetUInt32();
-            _email = fields[9].GetCppString();
+            lockFlags = (LockFlag)(*result)[1].GetUInt32();
+            securityInfo = (*result)[5].GetCppString();
+            _lastIP = fields[2].GetString();
+            _geoUnlockPIN = fields[7].GetUInt32();
+            _email = fields[8].GetCppString();
 
             if (lockFlags & IP_LOCK)
             {
@@ -482,9 +449,20 @@ bool AuthSocket::_HandleLogonChallenge()
                 DEBUG_LOG("[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
             }
 
-            if (!locked || (locked && (lockFlags & FIXED_PIN || lockFlags & TOTP)))
+            std::string databaseV = fields[3].GetCppString();
+            std::string databaseS = fields[4].GetCppString();
+            bool broken = false;
+
+            if (!srp.SetVerifier(databaseV.c_str()) || !srp.SetSalt(databaseS.c_str()))
             {
-                uint32 account_id = fields[1].GetUInt32();
+                pkt << (uint8)WOW_FAIL_FAIL_NOACCESS;
+                BASIC_LOG("[AuthChallenge] Broken v/s values in database for account %s!", _login.c_str());
+                broken = true;
+            }
+
+            if ((!locked || (locked && (lockFlags & FIXED_PIN || lockFlags & TOTP))) && !broken)
+            {
+                uint32 account_id = fields[0].GetUInt32();
                 ///- If the account is banned, reject the logon attempt
                 QueryResult *banresult = LoginDatabase.PQuery("SELECT `bandate`, `unbandate` FROM `account_banned` WHERE "
                     "`id` = %u AND `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `unbandate` = `bandate`) LIMIT 1", account_id);
@@ -505,39 +483,22 @@ bool AuthSocket::_HandleLogonChallenge()
                 }
                 else
                 {
-                    ///- Get the password from the account table, upper it, and make the SRP6 calculation
-                    std::string rI = fields[0].GetCppString();
-
-                    ///- Don't calculate (v, s) if there are already some in the database
-                    std::string databaseV = fields[4].GetCppString();
-                    std::string databaseS = fields[5].GetCppString();
-
                     DEBUG_LOG("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
 
-                    // multiply with 2, bytes are stored as hexstring
-                    if(databaseV.size() != s_BYTE_SIZE*2 || databaseS.size() != s_BYTE_SIZE*2)
-                        _SetVSFields(rI);
-                    else
-                    {
-                        s.SetHexStr(databaseS.c_str());
-                        v.SetHexStr(databaseV.c_str());
-                    }
+                    BigNumber s;
+                    s.SetHexStr(databaseS.c_str());
 
-                    b.SetRand(19 * 8);
-                    BigNumber gmod = g.ModExp(b, N);
-                    B = ((v * 3) + gmod) % N;
-
-                    MANGOS_ASSERT(gmod.GetNumBytes() <= 32);
+                    srp.CalculateHostPublicEphemeral();
 
                     ///- Fill the response packet with the result
                     pkt << uint8(WOW_SUCCESS);
 
                     // B may be calculated < 32B so we force minimal length to 32B
-                    pkt.append(B.AsByteArray(32));      // 32 bytes
+                    pkt.append(srp.GetHostPublicEphemeral().AsByteArray(32).data(), 32); // 32 bytes
                     pkt << uint8(1);
-                    pkt.append(g.AsByteArray());
+                    pkt.append(srp.GetGeneratorModulo().AsByteArray().data(), 1);
                     pkt << uint8(32);
-                    pkt.append(N.AsByteArray(32));
+                    pkt.append(srp.GetPrime().AsByteArray(32).data(), 32);
                     pkt.append(s.AsByteArray());        // 32 bytes
                     pkt.append(VersionChallenge.data(), VersionChallenge.size());
 
@@ -690,81 +651,11 @@ bool AuthSocket::_HandleLogonProof()
     /// </ul>
 
     ///- Continue the SRP6 calculation based on data received from the client
-    BigNumber A;
-
-    A.SetBinary(lp.A, 32);
-
-    // SRP safeguard: abort if A==0
-    if (A.isZero())
+    if (!srp.CalculateSessionKey(lp.A, 32))
         return false;
 
-    if ((A % N).isZero())
-        return false;
-
-    Sha1Hash sha;
-    sha.UpdateBigNumbers(&A, &B, nullptr);
-    sha.Finalize();
-    BigNumber u;
-    u.SetBinary(sha.GetDigest(), 20);
-    BigNumber S = (A * (v.ModExp(u, N))).ModExp(b, N);
-
-    uint8 t[32];
-    uint8 t1[16];
-    uint8 vK[40];
-    memcpy(t, S.AsByteArray(32).data(), 32);
-    for (int i = 0; i < 16; ++i)
-    {
-        t1[i] = t[i * 2];
-    }
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
-    for (int i = 0; i < 20; ++i)
-    {
-        vK[i * 2] = sha.GetDigest()[i];
-    }
-    for (int i = 0; i < 16; ++i)
-    {
-        t1[i] = t[i * 2 + 1];
-    }
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
-    for (int i = 0; i < 20; ++i)
-    {
-        vK[i * 2 + 1] = sha.GetDigest()[i];
-    }
-    K.SetBinary(vK, 40);
-
-    uint8 hash[20];
-
-    sha.Initialize();
-    sha.UpdateBigNumbers(&N, nullptr);
-    sha.Finalize();
-    memcpy(hash, sha.GetDigest(), 20);
-    sha.Initialize();
-    sha.UpdateBigNumbers(&g, nullptr);
-    sha.Finalize();
-    for (int i = 0; i < 20; ++i)
-    {
-        hash[i] ^= sha.GetDigest()[i];
-    }
-    BigNumber t3;
-    t3.SetBinary(hash, 20);
-
-    sha.Initialize();
-    sha.UpdateData(_login);
-    sha.Finalize();
-    uint8 t4[SHA_DIGEST_LENGTH];
-    memcpy(t4, sha.GetDigest(), SHA_DIGEST_LENGTH);
-
-    sha.Initialize();
-    sha.UpdateBigNumbers(&t3, nullptr);
-    sha.UpdateData(t4, SHA_DIGEST_LENGTH);
-    sha.UpdateBigNumbers(&s, &A, &B, &K, nullptr);
-    sha.Finalize();
-    BigNumber M;
-    M.SetBinary(sha.GetDigest(), 20);
+    srp.HashSessionKey();
+    srp.CalculateProof(_login);
 
     ///- Check PIN data is correct
     bool pinResult = true;
@@ -804,7 +695,7 @@ bool AuthSocket::_HandleLogonProof()
     }
 
     ///- Check if SRP6 results match (password is correct), else send an error
-    if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult)
+    if (!srp.Proof(lp.M1, 20) && pinResult)
     {
         if (!VerifyVersion(lp.A, sizeof(lp.A), lp.crc_hash, false))
         {
@@ -875,7 +766,7 @@ bool AuthSocket::_HandleLogonProof()
 
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
-        const char* K_hex = K.AsHexStr();
+        const char* K_hex = srp.GetStrongSessionKey().AsHexStr();
         const char *os = reinterpret_cast<char *>(&_os);    // no injection as there are only two possible values
         auto result = LoginDatabase.PQuery("UPDATE `account` SET `sessionkey` = '%s', `last_ip` = '%s', `last_login` = NOW(), `locale` = '%u', `failed_logins` = 0, `os` = '%s' WHERE `username` = '%s'",
             K_hex, get_remote_address().c_str(), GetLocaleByName(_localizationName), os, _safelogin.c_str() );
@@ -883,9 +774,8 @@ bool AuthSocket::_HandleLogonProof()
         OPENSSL_free((void*)K_hex);
 
         ///- Finish SRP6 and send the final result to the client
-        sha.Initialize();
-        sha.UpdateBigNumbers(&A, &M, &K, nullptr);
-        sha.Finalize();
+        Sha1Hash sha;
+        srp.Finalize(sha);
 
         SendProof(sha);
 
@@ -1001,7 +891,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     }
 
     Field* fields = result->Fetch ();
-    K.SetHexStr (fields[0].GetString ());
+    srp.SetStrongSessionKey(fields[0].GetString());
     _accountId = fields[1].GetUInt32();
     delete result;
 
@@ -1031,6 +921,7 @@ bool AuthSocket::_HandleReconnectProof()
     ///- Session is closed unless overriden
     _status = STATUS_CLOSED;
 
+    BigNumber K = srp.GetStrongSessionKey();
     if (_login.empty() || !_reconnectProof.GetNumBytes() || !K.GetNumBytes())
         return false;
 
