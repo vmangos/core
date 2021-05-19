@@ -8,20 +8,21 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210510125413');
 -- Add your query below.
 
+
 -- Stone Watcher of Norgannon, should be only spawned by script.
 DELETE FROM `creature` WHERE `guid` = 301766;
 DELETE FROM `quest_end_scripts` WHERE `id`=2966;
 DELETE FROM `quest_end_scripts` WHERE `id`=2946;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2966, 5, 10, 7918, 900000, 1, 10, 0, 0, 0, 0, 8, 0, -1, 1, -9619.05, -2814.95, 11.2104, 0.20944, 0, 'Seeing What Happens - Summon Stone Watcher of Norgannon');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2966, 5, 10, 7918, 900000, 1, 10, 0, 0, 0, 0, 8, 0, -1, 1, -9619.05, -2814.95, 11.2104, 0.20944, 0, 'Seeing What Happens: Summon Stone Watcher of Norgannon');
 UPDATE `quest_template` SET `CompleteScript` = 2966 WHERE `entry` = 2946;
 
 -- Lore Keeper of Norgannon, should only be spawned by script.
 UPDATE `creature_template` SET `ai_name` = 'EventAI', script_name = '', gossip_menu_id = 562 WHERE `entry` = 7172;
 DELETE FROM `creature` WHERE `guid` = 301706;
 DELETE FROM `quest_start_scripts` WHERE `id`=2278;
-INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2278, 0, 10, 7172, 900000, 1, 30, 0, 0, 0, 0, 8, 0, -1, 1, 148.657, 309.864, -52.1173, 5.23599, 0, 'The Platinum Discs - Summon Lore Keeper of Norgannon');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2278, 0, 10, 7172, 900000, 1, 30, 0, 0, 0, 0, 8, 0, -1, 1, 148.657, 309.864, -52.1173, 5.23599, 0, 'The Platinum Discs: Summon Lore Keeper of Norgannon');
 DELETE FROM `quest_end_scripts` WHERE `id`=2278;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2278, 0, 0, 0, 0, 0, 0, 7172, 20, 8, 2, 3743, 0, 0, 0, 0, 0, 0, 0, 0, 'The Platimum Discs - Lore Keeper of Norgannon Yell Text on Completion');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2278, 0, 0, 0, 0, 0, 0, 7172, 20, 8, 2, 3743, 0, 0, 0, 0, 0, 0, 0, 0, 'The Platimum Discs: Lore Keeper of Norgannon - Yell Text');
 UPDATE `quest_template` SET `StartScript` = 2278, `CompleteScript` = 2278 WHERE `entry` = 2278;
 
 -- Events list for Lore Keeper of Norgannon
@@ -29,7 +30,7 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=7172;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (717201, 7172, 0, 11, 0, 100, 0, 0, 0, 0, 0, 717201, 0, 0, 'Lore Keeper of Norgannon - Yell Text on Spawn');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=717201;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (717201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3308, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Set Text');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (717201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3308, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Say Text');
 
 UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN (3308, 3743);
 
@@ -77,6 +78,7 @@ DELETE FROM `gossip_scripts` WHERE `id`=576;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (576, 0, 7, 2278, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Complete Quest 2278');
 DELETE FROM `gossip_scripts` WHERE `id`=575;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (575, 0, 87, 0, 0, 0, 0, 170353, 10, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lore Keeper of Norgannon - Deactivate Dwarf Hologram');
+
 
 -- End of migration.
 END IF;
