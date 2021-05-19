@@ -147,14 +147,17 @@ Player* PartyBotAI::GetPartyLeader() const
 
     if (Player* originalLeader = ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid))
     {
-        // In case the original spawner is not in the same group as the bots anymore.
-        if (pGroup != originalLeader->GetGroup())
-            return nullptr;
+        if (me->InBattleGround() == originalLeader->InBattleGround())
+        {
+            // In case the original spawner is not in the same group as the bots anymore.
+            if (pGroup != originalLeader->GetGroup())
+                return nullptr;
 
-        // In case the current leader is the bot itself and it's not inside a Battleground.
-        ObjectGuid currentLeaderGuid = pGroup->GetLeaderGuid();
-        if (currentLeaderGuid == me->GetObjectGuid() && !me->InBattleGround())
-            return nullptr;
+            // In case the current leader is the bot itself and it's not inside a Battleground.
+            ObjectGuid currentLeaderGuid = pGroup->GetLeaderGuid();
+            if (currentLeaderGuid == me->GetObjectGuid() && !me->InBattleGround())
+                return nullptr;
+        }
 
         return originalLeader;
     }
