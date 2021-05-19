@@ -687,7 +687,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         stormwind.map = 0;
         stormwind.zoneId = ZONEID_STORMWIND;
-        stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f));
+        stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Stormwind Keep
     }
 
     attackPoints.push_back(undercity);
@@ -1034,9 +1034,9 @@ void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 
     if (!zone)
         return;
 
-    uint32 spawnLoc = (urand(0, zone->pallid.size() - 1));
+    uint32 SpawnLocationID = (urand(0, zone->pallid.size() - 1));
 
-    Map* mapPtr = GetMap(zone->map, zone->pallid[spawnLoc]);
+    Map* mapPtr = GetMap(zone->map, zone->pallid[SpawnLocationID]);
 
     // If any of the required maps are not available we return. Will cause the invasion to be started
     // on next update instead
@@ -1046,7 +1046,7 @@ void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 
         return;
     }
 
-    if (mapPtr && SummonPallid(mapPtr, zone, zone->pallid[spawnLoc], spawnLoc))
+    if (mapPtr && SummonPallid(mapPtr, zone, zone->pallid[SpawnLocationID], SpawnLocationID))
         sLog.outBasic("[Scourge Invasion Event] Pallid Horror summoned in zone %d", zoneId);
     else
         sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in %d", zone->map);
@@ -1090,8 +1090,6 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
 
     Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
 
-    // If any of the required maps are not available we return. Will cause the invasion to be started
-    // on next update instead
     if (!mapPtr)
     {
         sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
@@ -1128,8 +1126,6 @@ void ScourgeInvasionEvent::StartNewInvasion(uint32 zoneVariable, uint32 zoneId)
 
     Map* mapPtr = GetMap(zone->map, zone->mouth[0]);
 
-    // If any of the required maps are not available we return. Will cause the invasion to be started
-    // on next update instead
     if (!mapPtr)
     {
         sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
@@ -1183,7 +1179,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     return true;
 }
 
-bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point, uint32 spawnLoc)
+bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point, uint32 SpawnLocationID)
 {
     // Remove old pallid if required.
     Creature* pPallid = pMap->GetCreature(zone->pallidGuid);
@@ -1194,8 +1190,8 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
     if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
         pPallid->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
-        pPallid->AI()->InformGuid(pPallid->GetObjectGuid(), spawnLoc);
-        sLog.outBasic("[Scourge Invasion Event] spawnLoc %d", spawnLoc);
+        pPallid->AI()->InformGuid(pPallid->GetObjectGuid(), SpawnLocationID);
+        sLog.outBasic("[Scourge Invasion Event] SpawnLocationID %d", SpawnLocationID);
 
         zone->pallidGuid = pPallid->GetObjectGuid();
     }
