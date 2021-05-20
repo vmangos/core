@@ -401,14 +401,14 @@ AreaAura::AreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *cu
         case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
             m_areaAuraType = AREA_AURA_PARTY;
             if (target->GetCharmerOrOwnerOrSelf()->GetTypeId() == TYPEID_UNIT)
-                m_areaAuraType = AREA_AURA_FRIEND;
+                m_areaAuraType = AREA_AURA_CREATURE_GROUP;
             if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
         case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
             m_areaAuraType = AREA_AURA_RAID;
             if (target->GetCharmerOrOwnerOrSelf()->GetTypeId() == TYPEID_UNIT)
-                m_areaAuraType = AREA_AURA_FRIEND;
+                m_areaAuraType = AREA_AURA_CREATURE_GROUP;
             if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             // Light's Beacon not applied to caster itself (TODO: more generic check for another similar spell if any?)
@@ -631,6 +631,7 @@ void AreaAura::Update(uint32 diff)
                         // add owner
                         if (owner != caster && caster->IsWithinDistInMap(owner, m_radius))
                             targets.push_back(owner);
+
                         // add caster's pet
                         Unit* pet = caster->GetPet();
                         if (pet && caster->IsWithinDistInMap(pet, m_radius))
@@ -662,6 +663,36 @@ void AreaAura::Update(uint32 diff)
                 {
                     if (owner != caster && caster->IsWithinDistInMap(owner, m_radius))
                         targets.push_back(owner);
+                    break;
+                }
+                case AREA_AURA_CREATURE_GROUP:
+                {
+                    if (Creature* pCreature = caster->ToCreature())
+                    {
+                        if (pCreature->GetCreatureGroup())
+                        {
+                            MaNGOS::AnyCreatureGroupMembersInObjectRangeCheck u_check(pCreature, m_radius);
+                            MaNGOS::UnitListSearcher<MaNGOS::AnyCreatureGroupMembersInObjectRangeCheck> searcher(targets, u_check);
+                            Cell::VisitAllObjects(pCreature, searcher, m_radius);
+                        }
+                        else
+                        {
+                            // alternative when missing group definition, apply to same faction units
+                            MaNGOS::AnySameFactionUnitInObjectRangeCheck u_check(pCreature, m_radius);
+                            MaNGOS::UnitListSearcher<MaNGOS::AnySameFactionUnitInObjectRangeCheck> searcher(targets, u_check);
+                            Cell::VisitAllObjects(pCreature, searcher, m_radius);
+                        }
+                    }
+
+                    // add owner
+                    if (owner != caster && caster->IsWithinDistInMap(owner, m_radius) && std::find(targets.begin(), targets.end(), owner) == targets.end())
+                        targets.push_back(owner);
+
+                    // add caster's pet
+                    Unit* pet = caster->GetPet();
+                    if (pet && caster->IsWithinDistInMap(pet, m_radius) && std::find(targets.begin(), targets.end(), pet) == targets.end())
+                        targets.push_back(pet);
+
                     break;
                 }
             }
