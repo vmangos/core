@@ -486,8 +486,8 @@ struct instance_uldaman : public ScriptedInstance
                         // Open the Vault door
                         SetData(DATA_ANCIENT_DOOR, DONE);
                         // Summon Ancient Treasure
-                        instance->SummonGameObject(GO_ANCIENT_TREASURE, 153.39, 289.091, -52.2262, 2.68781,
-                                0, 0, 0.97437, 0.224951, -1, 0);
+                        instance->SummonGameObject(GO_ANCIENT_TREASURE, 153.39f, 289.091f, -52.2262f, 2.68781f,
+                                0, 0, 0.97437f, 0.224951f, -1, 0);
                         break;
                     default:
                         m_auiEncounter[ULDAMAN_ENCOUNTER_ARCHAEDAS] = uiData;
