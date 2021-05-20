@@ -7236,15 +7236,6 @@ void SpellAuraHolder::SetAuraMaxDuration(int32 duration)
     }
 }
 
-uint32 SpellAuraHolder::GetAuraPeriodicTickTimer(SpellEffectIndex index) const
-{
-    Aura* aura = m_auras[index];
-    if (!aura)
-        return -1;
-
-    return aura->GetAuraPeriodicTimer();
-}
-
 bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
 {
     if (mechanic == m_spellProto->Mechanic)

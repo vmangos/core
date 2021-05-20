@@ -108,7 +108,6 @@ class SpellAuraHolder
         bool ModStackAmount(int32 num); // return true if last charge dropped
 
         Aura* GetAuraByEffectIndex(SpellEffectIndex index) const { return m_auras[index]; }
-        uint32 GetAuraPeriodicTickTimer(SpellEffectIndex index) const;
 
         uint32 GetId() const;
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
