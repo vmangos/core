@@ -30,13 +30,10 @@
 #include "SpellMgr.h"
 #include "Player.h"
 #include "GossipDef.h"
-#include "UpdateMask.h"
 #include "ScriptMgr.h"
 #include "Creature.h"
 #include "Pet.h"
-#include "Guild.h"
 #include "Spell.h"
-#include "GuildMgr.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
 

@@ -83,11 +83,11 @@ void MemberSlot::ChangeRank(uint32 newRank)
 Guild::Guild() : m_Name(), MOTD(), GINFO()
 {
     m_Id = 0;
-    m_EmblemStyle = 0;
-    m_EmblemColor = 0;
-    m_BorderStyle = 0;
-    m_BorderColor = 0;
-    m_BackgroundColor = 0;
+    m_EmblemStyle = -1;
+    m_EmblemColor = -1;
+    m_BorderStyle = -1;
+    m_BorderColor = -1;
+    m_BackgroundColor = -1;
     m_accountsNumber = 0;
 
     m_CreatedYear = 0;
@@ -164,7 +164,7 @@ bool Guild::Create(Player* leader, std::string gname)
     // CharacterDatabase.PExecute("DELETE FROM guild WHERE guildid='%u'", Id); - MAX(guildid)+1 not exist
     CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guildid`='%u'", m_Id);
     CharacterDatabase.PExecute("INSERT INTO `guild` (`guildid`, `name`, `leaderguid`, `info`, `motd`, `createdate`, `EmblemStyle`, `EmblemColor`, `BorderStyle`, `BorderColor`, `BackgroundColor`) "
-                               "VALUES('%u','%s','%u', '%s', '%s','" UI64FMTD "','%u','%u','%u','%u','%u')",
+                               "VALUES('%u','%s','%u', '%s', '%s','" UI64FMTD "','%i','%i','%i','%i','%i')",
                                m_Id, gname.c_str(), m_LeaderGuid.GetCounter(), dbGINFO.c_str(), dbMOTD.c_str(), uint64(now), m_EmblemStyle, m_EmblemColor, m_BorderStyle, m_BorderColor, m_BackgroundColor);
     CharacterDatabase.CommitTransaction();
 
@@ -302,11 +302,11 @@ bool Guild::LoadGuildFromDB(QueryResult* guildDataResult)
     m_Id              = fields[0].GetUInt32();
     m_Name            = fields[1].GetCppString();
     m_LeaderGuid      = ObjectGuid(HIGHGUID_PLAYER, fields[2].GetUInt32());
-    m_EmblemStyle     = fields[3].GetUInt32();
-    m_EmblemColor     = fields[4].GetUInt32();
-    m_BorderStyle     = fields[5].GetUInt32();
-    m_BorderColor     = fields[6].GetUInt32();
-    m_BackgroundColor = fields[7].GetUInt32();
+    m_EmblemStyle     = fields[3].GetInt32();
+    m_EmblemColor     = fields[4].GetInt32();
+    m_BorderStyle     = fields[5].GetInt32();
+    m_BorderColor     = fields[6].GetInt32();
+    m_BackgroundColor = fields[7].GetInt32();
     GINFO             = fields[8].GetCppString();
     MOTD              = fields[9].GetCppString();
     time_t time       = fields[10].GetUInt64();
@@ -847,17 +847,17 @@ void Guild::Query(WorldSession* session)
             data << uint8(0);                               // null string
     }
 
-    data << uint32(m_EmblemStyle);
-    data << uint32(m_EmblemColor);
-    data << uint32(m_BorderStyle);
-    data << uint32(m_BorderColor);
-    data << uint32(m_BackgroundColor);
+    data << int32(m_EmblemStyle);
+    data << int32(m_EmblemColor);
+    data << int32(m_BorderStyle);
+    data << int32(m_BorderColor);
+    data << int32(m_BackgroundColor);
 
     session->SendPacket(&data);
     DEBUG_LOG("WORLD: Sent (SMSG_GUILD_QUERY_RESPONSE)");
 }
 
-void Guild::SetEmblem(uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor, uint32 backgroundColor)
+void Guild::SetEmblem(int32 emblemStyle, int32 emblemColor, int32 borderStyle, int32 borderColor, int32 backgroundColor)
 {
     m_EmblemStyle = emblemStyle;
     m_EmblemColor = emblemColor;
@@ -865,7 +865,7 @@ void Guild::SetEmblem(uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle
     m_BorderColor = borderColor;
     m_BackgroundColor = backgroundColor;
 
-    CharacterDatabase.PExecute("UPDATE `guild` SET `EmblemStyle`=%u, `EmblemColor`=%u, `BorderStyle`=%u, `BorderColor`=%u, `BackgroundColor`=%u WHERE `guildid` = %u", m_EmblemStyle, m_EmblemColor, m_BorderStyle, m_BorderColor, m_BackgroundColor, m_Id);
+    CharacterDatabase.PExecute("UPDATE `guild` SET `EmblemStyle`=%i, `EmblemColor`=%i, `BorderStyle`=%i, `BorderColor`=%i, `BackgroundColor`=%i WHERE `guildid` = %u", m_EmblemStyle, m_EmblemColor, m_BorderStyle, m_BorderColor, m_BackgroundColor, m_Id);
 }
 
 /**

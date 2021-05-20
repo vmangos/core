@@ -20,22 +20,16 @@
  */
 
 #include "Common.h"
+#include "Creature.h"
 #include "CreatureEventAI.h"
 #include "CreatureEventAIMgr.h"
-#include "ObjectMgr.h"
-#include "Spell.h"
-#include "World.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GameEventMgr.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "InstanceData.h"
+#include "Player.h"
+#include "SpellAuras.h"
 #include "Chat.h"
 #include "Language.h"
-#include "ScriptMgr.h"
-#include "CreatureAI.h"
 #include "GuardMgr.h"
+#include "Conditions.h"
+#include "Map.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax)
 {
@@ -132,7 +126,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     if (pHolder.Event.event_inverse_phase_mask & (1 << m_Phase))
         return false;
 
-    if (pHolder.Event.condition_id && !sObjectMgr.IsConditionSatisfied(pHolder.Event.condition_id, pActionInvoker ? pActionInvoker : m_creature->GetVictim(), m_creature->GetMap(), m_creature, CONDITION_FROM_EVENTAI))
+    if (pHolder.Event.condition_id && !IsConditionSatisfied(pHolder.Event.condition_id, pActionInvoker ? pActionInvoker : m_creature->GetVictim(), m_creature->GetMap(), m_creature, CONDITION_FROM_EVENTAI))
         return false;
 
     CreatureEventAI_Event const& event = pHolder.Event;

@@ -16,14 +16,11 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "SystemConfig.h"
-#include "revision.h"
 #include "Util.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
@@ -183,6 +180,34 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
         PSendSysMessage("Not spawned. Respawns in %u seconds (%u:%u:%u).", pGameObject->GetRespawnDelay(), pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
     }
     
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectUpdateFieldsInfoCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    ShowAllUpdateFieldsHelper(pGameObject);
 
     return true;
 }

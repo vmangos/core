@@ -36,7 +36,6 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "World.h"
-#include "ObjectAccessor.h"
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "SocialMgr.h"
@@ -45,10 +44,7 @@
 #include "Anticheat.h"
 #include "Language.h"
 #include "Auth/Sha1.h"
-#include "ChannelMgr.h"
 #include "Chat.h"
-#include "Channel.h"
-#include "AccountMgr.h"
 #include "MasterPlayer.h"
 
 // select opcodes appropriate for processing in Map::Update context for current session state
@@ -277,7 +273,7 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 
 bool WorldSession::ForcePlayerLogoutDelay()
 {
-    if (!sWorld.IsStopped() && GetPlayer() && GetPlayer()->FindMap() && GetPlayer()->IsInWorld() && sPlayerBotMgr.ForceLogoutDelay())
+    if (!sWorld.IsStopped() && GetPlayer() && GetPlayer()->FindMap() && GetPlayer()->IsInWorld() && sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
     {
         sLog.out(LOG_CHAR, "Account: %d (IP: %s) Lost socket for character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
         sWorld.LogCharacter(GetPlayer(), "LostSocket");

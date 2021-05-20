@@ -26,6 +26,7 @@ npc_zamael_lunthistle
 EndContentData */
 
 #include "scriptPCH.h"
+#include "Group.h"
 
 /*######
 ## npc_dorius_stonetender

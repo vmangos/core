@@ -21,16 +21,13 @@
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "Path.h"
-#include "ScriptMgr.h"
 #include "WorldPacket.h"
-#include "DBCStores.h"
 #include "World.h"
 #include "GameObjectAI.h"
 #include "MapReference.h"
 #include "Player.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "Totem.h"
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
 
@@ -429,7 +426,7 @@ void Transport::SendOutOfRangeUpdateToMap()
     if (!players.isEmpty())
     {
         UpdateData data;
-        BuildOutOfRangeUpdateBlock(&data);
+        BuildOutOfRangeUpdateBlock(data);
         WorldPacket packet;
         data.BuildPacket(&packet);
         for (const auto& player : players)
@@ -447,7 +444,7 @@ void Transport::SendCreateUpdateToMap()
             if (player.getSource()->GetTransport() != this)
             {
                 UpdateData data;
-                BuildCreateUpdateBlockForPlayer(&data, player.getSource());
+                BuildCreateUpdateBlockForPlayer(data, player.getSource());
                 data.Send(player.getSource()->GetSession());
             }
     }

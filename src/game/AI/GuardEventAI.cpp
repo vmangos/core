@@ -17,6 +17,7 @@
 */
 
 #include "GuardEventAI.h"
+#include "Creature.h"
 
 GuardEventAI::GuardEventAI(Creature* pCreature) : CreatureEventAI(pCreature)
 {}

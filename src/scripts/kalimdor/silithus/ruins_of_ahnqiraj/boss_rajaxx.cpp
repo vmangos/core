@@ -23,6 +23,8 @@ EndScriptData */
 
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
+#include "Group.h"
 #include "ruins_of_ahnqiraj.h"
 
 #define GOSSIP_START  "Let's find out."

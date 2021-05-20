@@ -579,7 +579,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* pQuest)
     data << uint32(pQuest->GetQuestId());                   // quest id
     data << uint32(pQuest->GetQuestMethod());               // Accepted values: 0, 1 or 2. 0==IsAutoComplete() (skip objectives/details)
     data << uint32(pQuest->GetQuestLevel());                // may be 0, static data, in other cases must be used dynamic level: Player::GetQuestLevelForPlayer
-    data << uint32(pQuest->GetZoneOrSort());                // zone or sort to display in quest log
+    data << int32(pQuest->GetZoneOrSort());                 // zone or sort to display in quest log
 
     data << uint32(pQuest->GetType());
     //[-ZERO] data << uint32(pQuest->GetSuggestedPlayers());

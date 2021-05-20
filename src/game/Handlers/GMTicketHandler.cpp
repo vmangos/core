@@ -27,8 +27,8 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "Chat.h"
-#include "SpellAuras.h"
 #include "World.h"
+#include "Opcodes.h"
 
 void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
 {

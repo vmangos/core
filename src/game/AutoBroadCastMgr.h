@@ -2,7 +2,7 @@
 #define _AUTOBROADCAST_MGR_H
 
 #include "Policies/Singleton.h"
-#include "SharedDefines.h"
+#include "Platform/Define.h"
 
 #include <vector>
 

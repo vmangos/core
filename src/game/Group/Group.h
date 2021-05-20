@@ -23,15 +23,14 @@
 #define MANGOSSERVER_GROUP_H
 
 #include "Common.h"
+#include "SharedDefines.h"
 #include "ObjectGuid.h"
 #include "GroupReference.h"
 #include "GroupRefManager.h"
 #include "BattleGround.h"
 #include "LootMgr.h"
-#include "DBCEnums.h"
-#include "SharedDefines.h"
-#include "LFGHandler.h"
 #include "LFGMgr.h"
+#include "DBCEnums.h"
 
 #include <map>
 #include <vector>

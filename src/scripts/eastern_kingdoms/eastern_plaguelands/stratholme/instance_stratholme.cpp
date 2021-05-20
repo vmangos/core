@@ -36,6 +36,8 @@ enum
     NPC_PLAGUED_INSECT          = 10461,
     NPC_PLAGUED_MAGGOT          = 10536,
     NPC_MINDLESS_UNDEAD         = 11030,
+    NPC_VENGEFUL_PHANTOM        = 10387,
+    NPC_THE_UNFORGIVEN          = 10516,
 
     RIVENDARE_YELL_45MIN        = -1000020,
     RIVENDARE_YELL_10MIN        = -1000021,
@@ -62,6 +64,8 @@ static uint32 const aPlaguedCritters[] =
 {
     NPC_PLAGUED_RAT, NPC_PLAGUED_MAGGOT, NPC_PLAGUED_INSECT
 };
+
+static Position const unforgivenTriggerSpot(3712.607f, -3429.338f, 131.001f, 0.0f);
 
 struct instance_stratholme : public ScriptedInstance
 {
@@ -574,6 +578,7 @@ struct instance_stratholme : public ScriptedInstance
             case TYPE_CRISTAL_ALL_DIE:
             case TYPE_EVENT_AURIUS:
             case TYPE_RAMSTEIN_EVENT:
+            case TYPE_UNFORGIVEN:
             {
                 m_auiEncounter[uiType] = uiData;
                 break;
@@ -732,6 +737,28 @@ struct instance_stratholme : public ScriptedInstance
 
     void Update(uint32 uiDiff) override
     {
+        if (GetData(TYPE_UNFORGIVEN) == NOT_STARTED)
+        {
+            Map::PlayerList const& players = instance->GetPlayers();
+            for (const auto& player : players)
+            {
+                if (Player* pPlayer = player.getSource())
+                {
+                    if (pPlayer->IsTargetable(true, false) &&
+                        pPlayer->GetDistance3dToCenter(unforgivenTriggerSpot) < 10.0f)
+                    {
+                        SetData(TYPE_UNFORGIVEN, DONE);
+                        instance->SummonCreature(NPC_THE_UNFORGIVEN, 3719.82f, -3426.25f, 131.844f, 3.3412f, TEMPSUMMON_DEAD_DESPAWN, 1 * HOUR * IN_MILLISECONDS);
+                        instance->SummonCreature(NPC_VENGEFUL_PHANTOM, 3715.85f, -3428.25f, 131.442f, 3.57792f, TEMPSUMMON_DEAD_DESPAWN, 1 * HOUR * IN_MILLISECONDS);
+                        instance->SummonCreature(NPC_VENGEFUL_PHANTOM, 3714.14f, -3423.75f, 131.673f, 3.61283f, TEMPSUMMON_DEAD_DESPAWN, 1 * HOUR * IN_MILLISECONDS);
+                        instance->SummonCreature(NPC_VENGEFUL_PHANTOM, 3721.93f, -3429.88f, 131.844f, 3.33358f, TEMPSUMMON_DEAD_DESPAWN, 1 * HOUR * IN_MILLISECONDS);
+                        instance->SummonCreature(NPC_VENGEFUL_PHANTOM, 3718.09f, -3432.27f, 131.306f, 4.3381f, TEMPSUMMON_DEAD_DESPAWN, 1 * HOUR * IN_MILLISECONDS);
+                        break;
+                    }
+                }
+            }
+        }
+
         // Loop over the two Gate traps, each one has up to three timers (trap reset, gate opening delay, critters spawning delay)
         for (uint8 i = 0; i < 2; i++)
         {

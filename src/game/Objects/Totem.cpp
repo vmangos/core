@@ -20,15 +20,12 @@
  */
 
 #include "Totem.h"
-#include "WorldPacket.h"
-#include "Log.h"
 #include "Group.h"
 #include "Player.h"
-#include "ObjectMgr.h"
 #include "SpellMgr.h"
-#include "DBCStores.h"
 #include "CreatureAI.h"
 #include "InstanceData.h"
+#include "ObjectAccessor.h"
 
 Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
 {

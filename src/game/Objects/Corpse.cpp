@@ -21,12 +21,10 @@
 
 #include "Corpse.h"
 #include "Player.h"
-#include "UpdateMask.h"
+#include "Group.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "Database/DatabaseEnv.h"
-#include "Opcodes.h"
-#include "GossipDef.h"
 #include "World.h"
 #include "ObjectMgr.h"
 
@@ -296,11 +294,4 @@ bool Corpse::IsExpired(time_t t) const
 uint32 Corpse::GetFactionTemplateId() const 
 {
     return m_faction->ID;
-}
-
-uint32 Corpse::GetLevel() const
-{
-    if (Unit* pOwner = ObjectAccessor::GetUnit(*this, GetOwnerGuid()))
-        return pOwner->GetLevel();
-    return PLAYER_MAX_LEVEL;
 }
