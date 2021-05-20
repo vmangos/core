@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210516190702');
 
 -- Theramore Deserters that were added in TBC.
 DELETE FROM `creature` WHERE `guid` IN (30741, 30769, 30770, 30742, 30772, 30773, 30771, 30774, 30776);
-DELETE FROM `creature_addon` WHERE `guid` = 30741;
+DELETE FROM `creature_addon` WHERE `guid` IN (30741, 30769, 30770, 30742, 30772, 30773, 30771, 30774, 30776);
 
 -- End of migration.
 END IF;
