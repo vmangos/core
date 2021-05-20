@@ -7210,7 +7210,7 @@ void SpellAuraHolder::RefreshHolder()
  * @param duration Custom duration to base tick on (typically in the case of passive auras)
  *
  */
-void SpellAuraHolder::RefreshAuraPeriodicTimers(uint32 duration)
+void SpellAuraHolder::RefreshAuraPeriodicTimers(int32 duration)
 {
     for (int i = 0 ; i < MAX_EFFECT_INDEX; ++i)
     {
@@ -7219,7 +7219,7 @@ void SpellAuraHolder::RefreshAuraPeriodicTimers(uint32 duration)
             // If the aura is periodic, update the periodic timer to correspond with the new
             // aura timer
             if (pAura->IsPeriodic())
-                pAura->UpdatePeriodicTimer(duration ? duration : m_duration);
+                pAura->UpdatePeriodicTimer(duration > 0 ? duration : m_duration);
         }
     }
 }

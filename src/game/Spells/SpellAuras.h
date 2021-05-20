@@ -64,7 +64,7 @@ struct Modifier
      * set to 0 it's only applied once and then removed when
      * the Aura is removed
      */
-    uint32 periodictime;
+    int32 periodictime;
 };
 
 struct HeartBeatData
@@ -171,7 +171,7 @@ class SpellAuraHolder
         void UpdateHolder(uint32 diff) { SetInUse(true); Update(diff); SetInUse(false); }
         void Update(uint32 diff);
         void RefreshHolder();
-        void RefreshAuraPeriodicTimers(uint32 duration = 0);
+        void RefreshAuraPeriodicTimers(int32 duration = 0);
 
         bool IsSingleTarget() const { return m_isSingleTarget; }
         void SetIsSingleTarget(bool val) { m_isSingleTarget = val; }
@@ -452,7 +452,7 @@ class Aura
         int32 GetAuraDuration() const { return GetHolder()->GetAuraDuration(); }
         time_t GetAuraApplyTime() const { return m_applyTime; }
         uint32 GetAuraTicks() const { return m_periodicTick; }
-        uint32 GetAuraPeriodicTimer() const { return m_periodicTimer; }
+        int32 GetAuraPeriodicTimer() const { return m_periodicTimer; }
         uint32 GetAuraMaxTicks() const
         {
             int32 maxDuration = GetAuraMaxDuration();
