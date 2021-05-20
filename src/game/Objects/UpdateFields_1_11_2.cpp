@@ -2,8 +2,8 @@
 // Patch: 1.11.2
 // Build: 5464
 
-static std::vector<UpdateFieldData> const g_updateFieldsData =
-{
+static std::array<UpdateFieldData, 322> const g_updateFieldsData =
+{{
     // enum EObjectFields
     { TYPEMASK_OBJECT       , "OBJECT_FIELD_GUID"                               , 0x0  , 2  , UF_TYPE_GUID     , UF_FLAG_PUBLIC },
     { TYPEMASK_OBJECT       , "OBJECT_FIELD_TYPE"                               , 0x2  , 1  , UF_TYPE_INT      , UF_FLAG_PUBLIC },
@@ -31,7 +31,7 @@ static std::vector<UpdateFieldData> const g_updateFieldsData =
     { TYPEMASK_CONTAINER    , "CONTAINER_FIELD_NUM_SLOTS"                       , 0x30 , 1  , UF_TYPE_INT      , UF_FLAG_PUBLIC },
     { TYPEMASK_CONTAINER    , "CONTAINER_ALIGN_PAD"                             , 0x31 , 1  , UF_TYPE_BYTES    , UF_FLAG_NONE },
     { TYPEMASK_CONTAINER    , "CONTAINER_FIELD_SLOT_1"                          , 0x32 , 72 , UF_TYPE_GUID     , UF_FLAG_PUBLIC },
-    { TYPEMASK_CONTAINER    , "CONTAINER_END"                                   , 0x7A , 0  , UF_TYPE_NONE     , UF_FLAG_NONE },;
+    { TYPEMASK_CONTAINER    , "CONTAINER_END"                                   , 0x7A , 0  , UF_TYPE_NONE     , UF_FLAG_NONE },
     // enum EUnitFields
     { TYPEMASK_UNIT         , "UNIT_FIELD_CHARM"                                , 0x6  , 2  , UF_TYPE_GUID     , UF_FLAG_PUBLIC },
     { TYPEMASK_UNIT         , "UNIT_FIELD_SUMMON"                               , 0x8  , 2  , UF_TYPE_GUID     , UF_FLAG_PUBLIC },
@@ -334,4 +334,4 @@ static std::vector<UpdateFieldData> const g_updateFieldsData =
     { TYPEMASK_CORPSE       , "CORPSE_FIELD_DYNAMIC_FLAGS"                      , 0x24 , 1  , UF_TYPE_INT      , UF_FLAG_DYNAMIC },
     { TYPEMASK_CORPSE       , "CORPSE_FIELD_PAD"                                , 0x25 , 1  , UF_TYPE_INT      , UF_FLAG_NONE },
     { TYPEMASK_CORPSE       , "CORPSE_END"                                      , 0x26 , 0  , UF_TYPE_NONE     , UF_FLAG_NONE },
-};
+}};

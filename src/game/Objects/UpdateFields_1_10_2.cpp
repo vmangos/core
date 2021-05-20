@@ -2,8 +2,8 @@
 // Patch: 1.10.2
 // Build: 5302
 
-static std::vector<UpdateFieldData> const g_updateFieldsData =
-{
+static std::array<UpdateFieldData, 321> const g_updateFieldsData =
+{{
     // enum EObjectFields
     { TYPEMASK_OBJECT       , "OBJECT_FIELD_GUID"                               , 0x0  , 2  , UF_TYPE_GUID     , UF_FLAG_PUBLIC },
     { TYPEMASK_OBJECT       , "OBJECT_FIELD_TYPE"                               , 0x2  , 1  , UF_TYPE_INT      , UF_FLAG_PUBLIC },
@@ -333,4 +333,4 @@ static std::vector<UpdateFieldData> const g_updateFieldsData =
     { TYPEMASK_CORPSE       , "CORPSE_FIELD_DYNAMIC_FLAGS"                      , 0x24 , 1  , UF_TYPE_INT      , UF_FLAG_DYNAMIC },
     { TYPEMASK_CORPSE       , "CORPSE_FIELD_PAD"                                , 0x25 , 1  , UF_TYPE_INT      , UF_FLAG_NONE },
     { TYPEMASK_CORPSE       , "CORPSE_END"                                      , 0x26 , 0  , UF_TYPE_NONE     , UF_FLAG_NONE },
-};
+}};
