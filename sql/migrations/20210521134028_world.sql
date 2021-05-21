@@ -21,20 +21,11 @@ UPDATE `creature_template` SET `spell_id2`=913 WHERE `entry`=453 && `spell_id2`=
 -- Kobold Geomancer is using wrong spell id for Fireball.
 UPDATE `creature_template` SET `spell_id1`=20793 WHERE `entry`=476 && `spell_id1`=133;
 
--- Riverpaw Outrunner is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=478 && `spell_id1`=3417;
-
 -- Murloc Nightcrawler is using wrong spell id for Backstab.
 UPDATE `creature_template` SET `spell_id1`=2589 WHERE `entry`=544 && `spell_id1`=7159;
 
 -- Defias Pillager is using wrong spell id for Fireball.
 UPDATE `creature_template` SET `spell_id1`=19816 WHERE `entry`=589 && `spell_id1`=20793;
-
--- Edwin VanCleef is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=639 && `spell_id1`=3417;
-
--- Skullsplitter Hunter is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=669 && `spell_id2`=3417;
 
 -- Wyrmkin Dreamwalker is using wrong spell id for Rejuvenation.
 UPDATE `creature_template` SET `spell_id3`=12160 WHERE `entry`=743 && `spell_id3`=20664;
@@ -51,9 +42,6 @@ UPDATE `creature_template` SET `spell_id2`=14145 WHERE `entry`=1046 && `spell_id
 -- Stonesplinter Geomancer is using wrong spell id for Flamestrike.
 UPDATE `creature_template` SET `spell_id1`=2120 WHERE `entry`=1165 && `spell_id1`=11829;
 
--- Tunnel Rat Kobold is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=1202 && `spell_id1`=3417;
-
 -- Bloodsail Swashbuckler is using wrong spell id for Kick.
 UPDATE `creature_template` SET `spell_id2`=1768 WHERE `entry`=1563 && `spell_id2`=11978;
 
@@ -66,9 +54,6 @@ UPDATE `creature_template` SET `spell_id2`=8629 WHERE `entry`=1565 && `spell_id2
 -- Dextren Ward is using wrong spell id for Battle Stance.
 UPDATE `creature_template` SET `spell_id3`=7165 WHERE `entry`=1663 && `spell_id3`=2457;
 
--- Targorr the Dread is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=1696 && `spell_id2`=3417;
-
 -- Defias Prisoner is using wrong spell id for Kick.
 UPDATE `creature_template` SET `spell_id1`=1766 WHERE `entry`=1706 && `spell_id1`=11978;
 
@@ -77,9 +62,6 @@ UPDATE `creature_template` SET `spell_id2`=3427 WHERE `entry`=1707 && `spell_id2
 
 -- Defias Captive is using wrong spell id for Backstab.
 UPDATE `creature_template` SET `spell_id1`=7159 WHERE `entry`=1707 && `spell_id1`=15657;
-
--- Skeletal Flayer is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=1783 && `spell_id1`=3417;
 
 -- Skeletal Executioner is using wrong spell id for Strike.
 UPDATE `creature_template` SET `spell_id2`=12057 WHERE `entry`=1787 && `spell_id2`=11976;
@@ -135,9 +117,6 @@ UPDATE `creature_template` SET `spell_id3`=13787 WHERE `entry`=1947 && `spell_id
 -- Gnarlpine Pathfinder is using wrong spell id for Wrath.
 UPDATE `creature_template` SET `spell_id1`=9739 WHERE `entry`=2012 && `spell_id1`=5177;
 
--- Raging Reef Crawler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=2236 && `spell_id1`=3417;
-
 -- Crushridge Enforcer is using wrong spell id for Intimidation.
 UPDATE `creature_template` SET `spell_id2`=7093 WHERE `entry`=2256 && `spell_id2`=19577;
 
@@ -152,9 +131,6 @@ UPDATE `creature_template` SET `spell_id1`=8439 WHERE `entry`=2550 && `spell_id1
 
 -- Witherbark Shadowcaster is using wrong spell id for Summon Imp.
 UPDATE `creature_template` SET `spell_id2`=11939 WHERE `entry`=2553 && `spell_id2`=688;
-
--- Highland Thrasher is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=2560 && `spell_id1`=3417;
 
 -- Boulderfist Shaman is using wrong spell id for Healing Wave.
 UPDATE `creature_template` SET `spell_id1`=959 WHERE `entry`=2570 && `spell_id1`=11986;
@@ -171,15 +147,6 @@ UPDATE `creature_template` SET `spell_id2`=15656 WHERE `entry`=2641 && `spell_id
 -- Vilebranch Shadowcaster is using wrong spell id for Shadow Bolt.
 UPDATE `creature_template` SET `spell_id1`=12471 WHERE `entry`=2642 && `spell_id1`=9613;
 
--- Vilebranch Raiding Wolf is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=2681 && `spell_id1`=3417;
-
--- Dustbelcher Mauler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=2717 && `spell_id1`=3417;
-
--- Feral Crag Coyote is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=2728 && `spell_id1`=3417;
-
 -- Thunder Lizard is using wrong spell id for Lizard Bolt.
 UPDATE `creature_template` SET `spell_id1`=5401 WHERE `entry`=3130 && `spell_id1`=6255;
 
@@ -189,23 +156,8 @@ UPDATE `creature_template` SET `spell_id1`=5401 WHERE `entry`=3239 && `spell_id1
 -- Thunderhawk Hatchling is using wrong spell id for Lightning Shield.
 UPDATE `creature_template` SET `spell_id2`=325 WHERE `entry`=3247 && `spell_id2`=13585;
 
--- Sunscale Scytheclaw is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=3256 && `spell_id1`=3417;
-
--- Bael'dun Officer is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=3378 && `spell_id2`=3417;
-
--- Razormane Pathfinder is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=3456 && `spell_id2`=3417;
-
--- Foulweald Den Watcher is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=3746 && `spell_id1`=3417;
-
 -- Felmusk Felsworn is using wrong spell id for Curse of Weakness.
 UPDATE `creature_template` SET `spell_id2`=6205 WHERE `entry`=3762 && `spell_id2`=11980;
-
--- Bloodfury Roguefeather is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4023 && `spell_id1`=3417;
 
 -- Rogue Flame Spirit is using wrong spell id for Curse of Weakness.
 UPDATE `creature_template` SET `spell_id2`=6205 WHERE `entry`=4036 && `spell_id2`=12741;
@@ -249,24 +201,6 @@ UPDATE `creature_template` SET `spell_id3`=8380 WHERE `entry`=4328 && `spell_id3
 -- Strashaz Myrmidon is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id1`=15754 WHERE `entry`=4368 && `spell_id1`=15284;
 
--- Strashaz Hydra is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4374 && `spell_id1`=3417;
-
--- Scarlet Avenger is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4493 && `spell_id1`=3417;
-
--- Scarlet Monk is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4540 && `spell_id1`=3417;
-
--- Kolkar Mauler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4634 && `spell_id1`=3417;
-
--- Magram Mauler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4645 && `spell_id1`=3417;
-
--- Maraudine Mauler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4656 && `spell_id1`=3417;
-
 -- Slitherblade Oracle is using wrong spell id for Slow.
 UPDATE `creature_template` SET `spell_id1`=246 WHERE `entry`=4718 && `spell_id1`=11436;
 
@@ -284,9 +218,6 @@ UPDATE `creature_template` SET `spell_id3`=865 WHERE `entry`=4844 && `spell_id3`
 
 -- Shadowforge Ruffian is using wrong spell id for Kick.
 UPDATE `creature_template` SET `spell_id1`=1767 WHERE `entry`=4845 && `spell_id1`=11978;
-
--- Stonevault Brawler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=4855 && `spell_id1`=3417;
 
 -- Gordunni Mage-Lord is using wrong spell id for Fireball.
 UPDATE `creature_template` SET `spell_id1`=20823 WHERE `entry`=5239 && `spell_id1`=8401;
@@ -315,21 +246,6 @@ UPDATE `creature_template` SET `spell_id1`=9591 WHERE `entry`=5280 && `spell_id1
 -- Hakkari Frostwing is using wrong spell id for Frost Nova.
 UPDATE `creature_template` SET `spell_id1`=11831 WHERE `entry`=5291 && `spell_id1`=9915;
 
--- Centipaar Stinger is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=5456 && `spell_id2`=3417;
-
--- Centipaar Swarmer is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=5457 && `spell_id1`=3417;
-
--- Centipaar Worker is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=5458 && `spell_id1`=3417;
-
--- Centipaar Tunneler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=5459 && `spell_id1`=3417;
-
--- Centipaar Sandreaver is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=5460 && `spell_id2`=3417;
-
 -- Dunemaul Warlock is using wrong spell id for Immolate.
 UPDATE `creature_template` SET `spell_id3`=2941 WHERE `entry`=5475 && `spell_id3`=707;
 
@@ -338,9 +254,6 @@ UPDATE `creature_template` SET `spell_id1`=6909 WHERE `entry`=5475 && `spell_id1
 
 -- Sandfury Axe Thrower is using wrong spell id for Throw.
 UPDATE `creature_template` SET `spell_id1`=15607 WHERE `entry`=5646 && `spell_id1`=10277;
-
--- Shade of Eranikus is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=5709 && `spell_id1`=3417;
 
 -- Jammal'an the Prophet is using wrong spell id for Hex of Jammal'an.
 UPDATE `creature_template` SET `spell_id3`=12479 WHERE `entry`=5710 && `spell_id3`=12480;
@@ -360,23 +273,11 @@ UPDATE `creature_template` SET `spell_id3`=11436 WHERE `entry`=5862 && `spell_id
 -- Twilight Geomancer is using wrong spell id for Fireball.
 UPDATE `creature_template` SET `spell_id1`=14034 WHERE `entry`=5862 && `spell_id1`=9053;
 
--- Dreadmaul Mauler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=5977 && `spell_id1`=3417;
-
--- Shadowsworn Thug is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=6005 && `spell_id1`=3417;
-
 -- Shadowsworn Adept is using wrong spell id for Blood Leech.
 UPDATE `creature_template` SET `spell_id2`=11015 WHERE `entry`=6006 && `spell_id2`=6958;
 
 -- Azuregos is using wrong spell id for Frost Breath.
 UPDATE `creature_template` SET `spell_id3`=21099 WHERE `entry`=6109 && `spell_id3`=22479;
-
--- Wavethrasher is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=6348 && `spell_id1`=3417;
-
--- Great Wavethrasher is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=6349 && `spell_id1`=3417;
 
 -- Fallen Champion is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id3`=15496 WHERE `entry`=6488 && `spell_id3`=19642;
@@ -395,9 +296,6 @@ UPDATE `creature_template` SET `spell_id2`=6660 WHERE `entry`=7038 && `spell_id2
 
 -- Thaurissan Agent is using wrong spell id for Gouge.
 UPDATE `creature_template` SET `spell_id1`=12540 WHERE `entry`=7038 && `spell_id1`=13579;
-
--- War Reaver is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=7039 && `spell_id1`=3417;
 
 -- Black Dragonspawn is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id1`=15663 WHERE `entry`=7040 && `spell_id1`=15284;
@@ -432,23 +330,14 @@ UPDATE `creature_template` SET `spell_id2`=11990 WHERE `entry`=7111 && `spell_id
 -- Jaedenar Guardian is using wrong spell id for Improved Blocking.
 UPDATE `creature_template` SET `spell_id1`=3248 WHERE `entry`=7113 && `spell_id1`=3639;
 
--- Ferocitas the Dream Eater is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=7234 && `spell_id1`=3417;
-
 -- Chief Ukorz Sandscalp is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id2`=15623 WHERE `entry`=7267 && `spell_id2`=15496;
 
 -- Sandfury Guardian is using wrong spell id for Poison.
 UPDATE `creature_template` SET `spell_id2`=744 WHERE `entry`=7268 && `spell_id2`=13518;
 
--- Sandfury Guardian is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=7268 && `spell_id1`=3417;
-
 -- Sandfury Executioner is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id2`=15623 WHERE `entry`=7274 && `spell_id2`=15496;
-
--- Stonevault Mauler is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=7320 && `spell_id1`=3417;
 
 -- Death's Head Geomancer is using wrong spell id for Flame Spike.
 UPDATE `creature_template` SET `spell_id2`=8814 WHERE `entry`=7335 && `spell_id2`=6725;
@@ -531,17 +420,11 @@ UPDATE `creature_template` SET `spell_id2`=13874 WHERE `entry`=8895 && `spell_id
 -- Cave Creeper is using wrong spell id for Poison.
 UPDATE `creature_template` SET `spell_id2`=13298 WHERE `entry`=8933 && `spell_id2`=744;
 
--- Felpaw Ravager is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=8961 && `spell_id1`=3417;
-
 -- Felpaw Ravager is using wrong spell id for Infected Wound.
 UPDATE `creature_template` SET `spell_id2`=3427 WHERE `entry`=8961 && `spell_id2`=17230;
 
 -- Warder Stilgiss is using wrong spell id for Frost Armor.
 UPDATE `creature_template` SET `spell_id3`=12544 WHERE `entry`=9041 && `spell_id3`=12556;
-
--- Rage Talon Dragonspawn is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id4`=3391 WHERE `entry`=9096 && `spell_id4`=3417;
 
 -- Spirestone Mystic is using wrong spell id for Forked Lightning.
 UPDATE `creature_template` SET `spell_id4`=8435 WHERE `entry`=9198 && `spell_id4`=22945;
@@ -551,9 +434,6 @@ UPDATE `creature_template` SET `spell_id2`=15754 WHERE `entry`=9200 && `spell_id
 
 -- Smolderthorn Shadow Hunter is using wrong spell id for Kick.
 UPDATE `creature_template` SET `spell_id3`=15614 WHERE `entry`=9265 && `spell_id3`=15610;
-
--- Smolderthorn Axe Thrower is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=9267 && `spell_id2`=3417;
 
 -- Flamekin Spitter is using wrong spell id for Venom Spit.
 UPDATE `creature_template` SET `spell_id1`=15664 WHERE `entry`=9776 && `spell_id1`=16866;
@@ -609,9 +489,6 @@ UPDATE `creature_template` SET `spell_id2`=15663 WHERE `entry`=10447 && `spell_i
 -- Scholomance Acolyte is using wrong spell id for Shadowform.
 UPDATE `creature_template` SET `spell_id4`=16592 WHERE `entry`=10471 && `spell_id4`=15473;
 
--- Risen Construct is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=10488 && `spell_id2`=3417;
-
 -- Kirtonos the Herald is using wrong spell id for Shadow Bolt Volley.
 UPDATE `creature_template` SET `spell_id2`=17228 WHERE `entry`=10506 && `spell_id2`=20741;
 
@@ -633,14 +510,8 @@ UPDATE `creature_template` SET `spell_id2`=20825 WHERE `entry`=10802 && `spell_i
 -- Archivist Galford is using wrong spell id for Fire Nova.
 UPDATE `creature_template` SET `spell_id2`=17366 WHERE `entry`=10811 && `spell_id2`=23462;
 
--- Crimson Monk is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=11043 && `spell_id1`=3417;
-
 -- Fras Siabi is using wrong spell id for Flame Breath.
 UPDATE `creature_template` SET `spell_id2`=17294 WHERE `entry`=11058 && `spell_id2`=20712;
-
--- Razzashi Adder is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id3`=3391 WHERE `entry`=11372 && `spell_id3`=3417;
 
 -- Vilebranch Speaker is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id3`=15663 WHERE `entry`=11391 && `spell_id3`=15284;
@@ -669,9 +540,6 @@ UPDATE `creature_template` SET `spell_id2`=12279 WHERE `entry`=11582 && `spell_i
 -- Flamewaker Priest is using wrong spell id for Shadow Word: Pain.
 UPDATE `creature_template` SET `spell_id2`=19776 WHERE `entry`=11662 && `spell_id2`=23952;
 
--- Putridus Trickster is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id2`=3391 WHERE `entry`=11791 && `spell_id2`=3417;
-
 -- Borelgore is using wrong spell id for Venom Spit.
 UPDATE `creature_template` SET `spell_id2`=16866 WHERE `entry`=11896 && `spell_id2`=6917;
 
@@ -680,12 +548,6 @@ UPDATE `creature_template` SET `spell_id1`=20604 WHERE `entry`=12119 && `spell_i
 
 -- Flamewaker Protector is using wrong spell id for Cleave.
 UPDATE `creature_template` SET `spell_id2`=20605 WHERE `entry`=12119 && `spell_id2`=20677;
-
--- Princess Theradras is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=12201 && `spell_id1`=3417;
-
--- Thessala Hydra is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=12207 && `spell_id1`=3417;
 
 -- Lord Vyletongue is using wrong spell id for Smoke Bomb.
 UPDATE `creature_template` SET `spell_id2`=7964 WHERE `entry`=12236 && `spell_id2`=8817;
@@ -764,9 +626,6 @@ UPDATE `creature_template` SET `spell_id1`=19133 WHERE `entry`=15211 && `spell_i
 
 -- Hoary Templar is using wrong spell id for Lightning Shield.
 UPDATE `creature_template` SET `spell_id1`=25020 WHERE `entry`=15212 && `spell_id1`=19514;
-
--- Lord Skwol is using wrong spell id for Thrash.
-UPDATE `creature_template` SET `spell_id1`=3391 WHERE `entry`=15305 && `spell_id1`=3417;
 
 -- Timbermaw Ancestor is using wrong spell id for Lightning Bolt.
 UPDATE `creature_template` SET `spell_id1`=9532 WHERE `entry`=15720 && `spell_id1`=20295;
