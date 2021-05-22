@@ -423,7 +423,7 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
     }
 
     if (script.summonCreature.scriptId)
-        ScriptsStart(sGenericScripts, script.summonCreature.scriptId, pCreature, target);
+        ScriptsStart(sGenericScripts, script.summonCreature.scriptId, pCreature->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
 
     return false;
 }
@@ -555,27 +555,34 @@ bool Map::ScriptCommand_RemoveAura(ScriptInfo const& script, WorldObject* source
 // SCRIPT_COMMAND_CAST_SPELL (15)
 bool Map::ScriptCommand_CastSpell(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    Unit* pUnitSource = ToUnit(source);
-    Unit* pUnitTarget = ToUnit(target);
-    
+    SpellCaster* pTarget = ToSpellCaster(target);
+
     if (!source)
     {
         sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a nullptr source, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 
-    if (!pUnitTarget)
+    SpellCaster* pSource = source->ToSpellCaster();
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a non-unit and non-gameobject source, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    if (!pTarget)
         return ShouldAbortScript(script);
 
-    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pUnitSource && pUnitSource->IsNonMeleeSpellCasted(false))
-        pUnitSource->InterruptNonMeleeSpells(false);
+    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pSource->IsNonMeleeSpellCasted(false))
+        pSource->InterruptNonMeleeSpells(false);
 
+    Unit* pUnitTarget = pTarget->ToUnit();
     Creature* pCreatureSource = source->ToCreature();
 
-    if (pCreatureSource)
+    if (pCreatureSource && pUnitTarget)
         pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
     else
-        source->CastSpell(pUnitTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
+        pSource->CastSpell(pTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
 
     return false;
 }
@@ -1239,7 +1246,7 @@ bool Map::ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* sourc
     }
 
     if (chosenId)
-        ScriptsStart(sGenericScripts, chosenId, source, target);
+        ScriptsStart(sGenericScripts, chosenId, source ? source->GetObjectGuid() : ObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
     else
         return ShouldAbortScript(script);
 
@@ -1937,7 +1944,7 @@ bool Map::ScriptCommand_StartScriptForAll(ScriptInfo const& script, WorldObject*
         }
 
         if (!script.startScriptForAll.objectEntry || (pWorldObject->GetEntry() == script.startScriptForAll.objectEntry))
-            ScriptsStart(sGenericScripts, script.startScriptForAll.scriptId, pWorldObject, target);
+            ScriptsStart(sGenericScripts, script.startScriptForAll.scriptId, pWorldObject->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
     }
     
     return false;
@@ -2339,5 +2346,20 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
     if (script.setPvP.enabled)
         pSource->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
+    return false;
+}
+
+// SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (87)
+bool Map::ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    GameObject* pGo = nullptr;
+
+    if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
+    {
+        sLog.outError("SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (script id %u) call for a nullptr gameobject, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    pGo->ResetDoorOrButton();
     return false;
 }

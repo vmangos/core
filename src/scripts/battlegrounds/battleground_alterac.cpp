@@ -4462,7 +4462,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
             static ScriptInfo si;
             si.command = SCRIPT_COMMAND_TALK;
             si.talk.textId[0] = SAY_LOKHOLAR_SPAWN_2;
-            m_creature->GetMap()->ScriptCommandStart(si, 3, m_creature, m_creature);
+            m_creature->GetMap()->ScriptCommandStart(si, 3, m_creature->GetObjectGuid(), m_creature->GetObjectGuid());
 
             isYelling = true;
         }

@@ -121,7 +121,7 @@ bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, 
     return true;
 }
 
-WorldObject* DynamicObject::GetCaster() const
+SpellCaster* DynamicObject::GetCaster() const
 {
     if (ObjectGuid guid = GetCasterGuid())
     {
@@ -160,16 +160,11 @@ uint32 DynamicObject::GetFactionTemplateId() const
     return GetCaster()->GetFactionTemplateId();
 }
 
-uint32 DynamicObject::GetLevel() const
-{
-    return GetCaster()->GetLevel();
-}
-
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 {
     WorldObject::Update(update_diff, p_time);
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
-    WorldObject* caster = GetCaster();
+    SpellCaster* caster = GetCaster();
     if (!caster)
     {
         Delete();

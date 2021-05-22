@@ -436,6 +436,7 @@ endif()
 # Add definitions for all build types
 # Don't place this above 'dep' subdirectory! Because of defines build will crash.
 set(DEFINITIONS
+  ${DEFINITIONS}
   DO_MYSQL
 )
 

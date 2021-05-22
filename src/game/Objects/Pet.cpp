@@ -1009,7 +1009,7 @@ int32 Pet::GetDispTP() const
 
 uint32 Pet::GetSkillIdForPetTraining() const
 {
-    switch (GetCreatureInfo()->beast_family)
+    switch (GetCreatureInfo()->pet_family)
     {
         case CREATURE_FAMILY_WOLF:
             return SKILL_PET_WOLF;
@@ -1302,7 +1302,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(creature->GetLevel()));
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->beast_family))
+    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->pet_family))
         SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
@@ -1383,7 +1383,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
 #endif
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->beast_family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->pet_family);
     if (cFamily && cFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;
@@ -1536,7 +1536,7 @@ bool Pet::HaveInDiet(ItemPrototype const* item) const
     if (!cInfo)
         return false;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->beast_family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->pet_family);
     if (!cFamily)
         return false;
 
@@ -2289,7 +2289,7 @@ void Pet::LearnPetPassives()
     if (!cInfo)
         return;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->beast_family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->pet_family);
     if (!cFamily)
         return;
 

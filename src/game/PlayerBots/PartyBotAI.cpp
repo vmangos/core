@@ -1653,9 +1653,9 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
     {
         if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPowerWordFortitude))
         {
-            if (CanTryToCastSpell(me, m_spells.priest.pPowerWordFortitude))
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pPowerWordFortitude))
             {
-                if (DoCastSpell(me, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
+                if (DoCastSpell(pTarget, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
                     return;

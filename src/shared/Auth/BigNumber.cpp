@@ -61,9 +61,9 @@ void BigNumber::SetBinary(uint8 const* bytes, int len)
     BN_bin2bn(t, len, _bn);
 }
 
-void BigNumber::SetHexStr(char const* str)
+int BigNumber::SetHexStr(const char* str)
 {
-    BN_hex2bn(&_bn, str);
+    return BN_hex2bn(&_bn, str);
 }
 
 void BigNumber::SetRand(int numbits)

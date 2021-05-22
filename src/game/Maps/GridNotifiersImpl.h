@@ -237,7 +237,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     if (holder && holder->IsChanneled())
     {
-        if (WorldObject* caster = i_dynobject.GetCaster())
+        if (SpellCaster* caster = i_dynobject.GetCaster())
         {
             // Caster is channeling this spell, update current channel spell holders with
             // the new holder. Don't check channel object, as it might be a spell with

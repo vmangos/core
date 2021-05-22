@@ -281,6 +281,21 @@ class Pet : public Creature
         void DeleteFromDB() override { MANGOS_ASSERT(false); }
 };
 
+inline bool Object::IsPet() const
+{
+    return IsCreature() && static_cast<Creature const*>(this)->IsPet();
+}
+
+inline Pet const* Object::ToPet() const
+{
+    return IsPet() ? static_cast<Pet const*>(this) : nullptr;
+}
+
+inline Pet* Object::ToPet()
+{
+    return IsPet() ? static_cast<Pet*>(this) : nullptr;
+}
+
 class UnsummonPetDelayEvent : public BasicEvent
 {
 public:

@@ -731,7 +731,7 @@ enum SpellVisualKit
 // ***********************************
 enum SpellAttributes
 {
-    SPELL_ATTR_DONT_DISPLAY_SPELL_RESULT      = 0x00000001,            // 0
+    SPELL_ATTR_PROC_FAILURE_BURNS_CHARGE      = 0x00000001,            // 0
     SPELL_ATTR_RANGED                         = 0x00000002,            // 1 All ranged abilites have this flag
     SPELL_ATTR_ON_NEXT_SWING_1                = 0x00000004,            // 2 on next swing
     SPELL_ATTR_IS_REPLENISHMENT               = 0x00000008,            // 3 not set in 2.4.2

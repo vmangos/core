@@ -242,7 +242,7 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
         for (int i = 0; i < 3; ++i)
         {
             _auraStruct.basepoints[i]   = fields[9 + i].GetInt32();
-            _auraStruct.periodictime[i]  = fields[12 + i].GetUInt32();
+            _auraStruct.periodictime[i] = fields[12 + i].GetUInt32();
         }
 
         if (!_auraStruct.spell)
