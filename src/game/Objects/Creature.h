@@ -634,6 +634,26 @@ class Creature : public Unit
         CreatureInfo const* m_creatureInfo;
 };
 
+inline Creature* Object::ToCreature()
+{
+    return IsCreature() ? static_cast<Creature*>(this) : nullptr;
+}
+
+inline Creature const* Object::ToCreature() const
+{
+    return IsCreature() ? static_cast<Creature const*>(this) : nullptr;
+}
+
+inline Creature* ToCreature(Object* object)
+{
+    return object && object->IsCreature() ? static_cast<Creature*>(object) : nullptr;
+}
+
+inline Creature const* ToCreature(Object const* object)
+{
+    return object && object->IsCreature() ? static_cast<Creature const*>(object) : nullptr;
+}
+
 class AssistDelayEvent : public BasicEvent
 {
     public:

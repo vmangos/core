@@ -67,17 +67,12 @@ enum
 };
 
 /*
- * Sand Blast timers are based on June 2006 values (15-20s) as shown in
- * https://www.youtube.com/watch?v=REmX3uRTFkQ and further reduced to account
- * for April 2006 nerfs (http://blue.cardplace.com/cache/wow-dungeons/481724.htm &
- * http://blue.cardplace.com/cache/wow-general/7950998.htm
- * Sweep timers based on the same video. No known nerfs.
+ * Sand Blast timers are based on June 2006 values (17-22s) as shown in
+ * https://www.youtube.com/watch?v=REmX3uRTFkQ Sweep timers based on the
+ * same video. No known nerfs.
  */
 const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
 const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
-const uint32_t SANDBLAST_TIMER_MIN         = 12000;
-const uint32_t SANDBLAST_TIMER_MAX         = 17000;
-const uint32_t SUBMERGE_TIMER              = 90000;
 const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
 const uint32_t SWEEP_TIMER                 = 15000;
 
@@ -107,11 +102,18 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     WorldLocation m_StartingLoc;
 
+    // Take nerfs into account http://blue.cardplace.com/cache/wow-dungeons/481724.htm for content patch progression
+    // Note: Investigate if these timers are 100% accurate.
+    inline uint32_t SandBlastTimerMin() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 17000 : 12000; }
+    inline uint32_t SandBlastTimerMax() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 22000 : 17000; }
+    inline uint32_t SubmergeTimer() { return sWorld.GetWowPatch() >= WOW_PATCH_110 ? 90000 : 60000; }
+
     void Reset() override
     {
+
         m_uiSweepTimer        = urand(30000, 40000);
         m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
-        m_uiSubmergeTimer     = SUBMERGE_TIMER;
+        m_uiSubmergeTimer     = SubmergeTimer();
         m_SummonBase = true;
         m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
         
@@ -193,7 +195,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         // "Ouro has a chance to submerge every 1.5minutes.
         // He will not submerge if he is busy casting a Sand Blast or Sweep, else he will submerge
         // (ie. the chance of submerging is totally random)"
-        m_uiSubmergeTimer = SUBMERGE_TIMER;
+        m_uiSubmergeTimer = SubmergeTimer();
 
         if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, false) == CAST_OK)
         {
@@ -303,7 +305,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
                 if (target && DoCastSpellIfCan(target, SPELL_SANDBLAST) == CAST_OK)
                 {
-                    m_uiSandBlastTimer = urand(SANDBLAST_TIMER_MIN, SANDBLAST_TIMER_MAX);
+                    m_uiSandBlastTimer = urand(SandBlastTimerMin(), SandBlastTimerMax());
                 }
             }
             else
@@ -403,10 +405,10 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
                     m_bSubmerged        = false;
                     m_SummonBase = true;
-                    m_uiSubmergeTimer   = SUBMERGE_TIMER;
+                    m_uiSubmergeTimer   = SubmergeTimer();
                     m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
                     m_uiSweepTimer = SWEEP_TIMER;
-                    m_uiSandBlastTimer = urand(SANDBLAST_TIMER_MIN, SANDBLAST_TIMER_MAX);
+                    m_uiSandBlastTimer = urand(SandBlastTimerMin(), SandBlastTimerMax());
 
                     DespawnCreatures(false);
 

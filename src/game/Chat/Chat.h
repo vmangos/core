@@ -452,12 +452,14 @@ class ChatHandler
         bool HandleDebugGetItemStateCommand(char* args);
         bool HandleDebugGetItemValueCommand(char* args);
         bool HandleDebugGetLootRecipientCommand(char* args);
-        bool HandleDebugGetValueCommand(char* args);
+        bool HandleDebugGetValueByIndexCommand(char* args);
+        bool HandleDebugGetValueByNameCommand(char* args);
         bool HandleDebugModItemValueCommand(char* args);
         bool HandleDebugModValueCommand(char* args);
         bool HandleDebugSetAuraStateCommand(char* args);
         bool HandleDebugSetItemValueCommand(char* args);
-        bool HandleDebugSetValueCommand(char* args);
+        bool HandleDebugSetValueByIndexCommand(char* args);
+        bool HandleDebugSetValueByNameCommand(char* args);
         bool HandleDebugSpellCheckCommand(char* args);
         bool HandleDebugSpellCoefsCommand(char* args);
         bool HandleDebugSpellModsCommand(char* args);
@@ -509,6 +511,7 @@ class ChatHandler
         bool HandleGameObjectSelectCommand(char* args);
         bool HandleGameObjectRespawnCommand(char* args);
         bool HandleGameObjectInfoCommand(char* args);
+        bool HandleGameObjectUpdateFieldsInfoCommand(char* args);
         bool HandleGameObjectUseCommand(char* args);
         bool HandleGameObjectSetGoStateCommand(char* args);
         bool HandleGameObjectSetLootStateCommand(char* args);
@@ -712,6 +715,7 @@ class ChatHandler
         bool HandleUnitInfoCommand(char* args);
         bool HandleUnitSpeedInfoCommand(char* args);
         bool HandleUnitStatInfoCommand(char* args);
+        bool HandleUnitUpdateFieldsInfoCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);
@@ -1025,6 +1029,8 @@ class ChatHandler
         void ShowPoolListHelper(uint16 pool_id);
         void ShowTriggerListHelper(AreaTriggerEntry const* atEntry);
         void ShowTriggerTargetListHelper(uint32 id, AreaTriggerTeleport const* at, bool subpart = false);
+        void ShowAllUpdateFieldsHelper(Object const* pTarget);
+        void ShowUpdateFieldHelper(Object const* pTarget, uint16 index);
         SkillLineEntry const* FindSkillLineEntryFromProfessionName(char* args, std::string& nameOut);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = nullptr);
         bool HandleBanListHelper(QueryResult* result);

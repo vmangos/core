@@ -215,24 +215,24 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
         return;
 
     WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->GetName().size() + 1 + 2 + 4 * 11));
-    data << uint32(petitionguid);                           // petition guid
-    data << ObjectGuid(petition->GetOwnerGuid());           // charter owner guid
-    data << petition->GetName();                            // name (guild/arena team)
-    data << uint8(0);                                       // CString
-    data << uint32(1);
-    data << uint32(9);
-    data << uint32(9);                                      // bypass client - side limitation, a different value is needed here for each petition
-    data << uint32(0);                                      // 5
-    data << uint32(0);                                      // 6
-    data << uint32(0);                                      // 7
-    data << uint32(0);                                      // 8
-    data << uint32(0);                                      // 9
-    data << uint16(0);                                      // 10 2 bytes field
-    data << uint32(0);                                      // 11
-    data << uint32(0);                                      // 12
-    data << uint32(0);                                      // 13 count of next strings; if 0, no data for strings, only 1 uint32 below
+    data << uint32(petitionguid);                           // int m_petitionID;
+    data << ObjectGuid(petition->GetOwnerGuid());           // unsigned __int64 m_petitioner;
+    data << petition->GetName();                            // char m_title[256];
+    data << uint8(0);                                       // char m_bodyText[4096];
+    data << uint32(1);                                      // int m_flags;
+    data << uint32(9);                                      // int m_minSignatures;
+    data << uint32(9);                                      // int m_maxSignatures;
+    data << uint32(0);                                      // int m_deadLine;
+    data << uint32(0);                                      // int m_issueDate;
+    data << uint32(0);                                      // int m_allowedGuildID;
+    data << uint32(0);                                      // int m_allowedClasses;
+    data << uint32(0);                                      // int m_allowedRaces;
+    data << uint16(0);                                      // __int16 m_allowedGender;
+    data << uint32(0);                                      // int m_allowedMinLevel;
+    data << uint32(0);                                      // int m_allowedMaxLevel;
+    data << uint32(0);                                      // char m_choicetext[10][64];
     // for (int i=0; i<field13; ++i) data << chartSignersName[i];   Probably, names of the petition signers
-    data << uint32(0);
+    data << uint32(0);                                      // int m_numChoices;
     SendPacket(&data);
 }
 

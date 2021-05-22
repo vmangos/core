@@ -721,14 +721,6 @@ CreatureAI* GetAI_ElloEbonlocke(Creature* pCreature)
     return new elloEbonlockeAI(pCreature);
 }
 
-bool GossipHello_npc_lord_ello_ebonlocke(Player* pPlayer, Creature* pCreature)
-{
-    /** Show quest menu */
-    pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-    return true;
-}
-
 bool QuestRewarded_npc_lord_ello_ebonlocke(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TRANSLATION_TO_ELO)
@@ -768,7 +760,6 @@ void AddSC_duskwood()
     newscript->Name = "npc_lord_ello_ebonlocke";
     newscript->GetAI = &GetAI_ElloEbonlocke;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_lord_ello_ebonlocke;
-    newscript->pGossipHello = &GossipHello_npc_lord_ello_ebonlocke;
     newscript->RegisterSelf();
 
     newscript = new Script;

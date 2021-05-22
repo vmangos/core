@@ -56,6 +56,7 @@
 #include "GameEventMgr.h"
 #include "InstanceData.h"
 #include "ScriptMgr.h"
+#include "SocialMgr.h"
 #include "..\scripts\world\scourge_invasion.h"
 
 using namespace Spells;
@@ -559,7 +560,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         scriptSetPhase.command = SCRIPT_COMMAND_SET_PHASE;
                         scriptSetPhase.setPhase.phase = 2;
                         scriptSetPhase.setPhase.mode = SO_SETPHASE_RAW;
-                        unitTarget->GetMap()->ScriptCommandStart(scriptSetPhase, 0, unitTarget, unitTarget);
+                        unitTarget->GetMap()->ScriptCommandStart(scriptSetPhase, 0, unitTarget->GetObjectGuid(), unitTarget->GetObjectGuid());
 
                         // Prevent further interaction with Naga Brazier.
                         if (GameObject* pGo = m_caster->FindNearestGameObject(178247, 30.0f))
@@ -1746,7 +1747,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
             {
                 if (SpellEntry const* pSpellEntry = m_triggeredByAuraSpell)
                 {
-                    WorldObject* pCaster = m_caster;
+                    SpellCaster* pCaster = m_caster;
                     if (SpellAuraHolder const* pAuraHolder = unitTarget->GetSpellAuraHolder(pSpellEntry->Id))
                         if (Unit* pAuraCaster = pAuraHolder->GetCaster())
                             pCaster = pAuraCaster;
@@ -2116,7 +2117,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
     }
 
     // select formal caster for triggered spell
-    WorldObject* caster = m_caster;
+    SpellCaster* caster = m_caster;
 
     // some triggered spells require specific equipment
     if (spellInfo->EquippedItemClass >= 0 && m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -2372,7 +2373,7 @@ void Spell::EffectSendEvent(SpellEffectIndex eff_idx)
     GameObject* gObject = focusObject ? focusObject : m_targets.getGOTarget();
 
     if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[eff_idx], m_caster, gObject, true))
-        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[eff_idx], m_caster, gObject);
+        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[eff_idx], m_caster->GetObjectGuid(), gObject ? gObject->GetObjectGuid() : ObjectGuid());
 }
 
 void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
@@ -2413,7 +2414,7 @@ void Spell::EffectHeal(SpellEffectIndex eff_idx)
     if (unitTarget && unitTarget->IsAlive() && damage >= 0)
     {
         // Try to get original caster
-        WorldObject* caster = GetAffectiveCasterObject();
+        SpellCaster* caster = GetAffectiveCasterObject();
         if (!caster)
             return;
 
@@ -2488,7 +2489,7 @@ void Spell::EffectHealMechanical(SpellEffectIndex eff_idx)
     if (unitTarget && unitTarget->IsAlive() && damage >= 0)
     {
         // Try to get original caster
-        WorldObject* caster = GetAffectiveCasterObject();
+        SpellCaster* caster = GetAffectiveCasterObject();
         if (!caster)
             return;
 
@@ -2645,7 +2646,7 @@ void Spell::EffectCreateItem(SpellEffectIndex eff_idx)
 
 void Spell::EffectPersistentAA(SpellEffectIndex eff_idx)
 {
-    WorldObject* pCaster = GetAffectiveCasterObject();
+    SpellCaster* pCaster = GetAffectiveCasterObject();
 
     if (GameObject* pGo = ToGameObject(pCaster))
         if (Unit* pOwner = pGo->GetOwner())
@@ -3704,7 +3705,7 @@ void Spell::EffectLearnSkill(SpellEffectIndex eff_idx)
     uint16 max = (step * 75);
     target->SetSkill(skillid, current, max, step);
 
-    if (WorldObject const* caster = GetCastingObject())
+    if (SpellCaster const* caster = GetCastingObject())
         DEBUG_LOG("Spell: %s has learned skill %u (to maxlevel %u) from %s", target->GetGuidStr().c_str(), skillid, max, caster->GetGuidStr().c_str());
 }
 
@@ -4140,7 +4141,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
 
         // if damage unitTarget call AI reaction
         unitTarget->AttackedBy(m_casterUnit);
-        m_damage = 0;
+        m_damage = 0.f;
         return;
     }
 
@@ -4181,7 +4182,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
         }
     }
 
-    int32 bonus = 0;
+    float bonus = 0.f;
     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch (m_spellInfo->Effect[j])
@@ -4195,13 +4196,13 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                 normalized = true;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                weaponDamagePercentMod *= float(CalculateDamage(SpellEffectIndex(j), unitTarget)) / 100.0f;
+                weaponDamagePercentMod *= CalculateDamage(SpellEffectIndex(j), unitTarget) / 100.0f;
 
                 // applied only to prev.effects fixed damage
                 if (customBonusDamagePercentMod)
-                    bonus = int32(bonus * bonusDamagePercentMod);
+                    bonus = bonus * bonusDamagePercentMod;
                 else
-                    bonus = int32(bonus * weaponDamagePercentMod);
+                    bonus = bonus * weaponDamagePercentMod;
                 break;
             default:
                 break;                                      // not weapon damage effect, just skip
@@ -4227,7 +4228,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
         }
 
         float weapon_total_pct  = m_casterUnit->GetModifierValue(unitMod, TOTAL_PCT);
-        bonus = int32(bonus * weapon_total_pct);
+        bonus = bonus * weapon_total_pct;
     }
 
     // + weapon damage with applied weapon% dmg to base weapon damage in call
@@ -4236,7 +4237,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
         if (unitTarget->IsImmuneToDamage(GetSchoolMask(m_casterUnit->GetWeaponDamageSchool(m_attackType, i))))
             continue;
 
-        bonus += int32(m_casterUnit->CalculateDamage(m_attackType, normalized, i) * weaponDamagePercentMod);
+        bonus += m_casterUnit->CalculateDamage(m_attackType, normalized, i) * weaponDamagePercentMod;
     }
 
     // Seal of Command
@@ -4248,7 +4249,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     }
 
     // prevent negative damage
-    m_damage += uint32(bonus > 0 ? bonus : 0);
+    m_damage += bonus > 0.f ? bonus : 0.f;
 }
 
 void Spell::EffectThreat(SpellEffectIndex eff_idx)
@@ -5251,7 +5252,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         return;
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart spellid %u in EffectScriptEffect ", m_spellInfo->Id);
-    m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster, unitTarget);
+    m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster->GetObjectGuid(), unitTarget->GetObjectGuid());
 }
 
 void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
@@ -5481,7 +5482,7 @@ void Spell::EffectSummonPlayer(SpellEffectIndex /*eff_idx*/)
         return;
 
     float x, y, z;
-    WorldObject* landingObject = m_caster;
+    SpellCaster* landingObject = m_caster;
     // summon to the ritual go location if any
     if (GameObject* pGo = m_targets.getGOTarget())
         if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
@@ -6565,25 +6566,29 @@ void Spell::EffectSummonDemon(SpellEffectIndex eff_idx)
         if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
             pGo->GetPosition(px, py, pz);
 
-    Creature* Charmed = m_caster->SummonCreature(m_spellInfo->EffectMiscValue[eff_idx], px, py, pz, m_caster->GetOrientation(), TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3600000);
-    if (!Charmed)
+    uint32 const summonDuration = m_duration > 0 ? m_duration : 3600000;
+    Creature* pSummon = m_caster->SummonCreature(m_spellInfo->EffectMiscValue[eff_idx], px, py, pz, m_caster->GetOrientation(), TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, summonDuration);
+    if (!pSummon)
         return;
 
     // might not always work correctly, maybe the creature that dies from CoD casts the effect on itself and is therefore the caster?
-    Charmed->SetLevel(m_caster->GetLevel());
+    pSummon->SetLevel(m_caster->GetLevel());
 
     // TODO: Add damage/mana/hp according to level
 
     if (m_spellInfo->EffectMiscValue[eff_idx] == 89)        // Inferno summon
     {
         // Enslave demon effect, without mana cost and cooldown
-        m_caster->CastSpell(Charmed, 20882, true);          // FIXME: enslave does not scale with level, level 62+ minions cannot be enslaved
+        m_caster->CastSpell(pSummon, 20882, true);          // FIXME: enslave does not scale with level, level 62+ minions cannot be enslaved
+
+        // Short root spell on infernal from sniffs
+        pSummon->CastSpell(pSummon, 22707, true);
 
         // Inferno effect
-        Charmed->CastSpell(Charmed, 22703, true, nullptr);
+        pSummon->CastSpell(pSummon, 22703, true);
     }
 
-    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(Charmed->GetObjectGuid()));
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pSummon->GetObjectGuid()));
 }
 
 void Spell::EffectSpiritHeal(SpellEffectIndex /*eff_idx*/)
