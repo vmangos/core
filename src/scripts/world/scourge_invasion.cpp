@@ -1351,61 +1351,6 @@ struct PallidHorrorAI : public ScriptedAI
                 FLAMESHOCKER->AddObjectToRemoveList();
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId) override
-    {
-        if (m_creature->GetZoneId() == ZONEID_STORMWIND)
-        {
-            /*
-                Stormwind routes are guessed, we have no sniffs.
-                The only correct spawn is the Stormwind City Guard in the Cathedral and the summoned Stormwind Elite Guards in the Trade District.
-            */
-            // Cathedral of Light -> Stormwind Keep
-            if (SpawnLocationID == 0)
-            {
-                // Keep moving until reached the last waypoint.
-                if (LastWayPoint < SW_STORMWIND_KEEP.size())
-                {
-                    sLog.outBasic("[PallidHorrorAI:MovementInform] SW_STORMWIND_KEEP: NextWayPoint: %d, LastWayPoint: %d, uiPointId: %d/%d for %d", NextWayPoint, LastWayPoint, uiPointId, SW_STORMWIND_KEEP.size(), m_creature->GetObjectGuid());
-                    m_creature->GetMotionMaster()->MovePoint(NextWayPoint, SW_STORMWIND_KEEP[NextWayPoint].x, SW_STORMWIND_KEEP[NextWayPoint].y, SW_STORMWIND_KEEP[NextWayPoint].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
-                    m_creature->SetHomePosition(SW_STORMWIND_KEEP[NextWayPoint].x, SW_STORMWIND_KEEP[NextWayPoint].y, SW_STORMWIND_KEEP[NextWayPoint].z, m_creature->GetOrientation());
-                }
-
-                // Cycling between the two last points (probably will never happen, because the Pallid Horror will die earlier).
-                if (NextWayPoint >= SW_STORMWIND_KEEP.size())
-                {
-                    LastWayPoint = 33;
-                    sLog.outBasic("[PallidHorrorAI:MovementInform] SW_STORMWIND_KEEP: reset LastWayPoint to: %d for %d", 15, m_creature->GetObjectGuid());
-                    m_creature->GetMotionMaster()->MovePoint(LastWayPoint, SW_STORMWIND_KEEP[LastWayPoint].x, SW_STORMWIND_KEEP[LastWayPoint].y, SW_STORMWIND_KEEP[LastWayPoint].z, MOVE_PATHFINDING + MOVE_WALK_MODE);
-                }
-
-                // Summon one Stormwind City Guard in the Cathedral.
-                if (LastWayPoint >= 4 && m_cathedral_stormwind_city_guard.empty())
-                {
-                    Creature* STORMWIND_CITY_GUARD = nullptr;
-
-                    for (auto i = 0; i < MAX_STORMWIND_CITY_GUARD_CATHEDRAL; i++)
-                        if (STORMWIND_CITY_GUARD = m_creature->SummonCreature(NPC_STORMWIND_CITY_GUARD, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].x, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].y, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].z, SW_CATHEDRAL_STORMWIND_CITY_GUARD[i].o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 1000))
-                            m_cathedral_stormwind_city_guard.insert(STORMWIND_CITY_GUARD->GetObjectGuid());
-
-                    if (STORMWIND_CITY_GUARD)
-                        DoScriptText(LANG_STORMWIND_CITY_GUARD_1, STORMWIND_CITY_GUARD, m_creature);
-                }
-
-                // Bolvar yelling at some point near the King.
-                if (LastWayPoint >= 32 && !b_bolvar)
-                {
-                    if (Creature* HIGHLORD_BOLVAR_FORDRAGON = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_GIGANTIC))
-                        DoScriptText(LANG_STORMWIND_BOLVAR_1, HIGHLORD_BOLVAR_FORDRAGON, m_creature);
-
-                    b_bolvar = true;
-                }
-            }
-            else if (SpawnLocationID == 1) // Stormwind Trade District
-            {
-            }
-        }
-    }
-
     void UpdateAI(uint32 const diff) override
     {
         m_events.Update(diff);

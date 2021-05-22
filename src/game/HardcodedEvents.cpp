@@ -1191,17 +1191,13 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
 
     if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
-        pPallid->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
         pPallid->GetMotionMaster()->Clear(false, true);
         if (pPallid->GetZoneId() == ZONEID_UNDERCITY)
-        {
-            if (SpawnLocationID == 0)
-                pathID = 149702;
+            pathID = SpawnLocationID == 0 ? 149702 : 149701;
+        else
+            pathID = SpawnLocationID == 0 ? 151901 : 151902;
 
-            if (SpawnLocationID == 1)
-                pathID = 149701;
-        }
-        pPallid->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, SpawnLocationID, false);
+        pPallid->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, pathID, false);
         sLog.outBasic("[Scourge Invasion Event] SpawnLocationID %d", SpawnLocationID);
 
         zone->pallidGuid = pPallid->GetObjectGuid();
