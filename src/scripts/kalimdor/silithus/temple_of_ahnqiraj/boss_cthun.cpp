@@ -44,6 +44,7 @@ enum eCreatures {
     PUNT_CREATURE                   = 15922, //invisible viscidus trigger, used in stomach
 };
 
+// C'Thun hotfixes: http://blue.cardplace.com/cache/wow-general/7950998.htm
 enum eSpells {
     // Phase 1 spells
     SPELL_FREEZE_ANIMATION          = 16245, // Dummy spell to avoid the eye gazing around during dark glare

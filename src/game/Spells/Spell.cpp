@@ -1011,8 +1011,11 @@ void Spell::CheckAtDelay(TargetInfo* pInf)
                 pInf->effectMask &= ~effMask;
         }
     }
+
     if (pTarget != m_caster &&
-            (pTarget->IsImmuneToDamage(m_spellInfo->GetSpellSchoolMask(), m_spellInfo) || pTarget->IsImmuneToSpell(m_spellInfo, pTarget == m_caster)))
+       ((!m_spellInfo->IsPositiveSpell(m_caster, pTarget) &&
+         pTarget->IsImmuneToDamage(m_spellInfo->GetSpellSchoolMask(), m_spellInfo)) ||
+         pTarget->IsImmuneToSpell(m_spellInfo, pTarget == m_caster)))
         pInf->missCondition = SPELL_MISS_IMMUNE;
 
     if (pTarget->IsCreature() && ((Creature*)pTarget)->IsInEvadeMode())

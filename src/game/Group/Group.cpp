@@ -37,6 +37,7 @@
 #include "LootMgr.h"
 #include "LFGMgr.h"
 #include "LFGHandler.h"
+#include "UpdateMask.h"
 
 #include <array>
 
@@ -359,6 +360,56 @@ bool Group::AddMember(ObjectGuid guid, char const* name, uint8 joinMethod)
             InstancePlayerBind* playerBind = player->GetBoundInstance(map->GetId());
             if (playerBind && groupBind && !player->m_InstanceValid && playerBind->state == groupBind->state && !((DungeonMap*)map)->IsUnloadingBeforeReset())
                 player->m_InstanceValid = true;
+        }
+
+        {
+            // Broadcast new player group member fields to rest of the group
+            UpdateData groupData;
+            WorldPacket groupDataPacket;
+
+            // Broadcast group members' fields to player
+            for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (itr->getSource() == player)
+                    continue;
+
+                if (Player* member = itr->getSource())
+                {
+                    if (player->IsInVisibleList(member))
+                    {
+                        UpdateMask updateMask;
+                        updateMask.SetCount(member->GetValuesCount());
+                        member->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_GROUP_ONLY);
+                        if (updateMask.HasData())
+                            member->BuildValuesUpdateBlockForPlayer(groupData, updateMask, player);
+                    }
+
+                    if (member->IsInVisibleList(player))
+                    {
+                        UpdateMask updateMask;
+                        updateMask.SetCount(member->GetValuesCount());
+                        member->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_GROUP_ONLY);
+                        if (updateMask.HasData())
+                        {
+                            UpdateData newData;
+                            player->BuildValuesUpdateBlockForPlayer(newData, updateMask, member);
+
+                            if (newData.HasData())
+                            {
+                                WorldPacket newDataPacket;
+                                newData.BuildPacket(&newDataPacket);
+                                member->SendDirectMessage(&newDataPacket);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (groupData.HasData())
+            {
+                groupData.BuildPacket(&groupDataPacket);
+                player->SendDirectMessage(&groupDataPacket);
+            }
         }
     }
 

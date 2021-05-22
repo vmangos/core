@@ -1682,7 +1682,6 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize static helper structures
     AIRegistry::Initialize();
-    Player::InitVisibleBits();
 
     sLog.outString("Loading GameObject models ...");
     LoadGameObjectModelList();

@@ -44,6 +44,7 @@ enum
     GO_ALTAR_OF_THE_KEEPER_TEMPLE_DOOR = 124367,
     GO_ANCIENT_VAULT_DOOR              = 124369,
     GO_KEYSTONE                        = 124371,
+    GO_ANCIENT_TREASURE                = 141979,
     
     // Npcs
     NPC_ARCHAEDAS          = 2748,

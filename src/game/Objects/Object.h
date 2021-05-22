@@ -278,9 +278,10 @@ class Object
         void SetObjectScale(float newScale);
 
         uint8 GetTypeId() const { return m_objectTypeId; }
+        uint8 GetTypeMask() const { return m_objectType; }
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
-        virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
+        virtual void BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const;
         void SendCreateUpdateToPlayer(Player* player);
 
         // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
@@ -292,9 +293,10 @@ class Object
         void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
         void ExecuteDelayedActions();
 
-        void BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const;
-        void BuildOutOfRangeUpdateBlock(UpdateData* data) const;
-        void BuildMovementUpdateBlock(UpdateData* data, uint8 flags = 0) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const;
+        void BuildOutOfRangeUpdateBlock(UpdateData& data) const;
+        void BuildMovementUpdateBlock(UpdateData& data, uint8 flags = 0) const;
 
         void BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const;
         void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const;
@@ -361,6 +363,7 @@ class Object
         void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
+        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag);
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
@@ -533,13 +536,12 @@ class Object
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
 
-        virtual void _SetUpdateBits(UpdateMask* updateMask, Player* target) const;
+        uint16 GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*& flags) const;
+        void _SetCreateBits(UpdateMask& updateMask, Player* target) const;
+        void _SetUpdateBits(UpdateMask& updateMask, Player* target) const;
         void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
-        virtual void _SetCreateBits(UpdateMask* updateMask, Player* target) const;
-
         uint16 m_objectType;
-
         uint8 m_objectTypeId;
         uint8 m_updateFlag = 0;
 

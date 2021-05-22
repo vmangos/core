@@ -255,7 +255,7 @@ void Object::SendForcedObjectUpdate()
         itr.second.Send(itr.first->GetSession());
 }
 
-void Object::BuildMovementUpdateBlock(UpdateData* data, uint8 flags) const
+void Object::BuildMovementUpdateBlock(UpdateData& data, uint8 flags) const
 {
     ByteBuffer buf(500);
 
@@ -264,10 +264,10 @@ void Object::BuildMovementUpdateBlock(UpdateData* data, uint8 flags) const
 
     BuildMovementUpdate(&buf, flags);
 
-    data->AddUpdateBlock(buf);
+    data.AddUpdateBlock(buf);
 }
 
-void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const
 {
     if (!target)
         return;
@@ -328,9 +328,9 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
-    _SetCreateBits(&updateMask, target);
+    _SetCreateBits(updateMask, target);
     BuildValuesUpdate(updatetype, &buf, &updateMask, target);
-    data->AddUpdateBlock(buf);
+    data.AddUpdateBlock(buf);
 }
 
 void Object::SendCreateUpdateToPlayer(Player* player)
@@ -338,7 +338,7 @@ void Object::SendCreateUpdateToPlayer(Player* player)
     // send create update to player
     UpdateData upd;
 
-    BuildCreateUpdateBlockForPlayer(&upd, player);
+    BuildCreateUpdateBlockForPlayer(upd, player);
     upd.Send(player->GetSession());
 }
 
@@ -371,7 +371,17 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index)
     SendObjectMessageToSet(&packet, true);
 }
 
-void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const
+{
+    UpdateMask updateMask;
+    updateMask.SetCount(m_valuesCount);
+
+    _SetUpdateBits(updateMask, target);
+    if (updateMask.HasData())
+        BuildValuesUpdateBlockForPlayer(data, updateMask, target);
+}
+
+void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const
 {
     ByteBuffer buf(500);
 
@@ -382,24 +392,19 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) c
     buf << GetGUID();
 #endif
 
-    UpdateMask updateMask;
-    updateMask.SetCount(m_valuesCount);
-
-    _SetUpdateBits(&updateMask, target);
     BuildValuesUpdate(UPDATETYPE_VALUES, &buf, &updateMask, target);
-
-    data->AddUpdateBlock(buf);
+    data.AddUpdateBlock(buf);
 }
 
-void Object::BuildOutOfRangeUpdateBlock(UpdateData* data) const
+void Object::BuildOutOfRangeUpdateBlock(UpdateData& data) const
 {
-    data->AddOutOfRangeGUID(GetObjectGuid());
+    data.AddOutOfRangeGUID(GetObjectGuid());
 }
 
 void Object::SendOutOfRangeUpdateToPlayer(Player* player)
 {
     UpdateData data;
-    BuildOutOfRangeUpdateBlock(&data);
+    BuildOutOfRangeUpdateBlock(data);
     WorldPacket packet;
     data.BuildPacket(&packet);
     player->SendDirectMessage(&packet);
@@ -937,6 +942,56 @@ bool Object::LoadValues(char const* data)
     return true;
 }
 
+uint16 Object::GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*& flags) const
+{
+    flags = UpdateFields::GetUpdateFieldFlagsArray(GetTypeId());
+    uint16 visibleFlag = UF_FLAG_PUBLIC | UF_FLAG_DYNAMIC;
+
+    if (target == this)
+        visibleFlag |= UF_FLAG_PRIVATE;
+
+    switch (GetTypeId())
+    {
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+            if (static_cast<Item const*>(this)->GetOwnerGuid() == target->GetObjectGuid())
+                visibleFlag |= UF_FLAG_OWNER_ONLY | UF_FLAG_UNK2;
+            break;
+        case TYPEID_UNIT:
+        case TYPEID_PLAYER:
+        {
+            if (static_cast<Unit const*>(this)->GetOwnerGuid() == target->GetObjectGuid() ||
+                static_cast<Unit const*>(this)->GetCharmerGuid() == target->GetObjectGuid())
+                visibleFlag |= UF_FLAG_OWNER_ONLY;
+
+            if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO))
+                if (target->CanSeeSpecialInfoOf(static_cast<Unit const*>(this)))
+                    visibleFlag |= UF_FLAG_SPECIAL_INFO;
+
+            if (Player* plr = static_cast<Unit const*>(this)->GetCharmerOrOwnerPlayerOrPlayerItself())
+                if (plr->IsInSameRaidWith(target))
+                    visibleFlag |= UF_FLAG_GROUP_ONLY;
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+            if (static_cast<GameObject const*>(this)->GetOwnerGuid() == target->GetObjectGuid())
+                visibleFlag |= UF_FLAG_OWNER_ONLY;
+            break;
+        case TYPEID_DYNAMICOBJECT:
+            if (static_cast<DynamicObject const*>(this)->GetCasterGuid() == target->GetObjectGuid())
+                visibleFlag |= UF_FLAG_OWNER_ONLY;
+            break;
+        case TYPEID_CORPSE:
+            if (static_cast<Corpse const*>(this)->GetOwnerGuid() == target->GetObjectGuid())
+                visibleFlag |= UF_FLAG_OWNER_ONLY;
+            break;
+        case TYPEID_OBJECT:
+            break;
+    }
+
+    return visibleFlag;
+}
+
 void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count)
 {
     if (data.empty())
@@ -954,21 +1009,41 @@ void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uin
     }
 }
 
-void Object::_SetUpdateBits(UpdateMask* updateMask, Player* /*target*/) const
+void Object::MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag)
 {
+    uint16 const* flags = UpdateFields::GetUpdateFieldFlagsArray(GetTypeId());
+    ASSERT(flags);
+
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
-        if (m_uint32Values_mirror[index] != m_uint32Values[index])
-            updateMask->SetBit(index);
+        if ((m_uint32Values[index] != 0) && (flags[index] & flag))
+            updateMask.SetBit(index);
     }
 }
 
-void Object::_SetCreateBits(UpdateMask* updateMask, Player* /*target*/) const
+void Object::_SetUpdateBits(UpdateMask& updateMask, Player* target) const
 {
+    uint16 const* flags = nullptr;
+    uint16 visibleFlag = GetUpdateFieldFlagsForTarget(target, flags);
+    ASSERT(flags);
+
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
-        if (GetUInt32Value(index) != 0)
-            updateMask->SetBit(index);
+        if ((m_uint32Values_mirror[index] != m_uint32Values[index]) && (flags[index] & visibleFlag))
+            updateMask.SetBit(index);
+    }
+}
+
+void Object::_SetCreateBits(UpdateMask& updateMask, Player* target) const
+{
+    uint16 const* flags = nullptr;
+    uint16 visibleFlag = GetUpdateFieldFlagsForTarget(target, flags);
+    ASSERT(flags);
+
+    for (uint16 index = 0; index < m_valuesCount; ++index)
+    {
+        if ((m_uint32Values[index] != 0) && (flags[index] & visibleFlag))
+            updateMask.SetBit(index);
     }
 }
 
@@ -1217,7 +1292,7 @@ void Object::BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_play
         iter = p.first;
     }
 
-    BuildValuesUpdateBlockForPlayer(&iter->second, iter->first);
+    BuildValuesUpdateBlockForPlayer(iter->second, iter->first);
 }
 
 void Object::AddToClientUpdateList()
@@ -2633,7 +2708,6 @@ bool WorldObject::IsControlledByPlayer() const
     }
 }
 
-// Nostalrius
 void Object::ForceValuesUpdateAtIndex(uint16 i)
 {
     m_uint32Values_mirror[i] = GetUInt32Value(i) + 1; // makes server think the field changed

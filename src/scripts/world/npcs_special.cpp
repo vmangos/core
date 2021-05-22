@@ -1387,7 +1387,7 @@ CreatureAI* GetAI_npc_summon_possessed(Creature* pCreature)
 }
 
 /*
- * Riggle Bassbait
+ * Riggle Bassbait (Stranglethorn Vale Fishing Extravaganza)
  */
 
 enum
@@ -1396,9 +1396,9 @@ enum
 
     EVENT_TOURNAMENT        = 15,
 
-    YELL_BEGIN              = -1900100,
-    YELL_WINNER             = -1900101,
-    YELL_OVER               = -1900102,
+    YELL_BEGIN              = 10608, // Let the Fishing Tournament BEGIN!
+    YELL_WINNER             = 10609, // We have a winner! $n has won FIRST PLACE in the tournament!
+    YELL_OVER               = 10610, // And the Tastyfish have gone for the week! I will remain for another hour to allow you to turn in your fish!
 };
 
 struct npc_riggle_bassbaitAI : ScriptedAI

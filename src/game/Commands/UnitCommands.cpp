@@ -488,6 +488,22 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitUpdateFieldsInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    ShowAllUpdateFieldsHelper(pTarget);
+
+    return true;
+}
+
 bool ChatHandler::HandleFreezeCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();

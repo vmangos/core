@@ -29,6 +29,7 @@
 #include "SpellMgr.h"
 #include "Player.h"
 #include "PlayerAI.h"
+#include "UpdateMask.h"
 #include "Spell.h"
 #include "DynamicObject.h"
 #include "Group.h"
@@ -400,14 +401,14 @@ AreaAura::AreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *cu
         case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
             m_areaAuraType = AREA_AURA_PARTY;
             if (target->GetCharmerOrOwnerOrSelf()->GetTypeId() == TYPEID_UNIT)
-                m_areaAuraType = AREA_AURA_FRIEND;
+                m_areaAuraType = AREA_AURA_CREATURE_GROUP;
             if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
         case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
             m_areaAuraType = AREA_AURA_RAID;
             if (target->GetCharmerOrOwnerOrSelf()->GetTypeId() == TYPEID_UNIT)
-                m_areaAuraType = AREA_AURA_FRIEND;
+                m_areaAuraType = AREA_AURA_CREATURE_GROUP;
             if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             // Light's Beacon not applied to caster itself (TODO: more generic check for another similar spell if any?)
@@ -630,6 +631,7 @@ void AreaAura::Update(uint32 diff)
                         // add owner
                         if (owner != caster && caster->IsWithinDistInMap(owner, m_radius))
                             targets.push_back(owner);
+
                         // add caster's pet
                         Unit* pet = caster->GetPet();
                         if (pet && caster->IsWithinDistInMap(pet, m_radius))
@@ -661,6 +663,36 @@ void AreaAura::Update(uint32 diff)
                 {
                     if (owner != caster && caster->IsWithinDistInMap(owner, m_radius))
                         targets.push_back(owner);
+                    break;
+                }
+                case AREA_AURA_CREATURE_GROUP:
+                {
+                    if (Creature* pCreature = caster->ToCreature())
+                    {
+                        if (pCreature->GetCreatureGroup())
+                        {
+                            MaNGOS::AnyCreatureGroupMembersInObjectRangeCheck u_check(pCreature, m_radius);
+                            MaNGOS::UnitListSearcher<MaNGOS::AnyCreatureGroupMembersInObjectRangeCheck> searcher(targets, u_check);
+                            Cell::VisitAllObjects(pCreature, searcher, m_radius);
+                        }
+                        else
+                        {
+                            // alternative when missing group definition, apply to same faction units
+                            MaNGOS::AnySameFactionUnitInObjectRangeCheck u_check(pCreature, m_radius);
+                            MaNGOS::UnitListSearcher<MaNGOS::AnySameFactionUnitInObjectRangeCheck> searcher(targets, u_check);
+                            Cell::VisitAllObjects(pCreature, searcher, m_radius);
+                        }
+                    }
+
+                    // add owner
+                    if (owner != caster && caster->IsWithinDistInMap(owner, m_radius) && std::find(targets.begin(), targets.end(), owner) == targets.end())
+                        targets.push_back(owner);
+
+                    // add caster's pet
+                    Unit* pet = caster->GetPet();
+                    if (pet && caster->IsWithinDistInMap(pet, m_radius) && std::find(targets.begin(), targets.end(), pet) == targets.end())
+                        targets.push_back(pet);
+
                     break;
                 }
             }
@@ -2926,6 +2958,25 @@ void Aura::HandleModPossess(bool apply, bool Real)
 #endif
     {
         pCaster->ModPossess(pTarget, apply, m_removeMode);
+        if (apply && pCaster->IsPlayer())
+        {
+            Player* pPlayerCaster = static_cast<Player*>(pCaster);
+            UpdateMask updateMask;
+            updateMask.SetCount(pTarget->GetValuesCount());
+            pTarget->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
+            if (updateMask.HasData())
+            {
+                UpdateData newData;
+                pTarget->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
+
+                if (newData.HasData())
+                {
+                    WorldPacket newDataPacket;
+                    newData.BuildPacket(&newDataPacket);
+                    pPlayerCaster->SendDirectMessage(&newDataPacket);
+                }
+            }
+        }
         pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
     }
 
@@ -3255,8 +3306,26 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         target->UpdateControl();
 
-        if (caster->IsPlayer())
-            static_cast<Player*>(caster)->CharmSpellInitialize();
+        if (Player* pPlayerCaster = caster->ToPlayer())
+        {
+            pPlayerCaster->CharmSpellInitialize();
+            
+            UpdateMask updateMask;
+            updateMask.SetCount(target->GetValuesCount());
+            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
+            if (updateMask.HasData())
+            {
+                UpdateData newData;
+                target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
+
+                if (newData.HasData())
+                {
+                    WorldPacket newDataPacket;
+                    newData.BuildPacket(&newDataPacket);
+                    pPlayerCaster->SendDirectMessage(&newDataPacket);
+                }
+            }
+        }
     }
     else
     {
@@ -5041,7 +5110,7 @@ void Aura::HandleAuraModAttackPower(bool apply, bool /*Real*/)
         {
             int32 attackPower = -25 * (target->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
             if (attackPower < 0)
-                target->CastCustomSpell(target, 23230, &attackPower, nullptr, nullptr, true, nullptr);
+                target->CastCustomSpell(target, 23230, attackPower, {}, {}, true, nullptr);
         }, 1);
     }
 #endif
@@ -5437,8 +5506,27 @@ void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
     if (ci && ci->type == CREATURE_TYPE_BEAST)
         target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
 
-    target->ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH);
-    target->ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH);
+    if (apply)
+    {
+        if (Player* pPlayerCaster = ToPlayer(GetCaster()))
+        {
+            UpdateMask updateMask;
+            updateMask.SetCount(target->GetValuesCount());
+            updateMask.SetBit(UNIT_FIELD_HEALTH);
+            updateMask.SetBit(UNIT_FIELD_MAXHEALTH);
+            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_SPECIAL_INFO);
+
+            UpdateData newData;
+            target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
+
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                pPlayerCaster->SendDirectMessage(&newDataPacket);
+            }
+        }
+    }
 }
 
 void Aura::HandleAuraUntrackable(bool apply, bool /*Real*/)
@@ -7122,7 +7210,7 @@ void SpellAuraHolder::RefreshHolder()
  * @param duration Custom duration to base tick on (typically in the case of passive auras)
  *
  */
-void SpellAuraHolder::RefreshAuraPeriodicTimers(uint32 duration)
+void SpellAuraHolder::RefreshAuraPeriodicTimers(int32 duration)
 {
     for (int i = 0 ; i < MAX_EFFECT_INDEX; ++i)
     {
@@ -7131,7 +7219,7 @@ void SpellAuraHolder::RefreshAuraPeriodicTimers(uint32 duration)
             // If the aura is periodic, update the periodic timer to correspond with the new
             // aura timer
             if (pAura->IsPeriodic())
-                pAura->UpdatePeriodicTimer(duration ? duration : m_duration);
+                pAura->UpdatePeriodicTimer(duration > 0 ? duration : m_duration);
         }
     }
 }
@@ -7146,15 +7234,6 @@ void SpellAuraHolder::SetAuraMaxDuration(int32 duration)
         if (!(IsPassive() && GetSpellProto()->DurationIndex == 0))
             SetPermanent(false);
     }
-}
-
-uint32 SpellAuraHolder::GetAuraPeriodicTickTimer(SpellEffectIndex index) const
-{
-    Aura* aura = m_auras[index];
-    if (!aura)
-        return -1;
-
-    return aura->GetAuraPeriodicTimer();
 }
 
 bool SpellAuraHolder::HasMechanic(uint32 mechanic) const

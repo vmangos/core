@@ -214,7 +214,7 @@ struct CreatureInfo
     uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
     uint32  unit_flags;                                     // enum UnitFlags mask values
     uint32  dynamic_flags;
-    uint32  beast_family;                                   // enum CreatureFamily values (optional)
+    uint32  pet_family;                                     // enum CreatureFamily values (optional)
     uint32  trainer_type;
     uint32  trainer_spell;
     uint32  trainer_class;
@@ -263,7 +263,7 @@ struct CreatureInfo
 
     bool isTameable() const
     {
-        return type == CREATURE_TYPE_BEAST && beast_family != 0 && type_flags & CREATURE_TYPEFLAGS_TAMEABLE;
+        return type == CREATURE_TYPE_BEAST && pet_family != 0 && type_flags & CREATURE_TYPEFLAGS_TAMEABLE;
     }
 };
 
