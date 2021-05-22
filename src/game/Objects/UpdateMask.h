@@ -28,7 +28,7 @@
 class UpdateMask
 {
     public:
-        UpdateMask() : mHasData(false), mCount(0), mBlocks(0), mUpdateMask(0) { }
+        UpdateMask() : mCount(0), mBlocks(0), mUpdateMask(0) { }
         UpdateMask(UpdateMask const& mask) : mUpdateMask(0) { *this = mask; }
 
         ~UpdateMask()
@@ -39,7 +39,6 @@ class UpdateMask
         void SetBit (uint32 index)
         {
             ( (uint8 *)mUpdateMask )[ index >> 3 ] |= 1 << ( index & 0x7 );
-            mHasData = true;
         }
 
         void UnsetBit (uint32 index)
@@ -56,7 +55,6 @@ class UpdateMask
         uint32 GetLength() const { return mBlocks << 2; }
         uint32 GetCount() const { return mCount; }
         uint8* GetMask() { return (uint8*)mUpdateMask; }
-        bool HasData() const { return mHasData; }
 
         void SetCount (uint32 valuesCount)
         {
@@ -73,7 +71,6 @@ class UpdateMask
         {
             if (mUpdateMask)
                 memset(mUpdateMask, 0, mBlocks << 2);
-            mHasData = false;
         }
 
         UpdateMask& operator = (UpdateMask const& mask)
@@ -121,7 +118,6 @@ class UpdateMask
         }
 
     private:
-        bool mHasData;
         uint32 mCount;
         uint32 mBlocks;
         uint32 *mUpdateMask;

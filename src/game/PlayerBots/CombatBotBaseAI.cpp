@@ -1,11 +1,14 @@
 #include "CombatBotBaseAI.h"
 #include "Player.h"
-#include "Group.h"
+#include "Log.h"
+#include "MotionMaster.h"
+#include "ObjectMgr.h"
 #include "PlayerBotMgr.h"
-#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "Spell.h"
 #include "SpellAuras.h"
+#include "Chat.h"
+#include "TargetedMovementGenerator.h"
 
 enum CombatBotSpells
 {

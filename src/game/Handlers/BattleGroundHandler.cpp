@@ -24,7 +24,6 @@
 #include "Opcodes.h"
 #include "Log.h"
 #include "Player.h"
-#include "Group.h"
 #include "ObjectMgr.h"
 #include "WorldSession.h"
 #include "Object.h"

@@ -16,7 +16,6 @@
  */
 
 #include "scriptPCH.h"
-#include "Utilities/EventMap.h"
 #include <array>
 
 enum FireworksShowTypeObjects

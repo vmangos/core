@@ -23,6 +23,8 @@
 #include "ObjectMgr.h"
 #include "Policies/SingletonImp.h"
 #include "Player.h"
+#include "WorldPacket.h"
+#include "Item.h"
 #include "Corpse.h"
 #include "GridNotifiers.h"
 #include "MapManager.h"
@@ -30,6 +32,7 @@
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectGuid.h"
+#include "World.h"
 
 #include <cmath>
 

@@ -52,7 +52,9 @@
 #include "GridSearchers.h"
 #include "ThreadPool.h"
 #include "AuraRemovalMgr.h"
+#include "GameEventMgr.h"
 #include "world/world_event_wareffort.h"
+#include "LFGMgr.h"
 
 Map::~Map()
 {
@@ -992,12 +994,12 @@ bool ScriptedEvent::UpdateEvent()
     WorldObject* pSource = GetSourceObject();
     WorldObject* pTarget = GetTargetObject();
 
-    if (m_uiFailureCondition && IsConditionSatisfied(m_uiFailureCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+    if (m_uiFailureCondition && sObjectMgr.IsConditionSatisfied(m_uiFailureCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(false);
         return true;
     }
-    else if (m_uiSuccessCondition && IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+    else if (m_uiSuccessCondition && sObjectMgr.IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(true);
         return true;
@@ -1010,12 +1012,12 @@ bool ScriptedEvent::UpdateEvent()
         if (!pObject || !pObject->IsInWorld())
             continue;
 
-        if (target.uiFailureCondition && IsConditionSatisfied(target.uiFailureCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+        if (target.uiFailureCondition && sObjectMgr.IsConditionSatisfied(target.uiFailureCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(false);
             return true;
         }
-        else if (target.uiSuccessCondition && IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
+        else if (target.uiSuccessCondition && sObjectMgr.IsConditionSatisfied(target.uiSuccessCondition, pObject, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(true);
             return true;
@@ -1030,9 +1032,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
     m_bEnded = true;
 
     if (bSuccess && m_uiSuccessScript)
-        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, m_Source, m_Target);
+        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
     else if (!bSuccess && m_uiFailureScript)
-        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, m_Source, m_Target);
+        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
 
     for (const auto& target : m_vTargets)
     {
@@ -1042,9 +1044,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
             continue;
 
         if (bSuccess && target.uiSuccessScript)
-            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, target.target, m_Target);
+            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, pObject, GetTargetObject());
         else if (!bSuccess && target.uiFailureScript)
-            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, target.target, m_Target);
+            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, pObject, GetTargetObject());
     }
 }
 
@@ -1551,11 +1553,11 @@ void Map::SendInitSelf(Player* player)
     if (Transport* transport = player->GetTransport())
     {
         hasTransport = true;
-        transport->BuildCreateUpdateBlockForPlayer(data, player);
+        transport->BuildCreateUpdateBlockForPlayer(&data, player);
     }
 
     // build data for self presence in world at own client (one time for map)
-    player->BuildCreateUpdateBlockForPlayer(data, player);
+    player->BuildCreateUpdateBlockForPlayer(&data, player);
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
@@ -1563,7 +1565,7 @@ void Map::SendInitSelf(Player* player)
             if (player != itr && player->IsInVisibleList(itr))
             {
                 hasTransport = true;
-                itr->BuildCreateUpdateBlockForPlayer(data, player);
+                itr->BuildCreateUpdateBlockForPlayer(&data, player);
             }
 
     data.Send(player->GetSession(), hasTransport);
@@ -1579,7 +1581,7 @@ void Map::SendInitTransports(Player* player)
         if (itr != player->GetTransport())
         {
             hasTransport = true;
-            itr->BuildCreateUpdateBlockForPlayer(transData, player);
+            itr->BuildCreateUpdateBlockForPlayer(&transData, player);
         }
     }
     transData.Send(player->GetSession(), hasTransport);
@@ -1595,7 +1597,7 @@ void Map::SendRemoveTransports(Player* player)
         if (itr != player->GetTransport())
         {
             hasTransport = true;
-            itr->BuildOutOfRangeUpdateBlock(transData);
+            itr->BuildOutOfRangeUpdateBlock(&transData);
         }
     }
     transData.Send(player->GetSession(), hasTransport);
@@ -2304,12 +2306,16 @@ void BattleGroundMap::UnloadAll(bool pForce)
 }
 
 /// Put scripts in the execution queue
-void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid)
+void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, WorldObject* source, WorldObject* target)
 {
     ///- Find the script map
     ScriptMapMap::const_iterator s = scripts.find(id);
     if (s == scripts.end())
         return;
+
+    // prepare static data
+    ObjectGuid sourceGuid = source->GetObjectGuid();
+    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
 
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
@@ -2331,9 +2337,13 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, ObjectGuid source
     }
 }
 
-void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid)
+void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, WorldObject* source, WorldObject* target)
 {
     // NOTE: script record _must_ exist until command executed
+
+    // prepare static data
+    ObjectGuid sourceGuid = source->GetObjectGuid();
+    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
 
     ScriptAction sa;
     sa.sourceGuid = sourceGuid;
@@ -2349,7 +2359,7 @@ void Map::ScriptCommandStartDirect(ScriptInfo const& script, WorldObject* source
 {
     if ((script.command != SCRIPT_COMMAND_DISABLED) && 
         FindScriptFinalTargets(source, target, script) && 
-        (!script.condition || IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
+        (!script.condition || sObjectMgr.IsConditionSatisfied(script.condition, target, this, source, CONDITION_FROM_DBSCRIPTS)))
         (this->*(m_ScriptCommands[script.command]))(script, source, target);
 }
 
@@ -2438,7 +2448,7 @@ void Map::ScriptsProcess()
     // ok as multimap is a *sorted* associative container
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
-        ScriptAction const step = iter->second;
+         ScriptAction const step = iter->second;
         lock.unlock();
 
         WorldObject* source = nullptr;
@@ -2447,7 +2457,7 @@ void Map::ScriptsProcess()
         bool scriptResultOk = (step.script->command != SCRIPT_COMMAND_DISABLED) &&
                               FindScriptInitialTargets(source, target, step) &&
                               FindScriptFinalTargets(source, target, *step.script) &&
-                              (!step.script->condition || IsConditionSatisfied(step.script->condition, target, this, source, CONDITION_FROM_DBSCRIPTS));
+                              (!step.script->condition || sObjectMgr.IsConditionSatisfied(step.script->condition, target, this, source, CONDITION_FROM_DBSCRIPTS));
 
         if (scriptResultOk)
             scriptResultOk = (this->*(m_ScriptCommands[step.script->command]))(*step.script, source, target);

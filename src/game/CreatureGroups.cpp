@@ -107,7 +107,7 @@ void CreatureGroup::OnMemberDied(Creature* member)
 
 void CreatureGroup::OnLeaveCombat(Creature* member)
 {
-    bool masterEvade = member->GetObjectGuid() == GetOriginalLeaderGuid();
+    bool masterEvade = member->GetObjectGuid() == GetLeaderGuid();
     if (m_options & OPTION_EVADE_TOGETHER)
     {
         for (const auto& itr : m_members)
@@ -116,21 +116,16 @@ void CreatureGroup::OnLeaveCombat(Creature* member)
                     if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
                         otherMember->AI()->EnterEvadeMode();
 
-        if (!masterEvade)
-        {
-            if (Creature* originaLeader = member->GetMap()->GetCreature(GetOriginalLeaderGuid()))
-            {
-                if (originaLeader->IsInWorld() && originaLeader->IsAlive() && originaLeader->AI())
+        if (member->GetObjectGuid() != GetLeaderGuid())
+            if (Creature* otherMember = member->GetMap()->GetCreature(GetLeaderGuid()))
+                if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
                 {
                     masterEvade = true;
-                    originaLeader->AI()->EnterEvadeMode();
+                    otherMember->AI()->EnterEvadeMode();
                 }
-            }
-        }
     }
-
-    if ((m_options & OPTION_RESPAWN_ALL_ON_ANY_EVADE) ||
-       ((m_options & OPTION_RESPAWN_ALL_ON_MASTER_EVADE) && masterEvade))
+    if (m_options & OPTION_RESPAWN_ALL_ON_ANY_EVADE ||
+            (m_options & OPTION_RESPAWN_ALL_ON_MASTER_EVADE && masterEvade))
         RespawnAll(member);
 }
 

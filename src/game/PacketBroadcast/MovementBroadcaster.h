@@ -1,15 +1,18 @@
 #ifndef MANGOS_MOVEMENT_BROADCASTER_H
 #define MANGOS_MOVEMENT_BROADCASTER_H
 
-#include "Platform/Define.h"
-
+#include "Log.h"
+#include "ObjectGuid.h"
+#include <array>
 #include <atomic>
+#include <array>
 #include <chrono>
+#include <unordered_map>
+#include <list>
 #include <vector>
 #include <cstddef>
 #include <memory>
 #include <thread>
-#include <functional>
 
 class PlayerBroadcaster;
 class MovementBroadcaster;

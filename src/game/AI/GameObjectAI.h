@@ -1,12 +1,9 @@
 #ifndef _HEADER_GAMEOBJECT_AI
 #define _HEADER_GAMEOBJECT_AI
 
-#include "Common.h"
+#include "SharedDefines.h"
 
-class Unit;
-class Creature;
 class GameObject;
-class ObjectGuid;
 
 class GameObjectAI
 {

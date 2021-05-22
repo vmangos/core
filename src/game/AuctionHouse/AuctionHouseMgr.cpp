@@ -21,10 +21,12 @@
 
 #include "AuctionHouseMgr.h"
 #include "Database/DatabaseEnv.h"
+#include "SQLStorages.h"
 #include "DBCStores.h"
+#include "ProgressBar.h"
+
 #include "AccountMgr.h"
 #include "Item.h"
-#include "Bag.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"

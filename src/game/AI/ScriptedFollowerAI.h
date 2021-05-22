@@ -6,9 +6,8 @@
 #define SC_FOLLOWERAI_H
 
 #include "ScriptedAI.h"
-#include "Pet.h"
-
-class Player;
+#include "Player.h"
+#include "QuestDef.h"
 
 enum eFollowState
 {

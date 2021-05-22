@@ -22,13 +22,6 @@
 #include "NullCreatureAI.h"
 #include "Creature.h"
 
-NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c)
-{
-    c->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
-    m_bMeleeAttack = false;
-    m_bCombatMovement = false;
-}
-
 NullCreatureAI::~NullCreatureAI()
 {
 }

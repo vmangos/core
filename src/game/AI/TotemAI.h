@@ -24,10 +24,16 @@
 
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
+#include "Timer.h"
 #include "Totem.h"
 
 class Creature;
 class Totem;
+
+enum
+{
+    NPC_TOTEM_GLEBE = 5925,
+};
 
 class TotemAI : public CreatureAI
 {

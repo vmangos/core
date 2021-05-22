@@ -17,6 +17,7 @@
 
 #include "ZoneScript.h"
 #include "ZoneScriptMgr.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Map.h"
 #include "MapManager.h"

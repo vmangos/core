@@ -41,7 +41,7 @@ class Sha1Hash
         void Finalize();
 
         uint8* GetDigest(void) { return mDigest; };
-        static int GetLength(void) { return SHA_DIGEST_LENGTH; };
+        int GetLength(void) { return SHA_DIGEST_LENGTH; };
 
     private:
         SHA_CTX mC;

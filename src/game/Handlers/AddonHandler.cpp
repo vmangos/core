@@ -22,7 +22,6 @@
 #include "AddonHandler.h"
 #include "Database/DatabaseEnv.h"
 #include "Opcodes.h"
-#include "WorldPacket.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 #include "zlib.h"

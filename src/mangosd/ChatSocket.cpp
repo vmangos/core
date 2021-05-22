@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "ChatSocket.h"
 #include "World.h"
+#include "Config/Config.h"
 #include "Util.h"
 #include "SharedDefines.h"
 #include "ObjectAccessor.h"
@@ -35,7 +36,6 @@
 #include "ObjectMgr.h"
 #include "AccountMgr.h"
 #include "Chat.h"
-#include "Opcodes.h"
 
 #define DEBUG_OUT_CHAT(...) //sLog.outString(__VA_ARGS__)
 

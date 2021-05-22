@@ -24,6 +24,7 @@
 #include "World.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
+#include "ProgressBar.h"
 #include "SpellMgr.h"
 
 void CharacterDatabaseCleaner::CleanDatabase()

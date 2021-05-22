@@ -20,12 +20,10 @@
  */
 
 #include "Common.h"
-#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "Log.h"
 #include "Corpse.h"
 #include "GameObject.h"
-#include "GameObjectAI.h"
 #include "Player.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
@@ -33,8 +31,8 @@
 #include "LootMgr.h"
 #include "Object.h"
 #include "Group.h"
+#include "GameObjectAI.h"
 #include "World.h"
-#include "ScriptMgr.h"
 #include "Util.h"
 #include "Anticheat.h"
 
@@ -377,7 +375,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                         DEBUG_LOG("Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetGUIDLow());
 
                         if (!sScriptMgr.OnProcessEvent(go->GetGOInfo()->chest.eventId, _player, go, true))
-                            go->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, _player->GetObjectGuid(), go->GetObjectGuid());
+                            go->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, _player, go);
                     }
 
                     // only vein pass this check

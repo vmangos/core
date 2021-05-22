@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Conditions.h"
+#include "Unit.h"
 #include "Player.h"
 #include "GameEventMgr.h"
 #include "SpellAuras.h"

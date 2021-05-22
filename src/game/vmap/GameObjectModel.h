@@ -24,6 +24,7 @@
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include "DBCStructure.h"
+#include "GameObject.h"
 
 #include "Platform/Define.h"
 
@@ -32,7 +33,6 @@ namespace VMAP
     class WorldModel;
 }
 
-class GameObject;
 
 class GameObjectModel
 {

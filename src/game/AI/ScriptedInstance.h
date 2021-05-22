@@ -5,12 +5,10 @@
 #ifndef SC_INSTANCE_H
 #define SC_INSTANCE_H
 
+#include "Creature.h"
+#include "GameObject.h"
 #include "InstanceData.h"
 #include "Map.h"
-#include "ScriptMgr.h"
-
-class GameObject;
-class Creature;
 
 enum EncounterState
 {

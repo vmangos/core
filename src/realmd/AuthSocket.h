@@ -29,7 +29,6 @@
 #include "Common.h"
 #include "Auth/BigNumber.h"
 #include "Auth/Sha1.h"
-#include "SRP6/SRP6.h"
 #include "ByteBuffer.h"
 
 #include "BufferedSocket.h"
@@ -78,6 +77,8 @@ class AuthSocket: public BufferedSocket
         bool _HandleXferCancel();
         bool _HandleXferAccept();
 
+        void _SetVSFields(const std::string& rI);
+
     private:
         enum eStatus
         {
@@ -91,7 +92,9 @@ class AuthSocket: public BufferedSocket
 
         bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
 
-        SRP6 srp;
+        BigNumber N, s, g, v;
+        BigNumber b, B;
+        BigNumber K;
         BigNumber _reconnectProof;
 
         bool promptPin;

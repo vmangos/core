@@ -2,9 +2,8 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
-#include "ScriptedInstance.h"
 #include "Player.h"
-#include "GameObject.h"
+#include "ScriptedInstance.h"
 
 #define SAVE_LOAD_LOG sLog.outDebug
 

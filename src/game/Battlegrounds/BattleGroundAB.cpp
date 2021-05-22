@@ -23,11 +23,13 @@
 #include "Player.h"
 #include "BattleGround.h"
 #include "BattleGroundAB.h"
+#include "Creature.h"
 #include "GameObject.h"
 #include "BattleGroundMgr.h"
 #include "Language.h"
 #include "Util.h"
 #include "WorldPacket.h"
+#include "MapManager.h"
 
 BattleGroundAB::BattleGroundAB()
 {

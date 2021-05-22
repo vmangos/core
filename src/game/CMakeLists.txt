@@ -174,12 +174,10 @@ set (game_SRCS
     Objects/Object.cpp
     Objects/Pet.cpp
     Objects/Player.cpp
-    Objects/SpellCaster.cpp
     Objects/TemporarySummon.cpp
     Objects/Totem.cpp
     Objects/Unit.cpp
     Objects/UpdateData.cpp
-    Objects/UpdateFields.cpp
     OutdoorPvP/OutdoorPvPEP.cpp
     OutdoorPvP/OutdoorPvPSI.cpp
     OutdoorPvP/Register.cpp
@@ -285,6 +283,7 @@ set (game_SRCS
     Chat/AsyncCommandHandlers.h
     Chat/AbstractPlayer.h
     Chat/MasterPlayer.h
+    Commands/Nostalrius.h
     Database/CharacterDatabaseCache.h
     Database/CharacterDatabaseCleaner.h
     Database/DBCEnums.h
@@ -323,7 +322,6 @@ set (game_SRCS
     Maps/MoveMapSharedDefines.h
     Maps/Path.h
     Maps/PathFinder.h
-    Maps/ScriptCommands.h
     Maps/ZoneScript.h
     Maps/ZoneScriptMgr.h
     Maps/Pool/PoolManager.h
@@ -354,17 +352,13 @@ set (game_SRCS
     Objects/Bag.h
     Objects/Corpse.h
     Objects/Creature.h
-    Objects/CreatureDefines.h
     Objects/DynamicObject.h
     Objects/GameObject.h
-    Objects/GameObjectDefines.h
     Objects/Item.h
     Objects/ItemPrototype.h
     Objects/Object.h
-    Objects/ObjectDefines.h
     Objects/Pet.h
     Objects/Player.h
-    Objects/SpellCaster.h
     Objects/TemporarySummon.h
     Objects/Totem.h
     Objects/Unit.h

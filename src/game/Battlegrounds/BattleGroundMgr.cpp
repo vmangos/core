@@ -21,9 +21,7 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
-#include "Opcodes.h"
 #include "Player.h"
-#include "Group.h"
 #include "BattleGroundMgr.h"
 #include "BattleGroundAV.h"
 #include "BattleGroundAB.h"

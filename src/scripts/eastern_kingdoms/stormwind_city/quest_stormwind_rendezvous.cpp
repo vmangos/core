@@ -3,7 +3,6 @@
  */
 
 #include "scriptPCH.h"
-#include "Group.h"
 #include "quest_stormwind_rendezvous.h"
 
 /*

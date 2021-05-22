@@ -20,7 +20,7 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "Policies/SingletonImp.h"
-#include "Map.h"
+#include "Player.h"
 #include "Creature.h"
 #include "SpellEntry.h"
 #include "ProgressBar.h"

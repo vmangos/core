@@ -16,14 +16,17 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "World.h"
 #include "Player.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "SystemConfig.h"
+#include "revision.h"
 #include "Util.h"
 #include "Creature.h"
-#include "CreatureGroups.h"
+#include "CreatureAI.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "GridNotifiers.h"
@@ -228,7 +231,7 @@ bool ChatHandler::HandleNpcSetLevelCommand(char* args)
         return false;
 
     uint8 lvl = (uint8) atoi(args);
-    if (lvl < 1)
+    if (lvl < 1 || lvl > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) + 3)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);

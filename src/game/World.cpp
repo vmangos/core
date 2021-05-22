@@ -34,7 +34,6 @@
 #include "WorldPacket.h"
 #include "Weather.h"
 #include "Player.h"
-#include "Group.h"
 #include "AccountMgr.h"
 #include "AuctionHouseMgr.h"
 #include "ObjectMgr.h"
@@ -51,6 +50,7 @@
 #include "CreatureAIRegistry.h"
 #include "Policies/SingletonImp.h"
 #include "BattleGroundMgr.h"
+#include "TemporarySummon.h"
 #include "VMapFactory.h"
 #include "GameEventMgr.h"
 #include "PoolManager.h"
@@ -67,6 +67,7 @@
 #include "AuctionHouseBotMgr.h"
 #include "Transports/TransportMgr.h"
 #include "PlayerBotMgr.h"
+#include "ProgressBar.h"
 #include "ZoneScriptMgr.h"
 #include "CharacterDatabaseCache.h"
 #include "CreatureGroups.h"
@@ -732,7 +733,6 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_PLAYER_COMMANDS, "PlayerCommands", true);
     setConfig(CONFIG_UINT32_INSTANT_LOGOUT, "InstantLogout", SEC_MODERATOR);
-    setConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY, "ForceLogoutDelay", true);
     setConfigMin(CONFIG_UINT32_GROUP_OFFLINE_LEADER_DELAY, "Group.OfflineLeaderDelay", 300, 0);
     setConfigMin(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT, "Guild.EventLogRecordsCount", GUILD_EVENTLOG_MAX_RECORDS, GUILD_EVENTLOG_MAX_RECORDS);
 
@@ -905,7 +905,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS, "Terrain.Preload.Continents", 1);
     setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES, "Terrain.Preload.Instances", 1);
 
-    setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE, "Movement.ExtrapolateChargePosition", true);
+    setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PLAYER, "Movement.ExtrapolatePlayerPosition", true);
     setConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET, "Movement.ExtrapolatePetPosition", true);
     setConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME, "Movement.PendingAckResponseTime", 2000);
     setConfigMinMax(CONFIG_UINT32_MAX_POINTS_PER_MVT_PACKET, "Movement.MaxPointsPerPacket", 80, 5, 10000);
@@ -913,8 +913,6 @@ void World::LoadConfigSettings(bool reload)
 
     sPlayerBotMgr.LoadConfig();
     setConfig(CONFIG_BOOL_PLAYER_BOT_SHOW_IN_WHO_LIST, "PlayerBot.ShowInWhoList", false);
-    setConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS, "PartyBot.MaxBots", 0);
-    setConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS, "PartyBot.SkipChecks", false);
 
     setConfigMinMax(CONFIG_UINT32_SPELL_EFFECT_DELAY, "Spell.EffectDelay", 400, 0, 1000);
     setConfigMinMax(CONFIG_UINT32_SPELL_PROC_DELAY, "Spell.ProcDelay", 400, 0, 1000);
@@ -1682,6 +1680,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize static helper structures
     AIRegistry::Initialize();
+    Player::InitVisibleBits();
 
     sLog.outString("Loading GameObject models ...");
     LoadGameObjectModelList();

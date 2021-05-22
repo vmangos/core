@@ -24,8 +24,6 @@
 #include "CreatureAIImpl.h"
 #include "NullCreatureAI.h"
 #include "GameEventMgr.h"
-#include "ObjectMgr.h"
-#include "Group.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
@@ -423,7 +421,7 @@ bool Map::ScriptCommand_SummonCreature(ScriptInfo const& script, WorldObject* so
     }
 
     if (script.summonCreature.scriptId)
-        ScriptsStart(sGenericScripts, script.summonCreature.scriptId, pCreature->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+        ScriptsStart(sGenericScripts, script.summonCreature.scriptId, pCreature, target);
 
     return false;
 }
@@ -555,34 +553,27 @@ bool Map::ScriptCommand_RemoveAura(ScriptInfo const& script, WorldObject* source
 // SCRIPT_COMMAND_CAST_SPELL (15)
 bool Map::ScriptCommand_CastSpell(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    SpellCaster* pTarget = ToSpellCaster(target);
-
+    Unit* pUnitSource = ToUnit(source);
+    Unit* pUnitTarget = ToUnit(target);
+    
     if (!source)
     {
         sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a nullptr source, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 
-    SpellCaster* pSource = source->ToSpellCaster();
-    if (!pSource)
-    {
-        sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a non-unit and non-gameobject source, skipping.", script.id);
-        return ShouldAbortScript(script);
-    }
-
-    if (!pTarget)
+    if (!pUnitTarget)
         return ShouldAbortScript(script);
 
-    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pSource->IsNonMeleeSpellCasted(false))
-        pSource->InterruptNonMeleeSpells(false);
+    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pUnitSource && pUnitSource->IsNonMeleeSpellCasted(false))
+        pUnitSource->InterruptNonMeleeSpells(false);
 
-    Unit* pUnitTarget = pTarget->ToUnit();
     Creature* pCreatureSource = source->ToCreature();
 
-    if (pCreatureSource && pUnitTarget)
+    if (pCreatureSource)
         pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
     else
-        pSource->CastSpell(pTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
+        source->CastSpell(pUnitTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
 
     return false;
 }
@@ -1033,7 +1024,7 @@ bool Map::ScriptCommand_TerminateCondition(ScriptInfo const& script, WorldObject
     WorldObject* pSource = source;
     WorldObject* pTarget = target;
 
-    bool terminateResult = IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
+    bool terminateResult = sObjectMgr.IsConditionSatisfied(script.terminateCond.conditionId, pTarget, this, pSource, CONDITION_FROM_DBSCRIPTS);
     
     if (script.terminateCond.flags & SF_TERMINATECONDITION_WHEN_FALSE)
         terminateResult = !terminateResult;
@@ -1246,7 +1237,7 @@ bool Map::ScriptCommand_StartScript(ScriptInfo const& script, WorldObject* sourc
     }
 
     if (chosenId)
-        ScriptsStart(sGenericScripts, chosenId, source ? source->GetObjectGuid() : ObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+        ScriptsStart(sGenericScripts, chosenId, source, target);
     else
         return ShouldAbortScript(script);
 
@@ -1783,7 +1774,7 @@ bool Map::ScriptCommand_RemoveMapEventTarget(ScriptInfo const& script, WorldObje
             {
                 if (WorldObject* pObject = GetWorldObject(itr->target))
                 {
-                    if (IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
+                    if (sObjectMgr.IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
                     {
                         itr = pEvent->m_vTargets.erase(itr);
                         if (script.removeMapEventTarget.targets == SO_REMOVETARGET_ONE_FIT_CONDITION)
@@ -1944,7 +1935,7 @@ bool Map::ScriptCommand_StartScriptForAll(ScriptInfo const& script, WorldObject*
         }
 
         if (!script.startScriptForAll.objectEntry || (pWorldObject->GetEntry() == script.startScriptForAll.objectEntry))
-            ScriptsStart(sGenericScripts, script.startScriptForAll.scriptId, pWorldObject->GetObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid());
+            ScriptsStart(sGenericScripts, script.startScriptForAll.scriptId, pWorldObject, target);
     }
     
     return false;
@@ -2346,20 +2337,5 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
     if (script.setPvP.enabled)
         pSource->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
-    return false;
-}
-
-// SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (87)
-bool Map::ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject* source, WorldObject* target)
-{
-    GameObject* pGo = nullptr;
-
-    if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
-    {
-        sLog.outError("SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (script id %u) call for a nullptr gameobject, skipping.", script.id);
-        return ShouldAbortScript(script);
-    }
-
-    pGo->ResetDoorOrButton();
     return false;
 }

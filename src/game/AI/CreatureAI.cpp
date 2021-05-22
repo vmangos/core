@@ -24,14 +24,7 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "Totem.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "Group.h"
-
-CreatureAI::CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
-{
-    SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
-}
+#include "GridSearchers.h"
 
 CreatureAI::~CreatureAI()
 {
@@ -249,7 +242,7 @@ void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
 
                     // If there is a script for this spell, run it.
                     if (spell.scriptId)
-                        m_creature->GetMap()->ScriptsStart(sCreatureSpellScripts, spell.scriptId, m_creature->GetObjectGuid(), pTarget->GetObjectGuid());
+                        m_creature->GetMap()->ScriptsStart(sCreatureSpellScripts, spell.scriptId, m_creature, pTarget);
                     break;
                 }
                 case SPELL_FAILED_FLEEING:

@@ -110,7 +110,7 @@ class SpellAuraHolder
         Aura* GetAuraByEffectIndex(SpellEffectIndex index) const { return m_auras[index]; }
         uint32 GetAuraPeriodicTickTimer(SpellEffectIndex index) const;
 
-        uint32 GetId() const;
+        uint32 GetId() const { return m_spellProto->Id; }
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
 
         ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
@@ -119,7 +119,7 @@ class SpellAuraHolder
         void SetRealCasterGuid(ObjectGuid guid) { m_realCasterGuid = guid; }
         ObjectGuid const& GetCastItemGuid() const { return m_castItemGuid; }
         Unit* GetCaster() const;
-        SpellCaster* GetRealCaster() const;
+        WorldObject* GetRealCaster() const;
         Unit* GetTarget() const { return m_target; }
         void SetTarget(Unit* target) { m_target = target; }
 
@@ -225,7 +225,7 @@ class SpellAuraHolder
 
         void UpdateAuraDuration() const;
 
-        void SetAura(uint32 slot, bool remove);
+        void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
         void SetAuraFlag(uint32 slot, bool add);
         void SetAuraLevel(uint32 slot, uint32 level);
 
@@ -434,15 +434,15 @@ class Aura
         void SetModifier(AuraType t, float a, uint32 pt, int32 miscValue);
         Modifier*       GetModifier()       { return &m_modifier; }
         Modifier const* GetModifier() const { return &m_modifier; }
-        int32 GetMiscValue() const;
+        int32 GetMiscValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValue[m_effIndex]; }
 
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
-        uint32 GetId() const{ return GetHolder()->GetId(); }
+        uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
         ObjectGuid const& GetCastItemGuid() const { return GetHolder()->GetCastItemGuid(); }
         ObjectGuid const& GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
         ObjectGuid const& GetRealCasterGuid() const { return GetHolder()->GetRealCasterGuid(); }
         Unit* GetCaster() const { return GetHolder()->GetCaster(); }
-        SpellCaster* GetRealCaster() const { return GetHolder()->GetRealCaster(); }
+        WorldObject* GetRealCaster() const { return GetHolder()->GetRealCaster(); }
         Unit* GetTarget() const { return GetHolder()->GetTarget(); }
 
         SpellEffectIndex GetEffIndex() const{ return m_effIndex; }

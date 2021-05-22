@@ -28,10 +28,12 @@
 #include "Util.h"
 #include "Auth/Sha1.h"
 #include "World.h"
+#include "Chat.h"
 #include "WorldSession.h"
+#include "Chat.h"
 #include "MasterPlayer.h"
 #include "Anticheat.h"
-#include "SRP6/SRP6.h"
+
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 
@@ -54,22 +56,9 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
         return AOR_NAME_ALREDY_EXIST;                       // username does already exist
     }
 
-    SRP6 srp;
-    srp.CalculateVerifier(CalculateShaPassHash(username, password));
-    const char* s_hex = srp.GetSalt().AsHexStr();
-    const char* v_hex = srp.GetVerifier().AsHexStr();
-
-    bool update_sv = LoginDatabase.PExecute(
-        "INSERT INTO account(`username`, `v`, `s`, `joindate`) VALUES('%s','%s','%s',NOW())",
-        username.c_str(), v_hex, s_hex);
-
-    OPENSSL_free((void*)s_hex);
-    OPENSSL_free((void*)v_hex);
-
-    if (!update_sv)
+    if (!LoginDatabase.PExecute("INSERT INTO `account` (`username`, `sha_pass_hash`, `joindate`) VALUES('%s','%s',NOW())", username.c_str(), CalculateShaPassHash(username, password).c_str()))
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
-    LoginDatabase.Execute(
-        "INSERT INTO `realmcharacters` (`realmid`, `acctid`, `numchars`) SELECT `realmlist`.`id`, `account`.`id`, 0 FROM `realmlist`, `account` LEFT JOIN `realmcharacters` ON `acctid`=`account`.`id` WHERE `acctid` IS NULL");
+    LoginDatabase.Execute("INSERT INTO `realmcharacters` (`realmid`, `acctid`, `numchars`) SELECT `realmlist`.`id`, `account`.`id`, 0 FROM `realmlist`,`account` LEFT JOIN `realmcharacters` ON `acctid`=`account`.`id` WHERE `acctid` IS NULL");
 
     return AOR_OK;                                          // everything's fine
 }
@@ -134,24 +123,11 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, 
     normalizeString(new_uname);
     normalizeString(new_passwd);
 
-    SRP6 srp;
-
-    srp.CalculateVerifier(CalculateShaPassHash(new_uname, new_passwd));
-
     std::string safe_new_uname = new_uname;
     LoginDatabase.escape_string(safe_new_uname);
 
-    const char* s_hex = srp.GetSalt().AsHexStr();
-    const char* v_hex = srp.GetVerifier().AsHexStr();
-
-    bool update_sv = LoginDatabase.PExecute(
-        "UPDATE `account` SET `v`='%s', `s`='%s', `username`='%s' WHERE `id`='%u'",
-        v_hex, s_hex, safe_new_uname.c_str(), accid);
-
-    OPENSSL_free((void*)s_hex);
-    OPENSSL_free((void*)v_hex);
-
-    if (!update_sv)
+    if (!LoginDatabase.PExecute("UPDATE `account` SET `v`='0', `s`='0', `username`='%s', `sha_pass_hash`='%s' WHERE `id`='%u'", safe_new_uname.c_str(),
+                                CalculateShaPassHash(new_uname, new_passwd).c_str(), accid))
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
 
     return AOR_OK;
@@ -172,22 +148,9 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd,
 
     normalizeString(new_passwd);
 
-    SRP6 srp;
-
-    srp.CalculateVerifier(CalculateShaPassHash(username, new_passwd));
-
-    const char* s_hex = srp.GetSalt().AsHexStr();
-    const char* v_hex = srp.GetVerifier().AsHexStr();
-
-    bool update_sv = LoginDatabase.PExecute(
-        "UPDATE `account` SET `v`='%s', `s`='%s' WHERE `id`='%u'",
-        v_hex, s_hex, accid);
-
-    OPENSSL_free((void*)s_hex);
-    OPENSSL_free((void*)v_hex);
-
     // also reset s and v to force update at next realmd login
-    if (!update_sv)
+    if (!LoginDatabase.PExecute("UPDATE `account` SET `v`='0', `s`='0', `sha_pass_hash`='%s' WHERE `id`='%u'",
+                                CalculateShaPassHash(username, new_passwd).c_str(), accid))
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
 
     return AOR_OK;
@@ -239,7 +202,7 @@ void AccountMgr::Load()
         case SEC_TICKETMASTER:
         case SEC_GAMEMASTER:
         case SEC_BASIC_ADMIN:
-        case SEC_DEVELOPER:
+        case SEC_DEVELOPPER:
         case SEC_ADMINISTRATOR:
             // Peut etre deja dans la liste ? On prend le plus haut gmlevel.
             if (m_accountSecurity.find(accountId) == m_accountSecurity.end() ||
@@ -312,22 +275,11 @@ bool AccountMgr::CheckPassword(uint32 accid, std::string passwd, std::string use
 
     normalizeString(passwd);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT `s`, `v` FROM `account` WHERE `id`='%u'", accid);
+    QueryResult* result = LoginDatabase.PQuery("SELECT 1 FROM `account` WHERE `id`='%u' AND `sha_pass_hash`='%s'", accid, CalculateShaPassHash(username, passwd).c_str());
     if (result)
     {
-        Field* fields = result->Fetch();
-        SRP6 srp;
-
-        bool calcv = srp.CalculateVerifier(
-            CalculateShaPassHash(username, passwd), fields[0].GetCppString().c_str());
-
-        if (calcv && srp.ProofVerifier(fields[1].GetCppString()))
-        {
-            delete result;
-            return true;
-        }
-
         delete result;
+        return true;
     }
 
     return false;

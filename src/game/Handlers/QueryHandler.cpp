@@ -20,6 +20,7 @@
  */
 
 #include "Common.h"
+#include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/DatabaseImpl.h"
 #include "WorldPacket.h"
@@ -30,6 +31,10 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "Player.h"
+#include "UpdateMask.h"
+#include "NPCHandler.h"
+#include "Pet.h"
+#include "MapManager.h"
 
 void WorldSession::SendNameQueryOpcode(Player* p)
 {
@@ -197,7 +202,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
 #endif
         data << uint32(ci->type);
 
-        data << uint32(ci->pet_family);                     // CreatureFamily.dbc
+        data << uint32(ci->beast_family);                   // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(0);                                  // unknown        wdbFeild11
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1

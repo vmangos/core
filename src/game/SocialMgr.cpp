@@ -25,7 +25,7 @@
 #include "Opcodes.h"
 #include "WorldPacket.h"
 #include "MasterPlayer.h"
-#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "World.h"
 #include "Util.h"
 

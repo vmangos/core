@@ -206,12 +206,8 @@ struct boss_vaelAI : public ScriptedAI
         if (!m_bEngaged)
         {
             m_bEngaged = true;
-            // From 1.8: There is no longer a one-hour time restriction on the Vaelastraz the Corrupt encounter in Blackwing Lair.
-            if (sWorld.GetWowPatch() < WOW_PATCH_108)
-            {
-                m_creature->SetRespawnDelay(43200); // 12h 43200
-                m_creature->ForcedDespawn(3600000); // 1h 3600000
-            }
+            m_creature->SetRespawnDelay(43200); // 12h 43200
+            m_creature->ForcedDespawn(3600000); // 1h 3600000
         }
     }
 

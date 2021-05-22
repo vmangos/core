@@ -18,6 +18,7 @@
 #define _GEOMETRY
 
 #include "Common.h"
+#include "SharedDefines.h"
 
 namespace Geometry
 {

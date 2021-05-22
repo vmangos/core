@@ -22,7 +22,6 @@ SDCategory: Scarlet Monastery
 EndScriptData */
 
 #include "scriptPCH.h"
-#include "Utilities/EventMap.h"
 #include "scarlet_monastery.h"
 
 enum AshbringerEventMisc

@@ -25,7 +25,7 @@
 #include "PoolManager.h"
 #include "SpellMgr.h"
 #include "Spell.h"
-#include "Group.h"
+#include "UpdateMask.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
 #include "World.h"
@@ -34,11 +34,13 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include "InstanceData.h"
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
 #include "BattleGround.h"
 #include "BattleGroundAV.h"
 #include "Util.h"
+
 #include "GameObjectAI.h"
 #include "ScriptMgr.h"
 #include "ZoneScript.h"
@@ -64,7 +66,7 @@ QuaternionData QuaternionData::fromEulerAnglesZYX(float Z, float Y, float X)
     return QuaternionData(quat.x, quat.y, quat.z, quat.w);
 }
 
-GameObject::GameObject() : SpellCaster(),
+GameObject::GameObject() : WorldObject(),
     loot(this),
     m_visible(true),
     m_goInfo(nullptr)
@@ -255,32 +257,24 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 class HunterTrapTargetSelectorCheck
 {
 public:
-    HunterTrapTargetSelectorCheck(GameObject const* pTrap, Unit const* pOwner, float range) : i_trap(pTrap), i_trapOwner(pOwner), i_range(range) {}
+    HunterTrapTargetSelectorCheck(GameObject const* obj, Unit const* funit, float range) : i_trap(obj), i_trapOwner(funit), i_range(range) {}
     WorldObject const& GetFocusObject() const
     {
         return *i_trap;
     }
-    bool operator()(Unit* pTarget)
+    bool operator()(Unit* u)
     {
-        if (!i_trap->CanSeeInWorld(pTarget))
+        if (!i_trap->CanSeeInWorld(u))
             return false;
 
-        // don't trigger on enemy player if our owner is not flagged for pvp
-        if (Player const* pOwnerPlayer = i_trapOwner->ToPlayer())
-        {
-            if (Player const* pTargetPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
-            {
-                if (!pOwnerPlayer->IsPvP() && !(pOwnerPlayer->IsFFAPvP() && pTargetPlayer->IsFFAPvP()) && !pOwnerPlayer->IsInDuelWith(pTargetPlayer))
-                    return false;
-            }
-        }
+        if (i_trapOwner->IsPlayer() && u->IsPlayer() && !i_trapOwner->IsPvP() && !i_trapOwner->ToPlayer()->IsInDuelWith(u->ToPlayer()))
+            return false;
 
-        bool isTotem = pTarget->IsCreature() && ((Creature*)pTarget)->IsTotem();
-        if (i_trap->IsWithinDistInMap(pTarget, isTotem ? i_range / 3.0f : i_range) &&
-            i_trapOwner->IsValidAttackTarget(pTarget) &&
-            (pTarget->IsInCombat() || i_trapOwner->IsHostileTo(pTarget)))
+        bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
+        if (u->IsAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
+            (u->IsInCombat() || i_trapOwner->IsHostileTo(u)))
         {
-            i_range = i_trap->GetDistance(pTarget);
+            i_range = i_trap->GetDistance(u);
             return true;
         }
         return false;
@@ -1381,7 +1375,7 @@ void GameObject::Use(Unit* user)
             UseDoorOrButton();
 
             // activate script
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
             return;
         }
         case GAMEOBJECT_TYPE_BUTTON:                        // 1
@@ -1395,7 +1389,7 @@ void GameObject::Use(Unit* user)
             UseDoorOrButton();
 
             // activate script
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
 
             TriggerLinkedGameObject(user);
             return;
@@ -1420,7 +1414,7 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
             TriggerLinkedGameObject(user);
             return;
         }
@@ -1565,10 +1559,10 @@ void GameObject::Use(Unit* user)
                     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Goober ScriptStart id %u for GO entry %u (GUID %u).", info->goober.eventId, GetEntry(), GetGUIDLow());
 
                     if (!sScriptMgr.OnProcessEvent(info->goober.eventId, player, this, true))
-                        GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player->GetObjectGuid(), GetObjectGuid());
+                        GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                 }
                 else
-                    GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
 
                 // possible quest objective for active quests
                 if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
@@ -1618,7 +1612,7 @@ void GameObject::Use(Unit* user)
             if (info->camera.eventID)
             {
                 if (!sScriptMgr.OnProcessEvent(info->camera.eventID, player, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player, this);
             }
 
             return;
@@ -1886,7 +1880,7 @@ void GameObject::Use(Unit* user)
                     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "FlagDrop ScriptStart id %u for GO entry %u (GUID %u).", info->flagdrop.eventID, GetEntry(), GetGUIDLow());
 
                     if (!sScriptMgr.OnProcessEvent(info->flagdrop.eventID, player, this, true))
-                        GetMap()->ScriptsStart(sEventScripts, info->flagdrop.eventID, player->GetObjectGuid(), GetObjectGuid());
+                        GetMap()->ScriptsStart(sEventScripts, info->flagdrop.eventID, player, this);
                 }
                 
                 spellId = info->flagdrop.pickupSpell;
@@ -1924,45 +1918,45 @@ void GameObject::Use(Unit* user)
             if (info->capturePoint.winEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.winEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID1, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID1, user, this);
             }
             if (info->capturePoint.winEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.winEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID2, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.winEventID2, user, this);
             }
 
             if (info->capturePoint.contestedEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.contestedEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID1, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID1, user, this);
             }
             if (info->capturePoint.contestedEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.contestedEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID2, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.contestedEventID2, user, this);
             }
 
             if (info->capturePoint.progressEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.progressEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID1, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID1, user, this);
             }
             if (info->capturePoint.progressEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.progressEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID2, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.progressEventID2, user, this);
             }
 
             if (info->capturePoint.neutralEventID1)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.neutralEventID1, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID1, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID1, user, this);
             }
             if (info->capturePoint.neutralEventID2)
             {
                 if (!sScriptMgr.OnProcessEvent(info->capturePoint.neutralEventID2, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID2, user->GetObjectGuid(), GetObjectGuid());
+                    GetMap()->ScriptsStart(sEventScripts, info->capturePoint.neutralEventID2, user, this);
             }
 
             // Some has spell, need to process those further.

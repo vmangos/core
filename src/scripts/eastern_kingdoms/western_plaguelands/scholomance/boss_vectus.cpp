@@ -22,7 +22,6 @@ SDCategory: Scholomance
 EndScriptData */
 
 #include "scriptPCH.h"
-#include "CreatureGroups.h"
 #include "scholomance.h"
 
 enum

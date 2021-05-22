@@ -23,8 +23,7 @@
 #define MANGOS_FORMULAS_H
 
 #include "World.h"
-#include "Creature.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 
 namespace MaNGOS
 {

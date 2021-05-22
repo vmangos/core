@@ -16,12 +16,14 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "World.h"
 #include "Player.h"
-#include "Group.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "ObjectMgr.h"
+#include "SystemConfig.h"
+#include "revision.h"
 #include "Util.h"
 
 bool ChatHandler::HandleTeleCommand(char* args)

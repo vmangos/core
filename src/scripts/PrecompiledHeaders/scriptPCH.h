@@ -6,6 +6,7 @@
 #define SC_PRECOMPILED_H
 
 #include "Mail.h"
+#include "Nostalrius.h"
 #include "ScriptMgr.h"
 #include "Object.h"
 #include "ObjectMgr.h"

@@ -27,7 +27,6 @@ mob_flesh_hunter
 EndContentData */
 
 #include "scriptPCH.h"
-#include "CreatureGroups.h"
 #include "ruins_of_ahnqiraj.h"
 
 // Anubisath guardian

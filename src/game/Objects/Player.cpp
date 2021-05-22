@@ -20,10 +20,8 @@
  */
 
 #include <unordered_map>
-#include <cmath>
 
 #include "Player.h"
-#include "Bag.h"
 #include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
@@ -40,11 +38,13 @@
 #include "ChannelMgr.h"
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
+#include "InstanceData.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
+#include "CreatureAI.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Guild.h"
@@ -66,12 +66,16 @@
 #include "GMTicketMgr.h"
 #include "MasterPlayer.h"
 #include "MovementPacketSender.h"
+
+/* Nostalrius */
 #include "Config/Config.h"
+#include <cmath>
 #include "ZoneScript.h"
 #include "ZoneScriptMgr.h"
 #include "PlayerBotMgr.h"
 #include "PlayerBotAI.h"
 #include "AccountMgr.h"
+#include "MoveSpline.h"
 #include "Anticheat.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
@@ -408,6 +412,8 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 }
 
 //== Player ====================================================
+
+UpdateMask Player::updateVisualBits;
 
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this),
@@ -1471,6 +1477,16 @@ void Player::Update(uint32 update_diff, uint32 p_time)
                 m_areaCheckTimer -= p_time;
         }
 
+        float x, y, z, o;
+        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PLAYER) && movespline->Finalized() && ExtrapolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time,  x, y, z, o))
+        {
+            GetMap()->DoPlayerGridRelocation(this, x, y, z, o);
+            m_position.x = x;
+            m_position.y = y;
+            m_position.z = z;
+            m_position.o = o;
+        }
+
         // Anticheat sanction
         std::stringstream reason;
         uint32 cheatAction = GetCheatData()->Update(p_time, reason);
@@ -1787,7 +1803,7 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
             {
                 petDisplayId = fields[17].GetUInt32();
                 petLevel = fields[18].GetUInt32();
-                petFamily = cInfo->pet_family;
+                petFamily = cInfo->beast_family;
             }
         }
 
@@ -2665,11 +2681,6 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
         return true;
 
     // Beast Lore
-    return CanSeeSpecialInfoOf(pTarget);
-}
-
-bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
-{
     for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
     {
         if (aura->GetCasterGuid() == this->GetObjectGuid())
@@ -4171,7 +4182,132 @@ bool Player::ResetTalents(bool no_cost)
     return true;
 }
 
-void Player::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const
+void Player::_SetCreateBits(UpdateMask* updateMask, Player* target) const
+{
+    if (target == this)
+        Object::_SetCreateBits(updateMask, target);
+    else
+    {
+        for (uint16 index = 0; index < m_valuesCount; index++)
+        {
+            if (GetUInt32Value(index) != 0 && updateVisualBits.GetBit(index))
+                updateMask->SetBit(index);
+        }
+    }
+}
+
+void Player::_SetUpdateBits(UpdateMask* updateMask, Player* target) const
+{
+    if (target == this)
+        Object::_SetUpdateBits(updateMask, target);
+    else
+    {
+        Object::_SetUpdateBits(updateMask, target);
+        *updateMask &= updateVisualBits;
+    }
+}
+
+void Player::InitVisibleBits()
+{
+    updateVisualBits.SetCount(PLAYER_END);
+
+    // TODO: really implement OWNER_ONLY and GROUP_ONLY. Flags can be found in UpdateFields.h
+
+    updateVisualBits.SetBit(OBJECT_FIELD_GUID);
+    updateVisualBits.SetBit(OBJECT_FIELD_TYPE);
+    updateVisualBits.SetBit(OBJECT_FIELD_SCALE_X);
+
+    updateVisualBits.SetBit(UNIT_FIELD_CHARM);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARM + 1);
+
+    updateVisualBits.SetBit(UNIT_FIELD_SUMMON);
+    updateVisualBits.SetBit(UNIT_FIELD_SUMMON + 1);
+
+    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY + 1);
+
+    updateVisualBits.SetBit(UNIT_FIELD_TARGET);
+    updateVisualBits.SetBit(UNIT_FIELD_TARGET + 1);
+
+    updateVisualBits.SetBit(UNIT_FIELD_CHANNEL_OBJECT);
+    updateVisualBits.SetBit(UNIT_FIELD_CHANNEL_OBJECT + 1);
+
+    updateVisualBits.SetBit(UNIT_FIELD_HEALTH);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER1);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER2);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER3);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER4);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER5);
+
+    updateVisualBits.SetBit(UNIT_FIELD_MAXHEALTH);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER1);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER2);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER3);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER4);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER5);
+
+    updateVisualBits.SetBit(UNIT_FIELD_LEVEL);
+    updateVisualBits.SetBit(UNIT_FIELD_FACTIONTEMPLATE);
+    updateVisualBits.SetBit(UNIT_FIELD_BYTES_0);
+    updateVisualBits.SetBit(UNIT_FIELD_FLAGS);
+    //[-ZERO] updateVisualBits.SetBit(UNIT_FIELD_FLAGS_2);
+    for (uint16 i = UNIT_FIELD_AURA; i < UNIT_FIELD_AURASTATE; ++i)
+        updateVisualBits.SetBit(i);
+    updateVisualBits.SetBit(UNIT_FIELD_AURASTATE);
+    updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME);
+    updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_BOUNDINGRADIUS);
+    updateVisualBits.SetBit(UNIT_FIELD_COMBATREACH);
+    updateVisualBits.SetBit(UNIT_FIELD_DISPLAYID);
+    updateVisualBits.SetBit(UNIT_FIELD_NATIVEDISPLAYID);
+    updateVisualBits.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
+    updateVisualBits.SetBit(UNIT_FIELD_BYTES_1);
+    updateVisualBits.SetBit(UNIT_FIELD_PETNUMBER);
+    updateVisualBits.SetBit(UNIT_FIELD_PET_NAME_TIMESTAMP);
+    updateVisualBits.SetBit(UNIT_DYNAMIC_FLAGS);
+    updateVisualBits.SetBit(UNIT_CHANNEL_SPELL);
+    updateVisualBits.SetBit(UNIT_MOD_CAST_SPEED);
+    updateVisualBits.SetBit(UNIT_FIELD_BYTES_2);
+
+    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER);
+    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER + 1);
+    updateVisualBits.SetBit(PLAYER_FLAGS);
+    updateVisualBits.SetBit(PLAYER_GUILDID);
+    updateVisualBits.SetBit(PLAYER_GUILDRANK);
+    updateVisualBits.SetBit(PLAYER_BYTES);
+    updateVisualBits.SetBit(PLAYER_BYTES_2);
+    updateVisualBits.SetBit(PLAYER_BYTES_3);
+    updateVisualBits.SetBit(PLAYER_DUEL_TEAM);
+    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
+
+    // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
+    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; i++)
+        updateVisualBits.SetBit(PLAYER_QUEST_LOG_1_1 + i*MAX_QUEST_OFFSET);
+
+    //Players visible items are not inventory stuff
+    //431) = 884 (0x374) = main weapon
+    for (uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
+    {
+        // item creator
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 0);
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 1);
+
+        uint16 visual_base = PLAYER_VISIBLE_ITEM_1_0 + (i * MAX_VISIBLE_ITEM_OFFSET);
+
+        // item entry
+        updateVisualBits.SetBit(visual_base + 0);
+
+        // item enchantment IDs
+        for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
+            updateVisualBits.SetBit(visual_base + 1 + j);
+
+        // random properties
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 0 + (i * MAX_VISIBLE_ITEM_OFFSET));
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 1 + (i * MAX_VISIBLE_ITEM_OFFSET));
+    }
+}
+
+void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
 {
     if (target == this)
     {
@@ -5471,16 +5607,15 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
         return; 
 
-    uint32 playerLevel      = GetLevel();
-    uint32 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
-    uint32 currentSkillMax  = 5 * playerLevel;
+    int32 playerLevel      = GetLevel();
+    int32 currenSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
+    int32 currentSkillMax  = 5 * playerLevel;
+    int32 skillDiff        = currentSkillMax - currenSkillValue;
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (currentSkillMax <= currentSkillValue)
+    if (skillDiff <= 0)
         return;
-
-    uint32 skillDiff = currentSkillMax - currentSkillValue;
 
     // Calculate base chance to increase
     float chance = 0.0f;
@@ -5500,15 +5635,15 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     }
     else // weapon skill https://classic.wowhead.com/guides/classic-wow-weapon-skills
     {
-        if (currentSkillMax * 0.9f > currentSkillValue)
+        if (currentSkillMax * 0.9f > currenSkillValue)
         {
             // Skill progress: 1% - 90% - chance decreases from 100% to 50%
-            chance = std::min(100.0f, float(currentSkillMax * 0.9f * 50) / currentSkillValue);
+            chance = std::min(100.0f, float(currentSkillMax * 0.9f * 50) / currenSkillValue);
         }
         else
         {
             // Skill progress: 90% - 100% - chance decreases from 50% to a minimum which is level dependent
-            chance = (0.5f - 0.0168966f * currentSkillValue * (300.0f / currentSkillMax) + 0.0152069f * currentSkillMax * (300.0f / currentSkillMax)) * 100.0f;
+            chance = (0.5f - 0.0168966f * currenSkillValue * (300.0f / currentSkillMax) + 0.0152069f * currentSkillMax * (300.0f / currentSkillMax)) * 100.0f;
             if (skillDiff <= 3)
                 chance *= (0.5f / (4 - skillDiff));
         }      
@@ -5519,7 +5654,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
 
     chance = std::min(100.0f, chance);
 
-    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, currentSkillValue, currentSkillMax, chance);
+    DEBUG_LOG("Player::UpdateCombatSkills(defence=%d, playerLevel=%i) -> (%i/%i) chance to increase skill is %f ", defence, playerLevel, currenSkillValue, currentSkillMax, chance);
 
     if (roll_chance_f(chance))
     {
@@ -12034,7 +12169,7 @@ void Player::PrepareGossipMenu(WorldObject* pSource, uint32 menuId)
         bool hasMenuItem = true;
         bool isGMSkipConditionCheck = false;
 
-        if (itr->second.condition_id && !IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_OPTION))
+        if (itr->second.condition_id && !sObjectMgr.IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_OPTION))
         {
             if (IsGameMaster())                             // Let GM always see menu items regardless of conditions
                 isGMSkipConditionCheck = true;
@@ -12345,9 +12480,9 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId)
     if (pMenuData.m_gAction_script)
     {
         if (pSource->GetTypeId() == TYPEID_GAMEOBJECT)
-            GetMap()->ScriptsStart(sGossipScripts, pMenuData.m_gAction_script, GetObjectGuid(), pSource->GetObjectGuid());
+            GetMap()->ScriptsStart(sGossipScripts, pMenuData.m_gAction_script, this, pSource);
         else if (pSource->GetTypeId() == TYPEID_UNIT)
-            GetMap()->ScriptsStart(sGossipScripts, pMenuData.m_gAction_script, pSource->GetObjectGuid(), GetObjectGuid());
+            GetMap()->ScriptsStart(sGossipScripts, pMenuData.m_gAction_script, pSource, this);
     }
 }
 
@@ -12378,7 +12513,7 @@ uint32 Player::GetGossipTextId(uint32 menuId, WorldObject* pSource)
         // Take the text that has the highest conditionId of all fitting
         // No condition and no text with condition found OR higher and fitting condition found
         if ((!itr->second.condition_id && !lastConditionId) ||
-                (itr->second.condition_id > lastConditionId && IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_MENU)))
+                (itr->second.condition_id > lastConditionId && sObjectMgr.IsConditionSatisfied(itr->second.condition_id, this, GetMap(), pSource, CONDITION_FROM_GOSSIP_MENU)))
         {
             lastConditionId = itr->second.condition_id;
             textId = itr->second.text_id;
@@ -12388,7 +12523,7 @@ uint32 Player::GetGossipTextId(uint32 menuId, WorldObject* pSource)
 
     // Start related script
     if (scriptId)
-        GetMap()->ScriptsStart(sGossipScripts, scriptId, pSource ? pSource->GetObjectGuid() : ObjectGuid(), GetObjectGuid());
+        GetMap()->ScriptsStart(sGossipScripts, scriptId, pSource, this);
 
     return textId;
 }
@@ -12916,7 +13051,7 @@ void Player::AddQuest(Quest const* pQuest, Object* questGiver)
         // starting initial DB quest script
         if (pQuest->GetQuestStartScript() != 0)
             if (WorldObject* pQuestGiver = questGiver->ToWorldObject())
-                GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), pQuestGiver->GetObjectGuid(), GetObjectGuid());
+                GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), pQuestGiver, this);
 
     }
 
@@ -13218,7 +13353,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
     }
 
     if (!handled && pQuest->GetQuestCompleteScript() != 0)
-        GetMap()->ScriptsStart(sQuestEndScripts, pQuest->GetQuestCompleteScript(), questEnder->GetObjectGuid(), GetObjectGuid());
+        GetMap()->ScriptsStart(sQuestEndScripts, pQuest->GetQuestCompleteScript(), questEnder, this);
 
     // Find spell cast on spell reward if any, then find the appropriate caster and cast it
     uint32 spellId = pQuest->GetRewSpellCast() ? pQuest->GetRewSpellCast() : pQuest->GetRewSpell();
@@ -13334,7 +13469,7 @@ bool Player::SatisfyQuestCondition(Quest const* qInfo, bool msg) const
 {
     if (uint32 conditionId = qInfo->GetRequiredCondition())
     {
-        bool result = IsConditionSatisfied(conditionId, this, GetMap(), nullptr, CONDITION_FROM_QUEST);
+        bool result = sObjectMgr.IsConditionSatisfied(conditionId, this, GetMap(), nullptr, CONDITION_FROM_QUEST);
 
         if (!result && msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
@@ -13816,12 +13951,12 @@ void Player::AdjustQuestReqItemCount(Quest const* pQuest, QuestStatusData& quest
     {
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
-            uint32 reqItemCount = pQuest->ReqItemCount[i];
-            if (reqItemCount != 0)
+            uint32 reqitemcount = pQuest->ReqItemCount[i];
+            if (reqitemcount != 0)
             {
-                uint32 curItemCount = GetItemCount(pQuest->ReqItemId[i], true);
+                uint32 curitemcount = GetItemCount(pQuest->ReqItemId[i], true);
 
-                questStatusData.m_itemcount[i] = std::min(curItemCount, reqItemCount);
+                questStatusData.m_itemcount[i] = std::min(curitemcount, reqitemcount);
                 if (questStatusData.uState != QUEST_NEW) questStatusData.uState = QUEST_CHANGED;
             }
         }
@@ -13918,19 +14053,18 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
             uint32 reqitem = qInfo->ReqItemId[j];
             if (reqitem == entry)
             {
-                uint32 reqItemCount = qInfo->ReqItemCount[j];
-                uint32 curItemCount = q_status.m_itemcount[j];
-                if (curItemCount < reqItemCount)
+                uint32 reqitemcount = qInfo->ReqItemCount[j];
+                uint32 curitemcount = q_status.m_itemcount[j];
+                if (curitemcount < reqitemcount)
                 {
-                    uint16 newItemCount = std::min<uint16>(q_status.m_itemcount[j] + count, reqItemCount);
-                    q_status.m_itemcount[j] = newItemCount;
+                    uint32 additemcount = (curitemcount + count <= reqitemcount ? count : reqitemcount - curitemcount);
+                    q_status.m_itemcount[j] += additemcount;
                     if (q_status.uState != QUEST_NEW)
                         q_status.uState = QUEST_CHANGED;
 
                     if (entry != qInfo->GetSrcItemId())
-                        SendQuestUpdateAddItem(qInfo, j, curItemCount, newItemCount - curItemCount);
+                        SendQuestUpdateAddItem(qInfo, j, curitemcount, additemcount);
                 }
-
                 if (CanCompleteQuest(questid))
                     CompleteQuest(questid);
                 break;
@@ -13969,9 +14103,8 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     curItemCount = GetItemCount(entry, false);
 
                 uint16 newItemCount = (count > curItemCount) ? 0 : curItemCount - count;
-                newItemCount = std::min<uint16>(newItemCount, reqItemCount);
 
-                if (newItemCount != reqItemCount)
+                if (newItemCount < reqItemCount)
                 {
                     q_status.m_itemcount[j] = newItemCount;
                     if (q_status.uState != QUEST_NEW)
@@ -18059,7 +18192,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         return false;
     }
 
-    if (crItem->conditionId && !IsGameMaster() && !IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+    if (crItem->conditionId && !IsGameMaster() && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, this, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
@@ -18481,7 +18614,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
                 if (((Creature*)target)->IsInCombat())
                     ((Creature*)target)->GetThreatManager().modifyThreatPercent(this, -101);
 
-            target->BuildOutOfRangeUpdateBlock(data);
+            target->BuildOutOfRangeUpdateBlock(&data);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
             m_visibleGUIDs.erase(t_guid);
             lock.unlock();
@@ -18495,7 +18628,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         if (target->FindMap() && target->isWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) && target->IsVisibleForInState(this, viewPoint, false))
         {
             visibleNow.insert(target);
-            target->BuildCreateUpdateBlockForPlayer(data, this);
+            target->BuildCreateUpdateBlockForPlayer(&data, this);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
             UpdateVisibilityOf_helper(m_visibleGUIDs, target);
             lock.unlock();
@@ -19138,7 +19271,7 @@ void Player::UpdateForQuestWorldObjects()
                     if (m_visibleGobjQuestActivated[obj->GetObjectGuid()] != obj->ActivateToQuest(this))
                     {
                         ++count;
-                        obj->BuildCreateUpdateBlockForPlayer(upd, this); //[-ZERO] we must send create packet because of GAMEOBJECT_FLAGS change (not dynamic) - probably incorrect
+                        obj->BuildCreateUpdateBlockForPlayer(&upd, this); //[-ZERO] we must send create packet because of GAMEOBJECT_FLAGS change (not dynamic) - probably incorrect
                     }
         }
     }
@@ -21518,7 +21651,7 @@ void Player::AddGCD(SpellEntry const& spellEntry, uint32 /*forcedDuration = 0*/,
         gcdDuration -= sWorld.GetCurrentDiff() > 200 ? 200 : sWorld.GetCurrentDiff();
     }
 
-    SpellCaster::AddGCD(spellEntry, gcdDuration);
+    WorldObject::AddGCD(spellEntry, gcdDuration);
 
     if (!updateClient)
         return;
@@ -21696,7 +21829,7 @@ void Player::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
     GetSession()->SendPacket(&data);
 
     // store lockout
-    SpellCaster::LockOutSpells(schoolMask, duration);
+    WorldObject::LockOutSpells(schoolMask, duration);
 }
 
 void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent /*= nullptr*/)

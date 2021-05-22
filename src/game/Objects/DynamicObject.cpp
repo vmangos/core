@@ -20,8 +20,11 @@
  */
 
 #include "Common.h"
+#include "UpdateMask.h"
+#include "Opcodes.h"
 #include "World.h"
 #include "ObjectAccessor.h"
+#include "Database/DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
@@ -121,7 +124,7 @@ bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, 
     return true;
 }
 
-SpellCaster* DynamicObject::GetCaster() const
+WorldObject* DynamicObject::GetCaster() const
 {
     if (ObjectGuid guid = GetCasterGuid())
     {
@@ -160,11 +163,16 @@ uint32 DynamicObject::GetFactionTemplateId() const
     return GetCaster()->GetFactionTemplateId();
 }
 
+uint32 DynamicObject::GetLevel() const
+{
+    return GetCaster()->GetLevel();
+}
+
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 {
     WorldObject::Update(update_diff, p_time);
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
-    SpellCaster* caster = GetCaster();
+    WorldObject* caster = GetCaster();
     if (!caster)
     {
         Delete();

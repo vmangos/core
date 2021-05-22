@@ -24,7 +24,6 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "blackrock_spire.h"
 #include "WaypointManager.h"
-#include "CreatureGroups.h"
 
 //#define DEBUG_ON
 

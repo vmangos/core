@@ -19,11 +19,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "SharedDefines.h"
-#include "Creature.h"
-#include "Pet.h"
 #include "Player.h"
+#include "Pet.h"
+#include "Creature.h"
+#include "SharedDefines.h"
 #include "SpellAuras.h"
+#include "ObjectMgr.h"
 #include "World.h"
 
 /*#######################################

@@ -5,14 +5,15 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "AccountMgr.h"
+#include "Opcodes.h"
 #include "Config/Config.h"
 #include "Chat.h"
 #include "Player.h"
-#include "Group.h"
 #include "PlayerBotAI.h"
 #include "PartyBotAI.h"
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
+#include "Anticheat.h"
 #include "Language.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);
@@ -20,18 +21,19 @@ INSTANTIATE_SINGLETON_1(PlayerBotMgr);
 
 PlayerBotMgr::PlayerBotMgr()
 {
-    m_totalChance = 0;
-    m_maxAccountId = 0;
+    totalChance = 0;
+    _maxAccountId = 0;
 
-    // Config
-    m_confMinRandomBots         = 3;
-    m_confMaxRandomBots         = 10;
-    m_confRandomBotsRefresh     = 60000;
-    m_confUpdateDiff            = 10000;
-    m_enableRandomBots          = false;
-    m_confDebug                 = false;
+    /* Config */
+    confMinBots         = 4;
+    confMaxBots         = 8;
+    confBotsRefresh     = 30000;
+    confUpdateDiff      = 10000;
+    enable              = false;
+    confDebug           = false;
+    forceLogoutDelay    = true;
 
-    // Time
+    /* Time */
     m_elapsedTime = 0;
     m_lastBotsRefresh = 0;
     m_lastUpdate = 0;
@@ -44,14 +46,14 @@ PlayerBotMgr::~PlayerBotMgr()
 
 void PlayerBotMgr::LoadConfig()
 {
-    m_enableRandomBots = sConfig.GetBoolDefault("RandomBot.Enable", false);
-    m_confMinRandomBots = sConfig.GetIntDefault("RandomBot.MinBots", 3);
-    m_confMaxRandomBots = sConfig.GetIntDefault("RandomBot.MaxBots", 10);
-    m_confRandomBotsRefresh = sConfig.GetIntDefault("RandomBot.Refresh", 60000);
-    m_confDebug = sConfig.GetBoolDefault("PlayerBot.Debug", false);
-    m_confUpdateDiff = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
-
-    if (!sWorld.getConfig(CONFIG_BOOL_FORCE_LOGOUT_DELAY))
+    enable              = sConfig.GetBoolDefault("PlayerBot.Enable", false);
+    confMinBots         = sConfig.GetIntDefault("PlayerBot.MinBots", 3);
+    confMaxBots         = sConfig.GetIntDefault("PlayerBot.MaxBots", 10);
+    confBotsRefresh     = sConfig.GetIntDefault("PlayerBot.Refresh", 60000);
+    confDebug           = sConfig.GetBoolDefault("PlayerBot.Debug", false);
+    confUpdateDiff      = sConfig.GetIntDefault("PlayerBot.UpdateMs", 10000);
+    forceLogoutDelay    = sConfig.GetBoolDefault("PlayerBot.ForceLogoutDelay", true);
+    if (!forceLogoutDelay)
         m_tempBots.clear();
 }
 
@@ -61,7 +63,7 @@ void PlayerBotMgr::Load()
     DeleteAll();
     m_bots.clear();
     m_tempBots.clear();
-    m_totalChance = 0;
+    totalChance = 0;
 
     // 2- Configuration
     LoadConfig();
@@ -76,7 +78,7 @@ void PlayerBotMgr::Load()
         return;
     }
     Field* fields = result->Fetch();
-    m_maxAccountId = fields[0].GetUInt32() + 10000;
+    _maxAccountId = fields[0].GetUInt32() + 10000;
     delete result;
 
     // 4- LoadFromDB
@@ -103,7 +105,7 @@ void PlayerBotMgr::Load()
                 entry->name = "<Unknown>";
             entry->ai->OnBotEntryLoad(entry);
             m_bots[entry->playerGUID] = entry;
-            m_totalChance += chance;
+            totalChance += chance;
         }
         while (result->NextRow());
         delete result;
@@ -111,31 +113,31 @@ void PlayerBotMgr::Load()
     }
 
     // 5- Check config/DB
-    if (m_confMinRandomBots >= m_bots.size() && !m_bots.empty())
-        m_confMinRandomBots = m_bots.size() - 1;
-    if (m_confMaxRandomBots > m_bots.size())
-        m_confMaxRandomBots = m_bots.size();
-    if (m_confMaxRandomBots <= m_confMinRandomBots)
-        m_confMaxRandomBots = m_confMinRandomBots + 1;
+    if (confMinBots >= m_bots.size() && !m_bots.empty())
+        confMinBots = m_bots.size() - 1;
+    if (confMaxBots > m_bots.size())
+        confMaxBots = m_bots.size();
+    if (confMaxBots <= confMinBots)
+        confMaxBots = confMinBots + 1;
 
     // 6- Start initial bots
-    if (m_enableRandomBots)
+    if (enable)
     {
-        for (uint32 i = 0; i < m_confMinRandomBots; i++)
+        for (uint32 i = 0; i < confMinBots; i++)
             AddRandomBot();
     }
 
     // 7- Fill stats info
-    m_stats.confMaxOnline = m_confMaxRandomBots;
-    m_stats.confMinOnline = m_confMinRandomBots;
+    m_stats.confMaxOnline = confMaxBots;
+    m_stats.confMinOnline = confMinBots;
     m_stats.totalBots = m_bots.size();
-    m_stats.confRandomBotsRefresh = m_confRandomBotsRefresh;
-    m_stats.confUpdateDiff = m_confUpdateDiff;
+    m_stats.confBotsRefresh = confBotsRefresh;
+    m_stats.confUpdateDiff = confUpdateDiff;
 
     // 8- Show stats if debug
-    if (m_confDebug)
+    if (confDebug)
     {
-        sLog.outString("[PlayerBotMgr] Between %u and %u bots online", m_confMinRandomBots, m_confMaxRandomBots);
+        sLog.outString("[PlayerBotMgr] Between %u and %u bots online", confMinBots, confMaxBots);
         sLog.outString("[PlayerBotMgr] %u now loading", m_stats.loadingCount);
     }
 }
@@ -151,25 +153,25 @@ void PlayerBotMgr::DeleteAll()
         if (i->second->state != PB_STATE_OFFLINE)
         {
             OnBotLogout(i->second);
-            m_totalChance += i->second->chance;
+            totalChance += i->second->chance;
         }
     }
     m_tempBots.clear();
 
-    if (m_confDebug)
+    if (confDebug)
         sLog.outString("[PlayerBotMgr] Deleting all bots [OK]");
 }
 
 void PlayerBotMgr::OnBotLogin(PlayerBotEntry *e)
 {
     e->state = PB_STATE_ONLINE;
-    if (m_confDebug)
+    if (confDebug)
         sLog.outString("[PlayerBot][Login]  '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
 }
 void PlayerBotMgr::OnBotLogout(PlayerBotEntry *e)
 {
     e->state = PB_STATE_OFFLINE;
-    if (m_confDebug)
+    if (confDebug)
         sLog.outString("[PlayerBot][Logout] '%s' GUID:%u Acc:%u", e->name.c_str(), e->playerGUID, e->accountId);
 }
 
@@ -215,14 +217,14 @@ void PlayerBotMgr::Update(uint32 diff)
     }
 
     m_elapsedTime += diff;
-    if (!((m_elapsedTime - m_lastUpdate) > m_confUpdateDiff))
+    if (!((m_elapsedTime - m_lastUpdate) > confUpdateDiff))
         return; // No need to update
     m_lastUpdate = m_elapsedTime;
 
     std::map<uint32, PlayerBotEntry*>::iterator iter;
     for (iter = m_bots.begin(); iter != m_bots.end(); ++iter)
     {
-        if (!m_enableRandomBots && !iter->second->customBot)
+        if (!enable && !iter->second->customBot)
             continue;
 
         if (iter->second->state == PB_STATE_ONLINE)
@@ -282,14 +284,14 @@ void PlayerBotMgr::Update(uint32 diff)
         }
     }
 
-    if (!m_enableRandomBots)
+    if (!enable)
         return;
 
-    uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / m_confRandomBotsRefresh;
+    uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / confBotsRefresh;
     for (uint32 i = 0; i < updatesCount; ++i)
     {
         AddOrRemoveBot();
-        m_lastBotsRefresh += m_confRandomBotsRefresh;
+        m_lastBotsRefresh += confBotsRefresh;
     }
 }
 
@@ -298,7 +300,7 @@ Toutes les X minutes, ajoute ou enleve un bot.
 */
 bool PlayerBotMgr::AddOrRemoveBot()
 {
-    uint32 alea = urand(m_confMinRandomBots, m_confMaxRandomBots);
+    uint32 alea = urand(confMinBots, confMaxBots);
     /*
     10 --- --- --- --- --- --- --- --- --- --- 20 bots
                 NumActuel
@@ -321,7 +323,8 @@ bool PlayerBotMgr::AddBot(PlayerBotAI* ai)
     e->customBot = true;
     ai->botEntry = e;
     m_bots[e->playerGUID] = e;
-    return AddBot(e->playerGUID, false);
+    AddBot(e->playerGUID, false);
+    return true;
 }
 
 bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot)
@@ -366,7 +369,7 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot)
 
 bool PlayerBotMgr::AddRandomBot()
 {
-    uint32 alea = urand(0, m_totalChance);
+    uint32 alea = urand(0, totalChance);
     std::map<uint32, PlayerBotEntry*>::iterator it;
     bool done = false;
     for (it = m_bots.begin(); it != m_bots.end() && !done; it++)
@@ -669,8 +672,7 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
         return false;
     }
 
-    if (pPlayer->GetGroup() && (pPlayer->GetGroup()->IsFull() || sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS) &&
-        (pPlayer->GetGroup()->GetMembersCount() - 1 >= sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_MAX_BOTS))))
+    if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
     {
         SendSysMessage("Cannot add more bots. Group is full.");
         return false;
@@ -693,7 +695,7 @@ bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player cons
     }
 
     // Restrictions when the command is made public to avoid abuse.
-    if (GetSession()->GetSecurity() <= SEC_PLAYER && !sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
+    if (GetSession()->GetSecurity() <= SEC_PLAYER)
     {
         if (pPlayer->IsDead())
         {
@@ -759,7 +761,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     }
 
     uint8 botClass = 0;
-    uint32 botLevel = pPlayer->GetLevel();
+    uint32 botLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
     CombatBotRoles botRole = ROLE_INVALID;
 
     if (char* arg1 = ExtractArg(&args))
@@ -783,6 +785,8 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
             botClass = CLASS_WARLOCK;
         else if (option == "druid")
             botClass = CLASS_DRUID;
+        else if (option == "hunter")
+            botClass = CLASS_HUNTER;
         else if (option == "dps")
         {
             botClass = PickRandomValue(CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK);
@@ -820,14 +824,9 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
     PartyBotAI* ai = new PartyBotAI(pPlayer, nullptr, botRole, botRace, botClass, botLevel, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
-    if (sPlayerBotMgr.AddBot(ai))
-        SendSysMessage("New party bot added.");
-    else
-    {
-        SendSysMessage("Error spawning bot.");
-        SetSentErrorMessage(true);
-        return false;
-    }
+    sPlayerBotMgr.AddBot(ai);
+    
+    SendSysMessage("New party bot added.");
 
     return true;
 }
@@ -859,14 +858,9 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
     PartyBotAI* ai = new PartyBotAI(pPlayer, pTarget, ROLE_INVALID, botRace, botClass, pPlayer->GetLevel(), pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
-    if (sPlayerBotMgr.AddBot(ai))
-        SendSysMessage("New party bot added.");
-    else
-    {
-        SendSysMessage("Error spawning bot.");
-        SetSentErrorMessage(true);
-        return false;
-    }
+    sPlayerBotMgr.AddBot(ai);
+
+    SendSysMessage("New party bot clone added.");
 
     return true;
 }

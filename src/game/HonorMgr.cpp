@@ -11,8 +11,6 @@
 #include "Database/DatabaseEnv.h"
 #include "Policies/SingletonImp.h"
 #include "ObjectAccessor.h"
-#include "ObjectMgr.h"
-#include "Opcodes.h"
 
 #include <fstream>
 

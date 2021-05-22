@@ -26,7 +26,6 @@ mobs_ghoul_flayer
 EndContentData */
 
 #include "scriptPCH.h"
-#include "CreatureGroups.h"
 
 // Eris Havenfire event
 

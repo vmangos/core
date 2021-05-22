@@ -1,12 +1,11 @@
 #ifndef _HEADER_CHEATS
 #define _HEADER_CHEATS
 
-#include "Common.h"
-#include "UnitDefines.h"
-#include "Anticheat.h"
-
 #include <array>
-#include <sstream>
+
+#include "Common.h"
+#include "Player.h"
+#include "Anticheat.h"
 
 enum CheatType
 {
@@ -43,8 +42,6 @@ enum CheatType
 #define CHEATS_UPDATE_INTERVAL      4000
 const char* GetMovementCheatName(CheatType type);
 
-class Player;
-class MovementInfo;
 class ChatHandler;
 class WorldSession;
 class WorldPacket;
@@ -52,7 +49,7 @@ class WorldPacket;
 class MovementAnticheat
 {
     public:
-        explicit MovementAnticheat(Player* _me);
+        explicit MovementAnticheat(Player* _me) : me(_me), m_session(_me->GetSession()) {}
 
         void Init();
         void InitNewPlayer(Player* pPlayer);
@@ -90,8 +87,8 @@ private:
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
         uint32 CheckTimeDesync(MovementInfo const& movementInfo);
 
-        MovementInfo& GetLastMovementInfo();
-        MovementInfo const& GetLastMovementInfo() const;
+        MovementInfo& GetLastMovementInfo() { return me->m_movementInfo; }
+        MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
         UnitMoveType GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const;
 
         bool m_knockBack = false;

@@ -26,6 +26,9 @@
 #include "Platform/Define.h"
 #include "Policies/Singleton.h"
 #include "Policies/ThreadingModel.h"
+
+#include "UpdateData.h"
+
 #include "GridDefines.h"
 #include "Object.h"
 #include "Player.h"

@@ -24,7 +24,6 @@
 
 #include "Common.h"
 #include "CreatureAI.h"
-#include "ScriptMgr.h"
 
 class Unit;
 class Creature;

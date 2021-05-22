@@ -26,7 +26,6 @@
 #include "World.h"
 #include "Util.h"
 #include "Conditions.h"
-#include "Group.h"
 
 static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
 {
@@ -379,7 +378,7 @@ LootItem::LootItem(uint32 itemid_, uint32 count_, int32 randomPropertyId_)
 bool LootItem::AllowedForPlayer(Player const* player, WorldObject const* lootTarget) const
 {
     // DB conditions check
-    if (conditionId && !IsConditionSatisfied(conditionId, player, player->GetMap(), lootTarget, CONDITION_FROM_LOOT))
+    if (conditionId && !sObjectMgr.IsConditionSatisfied(conditionId, player, player->GetMap(), lootTarget, CONDITION_FROM_LOOT))
         return false;
 
     ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);

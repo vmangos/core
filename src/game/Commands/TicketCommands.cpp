@@ -5,6 +5,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "GMTicketMgr.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 bool ChatHandler::HandleGMTicketAssignToCommand(char* args)

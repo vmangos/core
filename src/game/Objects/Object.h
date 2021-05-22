@@ -27,30 +27,90 @@
 #include "UpdateFields.h"
 #include "UpdateData.h"
 #include "ObjectGuid.h"
-#include "SharedDefines.h"
-#include "ObjectDefines.h"
-#include "DBCEnums.h"
-#include "Util.h"
-#include "Timer.h"
 #include "Camera.h"
+#include "SharedDefines.h"
+#include "SpellDefines.h"
+#include "DBCEnums.h"
+#include "Utilities/EventProcessor.h"
+#include "Util.h"
 
+#include <set>
 #include <string>
+#include <array>
+#include <memory>
+#include "nonstd/optional.hpp"
+
+using namespace nonstd;
+
+#define CONTACT_DISTANCE            0.5f
+#define INTERACTION_DISTANCE        5.0f
+#define ATTACK_DISTANCE             5.0f
+#define INSPECT_DISTANCE            10.0f
+#define TRADE_DISTANCE              11.11f
+
+#define MAX_VISIBILITY_DISTANCE     SIZE_OF_GRIDS      // max distance for visible object show, used to be 333 yards
+#define DEFAULT_VISIBILITY_DISTANCE 100.0f             // default visible distance on continents, used to be 90 yards
+#define DEFAULT_VISIBILITY_INSTANCE 170.0f             // default visible distance in instances, used to be 120 yards
+#define DEFAULT_VISIBILITY_BG       533.0f             // default visible distance in BG, used to be 180 yards
+#define DEFAULT_VISIBILITY_MODIFIER 0.0f               // default visibility modifier on some units that should be seen beyond normal visibility distances
+#define DEFAULT_CREATURE_SUMMON_LIMIT  100             // default maximum number of creatures an object can have summoned at once
+
+#define VISIBILITY_DISTANCE_GIGANTIC    400.0f
+#define VISIBILITY_DISTANCE_LARGE       200.0f
+#define VISIBILITY_DISTANCE_NORMAL      100.0f
+#define VISIBILITY_DISTANCE_SMALL       50.0f
+#define VISIBILITY_DISTANCE_TINY        25.0f
+
+#define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // currently used (correctly?) for any non Unit world objects. This is actually the bounding_radius, like player/creature from creature_model_data
+#define DEFAULT_OBJECT_SCALE        1.0f                    // player/item scale as default, npc/go from database, pets from dbc
+#define DEFAULT_GNOME_SCALE         1.15f
+#define DEFAULT_TAUREN_MALE_SCALE   1.35f                   // Tauren Male Player Scale by default
+#define DEFAULT_TAUREN_FEMALE_SCALE 1.25f                   // Tauren Female Player Scale by default
+
+#define MAX_STEALTH_DETECT_RANGE    45.0f
+
+// TrinityCore
+#define DEFAULT_COMBAT_REACH        1.5f
+#define MIN_MELEE_REACH             2.0f
+#define NOMINAL_MELEE_RANGE         5.0f
+#define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2)
+
+#define LEEWAY_MIN_MOVE_SPEED       4.97f
+#define LEEWAY_BONUS_RANGE          2.66f
+
+enum TempSummonType
+{
+    TEMPSUMMON_TIMED_OR_DEAD_DESPAWN          = 1,             // despawns after a specified time (out of combat) OR when the creature disappears
+    TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN        = 2,             // despawns after a specified time (out of combat) OR when the creature dies
+    TEMPSUMMON_TIMED_DESPAWN                  = 3,             // despawns after a specified time
+    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT    = 4,             // despawns after a specified time after the creature is out of combat
+    TEMPSUMMON_CORPSE_DESPAWN                 = 5,             // despawns instantly after death
+    TEMPSUMMON_CORPSE_TIMED_DESPAWN           = 6,             // despawns after a specified time after death
+    TEMPSUMMON_DEAD_DESPAWN                   = 7,             // despawns when the creature disappears
+    TEMPSUMMON_MANUAL_DESPAWN                 = 8,             // despawns when UnSummon() is called
+    TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN   = 9,             // despawns after a specified time (in or out of combat) OR when the creature disappears
+    TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN = 10,            // despawns after a specified time (in or out of combat) OR when the creature dies
+};
 
 class WorldPacket;
 class UpdateData;
-class Corpse;
+class WorldSession;
 class Creature;
-class Pet;
 class Player;
 class Unit;
-class GameObject;
-class SpellCaster;
 class Map;
+class Item;
+class Aura;
 class UpdateMask;
 class InstanceData;
 class TerrainInfo;
 class ZoneScript;
 class Transport;
+class SpellEntry;
+class Spell;
+struct ItemPrototype;
+class ChatHandler;
+
 struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
@@ -80,6 +140,19 @@ class WorldUpdateCounter
         void ResetTo(uint32 lastUpdate) {  m_tmStart = lastUpdate; }
     private:
         uint32 m_tmStart;
+};
+
+
+enum ObjectSpawnFlags
+{
+    SPAWN_FLAG_ACTIVE               = 0x01,
+    SPAWN_FLAG_DISABLED             = 0x02,
+    SPAWN_FLAG_RANDOM_RESPAWN_TIME  = 0x04,
+    SPAWN_FLAG_DYNAMIC_RESPAWN_TIME = 0x08,
+    SPAWN_FLAG_FORCE_DYNAMIC_ELITE  = 0x10, // creature only
+    SPAWN_FLAG_EVADE_OUT_HOME_AREA  = 0x20, // creature only
+    SPAWN_FLAG_NOT_VISIBLE          = 0x40, // creature only
+    SPAWN_FLAG_DEAD                 = 0x80, // creature only
 };
 
 // [-ZERO] Need check and update
@@ -237,6 +310,192 @@ enum ObjectDelayedAction
 
 typedef void(*CreatureAiSetter) (Creature* pCreature);
 
+class CooldownData
+{
+        friend class CooldownContainer;
+    public:
+        CooldownData(TimePoint clockNow, uint32 spellId, uint32 duration, uint32 spellCategory, uint32 categoryDuration, uint32 itemId = 0, bool isPermanent = false) :
+            m_spellId(spellId),
+            m_category(spellCategory),
+            m_expireTime(duration ? std::chrono::milliseconds(duration) + clockNow : TimePoint()),
+            m_catExpireTime(spellCategory && categoryDuration ? std::chrono::milliseconds(categoryDuration) + clockNow : TimePoint()),
+            m_typePermanent(isPermanent),
+            m_itemId(itemId)
+        {}
+
+        // return false if permanent
+        bool GetSpellCDExpireTime(TimePoint& expireTime) const
+        {
+            if (m_typePermanent)
+                return false;
+
+            expireTime = m_expireTime;
+            return true;
+        }
+
+        // return false if permanent
+        bool GetCatCDExpireTime(TimePoint& expireTime) const
+        {
+            if (m_typePermanent)
+                return false;
+
+            expireTime = m_catExpireTime;
+            return true;
+        }
+
+        bool IsSpellCDExpired(TimePoint const& now) const
+        {
+            if (m_typePermanent)
+                return false;
+
+            return now >= m_expireTime;
+        }
+
+        bool IsCatCDExpired(TimePoint const& now) const
+        {
+            if (m_typePermanent)
+                return false;
+
+            if (!m_category)
+                return true;
+
+            if (now >= m_catExpireTime)
+                return true;
+
+            return false;
+        }
+
+        bool IsPermanent() const { return m_typePermanent; }
+        uint32 GetItemId() const { return m_itemId; }
+        uint32 GetSpellId() const { return m_spellId; }
+        uint32 GetCategory() const { return m_category; }
+
+    private:
+        uint32            m_spellId;
+        uint32            m_category;
+        TimePoint         m_expireTime;
+        TimePoint         m_catExpireTime;
+        bool              m_typePermanent;
+        uint32            m_itemId;
+};
+
+typedef std::unique_ptr<CooldownData> CooldownDataUPTR;
+typedef std::map<uint32, TimePoint> GCDMap;
+typedef std::map<SpellSchools, TimePoint> LockoutMap;
+
+class CooldownContainer
+{
+    public:
+        typedef std::map<uint32, CooldownDataUPTR> spellIdMap;
+        typedef spellIdMap::const_iterator ConstIterator;
+        typedef spellIdMap::iterator Iterator;
+        typedef std::map<uint32, ConstIterator> categoryMap;
+
+        void Update(TimePoint const& now)
+        {
+            auto spellCDItr = m_spellIdMap.begin();
+            while (spellCDItr != m_spellIdMap.end())
+            {
+                auto& cd = spellCDItr->second;
+                if (cd->IsSpellCDExpired(now) && cd->IsCatCDExpired(now)) // will not remove permanent CD
+                    spellCDItr = erase(spellCDItr);
+                else
+                {
+                    if (cd->m_category && cd->IsCatCDExpired(now))
+                        m_categoryMap.erase(cd->m_category);
+                    ++spellCDItr;
+                }
+            }
+        }
+
+        bool AddCooldown(TimePoint clockNow, uint32 spellId, uint32 duration, uint32 spellCategory = 0, uint32 categoryDuration = 0, uint32 itemId = 0, bool onHold = false)
+        {
+            auto resultItr = m_spellIdMap.emplace(spellId, std::unique_ptr<CooldownData>(new CooldownData(clockNow, spellId, duration, spellCategory, categoryDuration, itemId, onHold)));
+            if (resultItr.second && spellCategory && categoryDuration)
+                m_categoryMap.emplace(spellCategory, resultItr.first);
+
+            return resultItr.second;
+        }
+
+        void RemoveBySpellId(uint32 spellId)
+        {
+            auto spellCDItr = m_spellIdMap.find(spellId);
+            if (spellCDItr != m_spellIdMap.end())
+            {
+                auto& cdData = spellCDItr->second;
+                if (cdData->m_category)
+                {
+                    auto catCDItr = m_categoryMap.find(cdData->m_category);
+                    if (catCDItr != m_categoryMap.end())
+                        m_categoryMap.erase(catCDItr);
+                }
+                m_spellIdMap.erase(spellCDItr);
+            }
+        }
+
+        void RemoveByCategory(uint32 category)
+        {
+            auto spellCDItr = m_categoryMap.find(category);
+            if (spellCDItr != m_categoryMap.end())
+                m_categoryMap.erase(spellCDItr);
+        }
+
+        Iterator erase(ConstIterator spellCDItr)
+        {
+            auto& cdData = spellCDItr->second;
+            if (cdData->m_category)
+            {
+                auto catCDItr = m_categoryMap.find(cdData->m_category);
+                if (catCDItr != m_categoryMap.end())
+                    m_categoryMap.erase(catCDItr);
+            }
+            return m_spellIdMap.erase(spellCDItr);
+        }
+
+        ConstIterator FindBySpellId(uint32 id) const { return m_spellIdMap.find(id); }
+
+        ConstIterator FindByCategory(uint32 category) const
+        {
+            auto itr = m_categoryMap.find(category);
+            return itr != m_categoryMap.end() ? itr->second : end();
+        }
+
+        void clear() { m_spellIdMap.clear(); m_categoryMap.clear(); }
+
+        ConstIterator begin() const { return m_spellIdMap.begin(); }
+        ConstIterator end() const { return m_spellIdMap.end(); }
+        bool IsEmpty() const { return m_spellIdMap.empty(); }
+        size_t size() const { return m_spellIdMap.size(); }
+
+    private:
+        spellIdMap m_spellIdMap;
+        categoryMap m_categoryMap;
+};
+
+// Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const* procSpell, bool dontTriggerSpecial
+
+// External struct for passing on data
+struct SpellModifier;
+struct ProcSystemArguments
+{
+    Unit* pVictim;
+    ObjectGuid victimGuid;
+
+    uint32 procFlagsAttacker;
+    uint32 procFlagsVictim;
+    uint32 procExtra;
+
+    uint32 amount; // contains full heal or full damage
+    SpellEntry const* procSpell;
+    WeaponAttackType attType;
+
+    std::list<SpellModifier*> appliedSpellModifiers; // don't dereference pointers
+    bool isSpellTriggeredByAura;
+
+    explicit ProcSystemArguments(Unit* pVictim_, uint32 procFlagsAttacker_, uint32 procFlagsVictim_, uint32 procExtra_, uint32 amount_, WeaponAttackType attType_ = BASE_ATTACK,
+        SpellEntry const* procSpell_ = nullptr, Spell const* spell = nullptr);
+};
+
 class Object
 {
     public:
@@ -278,10 +537,9 @@ class Object
         void SetObjectScale(float newScale);
 
         uint8 GetTypeId() const { return m_objectTypeId; }
-        uint8 GetTypeMask() const { return m_objectType; }
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
-        virtual void BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const;
+        virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
         void SendCreateUpdateToPlayer(Player* player);
 
         // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
@@ -293,10 +551,9 @@ class Object
         void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
         void ExecuteDelayedActions();
 
-        void BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const;
-        void BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const;
-        void BuildOutOfRangeUpdateBlock(UpdateData& data) const;
-        void BuildMovementUpdateBlock(UpdateData& data, uint8 flags = 0) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const;
+        void BuildOutOfRangeUpdateBlock(UpdateData* data) const;
+        void BuildMovementUpdateBlock(UpdateData* data, uint8 flags = 0) const;
 
         void BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const;
         void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const;
@@ -363,7 +620,6 @@ class Object
         void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
-        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag);
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
@@ -496,36 +752,32 @@ class Object
 
         // Convertions
         inline bool IsWorldObject() const { return isType(TYPEMASK_WORLDOBJECT); }
-        WorldObject* ToWorldObject();
-        WorldObject const* ToWorldObject() const;
+        WorldObject* ToWorldObject() { if (IsWorldObject()) return reinterpret_cast<WorldObject*>(this); else return nullptr; }
+        WorldObject const* ToWorldObject() const { if (IsWorldObject()) return reinterpret_cast<WorldObject const*>(this); else return nullptr; }
 
         inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
-        Player* ToPlayer();
-        Player const* ToPlayer() const;
+        Player* ToPlayer() { if (IsPlayer()) return reinterpret_cast<Player*>(this); else return nullptr; }
+        Player const* ToPlayer() const { if (IsPlayer()) return reinterpret_cast<Player const*>(this); else return nullptr; }
 
         inline bool IsCreature() const { return GetTypeId() == TYPEID_UNIT; }
-        Creature* ToCreature();
-        Creature const* ToCreature() const;
+        Creature* ToCreature() { if (IsCreature()) return reinterpret_cast<Creature*>(this); else return nullptr; }
+        Creature const* ToCreature() const { if (IsCreature()) return reinterpret_cast<Creature const*>(this); else return nullptr; }
 
         inline bool IsUnit() const { return isType(TYPEMASK_UNIT); }
-        Unit* ToUnit();
-        Unit const* ToUnit() const;
+        Unit* ToUnit() { if (IsUnit()) return reinterpret_cast<Unit*>(this); else return nullptr; }
+        Unit const* ToUnit() const { if (IsUnit()) return reinterpret_cast<Unit const*>(this); else return nullptr; }
 
         inline bool IsGameObject() const { return GetTypeId() == TYPEID_GAMEOBJECT; }
-        GameObject* ToGameObject();
-        GameObject const* ToGameObject() const;
-
-        inline bool IsSpellCaster() const { return IsUnit() || IsGameObject(); }
-        SpellCaster* ToSpellCaster();
-        SpellCaster const* ToSpellCaster() const;
+        GameObject* ToGameObject() { if (IsGameObject()) return reinterpret_cast<GameObject*>(this); else return nullptr; }
+        GameObject const* ToGameObject() const { if (IsGameObject()) return reinterpret_cast<GameObject const*>(this); else return nullptr; }
 
         inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
-        Corpse* ToCorpse();
-        Corpse const* ToCorpse() const;
+        Corpse* ToCorpse() { if (IsCorpse()) return reinterpret_cast<Corpse*>(this); else return nullptr; }
+        Corpse const* ToCorpse() const { if (IsCorpse()) return reinterpret_cast<Corpse const*>(this); else return nullptr; }
 
-        bool IsPet() const;
-        Pet* ToPet();
+        bool IsPet()      const;
         Pet const* ToPet() const;
+        Pet* ToPet();
 
         virtual bool HasQuest(uint32 /* quest_id */) const { return false; }
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
@@ -536,12 +788,13 @@ class Object
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
 
-        uint16 GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*& flags) const;
-        void _SetCreateBits(UpdateMask& updateMask, Player* target) const;
-        void _SetUpdateBits(UpdateMask& updateMask, Player* target) const;
+        virtual void _SetUpdateBits(UpdateMask* updateMask, Player* target) const;
         void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
+        virtual void _SetCreateBits(UpdateMask* updateMask, Player* target) const;
+
         uint16 m_objectType;
+
         uint8 m_objectTypeId;
         uint8 m_updateFlag = 0;
 
@@ -573,6 +826,65 @@ class Object
 };
 
 struct WorldObjectChangeAccumulator;
+
+// At least some values expected fixed and used in auras field, other custom
+enum MeleeHitOutcome
+{
+    MELEE_HIT_EVADE = 0,
+    MELEE_HIT_MISS = 1,
+    MELEE_HIT_DODGE = 2,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_BLOCK = 3,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_PARRY = 4,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_GLANCING = 5,
+    MELEE_HIT_CRIT = 6,
+    MELEE_HIT_CRUSHING = 7,
+    MELEE_HIT_NORMAL = 8,
+    MELEE_HIT_BLOCK_CRIT = 9,
+};
+
+// Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
+struct SpellNonMeleeDamage {
+    SpellNonMeleeDamage(WorldObject* _attacker, Unit* _target, uint32 _SpellID, SpellSchools _school)
+        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
+        absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
+    {}
+
+    Unit* target;
+    WorldObject* attacker;
+    uint32 SpellID;
+    uint32 damage;
+    SpellSchools school;
+    uint32 absorb;
+    int32 resist;
+    bool   periodicLog;
+    bool   unused;
+    uint32 blocked;
+    uint32 HitInfo;
+    Spell* spell;
+};
+
+struct CleanDamage
+{
+    CleanDamage(uint32 _damage, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome, uint32 _Absorb, int32 _Resist) :
+    damage(_damage), attackType(_attackType), hitOutCome(_hitOutCome), absorb(_Absorb), resist(_Resist) {}
+
+    uint32 damage;
+    WeaponAttackType attackType;
+    MeleeHitOutcome hitOutCome;
+    uint32 absorb;
+    int32 resist;
+};
+
+enum CurrentSpellTypes
+{
+    CURRENT_MELEE_SPELL             = 0,
+    CURRENT_GENERIC_SPELL           = 1,
+    CURRENT_AUTOREPEAT_SPELL        = 2,
+    CURRENT_CHANNELED_SPELL         = 3
+};
+
+#define CURRENT_FIRST_NON_MELEE_SPELL 1
+#define CURRENT_MAX_SPELL             4
 
 class WorldObject : public Object
 {
@@ -813,18 +1125,18 @@ class WorldObject : public Object
 
         void SendObjectSpawnAnim() const;
         void SendObjectDeSpawnAnim() const;
-        
-        bool IsControlledByPlayer() const;
-        bool IsLikePlayer() const;
-        virtual Player* GetAffectingPlayer() const { return nullptr; }
-        virtual bool IsCharmerOrOwnerPlayerOrPlayerItself() const { return IsPlayer(); }
-        virtual bool IsHostileTo(WorldObject const* target) const = 0;
-        virtual bool IsFriendlyTo(WorldObject const* target) const = 0;
-        FactionTemplateEntry const* getFactionTemplateEntry() const;
+
+        virtual bool IsHostileTo(WorldObject const* target) const =0;
+        virtual bool IsFriendlyTo(WorldObject const* target) const =0;
         virtual uint32 GetFactionTemplateId() const = 0;
+        FactionTemplateEntry const* getFactionTemplateEntry() const;
         virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         bool IsValidAttackTarget(Unit const* target, bool checkAlive = true) const;
+        virtual bool IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return IsVisibleForInState(pDetector, viewPoint, inVisibleList); }
+
+        bool IsControlledByPlayer() const;
+        bool IsLikePlayer() const;
 
         virtual void SaveRespawnTime() {}
         void AddObjectToRemoveList();
@@ -840,7 +1152,6 @@ class WorldObject : public Object
 
         // low level function for visibility change code, must be define in all main world object subclasses
         virtual bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
-        virtual bool IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return IsVisibleForInState(pDetector, viewPoint, inVisibleList); }
 
         void SetMap(Map* map);
         Map* GetMap() const;
@@ -904,8 +1215,119 @@ class WorldObject : public Object
         uint32 GetCreatureSummonLimit() const;
         void SetCreatureSummonLimit(uint32 limit);
 
+        virtual uint32 GetLevel() const = 0;
+        uint32 GetLevelForTarget(WorldObject const* target = nullptr) const;
+        uint16 GetSkillMaxForLevel(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; };
+        uint32 GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target = nullptr) const;
+        uint32 GetUnitMeleeSkill(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; }
+        uint32 GetDefenseSkillValue(WorldObject const* target = nullptr) const;
+
+        virtual Player* GetAffectingPlayer() const { return nullptr; }
+        virtual bool IsCharmerOrOwnerPlayerOrPlayerItself() const { return IsPlayer(); }
+        Unit* SelectMagnetTarget(Unit* victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
+
+        SpellCastResult CastSpell(Unit* pTarget, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(Unit* pTarget, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(GameObject* pTarget, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(GameObject* pTarget, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        void CastCustomSpell(Unit* pTarget, uint32 spellId, optional<int32> bp0, optional<int32> bp1, optional<int32> bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastCustomSpell(Unit* pTarget, SpellEntry const* spellInfo, optional<int32> bp0, optional<int32> bp1, optional<int32> bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        
+        void SetCurrentCastedSpell(Spell* pSpell);
+        Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
+        Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
+        bool CheckAndIncreaseCastCounter();
+        void DecreaseCastCounter() { if (m_castCounter) --m_castCounter; }
+
+        // set withDelayed to true to account delayed spells as casted
+        // delayed+channeled spells are always accounted as casted
+        // we can skip channeled or delayed checks using flags
+        bool IsNonMeleeSpellCasted(bool withDelayed = false, bool skipChanneled = false, bool skipAutorepeat = false) const;
+        bool IsNextSwingSpellCasted() const;
+        // for movement generators, check if current casted spell has movement interrupt flags
+        bool IsNoMovementSpellCasted() const;
+
+        // set withDelayed to true to interrupt delayed spells too
+        // delayed+channeled spells are always interrupted
+        void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0);
+        void InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except = 0);
+        void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true);
+        void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
+        
+        virtual bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const { return false; }
+        float SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const;
+        uint32 SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit* pVictim, Spell* spell = nullptr);
+        float  MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MagicSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        int32 MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
+        SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
+        void UpdatePendingProcs(uint32 diff);
+        void ProcDamageAndSpell(ProcSystemArguments&& data);
+        void ProcDamageAndSpell_real(ProcSystemArguments& data);
+        void ProcDamageAndSpell_delayed(ProcSystemArguments& data);
+        void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+        float CalculateSpellEffectValue(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr) const;
+        float SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, float total, float benefit, float ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell = nullptr) const;
+        static float CalculateLevelPenalty(SpellEntry const* spellProto);
+        float SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
+        float SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellProto, SpellEffectIndex effectIndex, float healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        float SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
+        float CalcArmorReducedDamage(Unit* pVictim, uint32 const damage) const;
+        float MeleeDamageBonusDone(Unit* pVictim, float damage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, SpellEffectIndex effectIndex = EFFECT_INDEX_0, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
+        virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
+        float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
+        virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr);
+        void DealDamageMods(Unit* pVictim, uint32& damage, uint32* absorb);
+        void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
+        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
+        void SendSpellNonMeleeDamageLog(Unit* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
+        void SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo);
+        void SendSpellOrDamageImmune(Unit* target, uint32 spellId) const;
+        int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
+        void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
+        void EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
+        void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
+
+        void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
+        DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex);
+        DynamicObject* GetDynObject(uint32 spellId);
+        void AddDynObject(DynamicObject* dynObj);
+        void RemoveDynObject(uint32 spellid);
+        void RemoveDynObjectWithGUID(ObjectGuid guid) { m_dynObjGUIDs.remove(guid); }
+        void RemoveAllDynObjects();
+
+        // cooldown system
+        virtual void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false);
+        virtual bool HasGCD(SpellEntry const* spellEntry) const;
+        void ResetGCD(SpellEntry const* spellEntry = nullptr);
+        virtual void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0);
+        virtual void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true);
+        void RemoveSpellCooldown(uint32 spellId, bool updateClient = true);
+        virtual void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true);
+        virtual void RemoveAllCooldowns(bool /*sendOnly*/ = false) { m_GCDCatMap.clear(); m_cooldownMap.clear(); m_lockoutMap.clear(); }
+        bool IsSpellReady(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr) const;
+        bool IsSpellReady(uint32 spellId, ItemPrototype const* itemProto = nullptr) const;
+        virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration);
+        void PrintCooldownList(ChatHandler& chat) const;
+        bool CheckLockout(SpellSchoolMask schoolMask) const;
+
+        // Event handler
+        EventProcessor m_Events;
     protected:
         explicit WorldObject();
+
+        // cooldown system
+        void UpdateCooldowns(TimePoint const& now);
+        bool GetExpireTime(SpellEntry const& spellEntry, TimePoint& expireTime, bool& isPermanent) const;
+
+        GCDMap            m_GCDCatMap;
+        LockoutMap        m_lockoutMap;
+        CooldownContainer m_cooldownMap;
 
         std::string m_name;
         ZoneScript* m_zoneScript;
@@ -927,27 +1349,81 @@ class WorldObject : public Object
         WorldUpdateCounter m_updateTracker;
 
         uint32 m_summonLimitAlert;                          // Timer to alert GMs if a creature is at the summon limit
+
+        typedef std::list<ObjectGuid> DynObjectGUIDs;
+        DynObjectGUIDs m_dynObjGUIDs;
+
+        uint32 m_procsUpdateTimer = 0;
+        std::vector<ProcSystemArguments> m_pendingProcChecks;
+        std::array<Spell*, CURRENT_MAX_SPELL> m_currentSpells{};
+        uint32 m_castCounter = 0;                           // count casts chain of triggered spells for prevent infinity cast crashes
+    private:
+        // Error traps for some wrong args using
+        // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
+        // no bodies expected for this declarations
+        template <typename TR>
+        SpellCastResult CastSpell(Unit* Victim, uint32 spell, TR triggered);
+        template <typename TR>
+        SpellCastResult CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
+        template <typename TR>
+        void CastCustomSpell(Unit* Victim, uint32 spell, optional<int32> bp0, optional<int32> bp1, optional<int32> bp2, TR triggered);
+        template <typename SP, typename TR>
+        void CastCustomSpell(Unit* Victim, SpellEntry const* spell, optional<int32> bp0, optional<int32> bp1, optional<int32> bp2, TR triggered);
+        template <typename TR>
+        SpellCastResult CastSpell(float x, float y, float z, uint32 spell, TR triggered);
+        template <typename TR>
+        SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
-
-inline WorldObject* Object::ToWorldObject()
-{
-    return IsWorldObject() ? static_cast<WorldObject*>(this) : nullptr;
-}
-
-inline WorldObject const* Object::ToWorldObject() const
-{
-    return IsWorldObject() ? static_cast<WorldObject const*>(this) : nullptr;
-}
 
 // Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.
 inline WorldObject* ToWorldObject(Object* object)
 {
-    return object && object->IsWorldObject() ? static_cast<WorldObject*>(object) : nullptr;
+    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject*>(object) : nullptr;
 }
 
 inline WorldObject const* ToWorldObject(Object const* object)
 {
-    return object && object->IsWorldObject() ? static_cast<WorldObject const*>(object) : nullptr;
+    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject const*>(object) : nullptr;
+}
+
+inline GameObject* ToGameObject(Object* object)
+{
+    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject*>(object) : nullptr;
+}
+
+inline GameObject const* ToGameObject(Object const* object)
+{
+    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject const*>(object) : nullptr;
+}
+
+inline Unit* ToUnit(Object* object)
+{
+    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit*>(object) : nullptr;
+}
+
+inline Unit const* ToUnit(Object const* object)
+{
+    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit const*>(object) : nullptr;
+}
+
+inline Creature* ToCreature(Object* object)
+{
+    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature*>(object) : nullptr;
+}
+
+inline Creature const* ToCreature(Object const* object)
+{
+    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature const*>(object) : nullptr;
+}
+
+inline Player* ToPlayer(Object* object)
+{
+    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player*>(object) : nullptr;
+}
+
+inline Player const* ToPlayer(Object const* object)
+{
+    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player const*>(object) : nullptr;
 }
 
 #endif
