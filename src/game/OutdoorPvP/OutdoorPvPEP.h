@@ -18,7 +18,6 @@
 #ifndef OUTDOOR_PVP_EP_
 #define OUTDOOR_PVP_EP_
 
-#include "DBCStructure.h"
 #include "ZoneScript.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2

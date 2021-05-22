@@ -23,15 +23,13 @@
 #include "Errors.h"
 #include "Pet.h"
 #include "Player.h"
-#include "DBCStores.h"
 #include "Spell.h"
-#include "ObjectAccessor.h"
 #include "SpellMgr.h"
+#include "ScriptMgr.h"
 #include "Creature.h"
-#include "World.h"
 #include "Util.h"
 #include "Group.h"
-#include "SpellAuras.h"
+#include "SpellAuraDefines.h"
 
 int PetAI::Permissible(Creature const* creature)
 {

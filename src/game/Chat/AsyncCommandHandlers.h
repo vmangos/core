@@ -29,10 +29,9 @@
 #include "Database/DatabaseEnv.h"
 #include "Database/Database.h"
 #include "Database/SqlOperations.h"
-#include "WorldSession.h"
-#include "World.h"
 
-enum {
+enum
+{
     PINFO_QUERY_GOLD_SENT = 0,
     PINFO_QUERY_GOLD_RECEIVED,
     PINFO_QUERY_ACCOUNT_INFO,
@@ -62,6 +61,8 @@ struct PInfoData
     std::string last_login;
     std::string target_name;
 };
+
+class WorldSession;
 
 /**
 Chain query handling for PInfo. It uses a long blocking query (select from characters)

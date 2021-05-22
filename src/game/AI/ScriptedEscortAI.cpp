@@ -9,10 +9,12 @@ SDComment:
 SDCategory: Npc
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "Chat.h"
-#include "PointMovementGenerator.h"
+#include "MovementGenerator.h"
+#include "Player.h"
+#include "Group.h"
 
 float const DEFAULT_MAX_PLAYER_DISTANCE = 100.0f;
 float const DEFAULT_MAX_ASSIST_DISTANCE =  40.0f;
@@ -90,6 +92,11 @@ void npc_escortAI::EnterCombat(Unit* pEnemy)
 
 void npc_escortAI::Aggro(Unit* /*pEnemy*/)
 {
+}
+
+Player* npc_escortAI::GetPlayerForEscort() const
+{
+    return m_creature->GetMap()->GetPlayer(m_uiPlayerGUID);
 }
 
 bool npc_escortAI::AssistPlayerInCombat(Unit* pWho)

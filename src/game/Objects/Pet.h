@@ -23,7 +23,6 @@
 #define MANGOSSERVER_PET_H
 
 #include "Common.h"
-#include "ObjectGuid.h"
 #include "Creature.h"
 
 enum PetType

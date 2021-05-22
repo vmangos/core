@@ -20,12 +20,9 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
-#include "ObjectAccessor.h"
 #include "ZoneScriptMgr.h"
-#include "Creature.h"
 #include "Language.h"
 #include "World.h"
-#include "GossipDef.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 

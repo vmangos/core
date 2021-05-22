@@ -2,6 +2,8 @@
 #define MANGOS_COMBAT_BOT_BASE_H
 
 #include "PlayerBotAI.h"
+#include "SpellEntry.h"
+#include "Player.h"
 
 struct HealSpellCompare
 {

@@ -10,6 +10,7 @@
  */
 
 #include "scriptPCH.h"
+#include "Utilities/EventMap.h"
 #include "molten_core.h"
 
 enum eSpells

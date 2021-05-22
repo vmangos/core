@@ -26,6 +26,7 @@ npc_blastmaster_emi_shortfuse
 EndContentData */
 
 #include "scriptPCH.h"
+#include "CreatureGroups.h"
 #include "gnomeregan.h"
 
 /*######

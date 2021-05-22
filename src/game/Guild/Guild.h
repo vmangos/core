@@ -23,11 +23,8 @@
 #define MANGOSSERVER_GUILD_H
 
 #include "Common.h"
-#include "Item.h"
 #include "ObjectAccessor.h"
-#include "SharedDefines.h"
 
-class Item;
 class Petition;
 
 #define GUILD_RANKS_MIN_COUNT   5

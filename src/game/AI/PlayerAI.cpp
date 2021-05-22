@@ -20,10 +20,8 @@
 #include "PlayerAI.h"
 #include "Player.h"
 #include "DBCStores.h"
-#include "Log.h"
 #include "SpellMgr.h"
 #include "MotionMaster.h"
-#include "MoveSpline.h"
 #include "Spell.h"
 
 // Misc spells we dont want players to cast
@@ -48,26 +46,27 @@ PlayerAI::~PlayerAI()
 {
 }
 
-CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered, bool checkControlled)
+bool PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered, bool checkControlled)
 {
     if (!pTarget)
-        return CAST_FAIL_OTHER;
+        return false;
+
     // If not triggered, we check
     if (!isTriggered)
     {
         // State does not allow
         if (me->HasUnitState(checkControlled ? UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL : UNIT_STAT_CAN_NOT_REACT))
-            return CAST_FAIL_STATE;
+            return false;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-            return CAST_FAIL_STATE;
+            return false;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
-            return CAST_FAIL_STATE;
+            return false;
 
         // Check for power (also done by Spell::CheckCast())
         if (me->GetPower((Powers)pSpell->powerType) < pSpell->manaCost)
-            return CAST_FAIL_POWER;
+            return false;
     }
 
     if (SpellRangeEntry const* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
@@ -78,17 +77,17 @@ CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bo
             float fDistance = me->GetCombatDistance(pTarget);
 
             if (fDistance > pSpellRange->maxRange)
-                return CAST_FAIL_TOO_FAR;
+                return false;
 
             float fMinRange = pSpellRange->minRange;
 
             if (fMinRange && fDistance < fMinRange)
-                return CAST_FAIL_TOO_CLOSE;
+                return false;
         }
-        return CAST_OK;
+        return true;
     }
-    else
-        return CAST_FAIL_OTHER;
+    
+    return false;
 }
 
 void PlayerAI::UpdateAI(uint32 const /*diff*/)
@@ -391,7 +390,7 @@ void PlayerControlledAI::UpdateAI(uint32 const uiDiff)
 
                 if (spellInfo)
                 {
-                    if (CanCastSpell(spellTarget, spellInfo, false, false) == CAST_OK)
+                    if (CanCastSpell(spellTarget, spellInfo, false, false))
                     {
                         me->CastSpell(spellTarget, spellId, false);
                         uiGlobalCD = 1500;

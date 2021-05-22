@@ -28,9 +28,7 @@
 #include "Util.h"
 #include "Auth/Sha1.h"
 #include "World.h"
-#include "Chat.h"
 #include "WorldSession.h"
-#include "Chat.h"
 #include "MasterPlayer.h"
 #include "Anticheat.h"
 

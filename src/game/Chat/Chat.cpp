@@ -30,6 +30,7 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "Player.h"
+#include "Group.h"
 #include "UpdateMask.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
@@ -496,6 +497,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "object",         SEC_TICKETMASTER,  true,  &ChatHandler::HandleListObjectCommand,         "", nullptr },
         { "talents",        SEC_TICKETMASTER,  false, &ChatHandler::HandleListTalentsCommand,        "", nullptr },
         { "movegens",       SEC_TICKETMASTER,  false, &ChatHandler::HandleListMoveGensCommand,       "", nullptr },
+        { "hostilerefs",    SEC_TICKETMASTER,  false, &ChatHandler::HandleListHostileRefsCommand,    "", nullptr },
         { nullptr,          0,                 false, nullptr,                                       "", nullptr }
     };
 

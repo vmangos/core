@@ -30,7 +30,6 @@
 #include "Timer.h"
 #include "Policies/Singleton.h"
 #include "SharedDefines.h"
-#include "Nostalrius.h"
 #include "ObjectGuid.h"
 #include "Chat/AbstractPlayer.h"
 #include "WorldPacket.h"
@@ -516,7 +515,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,
     CONFIG_BOOL_ENABLE_DK,
     CONFIG_BOOL_ENABLE_CITY_PROTECTOR,
-    CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PLAYER,
+    CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_CHARGE,
     CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET,
     CONFIG_BOOL_WHISPER_RESTRICTION,
     CONFIG_BOOL_MAILSPAM_ITEM,

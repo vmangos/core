@@ -27,8 +27,8 @@
  EndContentData */
 
 #include "scriptPCH.h"
-#include "Database/DatabaseEnv.h"
 #include "HardcodedEvents.h"
+#include "CreatureGroups.h"
 
 enum
 {

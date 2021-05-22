@@ -3316,6 +3316,15 @@ namespace SpellInternal
         if (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && spellInfo->SpellIconID == 242)
             return true;
 
+        // Demonic Sacrifice should be batched, so it's possible to use it together with Voidwalker's Sacrifice.
+        // https://www.youtube.com/watch?v=mrEsmmJomsg
+        if (spellInfo->Id == 18788)
+            return true;
+
+        // Execute should be batched.
+        if (spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->IsFitToFamilyMask<CF_WARRIOR_EXECUTE>())
+            return true;
+
         if (spellInfo->IsChanneledSpell() || spellInfo->IsNextMeleeSwingSpell() || spellInfo->IsRangedSpell())
             return false;
 

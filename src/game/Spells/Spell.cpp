@@ -20,35 +20,29 @@
  */
 
 #include "Spell.h"
-#include "Database/DatabaseEnv.h"
+#include "Log.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "World.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "UpdateMask.h"
-#include "World.h"
+#include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Player.h"
 #include "Pet.h"
 #include "DynamicObject.h"
 #include "Group.h"
-#include "UpdateData.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
-#include "CellImpl.h"
-#include "Policies/SingletonImp.h"
 #include "SharedDefines.h"
 #include "LootMgr.h"
 #include "VMapFactory.h"
 #include "BattleGround.h"
 #include "Util.h"
-#include "Chat.h"
 #include "PathFinder.h"
 #include "CharacterDatabaseCache.h"
-#include "GameObjectAI.h"
 #include "ZoneScript.h"
 
 using namespace Spells;
@@ -5474,7 +5468,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         // only allow triggered spells if at an ended battleground
         if (m_caster->IsPlayer())
-            if (BattleGround * bg = ((Player*)m_caster)->GetBattleGround())
+            if (BattleGround* bg = ((Player*)m_caster)->GetBattleGround())
                 if (bg->GetStatus() == STATUS_WAIT_LEAVE)
                     return SPELL_FAILED_DONT_REPORT;
 

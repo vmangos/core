@@ -31,7 +31,6 @@
 #include "Player.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "UpdateMask.h"
 #include "Auth/md5.h"
 #include "ObjectAccessor.h"
 #include "Group.h"

@@ -25,14 +25,13 @@
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "GridDefines.h"
-#include "World.h"
 #include "CellImpl.h"
-#include "Corpse.h"
-#include "ObjectMgr.h"
+#include "World.h"
+#include "Player.h"
+#include "Group.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
 #include "ThreadPool.h"
-#include "MoveMap.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -392,7 +391,7 @@ void MapManager::InitMaxInstanceId()
 {
     i_MaxInstanceId = RESERVED_INSTANCES_LAST;
 
-    QueryResult* result = CharacterDatabase.Query("SELECT MAX(id) FROM instance");
+    QueryResult* result = CharacterDatabase.Query("SELECT MAX(`id`) FROM `instance`");
     if (result)
     {
         i_MaxInstanceId = result->Fetch()[0].GetUInt32();

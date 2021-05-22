@@ -27,8 +27,9 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Item.h"
-#include "UpdateData.h"
+#include "Bag.h"
 #include "Chat.h"
+#include "Conditions.h"
 #include "Anticheat.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recv_data)
@@ -823,7 +824,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                             ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->getFactionTemplateEntry()->faction))
                         continue;
 
-                    if (crItem->conditionId && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+                    if (crItem->conditionId && !IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
                         continue;
                 }
 

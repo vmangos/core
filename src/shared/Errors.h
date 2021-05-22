@@ -82,4 +82,10 @@ if (!(CONDITION)) \
 #endif
 #endif
 
+#ifdef MANGOS_DEBUG
+#define MANGOS_DEBUG_ASSERT(x) MANGOS_ASSERT(x)
+#else
+#define MANGOS_DEBUG_ASSERT(x)
+#endif
+
 #endif

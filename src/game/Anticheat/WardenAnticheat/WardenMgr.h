@@ -17,6 +17,7 @@
 #ifndef _WARDENCHECKMGR_H
 #define _WARDENCHECKMGR_H
 
+#include <array>
 #include <map>
 #include <mutex>
 #include "Auth/BigNumber.h"

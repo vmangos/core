@@ -4,8 +4,10 @@
 #include "SocialMgr.h"
 #include "Item.h"
 #include "Mail.h"
+#include "Bag.h"
 #include "ObjectAccessor.h"
 #include "WorldPacket.h"
+#include "Opcodes.h"
 
 MasterPlayer::MasterPlayer(WorldSession* s):
     m_speakTime(0), m_speakCount(0), m_social(nullptr), 

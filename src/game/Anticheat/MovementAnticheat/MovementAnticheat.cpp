@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
+#include "Opcodes.h"
 #include "MovementAnticheat.h"
 #include "Chat.h"
 #include "Player.h"
@@ -74,6 +75,20 @@ const char* GetMovementCheatName(CheatType flagId)
     }
 
     return "UnknownCheat";
+}
+
+MovementAnticheat::MovementAnticheat(Player* _me) : me(_me), m_session(_me->GetSession())
+{
+}
+
+MovementInfo& MovementAnticheat::GetLastMovementInfo()
+{
+    return me->m_movementInfo;
+}
+
+MovementInfo const& MovementAnticheat::GetLastMovementInfo() const
+{
+    return me->m_movementInfo;
 }
 
 uint32 MovementAnticheat::Update(uint32 diff, std::stringstream& reason)

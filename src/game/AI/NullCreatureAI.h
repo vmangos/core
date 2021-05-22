@@ -28,10 +28,7 @@
 class NullCreatureAI : public CreatureAI
 {
     public:
-        explicit NullCreatureAI(Creature* c) : CreatureAI(c)
-        {
-            c->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
-        }
+        explicit NullCreatureAI(Creature* c);
         ~NullCreatureAI() override;
 
         void MoveInLineOfSight(Unit*) override {}
