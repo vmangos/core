@@ -605,6 +605,15 @@ enum
 
     SPELL_MANA_BURN                 = 11981,
 
+    SAY_KINDAL_BEGIN                = 4079,
+    SAY_KINDAL_SUCCESS              = 4080,
+    SAY_KINDAL_FAIL_SPRITES         = 4081,
+    SAY_KINDAL_FAIL_TIMER           = 5285,
+    SAY_KINDAL_AGGRO1               = 4122,
+    SAY_KINDAL_AGGRO2               = 4123,
+    SAY_KINDAL_AGGRO3               = 4124,
+    SAY_KINDAL_AGGRO4               = 4125,
+
     FACTION_ESCORTEE_SPRITE         = 10,
     FACTION_ESCORTEE_KINDAL         = 231,
 };
@@ -674,6 +683,17 @@ struct npc_kindal_moonweaverAI : public FollowerAI
         FollowerAI::JustDied(pWho);
 
         m_creature->SetRespawnTime(10);
+    }
+
+    void OnEscortFailed(bool bDied) override
+    {
+        if (!bDied)
+            DoScriptText(SAY_KINDAL_FAIL_TIMER, m_creature);
+    }
+
+    void EnterCombat(Unit* pVictim) override
+    {
+        DoScriptText(urand(SAY_KINDAL_AGGRO1, SAY_KINDAL_AGGRO4), m_creature, pVictim);
     }
 
     void BeginEvent();
@@ -854,7 +874,10 @@ void npc_kindal_moonweaverAI::SpriteSaved()
         if (Player* pPlayer = GetLeaderForFollower())
         {
             if (pPlayer->GetQuestStatus(QUEST_FREEDOM_FOR_ALL_CREATURES) == QUEST_STATUS_INCOMPLETE)
+            {
                 pPlayer->GroupEventHappens(QUEST_FREEDOM_FOR_ALL_CREATURES, m_creature);
+                DoScriptText(SAY_KINDAL_SUCCESS, m_creature, pPlayer);
+            }  
         }
 
         SetFollowComplete(true);
@@ -873,7 +896,10 @@ void npc_kindal_moonweaverAI::SpriteDied()
         if (Player* pPlayer = GetLeaderForFollower())
         {
             if (pPlayer->GetQuestStatus(QUEST_FREEDOM_FOR_ALL_CREATURES) == QUEST_STATUS_INCOMPLETE)
+            {
                 pPlayer->FailQuest(QUEST_FREEDOM_FOR_ALL_CREATURES);
+                DoScriptText(SAY_KINDAL_FAIL_SPRITES, m_creature, pPlayer);
+            } 
         }
 
         SetFollowComplete(false);
@@ -905,10 +931,22 @@ bool QuestAccept_npc_kindal_moonweaver(Player* pPlayer, Creature* pCreature, Que
     {
         if (auto pKindalAI = dynamic_cast<npc_kindal_moonweaverAI*>(pCreature->AI()))
         {
-            pKindalAI->StartFollow(pPlayer, FACTION_ESCORTEE_KINDAL, pQuest);
-            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+            pCreature->SetFacingToObject(pPlayer);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            DoScriptText(SAY_KINDAL_BEGIN, pCreature, pPlayer);
+            pKindalAI->StartFollow(pPlayer, FACTION_ESCORTEE_KINDAL, pQuest);
             pKindalAI->BeginEvent();
+            pKindalAI->SetFollowPaused(true);
+
+            pCreature->m_Events.AddLambdaEventAtOffset([pCreature]
+            {
+                if (!pCreature->IsAlive())
+                    return;
+
+                if (auto pKindalAI = dynamic_cast<npc_kindal_moonweaverAI*>(pCreature->AI()))
+                    pKindalAI->SetFollowPaused(false);
+            }, 3000);
         }
     }
 
