@@ -11,6 +11,7 @@
 #include <chrono>
 #include <random>
 #include <limits>
+#include "WaypointManager.h"
 
 /*
  * Elemental Invasion
@@ -1183,6 +1184,7 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
 {
     // Remove old pallid if required.
     Creature* pPallid = pMap->GetCreature(zone->pallidGuid);
+    uint32 pathID = 0;
 
     if (pPallid)
         pPallid->RemoveFromWorld();
@@ -1190,7 +1192,16 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
     if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
         pPallid->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
-        pPallid->AI()->InformGuid(pPallid->GetObjectGuid(), SpawnLocationID);
+        pPallid->GetMotionMaster()->Clear(false, true);
+        if (pPallid->GetZoneId() == ZONEID_UNDERCITY)
+        {
+            if (SpawnLocationID == 0)
+                pathID = 149702;
+
+            if (SpawnLocationID == 1)
+                pathID = 149701;
+        }
+        pPallid->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, SpawnLocationID, false);
         sLog.outBasic("[Scourge Invasion Event] SpawnLocationID %d", SpawnLocationID);
 
         zone->pallidGuid = pPallid->GetObjectGuid();
