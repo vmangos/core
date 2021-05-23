@@ -4189,6 +4189,15 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
         }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        for (int i = BUYBACK_SLOT_START; i < BUYBACK_SLOT_END; ++i)
+        {
+            if (m_items[i] == nullptr)
+                continue;
+
+            m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
+        }
+#endif
         for (int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
         {
             if (m_items[i] == nullptr)
