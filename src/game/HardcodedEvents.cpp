@@ -689,6 +689,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         stormwind.map = 0;
         stormwind.zoneId = ZONEID_STORMWIND;
         stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Stormwind Keep
+        stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Trade District
     }
 
     attackPoints.push_back(undercity);
@@ -873,15 +874,10 @@ void ScourgeInvasionEvent::Disable()
         Creature* pMouth = mapPtr->GetCreature(zone.mouthGuid);
         
         if (!pMouth)
-        {
-            sLog.outBasic("[Scourge Invasion Event] invalid mouth in zone %d", zone.zoneId);
             continue;
-        }
 
         pMouth->RemoveFromWorld();
         pMouth->DeleteLater();
-
-        sLog.outBasic("[Scourge Invasion Event] Mouth of Kel'Thuzad (ObjectGuid: %d) removed from zone %d", zone.mouthGuid, zone.zoneId);
     }
     
     sObjectMgr.SetSavedVariable(VARIABLE_SI_ATTACK_TIME1, time(nullptr), true);
@@ -1067,20 +1063,14 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
                                      sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_ZONE2));
 
     if (!isValidZoneId(zoneId))
-    {
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime with invalid zoneID: %d", zoneId);
         return;
-    }
+
     if (!isActiveZone(zoneId))
-    {
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime zoneID: %d is already being attacked", zoneId);
         return;
-    }
+
     if (GetActiveZones() >= 2)
-    {
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime %d/2 zones are already being attacked", GetActiveZones());
         return;
-    }
+
     sLog.outBasic("[Scourge Invasion Event] Starting new invasion in zone %d", zoneId);
     sObjectMgr.SetSavedVariable(zoneVariable, zoneId, true);
 
@@ -1198,7 +1188,6 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
             pathID = SpawnLocationID == 0 ? 151901 : 151902;
 
         pPallid->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, pathID, false);
-        sLog.outBasic("[Scourge Invasion Event] SpawnLocationID %d", SpawnLocationID);
 
         zone->pallidGuid = pPallid->GetObjectGuid();
     }

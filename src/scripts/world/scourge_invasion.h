@@ -514,18 +514,6 @@ enum ScourgeInvasionLang
     LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE                = 8481  // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
 };
 
-static const Position SW_TRADE_DISTRICT_STORMWIND_ELITE_GUARDS[8] =
-{
-    { -8828.65f, 640.132f, 94.4273f, 3.28122f },
-    { -8837.81f, 628.258f, 94.0939f, 1.67552f },
-    { -8832.66f, 629.215f, 94.1206f, 2.09439f },
-    { -8827.45f, 633.287f, 94.3621f, 2.87979f },
-    { -8841.72f, 631.157f, 94.6496f, 1.41372f },
-    { -8844.74f, 635.272f, 95.2692f, 1.37881f },
-    { -8845.08f, 614.403f, 93.0201f, 5.18363f },
-    { -8848.65f, 612.322f, 93.0186f, 5.42797f }
-};
-
 static const Position UNDERCITY_FLAMESHOCKERS[66] =
 {
     { 1404.49f, 432.129f, -54.7424f, 5.9107f },

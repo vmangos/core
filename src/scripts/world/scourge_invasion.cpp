@@ -297,11 +297,11 @@ struct MouthAI : public ScriptedAI
         case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
             ChangeZoneEventStatus(m_creature, true);
             m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_STORM, 0.25f, true);
-            m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2));
+            DoScriptText(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_START_2), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
             break;
         case EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP:
         {
-            m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_3));
+            DoScriptText(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_1, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_2, LANG_MOUTH_OF_KELTHUZAD_ZONE_ATTACK_ENDS_3), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
             ChangeZoneEventStatus(m_creature, false);
             m_creature->GetMap()->SetWeather(m_creature->GetZoneId(), WEATHER_TYPE_RAIN, 0.0f, false);
             m_creature->RemoveFromWorld();
@@ -319,7 +319,7 @@ struct MouthAI : public ScriptedAI
             switch (Events)
             {
             case EVENT_MOUTH_OF_KELTHUZAD_YELL:
-                m_creature->MonsterYellToZone(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_RANDOM_1, LANG_MOUTH_OF_KELTHUZAD_RANDOM_2, LANG_MOUTH_OF_KELTHUZAD_RANDOM_3, LANG_MOUTH_OF_KELTHUZAD_RANDOM_4));
+                DoScriptText(PickRandomValue(LANG_MOUTH_OF_KELTHUZAD_RANDOM_1, LANG_MOUTH_OF_KELTHUZAD_RANDOM_2, LANG_MOUTH_OF_KELTHUZAD_RANDOM_3, LANG_MOUTH_OF_KELTHUZAD_RANDOM_4), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                 m_events.ScheduleEvent(EVENT_MOUTH_OF_KELTHUZAD_YELL, urand((IN_MILLISECONDS * 150), (IN_MILLISECONDS * HOUR)));
             break;
             }
@@ -1328,10 +1328,10 @@ struct PallidHorrorAI : public ScriptedAI
     void JustDied(Unit* killer) override
     {
         if (Creature* HIGHLORD_BOLVAR_FORDRAGON = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
-            DoScriptText(LANG_STORMWIND_BOLVAR_2, HIGHLORD_BOLVAR_FORDRAGON, m_creature);
+            DoScriptText(LANG_STORMWIND_BOLVAR_2, HIGHLORD_BOLVAR_FORDRAGON, m_creature, CHAT_TYPE_ZONE_YELL);
 
         if (Creature* LADY_SYLVANAS_WINDRUNNER = m_creature->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
-            DoScriptText(LANG_UNDERCITY_SYLVANAS_1, LADY_SYLVANAS_WINDRUNNER, m_creature);
+            DoScriptText(LANG_UNDERCITY_SYLVANAS_1, LADY_SYLVANAS_WINDRUNNER, m_creature, CHAT_TYPE_ZONE_YELL);
 
         // Remove all custom summoned Flameshockers.
         for (const auto& guid : m_flameshockers)
@@ -1360,7 +1360,7 @@ struct PallidHorrorAI : public ScriptedAI
             {
             case EVENT_PALLID_RANDOM_YELL:
                 DoScriptText(PickRandomValue(LANG_PALLID_HORROR_YELL1, LANG_PALLID_HORROR_YELL2, LANG_PALLID_HORROR_YELL3, LANG_PALLID_HORROR_YELL4,
-                    LANG_PALLID_HORROR_YELL5, LANG_PALLID_HORROR_YELL6, LANG_PALLID_HORROR_YELL7, LANG_PALLID_HORROR_YELL8), m_creature);
+                    LANG_PALLID_HORROR_YELL5, LANG_PALLID_HORROR_YELL6, LANG_PALLID_HORROR_YELL7, LANG_PALLID_HORROR_YELL8), m_creature, nullptr, CHAT_TYPE_ZONE_YELL);
                 m_events.ScheduleEvent(EVENT_PALLID_RANDOM_YELL, urand(IN_MILLISECONDS * 65, IN_MILLISECONDS * 300));
                 break;
             case EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS:
@@ -1373,10 +1373,7 @@ struct PallidHorrorAI : public ScriptedAI
                 for (auto itr = m_flameshockers_city.begin(); itr != m_flameshockers_city.end();)
                 {
                     if (!m_creature->GetMap()->GetCreature(itr->second))
-                    {
                         itr = m_flameshockers_city.erase(itr);
-                        sLog.outBasic("[PallidHorrorAI:UpdateAI] EVENT_PALLID_SUMMON_FLAMESHOCKER: remove %d, %d/25", itr->first, m_flameshockers_city.size());
-                    }
 
                     ++itr;
                 }
@@ -1393,12 +1390,11 @@ struct PallidHorrorAI : public ScriptedAI
                 auto itr = m_flameshockers_city.find(i);
                 if (itr == m_flameshockers_city.end())
                 {
-                    if (m_flameshockers_city.size() < 25) // A guess.
+                    if (m_flameshockers_city.size() < 10) // A guess.
                         if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, urand((MINUTE * IN_MILLISECONDS), ((MINUTE * IN_MILLISECONDS) * 5)), true, 3000))
                         {
                             m_flameshockers_city.emplace(i, FLAMESHOCKER->GetObjectGuid());
                             FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
-                            sLog.outBasic("[PallidHorrorAI:UpdateAI] EVENT_PALLID_SUMMON_FLAMESHOCKER: summoned %d/25 in %d at %f, %f, %f", m_flameshockers_city.size(), m_creature->GetZoneId(), UNDERCITY_FLAMESHOCKERS[i].x, UNDERCITY_FLAMESHOCKERS[i].y, UNDERCITY_FLAMESHOCKERS[i].z);
                         }
                 }
 

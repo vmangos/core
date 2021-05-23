@@ -51,10 +51,10 @@ UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='1.19048', `armor`=
 
 -- Royal Dreadguard used more ranged shoots in sniffs
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (138390, 'Undercity - Royal Dreadguard', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14516, 100, 1, 0, 0, 66, 7, 10, 7, 10, 0, 9080, 100, 1, 0, 0, 32, 0, 0, 6, 9, 0, 16100, 100, 1, 0, 0, 138, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-UPDATE `creature_template` SET `npc_flags`='0', `unit_flags`='0' WHERE  `entry`=13839;
+UPDATE `creature_template` SET `npc_flags`='0', `unit_flags`='0' WHERE `entry`=13839;
 
 -- Stormwind Elite Guard
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='11', `dmg_min`='417', `dmg_max`='551', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='32768', `spell_list_id`='163960' WHERE `entry`=16396;
+UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='11', `dmg_min`='417', `dmg_max`='551', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='32768', `spell_list_id`='163960', `movement_type`='0' WHERE `entry`=16396;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (163960, 'Stormwind Elite Guard', 14516, 100, 1, 0, 0, 0, 0, 10, 10, 10, 0, 9080, 100, 1, 0, 0, 32, 0, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Undercity Elite Guardian
@@ -82,7 +82,7 @@ UPDATE `creature_template` SET `armor`='239', `dmg_min`='7', `dmg_max`='12', `au
 UPDATE `creature_template` SET `armor`='239', `dmg_min`='8', `dmg_max`='13' WHERE `entry`=16423;
 
 -- Ranges seems to be very short.
-UPDATE `creature_template` SET `detection_range`='4', `call_for_help_range`='1' WHERE  `script_name`='scourge_invasion_minion';
+UPDATE `creature_template` SET `detection_range`='4', `call_for_help_range`='1' WHERE `script_name`='scourge_invasion_minion';
 
 -- After completing quest 9154 (Light's Hope Chapel) you should receive this item in your mailbox: 22723 (A Letter from the Keeper of the Rolls) source: https://classic.wowhead.com/guides/wow-classic-scourge-invasions
 UPDATE `quest_template` SET `RewMailTemplateId`='171' WHERE `entry`=9154;
@@ -92,6 +92,8 @@ DELETE FROM `creature_ai_events` WHERE `id`=1624101;
 DELETE FROM `creature_ai_events` WHERE `id`=1624102;
 DELETE FROM `creature_ai_events` WHERE `id`=1625501;
 DELETE FROM `creature_ai_events` WHERE `id`=1625502;
+
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` IN (16241,16255);
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1624101 AND `delay`=0 AND `command`=1 AND `datalong`=11 AND `datalong2`=18 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Recruiter - Random Emote' LIMIT 1;
 DELETE FROM `creature_ai_scripts` WHERE `id`=1624102 AND `delay`=0 AND `command`=1 AND `datalong`=1 AND `datalong2`=0 AND `datalong3`=0 AND `datalong4`=0 AND `target_param1`=0 AND `target_param2`=0 AND `target_type`=0 AND `data_flags`=0 AND `dataint`=0 AND `dataint2`=0 AND `dataint3`=0 AND `dataint4`=0 AND `x`=0 AND `y`=0 AND `z`=0 AND `o`=0 AND `condition_id`=0 AND `comments`='Argent Recruiter - Emote 1' LIMIT 1;
@@ -3402,6 +3404,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (149702, 81, 1296.77, 326.485, -59.4742, 100, 0, 0, 0),
     (149702, 82, 1293.68, 320.572, -57.4819, 100, 0, 0, 0);
 
+-- Stormwind Keep
 DELETE FROM `creature_movement_special` WHERE `id`=151901;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
     (151901, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
@@ -3431,8 +3434,8 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (151901, 25, -8578.33, 547.375, 101.777, 100, 0, 0, 0),
     (151901, 26, -8559.37, 524.217, 100.483, 100, 0, 0, 0),
     (151901, 27, -8544.85, 502.583, 98.5454, 100, 0, 0, 0),
-    (151901, 28, -8535.21, 487.29, 101.279, 100, 0, 0, 0),
-    (151901, 29, -8539.38, 477.864, 102.922, 100, 0, 0, 151911),
+    (151901, 28, -8535.21, 487.29, 101.279, 100, 0, 0, 151911),
+    (151901, 29, -8539.38, 477.864, 102.922, 100, 0, 0, 0),
     (151901, 30, -8548.45, 468.814, 104.483, 100, 0, 0, 0),
     (151901, 31, -8533.58, 448.952, 104.917, 100, 0, 0, 0),
     (151901, 32, -8518.46, 430.065, 106.586, 100, 0, 0, 0),
@@ -3440,42 +3443,96 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (151901, 34, -8477.23, 378.372, 112.258, 100, 0, 0, 0),
     (151901, 35, -8457.71, 353.894, 120.084, 100, 0, 0, 0),
     (151901, 36, -8441.52, 333.366, 122.579, 100, 0, 0, 151912);
-    
-DELETE FROM `creature_movement_scripts` WHERE `id` IN (149720,149721,149722,149723,149724, 149711,149712,149713,151910,151911,151912);
+
+-- Stormwind Trade District
+DELETE FROM `creature_movement_special` WHERE `id`=151902;
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+    (151902, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
+    (151902, 2, -8564.43, 897.362, 96.6816, 100, 0, 0, 0),
+    (151902, 3, -8543.69, 868.857, 96.678, 100, 0, 0, 0),
+    (151902, 4, -8537.53, 877.229, 100.872, 100, 0, 0, 151910),
+    (151902, 5, -8549.34, 876.808, 106.524, 100, 0, 0, 0),
+    (151902, 6, -8528.83, 850.217, 106.519, 100, 0, 0, 0),
+    (151902, 7, -8566.04, 819.702, 106.519, 100, 0, 0, 0),
+    (151902, 8, -8561.33, 812.55, 106.519, 100, 0, 0, 0),
+    (151902, 9, -8574.4, 801.162, 106.519, 100, 0, 0, 0),
+    (151902, 10, -8581.51, 807.43, 106.519, 100, 0, 0, 0),
+    (151902, 11, -8621.97, 775.794, 96.6517, 100, 0, 0, 0),
+    (151902, 12, -8628.31, 784.316, 96.6517, 100, 0, 0, 0),
+    (151902, 13, -8634.53, 785.558, 96.6517, 100, 0, 0, 0),
+    (151902, 14, -8652.83, 772.453, 96.6857, 100, 0, 0, 0),
+    (151902, 15, -8661.34, 761.398, 96.7092, 100, 0, 0, 0),
+    (151902, 16, -8657.61, 749.952, 96.6926, 100, 0, 0, 0),
+    (151902, 17, -8672.58, 735.786, 97.0164, 100, 0, 0, 0),
+    (151902, 18, -8682.54, 727.803, 97.0164, 100, 0, 0, 0),
+    (151902, 19, -8697.41, 716.147, 97.0164, 100, 0, 0, 0),
+    (151902, 20, -8714.37, 733.442, 97.8139, 100, 0, 0, 0),
+    (151902, 21, -8729.23, 723.831, 101.453, 100, 0, 0, 0),
+    (151902, 22, -8743.99, 712.039, 98.1516, 100, 0, 0, 0),
+    (151902, 23, -8753.84, 723.528, 98.0697, 100, 0, 0, 0),
+    (151902, 24, -8766.63, 735.125, 99.0597, 100, 0, 0, 0),
+    (151902, 25, -8783.09, 742.485, 99.2329, 100, 0, 0, 0),
+    (151902, 26, -8800.1, 743.276, 97.658, 100, 0, 0, 0),
+    (151902, 27, -8818.66, 735.107, 97.987, 100, 0, 0, 0),
+    (151902, 28, -8841.98, 722.637, 97.3206, 100, 0, 0, 0),
+    (151902, 29, -8834.77, 699.853, 97.6099, 100, 0, 0, 0),
+    (151902, 30, -8824.55, 678.292, 97.5775, 100, 0, 0, 151920),
+    (151902, 31, -8833.21, 672.986, 98.3364, 100, 0, 0, 0),
+    (151902, 32, -8853.18, 659.676, 96.9430, 100, 0, 0, 0),
+    (151902, 33, -8844.56, 644.785, 96.2844, 100, 0, 0, 0),
+    (151902, 34, -8831.11, 627.578, 94.0042, 100, 0, 0, 0),
+    (151902, 35, -8835.94, 632.075, 94.2046, 100, 0, 0, 0),
+    (151902, 36, -8820.48, 642.907, 94.2301, 100, 0, 0, 0),
+    (151902, 37, -8804.64, 647.774, 94.4579, 100, 0, 0, 0),
+    (151902, 38, -8798.51, 658.14, 95.7397, 100, 0, 0, 0),
+    (151902, 39, -8791.07, 679.552, 102.017, 100, 0, 0, 0),
+    (151902, 40, -8807.04, 683.424, 100.21, 100, 0, 0, 151921);
+
+DELETE FROM `creature_movement_scripts` WHERE `id` IN (149720,149721,149722,149723,149724, 149711,149712,149713,151910,151911,151912,151920,151921);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (149720, 0, 0, 6, 0, 0, 0, 5624, 100, 8, 2, 12334, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Guardian: Scourge in sewers!  We need help!'),
-    (149721, 0, 10, 5624, 3600000, 0, 0, 0, 0, 0, 0, 2, 149721, -1, 1, 1720.11, 191.195, -62.0651, 1.02974, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 at Magic Quarters'),
-    (149722, 0, 10, 5624, 3600000, 0, 0, 0, 0, 0, 0, 2, 149722, -1, 1, 1472.94, 63.9248, -62.2098, 0.401426, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 at Rogues\' Quarter'),
-    (149723, 0, 10, 13839, 3600000, 0, 0, 0, 0, 0, 0, 2, 149723, -1, 1, 1466.95, 369.392, -59.3685, 4.41568, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 1 at Royal Quarter'),
+    (149721, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 149721, -1, 1, 1720.11, 191.195, -62.0651, 1.02974, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 at Magic Quarters'),
+    (149722, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 149722, -1, 1, 1472.94, 63.9248, -62.2098, 0.401426, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 at Rogues\' Quarter'),
+    (149723, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 149723, -1, 1, 1466.95, 369.392, -59.3685, 4.41568, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 1 at Royal Quarter'),
     (149723, 10, 0, 6, 0, 0, 0, 10181, 200, 8, 2, 12332, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Lady Sylvanas Windrunner: My Royal Dreadguard, you will deal with this matter as befits your station.  That, or you will wish that you had.'),
     (149724, 0, 0, 6, 0, 0, 0, 2425, 100, 8, 2, 12333, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Varimathras: Dreadguard, hold your line.  Halt the advance of those Scourge!'),
-    (149724, 0, 10, 13839, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1299.49, 353.789, -65.9394, 1.16937, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 3 at Royal Quarter'),
-    (149724, 0, 10, 13839, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1295.97, 354.728, -65.9162, 0.907571, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 4 at Royal Quarter'),
-    (149724, 0, 10, 13839, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1302.63, 352.871, -65.9109, 1.309, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 2 at Royal Quarter'),
-    (149724, 0, 10, 13839, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1305.82, 351.934, -65.8778, 1.69297, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 1 at Royal Quarter'),
-    (149711, 0, 10, 5624, 3600000, 0, 0, 0, 0, 0, 0, 2, 149711, -1, 1, 1649.6, 197.414, -62.0981, 1.06465, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 outside Trading Quarter'),
-    (149711, 0, 10, 5624, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1651.49, 192.836, -62.0972, 1.20428, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 2 outside Trading Quarter'),
-    (149711, 0, 10, 5624, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1645.86, 196.746, -62.0994, 1.01229, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 3 outside Trading Quarter'),
-    (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 149712, -1, 1, 1632.55, 233.419, -43.0193, 2.6529, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 1 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1633.06, 246.891, -43.0193, 3.59538, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 2 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1576.53, 243.989, -61.994, 4.76475, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 3 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1578.96, 237.109, -61.994, 4.53786, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 4 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1635.93, 240.378, -43.0193, 3.24631, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 5 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1583.21, 241.365, -61.994, 4.45059, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 6 at inner Trading Quarter'),
+    (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1299.49, 353.789, -65.9394, 1.16937, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 3 at Royal Quarter'),
+    (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1295.97, 354.728, -65.9162, 0.907571, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 4 at Royal Quarter'),
+    (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1302.63, 352.871, -65.9109, 1.309, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 2 at Royal Quarter'),
+    (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1305.82, 351.934, -65.8778, 1.69297, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 1 at Royal Quarter'),
+    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 149711, -1, 1, 1649.6, 197.414, -62.0981, 1.06465, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 outside Trading Quarter'),
+    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1651.49, 192.836, -62.0972, 1.20428, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 2 outside Trading Quarter'),
+    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1645.86, 196.746, -62.0994, 1.01229, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 3 outside Trading Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 149712, -1, 1, 1632.55, 233.419, -43.0193, 2.6529, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 1 at inner Trading Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1633.06, 246.891, -43.0193, 3.59538, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 2 at inner Trading Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1576.53, 243.989, -61.994, 4.76475, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 3 at inner Trading Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1578.96, 237.109, -61.994, 4.53786, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 4 at inner Trading Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1635.93, 240.378, -43.0193, 3.24631, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 5 at inner Trading Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1583.21, 241.365, -61.994, 4.45059, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 6 at inner Trading Quarter'),
     (149713, 0, 60, 3, 15, 0, 1, 0, 0, 0, 0, 149701, 149701, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in inner Trading Quarter'),
-    (151910, 0, 10, 68, 3600000, 0, 0, 0, 0, 0, 0, 2, 151910, -1, 1, -8534.62, 854.091, 106.601, 2.09439, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind City Guard 1 in the Cathedral of Light'),
-    (151911, 0, 0, 6, 0, 0, 0, 1756, 150, 8, 2, 12316, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind Royal Guard: The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!'),
-    (151911, 10, 0, 6, 0, 0, 0, 1748, 150, 8, 2, 12317, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Bolvar Fordragon: Hold the line!  Protect the King at all costs!'),
-    (151912, 0, 60, 3, 34, 0, 1, 0, 0, 0, 0, 0, 151901, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in Stormwind Keep');
-
-DELETE FROM `generic_scripts` WHERE `id` IN (149721,149722,149723,149711,149712,151910);
+    (151910, 0, 10, 68, 300000, 0, 0, 0, 0, 0, 0, 2, 151910, -1, 1, -8534.62, 854.091, 106.601, 2.09439, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind City Guard 1 in the Cathedral of Light'),
+    (151911, 0, 0, 6, 0, 0, 0, 1756, 250, 8, 2, 12316, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind Royal Guard: The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!'),
+    (151911, 10, 0, 6, 0, 0, 0, 1748, 250, 8, 2, 12317, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Bolvar Fordragon: Hold the line!  Protect the King at all costs!'),
+    (151912, 0, 60, 3, 34, 0, 1, 0, 0, 0, 0, 0, 151901, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in Stormwind Keep'),
+    (151921, 0, 60, 3, 30, 0, 1, 0, 0, 0, 0, 0, 151902, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 151920, -1, 1, -8828.65, 640.132, 94.4273, 3.28122, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 1 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8837.81, 628.258, 94.0939, 1.67552, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 2 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8832.66, 629.215, 94.1206, 2.09439, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 3 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8827.45, 633.287, 94.3621, 2.87979, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 4 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8841.72, 631.157, 94.6496, 1.41372, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 5 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8844.74, 635.272, 95.2692, 1.37881, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 6 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8845.08, 614.403, 93.0201, 5.18363, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 7 at Trade District'),
+    (151920, 0, 10, 16396, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, -8848.65, 612.322, 93.0186, 5.42797, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind Elite Guard 8 at Trade District');
+    
+DELETE FROM `generic_scripts` WHERE `id` IN (149721,149722,149723,149711,149712,151910,151920);
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (149721, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12335, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Guardian: Scourge attack Magic Quarter!'),
     (149722, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12336, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Guardian: Rogues\' Quarter attacked by Scourge!  Help!'),
     (149723, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12337, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Guardian: The Scourge are at the entrance to the Royal Quarter!  Kill them!!'),
     (149711, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12353, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Guardian: There Scourge outside Trade Quarter!'),
     (149712, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12354, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Elite Guardian: Scourge inside Trade Quarter!  Destroy!'),
-    (151910, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12310, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind City Guard: To arms!  Scourge spotted in the Cathedral of Light!');
+    (151910, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12310, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind City Guard: To arms!  Scourge spotted in the Cathedral of Light!'),
+    (151920, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12311, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind Elite Guard: Scourge in the Trade District!  Have at them!');
 
 -- End of migration.
 END IF;
