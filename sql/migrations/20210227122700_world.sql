@@ -8,6 +8,10 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210227122700');
 -- Add your query below.
 
+-- =============================================
+-- World Invasion
+-- =============================================
+
 -- Fix some Creatures.
 UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='3052', `health_max`='3052', `detection_range`='0', `call_for_help_range`='0', `unit_flags`='256', `faction`='1630', `speed_run`='1', `auras`='28346', `flags_extra`='198658', `script_name`='scourge_invasion_necrotic_shard' WHERE `entry` IN (16172,16136);
 UPDATE `creature_template` SET `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `flags_extra`='64', `health_min`='42', `health_max`='42', `unit_flags`='33554432', `movement_type`='0', `level_min`='1', `level_max`='1' WHERE `entry` IN (16401,16421,16398,16386);
@@ -843,7 +847,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264 AND `event`=@WINTERSPRING_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @WINTERSPRING_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+234;
+DELETE FROM `creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+249;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@WINTERSPRING_GUID+1, 16356, 1, 7803.92, -4223.38, 676.976, 2.00713),
     (@WINTERSPRING_GUID+2, 16356, 1, 7692.21, -3843.77, 688.606, 4.46804),
@@ -1078,10 +1082,25 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@WINTERSPRING_GUID+231, 16401, 1, 7755.75, -4030.91, 786.58, 0.471238),
     (@WINTERSPRING_GUID+232, 16421, 1, 6184.28, -4913.32, 807.76, 6.0912),
     (@WINTERSPRING_GUID+233, 16421, 1, 6646.69, -3442.36, 793, 4.86947),
-    (@WINTERSPRING_GUID+234, 16421, 1, 7755.75, -4030.91, 786.58, 0.471238);
+    (@WINTERSPRING_GUID+234, 16421, 1, 7755.75, -4030.91, 786.58, 0.471238),
+    (@WINTERSPRING_GUID+235, 16356, 1, 6244, -4779.69, 751.865, 5.81195),
+    (@WINTERSPRING_GUID+236, 16356, 1, 6074.43, -4722.75, 756.323, 1.09956),
+    (@WINTERSPRING_GUID+237, 16356, 1, 6248.46, -4755.08, 752.166, 4.46804),
+    (@WINTERSPRING_GUID+238, 16356, 1, 6734.2, -3572.91, 704.114, 4.06663),
+    (@WINTERSPRING_GUID+239, 16356, 1, 6743.76, -3605.07, 718.871, 4.03172),
+    (@WINTERSPRING_GUID+240, 16356, 1, 6745.98, -3560.78, 700.922, 4.04917),
+    (@WINTERSPRING_GUID+241, 16356, 1, 6756.25, -3610.65, 717.194, 1.88495),
+    (@WINTERSPRING_GUID+242, 16356, 1, 6772.13, -3621.32, 721.724, 0.506145),
+    (@WINTERSPRING_GUID+243, 16356, 1, 6817.91, -3615.72, 729.997, 3.26377),
+    (@WINTERSPRING_GUID+244, 16356, 1, 6819.23, -3570.4, 727.156, 0.226893),
+    (@WINTERSPRING_GUID+245, 16356, 1, 7694.82, -3881.97, 688.048, 5.20109),
+    (@WINTERSPRING_GUID+246, 16356, 1, 7708.42, -3907.95, 691.825, 6.24828),
+    (@WINTERSPRING_GUID+247, 16356, 1, 7720.34, -3881.16, 690.539, 1.85005),
+    (@WINTERSPRING_GUID+248, 16356, 1, 7694.82, -3881.97, 688.048, 5.20109),
+    (@WINTERSPRING_GUID+249, 16356, 1, 7694.82, -3881.97, 688.048, 5.20109);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+234 AND `event`=@WINTERSPRING_EVENT;
-INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+234;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+249 AND `event`=@WINTERSPRING_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+249;
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
@@ -2566,7 +2585,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+182 AND `event`=@EASTERN_PLAGUELANDS_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EASTERN_PLAGUELANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+182;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+176;
+DELETE FROM `creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@EASTERN_PLAGUELANDS_GUID+3, 16356, 0, 1966.54, -4717.01, 98.3666, 0.226893),
     (@EASTERN_PLAGUELANDS_GUID+4, 16356, 0, 1965.33, -5104.58, 84.9795, 3.26377),
@@ -2575,7 +2594,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+7, 16356, 0, 1960.41, -5144.66, 74.0155, 1.8675),
     (@EASTERN_PLAGUELANDS_GUID+8, 16356, 0, 1960.3, -4754.93, 97.2724, 2.00713),
     (@EASTERN_PLAGUELANDS_GUID+9, 16356, 0, 1959.05, -5115.43, 80.9018, 2.23402),
-    (@EASTERN_PLAGUELANDS_GUID+10, 16356, 0, 1966.77, -4737.56, 97.3501, 0.388933),
+    -- (@EASTERN_PLAGUELANDS_GUID+10, 16356, 0, 1966.77, -4737.56, 97.3501, 0.388933),
     (@EASTERN_PLAGUELANDS_GUID+11, 16356, 0, 1967.54, -5156.13, 75.3015, 1.95477),
     (@EASTERN_PLAGUELANDS_GUID+12, 16356, 0, 1969.07, -3130.91, 84.8494, 4.46804),
     (@EASTERN_PLAGUELANDS_GUID+13, 16356, 0, 1970.84, -5116.75, 83.369, 4.04917),
@@ -2637,7 +2656,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+69, 16356, 0, 1988.02, -4748.86, 97.1419, 5.97208),
     (@EASTERN_PLAGUELANDS_GUID+70, 16356, 0, 1993.22, -3117.53, 75.8745, 2.80997),
     (@EASTERN_PLAGUELANDS_GUID+71, 16356, 0, 1995.08, -4751.53, 96.7486, 6.0744),
-    (@EASTERN_PLAGUELANDS_GUID+72, 16356, 0, 1995.68, -4765.9, 93.3008, 1.87892),
+    -- (@EASTERN_PLAGUELANDS_GUID+72, 16356, 0, 1995.68, -4765.9, 93.3008, 1.87892),
     (@EASTERN_PLAGUELANDS_GUID+73, 16356, 0, 1998.26, -3100.47, 76.1631, 4.06662),
     (@EASTERN_PLAGUELANDS_GUID+74, 16356, 0, 2287.74, -4912.95, 98.9361, 0.226893),
     (@EASTERN_PLAGUELANDS_GUID+75, 16356, 0, 2289.91, -4894.23, 105.882, 5.81195),
@@ -2736,10 +2755,17 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+173, 16401, 0, 1766.67, -3033.34, 132.888, 5.18363),
     (@EASTERN_PLAGUELANDS_GUID+174, 16401, 0, 2101.69, -4930.03, 168.364, 1.0472),
     (@EASTERN_PLAGUELANDS_GUID+175, 16421, 0, 1766.67, -3033.34, 132.888, 5.18363),
-    (@EASTERN_PLAGUELANDS_GUID+176, 16421, 0, 2101.69, -4930.03, 168.364, 1.0472);
-    
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+176 AND `event`=@EASTERN_PLAGUELANDS_EVENT;
-INSERT INTO `game_event_creature` SELECT creature.guid, @EASTERN_PLAGUELANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+176;
+    (@EASTERN_PLAGUELANDS_GUID+176, 16421, 0, 2101.69, -4930.03, 168.364, 1.0472),
+    (@EASTERN_PLAGUELANDS_GUID+177, 16356, 0, 1635.26, -3052.03, 79.3638, 2.80997),
+    (@EASTERN_PLAGUELANDS_GUID+178, 16356, 0, 1880.03, -4775.64, 118.908, 4.06662),
+    (@EASTERN_PLAGUELANDS_GUID+179, 16356, 0, 1963.06, -4740.15, 96.6595, 0.506145),
+    (@EASTERN_PLAGUELANDS_GUID+180, 16356, 0, 1983.9, -4803.06, 100.701, 3.14159),
+    (@EASTERN_PLAGUELANDS_GUID+181, 16356, 0, 1997.14, -4768.31, 92.9923, 3.03684),
+    (@EASTERN_PLAGUELANDS_GUID+182, 16356, 0, 1999.05, -4747.77, 96.9688, 4.03171),
+    (@EASTERN_PLAGUELANDS_GUID+183, 16356, 0, 2343.07, -4984.65, 71.8132, 4.06663);
+
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183 AND `event`=@EASTERN_PLAGUELANDS_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @EASTERN_PLAGUELANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183;
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+174;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
@@ -3111,7 +3137,9 @@ INSERT INTO `game_event_creature` SELECT creature.guid, @BURNING_STEPPES_EVENT F
 UPDATE `creature` SET `movement_type`='1' WHERE id IN (16438, 16437, 16422, 16423);
 UPDATE `creature` SET `wander_distance`='0' WHERE `movement_type`='0' AND `wander_distance`<>'0';
 
--- DUNGEON BOSSES
+-- =============================================
+-- Dungeon Bosses
+-- =============================================
 
 -- Prepare
 UPDATE `creature_template` SET `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (14684, 14695, 14690, 14693, 14682, 14686, 4543);
@@ -3206,8 +3234,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `creature_template` SET `level_min`='25', `level_max`='25', `health_min`='6291', `health_max`='6291', `armor`='1026', `faction`='21', `unit_flags`='64', `dmg_min`='193', `dmg_max`='271', `display_scale1`='0', `dmg_multiplier`='1', `auras`='28126', `movement_type`='0' WHERE `entry`=14682;
 UPDATE `creature` SET `position_x`='-225.131', `position_y`='2302.95', `position_z`='94.7599', `orientation`='6.02139', `movement_type`='0' WHERE `guid`=2349;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146820, 'Shadowfang Keep - Sever', 16508, 100, 1, 0, 0, 0, 5, 20, 30, 60, 0, 17745, 100, 1, 0, 0, 0, 0, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14682;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1468202, 14682, 0, 2, 0, 100, 0, 30, 0, 0, 0, 1468202, 0, 0, 'Sever - Enrage at 30\%');
+
 DELETE FROM `creature_ai_scripts` WHERE `id`=1468202;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1468202, 0, 15, 8269, 35, 0, 0, 0, 0, 6, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sever - Cast Spell Berserking');
 
@@ -3216,15 +3246,21 @@ UPDATE `creature_template` SET `display_scale1`='0', `dmg_min`='282', `dmg_max`=
 UPDATE `creature` SET `position_x`='2583.18', `position_y`='695.861', `position_z`='56.8033', `orientation`='1.8675', `movement_type`='0' WHERE `guid`=2351;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146860, 'Razorfen Downs - Lady Falther\'ess', 16838, 100, 1, 0, 0, 0, 0, 20, 20, 20, 0, 17105, 100, 1, 0, 0, 0, 0, 30, 12, 30, 0, 22743, 100, 4, 0, 0, 0, 0, 25, 5, 25, 0, 7645, 100, 4, 0, 0, 0, 10, 30, 30, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14686;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (14686, 14686, 85, 10, 0, 100, 0, 1, 10, 1, 1, 14686, 0, 0, 'Lady Falther\'ess on LOS.');
-DELETE FROM `creature_ai_scripts` WHERE `id`=14686;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-    (14686, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12429, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess yelling'),
-    (14686, 0, 22, 21, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess faction change'),
-    (14686, 0, 14, 28533, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess Demorph'),
-    (14686, 0, 15, 28126, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess add purple aura');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+    (14686, 14686, 85, 10, 0, 100, 0, 2, 10, 1, 1, 14686, 0, 0, 'Lady Falther\'ess on LOS.'),
+    (14687, 14686, 0, 21, 0, 100, 0, 0, 0, 0, 0, 14687, 0, 0, 'Lady Falther\'ess on reset.');
 
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (14686, 14687);
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+    (14687, 0, 14, 28126, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess remove purple aura'),
+    (14686, 0, 15, 28126, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess add purple aura'),
+    (14686, 0, 14, 28533, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess Demorph'),
+    (14686, 0, 22, 21, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess faction change'),
+    (14686, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12429, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess yelling');
+
+-- =============================================
 -- City Attacks
+-- =============================================
 
 DELETE FROM `conditions` WHERE `condition_entry` IN (3319,3320,3321,3322);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
@@ -3396,10 +3432,10 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (151901, 26, -8559.37, 524.217, 100.483, 100, 0, 0, 0),
     (151901, 27, -8544.85, 502.583, 98.5454, 100, 0, 0, 0),
     (151901, 28, -8535.21, 487.29, 101.279, 100, 0, 0, 0),
-    (151901, 29, -8539.38, 477.864, 102.922, 100, 0, 0, 0),
+    (151901, 29, -8539.38, 477.864, 102.922, 100, 0, 0, 151911),
     (151901, 30, -8548.45, 468.814, 104.483, 100, 0, 0, 0),
     (151901, 31, -8533.58, 448.952, 104.917, 100, 0, 0, 0),
-    (151901, 32, -8518.46, 430.065, 106.586, 100, 0, 0, 151911),
+    (151901, 32, -8518.46, 430.065, 106.586, 100, 0, 0, 0),
     (151901, 33, -8497.76, 404.19, 108.386, 100, 0, 0, 0),
     (151901, 34, -8477.23, 378.372, 112.258, 100, 0, 0, 0),
     (151901, 35, -8457.71, 353.894, 120.084, 100, 0, 0, 0),
@@ -3428,7 +3464,8 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
     (149712, 0, 10, 16432, 3600000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1583.21, 241.365, -61.994, 4.45059, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 6 at inner Trading Quarter'),
     (149713, 0, 60, 3, 15, 0, 1, 0, 0, 0, 0, 149701, 149701, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in inner Trading Quarter'),
     (151910, 0, 10, 68, 3600000, 0, 0, 0, 0, 0, 0, 2, 151910, -1, 1, -8534.62, 854.091, 106.601, 2.09439, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind City Guard 1 in the Cathedral of Light'),
-    (151911, 0, 0, 6, 0, 0, 0, 1748, 150, 8, 2, 12317, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Bolvar Fordragon: Hold the line!  Protect the King at all costs!'),
+    (151911, 0, 0, 6, 0, 0, 0, 1756, 150, 8, 2, 12316, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind Royal Guard: The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!'),
+    (151911, 10, 0, 6, 0, 0, 0, 1748, 150, 8, 2, 12317, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Bolvar Fordragon: Hold the line!  Protect the King at all costs!'),
     (151912, 0, 60, 3, 34, 0, 1, 0, 0, 0, 0, 0, 151901, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in Stormwind Keep');
 
 DELETE FROM `generic_scripts` WHERE `id` IN (149721,149722,149723,149711,149712,151910);

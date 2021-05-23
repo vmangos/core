@@ -945,7 +945,7 @@ struct ScourgeMinion : public ScriptedAI
         switch (spell->Id)
         {
         case SPELL_SPIRIT_SPAWN_OUT:
-            m_creature->DespawnOrUnsummon(2000);
+            m_creature->DespawnOrUnsummon(3000);
             break;
         }
     }
@@ -1032,7 +1032,7 @@ struct ScourgeMinion : public ScriptedAI
             return;
 
         // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
-        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->GetFactionTemplateId() != m_creature->GetFactionTemplateId())
+        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->IsHostileTo(m_creature))
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
@@ -1338,8 +1338,7 @@ struct PallidHorrorAI : public ScriptedAI
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->DoKillUnit(FLAMESHOCKER);
 
-        // Yes it really did create a random crystal on death (in 2006 and also in classic sniffs): http://casualwow.blogspot.com/2006/07/pallid-horror.html
-        m_creature->CastSpell(m_creature, PickRandomValue(SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL, SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL), true);
+        m_creature->CastSpell(m_creature, (m_creature->GetZoneId() == ZONEID_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
     }
 
@@ -1395,7 +1394,7 @@ struct PallidHorrorAI : public ScriptedAI
                 if (itr == m_flameshockers_city.end())
                 {
                     if (m_flameshockers_city.size() < 25) // A guess.
-                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, o, TEMPSUMMON_DEAD_DESPAWN, 0, true, 3000))
+                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, urand((MINUTE * IN_MILLISECONDS), ((MINUTE * IN_MILLISECONDS) * 5)), true, 3000))
                         {
                             m_flameshockers_city.emplace(i, FLAMESHOCKER->GetObjectGuid());
                             FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
