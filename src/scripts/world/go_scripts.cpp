@@ -376,16 +376,14 @@ enum
     THERAMORE_LIGHTHOUSE_SPAWN = 87737,
 
     // Event 
-    GAME_EVENT_RING_BELLS = 78,
-    EVENT_RING_BELL       = 1,
-    EVENT_TIME            = 2
+    GAME_EVENT_RING_BELLS = 78, // event is scheduled every 2 minutes and lasts 1 minute
+    EVENT_RING_BELLS       = 1,
 };
 
 struct go_bells : public GameObjectAI
 {
-    /*
-    * GO_ALLIANCE_BELL object is used for both hourly bell and lighhouse horn -> distiguish them by guid
-    */
+
+    // Object GO_ALLIANCE_BELL is used for both hourly bell and lighhouse spawns -> distiguish bell type by spawn guid 
     bool IsLighHouseHorn()
     {
         if (uint32 guidLow = me->GetGUIDLow())
@@ -394,10 +392,7 @@ struct go_bells : public GameObjectAI
             return false;
     }
 
-    /*
-    * Event 78 is scheduled every two minutes and lasts 1 minute
-    * return true if current time is within 1 minute after a full hour
-    */
+    // True if it's within 1 minute after a full hour
     bool RingHourlyBell() {
         time_t rawtime;
         time(&rawtime);
@@ -405,9 +400,7 @@ struct go_bells : public GameObjectAI
         return timeinfo->tm_min < 1;
     }
 
-    /*
-    * Hourly bell ring amount is determined by the current hour
-    */
+    // Amount of rings depents on the hour
     uint8 GetHourlyBellRingAmount() {
         time_t rawtime;
         time(&rawtime);
@@ -467,24 +460,28 @@ struct go_bells : public GameObjectAI
 
         if (sGameEventMgr.IsActiveEvent(GAME_EVENT_RING_BELLS) && shouldRun)
         {
-            shouldRun = false; // Event lasts one minute but should get triggered only once
+            shouldRun = false;
 
-            if (IsLighHouseHorn()) {
-                _events.ScheduleEvent(EVENT_RING_BELL, Seconds(1));
+            if (IsLighHouseHorn()) // every 2 minutes
+            {
+                _events.ScheduleEvent(EVENT_RING_BELLS, Seconds(1));
             }
-            else if (RingHourlyBell())
+            else if (RingHourlyBell()) // every 60 minutes
             {
                 uint8 _rings = GetHourlyBellRingAmount();
-                // Schedule ring event
                 for (auto i = 0; i < _rings; ++i)
-                    _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
+                {
+                    _events.ScheduleEvent(EVENT_RING_BELLS, Seconds(i * 4 + 1));
+                }
             }
         }
 
         while (uint32 eventId = _events.ExecuteEvent())
         {
-            if (eventId == EVENT_RING_BELL)
+            if (eventId == EVENT_RING_BELLS)
+            {
                 me->PlayDirectSound(_soundId);
+            }
         }
     }
 private:
