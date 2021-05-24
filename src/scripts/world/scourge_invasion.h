@@ -253,35 +253,37 @@ enum ScourgeInvasionNPC
 
 enum ScourgeInvasionMisc
 {
-    ITEM_NECROTIC_RUNE                      = 22484,
+    ITEM_NECROTIC_RUNE                                  = 22484,
 
     // Invisible Objects
-    GOBJ_BUTTRESS_TRAP                      = 181112, // [Guessed] These objects cannot be sniffed and are not available in any database.
+    GOBJ_BUTTRESS_TRAP                                  = 181112, // [Guessed] These objects cannot be sniffed and are not available in any database.
 
-    GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL     = 181111, // Object is not in sniffed files or any database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) should probably summon them.
-    GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON  = 181155, // ""
-    GOBJ_SUMMON_MINION_TRAP_GHOUL_SKELETON  = 181156, // ""
+    GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL                 = 181111, // Object is not in sniffed files or any database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) should probably summon them.
+    GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON              = 181155, // ""
+    GOBJ_SUMMON_MINION_TRAP_GHOUL_SKELETON              = 181156, // ""
 
     // Visible Objects
-    GOBJ_SUMMON_CIRCLE                      = 181136,
-    GOBJ_SUMMONER_SHIELD                    = 181142,
+    GOBJ_SUMMON_CIRCLE                                  = 181136,
+    GOBJ_SUMMONER_SHIELD                                = 181142,
 
-    GOBJ_UNDEAD_FIRE                        = 181173,
-    GOBJ_UNDEAD_FIRE_AURA                   = 181174,
-    GOBJ_SKULLPILE_01                       = 181191,
-    GOBJ_SKULLPILE_02                       = 181192,
-    GOBJ_SKULLPILE_03                       = 181193,
-    GOBJ_SKULLPILE_04                       = 181194,
+    GOBJ_UNDEAD_FIRE                                    = 181173,
+    GOBJ_UNDEAD_FIRE_AURA                               = 181174,
+    GOBJ_SKULLPILE_01                                   = 181191,
+    GOBJ_SKULLPILE_02                                   = 181192,
+    GOBJ_SKULLPILE_03                                   = 181193,
+    GOBJ_SKULLPILE_04                                   = 181194,
 
-    GOBJ_NECROPOLIS_TINY                    = 181154, // Necropolis (scale 1.0)
-    GOBJ_NECROPOLIS_SMALL                   = 181373, // Necropolis (scale 1.5)
-    GOBJ_NECROPOLIS_MEDIUM                  = 181374, // Necropolis (scale 2.0)
-    GOBJ_NECROPOLIS_BIG                     = 181215, // Necropolis (scale 2.5)
-    GOBJ_NECROPOLIS_HUGE                    = 181223, // Necropolis (scale 3.5)
-    GOBJ_NECROPOLIS_CITY                    = 181172, // Necropolis at the Citys (scale 2.5)
+    GOBJ_NECROPOLIS_TINY                                = 181154, // Necropolis (scale 1.0)
+    GOBJ_NECROPOLIS_SMALL                               = 181373, // Necropolis (scale 1.5)
+    GOBJ_NECROPOLIS_MEDIUM                              = 181374, // Necropolis (scale 2.0)
+    GOBJ_NECROPOLIS_BIG                                 = 181215, // Necropolis (scale 2.5)
+    GOBJ_NECROPOLIS_HUGE                                = 181223, // Necropolis (scale 3.5)
+    GOBJ_NECROPOLIS_CITY                                = 181172, // Necropolis at the Citys (scale 2.5)
 
-    //NECROPOLIS_ATTACK_TIMER                           = 60 * 1, // debug 1 min
-    NECROPOLIS_ATTACK_TIMER                             = 60 * 60, // 60 min
+    ZONE_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min
+    ZONE_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min
+    CITY_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min
+    CITY_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min
 
     ZONEID_WINTERSPRING                                 = 618,
     ZONEID_AZSHARA                                      = 16,
@@ -366,28 +368,28 @@ enum ScourgeInvasionWorldStatesVariables
     WORLDSTATE_SI_WINTERSPRING                  = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
 
     // Variables
-    VARIABLE_SI_ATTACK_ZONE1                    = 110,
-    VARIABLE_SI_ATTACK_ZONE2                    = 111,
-    VARIABLE_SI_ATTACK_ZONE3                    = 112,
-    VARIABLE_SI_ATTACK_ZONE4                    = 113,
-    VARIABLE_SI_ATTACK_ZONE5                    = 114,
-    VARIABLE_SI_ATTACK_ZONE6                    = 115,
-    VARIABLE_SI_ATTACK_TIME1                    = 116,
-    VARIABLE_SI_ATTACK_TIME2                    = 117,
-    VARIABLE_SI_ATTACK_TIME3                    = 118,
-    VARIABLE_SI_ATTACK_TIME4                    = 119,
-    VARIABLE_SI_ATTACK_TIME5                    = 120,
-    VARIABLE_SI_ATTACK_TIME6                    = 121,
-    VARIABLE_SI_ATTACK_COUNT                    = 122,
-    VARIABLE_SI_UNDERCITY_TIME                  = 123,
-    VARIABLE_SI_STORMWIND_TIME                  = 124,
+    VARIABLE_SI_ATTACK_ZONE1                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 1,
+    VARIABLE_SI_ATTACK_ZONE2                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 2,
+    VARIABLE_SI_ATTACK_ZONE3                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 3,
+    VARIABLE_SI_ATTACK_ZONE4                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 4,
+    VARIABLE_SI_ATTACK_ZONE5                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 5,
+    VARIABLE_SI_ATTACK_ZONE6                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 6,
+    VARIABLE_SI_ATTACK_TIME1                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 11,
+    VARIABLE_SI_ATTACK_TIME2                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 12,
+    VARIABLE_SI_ATTACK_TIME3                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 13,
+    VARIABLE_SI_ATTACK_TIME4                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 14,
+    VARIABLE_SI_ATTACK_TIME5                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 15,
+    VARIABLE_SI_ATTACK_TIME6                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 16,
+    VARIABLE_SI_ATTACK_COUNT                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 0,
+    VARIABLE_SI_UNDERCITY_TIME                  = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_UNDERCITY,
+    VARIABLE_SI_STORMWIND_TIME                  = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_STORMWIND,
 
-    VARIABLE_SI_WINTERSPRING_REMAINING          = 30,
-    VARIABLE_SI_AZSHARA_REMAINING               = 31,
-    VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING   = 32,
-    VARIABLE_SI_BLASTED_LANDS_REMAINING         = 33,
-    VARIABLE_SI_BURNING_STEPPES_REMAINING       = 34,
-    VARIABLE_SI_TANARIS_REMAINING               = 35
+    VARIABLE_SI_WINTERSPRING_REMAINING          = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_WINTERSPRING,
+    VARIABLE_SI_AZSHARA_REMAINING               = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_AZSHARA,
+    VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING   = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS,
+    VARIABLE_SI_BLASTED_LANDS_REMAINING         = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS,
+    VARIABLE_SI_BURNING_STEPPES_REMAINING       = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES,
+    VARIABLE_SI_TANARIS_REMAINING               = (GAME_EVENT_SCOURGE_INVASION * 1000) + GAME_EVENT_SCOURGE_INVASION_TANARIS
 };
 
 enum ScourgeInvasionQuests

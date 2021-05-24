@@ -45,7 +45,7 @@ Unit* SelectRandomFlameshockerSpawnTarget(Creature* pUnit, Unit* except, float r
 
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if (!(*tIter)->IsFlying() || !(*tIter)->IsSwimming() || (*tIter)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) || (*tIter)->GetZoneId() != pUnit->GetZoneId() || (*tIter)->FindNearestCreature(NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
+        if (!(*tIter)->IsCreature() || !(*tIter)->ToCreature()->CanSummonGuards() || (*tIter)->GetZoneId() != pUnit->GetZoneId() || (*tIter)->FindNearestCreature(NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
         {
             std::list<Unit*>::iterator tIter2 = tIter;
             ++tIter;
@@ -423,9 +423,33 @@ struct NecropolisHealthAI : public ScriptedAI
         if (Creature* NECROPOLIS = m_creature->FindNearestCreature(NPC_NECROPOLIS, ATTACK_DISTANCE))
             m_creature->CastSpell(NECROPOLIS, SPELL_DESPAWNER_OTHER, true);
 
-        int numb = sObjectMgr.GetSavedVariable(m_creature->GetZoneId());
+        int TEMP_SI_ATTACK_ZONE = 0;
+
+        switch (m_creature->GetZoneId())
+        {
+        case ZONEID_TANARIS:
+            TEMP_SI_ATTACK_ZONE = VARIABLE_SI_TANARIS_REMAINING;
+            break;
+        case ZONEID_BLASTED_LANDS:
+            TEMP_SI_ATTACK_ZONE = VARIABLE_SI_BLASTED_LANDS_REMAINING;
+            break;
+        case ZONEID_EASTERN_PLAGUELANDS:
+            TEMP_SI_ATTACK_ZONE = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
+            break;
+        case ZONEID_BURNING_STEPPES:
+            TEMP_SI_ATTACK_ZONE = VARIABLE_SI_BURNING_STEPPES_REMAINING;
+            break;
+        case ZONEID_WINTERSPRING:
+            TEMP_SI_ATTACK_ZONE = VARIABLE_SI_WINTERSPRING_REMAINING;
+            break;
+        case ZONEID_AZSHARA:
+            TEMP_SI_ATTACK_ZONE = VARIABLE_SI_AZSHARA_REMAINING;
+            break;
+        }
+
+        int numb = sObjectMgr.GetSavedVariable(TEMP_SI_ATTACK_ZONE);
         if (numb > 0)
-            sObjectMgr.SetSavedVariable(m_creature->GetZoneId(), (numb - 1), true);
+            sObjectMgr.SetSavedVariable(TEMP_SI_ATTACK_ZONE, (numb - 1), true);
     }
 
     void SpellHitTarget(Unit* target, SpellEntry const* spell) override
@@ -1368,6 +1392,14 @@ struct PallidHorrorAI : public ScriptedAI
 
         m_creature->CastSpell(m_creature, (m_creature->GetZoneId() == ZONEID_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
+
+        time_t now = time(nullptr);
+        uint32 CITY_ATTACK_TIMER = urand(ZONE_ATTACK_TIMER_MIN, ZONE_ATTACK_TIMER_MAX);
+        time_t next_attack = now + CITY_ATTACK_TIMER;
+        time_t timeToNextAttack = next_attack - now;
+        uint32 index = m_creature->GetZoneId() == ZONEID_UNDERCITY ? VARIABLE_SI_UNDERCITY_TIME : VARIABLE_SI_STORMWIND_TIME;
+        sObjectMgr.SetSavedVariable(index, now + CITY_ATTACK_TIMER, true);
+        sLog.outBasic("[Scourge Invasion Event] The Scourge has been defeated in %s, next attack starting in %d minutes", m_creature->GetZoneId() == ZONEID_UNDERCITY ? "Undercity" : "Stormwind", uint32(timeToNextAttack / 60));
     }
 
     void SummonedCreatureJustDied(Creature* unit) override
@@ -1390,13 +1422,6 @@ struct PallidHorrorAI : public ScriptedAI
         for (const auto& guid : m_flameshockers)
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->AddObjectToRemoveList();
-
-        time_t now = time(nullptr);
-        time_t CITY_ATTACK_TIMER = (60 * (urand(45, 60))); // 45 - 60 Min
-        time_t next_attack = now + CITY_ATTACK_TIMER;
-        time_t timeToNextAttack = next_attack - now;
-        sObjectMgr.SetSavedVariable(m_creature->GetZoneId() == ZONEID_UNDERCITY ? VARIABLE_SI_UNDERCITY_TIME : VARIABLE_SI_STORMWIND_TIME, now + CITY_ATTACK_TIMER, true);
-        sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next city attack starting in %d minutes", m_creature->GetZoneId(), uint32(timeToNextAttack / 60));
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1423,7 +1448,7 @@ struct PallidHorrorAI : public ScriptedAI
                     if (Unit* pTarget = SelectRandomFlameshockerSpawnTarget(m_creature, (Unit*) nullptr, VISIBILITY_DISTANCE_GIGANTIC))
                     {
                         float x, y, z;
-                        pTarget->GetNearPoint(pTarget, x, y, z, 0, 5.0f, 0);
+                        pTarget->GetNearPoint(pTarget, x, y, z, 5.0f, 5.0f, 0);
                         if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, urand((MINUTE * IN_MILLISECONDS), ((MINUTE * IN_MILLISECONDS) * 5)), true, 3000))
                         {
                             m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
