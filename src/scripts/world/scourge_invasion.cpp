@@ -31,6 +31,43 @@ bool IsGuardOrBoss(Unit* pUnit) {
         pUnit->GetEntry() == NPC_STORMWIND_CITY_GUARD || pUnit->GetEntry() == NPC_HIGHLORD_BOLVAR_FORDRAGON || pUnit->GetEntry() == NPC_LADY_SYLVANAS_WINDRUNNER || pUnit->GetEntry() == NPC_VARIMATHRAS;
 }
 
+Unit* SelectRandomFlameshockerSpawnTarget(Creature* pUnit, Unit* except, float radius)
+{
+    std::list<Unit*> targets;
+
+    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pUnit, pUnit, radius);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+    Cell::VisitAllObjects(pUnit, searcher, radius);
+
+    // remove current target
+    if (except)
+        targets.remove(except);
+
+    for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        if (!(*tIter)->IsFlying() || !(*tIter)->IsSwimming() || (*tIter)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) || (*tIter)->GetZoneId() != pUnit->GetZoneId() || (*tIter)->FindNearestCreature(NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
+        {
+            std::list<Unit*>::iterator tIter2 = tIter;
+            ++tIter;
+            targets.erase(tIter2);
+        }
+        else
+            ++tIter;
+    }
+
+    // no appropriate targets
+    if (targets.empty())
+        return nullptr;
+
+    // select random
+    uint32 rIdx = urand(0, targets.size() - 1);
+    std::list<Unit*>::const_iterator tcIter = targets.begin();
+    for (uint32 i = 0; i < rIdx; ++i)
+        ++tcIter;
+
+    return *tcIter;
+}
+
 void ChangeZoneEventStatus(Creature* mouth, bool on)
 {
     if (!mouth)
@@ -1278,16 +1315,7 @@ struct PallidHorrorAI : public ScriptedAI
 {
     EventMap m_events;
 
-    bool b_citizens = false;
-    bool b_bolvar = false;
     std::set<ObjectGuid> m_flameshockers;
-    std::unordered_map<uint32, ObjectGuid> m_flameshockers_city;
-    std::set<ObjectGuid> m_cathedral_stormwind_city_guard;
-    std::set<ObjectGuid> m_trade_district_stormwind_elite_guards;
-
-    uint32 LastWayPoint = 1;
-    uint32 NextWayPoint = 0;
-    uint32 SpawnLocationID = 0;
 
     PallidHorrorAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -1342,12 +1370,33 @@ struct PallidHorrorAI : public ScriptedAI
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
     }
 
+    void SummonedCreatureJustDied(Creature* unit) override
+    {
+        // Remove dead Flameshockers here to respawn them if needed.
+        if (m_flameshockers.find(unit->GetObjectGuid()) != m_flameshockers.end())
+            m_flameshockers.erase(unit->GetObjectGuid());
+    }
+
+    void SummonedCreatureDespawn(Creature* unit) override
+    {
+        // Remove despawned Flameshockers here to respawn them if needed.
+        if (m_flameshockers.find(unit->GetObjectGuid()) != m_flameshockers.end())
+            m_flameshockers.erase(unit->GetObjectGuid());
+    }
+
     void OnRemoveFromWorld() override
     {
         // Remove all custom summoned Flameshockers.
         for (const auto& guid : m_flameshockers)
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->AddObjectToRemoveList();
+
+        time_t now = time(nullptr);
+        time_t CITY_ATTACK_TIMER = (60 * (urand(45, 60))); // 45 - 60 Min
+        time_t next_attack = now + CITY_ATTACK_TIMER;
+        time_t timeToNextAttack = next_attack - now;
+        sObjectMgr.SetSavedVariable(m_creature->GetZoneId() == ZONEID_UNDERCITY ? VARIABLE_SI_UNDERCITY_TIME : VARIABLE_SI_STORMWIND_TIME, now + CITY_ATTACK_TIMER, true);
+        sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next city attack starting in %d minutes", m_creature->GetZoneId(), uint32(timeToNextAttack / 60));
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1369,36 +1418,20 @@ struct PallidHorrorAI : public ScriptedAI
                 break;
             case EVENT_PALLID_SUMMON_FLAMESHOCKER:
             {
-                // Remove all despawned Flameshockers.
-                for (auto itr = m_flameshockers_city.begin(); itr != m_flameshockers_city.end();)
+                if (m_flameshockers.size() < 30)
                 {
-                    if (!m_creature->GetMap()->GetCreature(itr->second))
-                        itr = m_flameshockers_city.erase(itr);
-
-                    ++itr;
-                }
-
-                uint32 i = m_creature->GetZoneId() == ZONEID_UNDERCITY ? urand(1, 66) : urand(1, 27);
-                
-                float x, y, z, o;
-                
-                x = m_creature->GetZoneId() == ZONEID_UNDERCITY ? UNDERCITY_FLAMESHOCKERS[i].x : STORMWIND_FLAMESHOCKERS[i].x;
-                y = m_creature->GetZoneId() == ZONEID_UNDERCITY ? UNDERCITY_FLAMESHOCKERS[i].y : STORMWIND_FLAMESHOCKERS[i].y;
-                z = m_creature->GetZoneId() == ZONEID_UNDERCITY ? UNDERCITY_FLAMESHOCKERS[i].z : STORMWIND_FLAMESHOCKERS[i].z;
-                o = m_creature->GetZoneId() == ZONEID_UNDERCITY ? UNDERCITY_FLAMESHOCKERS[i].o : STORMWIND_FLAMESHOCKERS[i].o;
-                
-                auto itr = m_flameshockers_city.find(i);
-                if (itr == m_flameshockers_city.end())
-                {
-                    if (m_flameshockers_city.size() < 10) // A guess.
-                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, urand((MINUTE * IN_MILLISECONDS), ((MINUTE * IN_MILLISECONDS) * 5)), true, 3000))
+                    if (Unit* pTarget = SelectRandomFlameshockerSpawnTarget(m_creature, (Unit*) nullptr, VISIBILITY_DISTANCE_GIGANTIC))
+                    {
+                        float x, y, z;
+                        pTarget->GetNearPoint(pTarget, x, y, z, 0, 5.0f, 0);
+                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, urand((MINUTE * IN_MILLISECONDS), ((MINUTE * IN_MILLISECONDS) * 5)), true, 3000))
                         {
-                            m_flameshockers_city.emplace(i, FLAMESHOCKER->GetObjectGuid());
+                            m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
                             FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
                         }
+                    }
                 }
-
-                m_events.ScheduleEvent(EVENT_PALLID_SUMMON_FLAMESHOCKER, 5000);
+                m_events.ScheduleEvent(EVENT_PALLID_SUMMON_FLAMESHOCKER, 2000);
             }
             break;
             }

@@ -765,12 +765,6 @@ void ScourgeInvasionEvent::Update()
     if (!invasion2Loaded)
         invasion2Loaded = OnEnable(VARIABLE_SI_ATTACK_ZONE2, VARIABLE_SI_ATTACK_TIME2);
 
-    // Waiting until both invasions have been loaded. OnEnable will return true
-    // if no invasions are supposed to be started, so this will only be the case if any of the 
-    // maps required for a current invasionZone were not yet loaded
-    if (!invasion1Loaded || !invasion2Loaded)
-        return;
-
     time_t now = time(nullptr);
 
     for (CityAttack& zone : attackPoints)
@@ -788,6 +782,12 @@ void ScourgeInvasionEvent::Update()
         else if (PallidAlive == 0 && zone.zoneId == ZONEID_STORMWIND)
             HandleActiveCity(VARIABLE_SI_STORMWIND_TIME, now, zone.zoneId);
     }
+
+    // Waiting until both invasions have been loaded. OnEnable will return true
+    // if no invasions are supposed to be started, so this will only be the case if any of the 
+    // maps required for a current invasionZone were not yet loaded
+    if (!invasion1Loaded || !invasion2Loaded)
+        return;
 
     for (InvasionZone& zone : invasionPoints)
     {
@@ -823,6 +823,7 @@ void ScourgeInvasionEvent::Update()
             HandleActiveZone(VARIABLE_SI_ATTACK_TIME6, VARIABLE_SI_ATTACK_ZONE6, zone.remainingVar, now, zone.zoneId);
 
         sObjectMgr.SetSavedVariable(zone.remainingVar, NecropolisAlive, true);
+        sObjectMgr.SetSavedVariable(zone.zoneId, NecropolisAlive, true);
     }
 
     UpdateWorldState();
@@ -890,14 +891,6 @@ void ScourgeInvasionEvent::Disable()
     sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0, true);
 
-    /*
-    sObjectMgr.SetSavedVariable(VARIABLE_AZSHARA_NECROPOLIS_REMAINING, 0, true);
-    sObjectMgr.SetSavedVariable(VARIABLE_BLASTED_LANDS_NECROPOLIS_REMAINING, 0, true);
-    sObjectMgr.SetSavedVariable(VARIABLE_BURNING_STEPPES_NECROPOLIS_REMAINING, 0, true);
-    sObjectMgr.SetSavedVariable(VARIABLE_EASTERN_PLAGUELANDS_NECROPOLIS_REMAINING, 0, true);
-    sObjectMgr.SetSavedVariable(VARIABLE_TANARIS_NECROPOLIS_REMAINING, 0, true);
-    sObjectMgr.SetSavedVariable(VARIABLE_WINTERSPRING_NECROPOLIS_REMAINING, 0, true);
-    */
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
     sGameEventMgr.StopEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
@@ -966,20 +959,10 @@ void ScourgeInvasionEvent::HandleActiveCity(uint32 attackTimeVar, time_t now, ui
 
     Creature* pPallid = pMap->GetCreature(zone->pallidGuid);
 
-    if (!pPallid)
-    {
-        StartNewCityAttackIfTime(attackTimeVar, zoneId);
-    }
     // if previous remaining variable for this zone was not already 0, and the timer for next
     // attack is less than now, its time to set it for next attack
-    else if (t < now && pPallid && pPallid->IsDead())
-    {
-        time_t next_attack = now + CITY_ATTACK_TIMER;
-        time_t timeToNextAttack = next_attack - now;
-        sObjectMgr.SetSavedVariable(attackTimeVar, now + CITY_ATTACK_TIMER, true);
-
-        sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next city attack starting in %d minutes", zoneId, uint32(timeToNextAttack / 60));
-    }
+    if (!pPallid && t < now)
+        StartNewCityAttackIfTime(attackTimeVar, zoneId);
 }
 
 // Will return false if we were supposed to resume an invasion, but ResumeInvasion() returned false.
