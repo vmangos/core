@@ -569,6 +569,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    if (me->HasUnitState(UNIT_STAT_DIED) && me->HasAuraType(SPELL_AURA_FEIGN_DEATH) &&
+       !me->IsInCombat() && (!me->GetPet() || !me->GetPet()->IsInCombat()) &&
+       !me->SelectRandomUnfriendlyTarget(nullptr, 20.0f, false, true))
+        me->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
+
     if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         return;
 
