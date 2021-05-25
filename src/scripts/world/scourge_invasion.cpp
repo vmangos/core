@@ -1093,7 +1093,7 @@ struct ScourgeMinion : public ScriptedAI
             return;
 
         // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
-        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->GetVictim()->IsHostileTo(m_creature))
+        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->IsValidAttackTarget(m_creature->GetVictim(), true))
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
@@ -1394,7 +1394,7 @@ struct PallidHorrorAI : public ScriptedAI
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
 
         time_t now = time(nullptr);
-        uint32 CITY_ATTACK_TIMER = urand(ZONE_ATTACK_TIMER_MIN, ZONE_ATTACK_TIMER_MAX);
+        uint32 CITY_ATTACK_TIMER = urand(CITY_ATTACK_TIMER_MIN, CITY_ATTACK_TIMER_MAX);
         time_t next_attack = now + CITY_ATTACK_TIMER;
         time_t timeToNextAttack = next_attack - now;
         uint32 index = m_creature->GetZoneId() == ZONEID_UNDERCITY ? VARIABLE_SI_UNDERCITY_TIME : VARIABLE_SI_STORMWIND_TIME;

@@ -252,12 +252,11 @@ private:
     bool undercityLoaded;
     bool stormwindLoaded;
 
-    void HandleActiveZone(uint32 attackTimeVar, uint32 attackZoneVar, uint32 remainingVar, time_t now, uint32 zoneId);
+    void HandleActiveZone(uint32 attackTimeVar, uint32 zoneId, uint32 remainingVar, time_t now);
     void HandleActiveCity(uint32 attackTimeVar, time_t now, uint32 zoneId);
 
-    bool OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
+    bool OnEnable(uint32 zoneId, uint32 attackTimeVar);
 
-    void StartNewInvasion(uint32 zoneVariable, uint32 zoneid);
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
     void StartNewCityAttackIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
@@ -270,7 +269,7 @@ private:
     uint32 GetActiveZones();
     InvasionZone* GetInvasionZone(uint32 zoneId);
     CityAttack* GetCityZone(uint32 zoneId);
-    uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
+    uint32 GetNewRandomZone();
 
     void UpdateWorldState();
 
