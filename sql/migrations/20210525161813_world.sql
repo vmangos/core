@@ -18,6 +18,12 @@ UPDATE `pool_gameobject` SET `pool_entry`=1033 WHERE `guid` IN (4831, 15484, 154
 -- Copper Veins in Desolace wrongfully assigned to Stonetalon pool.
 UPDATE `pool_gameobject` SET `pool_entry`=1139 WHERE `guid` IN (4737, 5047, 5416, 20647, 20646, 20645, 34159);
 
+-- Copper Vein in Barrens wrongfully assigned to Mulgore pool.
+UPDATE `pool_gameobject` SET `pool_entry`=1033 WHERE `guid`=15453;
+
+-- Copper Veins in Durotar wrongfully assigned to Barrens pool.
+UPDATE `pool_gameobject` SET `pool_entry`=1024 WHERE `guid` IN (4948, 5191, 4963);
+
 
 -- End of migration.
 END IF;
