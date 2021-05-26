@@ -575,9 +575,7 @@ bool ToastingGoblets::ShouldEnable() const
 }
 
 ScourgeInvasionEvent::ScourgeInvasionEvent()
-    :WorldEvent(GAME_EVENT_SCOURGE_INVASION),
-    invasion1Loaded(false),
-    invasion2Loaded(false)
+    :WorldEvent(GAME_EVENT_SCOURGE_INVASION)
 {
     memset(&previousRemainingCounts[0], -1, sizeof(int) * 6);
 
@@ -732,20 +730,6 @@ void ScourgeInvasionEvent::Update()
     if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
         sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION, true);
 
-    if (GetActiveZones() >= 2)
-    {
-        invasion1Loaded = true;
-        invasion2Loaded = true;
-    }
-
-    /*
-    if (!invasion1Loaded)
-        invasion1Loaded = OnEnable(VARIABLE_SI_ATTACK_ZONE1, VARIABLE_SI_ATTACK_TIME1);
-
-    if (!invasion2Loaded)
-        invasion2Loaded = OnEnable(VARIABLE_SI_ATTACK_ZONE2, VARIABLE_SI_ATTACK_TIME2);
-*/
-
     time_t now = time(nullptr);
     uint32 victories = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
 
@@ -760,7 +744,7 @@ void ScourgeInvasionEvent::Update()
     // Waiting until both invasions have been loaded. OnEnable will return true
     // if no invasions are supposed to be started, so this will only be the case if any of the 
     // maps required for a current invasionZone were not yet loaded
-    if (!invasion1Loaded || !invasion2Loaded)
+    if (!invasion1Loaded || !invasion2Loaded || !invasion3Loaded || !invasion4Loaded || !invasion5Loaded || !invasion6Loaded)
         return;
 
     for (InvasionZone& zone : invasionPoints)
@@ -793,6 +777,8 @@ void ScourgeInvasionEvent::Update()
         HandleActiveZone(TEMP_SI_ATTACK_TIME, zone.zoneId, zone.remainingVar, now);
     }
 
+    HandleDefendedZones();
+
     UpdateWorldState();
 }
 
@@ -804,11 +790,11 @@ uint32 ScourgeInvasionEvent::GetNextUpdateDelay()
 void ScourgeInvasionEvent::Enable()
 { 
     invasion1Loaded = OnEnable(ZONEID_TANARIS, VARIABLE_TANARIS_ATTACK_TIME);
-    invasion1Loaded = OnEnable(ZONEID_BLASTED_LANDS, VARIABLE_BLASTED_LANDS_ATTACK_TIME);
-    invasion1Loaded = OnEnable(ZONEID_EASTERN_PLAGUELANDS, VARIABLE_EASTERN_PLAGUELANDS_ATTACK_TIME);
-    invasion2Loaded = OnEnable(ZONEID_BURNING_STEPPES, VARIABLE_BURNING_STEPPES_ATTACK_TIME);
-    invasion2Loaded = OnEnable(ZONEID_WINTERSPRING, VARIABLE_WINTERSPRING_ATTACK_TIME);
-    invasion2Loaded = OnEnable(ZONEID_AZSHARA, VARIABLE_AZSHARA_ATTACK_TIME);
+    invasion2Loaded = OnEnable(ZONEID_BLASTED_LANDS, VARIABLE_BLASTED_LANDS_ATTACK_TIME);
+    invasion3Loaded = OnEnable(ZONEID_EASTERN_PLAGUELANDS, VARIABLE_EASTERN_PLAGUELANDS_ATTACK_TIME);
+    invasion4Loaded = OnEnable(ZONEID_BURNING_STEPPES, VARIABLE_BURNING_STEPPES_ATTACK_TIME);
+    invasion5Loaded = OnEnable(ZONEID_WINTERSPRING, VARIABLE_WINTERSPRING_ATTACK_TIME);
+    invasion6Loaded = OnEnable(ZONEID_AZSHARA, VARIABLE_AZSHARA_ATTACK_TIME);
 
     UpdateWorldState();
 }
@@ -896,37 +882,32 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId,
     Creature* pMouth = pMap->GetCreature(zone->mouthGuid);
 
     if (zone->zoneId != zoneId)
-        sLog.outBasic("[ScourgeInvasionEvent::HandleActiveZone] zone->zoneId is %d but should be same as zoneId: %d.", zone->zoneId, zoneId);
+        return;
 
     // Calculate the next possible attack between ZONE_ATTACK_TIMER_MIN and ZONE_ATTACK_TIMER_MAX.
     uint32 ZONE_ATTACK_TIMER = urand(ZONE_ATTACK_TIMER_MIN, ZONE_ATTACK_TIMER_MAX);
     time_t next_attack = now + ZONE_ATTACK_TIMER;
     time_t timeToNextAttack = next_attack - now;
 
-    // Handles the inactive zone, without a Mouth of Kel'Thuzad (which spawns the whole zone event).
+    // Handles the inactive zone, without a Mouth of Kel'Thuzad summoned (which spawns the whole zone event).
     if (!pMouth)
     {
         // If more than one zones are alreay being attacked, set the timer again to ZONE_ATTACK_TIMER.
         if (GetActiveZones() > 1)
         {
             time_t newtimeToNextAttack = t - now;
-            
             sObjectMgr.SetSavedVariable(attackTimeVar, now + ZONE_ATTACK_TIMER, true);
-
-            sLog.outBasic("[ScourgeInvasionEvent::HandleActiveZone] Next attack in %d in %d seconds", zone->zoneId, uint32(newtimeToNextAttack));
         }
 
         // Try to start the zone if attackTimeVar is 0.
         StartNewInvasionIfTime(attackTimeVar, zoneId);
     }
-    // Handles every zone 
+    // Handles the active zone that has no necropolis left.
     else if (t < now && sObjectMgr.GetSavedVariable(remainingVar) == 0)
     {
         sObjectMgr.SetSavedVariable(attackTimeVar, now + ZONE_ATTACK_TIMER, true);
         sObjectMgr.SetSavedVariable(VARIABLE_SI_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT) + 1, true);
         sObjectMgr.SetSavedVariable(VARIABLE_SI_LATEST_ATTACK_ZONE, zoneId, true);
-
-        HandleDefendedZones();
 
         sLog.outBasic("[Scourge Invasion Event] The Scourge has been defeated in %d, next attack starting in %d minutes", zoneId, uint32(timeToNextAttack / 60));
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT));
@@ -959,7 +940,6 @@ void ScourgeInvasionEvent::HandleActiveCity(uint32 attackTimeVar, time_t now, ui
 bool ScourgeInvasionEvent::OnEnable(uint32 zoneId, uint32 attackTimeVar)
 {
     uint32 current1 = zoneId;
-    HandleDefendedZones();
 
     if (!isValidZoneId(current1))
     {
@@ -1047,7 +1027,7 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     if (GetActiveZones() > 1 && sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT) > 0)
         return;
 
-    sLog.outBasic("[Scourge Invasion Event] Starting new invasion in zone %d", zoneId);
+    sLog.outBasic("[Scourge Invasion Event] Starting new invasion in %d", zoneId);
 
     InvasionZone* zone = GetInvasionZone(zoneId);
 
@@ -1062,15 +1042,10 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
         return;
     }
 
-    uint32 num_necropolises_remaining = 0;
-
     if (mapPtr && SummonMouth(mapPtr, zone, zone->mouth[0]))
-        num_necropolises_remaining = zone->necroAmount;
+        sObjectMgr.SetSavedVariable(zone->remainingVar, zone->necroAmount, true);
     else
         sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d", zone->map);
-
-    // Setting num remaining directly
-    sObjectMgr.SetSavedVariable(zone->remainingVar, num_necropolises_remaining, true);
 }
 
 // Will return false if a required map was not available. In all other cases returns true.
@@ -1195,7 +1170,7 @@ bool ScourgeInvasionEvent::isActiveZone(uint32 zoneId)
 
 uint32 ScourgeInvasionEvent::GetActiveZones()
 {
-    int activeInvasions = 0;
+    int i = 0;
     for (const auto& invasionPoint : invasionPoints)
     {
         Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
@@ -1207,9 +1182,9 @@ uint32 ScourgeInvasionEvent::GetActiveZones()
         
         Creature* pMouth = mapPtr->GetCreature(invasionPoint.mouthGuid);
         if (pMouth)
-            activeInvasions++;
+            i++;
     }
-    return activeInvasions;
+    return i;
 }
 
 ScourgeInvasionEvent::CityAttack* ScourgeInvasionEvent::GetCityZone(uint32 zoneId)
@@ -1232,31 +1207,6 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetInvasionZone(uint32
     }
     sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
     return nullptr;
-}
-
-uint32 ScourgeInvasionEvent::GetNewRandomZone()
-{
-    std::vector<uint32> validZones;
-    for (const auto& invasionPoint : invasionPoints)
-    {
-        Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
-
-        if (!mapPtr)
-            continue;
-
-        Creature* pMouth = mapPtr->GetCreature(invasionPoint.mouthGuid);
-
-        if (!pMouth)
-            validZones.push_back(invasionPoint.zoneId);
-    }
-
-    if (validZones.empty())
-    {
-        sLog.outError("ScourgeInvasionEvent::GetNewRandomZone no valid zones");
-        return 0;
-    }
-    
-    return validZones[urand(0, validZones.size() - 1)];
 }
 
 void ScourgeInvasionEvent::UpdateWorldState()

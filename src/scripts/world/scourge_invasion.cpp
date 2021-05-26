@@ -1350,7 +1350,7 @@ struct PallidHorrorAI : public ScriptedAI
             for (int i = 0; i < amountShockers; ++i)
                 if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * IN_MILLISECONDS, true))
                 {
-                    float angle = (float(i) * (M_PI / (amountShockers / 2))) + m_creature->GetOrientation();
+                    float angle = (float(i) * (M_PI / (amountShockers / static_cast<float>(2)))) + m_creature->GetOrientation();
                     FLAMESHOCKER->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
                     FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
                     m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());

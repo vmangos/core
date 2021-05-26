@@ -248,6 +248,10 @@ private:
 
     bool invasion1Loaded;
     bool invasion2Loaded;
+    bool invasion3Loaded;
+    bool invasion4Loaded;
+    bool invasion5Loaded;
+    bool invasion6Loaded;
 
     bool undercityLoaded;
     bool stormwindLoaded;
@@ -269,7 +273,6 @@ private:
     uint32 GetActiveZones();
     InvasionZone* GetInvasionZone(uint32 zoneId);
     CityAttack* GetCityZone(uint32 zoneId);
-    uint32 GetNewRandomZone();
 
     void UpdateWorldState();
 

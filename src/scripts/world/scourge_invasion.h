@@ -25,9 +25,6 @@ enum ScourgeInvasionSpells
 {
     SPELL_SPIRIT_PARTICLES_PURPLE               = 28126, // Purple Minions Aura.
 
-    // Mouth of Kel'Thuzad?
-    SPELL_CANCEL_MOUTH_SPAWNS                   = 29500, // Not sure what it does.
-
     // GameObject Necropolis
     SPELL_SUMMON_NECROPOLIS_CRITTERS            = 27866, // Spawns NPCs Necropolis Health and Necropolis.
 
