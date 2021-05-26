@@ -183,6 +183,17 @@ void PlayerBotMgr::OnPlayerInWorld(Player* player)
     }
 }
 
+PlayerBotEntry* PlayerBotMgr::GetBotWithName(std::string name)
+{
+    for (const auto& itr : m_bots)
+    {
+        if (itr.second->name == name)
+            return itr.second;
+    }
+
+    return nullptr;
+}
+
 void PlayerBotMgr::Update(uint32 diff)
 {
     // Temporary bots.
