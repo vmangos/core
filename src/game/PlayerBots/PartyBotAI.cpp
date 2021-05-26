@@ -123,7 +123,7 @@ void PartyBotAI::LearnPremadeSpecForClass()
         }
     }
     
-    if (m_level > 1 && !foundspec))
+    if (m_level > 1 && !foundspec)
     {
         // Third attempt. Check for lower level specs. Better than nothing.
         for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
