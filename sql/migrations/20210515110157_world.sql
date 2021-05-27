@@ -348,6 +348,8 @@ UPDATE `quest_template` SET `RequiredSkill` = 165, `RequiredSkillValue` = 1, `Pr
 -- Gordok Courtyard Key should not drop from trash mobs                                            
 DELETE FROM `creature_loot_template` WHERE `item` = 18266;
 
+-- Add correct Items to Vendor Ranik
+UPDATE `npc_vendor` SET `item` = 6275 WHERE `entry` = 3499 AND `item` = 2675;
 
 -- End of migration.
 END IF;
