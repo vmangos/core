@@ -575,7 +575,13 @@ bool ToastingGoblets::ShouldEnable() const
 }
 
 ScourgeInvasionEvent::ScourgeInvasionEvent()
-    :WorldEvent(GAME_EVENT_SCOURGE_INVASION)
+    :WorldEvent(GAME_EVENT_SCOURGE_INVASION),
+    invasion1Loaded(false),
+    invasion2Loaded(false),
+    invasion3Loaded(false),
+    invasion4Loaded(false),
+    invasion5Loaded(false),
+    invasion6Loaded(false)
 {
     memset(&previousRemainingCounts[0], -1, sizeof(int) * 6);
 
@@ -746,6 +752,24 @@ void ScourgeInvasionEvent::Update()
     // maps required for a current invasionZone were not yet loaded
     if (!invasion1Loaded || !invasion2Loaded || !invasion3Loaded || !invasion4Loaded || !invasion5Loaded || !invasion6Loaded)
         return;
+
+    if (!invasion1Loaded)
+        invasion1Loaded = OnEnable(ZONEID_TANARIS, VARIABLE_TANARIS_ATTACK_TIME);
+
+    if (!invasion2Loaded)
+        invasion2Loaded = OnEnable(ZONEID_BLASTED_LANDS, VARIABLE_BLASTED_LANDS_ATTACK_TIME);
+
+    if (!invasion3Loaded)
+        invasion3Loaded = OnEnable(ZONEID_EASTERN_PLAGUELANDS, VARIABLE_EASTERN_PLAGUELANDS_ATTACK_TIME);
+
+    if (!invasion4Loaded)
+        invasion4Loaded = OnEnable(ZONEID_BURNING_STEPPES, VARIABLE_BURNING_STEPPES_ATTACK_TIME);
+
+    if (!invasion5Loaded)
+        invasion5Loaded = OnEnable(ZONEID_WINTERSPRING, VARIABLE_WINTERSPRING_ATTACK_TIME);
+
+    if (!invasion6Loaded)
+        invasion6Loaded = OnEnable(ZONEID_AZSHARA, VARIABLE_AZSHARA_ATTACK_TIME);
 
     for (InvasionZone& zone : invasionPoints)
     {

@@ -259,25 +259,6 @@ uint32 GetFindersAmount(Creature* shard)
 }
 
 /*
-SkullPile unused
-*/
-class GoSkullPile : public GameObjectAI
-{
-public:
-    GoSkullPile(GameObject* go) : GameObjectAI(go)
-    {
-        // Skull piles are always random entries, UpdateEntry would be nice for gobjects.
-        me->SetEntry(PickRandomValue(GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04));
-        me->UpdateModel();
-    }
-};
-
-GameObjectAI* GetAI_GoSkullPile(GameObject* go)
-{
-    return new GoSkullPile(go);
-}
-
-/*
 Circle
 */
 class GoCircle : public GameObjectAI
@@ -1541,11 +1522,6 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "scourge_invasion_minion";
     newscript->GetAI = &GetAI_ScourgeMinion;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_go_skullpile";
-    newscript->GOGetAI = &GetAI_GoSkullPile;
     newscript->RegisterSelf();
 
     newscript = new Script;
