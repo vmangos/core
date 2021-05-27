@@ -91,6 +91,7 @@ enum ScourgeInvasionSpells
     SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
     SPELL_CONTROLLER_TIMER                      = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (We don't know who is casting this yet)
     SPELL_DESPAWNER_SELF                        = 28091, // Trigger from Spell above.
+    SPELL_SUMMON_SCOURGE_CONTROLLER             = 28092,
 
     // Minion Abilities
     SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
@@ -168,6 +169,7 @@ enum ScourgeInvasionSpells
         SPELL_PH_CRYSTAL_CORPSE_TIMER                   = 28018, // Triggers 28020 ([PH] Crystal Corpse Despawn) after 2 hours.
         SPELL_PH_CYSTAL_BAZOOKA                         = 27849,
         SPELL_PH_SUMMON_BUTTRESS                        = 28024, // Summon (Cultist Engineer) for 1 hour.
+        SPELL_DND_SUMMON_CRYSTAL_MINION_FINDER          = 28227,
     */
 };
 
@@ -338,13 +340,14 @@ enum ScourgeInvasionNPCEvents
     EVENT_MINION_PSYCHIC_SCREAM             = 47,
     EVENT_MINION_SCOURGE_STRIKE             = 48,
     EVENT_MINION_SHADOW_WORD_PAIN           = 49,
+    EVENT_MINION_FLAMESHOCKERS_TOUCH        = 50,
 
     // Pallid Horror Events 
-    EVENT_PALLID_RANDOM_YELL                = 50,
-    EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 51,
-    EVENT_SYLVANAS_ANSWER_YELL              = 52,
-    EVENT_PALLID_RANDOM_SAY                 = 53,
-    EVENT_PALLID_SUMMON_FLAMESHOCKER        = 54
+    EVENT_PALLID_RANDOM_YELL                = 51,
+    EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 52,
+    EVENT_SYLVANAS_ANSWER_YELL              = 53,
+    EVENT_PALLID_RANDOM_SAY                 = 54,
+    EVENT_PALLID_SUMMON_FLAMESHOCKER        = 55
 };
 
 enum ScourgeInvasionWorldStatesVariables

@@ -909,7 +909,7 @@ struct ScourgeMinion : public ScriptedAI
     ScourgeMinion(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
-        if (m_creature->GetEntry() != NPC_SHADOW_OF_DOOM)
+        if (m_creature->GetEntry() != NPC_SHADOW_OF_DOOM && m_creature->GetEntry() != NPC_FLAMESHOCKER)
             m_creature->SetWanderDistance(1.0f);    // Seems to be very low.
     }
 
@@ -971,6 +971,9 @@ struct ScourgeMinion : public ScriptedAI
         case NPC_SKELETAL_TROOPER:
             m_events.ScheduleEvent(EVENT_MINION_SHADOW_WORD_PAIN, 2000);
             break;
+        case NPC_FLAMESHOCKER:
+            m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
+            break;
         }
     }
 
@@ -978,6 +981,8 @@ struct ScourgeMinion : public ScriptedAI
     {
         if (m_creature->GetEntry() == NPC_SHADOW_OF_DOOM)
             m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL_CORPSE, true);
+        else if (m_creature->GetEntry() == NPC_FLAMESHOCKER)
+            m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
         else
             m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL, true);
     }
@@ -990,6 +995,16 @@ struct ScourgeMinion : public ScriptedAI
             m_creature->DespawnOrUnsummon(3000);
             break;
         }
+    }
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        if (m_creature->GetEntry() == NPC_FLAMESHOCKER)
+            if (pWho->IsCreature() && m_creature->IsWithinDistInMap(pWho, VISIBILITY_DISTANCE_TINY) && m_creature->IsWithinLOSInMap(pWho) && !pWho->GetVictim())
+                if (IsGuardOrBoss(pWho) && pWho->AI())
+                    pWho->AI()->AttackStart(m_creature);
+
+        ScriptedAI::MoveInLineOfSight(pWho);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1066,6 +1081,10 @@ struct ScourgeMinion : public ScriptedAI
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_WORD_PAIN, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
                 m_events.ScheduleEvent(EVENT_MINION_SHADOW_WORD_PAIN, urand(9000, 18000));
                 break;
+            case EVENT_MINION_FLAMESHOCKERS_TOUCH:
+                DoCastSpellIfCan(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), CF_TRIGGERED);
+                m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, urand(30000, 45000));
+                break;
             }
         }
 
@@ -1074,7 +1093,7 @@ struct ScourgeMinion : public ScriptedAI
             return;
 
         // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
-        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->IsValidAttackTarget(m_creature->GetVictim(), true))
+        if (m_creature->GetEntry() != NPC_FLAMESHOCKER && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->IsValidAttackTarget(m_creature->GetVictim(), true))
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
@@ -1265,57 +1284,6 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
     return true;
 }
 
-// todo:
-
-struct FlameshockerAI : public ScriptedAI
-{
-    FlameshockerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        t_touchTimer = 5000;
-        m_creature->SetCorpseDelay(10); // Not sure.
-    }
-
-    uint32 t_touchTimer;
-
-    void Reset() override {}
-
-    void JustDied(Unit* killer) override
-    {
-        m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
-    }
-
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        if (pWho->IsCreature() && m_creature->IsWithinDistInMap(pWho, VISIBILITY_DISTANCE_TINY) && m_creature->IsWithinLOSInMap(pWho) && !pWho->GetVictim())
-            if (IsGuardOrBoss(pWho) && pWho->AI())
-                pWho->AI()->AttackStart(m_creature);
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (t_touchTimer < diff)
-        {
-            m_creature->CastSpell(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), true);
-            t_touchTimer = urand(30000, 45000);
-        }
-        else
-            t_touchTimer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_Flameshocker(Creature* pCreature)
-{
-    return new FlameshockerAI(pCreature);
-}
-
 struct PallidHorrorAI : public ScriptedAI
 {
     EventMap m_events;
@@ -1367,7 +1335,8 @@ struct PallidHorrorAI : public ScriptedAI
             DoScriptText(LANG_UNDERCITY_SYLVANAS_1, LADY_SYLVANAS_WINDRUNNER, m_creature, CHAT_TYPE_ZONE_YELL);
 
         // Remove all custom summoned Flameshockers.
-        for (const auto& guid : m_flameshockers)
+        auto flameshockers = m_flameshockers;
+        for (const auto& guid : flameshockers)
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->DoKillUnit(FLAMESHOCKER);
 
@@ -1400,7 +1369,8 @@ struct PallidHorrorAI : public ScriptedAI
     void OnRemoveFromWorld() override
     {
         // Remove all custom summoned Flameshockers.
-        for (const auto& guid : m_flameshockers)
+        auto flameshockers = m_flameshockers;
+        for (const auto& guid : flameshockers)
             if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
                 FLAMESHOCKER->AddObjectToRemoveList();
     }
@@ -1430,10 +1400,11 @@ struct PallidHorrorAI : public ScriptedAI
                     {
                         float x, y, z;
                         pTarget->GetNearPoint(pTarget, x, y, z, 5.0f, 5.0f, 0);
-                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, urand((MINUTE * IN_MILLISECONDS), ((MINUTE * IN_MILLISECONDS) * 5)), true, 3000))
+                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, true, 3000))
                         {
                             m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
                             FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
+                            FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_DESPAWN_TIMER, true);
                         }
                     }
                 }
@@ -1538,11 +1509,6 @@ void AddSC_scourge_invasion()
     newscript->Name = "npc_argent_emissary";
     newscript->pGossipHello = &GossipHello_npc_argent_emissary;
     newscript->pGossipSelect = &GossipSelect_npc_argent_emissary;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_flameshocker";
-    newscript->GetAI = &GetAI_Flameshocker;
     newscript->RegisterSelf();
 
     newscript = new Script;

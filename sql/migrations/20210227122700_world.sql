@@ -28,7 +28,7 @@ UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`=
 UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='1' WHERE `entry`=16285;
 UPDATE `creature_template` SET `display_scale1`='0', `level_min`='60', `level_max`='60', `health_min`='91560', `health_max`='91560', `faction`='1634', `dmg_min`='249', `dmg_max`='413', `speed_walk`='0.8', `speed_run`='1.14286', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='64', `auras`='28126', `movement_type`='1', `inhabit_type`='1', `regeneration`='0' WHERE `entry` IN (16394,16382);
 UPDATE `creature_template` SET `health_min`='3052', `health_max`='3052', `npc_flags`='2', `speed_run`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='262400', `auras`='29826', `civilian`='1', `flags_extra`='198658', `script_name`='scourge_invasion_necrotic_crystal' WHERE `entry` IN (16531,16431);
-UPDATE `creature_template` SET `level_min`='53', `level_max`='55', `health_min`='24530', `health_max`='26140', `armor`='3271', `faction`='1634', `dmg_min`='91', `dmg_max`='123', `base_attack_time`='2000', `ranged_attack_time`='2000', `auras`='28330', `regeneration`='0', `inhabit_type`='1' WHERE `entry`=16383;
+UPDATE `creature_template` SET `level_min`='53', `level_max`='55', `health_min`='24530', `health_max`='26140', `armor`='3271', `faction`='1634', `dmg_min`='91', `dmg_max`='123', `base_attack_time`='2000', `ranged_attack_time`='2000', `auras`='28330', `regeneration`='0', `inhabit_type`='1', `script_name`='scourge_invasion_minion' WHERE `entry`=16383;
 
 -- Delete some custom Nostalrius waypoint npcs
 DELETE FROM `creature_template` WHERE `entry` IN (20099,20100,20101,20102);
