@@ -585,6 +585,7 @@ bool OnTrigger_at_zumrah(Player* pPlayer, AreaTriggerEntry const *at)
         if (InstanceData* pInstance = pZumrah->GetInstanceData())
             pInstance->SetData(EVENT_ZUMRAH, IN_PROGRESS);
 
+        pZumrah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         pZumrah->SetFactionTemplateId(ZUMRAH_HOSTILE_FACTION);
         DoScriptText(SAY_ZUMRAH_TRIGGER, pZumrah);
     }
