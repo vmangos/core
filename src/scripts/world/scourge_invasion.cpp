@@ -909,8 +909,6 @@ struct ScourgeMinion : public ScriptedAI
     ScourgeMinion(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
-        if (m_creature->GetEntry() != NPC_SHADOW_OF_DOOM && m_creature->GetEntry() != NPC_FLAMESHOCKER)
-            m_creature->SetWanderDistance(1.0f);    // Seems to be very low.
     }
 
     EventMap m_events;
@@ -943,29 +941,6 @@ struct ScourgeMinion : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-        case NPC_GHOUL_BERSERKER:
-            m_events.ScheduleEvent(EVENT_MINION_INFECTED_BITE, 2000);
-            m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 2000);
-            break;
-        case NPC_SKELETAL_SHOCKTROOPER:
-            m_events.ScheduleEvent(EVENT_MINION_BONE_SHARDS, 2000);
-            break;
-        case NPC_SPECTRAL_SOLDIER:
-            m_events.ScheduleEvent(EVENT_MINION_SUNDER_ARMOR, 2000);
-            m_events.ScheduleEvent(EVENT_MINION_DEMORALIZING_SHOUT, 2000);
-            break;
-        case NPC_LUMBERING_HORROR:
-            m_events.ScheduleEvent(EVENT_RARE_KNOCKDOWN, 2000);
-            m_events.ScheduleEvent(EVENT_RARE_TRAMPLE, 2000);
-            break;
-        case NPC_BONE_WITCH:
-            m_events.ScheduleEvent(EVENT_MINION_BONE_SHARDS, 2000);
-            m_events.ScheduleEvent(EVENT_MINION_ARCANE_BOLT, 2000);
-            break;
-        case NPC_SPIRIT_OF_THE_DAMNED:
-            m_events.ScheduleEvent(EVENT_MINION_PSYCHIC_SCREAM, 2000);
-            m_events.ScheduleEvent(EVENT_RARE_RIBBON_OF_SOULS, 2000);
-            break;
         case NPC_SHADOW_OF_DOOM:
             m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
             m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
@@ -983,14 +958,6 @@ struct ScourgeMinion : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-        case NPC_GHOUL_BERSERKER:
-        case NPC_SKELETAL_SHOCKTROOPER:
-        case NPC_SPECTRAL_SOLDIER:
-        case NPC_LUMBERING_HORROR:
-        case NPC_BONE_WITCH:
-        case NPC_SPIRIT_OF_THE_DAMNED:
-            m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL, true);
-            break;
         case NPC_SHADOW_OF_DOOM:
             m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL_CORPSE, true);
             break;
@@ -1040,47 +1007,9 @@ struct ScourgeMinion : public ScriptedAI
                     }
             }
                 break;
-            case EVENT_MINION_ENRAGE:
-                if (m_creature->GetHealthPercent() < 20 && m_creature->GetVictim())
-                    DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_AURA_NOT_PRESENT);
-                m_events.ScheduleEvent(EVENT_MINION_ENRAGE, 2000);
-                break;
-            case EVENT_MINION_BONE_SHARDS:
-                if (m_creature->IsInCombat())
-                    DoCastSpellIfCan(m_creature, SPELL_BONE_SHARDS, CF_AURA_NOT_PRESENT);
-                m_events.ScheduleEvent(EVENT_MINION_BONE_SHARDS, 16000);
-                break;
-            case EVENT_MINION_ARCANE_BOLT:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_BOLT, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
-                m_events.ScheduleEvent(EVENT_MINION_ARCANE_BOLT, urand(6000, 12000));
-                break;
-            case EVENT_MINION_INFECTED_BITE:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INFECTED_BITE, CF_AURA_NOT_PRESENT);
-                m_events.ScheduleEvent(EVENT_MINION_INFECTED_BITE, urand(6000, 12000));
-                break;
             case EVENT_MINION_PSYCHIC_SCREAM:
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PSYCHIC_SCREAM, CF_AURA_NOT_PRESENT);
                 m_events.ScheduleEvent(EVENT_MINION_PSYCHIC_SCREAM, urand(6000, 12000));
-                break;
-            case EVENT_MINION_DEMORALIZING_SHOUT:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DEMORALIZING_SHOUT, CF_AURA_NOT_PRESENT);
-                m_events.ScheduleEvent(EVENT_MINION_DEMORALIZING_SHOUT, 19000);
-                break;
-            case EVENT_MINION_SUNDER_ARMOR:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDER_ARMOR);
-                m_events.ScheduleEvent(EVENT_MINION_SUNDER_ARMOR, urand(6000, 12000));
-                break;
-            case EVENT_RARE_KNOCKDOWN:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKDOWN);
-                m_events.ScheduleEvent(EVENT_RARE_KNOCKDOWN, 17000);
-                break;
-            case EVENT_RARE_TRAMPLE:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE);
-                m_events.ScheduleEvent(EVENT_RARE_TRAMPLE, urand(5000, 10000));
-                break;
-            case EVENT_RARE_RIBBON_OF_SOULS:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RIBBON_OF_SOULS, CF_MAIN_RANGED_SPELL);
-                m_events.ScheduleEvent(EVENT_RARE_RIBBON_OF_SOULS, urand(2500, 6500));
                 break;
             case EVENT_DOOM_MINDFLAY:
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDFLAY);
