@@ -945,9 +945,6 @@ struct ScourgeMinion : public ScriptedAI
             m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
             m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
             break;
-        case NPC_SKELETAL_TROOPER:
-            m_events.ScheduleEvent(EVENT_MINION_SHADOW_WORD_PAIN, 2000);
-            break;
         case NPC_FLAMESHOCKER:
             m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
             break;
@@ -1007,10 +1004,6 @@ struct ScourgeMinion : public ScriptedAI
                     }
             }
                 break;
-            case EVENT_MINION_PSYCHIC_SCREAM:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PSYCHIC_SCREAM, CF_AURA_NOT_PRESENT);
-                m_events.ScheduleEvent(EVENT_MINION_PSYCHIC_SCREAM, urand(6000, 12000));
-                break;
             case EVENT_DOOM_MINDFLAY:
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDFLAY);
                 m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, urand(6500, 13000));
@@ -1018,10 +1011,6 @@ struct ScourgeMinion : public ScriptedAI
             case EVENT_DOOM_FEAR:
                 DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
                 m_events.ScheduleEvent(EVENT_DOOM_FEAR, 14500);
-                break;
-            case EVENT_MINION_SHADOW_WORD_PAIN:
-                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_WORD_PAIN, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
-                m_events.ScheduleEvent(EVENT_MINION_SHADOW_WORD_PAIN, urand(9000, 18000));
                 break;
             case EVENT_MINION_FLAMESHOCKERS_TOUCH:
                 DoCastSpellIfCan(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), CF_TRIGGERED);

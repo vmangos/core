@@ -58,12 +58,12 @@ UPDATE `creature_template` SET `spell_list_id`='162980' WHERE `entry`=16298;
 UPDATE `creature_template` SET `spell_list_id`='146970' WHERE `entry`=14697;
 UPDATE `creature_template` SET `spell_list_id`='163800' WHERE `entry`=16380;
 UPDATE `creature_template` SET `spell_list_id`='163790' WHERE `entry`=16379;
+UPDATE `creature_template` SET `spell_list_id`='164380' WHERE `entry`=16438;
 
 REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (12398, 28, 1, 0, 0, 0, 1);
 
-DELETE FROM `creature_ai_events` WHERE `creature_id` IN (16141,16299,16298,14697,16380,16379);
+DELETE FROM `creature_ai_events` WHERE `creature_id` IN (16141,16299,16298,14697,16380,16379,16438,16437,16422,16423);
 
-DELETE FROM `creature_ai_events` WHERE `creature_id`=16141;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
     (1614101, 16141, 0, 6, 0, 100, 0, 0, 0, 0, 0, 280320, 0, 0, 'Scourge Invasion - Ghoul Berserker cast Zap Crystal on death'),
     (1614102, 16141, 0, 2, 0, 100, 1, 20, 0, 5, 10, 1614102, 0, 0, 'Scourge Invasion - Ghoul Berserker Enrage at 20% HP'),
@@ -78,21 +78,26 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
     (1469701, 14697, 0, 6, 0, 100, 0, 0, 0, 0, 0, 280320, 0, 0, 'Scourge Invasion - Lumbering Horror cast Zap Crystal on death'),
     (1469702, 14697, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 176800, 0, 0, 'Scourge Invasion - Lumbering Horror despawn on hit by Spirit Spawn-out'),
     (1469703, 14697, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Lumbering Horror Scourge Strike on target'),
-    (1469704, 14697, 0, 4, 0, 100, 1, 0, 0, 0, 0, 1469704, 0, 0, 'Scourge Invasion - Lumbering Horror cast Aura of Fear'),
+    (1469704, 14697, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1469704, 0, 0, 'Scourge Invasion - Lumbering Horror cast Aura of Fear'),
     (1638001, 16380, 0, 6, 0, 100, 0, 0, 0, 0, 0, 280320, 0, 0, 'Scourge Invasion - Bone Witch cast Zap Crystal on death'),
     (1638002, 16380, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 176800, 0, 0, 'Scourge Invasion - Bone Witch despawn on hit by Spirit Spawn-out'),
     (1638003, 16380, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Bone Witch Scourge Strike on target'),
     (1637901, 16379, 0, 6, 0, 100, 0, 0, 0, 0, 0, 280320, 0, 0, 'Scourge Invasion - Spirit of the Damned cast Zap Crystal on death'),
     (1637902, 16379, 0, 8, 0, 100, 0, 17680, -1, 0, 0, 176800, 0, 0, 'Scourge Invasion - Spirit of the Damned despawn on hit by Spirit Spawn-out'),
-    (1637903, 16379, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Spirit of the Damned Scourge Strike on target');
+    (1637903, 16379, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Spirit of the Damned Scourge Strike on target'),
+    (1643801, 16438, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Skeletal Trooper Scourge Strike on target'),
+    (1643701, 16437, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Spectral Spirit Scourge Strike on target'),
+    (1642201, 16422, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Skeletal Soldier Scourge Strike on target'),
+    (1642301, 16423, 0, 9, 0, 100, 1, 0, 30, 5, 10, 282650, 0, 0, 'Scourge Invasion - Spectral Apparition Scourge Strike on target');
 
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
     (161410, 'Scourge Invasion - Ghoul Berserker', 7367, 50, 1, 0, 0, 32, 6, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
     (162990, 'Scourge Invasion - Skeletal Shocktrooper', 17014, 100, 6, 0, 0, 34, 0, 16, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
     (162980, 'Scourge Invasion - Spectral Soldier', 16244, 50, 1, 0, 0, 34, 0, 20, 20, 20, 0, 21081, 50, 1, 0, 0, 98, 6, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
     (146970, 'Scourge Invasion - Lumbering Horror', 16790, 100, 1, 0, 0, 0, 0, 17, 17, 17, 0, 5568, 100, 0, 0, 0, 0, 5, 10, 5, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (163800, 'Scourge Invasion - Bone Witch', 17014, 50, 0, 0, 0, 34, 1, 1, 8, 8, 0, 20720, 100, 1, 0, 0, 136, 1, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (163790, 'Scourge Invasion - Spirit of the Damned', 16243, 100, 1, 0, 0, 38, 1, 6, 3, 6, 0, 22884, 100, 1, 0, 0, 38, 1, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    (163800, 'Scourge Invasion - Bone Witch', 17014, 50, 0, 0, 0, 34, 1, 8, 8, 19, 0, 20720, 100, 1, 0, 0, 136, 1, 6, 3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (163790, 'Scourge Invasion - Spirit of the Damned', 16243, 100, 1, 0, 0, 38, 1, 6, 3, 6, 0, 22884, 100, 1, 0, 0, 38, 1, 12, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (164380, 'Scourge Invasion - Skeletal Trooper', 589, 100, 1, 0, 0, 34, 1, 9, 9, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1614102,280320,176800,282650,1469704);
 
@@ -128,7 +133,7 @@ UPDATE `creature_template` SET `gossip_menu_id`='7166', `health_min`='3052', `he
 UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='48840', `health_max`='48840', `mana_min`='2434', `mana_max`='2434', `faction`='1630', `armor`='3075', `dmg_min`='871', `dmg_max`='1153', `unit_flags`='320', `auras`='28126', `movement_type`='0', `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
 
 -- Fix Low level Minions
-UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `script_name`='scourge_invasion_minion' WHERE `entry` IN (16438,16437,16422,16423);
+UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
 UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry` IN (16437,16423);
 UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
 UPDATE `creature_template` SET `armor`='426', `dmg_min`='11', `dmg_max`='16', `spell_id2`='0' WHERE `entry`=16438;
@@ -3323,7 +3328,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
     (3321, 16, 16383, 0, 0, 0, 2),
     (3322, -2, 3319, 3320, 3321, 0, 0);
 
-UPDATE `creature_template` SET `ai_name`='EventAI ' WHERE `entry` IN (15766, 4549);
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` IN (15766, 4549);
 
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (17001,17002,17003,17004);
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
