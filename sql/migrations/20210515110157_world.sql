@@ -25,16 +25,16 @@ UPDATE `creature_template` SET `dmg_school` = 5 WHERE `entry` = 3470;
 UPDATE `creature` SET `position_x` = -9733.9384765625, `position_y` = 115.4759368896484375, `position_z` = 24.58680152893066406, `orientation` = 1.514374375343322753, `wander_distance` = 1, `movement_type` = 1 WHERE `guid` = 80647;
 UPDATE `creature` SET `position_x` = -9745.591796875, `position_y` = 87.60213470458984375, `position_z` = 12.82021617889404296, `orientation` = 1.686997294425964355, `wander_distance` = 1, `movement_type` = 1 WHERE `guid` = 80644;
 
--- Elwynn Forest - Forest's Edge - Hogger (credit cmangos)
+-- Elwynn Forest - Forests Edge - Hogger (credit cmangos)
 INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `patch_max`) VALUES
 (80731, 448, -9947.8779296875, 594.77252197265625, 39.60799789428710937, 5.193932056427001953, 180, 180, 15, 100, 0, 1, 10),
 (81027, 448, -10107.1787109375, 618.212646484375, 38.20453262329101562, 3.78528451919555664, 180, 180, 15, 100, 0, 1, 10),
 (81028, 448, -10085.3671875, 585.65655517578125, 39.27585601806640625, 1.303950071334838867, 180, 180, 15, 100, 0, 1, 10),
 (81029, 448, -10018.634765625, 640.62945556640625, 39.06363296508789062, 1.332400083541870117, 180, 180, 15, 100, 0, 1, 10);
 INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`) VALUES
-(448, 1265, 0, Elwynn Forest - Forest\s Edge - Hogger (448));
+(448, 1265, 0, Elwynn Forest - Forests Edge - Hogger (448));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(1265, 1, Elwynn Forest - Forest\s Edge - Hogger (448));
+(1265, 1, Elwynn Forest - Forests Edge - Hogger (448));
 
 -- Westfall - Dust Devil (credit cmangos)
 UPDATE `creature` SET `position_x` = -11115.1083984375, `position_y` = 617.48870849609375, `position_z` = 37.60480499267578125, `orientation` = 4.004544258117675781, `wander_distance` = 45 WHERE `guid` = 48554;
