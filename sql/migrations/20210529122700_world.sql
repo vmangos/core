@@ -12,6 +12,7 @@ INSERT INTO `migrations` VALUES ('20210529122700');
 -- World Invasion
 -- =============================================
 
+-- Fix for quest 9364 condition issues with scourge minions
 REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9365, -1, 85, 9364, 0, 0, 0);
 UPDATE `creature_ai_events` SET `condition_id`='9365' WHERE `condition_id`=9364;
 
