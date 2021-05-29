@@ -3,9 +3,9 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20210227122700');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20210529122700');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20210227122700');
+INSERT INTO `migrations` VALUES ('20210529122700');
 -- Add your query below.
 
 -- =============================================
@@ -849,7 +849,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264 AND `event`=@WINTERSPRING_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @WINTERSPRING_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+249;
+DELETE FROM `creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@WINTERSPRING_GUID+1, 16356, 1, 7803.92, -4223.38, 676.976, 2.00713),
     (@WINTERSPRING_GUID+2, 16356, 1, 7692.21, -3843.77, 688.606, 4.46804),
@@ -1097,12 +1097,10 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@WINTERSPRING_GUID+244, 16356, 1, 6819.23, -3570.4, 727.156, 0.226893),
     (@WINTERSPRING_GUID+245, 16356, 1, 7694.82, -3881.97, 688.048, 5.20109),
     (@WINTERSPRING_GUID+246, 16356, 1, 7708.42, -3907.95, 691.825, 6.24828),
-    (@WINTERSPRING_GUID+247, 16356, 1, 7720.34, -3881.16, 690.539, 1.85005),
-    (@WINTERSPRING_GUID+248, 16356, 1, 7694.82, -3881.97, 688.048, 5.20109),
-    (@WINTERSPRING_GUID+249, 16356, 1, 7694.82, -3881.97, 688.048, 5.20109);
+    (@WINTERSPRING_GUID+247, 16356, 1, 7720.34, -3881.16, 690.539, 1.85005);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+249 AND `event`=@WINTERSPRING_EVENT;
-INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+249;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247 AND `event`=@WINTERSPRING_EVENT;
+INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247;
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
@@ -3291,6 +3289,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
     (674102, 6741, 3322, 10, 0, 100, 3, 0, 50, 10000, 90000, 17001, 17002, 0, 'Scourge Invasion - Pallid Horror or Flameshocker in LOS'),
     (454901, 4549, 3322, 10, 0, 100, 3, 0, 50, 10000, 90000, 17001, 17002, 0, 'Scourge Invasion - Pallid Horror or Flameshocker in LOS');
 
+-- Undercity Trade Quarter
 DELETE FROM `creature_movement_special` WHERE `id`=149701;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES 
     (149701, 1, 1660.98, 257.238, -62.1777, 100, 0, 0, 0),
@@ -3319,6 +3318,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (149701, 24, 1585.38, 276.608, -43.1027, 100, 0, 0, 0),
     (149701, 25, 1605.34, 276.451, -43.1027, 100, 0, 0, 149713);
 
+-- Undercity Royal Quarter
 DELETE FROM `creature_movement_special` WHERE `id`=149702;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES 
     (149702, 1, 1596.72, 423.488, -46.3713, 100, 0, 0, 149720),
@@ -3500,16 +3500,16 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
     (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1295.97, 354.728, -65.9162, 0.907571, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 4 at Royal Quarter'),
     (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1302.63, 352.871, -65.9109, 1.309, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 2 at Royal Quarter'),
     (149724, 0, 10, 13839, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1305.82, 351.934, -65.8778, 1.69297, 0, 'Scourge Invasion - Pallid Horror: Spawn Royal Dreadguard 1 at Royal Quarter'),
-    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 149711, -1, 1, 1649.6, 197.414, -62.0981, 1.06465, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 outside Trading Quarter'),
-    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1651.49, 192.836, -62.0972, 1.20428, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 2 outside Trading Quarter'),
-    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1645.86, 196.746, -62.0994, 1.01229, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 3 outside Trading Quarter'),
-    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 149712, -1, 1, 1632.55, 233.419, -43.0193, 2.6529, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 1 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1633.06, 246.891, -43.0193, 3.59538, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 2 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1576.53, 243.989, -61.994, 4.76475, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 3 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1578.96, 237.109, -61.994, 4.53786, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 4 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1635.93, 240.378, -43.0193, 3.24631, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 5 at inner Trading Quarter'),
-    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1583.21, 241.365, -61.994, 4.45059, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 6 at inner Trading Quarter'),
-    (149713, 0, 60, 3, 15, 0, 1, 0, 0, 0, 0, 149701, 149701, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in inner Trading Quarter'),
+    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 149711, -1, 1, 1649.6, 197.414, -62.0981, 1.06465, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 outside Trade Quarter'),
+    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1651.49, 192.836, -62.0972, 1.20428, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 2 outside Trade Quarter'),
+    (149711, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1645.86, 196.746, -62.0994, 1.01229, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 3 outside Trade Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 149712, -1, 1, 1632.55, 233.419, -43.0193, 2.6529, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 1 at inner Trade Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1633.06, 246.891, -43.0193, 3.59538, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 2 at inner Trade Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1576.53, 243.989, -61.994, 4.76475, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 3 at inner Trade Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1578.96, 237.109, -61.994, 4.53786, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 4 at inner Trade Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1635.93, 240.378, -43.0193, 3.24631, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 5 at inner Trade Quarter'),
+    (149712, 0, 10, 16432, 300000, 0, 0, 0, 0, 0, 0, 2, 0, -1, 1, 1583.21, 241.365, -61.994, 4.45059, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Elite Guardian 6 at inner Trade Quarter'),
+    (149713, 0, 60, 3, 15, 0, 1, 0, 0, 0, 0, 149701, 149701, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Pallid Horror Repeat Waypoints in inner Trade Quarter'),
     (151910, 0, 10, 68, 300000, 0, 0, 0, 0, 0, 0, 2, 151910, -1, 1, -8534.62, 854.091, 106.601, 2.09439, 0, 'Scourge Invasion - Pallid Horror: Spawn Stormwind City Guard 1 in the Cathedral of Light'),
     (151911, 0, 0, 6, 0, 0, 0, 1756, 250, 8, 2, 12316, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Stormwind Royal Guard: The Scourge are at the castle entrance!  For Stormwind!  For King Anduin!'),
     (151911, 10, 0, 6, 0, 0, 0, 1748, 250, 8, 2, 12317, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Bolvar Fordragon: Hold the line!  Protect the King at all costs!'),

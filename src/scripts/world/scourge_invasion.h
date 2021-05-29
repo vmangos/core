@@ -39,19 +39,19 @@ enum ScourgeInvasionSpells
 
     // Necropolis -> Proxy
     SPELL_COMMUNIQUE_TIMER_NECROPOLIS           = 28395, // Periodically triggers 28373 Communique, Necropolis-to-Proxies every 15 seconds.
-    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES      = 28373, // purple bolt Visual (BIG)
+    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES      = 28373, // purple bolt Visual (BIG).
 
     // Proxy -> Necropolis
-    SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS        = 28367, // Purple bolt Visual (SMALL)
+    SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS        = 28367, // Purple bolt Visual (SMALL).
 
     // Proxy -> Relay
-    SPELL_COMMUNIQUE_PROXY_TO_RELAY             = 28366, // purple bolt Visual (BIG)
+    SPELL_COMMUNIQUE_PROXY_TO_RELAY             = 28366, // purple bolt Visual (BIG).
 
     // Relay -> Proxy
-    SPELL_COMMUNIQUE_RELAY_TO_PROXY             = 28365, // Purple bolt Visual (SMALL)
+    SPELL_COMMUNIQUE_RELAY_TO_PROXY             = 28365, // Purple bolt Visual (SMALL).
 
     // Relay -> Shard
-    SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG)
+    SPELL_COMMUNIQUE_RELAY_TO_CAMP              = 28326, // Purple bolt Visual (BIG).
 
     // Shard
     SPELL_CREATE_CRYSTAL                        = 28344, // Spawn a Necrotic Shard.
@@ -89,18 +89,18 @@ enum ScourgeInvasionSpells
     SPELL_MINION_SPAWN_IN                       = 28234, // Pink Lightning.
     SPELL_SPIRIT_SPAWN_OUT                      = 17680, // Makes invisible.
     SPELL_MINION_DESPAWN_TIMER                  = 28090, // Triggers 28091 (Despawner, self) every 150 seconds. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    SPELL_CONTROLLER_TIMER                      = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (We don't know who is casting this yet)
+    SPELL_CONTROLLER_TIMER                      = 28095, // Triggers 28091 (Despawner, self) every 60 seconds for 1 hour. (Unknown who is casting this).
     SPELL_DESPAWNER_SELF                        = 28091, // Trigger from Spell above.
     SPELL_SUMMON_SCOURGE_CONTROLLER             = 28092,
 
     // Minion Abilities
     SPELL_SCOURGE_STRIKE                        = 28265, // Pink Lightning (Instakill).
-    SPELL_ENRAGE                                = 8599,  // Used by 16141 (Ghoul Berserker)
-    SPELL_BONE_SHARDS                           = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper)
-    SPELL_INFECTED_BITE                         = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker)
-    SPELL_DEMORALIZING_SHOUT                    = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier)
-    SPELL_SUNDER_ARMOR                          = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier)
-    SPELL_SHADOW_WORD_PAIN                      = 589,   // Used by 16438 (Skeletal Trooper)
+    SPELL_ENRAGE                                = 8599,  // Used by 16141 (Ghoul Berserker).
+    SPELL_BONE_SHARDS                           = 17014, // [shortest sniff CD: 16,583 seconds] Used by 16299 (Skeletal Shocktrooper).
+    SPELL_INFECTED_BITE                         = 7367,  // [shortest sniff CD: 13,307 seconds] Used by 16141 (Ghoul Berserker).
+    SPELL_DEMORALIZING_SHOUT                    = 16244, // [shortest sniff CD: 19,438 seconds] Used by 16298 (Spectral Soldier).
+    SPELL_SUNDER_ARMOR                          = 21081, // [shortest sniff CD: 6,489 seconds] Used by 16298 (Spectral Soldier).
+    SPELL_SHADOW_WORD_PAIN                      = 589,   // Used by 16438 (Skeletal Trooper).
     SPELL_DUAL_WIELD                            = 674,   // Used by Skeletal Soldier and Skeletal Shocktrooper.
 
     // Marks of the Dawn
@@ -109,13 +109,13 @@ enum ScourgeInvasionSpells
     SPELL_CREATE_GREATER_MARK_OF_THE_DAWN       = 28321, // Create Greater Mark of the Dawn.
 
     // Rare Minions
-    SPELL_KNOCKDOWN                             = 16790, // Used by 14697 (Lumbering Horror)
-    SPELL_TRAMPLE                               = 5568,  // Used by 14697 (Lumbering Horror)
-    SPELL_AURA_OF_FEAR                          = 28313, // Used by 14697 (Lumbering Horror)
-    SPELL_RIBBON_OF_SOULS                       = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned)
-    SPELL_PSYCHIC_SCREAM                        = 22884, // or 26042, used by 16379 (Spirit of the Damned)
+    SPELL_KNOCKDOWN                             = 16790, // Used by 14697 (Lumbering Horror).
+    SPELL_TRAMPLE                               = 5568,  // Used by 14697 (Lumbering Horror).
+    SPELL_AURA_OF_FEAR                          = 28313, // Used by 14697 (Lumbering Horror).
+    SPELL_RIBBON_OF_SOULS                       = 16243, // [shortest sniff CD: 1,638 seconds] Used by 16379 (Spirit of the Damned).
+    SPELL_PSYCHIC_SCREAM                        = 22884, // or 26042, used by 16379 (Spirit of the Damned).
     SPELL_MINION_DESPAWN_TIMER_UNCOMMON         = 28292, // Triggers 28091 (Despawner, self) every 10 minutes. Triggers 17680 SPELL_SPIRIT_SPAWN_OUT via void Spell::EffectDummy.
-    SPELL_ARCANE_BOLT                           = 13748, /* 20720 Used by 16380 (Bone Witch)
+    SPELL_ARCANE_BOLT                           = 13748, /* 20720 Used by 16380 (Bone Witch).
                                                          https://classicdb.ch/?npc=16380#abilities says 13748 but 20720 is the only "Arcane Bolt" whichs requires no mana.
                                                          Danage is very high, so i guess it has a very long cd.
                                                          Spell description in the Bestiary is: Hurls a magical bolt at an enemy, inflicting Arcane damage.
@@ -134,9 +134,9 @@ enum ScourgeInvasionSpells
     SPELL_QUIET_SUICIDE                         = 3617,  // [3] Instakill, casted exactly same time as 31316 (Summon Boss Buff).
     SPELL_SUMMON_BOSS_BUFF                      = 31316, // [4] Summon Boss Buff, casted on Player
     SPELL_SUMMON_BOSS                           = 31315, /* [5] Reagents, 8 Necrotic Rune, Summon (Shadow of Doom) for 1 hour.
-                                                             The question is: What happens after this hour if the shadow despawns?
+                                                             The question is: What happens after this hour if the Shadow of Doom despawns?
                                                              Do the cultists respawn and channeling again on the damaged shard or
-                                                             Does the Necrotic crystal respawn with no cultists / shadows?
+                                                             Does the Necrotic crystal respawn without Cultists or Shadows of Doom?
                                                              */
 
     // Shadow of Doom
@@ -148,7 +148,7 @@ enum ScourgeInvasionSpells
     // Pallid Horror - Patchwerk Terror (also uses: 28315)
     SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL       = 28424, // Alliance.
     SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL         = 28699, // Horde.
-    SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard)
+    SPELL_DAMAGE_VS_GUARDS                      = 28364, // [shortest sniff CD: 11 seconds, longest 81 sec] hits 13839 (Royal Dreadguard).
 
     // Flameshocker (also uses: 28234, 17680)
     SPELL_FLAMESHOCKERS_TOUCH                   = 28314, // [shortest sniff CD: 30 seconds]
@@ -185,7 +185,7 @@ enum ScourgeInvasionNPC
     NPC_SHADOW_OF_DOOM                                  = 16143,
 
     // Camp Helpers (invisible)
-    NPC_SCOURGE_INVASION_MINION_FINDER                  = 16356, // casting 28203 (Find Camp Type).
+    NPC_SCOURGE_INVASION_MINION_FINDER                  = 16356, // Casting 28203 (Find Camp Type).
     NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL     = 16306,
     NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON  = 16336,
     NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON  = 16338,
@@ -255,7 +255,7 @@ enum ScourgeInvasionMisc
     ITEM_NECROTIC_RUNE                                  = 22484,
 
     // Invisible Objects
-    GOBJ_BUTTRESS_TRAP                                  = 181112, // [Guessed] These objects cannot be sniffed and are not available in any database.
+    GOBJ_BUTTRESS_TRAP                                  = 181112, // [Guessed] Those objects can't be sniffed and are not available in any database.
 
     GOBJ_SUMMON_MINION_TRAP_GHOST_GHOUL                 = 181111, // Object is not in sniffed files or any database such as WoWHead, but spell 28196 (Create Minion Trap: Ghost/Skeleton) should probably summon them.
     GOBJ_SUMMON_MINION_TRAP_GHOST_SKELETON              = 181155, // ""
@@ -272,18 +272,18 @@ enum ScourgeInvasionMisc
     GOBJ_SKULLPILE_03                                   = 181193,
     GOBJ_SKULLPILE_04                                   = 181194,
 
-    GOBJ_NECROPOLIS_TINY                                = 181154, // Necropolis (scale 1.0)
-    GOBJ_NECROPOLIS_SMALL                               = 181373, // Necropolis (scale 1.5)
-    GOBJ_NECROPOLIS_MEDIUM                              = 181374, // Necropolis (scale 2.0)
-    GOBJ_NECROPOLIS_BIG                                 = 181215, // Necropolis (scale 2.5)
-    GOBJ_NECROPOLIS_HUGE                                = 181223, // Necropolis (scale 3.5)
-    GOBJ_NECROPOLIS_CITY                                = 181172, // Necropolis at the Citys (scale 2.5)
+    GOBJ_NECROPOLIS_TINY                                = 181154, // Necropolis (scale 1.0).
+    GOBJ_NECROPOLIS_SMALL                               = 181373, // Necropolis (scale 1.5).
+    GOBJ_NECROPOLIS_MEDIUM                              = 181374, // Necropolis (scale 2.0).
+    GOBJ_NECROPOLIS_BIG                                 = 181215, // Necropolis (scale 2.5).
+    GOBJ_NECROPOLIS_HUGE                                = 181223, // Necropolis (scale 3.5).
+    GOBJ_NECROPOLIS_CITY                                = 181172, // Necropolis at the Citys (scale 2.5).
 
     // These timers may fail if you set it under 1 minute.
-    ZONE_ATTACK_TIMER_MIN                               = 60 * 2, // 45 min
-    ZONE_ATTACK_TIMER_MAX                               = 60 * 5, // 60 min
-    CITY_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min
-    CITY_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min
+    ZONE_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min.
+    ZONE_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min.
+    CITY_ATTACK_TIMER_MIN                               = 60 * 45, // 45 min.
+    CITY_ATTACK_TIMER_MAX                               = 60 * 60, // 60 min.
 
     ZONEID_WINTERSPRING                                 = 618,
     ZONEID_AZSHARA                                      = 16,
@@ -341,24 +341,25 @@ enum ScourgeInvasionNPCEvents
     EVENT_MINION_SCOURGE_STRIKE             = 48,
     EVENT_MINION_SHADOW_WORD_PAIN           = 49,
     EVENT_MINION_FLAMESHOCKERS_TOUCH        = 50,
+    EVENT_MINION_FLAMESHOCKERS_DESPAWN      = 51,
 
     // Pallid Horror Events 
-    EVENT_PALLID_RANDOM_YELL                = 51,
-    EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 52,
-    EVENT_SYLVANAS_ANSWER_YELL              = 53,
-    EVENT_PALLID_RANDOM_SAY                 = 54,
-    EVENT_PALLID_SUMMON_FLAMESHOCKER        = 55
+    EVENT_PALLID_RANDOM_YELL                = 52,
+    EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS     = 53,
+    EVENT_SYLVANAS_ANSWER_YELL              = 54,
+    EVENT_PALLID_RANDOM_SAY                 = 55,
+    EVENT_PALLID_SUMMON_FLAMESHOCKER        = 56
 };
 
 enum ScourgeInvasionWorldStatesVariables
 {
     // Worldstates
-    WORLDSTATE_WINTERSPRING                     = 0x08D3, // 2259 - Icon on map
-    WORLDSTATE_AZSHARA                          = 0x08D4, // 2260 - Icon on map
-    WORLDSTATE_EASTERN_PLAGUELANDS              = 0x08D8, // 2264 - Icon on map
-    WORLDSTATE_BLASTED_LANDS                    = 0x08D5, // 2261 - Icon on map
-    WORLDSTATE_BURNING_STEPPES                  = 0x08D6, // 2262 - Icon on map
-    WORLDSTATE_TANARIS                          = 0x08D7, // 2263 - Icon on map
+    WORLDSTATE_WINTERSPRING                     = 0x08D3, // 2259 - Icon on map.
+    WORLDSTATE_AZSHARA                          = 0x08D4, // 2260 - Icon on map.
+    WORLDSTATE_EASTERN_PLAGUELANDS              = 0x08D8, // 2264 - Icon on map.
+    WORLDSTATE_BLASTED_LANDS                    = 0x08D5, // 2261 - Icon on map.
+    WORLDSTATE_BURNING_STEPPES                  = 0x08D6, // 2262 - Icon on map.
+    WORLDSTATE_TANARIS                          = 0x08D7, // 2263 - Icon on map.
 
     WORLDSTATE_SI_BATTLES_WON                   = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
     WORLDSTATE_SI_AZSHARA_REMAINING             = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
@@ -376,7 +377,7 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_WINTERSPRING_ATTACK_TIME           = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_WINTERSPRING,
     VARIABLE_AZSHARA_ATTACK_TIME                = (GAME_EVENT_SCOURGE_INVASION * 1000) + ZONEID_AZSHARA,
     VARIABLE_SI_ATTACK_COUNT                    = (GAME_EVENT_SCOURGE_INVASION * 1000) + 0,
-    VARIABLE_SI_LATEST_ATTACK_ZONE              = (GAME_EVENT_SCOURGE_INVASION * 1000) + 1,
+    VARIABLE_SI_LAST_ATTACK_ZONE                = (GAME_EVENT_SCOURGE_INVASION * 1000) + 1,
     VARIABLE_SI_UNDERCITY_TIME                  = (GAME_EVENT_SCOURGE_INVASION * 10000) + ZONEID_UNDERCITY,
     VARIABLE_SI_STORMWIND_TIME                  = (GAME_EVENT_SCOURGE_INVASION * 10000) + ZONEID_STORMWIND,
 

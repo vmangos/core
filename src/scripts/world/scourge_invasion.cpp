@@ -935,6 +935,8 @@ struct ScourgeMinion : public ScriptedAI
             m_creature->MonsterSay(PickRandomValue(LANG_SHADOW_OF_DOOM_TEXT_0, LANG_SHADOW_OF_DOOM_TEXT_1, LANG_SHADOW_OF_DOOM_TEXT_2, LANG_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, unit);
             m_creature->CastSpell(m_creature, SPELL_SPAWN_SMOKE, true);
         }
+        if (action == NPC_FLAMESHOCKER)
+            m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
     }
 
     void EnterCombat(Unit*) override
@@ -979,12 +981,23 @@ struct ScourgeMinion : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        if (m_creature->GetEntry() == NPC_SHADOW_OF_DOOM)
-            m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL_CORPSE, true);
-        else if (m_creature->GetEntry() == NPC_FLAMESHOCKER)
-            m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
-        else
+        switch (m_creature->GetEntry())
+        {
+        case NPC_GHOUL_BERSERKER:
+        case NPC_SKELETAL_SHOCKTROOPER:
+        case NPC_SPECTRAL_SOLDIER:
+        case NPC_LUMBERING_HORROR:
+        case NPC_BONE_WITCH:
+        case NPC_SPIRIT_OF_THE_DAMNED:
             m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL, true);
+            break;
+        case NPC_SHADOW_OF_DOOM:
+            m_creature->CastSpell(m_creature, SPELL_ZAP_CRYSTAL_CORPSE, true);
+            break;
+        case NPC_FLAMESHOCKER:
+            m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKERS_REVENGE, true);
+            break;
+        }
     }
 
     void SpellHit(Unit* caster, SpellEntry const* spell) override
@@ -1084,6 +1097,11 @@ struct ScourgeMinion : public ScriptedAI
             case EVENT_MINION_FLAMESHOCKERS_TOUCH:
                 DoCastSpellIfCan(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), CF_TRIGGERED);
                 m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, urand(30000, 45000));
+                break;
+            case EVENT_MINION_FLAMESHOCKERS_DESPAWN:
+                if (!m_creature->IsInCombat())
+                    m_creature->CastSpell(m_creature, SPELL_DESPAWNER_SELF, true);
+                m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
                 break;
             }
         }
@@ -1396,15 +1414,16 @@ struct PallidHorrorAI : public ScriptedAI
             {
                 if (m_flameshockers.size() < 30)
                 {
-                    if (Unit* pTarget = SelectRandomFlameshockerSpawnTarget(m_creature, (Unit*) nullptr, VISIBILITY_DISTANCE_GIGANTIC))
+                    if (Unit* pTarget = SelectRandomFlameshockerSpawnTarget(m_creature, (Unit*) nullptr, DEFAULT_VISIBILITY_BG))
                     {
                         float x, y, z;
-                        pTarget->GetNearPoint(pTarget, x, y, z, 5.0f, 5.0f, 0);
-                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, true, 3000))
+                        pTarget->GetNearPoint(pTarget, x, y, z, 5.0f, 5.0f, 0.0f);
+                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 3000))
                         {
                             m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
                             FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
-                            FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_DESPAWN_TIMER, true);
+                            FLAMESHOCKER->AI()->DoAction(FLAMESHOCKER, NPC_FLAMESHOCKER);
+                            FLAMESHOCKER->AI()->AttackStart(pTarget);
                         }
                     }
                 }

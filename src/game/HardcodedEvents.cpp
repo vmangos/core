@@ -596,7 +596,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     sObjectMgr.InitSavedVariable(VARIABLE_SI_STORMWIND_TIME, time(nullptr));
 
     sObjectMgr.InitSavedVariable(VARIABLE_SI_ATTACK_COUNT, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_LATEST_ATTACK_ZONE, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE, 0);
 
     sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
@@ -686,6 +686,55 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     attackPoints.push_back(stormwind);
 }
 
+void ScourgeInvasionEvent::LogNextZoneTime()
+{
+    if (GetActiveZones() > 1)
+        return;
+
+    time_t now = time(nullptr);
+    uint32 timer = 0;
+    uint32 zoneid = 0;
+    std::vector<uint32> validZones;
+    for (const auto& invasionPoint : invasionPoints)
+    {
+        if (invasionPoint.zoneId == sObjectMgr.GetSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE))
+            continue;
+
+        Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
+
+        if (!mapPtr)
+            continue;
+
+        Creature* pMouth = mapPtr->GetCreature(invasionPoint.mouthGuid);
+
+        if (pMouth)
+            continue;
+
+        uint32 newtime = GetZoneTime(invasionPoint.zoneId);
+
+        if ((newtime < timer || timer == 0) && newtime > 0)
+        {
+            timer = newtime;
+            zoneid = invasionPoint.zoneId;
+        }
+    }
+
+    time_t newtimeToNextAttack = timer - now;
+    sLog.outBasic("[Scourge Invasion Event] Next invasion zone %d is in %d minutes.", zoneid, uint32(newtimeToNextAttack / 60));
+}
+
+uint32 ScourgeInvasionEvent::GetZoneTime(uint32 zoneId)
+{
+    uint32 time = 0;
+
+    if (!isValidZoneId(zoneId))
+        return time;
+
+    time = sObjectMgr.GetSavedVariable((GAME_EVENT_SCOURGE_INVASION * 1000) + zoneId);
+
+    return time;
+}
+
 void ScourgeInvasionEvent::EnableAndStartEvent(uint16 event_id)
 {
     if (!sGameEventMgr.IsActiveEvent(event_id))
@@ -747,7 +796,7 @@ void ScourgeInvasionEvent::Update()
             HandleActiveCity(VARIABLE_SI_STORMWIND_TIME, now, zone.zoneId);
     }
 
-    // Waiting until both invasions have been loaded. OnEnable will return true
+    // Waiting until all invasions have been loaded. OnEnable will return true
     // if no invasions are supposed to be started, so this will only be the case if any of the 
     // maps required for a current invasionZone were not yet loaded
     if (!invasion1Loaded || !invasion2Loaded || !invasion3Loaded || !invasion4Loaded || !invasion5Loaded || !invasion6Loaded)
@@ -802,8 +851,8 @@ void ScourgeInvasionEvent::Update()
     }
 
     HandleDefendedZones();
-
     UpdateWorldState();
+    LogNextZoneTime();
 }
 
 uint32 ScourgeInvasionEvent::GetNextUpdateDelay()
@@ -890,7 +939,7 @@ Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionXYZO const& invZone)
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
     if (!pMap)
-        sLog.outError("ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d", mapId, invZone.x, invZone.y);
+        sLog.outError("ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d.", mapId, invZone.x, invZone.y);
     return pMap;
 }
 
@@ -931,15 +980,15 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId,
     {
         sObjectMgr.SetSavedVariable(attackTimeVar, now + ZONE_ATTACK_TIMER, true);
         sObjectMgr.SetSavedVariable(VARIABLE_SI_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT) + 1, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_LATEST_ATTACK_ZONE, zoneId, true);
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE, zoneId, true);
 
-        sLog.outBasic("[Scourge Invasion Event] The Scourge has been defeated in %d, next attack starting in %d minutes", zoneId, uint32(timeToNextAttack / 60));
+        sLog.outBasic("[Scourge Invasion Event] The Scourge has been defeated in %d, next attack starting in %d minutes.", zoneId, uint32(timeToNextAttack / 60));
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT));
 
         if (pMouth)
             pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
         else
-            sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found", zone->mouthGuid);
+            sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found.", zone->mouthGuid);
     }
 }
 
@@ -984,7 +1033,7 @@ bool ScourgeInvasionEvent::OnEnable(uint32 zoneId, uint32 attackTimeVar)
         else
         {
             if (!oldZone)
-                sLog.outError("ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found");
+                sLog.outError("ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found.");
             StartNewInvasionIfTime(attackTimeVar, zoneId);
         }
     }
@@ -1001,7 +1050,7 @@ void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 
 
     uint32 zoneId = zoneID;
 
-    sLog.outBasic("[Scourge Invasion Event] Starting new City attack in zone %d", zoneId);
+    sLog.outBasic("[Scourge Invasion Event] Starting new City attack in zone %d.", zoneId);
 
     CityAttack* zone = GetCityZone(zoneId);
 
@@ -1016,14 +1065,14 @@ void ScourgeInvasionEvent::StartNewCityAttackIfTime(uint32 timeVariable, uint32 
     // on next update instead
     if (!mapPtr)
     {
-        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to access required map (%d). Retrying next update", zone->map);
+        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to access required map (%d). Retrying next update.", zone->map);
         return;
     }
 
     if (mapPtr && SummonPallid(mapPtr, zone, zone->pallid[SpawnLocationID], SpawnLocationID))
-        sLog.outBasic("[Scourge Invasion Event] Pallid Horror summoned in zone %d", zoneId);
+        sLog.outBasic("[Scourge Invasion Event] Pallid Horror summoned in zone %d.", zoneId);
     else
-        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in %d", zone->map);
+        sLog.outError("ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in %d.", zone->map);
 }
 
 // Will initialize an invasion in a new, random, zone if the cooldown is up. If somehow the maps for the
@@ -1044,14 +1093,14 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
         return;
 
     // Don't attack same zone as before.
-    if (zoneId == sObjectMgr.GetSavedVariable(VARIABLE_SI_LATEST_ATTACK_ZONE))
+    if (zoneId == sObjectMgr.GetSavedVariable(VARIABLE_SI_LAST_ATTACK_ZONE))
         return;
 
     // If we have at least one victory and more than 1 active zones stop here.
     if (GetActiveZones() > 1 && sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT) > 0)
         return;
 
-    sLog.outBasic("[Scourge Invasion Event] Starting new invasion in %d", zoneId);
+    sLog.outBasic("[Scourge Invasion Event] Starting new invasion in %d.", zoneId);
 
     InvasionZone* zone = GetInvasionZone(zoneId);
 
@@ -1062,14 +1111,14 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
 
     if (!mapPtr)
     {
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
+        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update.", zone->map);
         return;
     }
 
     if (mapPtr && SummonMouth(mapPtr, zone, zone->mouth[0]))
         sObjectMgr.SetSavedVariable(zone->remainingVar, zone->necroAmount, true);
     else
-        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d", zone->map);
+        sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to spawn mouth in %d.", zone->map);
 }
 
 // Will return false if a required map was not available. In all other cases returns true.
@@ -1080,7 +1129,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     sLog.outBasic("[Scourge Invasion Event] Resuming Scourge invasion in zone %d", zoneId);
     InvasionZone* zone = GetInvasionZone(zoneId);
     if (!zone) {
-        sLog.outError("ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d", zoneId);
+        sLog.outError("ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d.", zoneId);
         return false;
     }
     
@@ -1091,7 +1140,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     {
         if (!GetMap(zone->map, zone->mouth[0]))
         {
-            sLog.outError("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update", zone->map);
+            sLog.outError("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update.", zone->map);
             return false;
         }
     }
@@ -1131,11 +1180,10 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
     }
     else
     {
-        sLog.outError("ScourgeInvasionEvent::SummonPallid failed summoning Pallid Horror");
+        sLog.outError("ScourgeInvasionEvent::SummonPallid failed summoning Pallid Horror.");
         return false;
     }
 
-    //sLog.outError("ScourgeInvasionEvent::SummonPallid at %f %f %f", point.x, point.y, point.z);
     return true;
 }
 
@@ -1154,11 +1202,10 @@ bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXY
     }
     else
     {
-        sLog.outError("ScourgeInvasionEvent::SummonMouth failed summoning Mouth of Kel'Thuzad");
+        sLog.outError("ScourgeInvasionEvent::SummonMouth failed summoning Mouth of Kel'Thuzad.");
         return false;
     }
 
-    sLog.outBasic("ScourgeInvasionEvent::SummonMouth at %f %f %f", point.x, point.y, point.z);
     return true;
 }
 
@@ -1180,7 +1227,7 @@ bool ScourgeInvasionEvent::isActiveZone(uint32 zoneId)
             Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
             if (!mapPtr)
             {
-                sLog.outError("ScourgeInvasionEvent::isValidZoneId no map for zone %d", invasionPoint.map);
+                sLog.outError("ScourgeInvasionEvent::isValidZoneId no map for zone %d.", invasionPoint.map);
                 continue;
             }
 
@@ -1200,7 +1247,7 @@ uint32 ScourgeInvasionEvent::GetActiveZones()
         Map* mapPtr = GetMap(invasionPoint.map, invasionPoint.mouth[0]);
         if (!mapPtr)
         {
-            sLog.outError("ScourgeInvasionEvent::GetActiveZones no map for zone %d", invasionPoint.map);
+            sLog.outError("ScourgeInvasionEvent::GetActiveZones no map for zone %d.", invasionPoint.map);
             continue;
         }
         
@@ -1218,7 +1265,7 @@ ScourgeInvasionEvent::CityAttack* ScourgeInvasionEvent::GetCityZone(uint32 zoneI
         if (attackPoint.zoneId == zoneId)
             return &attackPoint;
     }
-    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
+    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d.", zoneId);
     return nullptr;
 }
 
@@ -1229,7 +1276,7 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetInvasionZone(uint32
         if (invasionPoint.zoneId == zoneId)
             return &invasionPoint;
     }
-    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
+    sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d.", zoneId);
     return nullptr;
 }
 

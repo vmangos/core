@@ -214,6 +214,8 @@ struct ScourgeInvasionEvent : WorldEvent
     ScourgeInvasionEvent();
 
     void Update() override;
+    uint32 GetZoneTime(uint32 zoneId);
+    void LogNextZoneTime();
     void EnableAndStartEvent(uint16 event_id);
     void DisableAndStopEvent(uint16 event_id);
     void HandleDefendedZones();
