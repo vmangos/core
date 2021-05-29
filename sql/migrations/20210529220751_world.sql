@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210529220751');
 
 
 -- Correct inhabit type and flags for Belfry Bat.
-UPDATE `creature_template` SET `inhabit_type`=4, `unit_flags`=33555200, `flags_extra`=33555202 WHERE `entry`=10716;
+UPDATE `creature_template` SET `inhabit_type`=4, `unit_flags`=33555200, `flags_extra`=33554434 WHERE `entry`=10716;
 
 -- Add bats that spawn every hour in Brill.
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `movement_type`, `wander_distance`) VALUES 
