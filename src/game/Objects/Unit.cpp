@@ -4279,7 +4279,6 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, SpellE
 
         SpellProcEventEntry const* spellProcEvent = itr.spellProcEvent;
         bool useCharges = triggeredByHolder->GetAuraCharges() > 0;
-        bool procSuccess = true;
         bool anyAuraProc = false;
         Unit* caster = itr.target == this ? pVictim : this;
 
@@ -4328,16 +4327,19 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, SpellE
                 case SPELL_AURA_PROC_CANT_TRIGGER:
                     continue;
                 case SPELL_AURA_PROC_FAILED:
-                    procSuccess = false;
+                    if (useCharges)
+                        useCharges = triggeredByHolder->GetSpellProto()->HasAttribute(SPELL_ATTR_PROC_FAILURE_BURNS_CHARGE);
                     break;
                 case SPELL_AURA_PROC_OK:
+                    if (useCharges)
+                        useCharges = !triggeredByHolder->GetSpellProto()->HasAttribute(SPELL_ATTR_PROC_FAILURE_BURNS_CHARGE);
                     break;
             }
 
             anyAuraProc = true;
         }
         // Remove charge (aura can be removed by triggers)
-        if (useCharges && procSuccess && anyAuraProc && !triggeredByHolder->IsDeleted())
+        if (useCharges && anyAuraProc && !triggeredByHolder->IsDeleted())
         {
             // If last charge dropped add spell to remove list
             if (triggeredByHolder->DropAuraCharge())
@@ -8233,13 +8235,9 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* pTarget, uint32 procFlag,
         // Update skills here for players
         if (IsPlayer())
         {
-            // On melee based hit/miss/resist need update skill (for victim and attacker)
+            // On melee based hit/miss/resist/parry/dodge/block need update skill
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT | PROC_EX_MISS | PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK | PROC_EX_RESIST))
-                ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
-
-            // Update defence if player is victim and parry/dodge/block
-            if (isVictim && procExtra & (PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK))
-                ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
+                ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim); // (isVictim -> defence, !isVictim -> weapon)
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))

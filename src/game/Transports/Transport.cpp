@@ -426,7 +426,7 @@ void Transport::SendOutOfRangeUpdateToMap()
     if (!players.isEmpty())
     {
         UpdateData data;
-        BuildOutOfRangeUpdateBlock(&data);
+        BuildOutOfRangeUpdateBlock(data);
         WorldPacket packet;
         data.BuildPacket(&packet);
         for (const auto& player : players)
@@ -444,7 +444,7 @@ void Transport::SendCreateUpdateToMap()
             if (player.getSource()->GetTransport() != this)
             {
                 UpdateData data;
-                BuildCreateUpdateBlockForPlayer(&data, player.getSource());
+                BuildCreateUpdateBlockForPlayer(data, player.getSource());
                 data.Send(player.getSource()->GetSession());
             }
     }

@@ -1551,11 +1551,11 @@ void Map::SendInitSelf(Player* player)
     if (Transport* transport = player->GetTransport())
     {
         hasTransport = true;
-        transport->BuildCreateUpdateBlockForPlayer(&data, player);
+        transport->BuildCreateUpdateBlockForPlayer(data, player);
     }
 
     // build data for self presence in world at own client (one time for map)
-    player->BuildCreateUpdateBlockForPlayer(&data, player);
+    player->BuildCreateUpdateBlockForPlayer(data, player);
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
@@ -1563,7 +1563,7 @@ void Map::SendInitSelf(Player* player)
             if (player != itr && player->IsInVisibleList(itr))
             {
                 hasTransport = true;
-                itr->BuildCreateUpdateBlockForPlayer(&data, player);
+                itr->BuildCreateUpdateBlockForPlayer(data, player);
             }
 
     data.Send(player->GetSession(), hasTransport);
@@ -1579,7 +1579,7 @@ void Map::SendInitTransports(Player* player)
         if (itr != player->GetTransport())
         {
             hasTransport = true;
-            itr->BuildCreateUpdateBlockForPlayer(&transData, player);
+            itr->BuildCreateUpdateBlockForPlayer(transData, player);
         }
     }
     transData.Send(player->GetSession(), hasTransport);
@@ -1595,7 +1595,7 @@ void Map::SendRemoveTransports(Player* player)
         if (itr != player->GetTransport())
         {
             hasTransport = true;
-            itr->BuildOutOfRangeUpdateBlock(&transData);
+            itr->BuildOutOfRangeUpdateBlock(transData);
         }
     }
     transData.Send(player->GetSession(), hasTransport);

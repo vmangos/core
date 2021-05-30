@@ -83,7 +83,10 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            me->SatisfyItemRequirements(pItem->GetProto());
             me->StoreNewItemInBestSlots(pItem->GetEntry(), 1);
+        }   
     }
 }
 
@@ -145,11 +148,23 @@ Player* PartyBotAI::GetPartyLeader() const
     if (!pGroup)
         return nullptr;
 
-    ObjectGuid leaderGuid = pGroup->GetLeaderGuid();
-    if (leaderGuid == me->GetObjectGuid() && !me->InBattleGround())
-        return nullptr;
+    if (Player* originalLeader = ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid))
+    {
+        if (me->InBattleGround() == originalLeader->InBattleGround())
+        {
+            // In case the original spawner is not in the same group as the bots anymore.
+            if (pGroup != originalLeader->GetGroup())
+                return nullptr;
 
-    return ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid);
+            // In case the current leader is the bot itself and it's not inside a Battleground.
+            ObjectGuid currentLeaderGuid = pGroup->GetLeaderGuid();
+            if (currentLeaderGuid == me->GetObjectGuid() && !me->InBattleGround())
+                return nullptr;
+        }
+
+        return originalLeader;
+    }
+    return nullptr;
 }
 
 bool PartyBotAI::RunAwayFromTarget(Unit* pTarget)
@@ -565,6 +580,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             me->GetMotionMaster()->MoveIdle();
         return;
     }
+
+    if (me->HasUnitState(UNIT_STAT_DIED) && me->HasAuraType(SPELL_AURA_FEIGN_DEATH) &&
+       !me->IsInCombat() && (!me->GetPet() || !me->GetPet()->IsInCombat()) &&
+       !me->SelectRandomUnfriendlyTarget(nullptr, 20.0f, false, true))
+        me->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         return;
