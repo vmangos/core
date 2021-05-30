@@ -33,6 +33,7 @@ class Unit;
 class GameObjectAI;
 class GameObjectModel;
 class Transport;
+struct TransportAnimation;
 
 struct GameObjectDisplayInfoEntry;
 
@@ -50,6 +51,7 @@ class GameObject : public SpellCaster
         GameObjectInfo const* GetGOInfo() const;
 
         bool IsTransport() const;
+        bool IsMoTransport() const;
 
         bool HasStaticDBSpawnData() const;                  // listed in `gameobject` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const { return HasStaticDBSpawnData() ? GetGUIDLow() : 0; }
@@ -220,11 +222,16 @@ class GameObject : public SpellCaster
         void AIM_Initialize();
         GameObjectAI* AI() { return i_AI; }
 
-        // NOSTALRIUS: GOCollision
         void UpdateCollisionState();
         void UpdateModel();                                 // updates model in case displayId were changed
         GameObjectModel* m_model;
         void UpdateModelPosition();
+
+        float GetStationaryX() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.x; return 0.f; }
+        float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.y; return 0.f; }
+        float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.z; return 0.f; }
+        float GetStationaryO() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.o; return GetOrientation(); }
+
         GameObjectData const*  GetGOData() const;
 
         // Transports system
@@ -268,7 +275,14 @@ class GameObject : public SpellCaster
         uint64 m_rotation;
         GameObjectInfo const* m_goInfo;
 
+        Position m_stationaryPosition;
+
         GameObjectAI* i_AI;
+
+        // transport only
+        uint32 m_pathProgress;
+        TransportAnimation const* m_animationInfo;
+        uint32 m_currentSeg;
 
         uint32 m_playerGroupId;
     private:

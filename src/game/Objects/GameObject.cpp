@@ -174,6 +174,8 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
     Relocate(x, y, z, ang);
     SetMap(map);
 
+    m_stationaryPosition = Position(x, y, z, ang);
+
     if (!IsPositionValid())
     {
         sLog.outError("Gameobject (GUID: %u Entry: %u ) not created. Suggested coordinates are invalid (X: %f Y: %f)", guidlow, name_id, x, y);
@@ -228,6 +230,19 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
     SetGoType(GameobjectTypes(goinfo->type));
 
     SetGoAnimProgress(animprogress);
+
+    switch (GetGoType())
+    {
+        case GAMEOBJECT_TYPE_TRANSPORT:
+            SetUInt32Value(GAMEOBJECT_LEVEL, goinfo->transport.pause);
+            SetGoState(goinfo->transport.startOpen ? GO_STATE_ACTIVE : GO_STATE_READY);
+            SetGoAnimProgress(animprogress);
+            m_pathProgress = 0;
+            m_animationInfo = sTransportMgr->GetTransportAnimInfo(goinfo->id);
+            m_currentSeg = 0;
+            break;
+    }
+
     SetName(goinfo->name);
 
     if (GetGOInfo()->IsLargeGameObject())
@@ -522,6 +537,48 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         // Some may have have animation and/or are expected to despawn.
                         if (HasCustomAnim())
                             SendGameObjectCustomAnim();
+                    }
+                }
+                if (goInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+                {
+                    if (!m_animationInfo)
+                        break;
+
+                    if (GetGoState() == GO_STATE_READY)
+                    {
+                        m_pathProgress += update_diff;
+                        // TODO: Fix movement in unloaded grid - currently GO will just disappear
+                        uint32 timer = sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime;
+                        TransportAnimationEntry const* nodeNext = m_animationInfo->GetNextAnimNode(timer);
+                        TransportAnimationEntry const* nodePrev = m_animationInfo->GetPrevAnimNode(timer);
+                        if (nodeNext && nodePrev)
+                        {
+                            m_currentSeg = nodePrev->TimeSeg;
+
+                            G3D::Vector3 posPrev = G3D::Vector3(nodePrev->X, nodePrev->Y, nodePrev->Z);
+                            G3D::Vector3 posNext = G3D::Vector3(nodeNext->X, nodeNext->Y, nodeNext->Z);
+                            G3D::Vector3 currentPos;
+                            if (posPrev == posNext)
+                                currentPos = posPrev;
+                            else
+                            {
+                                uint32 timeElapsed = timer - nodePrev->TimeSeg;
+                                uint32 timeDiff = nodeNext->TimeSeg - nodePrev->TimeSeg;
+                                G3D::Vector3 segmentDiff = posNext - posPrev;
+                                float velocityX = float(segmentDiff.x) / timeDiff, velocityY = float(segmentDiff.y) / timeDiff, velocityZ = float(segmentDiff.z) / timeDiff;
+
+                                currentPos = G3D::Vector3(timeElapsed* velocityX, timeElapsed* velocityY, timeElapsed* velocityZ);
+                                currentPos += posPrev;
+                            }
+
+                            currentPos += G3D::Vector3(m_stationaryPosition.x, m_stationaryPosition.y, m_stationaryPosition.z);
+
+                            Relocate(currentPos.x, currentPos.y, currentPos.z, GetOrientation());
+                            UpdateModelPosition();
+
+                            // SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000);
+                        }
+
                     }
                 }
 
@@ -1033,6 +1090,13 @@ bool GameObject::IsTransport() const
     return gInfo->type == GAMEOBJECT_TYPE_TRANSPORT || gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT;
 }
 
+bool GameObject::IsMoTransport() const
+{
+    GameObjectInfo const* gInfo = GetGOInfo();
+    if (!gInfo) return false;
+    return gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT;
+}
+
 Unit* GameObject::GetOwner() const
 {
     if (!FindMap())
@@ -1072,7 +1136,7 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
         return false;
 
     // Transport always visible at this step implementation
-    if (IsTransport() && IsInMap(pDetector))
+    if (IsMoTransport() && IsInMap(pDetector))
         return true;
 
     // quick check visibility false cases for non-GM-mode

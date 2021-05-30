@@ -80,6 +80,7 @@
 #include "AuraRemovalMgr.h"
 #include "InstanceStatistics.h"
 #include "GuardMgr.h"
+#include "TransportMgr.h"
 
 #include <chrono>
 
@@ -1685,6 +1686,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Loading GameObject models ...");
     LoadGameObjectModelList();
+
+    // loads GO data
+    sTransportMgr->LoadTransportAnimationAndRotation();
 
     ///- Initialize MapManager
     sLog.outString("Starting Map System");

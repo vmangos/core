@@ -459,12 +459,22 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     {
         if (updateFlags & UPDATEFLAG_HAS_POSITION)                     // 0x40
         {
-            WorldObject* object = ((WorldObject*)this);
-
-            *data << float(object->GetPositionX());
-            *data << float(object->GetPositionY());
-            *data << float(object->GetPositionZ());
-            *data << float(object->GetOrientation());
+            // 0x02
+            if (updateFlags & UPDATEFLAG_TRANSPORT)
+            {
+                GameObject const* go = static_cast<GameObject const*>(this);
+                *data << float(go->GetStationaryX());
+                *data << float(go->GetStationaryY());
+                *data << float(go->GetStationaryZ());
+                *data << float(go->GetStationaryO());
+            }
+            else
+            {
+                *data << float(((WorldObject*)this)->GetPositionX());
+                *data << float(((WorldObject*)this)->GetPositionY());
+                *data << float(((WorldObject*)this)->GetPositionZ());
+                *data << float(((WorldObject*)this)->GetOrientation());
+            }
         }
     }
     if (updateFlags & UPDATEFLAG_HIGHGUID)
@@ -501,10 +511,10 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
             this causes clients to receive different PathProgress
             resulting in players seeing the object in a different position
         */
-        if (go && go->ToTransport())
+        if (go && go->IsMoTransport())
             *data << uint32(go->ToTransport()->GetPathProgress());
         else
-            *data << uint32(WorldTimer::getMSTime());
+            *data << uint32(sWorld.GetCurrentMSTime());
     }
 #else
     Unit const* unit = ToUnit();
