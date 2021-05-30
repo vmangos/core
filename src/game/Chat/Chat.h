@@ -591,6 +591,7 @@ class ChatHandler
         bool HandleListTalentsCommand(char* args);
         bool HandleListMoveGensCommand(char* args);
         bool HandleListHostileRefsCommand(char* args);
+        bool HandleListThreatCommand(char* args);
 
         bool HandleLookupAccountEmailCommand(char* args);
         bool HandleLookupAccountIpCommand(char* args);
