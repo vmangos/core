@@ -668,6 +668,8 @@ class ObjectMgr
         TaxiNodesEntry const* GetTaxiNodeEntry(uint32 id) const { return id < GetMaxTaxiNodeId() ? m_TaxiNodes[id].get() : nullptr; }
         uint32 GetMaxTaxiNodeId() const { return m_TaxiNodes.size(); }
 
+        ObjectGuid GetFullTransportGuidFromLowGuid(uint32 lowGuid);
+
         Quest const* GetQuestTemplate(uint32 quest_id) const
         {
             auto itr = m_QuestTemplatesMap.find(quest_id);

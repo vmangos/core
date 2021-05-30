@@ -8226,6 +8226,20 @@ void ObjectMgr::LoadTaxiPathTransitions()
     sLog.outString(">> Loaded %u taxi path transitions", count);
 }
 
+ObjectGuid ObjectMgr::GetFullTransportGuidFromLowGuid(uint32 lowGuid)
+{
+    ObjectGuid guid(HIGHGUID_MO_TRANSPORT, lowGuid);
+
+    if (GameObjectData const* data = GetGOData(lowGuid))
+    {
+        if (GameObjectInfo const* pInfo = GetGameObjectInfo(data->id))
+            if (pInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+                guid = ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, lowGuid);
+    }
+
+    return guid;
+}
+
 void ObjectMgr::LoadReservedPlayersNames()
 {
     m_ReservedNames.clear();                                // need for reload case

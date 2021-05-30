@@ -2563,7 +2563,7 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
 
     // path
     PathInfo path(target);
-    Transport* transport = target->GetTransport();
+    GenericTransport* transport = target->GetTransport();
     if (!transport && player->GetTransport())
         transport = player->GetTransport();
     path.SetTransport(transport);
@@ -2608,7 +2608,7 @@ bool ChatHandler::HandleMmapLocCommand(char* /*args*/)
     unit->GetPosition(x, y, z);
     float location[VERTEX_SIZE] = {y, z, x};
 
-    if (Transport* transport = unit->GetTransport())
+    if (GenericTransport* transport = unit->GetTransport())
     {
         transport->CalculatePassengerOffset(location[2], location[0], location[1]);
         PSendSysMessage("* On transport navmesh 'go%03u.mmap' offsets [%f %f %f]", transport->GetDisplayId(), location[2], location[0], location[1]);
@@ -2717,7 +2717,7 @@ bool ChatHandler::HandleMmapStatsCommand(char* /*args*/)
     PSendSysMessage(" %u maps loaded with %u tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
 
     dtNavMesh const* navmesh = manager->GetNavMesh(m_session->GetPlayer()->GetMapId());
-    if (Transport* transport = m_session->GetPlayer()->GetTransport())
+    if (GenericTransport* transport = m_session->GetPlayer()->GetTransport())
     {
         dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetModelNavMeshQuery(transport->GetDisplayId());
         navmesh = navmeshquery ? navmeshquery->getAttachedNavMesh() : nullptr;

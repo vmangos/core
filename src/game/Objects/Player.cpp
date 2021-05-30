@@ -1528,7 +1528,7 @@ void Player::RelocateToLastClientPosition()
     }
 }
 
-void Player::GetSafePosition(float &x, float &y, float &z, Transport* onTransport) const
+void Player::GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport) const
 {
     if (!onTransport && m_movementInfo.ctime >  0)
     {
@@ -6619,7 +6619,7 @@ void Player::DismountCheck()
     }
 }
 
-void Player::SetTransport(Transport* t)
+void Player::SetTransport(GenericTransport* t)
 {
     WorldObject::SetTransport(t);
 
@@ -14748,14 +14748,19 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         _SaveBGData();
     }
 
+    // load the player's map here if it's not already loaded
+    if (GetMapId() <= 1)
+        SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
+    SetMap(sMapMgr.CreateMap(GetMapId(), this));
+
     if (transGUID != 0)
     {
-        ObjectGuid transObjectGuid(HIGHGUID_MO_TRANSPORT, transGUID);
-        Transport* transport = HashMapHolder<Transport>::Find(transObjectGuid);
-        if (transport)
+        ObjectGuid guid = sObjectMgr.GetFullTransportGuidFromLowGuid(transGUID);
+
+        if (GenericTransport* transport = GetMap()->GetTransport(guid))
         {
             float x = fields[26].GetFloat(), y = fields[27].GetFloat(), z = fields[28].GetFloat(), o = fields[29].GetFloat();
-            m_movementInfo.SetTransportData(transObjectGuid, x, y, z, o, 0);
+            m_movementInfo.SetTransportData(guid, x, y, z, o, 0);
             transport->CalculatePassengerPosition(x, y, z, &o);
 
             if (!MaNGOS::IsValidMapCoord(x, y, z, o) ||
@@ -14815,11 +14820,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             }
         }
     }
-
-    // load the player's map here if it's not already loaded
-    if (GetMapId() <= 1)
-        SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
-    SetMap(sMapMgr.CreateMap(GetMapId(), this));
 
     SaveRecallPosition();
 
@@ -20510,6 +20510,7 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
             if ((typemask & TYPEMASK_PLAYER) && IsInWorld())
                 return ObjectAccessor::FindPlayer(guid);
             break;
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             if ((typemask & TYPEMASK_GAMEOBJECT) && IsInWorld())
                 return GetMap()->GetGameObject(guid);
@@ -20526,7 +20527,6 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
             if ((typemask & TYPEMASK_DYNAMICOBJECT) && IsInWorld())
                 return GetMap()->GetDynamicObject(guid);
             break;
-        case HIGHGUID_TRANSPORT:
         case HIGHGUID_CORPSE:
         case HIGHGUID_MO_TRANSPORT:
             break;

@@ -107,6 +107,14 @@ GameObject::~GameObject()
     MANGOS_ASSERT(m_dynObjGUIDs.empty());
 }
 
+GameObject* GameObject::CreateGameObject(uint32 entry)
+{
+    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
+    if (goinfo && goinfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+        return new ElevatorTransport;
+    return new GameObject;
+}
+
 void GameObject::AddToWorld()
 {
     ///- Register the gameobject for guid lookup
@@ -237,9 +245,6 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
             SetUInt32Value(GAMEOBJECT_LEVEL, goinfo->transport.pause);
             SetGoState(goinfo->transport.startOpen ? GO_STATE_ACTIVE : GO_STATE_READY);
             SetGoAnimProgress(animprogress);
-            m_pathProgress = 0;
-            m_animationInfo = sTransportMgr->GetTransportAnimInfo(goinfo->id);
-            m_currentSeg = 0;
             break;
     }
 
@@ -537,48 +542,6 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         // Some may have have animation and/or are expected to despawn.
                         if (HasCustomAnim())
                             SendGameObjectCustomAnim();
-                    }
-                }
-                if (goInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
-                {
-                    if (!m_animationInfo)
-                        break;
-
-                    if (GetGoState() == GO_STATE_READY)
-                    {
-                        m_pathProgress += update_diff;
-                        // TODO: Fix movement in unloaded grid - currently GO will just disappear
-                        uint32 timer = sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime;
-                        TransportAnimationEntry const* nodeNext = m_animationInfo->GetNextAnimNode(timer);
-                        TransportAnimationEntry const* nodePrev = m_animationInfo->GetPrevAnimNode(timer);
-                        if (nodeNext && nodePrev)
-                        {
-                            m_currentSeg = nodePrev->TimeSeg;
-
-                            G3D::Vector3 posPrev = G3D::Vector3(nodePrev->X, nodePrev->Y, nodePrev->Z);
-                            G3D::Vector3 posNext = G3D::Vector3(nodeNext->X, nodeNext->Y, nodeNext->Z);
-                            G3D::Vector3 currentPos;
-                            if (posPrev == posNext)
-                                currentPos = posPrev;
-                            else
-                            {
-                                uint32 timeElapsed = timer - nodePrev->TimeSeg;
-                                uint32 timeDiff = nodeNext->TimeSeg - nodePrev->TimeSeg;
-                                G3D::Vector3 segmentDiff = posNext - posPrev;
-                                float velocityX = float(segmentDiff.x) / timeDiff, velocityY = float(segmentDiff.y) / timeDiff, velocityZ = float(segmentDiff.z) / timeDiff;
-
-                                currentPos = G3D::Vector3(timeElapsed* velocityX, timeElapsed* velocityY, timeElapsed* velocityZ);
-                                currentPos += posPrev;
-                            }
-
-                            currentPos += G3D::Vector3(m_stationaryPosition.x, m_stationaryPosition.y, m_stationaryPosition.z);
-
-                            Relocate(currentPos.x, currentPos.y, currentPos.z, GetOrientation());
-                            UpdateModelPosition();
-
-                            // SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000);
-                        }
-
                     }
                 }
 
@@ -2355,7 +2318,9 @@ struct SpawnGameObjectInMapsWorker
                 sLog.outString("[CRASH] Spawning already spawned Gobj ! GUID=%u", i_guid);
                 return;
             }
-            GameObject* pGameobject = new GameObject;
+            GameObjectData const* data = sObjectMgr.GetGOData(i_guid);
+            MANGOS_ASSERT(data);
+            GameObject* pGameobject = GameObject::CreateGameObject(data->id);
             //DEBUG_LOG("Spawning gameobject %u", *itr);
             if (!pGameobject->LoadFromDB(i_guid, map))
                 delete pGameobject;

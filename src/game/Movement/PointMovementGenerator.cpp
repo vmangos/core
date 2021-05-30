@@ -270,7 +270,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     Vector3 victimSpd; // speed vector of victim
     float o;
 
-    if (Transport* t = attacker.GetTransport())
+    if (GenericTransport* t = attacker.GetTransport())
         path.SetTransport(t);
 
     if (m_speed == 0)

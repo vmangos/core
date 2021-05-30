@@ -50,7 +50,7 @@ class UpdateMask;
 class InstanceData;
 class TerrainInfo;
 class ZoneScript;
-class Transport;
+class GenericTransport;
 struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
@@ -623,8 +623,8 @@ class WorldObject : public Object
         float GetPositionX() const { return m_position.x; }
         float GetPositionY() const { return m_position.y; }
         float GetPositionZ() const { return m_position.z; }
-        virtual void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
-        void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
+        virtual void GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
+        void GetPosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const;
         void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
         float GetOrientation() const { return m_position.o; }
         void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const
@@ -753,8 +753,8 @@ class WorldObject : public Object
         void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);
 
         // Transports / Movement
-        Transport* GetTransport() const { return m_transport; }
-        virtual void SetTransport(Transport* t) { m_transport = t; }
+        GenericTransport* GetTransport() const { return m_transport; }
+        virtual void SetTransport(GenericTransport* t) { m_transport = t; }
 
         float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
         float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
@@ -777,7 +777,7 @@ class WorldObject : public Object
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
         MovementInfo m_movementInfo;
-        Transport* m_transport;
+        GenericTransport* m_transport;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 

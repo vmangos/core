@@ -1892,7 +1892,7 @@ class Player final: public Unit
             m_summon_z = z;
         }
         void SummonIfPossible(bool agree);
-        void SetTransport(Transport* t) override;
+        void SetTransport(GenericTransport* t) override;
         void DismountCheck();
 
         // knockback/jumping states
@@ -2409,7 +2409,7 @@ class Player final: public Unit
         MovementAnticheat* GetCheatData() const { return m_session->GetCheatData(); }
         void OnDisconnected();
         void RelocateToLastClientPosition();
-        void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const override;
+        void GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const override;
 
         /*********************************************************/
         /***                 PACKET BROADCASTER                ***/

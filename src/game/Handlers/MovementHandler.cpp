@@ -111,7 +111,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     GetPlayer()->SetMap(map);
-    if (Transport* t = GetPlayer()->GetTransport()) // Transport position may have changed while loading
+    if (GenericTransport* t = GetPlayer()->GetTransport()) // Transport position may have changed while loading
         t->UpdatePassengerPosition(GetPlayer());
     else
         GetPlayer()->Relocate(loc.x, loc.y, loc.z, loc.o);
@@ -954,8 +954,8 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     pMover->m_movementInfo.ctime += lag;
 
     // fix an 1.12 client problem with transports
-    Transport* tr = pMover->GetTransport();
-    if (_player->HasJustBoarded() && tr)
+    GenericTransport* tr = pMover->GetTransport();
+    if (_player->HasJustBoarded() && tr->IsMoTransport())
     {
         _player->SetJustBoarded(false);
         tr->SendOutOfRangeUpdateToPlayer(_player);
@@ -1024,7 +1024,8 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             Unit* loadPetOnTransport = nullptr;
             if (!pPlayerMover->GetTransport())
             {
-                if (Transport* t = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
+                printf("has MOVEFLAG_ONTRANSPORT but not on transport\n");
+                if (GenericTransport* t = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
                 {
                     t->AddPassenger(pPlayerMover);
                     if (Pet* pet = pPlayerMover->GetPet())
@@ -1036,6 +1037,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             }
             else
                 pPlayerMover->SetJustBoarded(false);
+
             if (pPlayerMover->GetTransport())
             {
                 movementInfo.pos.x = movementInfo.GetTransportPos()->x;

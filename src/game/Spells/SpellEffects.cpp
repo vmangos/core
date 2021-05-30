@@ -5435,7 +5435,7 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
     duel2->startTime  = 0;
     duel2->startTimer = 0;
 
-    if (Transport* t = caster->GetTransport())
+    if (GenericTransport* t = caster->GetTransport())
     {
         duel->transportGuid  = t->GetGUIDLow();
         duel2->transportGuid = t->GetGUIDLow();

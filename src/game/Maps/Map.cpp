@@ -81,6 +81,18 @@ Map::~Map()
     m_weatherSystem = nullptr;
 }
 
+GenericTransport* Map::GetTransport(ObjectGuid guid)
+{
+    if (Transport* transport = HashMapHolder<Transport>::Find(guid))
+        return transport;
+
+    if (guid.GetEntry())
+        if (GameObject* go = GetGameObject(guid))
+            if (go->IsTransport())
+                return static_cast<GenericTransport*>(go);
+    return nullptr;
+}
+
 void Map::LoadMapAndVMap(int gx, int gy)
 {
     if (m_bLoadedGrids[gx][gx])
@@ -1548,7 +1560,7 @@ void Map::SendInitSelf(Player* player)
     bool hasTransport = false;
 
     // attach to player data current transport data
-    if (Transport* transport = player->GetTransport())
+    if (GenericTransport* transport = player->GetTransport())
     {
         hasTransport = true;
         transport->BuildCreateUpdateBlockForPlayer(data, player);
@@ -1558,7 +1570,7 @@ void Map::SendInitSelf(Player* player)
     player->BuildCreateUpdateBlockForPlayer(data, player);
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
-    if (Transport* transport = player->GetTransport())
+    if (GenericTransport* transport = player->GetTransport())
         for (const auto itr : transport->GetPassengers())
             if (player != itr && player->IsInVisibleList(itr))
             {
@@ -2517,15 +2529,6 @@ Creature* Map::GetAnyTypeCreature(ObjectGuid guid)
     return nullptr;
 }
 
-Transport* Map::GetTransport(ObjectGuid guid)
-{
-    if (!guid.IsMOTransport())
-        return nullptr;
-
-    GameObject* go = GetGameObject(guid);
-    return go ? go->ToTransport() : nullptr;
-}
-
 /**
  * Function return dynamic object that in world at CURRENT map
  *
@@ -2561,6 +2564,7 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
     {
         case HIGHGUID_PLAYER:
             return GetPlayer(guid);
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             return GetGameObject(guid);
         case HIGHGUID_UNIT:
@@ -2576,7 +2580,6 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
             return corpse && corpse->IsInWorld() ? corpse : nullptr;
         }
         case HIGHGUID_MO_TRANSPORT:
-        case HIGHGUID_TRANSPORT:
         default:
             break;
     }
@@ -2805,6 +2808,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
         case HIGHGUID_UNIT:
             guid = m_CreatureGuids.Generate();
             break;
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             guid = m_GameObjectGuids.Generate();
             break;
@@ -2973,7 +2977,7 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
     return result0;
 }
 
-bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, uint32 moveAllowedFlags, float zSearchDist, bool locatedOnSteepSlope) const
+bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, uint32 moveAllowedFlags, float zSearchDist, bool locatedOnSteepSlope) const
 {
     if (!MaNGOS::IsValidMapCoord(srcX, srcY, srcZ))
     {
@@ -3083,7 +3087,7 @@ bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float
 }
 
 
-bool Map::GetWalkRandomPosition(Transport* transport, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags) const
+bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags) const
 {
     ASSERT(MaNGOS::IsValidMapCoord(x, y, z));
 
