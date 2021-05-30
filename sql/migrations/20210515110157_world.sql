@@ -355,7 +355,10 @@ UPDATE `npc_vendor` SET `item` = 6275 WHERE `entry` = 3499 AND `item` = 2675;
 UPDATE `creature` SET `position_x` = -6662.364258, `position_y` = -3489.209961, `position_z`= 256.418640 WHERE `guid` = 6915;
 
 -- Fix Champoins Hall Door
-UPDATE `gameobject` SET `state`= 1 WHERE `guid`=26262;
+UPDATE `gameobject` SET `state` = 1 WHERE `guid` = 26262;
+
+-- Fix Hall of Legends Door
+UPDATE `gameobject` SET `state` =  1 WHERE `guid` = 31661;
 
 
 -- End of migration.
