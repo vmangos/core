@@ -31,9 +31,9 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (81027, 448, -10107.1787109375, 618.212646484375, 38.20453262329101562, 3.78528451919555664, 180, 180, 15, 100, 0, 1, 10),
 (81028, 448, -10085.3671875, 585.65655517578125, 39.27585601806640625, 1.303950071334838867, 180, 180, 15, 100, 0, 1, 10),
 (81029, 448, -10018.634765625, 640.62945556640625, 39.06363296508789062, 1.332400083541870117, 180, 180, 15, 100, 0, 1, 10);
-INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`) VALUES
+REPLACE INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`) VALUES
 (448, 1265, 0, 'Elwynn Forest - Forests Edge - Hogger (448)');
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+REPLACE INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (1265, 1, 'Elwynn Forest - Forests Edge - Hogger (448)');
 
 -- Westfall - Dust Devil (credit cmangos)
