@@ -354,6 +354,8 @@ UPDATE `npc_vendor` SET `item` = 6275 WHERE `entry` = 3499 AND `item` = 2675;
 -- Fix Ridge Huntress Stuck Underground
 UPDATE `creature` SET `position_x` = -6662.364258, `position_y` = -3489.209961, `position_z`= 256.418640 WHERE `guid` = 6915;
 
+-- Fix Champoins Hall Door
+UPDATE `gameobject` SET `state`= 1 WHERE `guid`=26262;
 
 -- End of migration.
 END IF;
