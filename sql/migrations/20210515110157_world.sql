@@ -356,6 +356,8 @@ UPDATE `creature` SET `position_x` = -6662.364258, `position_y` = -3489.209961, 
 
 -- Fix Champoins Hall Door
 UPDATE `gameobject` SET `state`= 1 WHERE `guid`=26262;
+DELETE FROM `gameobject` WHERE `guid` = 30699;
+
 
 -- End of migration.
 END IF;
