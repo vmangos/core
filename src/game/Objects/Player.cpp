@@ -18489,7 +18489,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
             ObjectGuid t_guid = target->GetObjectGuid();
 
             if (target->IsCreature() && IsInCombat() && !GetMap()->IsDungeon())
-                if (((Creature*)target)->IsInCombat())
+                if (((Creature*)target)->IsInCombat() && IsInCombatWithCreature((Creature*)target))
                     ((Creature*)target)->GetThreatManager().modifyThreatPercent(this, -101);
 
             target->BuildOutOfRangeUpdateBlock(data);
@@ -21734,4 +21734,19 @@ void Player::RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32
 
         SendClearCooldown(spellEntry->Id, this);
     }
+}
+
+bool Player::IsInCombatWithCreature(Creature const* pCreature)
+{
+    HostileReference* pReference = GetHostileRefManager().getFirst();
+
+    while (pReference)
+    {
+        if (pCreature == pReference->getSourceUnit())
+            return true;
+
+        pReference = pReference->next();
+    }
+
+    return false;
 }

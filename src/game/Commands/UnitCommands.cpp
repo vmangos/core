@@ -733,6 +733,26 @@ bool ChatHandler::HandleListHostileRefsCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleListThreatCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Threat list for %s:", pUnit->GetObjectGuid().GetString().c_str());
+    ThreatList const& threatList = pUnit->GetThreatManager().getThreatList();
+    for (auto const& itr : threatList)
+    {
+        PSendSysMessage("%g - %s", itr->getThreat(), itr->getUnitGuid().GetString().c_str());
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleCastCommand(char* args)
 {
     if (!*args)

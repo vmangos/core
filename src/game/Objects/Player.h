@@ -2026,6 +2026,7 @@ class Player final: public Unit
         // Cannot be detected by creature (Should be tested in AI::MoveInLineOfSight)
         void SetCannotBeDetectedTimer(uint32 milliseconds) { m_cannotBeDetectedTimer = milliseconds; };
         bool CanBeDetected() const override { return m_cannotBeDetectedTimer <= 0; }
+        bool IsInCombatWithCreature(Creature const* pCreature);
 
         // PlayerAI management
         PlayerAI* i_AI;
