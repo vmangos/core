@@ -281,11 +281,6 @@ class GameObject : public SpellCaster
 
         GameObjectAI* i_AI;
 
-        // transport only
-        uint32 m_pathProgress;
-        TransportAnimation const* m_animationInfo;
-        uint32 m_currentSeg;
-
         uint32 m_playerGroupId;
     private:
         void SwitchDoorOrButton(bool activate, bool alternative = false);

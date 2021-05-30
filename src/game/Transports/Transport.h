@@ -38,7 +38,7 @@ class GenericTransport : public GameObject
         void UpdatePassengerPosition(WorldObject* object);
 
         typedef std::set<WorldObject*> PassengerSet;
-        PassengerSet const& GetPassengers() const { return _passengers; }
+        PassengerSet const& GetPassengers() const { return m_passengers; }
 
         /// This method transforms supplied transport offsets into global coordinates
         void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
@@ -77,10 +77,11 @@ class GenericTransport : public GameObject
         }
 
         virtual uint32 GetPathProgress() const = 0;
-        PassengerSet _passengers;
-        PassengerSet::iterator _passengerTeleportItr;
     private:
         void UpdatePassengerPositions(PassengerSet& passengers); 
+    protected:
+        PassengerSet m_passengers;
+        PassengerSet::iterator m_passengerTeleportItr;
 };
 
 class ElevatorTransport : public GenericTransport
@@ -111,13 +112,13 @@ public:
 
     void BuildUpdate(UpdateDataMapType& data_map);
 
-    uint32 GetPathProgress() const override { return _pathProgress; }
+    uint32 GetPathProgress() const override { return m_pathProgress; }
     uint32 GetPeriod() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
     void SetPeriod(uint32 period) { SetUInt32Value(GAMEOBJECT_LEVEL, period); }
 
-    KeyFrameVec const& GetKeyFrames() const { return _transportInfo->keyFrames; }
+    KeyFrameVec const& GetKeyFrames() const { return m_transportInfo->keyFrames; }
 
-    TransportTemplate const* GetTransportTemplate() const { return _transportInfo; }
+    TransportTemplate const* GetTransportTemplate() const { return m_transportInfo; }
 
     void SendOutOfRangeUpdateToMap();
     void SendCreateUpdateToMap();
@@ -128,18 +129,18 @@ private:
     void DoEventIfAny(KeyFrame const& node, bool departure);
 
     //! Helpers to know if stop frame was reached
-    bool IsMoving() const { return _isMoving; }
-    void SetMoving(bool val) { _isMoving = val; }
+    bool IsMoving() const { return m_isMoving; }
+    void SetMoving(bool val) { m_isMoving = val; }
 
-    TransportTemplate const* _transportInfo;
+    TransportTemplate const* m_transportInfo;
 
-    KeyFrameVec::const_iterator _currentFrame;
-    KeyFrameVec::const_iterator _nextFrame;
-    ShortTimeTracker _positionChangeTimer;
-    bool _isMoving;
-    bool _pendingStop;
+    KeyFrameVec::const_iterator m_currentFrame;
+    KeyFrameVec::const_iterator m_nextFrame;
+    ShortTimeTracker m_positionChangeTimer;
+    bool m_isMoving;
+    bool m_pendingStop;
 
-    uint32 _pathProgress;
+    uint32 m_pathProgress;
 };
 
 #endif

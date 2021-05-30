@@ -1024,7 +1024,6 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             Unit* loadPetOnTransport = nullptr;
             if (!pPlayerMover->GetTransport())
             {
-                printf("has MOVEFLAG_ONTRANSPORT but not on transport\n");
                 if (GenericTransport* t = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
                 {
                     t->AddPassenger(pPlayerMover);
