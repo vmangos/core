@@ -91,6 +91,7 @@ namespace MMAP
             dtNavMeshQuery const* GetNavMeshQuery(uint32 mapId);
             dtNavMeshQuery const* GetModelNavMeshQuery(uint32 displayId);
             dtNavMesh const* GetNavMesh(uint32 mapId);
+            dtNavMesh const* GetGONavMesh(uint32 displayId);
 
             uint32 getLoadedTilesCount() const { return loadedTiles; }
             uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }

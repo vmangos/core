@@ -1201,12 +1201,12 @@ namespace MMAP
      * This is basically a copy-paste of buildMoveMapTile with slightly diff parameters
      * .. and without worrying about model/terrain, undermap or liquids.
      */
-    void MapBuilder::buildGameObject(std::string model, uint32 displayId)
+    void MapBuilder::buildGameObject(std::string modelName, uint32 displayId)
     {
-        printf("Building GameObject model %s\n", model.c_str());
+        printf("Building GameObject model %s\n", modelName.c_str());
         WorldModel m;
         MeshData meshData;
-        if (!m.readFile("vmaps/" + model))
+        if (!m.readFile("vmaps/" + modelName))
         {
             printf("* Unable to open file\n");
             return;
@@ -1217,7 +1217,7 @@ namespace MMAP
         m.getGroupModels(groupModels);
 
         // all M2s need to have triangle indices reversed
-        bool isM2 = model.find(".m2") != model.npos || model.find(".M2") != model.npos;
+        bool isM2 = modelName.find(".m2") != modelName.npos || modelName.find(".M2") != modelName.npos;
 
         for (vector<GroupModel>::iterator it = groupModels.begin(); it != groupModels.end(); ++it)
         {
@@ -1456,9 +1456,9 @@ namespace MMAP
         fclose(file);
         if (m_debug)
         {
-            iv.generateObjFile(model, meshData);
+            iv.generateObjFile(modelName, meshData);
             // Write navmesh data
-            std::string fname = "meshes/" + model + ".nav";
+            std::string fname = "meshes/" + modelName + ".nav";
             FILE* file = fopen(fname.c_str(), "wb");
             if (file)
             {

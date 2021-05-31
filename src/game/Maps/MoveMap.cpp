@@ -313,6 +313,14 @@ dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
     return loadedMMaps[mapId]->navMesh;
 }
 
+dtNavMesh const* MMapManager::GetGONavMesh(uint32 mapId)
+{
+    if (loadedModels.find(mapId) == loadedModels.end())
+        return nullptr;
+
+    return loadedModels[mapId]->navMesh;
+}
+
 dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
 {
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -435,11 +443,11 @@ dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
             if (dtStatusFailed(query->init(mmap->navMesh, 2048)))
             {
                 dtFreeNavMeshQuery(query);
-                sLog.outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
+                sLog.outError("MMAP:GetModelNavMeshQuery: Failed to initialize dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
                 return nullptr;
             }
 
-            DETAIL_LOG("MMAP:GetNavMeshQuery: created dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
+            DETAIL_LOG("MMAP:GetModelNavMeshQuery: created dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
             mmap->navMeshQueries.insert(std::pair<std::thread::id, dtNavMeshQuery*>(tid, query));
         }
     }
