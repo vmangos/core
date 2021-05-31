@@ -131,7 +131,7 @@ UPDATE `creature_template` SET `dmg_min`='188', `dmg_max`='249' WHERE `entry`=79
 UPDATE `creature_template` SET `gossip_menu_id`='7166', `health_min`='3052', `health_max`='3052', `faction`='190', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='768', `auras`='29826', `flags_extra`='198658', `script_name`='scourge_invasion_cultist_engineer' WHERE `entry`=16230;
 
 -- Fix Shadow of Doom
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='48840', `health_max`='48840', `mana_min`='2434', `mana_max`='2434', `faction`='1630', `armor`='3075', `dmg_min`='871', `dmg_max`='1153', `unit_flags`='320', `auras`='28126', `movement_type`='0', `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
+UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='48840', `health_max`='48840', `mana_min`='2434', `mana_max`='2434', `faction`='1630', `armor`='3075', `dmg_min`='871', `dmg_max`='1153', `unit_flags`='320', `auras`='28126', `movement_type`='0', `detection_range`='4', `call_for_help_range`='1', `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
 
 -- Fix Low level Minions
 UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
