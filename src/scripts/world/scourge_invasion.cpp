@@ -790,7 +790,10 @@ struct MinionspawnerAI : public ScriptedAI
                     break;
                 }
                 if (Creature* MINION = m_creature->SummonCreature(Spawn, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+                {
+                    MINION->SetWanderDistance(1.0f); // Seems to be very low.
                     m_creature->SendSpellGo(m_creature, SPELL_MINION_SPAWN_IN);
+                }
                 break;
             }
         }
