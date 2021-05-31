@@ -570,11 +570,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     data << pCurrChar->GetMapId();
     if (pCurrChar->GetTransport())
     {
-        Position const* transportPosition = pCurrChar->m_movementInfo.GetTransportPos();
-        data << transportPosition->x;
-        data << transportPosition->y;
-        data << transportPosition->z;
-        data << transportPosition->o;
+        Position const& transportPosition = pCurrChar->m_movementInfo.GetTransportPos();
+        data << transportPosition.x;
+        data << transportPosition.y;
+        data << transportPosition.z;
+        data << transportPosition.o;
     }
     else
     {

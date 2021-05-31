@@ -9936,10 +9936,10 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     Movement::Location loc = movespline->ComputePosition();
     if (GenericTransport* t = GetTransport())
     {
-        m_movementInfo.GetTransportPos()->x = loc.x;
-        m_movementInfo.GetTransportPos()->y = loc.y;
-        m_movementInfo.GetTransportPos()->z = loc.z;
-        m_movementInfo.GetTransportPos()->o = loc.orientation;
+        m_movementInfo.GetTransportPos().x = loc.x;
+        m_movementInfo.GetTransportPos().y = loc.y;
+        m_movementInfo.GetTransportPos().z = loc.z;
+        m_movementInfo.GetTransportPos().o = loc.orientation;
         t->CalculatePassengerPosition(loc.x, loc.y, loc.z, &loc.orientation);
     }
     if (!MaNGOS::IsValidMapCoord(loc.x, loc.y, loc.z))

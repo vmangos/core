@@ -160,7 +160,7 @@ class MovementInfo
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
 
         // Position manipulations
-        Position const* GetPos() const { return &pos; }
+        Position const& GetPos() const { return pos; }
         void SetTransportData(ObjectGuid guid, float x, float y, float z, float o, uint32 time)
         {
             t_guid = guid;
@@ -180,8 +180,8 @@ class MovementInfo
             t_time = 0;
         }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
-        Position const* GetTransportPos() const { return &t_pos; }
-        Position* GetTransportPos() { return &t_pos; }
+        Position const& GetTransportPos() const { return t_pos; }
+        Position& GetTransportPos() { return t_pos; }
         uint32 GetTransportTime() const { return t_time; }
         uint32 GetFallTime() const { return fallTime; }
         void ChangeOrientation(float o) { pos.o = o; }
@@ -761,10 +761,10 @@ class WorldObject : public Object
         GenericTransport* GetTransport() const { return m_transport; }
         virtual void SetTransport(GenericTransport* t) { m_transport = t; }
 
-        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
-        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
-        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos()->z; }
-        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos()->o; }
+        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos().x; }
+        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos().y; }
+        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos().z; }
+        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos().o; }
         uint32 GetTransTime() const { return m_movementInfo.GetTransportTime(); }
 
         void AddUnitMovementFlag(uint32 f) { m_movementInfo.moveFlags |= f; }
