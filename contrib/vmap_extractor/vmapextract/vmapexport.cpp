@@ -255,6 +255,7 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
 
     froot.ConvertToVMAPRootWmo(output);
     int Wmo_nVertices = 0;
+    uint32 RealNbOfGroups = froot.nGroups;
     //printf("root has %d groups\n", froot->nGroups);
     if (froot.nGroups != 0)
     {
@@ -276,6 +277,12 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
                 break;
             }
 
+            if (fgroup.mogpFlags & 0x80) // Skip lightning groups
+            {
+                RealNbOfGroups--;
+                continue;
+            }
+
             if (strcmp(szLocalFile, "./Buildings/Transport_Zeppelin.wmo") == 0)
                 FixZepp(fgroup);
 
@@ -286,6 +293,8 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
 
     fseek(output, 8, SEEK_SET); // store the correct no of vertices
     fwrite(&Wmo_nVertices, sizeof(int), 1, output);
+    fseek(output, 12, SEEK_SET); // store the correct no of groups
+    fwrite(&RealNbOfGroups, sizeof(uint32), 1, output);
     fclose(output);
 
     // Delete the extracted file in the case of an error
