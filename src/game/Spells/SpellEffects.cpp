@@ -20,11 +20,10 @@
  */
 
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
+#include "SharedDefines.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
 #include "Log.h"
-#include "UpdateMask.h"
 #include "World.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
@@ -33,25 +32,18 @@
 #include "DynamicObject.h"
 #include "SpellAuras.h"
 #include "Group.h"
-#include "UpdateData.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
-#include "SharedDefines.h"
+#include "Creature.h"
 #include "Pet.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
-#include "GossipDef.h"
-#include "Creature.h"
 #include "Totem.h"
 #include "CreatureAI.h"
 #include "BattleGroundMgr.h"
 #include "BattleGround.h"
 #include "BattleGroundWS.h"
-#include "Language.h"
-#include "SocialMgr.h"
 #include "VMapFactory.h"
 #include "Util.h"
-#include "TemporarySummon.h"
 #include "MoveMapSharedDefines.h"
 #include "GameEventMgr.h"
 #include "InstanceData.h"
@@ -272,7 +264,7 @@ void Spell::EffectResurrectNew(SpellEffectIndex eff_idx)
 
 void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 {
-    if (!unitTarget || !unitTarget->IsAlive())
+    if (!unitTarget)
         return;
 
     // Demonic Sacrifice
@@ -301,6 +293,11 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 
         m_casterUnit->CastSpell(m_casterUnit, spellId, true);
     }
+
+    // The alive check should be after the Demonic Sacrifice code to allow warlock to get
+    // both shields if he uses it at the same time as Voidwalker's Sacrifice.
+    if (!unitTarget->IsAlive())
+        return;
 
     if (m_caster == unitTarget)                             // prevent interrupt message
         finish();
@@ -549,6 +546,18 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+                case 18955: // Ranshalla's Torch Trap
+                case 18993: // Ranshalla's Altar Trap
+                {
+                    if (unitTarget)
+                        unitTarget->RemoveAurasDueToSpellByCancel(18953);
+                    return;
+                }
+                case 18954: // Ranshalla Despawn
+                {
+                    if (Creature* pRanshalla = ToCreature(unitTarget))
+                        pRanshalla->ForcedDespawn();
+                }
                 case 20863: // Muglash's Brazier Trap
                 {
                     if (unitTarget && unitTarget->IsCreature())
