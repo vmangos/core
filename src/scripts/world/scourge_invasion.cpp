@@ -45,7 +45,7 @@ Unit* SelectRandomFlameshockerSpawnTarget(Creature* pUnit, Unit* except, float r
 
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if (!(*tIter)->IsCreature() || !(*tIter)->ToCreature()->CanSummonGuards() || (*tIter)->GetZoneId() != pUnit->GetZoneId() || (*tIter)->FindNearestCreature(NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
+        if (!(*tIter)->IsCreature() || !(*tIter)->ToCreature()->CanSummonGuards() || (*tIter)->GetZoneId() != pUnit->GetZoneId() || !pUnit->IsValidAttackTarget((*tIter)) || (*tIter)->FindNearestCreature(NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
         {
             std::list<Unit*>::iterator tIter2 = tIter;
             ++tIter;
@@ -1344,7 +1344,6 @@ struct PallidHorrorAI : public ScriptedAI
                             m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
                             FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
                             FLAMESHOCKER->AI()->DoAction(FLAMESHOCKER, NPC_FLAMESHOCKER);
-                            FLAMESHOCKER->AI()->AttackStart(pTarget);
                         }
                     }
                 }
