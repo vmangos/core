@@ -107,6 +107,7 @@ bool handleArgs(int argc, char** argv,
                 bool& debugOutput,
                 bool& silent,
                 bool& quick,
+                bool& buildOnlyGameobjectModels,
                 char*& offMeshInputPath,
                 char*& configInputPath)
 {
@@ -163,6 +164,10 @@ bool handleArgs(int argc, char** argv,
         {
             quick = true;
         }
+        else if (strcmp(argv[i], "--onlyGO") == 0)
+        {
+            buildOnlyGameobjectModels = true;
+        }
         else if (strcmp(argv[i], "--offMeshInput") == 0)
         {
             param = argv[++i];
@@ -217,6 +222,7 @@ int main(int argc, char** argv)
     bool skipBattlegrounds = false;
     bool debug = false;
     bool silent = false;
+    bool buildOnlyGameobjectModels = false;
     bool quick = false;
 
     char* offMeshInputPath = "offmesh.txt";
@@ -224,7 +230,7 @@ int main(int argc, char** argv)
 
     bool validParam = handleArgs(argc, argv, mapId, tileX, tileY, skipLiquid,
                                  skipContinents, skipJunkMaps, skipBattlegrounds,
-                                 debug, silent, quick, offMeshInputPath, configInputPath);
+                                 debug, silent, quick, buildOnlyGameobjectModels, offMeshInputPath, configInputPath);
 
     if (!validParam)
         return silent ? -1 : finish("You have specified invalid parameters (use -? for more help)", -1);
@@ -247,7 +253,9 @@ int main(int argc, char** argv)
     MapBuilder builder(configInputPath, skipLiquid, skipContinents, skipJunkMaps,
                        skipBattlegrounds, debug, quick, offMeshInputPath);
 
-    if (tileX > -1 && tileY > -1 && mapId >= 0)
+    if (buildOnlyGameobjectModels)
+        builder.buildTransports();
+    else if (tileX > -1 && tileY > -1 && mapId >= 0)
         builder.buildSingleTile(mapId, tileX, tileY);
     else if (mapId >= 0)
         builder.buildMap(uint32(mapId));
