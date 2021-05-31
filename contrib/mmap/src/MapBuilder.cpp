@@ -1271,7 +1271,7 @@ namespace MMAP
         config.walkableRadius = (int)ceilf(agentRadius / config.cs);
         config.maxEdgeLen = (int)(12 / config.cs);
         config.maxSimplificationError = 1.5f;
-        config.minRegionArea = (int)rcSqr(30);
+        config.minRegionArea = (int)rcSqr(30) / 2;
         config.mergeRegionArea = (int)rcSqr(10);
         config.maxVertsPerPoly = 6;
         config.detailSampleDist = config.cs*6.0f; // sampling distance to use when generating the detail mesh
