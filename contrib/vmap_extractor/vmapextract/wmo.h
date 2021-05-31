@@ -87,6 +87,7 @@ class WMORoot
         float bbcorn2[3];
 
         std::vector<WMODoodadSet> doodadsets;
+        std::vector<char> GroupNames;
 
         WMORoot(std::string& filename);
         ~WMORoot();
@@ -163,6 +164,7 @@ class WMOGroup
         void WriteDoodadsVertices(FILE* output);
         void WriteDoodadsTriangles(FILE* output, int indexShift, WMORoot* rootWMO);
         void WriteDoodadsVertices(FILE* output, WMORoot* rootWMO);
+        bool ShouldSkip(WMORoot const& root) const;
     private:
         std::string filename;
         char outfilename;

@@ -277,8 +277,9 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
                 break;
             }
 
-            if (fgroup.mogpFlags & 0x80) // Skip lightning groups
+            if (fgroup.ShouldSkip(froot))
             {
+                printf("Skipped WMOGroup %s %s %d", fname.c_str(), s.c_str(), fgroup.mogpFlags);
                 RealNbOfGroups--;
                 continue;
             }
