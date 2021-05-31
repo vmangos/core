@@ -247,42 +247,37 @@ void ElevatorTransport::Update(uint32 update_diff, uint32 /*time_diff*/)
     if (!m_animationInfo)
         return;
 
-    if (GetGoState() == GO_STATE_READY)
+    m_pathProgress += update_diff;
+    uint32 timer = sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime;
+    TransportAnimationEntry const* nodeNext = m_animationInfo->GetNextAnimNode(timer);
+    TransportAnimationEntry const* nodePrev = m_animationInfo->GetPrevAnimNode(timer);
+    if (nodeNext && nodePrev)
     {
-        m_pathProgress += update_diff;
-        // TODO: Fix movement in unloaded grid - currently GO will just disappear
-        uint32 timer = sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime;
-        TransportAnimationEntry const* nodeNext = m_animationInfo->GetNextAnimNode(timer);
-        TransportAnimationEntry const* nodePrev = m_animationInfo->GetPrevAnimNode(timer);
-        if (nodeNext && nodePrev)
+        m_currentSeg = nodePrev->TimeSeg;
+
+        G3D::Vector3 posPrev = G3D::Vector3(nodePrev->X, nodePrev->Y, nodePrev->Z);
+        G3D::Vector3 posNext = G3D::Vector3(nodeNext->X, nodeNext->Y, nodeNext->Z);
+        G3D::Vector3 currentPos;
+        if (posPrev == posNext)
+            currentPos = posPrev;
+        else
         {
-            m_currentSeg = nodePrev->TimeSeg;
+            uint32 timeElapsed = timer - nodePrev->TimeSeg;
+            uint32 timeDiff = nodeNext->TimeSeg - nodePrev->TimeSeg;
+            G3D::Vector3 segmentDiff = posNext - posPrev;
+            float velocityX = float(segmentDiff.x) / timeDiff, velocityY = float(segmentDiff.y) / timeDiff, velocityZ = float(segmentDiff.z) / timeDiff;
 
-            G3D::Vector3 posPrev = G3D::Vector3(nodePrev->X, nodePrev->Y, nodePrev->Z);
-            G3D::Vector3 posNext = G3D::Vector3(nodeNext->X, nodeNext->Y, nodeNext->Z);
-            G3D::Vector3 currentPos;
-            if (posPrev == posNext)
-                currentPos = posPrev;
-            else
-            {
-                uint32 timeElapsed = timer - nodePrev->TimeSeg;
-                uint32 timeDiff = nodeNext->TimeSeg - nodePrev->TimeSeg;
-                G3D::Vector3 segmentDiff = posNext - posPrev;
-                float velocityX = float(segmentDiff.x) / timeDiff, velocityY = float(segmentDiff.y) / timeDiff, velocityZ = float(segmentDiff.z) / timeDiff;
-
-                currentPos = G3D::Vector3(timeElapsed * velocityX, timeElapsed * velocityY, timeElapsed * velocityZ);
-                currentPos += posPrev;
-            }
-
-            currentPos += G3D::Vector3(m_stationaryPosition.x, m_stationaryPosition.y, m_stationaryPosition.z);
-
-            GetMap()->GameObjectRelocation(this, currentPos.x, currentPos.y, currentPos.z, GetOrientation());
-            // SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000);
-            UpdateModelPosition();
-
-            UpdatePassengerPositions(m_passengers);
+            currentPos = G3D::Vector3(timeElapsed * velocityX, timeElapsed * velocityY, timeElapsed * velocityZ);
+            currentPos += posPrev;
         }
 
+        currentPos += G3D::Vector3(m_stationaryPosition.x, m_stationaryPosition.y, m_stationaryPosition.z);
+
+        GetMap()->GameObjectRelocation(this, currentPos.x, currentPos.y, currentPos.z, GetOrientation());
+        // SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000);
+        UpdateModelPosition();
+
+        UpdatePassengerPositions(m_passengers);
     }
 }
 
