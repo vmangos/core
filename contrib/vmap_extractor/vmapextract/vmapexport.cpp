@@ -169,7 +169,7 @@ bool ExtractSingleWmoWithAllConfig(std::string& fname)
 {
     // Copy files from archive
 
-    char szLocalFile[1024];
+    //char szLocalFile[1024];
     const char* plain_name = GetPlainName(fname.c_str());
 
     //if (FileExists(szLocalFile))
@@ -202,7 +202,7 @@ bool ExtractSingleWmoWithAllConfig(std::string& fname)
         return true;
     }
 
-    for (int i = 0; i < froot.nDoodadSets; i++)
+    for (uint32 i = 0; i < froot.nDoodadSets; i++)
     {
         //printf("Extracting wmo+doodadset %i\n", i);
         ExtractSingleWmo(fname, i);
