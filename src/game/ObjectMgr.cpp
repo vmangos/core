@@ -7243,6 +7243,10 @@ std::set<uint32> ObjectMgr::CheckGameObjectInfos()
         }
     }
 
+    // no model on which to path
+    transportDisplayIds.erase(462);
+    transportDisplayIds.erase(562);
+
     return transportDisplayIds;
 }
 
