@@ -192,6 +192,7 @@ void GenericTransport::AddPassenger(WorldObject* passenger)
         passenger->SetTransport(this);
         passenger->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
         passenger->m_movementInfo.t_guid = GetObjectGuid();
+        passenger->m_movementInfo.t_time = GetPathProgress();
         if (!passenger->m_movementInfo.t_pos.x)
         {
             passenger->m_movementInfo.t_pos.x = passenger->GetPositionX();
@@ -275,8 +276,11 @@ void ElevatorTransport::Update(uint32 update_diff, uint32 /*time_diff*/)
 
             currentPos += G3D::Vector3(m_stationaryPosition.x, m_stationaryPosition.y, m_stationaryPosition.z);
 
-            UpdatePosition(currentPos.x, currentPos.y, currentPos.z, GetOrientation());
-            //SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000);
+            GetMap()->GameObjectRelocation(this, currentPos.x, currentPos.y, currentPos.z, GetOrientation());
+            // SummonCreature(1, currentPos.x, currentPos.y, currentPos.z, GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000);
+            UpdateModelPosition();
+
+            UpdatePassengerPositions(m_passengers);
         }
 
     }
@@ -445,7 +449,10 @@ void GenericTransport::UpdatePassengerPosition(WorldObject* passenger)
         case TYPEID_UNIT:
         {
             Creature* creature = passenger->ToCreature();
-            GetMap()->CreatureRelocation(creature, x, y, z, o);
+            if (passenger->IsInWorld())
+                GetMap()->CreatureRelocation(creature, x, y, z, o);
+            else
+                passenger->Relocate(x, y, z, o);
             creature->m_movementInfo.t_time = GetPathProgress();
             break;
         }

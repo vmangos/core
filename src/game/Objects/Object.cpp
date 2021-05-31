@@ -57,7 +57,7 @@
 
 void MovementInfo::Read(ByteBuffer &data)
 {
-    time = WorldTimer::getMSTime();
+    stime = WorldTimer::getMSTime();
     data >> moveFlags;
     data >> ctime;
     data >> pos.x;
@@ -140,7 +140,7 @@ void MovementInfo::CorrectData(Unit* mover)
 void MovementInfo::Write(ByteBuffer &data) const
 {
     data << moveFlags;
-    data << time;
+    data << stime;
     data << pos.x;
     data << pos.y;
     data << pos.z;
@@ -432,7 +432,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
         MovementInfo m = wobject->m_movementInfo;
         if (!m.ctime)
         {
-            m.time = WorldTimer::getMSTime() + 1000;
+            m.stime = WorldTimer::getMSTime() + 1000;
             m.ChangePosition(wobject->GetPositionX(), wobject->GetPositionY(), wobject->GetPositionZ(), wobject->GetOrientation());
         }
         if (unit->ToCreature())
@@ -1395,13 +1395,10 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
-        m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0)
+        m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0), worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
+        m_transport(nullptr)
 {
-    // Phasing
-    worldMask = WORLD_DEFAULT_OBJECT;
-    m_zoneScript = nullptr;
-    m_transport = nullptr;
-    m_movementInfo.time = WorldTimer::getMSTime();
+    m_movementInfo.stime = WorldTimer::getMSTime();
 }
 
 void WorldObject::CleanupsBeforeDelete()

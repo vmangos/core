@@ -358,6 +358,12 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
     return navMeshQuery;
 }
 
+void MMapManager::loadAllGameObjectModels(std::set<uint32> const& displayIds)
+{
+    for (uint32 displayId : displayIds)
+        loadGameObject(displayId);
+}
+
 bool MMapManager::loadGameObject(uint32 displayId)
 {
     // we already have this map loaded?
@@ -365,9 +371,9 @@ bool MMapManager::loadGameObject(uint32 displayId)
         return true;
 
     // load and init dtNavMesh - read parameters from file
-    uint32 pathLen = sWorld.GetDataPath().length() + strlen("mmaps/go%04i.mmap") + 1;
+    uint32 pathLen = sWorld.GetDataPath().length() + strlen("mmaps/go%04i.mmtile") + 1;
     char *fileName = new char[pathLen];
-    snprintf(fileName, pathLen, (sWorld.GetDataPath() + "mmaps/go%04i.mmap").c_str(), displayId);
+    snprintf(fileName, pathLen, (sWorld.GetDataPath() + "mmaps/go%04i.mmtile").c_str(), displayId);
 
     FILE* file = fopen(fileName, "rb");
     if (!file)

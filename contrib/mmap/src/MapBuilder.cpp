@@ -1352,16 +1352,8 @@ namespace MMAP
         iv.polyMeshDetail = tile.dmesh;
         for (int i = 0; i < iv.polyMesh->npolys; ++i)
         {
-            if (iv.polyMesh->areas[i] == RC_WALKABLE_AREA)
-            {
-                iv.polyMesh->areas[i] = 0; // =SAMPLE_POLYAREA_GROUND in RecastDemo
-                iv.polyMesh->flags[i] = NAV_GROUND;
-            }
-            else
-            {
-                iv.polyMesh->areas[i] = 0;
-                iv.polyMesh->flags[i] = 0;
-            }
+            if (iv.polyMesh->areas[i] & RC_WALKABLE_AREA)
+                iv.polyMesh->flags[i] = iv.polyMesh->areas[i];
         }
 
         // Will be deleted by IntermediateValues
@@ -1433,7 +1425,7 @@ namespace MMAP
             return;
         }
         char fileName[255];
-        sprintf(fileName, "mmaps/go%4u.mmap", displayId);
+        sprintf(fileName, "mmaps/go%04u.mmtile", displayId);
         FILE* file = fopen(fileName, "wb");
         if (!file)
         {

@@ -1340,7 +1340,8 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadPageTexts();
 
     sLog.outString("Loading Game Object Templates...");     // must be after LoadPageTexts
-    sObjectMgr.LoadGameobjectInfo();
+    std::set<uint32> transportDisplayIds = sObjectMgr.LoadGameobjectInfo();
+    MMAP::MMapFactory::createOrGetMMapManager()->loadAllGameObjectModels(transportDisplayIds);
 
     sLog.outString("Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();

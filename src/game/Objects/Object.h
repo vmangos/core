@@ -33,6 +33,7 @@
 #include "Util.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "Cell.h"
 
 #include <string>
 
@@ -143,7 +144,7 @@ enum SplineFlags
 class MovementInfo
 {
     public:
-        MovementInfo() : moveFlags(MOVEFLAG_NONE), time(0), ctime(0),
+        MovementInfo() : moveFlags(MOVEFLAG_NONE), stime(0), ctime(0),
             t_time(0), s_pitch(0.0f), fallTime(0), splineElevation(0.0f) {}
 
         // Read/Write methods
@@ -185,7 +186,7 @@ class MovementInfo
         uint32 GetFallTime() const { return fallTime; }
         void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
-        void UpdateTime(uint32 _time) { time = _time; }
+        void UpdateTime(uint32 _time) { stime = _time; }
 
         struct JumpInfo
         {
@@ -199,7 +200,7 @@ class MovementInfo
     //private:
         // common
         uint32  moveFlags;                                  // see enum MovementFlags
-        uint32  time;
+        uint32  stime; // Server time
         uint32  ctime; // Client time
         Position pos;
         // transport
@@ -752,6 +753,10 @@ class WorldObject : public Object
         void GetNearRandomPositions(float distance, float &x, float &y, float &z);
         void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);
 
+        // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
+        Cell const& GetCurrentCell() const { return m_currentCell; }
+        void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
+
         // Transports / Movement
         GenericTransport* GetTransport() const { return m_transport; }
         virtual void SetTransport(GenericTransport* t) { m_transport = t; }
@@ -921,6 +926,7 @@ class WorldObject : public Object
         uint32 m_InstanceId;                                // in map copy with instance id
 
         Position m_position;
+        Cell m_currentCell;                                 // store current cell where object listed
 
         ViewPoint m_viewPoint;
 

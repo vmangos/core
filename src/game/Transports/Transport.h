@@ -77,9 +77,8 @@ class GenericTransport : public GameObject
         }
 
         virtual uint32 GetPathProgress() const = 0;
-    private:
-        void UpdatePassengerPositions(PassengerSet& passengers); 
     protected:
+        void UpdatePassengerPositions(PassengerSet& passengers);
         PassengerSet m_passengers;
         PassengerSet::iterator m_passengerTeleportItr;
 };

@@ -600,8 +600,8 @@ class ObjectMgr
 
         static GameObjectInfo const* GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
 
-        void LoadGameobjectInfo();
-        void CheckGameObjectInfos();
+        std::set<uint32> LoadGameobjectInfo();
+        std::set<uint32> CheckGameObjectInfos();
         void AddGameobjectInfo(GameObjectInfo* goinfo);
         void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();

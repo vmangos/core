@@ -950,7 +950,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     if (!pMover)
         return;
 
-    pMover->m_movementInfo.time += lag;
+    pMover->m_movementInfo.stime += lag;
     pMover->m_movementInfo.ctime += lag;
 
     // fix an 1.12 client problem with transports
