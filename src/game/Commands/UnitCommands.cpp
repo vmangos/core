@@ -135,7 +135,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
     {
         Position pos;
         obj->GetPosition(pos.x, pos.y, pos.z, transport);
-        PSendSysMessage("Transport coords: %f %f %f", pos.x, pos.y, pos.z);
+        PSendSysMessage("Transport coords: %f %f %f %f", pos.x, pos.y, pos.z, pos.o);
     }
 
     DEBUG_LOG("Player %s GPS call for %s '%s' (%s: %u):",
