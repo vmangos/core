@@ -31,6 +31,8 @@
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
 
+#include <G3D/Quat.h>
+
 GenericTransport::GenericTransport() : GameObject(), m_passengerTeleportItr(m_passengers.begin())
 {
 
@@ -254,7 +256,6 @@ void ElevatorTransport::Update(uint32 update_diff, uint32 /*time_diff*/)
     if (nodeNext && nodePrev)
     {
         m_currentSeg = nodePrev->TimeSeg;
-
         G3D::Vector3 posPrev = G3D::Vector3(nodePrev->X, nodePrev->Y, nodePrev->Z);
         G3D::Vector3 posNext = G3D::Vector3(nodeNext->X, nodeNext->Y, nodeNext->Z);
         G3D::Vector3 currentPos;
@@ -271,6 +272,10 @@ void ElevatorTransport::Update(uint32 update_diff, uint32 /*time_diff*/)
             currentPos += posPrev;
         }
 
+        auto data = GetLocalRotation();
+        G3D::Quat rotation(data.x, data.y, data.z, data.w);
+        currentPos = currentPos * rotation;
+        currentPos.y = -currentPos.y; // magical sign flip but it works - vanilla/tbc only
         currentPos += G3D::Vector3(m_stationaryPosition.x, m_stationaryPosition.y, m_stationaryPosition.z);
 
         GetMap()->GameObjectRelocation(this, currentPos.x, currentPos.y, currentPos.z, GetOrientation());
