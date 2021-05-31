@@ -1462,9 +1462,22 @@ namespace MMAP
     }
     void MapBuilder::buildTransports()
     {
-        // List here Transport gameobjects you want to extract.
+        // List of MO Transport gameobjects
         buildGameObject("Transportship.wmo.vmo", 3015);
         buildGameObject("Transport_Zeppelin.wmo.vmo", 3031);
+        // List of Transport gameobjects
+        buildGameObject("Elevatorcar.m2.vmo", 360);
+        buildGameObject("Undeadelevator.m2.vmo", 455);
+        buildGameObject("Undeadelevatordoor.m2.vmo", 462);
+        buildGameObject("Ironforgeelevator.m2.vmo", 561);
+        buildGameObject("Ironforgeelevatordoor.m2.vmo", 562);
+        buildGameObject("Gnomeelevatorcar01.m2.vmo", 807);
+        buildGameObject("Gnomeelevatorcar02.m2.vmo", 808);
+        buildGameObject("Gnomeelevatorcar03.m2.vmo", 827); // missing vmap - reusing 03
+        buildGameObject("Gnomeelevatorcar03.m2.vmo", 852);
+        buildGameObject("Gnomehutelevator.m2.vmo", 1587);
+        buildGameObject("Burningsteppselevator.m2.vmo", 2454);
+        buildGameObject("Subwaycar.m2.vmo", 3831);
     }
 
     bool MapBuilder::duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX)
