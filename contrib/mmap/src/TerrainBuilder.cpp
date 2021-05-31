@@ -91,6 +91,7 @@ namespace MMAP
         {
             fclose(mapFile);
             printf("%s is the wrong version, please extract new .map files\n", mapFileName);
+            printf("Expected version %u, got %u instead.\n", fheader.versionMagic, *((uint32 const*)(MAP_VERSION_MAGIC)));
             return false;
         }
 

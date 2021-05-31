@@ -279,7 +279,7 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
 
             if (fgroup.ShouldSkip(froot))
             {
-                printf("Skipped WMOGroup %s %s %d", fname.c_str(), s.c_str(), fgroup.mogpFlags);
+                printf("Skipped WMOGroup %s %s %d\n", fname.c_str(), s.c_str(), fgroup.mogpFlags);
                 RealNbOfGroups--;
                 continue;
             }
