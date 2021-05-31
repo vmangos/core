@@ -1250,10 +1250,10 @@ namespace MMAP
 
         printf("* Model opened (%u vertices)\n", allVerts.size());
 
-        float* verts = meshData.solidVerts.getCArray();
-        int nverts = meshData.solidVerts.size() / 3;
-        int* tris = meshData.solidTris.getCArray();
-        int ntris = meshData.solidTris.size() / 3;
+        float* tVerts = meshData.solidVerts.getCArray();
+        int tVertCount = meshData.solidVerts.size() / 3;
+        int* tTris = meshData.solidTris.getCArray();
+        int tTriCount = meshData.solidTris.size() / 3;
 
         // get bounds of current tile
         rcConfig config;
@@ -1278,7 +1278,7 @@ namespace MMAP
         config.detailSampleMaxError = 0.0f;
 
         // this sets the dimensions of the heightfield - should maybe happen before border padding
-        rcCalcBounds(verts, nverts, config.bmin, config.bmax);
+        rcCalcBounds(tVerts, tVertCount, config.bmin, config.bmax);
         rcCalcGridSize(config.bmin, config.bmax, config.cs, &config.width, &config.height);
 
         Tile tile;
@@ -1288,10 +1288,10 @@ namespace MMAP
             printf("* Failed building heightfield!            \n");
             return;
         }
-        unsigned char* m_triareas = new unsigned char[ntris];
-        memset(m_triareas, 0, ntris*sizeof(unsigned char));
-        rcMarkWalkableTriangles(m_rcContext, config.walkableSlopeAngle, verts, nverts, tris, ntris, m_triareas);
-        rcRasterizeTriangles(m_rcContext, verts, nverts, tris, m_triareas, ntris, *tile.solid, config.walkableClimb);
+        unsigned char* m_triareas = new unsigned char[tTriCount];
+        memset(m_triareas, 0, tTriCount*sizeof(unsigned char));
+        rcMarkWalkableTriangles(m_rcContext, config.walkableSlopeAngle, tVerts, tVertCount, tTris, tTriCount, m_triareas);
+        rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, m_triareas, tTriCount, *tile.solid, config.walkableClimb);
         rcFilterLowHangingWalkableObstacles(m_rcContext, config.walkableClimb, *tile.solid);
         rcFilterLedgeSpans(m_rcContext, config.walkableHeight, config.walkableClimb, *tile.solid);
         rcFilterWalkableLowHeightSpans(m_rcContext, config.walkableHeight, *tile.solid);
