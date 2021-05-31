@@ -43,7 +43,7 @@ UPDATE `creature_template` SET `unit_flags`='33554432', `health_min`='42', `heal
 UPDATE `creature_template` SET `level_min`='60', `health_min`='3052', `speed_walk`='1', `speed_run`='0.992063', `movement_type`='0', `unit_flags`='33555200', `script_name`='scourge_invasion_mouth' WHERE `entry`=16995;
 
 -- Fix Minions
-UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `spell_id1`='', `spell_id2`='', `spell_id3`='', `spell_id4`='', `spell_list_id`='', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
+UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
 UPDATE `creature_template` SET `unit_flags`='0', `auras`='28090 28126' WHERE `entry` IN (16299,16141);
 UPDATE `creature_template` SET `unit_flags`='64', `auras`='28292 28126' WHERE `entry` IN (14697,16380,16379);
 UPDATE `creature_template` SET `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16380;
