@@ -43,7 +43,7 @@ UPDATE `creature_template` SET `unit_flags`='33554432', `health_min`='42', `heal
 UPDATE `creature_template` SET `level_min`='60', `health_min`='3052', `speed_walk`='1', `speed_run`='0.992063', `movement_type`='0', `unit_flags`='33555200', `script_name`='scourge_invasion_mouth' WHERE `entry`=16995;
 
 -- Fix Minions
-UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
+UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `detection_range`='4', `call_for_help_range`='1', `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
 UPDATE `creature_template` SET `unit_flags`='0', `auras`='28090 28126' WHERE `entry` IN (16299,16141);
 UPDATE `creature_template` SET `unit_flags`='64', `auras`='28292 28126' WHERE `entry` IN (14697,16380,16379);
 UPDATE `creature_template` SET `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16380;
@@ -140,9 +140,6 @@ UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
 UPDATE `creature_template` SET `armor`='426', `dmg_min`='11', `dmg_max`='16', `spell_id2`='0' WHERE `entry`=16438;
 UPDATE `creature_template` SET `armor`='239', `dmg_min`='7', `dmg_max`='12', `auras`='28126 674', `spell_id1`='0' WHERE `entry`=16422;
 UPDATE `creature_template` SET `armor`='239', `dmg_min`='8', `dmg_max`='13' WHERE `entry`=16423;
-
--- Ranges seems to be very short.
-UPDATE `creature_template` SET `detection_range`='4', `call_for_help_range`='1' WHERE `script_name`='scourge_invasion_minion';
 
 -- After completing quest 9154 (Light's Hope Chapel) you should receive this item in your mailbox: 22723 (A Letter from the Keeper of the Rolls) source: https://classic.wowhead.com/guides/wow-classic-scourge-invasions
 UPDATE `quest_template` SET `RewMailTemplateId`='171' WHERE `entry`=9154;
