@@ -2264,7 +2264,7 @@ bool Map::ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* so
     if (GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, script.loadGo.goGuid)))
         return ShouldAbortScript(script); // already spawned
 
-    GameObject* pGameobject = new GameObject;
+    GameObject* pGameobject = GameObject::CreateGameObject(pGameObjectData->id);
     if (!pGameobject->LoadFromDB(script.loadGo.goGuid, this))
         delete pGameobject;
     else

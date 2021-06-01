@@ -33,6 +33,7 @@
 #include "Util.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "Cell.h"
 
 #include <string>
 
@@ -50,7 +51,7 @@ class UpdateMask;
 class InstanceData;
 class TerrainInfo;
 class ZoneScript;
-class Transport;
+class GenericTransport;
 struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
@@ -143,7 +144,7 @@ enum SplineFlags
 class MovementInfo
 {
     public:
-        MovementInfo() : moveFlags(MOVEFLAG_NONE), time(0), ctime(0),
+        MovementInfo() : moveFlags(MOVEFLAG_NONE), stime(0), ctime(0),
             t_time(0), s_pitch(0.0f), fallTime(0), splineElevation(0.0f) {}
 
         // Read/Write methods
@@ -159,7 +160,7 @@ class MovementInfo
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
 
         // Position manipulations
-        Position const* GetPos() const { return &pos; }
+        Position const& GetPos() const { return pos; }
         void SetTransportData(ObjectGuid guid, float x, float y, float z, float o, uint32 time)
         {
             t_guid = guid;
@@ -179,13 +180,13 @@ class MovementInfo
             t_time = 0;
         }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
-        Position const* GetTransportPos() const { return &t_pos; }
-        Position* GetTransportPos() { return &t_pos; }
+        Position const& GetTransportPos() const { return t_pos; }
+        Position& GetTransportPos() { return t_pos; }
         uint32 GetTransportTime() const { return t_time; }
         uint32 GetFallTime() const { return fallTime; }
         void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
-        void UpdateTime(uint32 _time) { time = _time; }
+        void UpdateTime(uint32 _time) { stime = _time; }
 
         struct JumpInfo
         {
@@ -199,7 +200,7 @@ class MovementInfo
     //private:
         // common
         uint32  moveFlags;                                  // see enum MovementFlags
-        uint32  time;
+        uint32  stime; // Server time
         uint32  ctime; // Client time
         Position pos;
         // transport
@@ -623,8 +624,8 @@ class WorldObject : public Object
         float GetPositionX() const { return m_position.x; }
         float GetPositionY() const { return m_position.y; }
         float GetPositionZ() const { return m_position.z; }
-        virtual void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
-        void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
+        virtual void GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
+        void GetPosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const;
         void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
         float GetOrientation() const { return m_position.o; }
         void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const
@@ -752,14 +753,18 @@ class WorldObject : public Object
         void GetNearRandomPositions(float distance, float &x, float &y, float &z);
         void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);
 
-        // Transports / Movement
-        Transport* GetTransport() const { return m_transport; }
-        virtual void SetTransport(Transport* t) { m_transport = t; }
+        // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
+        Cell const& GetCurrentCell() const { return m_currentCell; }
+        void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
 
-        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
-        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
-        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos()->z; }
-        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos()->o; }
+        // Transports / Movement
+        GenericTransport* GetTransport() const { return m_transport; }
+        virtual void SetTransport(GenericTransport* t) { m_transport = t; }
+
+        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos().x; }
+        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos().y; }
+        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos().z; }
+        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos().o; }
         uint32 GetTransTime() const { return m_movementInfo.GetTransportTime(); }
 
         void AddUnitMovementFlag(uint32 f) { m_movementInfo.moveFlags |= f; }
@@ -777,7 +782,7 @@ class WorldObject : public Object
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
         MovementInfo m_movementInfo;
-        Transport* m_transport;
+        GenericTransport* m_transport;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
@@ -921,6 +926,7 @@ class WorldObject : public Object
         uint32 m_InstanceId;                                // in map copy with instance id
 
         Position m_position;
+        Cell m_currentCell;                                 // store current cell where object listed
 
         ViewPoint m_viewPoint;
 

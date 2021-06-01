@@ -257,7 +257,7 @@ void ReadLiquidTypeTableDBC()
 
 // Map file format data
 static char const* MAP_MAGIC         = "MAPS";
-static char const* MAP_VERSION_MAGIC = "z1.4";
+static char const* MAP_VERSION_MAGIC = "z1.5";
 static char const* MAP_AREA_MAGIC    = "AREA";
 static char const* MAP_HEIGHT_MAGIC  = "MHGT";
 static char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -559,7 +559,7 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
                     {
                         liquid_show[cy][cx] = true;
                         if (liquid->flags[y][x] & (1 << 7))
-                            liquid_flags[i][j] |= MAP_LIQUID_TYPE_DARK_WATER;
+                            liquid_flags[i][j] |= MAP_LIQUID_TYPE_DEEP_WATER;
                         ++count;
                     }
                 }
@@ -642,7 +642,7 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
                 {
                     uint8* lm = h2o->getLiquidLightMap(h);
                     if (!lm)
-                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_DARK_WATER;
+                        liquid_flags[i][j] |= MAP_LIQUID_TYPE_DEEP_WATER;
                 }
 
                 if (!count && liquid_flags[i][j])
@@ -715,7 +715,10 @@ bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x)
                     if (minHeight > h) minHeight = h;
                 }
                 else
+                {
                     liquid_height[y][x] = CONF_use_minHeight;
+                    if (minHeight > CONF_use_minHeight) minHeight = CONF_use_minHeight;
+                }
             }
         }
         map.liquidMapOffset = map.heightMapOffset + map.heightMapSize;

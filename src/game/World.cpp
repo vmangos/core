@@ -80,6 +80,7 @@
 #include "AuraRemovalMgr.h"
 #include "InstanceStatistics.h"
 #include "GuardMgr.h"
+#include "TransportMgr.h"
 
 #include <chrono>
 
@@ -1339,7 +1340,8 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadPageTexts();
 
     sLog.outString("Loading Game Object Templates...");     // must be after LoadPageTexts
-    sObjectMgr.LoadGameobjectInfo();
+    std::set<uint32> transportDisplayIds = sObjectMgr.LoadGameobjectInfo();
+    MMAP::MMapFactory::createOrGetMMapManager()->loadAllGameObjectModels(transportDisplayIds);
 
     sLog.outString("Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();
@@ -1685,6 +1687,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Loading GameObject models ...");
     LoadGameObjectModelList();
+
+    // loads GO data
+    sTransportMgr->LoadTransportAnimationAndRotation();
 
     ///- Initialize MapManager
     sLog.outString("Starting Map System");

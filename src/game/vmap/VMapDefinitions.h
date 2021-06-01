@@ -23,8 +23,8 @@
 
 namespace VMAP
 {
-    char const VMAP_MAGIC[] = "VMAP_6.0";                   // used in final vmap files
-    char const RAW_VMAP_MAGIC[] = "VMAP005";                // used in extracted vmap files with raw data
+    char const VMAP_MAGIC[] = "VMAP_7.0";                   // used in final vmap files
+    char const RAW_VMAP_MAGIC[] = "VMAP006";                // used in extracted vmap files with raw data
     char const GAMEOBJECT_MODELS[] = "temp_gameobject_models";
 
     // defined in TileAssembler.cpp currently...
