@@ -47,7 +47,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     bool losChecked = false;
     bool losResult = false;
 
-    Transport* transport = nullptr;
+    GenericTransport* transport = nullptr;
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
     if (isPet)
         transport = i_target.getTarget()->GetTransport();
@@ -89,7 +89,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         {
             float o;
             if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
-                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.time) + 500, x, y, z, o)))
+                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.stime) + 500, x, y, z, o)))
             {
                 i_target->GetPosition(x, y, z);
                 o = i_target->GetOrientation();
@@ -313,7 +313,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
                 float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
                 bool targetMoved = false;
                 G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
-                if (Transport* ownerTransport = owner.GetTransport())
+                if (GenericTransport* ownerTransport = owner.GetTransport())
                 {
                     if (m_bTargetOnTransport)
                         ownerTransport->CalculatePassengerPosition(dest.x, dest.y, dest.z);
@@ -632,7 +632,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         {
             bool targetMoved = false;
             G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
-            if (Transport* ownerTransport = owner.GetTransport())
+            if (GenericTransport* ownerTransport = owner.GetTransport())
             {
                 if (m_bTargetOnTransport)
                     ownerTransport->CalculatePassengerPosition(dest.x, dest.y, dest.z);

@@ -270,7 +270,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     Vector3 victimSpd; // speed vector of victim
     float o;
 
-    if (Transport* t = attacker.GetTransport())
+    if (GenericTransport* t = attacker.GetTransport())
         path.SetTransport(t);
 
     if (m_speed == 0)
@@ -310,7 +310,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
                     pathTravelTime = (uint32)(1000 * 2 * currDistance / m_speed);
 
                 pathTravelTime *= 0.45f; // Attenuation factor (empirical)
-                m_extrapolateDelay = (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.time) + pathTravelTime;
+                m_extrapolateDelay = (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.stime) + pathTravelTime;
                 if (m_extrapolateDelay > 1500) m_extrapolateDelay = 1500;
                 if (victimPlayer->ExtrapolateMovement(victimPlayer->m_movementInfo, m_extrapolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
                 {

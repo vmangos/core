@@ -644,6 +644,13 @@ struct InstancePlayerBind
 
 #define MAX_INSTANCE_PER_ACCOUNT_PER_HOUR 5
 
+enum PlayerRestState
+{
+    REST_STATE_RESTED           = 0x01,
+    REST_STATE_NORMAL           = 0x02,
+    REST_STATE_RAF_LINKED       = 0x04                      // Exact use unknown
+};
+
 class PlayerTaxi
 {
     public:
@@ -1841,6 +1848,7 @@ class Player final: public Unit
         void UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target);
         template<class T>
         void UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+        void BeforeVisibilityDestroy(Creature* creature);
 
         Camera& GetCamera() { return m_camera; }
 
@@ -1892,7 +1900,7 @@ class Player final: public Unit
             m_summon_z = z;
         }
         void SummonIfPossible(bool agree);
-        void SetTransport(Transport* t) override;
+        void SetTransport(GenericTransport* t) override;
         void DismountCheck();
 
         // knockback/jumping states
@@ -1936,11 +1944,11 @@ class Player final: public Unit
 
     private:
         uint32 m_restTime;
-        time_t time_inn_enter;
-        uint32 inn_trigger_id;
-        float m_rest_bonus;
-        RestType rest_type;
-        void UpdateInnerTime(time_t time) { time_inn_enter = time; }
+        time_t m_timeInnEnter;
+        uint32 m_innTriggerId;
+        float m_restBonus;
+        RestType m_restType;
+        void UpdateInnerTime(time_t time) { m_timeInnEnter = time; }
     public:
         /**
         * \brief: compute rest bonus
@@ -1951,11 +1959,11 @@ class Player final: public Unit
         **/
         float ComputeRest(time_t timePassed, bool offline = false, bool inRestPlace = false);
 
-        float GetRestBonus() const { return m_rest_bonus; }
+        float GetRestBonus() const { return m_restBonus; }
         void SetRestBonus(float rest_bonus_new);
-        RestType GetRestType() const { return rest_type; }
+        RestType GetRestType() const { return m_restType; }
         void SetRestType(RestType n_r_type, uint32 areaTriggerId = 0);
-        time_t GetTimeInnEnter() const { return time_inn_enter; }
+        time_t GetTimeInnEnter() const { return m_timeInnEnter; }
         bool IsRested() const { return GetRestTime() >= 10 * IN_MILLISECONDS; }
         uint32 GetXPRestBonus(uint32 xp);
         uint32 GetRestTime() const { return m_restTime; }
@@ -2026,6 +2034,7 @@ class Player final: public Unit
         // Cannot be detected by creature (Should be tested in AI::MoveInLineOfSight)
         void SetCannotBeDetectedTimer(uint32 milliseconds) { m_cannotBeDetectedTimer = milliseconds; };
         bool CanBeDetected() const override { return m_cannotBeDetectedTimer <= 0; }
+        bool IsInCombatWithCreature(Creature const* pCreature);
 
         // PlayerAI management
         PlayerAI* i_AI;
@@ -2408,7 +2417,7 @@ class Player final: public Unit
         MovementAnticheat* GetCheatData() const { return m_session->GetCheatData(); }
         void OnDisconnected();
         void RelocateToLastClientPosition();
-        void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const override;
+        void GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const override;
 
         /*********************************************************/
         /***                 PACKET BROADCASTER                ***/

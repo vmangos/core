@@ -276,7 +276,7 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
-    GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().time + GetLastMovementInfo().ctime;
+    GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().stime + GetLastMovementInfo().ctime;
     GetLastMovementInfo().jump.start.x = me->GetPositionX();
     GetLastMovementInfo().jump.start.y = me->GetPositionY();
     GetLastMovementInfo().jump.start.z = me->GetPositionZ();
@@ -797,12 +797,12 @@ bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16
         m_jumpFlagCount++;
 
         if (!m_jumpFlagTime)
-            m_jumpFlagTime = movementInfo.time;
+            m_jumpFlagTime = movementInfo.stime;
     }
     
     return m_jumpFlagTime &&
        (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
-       (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
+       (movementInfo.stime - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
        (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
 }
@@ -816,7 +816,7 @@ uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)
     {
         if (GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
         {
-            int32 currentDesync = (int32)WorldTimer::getMSTimeDiff(GetLastMovementInfo().ctime, movementInfo.ctime) - WorldTimer::getMSTimeDiff(GetLastMovementInfo().time, movementInfo.time);
+            int32 currentDesync = (int32)WorldTimer::getMSTimeDiff(GetLastMovementInfo().ctime, movementInfo.ctime) - WorldTimer::getMSTimeDiff(GetLastMovementInfo().stime, movementInfo.stime);
             m_clientDesync += currentDesync;
             if (currentDesync > 1000)
                 APPEND_CHEAT(CHEAT_TYPE_NUM_DESYNC);
@@ -1041,7 +1041,7 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
 bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) const
 {
     if ((me->GetPositionX() == 0.0f || me->GetPositionY() == 0.0f || me->GetPositionZ() == 0.0f) ||
-       (movementInfo.GetPos()->x == 0.0f || movementInfo.GetPos()->y == 0.0f || movementInfo.GetPos()->z == 0.0f) ||
+       (movementInfo.GetPos().x == 0.0f || movementInfo.GetPos().y == 0.0f || movementInfo.GetPos().z == 0.0f) ||
        (me->IsLaunched()) || 
        (me->IsBeingTeleported()))
         return true;

@@ -87,8 +87,8 @@ class PathInfo
         float Length() const;
         void ExcludeSteepSlopes() { m_filter.setExcludeFlags(NAV_STEEP_SLOPES); }
         static dtPolyRef FindWalkPoly(dtNavMeshQuery const* query, float const* pointYZX, dtQueryFilter const& filter, float* closestPointYZX, float zSearchDist = 10.0f);
-        void SetTransport(Transport* t) { m_transport = t; }
-        Transport* GetTransport() const { return m_transport; }
+        void SetTransport(GenericTransport* t) { m_transport = t; }
+        GenericTransport* GetTransport() const { return m_transport; }
         void FillTargetAllowedFlags(Unit* target);
     private:
 
@@ -105,7 +105,7 @@ class PathInfo
         Vector3        m_startPosition;    // {x, y, z} of current location
         Vector3        m_endPosition;      // {x, y, z} of the destination
         Vector3        m_actualEndPosition;  // {x, y, z} of the closest possible point to given destination
-        Transport*     m_transport;
+        GenericTransport*       m_transport;
         Unit const* const       m_sourceUnit;       // the unit that is moving
         dtNavMesh const*        m_navMesh;          // the nav mesh
         dtNavMeshQuery const*   m_navMeshQuery;     // the nav mesh query used to find the path

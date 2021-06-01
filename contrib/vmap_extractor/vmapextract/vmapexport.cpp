@@ -76,7 +76,7 @@ bool preciseVectorData = false;
 
 //static const char * szWorkDirMaps = ".\\Maps";
 const char* szWorkDirWmo = "./Buildings";
-const char* szRawVMAPMagic = "VMAP005";
+const char* szRawVMAPMagic = "VMAP006";
 
 // Local testing functions
 
@@ -169,7 +169,7 @@ bool ExtractSingleWmoWithAllConfig(std::string& fname)
 {
     // Copy files from archive
 
-    char szLocalFile[1024];
+    //char szLocalFile[1024];
     const char* plain_name = GetPlainName(fname.c_str());
 
     //if (FileExists(szLocalFile))
@@ -202,7 +202,7 @@ bool ExtractSingleWmoWithAllConfig(std::string& fname)
         return true;
     }
 
-    for (int i = 0; i < froot.nDoodadSets; i++)
+    for (uint32 i = 0; i < froot.nDoodadSets; i++)
     {
         //printf("Extracting wmo+doodadset %i\n", i);
         ExtractSingleWmo(fname, i);
@@ -255,6 +255,7 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
 
     froot.ConvertToVMAPRootWmo(output);
     int Wmo_nVertices = 0;
+    uint32 RealNbOfGroups = froot.nGroups;
     //printf("root has %d groups\n", froot->nGroups);
     if (froot.nGroups != 0)
     {
@@ -276,6 +277,13 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
                 break;
             }
 
+            if (fgroup.ShouldSkip(froot))
+            {
+                printf("Skipped WMOGroup %s %s %d\n", fname.c_str(), s.c_str(), fgroup.mogpFlags);
+                RealNbOfGroups--;
+                continue;
+            }
+
             if (strcmp(szLocalFile, "./Buildings/Transport_Zeppelin.wmo") == 0)
                 FixZepp(fgroup);
 
@@ -286,6 +294,8 @@ bool ExtractSingleWmo(std::string& fname, int DoodadConfig)
 
     fseek(output, 8, SEEK_SET); // store the correct no of vertices
     fwrite(&Wmo_nVertices, sizeof(int), 1, output);
+    fseek(output, 12, SEEK_SET); // store the correct no of groups
+    fwrite(&RealNbOfGroups, sizeof(uint32), 1, output);
     fclose(output);
 
     // Delete the extracted file in the case of an error

@@ -32,7 +32,7 @@
 #include "SQLStorages.h"
 
 char const* MAP_MAGIC         = "MAPS";
-char const* MAP_VERSION_MAGIC = "z1.4";
+char const* MAP_VERSION_MAGIC = "z1.5";
 char const* MAP_AREA_MAGIC    = "AREA";
 char const* MAP_HEIGHT_MAGIC  = "MHGT";
 char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -520,7 +520,7 @@ GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 Re
     if (LiquidTypeEntry const* liquidEntry = sTerrainMgr.GetLiquidType(entry))
     {
         entry = liquidEntry->Id;
-        type &= MAP_LIQUID_TYPE_DARK_WATER;
+        type &= MAP_LIQUID_TYPE_DEEP_WATER;
         uint32 liqTypeIdx = liquidEntry->Type;
         if (entry < 21)
         {
@@ -542,7 +542,7 @@ GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 Re
             }
         }
 
-        type |= (1 << liqTypeIdx) | (type & MAP_LIQUID_TYPE_DARK_WATER);
+        type |= (1 << liqTypeIdx) | (type & MAP_LIQUID_TYPE_DEEP_WATER);
     }
 
     if (type == 0)
@@ -803,6 +803,10 @@ float TerrainInfo::GetHeightStatic(float x, float y, float z, bool useVmaps/*=tr
             // if not found in expected range, look for infinity range (case of far above floor, but below terrain-height)
             if (vmapHeight <= INVALID_HEIGHT)
                 vmapHeight = vmgr->getHeight(GetMapId(), x, y, z2, 10000.0f);
+
+            // look upwards
+            if (vmapHeight <= INVALID_HEIGHT && mapHeight > z2 && std::abs(z2 - mapHeight) > 30.f)
+                vmapHeight = vmgr->getHeight(GetMapId(), x, y, z2, -maxSearchDist);
 
             // still not found, look near terrain height
             if (vmapHeight <= INVALID_HEIGHT && mapHeight > INVALID_HEIGHT && z2 < mapHeight)

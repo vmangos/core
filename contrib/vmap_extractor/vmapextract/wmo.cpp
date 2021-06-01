@@ -172,6 +172,11 @@ bool WMORoot::open()
                 modelis[i] = mi;
             }
         }
+        else if (!strcmp(fourcc, "MOGN"))
+        {
+            GroupNames.resize(size);
+            f.read(GroupNames.data(), size);
+        }
         /*
         else if (!strcmp(fourcc,"MOTX"))
         {
@@ -180,9 +185,6 @@ bool WMORoot::open()
             The beginning of a string is always aligned to a 4Byte Adress. (0, 4, 8, C). The end of the string is Zero terminated and filled with zeros until the next aligment. Sometimes there also empty aligtments for no (it seems like no) real reason.
         }
         else if (!strcmp(fourcc,"MOMT"))
-        {
-        }
-        else if (!strcmp(fourcc,"MOGN"))
         {
         }
         else if (!strcmp(fourcc,"MOGI"))
@@ -555,9 +557,11 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
         for (int i = 0; i < nTriangles; ++i)
         {
             // Skip no collision triangles
-            if (MOPY[2 * i]&WMO_MATERIAL_NO_COLLISION ||
-                    !(MOPY[2 * i] & (WMO_MATERIAL_HINT | WMO_MATERIAL_COLLIDE_HIT)))
+            bool isRenderFace = (MOPY[2 * i] & WMO_MATERIAL_RENDER) && !(MOPY[2 * i] & WMO_MATERIAL_DETAIL);
+            bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace;
+            if (!isCollision)
                 continue;
+
             // Use this triangle
             for (int j = 0; j < 3; ++j)
             {
@@ -682,6 +686,22 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPrecis
     }
 
     return nColTriangles;
+}
+
+bool WMOGroup::ShouldSkip(WMORoot const& root) const
+{
+    // skip unreachable
+    if (mogpFlags & 0x80)
+        return true;
+
+    // skip antiportals
+    if (mogpFlags & 0x4000000)
+        return true;
+
+    if (groupName < int32(root.GroupNames.size()) && !strcmp(&root.GroupNames[groupName], "antiportal"))
+        return true;
+
+    return false;
 }
 
 WMOGroup::~WMOGroup()

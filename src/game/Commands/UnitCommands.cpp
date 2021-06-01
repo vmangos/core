@@ -131,6 +131,13 @@ bool ChatHandler::HandleGPSCommand(char* args)
                     cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), obj->GetInstanceId(),
                     zone_x, zone_y, ground_z, floor_z, have_map, have_vmap);
 
+    if (GenericTransport* transport = obj->GetTransport())
+    {
+        Position pos;
+        obj->GetPosition(pos.x, pos.y, pos.z, transport);
+        PSendSysMessage("Transport coords: %f %f %f %f", pos.x, pos.y, pos.z, pos.o);
+    }
+
     DEBUG_LOG("Player %s GPS call for %s '%s' (%s: %u):",
               m_session ? GetNameLink().c_str() : GetMangosString(LANG_CONSOLE_COMMAND),
               (obj->GetTypeId() == TYPEID_PLAYER ? "player" : "creature"), obj->GetName(),
@@ -728,6 +735,26 @@ bool ChatHandler::HandleListHostileRefsCommand(char* /*args*/)
         if (Unit* pTarget = pReference->getSourceUnit())
             PSendSysMessage("%u. %s", counter++, pTarget->GetGuidStr().c_str());
         pReference = pReference->next();
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleListThreatCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    if (!pUnit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Threat list for %s:", pUnit->GetObjectGuid().GetString().c_str());
+    ThreatList const& threatList = pUnit->GetThreatManager().getThreatList();
+    for (auto const& itr : threatList)
+    {
+        PSendSysMessage("%g - %s", itr->getThreat(), itr->getUnitGuid().GetString().c_str());
     }
 
     return true;

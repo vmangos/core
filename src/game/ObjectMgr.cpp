@@ -7063,17 +7063,19 @@ inline void CheckGOConsumable(GameObjectInfo const* goInfo, uint32 dataN, uint32
                     goInfo->id, goInfo->type, N, dataN);
 }
 
-void ObjectMgr::LoadGameobjectInfo()
+std::set<uint32> ObjectMgr::LoadGameobjectInfo()
 {
     SQLGameObjectLoader loader;
     loader.LoadProgressive(sGOStorage, sWorld.GetWowPatch());
-    CheckGameObjectInfos();
     sLog.outString(">> Loaded %u game object templates", sGOStorage.GetRecordCount());
     sLog.outString();
+    return CheckGameObjectInfos();
 }
 
-void ObjectMgr::CheckGameObjectInfos()
+std::set<uint32> ObjectMgr::CheckGameObjectInfos()
 {
+    std::set<uint32> transportDisplayIds;
+
     // some checks
     for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr != sGOStorage.end<GameObjectInfo>(); ++itr)
     {
@@ -7176,6 +7178,9 @@ void ObjectMgr::CheckGameObjectInfos()
                     CheckGOLinkedTrapId(*itr, itr->goober.linkedTrapId, 12);
                 break;
             }
+            case GAMEOBJECT_TYPE_TRANSPORT:
+                transportDisplayIds.insert(itr->displayId);
+                break;
             case GAMEOBJECT_TYPE_AREADAMAGE:                //12
             {
                 if (itr->areadamage.lockId)
@@ -7196,6 +7201,7 @@ void ObjectMgr::CheckGameObjectInfos()
                         sLog.outErrorDb("Gameobject (Entry: %u GoType: %u) have data0=%u but TaxiPath (Id: %u) not exist.",
                             itr->id, itr->type, itr->moTransport.taxiPathId, itr->moTransport.taxiPathId);
                 }
+                transportDisplayIds.insert(itr->displayId);
                 break;
             }
             case GAMEOBJECT_TYPE_SUMMONING_RITUAL:          //18
@@ -7236,6 +7242,12 @@ void ObjectMgr::CheckGameObjectInfos()
 #endif
         }
     }
+
+    // no model on which to path
+    transportDisplayIds.erase(462);
+    transportDisplayIds.erase(562);
+
+    return transportDisplayIds;
 }
 
 void ObjectMgr::LoadGameobjectsRequirements()
@@ -8224,6 +8236,20 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
     sLog.outString();
     sLog.outString(">> Loaded %u taxi path transitions", count);
+}
+
+ObjectGuid ObjectMgr::GetFullTransportGuidFromLowGuid(uint32 lowGuid)
+{
+    ObjectGuid guid(HIGHGUID_MO_TRANSPORT, lowGuid);
+
+    if (GameObjectData const* data = GetGOData(lowGuid))
+    {
+        if (GameObjectInfo const* pInfo = GetGameObjectInfo(data->id))
+            if (pInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+                guid = ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, lowGuid);
+    }
+
+    return guid;
 }
 
 void ObjectMgr::LoadReservedPlayersNames()
@@ -10268,7 +10294,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsLoaded(x, y))
     {
-        GameObject* go = new GameObject;
+        GameObject* go = GameObject::CreateGameObject(entry);
         if (!go->LoadFromDB(guid, map))
         {
             sLog.outError("AddGOData: cannot add gameobject entry %u to map", entry);
