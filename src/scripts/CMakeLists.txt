@@ -161,7 +161,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_arcanist_doan.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_azshir_the_sleepless.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_bloodmage_thalnos.cpp
-    eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_headless_horseman.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_herod.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_high_inquisitor_fairbanks.cpp
     eastern_kingdoms/tirisfal_glades/scarlet_monastery/boss_houndmaster_loksey.cpp
