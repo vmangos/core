@@ -18478,6 +18478,13 @@ void RemoveBroadcastListener(Player* target, Player* me)
         target->m_broadcaster->RemoveListener(me);
 }
 
+// Only called if player is in combat and not in dungeon.
+void Player::BeforeVisibilityDestroy(Creature* creature)
+{
+    if (creature->IsInCombat() && IsInCombatWithCreature(creature))
+        GetHostileRefManager().deleteReference(creature);
+}
+
 template<class T>
 void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
 {
@@ -18488,9 +18495,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         {
             ObjectGuid t_guid = target->GetObjectGuid();
 
+            // Make sure mobs who become out of range leave combat before grid unload.
             if (target->IsCreature() && IsInCombat() && !GetMap()->IsDungeon())
-                if (((Creature*)target)->IsInCombat() && IsInCombatWithCreature((Creature*)target))
-                    ((Creature*)target)->GetThreatManager().modifyThreatPercent(this, -101);
+                BeforeVisibilityDestroy((Creature*)target);
 
             target->BuildOutOfRangeUpdateBlock(data);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
