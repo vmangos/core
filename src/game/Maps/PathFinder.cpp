@@ -558,6 +558,7 @@ bool PathInfo::HaveTiles(Vector3 const& p) const
 {
     if (m_transport)
         return true;
+
     int tx, ty;
     float point[VERTEX_SIZE] = {p.y, p.z, p.x};
 

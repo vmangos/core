@@ -25,26 +25,20 @@
 
 struct CreatureData;
 
-class Transport : public GameObject
+class GenericTransport : public GameObject
 {
-        friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*);
-
-        Transport();
     public:
-        typedef std::set<WorldObject*> PassengerSet;
-
-        ~Transport() override;
-
-        bool Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
+        GenericTransport();
         void CleanupsBeforeDelete() override;
-
-        void Update(uint32 update_diff, uint32 /*time_diff*/) override;
-
-        void BuildUpdate(UpdateDataMapType& data_map);
 
         void AddPassenger(WorldObject* passenger);
         void RemovePassenger(WorldObject* passenger);
-        PassengerSet const& GetPassengers() const { return _passengers; }
+
+        void UpdatePosition(float x, float y, float z, float o);
+        void UpdatePassengerPosition(WorldObject* object);
+
+        typedef std::set<WorldObject*> PassengerSet;
+        PassengerSet const& GetPassengers() const { return m_passengers; }
 
         /// This method transforms supplied transport offsets into global coordinates
         void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
@@ -57,16 +51,6 @@ class Transport : public GameObject
         {
             CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         }
-
-        uint32 GetPathProgress() const { return _pathProgress; }
-        uint32 GetPeriod() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
-        void SetPeriod(uint32 period) { SetUInt32Value(GAMEOBJECT_LEVEL, period); }
-
-        KeyFrameVec const& GetKeyFrames() const { return _transportInfo->keyFrames; }
-
-        void UpdatePosition(float x, float y, float z, float o);
-
-        TransportTemplate const* GetTransportTemplate() const { return _transportInfo; }
 
         static void CalculatePassengerPosition(float& x, float& y, float& z, float* o, float transX, float transY, float transZ, float transO)
         {
@@ -91,32 +75,71 @@ class Transport : public GameObject
             y = (iny - inx * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
             x = (inx + iny * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
         }
-        void UpdatePassengerPosition(WorldObject* object);
-        void SendOutOfRangeUpdateToMap();
-        void SendCreateUpdateToMap();
-    private:
-        void MoveToNextWaypoint();
-        float CalculateSegmentPos(float perc);
-        bool TeleportTransport(uint32 newMapid, float x, float y, float z, float o);
+
+        virtual uint32 GetPathProgress() const = 0;
+    protected:
         void UpdatePassengerPositions(PassengerSet& passengers);
-        void DoEventIfAny(KeyFrame const& node, bool departure);
+        PassengerSet m_passengers;
+        PassengerSet::iterator m_passengerTeleportItr;
+};
 
-        //! Helpers to know if stop frame was reached
-        bool IsMoving() const { return _isMoving; }
-        void SetMoving(bool val) { _isMoving = val; }
+class ElevatorTransport : public GenericTransport
+{
+public:
+    bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang,
+        float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 animprogress = GO_ANIMPROGRESS_DEFAULT, GOState go_state = GO_STATE_READY) override;
+    void Update(uint32 update_diff, uint32 /*time_diff*/) override;
 
-        TransportTemplate const* _transportInfo;
+    uint32 GetPathProgress() const override;
+private:
+    uint32 m_pathProgress;
+    TransportAnimation const* m_animationInfo;
+    uint32 m_currentSeg;
+};
 
-        KeyFrameVec::const_iterator _currentFrame;
-        KeyFrameVec::const_iterator _nextFrame;
-        ShortTimeTracker _positionChangeTimer;
-        bool _isMoving;
-        bool _pendingStop;
+class Transport : public GenericTransport
+{
+    friend Transport* TransportMgr::CreateTransport(uint32, uint32, Map*);
 
-        PassengerSet _passengers;
-        PassengerSet::iterator _passengerTeleportItr;
+    Transport();
+public:
+    ~Transport() override;
 
-        uint32 _pathProgress;
+    bool Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
+
+    void Update(uint32 update_diff, uint32 /*time_diff*/) override;
+
+    void BuildUpdate(UpdateDataMapType& data_map);
+
+    uint32 GetPathProgress() const override { return m_pathProgress; }
+    uint32 GetPeriod() const { return GetUInt32Value(GAMEOBJECT_LEVEL); }
+    void SetPeriod(uint32 period) { SetUInt32Value(GAMEOBJECT_LEVEL, period); }
+
+    KeyFrameVec const& GetKeyFrames() const { return m_transportInfo->keyFrames; }
+
+    TransportTemplate const* GetTransportTemplate() const { return m_transportInfo; }
+
+    void SendOutOfRangeUpdateToMap();
+    void SendCreateUpdateToMap();
+private:
+    void MoveToNextWaypoint();
+    float CalculateSegmentPos(float perc);
+    bool TeleportTransport(uint32 newMapid, float x, float y, float z, float o);
+    void DoEventIfAny(KeyFrame const& node, bool departure);
+
+    //! Helpers to know if stop frame was reached
+    bool IsMoving() const { return m_isMoving; }
+    void SetMoving(bool val) { m_isMoving = val; }
+
+    TransportTemplate const* m_transportInfo;
+
+    KeyFrameVec::const_iterator m_currentFrame;
+    KeyFrameVec::const_iterator m_nextFrame;
+    ShortTimeTracker m_positionChangeTimer;
+    bool m_isMoving;
+    bool m_pendingStop;
+
+    uint32 m_pathProgress;
 };
 
 #endif

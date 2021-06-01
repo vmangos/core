@@ -416,7 +416,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     float o = float(chr->GetOrientation());
     Map* map = chr->GetMap();
 
-    GameObject* pGameObj = new GameObject;
+    GameObject* pGameObj = GameObject::CreateGameObject(gInfo->id);
 
     // used guids from specially reserved range (can be 0 if no free values)
     uint32 db_lowGUID = sObjectMgr.GenerateStaticGameObjectLowGuid();

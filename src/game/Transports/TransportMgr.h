@@ -21,6 +21,7 @@
 #include <G3D/Quat.h>
 #include "spline.h"
 #include "DBCStores.h"
+#include <map>
 
 struct KeyFrame;
 struct GameObjectInfo;
@@ -80,6 +81,23 @@ struct TransportTemplate
     uint32 entry;
 };
 
+typedef std::map<uint32, TransportAnimationEntry const*> TransportPathContainer;
+// typedef std::map<uint32, TransportRotationEntry const*> TransportPathRotationContainer;
+
+struct TransportAnimation
+{
+    TransportAnimation() : TotalTime(0) { }
+
+    TransportPathContainer Path;
+    // TransportPathRotationContainer Rotations;
+    uint32 TotalTime;
+
+    TransportAnimationEntry const* GetPrevAnimNode(uint32 time) const;
+    TransportAnimationEntry const* GetNextAnimNode(uint32 time) const;
+    // TransportRotationEntry const* GetAnimRotation(uint32 time) const; - wotlk onwards
+};
+
+typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
 
 class TransportMgr
 {
@@ -127,6 +145,24 @@ class TransportMgr
 
         // Container storing transport entries to create for instanced maps
         TransportInstanceMap _instanceTransports;
+
+    public:
+
+        void LoadTransportAnimationAndRotation();
+
+        TransportAnimation const* GetTransportAnimInfo(uint32 entry) const
+        {
+            TransportAnimationContainer::const_iterator itr = m_transportAnimations.find(entry);
+            if (itr != m_transportAnimations.end())
+                return &itr->second;
+
+            return nullptr;
+        }
+
+    private:
+        void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node);
+
+        TransportAnimationContainer m_transportAnimations;
 };
 
 #define sTransportMgr TransportMgr::instance()

@@ -60,6 +60,7 @@ class BattleGroundPersistentState;
 class ChatHandler;
 class BattleGround;
 class WeatherSystem;
+class GenericTransport;
 class Transport;
 
 namespace VMAP
@@ -374,6 +375,7 @@ class Map : public GridRefManager<NGridType>
         // Used at extrapolation.
         void DoPlayerGridRelocation(Player*, float x, float y, float z, float angl);
         void CreatureRelocation(Creature* creature, float x, float y, float z, float orientation);
+        void GameObjectRelocation(GameObject* go, float x, float y, float z, float orientation, bool respawnRelocationOnFail = true);
 
         template<class T, class CONTAINER> void Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
 
@@ -495,7 +497,7 @@ class Map : public GridRefManager<NGridType>
         Creature* GetCreature(ObjectGuid const& guid) { return GetObject<Creature>(guid); }
         Pet* GetPet(ObjectGuid const& guid) { return GetObject<Pet>(guid); }
         Creature* GetAnyTypeCreature(ObjectGuid guid);      // normal creature or pet
-        Transport* GetTransport(ObjectGuid guid);
+        GenericTransport* GetTransport(ObjectGuid guid);
         DynamicObject* GetDynamicObject(ObjectGuid guid);
         Corpse* GetCorpse(ObjectGuid guid);                   // !!! find corpse can be not in world
         Unit* GetUnit(ObjectGuid guid);                       // only use if sure that need objects at current map, specially for player case
@@ -547,9 +549,9 @@ class Map : public GridRefManager<NGridType>
         // First collision with object
         bool GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, float modifyDist) const;
         // Use navemesh to walk
-        bool GetWalkHitPosition(Transport* t, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, 
+        bool GetWalkHitPosition(GenericTransport* t, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, 
             uint32 moveAllowedFlags = 0xF /*NAV_GROUND | NAV_WATER | NAV_MAGMA | NAV_SLIME*/, float zSearchDist = 20.0f, bool locatedOnSteepSlope = true) const;
-        bool GetWalkRandomPosition(Transport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
+        bool GetWalkRandomPosition(GenericTransport* t, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags = 0xF) const;
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { _dynamicTree.balance(); }
@@ -718,6 +720,7 @@ class Map : public GridRefManager<NGridType>
         mutable std::mutex m_guidGenerators_lock;
         ObjectGuidGenerator<HIGHGUID_UNIT> m_CreatureGuids;
         ObjectGuidGenerator<HIGHGUID_GAMEOBJECT> m_GameObjectGuids;
+        ObjectGuidGenerator<HIGHGUID_TRANSPORT> m_transportGuids;
         ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT> m_DynObjectGuids;
         ObjectGuidGenerator<HIGHGUID_PET> m_PetGuids;
 

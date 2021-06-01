@@ -57,7 +57,7 @@
 
 void MovementInfo::Read(ByteBuffer &data)
 {
-    time = WorldTimer::getMSTime();
+    stime = WorldTimer::getMSTime();
     data >> moveFlags;
     data >> ctime;
     data >> pos.x;
@@ -140,7 +140,7 @@ void MovementInfo::CorrectData(Unit* mover)
 void MovementInfo::Write(ByteBuffer &data) const
 {
     data << moveFlags;
-    data << time;
+    data << stime;
     data << pos.x;
     data << pos.y;
     data << pos.z;
@@ -432,7 +432,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
         MovementInfo m = wobject->m_movementInfo;
         if (!m.ctime)
         {
-            m.time = WorldTimer::getMSTime() + 1000;
+            m.stime = WorldTimer::getMSTime() + 1000;
             m.ChangePosition(wobject->GetPositionX(), wobject->GetPositionY(), wobject->GetPositionZ(), wobject->GetOrientation());
         }
         if (unit->ToCreature())
@@ -459,12 +459,23 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     {
         if (updateFlags & UPDATEFLAG_HAS_POSITION)                     // 0x40
         {
-            WorldObject* object = ((WorldObject*)this);
-
-            *data << float(object->GetPositionX());
-            *data << float(object->GetPositionY());
-            *data << float(object->GetPositionZ());
-            *data << float(object->GetOrientation());
+            // 0x02
+            if (updateFlags & UPDATEFLAG_TRANSPORT)
+            {
+                GameObject const* go = static_cast<GameObject const*>(this);
+                *data << float(go->GetStationaryX());
+                *data << float(go->GetStationaryY());
+                *data << float(go->GetStationaryZ());
+                *data << float(go->GetStationaryO());
+            }
+            else
+            {
+                WorldObject const* wo = static_cast<WorldObject const*>(this);
+                *data << float(wo->GetPositionX());
+                *data << float(wo->GetPositionY());
+                *data << float(wo->GetPositionZ());
+                *data << float(wo->GetOrientation());
+            }
         }
     }
     if (updateFlags & UPDATEFLAG_HIGHGUID)
@@ -501,10 +512,10 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
             this causes clients to receive different PathProgress
             resulting in players seeing the object in a different position
         */
-        if (go && go->ToTransport())
+        if (go && go->IsMoTransport())
             *data << uint32(go->ToTransport()->GetPathProgress());
         else
-            *data << uint32(WorldTimer::getMSTime());
+            *data << uint32(sWorld.GetCurrentMSTime());
     }
 #else
     Unit const* unit = ToUnit();
@@ -1385,20 +1396,17 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
-        m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0)
+        m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0), worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
+        m_transport(nullptr)
 {
-    // Phasing
-    worldMask = WORLD_DEFAULT_OBJECT;
-    m_zoneScript = nullptr;
-    m_transport = nullptr;
-    m_movementInfo.time = WorldTimer::getMSTime();
+    m_movementInfo.stime = WorldTimer::getMSTime();
 }
 
 void WorldObject::CleanupsBeforeDelete()
 {
     RemoveFromWorld();
 
-    if (Transport* transport = GetTransport())
+    if (GenericTransport* transport = GetTransport())
         transport->RemovePassenger(this);
 }
 
@@ -2335,7 +2343,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
         return nullptr;
     }
     Map* map = GetMap();
-    GameObject* go = new GameObject();
+    GameObject* go = GameObject::CreateGameObject(entry);
     if (!go->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), entry, map, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, 100, GO_STATE_READY))
     {
         delete go;
@@ -3220,7 +3228,7 @@ void WorldObject::MonsterWhisper(int32 textId, Unit const* target, bool IsBossWh
     ((Player*)target)->GetSession()->SendPacket(&data);
 }
 
-void WorldObject::GetPosition(float &x, float &y, float &z, Transport* t) const
+void WorldObject::GetPosition(float &x, float &y, float &z, GenericTransport* t) const
 {
     if (t && m_movementInfo.t_guid == t->GetObjectGuid())
     {

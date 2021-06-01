@@ -1187,7 +1187,7 @@ class Unit : public SpellCaster
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
-        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC); }
+        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC)); }
 
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
         ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }

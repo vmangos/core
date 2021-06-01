@@ -426,3 +426,40 @@ void TransportMgr::CreateInstanceTransports(Map* map)
     for (const auto itr : mapTransports->second)
         CreateTransport(itr, 0, map);
 }
+
+void TransportMgr::LoadTransportAnimationAndRotation()
+{
+    for (uint32 i = 0; i < sTransportAnimationStore.GetNumRows(); ++i)
+        if (TransportAnimationEntry const* anim = sTransportAnimationStore.LookupEntry(i))
+            AddPathNodeToTransport(anim->TransportEntry, anim->TimeSeg, anim);
+}
+
+void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node)
+{
+    TransportAnimation& animNode = m_transportAnimations[transportEntry];
+    if (animNode.TotalTime < timeSeg)
+        animNode.TotalTime = timeSeg;
+
+    animNode.Path[timeSeg] = node;
+}
+
+TransportAnimationEntry const* TransportAnimation::GetPrevAnimNode(uint32 time) const
+{
+    auto itr = Path.lower_bound(time);
+    if (itr != Path.end() && itr != Path.begin())
+    {
+        --itr;
+        return itr->second;
+    }
+
+    return nullptr;
+}
+
+TransportAnimationEntry const* TransportAnimation::GetNextAnimNode(uint32 time) const
+{
+    auto itr = Path.lower_bound(time);
+    if (itr != Path.end())
+        return itr->second;
+
+    return nullptr;
+}

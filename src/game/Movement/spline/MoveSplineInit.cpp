@@ -65,21 +65,24 @@ int32 MoveSplineInit::Launch()
     float realSpeedRun = 0.0f;
     MoveSpline& move_spline = *unit.movespline;
 
-    Transport* newTransport = nullptr;
+    GenericTransport* newTransport = nullptr;
     if (args.transportGuid)
-        newTransport = HashMapHolder<Transport>::Find(ObjectGuid(HIGHGUID_MO_TRANSPORT, args.transportGuid));
+        newTransport = unit.GetMap()->GetTransport(sObjectMgr.GetFullTransportGuidFromLowGuid(args.transportGuid));
+
     Vector3 real_position(unit.GetPositionX(), unit.GetPositionY(), unit.GetPositionZ());
+
     // there is a big chance that current position is unknown if current state is not finalized, need compute it
     // this also allows calculate spline position and update map position in much greater intervals
     if (!move_spline.Finalized())
     {
         real_position = move_spline.ComputePosition();
-        Transport* oldTransport = nullptr;
+        GenericTransport* oldTransport = nullptr;
         if (move_spline.GetTransportGuid())
-            oldTransport = HashMapHolder<Transport>::Find(ObjectGuid(HIGHGUID_MO_TRANSPORT, move_spline.GetTransportGuid()));
+            oldTransport = unit.GetMap()->GetTransport(sObjectMgr.GetFullTransportGuidFromLowGuid(move_spline.GetTransportGuid()));
         if (oldTransport)
             oldTransport->CalculatePassengerPosition(real_position.x, real_position.y, real_position.z);
     }
+
     if (newTransport)
         newTransport->CalculatePassengerOffset(real_position.x, real_position.y, real_position.z);
 

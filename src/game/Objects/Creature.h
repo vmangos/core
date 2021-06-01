@@ -27,7 +27,6 @@
 #include "CreatureDefines.h"
 #include "Unit.h"
 #include "LootMgr.h"
-#include "Cell.h"
 #include "Util.h"
 
 #include <vector>
@@ -332,10 +331,6 @@ class Creature : public Unit
         void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
         void PauseOutOfCombatMovement();
 
-        // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
-        Cell const& GetCurrentCell() const { return m_currentCell; }
-        void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
-
         bool IsVisibleInGridForPlayer(Player const* pl) const override;
 
         void RemoveCorpse();
@@ -592,7 +587,6 @@ class Creature : public Unit
 
         CreatureSubtype m_subtype;                          // set in Creatures subclasses for fast it detect without dynamic_cast use
         MovementGeneratorType m_defaultMovementType;
-        Cell m_currentCell;                                 // store current cell where creature listed
         uint32 m_equipmentId;
         uint32 m_mountId;                                   // display Id to mount
 
