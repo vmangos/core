@@ -507,7 +507,9 @@ void PoolGroup<GameObject>::Spawn1Object(MapPersistentState& mapState, PoolObjec
         // We use spawn coords to spawn
         if (dataMap && dataMap->IsLoaded(data->position.x, data->position.y))
         {
-            GameObject* pGameobject = new GameObject;
+            GameObjectData const* data = sObjectMgr.GetGOData(obj->guid);
+            MANGOS_ASSERT(data);
+            GameObject* pGameobject = GameObject::CreateGameObject(data->id);
             //DEBUG_LOG("Spawning gameobject %u", obj->guid);
             if (!pGameobject->LoadFromDB(obj->guid, dataMap))
             {

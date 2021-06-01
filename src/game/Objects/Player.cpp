@@ -1528,7 +1528,7 @@ void Player::RelocateToLastClientPosition()
     }
 }
 
-void Player::GetSafePosition(float &x, float &y, float &z, Transport* onTransport) const
+void Player::GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport) const
 {
     if (!onTransport && m_movementInfo.ctime >  0)
     {
@@ -2186,10 +2186,10 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 data << uint32(mapid);
                 if (m_transport)
                 {
-                    data << m_movementInfo.GetTransportPos()->x;
-                    data << m_movementInfo.GetTransportPos()->y;
-                    data << m_movementInfo.GetTransportPos()->z;
-                    data << m_movementInfo.GetTransportPos()->o;
+                    data << m_movementInfo.GetTransportPos().x;
+                    data << m_movementInfo.GetTransportPos().y;
+                    data << m_movementInfo.GetTransportPos().z;
+                    data << m_movementInfo.GetTransportPos().o;
                 }
                 else
                 {
@@ -6619,7 +6619,7 @@ void Player::DismountCheck()
     }
 }
 
-void Player::SetTransport(Transport* t)
+void Player::SetTransport(GenericTransport* t)
 {
     WorldObject::SetTransport(t);
 
@@ -14748,21 +14748,26 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         _SaveBGData();
     }
 
+    // load the player's map here if it's not already loaded
+    if (GetMapId() <= 1)
+        SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
+    SetMap(sMapMgr.CreateMap(GetMapId(), this));
+
     if (transGUID != 0)
     {
-        ObjectGuid transObjectGuid(HIGHGUID_MO_TRANSPORT, transGUID);
-        Transport* transport = HashMapHolder<Transport>::Find(transObjectGuid);
-        if (transport)
+        ObjectGuid guid = sObjectMgr.GetFullTransportGuidFromLowGuid(transGUID);
+
+        if (GenericTransport* transport = GetMap()->GetTransport(guid))
         {
             float x = fields[26].GetFloat(), y = fields[27].GetFloat(), z = fields[28].GetFloat(), o = fields[29].GetFloat();
-            m_movementInfo.SetTransportData(transObjectGuid, x, y, z, o, 0);
+            m_movementInfo.SetTransportData(guid, x, y, z, o, 0);
             transport->CalculatePassengerPosition(x, y, z, &o);
 
             if (!MaNGOS::IsValidMapCoord(x, y, z, o) ||
                     // transport size limited
-                    std::fabs(m_movementInfo.GetTransportPos()->x) > 250.0f ||
-                    std::fabs(m_movementInfo.GetTransportPos()->y) > 250.0f ||
-                    std::fabs(m_movementInfo.GetTransportPos()->z) > 250.0f)
+                    std::fabs(m_movementInfo.GetTransportPos().x) > 250.0f ||
+                    std::fabs(m_movementInfo.GetTransportPos().y) > 250.0f ||
+                    std::fabs(m_movementInfo.GetTransportPos().z) > 250.0f)
             {
                 sLog.outError("Player %s have invalid transport coordinates (X: %f Y: %f Z: %f O: %f). Teleport to bind location.",
                               guid.GetString().c_str(), x, y, z, o);
@@ -14815,11 +14820,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             }
         }
     }
-
-    // load the player's map here if it's not already loaded
-    if (GetMapId() <= 1)
-        SetLocationInstanceId(sMapMgr.GetContinentInstanceId(GetMapId(), GetPositionX(), GetPositionY()));
-    SetMap(sMapMgr.CreateMap(GetMapId(), this));
 
     SaveRecallPosition();
 
@@ -16213,10 +16213,10 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(m_resetTalentsMultiplier);
     uberInsert.addUInt64(uint64(m_resetTalentsTime));
 
-    uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos()->x));
-    uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos()->y));
-    uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos()->z));
-    uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(m_movementInfo.GetTransportPos()->o)));
+    uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos().x));
+    uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos().y));
+    uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos().z));
+    uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(m_movementInfo.GetTransportPos().o)));
     if (m_transport)
         uberInsert.addUInt32(m_transport->GetGUIDLow());
     else
@@ -18421,7 +18421,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
         if (target->FindMap() && target->isWithinVisibilityDistanceOf(this, viewPoint, inVisibleList) && target->IsVisibleForInState(this, viewPoint, false))
         {
             target->SendCreateUpdateToPlayer(this);
-            if (target->GetTypeId() != TYPEID_GAMEOBJECT || !((GameObject*)target)->IsTransport())
+            if (target->GetTypeId() != TYPEID_GAMEOBJECT || !((GameObject*)target)->IsMoTransport())
             {
                 std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
                 m_visibleGUIDs.insert(target->GetObjectGuid());
@@ -18450,7 +18450,7 @@ inline void UpdateVisibilityOf_helper(ObjectGuidSet& s64, GameObject* target)
     if (target->GetEntry() == 181223)
         return;
 
-    if (!target->IsTransport())
+    if (!target->IsMoTransport())
     {
         s64.insert(target->GetObjectGuid());
     }
@@ -18478,6 +18478,13 @@ void RemoveBroadcastListener(Player* target, Player* me)
         target->m_broadcaster->RemoveListener(me);
 }
 
+// Only called if player is in combat and not in dungeon.
+void Player::BeforeVisibilityDestroy(Creature* creature)
+{
+    if (creature->IsInCombat() && IsInCombatWithCreature(creature))
+        GetHostileRefManager().deleteReference(creature);
+}
+
 template<class T>
 void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
 {
@@ -18488,9 +18495,9 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         {
             ObjectGuid t_guid = target->GetObjectGuid();
 
+            // Make sure mobs who become out of range leave combat before grid unload.
             if (target->IsCreature() && IsInCombat() && !GetMap()->IsDungeon())
-                if (((Creature*)target)->IsInCombat() && IsInCombatWithCreature((Creature*)target))
-                    ((Creature*)target)->GetThreatManager().modifyThreatPercent(this, -101);
+                BeforeVisibilityDestroy((Creature*)target);
 
             target->BuildOutOfRangeUpdateBlock(data);
             std::unique_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
@@ -19890,7 +19897,7 @@ void Player::UpdateUnderwaterState()
     }
 
     // Allow travel in dark water on taxi or transport
-    if ((liquid_status.type_flags & MAP_LIQUID_TYPE_DARK_WATER) && !IsTaxiFlying() && !GetTransport())
+    if ((liquid_status.type_flags & MAP_LIQUID_TYPE_DEEP_WATER) && !IsTaxiFlying() && !GetTransport())
         m_MirrorTimerFlags |= UNDERWATER_INDARKWATER;
     else
         m_MirrorTimerFlags &= ~UNDERWATER_INDARKWATER;
@@ -20170,7 +20177,7 @@ InventoryResult Player::CanEquipUniqueItem(ItemPrototype const* itemProto, uint8
 void Player::HandleFall(MovementInfo const& movementInfo)
 {
     // calculate total z distance of the fall
-    float z_diff = m_lastFallZ - movementInfo.GetPos()->z;
+    float z_diff = m_lastFallZ - movementInfo.GetPos().z;
     DEBUG_LOG("zDiff = %f", z_diff);
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
@@ -20191,8 +20198,8 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
             uint32 damage = (uint32)(damageperc * GetMaxHealth() * sWorld.getConfig(CONFIG_FLOAT_RATE_DAMAGE_FALL) * TakenTotalMod);
 
-            float height = movementInfo.GetPos()->z;
-            UpdateAllowedPositionZ(movementInfo.GetPos()->x, movementInfo.GetPos()->y, height);
+            float height = movementInfo.GetPos().z;
+            UpdateAllowedPositionZ(movementInfo.GetPos().x, movementInfo.GetPos().y, height);
 
             if (damage > 0)
             {
@@ -20204,7 +20211,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
             }
 
             //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
-            DEBUG_LOG("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.GetPos()->z, height, GetPositionZ(), movementInfo.GetFallTime(), height, damage, safe_fall);
+            DEBUG_LOG("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d" , movementInfo.GetPos().z, height, GetPositionZ(), movementInfo.GetFallTime(), height, damage, safe_fall);
         }
     }
 }
@@ -20325,8 +20332,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode)
 {
-    if (m_lastFallTime >= minfo.GetFallTime() || m_lastFallZ <= minfo.GetPos()->z || opcode == MSG_MOVE_FALL_LAND)
-        SetFallInformation(minfo.GetFallTime(), minfo.GetPos()->z);
+    if (m_lastFallTime >= minfo.GetFallTime() || m_lastFallZ <= minfo.GetPos().z || opcode == MSG_MOVE_FALL_LAND)
+        SetFallInformation(minfo.GetFallTime(), minfo.GetPos().z);
 }
 
 /**
@@ -20510,6 +20517,7 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
             if ((typemask & TYPEMASK_PLAYER) && IsInWorld())
                 return ObjectAccessor::FindPlayer(guid);
             break;
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             if ((typemask & TYPEMASK_GAMEOBJECT) && IsInWorld())
                 return GetMap()->GetGameObject(guid);
@@ -20526,7 +20534,6 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
             if ((typemask & TYPEMASK_DYNAMICOBJECT) && IsInWorld())
                 return GetMap()->GetDynamicObject(guid);
             break;
-        case HIGHGUID_TRANSPORT:
         case HIGHGUID_CORPSE:
         case HIGHGUID_MO_TRANSPORT:
             break;

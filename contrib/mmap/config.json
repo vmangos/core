@@ -1,0 +1,22 @@
+{
+	"0": {
+		"3147": {
+			"maxSimplificationError": 1.0,
+			"detailSampleDist": 0.5,
+			"_Info": "stomrwind keep - pathing guard"
+		},
+		"3050": {
+			"_Info": "TODO:westbrook garrison"
+		}
+	},
+	"1": {
+		"3541": {
+			"quick": 1,
+			"_Info": "fixes terrain beneath a bridge allowing galak messenger to path correctly"
+		},
+		"4045": {
+			"quick": 1,
+			"_Info": "fixes terrain beneath a tent so wastewander bandit is no longer stuck"
+		}
+	}
+}
