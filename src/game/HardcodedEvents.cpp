@@ -611,7 +611,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         winterspring.zoneId = ZONEID_WINTERSPRING;
         winterspring.remainingVar = VARIABLE_SI_WINTERSPRING_REMAINING;
         winterspring.necroAmount = 3;
-        winterspring.mouth.push_back(InvasionXYZO(7736.56f, -4033.75f, 696.327f, 5.51524f));
+        winterspring.mouth.push_back(Position(7736.56f, -4033.75f, 696.327f, 5.51524f));
     }
 
     InvasionZone tanaris;
@@ -620,7 +620,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         tanaris.zoneId = ZONEID_TANARIS;
         tanaris.remainingVar = VARIABLE_SI_TANARIS_REMAINING;
         tanaris.necroAmount = 3;
-        tanaris.mouth.push_back(InvasionXYZO(-8352.68f, -3972.68f, 10.0753f, 2.14675f));
+        tanaris.mouth.push_back(Position(-8352.68f, -3972.68f, 10.0753f, 2.14675f));
     }
 
     InvasionZone azshara;
@@ -629,7 +629,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         azshara.zoneId = ZONEID_AZSHARA;
         azshara.remainingVar = VARIABLE_SI_AZSHARA_REMAINING;
         azshara.necroAmount = 2;
-        azshara.mouth.push_back(InvasionXYZO(3273.75f, -4276.98f, 125.509f, 5.44543f));
+        azshara.mouth.push_back(Position(3273.75f, -4276.98f, 125.509f, 5.44543f));
     }
 
     InvasionZone blasted_lands;
@@ -638,7 +638,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         blasted_lands.zoneId = ZONEID_BLASTED_LANDS;
         blasted_lands.remainingVar = VARIABLE_SI_BLASTED_LANDS_REMAINING;
         blasted_lands.necroAmount = 2;
-        blasted_lands.mouth.push_back(InvasionXYZO(-11429.3f, -3327.82f, 7.73628f, 1.0821f));
+        blasted_lands.mouth.push_back(Position(-11429.3f, -3327.82f, 7.73628f, 1.0821f));
     }
 
     InvasionZone eastern_plaguelands;
@@ -647,7 +647,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         eastern_plaguelands.zoneId = ZONEID_EASTERN_PLAGUELANDS;
         eastern_plaguelands.remainingVar = VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING;
         eastern_plaguelands.necroAmount = 2;
-        eastern_plaguelands.mouth.push_back(InvasionXYZO(2014.55f, -4934.52f, 73.9846f, 0.0698132f));
+        eastern_plaguelands.mouth.push_back(Position(2014.55f, -4934.52f, 73.9846f, 0.0698132f));
     }
 
     InvasionZone burning_steppes;
@@ -656,7 +656,7 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
         burning_steppes.zoneId = ZONEID_BURNING_STEPPES;
         burning_steppes.remainingVar = VARIABLE_SI_BURNING_STEPPES_REMAINING;
         burning_steppes.necroAmount = 2;
-        burning_steppes.mouth.push_back(InvasionXYZO(-8229.53f, -1118.11f, 144.012f, 6.17846f));
+        burning_steppes.mouth.push_back(Position(-8229.53f, -1118.11f, 144.012f, 6.17846f));
     }
 
     invasionPoints.push_back(winterspring);
@@ -670,16 +670,16 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     {
         undercity.map = 0;
         undercity.zoneId = ZONEID_UNDERCITY;
-        undercity.pallid.push_back(InvasionXYZO(1595.87f, 440.539f, -46.3349f, 2.28207f)); // Royal Quarter
-        undercity.pallid.push_back(InvasionXYZO(1659.2f, 265.988f, -62.1788f, 3.64283f)); // Trade Quarter
+        undercity.pallid.push_back(Position(1595.87f, 440.539f, -46.3349f, 2.28207f)); // Royal Quarter
+        undercity.pallid.push_back(Position(1659.2f, 265.988f, -62.1788f, 3.64283f)); // Trade Quarter
     }
 
     CityAttack stormwind;
     {
         stormwind.map = 0;
         stormwind.zoneId = ZONEID_STORMWIND;
-        stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Stormwind Keep
-        stormwind.pallid.push_back(InvasionXYZO(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Trade District
+        stormwind.pallid.push_back(Position(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Stormwind Keep
+        stormwind.pallid.push_back(Position(-8578.15f, 886.382f, 87.3148f, 0.586275f)); // Trade District
     }
 
     attackPoints.push_back(undercity);
@@ -934,7 +934,7 @@ void ScourgeInvasionEvent::Disable()
     UpdateWorldState();
 }
 
-Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionXYZO const& invZone)
+Map* ScourgeInvasionEvent::GetMap(uint32 mapId, Position const& invZone)
 {
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
@@ -1157,7 +1157,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     return true;
 }
 
-bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZO& point, uint32 SpawnLocationID)
+bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, Position position, uint32 SpawnLocationID)
 {
     // Remove old pallid if required.
     Creature* pPallid = pMap->GetCreature(zone->pallidGuid);
@@ -1166,7 +1166,7 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
     if (pPallid)
         pPallid->RemoveFromWorld();
 
-    if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
+    if (Creature* pPallid = pMap->SummonCreature(PickRandomValue(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), position.x, position.y, position.z, position.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
         pPallid->GetMotionMaster()->Clear(false, true);
         if (pPallid->GetZoneId() == ZONEID_UNDERCITY)
@@ -1187,7 +1187,7 @@ bool ScourgeInvasionEvent::SummonPallid(Map* pMap, CityAttack* zone, InvasionXYZ
     return true;
 }
 
-bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXYZO& point)
+bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, Position position)
 {
     // Remove old mouth if required.
     Creature* pMouth = pMap->GetCreature(zone->mouthGuid);
@@ -1195,7 +1195,7 @@ bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, InvasionXY
     if (pMouth)
         pMouth->RemoveFromWorld();
 
-    if (Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, point.x, point.y, point.z, point.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
+    if (Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, position.x, position.y, position.z, position.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
         pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
         zone->mouthGuid = pMouth->GetObjectGuid();
@@ -1291,8 +1291,7 @@ void ScourgeInvasionEvent::UpdateWorldState()
     int REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
     int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
     int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
-    
-    
+
     if (previousRemainingCounts[0] != REMAINING_AZSHARA ||
         previousRemainingCounts[1] != REMAINING_BLASTED_LANDS ||
         previousRemainingCounts[2] != REMAINING_BURNING_STEPPES ||
@@ -1326,7 +1325,6 @@ void ScourgeInvasionEvent::UpdateWorldState()
         pl->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
         pl->SendUpdateWorldState(WORLDSTATE_TANARIS, REMAINING_TANARIS > 0 ? 1 : 0);
         pl->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, REMAINING_WINTERSPRING > 0 ? 1 : 0);
-
 
         pl->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
         pl->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
