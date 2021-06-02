@@ -20,7 +20,6 @@
 #define MANGOS_PATH_FINDER_H
 
 #include "Path.h"
-#include "Transport.h"
 #include "MoveMapSharedDefines.h"
 #include "../recastnavigation/Detour/Include/DetourNavMesh.h"
 #include "../recastnavigation/Detour/Include/DetourNavMeshQuery.h"
@@ -31,7 +30,7 @@ using Movement::Vector3;
 using Movement::PointsArray;
 
 class Unit;
-class Transport;
+class GenericTransport;
 struct GridMapLiquidData;
 
 // 64*6.0f=384y  number_of_points*interval = max_path_len
