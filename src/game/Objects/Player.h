@@ -69,16 +69,20 @@ enum SpellModType
     SPELLMOD_PCT          = 108                             // SPELL_AURA_ADD_PCT_MODIFIER
 };
 
-// 2^n values, Player::m_isunderwater is a bitmask. These are mangos internal values, they are never send to any client
-enum PlayerUnderwaterState
+enum EnvironmentFlags
 {
-    UNDERWATER_NONE                     = 0x00,
-    UNDERWATER_INWATER                  = 0x01,             // terrain type is water and player is afflicted by it
-    UNDERWATER_INLAVA                   = 0x02,             // terrain type is lava and player is afflicted by it
-    UNDERWATER_INSLIME                  = 0x04,             // terrain type is lava and player is afflicted by it
-    UNDERWATER_INDARKWATER              = 0x08,             // terrain type is dark water and player is afflicted by it
+    ENVIRONMENT_FLAG_NONE           = 0x00,
+    ENVIRONMENT_FLAG_IN_WATER       = 0x01,                     // Swimming or standing in water
+    ENVIRONMENT_FLAG_IN_MAGMA       = 0x02,                     // Swimming or standing in magma
+    ENVIRONMENT_FLAG_IN_SLIME       = 0x04,                     // Swimming or standing in slime
+    ENVIRONMENT_FLAG_HIGH_SEA       = 0x08,                     // Anywhere inside deep water area
+    ENVIRONMENT_FLAG_UNDERWATER     = 0x10,                     // Swimming fully submerged in any liquid
+    ENVIRONMENT_FLAG_HIGH_LIQUID    = 0x20,                     // In any liquid deep enough to be able to swim
+    ENVIRONMENT_FLAG_LIQUID         = 0x40,                     // Anywhere indide area with any liquid
 
-    UNDERWATER_EXIST_TIMERS             = 0x10
+    ENVIRONMENT_MASK_LIQUID_HAZARD  = (ENVIRONMENT_FLAG_IN_MAGMA | ENVIRONMENT_FLAG_IN_SLIME),
+    ENVIRONMENT_MASK_IN_LIQUID      = (ENVIRONMENT_FLAG_IN_WATER | ENVIRONMENT_MASK_LIQUID_HAZARD),
+    ENVIRONMENT_MASK_LIQUID_FLAGS   = (ENVIRONMENT_FLAG_UNDERWATER | ENVIRONMENT_MASK_IN_LIQUID | ENVIRONMENT_FLAG_HIGH_SEA | ENVIRONMENT_FLAG_LIQUID | ENVIRONMENT_FLAG_HIGH_LIQUID),
 };
 
 enum BuyBankSlotResult
@@ -367,14 +371,70 @@ enum ActivateTaxiReplies
     ERR_TAXINOTSTANDING             = 12
 };
 
-enum MirrorTimerType
+class MirrorTimer
 {
-    FATIGUE_TIMER      = 0,
-    BREATH_TIMER       = 1,
-    FIRE_TIMER         = 2
+    public:
+        enum Type
+        {
+            FATIGUE         = 0,
+            BREATH          = 1,
+            FEIGNDEATH      = 2,
+
+            NUM_CLIENT_TIMERS,
+
+            ENVIRONMENTAL   = NUM_CLIENT_TIMERS,
+
+            NUM_TIMERS
+        };
+
+        enum Status
+        {
+            UNCHANGED       = 0,
+            FULL_UPDATE     = 1,
+            STATUS_UPDATE   = 2,
+        };
+
+        MirrorTimer(Type type) : m_type(type), m_scale(-1), m_spellId(0), m_status(UNCHANGED), m_active(false), m_frozen(false) {}
+
+        inline bool     IsActive() const { return m_active; }
+        inline bool     IsRegenerating() const { return (m_scale > 0); }
+        inline bool     IsFrozen() const { return (m_frozen && !IsRegenerating()); }
+
+        inline Type     GetType() const { return m_type; }
+        inline uint32   GetRemaining() const { return (m_tracker.GetInterval() - m_tracker.GetCurrent()); }
+        inline uint32   GetDuration() const { return m_tracker.GetInterval(); }
+        inline int32    GetScale() const { return m_scale; }
+        inline uint32   GetSpellId() const { return m_spellId; }
+
+        inline Status   FetchStatus();
+
+        inline void Stop();
+
+        inline void Start(uint32 interval, uint32 spellId = 0);
+        inline void Start(uint32 current, uint32 max, uint32 spellId);
+
+        inline void SetRemaining(uint32 duration);
+        inline void SetDuration(uint32 duration);
+
+        inline void SetFrozen(bool state);
+
+        inline void SetScale(int32 scale);
+
+        bool Update(uint32 diff);
+
+    private:
+        Type m_type;
+        int32 m_scale;
+        uint32 m_spellId;
+
+        ShortIntervalTimer m_tracker;
+        ShortIntervalTimer m_pulse;
+
+        Status m_status;
+
+        bool m_active;
+        bool m_frozen;
 };
-#define MAX_TIMERS      3
-#define DISABLED_MIRROR_TIMER   -1
 
 // 2^n values
 enum AtLoginFlags
@@ -1680,7 +1740,7 @@ class Player final: public Unit
         bool m_bCanDelayTeleport;
         bool m_bHasDelayedTeleport;
         bool m_bHasBeenAliveAtDelayedTeleport;
-        uint32 m_areaCheckTimer; // Trigger call to UpdateUnderwaterState/CheckAreaExploreAndOutdoor
+        uint32 m_areaCheckTimer; // Trigger call to UpdateTerainEnvironmentFlags/CheckAreaExploreAndOutdoor
 
         // to fix an 1.12 client problem with transports
         // sometimes they need a refresh before being usable
@@ -1750,11 +1810,10 @@ class Player final: public Unit
 
         LiquidTypeEntry const* m_lastLiquid;
         uint8 m_isunderwater;
-        bool m_isInWater;
 
         void UpdateZoneDependentAuras();
         void UpdateAreaDependentAuras();                    // subzones
-        void UpdateUnderwaterState();
+        void UpdateTerainEnvironmentFlags();
         void CheckAreaExploreAndOutdoor(void);
     public:
         void AddToWorld() override;
@@ -1909,10 +1968,6 @@ class Player final: public Unit
         float GetXYSpeed() const { return xy_speed; }
         void SetXYSpeed(float speed) { xy_speed = speed; }
 
-        void SetInWater(bool apply);
-        bool IsInWater() const override { return m_isInWater; }
-        bool IsUnderWater() const override;
-
         void SendInitialPacketsBeforeAddToMap();
         void SendInitialPacketsAfterAddToMap(bool login = true);
 
@@ -1920,23 +1975,41 @@ class Player final: public Unit
         /***              ENVIRONMENTAL SYSTEM                 ***/
         /*********************************************************/
 
-    protected:
-        void SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen);
-        void StopMirrorTimer(MirrorTimerType Type);
-        void HandleDrowning(uint32 time_diff);
-        int32 GetMaxTimer(MirrorTimerType timer);
-        int32 m_MirrorTimer[MAX_TIMERS];
-        uint8 m_MirrorTimerFlags;
-        uint8 m_MirrorTimerFlagsLast;
+    protected: 
+        uint8 m_environmentFlags = ENVIRONMENT_FLAG_NONE;
+        float m_environmentBreathingMultiplier = 1.0f;
+        MirrorTimer m_mirrorTimers[MirrorTimer::NUM_TIMERS] = { MirrorTimer::FATIGUE, MirrorTimer::BREATH, MirrorTimer::FEIGNDEATH, MirrorTimer::ENVIRONMENTAL };
+
+        void SetEnvironmentFlags(EnvironmentFlags flags, bool apply);
+
+        void SendMirrorTimerStart(uint32 type, uint32 remaining, uint32 duration, int32 scale, bool paused = false, uint32 spellId = 0);
+        void SendMirrorTimerStop(uint32 type);
+        void SendMirrorTimerPause(uint32 type, bool state);
+
+        void FreezeMirrorTimers(bool state);
+        void UpdateMirrorTimers(uint32 diff, bool send = true);
+
+        inline bool CheckMirrorTimerActivation(MirrorTimer::Type timer) const;
+        inline bool CheckMirrorTimerDeactivation(MirrorTimer::Type timer) const;
+
+        inline void OnMirrorTimerExpirationPulse(MirrorTimer::Type timer);
+
+        inline uint32 GetMirrorTimerMaxDuration(MirrorTimer::Type timer) const;
+        inline SpellAuraHolder const* GetMirrorTimerBuff(MirrorTimer::Type timer) const;
     public:
+        bool IsUnderwater() const override { return (m_environmentFlags & ENVIRONMENT_FLAG_UNDERWATER); }
+        bool IsInWater() const override { return (m_environmentFlags & ENVIRONMENT_FLAG_IN_WATER); }
+        inline bool IsInMagma() const { return (m_environmentFlags & ENVIRONMENT_FLAG_IN_MAGMA); }
+        inline bool IsInSlime() const { return (m_environmentFlags & ENVIRONMENT_FLAG_IN_SLIME); }
+        inline bool IsInHighSea() const { return (m_environmentFlags & ENVIRONMENT_FLAG_HIGH_SEA); }
+        inline bool IsInHighLiquid() const { return (m_environmentFlags & ENVIRONMENT_FLAG_HIGH_LIQUID); }
+
+        inline uint32 GetWaterBreathingInterval() const;
+        void SetWaterBreathingIntervalMultiplier(float multiplier);
+
+        void SendMirrorTimers(bool forced = false);
+
         uint32 EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage);
-        void UpdateMirrorTimers();
-        void StopMirrorTimers()
-        {
-            StopMirrorTimer(FATIGUE_TIMER);
-            StopMirrorTimer(BREATH_TIMER);
-            StopMirrorTimer(FIRE_TIMER);
-        }
 
         /*********************************************************/
         /***                    REST SYSTEM                    ***/

@@ -966,32 +966,20 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        You can set it to very high value to prevent oldest guild events to be rewritten by latest guild events - but it can slow down performance
 #        Default: 100
 #
-#    TimerBar.Fatigue.GMLevel
-#        Disable/enable fatigue for security level (0..4) or high
-#        Default: 4 (None)
-#
-#    TimerBar.Fatigue.Max
+#    MirrorTimer.Fatigue.Max
 #        Fatigue max timer value (in secs)
 #        Default: 60 (1 minute)
-#                  0 (instant death)
+#                  0 (instant exhaustion damage start)
 #
-#    TimerBar.Breath.GMLevel
-#        Disable/enable waterbreathing for security level (0..4) or high
-#        Default: 4 (None)
-#
-#    TimerBar.Breath.Max
+#    MirrorTimer.Breath.Max
 #        Waterbreathing max timer value (in secs)
-#        Default:  60
-#                   0 (instant underwater breathing damage start)
+#        Default: 60
+#                  0 (instant underwater breathing damage start)
 #
-#    TimerBar.Fire.GMLevel
-#        Disable/enable lava fire damage for security level (0..4) or high
-#        Default: 4 (None)
-#
-#    TimerBar.Fire.Max
-#        Lava damage delay max timer value (in secs)
+#    MirrorTimer.Environmental.Max
+#        Generic environmental (lava/slime/etc) damage delay max timer value (in secs)
 #        Default:  1
-#                  0 (instant in lava damage start)
+#                  0 (instant in liquid damage start)
 #
 #    MaxPrimaryTradeSkill
 #        Max count that player can learn the primary trade skill.
@@ -1114,12 +1102,9 @@ Quests.HighLevelHideDiff = 7
 Quests.IgnoreRaid = 0
 Group.OfflineLeaderDelay = 300
 Guild.EventLogRecordsCount = 100
-TimerBar.Fatigue.GMLevel = 4
-TimerBar.Fatigue.Max = 60
-TimerBar.Breath.GMLevel = 4
-TimerBar.Breath.Max = 60
-TimerBar.Fire.GMLevel = 4
-TimerBar.Fire.Max = 1
+MirrorTimer.Fatigue.Max = 60
+MirrorTimer.Breath.Max = 60
+MirrorTimer.Environmental.Max = 1
 MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74

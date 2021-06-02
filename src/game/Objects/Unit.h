@@ -827,6 +827,8 @@ class Unit : public SpellCaster
         bool IsImmuneToSchoolMask(uint32 schoolMask) const;
         bool IsImmuneToMechanic(Mechanics mechanic) const;
         bool IsFrozen() const { return HasAuraState(AURA_STATE_FROZEN); }
+        bool IsFeigningDeath() const { return ((HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD) || IsFeigningDeathSuccessfully()) && IsAlive()); }
+        bool IsFeigningDeathSuccessfully() const { return HasUnitState(UNIT_STAT_FEIGN_DEATH); }
 
         bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = nullptr) const;
         bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
@@ -1363,7 +1365,7 @@ class Unit : public SpellCaster
 
         // Terrain checks
         virtual bool IsInWater() const;
-        virtual bool IsUnderWater() const;
+        virtual bool IsUnderwater() const;
         bool IsReachableBySwmming() const;
         bool IsInAccessablePlaceFor(Creature const* c) const;
 
