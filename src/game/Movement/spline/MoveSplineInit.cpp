@@ -23,6 +23,7 @@
 #include "WorldPacket.h"
 #include "Unit.h"
 #include "Transport.h"
+#include "ObjectMgr.h"
 #include "ObjectAccessor.h"
 #include "Anticheat.h"
 
