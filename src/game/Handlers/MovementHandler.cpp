@@ -1073,12 +1073,6 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
                     pPlayerMover->GetSession()->DoLootRelease(lootGuid);
         }
 
-        if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) != pPlayerMover->IsInWater())
-        {
-            // now client not include swimming flag in case jumping under water
-            pPlayerMover->SetInWater(!pPlayerMover->IsInWater() || pPlayerMover->GetTerrain()->IsUnderWater(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z));
-        }
-
         pPlayerMover->SetPosition(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
         pPlayerMover->m_movementInfo = movementInfo;
 

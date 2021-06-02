@@ -214,7 +214,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleNoImmediateEffect,                         //152 SPELL_AURA_MOD_DETECTED_RANGE         implemented in Creature::GetAttackDistance
     &Aura::HandleNoImmediateEffect,                         //153 SPELL_AURA_SPLIT_DAMAGE_FLAT          implemented in Unit::CalculateAbsorbAndResist
     &Aura::HandleNoImmediateEffect,                         //154 SPELL_AURA_MOD_STEALTH_LEVEL          implemented in Unit::IsVisibleForOrDetect
-    &Aura::HandleNoImmediateEffect,                         //155 SPELL_AURA_MOD_WATER_BREATHING        implemented in Player::GetMaxTimer
+    &Aura::HandleModWaterBreathing,                         //155 SPELL_AURA_MOD_WATER_BREATHING
     &Aura::HandleNoImmediateEffect,                         //156 SPELL_AURA_MOD_REPUTATION_GAIN        implemented in Player::CalculateReputationGain
     &Aura::HandleUnused,                                    //157 SPELL_AURA_PET_DAMAGE_MULTI (single test like spell 20782, also single for 214 aura)
     &Aura::HandleShieldBlockValue,                          //158 SPELL_AURA_MOD_SHIELD_BLOCKVALUE
@@ -2250,11 +2250,20 @@ void Aura::HandleAuraHover(bool apply, bool Real)
     GetTarget()->SetHover(apply);
 }
 
-void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)
+void Aura::HandleWaterBreathing(bool apply, bool /*Real*/)
 {
-    // update timers in client
-    if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)GetTarget())->UpdateMirrorTimers();
+    Unit* target = GetTarget();
+
+    if (target->GetTypeId() == TYPEID_PLAYER)
+        static_cast<Player*>(target)->SetWaterBreathingIntervalMultiplier(apply ? 0 : target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
+}
+
+void Aura::HandleModWaterBreathing(bool /*apply*/, bool /*Real*/)
+{
+    Unit* target = GetTarget();
+
+    if (target->GetTypeId() == TYPEID_PLAYER)
+        static_cast<Player*>(target)->SetWaterBreathingIntervalMultiplier(target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
 }
 
 std::pair<unsigned int, float> GetShapeshiftDisplayInfo(ShapeshiftForm form, Unit* target){
@@ -5624,9 +5633,6 @@ void Aura::HandleSpiritOfRedemption(bool apply, bool Real)
     {
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
-            // disable breath/etc timers
-            ((Player*)target)->StopMirrorTimers();
-
             // set stand state (expected in this form)
             if (!target->IsStandingUp())
                 target->SetStandState(UNIT_STAND_STATE_STAND);

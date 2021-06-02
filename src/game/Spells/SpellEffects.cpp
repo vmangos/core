@@ -1404,7 +1404,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     //m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEING_DEATH);
                     m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_casterUnit->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    m_casterUnit->AddUnitState(UNIT_STAT_DIED);
+                    m_casterUnit->AddUnitState(UNIT_STAT_FEIGN_DEATH);
 
                     // Summon globs
                     m_casterUnit->CastSpell(m_casterUnit, 25885, true);

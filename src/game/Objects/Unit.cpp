@@ -2899,7 +2899,7 @@ bool Unit::IsInWater() const
     return GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
-bool Unit::IsUnderWater() const
+bool Unit::IsUnderwater() const
 {
     return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
@@ -4957,7 +4957,7 @@ bool Unit::CanAttack(Unit const* target, bool force) const
     else if (!IsHostileTo(target))
         return false;
 
-    if (!target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()) || target->HasUnitState(UNIT_STAT_DIED))
+    if (!target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()) || target->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         return false;
 
     // shaman totem quests: spell 8898, shaman can detect elementals but elementals cannot see shaman
@@ -5819,7 +5819,7 @@ bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool
         if (!forAoE && !CanBeDetected())
             return false;
 
-        if (!isAttackerPlayer && !forAoE && HasUnitState(UNIT_STAT_DIED))
+        if (!isAttackerPlayer && !forAoE && HasUnitState(UNIT_STAT_FEIGN_DEATH))
             return false;
 
         // check flags
@@ -7167,7 +7167,7 @@ bool Unit::SelectHostileTarget()
     if (target)
     {
         // Nostalrius : Correction bug sheep/fear
-        if (!HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING) && (!HasAuraType(SPELL_AURA_MOD_FEAR) || HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
+        if (!HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_FEIGN_DEATH | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING) && (!HasAuraType(SPELL_AURA_MOD_FEAR) || HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
         {
             SetInFront(target);
             ((Creature*)this)->AI()->AttackStart(target);
@@ -8587,7 +8587,7 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
         {
             InterruptSpellsCastedOnMe();
 
-            AddUnitState(UNIT_STAT_DIED);
+            AddUnitState(UNIT_STAT_FEIGN_DEATH);
             CombatStop();
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
@@ -8610,7 +8610,7 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
 
         RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
 
-        ClearUnitState(UNIT_STAT_DIED);
+        ClearUnitState(UNIT_STAT_FEIGN_DEATH);
 
         RestoreMovement();
     }

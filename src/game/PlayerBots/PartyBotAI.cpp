@@ -581,7 +581,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
-    if (me->HasUnitState(UNIT_STAT_DIED) && me->HasAuraType(SPELL_AURA_FEIGN_DEATH) &&
+    if (me->HasUnitState(UNIT_STAT_FEIGN_DEATH) && me->HasAuraType(SPELL_AURA_FEIGN_DEATH) &&
        !me->IsInCombat() && (!me->GetPet() || !me->GetPet()->IsInCombat()) &&
        !me->SelectRandomUnfriendlyTarget(nullptr, 20.0f, false, true))
         me->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
@@ -1215,11 +1215,6 @@ void PartyBotAI::UpdateInCombatAI_Shaman()
 
 void PartyBotAI::UpdateOutOfCombatAI_Hunter()
 {
-    if (me->HasUnitState(UNIT_STAT_DIED) &&
-        m_spells.hunter.pFeignDeath &&
-        me->HasAura(m_spells.hunter.pFeignDeath->Id))
-        me->RemoveAurasDueToSpellByCancel(m_spells.hunter.pFeignDeath->Id);
-
     if (m_spells.hunter.pAspectOfTheHawk &&
         CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
     {
@@ -1253,12 +1248,6 @@ void PartyBotAI::UpdateOutOfCombatAI_Hunter()
 
 void PartyBotAI::UpdateInCombatAI_Hunter()
 {
-    if (me->HasUnitState(UNIT_STAT_DIED) &&
-        m_spells.hunter.pFeignDeath &&
-        me->GetAttackers().empty() &&
-        me->HasAura(m_spells.hunter.pFeignDeath->Id))
-        me->RemoveAurasDueToSpellByCancel(m_spells.hunter.pFeignDeath->Id);
-
     if (Unit* pVictim = me->GetVictim())
     {
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
