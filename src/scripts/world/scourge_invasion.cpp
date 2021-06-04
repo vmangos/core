@@ -68,12 +68,12 @@ Unit* SelectRandomFlameshockerSpawnTarget(Creature* pUnit, Unit* except, float r
     return *tcIter;
 }
 
-void ChangeZoneEventStatus(Creature* mouth, bool on)
+void ChangeZoneEventStatus(Creature* pMouth, bool on)
 {
-    if (!mouth)
+    if (!pMouth)
         return;
 
-    switch (mouth->GetZoneId())
+    switch (pMouth->GetZoneId())
     {
     case ZONEID_WINTERSPRING:
         if (on)
@@ -132,107 +132,107 @@ void ChangeZoneEventStatus(Creature* mouth, bool on)
     }
 }
 
-void DespawnEventDoodads(Creature* shard)
+void DespawnEventDoodads(Creature* pShard)
 {
-    if (!shard)
+    if (!pShard)
         return;
 
-    std::list<GameObject*> objectList;
-    GetGameObjectListWithEntryInGrid(objectList, shard, { GOBJ_SUMMON_CIRCLE, GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
-    for (const auto pobject : objectList)
-        pobject->RemoveFromWorld();
+    std::list<GameObject*> doodadList;
+    GetGameObjectListWithEntryInGrid(doodadList, pShard, { GOBJ_SUMMON_CIRCLE, GOBJ_UNDEAD_FIRE, GOBJ_UNDEAD_FIRE_AURA, GOBJ_SKULLPILE_01, GOBJ_SKULLPILE_02, GOBJ_SKULLPILE_03, GOBJ_SKULLPILE_04, GOBJ_SUMMONER_SHIELD }, 60.0f);
+    for (const auto pDoodad : doodadList)
+        pDoodad->RemoveFromWorld();
 
     std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, shard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
-    for (const auto pfinder : finderList)
-        pfinder->RemoveFromWorld();
+    GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+    for (const auto pFinder : finderList)
+        pFinder->RemoveFromWorld();
 }
 
-void DespawnNecropolis(Unit* despawner)
+void DespawnNecropolis(Unit* pDespawner)
 {
-    if (!despawner)
+    if (!pDespawner)
         return;
 
-    std::list<GameObject*> objectList;
-    GetGameObjectListWithEntryInGrid(objectList, despawner, { GOBJ_NECROPOLIS_TINY, GOBJ_NECROPOLIS_SMALL, GOBJ_NECROPOLIS_MEDIUM, GOBJ_NECROPOLIS_BIG, GOBJ_NECROPOLIS_HUGE }, ATTACK_DISTANCE);
-    for (const auto pobject : objectList)
-        pobject->Despawn();
+    std::list<GameObject*> necropolisList;
+    GetGameObjectListWithEntryInGrid(necropolisList, pDespawner, { GOBJ_NECROPOLIS_TINY, GOBJ_NECROPOLIS_SMALL, GOBJ_NECROPOLIS_MEDIUM, GOBJ_NECROPOLIS_BIG, GOBJ_NECROPOLIS_HUGE }, ATTACK_DISTANCE);
+    for (const auto pNecropolis : necropolisList)
+        pNecropolis->Despawn();
 }
 
-void SummonCultists(Unit* shard)
+void SummonCultists(Unit* pShard)
 {
-    if (!shard)
+    if (!pShard)
         return;
 
-    std::list<GameObject*> SUMMONER_SHIELD_List;
-    GetGameObjectListWithEntryInGrid(SUMMONER_SHIELD_List, shard, { GOBJ_SUMMONER_SHIELD }, INSPECT_DISTANCE);
-    for (const auto SUMMONER_SHIELD : SUMMONER_SHIELD_List)
-        SUMMONER_SHIELD->Despawn();
+    std::list<GameObject*> summonerShieldList;
+    GetGameObjectListWithEntryInGrid(summonerShieldList, pShard, { GOBJ_SUMMONER_SHIELD }, INSPECT_DISTANCE);
+    for (const auto pSummonerShield : summonerShieldList)
+        pSummonerShield->Despawn();
 
     // We don't have all positions sniffed from the Cultists, so why not using this code which placing them almost perfectly into the circle while blizzards positions are some times way off?
-    if (GameObject* circle = shard->FindNearestGameObject(GOBJ_SUMMON_CIRCLE, CONTACT_DISTANCE))
+    if (GameObject* pGameObject = pShard->FindNearestGameObject(GOBJ_SUMMON_CIRCLE, CONTACT_DISTANCE))
     {
         for (int i = 0; i < 4; ++i)
         {
-            float angle = (float(i) * (M_PI / 2)) + circle->GetOrientation();
-            float x = circle->GetPositionX() + 6.95f * cos(angle);
-            float y = circle->GetPositionY() + 6.75f * sin(angle);
-            float z = circle->GetPositionZ() + 5.0f;
-            shard->UpdateGroundPositionZ(x, y, z);
-            if (Creature* CULTIST_ENGINEER = shard->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
-                CULTIST_ENGINEER->AI()->DoAction(shard, NPC_CULTIST_ENGINEER);
+            float angle = (float(i) * (M_PI / 2)) + pGameObject->GetOrientation();
+            float x = pGameObject->GetPositionX() + 6.95f * cos(angle);
+            float y = pGameObject->GetPositionY() + 6.75f * sin(angle);
+            float z = pGameObject->GetPositionZ() + 5.0f;
+            pShard->UpdateGroundPositionZ(x, y, z);
+            if (Creature* pCultist = pShard->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
+                pCultist->AI()->DoAction(pShard, NPC_CULTIST_ENGINEER);
         }
     }
 }
 
-void DespawnCultists(Unit* despawner)
+void DespawnCultists(Unit* pDespawner)
 {
-    if (!despawner)
+    if (!pDespawner)
         return;
 
     std::list<Creature*> cultistList;
-    GetCreatureListWithEntryInGrid(cultistList, despawner, { NPC_CULTIST_ENGINEER }, INSPECT_DISTANCE);
-    for (const auto cultist : cultistList)
-        if (cultist)
-            cultist->ForcedDespawn();
+    GetCreatureListWithEntryInGrid(cultistList, pDespawner, { NPC_CULTIST_ENGINEER }, INSPECT_DISTANCE);
+    for (const auto pCultist : cultistList)
+        if (pCultist)
+            pCultist->ForcedDespawn();
 }
 
-void DespawnShadowsOfDoom(Unit* despawner)
+void DespawnShadowsOfDoom(Unit* pDespawner)
 {
-    if (!despawner)
+    if (!pDespawner)
         return;
 
-    std::list<Creature*> shadowList;
-    GetCreatureListWithEntryInGrid(shadowList, despawner, { NPC_SHADOW_OF_DOOM }, 200.0f);
-    for (const auto shadow : shadowList)
-        if (shadow && shadow->IsAlive() && !shadow->IsInCombat())
-            shadow->ForcedDespawn();
+    std::list<Creature*> ShadowList;
+    GetCreatureListWithEntryInGrid(ShadowList, pDespawner, { NPC_SHADOW_OF_DOOM }, 200.0f);
+    for (const auto pShadow : ShadowList)
+        if (pShadow && pShadow->IsAlive() && !pShadow->IsInCombat())
+            pShadow->ForcedDespawn();
 }
 
-uint32 HasMinion(Creature* spawner, float range)
+uint32 HasMinion(Creature* pSummoner, float range)
 {
-    if (!spawner)
+    if (!pSummoner)
         return false;
 
     uint32 minionCounter = NULL;
     std::list<Creature*> minionList;
-    GetCreatureListWithEntryInGrid(minionList, spawner, { NPC_SKELETAL_SHOCKTROOPER, NPC_GHOUL_BERSERKER, NPC_SPECTRAL_SOLDIER, NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, ATTACK_DISTANCE);
-    for (const auto minion : minionList)
-        if (minion && minion->IsAlive())
+    GetCreatureListWithEntryInGrid(minionList, pSummoner, { NPC_SKELETAL_SHOCKTROOPER, NPC_GHOUL_BERSERKER, NPC_SPECTRAL_SOLDIER, NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, ATTACK_DISTANCE);
+    for (const auto pMinion : minionList)
+        if (pMinion && pMinion->IsAlive())
             minionCounter++;
 
     return minionCounter;
 }
 
-bool UncommonMinionspawner(Creature* spawner) // Rare Minion Spawner.
+bool UncommonMinionspawner(Creature* pSummoner) // Rare Minion Spawner.
 {
-    if (!spawner)
+    if (!pSummoner)
         return false;
 
-    std::list<Creature*> rareList;
-    GetCreatureListWithEntryInGrid(rareList, spawner, { NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, 100.0f);
-    for (const auto rare : rareList)
-        if (rare)
+    std::list<Creature*> uncommonMinionList;
+    GetCreatureListWithEntryInGrid(uncommonMinionList, pSummoner, { NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, 100.0f);
+    for (const auto pMinion : uncommonMinionList)
+        if (pMinion)
             return false; // Already a rare found (dead or alive).
 
     /*
@@ -246,13 +246,13 @@ bool UncommonMinionspawner(Creature* spawner) // Rare Minion Spawner.
     return true;
 }
 
-uint32 GetFindersAmount(Creature* shard)
+uint32 GetFindersAmount(Creature* pShard)
 {
     uint32 finderCounter = NULL;
     std::list<Creature*> finderList;
-    GetCreatureListWithEntryInGrid(finderList, shard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
-    for (const auto pfinder : finderList)
-        if (pfinder)
+    GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
+    for (const auto pFinder : finderList)
+        if (pFinder)
             finderCounter++;
 
     return finderCounter;
@@ -264,15 +264,15 @@ Circle
 class GoCircle : public GameObjectAI
 {
 public:
-    GoCircle(GameObject* go) : GameObjectAI(go)
+    GoCircle(GameObject* pGameObject) : GameObjectAI(pGameObject)
     {
         me->CastSpell(me, SPELL_CREATE_CRYSTAL, true);
     }
 };
 
-GameObjectAI* GetAI_GoCircle(GameObject* go)
+GameObjectAI* GetAI_GoCircle(GameObject* pGameObject)
 {
-    return new GoCircle(go);
+    return new GoCircle(pGameObject);
 }
 
 /*
@@ -281,7 +281,7 @@ Necropolis
 class GoNecropolis : public GameObjectAI
 {
 public:
-    GoNecropolis(GameObject* go) : GameObjectAI(go)
+    GoNecropolis(GameObject* pGameObject) : GameObjectAI(pGameObject)
     {
         me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
@@ -363,7 +363,7 @@ struct NecropolisAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
     {
         if (m_creature->HasAura(SPELL_COMMUNIQUE_TIMER_NECROPOLIS))
             return;
@@ -393,7 +393,7 @@ struct NecropolisHealthAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->CastSpell(m_creature, SPELL_ZAP_NECROPOLIS, true);
@@ -401,8 +401,8 @@ struct NecropolisHealthAI : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        if (Creature* NECROPOLIS = m_creature->FindNearestCreature(NPC_NECROPOLIS, ATTACK_DISTANCE))
-            m_creature->CastSpell(NECROPOLIS, SPELL_DESPAWNER_OTHER, true);
+        if (Creature* pNecropolis = m_creature->FindNearestCreature(NPC_NECROPOLIS, ATTACK_DISTANCE))
+            m_creature->CastSpell(pNecropolis, SPELL_DESPAWNER_OTHER, true);
 
         int TEMP_SI_ATTACK_ZONE = 0;
 
@@ -433,13 +433,13 @@ struct NecropolisHealthAI : public ScriptedAI
             sObjectMgr.SetSavedVariable(TEMP_SI_ATTACK_ZONE, (numb - 1), true);
     }
 
-    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* spell) override
     {
         // Make sure m_creature despawn after SPELL_DESPAWNER_OTHER triggered.
-        if (spell->Id == SPELL_DESPAWNER_OTHER && target->GetEntry() == NPC_NECROPOLIS)
+        if (spell->Id == SPELL_DESPAWNER_OTHER && pTarget->GetEntry() == NPC_NECROPOLIS)
         {
-            DespawnNecropolis(target);
-            target->ToCreature()->RemoveFromWorld();
+            DespawnNecropolis(pTarget);
+            pTarget->ToCreature()->RemoveFromWorld();
             m_creature->RemoveFromWorld();
         }
     }
@@ -466,7 +466,7 @@ struct NecropolisProxyAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -477,13 +477,13 @@ struct NecropolisProxyAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, true);
             break;
         case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-            if (Creature* NECROPOLIS_HEALTH = m_creature->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 200.0f))
-                m_creature->CastSpell(NECROPOLIS_HEALTH, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+            if (Creature* pHealth = m_creature->FindNearestCreature(NPC_NECROPOLIS_HEALTH, 200.0f))
+                m_creature->CastSpell(pHealth, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
             break;
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* spell) override
     {
         // Make sure m_creature despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
@@ -523,8 +523,8 @@ struct NecropolisRelayAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_COMMUNIQUE_RELAY_TO_PROXY, true);
             break;
         case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-            if (Creature* NECROPOLIS_PROXY = m_creature->FindNearestCreature(NPC_NECROPOLIS_PROXY, 200.0f))
-                m_creature->CastSpell(NECROPOLIS_PROXY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+            if (Creature* pProxy = m_creature->FindNearestCreature(NPC_NECROPOLIS_PROXY, 200.0f))
+                m_creature->CastSpell(pProxy, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
             break;
         }
     }
@@ -553,7 +553,7 @@ struct NecroticShard : public ScriptedAI
     uint32 m_camptype = 0;
     uint32 m_finders = 0;
 
-    NecroticShard(Creature* creature) : ScriptedAI(creature)
+    NecroticShard(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
         m_creature->SetActiveObjectState(true);
@@ -569,14 +569,14 @@ struct NecroticShard : public ScriptedAI
             // Just in case.
             std::list<Creature*> shardList;
             GetCreatureListWithEntryInGrid(shardList, m_creature, { NPC_NECROTIC_SHARD, NPC_DAMAGED_NECROTIC_SHARD }, CONTACT_DISTANCE);
-            for (const auto pshard : shardList)
-                pshard->RemoveFromWorld();
+            for (const auto pShard : shardList)
+                pShard->RemoveFromWorld();
         }
     }
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -609,16 +609,16 @@ struct NecroticShard : public ScriptedAI
 
             // Lets the finder spawn the associated spawner.
             if (m_creature->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON))
-                caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON, true);
+                pCaster->CastSpell(pCaster, SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON, true);
             else if (m_creature->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL))
-                caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL, true);
+                pCaster->CastSpell(pCaster, SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL, true);
             else if (m_creature->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON))
-                caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON, true);
+                pCaster->CastSpell(pCaster, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON, true);
             break;
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* spell) override
     {
         if (m_creature->GetEntry() != NPC_DAMAGED_NECROTIC_SHARD)
             return;
@@ -627,10 +627,10 @@ struct NecroticShard : public ScriptedAI
             m_creature->RemoveFromWorld();
     }
 
-    void DamageTaken(Unit* dealer, uint32& damage) override
+    void DamageTaken(Unit* pDealer, uint32& damage) override
     {
         // Only Minions and the shard itself can deal damage.
-        if (dealer->GetFactionTemplateId() != m_creature->GetFactionTemplateId())
+        if (pDealer->GetFactionTemplateId() != m_creature->GetFactionTemplateId())
             damage = 0;
     }
 
@@ -645,13 +645,13 @@ struct NecroticShard : public ScriptedAI
         switch (m_creature->GetEntry())
         {
         case NPC_NECROTIC_SHARD:
-            if (Creature* DAMAGED_NECROTIC_SHARD = m_creature->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
+            if (Creature* pShard = m_creature->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
             {
                 // Get the camp type from the Necrotic Shard.
                 if (m_camptype)
-                    DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, m_camptype, true);
+                    pShard->CastSpell(pShard, m_camptype, true);
                 else
-                    DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, SPELL_CHOOSE_CAMP_TYPE, true);
+                    pShard->CastSpell(pShard, SPELL_CHOOSE_CAMP_TYPE, true);
 
                 m_creature->RemoveFromWorld();
             }
@@ -660,8 +660,8 @@ struct NecroticShard : public ScriptedAI
             // Buff Players.
             m_creature->CastSpell(m_creature, SPELL_SOUL_REVIVAL, true);
             // Sending the Death Bolt.
-            if (Creature* NECROPOLIS_RELAY = m_creature->FindNearestCreature(NPC_NECROPOLIS_RELAY, 200.0f))
-                m_creature->CastSpell(NECROPOLIS_RELAY, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+            if (Creature* pRelay = m_creature->FindNearestCreature(NPC_NECROPOLIS_RELAY, 200.0f))
+                m_creature->CastSpell(pRelay, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
             // Despawn remaining Cultists (should never happen).
             DespawnCultists(m_creature);
             // Remove Objects from the event around the Shard (Yes this is Blizzlike).
@@ -696,28 +696,28 @@ struct NecroticShard : public ScriptedAI
                 // On a fresh camp, first the minions are spawned close to the shard and then further and further out.
                 finderList.sort(ObjectDistanceOrder(m_creature));
 
-                for (const auto& pfinder : finderList)
+                for (const auto& pFinder : finderList)
                 {
                     // Stop summoning Minions if we reached the max spawn amount.
                     if (finderAmount == finderCounter)
                         break;
 
                     // Skip dead finders.
-                    if (!pfinder->IsAlive())
+                    if (!pFinder->IsAlive())
                         continue;
 
                     // Don't take finders with Minions.
-                    if (HasMinion(pfinder, ATTACK_DISTANCE))
+                    if (HasMinion(pFinder, ATTACK_DISTANCE))
                         continue;
 
                     /*
                     A finder disappears after summoning the spawner NPC (which summons the minion).
                     after 160-185 seconds a finder respawns on the same position as before.
                     */
-                    if (pfinder->AI()->DoCastSpellIfCan(m_creature, SPELL_FIND_CAMP_TYPE, CF_TRIGGERED) == CAST_OK)
+                    if (pFinder->AI()->DoCastSpellIfCan(m_creature, SPELL_FIND_CAMP_TYPE, CF_TRIGGERED) == CAST_OK)
                     {
-                        pfinder->SetRespawnDelay(urand(150, 200)); // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
-                        pfinder->DisappearAndDie();
+                        pFinder->SetRespawnDelay(urand(150, 200)); // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
+                        pFinder->DisappearAndDie();
                         finderCounter++;
                     }
                 }
@@ -775,23 +775,23 @@ struct MinionspawnerAI : public ScriptedAI
             switch (Events)
             case EVENT_SPAWNER_SUMMON_MINION:
             {
-                uint32 Spawn = NPC_GHOUL_BERSERKER; // just in case.
+                uint32 Entry = NPC_GHOUL_BERSERKER; // just in case.
 
                 switch (m_creature->GetEntry())
                 {
                 case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_GHOUL:
-                    Spawn = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_LUMBERING_HORROR) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER);
+                    Entry = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_LUMBERING_HORROR) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER);
                     break;
                 case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOST_SKELETON:
-                    Spawn = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_BONE_WITCH) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_SKELETAL_SHOCKTROOPER);
+                    Entry = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_SPIRIT_OF_THE_DAMNED, NPC_BONE_WITCH) : PickRandomValue(NPC_SPECTRAL_SOLDIER, NPC_SKELETAL_SHOCKTROOPER);
                     break;
                 case NPC_SCOURGE_INVASION_MINION_SPAWNER_GHOUL_SKELETON:
-                    Spawn = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_LUMBERING_HORROR, NPC_BONE_WITCH) : PickRandomValue(NPC_GHOUL_BERSERKER, NPC_SKELETAL_SHOCKTROOPER);
+                    Entry = UncommonMinionspawner(m_creature) ? PickRandomValue(NPC_LUMBERING_HORROR, NPC_BONE_WITCH) : PickRandomValue(NPC_GHOUL_BERSERKER, NPC_SKELETAL_SHOCKTROOPER);
                     break;
                 }
-                if (Creature* MINION = m_creature->SummonCreature(Spawn, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
+                if (Creature* pMinion = m_creature->SummonCreature(Entry, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 2000))
                 {
-                    MINION->SetWanderDistance(1.0f); // Seems to be very low.
+                    pMinion->SetWanderDistance(1.0f); // Seems to be very low.
                     m_creature->SendSpellGo(m_creature, SPELL_MINION_SPAWN_IN);
                 }
                 break;
@@ -821,18 +821,18 @@ struct npc_cultist_engineer : public ScriptedAI
 
     void JustDied(Unit*) override
     {
-        if (Creature* DAMAGED_NECROTIC_SHARD = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
+        if (Creature* pShard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
         {
-            DAMAGED_NECROTIC_SHARD->CastSpell(DAMAGED_NECROTIC_SHARD, SPELL_DAMAGE_CRYSTAL, true);
+            pShard->CastSpell(pShard, SPELL_DAMAGE_CRYSTAL, true);
             // Remove the Purple aura if the first Cultist dies.
-            DAMAGED_NECROTIC_SHARD->RemoveAurasDueToSpell(SPELL_BUTTRESS_CHANNEL);
-            DAMAGED_NECROTIC_SHARD->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+            pShard->RemoveAurasDueToSpell(SPELL_BUTTRESS_CHANNEL);
+            pShard->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
         }
-        if (GameObject* SUMMONER_SHIELD = m_creature->FindNearestGameObject(GOBJ_SUMMONER_SHIELD, CONTACT_DISTANCE))
-            SUMMONER_SHIELD->Delete();
+        if (GameObject* pGameObject = m_creature->FindNearestGameObject(GOBJ_SUMMONER_SHIELD, CONTACT_DISTANCE))
+            pGameObject->Delete();
     }
 
-    void DoAction(Unit* unit, uint32 action) override
+    void DoAction(Unit* pUnit, uint32 action) override
     {
         if (action == NPC_CULTIST_ENGINEER)
         {
@@ -853,13 +853,13 @@ struct npc_cultist_engineer : public ScriptedAI
             {
             case EVENT_CULTIST_CHANNELING:
             {
-                if (Creature* DAMAGED_NECROTIC_SHARD = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
+                if (Creature* pShard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
                 {
                     m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
-                    m_creature->SetChannelObjectGuid(DAMAGED_NECROTIC_SHARD->GetObjectGuid());
+                    m_creature->SetChannelObjectGuid(pShard->GetObjectGuid());
                     // If all 4 Cultists are channeling, the Shard has this Aura.
-                    DAMAGED_NECROTIC_SHARD->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
-                    DAMAGED_NECROTIC_SHARD->AddAura(SPELL_BUTTRESS_CHANNEL);
+                    pShard->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
+                    pShard->AddAura(SPELL_BUTTRESS_CHANNEL);
                 }
             }
             }
@@ -872,33 +872,33 @@ CreatureAI* GetAI_npc_cultist_engineer(Creature* pCreature)
     return new npc_cultist_engineer(pCreature);
 }
 
-bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint32 sender, uint32 action)
+bool GossipSelect_npc_cultist_engineer(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action)
 {
-    if (action == GOSSIP_ACTION_INFO_DEF + 1 && player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
+    if (action == GOSSIP_ACTION_INFO_DEF + 1 && pPlayer->HasItemCount(ITEM_NECROTIC_RUNE, 8))
     {
-        player->CLOSE_GOSSIP_MENU();
+        pPlayer->CLOSE_GOSSIP_MENU();
 
         // Player summons a Shadow of Doom for 1 hour.
-        if (Creature* SHADOW_OF_DOOM = player->SummonCreature(NPC_SHADOW_OF_DOOM, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 5000))
+        if (Creature* pShadow = pPlayer->SummonCreature(NPC_SHADOW_OF_DOOM, pCreature->GetPositionX(), pCreature->GetPositionY(), pCreature->GetPositionZ(), pCreature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 5000))
         {
-            SHADOW_OF_DOOM->AI()->InformGuid(player->GetObjectGuid(), 0);
-            SHADOW_OF_DOOM->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-            SHADOW_OF_DOOM->SetFacingToObject(player);
-            SHADOW_OF_DOOM->AI()->DoAction(player, NPC_SHADOW_OF_DOOM);
-            player->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
+            pShadow->AI()->InformGuid(pPlayer->GetObjectGuid(), 0);
+            pShadow->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+            pShadow->SetFacingToObject(pPlayer);
+            pShadow->AI()->DoAction(pPlayer, NPC_SHADOW_OF_DOOM);
+            pPlayer->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
         }
-        player->SendSpellGo(player, SPELL_SUMMON_BOSS);
-        creature->CastSpell(creature, SPELL_QUIET_SUICIDE, true);
+        pPlayer->SendSpellGo(pPlayer, SPELL_SUMMON_BOSS);
+        pCreature->CastSpell(pCreature, SPELL_QUIET_SUICIDE, true);
     }
 
     return true;
 }
 
-bool GossipHello_npc_cultist_engineer(Player* player, Creature* creature)
+bool GossipHello_npc_cultist_engineer(Player* pPlayer, Creature* pCreature)
 {
-    if (player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_CULTIST_ENGINEER_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    player->SEND_GOSSIP_MENU(LANG_CULTIST_ENGINEER_GOSSIP, creature->GetGUID());
+    if (pPlayer->HasItemCount(ITEM_NECROTIC_RUNE, 8))
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_CULTIST_ENGINEER_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(LANG_CULTIST_ENGINEER_GOSSIP, pCreature->GetGUID());
 
     return true;
 }
@@ -915,25 +915,25 @@ struct ScourgeMinion : public ScriptedAI
     }
 
     EventMap m_events;
-    ObjectGuid spawnerGuid;
+    ObjectGuid m_SummonerGuid;
 
     void Reset() {}
 
     void InformGuid(ObjectGuid const guid, uint32 type) override
     {
-        spawnerGuid = guid;
+        m_SummonerGuid = guid;
     }
 
-    void DoAction(Unit* unit, uint32 action) override
+    void DoAction(Unit* pUnit, uint32 action) override
     {
-        if (!unit)
+        if (!pUnit)
             return;
 
         if (action == NPC_SHADOW_OF_DOOM)
         {
             m_events.ScheduleEvent(EVENT_DOOM_START_ATTACK, 5000); // Remove Flag (immune to Players) after 5 seconds.
             // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
-            m_creature->MonsterSay(PickRandomValue(LANG_SHADOW_OF_DOOM_TEXT_0, LANG_SHADOW_OF_DOOM_TEXT_1, LANG_SHADOW_OF_DOOM_TEXT_2, LANG_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, unit);
+            m_creature->MonsterSay(PickRandomValue(LANG_SHADOW_OF_DOOM_TEXT_0, LANG_SHADOW_OF_DOOM_TEXT_1, LANG_SHADOW_OF_DOOM_TEXT_2, LANG_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, pUnit);
             m_creature->CastSpell(m_creature, SPELL_SPAWN_SMOKE, true);
         }
         if (action == NPC_FLAMESHOCKER)
@@ -967,7 +967,7 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(Unit* pUnit, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -999,10 +999,10 @@ struct ScourgeMinion : public ScriptedAI
             {
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 // Shadow of Doom seems to attack the Summoner here.
-                if (Player* Summoner = m_creature->GetMap()->GetPlayer(spawnerGuid))
-                    if (Summoner->IsWithinLOSInMap(m_creature))
+                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_SummonerGuid))
+                    if (pPlayer->IsWithinLOSInMap(m_creature))
                     {
-                        m_creature->SetInCombatWith(Summoner);
+                        m_creature->SetInCombatWith(pPlayer);
                         m_creature->SetDetectionDistance(2.0f);
                     }
             }
@@ -1044,12 +1044,12 @@ CreatureAI* GetAI_ScourgeMinion(Creature* pCreature)
     return new ScourgeMinion(pCreature);
 }
 
-bool GossipSelect_scourge_invasion_rewards_giver(Player* player, Creature* creature, uint32 sender, uint32 action)
+bool GossipSelect_scourge_invasion_rewards_giver(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action)
 {
     if (action == GOSSIP_ACTION_INFO_DEF + 1)
     {
         uint32 spellId = 0;
-        switch (creature->GetEntry())
+        switch (pCreature->GetEntry())
         {
             case NPC_ARGENT_DAWN_CLERIC:
             case NPC_ARGENT_DAWN_INITIATE:
@@ -1066,30 +1066,30 @@ bool GossipSelect_scourge_invasion_rewards_giver(Player* player, Creature* creat
             default:
                 return false;
         }
-        creature->CastSpell(player, spellId, false);
+        pCreature->CastSpell(pPlayer, spellId, false);
     }
-    player->CLOSE_GOSSIP_MENU();
+    pPlayer->CLOSE_GOSSIP_MENU();
     return true;
 }
 
-bool GossipHello_scourge_invasion_rewards_giver(Player* player, Creature* creature)
+bool GossipHello_scourge_invasion_rewards_giver(Player* pPlayer, Creature* pCreature)
 {
     // Add Item
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-    switch (creature->GetEntry())
+    switch (pCreature->GetEntry())
     {
     case NPC_ARGENT_DAWN_INITIATE:
     case NPC_ARGENT_DAWN_CLERIC:
-        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_50_WINS, creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_50_WINS, pCreature->GetGUID());
         break;
     case NPC_ARGENT_DAWN_PRIEST:
     case NPC_ARGENT_DAWN_PALADIN:
-        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_100_WINS, creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_100_WINS, pCreature->GetGUID());
         break;
     case NPC_ARGENT_DAWN_CRUSADER:
     case NPC_ARGENT_DAWN_CHAMPION:
-        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_150_WINS, creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_150_WINS, pCreature->GetGUID());
         break;
     }
 
@@ -1100,99 +1100,99 @@ bool GossipHello_scourge_invasion_rewards_giver(Player* player, Creature* creatu
 Argent Emissary
 Notes: NPC thats tells what is going on and shows what locations are under attack.
 */
-bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32 sender, uint32 action)
+bool GossipSelect_npc_argent_emissary(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action)
 {
     switch (action)
     {
         case GOSSIP_ACTION_INFO_DEF + 1:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_0, creature->GetGUID());
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_0, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 2:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_1, creature->GetGUID());
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_1, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 3:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
 
-            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2, creature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 4:
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
 
             uint32 random_text = urand(0, 2); // Random text selection
             if (random_text == 1)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_0, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_0, pCreature->GetGUID());
             else if (random_text == 2)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_1, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_1, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_2, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_2, pCreature->GetGUID());
             break;
         }
         case GOSSIP_ACTION_INFO_DEF + 5:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
             // Send General Gossip
-            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 6:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             if (sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING) > 0)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 7:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             if (sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING) > 0)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 8:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             if (sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING) > 0)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 9:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             if (sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING) > 0)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 10:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             if (sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING) > 0)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 11:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             if (sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING) > 0)
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, pCreature->GetGUID());
             break;
     }
-    //player->CLOSE_GOSSIP_MENU();
+    //pPlayer->CLOSE_GOSSIP_MENU();
     return true;
 }
 
-bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
+bool GossipHello_npc_argent_emissary(Player* pPlayer, Creature* pCreature)
 {
     // Get current values
     uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
@@ -1204,21 +1204,21 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
     uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
     // Send to client
-    player->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
-    player->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
-    player->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
-    player->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
-    player->SendUpdateWorldState(WORLDSTATE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS);
-    player->SendUpdateWorldState(WORLDSTATE_SI_TANARIS, REMAINING_TANARIS);
-    player->SendUpdateWorldState(WORLDSTATE_SI_WINTERSPRING, REMAINING_WINTERSPRING);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_TANARIS, REMAINING_TANARIS);
+    pPlayer->SendUpdateWorldState(WORLDSTATE_SI_WINTERSPRING, REMAINING_WINTERSPRING);
 
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
     // Send General Gossip
-    player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, pCreature->GetGUID());
 
     return true;
 }
@@ -1231,17 +1231,17 @@ struct PallidHorrorAI : public ScriptedAI
 
     PallidHorrorAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        int amountShockers = urand(5, 9); // sniffed are group sizes of 5-9 shockers on spawn.
+        int amount = urand(5, 9); // sniffed are group sizes of 5-9 shockers on spawn.
 
         if (m_creature->GetHealthPercent() == 100.0f)
         {
-            for (int i = 0; i < amountShockers; ++i)
-                if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * IN_MILLISECONDS, true))
+            for (int i = 0; i < amount; ++i)
+                if (Creature* pFlameshocker = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * IN_MILLISECONDS, true))
                 {
-                    float angle = (float(i) * (M_PI / (amountShockers / static_cast<float>(2)))) + m_creature->GetOrientation();
-                    FLAMESHOCKER->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
-                    FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
-                    m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
+                    float angle = (float(i) * (M_PI / (amount / static_cast<float>(2)))) + m_creature->GetOrientation();
+                    pFlameshocker->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
+                    pFlameshocker->CastSpell(pFlameshocker, SPELL_MINION_SPAWN_IN, true);
+                    m_flameshockers.insert(pFlameshocker->GetObjectGuid());
                 }
         }
         m_events.Reset();
@@ -1265,19 +1265,19 @@ struct PallidHorrorAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void JustDied(Unit* killer) override
+    void JustDied(Unit* pUnit) override
     {
-        if (Creature* HIGHLORD_BOLVAR_FORDRAGON = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
-            DoScriptText(LANG_STORMWIND_BOLVAR_2, HIGHLORD_BOLVAR_FORDRAGON, m_creature, CHAT_TYPE_ZONE_YELL);
+        if (Creature* pCreature = m_creature->FindNearestCreature(NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
+            DoScriptText(LANG_STORMWIND_BOLVAR_2, pCreature, m_creature, CHAT_TYPE_ZONE_YELL);
 
-        if (Creature* LADY_SYLVANAS_WINDRUNNER = m_creature->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
-            DoScriptText(LANG_UNDERCITY_SYLVANAS_1, LADY_SYLVANAS_WINDRUNNER, m_creature, CHAT_TYPE_ZONE_YELL);
+        if (Creature* pCreature = m_creature->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
+            DoScriptText(LANG_UNDERCITY_SYLVANAS_1, pCreature, m_creature, CHAT_TYPE_ZONE_YELL);
 
         // Remove all custom summoned Flameshockers.
         auto flameshockers = m_flameshockers;
         for (const auto& guid : flameshockers)
-            if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
-                FLAMESHOCKER->DoKillUnit(FLAMESHOCKER);
+            if (Creature* pFlameshocker = m_creature->GetMap()->GetCreature(guid))
+                pFlameshocker->DoKillUnit(pFlameshocker);
 
         m_creature->CastSpell(m_creature, (m_creature->GetZoneId() == ZONEID_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
         m_creature->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
@@ -1298,11 +1298,11 @@ struct PallidHorrorAI : public ScriptedAI
             m_flameshockers.erase(unit->GetObjectGuid());
     }
 
-    void SummonedCreatureDespawn(Creature* unit) override
+    void SummonedCreatureDespawn(Creature* pUnit) override
     {
         // Remove despawned Flameshockers here to respawn them if needed.
-        if (m_flameshockers.find(unit->GetObjectGuid()) != m_flameshockers.end())
-            m_flameshockers.erase(unit->GetObjectGuid());
+        if (m_flameshockers.find(pUnit->GetObjectGuid()) != m_flameshockers.end())
+            m_flameshockers.erase(pUnit->GetObjectGuid());
     }
 
     void OnRemoveFromWorld() override
@@ -1310,8 +1310,8 @@ struct PallidHorrorAI : public ScriptedAI
         // Remove all custom summoned Flameshockers.
         auto flameshockers = m_flameshockers;
         for (const auto& guid : flameshockers)
-            if (Creature* FLAMESHOCKER = m_creature->GetMap()->GetCreature(guid))
-                FLAMESHOCKER->AddObjectToRemoveList();
+            if (Creature* pFlameshocker = m_creature->GetMap()->GetCreature(guid))
+                pFlameshocker->AddObjectToRemoveList();
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1339,11 +1339,11 @@ struct PallidHorrorAI : public ScriptedAI
                     {
                         float x, y, z;
                         pTarget->GetNearPoint(pTarget, x, y, z, 5.0f, 5.0f, 0.0f);
-                        if (Creature* FLAMESHOCKER = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 3000))
+                        if (Creature* pFlameshocker = m_creature->SummonCreature(NPC_FLAMESHOCKER, x, y, z, pTarget->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 3000))
                         {
-                            m_flameshockers.insert(FLAMESHOCKER->GetObjectGuid());
-                            FLAMESHOCKER->CastSpell(FLAMESHOCKER, SPELL_MINION_SPAWN_IN, true);
-                            FLAMESHOCKER->AI()->DoAction(FLAMESHOCKER, NPC_FLAMESHOCKER);
+                            m_flameshockers.insert(pFlameshocker->GetObjectGuid());
+                            pFlameshocker->CastSpell(pFlameshocker, SPELL_MINION_SPAWN_IN, true);
+                            pFlameshocker->AI()->DoAction(pFlameshocker, NPC_FLAMESHOCKER);
                         }
                     }
                 }
@@ -1365,15 +1365,15 @@ CreatureAI* GetAI_PallidHorrorAI(Creature* pCreature)
     return new PallidHorrorAI(pCreature);
 }
 
-bool GossipHello_NecroticCrystal(Player* player, Creature* creature)
+bool GossipHello_NecroticCrystal(Player* pPlayer, Creature* pCreature)
 {
     uint32 questId = QUEST_CRACKED_NECROTIC_CRYSTAL;
-    if (player->GetTeam() == HORDE)
+    if (pPlayer->GetTeam() == HORDE)
         questId = QUEST_FAINT_NECROTIC_CRYSTAL;
     if (Quest const* quest = sObjectMgr.GetQuestTemplate(questId))
-        if (player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE &&
-            player->CanTakeQuest(quest, false))
-            player->PlayerTalkClass->SendQuestGiverQuestDetails(quest, creature->GetObjectGuid(), true);
+        if (pPlayer->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE &&
+            pPlayer->CanTakeQuest(quest, false))
+            pPlayer->PlayerTalkClass->SendQuestGiverQuestDetails(quest, pCreature->GetObjectGuid(), true);
     return true;
 }
 
