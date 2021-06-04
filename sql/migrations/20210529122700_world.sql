@@ -14,52 +14,52 @@ INSERT INTO `migrations` VALUES ('20210529122700');
 
 -- Fix for quest 9364 condition issues with scourge minions
 REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9365, -1, 85, 9364, 0, 0, 0);
-UPDATE `creature_ai_events` SET `condition_id`='9365' WHERE `condition_id`=9364;
+UPDATE `creature_ai_events` SET `condition_id`=9365 WHERE `condition_id`=9364;
 
 -- Fix some Creatures.
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='3052', `health_max`='3052', `detection_range`='0', `call_for_help_range`='0', `unit_flags`='256', `faction`='1630', `speed_run`='1', `auras`='28346', `flags_extra`='198658', `script_name`='scourge_invasion_necrotic_shard' WHERE `entry` IN (16172,16136);
-UPDATE `creature_template` SET `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `flags_extra`='64', `health_min`='42', `health_max`='42', `unit_flags`='33554432', `movement_type`='0', `level_min`='1', `level_max`='1' WHERE `entry` IN (16401,16421,16398,16386);
-UPDATE `creature_template` SET `speed_run`='0.992063' WHERE `entry`=16398;
-UPDATE `creature_template` SET `armor`='950' WHERE `entry`=16421;
+UPDATE `creature_template` SET `level_min`=60, `level_max`=60, `health_min`=3052, `health_max`=3052, `detection_range`=0, `call_for_help_range`=0, `unit_flags`=256, `faction`=1630, `speed_run`=1, `auras`='28346', `flags_extra`=198658, `script_name`='scourge_invasion_necrotic_shard' WHERE `entry` IN (16172,16136);
+UPDATE `creature_template` SET `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `flags_extra`=64, `health_min`=42, `health_max`=42, `unit_flags`=33554432, `movement_type`=0, `level_min`=1, `level_max`=1 WHERE `entry` IN (16401,16421,16398,16386);
+UPDATE `creature_template` SET `speed_run`=0.992063 WHERE `entry`=16398;
+UPDATE `creature_template` SET `armor`=950 WHERE `entry`=16421;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis' WHERE `entry`=16401;
-UPDATE `creature_template` SET `regeneration`='0', `script_name`='scourge_invasion_necropolis_health' WHERE `entry`=16421;
+UPDATE `creature_template` SET `regeneration`=0, `script_name`='scourge_invasion_necropolis_health' WHERE `entry`=16421;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE `entry`=16386;
-UPDATE `creature_template` SET `level_min`='55', `level_max`='55', `health_min`='5228', `health_max`='5228', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000' WHERE entry IN (16285,16361,16281,16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
-UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `movement_type`='0', `unit_flags`='512' WHERE entry IN (16395,16436,16434,16433,16384,16435);
-UPDATE `creature_template` SET `unit_flags`='33280', `faction`='794', `npc_flags`='2' WHERE `entry`=16786;
-UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='2' WHERE `entry` IN (16787,16281,16361);
-UPDATE `creature_template` SET `unit_flags`='512', `faction`='814', `npc_flags`='1' WHERE `entry`=16285;
-UPDATE `creature_template` SET `display_scale1`='0', `level_min`='60', `level_max`='60', `health_min`='91560', `health_max`='91560', `faction`='1634', `dmg_min`='249', `dmg_max`='413', `speed_walk`='0.8', `speed_run`='1.14286', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='64', `auras`='28126', `movement_type`='1', `inhabit_type`='1', `regeneration`='0' WHERE `entry` IN (16394,16382);
-UPDATE `creature_template` SET `health_min`='3052', `health_max`='3052', `npc_flags`='2', `speed_run`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='262400', `auras`='29826', `civilian`='1', `flags_extra`='198658', `script_name`='scourge_invasion_necrotic_crystal' WHERE `entry` IN (16531,16431);
-UPDATE `creature_template` SET `level_min`='53', `level_max`='55', `health_min`='24530', `health_max`='26140', `armor`='3271', `faction`='1634', `dmg_min`='91', `dmg_max`='123', `base_attack_time`='2000', `ranged_attack_time`='2000', `auras`='28330', `regeneration`='0', `inhabit_type`='1', `script_name`='scourge_invasion_minion' WHERE `entry`=16383;
+UPDATE `creature_template` SET `level_min`=55, `level_max`=55, `health_min`=5228, `health_max`=5228, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000 WHERE entry IN (16285,16361,16281,16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
+UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `movement_type`=0, `unit_flags`=512 WHERE entry IN (16395,16436,16434,16433,16384,16435);
+UPDATE `creature_template` SET `unit_flags`=33280, `faction`=794, `npc_flags`=2 WHERE `entry`=16786;
+UPDATE `creature_template` SET `unit_flags`=512, `faction`=814, `npc_flags`=2 WHERE `entry` IN (16787,16281,16361);
+UPDATE `creature_template` SET `unit_flags`=512, `faction`=814, `npc_flags`=1 WHERE `entry`=16285;
+UPDATE `creature_template` SET `display_scale1`=0, `level_min`=60, `level_max`=60, `health_min`=91560, `health_max`=91560, `faction`=1634, `dmg_min`=249, `dmg_max`=413, `speed_walk`=0.8, `speed_run`=1.14286, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=64, `auras`='28126', `movement_type`=1, `inhabit_type`=1, `regeneration`=0 WHERE `entry` IN (16394,16382);
+UPDATE `creature_template` SET `health_min`=3052, `health_max`=3052, `npc_flags`=2, `speed_run`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=262400, `auras`='29826', `civilian`=1, `flags_extra`=198658, `script_name`='scourge_invasion_necrotic_crystal' WHERE `entry` IN (16531,16431);
+UPDATE `creature_template` SET `level_min`=53, `level_max`=55, `health_min`=24530, `health_max`=26140, `armor`=3271, `faction`=1634, `dmg_min`=91, `dmg_max`=123, `base_attack_time`=2000, `ranged_attack_time`=2000, `auras`='28330', `regeneration`=0, `inhabit_type`=1, `script_name`='scourge_invasion_minion' WHERE `entry`=16383;
 
 -- Delete some custom Nostalrius waypoint npcs
 DELETE FROM `creature_template` WHERE `entry` IN (20099,20100,20101,20102);
 
 -- Fix Camp Spawners
-UPDATE `creature_template` SET `unit_flags`='33554432', `base_attack_time`='2000', `ranged_attack_time`='2000', `movement_type`='0', `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
-UPDATE `creature_template` SET `unit_flags`='33554432', `health_min`='42', `health_max`='42' WHERE `entry`=16356;
-UPDATE `creature_template` SET `level_min`='60', `health_min`='3052', `speed_walk`='1', `speed_run`='0.992063', `movement_type`='0', `unit_flags`='33555200', `script_name`='scourge_invasion_mouth' WHERE `entry`=16995;
+UPDATE `creature_template` SET `unit_flags`=33554432, `base_attack_time`=2000, `ranged_attack_time`=2000, `movement_type`=0, `script_name`='scourge_invasion_minion_spawner' WHERE `entry` IN (16338,16336,16306);
+UPDATE `creature_template` SET `unit_flags`=33554432, `health_min`=42, `health_max`=42 WHERE `entry`=16356;
+UPDATE `creature_template` SET `level_min`=60, `health_min`=3052, `speed_walk`=1, `speed_run`=0.992063, `movement_type`=0, `unit_flags`=33555200, `script_name`='scourge_invasion_mouth' WHERE `entry`=16995;
 
 -- Fix Minions
-UPDATE `creature_template` SET `movement_type`='1', `faction`='1630', `base_attack_time`='2000', `ranged_attack_time`='2000', `detection_range`='4', `call_for_help_range`='1', `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
-UPDATE `creature_template` SET `unit_flags`='0', `auras`='28090 28126' WHERE `entry` IN (16299,16141);
-UPDATE `creature_template` SET `unit_flags`='64', `auras`='28292 28126' WHERE `entry` IN (14697,16380,16379);
-UPDATE `creature_template` SET `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16380;
-UPDATE `creature_template` SET `health_min`='8489', `health_max`='8489', `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=14697;
-UPDATE `creature_template` SET `speed_run`='0.992063', `dmg_min`='159', `dmg_max`='210', `dmg_multiplier`='1' WHERE `entry`=16379;
-UPDATE `creature_template` SET `speed_walk`='1.11111', `unit_flags`='0', `auras`='28090 28126 674' WHERE `entry`=16298;
-UPDATE `creature_template` SET `speed_walk`='0.777776', `armor`='3791', `dmg_min`='102', `dmg_max`='138' WHERE `entry`=16141;
-UPDATE `creature_template` SET `speed_walk`='1', `speed_run`='1.19048', `armor`='3791', `dmg_min`='101', `dmg_max`='137' WHERE `entry`=16299;
+UPDATE `creature_template` SET `movement_type`=1, `faction`=1630, `base_attack_time`=2000, `ranged_attack_time`=2000, `detection_range`=4, `call_for_help_range`=1, `spell_id1`=0, `spell_id2`=0, `spell_id3`=0, `spell_id4`=0, `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16299,16141,16298,14697,16380,16379);
+UPDATE `creature_template` SET `unit_flags`=0, `auras`='28090 28126' WHERE `entry` IN (16299,16141);
+UPDATE `creature_template` SET `unit_flags`=64, `auras`='28292 28126' WHERE `entry` IN (14697,16380,16379);
+UPDATE `creature_template` SET `dmg_min`=159, `dmg_max`=210, `dmg_multiplier`=1 WHERE `entry`=16380;
+UPDATE `creature_template` SET `health_min`=8489, `health_max`=8489, `dmg_min`=159, `dmg_max`=210, `dmg_multiplier`=1 WHERE `entry`=14697;
+UPDATE `creature_template` SET `speed_run`=0.992063, `dmg_min`=159, `dmg_max`=210, `dmg_multiplier`=1 WHERE `entry`=16379;
+UPDATE `creature_template` SET `speed_walk`=1.11111, `unit_flags`=0, `auras`='28090 28126 674' WHERE `entry`=16298;
+UPDATE `creature_template` SET `speed_walk`=0.777776, `armor`=3791, `dmg_min`=102, `dmg_max`=138 WHERE `entry`=16141;
+UPDATE `creature_template` SET `speed_walk`=1, `speed_run`=1.19048, `armor`=3791, `dmg_min`=101, `dmg_max`=137 WHERE `entry`=16299;
 
-UPDATE `creature_template` SET `spell_list_id`='162990' WHERE `entry`=16299;
-UPDATE `creature_template` SET `spell_list_id`='161410' WHERE `entry`=16141;
-UPDATE `creature_template` SET `spell_list_id`='162980' WHERE `entry`=16298;
-UPDATE `creature_template` SET `spell_list_id`='146970' WHERE `entry`=14697;
-UPDATE `creature_template` SET `spell_list_id`='163800' WHERE `entry`=16380;
-UPDATE `creature_template` SET `spell_list_id`='163790' WHERE `entry`=16379;
-UPDATE `creature_template` SET `spell_list_id`='164380' WHERE `entry`=16438;
+UPDATE `creature_template` SET `spell_list_id`=162990 WHERE `entry`=16299;
+UPDATE `creature_template` SET `spell_list_id`=161410 WHERE `entry`=16141;
+UPDATE `creature_template` SET `spell_list_id`=162980 WHERE `entry`=16298;
+UPDATE `creature_template` SET `spell_list_id`=146970 WHERE `entry`=14697;
+UPDATE `creature_template` SET `spell_list_id`=163800 WHERE `entry`=16380;
+UPDATE `creature_template` SET `spell_list_id`=163790 WHERE `entry`=16379;
+UPDATE `creature_template` SET `spell_list_id`=164380 WHERE `entry`=16438;
 
 REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (12398, 28, 1, 0, 0, 0, 1);
 
@@ -111,38 +111,38 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- Royal Dreadguard used more ranged shoots in sniffs
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (138390, 'Undercity - Royal Dreadguard', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14516, 100, 1, 0, 0, 66, 7, 10, 7, 10, 0, 9080, 100, 1, 0, 0, 32, 0, 0, 6, 9, 0, 16100, 100, 1, 0, 0, 138, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-UPDATE `creature_template` SET `npc_flags`='0', `unit_flags`='0' WHERE `entry`=13839;
+UPDATE `creature_template` SET `npc_flags`=0, `unit_flags`=0 WHERE `entry`=13839;
 
 -- Stormwind Elite Guard
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='11', `dmg_min`='417', `dmg_max`='551', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='32768', `spell_list_id`='163960', `movement_type`='0' WHERE `entry`=16396;
+UPDATE `creature_template` SET `level_min`=60, `level_max`=60, `health_min`=9156, `health_max`=9156, `armor`=3791, `faction`=11, `dmg_min`=417, `dmg_max`=551, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=32768, `spell_list_id`=163960, `movement_type`=0 WHERE `entry`=16396;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (163960, 'Stormwind Elite Guard', 14516, 100, 1, 0, 0, 0, 0, 10, 10, 10, 0, 9080, 100, 1, 0, 0, 32, 0, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Undercity Elite Guardian
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='9156', `health_max`='9156', `armor`='3791', `faction`='71', `dmg_min`='417', `dmg_max`='551', `unit_flags`='32768', `auras`='18951', `spell_list_id`='164320', `flags_extra`='524288' WHERE `entry`=16432;
+UPDATE `creature_template` SET `level_min`=60, `level_max`=60, `health_min`=9156, `health_max`=9156, `armor`=3791, `faction`=71, `dmg_min`=417, `dmg_max`=551, `unit_flags`=32768, `auras`='18951', `spell_list_id`=164320, `flags_extra`=524288 WHERE `entry`=16432;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (164320, 'Undercity Elite Guardian', 7160, 100, 1, 0, 0, 0, 0, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Undercity Guardian
-UPDATE `creature_template` SET `dmg_min`='95', `dmg_max`='123' WHERE `entry`=5624;
+UPDATE `creature_template` SET `dmg_min`=95, `dmg_max`=123 WHERE `entry`=5624;
 
 -- Deathguard Elite
-UPDATE `creature_template` SET `dmg_min`='188', `dmg_max`='249' WHERE `entry`=7980;
+UPDATE `creature_template` SET `dmg_min`=188, `dmg_max`=249 WHERE `entry`=7980;
 
 -- Fix Cultist Engineer
-UPDATE `creature_template` SET `gossip_menu_id`='7166', `health_min`='3052', `health_max`='3052', `faction`='190', `speed_walk`='1', `base_attack_time`='2000', `ranged_attack_time`='2000', `unit_flags`='768', `auras`='29826', `flags_extra`='198658', `script_name`='scourge_invasion_cultist_engineer' WHERE `entry`=16230;
+UPDATE `creature_template` SET `gossip_menu_id`=7166, `health_min`=3052, `health_max`=3052, `faction`=190, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=768, `auras`='29826', `flags_extra`=198658, `script_name`='scourge_invasion_cultist_engineer' WHERE `entry`=16230;
 
 -- Fix Shadow of Doom
-UPDATE `creature_template` SET `level_min`='60', `level_max`='60', `health_min`='48840', `health_max`='48840', `mana_min`='2434', `mana_max`='2434', `faction`='1630', `armor`='3075', `dmg_min`='871', `dmg_max`='1153', `unit_flags`='320', `auras`='28126', `movement_type`='0', `detection_range`='4', `call_for_help_range`='1', `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
+UPDATE `creature_template` SET `level_min`=60, `level_max`=60, `health_min`=48840, `health_max`=48840, `mana_min`=2434, `mana_max`=2434, `faction`=1630, `armor`=3075, `dmg_min`=871, `dmg_max`=1153, `unit_flags`=320, `auras`='28126', `movement_type`=0, `detection_range`=4, `call_for_help_range`=1, `script_name`='scourge_invasion_minion' WHERE `entry`=16143;
 
 -- Fix Low level Minions
-UPDATE `creature_template` SET `movement_type`='1', `speed_run`='0.857143', `auras`='28126', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
-UPDATE `creature_template` SET `speed_walk`='1.11111' WHERE `entry` IN (16437,16423);
-UPDATE `creature_template` SET `speed_walk`='1' WHERE `entry` IN (16422,16438);
-UPDATE `creature_template` SET `armor`='426', `dmg_min`='11', `dmg_max`='16', `spell_id2`='0' WHERE `entry`=16438;
-UPDATE `creature_template` SET `armor`='239', `dmg_min`='7', `dmg_max`='12', `auras`='28126 674', `spell_id1`='0' WHERE `entry`=16422;
-UPDATE `creature_template` SET `armor`='239', `dmg_min`='8', `dmg_max`='13' WHERE `entry`=16423;
+UPDATE `creature_template` SET `movement_type`=1, `speed_run`=0.857143, `auras`='28126', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (16438,16437,16422,16423);
+UPDATE `creature_template` SET `speed_walk`=1.11111 WHERE `entry` IN (16437,16423);
+UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry` IN (16422,16438);
+UPDATE `creature_template` SET `armor`=426, `dmg_min`=11, `dmg_max`=16, `spell_id2`=0 WHERE `entry`=16438;
+UPDATE `creature_template` SET `armor`=239, `dmg_min`=7, `dmg_max`=12, `auras`='28126 674', `spell_id1`=0 WHERE `entry`=16422;
+UPDATE `creature_template` SET `armor`=239, `dmg_min`=8, `dmg_max`=13 WHERE `entry`=16423;
 
 -- After completing quest 9154 (Light's Hope Chapel) you should receive this item in your mailbox: 22723 (A Letter from the Keeper of the Rolls) source: https://classic.wowhead.com/guides/wow-classic-scourge-invasions
-UPDATE `quest_template` SET `RewMailTemplateId`='171' WHERE `entry`=9154;
+UPDATE `quest_template` SET `RewMailTemplateId`=171 WHERE `entry`=9154;
 
 -- Argent NPC's do not have random emotes
 DELETE FROM `creature_ai_events` WHERE `id`=1624101;
@@ -163,8 +163,6 @@ DELETE FROM `quest_greeting` WHERE `entry` IN (16281,16787);
 INSERT INTO `quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES (16281, 'The Argent Dawn will turn away none who are willing to sacrifice for our cause.', 1);
 INSERT INTO `quest_greeting` (`entry`, `content_default`, `emote_id`) VALUES (16787, 'Greetings, $n. If you bring me necrotic stones from the undead invaders, I can give you access to the stores of the Argent Dawn.', 66);
 
-DELETE FROM `creature_involvedrelation` WHERE `id`=16787;
-
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
     (16787, 9094, 9, 10),
     (16787, 9317, 9, 10),
@@ -172,8 +170,6 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`
     (16787, 9320, 9, 10),
     (16787, 9321, 9, 10),
     (16787, 9341, 9, 10);
-
-DELETE FROM `creature_questrelation` WHERE `id`=16787;
 
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
     (16787, 9094, 9, 10),
@@ -209,8 +205,8 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
     (28364, 1, 13839, 0, 0, 5464, 5875);
 
 -- Fix GameObjects
-UPDATE `gameobject_template` SET `script_name`='scourge_invasion_go_circle', `faction`='114' WHERE `entry`=181136;
-UPDATE `gameobject_template` SET `faction`='114', `flags`='32' WHERE `entry` IN (181154,181373,181374,181215,181223,181172);
+UPDATE `gameobject_template` SET `script_name`='scourge_invasion_go_circle', `faction`=114 WHERE `entry`=181136;
+UPDATE `gameobject_template` SET `faction`=114, `flags`=32 WHERE `entry` IN (181154,181373,181374,181215,181223,181172);
 UPDATE `gameobject_template` SET `script_name`='scourge_invasion_go_necropolis' WHERE `entry` IN (181154,181373,181374,181215,181223);
 
 -- Events
@@ -271,7 +267,6 @@ DELETE FROM `game_event_creature` WHERE `event` = 17;
 DELETE FROM `game_event_gameobject` WHERE `event` = 80;
 DELETE FROM `game_event_creature` WHERE `event` = 80;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@SCOURGE_INVASION_GUID+1, 16422, 0, -9226.02, 355.318, 73.5737, 2.4289),
     (@SCOURGE_INVASION_GUID+2, 16422, 0, -9224.34, 255.678, 72.4395, 5.62633),
@@ -505,10 +500,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@SCOURGE_INVASION_GUID+230, 16361, 0, 2240.87, -5317.26, 82.2506, 1.67552),
     (@SCOURGE_INVASION_GUID+231, 16285, 0, 2247.79, -5317.31, 82.1935, 1.5708);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231 AND `event`=@SCOURGE_INVASION_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @SCOURGE_INVASION_EVENT FROM `creature` WHERE creature.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@SCOURGE_INVASION_GUID+1, 181172, 0, -5122.8, -725, 505.467, 0.0349062, 0, 0, 0.0174522, 0.999848, 255, 1),
     (@SCOURGE_INVASION_GUID+2, 181172, 0, 1852.46, 266.873, 114.815, 0.541051, 0, 0, 0.267238, 0.963631, 255, 1),
@@ -568,10 +561,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@SCOURGE_INVASION_GUID+56, 181256, 0, 2248.47, -5318.94, 82.1143, 1.5708, 0, 0, 0.707107, 0.707107, 255, 1),
     (@SCOURGE_INVASION_GUID+57, 181254, 0, 2243.86, -5321.14, 82.1673, 1.48353, 0, 0, 0.67559, 0.737278, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57 AND `event`=@SCOURGE_INVASION_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @SCOURGE_INVASION_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@INVASIONS_DONE_GUID+1 , 16787, 1, 1583.22, -4412.06, 7.73177, 2.37365),
     (@INVASIONS_DONE_GUID+2 , 16787, 0, 1585.96, 249.99, -61.994, 2.26893),
@@ -581,10 +572,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@INVASIONS_DONE_GUID+6 , 16786, 0, -4885.84, -945.795, 501.547, 2.72228),
     (@INVASIONS_DONE_GUID+7 , 16786, 0, 2253.82, -5310.68, 82.2506, 1.8675);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7 AND `event`=@INVASIONS_DONE_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @INVASIONS_DONE_EVENT FROM `creature` WHERE creature.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@INVASIONS_DONE_GUID+1, 181256, 1, 1585.55, -4409.76, 7.27701, 3.03684, 0, 0, 0.998629, 0.0523532, 255, 1),
     (@INVASIONS_DONE_GUID+2, 181256, 0, 1584.6, 245.848, -62.0773, 3.12412, 0, 0, 0.999962, 0.00873464, 255, 1),
@@ -594,10 +583,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@INVASIONS_DONE_GUID+6, 181256, 1, 9909.79, 2516.55, 1316.68, 5.11382, 0, 0, -0.551936, 0.833886, 255, 1),
     (@INVASIONS_DONE_GUID+7, 181256, 0, 2250.87, -5312.69, 82.1539, 2.89724, 0, 0, 0.992546, 0.12187, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7 AND `event`=@INVASIONS_DONE_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @INVASIONS_DONE_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@FIFTY_INVASIONS_GUID+1, 16395, 0, -8834.53, 643.027, 95.2532, 4.32842),
     (@FIFTY_INVASIONS_GUID+2, 16395, 0, -4888.24, -945.974, 501.549, 2.86191),
@@ -607,10 +594,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@FIFTY_INVASIONS_GUID+6, 16384, 1, -1256.82, 75.1629, 127.892, 4.18879),
     (@FIFTY_INVASIONS_GUID+7, 16384, 1, 1581.37, -4411.9, 7.4357, 2.47837);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+7 AND `event`=@FIFTY_INVASIONS_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @FIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+7;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@HUNDRED_INVASIONS_GUID+1, 16433, 0, -8834.53, 643.027, 95.2532, 4.32842),
     (@HUNDRED_INVASIONS_GUID+2, 16433, 0, -4888.24, -945.974, 501.549, 2.86191),
@@ -620,10 +605,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@HUNDRED_INVASIONS_GUID+6, 16435, 1, -1256.82, 75.1629, 127.892, 4.18879),
     (@HUNDRED_INVASIONS_GUID+7, 16435, 1, 1581.37, -4411.9, 7.4357, 2.47837);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+7 AND `event`=@HUNDRED_INVASIONS_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDRED_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+7;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+7;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@HUNDREDFIFTY_INVASIONS_GUID+1, 16434, 0, -8834.53, 643.027, 95.2532, 4.32842),
     (@HUNDREDFIFTY_INVASIONS_GUID+2, 16434, 0, -4888.24, -945.974, 501.549, 2.86191),
@@ -633,10 +616,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@HUNDREDFIFTY_INVASIONS_GUID+6, 16436, 1, -1256.82, 75.1629, 127.892, 4.18879),
     (@HUNDREDFIFTY_INVASIONS_GUID+7, 16436, 1, 1581.37, -4411.9, 7.4357, 2.47837);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+7 AND `event`=@HUNDREDFIFTY_INVASIONS_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDREDFIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+7;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@WINTERSPRING_GUID+1, 181136, 1, 6052.6, -4749.63, 785.534, 1.27409, 0, 0, 0.594822, 0.803857, 255, 1),
     (@WINTERSPRING_GUID+2, 181136, 1, 7939.65, -3870.93, 695.403, 0.244346, 0, 0, 0.121869, 0.992546, 255, 1),
@@ -903,10 +884,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@WINTERSPRING_GUID+263, 181223, 1, 7755.75, -4030.91, 786.496, 0.471238, 0, 0, 0.233445, 0.97237, 255, 1),
     (@WINTERSPRING_GUID+264, 181373, 1, 6184.28, -4913.32, 807.676, 6.0912, 0, 0, -0.0958452, 0.995396, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264 AND `event`=@WINTERSPRING_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @WINTERSPRING_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@WINTERSPRING_GUID+1, 16356, 1, 7803.92, -4223.38, 676.976, 2.00713),
     (@WINTERSPRING_GUID+2, 16356, 1, 7692.21, -3843.77, 688.606, 4.46804),
@@ -1156,10 +1135,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@WINTERSPRING_GUID+246, 16356, 1, 7708.42, -3907.95, 691.825, 6.24828),
     (@WINTERSPRING_GUID+247, 16356, 1, 7720.34, -3881.16, 690.539, 1.85005);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247 AND `event`=@WINTERSPRING_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@TANARIS_GUID+1, 181136, 1, -8833.58, -2600.38, 21.7275, 3.17653, 0, 0, -0.999847, 0.0174693, 255, 1),
     (@TANARIS_GUID+2, 181136, 1, -7246.02, -3543.61, 13.5918, 0.244346, 0, 0, 0.121869, 0.992546, 255, 1),
@@ -1426,10 +1403,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@TANARIS_GUID+263, 181215, 1, -8633.21, -2499.82, 114.017, 2.82743, 0, 0, 0.987688, 0.156436, 255, 1),
     (@TANARIS_GUID+264, 181215, 1, -8333.68, -3966.4, 77.8483, 1.37881, 0, 0, 0.636078, 0.771625, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264 AND `event`=@TANARIS_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @TANARIS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+277;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@TANARIS_GUID+1, 16356, 1, -7613.69, -3766.51, 14.5989, 3.03684),
     (@TANARIS_GUID+2, 16356, 1, -7653.08, -3726.19, 25.1272, 5.53269),
@@ -1709,10 +1684,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@TANARIS_GUID+276, 16421, 1, -8333.68, -3966.4, 77.9316, 1.37881),
     (@TANARIS_GUID+277, 16421, 1, -7399.95, -3733.06, 61.1337, 5.81195);
     
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+277 AND `event`=@TANARIS_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @TANARIS_EVENT FROM `creature` WHERE creature.guid BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+277;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+176;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@AZSHARA_GUID+1, 181136, 1, 3086.48, -4215.71, 97.6507, 0.244346, 0, 0, 0.121869, 0.992546, 255, 1),
     (@AZSHARA_GUID+2, 181136, 1, 3337.51, -4516.62, 97.713, 0.244346, 0, 0, 0.121869, 0.992546, 255, 1),
@@ -1891,10 +1864,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@AZSHARA_GUID+175, 181194, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 255, 1),
     (@AZSHARA_GUID+176, 181194, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+176 AND `event`=@AZSHARA_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @AZSHARA_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+176;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+185;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@AZSHARA_GUID+1, 16356, 1, 3533.39, -4172.37, 105.328, 1.88495),
     (@AZSHARA_GUID+2, 16356, 1, 3518.78, -5750.42, 5.19787, 4.03171),
@@ -2082,10 +2053,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@AZSHARA_GUID+184, 16421, 1, 3299.55, -4301.3, 177.891, 5.81195),
     (@AZSHARA_GUID+185, 16421, 1, 3544.98, -5610.26, 67.196, 2.82743);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+185 AND `event`=@AZSHARA_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @AZSHARA_EVENT FROM `creature` WHERE creature.guid BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+185;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+175;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@BLASTED_LANDS_GUID+1, 181136, 0, -11548.5, -3283.3, 7.45651, 4.4855, 0, 0, -0.782608, 0.622515, 255, 1),
     (@BLASTED_LANDS_GUID+2, 181136, 0, -11420, -2816.92, 0.782562, 2.84488, 0, 0, 0.989016, 0.147811, 255, 1),
@@ -2263,10 +2232,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@BLASTED_LANDS_GUID+174, 181223, 0, -11402.1, -3316.55, 111.188, 4.46804, 0, 0, -0.788011, 0.615662, 255, 1),
     (@BLASTED_LANDS_GUID+175, 181374, 0, -11233.9, -2841.77, 185.603, 4.45059, 0, 0, -0.793353, 0.608762, 255, 1);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+175 AND `event`=@BLASTED_LANDS_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @BLASTED_LANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+175;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+185;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@BLASTED_LANDS_GUID+1, 16356, 0, -11181.1, -2973.18, 7.62003, 5.20108),
     (@BLASTED_LANDS_GUID+2, 16356, 0, -11217.4, -3372.26, 9.48901, 4.20625),
@@ -2454,11 +2421,9 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@BLASTED_LANDS_GUID+184, 16421, 0, -11402.1, -3316.55, 111.272, 4.46804),
     (@BLASTED_LANDS_GUID+185, 16421, 0, -11233.9, -2841.77, 185.686, 4.45059);
     
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+185 AND `event`=@BLASTED_LANDS_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @BLASTED_LANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+185;
 
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+182;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@EASTERN_PLAGUELANDS_GUID+1, 181136, 0, 1599.78, -3039.54, 78.7164, 2.1293, 0, 0, 0.874619, 0.48481, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+2, 181136, 0, 1804.44, -2842.5, 72.9479, 2.1293, 0, 0, 0.874619, 0.48481, 255, 1),
@@ -2639,10 +2604,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@EASTERN_PLAGUELANDS_GUID+181, 181192, 0, 2350.44, -4913.78, 74.405, 5.37562, 0, 0, -0.438371, 0.898794, 255, 1),
     (@EASTERN_PLAGUELANDS_GUID+182, 181193, 0, 2351.85, -4914.2, 74.3483, 5.37562, 0, 0, -0.438371, 0.898794, 255, 1);
     
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+182 AND `event`=@EASTERN_PLAGUELANDS_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EASTERN_PLAGUELANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+182;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@EASTERN_PLAGUELANDS_GUID+3, 16356, 0, 1966.54, -4717.01, 98.3666, 0.226893),
     (@EASTERN_PLAGUELANDS_GUID+4, 16356, 0, 1965.33, -5104.58, 84.9795, 3.26377),
@@ -2821,10 +2784,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@EASTERN_PLAGUELANDS_GUID+182, 16356, 0, 1999.05, -4747.77, 96.9688, 4.03171),
     (@EASTERN_PLAGUELANDS_GUID+183, 16356, 0, 2343.07, -4984.65, 71.8132, 4.06663);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183 AND `event`=@EASTERN_PLAGUELANDS_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @EASTERN_PLAGUELANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+174;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`) VALUES
     (@BURNING_STEPPES_GUID+1, 181136, 0, -8399.82, -1246.03, 202.741, 1.37881, 0, 0, 0.636078, 0.771625, 255, 1),
     (@BURNING_STEPPES_GUID+2, 181136, 0, -8371.14, -963.306, 191.002, 5.23599, 0, 0, -0.5, 0.866025, 255, 1),
@@ -3001,10 +2962,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@BURNING_STEPPES_GUID+173, 181194, 0, -7587.87, -2607.69, 137.044, 3.05433, 0, 0, 0.999048, 0.0436193, 255, 1),
     (@BURNING_STEPPES_GUID+174, 181193, 0, -7587.59, -2606.65, 137.194, 3.31614, 0, 0, -0.996194, 0.087165, 255, 1);
     
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+174 AND `event`=@BURNING_STEPPES_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @BURNING_STEPPES_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+174;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+180;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (@BURNING_STEPPES_GUID+1, 16356, 0, -8000.75, -985.283, 127.825, 1.09956),
     (@BURNING_STEPPES_GUID+2, 16356, 0, -7756.19, -2210.4, 133.609, 2.80997),
@@ -3187,31 +3146,29 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@BURNING_STEPPES_GUID+179, 16421, 0, -8232.78, -1099.86, 201.572, 5.18363),
     (@BURNING_STEPPES_GUID+180, 16421, 0, -7733.71, -2432.74, 190.869, 2.67035);
     
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+180 AND `event`=@BURNING_STEPPES_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @BURNING_STEPPES_EVENT FROM `creature` WHERE creature.guid BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+180;
 
 -- Fix Movement.
-UPDATE `creature` SET `movement_type`='1' WHERE id IN (16438, 16437, 16422, 16423);
-UPDATE `creature` SET `wander_distance`='0' WHERE `movement_type`='0' AND `wander_distance`<>'0';
+UPDATE `creature` SET `movement_type`=1 WHERE id IN (16438, 16437, 16422, 16423);
+UPDATE `creature` SET `wander_distance`=0 WHERE `movement_type`=0 && `wander_distance`!=0;
 
 -- =============================================
 -- Dungeon Bosses
 -- =============================================
 
 -- Prepare
-UPDATE `creature_template` SET `spell_id1`='0', `spell_id2`='0', `spell_id3`='0', `spell_id4`='0', `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (14684, 14695, 14690, 14693, 14682, 14686, 4543);
+UPDATE `creature_template` SET `spell_id1`=0, `spell_id2`=0, `spell_id3`=0, `spell_id4`=0, `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (14684, 14695, 14690, 14693, 14682, 14686, 4543);
 
 -- Balzaphon
 -- todo: spells not sniffed: cone of cold: 12557, 12611, 15244, 20828, 22746, 30095 Fear: 26580?
-UPDATE `creature_template` SET `faction`='21', `unit_flags`='64', `auras`='28126', `dmg_min`='418', `dmg_max`='481' WHERE `entry`=14684;
-UPDATE `creature` SET `position_x`='3733.27', `position_y`='-3480.11', `position_z`='131.04', `orientation`='3.05433' WHERE `guid`=2354;
+UPDATE `creature_template` SET `faction`=21, `unit_flags`=64, `auras`='28126', `dmg_min`=418, `dmg_max`=481 WHERE `entry`=14684;
+UPDATE `creature` SET `position_x`=3733.27, `position_y`=-3480.11, `position_z`=131.04, `orientation`=3.05433 WHERE `guid`=2354;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146840, 'Stratholme - Balzaphon', 16799, 100, 1, 0, 0, 0, 2, 5, 2, 5, 0, 8398, 100, 4, 0, 0, 0, 2, 16, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Lord Blackwood
-UPDATE `creature_template` SET `faction`='21', `dmg_min`='674', `dmg_max`='776', `auras`='28126', `spell_list_id`='146950' WHERE `entry`=14695;
+UPDATE `creature_template` SET `faction`=21, `dmg_min`=674, `dmg_max`=776, `auras`='28126', `spell_list_id`=146950 WHERE `entry`=14695;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146950, 'Scholomance - Lord Blackwood', 16496, 100, 4, 0, 0, 0, 3, 25, 3, 25, 0, 7964, 100, 1, 0, 0, 0, 2, 20, 20, 20, 0, 20733, 100, 1, 0, 0, 0, 2, 20, 20, 20, 0, 21390, 100, 4, 0, 0, 0, 2, 10, 10, 10, 0, 11972, 100, 1, 0, 0, 66, 2, 10, 5, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-UPDATE `creature` SET `position_x`='200.201', `position_y`='150.839', `position_z`='109.879', `orientation`='5.06145', `movement_type`='2' WHERE `guid`=2353;
-DELETE FROM `creature_movement` WHERE `id`=2353;
+UPDATE `creature` SET `position_x`=200.201, `position_y`=150.839, `position_z`=109.879, `orientation`=5.06145, `movement_type`=2 WHERE `guid`=2353;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (2353, 1, 248.659, 153.031, 109.788, 100),
     (2353, 2, 200.116, 150.961, 109.909, 100),
@@ -3232,15 +3189,14 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
     (2353, 17, 200.116, 150.961, 109.909, 100);
 
 -- Revanchion
-UPDATE `creature_template` SET `display_scale1`='0', `faction`='21', `armor`='3795', `dmg_min`='837', `dmg_max`='962', `dmg_multiplier`='1', `speed_walk`='1.11111', `unit_flags`='64', `auras`='28126 16331 12556' WHERE `entry`=14690;
-UPDATE `creature` SET `position_x`='-112.776', `position_y`='583.823', `position_z`='-3.47887', `orientation`='5.60251' WHERE `guid`=2352;
+UPDATE `creature_template` SET `display_scale1`=0, `faction`=21, `armor`=3795, `dmg_min`=837, `dmg_max`=962, `dmg_multiplier`=1, `speed_walk`=1.11111, `unit_flags`=64, `auras`='28126 16331 12556' WHERE `entry`=14690;
+UPDATE `creature` SET `position_x`=-112.776, `position_y`=583.823, `position_z`=-3.47887, `orientation`=5.60251 WHERE `guid`=2352;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146900, 'Dire Maul - Revanchion', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14907, 100, 1, 0, 0, 0, 5, 33, 33, 33, 0, 15245, 100, 1, 0, 0, 0, 5, 16, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Scorn: https://www.youtube.com/watch?v=wJ5nSn94wN0
-UPDATE `creature_template` SET `display_scale1`='0', `faction`='21', `unit_flags`='64', `dmg_min`='240', `dmg_max`='273', `spell_list_id`='146930', `auras`='28126', `movement_type`='2' WHERE `entry`=14693;
+UPDATE `creature_template` SET `display_scale1`=0, `faction`=21, `unit_flags`=64, `dmg_min`=240, `dmg_max`=273, `spell_list_id`=146930, `auras`='28126', `movement_type`=2 WHERE `entry`=14693;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146930, 'Scarlet Monastery - Scorn', 22643, 100, 1, 0, 0, 64, 0, 3, 3, 10, 0, 17165, 100, 4, 0, 0, 0, 0, 5, 14, 40, 0, 15531, 100, 1, 0, 0, 0, 0, 5, 12, 20, 0, 28873, 100, 1, 0, 0, 0, 0, 5, 17, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 DELETE FROM `creature` WHERE `guid`=2350;
-DELETE FROM `creature_movement_template` WHERE `entry`=14693;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
     (14693, 1, 1796.82, 1219.18, 18.2921, 100),
     (14693, 2, 1797.05, 1255.55, 18.4921, 100),
@@ -3268,7 +3224,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
     (14693, 24, 1797.05, 1255.55, 18.4921, 100);
     
 -- Bloodmage Thalnos https://www.youtube.com/watch?v=7tB7oZNkiEU
-UPDATE `creature_template` SET `mana_min`='2518', `mana_max`='2518', `dmg_min`='74', `dmg_max`='97', `spell_list_id`='45430' WHERE `entry`=4543;
+UPDATE `creature_template` SET `mana_min`=2518, `mana_max`=2518, `dmg_min`=74, `dmg_max`=97, `spell_list_id`=45430 WHERE `entry`=4543;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (45430, 'Scarlet Monastery - Bloodmage Thalnos', 8053, 100, 1, 0, 0, 0, 0, 16, 16, 60, 0, 8814, 100, 4, 0, 0, 0, 0, 8, 8, 16, 0, 9613, 100, 1, 0, 0, 12, 0, 3, 3, 5, 0, 12470, 100, 4, 0, 0, 64, 0, 9, 9, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4543;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
@@ -3284,12 +3240,11 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=45432;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45432, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6201, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Aggro Yell');
 DELETE FROM `creature_ai_scripts` WHERE `id`=45433;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45433, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6203, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - Killed Unit Yell');
-DELETE FROM `conditions` WHERE `condition_entry`=14693;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (14693, 12, 17, 0, 0, 0, 0);
 
 -- Sever
-UPDATE `creature_template` SET `level_min`='25', `level_max`='25', `health_min`='6291', `health_max`='6291', `armor`='1026', `faction`='21', `unit_flags`='64', `dmg_min`='193', `dmg_max`='271', `display_scale1`='0', `dmg_multiplier`='1', `auras`='28126', `movement_type`='0' WHERE `entry`=14682;
-UPDATE `creature` SET `position_x`='-225.131', `position_y`='2302.95', `position_z`='94.7599', `orientation`='6.02139', `movement_type`='0' WHERE `guid`=2349;
+UPDATE `creature_template` SET `level_min`=25, `level_max`=25, `health_min`=6291, `health_max`=6291, `armor`=1026, `faction`=21, `unit_flags`=64, `dmg_min`=193, `dmg_max`=271, `display_scale1`=0, `dmg_multiplier`=1, `auras`='28126', `movement_type`=0 WHERE `entry`=14682;
+UPDATE `creature` SET `position_x`=-225.131, `position_y`=2302.95, `position_z`=94.7599, `orientation`=6.02139, `movement_type`=0 WHERE `guid`=2349;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146820, 'Shadowfang Keep - Sever', 16508, 100, 1, 0, 0, 0, 5, 20, 30, 60, 0, 17745, 100, 1, 0, 0, 0, 0, 5, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14682;
@@ -3299,8 +3254,8 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1468202;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1468202, 0, 15, 8269, 35, 0, 0, 0, 0, 6, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sever - Cast Spell Berserking');
 
 -- Lady Falther'ess: https://youtu.be/FAiC1wwQCuc?t=104
-UPDATE `creature_template` SET `display_scale1`='0', `dmg_min`='282', `dmg_max`='323', `level_min`='40', `level_max`='40', `health_min`='9808', `health_max`='9808', `mana_min`='5132', `mana_max`='5132', `faction`='35', `speed_walk`='1', `unit_flags`='64', `auras`='28533', `movement_type`='0' WHERE `entry`=14686;
-UPDATE `creature` SET `position_x`='2583.18', `position_y`='695.861', `position_z`='56.8033', `orientation`='1.8675', `movement_type`='0' WHERE `guid`=2351;
+UPDATE `creature_template` SET `display_scale1`=0, `dmg_min`=282, `dmg_max`=323, `level_min`=40, `level_max`=40, `health_min`=9808, `health_max`=9808, `mana_min`=5132, `mana_max`=5132, `faction`=35, `speed_walk`=1, `unit_flags`=64, `auras`='28533', `movement_type`=0 WHERE `entry`=14686;
+UPDATE `creature` SET `position_x`=2583.18, `position_y`=695.861, `position_z`=56.8033, `orientation`=1.8675, `movement_type`=0 WHERE `guid`=2351;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (146860, 'Razorfen Downs - Lady Falther\'ess', 16838, 100, 1, 0, 0, 0, 0, 20, 20, 20, 0, 17105, 100, 1, 0, 0, 0, 0, 30, 12, 30, 0, 22743, 100, 4, 0, 0, 0, 0, 25, 5, 25, 0, 7645, 100, 4, 0, 0, 0, 10, 30, 30, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14686;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
@@ -3319,7 +3274,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 -- City Attacks
 -- =============================================
 
-DELETE FROM `conditions` WHERE `condition_entry` IN (3319,3320,3321,3322);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
     (3319, 16, 16394, 0, 0, 0, 2),
     (3320, 16, 16382, 0, 0, 0, 2),
@@ -3347,7 +3301,6 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
     (454901, 4549, 3322, 10, 0, 100, 3, 0, 50, 10000, 90000, 17001, 17002, 0, 'Scourge Invasion - Pallid Horror or Flameshocker in LOS');
 
 -- Undercity Trade Quarter
-DELETE FROM `creature_movement_special` WHERE `id`=149701;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES 
     (149701, 1, 1660.98, 257.238, -62.1777, 100, 0, 0, 0),
     (149701, 2, 1659.01, 234.474, -62.1776, 100, 0, 0, 149711),
@@ -3376,7 +3329,6 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (149701, 25, 1605.34, 276.451, -43.1027, 100, 0, 0, 149713);
 
 -- Undercity Royal Quarter
-DELETE FROM `creature_movement_special` WHERE `id`=149702;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES 
     (149702, 1, 1596.72, 423.488, -46.3713, 100, 0, 0, 149720),
     (149702, 2, 1603.8, 423.409, -46.3814, 100, 0, 0, 0),
@@ -3462,7 +3414,6 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (149702, 82, 1293.68, 320.572, -57.4819, 100, 0, 0, 0);
 
 -- Stormwind Keep
-DELETE FROM `creature_movement_special` WHERE `id`=151901;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
     (151901, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
     (151901, 2, -8564.43, 897.362, 96.6816, 100, 0, 0, 0),
@@ -3502,7 +3453,6 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (151901, 36, -8441.52, 333.366, 122.579, 100, 0, 0, 151912);
 
 -- Stormwind Trade District
-DELETE FROM `creature_movement_special` WHERE `id`=151902;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
     (151902, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
     (151902, 2, -8564.43, 897.362, 96.6816, 100, 0, 0, 0),
@@ -3545,7 +3495,6 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
     (151902, 39, -8791.07, 679.552, 102.017, 100, 0, 0, 0),
     (151902, 40, -8807.04, 683.424, 100.21, 100, 0, 0, 151921);
 
-DELETE FROM `creature_movement_scripts` WHERE `id` IN (149720,149721,149722,149723,149724, 149711,149712,149713,151910,151911,151912,151920,151921);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
     (149720, 0, 0, 6, 0, 0, 0, 5624, 100, 8, 2, 12334, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion - Undercity Guardian: Scourge in sewers!  We need help!'),
     (149721, 0, 10, 5624, 300000, 0, 0, 0, 0, 0, 0, 2, 149721, -1, 1, 1720.11, 191.195, -62.0651, 1.02974, 0, 'Scourge Invasion - Pallid Horror: Spawn Undercity Guardian 1 at Magic Quarters'),
