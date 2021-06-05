@@ -4804,7 +4804,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    unitTarget->HandleEmote(EMOTE_ONESHOT_CHEER);
+                    m_caster->CastSpell(unitTarget, 26005, true);
                     return;
                 }
                 case 26137:                                 // Rotate Trigger
