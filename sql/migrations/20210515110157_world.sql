@@ -604,6 +604,15 @@ DELETE FROM `creature_loot_template` WHERE  `entry` = 232 AND `item` = 30048;
 -- Fix Base Mana For Druids
 UPDATE `player_classlevelstats` SET `basemana` = 34 WHERE `class` = 11 AND `level` = 1;
 
+-- Bloodfen Scytheclaw Skinning Template
+UPDATE `creature_template` SET `skinning_loot_id` = 4343 WHERE `entry` = 4355;
+
+-- Deatheye Skinning Template
+UPDATE `creature_template` SET `skinning_loot_id` = 8302 WHERE `entry` = 8302;
+INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `patch_max`) VALUES
+(8302, 4304, 85, 1, 1, 1, 10),
+(8302, 8170, 15, 1, 1, 1, 10);
+
 
 -- End of migration.
 END IF;
