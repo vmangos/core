@@ -3684,6 +3684,170 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
     (151920, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 12311, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Invasion: Stormwind Elite Guard - Scourge in the Trade District!  Have at them!');
 
 
+-- =============================================
+-- Letter Quests
+-- =============================================
+
+/*
+-- Item: A Careworn Note (22972)
+-- Quest: Note from the Front (9299)
+-- Alliance Relative: Alexander Calder (5173)
+-- Horde Relative: Deze Snowbane (15006)
+-- Mailed Item: Sealed Research Report (23008)
+*/
+
+-- Condition Quest 9299 Completed
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9299, 8, 9299, 0, 0, 0, 0);
+
+-- Add vendor npc flag to Alexander Calder in patch 1.11.
+DELETE FROM `creature_template` WHERE `entry`=5173;
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5173, 0, 3122, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Alexander Calder', 'Warlock Trainer', 4566, 60, 60, 4120, 4120, 0, 0, 8401, 55, 19, 1, 1.14286, 18, 5, 0, 0, 1, 110, 142, 0, 272, 1, 2000, 2000, 1, 4608, 0, 0, 0, 0, 9, 0, 74.448, 102.366, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 3, 0, 0, 3, 5173, 14, 0, 0, 0, 524298, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5173, 9, 3122, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Alexander Calder', 'Warlock Trainer', 4566, 60, 60, 4120, 4120, 0, 0, 8401, 55, 23, 1, 1.14286, 18, 5, 0, 0, 1, 110, 142, 0, 272, 1, 2000, 2000, 1, 4608, 0, 0, 0, 0, 9, 0, 74.448, 102.366, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 3, 0, 0, 3, 5173, 14, 0, 0, 0, 524298, '');
+
+-- Add missing gossip option to Alexander Calder.
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4566, 2, 1, 'Let me browse your goods.', 2823, 3, 4, 0, 0, 0, 0, 0, NULL, 0, 9299);
+
+-- Add missing vendor items to Alexander Calder.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(5173, 23161, 9299),
+(5173, 23160, 9299);
+
+-- Add vendor npc flag to Deze Snowbane in patch 1.11.
+DELETE FROM `creature_template` WHERE `entry`=15006;
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (15006, 5, 15112, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0, 'Deze Snowbane', 'Arathi Basin Battlemaster', 6470, 61, 61, 157200, 157200, 0, 0, 4091, 412, 2049, 1, 1.14286, 20, 5, 0, 1, 1, 544, 703, 0, 278, 1, 2000, 2000, 1, 4672, 0, 0, 0, 0, 0, 0, 172.1, 240.07, 100, 7, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, NULL, 0, 0, '', 0, 3, 0, 0, 3, 15006, 0, 0, 0, 0, 524296, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (15006, 9, 15112, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0, 'Deze Snowbane', 'Arathi Basin Battlemaster', 6470, 61, 61, 157200, 157200, 0, 0, 4091, 412, 2053, 1, 1.14286, 20, 5, 0, 1, 1, 544, 703, 0, 278, 1, 2000, 2000, 1, 4672, 0, 0, 0, 0, 0, 0, 172.1, 240.07, 100, 7, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, NULL, 0, 0, '', 0, 3, 0, 0, 3, 15006, 0, 0, 0, 0, 524296, '');
+
+-- Add missing gossip option to Deze Snowbane.
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (6470, 0, 9, 'I would like to go to the battleground.', 10355, 12, 2048, 0, 0, 0, 0, 0, NULL, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (6470, 1, 1, 'Let me browse your goods.', 2823, 3, 4, 0, 0, 0, 0, 0, NULL, 0, 9299);
+
+-- Add missing vendor items to Deze Snowbane.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(15006, 23161, 9299),
+(15006, 23160, 9299);
+
+/*
+-- Item: A Torn Letter (22977)
+-- Quest: Letter from the Front (9295)
+-- Alliance Relative: Orphan Matron Nightingale (14450)
+-- Horde Relative: Joanna Whitehall (5698)
+-- Mailed Item: Sealed Research Report (23010)
+*/
+
+-- Condition Quest 9295 Completed
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9295, 8, 9295, 0, 0, 0, 0);
+
+-- Add missing gossip option to Orphan Matron Nightingale.
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=5849;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (5849, 2, 1, 'Let me browse your goods.', 2823, 3, 4, 0, 0, 0, 0, 0, NULL, 0, 9295);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (5849, 3, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 402, 0, 0, NULL, 0, 462);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (5849, 4, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 403, 0, 0, NULL, 0, 461);
+
+-- Assign condition id to Orphan Matron Nightingale's vendor items.
+UPDATE `npc_vendor` SET `condition_id`=9295 WHERE `entry`=14450;
+
+-- Add vendor npc flag to Joanna Whitehall in patch 1.11.
+DELETE FROM `creature_template` WHERE `entry`=5698;
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5698, 0, 4052, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0, 'Joanna Whitehall', NULL, 9421, 40, 40, 1752, 1752, 0, 0, 1890, 68, 0, 1, 1.14286, 18, 5, 0, 0, 1, 61, 78, 0, 156, 1, 2000, 2000, 1, 37376, 0, 0, 0, 0, 0, 0, 56.672, 77.924, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 3, 0, 0, 3, 5698, 0, 0, 0, 0, 524298, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5698, 9, 4052, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 100, 0, 'Joanna Whitehall', NULL, 9421, 40, 40, 1752, 1752, 0, 0, 1890, 68, 4, 1, 1.14286, 18, 5, 0, 0, 1, 61, 78, 0, 156, 1, 2000, 2000, 1, 37376, 0, 0, 0, 0, 0, 0, 56.672, 77.924, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 3, 0, 0, 3, 5698, 0, 0, 0, 0, 524298, '');
+
+-- Add missing vendor items to Joanna Whitehall.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(5698, 23161, 9295),
+(5698, 23160, 9295);
+
+/*
+-- Item: A Ragged Page (22974)
+-- Quest: Page from the Front (9300)
+-- Alliance Relative: Elissa Dumas (4165)
+-- Horde Relative: Miles Welsh (3044)
+-- Mailed Item: Sealed Research Report (23011)
+*/
+
+-- Condition Quest 9300 Completed
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9300, 8, 9300, 0, 0, 0, 0);
+
+-- Add vendor npc flag to Elissa Dumas in patch 1.11.
+DELETE FROM `creature_template` WHERE `entry`=4165;
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (4165, 0, 7669, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Elissa Dumas', 'Portal Trainer', 4821, 35, 35, 992, 992, 2680, 2680, 1156, 80, 19, 1, 1.14286, 18, 5, 0, 0, 1, 51, 65, 0, 138, 1, 2000, 2000, 8, 4608, 0, 0, 0, 0, 8, 0, 51.128, 70.301, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 3, 1, 0, 3, 4165, 50, 0, 0, 0, 524298, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (4165, 9, 7669, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Elissa Dumas', 'Portal Trainer', 4821, 35, 35, 992, 992, 2680, 2680, 1156, 80, 23, 1, 1.14286, 18, 5, 0, 0, 1, 51, 65, 0, 138, 1, 2000, 2000, 8, 4608, 0, 0, 0, 0, 8, 0, 51.128, 70.301, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 3, 1, 0, 3, 4165, 50, 0, 0, 0, 524298, '');
+
+-- Add missing gossip option to Elissa Dumas.
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=4821;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4821, 0, 3, 'Please teach me.', 8442, 5, 16, 0, 0, 0, 0, 0, '', 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4821, 1, 1, 'Let me browse your goods.', 2823, 3, 4, 0, 0, 0, 0, 0, NULL, 0, 9300);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4821, 2, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 410, 0, 0, NULL, 0, 462);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4821, 3, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 411, 0, 0, NULL, 0, 461);
+
+-- Add missing vendor items to Elissa Dumas.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(4165, 23161, 9300),
+(4165, 23160, 9300);
+
+-- Add vendor npc flag to Miles Walsh in patch 1.11.
+DELETE FROM `creature_template` WHERE `entry`=3044;
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (3044, 0, 2139, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Miles Welsh', 'Priest Trainer', 4533, 40, 40, 1752, 1752, 0, 0, 1890, 68, 19, 1, 1.14286, 18, 5, 0, 0, 1, 61, 78, 0, 156, 1, 2000, 2000, 1, 37376, 0, 0, 0, 0, 5, 0, 56.672, 77.924, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 1, 0, 0, 3, 3044, 8, 0, 0, 0, 524298, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (3044, 9, 2139, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Miles Welsh', 'Priest Trainer', 4533, 40, 40, 1752, 1752, 0, 0, 1890, 68, 23, 1, 1.14286, 18, 5, 0, 0, 1, 61, 78, 0, 156, 1, 2000, 2000, 1, 37376, 0, 0, 0, 0, 5, 0, 56.672, 77.924, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 'EventAI', 0, 1, 0, 0, 3, 3044, 8, 0, 0, 0, 524298, '');
+
+-- Add missing gossip option to Miles Welsh.
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (4533, 8653, 9300);
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=4533;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4533, 0, 3, 'I seek more training in the priestly ways.', 7157, 5, 16, 0, 0, 0, 0, 0, '', 0, 94);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4533, 1, 0, 'I wish to unlearn my talents.', 8271, 1, 1, 4461, 0, 0, 0, 0, '', 0, 163);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4533, 2, 1, 'Let me browse your goods.', 2823, 3, 4, 0, 0, 0, 0, 0, NULL, 0, 9300);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4533, 3, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 423, 0, 0, '', 0, 461);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (4533, 4, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 422, 0, 0, '', 0, 462);
+
+-- Add missing vendor items to Miles Welsh.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(3044, 23161, 9300),
+(3044, 23160, 9300);
+
+/*
+-- Item: A Crumpled Missive (22973)
+-- Quest: Missive from the Front (9302)
+-- Neutral Relative: Garon Hutchins (16543)
+-- Mailed Item: Sealed Research Report (23012)
+*/
+
+-- Condition Quest 9302 Completed
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9302, 8, 9302, 0, 0, 0, 0);
+
+-- Add missing gossip option to Garon Hutchins (his vendor option is bugged on official servers, and does not really sell items).
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (7418, 8653, 9302);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES (7418, 0, 0, 'I would like to buy from you.', 2583, 1, 1, 0, 0, 0, 0, 0, NULL, 0, 9302);
+
+/*
+-- Item: A Bloodstained Envelope (22970)
+-- Quest: Envelope from the Front (9301)
+-- Neutral Relative: Zarena Cromwind (2482)
+-- Mailed Item: Sealed Research Report (23013)
+*/
+
+-- Condition Quest 9301 Completed
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9301, 8, 9301, 0, 0, 0, 0);
+
+-- Add missing vendor items to Zarena Cromwind.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(2482, 23160, 9301),
+(2482, 23161, 9301);
+
+/*
+-- Item: A Smudged Document (22975)
+-- Quest: Document from the Front (9304)
+-- Neutral Relative: Caretaker Alen (11038)
+-- Mailed Item: Sealed Research Report (23016)
+*/
+
+-- Condition Quest 9304 Completed
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (9304, 8, 9304, 0, 0, 0, 0);
+
+-- Add missing vendor items to Caretaker Alen.
+INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
+(11038, 23161, 9304),
+(11038, 23160, 9304);
+
+
 -- End of migration.
 END IF;
 END??
