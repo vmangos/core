@@ -907,12 +907,25 @@ struct ScourgeMinion : public ScriptedAI
     ScourgeMinion(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_events.Reset();
+        Reset();
     }
 
     EventMap m_events;
     ObjectGuid m_SummonerGuid;
 
-    void Reset() {}
+    void Reset()
+    {
+        switch (m_creature->GetEntry())
+        {
+        case NPC_SHADOW_OF_DOOM:
+            m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
+            m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
+            break;
+        case NPC_FLAMESHOCKER:
+            m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
+            break;
+        }
+    }
 
     void InformGuid(ObjectGuid const guid, uint32 type) override
     {
@@ -933,20 +946,6 @@ struct ScourgeMinion : public ScriptedAI
         }
         if (action == NPC_FLAMESHOCKER)
             m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
-    }
-
-    void EnterCombat(Unit*) override
-    {
-        switch (m_creature->GetEntry())
-        {
-            case NPC_SHADOW_OF_DOOM:
-                m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
-                m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
-                break;
-            case NPC_FLAMESHOCKER:
-                m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
-                break;
-        }
     }
 
     void JustDied(Unit* pKiller) override
