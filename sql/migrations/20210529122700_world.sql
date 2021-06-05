@@ -3847,6 +3847,35 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `condition_id`) VALUES
 (11038, 23161, 9304),
 (11038, 23160, 9304);
 
+-- =============================================
+-- Low Level Starting Zone Quests
+-- =============================================
+
+-- Lieutenant Orrin (Stormwind) (16478)
+UPDATE `creature_template` SET `npc_flags`=2, `faction`=794, `unit_flags`=33536, `level_min`=10, `level_max`=10, `health_min`=186, `health_max`=186 WHERE `entry`=16478;
+-- Lieutenant Nevell (Ironforge) (16484)
+UPDATE `creature_template` SET `npc_flags`=2, `faction`=794, `unit_flags`=33536, `level_min`=10, `level_max`=10, `health_min`=186, `health_max`=186 WHERE `entry`=16484;
+-- Lieutenant Beitha (Darnassus) (16495)
+UPDATE `creature_template` SET `npc_flags`=2, `faction`=794, `unit_flags`=33536, `level_min`=10, `level_max`=10, `health_min`=186, `health_max`=186 WHERE `entry`=16495;
+-- Lieutenant Dagel (Orgrimmar) (16493)
+UPDATE `creature_template` SET `npc_flags`=2, `faction`=794, `unit_flags`=33536, `level_min`=10, `level_max`=10, `health_min`=186, `health_max`=186 WHERE `entry`=16493;
+-- Lieutenant Lisande (Thunder Bluff) (16490)
+UPDATE `creature_template` SET `npc_flags`=2, `faction`=794, `unit_flags`=33536, `level_min`=10, `level_max`=10, `health_min`=186, `health_max`=186 WHERE `entry`=16490;
+-- Lieutenant Rukag (Undercity) (16494)
+UPDATE `creature_template` SET `npc_flags`=2, `faction`=794, `unit_flags`=33536, `level_min`=10, `level_max`=10, `health_min`=186, `health_max`=186 WHERE `entry`=16494;
+INSERT INTO `quest_greeting` (`entry`, `type`, `content_default`, `emote_id`, `emote_delay`) VALUES (16494, 0, 'Good day to you, citizen. Have you come to aid us against the Scourge?', 1, 0);
+
+-- Add Dim Necrotic Stone drops.
+DELETE FROM `creature_loot_template` WHERE `item`=22892;
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (16422, 22892, -22, 0, 1, 1, 0, 9, 10);
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (16423, 22892, -22, 0, 1, 1, 0, 9, 10);
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (16437, 22892, -22, 0, 1, 1, 0, 9, 10);
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (16438, 22892, -22, 0, 1, 1, 0, 9, 10);
+UPDATE `creature_template` SET `loot_id`=16422 WHERE `entry`=16422;
+UPDATE `creature_template` SET `loot_id`=16423 WHERE `entry`=16423;
+UPDATE `creature_template` SET `loot_id`=16437 WHERE `entry`=16437;
+UPDATE `creature_template` SET `loot_id`=16438 WHERE `entry`=16438;
+
 
 -- End of migration.
 END IF;
