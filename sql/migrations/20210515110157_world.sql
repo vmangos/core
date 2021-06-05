@@ -613,6 +613,9 @@ INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 (8302, 4304, 85, 1, 1, 1, 10),
 (8302, 8170, 15, 1, 1, 1, 10);
 
+-- Correct Faction for Firecrackers
+UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` IN (180871, 180764);
+
 
 -- End of migration.
 END IF;
