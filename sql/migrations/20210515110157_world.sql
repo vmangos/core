@@ -601,6 +601,9 @@ DELETE FROM `creature_loot_template` WHERE  `item`= 4422 AND `entry`= 232;
 DELETE FROM `creature_loot_template` WHERE  `item`= 4599 AND `entry`= 232;
 DELETE FROM `creature_loot_template` WHERE  `entry` = 232 AND `item` = 30048;
 
+-- Fix Base Mana For Druids
+UPDATE `player_classlevelstats` SET `basemana` = 34 WHERE `class` = 11 AND `level` = 1;
+
 
 -- End of migration.
 END IF;
