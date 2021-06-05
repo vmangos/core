@@ -590,6 +590,17 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 -- Southsea Cannoneer Should Not Drop Lvl 20 Items
 UPDATE `creature_loot_template` SET `item` = 30041 WHERE `entry` = 3382 AND `item` = 30040 AND `groupid` = 0;
 
+-- Farmer Ray Should Not Drop Lvl 30+ Items
+DELETE FROM `creature_loot_template` WHERE  `item`= 4421 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 4424 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 6149 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 1645 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 3928 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 4419 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 4422 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `item`= 4599 AND `entry`= 232;
+DELETE FROM `creature_loot_template` WHERE  `entry` = 232 AND `item` = 30048;
+
 
 -- End of migration.
 END IF;
