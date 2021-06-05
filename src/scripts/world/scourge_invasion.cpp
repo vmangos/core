@@ -851,17 +851,38 @@ struct npc_cultist_engineer : public ScriptedAI
         {
             switch (Events)
             {
-            case EVENT_CULTIST_CHANNELING:
-            {
-                if (Creature* pShard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
+                case EVENT_CULTIST_CHANNELING:
                 {
-                    m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
-                    m_creature->SetChannelObjectGuid(pShard->GetObjectGuid());
-                    // If all 4 Cultists are channeling, the Shard has this Aura.
-                    pShard->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
-                    pShard->AddAura(SPELL_BUTTRESS_CHANNEL);
+                    if (Creature* pShard = m_creature->FindNearestCreature(NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
+                    {
+                        m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
+                        m_creature->SetChannelObjectGuid(pShard->GetObjectGuid());
+                        // If all 4 Cultists are channeling, the Shard has this Aura.
+                        pShard->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_BUTTRESS_CHANNEL);
+                        pShard->AddAura(SPELL_BUTTRESS_CHANNEL);
+                    }
                 }
             }
+        }
+    }
+
+    void OnScriptEventHappened(uint32 uiEvent, uint32 uiData, WorldObject* pInvoker) override
+    {
+        if (uiEvent == 7166 && uiData == 0)
+        {
+            if (Player* pPlayer = ToPlayer(pInvoker))
+            {
+                // Player summons a Shadow of Doom for 1 hour.
+                if (Creature* pShadow = pPlayer->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * IN_MILLISECONDS, true, 5000))
+                {
+                    pShadow->AI()->InformGuid(pPlayer->GetObjectGuid(), 0);
+                    pShadow->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                    pShadow->SetFacingToObject(pPlayer);
+                    pShadow->AI()->DoAction(pPlayer, NPC_SHADOW_OF_DOOM);
+                    pPlayer->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
+                }
+                pPlayer->SendSpellGo(pPlayer, SPELL_SUMMON_BOSS);
+                m_creature->CastSpell(m_creature, SPELL_QUIET_SUICIDE, true);
             }
         }
     }
@@ -870,37 +891,6 @@ struct npc_cultist_engineer : public ScriptedAI
 CreatureAI* GetAI_npc_cultist_engineer(Creature* pCreature)
 {
     return new npc_cultist_engineer(pCreature);
-}
-
-bool GossipSelect_npc_cultist_engineer(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action)
-{
-    if (action == GOSSIP_ACTION_INFO_DEF + 1 && pPlayer->HasItemCount(ITEM_NECROTIC_RUNE, 8))
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-
-        // Player summons a Shadow of Doom for 1 hour.
-        if (Creature* pShadow = pPlayer->SummonCreature(NPC_SHADOW_OF_DOOM, pCreature->GetPositionX(), pCreature->GetPositionY(), pCreature->GetPositionZ(), pCreature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 5000))
-        {
-            pShadow->AI()->InformGuid(pPlayer->GetObjectGuid(), 0);
-            pShadow->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-            pShadow->SetFacingToObject(pPlayer);
-            pShadow->AI()->DoAction(pPlayer, NPC_SHADOW_OF_DOOM);
-            pPlayer->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
-        }
-        pPlayer->SendSpellGo(pPlayer, SPELL_SUMMON_BOSS);
-        pCreature->CastSpell(pCreature, SPELL_QUIET_SUICIDE, true);
-    }
-
-    return true;
-}
-
-bool GossipHello_npc_cultist_engineer(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->HasItemCount(ITEM_NECROTIC_RUNE, 8))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_CULTIST_ENGINEER_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->SEND_GOSSIP_MENU(LANG_CULTIST_ENGINEER_GOSSIP, pCreature->GetGUID());
-
-    return true;
 }
 
 /*
@@ -1365,18 +1355,6 @@ CreatureAI* GetAI_PallidHorrorAI(Creature* pCreature)
     return new PallidHorrorAI(pCreature);
 }
 
-bool GossipHello_NecroticCrystal(Player* pPlayer, Creature* pCreature)
-{
-    uint32 questId = QUEST_CRACKED_NECROTIC_CRYSTAL;
-    if (pPlayer->GetTeam() == HORDE)
-        questId = QUEST_FAINT_NECROTIC_CRYSTAL;
-    if (Quest const* quest = sObjectMgr.GetQuestTemplate(questId))
-        if (pPlayer->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE &&
-            pPlayer->CanTakeQuest(quest, false))
-            pPlayer->PlayerTalkClass->SendQuestGiverQuestDetails(quest, pCreature->GetObjectGuid(), true);
-    return true;
-}
-
 void AddSC_scourge_invasion()
 {
     Script* newscript;
@@ -1419,8 +1397,6 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "scourge_invasion_cultist_engineer";
     newscript->GetAI = &GetAI_npc_cultist_engineer;
-    newscript->pGossipHello = &GossipHello_npc_cultist_engineer;
-    newscript->pGossipSelect = &GossipSelect_npc_cultist_engineer;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1453,10 +1429,5 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "npc_pallid_horror";
     newscript->GetAI = &GetAI_PallidHorrorAI;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_necrotic_crystal";
-    newscript->pGossipHello = &GossipHello_NecroticCrystal;
     newscript->RegisterSelf();
 }
