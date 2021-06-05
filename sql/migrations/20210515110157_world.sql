@@ -587,6 +587,9 @@ DELETE FROM `pool_template` WHERE `entry` = 1266;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (125, 1, 'Tethis (730)');
 
+-- Southsea Cannoneer Should Not Drop Lvl 20 Items
+UPDATE `creature_loot_template` SET `item` = 30041 WHERE `entry` = 3382 AND `item` = 30040 AND `groupid` = 0;
+
 
 -- End of migration.
 END IF;
