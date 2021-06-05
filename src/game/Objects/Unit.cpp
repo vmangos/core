@@ -3038,7 +3038,8 @@ float Unit::GetTotalAuraModifier(AuraType auratype) const
     {
         // Exception for stealth detection, remove hidden trap detection (id:2836) from stealth modifier (should not be taken into account)
         // If it was the cast, rogue will see others rogue at 40 meters
-        if (i->GetId() != 2836) {
+        if (i->GetId() != 2836)
+        {
             if (auratype == SPELL_AURA_MOD_STEALTH)
                 modifier = std::max (modifier, i->GetModifier()->m_amount);
             else
@@ -6206,7 +6207,7 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     if (distance < 1.5f) //collision
         return true;
 
-    // Hunter mark functionality. TODO: range cap at 60, actual range needs to be verified
+    // Hunter mark functionality.
     AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
     for (const auto& iter : auras)
         if (iter->GetCasterGuid() == GetObjectGuid())
