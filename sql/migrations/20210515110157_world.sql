@@ -580,8 +580,10 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (2588, 730, -12978.6, 411.841, 21.7456, 3.43503, 420, 600, 15, 100, 1, 10),
 (565, 730, -13017.2, 193.101, 22.7814, 1.45268, 420, 600, 15, 100, 1, 10);
 UPDATE `creature` SET `wander_distance` = 20, `movement_type` = 1 WHERE `id` = 730;
+DELETE FROM `pool_creature_template` WHERE `id` = 730;
 INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
 (730, 125, 0, 'Tethis (730)', 10);
+DELETE FROM `pool_template` WHERE `entry` = 1266;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (125, 1, 'Tethis (730)');
 
