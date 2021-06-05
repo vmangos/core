@@ -1183,12 +1183,12 @@ AllowTwoSide.AddFriend = 0
 #    MaxPlayersStealthDetectRange
 #        Players won't search for stealthed units farther than this.
 #        Reduce for better performances.
-#        Default: 40 yards
+#        Default: 30 yards
 #
 #    MaxCreaturesStealthDetectRange
 #        Creatures won't search for stealthed units farther than this.
 #        Reduce for better performances.
-#        Default: 15 yards
+#        Default: 30 yards
 #
 #    MaxCreatureSummonLimit
 #       Game objects (and other creatures) won't be able to summon more creatures than this limit
@@ -1293,8 +1293,8 @@ AllowTwoSide.AddFriend = 0
 ThreatRadius = 50
 Rate.Creature.Aggro = 1
 MaxCreaturesAttackRadius = 40
-MaxPlayersStealthDetectRange = 40
-MaxCreaturesStealthDetectRange = 15
+MaxPlayersStealthDetectRange = 30
+MaxCreaturesStealthDetectRange = 30
 MaxCreatureSummonLimit = 100
 CreatureFamilyFleeAssistanceRadius = 30
 CreatureFamilyAssistanceRadius = 10
