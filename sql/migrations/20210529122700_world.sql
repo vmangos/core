@@ -27,13 +27,33 @@ UPDATE `creature_template` SET `regeneration`=0, `script_name`='scourge_invasion
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `script_name`='scourge_invasion_necropolis_relay' WHERE `entry`=16386;
 UPDATE `creature_template` SET `level_min`=55, `level_max`=55, `health_min`=5228, `health_max`=5228, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000 WHERE entry IN (16285,16361,16281,16395,16436,16434,16433,16435,16384,16787,16359,16255,16786);
-UPDATE `creature_template` SET `script_name`='scourge_invasion_rewards_giver', `movement_type`=0, `unit_flags`=512 WHERE entry IN (16395,16436,16434,16433,16384,16435);
 UPDATE `creature_template` SET `unit_flags`=33280, `faction`=794, `npc_flags`=2 WHERE `entry`=16786;
 UPDATE `creature_template` SET `unit_flags`=512, `faction`=814, `npc_flags`=2 WHERE `entry` IN (16787,16281,16361);
 UPDATE `creature_template` SET `unit_flags`=512, `faction`=814, `npc_flags`=1 WHERE `entry`=16285;
 UPDATE `creature_template` SET `display_scale1`=0, `level_min`=60, `level_max`=60, `health_min`=91560, `health_max`=91560, `faction`=1634, `dmg_min`=249, `dmg_max`=413, `speed_walk`=0.8, `speed_run`=1.14286, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=64, `auras`='28126', `movement_type`=1, `inhabit_type`=1, `regeneration`=0 WHERE `entry` IN (16394,16382);
 UPDATE `creature_template` SET `health_min`=3052, `health_max`=3052, `npc_flags`=2, `speed_run`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=262400, `auras`='29826', `civilian`=1, `flags_extra`=198658 WHERE `entry` IN (16531,16431);
 UPDATE `creature_template` SET `level_min`=53, `level_max`=55, `health_min`=24530, `health_max`=26140, `armor`=3271, `faction`=1634, `dmg_min`=91, `dmg_max`=123, `base_attack_time`=2000, `ranged_attack_time`=2000, `auras`='28330', `regeneration`=0, `inhabit_type`=1, `script_name`='scourge_invasion_minion' WHERE `entry`=16383;
+UPDATE `creature_template` SET `script_name`='' WHERE `entry` IN (16431, 16531);
+
+-- Gossip menu for Argent Dawn Reward Givers.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7200, 16, 16433, 16434, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7201, 16, 16436, 16395, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7202, 16, 16384, 16435, 0, 0, 0);
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(7230, 8525, 7200),
+(7230, 8526, 7201),
+(7230, 8527, 7202);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES 
+(7230, 0, 0, 'Give me one of your magic items.', 12302, 1, 1, -1, 0, 72301, 0, 0, NULL, 0, 7200),
+(7230, 1, 0, 'Give me one of your magic items.', 12302, 1, 1, -1, 0, 72302, 0, 0, NULL, 0, 7201),
+(7230, 2, 0, 'Give me one of your magic items.', 12302, 1, 1, -1, 0, 72303, 0, 0, NULL, 0, 7202);
+DELETE FROM `gossip_scripts` WHERE `id`=72301;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (72301, 0, 15, 28321, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Argent Dawn Reward Giver - Cast Spell Create Greater Mark of the Dawn');
+DELETE FROM `gossip_scripts` WHERE `id`=72302;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (72302, 0, 15, 28320, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Argent Dawn Reward Giver - Cast Spell Create Mark of the Dawn');
+DELETE FROM `gossip_scripts` WHERE `id`=72303;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (72303, 0, 15, 28319, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Argent Dawn Reward Giver - Cast Spell Create Lesser Mark of the Dawn');
+UPDATE `creature_template` SET `gossip_menu_id`=7230, `movement_type`=0, `unit_flags`=512, `script_name`='' WHERE entry IN (16395,16436,16434,16433,16384,16435);
 
 -- Delete some custom Nostalrius waypoint npcs
 DELETE FROM `creature_template` WHERE `entry` IN (20099,20100,20101,20102);

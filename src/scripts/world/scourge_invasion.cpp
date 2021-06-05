@@ -1,9 +1,4 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
- * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -1054,58 +1049,6 @@ CreatureAI* GetAI_ScourgeMinion(Creature* pCreature)
     return new ScourgeMinion(pCreature);
 }
 
-bool GossipSelect_scourge_invasion_rewards_giver(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action)
-{
-    if (action == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        uint32 spellId = 0;
-        switch (pCreature->GetEntry())
-        {
-            case NPC_ARGENT_DAWN_CLERIC:
-            case NPC_ARGENT_DAWN_INITIATE:
-                spellId = SPELL_CREATE_LESSER_MARK_OF_THE_DAWN;
-                break;
-            case NPC_ARGENT_DAWN_PRIEST:
-            case NPC_ARGENT_DAWN_PALADIN:
-                spellId = SPELL_CREATE_MARK_OF_THE_DAWN;
-                break;
-            case NPC_ARGENT_DAWN_CHAMPION:
-            case NPC_ARGENT_DAWN_CRUSADER:
-                spellId = SPELL_CREATE_GREATER_MARK_OF_THE_DAWN;
-                break;
-            default:
-                return false;
-        }
-        pCreature->CastSpell(pPlayer, spellId, false);
-    }
-    pPlayer->CLOSE_GOSSIP_MENU();
-    return true;
-}
-
-bool GossipHello_scourge_invasion_rewards_giver(Player* pPlayer, Creature* pCreature)
-{
-    // Add Item
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    switch (pCreature->GetEntry())
-    {
-        case NPC_ARGENT_DAWN_INITIATE:
-        case NPC_ARGENT_DAWN_CLERIC:
-            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_50_WINS, pCreature->GetGUID());
-            break;
-        case NPC_ARGENT_DAWN_PRIEST:
-        case NPC_ARGENT_DAWN_PALADIN:
-            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_100_WINS, pCreature->GetGUID());
-            break;
-        case NPC_ARGENT_DAWN_CRUSADER:
-        case NPC_ARGENT_DAWN_CHAMPION:
-            pPlayer->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_150_WINS, pCreature->GetGUID());
-            break;
-    }
-
-    return true;
-}
-
 /*
 Argent Emissary
 Notes: NPC thats tells what is going on and shows what locations are under attack.
@@ -1443,12 +1386,6 @@ void AddSC_scourge_invasion()
     newscript = new Script;
     newscript->Name = "scourge_invasion_cultist_engineer";
     newscript->GetAI = &GetAI_npc_cultist_engineer;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "scourge_invasion_rewards_giver";
-    newscript->pGossipHello = &GossipHello_scourge_invasion_rewards_giver;
-    newscript->pGossipSelect = &GossipSelect_scourge_invasion_rewards_giver;
     newscript->RegisterSelf();
 
     newscript = new Script;
