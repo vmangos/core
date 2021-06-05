@@ -917,13 +917,13 @@ struct ScourgeMinion : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-        case NPC_SHADOW_OF_DOOM:
-            m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
-            m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
-            break;
-        case NPC_FLAMESHOCKER:
-            m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
-            break;
+            case NPC_SHADOW_OF_DOOM:
+                m_events.ScheduleEvent(EVENT_DOOM_MINDFLAY, 2000);
+                m_events.ScheduleEvent(EVENT_DOOM_FEAR, 2000);
+                break;
+            case NPC_FLAMESHOCKER:
+                m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000);
+                break;
         }
     }
 
