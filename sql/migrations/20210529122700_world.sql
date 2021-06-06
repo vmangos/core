@@ -9,6 +9,8 @@ INSERT INTO `migrations` VALUES ('20210529122700');
 -- Add your query below.
 
 
+UPDATE gameobject SET guid=66885 WHERE guid=67867;
+
 -- =============================================
 -- World Invasion
 -- =============================================
@@ -299,32 +301,32 @@ INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `lengt
     (95, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Attacking Burning Steppes', 1, 1, 9, 10),
     (96, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 50 Invasions Done', 1, 1, 9, 10),
     (97, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - 100 Invasions Done', 1, 1, 9, 10),
-    -- following events should stay for (1814400 / 60 / 60 / 24) = 21 days - 3 weeks
+ -- following events should stay for (1814400 / 60 / 60 / 24) = 21 days - 3 weeks
     (98, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 1814400, 0, 'Scourge Invasion - 150 Invasions Done', 1, 1, 9, 10),
     (99, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 1814400, 0, 'Scourge Invasion - Invasions Done', 1, 1, 9, 10);
 
-SET @SCOURGE_INVASION_GUID = 700000;
+SET @SCOURGE_INVASION_GUID = 67002;
 SET @SCOURGE_INVASION_EVENT = 17;
 SET @WINTERSPRING_EVENT = 90;
-SET @WINTERSPRING_GUID = 900000;
+SET @WINTERSPRING_GUID = 67233;
 SET @TANARIS_EVENT = 91;
-SET @TANARIS_GUID = 910000;
+SET @TANARIS_GUID = 67497;
 SET @AZSHARA_EVENT = 92;
-SET @AZSHARA_GUID = 920000;
+SET @AZSHARA_GUID = 67774;
 SET @BLASTED_LANDS_EVENT = 93;
-SET @BLASTED_LANDS_GUID = 930000;
+SET @BLASTED_LANDS_GUID = 67959;
 SET @EASTERN_PLAGUELANDS_EVENT = 94;
-SET @EASTERN_PLAGUELANDS_GUID = 940000;
+SET @EASTERN_PLAGUELANDS_GUID = 68144;
 SET @BURNING_STEPPES_EVENT = 95;
-SET @BURNING_STEPPES_GUID = 950000;
+SET @BURNING_STEPPES_GUID = 65607;
 SET @FIFTY_INVASIONS_EVENT = 96;
-SET @FIFTY_INVASIONS_GUID = 960000;
+SET @FIFTY_INVASIONS_GUID = 65787;
 SET @HUNDRED_INVASIONS_EVENT = 97;
-SET @HUNDRED_INVASIONS_GUID = 970000;
+SET @HUNDRED_INVASIONS_GUID = 65794;
 SET @HUNDREDFIFTY_INVASIONS_EVENT = 98;
-SET @HUNDREDFIFTY_INVASIONS_GUID = 980000;
+SET @HUNDREDFIFTY_INVASIONS_GUID = 65801;
 SET @INVASIONS_DONE_EVENT = 99;
-SET @INVASIONS_DONE_GUID = 990000;
+SET @INVASIONS_DONE_GUID = 65808;
 
 UPDATE `game_event` SET `disabled`=0 WHERE `entry` IN (@EVENT, 81, 129, 130);
 
@@ -2501,7 +2503,6 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@BLASTED_LANDS_GUID+185, 16421, 0, -11233.9, -2841.77, 185.686, 4.45059, 120, 120, 0, 0, 9);
     
 INSERT INTO `game_event_creature` SELECT creature.guid, @BLASTED_LANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+185;
-
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@EASTERN_PLAGUELANDS_GUID+1, 181136, 0, 1599.78, -3039.54, 78.7164, 2.1293, 0, 0, 0.874619, 0.48481, 100, 1, 120, 120, 9),
