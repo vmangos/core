@@ -3934,20 +3934,24 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
             SetFreePrimaryProfessions(freeProfs - 1);
     }
 
-    // cast talents with SPELL_EFFECT_LEARN_SPELL (other dependent spells will learned later as not auto-learned)
-    // note: all spells with SPELL_EFFECT_LEARN_SPELL isn't passive
-    if (talentPos && spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+    // Avoid casting spells during character creation.
+    if (IsInWorld() || GetSession()->PlayerLoading())
     {
-        // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
-        CastSpell(this, spell_id, true);
-    }
-    // also cast passive (and passive like) spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
-    else if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
-        CastSpell(this, spell_id, true);
-    else if (spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP))
-    {
-        CastSpell(this, spell_id, true);
-        return false;
+        // cast talents with SPELL_EFFECT_LEARN_SPELL (other dependent spells will learned later as not auto-learned)
+        // note: all spells with SPELL_EFFECT_LEARN_SPELL isn't passive
+        if (talentPos && spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+        {
+            // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
+            CastSpell(this, spell_id, true);
+        }
+        // also cast passive (and passive like) spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
+        else if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
+            CastSpell(this, spell_id, true);
+        else if (spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP))
+        {
+            CastSpell(this, spell_id, true);
+            return false;
+        }
     }
 
     // add dependent skills
