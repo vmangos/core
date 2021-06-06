@@ -911,7 +911,7 @@ struct ScourgeMinion : public ScriptedAI
     }
 
     EventMap m_events;
-    ObjectGuid m_SummonerGuid;
+    ObjectGuid m_summonerGuid;
 
     void Reset()
     {
@@ -929,7 +929,7 @@ struct ScourgeMinion : public ScriptedAI
 
     void InformGuid(ObjectGuid const guid, uint32 type) override
     {
-        m_SummonerGuid = guid;
+        m_summonerGuid = guid;
     }
 
     void DoAction(Unit* pUnit, uint32 action) override
@@ -993,7 +993,7 @@ struct ScourgeMinion : public ScriptedAI
                 {
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     // Shadow of Doom seems to attack the Summoner here.
-                    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_SummonerGuid))
+                    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_summonerGuid))
                     {
                         if (pPlayer->IsWithinLOSInMap(m_creature))
                         {
