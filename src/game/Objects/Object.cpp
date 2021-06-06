@@ -319,10 +319,10 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     if (updateFlags & UPDATEFLAG_TRANSPORT)
     {
         GameObject const* go = ToGameObject();
-        if (go && go->ToTransport())
+        if (go && go->IsMoTransport())
             buf << uint32(go->ToTransport()->GetPathProgress());
         else
-            buf << uint32(WorldTimer::getMSTime());
+            buf << uint32(sWorld.GetCurrentMSTime());
     }
 #endif
 
@@ -525,7 +525,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
         MovementInfo m = wobject->m_movementInfo;
         if (!m.ctime)
         {
-            m.time = WorldTimer::getMSTime() + 1000;
+            m.stime = WorldTimer::getMSTime() + 1000;
             m.ChangePosition(wobject->GetPositionX(), wobject->GetPositionY(), wobject->GetPositionZ(), wobject->GetOrientation());
         }
         if (unit->IsCreature())
