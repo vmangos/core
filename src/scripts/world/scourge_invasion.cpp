@@ -19,9 +19,9 @@
 #include "CreatureGroups.h"
 #include "Utilities/EventMap.h"
 
-uint32 GetCampType(Creature* pUnit) { return pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON); };
+inline uint32 GetCampType(Creature* pUnit) { return pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL) || pUnit->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON); };
 
-bool IsGuardOrBoss(Unit* pUnit) {
+inline bool IsGuardOrBoss(Unit* pUnit) {
     return pUnit->GetEntry() == NPC_ROYAL_DREADGUARD || pUnit->GetEntry() == NPC_STORMWIND_ROYAL_GUARD || pUnit->GetEntry() == NPC_UNDERCITY_ELITE_GUARDIAN || pUnit->GetEntry() == NPC_UNDERCITY_GUARDIAN || pUnit->GetEntry() == NPC_DEATHGUARD_ELITE ||
         pUnit->GetEntry() == NPC_STORMWIND_CITY_GUARD || pUnit->GetEntry() == NPC_HIGHLORD_BOLVAR_FORDRAGON || pUnit->GetEntry() == NPC_LADY_SYLVANAS_WINDRUNNER || pUnit->GetEntry() == NPC_VARIMATHRAS;
 }
@@ -197,9 +197,9 @@ void DespawnShadowsOfDoom(Unit* pDespawner)
     if (!pDespawner)
         return;
 
-    std::list<Creature*> ShadowList;
-    GetCreatureListWithEntryInGrid(ShadowList, pDespawner, { NPC_SHADOW_OF_DOOM }, 200.0f);
-    for (const auto pShadow : ShadowList)
+    std::list<Creature*> shadowList;
+    GetCreatureListWithEntryInGrid(shadowList, pDespawner, { NPC_SHADOW_OF_DOOM }, 200.0f);
+    for (const auto pShadow : shadowList)
         if (pShadow && pShadow->IsAlive() && !pShadow->IsInCombat())
             pShadow->ForcedDespawn();
 }
@@ -209,7 +209,7 @@ uint32 HasMinion(Creature* pSummoner, float range)
     if (!pSummoner)
         return false;
 
-    uint32 minionCounter = NULL;
+    uint32 minionCounter = 0;
     std::list<Creature*> minionList;
     GetCreatureListWithEntryInGrid(minionList, pSummoner, { NPC_SKELETAL_SHOCKTROOPER, NPC_GHOUL_BERSERKER, NPC_SPECTRAL_SOLDIER, NPC_LUMBERING_HORROR, NPC_BONE_WITCH, NPC_SPIRIT_OF_THE_DAMNED }, ATTACK_DISTANCE);
     for (const auto pMinion : minionList)
@@ -243,7 +243,7 @@ bool UncommonMinionspawner(Creature* pSummoner) // Rare Minion Spawner.
 
 uint32 GetFindersAmount(Creature* pShard)
 {
-    uint32 finderCounter = NULL;
+    uint32 finderCounter = 0;
     std::list<Creature*> finderList;
     GetCreatureListWithEntryInGrid(finderList, pShard, { NPC_SCOURGE_INVASION_MINION_FINDER }, 60.0f);
     for (const auto pFinder : finderList)
@@ -1037,7 +1037,7 @@ struct ScourgeMinion : public ScriptedAI
 
         // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
         if (m_creature->GetEntry() != NPC_FLAMESHOCKER && m_creature->IsWithinDistInMap(m_creature->GetVictim(), 30.0f) && !m_creature->GetVictim()->IsCharmerOrOwnerPlayerOrPlayerItself() && m_creature->IsValidAttackTarget(m_creature->GetVictim(), true))
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_MAIN_RANGED_SPELL + CF_TRIGGERED);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE, CF_TRIGGERED);
 
         DoMeleeAttackIfReady();
     }
