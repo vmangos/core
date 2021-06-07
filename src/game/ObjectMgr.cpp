@@ -10669,16 +10669,16 @@ void ObjectMgr::RestoreDeletedItems()
         Field* fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
-        uint32 memberGuidlow = fields[1].GetUInt32();
+        uint32 playerGuidLow = fields[1].GetUInt32();
         uint32 itemEntry = fields[2].GetUInt32();
         uint32 stackCount = fields[3].GetUInt32();
         
         if (ItemPrototype const* itemProto = GetItemPrototype(itemEntry))
         {
-            ObjectGuid memberGuid = ObjectGuid(HIGHGUID_PLAYER, memberGuidlow);
-            Player* pPlayer = ObjectAccessor::FindPlayerNotInWorld(memberGuid);
+            ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerGuidLow);
+            Player* pPlayer = ObjectAccessor::FindPlayerNotInWorld(playerGuid);
 
-            if (Item* restoredItem = Item::CreateItem(itemEntry, stackCount ? stackCount : 1, pPlayer))
+            if (Item* restoredItem = Item::CreateItem(itemEntry, stackCount ? stackCount : 1, playerGuid))
             {
                 // save new item before send
                 restoredItem->SaveToDB();
@@ -10691,7 +10691,7 @@ void ObjectMgr::RestoreDeletedItems()
                 
                 MailDraft(subject, textFormat)
                     .AddItem(restoredItem)
-                    .SendMailTo(MailReceiver(memberGuid), MailSender(MAIL_NORMAL, memberGuid.GetCounter(), MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED, 0, 30 * DAY);
+                    .SendMailTo(MailReceiver(playerGuid), MailSender(MAIL_NORMAL, playerGuid.GetCounter(), MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED, 0, 30 * DAY);
 
                 CharacterDatabase.PExecute("DELETE FROM `character_deleted_items` WHERE `id` = %u", id);
 

@@ -388,7 +388,7 @@ class Spell
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
         void SendSpellStart();
-        void SendSpellGo(bool SendToCaster = true);
+        void SendSpellGo();
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);

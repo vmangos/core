@@ -5815,7 +5815,7 @@ bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool
 
     if (Player const* pPlayer = ToPlayer())
     {
-        if (pPlayer->IsGameMaster() || pPlayer->watching_cinematic_entry != 0)
+        if (pPlayer->IsGameMaster() || pPlayer->GetCurrentCinematicEntry() != 0)
             return false;
     }
 

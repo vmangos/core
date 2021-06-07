@@ -28,10 +28,10 @@ MasterPlayer::~MasterPlayer()
         delete itr.second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
 }
 
-void MasterPlayer::Create(Player* player)
+void MasterPlayer::Create(ObjectGuid playerGuid, uint8 raceId, uint32 classId)
 {
-    guid = player->GetObjectGuid();
-    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(player->GetRace(), player->GetClass());
+    guid = playerGuid;
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(raceId, classId);
     ASSERT(info);
 
     // original action bar

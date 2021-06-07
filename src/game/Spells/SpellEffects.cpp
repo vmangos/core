@@ -2878,7 +2878,7 @@ void Spell::EffectSummonChangeItem(SpellEffectIndex eff_idx)
 
     uint16 pos = m_CastItem->GetPos();
 
-    Item *pNewItem = Item::CreateItem(newitemid, 1, player);
+    Item *pNewItem = Item::CreateItem(newitemid, 1, player->GetObjectGuid());
     if (!pNewItem)
         return;
 
@@ -2947,20 +2947,20 @@ void Spell::EffectSummonChangeItem(SpellEffectIndex eff_idx)
 
 void Spell::EffectProficiency(SpellEffectIndex /*eff_idx*/)
 {
-    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+    Player* pTarget = ToPlayer(unitTarget);
+    if (!pTarget)
         return;
-    Player* p_target = (Player*)unitTarget;
 
     uint32 subClassMask = m_spellInfo->EquippedItemSubClassMask;
-    if (m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && !(p_target->GetWeaponProficiency() & subClassMask))
+    if (m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && !(pTarget->GetWeaponProficiency() & subClassMask))
     {
-        p_target->AddWeaponProficiency(subClassMask);
-        p_target->SendProficiency(ITEM_CLASS_WEAPON, p_target->GetWeaponProficiency());
+        pTarget->AddWeaponProficiency(subClassMask);
+        pTarget->SendProficiency(ITEM_CLASS_WEAPON, pTarget->GetWeaponProficiency());
     }
-    if (m_spellInfo->EquippedItemClass == ITEM_CLASS_ARMOR && !(p_target->GetArmorProficiency() & subClassMask))
+    if (m_spellInfo->EquippedItemClass == ITEM_CLASS_ARMOR && !(pTarget->GetArmorProficiency() & subClassMask))
     {
-        p_target->AddArmorProficiency(subClassMask);
-        p_target->SendProficiency(ITEM_CLASS_ARMOR, p_target->GetArmorProficiency());
+        pTarget->AddArmorProficiency(subClassMask);
+        pTarget->SendProficiency(ITEM_CLASS_ARMOR, pTarget->GetArmorProficiency());
     }
 }
 
