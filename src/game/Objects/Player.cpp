@@ -16368,7 +16368,7 @@ bool Player::SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string co
     if (cEntry->powerType == POWER_MANA)
         powers[POWER_MANA] = uint32(classInfo.basemana + GetManaBonusFromIntellect(levelInfo.stats[STAT_INTELLECT]));
     else if (cEntry->powerType == POWER_ENERGY)
-        powers[POWER_ENERGY] = 0;
+        powers[POWER_ENERGY] = 100;
 
     uberInsert.addUInt32(hp);
 
