@@ -346,44 +346,30 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         }
     }
 
-    Player* pNewChar = new Player(this);
-    if (!pNewChar->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
-    {
-        // Player not create (race/class problem?)
-        delete pNewChar;
+    uint32 cinematic = 0;
+    if ((have_same_race && skipCinematics == CINEMATICS_SKIP_SAME_RACE) || skipCinematics == CINEMATICS_SKIP_ALL)
+        cinematic = 1; // don't show intro
 
-        data << (uint8)CHAR_CREATE_ERROR;
+    uint32 const guidLow = sObjectMgr.GeneratePlayerLowGuid();
+    if (Player::SaveNewPlayer(this, guidLow, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair, cinematic))
+    {
+        _charactersCount += 1;
+
+        LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%u' AND realmid = '%u'", GetAccountId(), realmID);
+        LoginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)", _charactersCount, GetAccountId(), realmID);
+
+        data << (uint8)CHAR_CREATE_SUCCESS;
         SendPacket(&data);
 
-        return;
+        std::string IP_str = GetRemoteAddress();
+        BASIC_LOG("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
+        sLog.out(LOG_CHAR, "Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
     }
-
-    MasterPlayer masterPlayer(this);
-    masterPlayer.Create(pNewChar);
-    if ((have_same_race && skipCinematics == CINEMATICS_SKIP_SAME_RACE) || skipCinematics == CINEMATICS_SKIP_ALL)
-        pNewChar->SetCinematic(1);                          // not show intro
-
-    pNewChar->SetAtLoginFlag(AT_LOGIN_FIRST);               // First login
-
-    // Player created, save it now
-    pNewChar->SaveToDB();
-    masterPlayer.SaveToDB();
-
-    sObjectMgr.InsertPlayerInCache(pNewChar);
-    sObjectMgr.UpdatePlayerCachedPosition(pNewChar);
-    _charactersCount += 1;
-
-    LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%u' AND realmid = '%u'", GetAccountId(), realmID);
-    LoginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)",  _charactersCount, GetAccountId(), realmID);
-
-    data << (uint8)CHAR_CREATE_SUCCESS;
-    SendPacket(&data);
-
-    std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
-    sWorld.LogCharacter(pNewChar, "Create");
-    delete pNewChar;                                        // created only to call SaveToDB()
+    else
+    {
+        data << (uint8)CHAR_CREATE_ERROR;
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)

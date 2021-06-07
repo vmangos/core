@@ -928,6 +928,7 @@ class Player final: public Unit
 
         void CleanupsBeforeDelete() override;
 
+        // Initializes a new Player object that was not loaded from the database.
         bool Create(uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         void Update(uint32 update_diff, uint32 time) override;
         static bool BuildEnumData(QueryResult* result,  WorldPacket* p_data);
@@ -1108,6 +1109,7 @@ class Player final: public Unit
         void AutoUnequipOffhandIfNeed();
         void AutoUnequipItemFromSlot(uint32 slot);
         void SatisfyItemRequirements(ItemPrototype const* pItem);
+        void AddStartingItems();
         bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count, uint32 enchantId = 0);
         Item* StoreNewItemInInventorySlot(uint32 itemEntry, uint32 amount);
         void AutoStoreLoot(Loot& loot, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
@@ -1361,7 +1363,7 @@ class Player final: public Unit
         bool SaveAura(SpellAuraHolder* holder, AuraSaveStruct& saveStruct);
         void _LoadAuras(QueryResult* result, uint32 timediff);
         void _LoadBoundInstances(QueryResult* result);
-        void _LoadInventory(QueryResult* result, uint32 timediff, bool& has_epic_mount);
+        bool _LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicMount);
         void _LoadItemLoot(QueryResult* result);
         void _LoadQuestStatus(QueryResult* result);
         void _LoadGroup(QueryResult* result);
@@ -1404,6 +1406,8 @@ class Player final: public Unit
         void _SaveStats();
         uint32 m_nextSave;
     public:
+        // Saves a new character directly in the database, without creating a Player object in memory.
+        static bool SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint32 cinematic);
         void SaveToDB(bool online = true, bool force = false);
         void SaveInventoryAndGoldToDB();                    // fast save function for item/money cheating preventing
         void SaveGoldToDB();
@@ -1681,7 +1685,7 @@ class Player final: public Unit
         void InitPrimaryProfessions();
         void UpdateSkillTrainedSpells(uint16 id, uint16 currVal);                                   // learns/unlearns spells dependent on a skill
         void UpdateSpellTrainedSkills(uint32 spellId, bool apply);                                  // learns/unlearns skills dependent on a spell
-        void UpdateOldRidingSkillToNew(bool has_epic_mount);
+        void UpdateOldRidingSkillToNew(bool hasEpicMount);
         void UpdateSkillsForLevel();
         SkillStatusMap mSkillStatus;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
@@ -2063,20 +2067,19 @@ class Player final: public Unit
 
     private:
         uint32 m_cinematic;
+        uint32 m_currentCinematicEntry;
+        Position m_cinematicStartPos;
+        uint32 m_cinematicLastCheck;
+        uint32 m_cinematicElapsedTime;
         void UpdateCinematic(uint32 diff);
     public:
         uint32 GetCinematic() { return m_cinematic; }
         void SetCinematic(uint32 cine) { m_cinematic = cine; }
         void SendCinematicStart(uint32 CinematicSequenceId);
+        uint32 GetCurrentCinematicEntry() const { return m_currentCinematicEntry; }
 
         void CinematicEnd();
         void CinematicStart(uint32 id);
-
-        uint32 watching_cinematic_entry;
-        Position cinematic_start;
-        Position const* cinematic_current_waypoint;
-        uint32 cinematic_last_check;
-        uint32 cinematic_elapsed_time;
 
         /*********************************************************/
         /***                   COMBAT SYSTEM                   ***/

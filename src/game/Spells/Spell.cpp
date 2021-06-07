@@ -1209,9 +1209,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     }
     else                                                    // in 1.12.1 we need explicit miss info
     {
-        if (pRealCaster && !IsNeedSendToClient())
-            pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, missInfo);
-
         if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
         {
             if (pRealUnitCaster && pRealUnitCaster != unit)
@@ -4616,7 +4613,7 @@ void Spell::SendSpellStart()
     m_caster->SendObjectMessageToSet(&data, true);
 }
 
-void Spell::SendSpellGo(bool bSendToCaster)
+void Spell::SendSpellGo()
 {
     // not send invisible spell casting
     if (!IsNeedSendToClient())
@@ -4664,7 +4661,7 @@ void Spell::SendSpellGo(bool bSendToCaster)
     if (castFlags & CAST_FLAG_AMMO)                         // projectile info
         WriteAmmoToPacket(&data);
 
-    m_caster->SendObjectMessageToSet(&data, bSendToCaster);
+    m_caster->SendObjectMessageToSet(&data, true);
 }
 
 void Spell::WriteAmmoToPacket(WorldPacket* data)
@@ -8129,7 +8126,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
 
 bool Spell::IsNeedSendToClient() const
 {
-    return !IsChannelingVisual() && (m_spellInfo->SpellVisual != 0 || m_channeled ||
+    return !IsChannelingVisual() && m_caster->IsInWorld() && (m_spellInfo->SpellVisual != 0 || m_channeled ||
            m_spellInfo->speed > 0.0f || (!m_triggeredByAuraSpell && !m_IsTriggeredSpell));
 }
 

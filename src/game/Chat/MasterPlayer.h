@@ -24,7 +24,7 @@ public:
     MasterPlayer(WorldSession* s);
     ~MasterPlayer();
 
-    void Create(Player* player);
+    void Create(ObjectGuid playerGuid, uint8 raceId, uint32 classId);
     void LoadPlayer(Player* player);
     void SaveToDB();
     void Update();

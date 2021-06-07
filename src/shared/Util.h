@@ -412,4 +412,7 @@ void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false)
 uint32 ditheru(float v);
 int32 dither(float v);
 
+void SetByteValue(uint32& variable, uint8 offset, uint8 value);
+void SetUInt16Value(uint32& variable, uint8 offset, uint16 value);
+
 #endif

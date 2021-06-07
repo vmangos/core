@@ -687,7 +687,7 @@ Player::Player(WorldSession* session) : Unit(),
     m_lastFallTime = 0;
     m_lastFallZ = 0;
 
-    watching_cinematic_entry = 0;
+    m_currentCinematicEntry = 0;
 
     m_cannotBeDetectedTimer = 0;
 
@@ -919,6 +919,24 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     // original spells
     LearnDefaultSpells();
 
+    // original items
+    AddStartingItems();
+
+    // Phasing
+    SetWorldMask(WORLD_DEFAULT_CHAR);
+
+    return true;
+}
+
+void Player::AddStartingItems()
+{
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass());
+    if (!info)
+    {
+        sLog.outError("Player have incorrect race/class pair. Can't add starting items.");
+        return;
+    }
+
     // Starting items.
     for (const auto& item_id_itr : info->item)
         StoreNewItemInBestSlots(item_id_itr.item_id, item_id_itr.item_amount);
@@ -957,11 +975,6 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
         }
     }
     // all item positions resolved
-
-    // Phasing
-    SetWorldMask(WORLD_DEFAULT_CHAR);
-
-    return true;
 }
 
 bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount, uint32 enchantId)
@@ -1651,7 +1664,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     UpdateEnchantTime(update_diff);
     UpdateHomebindTime(update_diff);
 
-    if (watching_cinematic_entry)
+    if (m_currentCinematicEntry)
         UpdateCinematic(p_time);
 
     // group update
@@ -1773,21 +1786,21 @@ void Player::SetWorldMask(uint32 newMask)
 
 void Player::UpdateCinematic(uint32 diff)
 {
-    cinematic_elapsed_time += diff;
+    m_cinematicElapsedTime += diff;
     // On check une nouvelle position toutes les secondes.
-    if ((cinematic_last_check + 1000) > cinematic_elapsed_time)
+    if ((m_cinematicLastCheck + 1000) > m_cinematicElapsedTime)
         return;
 
-    cinematic_last_check = cinematic_elapsed_time;
+    m_cinematicLastCheck = m_cinematicElapsedTime;
     Position const* tpPosition = nullptr;
-    if ((tpPosition = sObjectMgr.GetCinematicPosition(watching_cinematic_entry, cinematic_elapsed_time)) == nullptr)
-        tpPosition = sObjectMgr.GetCinematicInitialPosition(watching_cinematic_entry);
+    if ((tpPosition = sObjectMgr.GetCinematicPosition(m_currentCinematicEntry, m_cinematicElapsedTime)) == nullptr)
+        tpPosition = sObjectMgr.GetCinematicInitialPosition(m_currentCinematicEntry);
 
     if (!tpPosition)
         return;
 
-    float x_diff = (cinematic_start.x - tpPosition->x);
-    float y_diff = (cinematic_start.y - tpPosition->y);
+    float x_diff = (m_cinematicStartPos.x - tpPosition->x);
+    float y_diff = (m_cinematicStartPos.y - tpPosition->y);
     // Re-tp a la position de fin de la cinematique
     if ((x_diff * x_diff) <= 20 || (y_diff * y_diff) <= 20)
     {
@@ -1801,25 +1814,30 @@ void Player::UpdateCinematic(uint32 diff)
 
 void Player::CinematicStart(uint32 id)
 {
-    cinematic_start.x = GetPositionX();
-    cinematic_start.y = GetPositionY();
-    cinematic_start.z = GetPositionZ();
-    cinematic_start.o = GetOrientation();
+    m_cinematicStartPos.x = GetPositionX();
+    m_cinematicStartPos.y = GetPositionY();
+    m_cinematicStartPos.z = GetPositionZ();
+    m_cinematicStartPos.o = GetOrientation();
 
-    cinematic_last_check = 0;
-    cinematic_elapsed_time = 0;
-    watching_cinematic_entry = id;
+    m_cinematicLastCheck = 0;
+    m_cinematicElapsedTime = 0;
+    m_currentCinematicEntry = id;
 
     // Pour teleporter a la premiere position de la cinematique
     UpdateCinematic(1);
 }
+
 void Player::CinematicEnd()
 {
     GetCamera().ResetView();
 
-    watching_cinematic_entry = 0;
-    cinematic_last_check = 0;
-    cinematic_elapsed_time = 0;
+    m_currentCinematicEntry = 0;
+    m_cinematicLastCheck = 0;
+    m_cinematicElapsedTime = 0;
+
+    // When you make a new character, current area gets
+    // explored after you finish watching the cinematic.
+    CheckAreaExploreAndOutdoor();
 }
 
 void Player::SetDeathState(DeathState s)
@@ -3934,24 +3952,20 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
             SetFreePrimaryProfessions(freeProfs - 1);
     }
 
-    // Avoid casting spells during character creation.
-    if (IsInWorld() || GetSession()->PlayerLoading())
+    // cast talents with SPELL_EFFECT_LEARN_SPELL (other dependent spells will learned later as not auto-learned)
+    // note: all spells with SPELL_EFFECT_LEARN_SPELL isn't passive
+    if (talentPos && spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
     {
-        // cast talents with SPELL_EFFECT_LEARN_SPELL (other dependent spells will learned later as not auto-learned)
-        // note: all spells with SPELL_EFFECT_LEARN_SPELL isn't passive
-        if (talentPos && spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
-        {
-            // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
-            CastSpell(this, spell_id, true);
-        }
-        // also cast passive (and passive like) spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
-        else if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
-            CastSpell(this, spell_id, true);
-        else if (spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP))
-        {
-            CastSpell(this, spell_id, true);
-            return false;
-        }
+        // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
+        CastSpell(this, spell_id, true);
+    }
+    // also cast passive (and passive like) spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
+    else if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
+        CastSpell(this, spell_id, true);
+    else if (spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP))
+    {
+        CastSpell(this, spell_id, true);
+        return false;
     }
 
     // add dependent skills
@@ -6367,8 +6381,8 @@ void Player::CheckAreaExploreAndOutdoor()
     if (IsTaxiFlying())
         return;
 
-    // Pas d'exploration en cinematique
-    if (watching_cinematic_entry)
+    // Wait for cinematic to complete.
+    if (m_currentCinematicEntry)
         return;
 
     bool isOutdoor;
@@ -6433,19 +6447,17 @@ void Player::CheckAreaExploreAndOutdoor()
         const auto* p = AreaEntry::GetByAreaFlagAndMap(areaFlag, GetMapId());
         if (!p)
             sLog.outError("PLAYER: Player %u discovered unknown area (x: %f y: %f map: %u", GetGUIDLow(), GetPositionX(), GetPositionY(), GetMapId());
-        else if (p->AreaLevel > 0)
+        else
         {
             GetCheatData()->OnExplore(p);
             uint32 area = p->Id;
-            if (GetLevel() >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-                SendExplorationExperience(area, 0);
-            else
+            uint32 xp = 0;
+            if (p->AreaLevel > 0 && GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
             {
                 float const explorationRate = GetPersonalXpRate() >= 0.0f ? GetPersonalXpRate() : sWorld.getConfig(CONFIG_FLOAT_RATE_XP_EXPLORE);
                 int32 const diff = int32(GetLevel()) - p->AreaLevel;
-                uint32 XP = 0;
                 if (diff < -5)
-                    XP = uint32(sObjectMgr.GetBaseXP(GetLevel() + 5) * explorationRate);
+                    xp = uint32(sObjectMgr.GetBaseXP(GetLevel() + 5) * explorationRate);
                 else if (diff > 5)
                 {
                     int32 exploration_percent = (100 - ((diff - 5) * 5));
@@ -6454,14 +6466,16 @@ void Player::CheckAreaExploreAndOutdoor()
                     else if (exploration_percent < 0)
                         exploration_percent = 0;
 
-                    XP = uint32(sObjectMgr.GetBaseXP(p->AreaLevel) * exploration_percent / 100 * explorationRate);
+                    xp = uint32(sObjectMgr.GetBaseXP(p->AreaLevel) * exploration_percent / 100 * explorationRate);
                 }
                 else
-                    XP = uint32(sObjectMgr.GetBaseXP(p->AreaLevel) * explorationRate);
+                    xp = uint32(sObjectMgr.GetBaseXP(p->AreaLevel) * explorationRate);
 
-                GiveXP(XP, nullptr);
-                SendExplorationExperience(area, XP);
+                GiveXP(xp, nullptr);
             }
+
+            // Exploration packet should be sent even if no XP is gained.
+            SendExplorationExperience(area, xp);
             DETAIL_LOG("PLAYER: Player %u discovered a new area: %u", GetGUIDLow(), area);
         }
     }
@@ -8550,128 +8564,8 @@ void Player::SetSheath(SheathState sheathed)
 
 uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const
 {
-    uint8 pClass = GetClass();
-
     uint8 slots[4];
-    slots[0] = NULL_SLOT;
-    slots[1] = NULL_SLOT;
-    slots[2] = NULL_SLOT;
-    slots[3] = NULL_SLOT;
-    switch (proto->InventoryType)
-    {
-        case INVTYPE_HEAD:
-            slots[0] = EQUIPMENT_SLOT_HEAD;
-            break;
-        case INVTYPE_NECK:
-            slots[0] = EQUIPMENT_SLOT_NECK;
-            break;
-        case INVTYPE_SHOULDERS:
-            slots[0] = EQUIPMENT_SLOT_SHOULDERS;
-            break;
-        case INVTYPE_BODY:
-            slots[0] = EQUIPMENT_SLOT_BODY;
-            break;
-        case INVTYPE_CHEST:
-            slots[0] = EQUIPMENT_SLOT_CHEST;
-            break;
-        case INVTYPE_ROBE:
-            slots[0] = EQUIPMENT_SLOT_CHEST;
-            break;
-        case INVTYPE_WAIST:
-            slots[0] = EQUIPMENT_SLOT_WAIST;
-            break;
-        case INVTYPE_LEGS:
-            slots[0] = EQUIPMENT_SLOT_LEGS;
-            break;
-        case INVTYPE_FEET:
-            slots[0] = EQUIPMENT_SLOT_FEET;
-            break;
-        case INVTYPE_WRISTS:
-            slots[0] = EQUIPMENT_SLOT_WRISTS;
-            break;
-        case INVTYPE_HANDS:
-            slots[0] = EQUIPMENT_SLOT_HANDS;
-            break;
-        case INVTYPE_FINGER:
-            slots[0] = EQUIPMENT_SLOT_FINGER1;
-            slots[1] = EQUIPMENT_SLOT_FINGER2;
-            break;
-        case INVTYPE_TRINKET:
-            slots[0] = EQUIPMENT_SLOT_TRINKET1;
-            slots[1] = EQUIPMENT_SLOT_TRINKET2;
-            break;
-        case INVTYPE_CLOAK:
-            slots[0] =  EQUIPMENT_SLOT_BACK;
-            break;
-        case INVTYPE_WEAPON:
-        {
-            slots[0] = EQUIPMENT_SLOT_MAINHAND;
-
-            // suggest offhand slot only if know dual wielding
-            // (this will be replace mainhand weapon at auto equip instead unwonted "you don't known dual wielding" ...
-            if (CanDualWield())
-                slots[1] = EQUIPMENT_SLOT_OFFHAND;
-            break;
-        };
-        case INVTYPE_SHIELD:
-            slots[0] = EQUIPMENT_SLOT_OFFHAND;
-            break;
-        case INVTYPE_RANGED:
-            slots[0] = EQUIPMENT_SLOT_RANGED;
-            break;
-        case INVTYPE_2HWEAPON:
-            slots[0] = EQUIPMENT_SLOT_MAINHAND;
-            break;
-        case INVTYPE_TABARD:
-            slots[0] = EQUIPMENT_SLOT_TABARD;
-            break;
-        case INVTYPE_WEAPONMAINHAND:
-            slots[0] = EQUIPMENT_SLOT_MAINHAND;
-            break;
-        case INVTYPE_WEAPONOFFHAND:
-            slots[0] = EQUIPMENT_SLOT_OFFHAND;
-            break;
-        case INVTYPE_HOLDABLE:
-            slots[0] = EQUIPMENT_SLOT_OFFHAND;
-            break;
-        case INVTYPE_THROWN:
-            slots[0] = EQUIPMENT_SLOT_RANGED;
-            break;
-        case INVTYPE_RANGEDRIGHT:
-            slots[0] = EQUIPMENT_SLOT_RANGED;
-            break;
-        case INVTYPE_BAG:
-            slots[0] = INVENTORY_SLOT_BAG_START + 0;
-            slots[1] = INVENTORY_SLOT_BAG_START + 1;
-            slots[2] = INVENTORY_SLOT_BAG_START + 2;
-            slots[3] = INVENTORY_SLOT_BAG_START + 3;
-            break;
-        case INVTYPE_RELIC:
-        {
-            switch (proto->SubClass)
-            {
-                case ITEM_SUBCLASS_ARMOR_LIBRAM:
-                    if (pClass == CLASS_PALADIN)
-                        slots[0] = EQUIPMENT_SLOT_RANGED;
-                    break;
-                case ITEM_SUBCLASS_ARMOR_IDOL:
-                    if (pClass == CLASS_DRUID)
-                        slots[0] = EQUIPMENT_SLOT_RANGED;
-                    break;
-                case ITEM_SUBCLASS_ARMOR_TOTEM:
-                    if (pClass == CLASS_SHAMAN)
-                        slots[0] = EQUIPMENT_SLOT_RANGED;
-                    break;
-                case ITEM_SUBCLASS_ARMOR_MISC:
-                    if (pClass == CLASS_WARLOCK)
-                        slots[0] = EQUIPMENT_SLOT_RANGED;
-                    break;
-            }
-            break;
-        }
-        default :
-            return NULL_SLOT;
-    }
+    proto->GetAllowedEquipSlots(slots, GetClass(), CanDualWield());
 
     if (slot != NULL_SLOT)
     {
@@ -9954,7 +9848,7 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
 InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const
 {
     dest = 0;
-    Item* pItem = Item::CreateItem(item, 1, this);
+    Item* pItem = Item::CreateItem(item, 1, GetObjectGuid());
     if (pItem)
     {
         InventoryResult result = CanEquipItem(slot, dest, pItem, swap);
@@ -10458,7 +10352,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
     for (const auto& itr : dest)
         count += itr.count;
 
-    Item* pItem = Item::CreateItem(item, count, this);
+    Item* pItem = Item::CreateItem(item, count, GetObjectGuid());
     if (pItem)
     {
         ItemAddedQuestCheck(item, count);
@@ -10599,7 +10493,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
 Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
 {
-    if (Item* pItem = Item::CreateItem(item, 1, this))
+    if (Item* pItem = Item::CreateItem(item, 1, GetObjectGuid()))
     {
         ItemAddedQuestCheck(item, 1);
         return EquipItem(pos, pItem, update);
@@ -15140,8 +15034,12 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     // must be before inventory (some items required reputation check)
     m_reputationMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION));
 
-    bool has_epic_mount = false; // Needed for riding skill replacement in patch 1.12.
-    _LoadInventory(holder->GetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY), time_diff, has_epic_mount);
+    bool hasEpicMount = false; // Needed for riding skill replacement in patch 1.12.
+    bool hasItems = _LoadInventory(holder->GetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY), time_diff, hasEpicMount);
+
+    if (!hasItems && HasAtLoginFlag(AT_LOGIN_FIRST))
+        AddStartingItems();
+
     _LoadItemLoot(holder->GetResult(PLAYER_LOGIN_QUERY_LOADITEMLOOT));
 
     // update items with duration and realtime
@@ -15300,7 +15198,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     CreatePacketBroadcaster();
 
     if (sWorld.GetWowPatch() >= WOW_PATCH_112)
-        UpdateOldRidingSkillToNew(has_epic_mount);
+        UpdateOldRidingSkillToNew(hasEpicMount);
 
     return true;
 }
@@ -15308,7 +15206,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 // The new riding skills (Apprentice/Journeyman) were added in patch 1.12.
 // Prior to that there was a separate skill of each type of mount.
 // All players who have the old skill need to have it swapped for the new one.
-void Player::UpdateOldRidingSkillToNew(bool has_epic_mount)
+void Player::UpdateOldRidingSkillToNew(bool hasEpicMount)
 {
     // Already has the new skill, no need to do anything.
     if (HasSkill(SKILL_RIDING))
@@ -15370,12 +15268,12 @@ void Player::UpdateOldRidingSkillToNew(bool has_epic_mount)
 
     // Paladin and Warlock level 60 mounts
     if (HasSpell(23214u) || HasSpell(23161u))
-        has_epic_mount = true;
+        hasEpicMount = true;
 
     if (!has_old_riding_skill)
         return;
     
-    if (has_epic_mount)
+    if (hasEpicMount)
         LearnSpell(33391u, false); // Journeyman Riding
     else
         LearnSpell(33388u, false); // Apprentice Riding
@@ -15581,21 +15479,22 @@ void Player::LoadCorpse()
     }
 }
 
-void Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& has_epic_mount)
+bool Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& hasEpicMount)
 {
     //               0                1      2         3        4      5             6                 7           8     9    10    11   12    13              14
     //SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, bag, slot, item, itemEntry, generated_loot
-    std::unordered_map<uint32, Bag*> bagMap;                          // fast guid lookup for bags
-    //NOTE: the "order by `bag`" is important because it makes sure
-    //the bagMap is filled before items in the bags are loaded
-    //NOTE2: the "order by `slot`" is needed because mainhand weapons are (wrongly?)
-    //expected to be equipped before offhand items (TODO: fixme)
-
-    std::set<uint32> itemGuids;
-    uint32 zone = GetZoneId();
 
     if (result)
     {
+        std::unordered_map<uint32, Bag*> bagMap;                          // fast guid lookup for bags
+        //NOTE: the "order by `bag`" is important because it makes sure
+        //the bagMap is filled before items in the bags are loaded
+        //NOTE2: the "order by `slot`" is needed because mainhand weapons are (wrongly?)
+        //expected to be equipped before offhand items (TODO: fixme)
+
+        std::set<uint32> itemGuids;
+        uint32 zone = GetZoneId();
+
         std::list<Item*> problematicItems;
 
         // prevent items from being added to the queue when stored
@@ -15621,7 +15520,7 @@ void Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& has_epic
 
             // Needed for riding skill replacement in patch 1.12.
             if ((proto->RequiredSkill == SKILL_RIDING) && (proto->RequiredSkillRank == 150))
-                has_epic_mount = true;
+                hasEpicMount = true;
 
             // Duplicate check. Player listed item in AH and then immediately relogged, before the item
             // was deleted from the inventory in the DB
@@ -15794,10 +15693,13 @@ void Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& has_epic
 
             draft.SendMailTo(this, MailSender(this, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED);
         }
+        
+        // if (IsAlive())
+        _ApplyAllItemMods();
+        return true;
     }
-
-    //if (IsAlive())
-    _ApplyAllItemMods();
+    
+    return false;
 }
 
 void Player::_LoadItemLoot(QueryResult* result)
@@ -16308,6 +16210,230 @@ void Player::_LoadGuild(QueryResult* result)
 /*********************************************************/
 /***                   SAVE SYSTEM                     ***/
 /*********************************************************/
+
+bool Player::SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint32 cinematic)
+{
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(race, class_);
+    if (!info)
+    {
+        sLog.outError("Player have incorrect race/class pair. Can't be loaded.");
+        return false;
+    }
+
+    ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(class_);
+    if (!cEntry)
+    {
+        sLog.outError("Class %u not found in DBC (Wrong DBC files?)", class_);
+        return false;
+    }
+
+    // player store gender in single bit
+    if (gender != uint8(GENDER_MALE) && gender != uint8(GENDER_FEMALE))
+    {
+        sLog.outError("Invalid gender %u at player creating", uint32(gender));
+        return false;
+    }
+
+    CharacterDatabase.BeginTransaction(guidlow);
+
+    static SqlStatementID insChar;
+
+    SqlStatement uberInsert = CharacterDatabase.CreateStatement(insChar, "REPLACE INTO `characters` (`guid`, `account`, `name`, `race`, `class`, `gender`, `level`, `xp`, `money`, `playerBytes`, `playerBytes2`, `playerFlags`,"
+        "`map`, `position_x`, `position_y`, `position_z`, `orientation`, "
+        "`taximask`, `online`, `cinematic`, "
+        "`totaltime`, `leveltime`, `rest_bonus`, `logout_time`, `is_logout_resting`, `resettalents_multiplier`, `resettalents_time`, "
+        "`trans_x`, `trans_y`, `trans_z`, `trans_o`, `transguid`, `extra_flags`, `stable_slots`, `at_login`, `zone`, "
+        "`death_expire_time`, `taxi_path`, "
+        "`honorRankPoints`, `honorHighestRank`, `honorStanding`, `honorLastWeekHK`, `honorLastWeekCP`, `honorStoredHK`, `honorStoredDK`, "
+        "`watchedFaction`, `drunk`, `health`, `power1`, `power2`, `power3`, "
+        "`power4`, `power5`, `exploredZones`, `equipmentCache`, `ammoId`, `actionBars`, "
+        "`area`, `world_phase_mask`) "
+        "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"
+        "?, ?, ?, ?, ?, "
+        "?, ?, ?, "
+        "?, ?, ?, ?, ?, ?, ?, "
+        "?, ?, ?, ?, ?, ?, ?, ?, ?, "
+        "?, ?, "
+        "?, ?, ?, ?, ?, ?, ?, "
+        "?, ?, ?, ?, ?, ?, "
+        "?, ?, ?, ?, ?, ?, "
+        "?, ?) ");
+
+    uberInsert.addUInt32(guidlow);
+    uberInsert.addUInt32(session->GetAccountId());
+    uberInsert.addString(name);
+    uberInsert.addUInt8(race);
+    uberInsert.addUInt8(class_);
+    uberInsert.addUInt8(gender);
+
+    uint32 const startingLevel = sWorld.getConfig((session->GetSecurity() >= SEC_MODERATOR) ? CONFIG_UINT32_START_GM_LEVEL : CONFIG_UINT32_START_PLAYER_LEVEL);
+    uberInsert.addUInt32(startingLevel);
+    uberInsert.addUInt32(0); // xp
+    uberInsert.addUInt32(sWorld.getConfig(CONFIG_UINT32_START_PLAYER_MONEY));
+
+    uint32 playerBytes1 = 0;
+    ::SetByteValue(playerBytes1, 0, skin);
+    ::SetByteValue(playerBytes1, 1, face);
+    ::SetByteValue(playerBytes1, 2, hairStyle);
+    ::SetByteValue(playerBytes1, 3, hairColor);
+    uberInsert.addUInt32(playerBytes1);
+
+    uint32 playerBytes2 = 0;
+    ::SetByteValue(playerBytes2, 0, facialHair);
+    ::SetByteValue(playerBytes2, 3, REST_STATE_NORMAL);
+    uberInsert.addUInt32(playerBytes2);
+
+    uberInsert.addUInt32(0); // player flags
+
+    uberInsert.addUInt32(info->mapId);
+    uberInsert.addFloat(info->positionX);
+    uberInsert.addFloat(info->positionY);
+    uberInsert.addFloat(info->positionZ);
+    uberInsert.addFloat(info->orientation);
+
+    PlayerTaxi taxi;
+    taxi.InitTaxiNodes(race, class_);
+    std::ostringstream ss;
+    ss << taxi; // string with TaxiMaskSize numbers
+    uberInsert.addString(ss);
+
+    uberInsert.addUInt32(0); // online
+    uberInsert.addUInt32(cinematic);
+
+    uberInsert.addUInt32(0); // total played time
+    uberInsert.addUInt32(0); // level played time
+
+    uberInsert.addFloat(0); // rest bonus
+    uberInsert.addUInt64(uint64(time(nullptr)));
+    uberInsert.addUInt32(0); // resting
+
+    //save, far from tavern/city
+    //save, but in tavern/city
+    uberInsert.addUInt32(0); // reset talents multiplier
+    uberInsert.addUInt64(0); // reset talents time
+
+    uberInsert.addFloat(0); // transport position x
+    uberInsert.addFloat(0); // transport position y
+    uberInsert.addFloat(0); // transport position z
+    uberInsert.addFloat(0); // transport position o
+    uberInsert.addUInt32(0); // transport guid
+
+    uint32 extraFlags = 0;
+    if (session->GetSecurity() > SEC_PLAYER)
+        extraFlags |= PLAYER_EXTRA_GM_ACCEPT_TICKETS;
+    else
+        extraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS;
+    uberInsert.addUInt32(extraFlags);
+
+    uberInsert.addUInt32(0); // stable slots
+
+    uberInsert.addUInt32(AT_LOGIN_FIRST); // login flags
+
+    uint32 zoneId = 0;
+    uint32 areaId = 0;
+    if (auto map = sMapMgr.FindMap(info->mapId))
+        map->GetTerrain()->GetZoneAndAreaId(zoneId, areaId, info->positionX, info->positionY, info->positionZ);
+    uberInsert.addUInt32(0); // zone id (should be 0 before first login)
+
+    uberInsert.addUInt64(0); // death expire time
+
+    ss << taxi.SaveTaxiDestinationsToString(); // string
+    uberInsert.addString(ss);
+
+    // Honor stored data
+    uberInsert.addFloat(0); // rank points
+    uberInsert.addUInt32(0); // highest rank
+    uberInsert.addUInt32(0); // standing
+    uberInsert.addUInt32(0); // last week hk
+    uberInsert.addFloat(0); // last week cp
+    uberInsert.addUInt32(0); // stored hk
+    uberInsert.addUInt32(0); // stored dk
+
+    // FIXME: at this moment send to DB as unsigned, including uint32(-1)
+    uberInsert.addUInt32(-1);
+
+    uint32 playerBytes3 = 0;
+    ::SetUInt16Value(playerBytes3, 0, gender);              // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
+    ::SetByteValue(playerBytes3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
+    uberInsert.addUInt16(uint16(playerBytes3 & 0xFFFE));
+
+    PlayerLevelInfo levelInfo;
+    sObjectMgr.GetPlayerLevelInfo(race, class_, startingLevel, &levelInfo);
+
+    PlayerClassLevelInfo classInfo;
+    sObjectMgr.GetPlayerClassLevelInfo(class_, startingLevel, &classInfo);
+
+    uint32 hp = uint32(classInfo.basehealth + GetHealthBonusFromStamina(levelInfo.stats[STAT_STAMINA]));
+    uint32 powers[MAX_POWERS] = {};
+    if (cEntry->powerType == POWER_MANA)
+        powers[POWER_MANA] = uint32(classInfo.basemana + GetManaBonusFromIntellect(levelInfo.stats[STAT_INTELLECT]));
+    else if (cEntry->powerType == POWER_ENERGY)
+        powers[POWER_ENERGY] = 100;
+
+    uberInsert.addUInt32(hp);
+
+    for (uint32 i = 0; i < MAX_POWERS; ++i)
+        uberInsert.addUInt32(powers[i]);
+
+    for (uint32 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
+        ss << "0 ";
+    uberInsert.addString(ss); // explored zones
+
+    uint32 ammoId = 0;
+    uint32 startingItems[INVENTORY_SLOT_BAG_START+1] = {};
+
+    // Starting items.
+    for (const auto& itr : info->item)
+    {
+        if (ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itr.item_id))
+        {
+            uint8 slots[4];
+            pProto->GetAllowedEquipSlots(slots, class_, false);
+
+            for (uint32 i = 0; i < 4; i++)
+            {
+                if (slots[i] != NULL_SLOT)
+                {
+                    if (!startingItems[slots[i]])
+                        startingItems[slots[i]] = itr.item_id;
+                }
+            }
+
+            if (pProto->InventoryType == INVTYPE_AMMO)
+                ammoId = itr.item_id;
+        }
+    }
+
+    for (uint32 i = 0; i < INVENTORY_SLOT_BAG_START + 1; ++i)         // string: item id, ench (perm/temp)
+    {
+        ss << startingItems[i] << " ";
+        ss << uint32(MAKE_PAIR32(0, 0)) << " ";
+    }
+
+    uberInsert.addString(ss);
+
+    uberInsert.addUInt32(ammoId);
+
+    uberInsert.addUInt32(0); // action bars
+
+    uberInsert.addUInt32(areaId);
+    uberInsert.addUInt32(WORLD_DEFAULT_CHAR);
+    uberInsert.Execute();
+
+    sObjectMgr.SetPlayerWorldMask(guidlow, WORLD_DEFAULT_CHAR);
+    session->SaveTutorialsData(); // changed only while character in game
+
+    CharacterDatabase.CommitTransaction();
+
+    MasterPlayer masterPlayer(session);
+    masterPlayer.Create(ObjectGuid(HIGHGUID_PLAYER, guidlow), race, class_);
+    masterPlayer.SaveToDB();
+    PlayerCacheData* cacheData = sObjectMgr.InsertPlayerInCache(guidlow, race, class_, gender, session->GetAccountId(), name, startingLevel, zoneId);
+    sObjectMgr.UpdatePlayerCachedPosition(cacheData, info->mapId, info->positionX, info->positionY, info->positionZ, info->orientation, false);
+    sWorld.LogCharacter(session, guidlow, name, "Create");
+
+    return true;
+}
 
 void Player::SaveToDB(bool online, bool force)
 {

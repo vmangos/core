@@ -170,7 +170,7 @@ bool MailDraft::prepareItems(Player* receiver)
     {
         if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver->GetGUIDLow()))
         {
-            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver))
+            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver->GetObjectGuid()))
             {
                 item->SaveToDB();                           // save for prevent lost at next mail load, if send fail then item will deleted
                 AddItem(item);
@@ -402,7 +402,7 @@ void Mail::prepareTemplateItems(Player* receiver)
     {
         if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver->GetGUIDLow()))
         {
-            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver))
+            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver->GetObjectGuid()))
             {
                 item->SaveToDB();
 
