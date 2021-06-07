@@ -9,7 +9,8 @@ INSERT INTO `migrations` VALUES ('20210529122700');
 -- Add your query below.
 
 
-UPDATE gameobject SET guid=66885 WHERE guid=67867;
+-- Move Orb of Domination spawn out of the guid range we are going to use.
+UPDATE `gameobject` SET `guid`=66885 WHERE `guid`=67867;
 
 -- =============================================
 -- World Invasion
