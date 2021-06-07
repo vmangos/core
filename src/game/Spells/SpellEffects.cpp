@@ -3577,12 +3577,10 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
         spawnCreature->SetCreatorGuid(m_casterUnit->GetObjectGuid());
         spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
-
         spawnCreature->InitStatsForLevel(level, m_casterUnit);
         spawnCreature->GetCharmInfo()->SetPetNumber(pet_number, false);
-
         spawnCreature->AIM_Initialize();
-
+        spawnCreature->LoadCreatureAddon();
         m_casterUnit->AddGuardian(spawnCreature);
 
         map->Add((Creature*)spawnCreature);
