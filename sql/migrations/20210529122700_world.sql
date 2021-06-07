@@ -582,7 +582,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@SCOURGE_INVASION_GUID+230, 16361, 0, 2240.87, -5317.26, 82.2506, 1.67552, 120, 120, 0, 0, 9),
     (@SCOURGE_INVASION_GUID+231, 16285, 0, 2247.79, -5317.31, 82.1935, 1.5708, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @SCOURGE_INVASION_EVENT FROM `creature` WHERE creature.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+231;
+INSERT INTO `game_event_creature` SELECT creature.guid, @SCOURGE_INVASION_EVENT FROM `creature` WHERE creature.guid BETWEEN @SCOURGE_INVASION_GUID+1 AND @SCOURGE_INVASION_GUID+231;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@SCOURGE_INVASION_GUID+1, 181172, 0, -5122.8, -725, 505.467, 0.0349062, 0, 0, 0.0174522, 0.999848, 100, 1, 120, 120, 9),
@@ -643,7 +643,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@SCOURGE_INVASION_GUID+56, 181256, 0, 2248.47, -5318.94, 82.1143, 1.5708, 0, 0, 0.707107, 0.707107, 100, 1, 120, 120, 9),
     (@SCOURGE_INVASION_GUID+57, 181254, 0, 2243.86, -5321.14, 82.1673, 1.48353, 0, 0, 0.67559, 0.737278, 100, 1, 120, 120, 9);
 
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @SCOURGE_INVASION_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @SCOURGE_INVASION_GUID+0 AND @SCOURGE_INVASION_GUID+57;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @SCOURGE_INVASION_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @SCOURGE_INVASION_GUID+1 AND @SCOURGE_INVASION_GUID+57;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@INVASIONS_DONE_GUID+1 , 16787, 1, 1583.22, -4412.06, 7.73177, 2.37365, 120, 120, 0, 0, 9),
@@ -654,7 +654,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@INVASIONS_DONE_GUID+6 , 16786, 0, -4885.84, -945.795, 501.547, 2.72228, 120, 120, 0, 0, 9),
     (@INVASIONS_DONE_GUID+7 , 16786, 0, 2253.82, -5310.68, 82.2506, 1.8675, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @INVASIONS_DONE_EVENT FROM `creature` WHERE creature.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
+INSERT INTO `game_event_creature` SELECT creature.guid, @INVASIONS_DONE_EVENT FROM `creature` WHERE creature.guid BETWEEN @INVASIONS_DONE_GUID+1 AND @INVASIONS_DONE_GUID+7;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@INVASIONS_DONE_GUID+1, 181256, 1, 1585.55, -4409.76, 7.27701, 3.03684, 0, 0, 0.998629, 0.0523532, 100, 1, 120, 120, 9),
@@ -665,7 +665,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@INVASIONS_DONE_GUID+6, 181256, 1, 9909.79, 2516.55, 1316.68, 5.11382, 0, 0, -0.551936, 0.833886, 100, 1, 120, 120, 9),
     (@INVASIONS_DONE_GUID+7, 181256, 0, 2250.87, -5312.69, 82.1539, 2.89724, 0, 0, 0.992546, 0.12187, 100, 1, 120, 120, 9);
 
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @INVASIONS_DONE_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @INVASIONS_DONE_GUID+0 AND @INVASIONS_DONE_GUID+7;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @INVASIONS_DONE_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @INVASIONS_DONE_GUID+1 AND @INVASIONS_DONE_GUID+7;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@FIFTY_INVASIONS_GUID+1, 16395, 0, -8834.53, 643.027, 95.2532, 4.32842, 120, 120, 0, 0, 9),
@@ -676,7 +676,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@FIFTY_INVASIONS_GUID+6, 16384, 1, -1256.82, 75.1629, 127.892, 4.18879, 120, 120, 0, 0, 9),
     (@FIFTY_INVASIONS_GUID+7, 16384, 1, 1581.37, -4411.9, 7.4357, 2.47837, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @FIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @FIFTY_INVASIONS_GUID+0 AND @FIFTY_INVASIONS_GUID+7;
+INSERT INTO `game_event_creature` SELECT creature.guid, @FIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @FIFTY_INVASIONS_GUID+1 AND @FIFTY_INVASIONS_GUID+7;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@HUNDRED_INVASIONS_GUID+1, 16433, 0, -8834.53, 643.027, 95.2532, 4.32842, 120, 120, 0, 0, 9),
@@ -687,7 +687,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@HUNDRED_INVASIONS_GUID+6, 16435, 1, -1256.82, 75.1629, 127.892, 4.18879, 120, 120, 0, 0, 9),
     (@HUNDRED_INVASIONS_GUID+7, 16435, 1, 1581.37, -4411.9, 7.4357, 2.47837, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDRED_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDRED_INVASIONS_GUID+0 AND @HUNDRED_INVASIONS_GUID+7;
+INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDRED_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDRED_INVASIONS_GUID+1 AND @HUNDRED_INVASIONS_GUID+7;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@HUNDREDFIFTY_INVASIONS_GUID+1, 16434, 0, -8834.53, 643.027, 95.2532, 4.32842, 120, 120, 0, 0, 9),
@@ -698,7 +698,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@HUNDREDFIFTY_INVASIONS_GUID+6, 16436, 1, -1256.82, 75.1629, 127.892, 4.18879, 120, 120, 0, 0, 9),
     (@HUNDREDFIFTY_INVASIONS_GUID+7, 16436, 1, 1581.37, -4411.9, 7.4357, 2.47837, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDREDFIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+0 AND @HUNDREDFIFTY_INVASIONS_GUID+7;
+INSERT INTO `game_event_creature` SELECT creature.guid, @HUNDREDFIFTY_INVASIONS_EVENT FROM `creature` WHERE creature.guid BETWEEN @HUNDREDFIFTY_INVASIONS_GUID+1 AND @HUNDREDFIFTY_INVASIONS_GUID+7;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@WINTERSPRING_GUID+1, 181136, 1, 6052.6, -4749.63, 785.534, 1.27409, 0, 0, 0.594822, 0.803857, 100, 1, 120, 120, 9),
@@ -966,7 +966,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@WINTERSPRING_GUID+263, 181223, 1, 7755.75, -4030.91, 786.496, 0.471238, 0, 0, 0.233445, 0.97237, 100, 1, 120, 120, 9),
     (@WINTERSPRING_GUID+264, 181373, 1, 6184.28, -4913.32, 807.676, 6.0912, 0, 0, -0.0958452, 0.995396, 100, 1, 120, 120, 9);
 
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @WINTERSPRING_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+264;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @WINTERSPRING_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @WINTERSPRING_GUID+1 AND @WINTERSPRING_GUID+264;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@WINTERSPRING_GUID+1, 16356, 1, 7803.92, -4223.38, 676.976, 2.00713, 120, 120, 0, 0, 9),
@@ -1217,7 +1217,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@WINTERSPRING_GUID+246, 16356, 1, 7708.42, -3907.95, 691.825, 6.24828, 120, 120, 0, 0, 9),
     (@WINTERSPRING_GUID+247, 16356, 1, 7720.34, -3881.16, 690.539, 1.85005, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+0 AND @WINTERSPRING_GUID+247;
+INSERT INTO `game_event_creature` SELECT creature.guid, @WINTERSPRING_EVENT FROM `creature` WHERE creature.guid BETWEEN @WINTERSPRING_GUID+1 AND @WINTERSPRING_GUID+247;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@TANARIS_GUID+1, 181136, 1, -8833.58, -2600.38, 21.7275, 3.17653, 0, 0, -0.999847, 0.0174693, 100, 1, 120, 120, 9),
@@ -1485,7 +1485,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@TANARIS_GUID+263, 181215, 1, -8633.21, -2499.82, 114.017, 2.82743, 0, 0, 0.987688, 0.156436, 100, 1, 120, 120, 9),
     (@TANARIS_GUID+264, 181215, 1, -8333.68, -3966.4, 77.8483, 1.37881, 0, 0, 0.636078, 0.771625, 100, 1, 120, 120, 9);
 
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @TANARIS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+264;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @TANARIS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @TANARIS_GUID+1 AND @TANARIS_GUID+264;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@TANARIS_GUID+1, 16356, 1, -7613.69, -3766.51, 14.5989, 3.03684, 120, 120, 0, 0, 9),
@@ -1766,7 +1766,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@TANARIS_GUID+276, 16421, 1, -8333.68, -3966.4, 77.9316, 1.37881, 120, 120, 0, 0, 9),
     (@TANARIS_GUID+277, 16421, 1, -7399.95, -3733.06, 61.1337, 5.81195, 120, 120, 0, 0, 9);
     
-INSERT INTO `game_event_creature` SELECT creature.guid, @TANARIS_EVENT FROM `creature` WHERE creature.guid BETWEEN @TANARIS_GUID+0 AND @TANARIS_GUID+277;
+INSERT INTO `game_event_creature` SELECT creature.guid, @TANARIS_EVENT FROM `creature` WHERE creature.guid BETWEEN @TANARIS_GUID+1 AND @TANARIS_GUID+277;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@AZSHARA_GUID+1, 181136, 1, 3086.48, -4215.71, 97.6507, 0.244346, 0, 0, 0.121869, 0.992546, 100, 1, 120, 120, 9),
@@ -1946,7 +1946,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@AZSHARA_GUID+175, 181194, 1, 3539.07, -5723.81, 2.33291, 3.64774, 0, 0, -0.968147, 0.250381, 100, 1, 120, 120, 9),
     (@AZSHARA_GUID+176, 181194, 1, 3386.43, -5551.54, 13.8384, 3.05433, 0, 0, 0.999048, 0.0436193, 100, 1, 120, 120, 9);
 
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @AZSHARA_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+176;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @AZSHARA_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @AZSHARA_GUID+1 AND @AZSHARA_GUID+176;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@AZSHARA_GUID+1, 16356, 1, 3533.39, -4172.37, 105.328, 1.88495, 120, 120, 0, 0, 9),
@@ -2135,7 +2135,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@AZSHARA_GUID+184, 16421, 1, 3299.55, -4301.3, 177.891, 5.81195, 120, 120, 0, 0, 9),
     (@AZSHARA_GUID+185, 16421, 1, 3544.98, -5610.26, 67.196, 2.82743, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @AZSHARA_EVENT FROM `creature` WHERE creature.guid BETWEEN @AZSHARA_GUID+0 AND @AZSHARA_GUID+185;
+INSERT INTO `game_event_creature` SELECT creature.guid, @AZSHARA_EVENT FROM `creature` WHERE creature.guid BETWEEN @AZSHARA_GUID+1 AND @AZSHARA_GUID+185;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@BLASTED_LANDS_GUID+1, 181136, 0, -11548.5, -3283.3, 7.45651, 4.4855, 0, 0, -0.782608, 0.622515, 100, 1, 120, 120, 9),
@@ -2314,7 +2314,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@BLASTED_LANDS_GUID+174, 181223, 0, -11402.1, -3316.55, 111.188, 4.46804, 0, 0, -0.788011, 0.615662, 100, 1, 120, 120, 9),
     (@BLASTED_LANDS_GUID+175, 181374, 0, -11233.9, -2841.77, 185.603, 4.45059, 0, 0, -0.793353, 0.608762, 100, 1, 120, 120, 9);
 
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @BLASTED_LANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+175;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @BLASTED_LANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @BLASTED_LANDS_GUID+1 AND @BLASTED_LANDS_GUID+175;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@BLASTED_LANDS_GUID+1, 16356, 0, -11181.1, -2973.18, 7.62003, 5.20108, 120, 120, 0, 0, 9),
@@ -2503,7 +2503,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@BLASTED_LANDS_GUID+184, 16421, 0, -11402.1, -3316.55, 111.272, 4.46804, 120, 120, 0, 0, 9),
     (@BLASTED_LANDS_GUID+185, 16421, 0, -11233.9, -2841.77, 185.686, 4.45059, 120, 120, 0, 0, 9);
     
-INSERT INTO `game_event_creature` SELECT creature.guid, @BLASTED_LANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @BLASTED_LANDS_GUID+0 AND @BLASTED_LANDS_GUID+185;
+INSERT INTO `game_event_creature` SELECT creature.guid, @BLASTED_LANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @BLASTED_LANDS_GUID+1 AND @BLASTED_LANDS_GUID+185;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@EASTERN_PLAGUELANDS_GUID+1, 181136, 0, 1599.78, -3039.54, 78.7164, 2.1293, 0, 0, 0.874619, 0.48481, 100, 1, 120, 120, 9),
@@ -2685,7 +2685,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@EASTERN_PLAGUELANDS_GUID+181, 181192, 0, 2350.44, -4913.78, 74.405, 5.37562, 0, 0, -0.438371, 0.898794, 100, 1, 120, 120, 9),
     (@EASTERN_PLAGUELANDS_GUID+182, 181193, 0, 2351.85, -4914.2, 74.3483, 5.37562, 0, 0, -0.438371, 0.898794, 100, 1, 120, 120, 9);
     
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EASTERN_PLAGUELANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+182;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @EASTERN_PLAGUELANDS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+1 AND @EASTERN_PLAGUELANDS_GUID+182;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@EASTERN_PLAGUELANDS_GUID+3, 16356, 0, 1966.54, -4717.01, 98.3666, 0.226893, 120, 120, 0, 0, 9),
@@ -2862,7 +2862,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@EASTERN_PLAGUELANDS_GUID+182, 16356, 0, 1999.05, -4747.77, 96.9688, 4.03171, 120, 120, 0, 0, 9),
     (@EASTERN_PLAGUELANDS_GUID+183, 16356, 0, 2343.07, -4984.65, 71.8132, 4.06663, 120, 120, 0, 0, 9);
 
-INSERT INTO `game_event_creature` SELECT creature.guid, @EASTERN_PLAGUELANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+0 AND @EASTERN_PLAGUELANDS_GUID+183;
+INSERT INTO `game_event_creature` SELECT creature.guid, @EASTERN_PLAGUELANDS_EVENT FROM `creature` WHERE creature.guid BETWEEN @EASTERN_PLAGUELANDS_GUID+1 AND @EASTERN_PLAGUELANDS_GUID+183;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `animprogress`, `state`, `spawntimesecsmin`, `spawntimesecsmax`, `patch_min`) VALUES
     (@BURNING_STEPPES_GUID+1, 181136, 0, -8399.82, -1246.03, 202.741, 1.37881, 0, 0, 0.636078, 0.771625, 100, 1, 120, 120, 9),
@@ -3040,7 +3040,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@BURNING_STEPPES_GUID+173, 181194, 0, -7587.87, -2607.69, 137.044, 3.05433, 0, 0, 0.999048, 0.0436193, 100, 1, 120, 120, 9),
     (@BURNING_STEPPES_GUID+174, 181193, 0, -7587.59, -2606.65, 137.194, 3.31614, 0, 0, -0.996194, 0.087165, 100, 1, 120, 120, 9);
     
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @BURNING_STEPPES_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+174;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @BURNING_STEPPES_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @BURNING_STEPPES_GUID+1 AND @BURNING_STEPPES_GUID+174;
 
 INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, movement_type, wander_distance, patch_min) VALUES
     (@BURNING_STEPPES_GUID+1, 16356, 0, -8000.75, -985.283, 127.825, 1.09956, 120, 120, 0, 0, 9),
@@ -3224,7 +3224,7 @@ INSERT INTO creature (guid, id, map, position_x, position_y, position_z, orienta
     (@BURNING_STEPPES_GUID+179, 16421, 0, -8232.78, -1099.86, 201.572, 5.18363, 120, 120, 0, 0, 9),
     (@BURNING_STEPPES_GUID+180, 16421, 0, -7733.71, -2432.74, 190.869, 2.67035, 120, 120, 0, 0, 9);
     
-INSERT INTO `game_event_creature` SELECT creature.guid, @BURNING_STEPPES_EVENT FROM `creature` WHERE creature.guid BETWEEN @BURNING_STEPPES_GUID+0 AND @BURNING_STEPPES_GUID+180;
+INSERT INTO `game_event_creature` SELECT creature.guid, @BURNING_STEPPES_EVENT FROM `creature` WHERE creature.guid BETWEEN @BURNING_STEPPES_GUID+1 AND @BURNING_STEPPES_GUID+180;
 
 -- =============================================
 -- Dungeon Bosses
