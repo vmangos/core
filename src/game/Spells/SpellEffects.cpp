@@ -589,6 +589,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }, 1);
                     return;
                 }
+                case 28091: // [Event: Scourge Invasion] (Despawner, self) triggers (Spirit Spawn-out)?
+                {
+                    if (!m_casterUnit->IsInCombat())
+                        m_casterUnit->CastSpell(m_casterUnit, 17680, false);
+                    return;
+                }
+                case 28345: // [Event: Scourge Invasion] (Communique Trigger) triggers (Communique, Camp-to-Relay)?
+                {
+                    unitTarget->CastSpell(unitTarget, 28281, true);
+                    return;
+                }
                 case 23383: // Alliance Flag Click
                 case 23384: // Horde Flag Click
                 {

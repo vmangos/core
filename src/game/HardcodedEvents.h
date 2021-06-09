@@ -214,53 +214,66 @@ struct ScourgeInvasionEvent : WorldEvent
     ScourgeInvasionEvent();
 
     void Update() override;
+    uint32 GetZoneTime(uint32 zoneId);
+    void LogNextZoneTime();
+    void EnableAndStartEvent(uint16 event_id);
+    void DisableAndStopEvent(uint16 event_id);
+    void HandleDefendedZones();
     void Enable() override;
     void Disable() override;
     uint32 GetNextUpdateDelay() override;
 
 private:
-    struct InvasionXYZ {
-        InvasionXYZ(float x, float y, float z)
-            : x(x), y(y), z(z) {}
-        float x, y, z;
-    };
-
-    struct InvasionNecropolis {
-        InvasionNecropolis(float x, float y, float z, float o)
-            : x(x), y(y), z(z), o(o) {}
-        float x, y, z, o;
-        std::vector<InvasionXYZ> shards;
-
-        ObjectGuid relayGuid;
-    };
-
     struct InvasionZone
     {
         uint32 map;
         uint32 zoneId;
         uint32 remainingVar;
-        std::vector<InvasionNecropolis> points;
+        uint32 necroAmount;
+        ObjectGuid mouthGuid;
+        std::vector<Position> mouth;
+    };
+
+    struct CityAttack
+    {
+        uint32 map;
+        uint32 zoneId;
+        ObjectGuid pallidGuid;
+        std::vector<Position> pallid;
     };
 
     bool invasion1Loaded;
     bool invasion2Loaded;
+    bool invasion3Loaded;
+    bool invasion4Loaded;
+    bool invasion5Loaded;
+    bool invasion6Loaded;
 
-    void HandleActiveZone(uint32 attackTimeVar, uint32 attackZoneVar, uint32 remainingVar, time_t now, uint32 zoneId);
+    bool undercityLoaded;
+    bool stormwindLoaded;
 
-    bool OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
+    void HandleActiveZone(uint32 attackTimeVar, uint32 zoneId, uint32 remainingVar, time_t now);
+    void HandleActiveCity(uint32 attackTimeVar, time_t now, uint32 zoneId);
+
+    bool OnEnable(uint32 zoneId, uint32 attackTimeVar);
 
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
+    void StartNewCityAttackIfTime(uint32 timeVariable, uint32 zoneVariable);
     bool ResumeInvasion(uint32 zoneId);
-    bool SummonNecropolis(Map* pMap, InvasionNecropolis& point);
+    bool SummonMouth(Map* pMap, InvasionZone* zone, Position position);
+    bool SummonPallid(Map* pMap, CityAttack* zone, Position position, uint32 spawnLoc);
 
-    Map* GetMap(uint32 mapId, InvasionNecropolis const& invZone);
+    Map* GetMap(uint32 mapId, Position const& invZone);
     bool isValidZoneId(uint32 zoneId);
-    InvasionZone* GetZone(uint32 zoneId);
-    uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
+    bool isActiveZone(uint32 zoneId);
+    uint32 GetActiveZones();
+    InvasionZone* GetInvasionZone(uint32 zoneId);
+    CityAttack* GetCityZone(uint32 zoneId);
 
     void UpdateWorldState();
 
     std::vector<InvasionZone> invasionPoints;
+    std::vector<CityAttack> attackPoints;
     int previousRemainingCounts[6];
 };
 

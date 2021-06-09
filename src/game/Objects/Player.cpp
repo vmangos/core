@@ -76,7 +76,7 @@
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GameEventMgr.h"
-#include "world/world_event_naxxramas.h"
+#include "world/scourge_invasion.h"
 #include "world/world_event_wareffort.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
@@ -8400,9 +8400,7 @@ void Player::SendInitWorldStates(uint32 zoneid) const
     // Scourge Invasion - Patch 1.11
     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
     {
-        //int ATTACK_ZONE1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-        //int ATTACK_ZONE2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
-        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT);
         int REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
         int REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
         int REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);

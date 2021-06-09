@@ -1360,6 +1360,27 @@ namespace MaNGOS
             float m_fRange;
     };
 
+    class AllGameObjectsMatchingOneEntryInRange
+    {
+    public:
+        AllGameObjectsMatchingOneEntryInRange(WorldObject const* pObject, std::vector<uint32> const& entries, float fMaxRange)
+            : m_pObject(pObject), entries(entries), m_fRange(fMaxRange) {}
+        bool operator() (GameObject* pGo)
+        {
+            for (const auto entry : entries) {
+                if (pGo->GetEntry() == entry && m_pObject->IsWithinDist(pGo, m_fRange, false)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> entries;
+        float m_fRange;
+    };
+
     class AllCreaturesOfEntryInRange
     {
     public:
