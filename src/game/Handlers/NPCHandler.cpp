@@ -600,7 +600,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
         for (const auto it : myPets->second)
             if (it->slot >= PET_SAVE_FIRST_STABLE_SLOT && it->slot <= PET_SAVE_LAST_STABLE_SLOT)
             {
-                data << uint32(it->id);                 // petnumber
+                data << uint32(it->id);                 // pet number
                 data << uint32(it->entry);              // creature entry
                 data << uint32(it->level);              // level
                 data << it->name;                       // name
@@ -702,9 +702,9 @@ void WorldSession::HandleUnstablePet(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recv CMSG_UNSTABLE_PET.");
     ObjectGuid npcGUID;
-    uint32 petnumber;
+    uint32 petNumber;
 
-    recv_data >> npcGUID >> petnumber;
+    recv_data >> npcGUID >> petNumber;
 
     if (!CheckStableMaster(npcGUID))
     {
@@ -714,18 +714,16 @@ void WorldSession::HandleUnstablePet(WorldPacket& recv_data)
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
 
-    uint32 creature_id = 0;
-
-    CharacterPetCache const* petData = sCharacterDatabaseCache.GetCharacterPetCacheByOwnerAndId(_player->GetGUIDLow(), petnumber);
+    CharacterPetCache const* petData = sCharacterDatabaseCache.GetCharacterPetCacheByOwnerAndId(_player->GetGUIDLow(), petNumber);
 
     if (!petData || petData->slot < PET_SAVE_FIRST_STABLE_SLOT || petData->slot > PET_SAVE_LAST_STABLE_SLOT)
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;
     }
-    creature_id = petData->entry;
 
-    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(creature_id);
+    uint32 creatureId = petData->entry;
+    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(creatureId);
     if (!creatureInfo || !creatureInfo->isTameable())
     {
         SendStableResult(STABLE_ERR_STABLE);
@@ -741,7 +739,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recv_data)
     }
 
     Pet* newpet = new Pet(HUNTER_PET);
-    if (!newpet->LoadPetFromDB(_player, creature_id, petnumber))
+    if (!newpet->LoadPetFromDB(_player, creatureId, petNumber))
     {
         delete newpet;
         newpet = nullptr;

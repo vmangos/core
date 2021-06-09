@@ -597,7 +597,7 @@ class SpellEntry
 
         inline bool IsSpellAppliesAura(uint32 effectMask) const
         {
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if (effectMask & (1 << i))
                 {
@@ -692,7 +692,7 @@ class SpellEntry
         inline bool HasSingleAura(AuraType aura) const
         {
             bool hasAura = false;
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
                 if (AuraType(EffectApplyAuraName[i]) == aura)
                     hasAura = true;
                 else if (Effect[i] == SPELL_EFFECT_APPLY_AURA)
@@ -789,7 +789,7 @@ class SpellEntry
         {
             // spells with at least one negative effect are considered negative
             // some self-applied spells have negative effects but in self casting case negative check ignored.
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
                 if (Effect[i] && (effectMask & (1 << i)) && !IsPositiveEffect(SpellEffectIndex(i), caster, target))
                     return false;
             return true;
@@ -904,7 +904,7 @@ class SpellEntry
         // Spell effects require a specific power type on the target
         inline bool IsTargetPowerTypeValid(Powers powerType) const
         {
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if (Effect[i] == SPELL_EFFECT_NONE)
                     continue;
@@ -940,7 +940,7 @@ class SpellEntry
             if (Mechanic)
                 mask |= 1 << (Mechanic - 1);
 
-            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if (!(effectMask & (1 << i)))
                     continue;

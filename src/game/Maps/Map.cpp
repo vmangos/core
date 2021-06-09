@@ -3315,9 +3315,9 @@ void Map::BindToInstanceOrRaid(Player* player, time_t objectResetTime, bool perm
             DungeonPersistentState* save = ((DungeonMap*)this)->GetPersistanceState();
             // the reset time is set but not added to the scheduler
             // until the players leave the instance
-            time_t resettime = objectResetTime + 2 * HOUR;
-            if (save->GetResetTime() < resettime)
-                save->SetResetTime(resettime);
+            time_t resetTime = objectResetTime + 2 * HOUR;
+            if (save->GetResetTime() < resetTime)
+                save->SetResetTime(resetTime);
         }
     }
 }

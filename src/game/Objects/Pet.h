@@ -159,7 +159,7 @@ class Pet : public Creature
 
         bool Create (uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number);
         bool CreateBaseAtCreature(Creature* creature);
-        bool LoadPetFromDB(Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false);
+        bool LoadPetFromDB(Player* owner, uint32 petEntry = 0, uint32 petNumber = 0, bool current = false);
         void SavePetToDB(PetSaveMode mode);
         void Unsummon(PetSaveMode mode, Unit* owner = nullptr);
         void DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode);
@@ -192,7 +192,7 @@ class Pet : public Creature
         void SynchronizeLevelWithOwner();
         bool InitStatsForLevel(uint32 level, Unit* owner = nullptr);
         bool HaveInDiet(ItemPrototype const* item) const;
-        uint32 GetCurrentFoodBenefitLevel(uint32 itemlevel) const;
+        uint32 GetCurrentFoodBenefitLevel(uint32 itemLevel) const;
         void SetDuration(int32 dur) { m_duration = dur; }
 
         int32 GetBonusDamage() const { return m_bonusdamage; }
@@ -229,10 +229,10 @@ class Pet : public Creature
         void _LoadSpells();
         void _SaveSpells();
 
-        bool AddSpell(uint32 spell_id,ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
-        bool LearnSpell(uint32 spell_id);
-        bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
-        bool RemoveSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
+        bool AddSpell(uint32 spellId, ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
+        bool LearnSpell(uint32 spellId);
+        bool unlearnSpell(uint32 spellId, bool learn_prev, bool clear_ab = true);
+        bool RemoveSpell(uint32 spellId, bool learn_prev, bool clear_ab = true);
         void CleanupActionBar();
 
         PetSpellMap     m_petSpells;

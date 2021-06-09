@@ -113,7 +113,7 @@ void Corpse::SaveToDB()
     MANGOS_ASSERT(GetType() != CORPSE_BONES);
 
     std::ostringstream ss;
-    ss  << "REPLACE INTO corpse (guid,player,position_x,position_y,position_z,orientation,map,time,corpse_type,instance) VALUES ("
+    ss  << "REPLACE INTO `corpse` (`guid`, `player_guid`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `time`, `corpse_type`, `instance`) VALUES ("
         << GetGUIDLow() << ", "
         << GetOwnerGuid().GetCounter() << ", "
         << GetPositionX() << ", "
@@ -149,16 +149,16 @@ void Corpse::DeleteFromDB()
     // all corpses (not bones)
     static SqlStatementID id;
 
-    SqlStatement stmt = CharacterDatabase.CreateStatement(id, "DELETE FROM corpse WHERE player = ? AND corpse_type <> '0'");
+    SqlStatement stmt = CharacterDatabase.CreateStatement(id, "DELETE FROM `corpse` WHERE `player_guid` = ? AND `corpse_type` <> '0'");
     stmt.PExecute(GetOwnerGuid().GetCounter());
 }
 
 bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 {
-    ////                                                    0            1       2                  3                  4                  5                   6
-    //QueryResult* result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
-    ////   7     8            9         10      11    12     13           14            15              16       17
-    //    "time, corpse_type, instance, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse"
+    ////                                                    0            1            2                  3                  4                  5                   6
+    //QueryResult* result = CharacterDatabase.Query("SELECT corpse.guid, player_guid, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
+    ////   7     8            9         10      11    12     13     14   15          16          17           18               19        20
+    //    "time, corpse_type, instance, gender, race, class, skin, face, hair_style, hair_color, facial_hair, equipment_cache, guild_id, player_flags FROM corpse"
     uint32 playerLowGuid = fields[1].GetUInt32();
     float positionX     = fields[2].GetFloat();
     float positionY     = fields[3].GetFloat();
@@ -181,10 +181,15 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     uint8 gender        = fields[10].GetUInt8();
     uint8 race          = fields[11].GetUInt8();
     uint8 _class        = fields[12].GetUInt8();
-    uint32 playerBytes  = fields[13].GetUInt32();
-    uint32 playerBytes2 = fields[14].GetUInt32();
-    uint32 guildId      = fields[16].GetUInt32();
-    uint32 playerFlags  = fields[17].GetUInt32();
+
+    uint8 skin = fields[13].GetUInt8();
+    uint8 face = fields[14].GetUInt8();
+    uint8 hairstyle = fields[15].GetUInt8();
+    uint8 haircolor = fields[16].GetUInt8();
+    uint8 facialhair = fields[17].GetUInt8();
+
+    uint32 guildId      = fields[19].GetUInt32();
+    uint32 playerFlags  = fields[20].GetUInt32();
 
     ObjectGuid guid = ObjectGuid(HIGHGUID_CORPSE, lowguid);
     ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerLowGuid);
@@ -204,7 +209,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     SetUInt32Value(CORPSE_FIELD_DISPLAY_ID, gender == GENDER_FEMALE ? info->displayId_f : info->displayId_m);
 
     // Load equipment
-    Tokens data = StrSplit(fields[15].GetCppString(), " ");
+    Tokens data = StrSplit(fields[18].GetCppString(), " ");
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; slot++)
     {
         uint32 visualbase = slot * 2;
@@ -219,11 +224,6 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
         SetUInt32Value(CORPSE_FIELD_ITEM + slot, proto->DisplayInfoID | (proto->InventoryType << 24));
     }
 
-    uint8 skin       = (uint8)(playerBytes);
-    uint8 face       = (uint8)(playerBytes >> 8);
-    uint8 hairstyle  = (uint8)(playerBytes >> 16);
-    uint8 haircolor  = (uint8)(playerBytes >> 24);
-    uint8 facialhair = (uint8)(playerBytes2);
     SetUInt32Value(CORPSE_FIELD_BYTES_1, ((0x00) | (race << 8) | (gender << 16) | (skin << 24)));
     SetUInt32Value(CORPSE_FIELD_BYTES_2, ((face) | (hairstyle << 8) | (haircolor << 16) | (facialhair << 24)));
 

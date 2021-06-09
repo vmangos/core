@@ -346,7 +346,7 @@ void SpellAuraHolder::Refresh(Unit* caster, Unit* target, SpellAuraHolder* pRefr
     m_applyTime = time(nullptr);
     m_duration = pRefreshWithHolder->GetAuraDuration();
     m_maxDuration = pRefreshWithHolder->GetAuraMaxDuration();
-    for (int i = 0 ; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0 ; i < MAX_EFFECT_INDEX; ++i)
     {
         if (Aura* pAura = GetAuraByEffectIndex(SpellEffectIndex(i)))
             pAura->Refresh(caster, target, pRefreshWithHolder);
@@ -6468,7 +6468,7 @@ void Aura::HandleManaShield(bool apply, bool Real)
 
 bool Aura::IsLastAuraOnHolder()
 {
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (i != GetEffIndex() && GetHolder()->m_auras[i])
             return false;
     return true;
@@ -6565,7 +6565,7 @@ void SpellAuraHolder::RemoveAura(SpellEffectIndex index)
 
 void SpellAuraHolder::ApplyAuraModifiers(bool apply, bool real)
 {
-    for (int32 i = 0; i < MAX_EFFECT_INDEX && !IsDeleted(); ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX && !IsDeleted(); ++i)
         if (Aura* aur = GetAuraByEffectIndex(SpellEffectIndex(i)))
             aur->ApplyModifier(apply, real);
 }
@@ -6739,7 +6739,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
 
 void SpellAuraHolder::CleanupTriggeredSpells()
 {
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (!m_spellProto->EffectApplyAuraName[i])
             continue;
@@ -6801,7 +6801,7 @@ void SpellAuraHolder::SetStackAmount(uint32 stackAmount)
         m_stackAmount = stackAmount;
         UpdateAuraApplication();
 
-        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
             if (Aura* aur = m_auras[i])
             {
@@ -6898,7 +6898,7 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
     bool persistent = m_spellProto->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_PERSISTENT_AREA_AURA;
     bool persistentWithSecondaryEffect = false;
 
-    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         // Check for persistent aura here since the effect aura is applied to the holder
         // by a dynamic object as the target passes through the object field, meaning
@@ -7218,7 +7218,7 @@ void SpellAuraHolder::RefreshHolder()
  */
 void SpellAuraHolder::RefreshAuraPeriodicTimers(int32 duration)
 {
-    for (int i = 0 ; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0 ; i < MAX_EFFECT_INDEX; ++i)
     {
         if (Aura* pAura = GetAuraByEffectIndex(SpellEffectIndex(i)))
         {
@@ -7247,7 +7247,7 @@ bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
     if (mechanic == m_spellProto->Mechanic)
         return true;
 
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (m_auras[i] && m_spellProto->EffectMechanic[i] == mechanic)
             return true;
     return false;
@@ -7258,7 +7258,7 @@ bool SpellAuraHolder::HasMechanicMask(uint32 mechanicMask) const
     if (m_spellProto->Mechanic && mechanicMask & (1 << (m_spellProto->Mechanic - 1)))
         return true;
 
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (m_auras[i] && m_spellProto->EffectMechanic[i] && ((1 << (m_spellProto->EffectMechanic[i] - 1)) & mechanicMask))
             return true;
     return false;

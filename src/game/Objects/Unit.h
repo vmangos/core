@@ -228,12 +228,12 @@ typedef UnitActionBarEntry CharmSpellEntry;
 struct CharmInfo
 {
     explicit CharmInfo(Unit* unit);
-    uint32 GetPetNumber() const { return m_petnumber; }
-    void SetPetNumber(uint32 petnumber, bool statwindow);
+    uint32 GetPetNumber() const { return m_petNumber; }
+    void SetPetNumber(uint32 petNumber, bool statWindow);
 
-    void SetCommandState(CommandStates st) { m_CommandState = st; }
-    CommandStates GetCommandState() const { return m_CommandState; }
-    bool HasCommandState(CommandStates state) const { return m_CommandState == state; }
+    void SetCommandState(CommandStates state) { m_commandState = state; }
+    CommandStates GetCommandState() const { return m_commandState; }
+    bool HasCommandState(CommandStates state) const { return m_commandState == state; }
     void SetReactState(ReactStates st) { m_reactState = st; }
     ReactStates GetReactState() const { return m_reactState; }
     bool HasReactState(ReactStates state) const { return m_reactState == state; }
@@ -247,20 +247,20 @@ struct CharmInfo
     void InitEmptyActionBar();
 
                                                         //return true if successful
-    bool AddSpellToActionBar(uint32 spellid, ActiveStates newstate = ACT_DECIDE);
-    bool RemoveSpellFromActionBar(uint32 spell_id);
+    bool AddSpellToActionBar(uint32 spellId, ActiveStates newstate = ACT_DECIDE);
+    bool RemoveSpellFromActionBar(uint32 spellId);
     void LoadPetActionBar(std::string const& data);
     void BuildActionBar(WorldPacket* data);
-    void SetSpellAutocast(uint32 spell_id, bool state);
+    void SetSpellAutocast(uint32 spellId, bool state);
     void SetActionBar(uint8 index, uint32 spellOrAction,ActiveStates type)
     {
-        PetActionBar[index].SetActionAndType(spellOrAction,type);
+        m_petActionBar[index].SetActionAndType(spellOrAction,type);
     }
-    UnitActionBarEntry const* GetActionBarEntry(uint8 index) const { return &(PetActionBar[index]); }
+    UnitActionBarEntry const* GetActionBarEntry(uint8 index) const { return &(m_petActionBar[index]); }
 
     void ToggleCreatureAutocast(uint32 spellid, bool apply);
 
-    CharmSpellEntry* GetCharmSpell(uint8 index) { return &(m_charmspells[index]); }
+    CharmSpellEntry* GetCharmSpell(uint8 index) { return &(m_charmSpells[index]); }
 
     void SetIsCommandAttack(bool val);
     bool IsCommandAttack();
@@ -279,11 +279,11 @@ private:
     Unit* m_unit;
     FactionTemplateEntry const* m_originalFactionTemplate;
 
-    UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
-    CharmSpellEntry m_charmspells[CREATURE_MAX_SPELLS];
-    CommandStates   m_CommandState;
+    UnitActionBarEntry m_petActionBar[MAX_UNIT_ACTION_BAR_INDEX];
+    CharmSpellEntry m_charmSpells[CREATURE_MAX_SPELLS];
+    CommandStates   m_commandState;
     ReactStates     m_reactState;
-    uint32          m_petnumber;
+    uint32          m_petNumber;
 
     bool m_isCommandAttack;
     bool m_isCommandFollow;
@@ -805,13 +805,13 @@ class Unit : public SpellCaster
         uint64 GetAuraApplicationMask() const;
         uint64 GetNegativeAuraApplicationMask() const;
 
-        SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spell_id)
+        SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spellId)
         {
-            return m_spellAuraHolders.equal_range(spell_id);
+            return m_spellAuraHolders.equal_range(spellId);
         }
-        SpellAuraHolderConstBounds GetSpellAuraHolderBounds(uint32 spell_id) const
+        SpellAuraHolderConstBounds GetSpellAuraHolderBounds(uint32 spellId) const
         {
-            return m_spellAuraHolders.equal_range(spell_id);
+            return m_spellAuraHolders.equal_range(spellId);
         }
 
         bool HasAuraType(AuraType auraType) const;

@@ -65,7 +65,7 @@ void HonorMaintenancer::LoadWeeklyScores()
 
     std::ostringstream query;
 
-    query << "SELECT `scores`.`guid`, `c`.`level`, `c`.`account`, `c`.`honorRankPoints`, `c`.`honorHighestRank`, SUM(`hk`), SUM(`dk`), SUM(`cp`) FROM"
+    query << "SELECT `scores`.`guid`, `c`.`level`, `c`.`account`, `c`.`honor_rank_points`, `c`.`honor_highest_rank`, SUM(`hk`), SUM(`dk`), SUM(`cp`) FROM"
         "("
         "  SELECT `guid` AS `guid`, COUNT(*) AS `hk`, 0 AS `dk`, SUM(`cp`) AS `cp` FROM `character_honor_cp` WHERE `type` = " << HONORABLE <<
         "  AND (`date` BETWEEN " << weekBeginDay << " AND " << weekEndDay << ") GROUP BY `guid`"
@@ -76,7 +76,7 @@ void HonorMaintenancer::LoadWeeklyScores()
         "  SELECT `guid` AS `guid`, 0 AS `hk`, 0 AS `dk`, SUM(`cp`) AS `cp` FROM `character_honor_cp` WHERE `type` NOT IN (" << HONORABLE << ", " << DISHONORABLE << ")"
         "  AND (`date` BETWEEN " << weekBeginDay << " AND " << weekEndDay << ") GROUP BY `guid`"
         "  UNION"
-        "  SELECT `guid` AS `guid`, 0 AS `hk`, 0 AS `dk`, 0 AS `cp` FROM `characters` WHERE `honorRankPoints` > 0"
+        "  SELECT `guid` AS `guid`, 0 AS `hk`, 0 AS `dk`, 0 AS `cp` FROM `characters` WHERE `honor_rank_points` > 0"
         ") AS `scores` INNER JOIN `characters` AS `c` ON `scores`.`guid` = `c`.`guid` GROUP BY `guid` ORDER BY `guid` ";
 
     QueryResult* result = CharacterDatabase.Query(query.str().c_str());
@@ -200,7 +200,7 @@ void HonorMaintenancer::SetCityRanks()
 
     for (uint8 i = 1; i < MAX_RACES; ++i)
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honorStanding` FROM `characters` WHERE `honorStanding` > 0 and `race` = %u ORDER BY `honorStanding` ASC LIMIT 1", i);
+        QueryResult* result = CharacterDatabase.PQuery("SELECT `guid`, `honor_standing` FROM `characters` WHERE `honor_standing` > 0 and `race` = %u ORDER BY `honor_standing` ASC LIMIT 1", i);
 
         if (result)
         {
@@ -229,7 +229,7 @@ void HonorMaintenancer::SetCityRanks()
 void HonorMaintenancer::FlushRankPoints()
 {
     // Imediatly reset honor standing before flushing
-    CharacterDatabase.Execute("UPDATE `characters` SET `honorStanding` = 0 WHERE `honorStanding` > 0");
+    CharacterDatabase.Execute("UPDATE `characters` SET `honor_standing` = 0 WHERE `honor_standing` > 0");
 
     for (auto& pair : m_weeklyScores)
     {
@@ -244,8 +244,8 @@ void HonorMaintenancer::FlushRankPoints()
         if (currentRank.visualRank > 0 && (currentRank.visualRank > highestRank.visualRank))
             highestRank = currentRank;
 
-        CharacterDatabase.PExecute("UPDATE `characters` SET `honorHighestRank` = %u, `honorRankPoints` = %.1f, `honorStanding` = %u, "
-            "`honorLastWeekHK` = %u, `honorStoredHK` = (`honorStoredHK` + %u), `honorStoredDK` = (`honorStoredDK` + %u), `honorLastWeekCP` = %.1f WHERE `guid` = %u",
+        CharacterDatabase.PExecute("UPDATE `characters` SET `honor_highest_rank` = %u, `honor_rank_points` = %.1f, `honor_standing` = %u, "
+            "`honor_last_week_hk` = %u, `honor_stored_hk` = (`honor_stored_hk` + %u), `honor_stored_dk` = (`honor_stored_dk` + %u), `honor_last_week_cp` = %.1f WHERE `guid` = %u",
             highestRank.rank,
             finiteAlways(weeklyScore.newRp), weeklyScore.standing,
             weeklyScore.hk, weeklyScore.hk, weeklyScore.dk,
@@ -593,8 +593,8 @@ void HonorMaintenancer::CheckMaintenanceDay()
 void HonorMaintenancer::ToggleMaintenanceMarker()
 {
     m_markerToStart = !m_markerToStart;
-    CharacterDatabase.PExecute("INSERT INTO `saved_variables` (`key`, `honorMaintenanceMarker`) VALUES (0, %u) "
-        "ON DUPLICATE KEY UPDATE `honorMaintenanceMarker` = %u", m_markerToStart, m_markerToStart);
+    CharacterDatabase.PExecute("INSERT INTO `saved_variables` (`key`, `honor_maintenance_marker`) VALUES (0, %u) "
+        "ON DUPLICATE KEY UPDATE `honor_maintenance_marker` = %u", m_markerToStart, m_markerToStart);
 }
 
 void HonorMaintenancer::SetMaintenanceDays(uint32 last, uint32 next)
@@ -604,8 +604,8 @@ void HonorMaintenancer::SetMaintenanceDays(uint32 last, uint32 next)
     if (!next)
         m_nextMaintenanceDay = m_lastMaintenanceDay + 7;
 
-    CharacterDatabase.PExecute("INSERT INTO `saved_variables` (`key`, `lastHonorMaintenanceDay`, `nextHonorMaintenanceDay`) VALUES (0, %u, %u) "
-        "ON DUPLICATE KEY UPDATE `lastHonorMaintenanceDay` = %u, `nextHonorMaintenanceDay` = %u",
+    CharacterDatabase.PExecute("INSERT INTO `saved_variables` (`key`, `honor_last_maintenance_day`, `honor_next_maintenance_day`) VALUES (0, %u, %u) "
+        "ON DUPLICATE KEY UPDATE `honor_last_maintenance_day` = %u, `honor_next_maintenance_day` = %u",
         m_lastMaintenanceDay, m_nextMaintenanceDay, m_lastMaintenanceDay, m_nextMaintenanceDay);
 }
 
@@ -613,7 +613,7 @@ void HonorMaintenancer::Initialize()
 {
     sLog.outString("Initialize Honor Maintenance system...");
 
-    QueryResult* result = CharacterDatabase.Query("SELECT `lastHonorMaintenanceDay`, `nextHonorMaintenanceDay`, `honorMaintenanceMarker` FROM `saved_variables`");
+    QueryResult* result = CharacterDatabase.Query("SELECT `honor_last_maintenance_day`, `honor_next_maintenance_day`, `honor_maintenance_marker` FROM `saved_variables`");
     if (result)
     {
         Field* fields = result->Fetch();
@@ -674,7 +674,7 @@ void HonorMgr::Save()
         switch (honorCP.state)
         {
             case STATE_NEW:
-                CharacterDatabase.PExecute("INSERT INTO `character_honor_cp` (`guid`, `victimType`, `victim`, `cp`, `date`, `type`) "
+                CharacterDatabase.PExecute("INSERT INTO `character_honor_cp` (`guid`, `victim_type`, `victim_id`, `cp`, `date`, `type`) "
                     " VALUES (%u, %u, %u, %.1f, %u, %u)", m_owner->GetGUIDLow(), honorCP.victimType, honorCP.victimId,
                     finiteAlways(honorCP.cp), honorCP.date, honorCP.type);
                 honorCP.state = STATE_UNCHANGED;
@@ -716,8 +716,8 @@ void HonorMgr::SaveStoredData()
     if (!m_owner)
         return;
         
-    CharacterDatabase.PExecute("UPDATE `characters` SET `honorRankPoints` = %.1f, `honorStanding` = %u, `honorHighestRank` = %u, "
-            "`honorLastWeekHK` = %u, `honorLastWeekCP` = %.1f, `honorStoredHK` = %u, `honorStoredDK` = %u WHERE `guid` = %u",
+    CharacterDatabase.PExecute("UPDATE `characters` SET `honor_rank_points` = %.1f, `honor_standing` = %u, `honor_highest_rank` = %u, "
+            "`honor_last_week_hk` = %u, `honor_last_week_cp` = %.1f, `honor_stored_hk` = %u, `honor_stored_dk` = %u WHERE `guid` = %u",
             finiteAlways(m_rankPoints), m_standing, m_highestRank.rank, m_lastWeekHK,
             finiteAlways(m_lastWeekCP), m_storedHK, m_storedDK, m_owner->GetGUIDLow());
 }

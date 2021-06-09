@@ -6,8 +6,8 @@
 // pet_spell_cooldown
 struct PetSpellCoodown
 {
-    uint32 spell;
-    uint64 time;
+    uint32 spell = 0;
+    uint64 time = 0;
 };
 
 typedef std::vector<PetSpellCoodown> PetSpellCDs;
@@ -15,41 +15,43 @@ typedef std::vector<PetSpellCoodown> PetSpellCDs;
 // pet_spell
 struct PetSpellCache
 {
-    uint32 spell;
-    uint8  active;
+    uint32 spell = 0;
+    uint8  active = 0;
 };
 typedef std::vector<PetSpellCache> PetSpells;
 
 // pet_aura
-struct PetAuraCache
-{
-    uint64 caster_guid;
-    uint32 item_guid, spell;
-    uint32 stackcount, remaincharges;
-    int32 maxduration, remaintime;
-    uint32 effIndexMask;
-
-    int32 basepoints[3];
-    uint32 periodictime[3];
-};
+typedef AuraSaveStruct PetAuraCache;
 typedef std::vector<PetAuraCache> PetAuras;
-
 
 struct CharacterPetCache
 {
     // character_pet
-    uint32 id, entry, modelid, level, exp, loyalty;
-    uint32 slot, curhealth, curmana, curhappiness, resettalents_cost;
-    uint32 resettalents_time, CreatedBySpell, PetType;
-    int32 trainpoint, loyaltypoints;
-    uint64 owner, savetime;
-    uint8 Reactstate;
-    std::string name, abdata, TeachSpelldata;
-    bool renamed;
+    uint32 id = 0;
+    uint32 entry = 0;
+    uint32 displayId = 0;
+    uint32 level = 0;
+    uint32 xp = 0;
+    uint32 loyalty = 0;
+    uint32 slot = 0;
+    uint32 currentHealth = 0;
+    uint32 currentMana = 0;
+    uint32 currentHappiness = 0;
+    uint32 resetTalentsCost = 0;
+    uint32 resetTalentsTime = 0;
+    uint32 createdBySpell = 0;
+    uint32 petType = 0;
+    int32 trainingPoints = 0;
+    int32 loyaltyPoints = 0;;
+    uint32 ownerGuid = 0;
+    uint64 saveTime = 0;
+    uint8 reactState = 0;
+    std::string name, actionBarData, teachSpellData;
+    bool renamed = false;
     // pet_spell
     PetSpells   spells;
     // pet_spell_cooldown
-    PetSpellCDs spellCooldown;
+    PetSpellCDs spellCooldowns;
     // pet_aura
     PetAuras    auras;
 };
@@ -76,10 +78,10 @@ class CharacterDatabaseCache
         void LoadPetSpellCooldown(uint32 singlePetId);
         void LoadPetAura(uint32 singlePetId);
 
-        CharacterPetCache* GetCharacterPetCacheByOwnerAndId(uint64 owner, uint32 id);
-        CharacterPetCache* GetCharacterCurrentPet(uint64 owner);
-        CharacterPetCache* GetCharacterPetByOwnerAndEntry(uint64 owner, uint32 entry);
-        CharacterPetCache* GetCharacterPetByOwner(uint64 owner);
+        CharacterPetCache* GetCharacterPetCacheByOwnerAndId(uint32 ownerGuidLow, uint32 id);
+        CharacterPetCache* GetCharacterCurrentPet(uint32 owner);
+        CharacterPetCache* GetCharacterPetByOwnerAndEntry(uint32 owner, uint32 entry);
+        CharacterPetCache* GetCharacterPetByOwner(uint32 owner);
         CharacterPetCache* GetCharacterPetById(uint32 id); // Very slow method (iterates over all the stored pets)
         void CharacterPetSetOthersNotInSlot(CharacterPetCache* pCache);
         void InsertCharacterPet(CharacterPetCache* cache);

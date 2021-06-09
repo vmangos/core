@@ -280,8 +280,8 @@ class MailDraft
  */
 struct MailItemInfo
 {
-    uint32 item_guid;                                       ///< the GUID of the item.
-    uint32 item_template;                                   ///< the ID of the template of the item.
+    uint32 itemGuid;                                        ///< the item instance GUID
+    uint32 itemId;                                          ///< the item template ID
 };
 
 typedef std::vector<MailItemInfo> MailItemInfoVec;
@@ -335,11 +335,11 @@ struct Mail
      * @param item_template the ID of the template of the item.
      *
      */
-    void AddItem(uint32 itemGuidLow, uint32 item_template)
+    void AddItem(uint32 itemGuidLow, uint32 itemId)
     {
         MailItemInfo mii;
-        mii.item_guid = itemGuidLow;
-        mii.item_template = item_template;
+        mii.itemGuid = itemGuidLow;
+        mii.itemId = itemId;
         items.push_back(mii);
         has_items = true;
     }
@@ -354,11 +354,11 @@ struct Mail
      * @returns true if the item was removed, or false if no item with that GUID was found.
      *
      */
-    bool RemoveItem(uint32 item_guid)
+    bool RemoveItem(uint32 itemGuid)
     {
         for(MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
-            if (itr->item_guid == item_guid)
+            if (itr->itemGuid == itemGuid)
             {
                 items.erase(itr);
                 return true;

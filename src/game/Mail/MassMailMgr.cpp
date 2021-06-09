@@ -43,11 +43,11 @@ void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender const& sender
     if (RACEMASK_ALL_PLAYABLE & ~raceMask)                  // have races not included in mask
     {
         std::ostringstream ss;
-        ss << "SELECT `guid` FROM `characters` WHERE (1 << (`race` - 1)) & " << raceMask << " AND `deleteDate` IS NULL";
+        ss << "SELECT `guid` FROM `characters` WHERE (1 << (`race` - 1)) & " << raceMask << " AND `deleted_time` IS NULL";
         AddMassMailTask(mailProto, sender, ss.str().c_str());
     }
     else
-        AddMassMailTask(mailProto, sender, "SELECT `guid` FROM `characters` WHERE `deleteDate` IS NULL");
+        AddMassMailTask(mailProto, sender, "SELECT `guid` FROM `characters` WHERE `deleted_time` IS NULL");
 }
 
 struct MassMailerQueryHandler

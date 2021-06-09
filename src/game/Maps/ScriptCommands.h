@@ -105,7 +105,7 @@ enum eScriptCommand
                                                             // datalong = sound_id
                                                             // datalong2 = ePlaySoundFlags
     SCRIPT_COMMAND_CREATE_ITEM              = 17,           // source = Player (from provided source or target)
-                                                            // datalong = item_entry
+                                                            // datalong = item_id
                                                             // datalong2 = amount
     SCRIPT_COMMAND_DESPAWN_CREATURE         = 18,           // source = Creature
                                                             // datalong = despawn_delay
@@ -177,7 +177,7 @@ enum eScriptCommand
                                                             // datalong1-4 = event_script id
                                                             // dataint1-4 = chance (total cant be above 100)
     SCRIPT_COMMAND_REMOVE_ITEM              = 40,           // source = Player (from provided source or target)
-                                                            // datalong = item_entry
+                                                            // datalong = item_id
                                                             // datalong2 = amount
     SCRIPT_COMMAND_REMOVE_OBJECT            = 41,           // source = GameObject
                                                             // target = Unit
@@ -629,7 +629,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_CREATE_ITEM (17)
         {
-            uint32 itemEntry;                               // datalong
+            uint32 itemId;                                  // datalong
             uint32 amount;                                  // datalong2
         } createItem;
 
@@ -762,7 +762,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_REMOVE_ITEM (40)
         {
-            uint32 itemEntry;                               // datalong
+            uint32 itemId;                                  // datalong
             uint32 amount;                                  // datalong2
         } removeItem;
 

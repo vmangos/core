@@ -269,14 +269,14 @@ enum InstanceResetFailReason
 struct DungeonResetEvent
 {
     ResetEventType type   :8;                               // if RESET_EVENT_DUNGEON then InstanceID == 0 and applied to all instances for map)
-    uint16 mapid;                                           // used with mapid used as for select reset for global cooldown instances (instanceid==0 for event)
+    uint16 mapId;                                           // used with mapId used as for select reset for global cooldown instances (instanceid==0 for event)
     uint32 instanceId;                                      // used for select reset for normal dungeons
 
-    DungeonResetEvent() : type(RESET_EVENT_NORMAL_DUNGEON), mapid(0), instanceId(0) {}
+    DungeonResetEvent() : type(RESET_EVENT_NORMAL_DUNGEON), mapId(0), instanceId(0) {}
     DungeonResetEvent(ResetEventType t, uint32 _mapid, uint32 _instanceid)
-        : type(t), mapid(_mapid), instanceId(_instanceid) {}
+        : type(t), mapId(_mapid), instanceId(_instanceid) {}
 
-    bool operator == (DungeonResetEvent const& e) { return e.mapid == mapid && e.instanceId == instanceId; }
+    bool operator == (DungeonResetEvent const& e) { return e.mapId == mapId && e.instanceId == instanceId; }
 };
 
 typedef std::map<uint32, std::pair<uint32, time_t> > ResetTimeMapType;
@@ -290,14 +290,14 @@ class DungeonResetScheduler
         void ScheduleAllDungeonResets();
 
     public:                                                 // accessors
-        time_t GetResetTimeFor(uint32 mapid) { return m_resetTimeByMapId[mapid]; }
+        time_t GetResetTimeFor(uint32 mapId) { return m_resetTimeByMapId[mapId]; }
 
         static uint32 GetMaxResetTimeFor(MapEntry const* temp);
         static time_t CalculateNextResetTime(MapEntry const* temp, time_t prevResetTime);
     public:                                                 // modifiers
-        void SetResetTimeFor(uint32 mapid, time_t t)
+        void SetResetTimeFor(uint32 mapId, time_t t)
         {
-            m_resetTimeByMapId[mapid] = t;
+            m_resetTimeByMapId[mapId] = t;
         }
 
         void ScheduleReset(bool add, time_t time, DungeonResetEvent event);
@@ -347,7 +347,7 @@ class MapPersistentStateManager : public MaNGOS::Singleton<MapPersistentStateMan
 
         DungeonResetScheduler& GetScheduler() { return m_Scheduler; }
 
-        static void DeleteInstanceFromDB(uint32 mapid, uint32 instanceid);
+        static void DeleteInstanceFromDB(uint32 mapId, uint32 instanceId);
 
         void GetStatistics(uint32& numStates, uint32& numBoundPlayers, uint32& numBoundGroups);
 
@@ -356,8 +356,8 @@ class MapPersistentStateManager : public MaNGOS::Singleton<MapPersistentStateMan
         typedef std::unordered_map<uint32 /*InstanceId or MapId*/, MapPersistentState*> PersistentStateMap;
 
         //  called by scheduler for DungeonPersistentStates
-        void _ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeleft);
-        void _ResetInstance(uint32 mapid, uint32 instanceId);
+        void _ResetOrWarnAll(uint32 mapId, bool warn, uint32 timeleft);
+        void _ResetInstance(uint32 mapId, uint32 instanceId);
         void _CleanupExpiredInstancesAtTime(time_t t);
 
         void _ResetSave(PersistentStateMap& holder, PersistentStateMap::iterator &itr);

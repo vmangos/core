@@ -835,7 +835,7 @@ class TradeData
     public:                                                 // access functions
 
         void SetItem(TradeSlots slot, Item* item);
-        void SetSpell(uint32 spell_id, Item* castItem = nullptr);
+        void SetSpell(uint32 spellId, Item* castItem = nullptr);
         void SetMoney(uint32 money);
 
         void SetAccepted(bool state, bool crosssend = false);
@@ -885,17 +885,16 @@ class MovementAnticheat;
 
 struct AuraSaveStruct
 {
-    ObjectGuid caster_guid = 0;
-    uint32 item_lowguid = 0;
-    uint32 spellid = 0;
-    uint32 stackcount = 0;
-    uint32 remaincharges = 0;
+    ObjectGuid casterGuid = 0;
+    uint32 itemLowGuid = 0;
+    uint32 spellId = 0;
+    uint32 stacks = 0;
+    uint32 charges = 0;
     float  damage[MAX_EFFECT_INDEX] = { 0 };
     uint32 periodicTime[MAX_EFFECT_INDEX] = { 0 };
-
-    int32 maxduration = 0;
-    int32 remaintime = 0;
-    uint32 effIndexMask = 0;
+    int32 maxDuration = 0;
+    int32 duration = 0;
+    uint8 effIndexMask = 0;
 };
 
 struct ScheduledTeleportData
@@ -1110,8 +1109,8 @@ class Player final: public Unit
         void AutoUnequipItemFromSlot(uint32 slot);
         void SatisfyItemRequirements(ItemPrototype const* pItem);
         void AddStartingItems();
-        bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count, uint32 enchantId = 0);
-        Item* StoreNewItemInInventorySlot(uint32 itemEntry, uint32 amount);
+        bool StoreNewItemInBestSlots(uint32 itemId, uint32 amount, uint32 enchantId = 0);
+        Item* StoreNewItemInInventorySlot(uint32 itemId, uint32 amount);
         void AutoStoreLoot(Loot& loot, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
         void SetAmmo(uint32 item);
         void RemoveAmmo();
@@ -1323,7 +1322,7 @@ class Player final: public Unit
         void ItemRemovedQuestCheck(uint32 entry, uint32 count);
         void KilledMonster(CreatureInfo const* cInfo, ObjectGuid guid);
         void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid());
-        void CastedCreatureOrGO(uint32 entry, ObjectGuid guid, uint32 spell_id, bool original_caster = true);
+        void CastedCreatureOrGO(uint32 entry, ObjectGuid guid, uint32 spellId, bool originalCaster = true);
         void TalkedToCreature(uint32 entry, ObjectGuid guid);
         void MoneyChanged(uint32 value);
         void ReputationChanged(FactionEntry const* factionEntry);
@@ -1407,13 +1406,13 @@ class Player final: public Unit
         uint32 m_nextSave;
     public:
         // Saves a new character directly in the database, without creating a Player object in memory.
-        static bool SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint32 cinematic);
+        static bool SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string const& name, uint8 raceId, uint8 classId, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         void SaveToDB(bool online = true, bool force = false);
         void SaveInventoryAndGoldToDB();                    // fast save function for item/money cheating preventing
         void SaveGoldToDB();
         static void SavePositionInDB(ObjectGuid guid, uint32 mapid, float x,float y,float z,float o,uint32 zone);
 
-        static void DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRealmChars = true, bool deleteFinally = false);
+        static void DeleteFromDB(ObjectGuid playerGuid, uint32 accountId, bool updateRealmChars = true, bool deleteFinally = false);
         static void DeleteOldCharacters();
         static void DeleteOldCharacters(uint32 keepDays);
 
@@ -1453,7 +1452,7 @@ class Player final: public Unit
 
         // Temporarily removed pet cache
         uint32 GetTemporaryUnsummonedPetNumber() const { return m_temporaryUnsummonedPetNumber; }
-        void SetTemporaryUnsummonedPetNumber(uint32 petnumber) { m_temporaryUnsummonedPetNumber = petnumber; }
+        void SetTemporaryUnsummonedPetNumber(uint32 petNumber) { m_temporaryUnsummonedPetNumber = petNumber; }
         void UnsummonPetTemporaryIfAny();
         void ResummonPetTemporaryUnSummonedIfAny();
         bool IsPetNeedBeTemporaryUnsummoned() const { return !IsInWorld() || !IsAlive() || IsMounted() /*+in flight*/; }
@@ -1471,16 +1470,16 @@ class Player final: public Unit
         
         bool IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const;
         void SendInitialSpells() const;
-        bool AddSpell(uint32 spell_id, bool active, bool learning, bool dependent, bool disabled);
+        bool AddSpell(uint32 spellId, bool active, bool learning, bool dependent, bool disabled);
     public:
         bool HasSpell(uint32 spell) const override;
         bool HasActiveSpell(uint32 spell) const;            // show in spellbook
         TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
-        bool IsSpellFitByClassAndRace(uint32 spell_id, uint32* pReqlevel = nullptr) const;
+        bool IsSpellFitByClassAndRace(uint32 spellId, uint32* pReqlevel = nullptr) const;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
-        void SendSpellRemoved(uint32 spell_id) const;
-        void LearnSpell(uint32 spell_id, bool dependent, bool talent = false);
-        void RemoveSpell(uint32 spell_id, bool disabled = false, bool learn_low_rank = true);
+        void SendSpellRemoved(uint32 spellId) const;
+        void LearnSpell(uint32 spellId, bool dependent, bool talent = false);
+        void RemoveSpell(uint32 spellId, bool disabled = false, bool learn_low_rank = true);
         void ResetSpells();
         void LearnDefaultSpells();
         void LearnQuestRewardedSpells();
@@ -1512,7 +1511,7 @@ class Player final: public Unit
         virtual void RemoveAllCooldowns(bool sendOnly = false);
         virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) override;
         void RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent = nullptr);
-        void SendClearCooldown(uint32 spell_id, Unit* target) const;
+        void SendClearCooldown(uint32 spellId, Unit* target) const;
         void SendClearAllCooldowns(Unit* target) const;
         void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
         void _LoadSpellCooldowns(QueryResult* result);
@@ -2066,15 +2065,12 @@ class Player final: public Unit
         /*********************************************************/
 
     private:
-        uint32 m_cinematic;
         uint32 m_currentCinematicEntry;
         Position m_cinematicStartPos;
         uint32 m_cinematicLastCheck;
         uint32 m_cinematicElapsedTime;
         void UpdateCinematic(uint32 diff);
     public:
-        uint32 GetCinematic() { return m_cinematic; }
-        void SetCinematic(uint32 cine) { m_cinematic = cine; }
         void SendCinematicStart(uint32 CinematicSequenceId);
         uint32 GetCurrentCinematicEntry() const { return m_currentCinematicEntry; }
 
@@ -2130,9 +2126,10 @@ class Player final: public Unit
     private:
         WorldSession* m_session;
         uint32 m_skippedUpdateTime;
-        time_t m_logintime;
-        time_t m_Last_tick;
-        uint32 m_Played_time[MAX_PLAYED_TIME_INDEX];
+        time_t m_createTime;
+        time_t m_loginTime;
+        time_t m_lastTick;
+        uint32 m_playedTime[MAX_PLAYED_TIME_INDEX];
     public:
         WorldSession* GetSession() const { return m_session; }
         void SetSession(WorldSession* s);
@@ -2149,8 +2146,8 @@ class Player final: public Unit
         void SendUpdateWorldState(uint32 Field, uint32 Value) const;
         void SendDirectMessage(WorldPacket* data) const;
 
-        uint32 GetTotalPlayedTime() const { return m_Played_time[PLAYED_TIME_TOTAL]; }
-        uint32 GetLevelPlayedTime() const { return m_Played_time[PLAYED_TIME_LEVEL]; }
+        uint32 GetTotalPlayedTime() const { return m_playedTime[PLAYED_TIME_TOTAL]; }
+        uint32 GetLevelPlayedTime() const { return m_playedTime[PLAYED_TIME_LEVEL]; }
 
         void AddSkippedUpdateTime(uint32 t) { m_skippedUpdateTime += t; }
         uint32 GetSkippedUpdateTime() const { return m_skippedUpdateTime; }
