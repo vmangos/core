@@ -581,7 +581,7 @@ bool ChatHandler::HandleAuraHelper(uint32 spellId, int32 duration, Unit* unit)
     if (duration > 0)
         holder->SetAuraDuration(duration * IN_MILLISECONDS);
 
-    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         uint8 eff = spellInfo->Effect[i];
         if (eff >= TOTAL_SPELL_EFFECTS)
@@ -667,7 +667,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
         SpellAuraHolder* holder = aura.second;
         char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()].c_str();
 
-        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
             Aura* aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
             if (!aur)

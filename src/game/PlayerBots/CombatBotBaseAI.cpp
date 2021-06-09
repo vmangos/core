@@ -2263,7 +2263,7 @@ bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const*
     uint32 dispelMask = 0;
     bool bFoundOneDispell = false;
     // Compute Dispel Mask
-    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (pSpellEntry->Effect[i] != SPELL_EFFECT_DISPEL)
             continue;

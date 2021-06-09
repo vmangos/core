@@ -307,9 +307,9 @@ void Item::SaveToDB()
             static SqlStatementID updItem;
 
             SqlStatement stmt = (uState == ITEM_NEW) ?
-                                CharacterDatabase.CreateStatement(insItem, "REPLACE INTO `item_instance` (`itemEntry`, `owner_guid`, `creatorGuid`, `giftCreatorGuid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `randomPropertyId`, `durability`, `text`, `generated_loot`, `guid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                                CharacterDatabase.CreateStatement(insItem, "REPLACE INTO `item_instance` (`item_id`, `owner_guid`, `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `generated_loot`, `guid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                                 :
-                                CharacterDatabase.CreateStatement(updItem, "UPDATE `item_instance` SET `itemEntry` = ?, `owner_guid` = ?, `creatorGuid` = ?, `giftCreatorGuid` = ?, `count` = ?, `duration` = ?, `charges` = ?, `flags` = ?, `enchantments` = ?, `randomPropertyId` = ?, `durability` = ?, `text` = ?, `generated_loot` = ? WHERE `guid` = ?");
+                                CharacterDatabase.CreateStatement(updItem, "UPDATE `item_instance` SET `item_id` = ?, `owner_guid` = ?, `creator_guid` = ?, `gift_creator_guid` = ?, `count` = ?, `duration` = ?, `charges` = ?, `flags` = ?, `enchantments` = ?, `random_property_id` = ?, `durability` = ?, `text` = ?, `generated_loot` = ? WHERE `guid` = ?");
             stmt.addUInt32(GetEntry());
             stmt.addUInt32(GetOwnerGuid().GetCounter());
             stmt.addUInt32(GetGuidValue(ITEM_FIELD_CREATOR).GetCounter());
@@ -396,11 +396,11 @@ void Item::SaveToDB()
             // save money as 0 itemid data
             if (loot.gold)
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(saveGold, "INSERT INTO `item_loot` (`guid`, `owner_guid`, `itemid`, `amount`, `property`) VALUES (?, ?, 0, ?, 0)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(saveGold, "INSERT INTO `item_loot` (`guid`, `owner_guid`, `item_id`, `amount`, `property`) VALUES (?, ?, 0, ?, 0)");
                 stmt.PExecute(GetGUIDLow(), ownerGuid.GetCounter(), loot.gold);
             }
 
-            SqlStatement stmt = CharacterDatabase.CreateStatement(saveLoot, "INSERT INTO `item_loot` (`guid`, `owner_guid`, `itemid`, `amount`, `property`) VALUES (?, ?, ?, ?, ?)");
+            SqlStatement stmt = CharacterDatabase.CreateStatement(saveLoot, "INSERT INTO `item_loot` (`guid`, `owner_guid`, `item_id`, `amount`, `property`) VALUES (?, ?, ?, ?, ?)");
 
             // save items and quest items (at load its all will added as normal, but this not important for item loot case)
             for (size_t i = 0; i < loot.GetMaxSlotInLootFor(ownerGuid); ++i)
@@ -435,8 +435,8 @@ void Item::SaveToDB()
 
 bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint32 entry)
 {
-    //                0                1      2         3        4      5             6                 7           8     9       10         11
-    // SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, item_guid, itemEntry
+    //         0            1                  2      3         4        5      6             7                   8           9     10         11
+    // SELECT creator_guid, gift_creator_guid, count, duration, charges, flags, enchantments, random_property_id, durability, text, item_guid, item_id
     // create item before any checks for store correct guid
     // and allow use "FSetState(ITEM_REMOVED); SaveToDB();" for deleting item from DB
     Object::_Create(guidLow, 0, HIGHGUID_ITEM);
@@ -532,8 +532,8 @@ bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint3
 void Item::DeleteAllFromDB(uint32 guidLow)
 {
     CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `guid` = '%u'", guidLow);
-    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item` = '%u'", guidLow);
-    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `itemguid` = '%u'", guidLow);
+    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item_guid` = '%u'", guidLow);
+    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `item_guid` = '%u'", guidLow);
     CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` = '%u'", guidLow);
     // Petitions
     if (Petition* petition = sGuildMgr.GetPetitionByCharterGuid(ObjectGuid(guidLow)))
@@ -561,7 +561,7 @@ void Item::LoadLootFromDB(Field* fields)
 
     if (!proto)
     {
-        CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `guid` = '%u' AND `itemid` = '%u'", GetGUIDLow(), item_id);
+        CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `guid` = '%u' AND `item_id` = '%u'", GetGUIDLow(), item_id);
         sLog.outError("Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
         return;
     }
@@ -584,7 +584,7 @@ void Item::DeleteFromInventoryDB()
 {
     static SqlStatementID delInv ;
 
-    SqlStatement stmt = CharacterDatabase.CreateStatement(delInv, "DELETE FROM `character_inventory` WHERE `item` = ?");
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delInv, "DELETE FROM `character_inventory` WHERE `item_guid` = ?");
     stmt.PExecute(GetGUIDLow());
 }
 

@@ -3309,7 +3309,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
     // add aura, register in lists and arrays
     m_spellAuraHolders.insert(SpellAuraHolderMap::value_type(holder->GetId(), holder));
 
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (Aura* aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
             AddAuraToModList(aur);
 
@@ -3402,7 +3402,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
 
     uint32 firstInChain = 0;
     bool dmgPeriodic = false;
-    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+    for (uint8 eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
     {
         if (Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(eff)))
         {
@@ -4297,7 +4297,7 @@ void Unit::HandleTriggers(Unit* pVictim, uint32 procExtra, uint32 amount, SpellE
         if (spellProcEvent && spellProcEvent->cooldown)
             cooldown = spellProcEvent->cooldown;
 
-        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
             Aura* triggeredByAura = triggeredByHolder->GetAuraByEffectIndex(SpellEffectIndex(i));
             if (!triggeredByAura)
@@ -7870,11 +7870,11 @@ CharmInfo* Unit::InitCharmInfo(Unit* charm)
 }
 
 CharmInfo::CharmInfo(Unit* unit)
-    : m_unit(unit), m_originalFactionTemplate(nullptr), m_CommandState(COMMAND_FOLLOW), m_reactState(REACT_PASSIVE), m_petnumber(0),
+    : m_unit(unit), m_originalFactionTemplate(nullptr), m_commandState(COMMAND_FOLLOW), m_reactState(REACT_PASSIVE), m_petNumber(0),
       m_isCommandAttack(false), m_isCommandFollow(false), m_isAtStay(false), m_isFollowing(false), m_isReturning(false),
       m_stayX(0.0f), m_stayY(0.0f), m_stayZ(0.0f)
 {
-    for (auto& itr : m_charmspells)
+    for (auto& itr : m_charmSpells)
         itr.SetActionAndType(0, ACT_DISABLED);
 }
 
@@ -7943,18 +7943,18 @@ void CharmInfo::InitCharmCreateSpells()
 
         if (!spellId)
         {
-            m_charmspells[x].SetActionAndType(spellId, ACT_DISABLED);
+            m_charmSpells[x].SetActionAndType(spellId, ACT_DISABLED);
             continue;
         }
 
         if (Spells::IsPassiveSpell(spellId))
         {
             m_unit->CastSpell(m_unit, spellId, true);
-            m_charmspells[x].SetActionAndType(spellId, ACT_PASSIVE);
+            m_charmSpells[x].SetActionAndType(spellId, ACT_PASSIVE);
         }
         else
         {
-            m_charmspells[x].SetActionAndType(spellId, ACT_DISABLED);
+            m_charmSpells[x].SetActionAndType(spellId, ACT_DISABLED);
 
             ActiveStates newstate;
             bool onlyselfcast = true;
@@ -7987,18 +7987,18 @@ void CharmInfo::InitCharmCreateSpells()
     }
 }
 
-bool CharmInfo::AddSpellToActionBar(uint32 spell_id, ActiveStates newstate)
+bool CharmInfo::AddSpellToActionBar(uint32 spellId, ActiveStates newstate)
 {
-    uint32 first_id = sSpellMgr.GetFirstSpellInChain(spell_id);
+    uint32 first_id = sSpellMgr.GetFirstSpellInChain(spellId);
 
     // new spell rank can be already listed
-    for (auto& i : PetActionBar)
+    for (auto& i : m_petActionBar)
     {
         if (uint32 action = i.GetAction())
         {
             if (i.IsActionBarForSpell() && sSpellMgr.GetFirstSpellInChain(action) == first_id)
             {
-                i.SetAction(spell_id);
+                i.SetAction(spellId);
                 return true;
             }
         }
@@ -8007,24 +8007,24 @@ bool CharmInfo::AddSpellToActionBar(uint32 spell_id, ActiveStates newstate)
     // or use empty slot in other case
     for (uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
     {
-        if (!PetActionBar[i].GetAction() && PetActionBar[i].IsActionBarForSpell())
+        if (!m_petActionBar[i].GetAction() && m_petActionBar[i].IsActionBarForSpell())
         {
-            SetActionBar(i, spell_id, newstate == ACT_DECIDE ? ACT_DISABLED : newstate);
+            SetActionBar(i, spellId, newstate == ACT_DECIDE ? ACT_DISABLED : newstate);
             return true;
         }
     }
     return false;
 }
 
-bool CharmInfo::RemoveSpellFromActionBar(uint32 spell_id)
+bool CharmInfo::RemoveSpellFromActionBar(uint32 spellId)
 {
-    uint32 first_id = sSpellMgr.GetFirstSpellInChain(spell_id);
+    uint32 first_id = sSpellMgr.GetFirstSpellInChain(spellId);
 
     for (uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
     {
-        if (uint32 action = PetActionBar[i].GetAction())
+        if (uint32 action = m_petActionBar[i].GetAction())
         {
-            if (PetActionBar[i].IsActionBarForSpell() && sSpellMgr.GetFirstSpellInChain(action) == first_id)
+            if (m_petActionBar[i].IsActionBarForSpell() && sSpellMgr.GetFirstSpellInChain(action) == first_id)
             {
                 SetActionBar(i, 0, ACT_DISABLED);
                 return true;
@@ -8040,16 +8040,16 @@ void CharmInfo::ToggleCreatureAutocast(uint32 spellid, bool apply)
     if (Spells::IsPassiveSpell(spellid))
         return;
 
-    for (auto& itr : m_charmspells)
+    for (auto& itr : m_charmSpells)
         if (spellid == itr.GetAction())
             itr.SetType(apply ? ACT_ENABLED : ACT_DISABLED);
 }
 
-void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)
+void CharmInfo::SetPetNumber(uint32 petNumber, bool statWindow)
 {
-    m_petnumber = petnumber;
-    if (statwindow)
-        m_unit->SetUInt32Value(UNIT_FIELD_PETNUMBER, m_petnumber);
+    m_petNumber = petNumber;
+    if (statWindow)
+        m_unit->SetUInt32Value(UNIT_FIELD_PETNUMBER, m_petNumber);
     else
         m_unit->SetUInt32Value(UNIT_FIELD_PETNUMBER, 0);
 }
@@ -8072,25 +8072,25 @@ void CharmInfo::LoadPetActionBar(std::string const& data)
         ++iter;
         uint32 action = atol((*iter).c_str());
 
-        PetActionBar[index].SetActionAndType(action, ActiveStates(type));
+        m_petActionBar[index].SetActionAndType(action, ActiveStates(type));
 
         // check correctness
-        if (PetActionBar[index].IsActionBarForSpell() && !sSpellMgr.GetSpellEntry(PetActionBar[index].GetAction()))
+        if (m_petActionBar[index].IsActionBarForSpell() && !sSpellMgr.GetSpellEntry(m_petActionBar[index].GetAction()))
             SetActionBar(index, 0, ACT_DISABLED);
     }
 }
 
 void CharmInfo::BuildActionBar(WorldPacket* data)
 {
-    for (const auto& i : PetActionBar)
+    for (const auto& i : m_petActionBar)
         *data << uint32(i.packedData);
 }
 
-void CharmInfo::SetSpellAutocast(uint32 spell_id, bool state)
+void CharmInfo::SetSpellAutocast(uint32 spellId, bool state)
 {
-    for (auto& i : PetActionBar)
+    for (auto& i : m_petActionBar)
     {
-        if (spell_id == i.GetAction() && i.IsActionBarForSpell())
+        if (spellId == i.GetAction() && i.IsActionBarForSpell())
         {
             i.SetType(state ? ACT_ENABLED : ACT_DISABLED);
             break;
@@ -9815,7 +9815,7 @@ SpellAuraHolder* Unit::AddAura(uint32 spellId, uint32 addAuraFlags, Unit* pCaste
     if (addAuraFlags & ADD_AURA_PERMANENT)
         holder->SetPermanent(true);
 
-    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         uint8 eff = spellInfo->Effect[i];
         if (eff >= TOTAL_SPELL_EFFECTS)

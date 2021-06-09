@@ -516,7 +516,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
             auction_owner->GetSession()->SendAuctionOwnerNotification(auction, false);
 
         // after this update we should save player's money ...
-        CharacterDatabase.PExecute("UPDATE auction SET buyguid = '%u', lastbid = '%u' WHERE id = '%u'", auction->bidder, auction->bid, auction->Id);
+        CharacterDatabase.PExecute("UPDATE `auction` SET `buyer_guid` = '%u', `last_bid` = '%u' WHERE `id` = '%u'", auction->bidder, auction->bid, auction->Id);
 
         SendAuctionCommandResult(auction, AUCTION_BID_PLACED, AUCTION_OK);
     }

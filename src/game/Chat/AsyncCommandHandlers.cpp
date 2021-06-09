@@ -60,8 +60,8 @@ void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, Obj
     {
         data->target_guid = target_guid;
         CharacterDatabase.AsyncPQuery(&PInfoHandler::HandlePlayerLookupResult, data,
-            //  0          1      2      3        4     5
-            "SELECT `totaltime`, `level`, `money`, `account`, `race`, `class` FROM `characters` WHERE `guid` = '%u'",
+            //       0                    1        2        3          4       5
+            "SELECT `played_time_total`, `level`, `money`, `account`, `race`, `class` FROM `characters` WHERE `guid` = '%u'",
             target_guid.GetCounter());
     }
 }
@@ -91,8 +91,8 @@ void PInfoHandler::HandleDataAfterPlayerLookup(PInfoData *data)
 {
     SqlQueryHolder* charHolder = new SqlQueryHolder;
     charHolder->SetSize(2);
-    charHolder->SetPQuery(PINFO_QUERY_GOLD_SENT, "SELECT SUM(money) FROM mail WHERE sender = %u", data->target_guid.GetCounter());
-    charHolder->SetPQuery(PINFO_QUERY_GOLD_RECEIVED, "SELECT SUM(money) FROM mail WHERE receiver = %u", data->target_guid.GetCounter());
+    charHolder->SetPQuery(PINFO_QUERY_GOLD_SENT, "SELECT SUM(`money`) FROM `mail` WHERE `sender_guid` = %u", data->target_guid.GetCounter());
+    charHolder->SetPQuery(PINFO_QUERY_GOLD_RECEIVED, "SELECT SUM(`money`) FROM `mail` WHERE `receiver_guid` = %u", data->target_guid.GetCounter());
 
     CharacterDatabase.DelayQueryHolder(&PInfoHandler::HandleDelayedMoneyQuery, charHolder, data);
 }

@@ -256,7 +256,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_SOURCE_ENTRY:
         {
-            return source->GetEntry() == m_value1;
+            return (source->GetEntry() == m_value1) ||
+                   (m_value2 && source->GetEntry() == m_value2) ||
+                   (m_value3 && source->GetEntry() == m_value3) ||
+                   (m_value4 && source->GetEntry() == m_value4);
         }
         case CONDITION_SPELL:
         {

@@ -165,11 +165,11 @@ enum GuildEmblem
 
 struct GuildEventLogEntry
 {
-    uint8  EventType;
-    uint32 PlayerGuid1;
-    uint32 PlayerGuid2;
-    uint8  NewRank;
-    uint64 TimeStamp;
+    uint8  eventType = 0;
+    uint32 playerGuid1 = 0;
+    uint32 playerGuid2 = 0;
+    uint8  newRank = 0;
+    uint64 timestamp = 0;
 };
 
 struct MemberSlot
@@ -312,7 +312,7 @@ class Guild
         // Guild EventLog
         void   LoadGuildEventLogFromDB();
         void   DisplayGuildEventLog(WorldSession* session);
-        void   LogGuildEvent(uint8 EventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
+        void   LogGuildEvent(uint8 eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
 
     protected:
         void AddRank(std::string const& name,uint32 rights);

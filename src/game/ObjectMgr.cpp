@@ -654,8 +654,8 @@ void ObjectMgr::LoadPlayerCacheData()
     m_playerNameToGuid.clear();
 
     std::unique_ptr<QueryResult> result(CharacterDatabase.Query(
-        //       0       1       2        3         4          5       6        7       8      9             10            11            12             13
-        "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `taxi_path` FROM `characters`;"));
+        //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
+        "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters`;"));
 
     uint32 total_count = 0;
 
@@ -3291,7 +3291,7 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
 {
     // These are all the items that have been obtained by players.
     {
-        std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT DISTINCT `itemEntry` FROM `item_instance`"));
+        std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT DISTINCT `item_id` FROM `item_instance`"));
         if (result)
         {
             do
@@ -3746,7 +3746,7 @@ void ObjectMgr::LoadItemRequiredTarget()
                     if (bounds.first != bounds.second)
                         break;
 
-                    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+                    for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
                     {
                         if (pSpellInfo->EffectImplicitTargetA[j] == TARGET_UNIT_ENEMY ||
                                 pSpellInfo->EffectImplicitTargetB[j] == TARGET_UNIT_ENEMY ||
@@ -4568,8 +4568,8 @@ void ObjectMgr::LoadGroups()
 {
     // -- loading groups --
     uint32 count = 0;
-    //                                                                   0           1                2             3             4                5        6        7        8        9        10       11       12       13        14            15
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `mainTank`, `mainAssistant`, `lootMethod`, `looterGuid`, `lootThreshold`, `icon1`, `icon2`, `icon3`, `icon4`, `icon5`, `icon6`, `icon7`, `icon8`, `isRaid`, `leaderGuid`, `groupId` FROM `groups`"));
+    //                                                                   0                 1                      2              3              4                 5        6        7        8        9        10       11       12       13         14             15
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `main_tank_guid`, `main_assistant_guid`, `loot_method`, `looter_guid`, `loot_threshold`, `icon1`, `icon2`, `icon3`, `icon4`, `icon5`, `icon6`, `icon7`, `icon8`, `is_raid`, `leader_guid`, `group_id` FROM `groups`"));
 
     if (!result)
     {
@@ -4605,8 +4605,8 @@ void ObjectMgr::LoadGroups()
 
     // -- loading members --
     count = 0;
-    //                                            0             1            2           3
-    result.reset(CharacterDatabase.Query("SELECT `memberGuid`, `assistant`, `subgroup`, `groupId` FROM `group_member` ORDER BY `groupId`"));
+    //                                            0              1            2           3
+    result.reset(CharacterDatabase.Query("SELECT `member_guid`, `assistant`, `subgroup`, `group_id` FROM `group_member` ORDER BY `group_id`"));
     if (!result)
     {
         BarGoLink bar2(1);
@@ -4635,7 +4635,7 @@ void ObjectMgr::LoadGroups()
                 {
                     sLog.outErrorDb("Incorrect entry in group_member table : no group with Id %d for member %s!",
                                     groupId, memberGuid.GetString().c_str());
-                    CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%u'", memberGuidlow);
+                    CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `member_guid` = '%u'", memberGuidlow);
                     continue;
                 }
             }
@@ -4644,7 +4644,7 @@ void ObjectMgr::LoadGroups()
             {
                 sLog.outErrorDb("Incorrect entry in group_member table : member %s cannot be added to group (Id: %u)!",
                                 memberGuid.GetString().c_str(), groupId);
-                CharacterDatabase.PExecute("DELETE FROM group_member WHERE memberGuid = '%u'", memberGuidlow);
+                CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `member_guid` = '%u'", memberGuidlow);
             }
         }
         while (result->NextRow());
@@ -4670,13 +4670,13 @@ void ObjectMgr::LoadGroups()
     // -- loading instances --
     count = 0;
     result.reset(CharacterDatabase.Query(
-                 //                        0             1      2           3            4
-                 "SELECT `group_instance`.`leaderGuid`, `map`, `instance`, `permanent`, `resettime`, "
+                 //                        0              1      2           3            4
+                 "SELECT `group_instance`.`leader_guid`, `map`, `instance`, `permanent`, `reset_time`, "
                  // 5
-                 "(SELECT COUNT(*) FROM `character_instance` WHERE `guid` = `group_instance`.`leaderGuid` AND `instance` = `group_instance`.`instance` AND `permanent` = 1 LIMIT 1), "
+                 "(SELECT COUNT(*) FROM `character_instance` WHERE `guid` = `group_instance`.`leader_guid` AND `instance` = `group_instance`.`instance` AND `permanent` = 1 LIMIT 1), "
                  // 6
-                 " `groups`.`groupId` "
-                 "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leaderGUID` = `group_instance`.`leaderGUID` ORDER BY `leaderGuid`"
+                 " `groups`.`group_id` "
+                 "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leader_guid` = `group_instance`.`leader_guid` ORDER BY `leader_guid`"
              ));
 
     if (!result)
@@ -5067,10 +5067,10 @@ void ObjectMgr::LoadQuests()
                 if (!qinfo->ReqCreatureOrGOId[j])
                 {
                     bool found = false;
-                    for (int k = 0; k < MAX_EFFECT_INDEX; ++k)
+                    for (uint8 k = 0; k < MAX_EFFECT_INDEX; ++k)
                     {
                         if ((spellInfo->Effect[k] == SPELL_EFFECT_QUEST_COMPLETE && uint32(spellInfo->EffectMiscValue[k]) == qinfo->QuestId) ||
-                                spellInfo->Effect[k] == SPELL_EFFECT_SEND_EVENT)
+                             spellInfo->Effect[k] == SPELL_EFFECT_SEND_EVENT)
                         {
                             found = true;
                             break;
@@ -5347,7 +5347,7 @@ void ObjectMgr::LoadQuests()
         if (!spellInfo)
             continue;
 
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+        for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             if (spellInfo->Effect[j] != SPELL_EFFECT_QUEST_COMPLETE)
                 continue;
@@ -5982,12 +5982,12 @@ public:
             else                // Return to sender
             {
                 // mail will be returned:
-                CharacterDatabase.PExecute("UPDATE `mail` SET `sender` = '%u', `receiver` = '%u', `expire_time` = '" UI64FMTD "', `deliver_time` = '" UI64FMTD "', `cod` = '0', `checked` = '%u' WHERE `id` = '%u'",
+                CharacterDatabase.PExecute("UPDATE `mail` SET `sender_guid` = '%u', `receiver_guid` = '%u', `expire_time` = '" UI64FMTD "', `deliver_time` = '" UI64FMTD "', `cod` = '0', `checked` = '%u' WHERE `id` = '%u'",
                                            receiverGuid.GetCounter(), returnToLowGuid, (uint64)(basetime + 30 * DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, messageID);
                 if (item_guid)
                 {
                     // update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
-                    CharacterDatabase.PExecute("UPDATE `mail_items` SET `receiver` = %u WHERE `item_guid` = '%u'", returnToLowGuid, item_guid);
+                    CharacterDatabase.PExecute("UPDATE `mail_items` SET `receiver_guid` = %u WHERE `item_guid` = '%u'", returnToLowGuid, item_guid);
                     CharacterDatabase.PExecute("UPDATE `item_instance` SET `owner_guid` = %u WHERE `guid` = '%u'", returnToLowGuid, item_guid);
                 }
             }
@@ -6084,12 +6084,12 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
     DEBUG_LOG("Returning mails current time: hour: %d, minute: %d, second: %d ", localtime(&basetime)->tm_hour, localtime(&basetime)->tm_min, localtime(&basetime)->tm_sec);
     //delete all old mails without item and without body immediately, if starting server
     if (!serverUp)
-        CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `expire_time` < '" UI64FMTD "' AND `has_items` = '0' AND `itemTextId` = 0", (uint64)basetime);
+        CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `expire_time` < '" UI64FMTD "' AND `has_items` = '0' AND `item_text_id` = 0", (uint64)basetime);
     OldMailsReturner* cb = new OldMailsReturner();
     cb->serverUp = serverUp;
     cb->basetime = basetime;
     uint32 limit = serverUp ? 5 : 1000;
-    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT `id`, `messageType`, `sender`, `receiver`, `itemTextId`, `has_items`, `expire_time`, `cod`, `checked`, `mailTemplateId` FROM `mail` WHERE `expire_time` < '" UI64FMTD "' ORDER BY `expire_time` LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
+    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT `id`, `message_type`, `sender_guid`, `receiver_guid`, `item_text_id`, `has_items`, `expire_time`, `cod`, `checked`, `mail_template_id` FROM `mail` WHERE `expire_time` < '" UI64FMTD "' ORDER BY `expire_time` LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
 }
 
 void ObjectMgr::LoadAreaTriggers()
@@ -6803,7 +6803,7 @@ void ObjectMgr::PackGroupIds()
     // all valid ids are in the instance table
     // any associations to ids not in this table are assumed to be
     // cleaned already in CleanupInstances
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `groupId` FROM `groups` ORDER BY `groupId` ASC"));
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `group_id` FROM `groups` ORDER BY `group_id` ASC"));
     if (result)
     {
         do
@@ -6815,8 +6815,8 @@ void ObjectMgr::PackGroupIds()
             if (id == 0)
             {
                 CharacterDatabase.BeginTransaction();
-                CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `groupId` = '%u'", id);
-                CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `groupId` = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `group_id` = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `group_id` = '%u'", id);
                 CharacterDatabase.CommitTransaction();
                 continue;
             }
@@ -6837,8 +6837,8 @@ void ObjectMgr::PackGroupIds()
         {
             // remap group id
             CharacterDatabase.BeginTransaction();
-            CharacterDatabase.PExecute("UPDATE `groups` SET `groupId` = '%u' WHERE `groupId` = '%u'", groupId, i);
-            CharacterDatabase.PExecute("UPDATE `group_member` SET `groupId` = '%u' WHERE `groupId` = '%u'", groupId, i);
+            CharacterDatabase.PExecute("UPDATE `groups` SET `group_id` = '%u' WHERE `group_id` = '%u'", groupId, i);
+            CharacterDatabase.PExecute("UPDATE `group_member` SET `group_id` = '%u' WHERE `group_id` = '%u'", groupId, i);
             CharacterDatabase.CommitTransaction();
         }
 
@@ -6868,9 +6868,9 @@ void ObjectMgr::SetHighestGuids()
 
     // Cleanup other tables from nonexistent guids (>=m_hiItemGuid)
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `itemguid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.CommitTransaction();
 
     result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `gameobject`"));
@@ -6900,15 +6900,15 @@ void ObjectMgr::SetHighestGuids()
     if (result)
         m_CorpseGuids.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`guildid`) FROM `guild`"));
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guild_id`) FROM `guild`"));
     if (result)
         m_GuildIds.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`groupId`) FROM `groups`"));
+    result.reset(CharacterDatabase.Query("SELECT MAX(`group_id`) FROM `groups`"));
     if (result)
         m_GroupIds.Set((*result)[0].GetUInt32() + 1);
 
-    result.reset(CharacterDatabase.Query("SELECT MAX(`petitionguid`) FROM `petition`"));
+    result.reset(CharacterDatabase.Query("SELECT MAX(`petition_guid`) FROM `petition`"));
     if (result)
         m_PetitionIds.Set((*result)[0].GetUInt32() + 1);
 
@@ -7449,12 +7449,12 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 void ObjectMgr::LoadCorpses()
 {
     uint32 count = 0;
-    //                                                                            0       1                  2                      3                      4                      5                       6
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `corpse`.`guid`, `player`, `corpse`.`position_x`, `corpse`.`position_y`, `corpse`.`position_z`, `corpse`.`orientation`, `corpse`.`map`, "
-    //                      7       8              9           10        11      12       13             14              15                16         17
-                          "`time`, `corpse_type`, `instance`, `gender`, `race`, `class`, `playerBytes`, `playerBytes2`, `equipmentCache`, `guildId`, `playerFlags` FROM `corpse` "
-                          "JOIN `characters` ON `player` = `characters`.`guid` "
-                          "LEFT JOIN `guild_member` ON `player`=`guild_member`.`guid` WHERE `corpse_type` <> 0"));
+    //                                                                            0       1                       2                      3                      4                      5                       6
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `corpse`.`guid`, `player_guid`, `corpse`.`position_x`, `corpse`.`position_y`, `corpse`.`position_z`, `corpse`.`orientation`, `corpse`.`map`, "
+    //                      7       8              9           10        11      12       13      14      15            16            17             18                 19          20
+                          "`time`, `corpse_type`, `instance`, `gender`, `race`, `class`, `skin`, `face`, `hair_style`, `hair_color`, `facial_hair`, `equipment_cache`, `guild_id`, `player_flags` FROM `corpse` "
+                          "JOIN `characters` ON `player_guid` = `characters`.`guid` "
+                          "LEFT JOIN `guild_member` ON `player_guid`=`guild_member`.`guid` WHERE `corpse_type` <> 0"));
 
     if (!result)
     {
@@ -10648,7 +10648,7 @@ void ObjectMgr::LoadFactionChangeMounts()
 
 void ObjectMgr::RestoreDeletedItems()
 {
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `player_guid`, `item_entry`, `stack_count` FROM `character_deleted_items`"));
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `player_guid`, `item_id`, `stack_count` FROM `character_deleted_items`"));
 
     if (!result)
     {
@@ -10670,15 +10670,15 @@ void ObjectMgr::RestoreDeletedItems()
 
         uint32 id = fields[0].GetUInt32();
         uint32 playerGuidLow = fields[1].GetUInt32();
-        uint32 itemEntry = fields[2].GetUInt32();
+        uint32 itemId = fields[2].GetUInt32();
         uint32 stackCount = fields[3].GetUInt32();
         
-        if (ItemPrototype const* itemProto = GetItemPrototype(itemEntry))
+        if (ItemPrototype const* itemProto = GetItemPrototype(itemId))
         {
             ObjectGuid playerGuid = ObjectGuid(HIGHGUID_PLAYER, playerGuidLow);
             Player* pPlayer = ObjectAccessor::FindPlayerNotInWorld(playerGuid);
 
-            if (Item* restoredItem = Item::CreateItem(itemEntry, stackCount ? stackCount : 1, playerGuid))
+            if (Item* restoredItem = Item::CreateItem(itemId, stackCount ? stackCount : 1, playerGuid))
             {
                 // save new item before send
                 restoredItem->SaveToDB();

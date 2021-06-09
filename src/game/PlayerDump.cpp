@@ -53,7 +53,6 @@ static DumpTable dumpTables[] =
     { "character_skills",                 DTT_CHAR_TABLE },
     { "character_spell",                  DTT_CHAR_TABLE },
     { "character_spell_cooldown",         DTT_CHAR_TABLE },
-    { "character_ticket",                 DTT_CHAR_TABLE },
     { "mail",                             DTT_MAIL       }, // -> mail guids
     { "mail_items",                       DTT_MAIL_ITEM  }, // -> item guids    <- mail guids
     { "pet_aura",                         DTT_PET_TABLE  }, //                  <- pet number
@@ -357,7 +356,7 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
                 // item text id collection
                 case DTT_PET:
                     StoreGUID(result, 0, pets);
-                    break;       // pet petnumber collection (character_pet.id)
+                    break;       // pet pet number collection (character_pet.id)
                 case DTT_MAIL:
                     StoreGUID(result, 0, mails);            // mail id collection (mail.id)
                     StoreGUID(result, 7, texts);
@@ -583,7 +582,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                     {
                         delete result;
 
-                        if (!changenth(line, 35, "1"))      // characters.at_login set to "rename on login"
+                        if (!changenth(line, 35, "1"))      // characters.at_login_flags set to "rename on login"
                             ROLLBACK(DUMP_FILE_BROKEN);
                     }
                 }
@@ -654,7 +653,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
 
                 if (!changenth(line, 1, newpetid))          // character_pet.id update
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 3, newguid))           // character_pet.owner update
+                if (!changenth(line, 3, newguid))           // character_pet.owner_guid update
                     ROLLBACK(DUMP_FILE_BROKEN);
 
                 break;
@@ -691,7 +690,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                     ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.id
                 if (!changeGuid(line, 2, items, sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed()))
                     ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.item_guid
-                if (!changenth(line, 4, newguid))           // mail_items.receiver
+                if (!changenth(line, 4, newguid))           // mail_items.receiver_guid
                     ROLLBACK(DUMP_FILE_BROKEN);
                 break;
             }

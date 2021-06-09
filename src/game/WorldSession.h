@@ -372,7 +372,7 @@ class WorldSession
         void SendCancelTrade();
 
         // Pet
-        void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
+        void SendPetNameQuery(ObjectGuid guid, uint32 petNumber);
         void SendStablePet(ObjectGuid guid);
         void SendStableResult(uint8 res);
         bool CheckStableMaster(ObjectGuid guid);
@@ -422,7 +422,6 @@ class WorldSession
         void SendGuildCommandResult(uint32 typecmd, std::string const& str, uint32 cmdresult);
         void SendPetitionShowList(ObjectGuid& guid);
         void SendSaveGuildEmblem(uint32 msg);
-        void SendPetitionQueryOpcode(uint32 petitionguid);
 
         // Battleground
         void SendBattleGroundJoinError(uint8 err);

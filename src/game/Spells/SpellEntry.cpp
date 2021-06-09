@@ -157,7 +157,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
 
     // Attack speed reduction
     if (spellInfo->HasSingleAura(SPELL_AURA_MOD_MELEE_HASTE))
-        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             if (AuraType(spellInfo->EffectApplyAuraName[i]) == SPELL_AURA_MOD_MELEE_HASTE && spellInfo->EffectBasePoints[i] < 0)
                 return SPELL_NEGATIVE_HASTE;
 
@@ -176,7 +176,7 @@ int32 Spells::CompareAuraRanks(uint32 spellId_1, uint32 spellId_2)
     if (!spellInfo_1 || !spellInfo_2) return 0;
     if (spellId_1 == spellId_2) return 0;
 
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (spellInfo_1->Effect[i] != 0 && spellInfo_2->Effect[i] != 0 && spellInfo_1->Effect[i] == spellInfo_2->Effect[i])
         {
@@ -194,9 +194,9 @@ bool Spells::CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry
     if (!spellInfo_1 || !spellInfo_2) return 0;
     if (spellInfo_1 == spellInfo_2) return 0;
 
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
+        for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             if (spellInfo_1->Effect[i] == SPELL_EFFECT_APPLY_AURA
                 && spellInfo_1->EffectApplyAuraName[i] == spellInfo_2->EffectApplyAuraName[j])
@@ -626,11 +626,11 @@ uint32 SpellEntry::GetCastTimeForBonus(DamageEffectType damagetype) const
     bool DirectDamage = false;
     bool AreaEffect   = false;
 
-    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (IsAreaEffectTarget(SpellTarget(EffectImplicitTargetA[i])) || IsAreaEffectTarget(SpellTarget(EffectImplicitTargetB[i])))
             AreaEffect = true;
 
-    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         switch (Effect[i])
         {
@@ -696,10 +696,10 @@ uint32 SpellEntry::GetCastTimeForBonus(DamageEffectType damagetype) const
         CastingTime /= 2;
 
     // 50% for damage and healing spells for leech spells from damage bonus and 0% from healing
-    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+    for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         if (Effect[j] == SPELL_EFFECT_HEALTH_LEECH ||
-                (Effect[j] == SPELL_EFFECT_APPLY_AURA && EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_LEECH))
+           (Effect[j] == SPELL_EFFECT_APPLY_AURA && EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_LEECH))
         {
             CastingTime /= 2;
             break;
@@ -853,7 +853,7 @@ uint16 SpellEntry::GetAuraMaxTicks() const
     if (DotDuration > 30000)
         DotDuration = 30000;
 
-    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+    for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         if (Effect[j] == SPELL_EFFECT_APPLY_AURA && (
             EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_DAMAGE ||
@@ -875,7 +875,7 @@ bool SpellEntry::IsPositiveSpell(WorldObject const* caster, WorldObject const* v
         return false;
     // spells with at least one negative effect are considered negative
     // some self-applied spells have negative effects but in self casting case negative check ignored.
-    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (Effect[i] && !IsPositiveEffect(SpellEffectIndex(i), caster, victim))
             return false;
     return true;
@@ -991,7 +991,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                         if (spellTriggeredProto)
                         {
                             // non-positive targets of main spell return early
-                            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
                             {
                                 // if non-positive trigger cast targeted to positive target this main cast is non-positive
                                 // this will place this spell auras as debuffs
