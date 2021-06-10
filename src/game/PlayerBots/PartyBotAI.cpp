@@ -1876,7 +1876,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         }
 
         // Direct heal more seriously injured.
-        if (Unit* pTarget = SelectHealTarget(70.0f, 80.0f))
+        if (Unit* pTarget = SelectHealTarget(60.0f, 80.0f))
             if (HealInjuredTargetDirect(pTarget))
                 return;
 
