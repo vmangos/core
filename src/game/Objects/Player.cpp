@@ -75,6 +75,7 @@
 #include "Anticheat.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include "CharacterDatabaseCache.h"
 #include "GameEventMgr.h"
 #include "world/scourge_invasion.h"
 #include "world/world_event_wareffort.h"
@@ -14876,8 +14877,13 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             }
             else
             {
+                if (transport->GetMap() != this->GetMap())
+                {
+                    if (transport->GetMapId() <= 1)
+                        SetLocationInstanceId(sMapMgr.GetContinentInstanceId(transport->GetMapId(), transport->GetPositionX(), transport->GetPositionY()));
+                    SetMap(transport->GetMap());
+                }
                 Relocate(x, y, z, o);
-                SetLocationMapId(transport->GetMapId());
 
                 transport->AddPassenger(this);
             }

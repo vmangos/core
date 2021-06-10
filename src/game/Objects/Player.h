@@ -42,6 +42,7 @@
 
 struct Mail;
 struct ItemPrototype;
+struct AuraSaveStruct;
 class Group;
 class Channel;
 class Creature;
@@ -882,20 +883,6 @@ struct RacialSpells
 };
 
 class MovementAnticheat;
-
-struct AuraSaveStruct
-{
-    ObjectGuid casterGuid = 0;
-    uint32 itemLowGuid = 0;
-    uint32 spellId = 0;
-    uint32 stacks = 0;
-    uint32 charges = 0;
-    float  damage[MAX_EFFECT_INDEX] = { 0 };
-    uint32 periodicTime[MAX_EFFECT_INDEX] = { 0 };
-    int32 maxDuration = 0;
-    int32 duration = 0;
-    uint8 effIndexMask = 0;
-};
 
 struct ScheduledTeleportData
 {
