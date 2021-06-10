@@ -640,15 +640,43 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             return;
 
         // Teleport to leader if too far away.
-        if (!me->IsWithinDistInMap(pLeader, 100.0f))
+        bool const tooFarAway = !me->IsWithinDistInMap(pLeader, 100.0f);
+        bool const onDifferentTransports = me->m_movementInfo.t_guid != pLeader->m_movementInfo.t_guid;
+
+        if (tooFarAway || onDifferentTransports)
         {
             if (!me->IsStopped())
                 me->StopMoving();
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
-            char name[128] = {};
-            strcpy(name, pLeader->GetName());
-            ChatHandler(me).HandleGonameCommand(name);
+
+            if (tooFarAway)
+            {
+                char name[128] = {};
+                strcpy(name, pLeader->GetName());
+                ChatHandler(me).HandleGonameCommand(name);
+            }
+            else // if (onDifferentTransports)
+            {
+                bool sendHeartbeat = false;
+
+                if (GenericTransport* pMyTransport = me->GetTransport())
+                {
+                    sendHeartbeat = true;
+                    pMyTransport->RemovePassenger(me);
+                    me->Relocate(pLeader->GetPositionX(), pLeader->GetPositionY(), pLeader->GetPositionZ());
+                }
+
+                if (GenericTransport* pHisTransport = pLeader->GetTransport())
+                {
+                    sendHeartbeat = true;
+                    me->Relocate(pLeader->GetPositionX(), pLeader->GetPositionY(), pLeader->GetPositionZ());
+                    pHisTransport->AddPassenger(me);
+                }
+
+                if (sendHeartbeat)
+                    me->SendHeartBeat(false);
+            }
             return;
         }
     }
@@ -668,8 +696,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     Unit* pVictim = me->GetVictim();
+    bool const isOnTransport = me->GetTransport() != nullptr;
 
-    if (m_role != ROLE_HEALER)
+    if (m_role != ROLE_HEALER && !isOnTransport)
     {
         if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
         {
@@ -715,7 +744,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
                 me->GetMotionMaster()->MoveFollow(pLeader, urand(PB_MIN_FOLLOW_DIST, PB_MAX_FOLLOW_DIST), frand(PB_MIN_FOLLOW_ANGLE, PB_MAX_FOLLOW_ANGLE));
         }
-        else
+        else if (!isOnTransport)
         {
             if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
                (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
@@ -728,7 +757,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
     }
 
-    if (me->IsInCombat())
+    if (me->IsInCombat() && !isOnTransport)
         UpdateInCombatAI();
 }
 

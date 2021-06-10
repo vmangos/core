@@ -1018,13 +1018,23 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             return;
         }
 
-        if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+        if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
         {
-            GetPlayer()->GetCheatData()->OnTransport(pPlayerMover, movementInfo.GetTransportGuid());
+            if (ObjectGuid const& lootGuid = pPlayerMover->GetLootGuid())
+                if (!lootGuid.IsItem())
+                    pPlayerMover->GetSession()->DoLootRelease(lootGuid);
+        }
+
+        pPlayerMover->m_movementInfo = movementInfo;
+
+        if (pPlayerMover->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+        {
+            GetPlayer()->GetCheatData()->OnTransport(pPlayerMover, pPlayerMover->m_movementInfo.GetTransportGuid());
+
             Unit* loadPetOnTransport = nullptr;
             if (!pPlayerMover->GetTransport())
             {
-                if (GenericTransport* t = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
+                if (GenericTransport* t = pPlayerMover->GetMap()->GetTransport(pPlayerMover->m_movementInfo.GetTransportGuid()))
                 {
                     t->AddPassenger(pPlayerMover);
                     if (Pet* pet = pPlayerMover->GetPet())
@@ -1039,14 +1049,14 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
 
             if (pPlayerMover->GetTransport())
             {
-                movementInfo.pos.x = movementInfo.GetTransportPos().x;
-                movementInfo.pos.y = movementInfo.GetTransportPos().y;
-                movementInfo.pos.z = movementInfo.GetTransportPos().z;
-                movementInfo.pos.o = movementInfo.GetTransportPos().o;
-                pPlayerMover->GetTransport()->CalculatePassengerPosition(movementInfo.pos.x, movementInfo.pos.y, movementInfo.pos.z, &movementInfo.pos.o);
+                pPlayerMover->m_movementInfo.pos.x = pPlayerMover->m_movementInfo.GetTransportPos().x;
+                pPlayerMover->m_movementInfo.pos.y = pPlayerMover->m_movementInfo.GetTransportPos().y;
+                pPlayerMover->m_movementInfo.pos.z = pPlayerMover->m_movementInfo.GetTransportPos().z;
+                pPlayerMover->m_movementInfo.pos.o = pPlayerMover->m_movementInfo.GetTransportPos().o;
+                pPlayerMover->GetTransport()->CalculatePassengerPosition(pPlayerMover->m_movementInfo.pos.x, pPlayerMover->m_movementInfo.pos.y, pPlayerMover->m_movementInfo.pos.z, &pPlayerMover->m_movementInfo.pos.o);
                 if (loadPetOnTransport)
                 {
-                    loadPetOnTransport->NearTeleportTo(movementInfo.pos);
+                    loadPetOnTransport->NearTeleportTo(pPlayerMover->m_movementInfo.pos);
                     pPlayerMover->GetTransport()->AddPassenger(loadPetOnTransport);
                 }
             }
@@ -1061,20 +1071,13 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
                 if (pet->GetTransport())
                 {
                     pet->GetTransport()->RemovePassenger(pet);
-                    pet->NearTeleportTo(movementInfo.pos);
+                    pet->NearTeleportTo(pPlayerMover->m_movementInfo.pos);
                 }
             }
         }
 
-        if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-        {
-            if (ObjectGuid const& lootGuid = pPlayerMover->GetLootGuid())
-                if (!lootGuid.IsItem())
-                    pPlayerMover->GetSession()->DoLootRelease(lootGuid);
-        }
-
+        movementInfo = pPlayerMover->m_movementInfo;
         pPlayerMover->SetPosition(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
-        pPlayerMover->m_movementInfo = movementInfo;
 
         // Nostalrius - antiundermap1
         if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))
@@ -1093,6 +1096,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
         }
         else if (pPlayerMover->CanFreeMove())
             pPlayerMover->SaveNoUndermapPosition(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z + 3.0f, movementInfo.GetPos().o);
+        
         // Antiundermap2: teleport to graveyard
         if (movementInfo.GetPos().z < -500.0f)
         {

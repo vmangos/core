@@ -49,7 +49,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 
     GenericTransport* transport = nullptr;
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
-    if (isPet)
+    if (isPet || owner.IsPlayer())
         transport = i_target.getTarget()->GetTransport();
 
     if (!m_fOffset)
