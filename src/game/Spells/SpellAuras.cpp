@@ -2869,15 +2869,18 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
 
 void Aura::HandleBindSight(bool apply, bool /*Real*/)
 {
-    Unit* caster = GetCaster();
-    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    Player* caster = ToPlayer(GetCaster());
+    if (!caster)
         return;
 
-    Camera& camera = ((Player*)caster)->GetCamera();
+    Camera& camera = caster->GetCamera();
     if (apply)
         camera.SetView(GetTarget());
     else
+    {
         camera.ResetView();
+        caster->SendCreateUpdateToPlayer(caster);
+    }
 }
 
 void Aura::HandleFarSight(bool apply, bool /*Real*/)
@@ -3133,7 +3136,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
             MovementPacketSender::AddMovementFlagChangeToController(pTarget, MOVEFLAG_ROOT, true);
     }
 
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
     pTarget->SendCreateUpdateToPlayer(pCaster);
 #endif
 }
@@ -3210,7 +3213,7 @@ void Player::ModPossessPet(Pet* pPet, bool apply, AuraRemoveMode m_removeMode)
         // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode
     }
 
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
     pPet->SendCreateUpdateToPlayer(pCaster);
 #endif
 }
