@@ -818,6 +818,10 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 7053;
 -- Touch of Zanzil Should Not Be Applied When Accepting 2607
 UPDATE `quest_template` SET `SrcSpell` = 0 WHERE `entry` = 2607;
 
+-- Add Quest Start Script for 2359
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2359, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3264, 0, 0, 0, 0, 0, 0, 0, 0, 'Klaven\'s Tower (2359) - Agent Kearnen - Talk');
+UPDATE `quest_template` SET `StartScript` = 2359 WHERE `entry` = 2359;
+
 
 -- End of migration.
 END IF;
