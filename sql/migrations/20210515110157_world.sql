@@ -788,6 +788,27 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 7288 AND `item` = 8073;
 -- Touch of Zanzil Should Not Be Applied When Accepting 2479
 UPDATE `quest_template` SET `SrcSpell`= 0 WHERE  `entry` = 2479;
 
+-- Hammerfall Troll Attack Event (credit cmangos)
+INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `patch_max`) VALUES
+(140697, 2553, -1233.3, -3533.72, 46.0859, 5.80098, 120, 300, 0, 100, 100, 2, 10),
+(140696, 2552, -1229.85, -3535.1, 46.3087, 5.918, 120, 120, 0, 100, 0, 0, 10),
+(140695, 2552, -1230.75, -3533.46, 46.0261, 5.83082, 120, 120, 0, 100, 0, 0, 10),
+(140694, 2552, -1232.1, -3535.9, 46.4729, 5.6706, 120, 120, 0, 100, 0, 0, 10),
+(140693, 2556, -1234.76, -3536.47, 46.5823, 5.929, 120, 120, 0, 100, 0, 0, 10);
+
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(140697, 140696, 4, 4.71, 11),
+(140697, 140695, 4, 6.25244, 11),
+(140697, 140694, 4, 3.14, 11),
+(140697, 140693, 4, 1.57, 11);
+
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(140697, 1, -1233.3, -3533.72, 46.0859, 5.80098, 1000, 3180901),
+(140697, 2, -1233.3, -3533.72, 46.0859, 5.80098, 0, 0),
+(140697, 3, -1233.3, -3533.72, 46.0859, 5.80098, 0, 0),
+(140697, 4, -1162.87, -3563.07, 50.5074, 0.0411459, 0, 0),
+(140697, 5, -1032.97, -3550.54, 55.9796, 6.22908, 0, 0);
+
 
 -- End of migration.
 END IF;
