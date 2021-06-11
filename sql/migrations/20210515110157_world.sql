@@ -782,6 +782,12 @@ UPDATE creature_template_addon SET bytes1 = 0 WHERE entry = 1713;
 DELETE FROM creature_addon WHERE guid IN (SELECT guid FROM creature WHERE id = 2731);
 UPDATE creature_template_addon SET bytes1 = 0, auras = NULL WHERE entry = 2731;
 
+-- Grand Foreman Puzik should not drop Cache of Zanzils Altered Mixture
+DELETE FROM `creature_loot_template` WHERE `entry` = 7288 AND `item` = 8073;
+
+-- Touch of Zanzil Should Not Be Applied When Accepting 2479
+UPDATE `quest_template` SET `SrcSpell`= 0 WHERE  `entry` = 2479;
+
 
 -- End of migration.
 END IF;
