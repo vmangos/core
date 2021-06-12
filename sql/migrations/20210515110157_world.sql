@@ -8,6 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210515110157');
 -- Add your query below.
 
+
 -- Stratholme - Wrath Phantom (credit cmangos)
 UPDATE `creature_template` SET `faction` = 21, `base_attack_time` = 2000, `base_attack_time` = 2000, `dmg_school` = 5 WHERE `entry` = 10389;
 
@@ -31,10 +32,10 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (81027, 448, -10107.1787109375, 618.212646484375, 38.20453262329101562, 3.78528451919555664, 180, 180, 15, 100, 0, 1, 10),
 (81028, 448, -10085.3671875, 585.65655517578125, 39.27585601806640625, 1.303950071334838867, 180, 180, 15, 100, 0, 1, 10),
 (81029, 448, -10018.634765625, 640.62945556640625, 39.06363296508789062, 1.332400083541870117, 180, 180, 15, 100, 0, 1, 10);
-REPLACE INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`) VALUES
-(448, 1265, 0, 'Elwynn Forest - Forests Edge - Hogger (448)');
-REPLACE INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(1265, 1, 'Elwynn Forest - Forests Edge - Hogger (448)');
+INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`) VALUES
+(448, 1270, 0, 'Elwynn Forest - Forests Edge - Hogger (448)');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(1270, 1, 'Elwynn Forest - Forests Edge - Hogger (448)');
 
 -- Westfall - Dust Devil (credit cmangos)
 UPDATE `creature` SET `position_x` = -11115.1083984375, `position_y` = 617.48870849609375, `position_z` = 37.60480499267578125, `orientation` = 4.004544258117675781, `wander_distance` = 45 WHERE `guid` = 48554;
@@ -50,6 +51,11 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (155, 832, -10986.0615234375, 1815.8741455078125, 45.1251678466796875, 5.635118007659912109, 300, 300, 100, 0, 1, 45, 10),
 (170, 832, -10550.6669921875, 1420.46337890625, 47.43852996826171875, 6.067455291748046875, 300, 300, 100, 0, 1, 45, 10),
 (173, 832, -10785.8642578125, 1555.3922119140625, 48.61139297485351562, 4.12875223159790039, 300, 300, 100, 0, 1, 45, 10);
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
+(154, 10003, 'Dust Devil'),
+(155, 10003, 'Dust Devil'),
+(170, 10003, 'Dust Devil'),
+(173, 10003, 'Dust Devil');
 
 -- Blackthorn Ridge - Razormane Seer 
 DELETE FROM `creature_movement` WHERE (`id` = 14480);
