@@ -342,11 +342,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (43588, 43589, 4, 2.35619, 11),
 (43588, 43590, 4, 3.92699, 11);
-
--- Fix Gnomish Battle Chicken (credit cmangos)
-UPDATE `spell_template` SET `effect1`= 42 WHERE `entry` = 31366;
                                                 
-UPDATE `creature` SET `movement_type` = 1 WHERE `guid` = 20299;
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 20299;
                                                 
 -- Kodo Hide Bag is a Leatherworking Quest
 UPDATE `quest_template` SET `RequiredSkill` = 165, `RequiredSkillValue` = 1, `PrevQuestId` = 0 WHERE `entry` = 769;
@@ -600,12 +597,11 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 UPDATE `creature` SET `wander_distance` = 20, `movement_type` = 1 WHERE `id` = 730;
 INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
 (730, 125, 0, 'Tethis (730)', 10);
-DELETE FROM `pool_template` WHERE `entry` = 125;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (125, 1, 'Tethis (730)');
 
 -- Southsea Cannoneer Should Not Drop Lvl 20 Items
-UPDATE `creature_loot_template` SET `item` = 30041 WHERE `entry` = 3382 AND `item` = 30040 AND `groupid` = 0;
+UPDATE `creature_loot_template` SET `item` = 30041, `mincountOrRef` = -30041 WHERE `entry` = 3382 AND `item` = 30040 AND `groupid` = 0;
 
 -- Farmer Ray Should Not Drop Lvl 30+ Items
 DELETE FROM `creature_loot_template` WHERE  `item`= 4421 AND `entry`= 232;
@@ -788,16 +784,6 @@ UPDATE creature SET position_x = -6629.925293, position_y = -3554.510498, positi
 UPDATE creature SET position_x = 51.213818, position_y = 1539.047974, position_z = 107.961784, wander_distance = 7, movement_type = 1 WHERE guid = 27980;
 UPDATE creature SET position_x = 393.519775, position_y = -623.946899, position_z = 162.409653, wander_distance = 5, movement_type = 1 WHERE guid = 17345;
 UPDATE creature SET position_x = -3649.268, position_y = -727.9708, position_z = 10.7234, orientation = 5.907869, wander_distance = 0, movement_type = 0 WHERE guid = 9530;
-
--- Elder Shadowmaw Panther 1713 (credit cmangos)
--- swimming anim fixed
-DELETE FROM creature_addon WHERE guid IN (SELECT guid FROM creature WHERE id = 1713);
-UPDATE creature_template_addon SET bytes1 = 0 WHERE entry = 1713;
-
--- Ridge Stalker 2731 (credit cmangos)
--- swimming anim fixed
-DELETE FROM creature_addon WHERE guid IN (SELECT guid FROM creature WHERE id = 2731);
-UPDATE creature_template_addon SET bytes1 = 0, auras = NULL WHERE entry = 2731;
 
 -- Grand Foreman Puzik should not drop Cache of Zanzils Altered Mixture
 DELETE FROM `creature_loot_template` WHERE `entry` = 7288 AND `item` = 8073;
