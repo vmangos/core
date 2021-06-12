@@ -360,13 +360,27 @@ UPDATE `npc_vendor` SET `item` = 6275 WHERE `entry` = 3499 AND `item` = 2675;
 -- Fix Ridge Huntress Stuck Underground
 UPDATE `creature` SET `position_x` = -6662.364258, `position_y` = -3489.209961, `position_z`= 256.418640 WHERE `guid` = 6915;
 
--- Fix Champoins Hall Door
-UPDATE `gameobject` SET `id` = 176575, `state` = 1 WHERE `guid` = 26262;
-UPDATE `gameobject_template` SET `data0` = 1, `flags` = 32 WHERE `entry` = 176575;
+-- Officer's Door inside Champions' Hall.
+UPDATE `gameobject_template` SET `flags`=32 WHERE `entry`=176575;
+UPDATE `gameobject` SET `state`=1, `animprogress`=100 WHERE `id`=176575;
 
--- Fix Hall of Legends Door
-UPDATE `gameobject` SET `id` = 176566, `state` = 1 WHERE `guid` = 31661;
-UPDATE `gameobject_template` SET `data2` = 196608 WHERE `entry` = 176566;
+-- Officer's Door in Stormwind City.
+DELETE FROM `gameobject` WHERE `guid`=30699;
+UPDATE `gameobject` SET `state`=1, `patch_min`=0, `patch_max`=10 WHERE `guid`=26262;
+DELETE FROM `gameobject_template` WHERE `entry`=176576;
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (176576, 0, 0, 4413, 'Officer\'s Door', 0, 48, 1, 0, 0, 196608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (176576, 2, 0, 4413, 'Officer\'s Door', 0, 32, 1, 0, 0, 196608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+-- Officer's Door inside Hall of Legends.
+UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176566;
+UPDATE `gameobject` SET `state`=1, `animprogress`=100 WHERE `id`=176566;
+
+-- Officer's Door in Orgrimmar.
+DELETE FROM `gameobject` WHERE `guid`=31661;
+UPDATE `gameobject` SET `position_x`=1634.87, `position_y`=-4247.86, `position_z`=55.8397, `orientation`=4.19752, `rotation2`=-0.863835, `rotation3`=0.503774, `state`=1, `patch_min`=0, `patch_max`=10 WHERE `guid`=31660;
+DELETE FROM `gameobject_template` WHERE `entry`=176562;
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (176562, 0, 0, 4412, 'Officer\'s Door', 0, 48, 1, 0, 0, 196608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (176562, 2, 0, 4412, 'Officer\'s Door', 0, 32, 1, 0, 0, 196608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 -- Brave Ironhorn 3212 (credit cmangos)
 DELETE FROM `creature_movement` WHERE `id` IN (25222);
