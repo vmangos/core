@@ -812,9 +812,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (140697, 4, -1162.87, -3563.07, 50.5074, 0.0411459, 0, 0),
 (140697, 5, -1032.97, -3550.54, 55.9796, 6.22908, 0, 0);
 
--- Reduce Respawn of Gobject
-UPDATE `gameobject` SET `spawntimesecsmin` = 2, `spawntimesecsmax` = 2 WHERE `guid`=15702;
-
 -- Enable Eventai for Klaven Mortwake
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 7053;
 
