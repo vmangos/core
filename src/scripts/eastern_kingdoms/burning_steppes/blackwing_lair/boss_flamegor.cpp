@@ -26,9 +26,7 @@ EndScriptData */
 
 enum
 {
-    EMOTE_GENERIC_WING_BUFFET   = -1469032,
-    EMOTE_GENERIC_SHADOW_FLAME  = -1469033,
-    EMOTE_GENERIC_FRENZY        = -1000002,
+    EMOTE_GENERIC_FRENZY        = 1191,
 
     SPELL_SHADOW_FLAME          = 22539,
     SPELL_WING_BUFFET           = 23339,
@@ -97,10 +95,7 @@ struct boss_flamegorAI : public ScriptedAI
         if (m_uiShadowFlameTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SHADOW_FLAME) == CAST_OK)
-            {
-                DoScriptText(EMOTE_GENERIC_SHADOW_FLAME, m_creature);
                 m_uiShadowFlameTimer = 16000;
-            }
         }
         else
             m_uiShadowFlameTimer -= uiDiff;
@@ -109,10 +104,7 @@ struct boss_flamegorAI : public ScriptedAI
         if (m_uiWingBuffetTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WING_BUFFET) == CAST_OK)
-            {
-                DoScriptText(EMOTE_GENERIC_WING_BUFFET, m_creature);
                 m_uiWingBuffetTimer = 30000;
-            }
         }
         else
             m_uiWingBuffetTimer -= uiDiff;

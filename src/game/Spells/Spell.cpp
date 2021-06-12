@@ -2544,6 +2544,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             else
                 m_targets.getDestination(x, y, z);
 
+            if (x == 0.0f && y == 0.0f && z == 0.0f)
+                sLog.outError("Coordinates were not set properly for spell %u with target type %u!", m_spellInfo->Id, targetMode);
+
             // It may be possible to fill targets for some spell effects
             // automatically (SPELL_EFFECT_WMO_REPAIR(88) for example) but
             // for some/most spells we clearly need/want to limit with spell_target_script
@@ -2616,9 +2619,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             break;
         case TARGET_LOCATION_CASTER_SRC:
         {
-            // Check original caster is GO - set its coordinates as dst cast
+            // Check original caster is GO - set its coordinates as src cast
             if (SpellCaster* caster = GetCastingObject())
-                m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+                m_targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
             break;
         }
         case TARGET_ENUM_UNITS_ENEMY_WITHIN_CASTER_RANGE:
