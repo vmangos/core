@@ -583,9 +583,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3224,12,-2259.32,-296.491,-9.34905,100,5000,5,0);
 
 -- Explosive Sheep 2675 (credit cmangos)
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (267501, 2675, 0, 11, 0, 100, 0, 0, 0, 0, 0, 267501, 0, 0, 'Explosive Sheep - Cast Explosive Sheep Passive and Stealth Detection on Spawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (267501, 0, 15, 4051, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Explosive Sheep - Cast Spell');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (267501, 0, 15, 8279, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Explosive Sheep - Cast Spell');
+UPDATE `creature_template` SET `auras`='4051 8279' WHERE  `entry`=2675;
 
 -- Naga Explorer 1907 (credit cmangos)
 INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `movement_type`, `patch_max`) VALUES
@@ -600,10 +598,9 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (2588, 730, -12978.6, 411.841, 21.7456, 3.43503, 420, 600, 15, 100, 1, 10),
 (565, 730, -13017.2, 193.101, 22.7814, 1.45268, 420, 600, 15, 100, 1, 10);
 UPDATE `creature` SET `wander_distance` = 20, `movement_type` = 1 WHERE `id` = 730;
-DELETE FROM `pool_creature_template` WHERE `id` = 730;
 INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
 (730, 125, 0, 'Tethis (730)', 10);
-DELETE FROM `pool_template` WHERE `entry` = 1266;
+DELETE FROM `pool_template` WHERE `entry` = 125;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (125, 1, 'Tethis (730)');
 
@@ -619,10 +616,10 @@ DELETE FROM `creature_loot_template` WHERE  `item`= 3928 AND `entry`= 232;
 DELETE FROM `creature_loot_template` WHERE  `item`= 4419 AND `entry`= 232;
 DELETE FROM `creature_loot_template` WHERE  `item`= 4422 AND `entry`= 232;
 DELETE FROM `creature_loot_template` WHERE  `item`= 4599 AND `entry`= 232;
-DELETE FROM `creature_loot_template` WHERE  `entry` = 232 AND `item` = 30048;
+DELETE FROM `creature_loot_template` WHERE  `item`= 30048 AND `entry`= 232;
 
 -- Fix Base Mana For Druids
-UPDATE `player_classlevelstats` SET `basemana` = 34 WHERE `class` = 11 AND `level` = 1;
+UPDATE `player_classlevelstats` SET `basemana` = 50, `basehp` = 34 WHERE `class` = 11 AND `level` = 1;
 
 -- Bloodfen Scytheclaw Skinning Template
 UPDATE `creature_template` SET `skinning_loot_id` = 4343 WHERE `entry` = 4355;
