@@ -43,7 +43,7 @@ enum
     SPELL_EXPLODE       =   25699,
     SPELL_INIT_EXPLODE  =   25698,
 
-    EMOTE_FRENZY        =   -1000002,
+    EMOTE_FRENZY        =   10677,
 
     NPC_ANU_WARRIOR     =   15537,
     NPC_ANU_SWARM       =   15538,
