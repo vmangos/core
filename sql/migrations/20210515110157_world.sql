@@ -929,7 +929,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (1309, 133, 0, 'Buccaneer\'s Strongbox Pool 8', 10),
 (1310, 133, 0, 'Buccaneer\'s Strongbox Pool 8', 10);
 
--- Add Rat Bomb Trap
+-- Add Rat Bomb Traps
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (1312, 123355, 1, -1452.1, -3966.4, 7.56134, -3.07178, 0, 0, 0.999391, -0.034899, 2, 2, 100, 1, 0, 0, 0, 10),
 (1417, 123355, 1, -1453.02, -3969.75, 7.56026, 2.49582, 0, 0, 0.948324, 0.317305, 2, 2, 100, 1, 0, 0, 0, 10),
@@ -948,6 +948,71 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (1529, 123334, 1, -1461.56, -3970.03, 7.56018, 0.750492, 0, 0, 0.366501, 0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
 (1534, 123334, 1, -1463, -3968.46, 7.56007, 0.069813, 0, 0, 0.034899, 0.999391, 2, 2, 100, 1, 0, 0, 0, 10),
 (1311, 123334, 1, -1462.45, -3966.9, 7.56138, -0.017453, 0, 0, 0.008727, -0.999962, 2, 2, 100, 1, 0, 0, 0, 10);
+
+-- Add Traps to Practice Lockboxes
+-- Update Spawntimes For Existing Objects
+UPDATE `gameobject` SET `spawntimesecsmin` = 2, `spawntimesecsmax` = 2 WHERE `guid` IN (20511, 20453, 20504, 20434, 31118, 31117, 31119);
+
+-- Practice Strongbox Pool 1
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1553, 178244, 0, -9232.72, -2705.1, 89.086, 0.890118, 0, 0, 0.430511, 0.902585, 2, 2, 100, 1, 0, 0, 0, 10),
+(1614, 178245, 0, -9232.72, -2705.1, 89.086, 0.890118, 0, 0, 0.430511, 0.902585, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(134, 1, 'Practice Strongbox Pool 1');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(20504, 134, 0, 'Practice Strongbox Pool 1', 10),
+(1553, 134, 0, 'Practice Strongbox Pool 1', 10),
+(1614, 134, 0, 'Practice Strongbox Pool 1', 10);
+
+-- Practice Strongbox Pool 2
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1843, 178244, 0, -9233.62, -2701.74, 89.086, -0.331612, 0, 0, 0.165048, -0.986286, 2, 2, 100, 1, 0, 0, 0, 10),
+(1875, 178245, 0, -9233.62, -2701.74, 89.086, -0.331612, 0, 0, 0.165048, -0.986286, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(135, 1, 'Practice Strongbox Pool 2');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(20434, 135, 0, 'Practice Strongbox Pool 2', 10),
+(1843, 135, 0, 'Practice Strongbox Pool 2', 10),
+(1875, 135, 0, 'Practice Strongbox Pool 2', 10);
+
+-- Practice Strongbox Pool 3
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1876, 178245, 0, -9227.89, -2696.93, 89.086, -0.872665, 0, 0, 0.422618, -0.906308, 2, 2, 100, 1, 0, 0, 0, 10),
+(1877, 178246, 0, -9227.89, -2696.93, 89.086, -0.872665, 0, 0, 0.422618, -0.906308, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(136, 1, 'Practice Strongbox Pool 3');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(31118, 136, 0, 'Practice Strongbox Pool 3', 10),
+(1876, 136, 0, 'Practice Strongbox Pool 3', 10),
+(1877, 136, 0, 'Practice Strongbox Pool 3', 10);
+
+-- Practice Strongbox Pool 4
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1878, 178245, 0, -9231.58, -2698.62, 89.086, -0.750491, 0, 0, 0.366501, -0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
+(1879, 178246, 0, -9231.58, -2698.62, 89.086, -0.750491, 0, 0, 0.366501, -0.930418, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(137, 1, 'Practice Strongbox Pool 4');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(31117, 137, 0, 'Practice Strongbox Pool 4', 10),
+(1878, 137, 0, 'Practice Strongbox Pool 4', 10),
+(1879, 137, 0, 'Practice Strongbox Pool 4', 10);
+
+-- Practice Strongbox Pool 5
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1880, 178245, 0, -9225.42, -2694.12, 89.086, -1.16937, 0, 0, 0.551937, -0.833886, 2, 2, 100, 1, 0, 0, 0, 10),
+(1881, 178246, 0, -9225.42, -2694.12, 89.086, -1.16937, 0, 0, 0.551937, -0.833886, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(138, 1, 'Practice Strongbox Pool 5');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(31119, 138, 0, 'Practice Strongbox Pool 5', 10),
+(1880, 138, 0, 'Practice Strongbox Pool 5', 10),
+(1881, 138, 0, 'Practice Strongbox Pool 5', 10);
+
+-- Add Frost Hold Traps
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1882, 123334, 0, -9227.89, -2696.93, 89.086, -0.872665, 0, 0, 0.422618, -0.906308, 2, 2, 100, 1, 0, 0, 0, 10),
+(1883, 123334, 0, -9231.58, -2698.62, 89.086, -0.750491, 0, 0, 0.366501, -0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
+(1884, 123334, 0, -9225.42, -2694.12, 89.086, -1.16937, 0, 0, 0.551937, -0.833886, 2, 2, 100, 1, 0, 0, 0, 10);
 
 
 -- End of migration.
