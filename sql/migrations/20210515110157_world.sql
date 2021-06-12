@@ -822,6 +822,133 @@ UPDATE `quest_template` SET `SrcSpell` = 0 WHERE `entry` = 2607;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2359, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3264, 0, 0, 0, 0, 0, 0, 0, 0, 'Klaven\'s Tower (2359) - Agent Kearnen - Talk');
 UPDATE `quest_template` SET `StartScript` = 2359 WHERE `entry` = 2359;
 
+-- Add Traps to Buccaneers Strongboxes
+-- Update Spawntimes For Existing Objects
+UPDATE `gameobject` SET `spawntimesecsmin` = 2, `spawntimesecsmax` = 2 WHERE `guid` IN (15683, 15145, 15702, 15705, 55913, 55911);
+UPDATE `gameobject` SET `animprogress` = 100 WHERE `guid` IN (55913, 55911);
+
+-- Buccaneers Strongbox Pool 1
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(978, 123331, 1, -1452.1, -3966.4, 7.56134, -3.07178, 0, 0, 0.999391, -0.034899, 2, 2, 100, 1, 0, 0, 0, 10),
+(1209, 123332, 1, -1452.1, -3966.4, 7.56134, -3.07178, 0, 0, 0.999391, -0.034899, 2, 2, 100, 1, 0, 0, 0, 10),
+(1219, 123333, 1, -1452.1, -3966.4, 7.56134, -3.07178, 0, 0, 0.999391, -0.034899, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(126, 1, 'Buccaneer\'s Strongbox Pool 1');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15121, 126, 0, 'Buccaneer\'s Strongbox Pool 1', 10),
+(978, 126, 0, 'Buccaneer\'s Strongbox Pool 1', 10),
+(1209, 126, 0, 'Buccaneer\'s Strongbox Pool 1', 10),
+(1219, 126, 0, 'Buccaneer\'s Strongbox Pool 1', 10);
+
+-- Buccaneers Strongbox Pool 2
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1231, 123331, 1, -1453.02, -3969.75, 7.56026, 2.49582, 0, 0, 0.948324, 0.317305, 2, 2, 100, 1, 0, 0, 0, 10),
+(1243, 123332, 1, -1453.02, -3969.75, 7.56026, 2.49582, 0, 0, 0.948324, 0.317305, 2, 2, 100, 1, 0, 0, 0, 10),
+(1246, 123333, 1, -1453.02, -3969.75, 7.56026, 2.49582, 0, 0, 0.948324, 0.317305, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(127, 1, 'Buccaneer\'s Strongbox Pool 2');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15122, 127, 0, 'Buccaneer\'s Strongbox Pool 2', 10),
+(1231, 127, 0, 'Buccaneer\'s Strongbox Pool 2', 10),
+(1243, 127, 0, 'Buccaneer\'s Strongbox Pool 2', 10),
+(1246, 127, 0, 'Buccaneer\'s Strongbox Pool 2', 10);
+
+-- Buccaneers Strongbox Pool 3
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1249, 123330, 1, -1454.38, -3971.26, 7.5598, 2.14675, 0, 0, 0.878817, 0.477159, 2, 2, 100, 1, 0, 0, 0, 10),
+(1250, 123331, 1, -1454.38, -3971.26, 7.5598, 2.14675, 0, 0, 0.878817, 0.477159, 2, 2, 100, 1, 0, 0, 0, 10),
+(1261, 123332, 1, -1454.38, -3971.26, 7.5598, 2.14675, 0, 0, 0.878817, 0.477159, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(128, 1, 'Buccaneer\'s Strongbox Pool 3');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15702, 128, 0, 'Buccaneer\'s Strongbox Pool 3', 10),
+(1249, 128, 0, 'Buccaneer\'s Strongbox Pool 3', 10),
+(1250, 128, 0, 'Buccaneer\'s Strongbox Pool 3', 10),
+(1261, 128, 0, 'Buccaneer\'s Strongbox Pool 3', 10);
+
+-- Buccaneers Strongbox Pool 4
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1298, 123331, 1, -1456.44, -3971.63, 7.56249, 1.8326, 0, 0, 0.793353, 0.608761, 2, 2, 100, 1, 0, 0, 0, 10),
+(1299, 123332, 1, -1456.44, -3971.63, 7.56249, 1.8326, 0, 0, 0.793353, 0.608761, 2, 2, 100, 1, 0, 0, 0, 10),
+(1300, 123333, 1, -1456.44, -3971.63, 7.56249, 1.8326, 0, 0, 0.793353, 0.608761, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(129, 1, 'Buccaneer\'s Strongbox Pool 4');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15119, 129, 0, 'Buccaneer\'s Strongbox Pool 4', 10),
+(1298, 129, 0, 'Buccaneer\'s Strongbox Pool 4', 10),
+(1299, 129, 0, 'Buccaneer\'s Strongbox Pool 4', 10),
+(1300, 129, 0, 'Buccaneer\'s Strongbox Pool 4', 10);
+
+-- Buccaneers Strongbox Pool 5
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1301, 123333, 1, -1458.06, -3972.06, 8.26139, 1.39626, 0, 0, 0.642788, 0.766044, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(130, 1, 'Buccaneer\'s Strongbox Pool 5');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15125, 130, 0, 'Buccaneer\'s Strongbox Pool 5', 10),
+(15683, 130, 0, 'Buccaneer\'s Strongbox Pool 5', 10),
+(55911, 130, 0, 'Buccaneer\'s Strongbox Pool 5', 10),
+(1301, 130, 0, 'Buccaneer\'s Strongbox Pool 5', 10);
+
+-- Buccaneers Strongbox Pool 6
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1302, 123331, 1, -1461.56, -3970.03, 7.56018, 0.750492, 0, 0, 0.366501, 0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
+(1303, 123332, 1, -1461.56, -3970.03, 7.56018, 0.750492, 0, 0, 0.366501, 0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
+(1304, 123333, 1, -1461.56, -3970.03, 7.56018, 0.750492, 0, 0, 0.366501, 0.930418, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(131, 1, 'Buccaneer\'s Strongbox Pool 6');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15120, 131, 0, 'Buccaneer\'s Strongbox Pool 6', 10),
+(1302, 131, 0, 'Buccaneer\'s Strongbox Pool 6', 10),
+(1303, 131, 0, 'Buccaneer\'s Strongbox Pool 6', 10),
+(1304, 131, 0, 'Buccaneer\'s Strongbox Pool 6', 10);
+
+-- Buccaneers Strongbox Pool 7
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1305, 123330, 1, -1463, -3968.46, 7.56007, 0.069813, 0, 0, 0.034899, 0.999391, 2, 2, 100, 1, 0, 0, 0, 10),
+(1306, 123332, 1, -1463, -3968.46, 7.56007, 0.069813, 0, 0, 0.034899, 0.999391, 2, 2, 100, 1, 0, 0, 0, 10),
+(1307, 123333, 1, -1463, -3968.46, 7.56007, 0.069813, 0, 0, 0.034899, 0.999391, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(132, 1, 'Buccaneer\'s Strongbox Pool 7');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15145, 132, 0, 'Buccaneer\'s Strongbox Pool 7', 10),
+(1305, 132, 0, 'Buccaneer\'s Strongbox Pool 7', 10),
+(1306, 132, 0, 'Buccaneer\'s Strongbox Pool 7', 10),
+(1307, 132, 0, 'Buccaneer\'s Strongbox Pool 7', 10);
+
+-- Buccaneers Strongbox Pool 8
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1308, 123331, 1, -1462.45, -3966.9, 7.56138, -0.017453, 0, 0, 0.008727, -0.999962, 2, 2, 100, 1, 0, 0, 0, 10),
+(1309, 123332, 1, -1462.45, -3966.9, 7.56138, -0.017453, 0, 0, 0.008727, -0.999962, 2, 2, 100, 1, 0, 0, 0, 10),
+(1310, 123333, 1, -1462.45, -3966.9, 7.56138, -0.017453, 0, 0, 0.008727, -0.999962, 2, 2, 100, 1, 0, 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(133, 1, 'Buccaneer\'s Strongbox Pool 8');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(15123, 133, 0, 'Buccaneer\'s Strongbox Pool 8', 10),
+(1308, 133, 0, 'Buccaneer\'s Strongbox Pool 8', 10),
+(1309, 133, 0, 'Buccaneer\'s Strongbox Pool 8', 10),
+(1310, 133, 0, 'Buccaneer\'s Strongbox Pool 8', 10);
+
+-- Add Rat Bomb Trap
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1312, 123355, 1, -1452.1, -3966.4, 7.56134, -3.07178, 0, 0, 0.999391, -0.034899, 2, 2, 100, 1, 0, 0, 0, 10),
+(1417, 123355, 1, -1453.02, -3969.75, 7.56026, 2.49582, 0, 0, 0.948324, 0.317305, 2, 2, 100, 1, 0, 0, 0, 10),
+(1432, 123355, 1, -1456.44, -3971.63, 7.56249, 1.8326, 0, 0, 0.793353, 0.608761, 2, 2, 100, 1, 0, 0, 0, 10),
+(1438, 123355, 1, -1458.06, -3972.06, 8.26139, 1.39626, 0, 0, 0.642788, 0.766044, 2, 2, 100, 1, 0, 0, 0, 10),
+(1451, 123355, 1, -1461.56, -3970.03, 7.56018, 0.750492, 0, 0, 0.366501, 0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
+(1474, 123355, 1, -1463, -3968.46, 7.56007, 0.069813, 0, 0, 0.034899, 0.999391, 2, 2, 100, 1, 0, 0, 0, 10),
+(1494, 123355, 1, -1462.45, -3966.9, 7.56138, -0.017453, 0, 0, 0.008727, -0.999962, 2, 2, 100, 1, 0, 0, 0, 10);
+
+-- Add Frost Hold Traps
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1502, 123334, 1, -1452.1, -3966.4, 7.56134, -3.07178, 0, 0, 0.999391, -0.034899, 2, 2, 100, 1, 0, 0, 0, 10),
+(1507, 123334, 1, -1453.02, -3969.75, 7.56026, 2.49582, 0, 0, 0.948324, 0.317305, 2, 2, 100, 1, 0, 0, 0, 10),
+(1515, 123334, 1, -1454.38, -3971.26, 7.5598, 2.14675, 0, 0, 0.878817, 0.477159, 2, 2, 100, 1, 0, 0, 0, 10),
+(1523, 123334, 1, -1456.44, -3971.63, 7.56249, 1.8326, 0, 0, 0.793353, 0.608761, 2, 2, 100, 1, 0, 0, 0, 10),
+(1529, 123334, 1, -1461.56, -3970.03, 7.56018, 0.750492, 0, 0, 0.366501, 0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
+(1534, 123334, 1, -1463, -3968.46, 7.56007, 0.069813, 0, 0, 0.034899, 0.999391, 2, 2, 100, 1, 0, 0, 0, 10),
+(1311, 123334, 1, -1462.45, -3966.9, 7.56138, -0.017453, 0, 0, 0.008727, -0.999962, 2, 2, 100, 1, 0, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
