@@ -1014,6 +1014,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (1883, 123334, 0, -9231.58, -2698.62, 89.086, -0.750491, 0, 0, 0.366501, -0.930418, 2, 2, 100, 1, 0, 0, 0, 10),
 (1884, 123334, 0, -9225.42, -2694.12, 89.086, -1.16937, 0, 0, 0.551937, -0.833886, 2, 2, 100, 1, 0, 0, 0, 10);
 
+-- Greatfather Winters Helpers Should only spawn on the 25th
+DELETE FROM `game_event_creature` WHERE `guid` IN (62028, 62029);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(62029, 21),
+(62028, 21);
+
 
 -- End of migration.
 END IF;
