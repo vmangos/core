@@ -1020,6 +1020,43 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (62029, 21),
 (62028, 21);
 
+-- Correct Gossip Menu For Itharius
+-- Add Gossip Menu For When Player Does Not Have Chained Essence of Eranikus
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(1341, 1973);
+
+-- Add Condition To Check If Player Has Chained Essence of Eranikus
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1341, 2, 10455, 1, 0, 0, 0);
+
+-- Add Condition To Gossip Menu And Gossip Menu Option
+UPDATE `gossip_menu` SET `condition_id` = 1341 WHERE `entry` = 1341 AND `text_id` = 1995;
+UPDATE `gossip_menu_option` SET `condition_id` = 1341 WHERE `menu_id` = 1341 AND `id` = 0;
+
+-- Add missing Gossip Menu Option
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(1341, 1, 0, 'What\'s an elf like you doing inside a cave like this?', 4471, 1, 1, 1363, 0, 0, 0, 0, \N, 0, 0);
+
+-- Add missing Gossip Menu
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(1363, 1996);
+
+-- Add missing NPC Text
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES
+(1363, 4472, 1);
+
+-- SET Correct Gossip Menu For Option 1341
+UPDATE `gossip_menu_option` SET `action_menu_id` = 1366 WHERE `menu_id` = 1341 AND `id`=0;
+
+-- Add misiing Gossip Menu
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(1366, 1997);
+
+-- Update Gossip Menu Option With Correct Gossip Menu
+UPDATE `gossip_menu_option` SET `menu_id` = 1366 WHERE `menu_id` = 16033;
+
+-- Remove Incorrect Gossip Menu
+DELETE FROM `gossip_menu` WHERE `entry` = 16033;
+
 
 -- End of migration.
 END IF;
