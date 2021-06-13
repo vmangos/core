@@ -37,7 +37,7 @@ add_library(bz2
     ../../dep/src/bzip2/crctable.c
     ../../dep/src/bzip2/decompress.c
     ../../dep/src/bzip2/huffman.c
-    ../../dep/src/bzip2/randtable
+    ../../dep/src/bzip2/randtable.c
 )
 
 SET_TARGET_PROPERTIES (bz2 PROPERTIES FOLDER "3rd Party")
