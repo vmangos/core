@@ -1020,7 +1020,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (62029, 21),
 (62028, 21);
 
--- Correct Gossip Menu For Itharius
+-- Correct Gossip Menu For Itharius (credit cmangos)
 -- Add Gossip Menu For When Player Does Not Have Chained Essence of Eranikus
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (1341, 1973);
