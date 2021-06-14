@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
+-- Host:                         127.0.0.1
 -- Server version:               5.5.53 - MySQL Community Server (GPL)
 -- Server OS:                    Win32
--- HeidiSQL Версия:              9.3.0.4998
+-- HeidiSQL Version:             9.3.0.4998
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -11,11 +11,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for table realmd.account
-DROP TABLE IF EXISTS `account`;
 CREATE TABLE IF NOT EXISTS `account` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `username` varchar(32) NOT NULL,
-  `sha_pass_hash` varchar(40) NOT NULL,
   `gmlevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `sessionkey` longtext,
   `v` longtext,
@@ -63,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `account` (
 
 
 -- Dumping structure for table realmd.account_access
-DROP TABLE IF EXISTS `account_access`;
 CREATE TABLE IF NOT EXISTS `account_access` (
   `id` int(11) unsigned NOT NULL,
   `gmlevel` tinyint(3) unsigned NOT NULL,
@@ -75,7 +72,6 @@ CREATE TABLE IF NOT EXISTS `account_access` (
 
 
 -- Dumping structure for table realmd.account_banned
-DROP TABLE IF EXISTS `account_banned`;
 CREATE TABLE IF NOT EXISTS `account_banned` (
   `banid` bigint(20) NOT NULL AUTO_INCREMENT,
   `id` bigint(20) NOT NULL DEFAULT '0' COMMENT 'Account id',
@@ -94,7 +90,6 @@ CREATE TABLE IF NOT EXISTS `account_banned` (
 
 
 -- Dumping structure for table realmd.geoip
-DROP TABLE IF EXISTS `geoip`;
 CREATE TABLE IF NOT EXISTS `geoip` (
   `network_start_integer` int(11) DEFAULT NULL,
   `network_last_integer` int(11) DEFAULT NULL,
@@ -115,7 +110,6 @@ CREATE TABLE IF NOT EXISTS `geoip` (
 
 
 -- Dumping structure for table realmd.ip2nation
-DROP TABLE IF EXISTS `ip2nation`;
 CREATE TABLE IF NOT EXISTS `ip2nation` (
   `ip` int(11) unsigned NOT NULL DEFAULT '0',
   `country` char(2) NOT NULL DEFAULT '',
@@ -126,7 +120,6 @@ CREATE TABLE IF NOT EXISTS `ip2nation` (
 
 
 -- Dumping structure for table realmd.ip2nationcountries
-DROP TABLE IF EXISTS `ip2nationcountries`;
 CREATE TABLE IF NOT EXISTS `ip2nationcountries` (
   `code` varchar(4) NOT NULL DEFAULT '',
   `iso_code_2` varchar(2) NOT NULL DEFAULT '',
@@ -143,7 +136,6 @@ CREATE TABLE IF NOT EXISTS `ip2nationcountries` (
 
 
 -- Dumping structure for table realmd.ip_banned
-DROP TABLE IF EXISTS `ip_banned`;
 CREATE TABLE IF NOT EXISTS `ip_banned` (
   `ip` varchar(32) NOT NULL DEFAULT '0.0.0.0',
   `bandate` int(11) NOT NULL,
@@ -157,7 +149,6 @@ CREATE TABLE IF NOT EXISTS `ip_banned` (
 
 
 -- Dumping structure for table realmd.migrations
-DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
@@ -167,7 +158,6 @@ CREATE TABLE IF NOT EXISTS `migrations` (
 
 
 -- Dumping structure for table realmd.realmcharacters
-DROP TABLE IF EXISTS `realmcharacters`;
 CREATE TABLE IF NOT EXISTS `realmcharacters` (
   `realmid` int(11) unsigned NOT NULL DEFAULT '0',
   `acctid` bigint(20) unsigned NOT NULL,
@@ -180,7 +170,6 @@ CREATE TABLE IF NOT EXISTS `realmcharacters` (
 
 
 -- Dumping structure for table realmd.realmlist
-DROP TABLE IF EXISTS `realmlist`;
 CREATE TABLE IF NOT EXISTS `realmlist` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL DEFAULT '',
@@ -205,7 +194,6 @@ CREATE TABLE IF NOT EXISTS `realmlist` (
 
 
 -- Dumping structure for table realmd.uptime
-DROP TABLE IF EXISTS `uptime`;
 CREATE TABLE IF NOT EXISTS `uptime` (
   `realmid` int(11) unsigned NOT NULL,
   `starttime` bigint(20) unsigned NOT NULL DEFAULT '0',
