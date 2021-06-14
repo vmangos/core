@@ -1042,7 +1042,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 
 -- Add missing NPC Text
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES
-(1363, 4472, 1);
+(1996, 4472, 1);
 
 -- SET Correct Gossip Menu For Option 1341
 UPDATE `gossip_menu_option` SET `action_menu_id` = 1366 WHERE `menu_id` = 1341 AND `id`=0;
