@@ -24,6 +24,7 @@
 #include "DBCStores.h"
 #include <map>
 
+class Transport;
 struct GameObjectInfo;
 
 typedef std::map<uint32, TransportAnimationEntry const*> TransportPathContainer;
