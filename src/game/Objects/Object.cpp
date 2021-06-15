@@ -1406,8 +1406,9 @@ void WorldObject::CleanupsBeforeDelete()
 {
     RemoveFromWorld();
 
-    if (GenericTransport* transport = GetTransport())
-        transport->RemovePassenger(this);
+    if (Unit* pUnit = ToUnit())
+        if (GenericTransport* transport = GetTransport())
+            transport->RemovePassenger(pUnit);
 }
 
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh)

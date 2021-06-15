@@ -1029,51 +1029,25 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
 
         if (pPlayerMover->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
         {
-            GetPlayer()->GetCheatData()->OnTransport(pPlayerMover, pPlayerMover->m_movementInfo.GetTransportGuid());
-
-            Unit* loadPetOnTransport = nullptr;
             if (!pPlayerMover->GetTransport())
             {
-                if (GenericTransport* t = pPlayerMover->GetMap()->GetTransport(pPlayerMover->m_movementInfo.GetTransportGuid()))
-                {
-                    t->AddPassenger(pPlayerMover);
-                    if (Pet* pet = pPlayerMover->GetPet())
-                        if (pet->GetTransport() != t)
-                            loadPetOnTransport = pet;
-                }
-                // fix an 1.12 client problem with transports
-                pPlayerMover->SetJustBoarded(true);
+                if (GenericTransport* transport = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
+                    transport->AddPassenger(pPlayerMover);
             }
             else
-                pPlayerMover->SetJustBoarded(false);
-
-            if (pPlayerMover->GetTransport())
             {
                 pPlayerMover->m_movementInfo.pos.x = pPlayerMover->m_movementInfo.GetTransportPos().x;
                 pPlayerMover->m_movementInfo.pos.y = pPlayerMover->m_movementInfo.GetTransportPos().y;
                 pPlayerMover->m_movementInfo.pos.z = pPlayerMover->m_movementInfo.GetTransportPos().z;
                 pPlayerMover->m_movementInfo.pos.o = pPlayerMover->m_movementInfo.GetTransportPos().o;
                 pPlayerMover->GetTransport()->CalculatePassengerPosition(pPlayerMover->m_movementInfo.pos.x, pPlayerMover->m_movementInfo.pos.y, pPlayerMover->m_movementInfo.pos.z, &pPlayerMover->m_movementInfo.pos.o);
-                if (loadPetOnTransport)
-                {
-                    loadPetOnTransport->NearTeleportTo(pPlayerMover->m_movementInfo.pos);
-                    pPlayerMover->GetTransport()->AddPassenger(loadPetOnTransport);
-                }
             }
         }
-        else if (pPlayerMover->GetTransport())
+        else if (pPlayerMover->GetTransport()) // if we were on a transport, leave
         {
-            pPlayerMover->GetTransport()->RemovePassenger(pPlayerMover);
-            if (Pet* pet = pPlayerMover->GetPet())
-            {
-                // If moving on transport, stop it.
-                pet->DisableSpline();
-                if (pet->GetTransport())
-                {
-                    pet->GetTransport()->RemovePassenger(pet);
-                    pet->NearTeleportTo(pPlayerMover->m_movementInfo.pos);
-                }
-            }
+            pPlayerMover->m_transport->RemovePassenger(pPlayerMover);
+            pPlayerMover->m_transport = nullptr;
+            pPlayerMover->m_movementInfo.ClearTransportData();
         }
 
         movementInfo = pPlayerMover->m_movementInfo;
