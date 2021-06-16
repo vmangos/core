@@ -1084,6 +1084,31 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2993, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6139, 0, 0, 0, 0, 0, 0, 0, 0, 'Malyfous Darkhammer - Talk');
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2993, 5, 35, 1, 0, 0, 0, 175927, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 3.12414, 0, 'Malyfous Darkhammer - Set Orientation');
 
+-- Malyfous's Catalogue
+-- Add Correct Gossip Menus
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(2986,3695,0),
+(2987,3696,0),
+(2988,3697,0),
+(2989,3699,0),
+(2990,3698,0);
+
+-- Add Missing Gossip Menu Options
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(2985, 0, 0, 'Chapter on Frayed Abomination Stitchings.', 6145, 1, 1, 2986, 0, 0, 0, 0, '', 0, 5047),
+(2985, 1, 0, 'Chapter on Enchanted Scarlet Thread.', 6146, 1, 1, 2987, 0, 0, 0, 0, '', 0, 5047),
+(2985, 2, 0, 'Chapter on Frostwhisper\'s Embalming Fluid.', 6147, 1, 1, 2988, 0, 0, 0, 0, '', 0, 5047),
+(2985, 3, 0, 'Chapter on Arcane Crystals and Arcanite.', 6151, 1, 1, 2989, 0, 0, 0, 0, '', 0, 5047),
+(2985, 4, 0, 'Chapter on Skin of Shadow.', 6161, 1, 1, 2990, 0, 0, 0, 0, '', 0, 5047);
+
+-- Add Missing NPC Text
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES
+(3695, 6163, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3696, 6164, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3697, 6165, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3698, 6166, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3699, 6167, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
