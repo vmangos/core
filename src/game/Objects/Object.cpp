@@ -319,8 +319,8 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     if (updateFlags & UPDATEFLAG_TRANSPORT)
     {
         GameObject const* go = ToGameObject();
-        if (go && go->IsMoTransport())
-            buf << uint32(go->ToTransport()->GetPathProgress());
+        if (go && go->IsTransport())
+            buf << uint32(static_cast<GenericTransport const*>(go)->GetPathProgress());
         else
             buf << uint32(sWorld.GetCurrentMSTime());
     }
@@ -507,13 +507,8 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     {
         // transport progress or mstime.
         GameObject const* go = ToGameObject();
-        /** @TODO Use IsTransport() to also handle type 11 (TRANSPORT)
-            Currently grid objects are not updated if there are no nearby players,
-            this causes clients to receive different PathProgress
-            resulting in players seeing the object in a different position
-        */
-        if (go && go->IsMoTransport())
-            *data << uint32(go->ToTransport()->GetPathProgress());
+        if (go && go->IsTransport())
+            *data << uint32(static_cast<GenericTransport const*>(go)->GetPathProgress());
         else
             *data << uint32(sWorld.GetCurrentMSTime());
     }
