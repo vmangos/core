@@ -24,6 +24,7 @@
 #include "DBCStores.h"
 #include <map>
 
+class Map;
 class Transport;
 struct GameObjectInfo;
 

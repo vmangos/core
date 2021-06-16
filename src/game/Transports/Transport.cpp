@@ -130,12 +130,9 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 {
     printf("Teleport transport %u to Map %u X %g Y %g Z %g\n", GetEntry(), newMapid, x, y, z);
     Map const* oldMap = GetMap();
-    Relocate(x, y, z, o);
-
     uint32 const oldInstanceId = GetInstanceId();
     uint32 const newInstanceId = sMapMgr.GetContinentInstanceId(newMapid, x, y);
     bool const mapChange = GetMapId() != newMapid || oldInstanceId != newInstanceId;
-    SetLocationInstanceId(newInstanceId);
 
     for (m_passengerTeleportIterator = m_passengers.begin(); m_passengerTeleportIterator != m_passengers.end();)
     {
@@ -194,6 +191,8 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
     {
         Map* newMap = sMapMgr.CreateMap(newMapid, this);
         GetMap()->Remove<Transport>(this, false);
+        Relocate(x, y, z, o);
+        SetLocationInstanceId(newInstanceId);
         SetMap(newMap);
         GetMap()->Add<Transport>(this);
     }
