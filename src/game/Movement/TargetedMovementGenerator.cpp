@@ -49,8 +49,20 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 
     GenericTransport* transport = nullptr;
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
-    if (isPet || owner.IsPlayer())
+
+    if (this->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE && i_target.getTarget()->IsPlayer())
+    {
         transport = i_target.getTarget()->GetTransport();
+
+        if (transport != owner.GetTransport())
+        {
+            if (owner.GetTransport())
+                owner.GetTransport()->RemoveFollowerFromTransport(i_target.getTarget(), &owner);
+
+            if (transport)
+                transport->AddFollowerToTransport(i_target.getTarget(), &owner);
+        }
+    }
 
     if (!m_fOffset)
     {

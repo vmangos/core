@@ -26,18 +26,21 @@
 #include <map>
 #include <set>
 
-typedef std::set<WorldObject*> PassengerSet;
+typedef std::set<Unit*> PassengerSet;
 
 class GenericTransport : public GameObject
 {
 public:
-    GenericTransport() : m_passengerTeleportIterator(m_passengers.end()), m_pathProgress(0), m_movementStarted(0) {}
-    bool AddPassenger(Unit* passenger, bool adjustCoords = true);
-    bool RemovePassenger(Unit* passenger);
-    bool AddPetToTransport(Unit* passenger, Pet* pet);
+    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0), m_movementStarted(0) {}
+    void CleanupsBeforeDelete() override;
+
+    void AddPassenger(Unit* passenger, bool adjustCoords = true);
+    void RemovePassenger(Unit* passenger);
+    void AddFollowerToTransport(Unit* passenger, Unit* follower);
+    void RemoveFollowerFromTransport(Unit* passenger, Unit* follower);
 
     void UpdatePosition(float x, float y, float z, float o);
-    void UpdatePassengerPosition(WorldObject* object);
+    void UpdatePassengerPosition(Unit* object);
 
     typedef std::set<Player*> PlayerSet;
     PassengerSet& GetPassengers() { return m_passengers; }
@@ -64,7 +67,7 @@ protected:
     void UpdatePassengerPositions(PassengerSet& passengers);
 
     PassengerSet m_passengers;
-    PassengerSet::iterator m_passengerTeleportIterator;
+    PassengerSet::iterator m_passengerTeleportItr;
 
     uint32 m_pathProgress; // for MO transport its full time since start for normal time in cycle
     uint32 m_movementStarted;

@@ -1032,10 +1032,14 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             if (!pPlayerMover->GetTransport())
             {
                 if (GenericTransport* transport = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
+                {
                     transport->AddPassenger(pPlayerMover);
+                    pPlayerMover->SetJustBoarded(true); // fix a 1.12 client problem with transports
+                }
             }
             else
             {
+                pPlayerMover->SetJustBoarded(false);
                 pPlayerMover->m_movementInfo.pos.x = pPlayerMover->m_movementInfo.GetTransportPos().x;
                 pPlayerMover->m_movementInfo.pos.y = pPlayerMover->m_movementInfo.GetTransportPos().y;
                 pPlayerMover->m_movementInfo.pos.z = pPlayerMover->m_movementInfo.GetTransportPos().z;
