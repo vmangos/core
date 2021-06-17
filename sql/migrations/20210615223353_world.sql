@@ -26,6 +26,9 @@ UPDATE `transports` SET `period`=303466 WHERE `entry`=175080 && `guid`=7;
 -- Grom'Gol Base Camp and Undercity
 UPDATE `transports` SET `period`=335297 WHERE `entry`=176495 && `guid`=8;
 
+-- Correct summon range of Eye of Kilrog.
+UPDATE `spell_effect_mod` SET `effectRadiusIndex`=7 WHERE `Id` IN (126, 11403);
+
 
 -- End of migration.
 END IF;

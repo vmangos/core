@@ -489,6 +489,7 @@ class Spell
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
+        void UpdateCastStartPosition();
 
         SpellCaster* const m_caster = nullptr;
         Unit* const m_casterUnit = nullptr;

@@ -3670,6 +3670,9 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
         return;
     }
 
+    // Don't interrupt spell if player turned before cast finished.
+    UpdateCastStartPosition();
+
     // Notify Summoner
     if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->AI())
         m_originalCaster->AI()->JustSummoned(pMinion);

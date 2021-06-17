@@ -30,7 +30,6 @@
 #include "CellImpl.h"
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
-#include "CreatureAI.h"
 
 #include <G3D/Quat.h>
 
@@ -167,10 +166,23 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                 // Units teleport on transport not implemented.
                 Creature* creature = static_cast<Creature*>(passenger);
                 RemovePassenger(creature);
-                if (creature->IsInCombat() && creature->AI())
-                    creature->AI()->EnterEvadeMode();
-                else
-                    creature->GetMotionMaster()->MoveTargetedHome();
+
+                Player* pOwner = ::ToPlayer(creature->GetOwner());
+                if (!pOwner || pOwner->GetTransport() != this)
+                {
+                    if (creature->IsInCombat())
+                        creature->OnLeaveCombat();
+                    else
+                    {
+                        float x, y, z, o = 0.0f;
+                        if (pOwner)
+                            pOwner->GetPosition(x, y, z);
+                        else
+                            creature->GetRespawnCoord(x, y, z, &o);
+                        creature->NearTeleportTo(x, y, z, o);
+                    }
+                }
+                
                 break;
             }
             case TYPEID_PLAYER:
