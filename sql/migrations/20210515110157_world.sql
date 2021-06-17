@@ -1019,36 +1019,27 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 -- Add Gossip Menu For When Player Does Not Have Chained Essence of Eranikus
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (1341, 1973);
-
 -- Add Condition To Check If Player Has Chained Essence of Eranikus
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1341, 2, 10455, 1, 0, 0, 0);
-
 -- Add Condition To Gossip Menu And Gossip Menu Option
 UPDATE `gossip_menu` SET `condition_id` = 1341 WHERE `entry` = 1341 AND `text_id` = 1995;
 UPDATE `gossip_menu_option` SET `condition_id` = 1341 WHERE `menu_id` = 1341 AND `id` = 0;
-
 -- Add missing Gossip Menu Option
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (1341, 1, 0, 'What\'s an elf like you doing inside a cave like this?', 4471, 1, 1, 1363, 0, 0, 0, 0, \N, 0, 0);
-
 -- Add missing Gossip Menu
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (1363, 1996);
-
 -- Add missing NPC Text
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES
 (1996, 4472, 1);
-
 -- SET Correct Gossip Menu For Option 1341
 UPDATE `gossip_menu_option` SET `action_menu_id` = 1366 WHERE `menu_id` = 1341 AND `id`=0;
-
 -- Add misiing Gossip Menu
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (1366, 1997);
-
 -- Update Gossip Menu Option With Correct Gossip Menu
 UPDATE `gossip_menu_option` SET `menu_id` = 1366 WHERE `menu_id` = 16033;
-
 -- Remove Incorrect Gossip Menu
 DELETE FROM `gossip_menu` WHERE `entry` = 16033;
 
@@ -1056,30 +1047,27 @@ DELETE FROM `gossip_menu` WHERE `entry` = 16033;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (5400, 'Temple of Atal\'?Hakkar - Zekkis', 8282, 100, 1, 0, 0, 0, 0, 5, 60, 60, 0, 7102, 100, 1, 0, 0, 0, 5, 10, 120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 UPDATE `creature_template` SET `speed_walk` = 2.5, `base_attack_time` = 2000, `spell_id2` = 0, `spell_id1` = 0, `spell_list_id` = 5400, `script_name`= '' WHERE `entry`=5400 AND `patch`=0;
 
--- Add Gossip Menus to Malyfous Darkhammer
+-- Add Gossip Menus to Malyfous Darkhammer (credit trinity core)
 -- Add Correct Gossip Menus
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2991, 3674, 0),
 (2992, 3675, 0),
 (2993, 3676, 0);
-
 -- Add Condition Quest 5047 Must Be Completed
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (2984, 8, 5047, 0, 0, 0, 0);
-
 -- Add Missing Gossip Menu Options
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (2984, 0, 0, 'Tell me about the hide.', 6129, 1, 1, 2991, 0, 0, 0, 0, '', 0, 2984),
 (2991, 0, 0, 'What are the chances of obtaining such a hide?', 6131, 1, 1, 2992, 0, 0, 0, 0, '', 0, 0),
 (2992, 0, 0, 'So let us pretend I get this hide, what else would you need and what could you actually make?', 6133, 1, 1, 2993, 0, 0, 0, 0, '', 0, 0),
 (2993, 0, 0, 'Ok!', 6135, 1, 1, -1, 0, 2993, 0, 0, '', 0, 0);
-
 -- Add Gossip Script
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2993, 0, 35, 0, 0, 0, 0, 175927, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Malyfous Darkhammer - Set Orientation');
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2993, 2, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Malyfous Darkhammer - Emote');
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2993, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6139, 0, 0, 0, 0, 0, 0, 0, 0, 'Malyfous Darkhammer - Talk');
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2993, 5, 35, 1, 0, 0, 0, 175927, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 3.12414, 0, 'Malyfous Darkhammer - Set Orientation');
 
--- Malyfous's Catalogue
+-- Malyfous's Catalogue (credit trinity core)
 -- Add Correct Gossip Menus
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2986,3695,0),
@@ -1087,7 +1075,6 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2988,3697,0),
 (2989,3699,0),
 (2990,3698,0);
-
 -- Add Missing Gossip Menu Options
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (2985, 0, 0, 'Chapter on Frayed Abomination Stitchings.', 6145, 1, 1, 2986, 0, 0, 0, 0, '', 0, 2984),
@@ -1095,7 +1082,6 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (2985, 2, 0, 'Chapter on Frostwhisper\'s Embalming Fluid.', 6147, 1, 1, 2988, 0, 0, 0, 0, '', 0, 2984),
 (2985, 3, 0, 'Chapter on Arcane Crystals and Arcanite.', 6151, 1, 1, 2989, 0, 0, 0, 0, '', 0, 2984),
 (2985, 4, 0, 'Chapter on Skin of Shadow.', 6161, 1, 1, 2990, 0, 0, 0, 0, '', 0, 2984);
-
 -- Add Missing NPC Text
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES
 (3695, 6163, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -1103,6 +1089,14 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 (3697, 6165, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (3698, 6166, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (3699, 6167, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+-- Add Scripts to Gameobjects Used in Quest Samophlange Part 2 (credit trinity core)
+UPDATE `gameobject_template` SET `data2` = 4072 WHERE  `entry` = 4072;
+UPDATE `gameobject_template` SET `data2` = 61935 WHERE  `entry` = 61935;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4072, 0, 10, 3284, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 826.776, -2674.53, 91.6667, 5.53466, 0, 'Main Control Valve - Summon Creature');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4072, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 824.479, -2678.73, 91.6667, 6.04909, 0, 'Main Control Valve - Summon Creature');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (61935, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 843.523, -2669.85, 91.6668, 4.39584, 0, 'Main Control Valve - Summon Creature');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (407201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4704, 0, 0, 0, 0, 0, 0, 0, 0, 'Venture Co. Peon / Drudger - Talk');
 
 
 -- End of migration.
