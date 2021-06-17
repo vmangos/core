@@ -30,6 +30,7 @@
 #include "CellImpl.h"
 #include "GameObjectModel.h"
 #include "ObjectAccessor.h"
+#include "CreatureAI.h"
 
 #include <G3D/Quat.h>
 
@@ -150,25 +151,32 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
     for (m_passengerTeleportItr = m_passengers.begin(); m_passengerTeleportItr != m_passengers.end();)
     {
-        Unit* obj = (*m_passengerTeleportItr++);
+        Unit* passenger = (*m_passengerTeleportItr++);
 
         float destX, destY, destZ, destO;
-        destX = obj->GetTransOffsetX();
-        destY = obj->GetTransOffsetY();
-        destZ = obj->GetTransOffsetZ();
-        destO = obj->GetTransOffsetO();
+        destX = passenger->GetTransOffsetX();
+        destY = passenger->GetTransOffsetY();
+        destZ = passenger->GetTransOffsetZ();
+        destO = passenger->GetTransOffsetO();
         CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
 
-        switch (obj->GetTypeId())
+        switch (passenger->GetTypeId())
         {
             case TYPEID_UNIT:
+            {
                 // Units teleport on transport not implemented.
-                RemovePassenger(obj);
+                Creature* creature = static_cast<Creature*>(passenger);
+                RemovePassenger(creature);
+                if (creature->IsInCombat() && creature->AI())
+                    creature->AI()->EnterEvadeMode();
+                else
+                    creature->GetMotionMaster()->MoveTargetedHome();
                 break;
+            }
             case TYPEID_PLAYER:
             {
                 // Remove some auras to prevent undermap
-                Player* player = obj->ToPlayer();
+                Player* player = static_cast<Player*>(passenger);
                 if (!player->IsInWorld())
                 {
                     RemovePassenger(player);

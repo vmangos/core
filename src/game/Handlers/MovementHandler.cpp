@@ -1009,7 +1009,9 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
     if (pMover->HasUnitMovementFlag(MOVEFLAG_ROOT) && !movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
         movementInfo.AddMovementFlag(MOVEFLAG_ROOT);
 
-    if (Player* pPlayerMover = pMover->ToPlayer())
+    Player* const pPlayerMover = pMover->ToPlayer();
+
+    if (pPlayerMover)
     {
         // ignore current relocation if needed
         if (pPlayerMover->IsNextRelocationIgnored())
@@ -1024,39 +1026,51 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
                 if (!lootGuid.IsItem())
                     pPlayerMover->GetSession()->DoLootRelease(lootGuid);
         }
+    }
 
-        pPlayerMover->m_movementInfo = movementInfo;
+    if (!pPlayerMover)
+        pMover->GetMap()->CreatureRelocation((Creature*)pMover, movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
 
-        if (pPlayerMover->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    pMover->m_movementInfo = movementInfo;
+
+    if (pMover->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    {
+        if (!pMover->GetTransport())
         {
-            if (!pPlayerMover->GetTransport())
+            if (GenericTransport* transport = pMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
             {
-                if (GenericTransport* transport = pPlayerMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
-                {
-                    transport->AddPassenger(pPlayerMover);
+                transport->AddPassenger(pMover);
+                if (pPlayerMover)
                     pPlayerMover->SetJustBoarded(true); // fix a 1.12 client problem with transports
-                }
-            }
-            else
-            {
-                pPlayerMover->SetJustBoarded(false);
-                pPlayerMover->m_movementInfo.pos.x = pPlayerMover->m_movementInfo.GetTransportPos().x;
-                pPlayerMover->m_movementInfo.pos.y = pPlayerMover->m_movementInfo.GetTransportPos().y;
-                pPlayerMover->m_movementInfo.pos.z = pPlayerMover->m_movementInfo.GetTransportPos().z;
-                pPlayerMover->m_movementInfo.pos.o = pPlayerMover->m_movementInfo.GetTransportPos().o;
-                pPlayerMover->GetTransport()->CalculatePassengerPosition(pPlayerMover->m_movementInfo.pos.x, pPlayerMover->m_movementInfo.pos.y, pPlayerMover->m_movementInfo.pos.z, &pPlayerMover->m_movementInfo.pos.o);
             }
         }
-        else if (pPlayerMover->GetTransport()) // if we were on a transport, leave
+        else
         {
-            pPlayerMover->m_transport->RemovePassenger(pPlayerMover);
-            pPlayerMover->m_transport = nullptr;
-            pPlayerMover->m_movementInfo.ClearTransportData();
+            if (pPlayerMover)
+                pPlayerMover->SetJustBoarded(false);
+            pMover->m_movementInfo.pos.x = pMover->m_movementInfo.GetTransportPos().x;
+            pMover->m_movementInfo.pos.y = pMover->m_movementInfo.GetTransportPos().y;
+            pMover->m_movementInfo.pos.z = pMover->m_movementInfo.GetTransportPos().z;
+            pMover->m_movementInfo.pos.o = pMover->m_movementInfo.GetTransportPos().o;
+            pMover->GetTransport()->CalculatePassengerPosition(pMover->m_movementInfo.pos.x, pMover->m_movementInfo.pos.y, pMover->m_movementInfo.pos.z, &pMover->m_movementInfo.pos.o);
         }
+    }
+    else if (pMover->GetTransport()) // if we were on a transport, leave
+    {
+        pMover->m_transport->RemovePassenger(pMover);
+        pMover->m_transport = nullptr;
+        pMover->m_movementInfo.ClearTransportData();
+    }
 
-        movementInfo = pPlayerMover->m_movementInfo;
+    movementInfo = pMover->m_movementInfo;
+
+    if (pPlayerMover)
         pPlayerMover->SetPosition(movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
+    else
+        pMover->GetMap()->CreatureRelocation((Creature*)pMover, movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
 
+    if (pPlayerMover)
+    {
         // Nostalrius - antiundermap1
         if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))
         {
@@ -1102,11 +1116,6 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             sLog.outInfo("[UNDERMAP/Teleport] Player %s teleported.", pPlayerMover->GetName(), pPlayerMover->GetGUIDLow(), pPlayerMover->GetMapId(), pPlayerMover->GetPositionX(), pPlayerMover->GetPositionY(), pPlayerMover->GetPositionZ());
             pPlayerMover->RepopAtGraveyard();
         }
-    }
-    else // creature charmed
-    {
-        if (pMover->IsInWorld())
-            pMover->GetMap()->CreatureRelocation((Creature*)pMover, movementInfo.GetPos().x, movementInfo.GetPos().y, movementInfo.GetPos().z, movementInfo.GetPos().o);
     }
 }
 

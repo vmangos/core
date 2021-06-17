@@ -123,24 +123,28 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                     break;
                 case COMMAND_ATTACK:                        // spellid=1792  // ATTACK
                 {
-                    // Can't attack if owner is pacified
-                    if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                    Unit* pTarget = _player->GetMap()->GetUnit(targetGuid);
+                    if (!pTarget)
                     {
-                        //pet->SendPetCastFail(spellid, SPELL_FAILED_PACIFIED);
-                        /// @todo Send proper error message to client
+                        pCharmedUnit->SendPetActionFeedback(FEEDBACK_NOTHING_TO_ATT);
                         return;
                     }
 
-                    Unit* TargetUnit = _player->GetMap()->GetUnit(targetGuid);
-                    if (!TargetUnit)
+                    if (!_player->IsValidAttackTarget(pTarget) || _player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                    {
+                        pCharmedUnit->SendPetActionFeedback(FEEDBACK_CANT_ATT_TARGET);
                         return;
+                    }
 
-                    if (!GetPlayer()->IsValidAttackTarget(TargetUnit))
+                    if (pCharmedUnit->GetTransport() != pTarget->GetTransport())
+                    {
+                        pCharmedUnit->SendPetActionFeedback(FEEDBACK_NO_PATH_TO);
                         return;
+                    }
 
                     pCharmedUnit->ClearUnitState(UNIT_STAT_FOLLOW);
                     // This is true if pet has no target or has target but targets differs.
-                    if (pCharmedUnit->GetVictim() != TargetUnit || (pCharmedUnit->GetVictim() == TargetUnit && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+                    if (pCharmedUnit->GetVictim() != pTarget || (pCharmedUnit->GetVictim() == pTarget && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
                     {
                         if (pCharmedUnit->GetVictim())
                             pCharmedUnit->AttackStop();
@@ -153,10 +157,10 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                             charmInfo->SetIsCommandFollow(false);
                             charmInfo->SetIsReturning(false);
 
-                            pCharmedUnit->ToCreature()->AI()->AttackStart(TargetUnit);
+                            pCharmedUnit->ToCreature()->AI()->AttackStart(pTarget);
 
                             //10% chance to play special pet attack talk, else growl
-                            if (pCharmedUnit->ToCreature()->IsPet() && ((Pet*)pCharmedUnit)->getPetType() == SUMMON_PET && pCharmedUnit != TargetUnit && urand(0, 100) < 10)
+                            if (pCharmedUnit->ToCreature()->IsPet() && ((Pet*)pCharmedUnit)->getPetType() == SUMMON_PET && pCharmedUnit != pTarget && urand(0, 100) < 10)
                                 pCharmedUnit->SendPetTalk((uint32)PET_TALK_ATTACK);
                             else
                             {
@@ -166,7 +170,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                         }
                         else                                // charmed player
                         {
-                            if (pCharmedUnit->GetVictim() && pCharmedUnit->GetVictim() != TargetUnit)
+                            if (pCharmedUnit->GetVictim() && pCharmedUnit->GetVictim() != pTarget)
                                 pCharmedUnit->AttackStop();
 
                             charmInfo->SetIsCommandAttack(true);
@@ -175,9 +179,9 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                             charmInfo->SetIsCommandFollow(false);
                             charmInfo->SetIsReturning(false);
 
-                            pCharmedUnit->Attack(TargetUnit, true);
+                            pCharmedUnit->Attack(pTarget, true);
                             pCharmedUnit->SendPetAIReaction();
-                            pCharmedUnit->GetMotionMaster()->MoveChase(TargetUnit);
+                            pCharmedUnit->GetMotionMaster()->MoveChase(pTarget);
                         }
                     }
                     break;

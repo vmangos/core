@@ -47,10 +47,11 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     bool losChecked = false;
     bool losResult = false;
 
-    GenericTransport* transport = nullptr;
+    GenericTransport* transport = owner.GetTransport();
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
 
-    if (this->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE && i_target.getTarget()->IsPlayer())
+    // Can switch transports during follow movement.
+    if (this->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
     {
         transport = i_target.getTarget()->GetTransport();
 
@@ -62,6 +63,16 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             if (transport)
                 transport->AddFollowerToTransport(i_target.getTarget(), &owner);
         }
+    }
+
+    m_bTargetOnTransport = transport;
+    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, transport);
+
+    // Can't path to target if transports are still different.
+    if (owner.GetTransport() != i_target.getTarget()->GetTransport())
+    {
+        m_bReachable = false;
+        return;
     }
 
     if (!m_fOffset)
@@ -114,9 +125,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
                 i_target->GetSafePosition(x, y, z);
     }
-
-    m_bTargetOnTransport = transport;
-    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, transport);
 
     PathFinder path(&owner);
 
