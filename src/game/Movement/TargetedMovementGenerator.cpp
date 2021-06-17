@@ -65,8 +65,8 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         }
     }
 
-    m_bTargetOnTransport = transport;
-    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, transport);
+    m_bTargetOnTransport = i_target.getTarget()->GetTransport();
+    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, i_target.getTarget()->GetTransport());
 
     // Can't path to target if transports are still different.
     if (owner.GetTransport() != i_target.getTarget()->GetTransport())
