@@ -51,11 +51,6 @@ INSERT INTO `creature` (`guid`, `id`, `position_x`, `position_y`, `position_z`, 
 (155, 832, -10986.0615234375, 1815.8741455078125, 45.1251678466796875, 5.635118007659912109, 300, 300, 100, 0, 1, 45, 10),
 (170, 832, -10550.6669921875, 1420.46337890625, 47.43852996826171875, 6.067455291748046875, 300, 300, 100, 0, 1, 45, 10),
 (173, 832, -10785.8642578125, 1555.3922119140625, 48.61139297485351562, 4.12875223159790039, 300, 300, 100, 0, 1, 45, 10);
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `description`) VALUES
-(154, 10003, 'Dust Devil'),
-(155, 10003, 'Dust Devil'),
-(170, 10003, 'Dust Devil'),
-(173, 10003, 'Dust Devil');
 
 -- Blackthorn Ridge - Razormane Seer 
 DELETE FROM `creature_movement` WHERE (`id` = 14480);
