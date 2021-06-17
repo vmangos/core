@@ -85,7 +85,7 @@ int32 MoveSplineInit::Launch()
     }
 
     if (newTransport)
-        newTransport->CalculatePassengerOffset(real_position.x, real_position.y, real_position.z);
+        newTransport->CalculatePassengerOffset(real_position.x, real_position.y, real_position.z, &args.facing.angle);
 
     if (args.path.empty())
     {

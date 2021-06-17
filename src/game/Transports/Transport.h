@@ -90,7 +90,6 @@ class Transport : public GenericTransport
 public:
     explicit Transport(TransportTemplate const& transportTemplate);
 
-    static Transport* LoadTransport(TransportTemplate const& transportTemplate, Map* map);
     bool Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void Update(uint32 update_diff, uint32 /*time_diff*/) override;
 

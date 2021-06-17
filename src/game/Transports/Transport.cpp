@@ -36,37 +36,7 @@
 Transport::Transport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
 {
     m_updateFlag = (UPDATEFLAG_TRANSPORT | UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
-}
-
-Transport* Transport::LoadTransport(TransportTemplate const& transportTemplate, Map* map)
-{
-    Transport* t = new Transport(transportTemplate);
-
-    t->SetPeriod(transportTemplate.pathTime);
-
-    // sLog.outString("Loading transport %d between %s, %s", entry, name.c_str(), goinfo->name);
-
-    TaxiPathNodeEntry const* startNode = transportTemplate.keyFrames.begin()->Node;
-    uint32 mapId = startNode->mapid;
-    float x = startNode->x;
-    float y = startNode->y;
-    float z = startNode->z;
-    float o = t->GetKeyFrames().begin()->InitialOrientation;
-
-    // If we someday decide to use the grid to track transports, here:
-    t->SetLocationInstanceId(sMapMgr.GetContinentInstanceId(mapId, x, y));
-    t->SetMap(map ? map : sMapMgr.CreateMap(mapId, t));
-
-    // creates the Gameobject
-    if (!t->Create(transportTemplate.entry, mapId, x, y, z, o, GO_ANIMPROGRESS_DEFAULT))
-    {
-        delete t;
-        return nullptr;
-    }
-
-    // Passengers will be loaded once a player is near
-    t->GetMap()->Add<Transport>(t);
-    return t;
+    SetPeriod(transportTemplate.pathTime);
 }
 
 bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)

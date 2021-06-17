@@ -342,11 +342,45 @@ Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
     TransportTemplate const* tInfo = GetTransportTemplate(entry);
     if (!tInfo)
     {
-        sLog.outErrorDb("Transport %u will not be loaded, `transport_template` missing", entry);
+        sLog.outErrorDb("Transport %u will not be loaded, transport template is missing", entry);
         return nullptr;
     }
 
-    return Transport::LoadTransport(*tInfo, map);
+    // create transport...
+    Transport* trans = new Transport(*tInfo);
+
+    // ...at first waypoint
+    TaxiPathNodeEntry const* startNode = tInfo->keyFrames.begin()->Node;
+    uint32 mapId = startNode->mapid;
+    float x = startNode->x;
+    float y = startNode->y;
+    float z = startNode->z;
+    float o = tInfo->keyFrames.begin()->InitialOrientation;
+
+    // creates the Gameobject
+    if (!trans->Create(entry, mapId, x, y, z, o, GO_ANIMPROGRESS_DEFAULT))
+    {
+        delete trans;
+        return nullptr;
+    }
+
+    if (MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapId))
+    {
+        if (mapEntry->Instanceable() != tInfo->inInstance)
+        {
+            sLog.outError("Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName(), mapId);
+            delete trans;
+            return nullptr;
+        }
+    }
+
+    // use preset map for instances (need to know which instance)
+    trans->SetLocationInstanceId(sMapMgr.GetContinentInstanceId(mapId, x, y));
+    trans->SetMap(map ? map : sMapMgr.CreateMap(mapId, trans));
+
+    // Passengers will be loaded once a player is near
+    trans->GetMap()->Add<Transport>(trans);
+    return trans;
 }
 
 void TransportMgr::SpawnContinentTransports()
