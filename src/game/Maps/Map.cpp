@@ -1345,9 +1345,9 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
 
     if (old_cell.DiffGrid(new_cell))
     {
-        if (!go->isActiveObject() && !loaded(new_cell.gridPair()))
+        if ((!go->isActiveObject() || IsUnloading()) && !loaded(new_cell.gridPair()))
         {
-            DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "Creature (GUID: %u Entry: %u) attempt move from grid[%u,%u]cell[%u,%u] to unloaded grid[%u,%u]cell[%u,%u].", go->GetGUIDLow(), go->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+            DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "GameObject (GUID: %u Entry: %u) attempt move from grid[%u,%u]cell[%u,%u] to unloaded grid[%u,%u]cell[%u,%u].", go->GetGUIDLow(), go->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
             return;
         }
         EnsureGridLoadedAtEnter(new_cell);

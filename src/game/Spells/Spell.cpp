@@ -3400,18 +3400,8 @@ bool IsAcceptableAutorepeatError(SpellCastResult result)
     return false;
 }
 
-SpellCastResult Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura, uint32 chance)
+void Spell::UpdateCastStartPosition()
 {
-    m_targets = std::move(targets);
-    return prepare(triggeredByAura, chance);
-}
-
-SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
-{
-    m_spellState = SPELL_STATE_PREPARING;
-    m_delayed = m_spellInfo->speed > 0.0f 
-        || (!m_IsTriggeredSpell && m_caster->IsPlayer() && m_spellInfo->IsSpellWithDelayableEffects());
-
     if (m_caster->GetTransport())
     {
         m_castPositionX = m_caster->GetTransOffsetX();
@@ -3426,8 +3416,24 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         m_castPositionZ = m_caster->GetPositionZ();
         m_castOrientation = m_caster->GetOrientation();
     }
+}
 
-    if (triggeredByAura) {
+SpellCastResult Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura, uint32 chance)
+{
+    m_targets = std::move(targets);
+    return prepare(triggeredByAura, chance);
+}
+
+SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
+{
+    m_spellState = SPELL_STATE_PREPARING;
+    m_delayed = m_spellInfo->speed > 0.0f 
+        || (!m_IsTriggeredSpell && m_caster->IsPlayer() && m_spellInfo->IsSpellWithDelayableEffects());
+
+    UpdateCastStartPosition();
+
+    if (triggeredByAura)
+    {
         m_triggeredByAuraSpell = triggeredByAura->GetSpellProto();
         m_triggeredByAuraBasePoints = triggeredByAura->GetBasePoints();
     }

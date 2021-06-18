@@ -1,18 +1,19 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef TRANSPORTMGR_H
@@ -23,18 +24,29 @@
 #include "DBCStores.h"
 #include <map>
 
-struct KeyFrame;
-struct GameObjectInfo;
-struct TransportTemplate;
-class Transport;
 class Map;
+class Transport;
+struct GameObjectInfo;
+
+typedef std::map<uint32, TransportAnimationEntry const*> TransportPathContainer;
+// typedef std::map<uint32, TransportRotationEntry const*> TransportPathRotationContainer;
+
+struct TransportAnimation
+{
+    TransportAnimation() : TotalTime(0) { }
+
+    TransportPathContainer Path;
+    // TransportPathRotationContainer Rotations;
+    uint32 TotalTime;
+
+    TransportAnimationEntry const* GetPrevAnimNode(uint32 time) const;
+    TransportAnimationEntry const* GetNextAnimNode(uint32 time) const;
+    // TransportRotationEntry const* GetAnimRotation(uint32 time) const; - wotlk onwards
+};
+
+typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
 
 typedef Movement::Spline<double>                 TransportSpline;
-typedef std::vector<KeyFrame>                    KeyFrameVec;
-typedef std::unordered_map<uint32, TransportTemplate> TransportTemplates;
-typedef std::set<Transport*>                     TransportSet;
-typedef std::unordered_map<uint32, TransportSet>      TransportMap;
-typedef std::unordered_map<uint32, std::set<uint32> > TransportInstanceMap;
 
 struct KeyFrame
 {
@@ -67,6 +79,8 @@ struct KeyFrame
     bool IsStopFrame() const { return Node->actionFlag == 2; }
 };
 
+typedef std::vector<KeyFrame>  KeyFrameVec;
+
 struct TransportTemplate
 {
     TransportTemplate() : inInstance(false), pathTime(0), accelTime(0.0f), accelDist(0.0f), entry(0) { }
@@ -81,90 +95,35 @@ struct TransportTemplate
     uint32 entry;
 };
 
-typedef std::map<uint32, TransportAnimationEntry const*> TransportPathContainer;
-// typedef std::map<uint32, TransportRotationEntry const*> TransportPathRotationContainer;
-
-struct TransportAnimation
-{
-    TransportAnimation() : TotalTime(0) { }
-
-    TransportPathContainer Path;
-    // TransportPathRotationContainer Rotations;
-    uint32 TotalTime;
-
-    TransportAnimationEntry const* GetPrevAnimNode(uint32 time) const;
-    TransportAnimationEntry const* GetNextAnimNode(uint32 time) const;
-    // TransportRotationEntry const* GetAnimRotation(uint32 time) const; - wotlk onwards
-};
-
-typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
-
 class TransportMgr
 {
-        friend void LoadDBCStores(std::string const&);
+public:
 
-    public:
-        static TransportMgr* instance()
-        {
-            static TransportMgr instance;
-            return &instance;
-        }
+    void LoadTransportAnimationAndRotation();
 
-        void Unload();
+    TransportAnimation const* GetTransportAnimInfo(uint32 entry) const
+    {
+        auto itr = m_transportAnimations.find(entry);
+        if (itr != m_transportAnimations.end())
+            return &itr->second;
 
-        void LoadTransportTemplates();
+        return nullptr;
+    }
 
-        // Creates a transport using given GameObject template entry
-        Transport* CreateTransport(uint32 entry, uint32 guid = 0, Map* map = nullptr);
+    TransportTemplate* GetTransportTemplate(uint32 entry);
 
-        // Spawns all continent transports, used at core startup
-        void SpawnContinentTransports();
+    void LoadTransportTemplates();
+    void SpawnContinentTransports();
+    Transport* CreateTransport(uint32 entry, Map* map = nullptr);
 
-        // creates all transports for instance
-        void CreateInstanceTransports(Map* map);
+private:
+    void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node);
+    bool GenerateWaypoints(GameObjectInfo const* goinfo, TransportTemplate& transportTemplate);
 
-        TransportTemplate const* GetTransportTemplate(uint32 entry) const
-        {
-            TransportTemplates::const_iterator itr = _transportTemplates.find(entry);
-            if (itr != _transportTemplates.end())
-                return &itr->second;
-            return nullptr;
-        }
-
-    private:
-        TransportMgr();
-        ~TransportMgr();
-        TransportMgr(TransportMgr const&);
-        TransportMgr& operator=(TransportMgr const&);
-
-        // Generates and precaches a path for transport to avoid generation each time transport instance is created
-        void GeneratePath(GameObjectInfo const* goInfo, TransportTemplate* transport);
-
-        // Container storing transport templates
-        TransportTemplates _transportTemplates;
-
-        // Container storing transport entries to create for instanced maps
-        TransportInstanceMap _instanceTransports;
-
-    public:
-
-        void LoadTransportAnimationAndRotation();
-
-        TransportAnimation const* GetTransportAnimInfo(uint32 entry) const
-        {
-            TransportAnimationContainer::const_iterator itr = m_transportAnimations.find(entry);
-            if (itr != m_transportAnimations.end())
-                return &itr->second;
-
-            return nullptr;
-        }
-
-    private:
-        void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node);
-
-        TransportAnimationContainer m_transportAnimations;
+    TransportAnimationContainer m_transportAnimations;
+    std::unordered_map<uint32, TransportTemplate> m_transportTemplates;
 };
 
-#define sTransportMgr TransportMgr::instance()
+#define sTransportMgr MaNGOS::Singleton<TransportMgr>::Instance()
 
 #endif // TRANSPORTMGR_H
