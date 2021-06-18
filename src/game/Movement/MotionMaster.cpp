@@ -371,6 +371,9 @@ void MotionMaster::MoveTargetedHome()
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s refollowed linked master", m_owner->GetGuidStr().c_str());
         else
         {
+            if (m_owner->GetTransport())
+                m_owner->GetTransport()->RemovePassenger(m_owner);
+
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted home", m_owner->GetGuidStr().c_str());
             Mutate(new HomeMovementGenerator<Creature>());
         }

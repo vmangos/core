@@ -217,14 +217,6 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
         return false;
     }
 
-    if (owner->GetTransport())
-    {
-        owner->GetTransport()->AddPassenger(this);
-        m_movementInfo.t_pos.x = owner->m_movementInfo.t_pos.x;
-        m_movementInfo.t_pos.y = owner->m_movementInfo.t_pos.y;
-        m_movementInfo.t_pos.z = owner->m_movementInfo.t_pos.z;
-    }
-
     Map* map = owner->GetMap();
     CreatureCreatePos pos(owner, owner->GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
@@ -237,8 +229,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
         m_loading = false;
         return false;
     }
-    if (owner->GetTransport() && GetTransport())
+
+    if (owner->GetTransport())
     {
+        owner->GetTransport()->AddPassenger(this);
         m_movementInfo.t_pos.x = owner->m_movementInfo.t_pos.x;
         m_movementInfo.t_pos.y = owner->m_movementInfo.t_pos.y;
         m_movementInfo.t_pos.z = owner->m_movementInfo.t_pos.z;

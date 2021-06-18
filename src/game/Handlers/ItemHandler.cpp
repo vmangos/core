@@ -775,6 +775,8 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
     if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
         pCreature->PauseOutOfCombatMovement();
 
+    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
+
     VendorItemData const* vItems = menu_type & VENDOR_MENU_NORMAL ? pCreature->GetVendorItems() : nullptr;
     VendorItemData const* tItems = menu_type & VENDOR_MENU_TEMPLATE ? pCreature->GetVendorTemplateItems() : nullptr;
 

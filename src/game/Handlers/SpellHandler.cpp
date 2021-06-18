@@ -296,6 +296,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
     // Nostalrius
     if (obj->PlayerCanUse(_player))
     {
+        _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
         obj->Use(_player);
     }

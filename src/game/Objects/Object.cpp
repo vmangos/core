@@ -319,8 +319,8 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
     if (updateFlags & UPDATEFLAG_TRANSPORT)
     {
         GameObject const* go = ToGameObject();
-        if (go && go->IsMoTransport())
-            buf << uint32(go->ToTransport()->GetPathProgress());
+        if (go && go->IsTransport())
+            buf << uint32(static_cast<GenericTransport const*>(go)->GetPathProgress());
         else
             buf << uint32(sWorld.GetCurrentMSTime());
     }
@@ -507,13 +507,8 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     {
         // transport progress or mstime.
         GameObject const* go = ToGameObject();
-        /** @TODO Use IsTransport() to also handle type 11 (TRANSPORT)
-            Currently grid objects are not updated if there are no nearby players,
-            this causes clients to receive different PathProgress
-            resulting in players seeing the object in a different position
-        */
-        if (go && go->IsMoTransport())
-            *data << uint32(go->ToTransport()->GetPathProgress());
+        if (go && go->IsTransport())
+            *data << uint32(static_cast<GenericTransport const*>(go)->GetPathProgress());
         else
             *data << uint32(sWorld.GetCurrentMSTime());
     }
@@ -1406,8 +1401,9 @@ void WorldObject::CleanupsBeforeDelete()
 {
     RemoveFromWorld();
 
-    if (GenericTransport* transport = GetTransport())
-        transport->RemovePassenger(this);
+    if (Unit* pUnit = ToUnit())
+        if (GenericTransport* transport = GetTransport())
+            transport->RemovePassenger(pUnit);
 }
 
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh)
@@ -2274,7 +2270,7 @@ Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
     return pCreature;
 }
 
-Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject, uint32 pacifiedTimer, CreatureAiSetter pFuncAiSetter)
+Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject, uint32 pacifiedTimer, CreatureAiSetter pFuncAiSetter, GenericTransport* pTransport)
 {
     CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(id);
     if (!cinfo)
@@ -2308,6 +2304,9 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
         delete pCreature;
         return nullptr;
     }
+
+    if (pTransport)
+        pTransport->AddPassenger(pCreature);
 
     pCreature->SetTempPacified(pacifiedTimer);
     pCreature->SetSummonPoint(pos);

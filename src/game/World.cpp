@@ -1342,7 +1342,7 @@ void World::SetInitialWorldSettings()
     MMAP::MMapFactory::createOrGetMMapManager()->loadAllGameObjectModels(transportDisplayIds);
 
     sLog.outString("Loading Transport templates...");
-    sTransportMgr->LoadTransportTemplates();
+    sTransportMgr.LoadTransportTemplates();
 
     sLog.outString("Loading Spell Chain Data...");
     sSpellMgr.LoadSpellChains();
@@ -1687,7 +1687,7 @@ void World::SetInitialWorldSettings()
     LoadGameObjectModelList();
 
     // loads GO data
-    sTransportMgr->LoadTransportAnimationAndRotation();
+    sTransportMgr.LoadTransportAnimationAndRotation();
 
     ///- Initialize MapManager
     sLog.outString("Starting Map System");
@@ -1702,7 +1702,7 @@ void World::SetInitialWorldSettings()
 
     //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
     sLog.outString("Loading Transports...");
-    sTransportMgr->SpawnContinentTransports();
+    sTransportMgr.SpawnContinentTransports();
 
     sLog.outString("Deleting expired bans...");
     LoginDatabase.Execute("DELETE FROM `ip_banned` WHERE `unbandate`<=UNIX_TIMESTAMP() AND `unbandate`<>`bandate`");

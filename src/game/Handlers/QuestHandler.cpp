@@ -103,6 +103,8 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recv_data)
     if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
         pCreature->PauseOutOfCombatMovement();
 
+    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
+
     if (sScriptMgr.OnGossipHello(_player, pCreature))
         return;
 
