@@ -317,6 +317,7 @@ public:
     // delayed+channeled spells are always interrupted
     void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0);
     void InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except = 0);
+    void InterruptSpellsWithChannelFlags(uint32 flags, uint32 except = 0);
     void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true);
     void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
 

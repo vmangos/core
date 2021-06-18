@@ -1220,7 +1220,10 @@ void Player::SetEnvironmentFlags(EnvironmentFlags flags, bool apply)
 
     // Remove auras that need land or water
     if (flags & ENVIRONMENT_FLAG_HIGH_LIQUID)
-        RemoveAurasWithInterruptFlags(apply ?  AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
+    {
+        InterruptSpellsWithChannelFlags(apply ? CHANNEL_FLAG_ABOVE_WATER_CANCELS : CHANNEL_FLAG_UNDER_WATER_CANCELS);
+        RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
+    }
 
     // On moving in/out high sea area: affect fatigue timer
     if (flags & ENVIRONMENT_FLAG_HIGH_SEA)

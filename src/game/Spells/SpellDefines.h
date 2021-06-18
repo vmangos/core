@@ -456,22 +456,33 @@ enum SpellCastResult
 
 enum SpellInterruptFlags
 {
-    SPELL_INTERRUPT_FLAG_MOVEMENT     = 0x01,
-    SPELL_INTERRUPT_FLAG_DAMAGE       = 0x02,
-    SPELL_INTERRUPT_FLAG_INTERRUPT    = 0x04,
-    SPELL_INTERRUPT_FLAG_AUTOATTACK   = 0x08,
-    SPELL_INTERRUPT_FLAG_ABORT_ON_DMG = 0x10,               // _complete_ interrupt on direct damage
+    SPELL_INTERRUPT_FLAG_MOVEMENT        = 0x01, // Movement
+    SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK = 0x02, // Dmg Pushback(Player)
+    SPELL_INTERRUPT_FLAG_STUN            = 0x04, // Stun
+    SPELL_INTERRUPT_FLAG_COMBAT          = 0x08, // Combat
+    SPELL_INTERRUPT_FLAG_DAMAGE_CANCELS  = 0x10, // Dmg Cancels(Player)
 };
 
 enum SpellChannelInterruptFlags
 {
-    CHANNEL_FLAG_ENTER_COMBAT = 0x0001, // Nostalrius: guessed
-    CHANNEL_FLAG_DAMAGE       = 0x0002,
-    CHANNEL_FLAG_INTERRUPT    = 0x0004,
-    CHANNEL_FLAG_MOVEMENT     = 0x0008,
-    CHANNEL_FLAG_TURNING      = 0x0010,
-    CHANNEL_FLAG_DAMAGE2      = 0x0080,
-    CHANNEL_FLAG_DELAY        = 0x4000
+    CHANNEL_FLAG_HOSTILE_ACTION_RECEIVED_CANCELS = 0x00001, // Hostile Action Received Cancels
+    CHANNEL_FLAG_DAMAGE_CANCELS                  = 0x00002, // Damage Cancels
+    CHANNEL_FLAG_ACTION_CANCELS                  = 0x00004, // Action Cancels
+    CHANNEL_FLAG_MOVING_CANCELS                  = 0x00008, // Moving Cancels
+    CHANNEL_FLAG_TURNING_CANCELS                 = 0x00010, // Turning Cancels
+    CHANNEL_FLAG_ANIM_CANCELS                    = 0x00020, // Anim Cancels
+    CHANNEL_FLAG_DISMOUNT_CANCELS                = 0x00040, // Dismount Cancels
+    CHANNEL_FLAG_UNDER_WATER_CANCELS             = 0x00080, // Under Water Cancels
+    CHANNEL_FLAG_ABOVE_WATER_CANCELS             = 0x00100, // Above Water Cancels
+    CHANNEL_FLAG_SHEATHING_CANCELS               = 0x00200, // Sheathing Cancels
+    CHANNEL_FLAG_INTERACTING_CANCELS             = 0x00400, // Interacting Cancels
+    CHANNEL_FLAG_LOOTING_CANCELS                 = 0x00800, // Looting Cancels
+    CHANNEL_FLAG_ATTACKING_CANCELS               = 0x01000, // Attacking Cancels
+    CHANNEL_FLAG_ITEM_USE_CANCELS                = 0x02000, // Item Use Cancels
+    CHANNEL_FLAG_DAMAGE_CHANNEL_DURATION         = 0x04000, // Damage Channel Duration
+    CHANNEL_FLAG_SHAPESHIFTING_CANCELS           = 0x08000, // Shapeshifting Cancels
+    CHANNEL_FLAG_ACTION_CANCELS_LATE             = 0x10000, // Action Cancels - Late
+    CHANNEL_FLAG_MOUNT_CANCELS                   = 0x20000, // Mount Cancels
 };
 
 enum SpellAuraInterruptFlags

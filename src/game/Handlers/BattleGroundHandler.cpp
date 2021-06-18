@@ -68,6 +68,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recv_data)
         return;
     }
 
+    _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
     SendBattleGroundList(guid, bgTypeId);
 }
 

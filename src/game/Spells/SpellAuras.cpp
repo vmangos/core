@@ -3557,11 +3557,8 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
 
         target->AddUnitState(inCharge ? UNIT_STAT_PENDING_STUNNED : UNIT_STAT_STUNNED);
         target->SetTargetGuid(ObjectGuid());
-
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        target->CastStop(target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
-        if (target->GetObjectGuid() != GetCasterGuid())
-            target->InterruptNonMeleeSpells(false);
+        target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
 
         // Player specific
         if (Player* targetPlayer = target->ToPlayer())

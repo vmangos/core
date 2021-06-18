@@ -3404,17 +3404,17 @@ void Spell::UpdateCastStartPosition()
 {
     if (m_caster->GetTransport())
     {
-        m_castPositionX = m_caster->GetTransOffsetX();
-        m_castPositionY = m_caster->GetTransOffsetY();
-        m_castPositionZ = m_caster->GetTransOffsetZ();
-        m_castOrientation = m_caster->GetTransOffsetO();
+        m_castPosition.x = m_caster->GetTransOffsetX();
+        m_castPosition.y = m_caster->GetTransOffsetY();
+        m_castPosition.z = m_caster->GetTransOffsetZ();
+        m_castPosition.o = m_caster->GetTransOffsetO();
     }
     else
     {
-        m_castPositionX = m_caster->GetPositionX();
-        m_castPositionY = m_caster->GetPositionY();
-        m_castPositionZ = m_caster->GetPositionZ();
-        m_castOrientation = m_caster->GetOrientation();
+        m_castPosition.x = m_caster->GetPositionX();
+        m_castPosition.y = m_caster->GetPositionY();
+        m_castPosition.z = m_caster->GetPositionZ();
+        m_castPosition.o = m_caster->GetOrientation();
     }
 }
 
@@ -3579,7 +3579,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
     }
     catch (std::runtime_error &e)
     {
-        sLog.outInfo("[Spell/Crash] 'prepare()' [%u:%s:%u:{%f:%f:%f}]", m_spellInfo->Id, m_caster->GetName(), m_caster->GetGUIDLow(), m_castPositionX, m_castPositionY, m_castPositionZ);
+        sLog.outInfo("[Spell/Crash] 'prepare()' [%u:%s:%u:{%f:%f:%f}]", m_spellInfo->Id, m_caster->GetName(), m_caster->GetGUIDLow(), m_castPosition.x, m_castPosition.y, m_castPosition.z);
         sLog.outInfo(e.what());
         finish(false);
         return SPELL_FAILED_UNKNOWN;
@@ -4146,7 +4146,7 @@ void Spell::update(uint32 difftime)
         nowO = m_caster->GetOrientation();
     }
     if ((m_caster->IsPlayer() && m_timer != 0) &&
-            (fabs(m_castPositionX - nowPosX) > 0.5f || fabs(m_castPositionY - nowPosY) > 0.5f || fabs(m_castPositionZ - nowPosZ) > 0.5f) &&
+            (fabs(m_castPosition.x - nowPosX) > 0.5f || fabs(m_castPosition.y - nowPosY) > 0.5f || fabs(m_castPosition.z - nowPosZ) > 0.5f) &&
             (m_spellInfo->Effect[EFFECT_INDEX_0] != SPELL_EFFECT_STUCK || !((Player*)m_caster)->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR)) &&
             ((m_spellInfo->Id != 24322) && (m_spellInfo->Id != 24323)))
     {
@@ -4207,9 +4207,14 @@ void Spell::update(uint32 difftime)
             if (m_timer)
             {
                 // check for incapacitating states
-                if (m_casterUnit && m_casterUnit->IsPlayer() &&
-                    m_casterUnit->HasUnitState(UNIT_STAT_CAN_NOT_REACT))
-                    cancel();
+                if (m_casterUnit && m_casterUnit->IsPlayer())
+                {
+                    uint32 interruptStates = (UNIT_STAT_FEIGN_DEATH | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING);
+                    if (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_STUN)
+                        interruptStates |= UNIT_STAT_STUNNED;
+                    if (m_casterUnit->HasUnitState(interruptStates))
+                        cancel();
+                }
 
                 if (difftime >= m_timer)
                     m_timer = 0;
@@ -4221,6 +4226,10 @@ void Spell::update(uint32 difftime)
             {
                 RemoveStealthAuras();
                 cast();
+
+                // For channeled spells with a cast time, cast start position is set when channeling begins.
+                if (m_channeled)
+                    UpdateCastStartPosition();
             }
         }
         break;
@@ -4248,7 +4257,7 @@ void Spell::update(uint32 difftime)
                         cancel();
 
                     // check if player has turned if flag is set
-                    if (m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_TURNING && m_castOrientation != nowO)
+                    if (m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_TURNING_CANCELS && m_castPosition.o != nowO)
                         cancel();
                 }
 
@@ -5848,15 +5857,6 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     if (m_casterUnit)
     {
-        // Nostalrius: impossible to cast spells while banned / feared / confused ...
-        // Except divine shields, pvp trinkets for example
-        // Stoneform is explicitly excluded, it should be allowed to cast always 
-        // TODO: This condition allows an antifear item to be used while stuned for example.
-        if (!m_IsTriggeredSpell && !m_spellInfo->HasAura(SPELL_AURA_SCHOOL_IMMUNITY) && !m_spellInfo->HasAura(SPELL_AURA_MECHANIC_IMMUNITY) &&
-            m_spellInfo->Id != 20594 && // Stoneform
-            m_casterUnit->HasUnitState(UNIT_STAT_ISOLATED | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
-            return SPELL_FAILED_DONT_REPORT;
-
         // zone check
         SpellCastResult locRes = sSpellMgr.GetSpellAllowedInLocationError(m_spellInfo, m_casterUnit, m_casterUnit->GetCharmerOrOwnerPlayerOrPlayerItself());
         if (locRes != SPELL_CAST_OK)
@@ -7113,17 +7113,18 @@ SpellCastResult Spell::CheckCasterAuras() const
     SpellCastResult prevented_reason = SPELL_CAST_OK;
     // Have to check if there is a stun aura. Otherwise will have problems with ghost aura apply while logging out
     uint32 unitflag = m_casterUnit->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
-    if (unitflag & UNIT_FLAG_STUNNED && !(mechanic_immune & (1 << (MECHANIC_STUN - 1u))))
+    if ((unitflag & UNIT_FLAG_STUNNED) && !(mechanic_immune & (1 << (MECHANIC_STUN - 1u))) && 
+        (!m_casttime || (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_STUN)))
         prevented_reason = SPELL_FAILED_STUNNED;
-    else if (unitflag & UNIT_FLAG_CONFUSED && !(mechanic_immune & CONFUSED_MECHANIC_MASK))
+    else if ((unitflag & UNIT_FLAG_CONFUSED) && !(mechanic_immune & CONFUSED_MECHANIC_MASK))
         prevented_reason = SPELL_FAILED_CONFUSED;
-    else if (unitflag & UNIT_FLAG_FLEEING && !(mechanic_immune & (1 << (MECHANIC_FEAR - 1u))))
+    else if ((unitflag & UNIT_FLAG_FLEEING) && !(mechanic_immune & (1 << (MECHANIC_FEAR - 1u))))
         prevented_reason = SPELL_FAILED_FLEEING;
     else if (m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE &&
             ((unitflag & UNIT_FLAG_SILENCED) ||
                 m_casterUnit->CheckLockout(m_spellInfo->GetSpellSchoolMask()))) // Nostalrius : fix counterspell for mobs.
         prevented_reason = SPELL_FAILED_SILENCED;
-    else if (unitflag & UNIT_FLAG_PACIFIED && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
+    else if ((unitflag & UNIT_FLAG_PACIFIED) && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
         prevented_reason = SPELL_FAILED_PACIFIED;
 
     // Attr must make flag drop spell totally immune from all effects
@@ -7889,7 +7890,7 @@ void Spell::Delayed()
         return;                                             // spell is active and can't be time-backed
 
     // spells not loosing casting time ( slam, dynamites, bombs.. )
-    if (!(m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE))
+    if (!(m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
         return;
 
     //check resist chance
