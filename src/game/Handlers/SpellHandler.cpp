@@ -293,7 +293,6 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
     if (!obj->IsAtInteractDistance(_player))
         return;
 
-    // Nostalrius
     if (obj->PlayerCanUse(_player))
     {
         _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
