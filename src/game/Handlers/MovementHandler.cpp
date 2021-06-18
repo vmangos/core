@@ -1038,7 +1038,10 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
     {
         if (!pMover->GetTransport())
         {
-            if (GenericTransport* transport = pMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
+            if (pPlayerMover)
+                GetPlayer()->GetCheatData()->OnTransport(pPlayerMover, pPlayerMover->m_movementInfo.GetTransportGuid());
+
+            if (GenericTransport* transport = pMover->GetMap()->GetTransport(pMover->m_movementInfo.GetTransportGuid()))
             {
                 transport->AddPassenger(pMover);
                 if (pPlayerMover)

@@ -75,7 +75,7 @@ class MovementAnticheat
         void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin);
         void OnUnreachable(Unit* attacker);
         void OnExplore(AreaEntry const* pArea);
-        void OnTransport(Player* plMover, ObjectGuid transportGuid);
+        void OnTransport(Player* pPlayer, ObjectGuid transportGuid);
         void OnWrongAckData();
         void OnFailedToAckChange();
 
