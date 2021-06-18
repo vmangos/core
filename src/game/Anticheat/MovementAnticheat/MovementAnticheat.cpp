@@ -322,10 +322,7 @@ void MovementAnticheat::OnExplore(AreaEntry const* pArea)
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
 
-// Deeprun tram is not properly handled as a transport.
-#define MAP_DEEPRUN_TRAM 369
-
-void MovementAnticheat::OnTransport(Player* plMover, ObjectGuid transportGuid)
+void MovementAnticheat::OnTransport(Player* pPlayer, ObjectGuid transportGuid)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED) ||
@@ -333,10 +330,9 @@ void MovementAnticheat::OnTransport(Player* plMover, ObjectGuid transportGuid)
         return;
 
     // Do not allow bypassing anticheat by pretending to be on a transport.
-    GameObject* transportGobj = plMover->GetMap()->GetGameObject(transportGuid);
-    float const maxDist2d = (plMover->GetMapId() == MAP_DEEPRUN_TRAM) ? 3000.0f : 70.0f;
+    GameObject* pTransport = pPlayer->GetMap()->GetGameObject(transportGuid);
 
-    if (!transportGobj || !transportGobj->IsTransport() || !transportGobj->IsWithinDist(plMover, maxDist2d, false))
+    if (!pTransport || !pTransport->IsTransport() || !pTransport->IsWithinDist(pPlayer, 70.0f, false))
         AddCheats(1 << CHEAT_TYPE_FAKE_TRANSPORT);
 }
 
