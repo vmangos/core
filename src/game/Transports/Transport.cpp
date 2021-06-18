@@ -109,7 +109,6 @@ void Transport::MoveToNextWayPoint()
 
 bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, float o)
 {
-    printf("Teleport transport %u to Map %u X %g Y %g Z %g\n", GetEntry(), newMapid, x, y, z);
     Map const* oldMap = GetMap();
 
     uint32 newInstanceId = sMapMgr.GetContinentInstanceId(newMapid, x, y);

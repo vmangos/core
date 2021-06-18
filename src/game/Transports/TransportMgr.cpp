@@ -403,8 +403,13 @@ void TransportMgr::SpawnContinentTransports()
 
             if (TransportTemplate* tInfo = GetTransportTemplate(entry))
             {
-                tInfo->pathTime = period;
-                tInfo->keyFrames.back().DepartureTime = period;
+                if (period)
+                {
+                    // Override calculated period with more accurate db value.
+                    tInfo->pathTime = period;
+                    tInfo->keyFrames.back().DepartureTime = period;
+                }
+                
                 if (!tInfo->inInstance)
                     if (CreateTransport(entry))
                         ++count;
