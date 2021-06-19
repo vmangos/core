@@ -94,6 +94,70 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484202, 14842, 946, 1, 0, 100, 1, 45000, 120000, 45000, 120000, 1484202, 0, 0, 'Melnan Darkstone - Talk - OOC - Event 4 and 5');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10101, 10102, 10103, 10104, 0, 0, 0, 0, 0, 'Melnan Darkstone - Talk');
 
+-- Add Flick Waypoints and Scripts
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14860;
+UPDATE `creature` SET `position_x` = -9582.77, `position_y` = 37.0359, `position_z` = 60.3921 WHERE `guid` IN (56625, 56624);
+DELETE FROM `creature_movement` WHERE `id` = 56625;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `script_id`) VALUES
+(14860, 1, -9582.77, 37.0359, 60.3921, 100, 3180901),
+(14860, 2, -9575.36, 46.4425, 60.2917, 100, 0),
+(14860, 3, -9574.4, 57.7072, 60.9694, 100, 0),
+(14860, 4, -9581.27, 61.9526, 61.5924, 100, 0),
+(14860, 5, -9582.19, 57.5235, 61.5598, 100, 0),
+(14860, 6, -9573.22, 55.109, 60.7786, 100, 0),
+(14860, 7, -9562.44, 58.7552, 60.237, 100, 0),
+(14860, 8, -9554.86, 68.119, 59.1309, 100, 0),
+(14860, 9, -9553.75, 79.372, 59.0324, 100, 0),
+(14860, 10, -9557.24, 88.6613, 59.0065, 100, 0),
+(14860, 11, -9549.26, 93.6267, 59.0065, 100, 0),
+(14860, 12, -9538.74, 89.6264, 59.0065, 100, 0),
+(14860, 13, -9526.86, 85.964, 58.9329, 100, 0),
+(14860, 14, -9515.2, 81.7789, 59.6269, 100, 0),
+(14860, 15, -9504.11, 77.2859, 57.8536, 100, 0),
+(14860, 16, -9492.49, 72.1215, 56.098, 100, 0),
+(14860, 17, -9480.97, 65.3954, 56.31, 100, 0),
+(14860, 18, -9469.44, 58.7708, 56.4992, 100, 0),
+(14860, 19, -9458.37, 55.9505, 56.3491, 100, 0),
+(14860, 20, -9453.54, 61.264, 55.9207, 100, 0),
+(14860, 21, -9460.56, 66.5982, 56.2413, 100, 0),
+(14860, 22, -9472.02, 68.2707, 56.3907, 100, 0),
+(14860, 23, -9483.02, 73.8962, 56.3455, 100, 0),
+(14860, 24, -9495.46, 74.8723, 56.4481, 100, 0),
+(14860, 25, -9506.86, 78.1109, 58.6032, 100, 0),
+(14860, 26, -9517.98, 84.3942, 59.3436, 100, 0),
+(14860, 27, -9529.59, 88.1913, 58.9516, 100, 0),
+(14860, 28, -9539.61, 95.543, 58.9866, 100, 0),
+(14860, 29, -9545.48, 106.784, 59.071, 100, 0),
+(14860, 30, -9548.48, 118.797, 59.2565, 100, 0),
+(14860, 31, -9548.38, 131.102, 58.9597, 100, 0),
+(14860, 32, -9543.12, 126.014, 59.2042, 100, 0),
+(14860, 33, -9541.34, 114.956, 59.0332, 100, 0),
+(14860, 34, -9540.89, 102.602, 59.1528, 100, 0),
+(14860, 35, -9538.99, 89.9361, 59.0989, 100, 0),
+(14860, 36, -9541.2, 77.9545, 59.0065, 100, 0),
+(14860, 37, -9550.35, 70.3581, 59.2352, 100, 0),
+(14860, 38, -9559.09, 61.4263, 60.006, 100, 0),
+(14860, 39, -9568.32, 53.1292, 60.3528, 100, 0),
+(14860, 40, -9568.45, 42.5114, 60.0803, 100, 0),
+(14860, 41, -9561.53, 32.2363, 60.9041, 100, 0),
+(14860, 42, -9566.65, 22.282, 61.4776, 100, 0),
+(14860, 43, -9575.63, 16.3312, 60.4544, 100, 0),
+(14860, 44, -9585.13, 21.0085, 60.3996, 100, 0),
+(14860, 45, -9588.79, 29.5242, 60.2019, 100, 0);
+
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(56625, 56625, 2, 6.25244, 11),
+(56625, 56624, 2, 0, 11);
+
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1486001, 14860, 0, 1, 0, 100, 1, 30000, 45000, 30000, 45000, 1486001, 0, 0, 'Flik - Talk - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1486001, 0, 39, 1486001, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Flik - Start Script');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1486001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10148, 10147, 10145, 10146, 0, 0, 0, 0, 0, 'Flik - Talk');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1486001, 1, 16, 8353, 2, 0, 0, 14866, 10, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Fliks Frog - Play Sound');
+
+
+
+
+
 
 -- End of migration.
 END IF;
