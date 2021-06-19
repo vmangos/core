@@ -993,7 +993,6 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
                 float const distanceAllowed = std::max(distanceAllowed1, distanceAllowed2);
                 if (distanceTraveled > distanceAllowed * 2.0f)
                     m_overspeedDistance += (distanceTraveled - distanceAllowed);
-                    
             }
         }
     }
