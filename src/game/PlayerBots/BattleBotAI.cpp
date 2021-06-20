@@ -2459,7 +2459,7 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (m_spells.warrior.pHeroicStrike &&
-           (me->GetPower(POWER_RAGE) > 20) &&
+           (me->GetPower(POWER_RAGE) > 30) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)

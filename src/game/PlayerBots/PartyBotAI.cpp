@@ -2375,23 +2375,22 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
             me->GetMotionMaster()->MoveChase(pVictim);
         }
 
-        if (me->GetPower(POWER_RAGE) > 20)
+        if (me->GetPower(POWER_RAGE) > 30)
         {
-            if (me->GetEnemyCountInRadiusAround(pVictim, 8.0f) > 1)
+            if (m_spells.warrior.pCleave && me->GetEnemyCountInRadiusAround(pVictim, 8.0f) > 1)
             {
-                if (m_spells.warrior.pHeroicStrike &&
-                    CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
+                if (CanTryToCastSpell(pVictim, m_spells.warrior.pCleave))
                 {
-                    if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)
+                    if (DoCastSpell(pVictim, m_spells.warrior.pCleave) == SPELL_CAST_OK)
                         return;
                 }
             }
             else
             {
-                if (m_spells.warrior.pCleave &&
-                    CanTryToCastSpell(pVictim, m_spells.warrior.pCleave))
+                if (m_spells.warrior.pHeroicStrike &&
+                    CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
                 {
-                    if (DoCastSpell(pVictim, m_spells.warrior.pCleave) == SPELL_CAST_OK)
+                    if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)
                         return;
                 }
             }
