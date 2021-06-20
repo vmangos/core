@@ -35,7 +35,12 @@
 
 Transport::Transport(TransportTemplate const& transportTemplate) : GenericTransport(), m_transportTemplate(transportTemplate), m_isMoving(true), m_pendingStop(false)
 {
-    m_updateFlag = (UPDATEFLAG_TRANSPORT | UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
+    m_updateFlag = UPDATEFLAG_TRANSPORT;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    m_updateFlag |= UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION;
+#endif
+
     SetPeriod(transportTemplate.pathTime);
 }
 
