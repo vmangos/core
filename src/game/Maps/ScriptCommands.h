@@ -139,7 +139,6 @@ enum eScriptCommand
                                                             // target = Player
     SCRIPT_COMMAND_UPDATE_ENTRY             = 27,           // source = Creature
                                                             // datalong = creature_entry
-                                                            // datalong2 = team for display_id (0 = alliance, 1 = horde)
     SCRIPT_COMMAND_STAND_STATE              = 28,           // source = Unit
                                                             // datalong = stand_state (enum UnitStandStateType)
     SCRIPT_COMMAND_MODIFY_THREAT            = 29,           // source = Creature
@@ -690,7 +689,6 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_UPDATE_ENTRY (27)
         {
             uint32 creatureEntry;                           // datalong
-            uint32 team;                                    // datalong2
         } updateEntry;
 
         struct                                              // SCRIPT_COMMAND_STAND_STATE (28)
