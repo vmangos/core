@@ -1095,6 +1095,28 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (61935, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 843.523, -2669.85, 91.6668, 4.39584, 0, 'Regulator Valve - Summon Creature');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (407201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4704, 0, 0, 0, 0, 0, 0, 0, 0, 'Venture Co. Peon / Drudger - Talk');
 
+-- Update Lunar Festival Elder Spawns
+UPDATE `creature` SET position_x = 514.754, position_y = 1560.97, position_z = 130.145, orientation = 4.39823 WHERE `id` = 15561;
+UPDATE `creature` SET position_x = -8761.99, position_y = 1092.71, position_z = 94.8771, orientation = 5.13127 WHERE `id` = 15562;
+UPDATE `creature` SET position_x = 1633.3, position_y = 233.931, position_z = 62.6749, orientation = 0.401426 WHERE `id` = 15564;
+UPDATE `creature` SET position_x = -9413.27, position_y = 154.286, position_z = 57.1548, orientation = 2.14675 WHERE `id` = 15565;
+UPDATE `creature` SET position_x = 2237.86, position_y = -5340.41, position_z = 84.7113, orientation = 1.13446 WHERE `id` = 15566;
+UPDATE `creature` SET position_x = 2215.43, position_y = 237.536, position_z = 34.7272, orientation = 1.69297 WHERE `id` = 15568;
+UPDATE `creature` SET position_x = -5571.58, position_y = -503.608, position_z = 403.093, orientation = 1.91986 WHERE `id` = 15569;
+UPDATE `creature` SET position_x = 6746.22, position_y = -4679.31, position_z = 725.611, orientation = 1.5708 WHERE `id` = 15574;
+UPDATE `creature` SET position_x = -2103.06, position_y = -438.984, position_z = -7.22764, orientation = 1.44862 WHERE `id` = 15575;
+UPDATE `creature` SET position_x = -14327.7, position_y = 458.502, position_z = 8.04239, orientation = 2.6529 WHERE `id` = 15576;
+UPDATE `creature` SET position_x = 1957.36, position_y = -4257.51, position_z = 31.384, orientation = 1.23918 WHERE `id` = 15579;
+UPDATE `creature` SET position_x = -1012.62, position_y = -245.095, position_z = 159.361, orientation = 0.244346 WHERE `id` = 15580;
+UPDATE `creature` SET position_x = -869.85, position_y = -3725.6, position_z = 24.4655, orientation = 4.62512 WHERE `id` = 15582;
+UPDATE `creature` SET position_x = -5435.71, position_y = -2431.92, position_z = 89.3615, orientation = 5.42797 WHERE `id` = 15584;
+UPDATE `creature` SET position_x = 1853.99, position_y = -3721.45, position_z = 162.308, orientation = 1.27409 WHERE `id` = 15592;
+UPDATE `creature` SET position_x = -460.237, position_y = -2586.04, position_z = 99.476, orientation = 5.13127 WHERE `id` = 15597;
+UPDATE `creature` SET position_x = 10137.4, position_y = 2583.92, position_z = 1325.58, orientation = 4.38078 WHERE `id` = 15598;
+UPDATE `creature` SET position_x = 1995.88, position_y = -2420.17, position_z = 59.3823, orientation = 2.72271 WHERE `id` = 15602;
+UPDATE `creature` SET position_x = 6466.88, position_y = -4265.45, position_z = 663.761, orientation = 0.767945 WHERE `id` = 15606;
+UPDATE `creature` SET position_x = -4659.2, position_y = -944.427, position_z = 500.461, orientation = 4.24115 WHERE `id` = 15871;
+
 
 -- End of migration.
 END IF;
