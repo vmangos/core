@@ -16261,13 +16261,13 @@ bool Player::SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string co
         "`map`, `position_x`, `position_y`, `position_z`, `orientation`, "
         "`known_taxi_mask`, `current_taxi_path`, `online`, `extra_flags`, `at_login_flags`, "
         "`health`, `power1`, `power2`, `power3`, `power4`, `power5`, "
-        "`explored_zones`, `equipment_cache`, `ammo_id`, `world_phase_mask`, `create_time`) "
+        "`explored_zones`, `equipment_cache`, `ammo_id`, `world_phase_mask`, `create_time`, `logout_time`) "
         "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, ?, "
-        "?, ?, ?, ?, ?)");
+        "?, ?, ?, ?, ?, ?)");
 
     uberInsert.addUInt32(guidlow);
     uberInsert.addUInt32(session->GetAccountId());
@@ -16369,7 +16369,8 @@ bool Player::SaveNewPlayer(WorldSession* session, uint32 guidlow, std::string co
 
     uberInsert.addUInt32(ammoId);
     uberInsert.addUInt32(WORLD_DEFAULT_CHAR);
-    uberInsert.addUInt64(uint64(time(nullptr)));
+    uberInsert.addUInt64(uint64(time(nullptr))); // create time
+    uberInsert.addUInt64(uint64(time(nullptr))); // logout time (for rested xp)
     uberInsert.Execute();
 
     sObjectMgr.SetPlayerWorldMask(guidlow, WORLD_DEFAULT_CHAR);
