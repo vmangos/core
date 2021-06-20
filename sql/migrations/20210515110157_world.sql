@@ -767,18 +767,18 @@ UPDATE `creature_template` SET `display_scale1` = 1.25 WHERE `entry` = 15789;
 UPDATE `creature_template` SET `display_scale1` = 1.35 WHERE `entry` = 15793;
 
 -- Greatfather Winter's Helper Should Yell
-DELETE FROM `creature_ai_scripts` WHERE `id` = 1574601;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1574601, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 11430, 0, 0, 0, 0, 0, 0, 0, 0, 'Great-father Winter\'s Helper - Say Text');
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=11430;
+UPDATE `creature_ai_scripts` SET `datalong`=0 WHERE `datalong`=1 && `dataint`=11430;
 
 -- Quest 6962 Is Not Repeatable
 UPDATE `quest_template` SET `SpecialFlags` = 0 WHERE `entry` = 6962;
 
 -- Falling underground - Fixes (credit cmangos)
-UPDATE creature SET position_x = -6690.331543, position_y = -2988.697021, position_z = 248.367706, wander_distance = 7, movement_type = 1 WHERE guid = 6910;
-UPDATE creature SET position_x = -6629.925293, position_y = -3554.510498, position_z = 254.083786, wander_distance = 7, movement_type = 1 WHERE guid = 6926;
-UPDATE creature SET position_x = 51.213818, position_y = 1539.047974, position_z = 107.961784, wander_distance = 7, movement_type = 1 WHERE guid = 27980;
-UPDATE creature SET position_x = 393.519775, position_y = -623.946899, position_z = 162.409653, wander_distance = 5, movement_type = 1 WHERE guid = 17345;
-UPDATE creature SET position_x = -3649.268, position_y = -727.9708, position_z = 10.7234, orientation = 5.907869, wander_distance = 0, movement_type = 0 WHERE guid = 9530;
+UPDATE `creature` SET `position_x` = -6690.331543, `position_y` = -2988.697021, `position_z` = 248.367706, `wander_distance` = 7, `movement_type` = 1 WHERE `guid` = 6910;
+UPDATE `creature` SET `position_x` = -6629.925293, `position_y` = -3554.510498, `position_z` = 254.083786, `wander_distance` = 7, movement_type = 1 WHERE `guid` = 6926;
+UPDATE `creature` SET `position_x` = 51.213818, `position_y` = 1539.047974, `position_z` = 107.961784, `wander_distance` = 7, `movement_type` = 1 WHERE `guid` = 27980;
+UPDATE `creature` SET `position_x` = 393.519775, `position_y` = -623.946899, `position_z` = 162.409653, `wander_distance` = 5, `movement_type` = 1 WHERE `guid` = 17345;
+UPDATE `creature` SET `position_x` = -3649.268, `position_y` = -727.9708, `position_z` = 10.7234, `orientation` = 5.907869, `wander_distance` = 0, `movement_type` = 0 WHERE `guid` = 9530;
 
 -- Grand Foreman Puzik should not drop Cache of Zanzils Altered Mixture
 DELETE FROM `creature_loot_template` WHERE `entry` = 7288 AND `item` = 8073;
@@ -814,7 +814,7 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 7053;
 UPDATE `quest_template` SET `SrcSpell` = 0 WHERE `entry` = 2607;
 
 -- Add Quest Start Script for 2359
-INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2359, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3264, 0, 0, 0, 0, 0, 0, 0, 0, 'Klaven\'s Tower (2359) - Agent Kearnen - Talk');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2359, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3264, 0, 0, 0, 0, 0, 0, 0, 0, 'Klaven\'s Tower: Agent Kearnen - Talk');
 UPDATE `quest_template` SET `StartScript` = 2359 WHERE `entry` = 2359;
 
 -- Add Traps to Buccaneers Strongboxes
@@ -1041,8 +1041,8 @@ UPDATE `gossip_menu_option` SET `menu_id` = 1366 WHERE `menu_id` = 16033;
 DELETE FROM `gossip_menu` WHERE `entry` = 16033;
 
 -- Add Missing Abilities to Zekkis (credit cmangos)
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (5400, 'Temple of Atal\'?Hakkar - Zekkis', 8282, 100, 1, 0, 0, 0, 0, 5, 60, 60, 0, 7102, 100, 1, 0, 0, 0, 5, 10, 120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-UPDATE `creature_template` SET `speed_walk` = 2.5, `base_attack_time` = 2000, `spell_id2` = 0, `spell_id1` = 0, `spell_list_id` = 5400, `script_name`= '' WHERE `entry`=5400 AND `patch`=0;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (54000, 'Temple of Atal\'Hakkar - Zekkis', 8282, 100, 1, 0, 0, 0, 0, 5, 60, 60, 0, 7102, 100, 1, 0, 0, 0, 5, 10, 120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `creature_template` SET `speed_walk` = 2.5, `base_attack_time` = 2000, `spell_id2` = 0, `spell_id1` = 0, `spell_list_id` = 54000, `script_name`= '' WHERE `entry`=5400 AND `patch`=0;
 
 -- Add Gossip Menus to Malyfous Darkhammer (credit trinity core)
 -- Add Correct Gossip Menus
@@ -1088,12 +1088,10 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastText
 (3699, 6167, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Add Scripts to Gameobjects Used in Quest Samophlange Part 2 (credit trinity core)
-UPDATE `gameobject_template` SET `data2` = 4072 WHERE  `entry` = 4072;
-UPDATE `gameobject_template` SET `data2` = 61935 WHERE  `entry` = 61935;
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4072, 0, 10, 3284, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 826.776, -2674.53, 91.6667, 5.53466, 0, 'Main Control Valve - Summon Creature');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4072, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 824.479, -2678.73, 91.6667, 6.04909, 0, 'Main Control Valve - Summon Creature');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (61935, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 843.523, -2669.85, 91.6668, 4.39584, 0, 'Regulator Valve - Summon Creature');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (407201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4704, 0, 0, 0, 0, 0, 0, 0, 0, 'Venture Co. Peon / Drudger - Talk');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (15722, 0, 10, 3284, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 826.776, -2674.53, 91.6667, 5.53466, 0, 'Main Control Valve - Summon Creature');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (15722, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 824.479, -2678.73, 91.6667, 6.04909, 0, 'Main Control Valve - Summon Creature');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (15730, 0, 10, 3285, 180000, 0, 0, 0, 0, 0, 0, 0, 407201, -1, 2, 843.523, -2669.85, 91.6668, 4.39584, 0, 'Regulator Valve - Summon Creature');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (407201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4704, 0, 0, 0, 0, 0, 0, 0, 0, 'Venture Co. Peon and Drudger - Talk');
 
 -- Update Lunar Festival Elder Spawns
 UPDATE `creature` SET position_x = 514.754, position_y = 1560.97, position_z = 130.145, orientation = 4.39823 WHERE `id` = 15561;
@@ -1116,6 +1114,30 @@ UPDATE `creature` SET position_x = 10137.4, position_y = 2583.92, position_z = 1
 UPDATE `creature` SET position_x = 1995.88, position_y = -2420.17, position_z = 59.3823, orientation = 2.72271 WHERE `id` = 15602;
 UPDATE `creature` SET position_x = 6466.88, position_y = -4265.45, position_z = 663.761, orientation = 0.767945 WHERE `id` = 15606;
 UPDATE `creature` SET position_x = -4659.2, position_y = -944.427, position_z = 500.461, orientation = 4.24115 WHERE `id` = 15871;
+
+-- Add missing loot to Xandivious' Demon Bag.
+UPDATE `gameobject_template` SET `patch`=7 WHERE `entry`=180671;
+INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (17516, 21145, -100, 0, 1, 1, 0, 7, 10);
+
+-- Add missing gameobject Demon Summoning Torch.
+INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `script_name`) VALUES (180672, 5, 4095, 'Demon Summoning Torch', 1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+-- Events list for Xandivious
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15623;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1562301, 15623, 0, 2, 0, 100, 0, 50, 1, 0, 0, 1562301, 0, 0, 'Xandivious - Enrage at 50% HP');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1562302, 15623, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1562302, 0, 0, 'Xandivious - Summon Xandivious\' Demon Bag on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1562303, 15623, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1562303, 0, 0, 'Xandivious - Say Text on Spawn');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1562301;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1562301, 0, 15, 8599, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Xandivious - Cast Spell Enrage');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1562301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2384, 0, 0, 0, 0, 0, 0, 0, 0, 'Xandivious - Say Text');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1562302;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1562302, 0, 15, 25791, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Xandivious - Cast Spell Xandivious\' Demon Bag');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1562303;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1562303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11268, 0, 0, 0, 0, 0, 0, 0, 0, 'Xandivious - Say Text');
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (156230, 'Winterspring - Xandivious', 11980, 100, 1, 0, 0, 32, 3, 3, 15, 15, 0, 11639, 100, 1, 0, 0, 32, 5, 5, 15, 15, 0, 16046, 100, 1, 0, 0, 64, 7, 7, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=11268;
+DELETE FROM `creature_loot_template` WHERE `entry`=15623;
+UPDATE `creature_template` SET `loot_id`=0, `spell_list_id`=156230, `ai_name`='EventAI', `script_name`='' WHERE `entry`=15623;
 
 
 -- End of migration.
