@@ -1246,6 +1246,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
             break;
         }
         case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
+        case TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY:
         {
             if (!ObjectMgr::GetGameObjectInfo(targetParam1))
             {
@@ -2784,6 +2785,13 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pM
             if (!((pSearcher = pSource) || (pSearcher = pTarget)))
                 return nullptr;
             return pSearcher->FindNearestGameObject(param1, param2);
+        }
+        case TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY:
+        {
+            WorldObject* pSearcher;
+            if (!((pSearcher = pSource) || (pSearcher = pTarget)))
+                return nullptr;
+            return pSearcher->FindRandomGameObject(param1, param2);
         }
         case TARGET_T_GAMEOBJECT_WITH_GUID:
         {
