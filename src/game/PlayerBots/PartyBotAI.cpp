@@ -2736,6 +2736,14 @@ bool PartyBotAI::EnterCombatDruidForm()
 
 void PartyBotAI::UpdateOutOfCombatAI_Druid()
 {
+    // Make sure bot leaves combat form if his role is changed to healer.
+    if (m_role == ROLE_HEALER && me->GetShapeshiftForm() != FORM_NONE &&
+        me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+    {
+        me->RemoveAurasDueToSpellByCancel(me->GetAurasByType(SPELL_AURA_MOD_SHAPESHIFT).front()->GetId());
+        return;
+    }
+
     if (m_spells.druid.pGiftoftheWild)
     {
         if (Player* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))

@@ -110,27 +110,27 @@ inline uint32 GetIndexOfUpdateFieldForCurrentBuild(uint32 db_index)
 
 enum UpdateFieldValueTypes
 {
-	UF_TYPE_NONE      = 0,
-	UF_TYPE_INT       = 1,
-	UF_TYPE_TWO_SHORT = 2,
-	UF_TYPE_FLOAT     = 3,
-	UF_TYPE_GUID      = 4,
-	UF_TYPE_BYTES     = 5,
-	UF_TYPE_BYTES2    = 6
+    UF_TYPE_NONE      = 0,
+    UF_TYPE_INT       = 1,
+    UF_TYPE_TWO_SHORT = 2,
+    UF_TYPE_FLOAT     = 3,
+    UF_TYPE_GUID      = 4,
+    UF_TYPE_BYTES     = 5,
+    UF_TYPE_BYTES2    = 6
 };
 
 enum UpdateFieldFlags
 {
-	UF_FLAG_NONE         = 0x000,
-	UF_FLAG_PUBLIC       = 0x001,
-	UF_FLAG_PRIVATE      = 0x002,
-	UF_FLAG_OWNER_ONLY   = 0x004,
-	UF_FLAG_UNK1         = 0x008,
-	UF_FLAG_UNK2         = 0x010,
-	UF_FLAG_SPECIAL_INFO = 0x020,
-	UF_FLAG_GROUP_ONLY   = 0x040,
-	UF_FLAG_UNK5         = 0x080,
-	UF_FLAG_DYNAMIC      = 0x100,
+    UF_FLAG_NONE         = 0x000,
+    UF_FLAG_PUBLIC       = 0x001,
+    UF_FLAG_PRIVATE      = 0x002,
+    UF_FLAG_OWNER_ONLY   = 0x004,
+    UF_FLAG_UNK1         = 0x008,
+    UF_FLAG_UNK2         = 0x010,
+    UF_FLAG_SPECIAL_INFO = 0x020,
+    UF_FLAG_GROUP_ONLY   = 0x040,
+    UF_FLAG_UNK5         = 0x080,
+    UF_FLAG_DYNAMIC      = 0x100,
 };
 
 struct UpdateFieldData
