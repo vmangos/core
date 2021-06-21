@@ -1026,7 +1026,7 @@ UPDATE `gossip_menu` SET `condition_id` = 1341 WHERE `entry` = 1341 AND `text_id
 UPDATE `gossip_menu_option` SET `condition_id` = 1341 WHERE `menu_id` = 1341 AND `id` = 0;
 -- Add missing Gossip Menu Option
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(1341, 1, 0, 'What\'s an elf like you doing inside a cave like this?', 4471, 1, 1, 1363, 0, 0, 0, 0, \N, 0, 0);
+(1341, 1, 0, 'What\'s an elf like you doing inside a cave like this?', 4471, 1, 1, 1363, 0, 0, 0, 0, NULL, 0, 0);
 -- Add missing Gossip Menu
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (1363, 1996);
