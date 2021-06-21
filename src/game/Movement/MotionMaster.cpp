@@ -872,7 +872,7 @@ void MotionMaster::ReInitializePatrolMovement()
     }
 }
 
-void Creature::PauseOutOfCombatMovement()
+void Creature::PauseOutOfCombatMovement(uint32 pauseTime)
 {
     if (IsInCombat())
         return;
@@ -883,14 +883,14 @@ void Creature::PauseOutOfCombatMovement()
         {
             if (!IsStopped())
                 StopMoving();
-            ((RandomMovementGenerator*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(NPC_MOVEMENT_PAUSE_TIME);
+            ((RandomMovementGenerator*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(pauseTime);
             break;
         }
         case WAYPOINT_MOTION_TYPE:
         {
             if (!IsStopped())
                 StopMoving();
-            ((WaypointMovementGenerator<Creature>*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(NPC_MOVEMENT_PAUSE_TIME);
+            ((WaypointMovementGenerator<Creature>*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(pauseTime);
             break;
         }
     }

@@ -81,8 +81,39 @@ bool Map::ScriptCommand_Emote(ScriptInfo const& script, WorldObject* source, Wor
 
     uint32 emoteCount = 1;
     for (; emoteCount < MAX_EMOTE_ID && script.emote.emoteId[emoteCount]; ++emoteCount);
+    uint32 const emoteId = script.emote.emoteId[urand(0, emoteCount - 1)];
 
-    pSource->HandleEmote(script.emote.emoteId[urand(0, emoteCount-1)]);
+    // This is a targeted emote.
+    if (script.emote.isTargeted)
+    {
+        Creature* pCreatureSource = pSource->ToCreature();
+        if (!pCreatureSource)
+        {
+            sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for targeted emote with non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+            return ShouldAbortScript(script);
+        }
+
+        Unit* pTarget = ToUnit(target);
+        if (!pTarget)
+        {
+            sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for targeted emote with non-unit target (TypeId: %u), skipping.", script.id, target ? target->GetTypeId() : 0);
+            return ShouldAbortScript(script);
+        }
+
+        // Abort if target is in combat, or already doing a targeted emote.
+        if (pCreatureSource->IsInCombat() || pCreatureSource->HasCreatureState(CSTATE_TARGETED_EMOTE))
+            return ShouldAbortScript(script);
+
+        pCreatureSource->PauseOutOfCombatMovement(8 * IN_MILLISECONDS);
+        pCreatureSource->AddCreatureState(CSTATE_TARGETED_EMOTE);
+
+        TargetedEmoteEvent *pEmoteEvent = new TargetedEmoteEvent(*pCreatureSource, pTarget->GetObjectGuid(), emoteId);
+        pCreatureSource->m_Events.AddEvent(pEmoteEvent, pCreatureSource->m_Events.CalculateTime(2000));
+        TargetedEmoteCleanupEvent *pCleanupEvent = new TargetedEmoteCleanupEvent(*pCreatureSource, pCreatureSource->GetOrientation());
+        pCreatureSource->m_Events.AddEvent(pCleanupEvent, pCreatureSource->m_Events.CalculateTime(6000));
+    }
+    else
+        pSource->HandleEmote(emoteId);
 
     return false;
 }

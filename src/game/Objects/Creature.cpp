@@ -133,6 +133,35 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
+bool TargetedEmoteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (!m_owner.IsInCombat() && !m_owner.IsMoving())
+    {
+        if (Unit* pTarget = m_owner.GetMap()->GetUnit(m_targetGuid))
+        {
+            m_owner.SetFacingToObject(pTarget);
+            m_owner.HandleEmote(m_emoteId);
+            return true;
+        }
+    }
+
+    m_owner.ClearCreatureState(CSTATE_TARGETED_EMOTE);
+    return true;
+}
+
+bool TargetedEmoteCleanupEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (m_owner.HasCreatureState(CSTATE_TARGETED_EMOTE))
+    {
+        if (!m_owner.IsInCombat() && !m_owner.IsMoving())
+            m_owner.SetFacingTo(m_orientation);
+        m_owner.HandleEmoteState(0);
+        m_owner.ClearCreatureState(CSTATE_TARGETED_EMOTE);
+    }
+
+    return true;
+}
+
 void CreatureCreatePos::SelectFinalPoint(Creature* cr)
 {
     // if object provided then selected point at specific dist/angle from object forward look
