@@ -40,6 +40,7 @@ enum eScriptCommand
                                                             // dataint = broadcast_text id. dataint2-4 optional for random selected text.
     SCRIPT_COMMAND_EMOTE                    = 1,            // source = Unit
                                                             // datalong1-4 = emote_id
+                                                            // dataint = (bool) is_targeted
     SCRIPT_COMMAND_FIELD_SET                = 2,            // source = Object
                                                             // datalong = field_id
                                                             // datalong2 = value
@@ -526,6 +527,8 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_EMOTE (1)
         {
             uint32 emoteId[MAX_EMOTE_ID];                   // datalong to datalong4
+            uint32 unused;                                  // data_flags
+            int32  isTargeted;                              // dataint
         } emote;
 
         struct                                              // SCRIPT_COMMAND_FIELD_SET (2)
