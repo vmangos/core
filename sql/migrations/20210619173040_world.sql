@@ -162,6 +162,62 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482903, 0, 16, 8356, 2, 0, 0, 57441, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Felinni - Play Sound');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482904, 0, 16, 8355, 2, 0, 0, 56323, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hornsley - Play Sound');
 
+-- Add Silas Darkmoon Waypoints and Scripts
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(14823, 1, -9530.5, 80.2025, 58.8821, 0.20944, 5000, 0, 1482301),
+(14823, 2, -9527.15, 82.1972, 58.8825, 100, 0, 0, 0),
+(14823, 3, -9530.15, 87.5633, 58.8818, 100, 0, 0, 0),
+(14823, 4, -9534.1, 88.4057, 58.882, 100, 0, 0, 0),
+(14823, 5, -9537.35, 90.3927, 58.887, 100, 0, 0, 0),
+(14823, 6, -9541.47, 97.2985, 58.9402, 100, 0, 0, 0),
+(14823, 7, -9543.33, 100.868, 59.2083, 100, 0, 0, 0),
+(14823, 8, -9544.26, 104.777, 59.3098, 100, 0, 0, 0),
+(14823, 9, -9544.69, 108.763, 58.9851, 100, 0, 0, 0),
+(14823, 10, -9544.88, 112.797, 58.9596, 100, 0, 0, 0),
+(14823, 11, -9545.73, 122.049, 59.3392, 100, 50000, 0, 1482302),
+(14823, 12, -9548.98, 122.923, 59.1685, 100, 0, 0, 0),
+(14823, 13, -9549.59, 119.046, 59.1185, 100, 0, 0, 0),
+(14823, 14, -9548.9, 115.057, 59.0088, 100, 0, 0, 0),
+(14823, 15, -9547.82, 111.168, 58.8986, 100, 0, 0, 0),
+(14823, 16, -9546.38, 107.413, 59.0617, 100, 0, 0, 0),
+(14823, 17, -9546.63, 103.384, 59.2445, 100, 0, 0, 0),
+(14823, 18, -9547.97, 99.6789, 58.9806, 100, 0, 0, 0),
+(14823, 19, -9550.97, 97.2432, 58.8818, 100, 0, 0, 0),
+(14823, 20, -9554.95, 97.1711, 58.8825, 100, 0, 0, 0),
+(14823, 21, -9558.96, 97.0413, 58.8833, 100, 0, 0, 0),
+(14823, 22, -9562.8, 95.7671, 58.8815, 100, 0, 0, 0),
+(14823, 23, -9566.04, 93.462, 58.8825, 100, 0, 0, 0),
+(14823, 24, -9568.07, 89.9848, 58.8823, 100, 0, 0, 0),
+(14823, 25, -9568.67, 86.0765, 58.8821, 100, 0, 0, 0),
+(14823, 26, -9567.67, 82.2198, 58.8819, 100, 0, 0, 0),
+(14823, 27, -9564.81, 79.4411, 58.8819, 100, 0, 0, 0),
+(14823, 28, -9561.18, 77.7701, 58.8822, 100, 0, 0, 0),
+(14823, 29, -9557.39, 78.4318, 58.8827, 100, 0, 0, 0),
+(14823, 30, -9554.66, 81.3076, 58.8819, 100, 0, 0, 0),
+(14823, 31, -9551.66, 83.6935, 59.1167, 100, 0, 0, 0),
+(14823, 32, -9543.25, 83.1796, 59.357, 100, 60000, 0, 1482303),
+(14823, 33, -9547.21, 83.4137, 59.4403, 100, 0, 0, 0),
+(14823, 34, -9551.38, 83.3604, 59.0668, 100, 0, 0, 0),
+(14823, 35, -9554.29, 81.6836, 58.8818, 100, 0, 0, 0),
+(14823, 36, -9555.42, 78.1126, 58.8827, 100, 0, 0, 0),
+(14823, 37, -9554, 74.4676, 58.8833, 100, 0, 0, 0),
+(14823, 38, -9550.76, 72.4111, 58.9634, 100, 0, 0, 0),
+(14823, 39, -9546.81, 73.0513, 58.8997, 100, 0, 0, 0),
+(14823, 40, -9543.22, 74.8442, 58.8855, 100, 0, 0, 0),
+(14823, 41, -9540.01, 77.279, 58.899, 100, 0, 0, 0),
+(14823, 42, -9536.56, 79.3169, 58.882, 100, 0, 0, 0),
+(14823, 43, -9530.92, 80.2141, 58.8823, 100, 0, 0, 0),
+(14823, 44, -9530.5, 80.2025, 58.8821, 0.20944, 72000, 0, 0);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482301, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10154, 10155, 10156, 10157, 0, 0, 0, 0, 0, 'Silas Darkmoon - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10153, 0, 0, 0, 0, 0, 0, 0, 0, 'Silas Darkmoon - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10158, 10160, 10157, 10156, 0, 0, 0, 0, 0, 'Silas Darkmoon - Talk');
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(56600, 56600, 6, 6.25244, 11),
+(56600, 56611, 6, 3.14, 11);
+UPDATE `creature` SET `position_x` = -9530.5, `position_y` = 80.2025, `position_z` = 58.8821, `orientation` = 0.20944, `movement_type` = 2, `ai_name` = '' WHERE `guid` = 56600;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1482321, 1482322);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=14823;
+
 
 -- End of migration.
 END IF;
