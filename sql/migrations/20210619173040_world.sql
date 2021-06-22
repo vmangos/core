@@ -270,7 +270,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- Jubjub Waypoints Elwynn
 UPDATE `creature` SET `position_x` = -9585.66, `position_y` = 79.5061, `position_z` = 60.5998, `movement_type` = 2 WHERE `guid` = 54427;
-INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `script_id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (80362, 1, -9585.66, 79.5061, 60.5998, 100, 0, 0, 0),
 (54427, 2, -9584.17, 95.5632, 59.8141, 100, 0, 0, 0),
 (54427, 3, -9584, 103.571, 59.856, 100, 0, 0, 0),
@@ -385,12 +385,6 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484902, 14849, 511, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484902, 0, 0, 'Darkmoon Faire Carnie - Talk - OOC (Event 23)');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10058, 10059, 10060, 10061, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (511, 52, 46801, 42598, 8969, 12604, 0);
-
-
-
-
-
-
 
 
 -- End of migration.
