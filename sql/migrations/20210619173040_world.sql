@@ -233,6 +233,12 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14844;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484401, 14844, 0, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484401, 0, 0, 'Sylannia - Talk - OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10129, 10130, 10131, 10132, 0, 0, 0, 0, 0, 'Sylannia - Talk');
 
+-- Update Events List for Stamp Thunderhorn
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1484502);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=14845;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484501, 14845, 0, 1, 0, 100, 1, 90000, 90000, 300000, 300000, 1484501, 0, 0, 'Stamp Thunderhorn - Random Say OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1484501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10133, 10135, 10134, 10136, 0, 0, 0, 0, 0, 'Stamp Thunderhorn - Say Text');
 
 
 -- End of migration.
