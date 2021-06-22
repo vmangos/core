@@ -582,7 +582,7 @@ void PetAI::HandleReturnMovement()
             ClearCharmInfoFlags();
             m_creature->GetCharmInfo()->SetIsReturning(true);
             m_creature->GetMotionMaster()->Clear(false);
-            m_creature->GetMotionMaster()->MovePoint(m_creature->GetGUIDLow(), x, y, z);
+            m_creature->GetMotionMaster()->MovePoint(m_creature->GetGUIDLow(), x, y, z, MOVE_PATHFINDING);
         }
     }
     else // COMMAND_FOLLOW
