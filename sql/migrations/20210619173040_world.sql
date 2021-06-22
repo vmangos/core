@@ -260,6 +260,32 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14822;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1482201, 14822, 0, 1, 0, 100, 1, 45000, 84000, 45000, 84000, 1482201, 0, 0, 'Sayge - Talk - OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10125, 10126, 10127, 10128, 0, 0, 0, 0, 0, 'Sayge - Talk');
 
+-- Jubjub Waypoints Elwynn
+UPDATE `creature` SET `position_x` = -9585.66, `position_y` = 79.5061, `position_z` = 60.5998, `movement_type` = 2 WHERE `guid` = 54427;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `script_id`) VALUES
+(80362, 1, -9585.66, 79.5061, 60.5998, 100, 0, 0, 0),
+(54427, 2, -9584.17, 95.5632, 59.8141, 100, 0, 0, 0),
+(54427, 3, -9584, 103.571, 59.856, 100, 0, 0, 0),
+(54427, 4, -9584.64, 107.536, 59.6543, 100, 0, 0, 0),
+(54427, 5, -9582.43, 114.764, 59.2894, 100, 0, 0, 0),
+(54427, 6, -9574, 118.982, 59.6164, 100, 0, 0, 0),
+(54427, 7, -9570.69, 112.249, 59.5458, 100, 0, 0, 0),
+(54427, 8, -9570.76, 108.283, 59.2705, 100, 0, 0, 0),
+(54427, 9, -9568.36, 105.039, 59.071, 100, 0, 0, 0),
+(54427, 10, -9567.95, 101.312, 58.882, 100, 0, 0, 0),
+(54427, 11, -9570.35, 98.4068, 58.8816, 100, 0, 0, 0),
+(54427, 12, -9578.01, 99.1436, 59.1952, 100, 0, 0, 0),
+(54427, 13, -9582.01, 98.9142, 59.6212, 100, 0, 0, 0),
+(54427, 14, -9589.96, 98.3539, 60.5856, 100, 0, 0, 0),
+(54427, 15, -9594.79, 95.4556, 60.9452, 100, 60000, 4, 0),
+(54427, 16, -9601.24, 94.1501, 59.979, 100, 0, 0, 0),
+(54427, 17, -9609.27, 85.1976, 60.6269, 100, 0, 0, 0),
+(54427, 18, -9615.09, 79.7946, 61.4041, 100, 0, 0, 0),
+(54427, 19, -9620.68, 74.492, 62.5296, 100, 0, 0, 0),
+(54427, 20, -9622.75, 59.0094, 60.4357, 100, 60000, 4, 0),
+(54427, 21, -9599.96, 60.5064, 60.739, 100, 0, 0, 0),
+(54427, 22, -9589.01, 65.5766, 61.9161, 100, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
