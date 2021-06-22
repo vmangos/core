@@ -270,7 +270,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- Jubjub Waypoints Elwynn
 UPDATE `creature` SET `position_x` = -9585.66, `position_y` = 79.5061, `position_z` = 60.5998, `movement_type` = 2 WHERE `guid` = 54427;
-INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (80362, 1, -9585.66, 79.5061, 60.5998, 100, 0, 0, 0),
 (54427, 2, -9584.17, 95.5632, 59.8141, 100, 0, 0, 0),
 (54427, 3, -9584, 103.571, 59.856, 100, 0, 0, 0),
