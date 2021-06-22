@@ -221,7 +221,8 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (56600, 56600, 6, 6.25244, 11),
 (56600, 56611, 6, 3.14, 11);
-UPDATE `creature` SET `position_x` = -9530.5, `position_y` = 80.2025, `position_z` = 58.8821, `orientation` = 0.20944, `movement_type` = 2, `ai_name` = '' WHERE `guid` = 56600;
+UPDATE `creature_template` SET `ai_name` = '' WHERE `entry` = 14823;
+UPDATE `creature` SET `position_x` = -9530.5, `position_y` = 80.2025, `position_z` = 58.8821, `orientation` = 0.20944, `movement_type` = 2 WHERE `guid` = 56600;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1482321, 1482322);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14823;
 
