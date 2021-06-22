@@ -2225,6 +2225,10 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (!IsHostileTo(enemy))
         return false;
 
+    // prevent player from being stuck in combat with creature out of visibility radius
+    if (enemy->IsCharmerOrOwnerPlayerOrPlayerItself() && !isWithinVisibilityDistanceOf(enemy, enemy) && !GetMap()->IsDungeon())
+        return false;
+
     return true;
 }
 
