@@ -245,6 +245,21 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14847;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484701, 14847, 0, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484701, 0, 0, 'Professor Thaddeus Paleo - Talk - OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10137, 10138, 10139, 10140, 0, 0, 0, 0, 0, 'Professor Thaddeus Paleo - Talk');
 
+-- Lhara Talk OOC
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14846;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484601, 14846, 0, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484601, 0, 0, 'Lhara - Talk - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10141, 10142, 10143, 10144, 0, 0, 0, 0, 0, 'Lhara - Talk');
+
+-- Gelvas Grimegate Talk OOC
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14828;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1482801, 14828, 0, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1482801, 0, 0, 'Gelvas Grimegate - Talk - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10149, 10150, 10151, 10152, 0, 0, 0, 0, 0, 'Gelvas Grimegate - Talk');
+
+-- Sayge  Talk OOC
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14822;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1482201, 14822, 0, 1, 0, 100, 1, 45000, 75000, 45000, 75000, 1482201, 0, 0, 'Sayge - Talk - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10125, 10126, 10127, 10128, 0, 0, 0, 0, 0, 'Sayge - Talk');
+
 
 -- End of migration.
 END IF;
