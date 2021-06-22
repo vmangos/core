@@ -286,6 +286,18 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (54427, 21, -9599.96, 60.5064, 60.739, 100, 0, 0, 0),
 (54427, 22, -9589.01, 65.5766, 61.9161, 100, 0, 0, 0);
 
+-- Update Darkmoon Vendors
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 954;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 1711;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 2289;
+UPDATE `npc_vendor` SET `maxcount` = 4 WHERE `entry` = 14847 AND `item` = 3385;
+UPDATE `npc_vendor` SET `maxcount` = 4 WHERE `entry` = 14847 AND `item` = 858;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 4421;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 4424;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 13443;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 1477;
+DELETE FROM `npc_vendor` WHERE `entry` = 14846 AND `item` = 13456;
+
 
 -- End of migration.
 END IF;
