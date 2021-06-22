@@ -30,6 +30,8 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (80695, -23),
 (80699, -23);
 
+
+--------------------------------------
 -- Correct Gossip For Kruban Darkblade
 -- Assign Kruban Darkblade to Darkmoon Events
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
@@ -66,6 +68,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484302, 14843, 946, 1, 0, 100, 1, 45000, 120000, 45000, 0, 1484302, 0, 0, 'Kruban Darkblade - Talk - OOC - Event 4 and 5');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10106, 10107, 10108, 10105, 0, 0, 0, 0, 0, 'Kruban Darkblade - Talk');
 
+
+--------------------------------------
 -- Correct Gossip For Melnan Darkstone
 -- Assign Melnan Darkstone to Darkmoon Events
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
@@ -94,7 +98,10 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484202, 14842, 946, 1, 0, 100, 1, 45000, 120000, 45000, 120000, 1484202, 0, 0, 'Melnan Darkstone - Talk - OOC - Event 4 and 5');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10101, 10102, 10103, 10104, 0, 0, 0, 0, 0, 'Melnan Darkstone - Talk');
 
--- Elwynn Flick Waypoints and Scripts
+
+------------------------
+-- Darkmoon Faire ELWYNN - Event 4
+-- Flick Waypoints and Scripts
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14860;
 UPDATE `creature` SET `position_x` = -9582.77, `position_y` = 37.0359, `position_z` = 60.3921 WHERE `guid` IN (56625, 56624);
 DELETE FROM `creature_movement` WHERE `id` = 56625;
@@ -152,7 +159,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1486001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10148, 10147, 10145, 10146, 0, 0, 0, 0, 0, 'Flik - Talk');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1486001, 1, 16, 8353, 2, 0, 0, 14866, 10, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Fliks Frog - Play Sound');
 
--- Elwynn Darkmoon Zoo Sounds
+-- Darkmoon Zoo Sounds
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14829;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1482901, 14829, 0, 1, 0, 100, 1, 3000, 40000, 3000, 40000, 1482901, 0, 0, 'Yebb Neblegear - Play Sounds - OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482901, 0, 39, 1482901, 1482902, 1482903, 1482904, 0, 0, 0, 0, 25, 25, 25, 25, 0, 0, 0, 0, 0, 'Yebb Neblegear - Start Script');
@@ -162,7 +169,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482903, 0, 16, 8356, 2, 0, 0, 57441, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Felinni - Play Sound');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482904, 0, 16, 8355, 2, 0, 0, 56323, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hornsley - Play Sound');
 
--- Elwynn Silas Darkmoon Waypoints and Scripts
+-- Silas Darkmoon Waypoints and Scripts
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (56600, 1, -9530.5, 80.2025, 58.8821, 0.20944, 5000, 0, 1482301),
 (56600, 2, -9527.15, 82.1972, 58.8825, 100, 0, 0, 0),
@@ -218,7 +225,7 @@ UPDATE `creature` SET `position_x` = -9530.5, `position_y` = 80.2025, `position_
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1482321, 1482322);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=14823;
 
--- Elwynn Darkmoon Carnie Talk OOC
+-- Darkmoon Carnie Talk OOC
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14849;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484901, 14849, 510, 1, 0, 100, 1, 45000, 84000, 45000, 84000, 1484901, 0, 0, 'Darkmoon Faire Carnie - Talk - OOC (Event 4)');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10118, 10119, 10120, 10121, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
@@ -297,6 +304,89 @@ UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 4424;
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 13443;
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 14847 AND `item` = 1477;
 DELETE FROM `npc_vendor` WHERE `entry` = 14846 AND `item` = 13456;
+
+
+--------------------------------------
+-- Building Darkmoon ELWYNN - Event 23
+-- Add Some Missing Gobjects
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(2517, 180005, 0, -9590.03, 57.8195, 63.2871, 4.38078, 0, 0, -0.814116, 0.580703, 180, 180, 100, 1, 0, 0, 4, 10),
+(2603, 180045, 0, -9588.16, 41.7611, 59.8424, 4.88692, 0, 0, -0.642787, 0.766045, 180, 180, 100, 1, 0, 0, 0, 10);
+INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
+(2517, 23),
+(2603, 23);
+
+-- Fix Incorrect Entries
+DELETE FROM `creature_addon` WHERE `guid` IN (27660, 8971, 8969, 44187, 38004) AND `patch` = 0;
+UPDATE `creature_addon` SET `emote_state` = 234 WHERE `guid` IN (27660, 8971, 8969, 44187, 38004) AND `patch`=4;
+UPDATE `creature_addon` SET `emote_state` = 0, `equipment_id` = 0 WHERE `guid` IN (46801, 42598, 12604);
+
+-- Remove Uneeded Creature 
+DELETE FROM `creature` WHERE `guid` = 42601;
+DELETE FROM `creature_addon` WHERE `guid` = 42601;
+
+-- Darkmoon Faire Carnie Waypoints And Scripts
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` IN (46801, 42598, 12604);
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(46801, 1, -9546.88, 127.129, 59.1315, 1.09956, 10000, 1484901),
+(46801, 2, -9546.88, 127.129, 59.1315, 100, 2000, 1484902),
+(46801, 3, -9546.45, 123.157, 59.3754, 100, 0, 0),
+(46801, 4, -9546.12, 119.141, 59.4096, 100, 0, 0),
+(46801, 5, -9544.63, 111.26, 59.1377, 100, 0, 0),
+(46801, 6, -9543.83, 107.331, 59.1907, 100, 0, 0),
+(46801, 7, -9542.42, 103.546, 59.2837, 100, 0, 0),
+(46801, 8, -9535.18, 99.2403, 59.0065, 0.593412, 10000, 1484903),
+(46801, 9, -9535.18, 99.2403, 59.0065, 100, 2000, 1484904),
+(46801, 10, -9538.4, 101.454, 59.0065, 100, 0, 0),
+(46801, 11, -9542.46, 108.085, 59.0961, 100, 0, 0),
+(46801, 12, -9545.2, 115.717, 59.2422, 100, 0, 0),
+(46801, 13, -9547.06, 125.859, 59.2559, 100, 0, 0);
+
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(42598, 1, -9554.06, 89.1628, 59.0065, 2.44346, 12000, 1484901),
+(42598, 2, -9554.06, 89.1628, 59.0065, 100, 2000, 1484902),
+(42598, 3, -9550.75, 86.7618, 59.2564, 100, 0, 0),
+(42598, 4, -9547.53, 84.4004, 59.4745, 100, 0, 0),
+(42598, 5, -9544.45, 81.7795, 59.3819, 100, 0, 0),
+(42598, 6, -9539.4, 75.5277, 59.0065, 100, 0, 0),
+(42598, 7, -9536.15, 67.2438, 59.0065, 100, 10000, 1484903),
+(42598, 8, -9536.15, 67.2438, 59.0065, 100, 2000, 1484904),
+(42598, 9, -9538.14, 70.6069, 59.0065, 100, 0, 0),
+(42598, 10, -9540.93, 73.5188, 59.0065, 100, 0, 0),
+(42598, 11, -9543.65, 76.5191, 59.0065, 100, 0, 0),
+(42598, 12, -9546.4, 79.5484, 59.2418, 100, 0, 0),
+(42598, 13, -9548.81, 82.6701, 59.2518, 100, 0, 0),
+(42598, 14, -9553.58, 88.6667, 59.0065, 100, 0, 0);
+
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(12604, 1, -9582.17, 59.1424, 61.714, 3.35103, 12000, 1484901),
+(12604, 2, -9582.17, 59.1424, 61.714, 100, 2000, 1484902),
+(12604, 3, -9578.41, 60.2842, 61.2846, 100, 0, 0),
+(12604, 4, -9574.79, 62.0006, 60.9357, 100, 0, 0),
+(12604, 5, -9571.42, 64.165, 60.6065, 100, 0, 0),
+(12604, 6, -9568.05, 66.3986, 60.2327, 100, 0, 0),
+(12604, 7, -9561.75, 71.9971, 59.0065, 1.13446, 10000, 1484903),
+(12604, 8, -9561.75, 71.9971, 59.0065, 100, 2000, 1484904),
+(12604, 9, -9564.05, 68.9382, 59.6637, 100, 0, 0),
+(12604, 10, -9567.12, 66.3971, 60.139, 100, 0, 0),
+(12604, 12, -9570.39, 64.0827, 60.6654, 100, 0, 0),
+(12604, 13, -9573.95, 62.0258, 61.0851, 100, 0, 0),
+(12604, 14, -9580.59, 59.3138, 61.5253, 100, 0, 0);
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484901, 2, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Emote');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484902, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Emote');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484903, 2, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Set Stand State');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484904, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Set Stand State');
+
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484902, 14849, 511, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484902, 0, 0, 'Darkmoon Faire Carnie - Talk - OOC (Event 23)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10058, 10059, 10060, 10061, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (511, 52, 46801, 42598, 8969, 12604, 0);
+
+
+
+
+
+
 
 
 -- End of migration.
