@@ -320,6 +320,9 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 DELETE FROM `creature_addon` WHERE `guid` IN (27660, 8971, 8969, 44187, 38004) AND `patch` = 0;
 UPDATE `creature_addon` SET `emote_state` = 234 WHERE `guid` IN (27660, 8971, 8969, 44187, 38004) AND `patch`=4;
 UPDATE `creature_addon` SET `emote_state` = 0, `equipment_id` = 0 WHERE `guid` IN (46801, 42598, 12604);
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`) VALUES
+(12604, 4, 0, 0, 0, 0, 0, 0),
+(42598, 4, 0, 0, 0, 0, 0, 0);
 
 -- Remove Uneeded Creature 
 DELETE FROM `creature` WHERE `guid` = 42601;
