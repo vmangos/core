@@ -955,12 +955,14 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     pMover->m_movementInfo.ctime += lag;
 
     // fix an 1.12 client problem with transports
-    GenericTransport* tr = pMover->GetTransport();
-    if (_player->HasJustBoarded() && tr->IsMoTransport())
+    if (_player->HasJustBoarded())
     {
         _player->SetJustBoarded(false);
-        tr->SendOutOfRangeUpdateToPlayer(_player);
-        tr->SendCreateUpdateToPlayer(_player);
+        if (GenericTransport* pTransport = pMover->GetTransport())
+        {
+            pTransport->SendOutOfRangeUpdateToPlayer(_player);
+            pTransport->SendCreateUpdateToPlayer(_player);
+        }
     }
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     else
