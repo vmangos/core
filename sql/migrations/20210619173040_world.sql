@@ -221,7 +221,7 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=14823;
 -- Elwynn Darkmoon Carnie Talk OOC
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14849;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484901, 14849, 510, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484901, 0, 0, 'Darkmoon Faire Carnie - Talk - OOC');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10101, 10102, 10103, 10104, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10118, 10119, 10120, 10121, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (510, 52, 56680, 56613, 0, 0, 0);
 
 -- Morja Talk OOC
@@ -239,6 +239,11 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=14845;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484501, 14845, 0, 1, 0, 100, 1, 90000, 90000, 300000, 300000, 1484501, 0, 0, 'Stamp Thunderhorn - Random Say OOC');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1484501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10133, 10135, 10134, 10136, 0, 0, 0, 0, 0, 'Stamp Thunderhorn - Say Text');
+
+-- Professor Thaddeus Paleo Talk OOC
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14847;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484701, 14847, 0, 1, 0, 100, 1, 45000, 72000, 45000, 72000, 1484701, 0, 0, 'Professor Thaddeus Paleo - Talk - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10137, 10138, 10139, 10140, 0, 0, 0, 0, 0, 'Professor Thaddeus Paleo - Talk');
 
 
 -- End of migration.
