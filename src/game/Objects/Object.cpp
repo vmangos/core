@@ -513,42 +513,24 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
             *data << uint32(sWorld.GetCurrentMSTime());
     }
 #else
-    Unit const* unit = ToUnit();
-    if (unit)
+    WorldObject const* wobject = ToWorldObject();
+    MovementInfo m = wobject ? wobject->m_movementInfo : MovementInfo();
+    if (!m.ctime)
     {
-        WorldObject const* wobject = (WorldObject*)this;
-        MovementInfo m = wobject->m_movementInfo;
-        if (!m.ctime)
+        m.stime = WorldTimer::getMSTime() + 1000;
+        if (updateFlags & UPDATEFLAG_TRANSPORT)
         {
-            m.stime = WorldTimer::getMSTime() + 1000;
+            GameObject const* go = static_cast<GameObject const*>(wobject);
+            m.ChangePosition(go->GetStationaryX(), go->GetStationaryY(), go->GetStationaryZ(), go->GetStationaryO());
+        }
+        else if (wobject)
             m.ChangePosition(wobject->GetPositionX(), wobject->GetPositionY(), wobject->GetPositionZ(), wobject->GetOrientation());
-        }
-        if (unit->IsCreature())
-            m.moveFlags = m.moveFlags & ~MOVEFLAG_ROOT;
-        *data << m;
     }
-    else
-    {
-        *data << uint32(0); // movement flags
-        *data << uint32(WorldTimer::getMSTime());
-        if (WorldObject const* pObject = ToWorldObject())
-        {
-            *data << float(pObject->GetPositionX());
-            *data << float(pObject->GetPositionY());
-            *data << float(pObject->GetPositionZ());
-            *data << float(pObject->GetOrientation());
-        }
-        else
-        {
-            *data << float(0); // x
-            *data << float(0); // y
-            *data << float(0); // z
-            *data << float(0); // o
-        }
-        *data << float(0); // unk
-    }
+    if (IsCreature())
+        m.moveFlags = m.moveFlags & ~MOVEFLAG_ROOT;
+    *data << m;
     
-    if (unit)
+    if (Unit const* unit = ToUnit())
     {
         *data << float(unit->GetSpeed(MOVE_WALK));
         *data << float(unit->GetSpeed(MOVE_RUN));
