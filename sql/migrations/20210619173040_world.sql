@@ -873,6 +873,32 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (4661, 24),
 (4664, 24);
 
+-- Update Some Creatures
+DELETE FROM `creature_movement_scripts` WHERE `id` = 63;
+DELETE FROM `creature_movement` WHERE `id` = 301276;
+UPDATE `creature` SET `position_x` = -1542.71, `position_y` = 152.941, `position_z` = -7.70777, `orientation` = 3.19395, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301275;
+UPDATE `creature` SET `position_x` = -1551.45, `position_y` = 171.644, `position_z` = -7.70948, `orientation` = 0.767945, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301273;
+UPDATE `creature` SET `position_x` = -1552.1, `position_y` = 147.945, `position_z` = -7.70948, `orientation` = 0.0698132, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301274;
+UPDATE `creature` SET `position_x` = -1589.81, `position_y` = 159.245, `position_z` = -7.16003, `orientation` = 2.49582, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301276;
+UPDATE `creature` SET `position_x` = -1622.75, `position_y` = 123.118, `position_z` = -17.8536, `orientation` = 1.65806 , `movement_type` = 0, `wander_distance` = 0WHERE `guid` = 301271;
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`) VALUES
+(301275, 4, 0, -1, 1715, 0, 1, 234),
+(301273, 4, 0, -1, 1715, 0, 1, 234),
+(301274, 4, 0, -1, 1715, 0, 1, 234),
+(301276, 4, 0, -1, 1715, 0, 1, 234),
+(301271, 4, 0, -1, 1715, 0, 1, 234),
+(180, 4, 0, 0, 0, 0, 0, 0),
+(565, 4, 0, 0, 0, 0, 0, 0),
+(566, 4, 0, 0, 0, 0, 0, 0);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(180, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
+(565, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
+(566, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(180, 24),
+(565, 24);
+(566, 24);
+
 
 -- End of migration.
 END IF;
