@@ -109,6 +109,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 ------------------------
 -- Darkmoon Faire ELWYNN - Event 4
 -- Flick Waypoints and Scripts
+DELETE FROM `creature_movement_scripts` WHERE `id` = 5662506;
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14860;
 UPDATE `creature` SET `position_x` = -9582.77, `position_y` = 37.0359, `position_z` = 60.3921 WHERE `guid` IN (56625, 56624);
 DELETE FROM `creature_movement` WHERE `id` = 56625;
