@@ -739,6 +739,9 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (4252, 24);
 
 -- Update Some Creatures
+DELETE FROM `creature` WHERE `guid` = 301272;
+DELETE FROM `creature_movement` WHERE `id` = 301272;
+DELETE FROM `creature_movement_scripts` WHERE `id` = 59;
 DELETE FROM `creature_movement_scripts` WHERE `id` = 63;
 DELETE FROM `creature_movement` WHERE `id` = 301276;
 UPDATE `creature` SET `position_x` = -1542.71, `position_y` = 152.941, `position_z` = -7.70777, `orientation` = 3.19395, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301275;
