@@ -756,9 +756,9 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`,
 (565, 4, 0, 0, 0, 0, 0, 0),
 (566, 4, 0, 0, 0, 0, 0, 0);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(180, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
-(565, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
-(566, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
+(180, 14849, 0, 0, 0, 1, -1538.66, 172.904, -7.79281, 2.96706, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
+(565, 14849, 0, 0, 0, 1, -1550.61, 176.078, -7.7726, 6.0912, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
+(566, 14849, 0, 0, 0, 1, -1577.23, 165.239, -7.58654, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (180, 24),
 (565, 24),
