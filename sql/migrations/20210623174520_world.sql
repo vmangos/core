@@ -22,7 +22,8 @@ UPDATE `creature_template` SET `unit_flags`='33536' WHERE `entry`=16781;
 DELETE FROM `gameobject_template` WHERE  `entry`=300068;
 
 -- Festival Flamekeeper
-UPDATE `creature_template` SET `faction`='775', `auras`='29243', `display_scale1`='1.35' WHERE `entry`=16788;
+UPDATE `creature_template` SET `faction`='775', `civilian`='1' WHERE `entry`=16788;
+UPDATE `creature_template` SET `display_scale1`='1.25' WHERE  `entry`=16987;
 
 -- Undercity Fireeater
 UPDATE `creature_template` SET `unit_flags`='33536', `auras`='29402' WHERE `entry` in (17041,17050,17051,17038,17048,17049);
@@ -35,6 +36,21 @@ INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181371, 0, 8, 0, 'Midsummer Bonfire Spell Focus', 0, 0, 1, 1365, 10, 181375, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181290, 0, 6, 0, 'Midsummer Bonfire Spawn Trap', 0, 0, 1, 0, 0, 0, 28784, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181375, 0, 6, 0, 'Midsummer Bonfire Spawn Trap 2', 0, 0, 1, 0, 0, 0, 29114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+-- Quests
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9323, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9322, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16817, 9367, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16817, 9389, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16818, 9389, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16818, 9388, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16817, 9388, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16817, 9319, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16818, 9319, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16818, 9365, 0, 10);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16817, 9339, 0, 10);
+
 
 -- spell_script_target fix
 DELETE FROM `spell_script_target` WHERE `entry` IN (29437,28806);
@@ -199,6 +215,15 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @MIDSUMMER_CREATURE_GUID+1 AND @MIDSUMMER_CREATURE_GUID+115 AND `event`=@MIDSUMMER_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @MIDSUMMER_EVENT FROM `creature` WHERE creature.guid BETWEEN @MIDSUMMER_CREATURE_GUID+1 AND @MIDSUMMER_CREATURE_GUID+115;
+
+-- Apply correct Visual to Flamekeepers
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES (70630, 0, 0, -1, -1, 0, 1, 0, '29243');
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES (70607, 0, 0, -1, -1, 0, 1, 0, '29245');
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES (70596, 0, 0, -1, -1, 0, 1, 0, '29246');
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES (70693, 0, 0, -1, -1, 0, 1, 0, '29246');
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES (70669, 0, 0, -1, -1, 0, 1, 0, '29243');
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES (70656, 0, 0, -1, -1, 0, 1, 0, '29244');
+
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
     (@MIDSUMMER_GAMEOBJECT_GUID+1, 181301, 0, -11280.6, 1813.85, 39.6464, 3.4034, 0, 0, -0.991445, 0.130528, 120, 120, 100, 1, 0),
