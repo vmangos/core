@@ -880,7 +880,7 @@ UPDATE `creature` SET `position_x` = -1542.71, `position_y` = 152.941, `position
 UPDATE `creature` SET `position_x` = -1551.45, `position_y` = 171.644, `position_z` = -7.70948, `orientation` = 0.767945, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301273;
 UPDATE `creature` SET `position_x` = -1552.1, `position_y` = 147.945, `position_z` = -7.70948, `orientation` = 0.0698132, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301274;
 UPDATE `creature` SET `position_x` = -1589.81, `position_y` = 159.245, `position_z` = -7.16003, `orientation` = 2.49582, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301276;
-UPDATE `creature` SET `position_x` = -1622.75, `position_y` = 123.118, `position_z` = -17.8536, `orientation` = 1.65806 , `movement_type` = 0, `wander_distance` = 0WHERE `guid` = 301271;
+UPDATE `creature` SET `position_x` = -1622.75, `position_y` = 123.118, `position_z` = -17.8536, `orientation` = 1.65806 , `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 301271;
 INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`) VALUES
 (301275, 4, 0, -1, 1715, 0, 1, 234),
 (301273, 4, 0, -1, 1715, 0, 1, 234),
@@ -896,7 +896,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (566, 14849, 0, 0, 0, 1, -9546.6, 124.032, 59.3384, 4.87607, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (180, 24),
-(565, 24);
+(565, 24),
 (566, 24);
 
 -- Darkmoon Faire Carnie Waypoints
