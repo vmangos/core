@@ -399,7 +399,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (173, 14849, 0, 0, 0, 1, -1527.93, 171.559, -7.79277, 0.573501, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (154, 5),
-(155, 5);
+(155, 5),
 (170, 5),
 (173, 5);
 
