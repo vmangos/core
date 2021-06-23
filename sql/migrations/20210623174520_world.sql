@@ -80,7 +80,6 @@ DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobj
 DELETE FROM `game_event_gameobject` WHERE `event` = @MIDSUMMER_EVENT;
 DELETE FROM `game_event_creature` WHERE `event` = @MIDSUMMER_EVENT;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @MIDSUMMER_CREATURE_GUID+1 AND @MIDSUMMER_CREATURE_GUID+115;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `movement_type`, `patch_min`) VALUES
     (@MIDSUMMER_CREATURE_GUID+1, 16781, 0, -11282.1, 1826.88, 38.9305, 0.785398, 120, 120, 0, 0, 0),
     (@MIDSUMMER_CREATURE_GUID+2, 17066, 0, -11281.7, -3046.21, 6.42605, 1.01229, 120, 120, 0, 0, 0),
@@ -201,7 +200,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @MIDSUMMER_CREATURE_GUID+1 AND @MIDSUMMER_CREATURE_GUID+115 AND `event`=@MIDSUMMER_EVENT;
 INSERT INTO `game_event_creature` SELECT creature.guid, @MIDSUMMER_EVENT FROM `creature` WHERE creature.guid BETWEEN @MIDSUMMER_CREATURE_GUID+1 AND @MIDSUMMER_CREATURE_GUID+115;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
     (@MIDSUMMER_GAMEOBJECT_GUID+1, 181301, 0, -11280.6, 1813.85, 39.6464, 3.4034, 0, 0, -0.991445, 0.130528, 120, 120, 100, 1, 0),
     (@MIDSUMMER_GAMEOBJECT_GUID+2, 181301, 0, -11278.9, -3058.45, -0.126717, 1.97222, 0, 0, 0.833885, 0.551938, 120, 120, 100, 1, 0),
