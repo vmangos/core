@@ -577,6 +577,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (173, 28, -1491.73, 195.238, -7.79274, 100, 0, 0, 0),
 (173, 29, -1500.02, 186.776, -7.79277, 100, 0, 0, 0);
 
+-- Darkmoon Carnie Talk OOC
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484903, 14849, 512, 1, 0, 100, 1, 45000, 84000, 45000, 84000, 1484903, 0, 0, 'Darkmoon Faire Carnie - Talk - OOC (Event 5)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484903, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10118, 10119, 10120, 10121, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (512, 52, 170, 173, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
