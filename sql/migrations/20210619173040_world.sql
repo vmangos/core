@@ -586,6 +586,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 ---------------------------------------------
 -- Building Darkmoon Faire MULGORE - Event 24
 -- Respawn Building Darkmoon Faire Mulgore
+DELETE FROM `game_event_gameobject` WHERE `event` = 24;
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event` = 24);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (1888, 3286, 1, -1155.98, 66.8118, 145.96, 0.0959937, 0, 0, 0.0479784, 0.998848, 25, 25, 100, 1, 0, 0, 4, 10),
