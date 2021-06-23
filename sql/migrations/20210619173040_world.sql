@@ -503,8 +503,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 UPDATE `creature` SET `position_x` = -1543.12, `position_y` = 170.697, `position_z` = -7.79227, `movement_type` = 2 WHERE `guid` = 54417;
 UPDATE `creature` SET `position_x` = -1543.12, `position_y` = 170.697, `position_z` = -7.79227 WHERE `guid` = 54426;
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(54417, 54417, 6, 6.25244, 11),
-(54417, 54426, 6, 3.14, 11);
+(54417, 54417, 2, 6.25244, 11),
+(54417, 54426, 2, 0, 11);
 
 -- Jubjub Waypoints
 UPDATE `creature` SET `position_x` = -1552.02, `position_y` = 111.469, `position_z` = -5.41143, `movement_type` = 2 WHERE `guid` = 54428;
