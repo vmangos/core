@@ -835,58 +835,9 @@ float TerrainInfo::GetHeightStatic(float x, float y, float z, bool useVmaps/*=tr
 }
 
 
-inline bool IsOutdoorWMO(uint32 mogpFlags, uint32 groupId, int32 adtId, int32 rootId, uint32 mapId)
+inline bool IsOutdoorWMO(uint32 mogpFlags)
 {
-    /*
-    [Nostalrius] Research on mogpFlags.
-
-    OUTDOOR
-    Warsong :                   0x8209
-    Ironforge :                 0xa005
-    Ironforge2 :                0x2a05 (-4873.546875 -1080.512329 502.211090 0)
-    Outside :                   0x0809
-    Zone test :                 0x0009
-    Orgri :                     0xa841
-    Stormwind :                 0xaa41
-    Undercity :                 0x3a05
-    Alterac :                   0x0809
-
-    INDOOR
-    Stormwind : Inside :        0x2a05
-    Warsong : Inside :          0x2a05
-    Inside a house, Elwynn :    0x2805
-    Inn Elwynn :                0x2805
-    Farm :                      0x2805
-    Inn gadzetsan :             0x2841
-    Alterac starting area :     0x2805
-    Warsong: entrance room      0x0a09 <-- Hackfixed
-    AV end of start tunnel:
-    Horde:    GroupID=0 flags=0x809 root=4013 adt=0 <- Hackfixed
-    Horde:    GroupID=19333 flags=0x809 rootId=4293 <- Hackfixed
-    Alliance: GroupID=0 flags=0x809 root=0 adt=0    <- Hackfixed
-    */
-
-    // Hack fixes.
-    switch (groupId)
-    {
-        // Warsong entrance
-        case 19307: // Horde
-        case 19343: // Alliance
-            mogpFlags = 0x2a05;
-            break;
-    }
-    if (mapId == 30) // Alterac valley
-        switch (rootId)
-        {
-            case 0:
-            case 4013:
-            case 4193: // Alliance tower
-            case 4293: // Horde tower
-                mogpFlags = 0x2805;
-                break;
-        }
-
-    return (mogpFlags & 0xf000) != 0x2000;
+    return (mogpFlags & 0x8000) != 0;
 }
 
 bool TerrainInfo::IsOutdoors(float x, float y, float z) const
@@ -898,7 +849,7 @@ bool TerrainInfo::IsOutdoors(float x, float y, float z) const
     if (!GetAreaInfo(x, y, z, mogpFlags, adtId, rootId, groupId))
         return true;
 
-    return IsOutdoorWMO(mogpFlags, groupId, adtId, rootId, GetMapId());
+    return IsOutdoorWMO(mogpFlags);
 }
 
 bool TerrainInfo::GetAreaInfo(float x, float y, float z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
@@ -954,7 +905,7 @@ uint16 TerrainInfo::GetAreaFlag(float x, float y, float z, bool* isOutdoors) con
     if (isOutdoors)
     {
         if (haveAreaInfo)
-            *isOutdoors = IsOutdoorWMO(mogpFlags, groupId, adtId, rootId, GetMapId());
+            *isOutdoors = IsOutdoorWMO(mogpFlags);
         else
             *isOutdoors = true;
     }
