@@ -696,6 +696,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3995981, 5);
 
 -- Update Some Creatures
+UPDATE `creature` SET `position_x` = -1625.257, `position_y` = 88.9693, `position_z` = -17.9479 WHERE `guid` = 54423;
 UPDATE `creature` SET `position_x` = -1586.9, `position_y` = 151.369, `position_z` = -7.49291, `orientation` = 0.488692 WHERE `id` = 14822 AND `map` = 1;
 UPDATE `creature` SET `position_x` = -1579.04, `position_y` = 176.145, `position_z` = -7.70948, `orientation` = 5.37561 WHERE `id` = 14847 AND `map` = 1;
 UPDATE `creature` SET `position_x` = -1565.04, `position_y` = 131.113, `position_z` = -7.64821, `orientation` = 2.05949 WHERE `id` = 14828 AND `map` = 1;
