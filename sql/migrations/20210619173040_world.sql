@@ -723,13 +723,13 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (566, 14869, 0, 0, 0, 1, -1625.45, 109.86, -17.8232, 1.58793, 630, 630, 3, 100, 0, 1, 0, 0, 4, 10),
 (567, 14869, 0, 0, 0, 1, -1637.45, 109.088, -17.8232, 2.19481, 630, 630, 3, 100, 0, 1, 0, 0, 4, 10),
 (684, 14849, 0, 0, 0, 1, -1611.23, 114.531, -17.5299, 0.573501, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
-(567, 10445, 0, 0, 0, 1, -1562.91, 152.304, -7.70948, 4.03171, 180, 180, 0, 100, 0, 0, 0, 0, 4, 10),
+(726, 10445, 0, 0, 0, 1, -1562.91, 152.304, -7.70948, 4.03171, 180, 180, 0, 100, 0, 0, 0, 0, 4, 10),
 (720, 14849, 0, 0, 0, 1, -1527.93, 171.559, -7.79277, 0.573501, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (566, 5),
 (567, 5),
 (684, 5),
-(567, 5),
+(726, 5),
 (720, 5);
 
  -- Silas Darkmoon Waypoints and Scripts
@@ -1091,7 +1091,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (566, 14849, 0, 0, 0, 1, -1577.23, 165.239, -7.58654, 6.0912, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (724, 24),
-(565, 24),
+(725, 24),
 (566, 24);
 
 -- Darkmoon Faire Carnie Waypoints
@@ -1121,7 +1121,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- Darkmoon Faire Carnie Talk OOC
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1484904, 14849, 516, 1, 0, 100, 1, 45000, 84000, 45000, 84000, 1484904, 0, 0, 'Darkmoon Faire Carnie - Talk - OOC (Event 24)');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484904, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10058, 10059, 10060, 10061, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Talk');
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (516, 52, 301271, 180, 566, 301274, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (516, 52, 301271, 724, 566, 301274, 0);
 
 
 -- End of migration.
