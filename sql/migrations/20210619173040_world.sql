@@ -378,9 +378,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (12604, 8, -9561.75, 71.9971, 59.0065, 100, 2000, 1484904),
 (12604, 9, -9564.05, 68.9382, 59.6637, 100, 0, 0),
 (12604, 10, -9567.12, 66.3971, 60.139, 100, 0, 0),
-(12604, 12, -9570.39, 64.0827, 60.6654, 100, 0, 0),
-(12604, 13, -9573.95, 62.0258, 61.0851, 100, 0, 0),
-(12604, 14, -9580.59, 59.3138, 61.5253, 100, 0, 0);
+(12604, 11, -9570.39, 64.0827, 60.6654, 100, 0, 0),
+(12604, 12, -9573.95, 62.0258, 61.0851, 100, 0, 0),
+(12604, 13, -9580.59, 59.3138, 61.5253, 100, 0, 0);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484901, 2, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Emote');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484902, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Emote');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1484903, 2, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkmoon Faire Carnie - Set Stand State');
