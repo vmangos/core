@@ -9,6 +9,9 @@ INSERT INTO `migrations` VALUES ('20210623174520');
 -- Add your query below.
 
 
+-- Remove wrongly spawned 181354 (Floating, medium) - Flowers in the canals of Stormwind
+DELETE FROM `gameobject` WHERE `guid`=26524;
+
 -- Midsummer Bonfire
 UPDATE `creature_template` SET `health_min`='42', `health_max`='42' WHERE `entry` in (16592,17066);
 
