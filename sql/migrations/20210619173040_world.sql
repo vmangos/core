@@ -1067,6 +1067,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 
 -- Update Some Creatures
 DELETE FROM `creature` WHERE `guid` = 301272;
+DELETE FROM `creature_addon` WHERE `guid` = 301272;
 DELETE FROM `creature_movement` WHERE `id` = 301272;
 DELETE FROM `creature_movement_scripts` WHERE `id` = 59;
 DELETE FROM `creature_movement_scripts` WHERE `id` = 63;
