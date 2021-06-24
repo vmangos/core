@@ -399,7 +399,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (8887, 4),
 (12992, 4);
 
-INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+REPLACE INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (52415, 15303, 0, 0, 0, 0, -9568.32, -7.84619, 63.0966, 1.79769, 180, 180, 0, 100, 0, 0, 0, 0, 6, 10);
 
 -- Flick Waypoints and Scripts
