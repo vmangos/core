@@ -5292,7 +5292,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
 
             // For show in client
             if (target->GetTypeId() == TYPEID_PLAYER)
-                target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, m_modifier.m_amount / 100.0f, apply);
+                target->ApplyPercentModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, /*TODO: m_isAuraEnabled ? m_amount : 0 */ m_modifier.m_amount, apply);
         }
         else
         {
