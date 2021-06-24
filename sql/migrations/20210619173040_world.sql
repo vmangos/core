@@ -696,16 +696,32 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3995981, 5);
 
 -- Update Some Creatures
+UPDATE `creature` SET `position_x` = -1586.9, `position_y` = 151.369, `position_z` = -7.49291, `orientation` = 0.488692 WHERE `id` = 14822 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1579.04, `position_y` = 176.145, `position_z` = -7.70948, `orientation` = 5.37561 WHERE `id` = 14847 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1565.04, `position_y` = 131.113, `position_z` = -7.64821, `orientation` = 2.05949 WHERE `id` = 14828 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1550.86, `position_y` = 141.069, `position_z` = -7.68689, `orientation` = 2.25148 WHERE `id` = 14841 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1575.47, `position_y` = 177.926, `position_z` = -7.70948, `orientation` = 4.90438 WHERE `id` = 14846 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1630.16, `position_y` = 119.184, `position_z` = -17.8649, `orientation` = 5.93412 WHERE `id` = 14829 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1637.21, `position_y` = 102.255, `position_z` = -17.8649, `orientation` = 0.785398 WHERE `id` = 14832 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1623.63, `position_y` = 103.792, `position_z` = -17.8649, `orientation` = 1.76278 WHERE `id` = 14865 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1633.75, `position_y` = 92.3871, `position_z` = -17.8649, `orientation` = 0.383972 WHERE `id` = 14868 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1477.94, `position_y` = 190.359, `position_z` = -7.70947, `orientation` = 5.37561 WHERE `id` = 14833 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1479.99, `position_y` = 205.206, `position_z` = -7.70947, `orientation` = 3.28122 WHERE `id` = 14871 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1585.4, `position_y` = 163.72, `position_z` = -7.31547, `orientation` = 6.10865 WHERE `id` = 14844 AND `map` = 1;
+UPDATE `creature` SET `position_x` = -1584.82, `position_y` = 167.721, `position_z` = -7.37061, `orientation` = 6.07375  WHERE `id` = 14845 AND `map` = 1;
+
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` IN (54423, 54431, 54430, 54422);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (154, 14869, 0, 0, 0, 1, -1625.45, 109.86, -17.8232, 1.58793, 630, 630, 3, 100, 0, 1, 0, 0, 4, 10),
 (155, 14869, 0, 0, 0, 1, -1637.45, 109.088, -17.8232, 2.19481, 630, 630, 3, 100, 0, 1, 0, 0, 4, 10),
 (170, 14849, 0, 0, 0, 1, -1611.23, 114.531, -17.5299, 0.573501, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10),
+(567, 10445, 0, 0, 0, 1, -1562.91, 152.304, -7.70948, 4.03171, 180, 180, 0, 100, 0, 0, 0, 0, 4, 10),
 (173, 14849, 0, 0, 0, 1, -1527.93, 171.559, -7.79277, 0.573501, 270, 270, 0, 100, 0, 2, 0, 0, 4, 10);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (154, 5),
 (155, 5),
 (170, 5),
+(567, 5),
 (173, 5);
 
  -- Silas Darkmoon Waypoints and Scripts
