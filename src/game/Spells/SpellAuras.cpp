@@ -5292,7 +5292,10 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
 
             // For show in client
             if (target->GetTypeId() == TYPEID_PLAYER)
-                target->ApplyPercentModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, /*TODO: m_isAuraEnabled ? m_amount : 0 */ m_modifier.m_amount, apply);
+            {
+                // TODO: fix positive aura gets removed -> damage is displayed at 100%
+                target->ApplyPercentModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, m_modifier.m_amount, apply);
+            }         
         }
         else
         {
@@ -5317,7 +5320,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
     // Send info to client
     if (target->GetTypeId() == TYPEID_PLAYER)
         for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-            target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, m_modifier.m_amount / 100.0f, apply);
+            target->ApplyPercentModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, m_modifier.m_amount, apply);
 }
 
 void Aura::HandleModOffhandDamagePercent(bool apply, bool Real)
