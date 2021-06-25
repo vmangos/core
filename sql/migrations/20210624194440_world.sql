@@ -12,9 +12,8 @@ INSERT INTO `migrations` VALUES ('20210624194440');
 -- Correct Barbs Aura Passive for Mudrock Spikeshell 4397 (credit cmangos)
 UPDATE `creature_template` SET `auras` = '9464' WHERE `entry` = 4397;
 
--- Add Missing Loot Template
-INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
-(17516, 21145, 100, 0, 1, 1, 0, 0, 10);
+-- Fix Creature Stuck Underground
+UPDATE `creature` SET `position_z` = 79.5248 WHERE `guid` = 15226;
 
 
 -- End of migration.
