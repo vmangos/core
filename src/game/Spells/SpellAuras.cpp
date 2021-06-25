@@ -5289,7 +5289,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
             target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_PCT, m_modifier.m_amount, apply);
-            
+
             // For show in client
             if (target->GetTypeId() == TYPEID_PLAYER)
             {
