@@ -5293,7 +5293,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
             // For show in client
             if (target->GetTypeId() == TYPEID_PLAYER)
             {
-                // TODO: fix positive aura gets removed -> damage is displayed at 100%
+                // TODO: fix positive aura gets removed -> damage is displayed red at 100%
                 target->ApplyPercentModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, m_modifier.m_amount, apply);
             }         
         }
