@@ -5281,7 +5281,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
     // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
     // m_modifier.m_miscvalue comparison with item generated damage types
 
-    if ((m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL) != 0)
+    if (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
     {
         // apply generic physical damage bonuses including wand case
         if (GetSpellProto()->EquippedItemClass == -1 || target->GetTypeId() != TYPEID_PLAYER)
@@ -5289,12 +5289,19 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
             target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_PCT, m_modifier.m_amount, apply);
-
+            
             // For show in client
             if (target->GetTypeId() == TYPEID_PLAYER)
             {
-                // TODO: fix positive aura gets removed -> damage is displayed red at 100%
-                target->ApplyPercentModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, m_modifier.m_amount, apply);
+                for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+                {
+                    if (GetMiscValue() & (1 << i))
+                    {
+                        // only aura type modifying PLAYER_FIELD_MOD_DAMAGE_DONE_PCT
+                        float amount = target->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, 1 << i);
+                        target->SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, amount);
+                    }
+                }
             }         
         }
         else
