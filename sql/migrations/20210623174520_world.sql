@@ -13,28 +13,28 @@ INSERT INTO `migrations` VALUES ('20210623174520');
 DELETE FROM `gameobject` WHERE `guid`=26524;
 
 -- Midsummer Bonfire
-UPDATE `creature_template` SET `health_min`='42', `health_max`='42' WHERE `entry` in (16592,17066);
+UPDATE `creature_template` SET `health_min`=42, `health_max`=42 WHERE `entry` in (16592,17066);
 
 -- Midsummer Bonfire
-UPDATE `gameobject_template` SET `patch`='9', `displayId`='0', `type`='8', `data0`='1365', `data1`='10' WHERE `entry`=181288;
+UPDATE `gameobject_template` SET `patch`=9, `displayId`=0, `type`=8, `data0`=1365, `data1`=10 WHERE `entry`=181288;
 
 -- Midsummer Celebrant
-UPDATE `creature_template` SET `unit_flags`='33536' WHERE `entry`=16781;
+UPDATE `creature_template` SET `unit_flags`=33536 WHERE `entry`=16781;
 
 -- Delete weird GameObjects
 DELETE FROM `gameobject_template` WHERE `entry`=300068;
 
 -- Festival Flamekeeper
-UPDATE `creature_template` SET `faction`='775', `civilian`='1', `ai_name`='EventAI' WHERE `entry`=16788;
+UPDATE `creature_template` SET `faction`=775, `civilian`=1, `ai_name`='EventAI' WHERE `entry`=16788;
 
 -- Fix female Tauren scale for Thunderbluffs Flamekeeper
-UPDATE `creature_template` SET `display_scale1`='1.25' WHERE `entry`=16987;
+UPDATE `creature_template` SET `display_scale1`=1.25 WHERE `entry`=16987;
 
 -- Undercity Fireeater
-UPDATE `creature_template` SET `unit_flags`='33536', `auras`='29402' WHERE `entry` in (17041,17050,17051,17038,17048,17049);
+UPDATE `creature_template` SET `unit_flags`=33536, `auras`=29402 WHERE `entry` in (17041,17050,17051,17038,17048,17049);
 
 -- Remove movement_type
-UPDATE `creature_template` SET `movement_type`='0' WHERE `entry` in (16592,16781,16788,16817,16818,17038,17041,17048,17049,17051,17066);
+UPDATE `creature_template` SET `movement_type`=0 WHERE `entry` in (16592,16781,16788,16817,16818,17038,17041,17048,17049,17051,17066);
 
 -- Add missing GameObjects
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181377, 9, 8, 0, 'Midsummer Bonfire Campfire Spell Focus', 0, 0, 1, 4, 10, 181376, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
@@ -42,7 +42,7 @@ INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181290, 9, 6, 0, 'Midsummer Bonfire Spawn Trap', 0, 0, 1, 0, 0, 0, 28784, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181375, 9, 6, 0, 'Midsummer Bonfire Spawn Trap 2', 0, 0, 1, 0, 0, 0, 29114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
--- Quests
+-- Missing quests
 INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLevel`, `MaxLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RequiredCondition`, `RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`, `Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`, `ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`, `ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`, `ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`, `RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`, `RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`, `RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`, `RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`, `RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`, `StartScript`, `CompleteScript`) VALUES (9389, 9, 2, -369, 1, 255, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 'Flickering Flames in the Eastern Kingdoms', 'The Midsummer Fire Festival traditionally lights up the land with a myriad of flames. Some argue that the green fires are the finest, as they are the hardest to maintain and have such a distinctive hue.$B$BMake sure they still burn in the Eastern Kingdoms for our Flamekeeper. They sit near Dun Modr in the Wetlands, close to Pyrewood Village within Silverpine Forest, on the cliffs overlooking the lighthouse in Westfall, and by the ruined tower in Hillsbrad Foothills.', 'Visit the bonfires within Hillsbrad Foothills, Silverpine Forest, Westfall, and the Wetlands, then speak with the Festival Flamekeeper.', 'So you\'ve returned, and you\'ve seen to the emerald flames of the continent. What do you think, mm? A rare and wonderful sight, to be certain. I am aware, however, that tangible rewards are better appreciated... so please, take this for your trouble.', 'Have you seen to your task?', NULL, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -181566, -181564, -181565, -181567, 1, 1, 1, 1, 0, 0, 0, 0, 23435, 23327, 23326, 23211, 0, 0, 5, 4, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLevel`, `MaxLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RequiredCondition`, `RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`, `Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`, `ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`, `ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`, `ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`, `RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`, `RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`, `RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`, `RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`, `RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`, `StartScript`, `CompleteScript`) VALUES (9367, 9, 2, -369, 1, 255, 60, 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 'The Festival of Fire', 'Midsummer is upon us once again!$B$BEach year, as tradition dictates, Flamekeepers are chosen to tend the bonfires within our capitals. While fires are burning throughout Azeroth, it is imperative that ours be the hottest and brightest, to properly pay homage to the season.$B$BIn fact, I have a task for you, if you don\'t mind. I\'ve not yet heard if the fires in all capitals are properly burning. Travel there yourself and warm yourself by the fires--make sure they\'re hot!', 'Touch the bonfires within Stormwind, Ironforge, and Darnassus, then speak to a Festival Loremaster within the capital cities.', 'Excellent! It seems we\'ve appointed dutiful Flamekeepers this year if the bonfires are as well-kept as you claim. Thank you for inspecting them for me; here, take this as a small token of my esteem.', 'Are the fires burning?', NULL, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -181332, -181333, -181334, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23247, 23246, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLevel`, `MaxLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RequiredCondition`, `RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`, `Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`, `ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`, `ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`, `ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`, `RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`, `RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`, `RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`, `RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`, `RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`, `StartScript`, `CompleteScript`) VALUES (9388, 9, 2, -369, 1, 255, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 'Flickering Flames in Kalimdor', 'There are many flames burning throughout the world today, $n. The trickiest fires to tend are those that burn green; they do not stay lit long without supervision. Make certain the emerald fires still burn on Kalimdor for our Flamekeeper, eh?$B$BYou will find them near Ratchet in the Barrens, close to the Master\'s Glaive in Darkshore, in the forest of Ashenvale by the bridge near Silverwing Outpost, and near the road to Windshear Crag along the main road in Stonetalon Mountains.', 'Visit the bonfires within Ashenvale, the Barrens, Darkshore, and Stonetalon Mountains, then speak with the Festival Flamekeeper.', 'Ahhh, so they do still burn. I am glad; it would not do for those fires to burn out before their time. You have done well, $N. Take this with my blessing.', 'The fires cannot die until the festival is done!', NULL, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -181561, -181560, -181563, -181562, 1, 1, 1, 1, 0, 0, 0, 0, 23435, 23327, 23326, 23211, 0, 0, 5, 4, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -51,8 +51,8 @@ DELETE FROM `creature_involvedrelation` WHERE `id` in (16788,16817,16818);
 DELETE FROM `creature_questrelation` WHERE `id` in (16788,16817,16818);
 
 -- A Light in Dark Places TBC?
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
-INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
+-- INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
+-- INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
 -- A Light in Dark Places
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9319, 9, 10);
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9319, 9, 10);
@@ -95,7 +95,7 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16818, 9332, 9, 10);
 
 -- Fix spell scripts to create flames of ...
-UPDATE `spell_scripts` SET `data_flags`='6' WHERE `id` in (29126,29135,29136,29137,29138,29139);
+UPDATE `spell_scripts` SET `data_flags`=6 WHERE `id` in (29126,29135,29136,29137,29138,29139);
 
 -- spell_script_target fix
 DELETE FROM `spell_script_target` WHERE `entry` IN (29437,28806);
@@ -281,6 +281,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16788;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1, 16788, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1678801, 1678802, 0, 'Midsummer Festival- Apply Faction for Flamekeeper');
 
+-- Fire Festival Fury Trap should only be spawned by the event
+DELETE FROM `gameobject` WHERE `id`=181431;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
     (@MIDSUMMER_GAMEOBJECT_GUID+1, 181301, 0, -11280.6, 1813.85, 39.6464, 3.4034, 0, 0, -0.991445, 0.130528, 120, 120, 100, 1, 9),
@@ -1397,6 +1399,180 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110 AND `event`=@MIDSUMMER_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @MIDSUMMER_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110;
 
+-- Fire Festival Fortitude buff on stealing quests turn in.
+DELETE FROM `quest_end_scripts` WHERE `id`=9324;
+UPDATE `quest_template` SET `CompleteScript`=9324 WHERE `entry` in (9324,9325,9326,9330,9331,9332);
+
+-- cast Fire Festival Fortitude in Stormwind
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1519, 4, 1519, 0, 0, 0, 2);
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+906, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+907, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+908, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+909, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+910, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+911, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+912, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+913, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+914, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+915, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+916, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+917, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+918, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+919, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+920, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+921, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+922, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+923, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+924, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+925, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+926, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+927, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+928, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+929, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+930, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+931, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+932, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+933, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1519, 'Midsummer festival - cast Fire Festival Fortitude in Stormwind');
+
+-- cast Fire Festival Fortitude in Undercity
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1497, 4, 1497, 0, 0, 0, 2);
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+948, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+949, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+950, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+951, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+952, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+953, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+954, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+955, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+956, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+957, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+958, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+959, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+960, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+961, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+962, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+963, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+964, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+965, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+966, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+967, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+968, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+969, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+970, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+971, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+972, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+973, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1497, 'Midsummer festival - cast Fire Festival Fortitude in Undercity');
+
+-- cast Fire Festival Fortitude in Thunder Bluff
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1638, 4, 1638, 0, 0, 0, 2);
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+974, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+975, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+976, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+977, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+978, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+979, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+980, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+981, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+982, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+983, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+984, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+985, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+986, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+987, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+988, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+989, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+990, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+991, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1638, 'Midsummer festival - cast Fire Festival Fortitude in Thunder Bluff');
+
+-- cast Fire Festival Fortitude in Ironforge
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1537, 4, 1537, 0, 0, 0, 2);
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+934, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+935, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+936, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+937, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+938, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+939, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+940, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+941, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+942, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+943, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+944, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+945, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+946, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+947, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1537, 'Midsummer festival - cast Fire Festival Fortitude in Ironforge');
+
+-- cast Fire Festival Fortitude in Orgrimmar
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1637, 4, 1637, 0, 0, 0, 2);
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+992, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+993, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+994, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+995, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+996, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+997, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+998, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+999, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1000, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1001, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1002, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1003, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1004, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1005, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1006, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1007, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1008, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1009, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1010, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1011, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1012, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1013, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1014, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1015, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1016, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1017, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1018, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1019, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1637, 'Midsummer festival - cast Fire Festival Fortitude in Orgrimmar');
+
+-- cast Fire Festival Fortitude in Darnassus
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1657, 4, 1657, 0, 0, 0, 2);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (702, 4, 702, 0, 0, 0, 2);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1658, -2, 1657, 702, 0, 0, 0);
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1020, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1021, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1022, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1023, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1024, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1025, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1026, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1027, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1028, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1029, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1030, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1031, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1032, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1033, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1034, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1035, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1036, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1037, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1038, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1039, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1040, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1041, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1042, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1043, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1044, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1045, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1046, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1047, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1048, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1049, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1050, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1658, 'Midsummer festival - cast Fire Festival Fortitude in Darnassus');
 
 
 -- End of migration.
