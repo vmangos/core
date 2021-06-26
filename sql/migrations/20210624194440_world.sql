@@ -15,6 +15,7 @@ UPDATE `creature_template` SET `auras` = '9464' WHERE `entry` = 4397;
 -- Fix Creature Stuck Underground
 UPDATE `creature` SET `position_z` = 79.5248, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 15226;
 UPDATE `creature` SET `position_x` = -4268.95, `position_y` = 36.598, `position_z` = 55.1443, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 50875;
+UPDATE `creature` SET `position_x` = -269.935, `position_y` = -1409.396, `position_z` = 91.607, `orientation` = 1.929 WHERE `guid`= 14851;
 
 -- Shellfish Trap Summons Drysnap Crawler
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (32555, 0, 39, 176582, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 'Shellfish Trap - Start Script');
