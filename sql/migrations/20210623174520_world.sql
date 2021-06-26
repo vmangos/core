@@ -41,6 +41,7 @@ INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181371, 9, 8, 0, 'Midsummer Bonfire Spell Focus', 0, 0, 1, 1365, 10, 181375, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181290, 9, 6, 0, 'Midsummer Bonfire Spawn Trap', 0, 0, 1, 0, 0, 0, 28784, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181375, 9, 6, 0, 'Midsummer Bonfire Spawn Trap 2', 0, 0, 1, 0, 0, 0, 29114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (181604, 9, 6, 6771, 'TEST Ribbon Pole TRAP', 35, 0, 1, 0, 0, 0, 29708, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 -- Missing quests
 INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLevel`, `MaxLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RequiredCondition`, `RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`, `Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`, `ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`, `ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`, `ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`, `RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`, `RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`, `RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`, `RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`, `RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`, `StartScript`, `CompleteScript`) VALUES (9389, 9, 2, -369, 1, 255, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 'Flickering Flames in the Eastern Kingdoms', 'The Midsummer Fire Festival traditionally lights up the land with a myriad of flames. Some argue that the green fires are the finest, as they are the hardest to maintain and have such a distinctive hue.$B$BMake sure they still burn in the Eastern Kingdoms for our Flamekeeper. They sit near Dun Modr in the Wetlands, close to Pyrewood Village within Silverpine Forest, on the cliffs overlooking the lighthouse in Westfall, and by the ruined tower in Hillsbrad Foothills.', 'Visit the bonfires within Hillsbrad Foothills, Silverpine Forest, Westfall, and the Wetlands, then speak with the Festival Flamekeeper.', 'So you\'ve returned, and you\'ve seen to the emerald flames of the continent. What do you think, mm? A rare and wonderful sight, to be certain. I am aware, however, that tangible rewards are better appreciated... so please, take this for your trouble.', 'Have you seen to your task?', NULL, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -181566, -181564, -181565, -181567, 1, 1, 1, 1, 0, 0, 0, 0, 23435, 23327, 23326, 23211, 0, 0, 5, 4, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -98,7 +99,7 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`
 UPDATE `spell_scripts` SET `data_flags`=6 WHERE `id` in (29126,29135,29136,29137,29138,29139);
 
 -- spell_script_target fix
-DELETE FROM `spell_script_target` WHERE `entry` IN (29437,28806);
+DELETE FROM `spell_script_target` WHERE `entry` IN (29437,29726,29727,28806,29705);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
     (29437, 0, 181332, 0, 0, 5462, 5875),
     (29437, 0, 181333, 0, 0, 5462, 5875),
@@ -128,6 +129,7 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
     (29437, 0, 181567, 0, 0, 5462, 5875),
     (29726, 1, 17066, 0, 0, 5462, 5875),
     (29727, 1, 17066, 0, 0, 5462, 5875),
+    (29705, 1, 17066, 0, 0, 5462, 5875),
     (28806, 1, 16592, 0, 0, 5462, 5875);
 
 SET @MIDSUMMER_CREATURE_GUID = 70579;
@@ -1399,14 +1401,207 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110 AND `event`=@MIDSUMMER_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @MIDSUMMER_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110;
 
--- Fire Festival Fortitude buff on stealing quests turn in.
-UPDATE `quest_template` SET `CompleteScript`=9325 WHERE `entry` in (9324,9325,9326,9330,9331,9332);
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(9325, 0, 68, 9325, 0, 181431, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer festival - Activate Fire Festival Fury Traps');
-DELETE FROM `generic_scripts` WHERE `id`=9325;
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(9325, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate GameObject');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (991, 33, 1, 0, 0, 0, 0); -- Only on map 1.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (990, 33, 0, 0, 0, 0, 0); -- Only on map 0.
 
+-- Only on Active Game Event 1 (Midsummer Festival).
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (308, 12, 1, 0, 0, 0, 0);
+
+-- Fire Festival Fortitude buff on stealing quests turn in.
+DELETE FROM `quest_end_scripts` WHERE `id`=9323;
+UPDATE `quest_template` SET `CompleteScript`=9323 WHERE `entry` in (9324,9325,9326,9330,9331,9332);
+
+-- Make Fire Festival Fury Traps active to avoid log errors.
+UPDATE `gameobject` SET `spawn_flags`='1' WHERE  `id`=181431;
+
+-- Cast Fire Festival Fortitude on all Players in Stormwind on Quests (9324,9325,9326,9330,9331,9332) turn in.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1519, 4, 1519, 0, 0, 0, 0); -- Only in AreaID Stormwind.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1520, -1, 308, 990, 1519, 0, 0); -- Only if Event 1 active and map 0 and AreaID Undercity.
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9323, 0, 39, 9330, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1520, 'Midsummer festival - Activate Fire Festival Fury Traps in Stormwind');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+906, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+907, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+908, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+909, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+910, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+911, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+912, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+913, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+914, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+915, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+916, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+917, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+918, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+919, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+920, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+921, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+922, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+923, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+924, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+925, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+926, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+927, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+928, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+929, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+930, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+931, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+932, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind'),
+(9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+933, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind');
+
+-- Cast Fire Festival Fortitude on all Players in Undercity on Quests (9324,9325,9326,9330,9331,9332) turn in.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1497, 4, 1497, 0, 0, 0, 0); -- Only in AreaID Undercity.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1498, -1, 308, 990, 1497, 0, 0); -- Only if Event 1 active and map 0 and AreaID Undercity.
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9323, 0, 39, 9326, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1498, 'Midsummer festival - Activate Fire Festival Fury Traps in Undercity');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+948, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+949, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+950, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+951, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+952, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+953, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+954, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+955, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+956, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+957, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+958, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+959, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+960, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+961, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+962, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+963, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+964, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+965, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+966, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+967, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+968, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+969, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+970, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+971, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+972, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity'),
+(9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+973, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity');
+
+-- Cast Fire Festival Fortitude on all Players in Thunder Bluff on Quests (9324,9325,9326,9330,9331,9332) turn in.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1638, 4, 1638, 0, 0, 0, 0); -- Only in AreaID Thunder Bluff.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1639, -1, 308, 991, 1638, 0, 0); -- Only if Event 1 active and map 1 and AreaID Thunder Bluff.
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9323, 0, 39, 9325, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1639, 'Midsummer festival - Activate Fire Festival Fury Traps in Thunder Bluff');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+974, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+975, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+976, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+977, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+978, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+979, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+980, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+981, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+982, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+983, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+984, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+985, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+986, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+987, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+988, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+989, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+990, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff'),
+(9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+991, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff');
+
+-- Cast Fire Festival Fortitude on all Players in Ironforge on Quests (9324,9325,9326,9330,9331,9332) turn in.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1537, 4, 1537, 0, 0, 0, 0); -- Only in AreaID Ironforge.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1538, -1, 308, 990, 1537, 0, 0); -- Only if Event 1 active and map 0 and AreaID Ironforge.
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9323, 0, 39, 9331, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1538, 'Midsummer festival - Activate Fire Festival Fury Traps in Orgrimmar');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+934, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+935, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+936, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+937, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+938, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+939, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+940, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+941, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+942, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+943, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+944, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+945, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+946, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge'),
+(9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+947, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge');
+
+-- Cast Fire Festival Fortitude on all Players in Orgrimmar on Quests (9324,9325,9326,9330,9331,9332) turn in.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1637, 4, 1637, 0, 0, 0, 0); -- Only in AreaID Orgrimmar.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1640, -1, 308, 991, 1637, 0, 0); -- Only if Event 1 active and map 1 and AreaID Orgrimmar.
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9323, 0, 39, 9324, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1640, 'Midsummer festival - Activate Fire Festival Fury Traps in Orgrimmar');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+992, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+993, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+994, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+995, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+996, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+997, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+998, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+999, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1000, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1001, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1002, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1003, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1004, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1005, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1006, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1007, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1008, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1009, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1010, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1011, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1012, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1013, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1014, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1015, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1016, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1017, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1018, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar'),
+(9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1019, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar');
+
+-- Cast Fire Festival Fortitude on all Players in Darnassus on Quests (9324,9325,9326,9330,9331,9332) turn in.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1657, 4, 1657, 0, 0, 0, 0); -- Only in AreaID Darnassus.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (702, 4, 702, 0, 0, 0, 0); -- Only in AreaID Rut'theran (location of the quest giver).
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1658, -2, 1657, 702, 0, 0, 0); -- Only in AreaID Darnassus or Rut'theran.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1659, -1, 308, 991, 1658, 0, 0); -- Only if Event 1 active and map 1 and AreaID Darnassus or Rut'theran.
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9323, 0, 39, 9332, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1659, 'Midsummer festival - Activate Fire Festival Fury Traps in Darnassus');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1020, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1021, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1022, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1023, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1024, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1025, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1026, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1027, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1028, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1029, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1030, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1031, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1032, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1033, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1034, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1035, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1036, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1037, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1038, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1039, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1040, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1041, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1042, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1043, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1044, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1045, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1046, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1047, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1048, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1049, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus'),
+(9332, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1050, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Darnassus');
 
 
 -- End of migration.
