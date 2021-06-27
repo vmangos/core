@@ -17,7 +17,7 @@ UPDATE `creature` SET `position_z` = 79.5248, `movement_type` = 1, `wander_dista
 UPDATE `creature` SET `position_x` = -4268.95, `position_y` = 36.598, `position_z` = 55.1443, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 50875;
 UPDATE `creature` SET `position_x` = -6695.45, `position_y` = -3014.05, `position_z` = 261.037, `movement_type` = 1, `wander_distance` = 4 WHERE `guid` = 6910;
 UPDATE `creature` SET `position_x` = -269.935, `position_y` = -1409.396, `position_z` = 91.607, `orientation` = 1.929 WHERE `guid`= 14851;
-DELETE FROM `creature` WHERE `guid` = 92880;
+DELETE FROM `creature` WHERE `guid` IN  (92880, 51693, 51699, 51704);
 UPDATE `creature` SET `position_x` = -1813.75, `position_y` = 2889.85, `position_z` = 50.971, `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 28907;
 
 -- Shellfish Trap Summons Drysnap Crawler
