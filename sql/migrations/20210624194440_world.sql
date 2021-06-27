@@ -37,7 +37,9 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1099605, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6375, 6374, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero - Talk');
 
 -- Sahrhee Gossip Menu
-UPDATE `mangos`.`creature_template` SET `gossip_menu_id`='1483' WHERE  `entry`=8767 AND `patch`=0;
+UPDATE `creature_template` SET `gossip_menu_id` = 1483 WHERE `entry` = 8767;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(1483, 2155);
 
 
 -- End of migration.
