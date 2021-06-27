@@ -17,10 +17,10 @@ DELETE FROM `creature` WHERE `id`=17066;
 
 -- Midsummer Bonfire
 UPDATE `creature_template` SET `health_min`=42, `health_max`=42 WHERE `entry` in (16592,17066);
-UPDATE `creature_template` SET `ai_name`='EventAI', `flags_extra`='70' WHERE  `entry`=16592;
+UPDATE `creature_template` SET `ai_name`='EventAI', `flags_extra`=70 WHERE  `entry`=16592;
 
 -- Midsummer Bonfire Despawner
-UPDATE `creature_template` SET `health_min`='42', `health_max`='42', `speed_walk`='1', `unit_flags`='33554432', `ai_name`='EventAI', `flags_extra`='70' WHERE `entry`=16606;
+UPDATE `creature_template` SET `health_min`=42, `health_max`=42, `speed_walk`=1, `unit_flags`=33554432, `ai_name`='EventAI', `flags_extra`=70 WHERE `entry`=16606;
 
 -- If Event Midsummer Festival (1) is not active.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (309, 12, 1, 0, 0, 0, 1);
@@ -1453,7 +1453,7 @@ DELETE FROM `quest_end_scripts` WHERE `id`=9323;
 UPDATE `quest_template` SET `CompleteScript`=9323 WHERE `entry` in (9324,9325,9326,9330,9331,9332);
 
 -- Make Fire Festival Fury Traps active to avoid log errors.
-UPDATE `gameobject` SET `spawn_flags`='1' WHERE  `id`=181431;
+UPDATE `gameobject` SET `spawn_flags`=1 WHERE  `id`=181431;
 
 -- Cast Fire Festival Fortitude on all Players in Stormwind on Quests (9324,9325,9326,9330,9331,9332) turn in.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1519, 4, 1519, 0, 0, 0, 0); -- Only in AreaID Stormwind.
