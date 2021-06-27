@@ -19,10 +19,17 @@ DELETE FROM `creature` WHERE `id`=17066;
 UPDATE `creature_template` SET `health_min`=42, `health_max`=42 WHERE `entry` in (16592,17066);
 UPDATE `creature_template` SET `ai_name`='EventAI', `flags_extra`='70' WHERE  `entry`=16592;
 
+-- Midsummer Bonfire Despawner
+UPDATE `creature_template` SET `health_min`='42', `health_max`='42', `speed_walk`='1', `unit_flags`='33554432', `ai_name`='EventAI', `flags_extra`='70' WHERE `entry`=16606;
+
+-- If Event Midsummer Festival (1) is not active.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (309, 12, 1, 0, 0, 0, 1);
+
 -- Events list for Midsummer Bonfire
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16592;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1659201, 16592, 0, 8, 0, 100, 1, 28806, 1, 0, 0, 1659201, 0, 0, 'Midsummer festival - Midsummer Bonfire hit by Toss Fuel on Bonfire');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1659202, 16592, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1659202, 0, 0, 'Midsummer festival - Midsummer Bonfire on death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1659203, 16592, 309, 1, 0, 100, 0, 0, 0, 12000, 12000, 1659203, 0, 0, 'Midsummer festival - Midsummer Bonfire check if Event 1 is active');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1659201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659201, 0, 15, 29831, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire cast Damage Bonfire (DND)');
@@ -30,6 +37,14 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1659202;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659202, 0, 15, 28860, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 308, 'Midsummer festival - Midsummer Bonfire cast Summon Midsummer Bonfire Fuel Counter');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659202, 0, 15, 28803, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire cast Bonfire Superbuff');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659202, 0, 18, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire despawn on death');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1659203;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659203, 0, 18, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 309, 'Midsummer festival - Midsummer Bonfire check if Event 1 is active');
+
+-- Events list for Midsummer Bonfire Despawner
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16606;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1660601, 16606, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1660601, 0, 0, 'Midsummer festival - Midsummer Bonfire Despawner summon Midsummer Bonfire');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1660601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1660601, 0, 15, 28860, 6, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire Despawner cast Summon Midsummer Bonfire Fuel Counter');
 
 -- Midsummer Bonfire
 UPDATE `gameobject_template` SET `patch`=9, `displayId`=0, `type`=8, `data0`=1365, `data1`=10 WHERE `entry`=181288;
@@ -118,6 +133,10 @@ UPDATE `spell_scripts` SET `data_flags`=6 WHERE `id` in (29126,29135,29136,29137
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (28803, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 14, -1, -1, -1, 0, -1, -1, NULL);
 -- Fix Fire Festival Fury ignore Los.
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (29846, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
+-- Fix Damage Bonfire (DND) damage.
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (29831, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 536870912, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (29831, 0, -1, -1, -1, -1, -1, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, NULL);
+
 
 -- spell_script_target fix.
 DELETE FROM `spell_script_target` WHERE `entry` IN (29437,29726,29727,28806,29705,28861);
@@ -170,113 +189,113 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
     (@MIDSUMMER_CREATURE_GUID+2, 17066, 0, -11281.7, -3046.21, 6.42605, 1.01229, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+3, 16781, 0, -11281.5, 1822.94, 39.1475, 1.43117, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+4, 16781, 0, -11276.1, -3049.76, -0.0739447, 5.79449, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+5, 16592, 0, -11275.4, 1825.71, 38.9628, 3.14159, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+5, 16606, 0, -11275.4, 1825.71, 38.9628, 3.14159, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+6, 16781, 0, -11272.6, 1820.08, 39.6662, 2.11185, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+7, 16781, 0, -11269.8, -3060.97, -0.0628627, 0.541052, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+8, 16592, 0, -11268.3, -3052.75, -0.151507, 0.977383, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+8, 16606, 0, -11268.3, -3052.75, -0.151507, 0.977383, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+9, 17066, 0, -11267.4, 1815.52, 45.6777, 5.02655, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+10, 16781, 0, -11267, -3060.03, -0.12069, 3.40339, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+11, 17066, 0, -8839.29, 851.482, 105.522, 3.14159, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+12, 17038, 0, -8839.17, 859.532, 98.7703, 1.309, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+13, 17038, 0, -8837.43, 862.447, 98.8083, 4.10152, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+14, 16592, 0, -8832.46, 858.99, 99.3705, 4.20625, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+14, 16606, 0, -8832.46, 858.99, 99.3705, 4.20625, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+15, 17038, 0, -8831.34, 871.603, 98.7346, 6.00393, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+16, 16817, 0, -8829.53, 853.805, 99.2566, 5.2709, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+17, 16788, 0, -8828.27, 862.905, 99.0053, 1.11701, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+18, 17066, 0, -7199.33, -1052.61, 248.076, 3.97936, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+19, 16781, 0, -7189.63, -1049.43, 240.652, 4.72984, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+20, 16592, 0, -7186.76, -1057.36, 240.61, 2.84488, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+20, 16606, 0, -7186.76, -1057.36, 240.61, 2.84488, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+21, 16781, 0, -7180.6, -1058.16, 241.306, 1.79769, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+22, 16781, 0, -7180.46, -1055.36, 241.063, 4.69494, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+23, 17048, 0, -4707.51, -1223.65, 501.743, 1.43117, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+24, 17048, 0, -4706.33, -1220.87, 501.743, 4.38078, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+25, 16817, 0, -4704.04, -1218.32, 501.743, 1.53589, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+26, 17066, 0, -4703.13, -1236.91, 508.243, 3.61284, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+27, 16592, 0, -4700.28, -1224.33, 502.326, 4.13643, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+27, 16606, 0, -4700.28, -1224.33, 502.326, 4.13643, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+28, 16788, 0, -4699.43, -1216.39, 501.743, 1.85005, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+29, 17048, 0, -4692.08, -1222.79, 501.743, 5.79449, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+30, 16781, 0, -2628.57, -2513.28, 81.9053, 0, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+31, 17066, 0, -2623.97, -2498.25, 88.4694, 0.087266, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+32, 16781, 0, -2623.88, -2513.47, 82.3713, 3.64774, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+33, 16592, 0, -2618.66, -2508.29, 82.6982, 4.10152, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+34, 16592, 0, -321.911, -673.938, 54.5043, 4.5204, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+33, 16606, 0, -2618.66, -2508.29, 82.6982, 4.10152, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+34, 16606, 0, -321.911, -673.938, 54.5043, 4.5204, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+35, 16781, 0, -320.937, -680.4, 54.6912, 0.575959, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+36, 16781, 0, -317.56, -678.568, 54.784, 4.11898, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+37, 17066, 0, -313.599, -664.701, 60.8088, 3.64774, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+38, 16781, 0, -288.795, 1168.54, 64.1617, 6.26573, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+39, 16592, 0, -286.361, 1174.44, 63.6921, 1.90241, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+39, 16606, 0, -286.361, 1174.44, 63.6921, 1.90241, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+40, 16781, 0, -285.113, 1168.45, 64.0939, 3.42085, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+41, 16781, 0, -277.606, 1160.31, 64.093, 1.51844, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+42, 17066, 0, -270.21, 1174.54, 70.3022, 4.62512, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+43, 16592, 0, 97.2431, -3965.84, 138.82, 4.76475, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+43, 16606, 0, 97.2431, -3965.84, 138.82, 4.76475, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+44, 16781, 0, 100.665, -3958.23, 138.613, 5.51524, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+45, 16781, 0, 102.724, -3959.83, 138.764, 3.10669, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+46, 17066, 0, 104.583, -3971.71, 144.075, 4.36332, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+47, 16818, 0, 1634.37, 234.939, 62.6749, 5.41052, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+48, 17051, 0, 1639.35, 244.837, 62.6749, 5.34071, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+49, 16592, 0, 1642.08, 239.809, 63.0082, 6.24828, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+49, 16606, 0, 1642.08, 239.809, 63.0082, 6.24828, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+50, 17051, 0, 1644.17, 233.83, 62.6749, 0.593412, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+51, 16788, 0, 1645.43, 244.468, 62.6749, 5.88176, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+52, 17051, 0, 1646.02, 234.915, 62.6749, 3.66519, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+53, 17066, 0, 1649.94, 228.771, 69.1749, 3.90954, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+54, 16781, 0, 1916.71, -4409.27, 74.1897, 0.418879, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+55, 16781, 0, 1918.46, -4407.55, 74.1216, 4.39823, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+56, 16592, 0, 1923.93, -4411.43, 74.0289, 1.27409, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+56, 16606, 0, 1923.93, -4411.43, 74.0289, 1.27409, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+57, 17066, 0, 1925.07, -4422.95, 82.0504, 2.67035, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+58, 16781, 0, 1930.94, -4413.03, 74.2719, 5.18363, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+59, 16781, 0, 1933, -4416.82, 74.5359, 2.40855, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+60, 16781, 1, -7840.72, -2062, -271.745, 6.03884, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+61, 16592, 1, -7838.28, -2068.66, -271.721, 3.64774, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+61, 16606, 1, -7838.28, -2068.66, -271.721, 3.64774, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+62, 16781, 1, -7837.74, -2061.55, -271.647, 3.4383, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+63, 17066, 1, -7823.73, -2050.81, -266.101, 5.98648, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+64, 17066, 1, -6395.59, -194.82, 11.4199, 2.23402, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+65, 16781, 1, -6395.06, -186.201, 6.94019, 4.99164, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+66, 16592, 1, -6394.94, -180.017, 7.2856, 5.044, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+66, 16606, 1, -6394.94, -180.017, 7.2856, 5.044, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+67, 16781, 1, -6394.1, -187.741, 6.74095, 2.26893, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+68, 16781, 1, -1048.48, -3434.25, 71.4096, 5.14872, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+69, 16781, 1, -1047.62, -3437.36, 70.9655, 1.58825, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+70, 17050, 1, -1043.1, 299.652, 135.348, 0.541052, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+71, 16592, 1, -1043.04, -3436.6, 70.0802, 0.59341, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+71, 16606, 1, -1043.04, -3436.6, 70.0802, 0.59341, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+72, 17050, 1, -1039.95, 303.696, 135.273, 4.4855, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+73, 16818, 1, -1039.18, 292.043, 135.805, 3.90954, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+74, 17066, 1, -1036.06, 311.463, 141.387, 0.331611, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+75, 16592, 1, -1035.91, 297.17, 136.732, 2.82743, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+75, 16606, 1, -1035.91, 297.17, 136.732, 2.82743, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+76, 17066, 1, -1031.56, -3433.01, 78.5065, 4.64258, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+77, 16788, 1, -1029.96, 292.405, 135.829, 3.52556, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+78, 17066, 1, 548.813, 330.833, 59.1872, 3.22886, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+79, 16781, 1, 551.366, 335.412, 53.3925, 5.5676, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+80, 16781, 1, 553.577, 333.317, 53.1017, 2.46091, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+81, 16781, 1, 553.716, 344.341, 53.5003, 0.261799, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+82, 16592, 1, 556.03, 339.1, 53.005, 0.244346, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+82, 16606, 1, 556.03, 339.1, 53.005, 0.244346, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+83, 16781, 1, 558.376, 344.881, 53.4507, 3.10669, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+84, 16592, 1, 1918.54, -2037.16, 103.634, 1.53589, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+84, 16606, 1, 1918.54, -2037.16, 103.634, 1.53589, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+85, 16781, 1, 1923.24, -2033.76, 103.681, 5.06145, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+86, 16781, 1, 1923.76, -2036.08, 104.042, 2.00713, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+87, 16781, 1, 1933.89, -2029.39, 102.052, 3.80482, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+88, 17066, 1, 1941.17, -2043.15, 105.859, 2.53072, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+89, 16818, 1, 1950.21, -4277.09, 30.3329, 4.60767, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+90, 16788, 1, 1952.94, -4278.46, 30.1103, 3.97935, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+91, 16592, 1, 1953.74, -4271.32, 31.0475, 6.07375, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+91, 16606, 1, 1953.74, -4271.32, 31.0475, 6.07375, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+92, 17041, 1, 1958.64, -4277.85, 30.3311, 4.36332, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+93, 17041, 1, 1959.2, -4280, 29.8537, 1.76278, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+94, 17041, 1, 1964, -4289.06, 27.8867, 2.63545, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+95, 17066, 1, 1969.06, -4273.19, 38.1102, 5.81195, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+96, 16781, 1, 3876.14, -5373, 141.429, 6.16101, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+97, 16592, 1, 3882.52, -5379.73, 141.249, 4.01426, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+97, 16606, 1, 3882.52, -5379.73, 141.249, 4.01426, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+98, 16781, 1, 3885.24, -5384.74, 142.083, 1.44862, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+99, 16781, 1, 3887.57, -5383.4, 141.999, 3.38594, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+100, 17066, 1, 3897.84, -5392.36, 146.452, 1.5708, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+101, 17066, 1, 4366.52, 215.383, 58.8768, 6.24828, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+102, 16781, 1, 4372.52, 216.975, 52.3393, 0.122173, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+103, 16781, 1, 4373.97, 228.759, 52.5975, 4.4855, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+104, 16592, 1, 4374.53, 222.613, 51.73, 3.57793, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+104, 16606, 1, 4374.53, 222.613, 51.73, 3.57793, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+105, 16781, 1, 4375.73, 216.97, 51.9598, 3.24631, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+106, 17066, 1, 6483.36, -2476.65, 575.912, 0.715585, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+107, 16592, 1, 6493.63, -2499.77, 568.401, 5.75959, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+107, 16606, 1, 6493.63, -2499.77, 568.401, 5.75959, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+108, 16781, 1, 6494.9, -2505.44, 569.589, 0.802851, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+109, 16781, 1, 6496.87, -2504.67, 568.97, 3.36848, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+110, 16817, 1, 8699.32, 933.907, 15.1335, 1.79769, 120, 120, 0, 0, 9),
-    (@MIDSUMMER_CREATURE_GUID+111, 16592, 1, 8699.36, 927.891, 15.7129, 1.67551, 120, 120, 0, 0, 9),
+    (@MIDSUMMER_CREATURE_GUID+111, 16606, 1, 8699.36, 927.891, 15.7129, 1.67551, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+112, 17049, 1, 8703.97, 933.18, 15.2507, 6.17846, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+113, 17049, 1, 8705.62, 931.33, 15.49, 2.11185, 120, 120, 0, 0, 9),
     (@MIDSUMMER_CREATURE_GUID+114, 16788, 1, 8709.66, 935.363, 14.8101, 2.35619, 120, 120, 0, 0, 9),
