@@ -12,8 +12,24 @@ INSERT INTO `migrations` VALUES ('20210623174520');
 -- Remove wrongly spawned 181354 (Floating, medium) - Flowers in the canals of Stormwind
 DELETE FROM `gameobject` WHERE `guid`=26524;
 
+-- Delete all Ribbon Pole Debug Target from the world (some of them where randomly spawned in the world for no reason).
+DELETE FROM `creature` WHERE `id`=17066;
+
 -- Midsummer Bonfire
 UPDATE `creature_template` SET `health_min`=42, `health_max`=42 WHERE `entry` in (16592,17066);
+UPDATE `creature_template` SET `ai_name`='EventAI', `flags_extra`='70' WHERE  `entry`=16592;
+
+-- Events list for Midsummer Bonfire
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16592;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1659201, 16592, 0, 8, 0, 100, 1, 28806, 1, 0, 0, 1659201, 0, 0, 'Midsummer festival - Midsummer Bonfire hit by Toss Fuel on Bonfire');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1659202, 16592, 0, 6, 0, 100, 0, 0, 0, 0, 0, 1659202, 0, 0, 'Midsummer festival - Midsummer Bonfire on death');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1659201;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659201, 0, 15, 29831, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire cast Damage Bonfire (DND)');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1659202;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659202, 0, 15, 28860, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 308, 'Midsummer festival - Midsummer Bonfire cast Summon Midsummer Bonfire Fuel Counter');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659202, 0, 15, 28803, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire cast Bonfire Superbuff');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1659202, 0, 18, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Midsummer Bonfire despawn on death');
 
 -- Midsummer Bonfire
 UPDATE `gameobject_template` SET `patch`=9, `displayId`=0, `type`=8, `data0`=1365, `data1`=10 WHERE `entry`=181288;
@@ -51,9 +67,9 @@ INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLeve
 DELETE FROM `creature_involvedrelation` WHERE `id` in (16788,16817,16818);
 DELETE FROM `creature_questrelation` WHERE `id` in (16788,16817,16818);
 
--- A Light in Dark Places TBC?
--- INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
--- INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
+-- A Light in Dark Places if you already did 9319 last year!
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9386, 9, 10);
 -- A Light in Dark Places
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9319, 9, 10);
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (16788, 9319, 9, 10);
@@ -98,8 +114,13 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`
 -- Fix spell scripts to create flames of ...
 UPDATE `spell_scripts` SET `data_flags`=6 WHERE `id` in (29126,29135,29136,29137,29138,29139);
 
--- spell_script_target fix
-DELETE FROM `spell_script_target` WHERE `entry` IN (29437,29726,29727,28806,29705);
+-- Fix Bonfire Superbuff ignore Los.
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (28803, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 14, -1, -1, -1, 0, -1, -1, NULL);
+-- Fix Fire Festival Fury ignore Los.
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (29846, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
+
+-- spell_script_target fix.
+DELETE FROM `spell_script_target` WHERE `entry` IN (29437,29726,29727,28806,29705,28861);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
     (29437, 0, 181332, 0, 0, 5462, 5875),
     (29437, 0, 181333, 0, 0, 5462, 5875),
@@ -130,7 +151,8 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
     (29726, 1, 17066, 0, 0, 5462, 5875),
     (29727, 1, 17066, 0, 0, 5462, 5875),
     (29705, 1, 17066, 0, 0, 5462, 5875),
-    (28806, 1, 16592, 0, 0, 5462, 5875);
+    (28806, 1, 16592, 0, 0, 5462, 5875),
+    (28861, 1, 16592, 0, 0, 5462, 5875);
 
 SET @MIDSUMMER_CREATURE_GUID = 70579;
 SET @MIDSUMMER_GAMEOBJECT_GUID = 36014;
