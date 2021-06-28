@@ -43,6 +43,16 @@ UPDATE `creature_template` SET `gossip_menu_id` = 1483 WHERE `entry` = 8767;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (1483, 2155);
 
+-- Fix Lunar Festival Questgivers
+UPDATE `quest_template` SET `RequiredCondition` = 0 WHERE `entry` IN (8870, 8871, 8872, 8873, 8874, 8875);
+DELETE FROM `conditions` WHERE `condition_entry` IN (8870, 8871, 8872, 8873, 8874, 8875);
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 15892;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589201, 15892, 192, 1, 0, 100, 0, 0, 0, 0, 0, 1589201, 0, 0, 'Lunar Festival Emissary - Modify Flags - On Spawn');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Emissary - Modify Flags');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (187, 52, 91629, 91688, 91599, 91595, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (191, 52, 91605, 91623, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (192, -1, 187, 191, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
