@@ -6204,44 +6204,78 @@ bool Unit::CanDetectInvisibilityOf(Unit const* u) const
 
 bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) const
 {
+    /*
+
+    TEST RESULTS FROM CLASSIC WITH SNIFFED EXACT POSITIONS TO MEASURE DISTANCES
+
+    Level 1 Rogue vs Level 1 Rogue from behind - detected at 1.49299 yards
+    Level 4 Creature vs Level 4 Rogue - aggro at 1.48306 yards
+    Conclusion: target is always detectable below 1.5 yards
+
+    Level 4 Creature vs Level 1 Rogue - aggro at 3.23737 yards
+    Level 4 Creature vs Level 2 Rogue - aggro at 2.38938 yards
+    Level 4 Creature vs Level 3 Rogue - aggro at 1.58823 yards
+    Conclusion: aggro distance increases by 5/6 yards per level for creature detector
+
+    Level 4 Creature vs Level 1 Rogue - alerted at 8.23134 yards
+    Level 4 Creature vs Level 2 Rogue - alerted at 7.37808 yards
+    Level 4 Creature vs Level 3 Rogue - alerted at 6.64495 yards
+    Conclusion: alert distance is 5 yards longer than aggro distance
+
+    Level 1 Rogue vs Level 1 Rogue - detected at 8.97499 yards (approaching 9)
+    Level 1 Rogue with Perception vs Level 1 Rogue - detected at 23.973 yards (approaching 24)
+    Level 1 Rogue vs Level 2 Rogue - detected at 7.48335 yards (approaching 7.5)
+    Level 1 Rogue with Perception vs Level 2 Rogue - detected at 22.382 yards (approaching 22.5)
+    Level 1 Rogue vs Level 3 Rogue - detected at 5.96001 yards (approaching 6)
+    Level 1 Rogue with Perception vs Level 3 Rogue - detected at 20.8784 yards (approaching 21)
+    Conclusion: detection distance increases by 1.5 per level for player detector
+
+    Level 32 Hunter vs Level 1 Rogue - detected at 29.9698 yards (approaching 30)
+    Conclusion: max detection distance cap due to level difference is 30
+
+    Level 32 Hunter vs Level 1 Rogue from behind - detected at 20.9902 yards (approaching 21)
+    Conclusion: distance is reduced by 9 yards if target is behind you, applied after the cap
+
+    Level 32 Hunter with Hunter's Mark vs Level 1 Rogue - detected at 99.682 yards (approaching 100)
+    Conclusion: target is detectable all the way to max visibility distance
+
+    */
+
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
         return false;
-    if (distance < 1.5f) //collision
+
+    if (distance < 1.5f) // collision
         return true;
 
-    // Hunter mark functionality.
+    // Hunter's Mark makes target always visible to caster.
     AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
     for (const auto& iter : auras)
         if (iter->GetCasterGuid() == GetObjectGuid())
             return true;
 
-    if (distance > sWorld.getConfig(IsPlayer()?CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE:CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
+    if (distance > sWorld.getConfig(IsPlayer() ? CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE : CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
         return false;
 
-    float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.f : 21.f) : 0.f;
-    //Always invisible from back (when stealth detection is on), also filter max distance cases
-    float yardsPerLevel = 5.f/6.f;
+    float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.0f : 21.f) : (5.0f / 6.0f);
+    float yardsPerLevel = IsPlayer() ? 1.5f : 5.0f / 6.0f;
     int32 stealthSkill = target->IsPlayer() ? target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) : target->GetLevelForTarget(this) * 5;
     stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
-    int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
-
-    if (level_diff > 3)
+    int32 const levelDiff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
+    if (levelDiff > 3)
         yardsPerLevel *= 2;
 
-    // stealth level: 5 points -> 1 level
-    visibleDistance += ((detectSkill - stealthSkill) + 5) * yardsPerLevel / 5.f;
+    visibleDistance += (detectSkill - stealthSkill) * yardsPerLevel / 5.0f;
 
-    visibleDistance = std::min(visibleDistance, 30.f);
-
-    visibleDistance = std::max(visibleDistance, 1.f);
+    if (visibleDistance > 30.0f)
+        visibleDistance = 30.0f;
+    else if (visibleDistance < 0.0f)
+        visibleDistance = 0.0f;
 
     if (!HasInArc(target))
-        visibleDistance -= 9.f;
+        visibleDistance -= 9.0f;
 
-
-    float alertRange = visibleDistance + 5.f;
-
+    float alertRange = visibleDistance + 5.0f;
 
     // recheck new distance
     if (alert)
