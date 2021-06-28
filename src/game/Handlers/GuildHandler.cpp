@@ -722,10 +722,10 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     DEBUG_LOG("WORLD: Received MSG_SAVE_GUILD_EMBLEM");
 
     ObjectGuid vendorGuid;
-    uint32 EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor;
+    int32 emblemStyle, emblemColor, borderStyle, borderColor, backgroundColor;
 
     recvPacket >> vendorGuid;
-    recvPacket >> EmblemStyle >> EmblemColor >> BorderStyle >> BorderColor >> BackgroundColor;
+    recvPacket >> emblemStyle >> emblemColor >> borderStyle >> borderColor >> backgroundColor;
 
     Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!pCreature)
@@ -737,7 +737,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
@@ -763,7 +763,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     }
 
     GetPlayer()->ModifyMoney(-10 * GOLD);
-    guild->SetEmblem(EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor);
+    guild->SetEmblem(emblemStyle, emblemColor, borderStyle, borderColor, backgroundColor);
 
     //"Guild Emblem saved."
     SendSaveGuildEmblem(ERR_GUILDEMBLEM_SUCCESS);

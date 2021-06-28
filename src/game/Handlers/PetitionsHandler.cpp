@@ -80,7 +80,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
         return;
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     // if tabard designer, then trying to buy a guild charter.
@@ -173,25 +173,25 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
     if (!charter)
         return;
 
-    uint32 petitionguid = charter->GetEnchantmentId(EnchantmentSlot(0));
-    Petition *petition = sGuildMgr.GetPetitionById(petitionguid);
+    uint32 petitionGuid = charter->GetEnchantmentId(EnchantmentSlot(0));
+    Petition *petition = sGuildMgr.GetPetitionById(petitionGuid);
 
     if (!petition)
     {
         sLog.outError("[PetitionHandler] No petition exists for petition ID %u, yet charter exists with guid %u for owner %s",
-            petitionguid, itemguid.GetCounter(), _player->GetGuidStr().c_str());
+            petitionGuid, itemguid.GetCounter(), _player->GetGuidStr().c_str());
 
         return;
     }
 
     uint8 signs = petition->GetSignatureCount();
 
-    DEBUG_LOG("CMSG_PETITION_SHOW_SIGNATURES petition: %u", petitionguid);
+    DEBUG_LOG("CMSG_PETITION_SHOW_SIGNATURES petition: %u", petitionGuid);
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << itemguid;                               // item guid
     data << _player->GetObjectGuid();               // owner guid
-    data << petitionguid;                           // petition guid
+    data << petitionGuid;                           // petition guid
     data << signs;                                  // sign's count
 
     petition->BuildSignatureData(data);
@@ -204,35 +204,35 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
     DEBUG_LOG("Received opcode CMSG_PETITION_QUERY");
     //recv_data.hexlike();
 
-    uint32 petitionguid;
-    ObjectGuid itemguid;
-    recv_data >> petitionguid;                          // petition guid
-    recv_data >> itemguid;                              // item guid
-    DEBUG_LOG("CMSG_PETITION_QUERY Item %s Petition GUID %u", itemguid.GetString().c_str(), petitionguid);
+    uint32 petitionGuid;
+    ObjectGuid itemGuid;
+    recv_data >> petitionGuid;                          // petition guid
+    recv_data >> itemGuid;                              // item guid
+    DEBUG_LOG("CMSG_PETITION_QUERY Item %s Petition GUID %u", itemGuid.GetString().c_str(), petitionGuid);
 
-    Petition* petition = sGuildMgr.GetPetitionById(petitionguid);
+    Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
         return;
 
     WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->GetName().size() + 1 + 2 + 4 * 11));
-    data << uint32(petitionguid);                           // petition guid
-    data << ObjectGuid(petition->GetOwnerGuid());           // charter owner guid
-    data << petition->GetName();                            // name (guild/arena team)
-    data << uint8(0);                                       // CString
-    data << uint32(1);
-    data << uint32(9);
-    data << uint32(9);                                      // bypass client - side limitation, a different value is needed here for each petition
-    data << uint32(0);                                      // 5
-    data << uint32(0);                                      // 6
-    data << uint32(0);                                      // 7
-    data << uint32(0);                                      // 8
-    data << uint32(0);                                      // 9
-    data << uint16(0);                                      // 10 2 bytes field
-    data << uint32(0);                                      // 11
-    data << uint32(0);                                      // 12
-    data << uint32(0);                                      // 13 count of next strings; if 0, no data for strings, only 1 uint32 below
+    data << uint32(petitionGuid);                           // int m_petitionID;
+    data << ObjectGuid(petition->GetOwnerGuid());           // unsigned __int64 m_petitioner;
+    data << petition->GetName();                            // char m_title[256];
+    data << uint8(0);                                       // char m_bodyText[4096];
+    data << uint32(1);                                      // int m_flags;
+    data << uint32(9);                                      // int m_minSignatures;
+    data << uint32(9);                                      // int m_maxSignatures;
+    data << uint32(0);                                      // int m_deadLine;
+    data << uint32(0);                                      // int m_issueDate;
+    data << uint32(0);                                      // int m_allowedGuildID;
+    data << uint32(0);                                      // int m_allowedClasses;
+    data << uint32(0);                                      // int m_allowedRaces;
+    data << uint16(0);                                      // __int16 m_allowedGender;
+    data << uint32(0);                                      // int m_allowedMinLevel;
+    data << uint32(0);                                      // int m_allowedMaxLevel;
+    data << uint32(0);                                      // char m_choicetext[10][64];
     // for (int i=0; i<field13; ++i) data << chartSignersName[i];   Probably, names of the petition signers
-    data << uint32(0);
+    data << uint32(0);                                      // int m_numChoices;
     SendPacket(&data);
 }
 
@@ -262,10 +262,9 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
         return;
     }
 
-    std::string db_newname = newname;
-    uint32 petitionguid = charter->GetEnchantmentId(EnchantmentSlot(0));
+    uint32 petitionGuid = charter->GetEnchantmentId(EnchantmentSlot(0));
 
-    Petition* petition = sGuildMgr.GetPetitionById(petitionguid);
+    Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
         return;
 
@@ -438,9 +437,9 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
     if (!charter)
         return;
 
-    uint32 petitionguid = charter->GetEnchantmentId(EnchantmentSlot(0));
+    uint32 petitionGuid = charter->GetEnchantmentId(EnchantmentSlot(0));
 
-    Petition* petition = sGuildMgr.GetPetitionById(petitionguid);
+    Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
     {
         sLog.outError("[PetitionHandler] No petition exists for charter with guid %u for signer %s",
@@ -448,7 +447,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
         return;
     }
 
-    DEBUG_LOG("OFFER PETITION: petition %u to %s", petitionguid, playerGuid.GetString().c_str());
+    DEBUG_LOG("OFFER PETITION: petition %u to %s", petitionGuid, playerGuid.GetString().c_str());
 
     /// Get petition signs count
     uint8 signs = petition->GetSignatureCount();
@@ -457,7 +456,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << ObjectGuid(itemGuid);                           // item guid
     data << ObjectGuid(_player->GetObjectGuid());           // owner guid
-    data << uint32(petitionguid);                           // petition guid
+    data << uint32(petitionGuid);                           // petition guid
     data << uint8(signs);                                   // sign's count
 
     petition->BuildSignatureData(data);
@@ -476,10 +475,10 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
     if (!charter)
         return;
 
-    uint32 petitionguid = charter->GetEnchantmentId(EnchantmentSlot(0));
-    DEBUG_LOG("Petition %u turned in by %s", petitionguid, _player->GetGuidStr().c_str());
+    uint32 petitionGuid = charter->GetEnchantmentId(EnchantmentSlot(0));
+    DEBUG_LOG("Petition %u turned in by %s", petitionGuid, _player->GetGuidStr().c_str());
 
-    Petition* petition = sGuildMgr.GetPetitionById(petitionguid);
+    Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
     {
         sLog.outError("[PetitionHandler] No petition exists for charter with guid %u for guild master %s",
@@ -534,7 +533,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
     _player->DestroyItem(charter->GetBagSlot(), charter->GetSlot(), true);
 
     // created
-    DEBUG_LOG("TURN IN PETITION %u", petitionguid);
+    DEBUG_LOG("TURN IN PETITION %u", petitionGuid);
 
     WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);
     data << uint32(PETITION_SIGN_OK);
@@ -561,7 +560,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid& guid)
     }
 
     // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     uint8 count = 1;

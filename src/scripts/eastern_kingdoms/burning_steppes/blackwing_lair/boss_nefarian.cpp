@@ -26,25 +26,21 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO                   = -1469007,
-    SAY_XHEALTH                 = -1469008,             // at 5% hp
-    SAY_SHADOWFLAME             = -1469009,
-    EMOTE_GENERIC_SHADOW_FLAME  = -1469033,
-    SAY_RAISE_SKELETONS         = -1469010,
-    SAY_SLAY                    = -1469011,
-    SAY_DEATH                   = -1469012,
-    EMOTE_ROAR                  = -1249005,
+    SAY_AGGRO                   = 9973,
+    SAY_SHADOWFLAME             = 9974,
+    SAY_RAISE_SKELETONS         = 9883,
+    SAY_SLAY                    = 9972,
+    SAY_DEATH                   = 9971,
 
-    SAY_MAGE                    = -1469013,
-    SAY_WARRIOR                 = -1469014,
-    SAY_DRUID                   = -1469015,
-    SAY_PRIEST                  = -1469016,
-    SAY_PALADIN                 = -1469017,
-    SAY_SHAMAN                  = -1469018,
-    SAY_WARLOCK                 = -1469019,
-    SAY_HUNTER                  = -1469020,
-    SAY_ROGUE                   = -1469021,
-    //SAY_DEATH_KNIGHT            = -1469031,             // spell unk for the moment
+    SAY_MAGE                    = 9850,
+    SAY_WARRIOR                 = 9855,
+    SAY_DRUID                   = 9851,
+    SAY_PRIEST                  = 9848,
+    SAY_PALADIN                 = 9853,
+    SAY_SHAMAN                  = 9854,
+    SAY_WARLOCK                 = 9852,
+    SAY_HUNTER                  = 9849,
+    SAY_ROGUE                   = 9856,
 
     SPELL_SHADOWFLAME_INITIAL   = 22992,                // old spell id 22972 -> wrong
     SPELL_SHADOWFLAME           = 22539,
@@ -96,7 +92,6 @@ struct boss_nefarianAI : ScriptedAI
     uint32 m_uiTailLashTimer;
     uint32 m_uiClassCallTimer;
     bool m_bPhase3;
-    bool m_bHasEndYell;
     uint8 m_uiTransitionStage;
     uint32 m_uiTransitionTimer;
     bool m_bTransitionDone;
@@ -115,7 +110,6 @@ struct boss_nefarianAI : ScriptedAI
         m_uiTailLashTimer       = 10000;
         m_uiClassCallTimer      = urand(25000, 35000);                            // 25-35 seconds
         m_bPhase3               = false;
-        m_bHasEndYell           = false;
         m_bTransitionDone       = false;
         m_bWarriorStance        = false;
         m_uiTransitionStage     = 0;
@@ -335,10 +329,7 @@ struct boss_nefarianAI : ScriptedAI
         if (m_uiShadowFlameTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SHADOWFLAME) == CAST_OK)
-            {
-                DoScriptText(EMOTE_GENERIC_SHADOW_FLAME, m_creature);
                 m_uiShadowFlameTimer = urand(18000, 25000);
-            }
         }
         else
             m_uiShadowFlameTimer -= uiDiff;
@@ -347,10 +338,7 @@ struct boss_nefarianAI : ScriptedAI
         if (m_uiBellowingRoarTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_BELLOWING_ROAR) == CAST_OK)
-            {
-                DoScriptText(EMOTE_ROAR, m_creature);
                 m_uiBellowingRoarTimer = urand(25000, 30000);
-            }
         }
         else
             m_uiBellowingRoarTimer -= uiDiff;
@@ -450,13 +438,6 @@ struct boss_nefarianAI : ScriptedAI
             m_bPhase3 = true;
             DoScriptText(SAY_RAISE_SKELETONS, m_creature);
             m_creature->CastSpell(m_creature, SPELL_RAISE_DRAKONID, true);
-        }
-
-        // 5% hp yell
-        if (!m_bHasEndYell && m_creature->GetHealthPercent() < 5.0f)
-        {
-            m_bHasEndYell = true;
-            DoScriptText(SAY_XHEALTH, m_creature);
         }
 
         if (DoMeleeAttackIfReady())

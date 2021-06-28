@@ -23,6 +23,7 @@
 #include "Platform/CompilerDefs.h"
 #include "Platform/Define.h"
 #include <unordered_map>
+#include <set>
 
 #include "Detour/Include/DetourAlloc.h"
 #include "Detour/Include/DetourNavMesh.h"
@@ -82,6 +83,7 @@ namespace MMAP
 
             bool loadMap(uint32 mapId, int32 x, int32 y);
             bool loadGameObject(uint32 displayId);
+            void loadAllGameObjectModels(std::set<uint32> const& displayIds);
             bool unloadMap(uint32 mapId, int32 x, int32 y);
             bool unloadMap(uint32 mapId);
             bool unloadMapInstance(uint32 mapId, std::thread::id instanceId);
@@ -91,6 +93,7 @@ namespace MMAP
             dtNavMeshQuery const* GetNavMeshQuery(uint32 mapId);
             dtNavMeshQuery const* GetModelNavMeshQuery(uint32 displayId);
             dtNavMesh const* GetNavMesh(uint32 mapId);
+            dtNavMesh const* GetGONavMesh(uint32 displayId);
 
             uint32 getLoadedTilesCount() const { return loadedTiles; }
             uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }

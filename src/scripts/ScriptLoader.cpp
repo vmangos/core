@@ -37,8 +37,7 @@ void AddSC_go_scripts();
 void AddSC_event_fireworks();
 void AddSC_npcs_special();
 void AddSC_Totems();
-void AddSC_world_event_naxxramas();
-void AddSC_event_scourge_invasion();
+void AddSC_scourge_invasion();
 
 //eastern kingdoms
 void AddSC_instance_blackrock_spire();
@@ -113,8 +112,6 @@ void AddSC_boss_sapphiron();
 void AddSC_instance_naxxramas();
 void AddSC_boss_arcanist_doan();                     //scarlet_monastery
 //void AddSC_boss_azshir_the_sleepless();
-void AddSC_boss_bloodmage_thalnos();
-void AddSC_boss_scorn();
 void AddSC_boss_herod();
 void AddSC_boss_high_inquisitor_fairbanks();
 void AddSC_boss_houndmaster_loksey();
@@ -131,7 +128,6 @@ void AddSC_boss_lorekeeperpolkelt();
 void AddSC_boss_rasfrost();
 void AddSC_boss_theravenian();
 void AddSC_boss_vectus();
-//void AddSC_boss_lordblackwood();
 void AddSC_scholo_trash();
 void AddSC_instance_scholomance();
 void AddSC_instance_shadowfang_keep();
@@ -286,8 +282,7 @@ void AddScripts()
     AddSC_event_fireworks();
     AddSC_npcs_special();
     AddSC_Totems();
-    AddSC_world_event_naxxramas();
-    AddSC_event_scourge_invasion();
+    AddSC_scourge_invasion();
 
     AddSC_war_effort();
 
@@ -362,8 +357,6 @@ void AddScripts()
     AddSC_instance_naxxramas();
     AddSC_boss_arcanist_doan();                             //scarlet_monastery
     //AddSC_boss_azshir_the_sleepless();
-    AddSC_boss_bloodmage_thalnos();
-    AddSC_boss_scorn();
     AddSC_boss_herod();
     AddSC_boss_high_inquisitor_fairbanks();
     AddSC_boss_houndmaster_loksey();
@@ -380,7 +373,6 @@ void AddScripts()
     AddSC_boss_rasfrost();
     AddSC_boss_theravenian();
     AddSC_boss_vectus();
-    //AddSC_boss_lordblackwood();
     AddSC_scholo_trash();
     AddSC_instance_scholomance();
     AddSC_instance_shadowfang_keep();

@@ -1371,11 +1371,11 @@ bool GossipHello_AV_npc_ram_wolf(Player* pPlayer, Creature* pCreature)
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
 
     /** Select corresponding item depending on NPC faction */
-    uint32 itemEntry = 0;
+    uint32 itemId = 0;
     if (pCreature->GetEntry() == NPC_TAME_MASTER_HORDE)
-        itemEntry = FROSTWOLF_MUZZLE;
+        itemId = FROSTWOLF_MUZZLE;
     else if (pCreature->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
-        itemEntry = STORMPIKE_TRAINING_COLLAR;
+        itemId = STORMPIKE_TRAINING_COLLAR;
 
     /** Prepare Quest and Creature ID depending on the NPC faction */
     if (pCreature->GetEntry() == NPC_TAME_MASTER_HORDE)
@@ -1399,15 +1399,15 @@ bool GossipHello_AV_npc_ram_wolf(Player* pPlayer, Creature* pCreature)
     }
 
     /** Give the corresponding item to the player if he don't have one already */
-    if (!pPlayer->HasItemCount(itemEntry, 1, true) && isAllowedToGetItem)
+    if (!pPlayer->HasItemCount(itemId, 1, true) && isAllowedToGetItem)
     {
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
-        uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemEntry, 1, &noSpaceForCount);
+        uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, &noSpaceForCount);
 
         if (msg == EQUIP_ERR_OK)
         {
-            Item* pItem = pPlayer->StoreNewItem(dest, itemEntry, true, Item::GenerateItemRandomPropertyId(5060));
+            Item* pItem = pPlayer->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(5060));
             pPlayer->SendNewItem(pItem, 1, true, false);
         }
     }

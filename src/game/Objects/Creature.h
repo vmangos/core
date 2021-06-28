@@ -27,7 +27,6 @@
 #include "CreatureDefines.h"
 #include "Unit.h"
 #include "LootMgr.h"
-#include "Cell.h"
 #include "Util.h"
 
 #include <vector>
@@ -330,11 +329,7 @@ class Creature : public Unit
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
         void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
-        void PauseOutOfCombatMovement();
-
-        // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
-        Cell const& GetCurrentCell() const { return m_currentCell; }
-        void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
+        void PauseOutOfCombatMovement(uint32 pauseTime = NPC_MOVEMENT_PAUSE_TIME);
 
         bool IsVisibleInGridForPlayer(Player const* pl) const override;
 
@@ -592,7 +587,6 @@ class Creature : public Unit
 
         CreatureSubtype m_subtype;                          // set in Creatures subclasses for fast it detect without dynamic_cast use
         MovementGeneratorType m_defaultMovementType;
-        Cell m_currentCell;                                 // store current cell where creature listed
         uint32 m_equipmentId;
         uint32 m_mountId;                                   // display Id to mount
 
@@ -676,6 +670,29 @@ class ForcedDespawnDelayEvent : public BasicEvent
 
     private:
         Creature& m_owner;
+};
+
+class TargetedEmoteEvent : public BasicEvent
+{
+public:
+    explicit TargetedEmoteEvent(Creature& owner, ObjectGuid const& targetGuid, uint32 emoteId) : BasicEvent(), m_owner(owner), m_targetGuid(targetGuid), m_emoteId(emoteId) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+private:
+    Creature& m_owner;
+    ObjectGuid m_targetGuid;
+    uint32 m_emoteId;
+};
+
+class TargetedEmoteCleanupEvent : public BasicEvent
+{
+public:
+    explicit TargetedEmoteCleanupEvent(Creature& owner, float orientation) : BasicEvent(), m_owner(owner), m_orientation(orientation) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+private:
+    Creature& m_owner;
+    float m_orientation;
 };
 
 #endif

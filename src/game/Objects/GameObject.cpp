@@ -107,6 +107,14 @@ GameObject::~GameObject()
     MANGOS_ASSERT(m_dynObjGUIDs.empty());
 }
 
+GameObject* GameObject::CreateGameObject(uint32 entry)
+{
+    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
+    if (goinfo && goinfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+        return new ElevatorTransport;
+    return new GameObject;
+}
+
 void GameObject::AddToWorld()
 {
     ///- Register the gameobject for guid lookup
@@ -174,6 +182,8 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
     Relocate(x, y, z, ang);
     SetMap(map);
 
+    m_stationaryPosition = Position(x, y, z, ang);
+
     if (!IsPositionValid())
     {
         sLog.outError("Gameobject (GUID: %u Entry: %u ) not created. Suggested coordinates are invalid (X: %f Y: %f)", guidlow, name_id, x, y);
@@ -228,6 +238,16 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
     SetGoType(GameobjectTypes(goinfo->type));
 
     SetGoAnimProgress(animprogress);
+
+    switch (GetGoType())
+    {
+        case GAMEOBJECT_TYPE_TRANSPORT:
+            SetUInt32Value(GAMEOBJECT_LEVEL, goinfo->transport.pause);
+            SetGoState(goinfo->transport.startOpen ? GO_STATE_ACTIVE : GO_STATE_READY);
+            SetGoAnimProgress(animprogress);
+            break;
+    }
+
     SetName(goinfo->name);
 
     if (GetGOInfo()->IsLargeGameObject())
@@ -255,24 +275,32 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 class HunterTrapTargetSelectorCheck
 {
 public:
-    HunterTrapTargetSelectorCheck(GameObject const* obj, Unit const* funit, float range) : i_trap(obj), i_trapOwner(funit), i_range(range) {}
+    HunterTrapTargetSelectorCheck(GameObject const* pTrap, Unit const* pOwner, float range) : i_trap(pTrap), i_trapOwner(pOwner), i_range(range) {}
     WorldObject const& GetFocusObject() const
     {
         return *i_trap;
     }
-    bool operator()(Unit* u)
+    bool operator()(Unit* pTarget)
     {
-        if (!i_trap->CanSeeInWorld(u))
+        if (!i_trap->CanSeeInWorld(pTarget))
             return false;
 
-        if (i_trapOwner->IsPlayer() && u->IsPlayer() && !i_trapOwner->IsPvP() && !i_trapOwner->ToPlayer()->IsInDuelWith(u->ToPlayer()))
-            return false;
-
-        bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
-        if (u->IsAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
-            (u->IsInCombat() || i_trapOwner->IsHostileTo(u)))
+        // don't trigger on enemy player if our owner is not flagged for pvp
+        if (Player const* pOwnerPlayer = i_trapOwner->ToPlayer())
         {
-            i_range = i_trap->GetDistance(u);
+            if (Player const* pTargetPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (!pOwnerPlayer->IsPvP() && !(pOwnerPlayer->IsFFAPvP() && pTargetPlayer->IsFFAPvP()) && !pOwnerPlayer->IsInDuelWith(pTargetPlayer))
+                    return false;
+            }
+        }
+
+        bool isTotem = pTarget->IsCreature() && ((Creature*)pTarget)->IsTotem();
+        if (i_trap->IsWithinDistInMap(pTarget, isTotem ? i_range / 3.0f : i_range) &&
+            i_trapOwner->IsValidAttackTarget(pTarget) &&
+            (pTarget->IsInCombat() || i_trapOwner->IsHostileTo(pTarget)))
+        {
+            i_range = i_trap->GetDistance(pTarget);
             return true;
         }
         return false;
@@ -1025,6 +1053,13 @@ bool GameObject::IsTransport() const
     return gInfo->type == GAMEOBJECT_TYPE_TRANSPORT || gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT;
 }
 
+bool GameObject::IsMoTransport() const
+{
+    GameObjectInfo const* gInfo = GetGOInfo();
+    if (!gInfo) return false;
+    return gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT;
+}
+
 Unit* GameObject::GetOwner() const
 {
     if (!FindMap())
@@ -1064,7 +1099,7 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
         return false;
 
     // Transport always visible at this step implementation
-    if (IsTransport() && IsInMap(pDetector))
+    if (IsMoTransport() && IsInMap(pDetector))
         return true;
 
     // quick check visibility false cases for non-GM-mode
@@ -2283,7 +2318,9 @@ struct SpawnGameObjectInMapsWorker
                 sLog.outString("[CRASH] Spawning already spawned Gobj ! GUID=%u", i_guid);
                 return;
             }
-            GameObject* pGameobject = new GameObject;
+            GameObjectData const* data = sObjectMgr.GetGOData(i_guid);
+            MANGOS_ASSERT(data);
+            GameObject* pGameobject = GameObject::CreateGameObject(data->id);
             //DEBUG_LOG("Spawning gameobject %u", *itr);
             if (!pGameobject->LoadFromDB(i_guid, map))
                 delete pGameobject;
@@ -2500,7 +2537,7 @@ SpellEntry const* GameObject::GetSpellForLock(Player const* player) const
 
         for (auto&& playerSpell : player->GetSpellMap())
             if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(playerSpell.first))
-                for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
                     if (spellInfo->Effect[i] == SPELL_EFFECT_OPEN_LOCK && ((uint32)spellInfo->EffectMiscValue[i]) == lock->Index[i])
                         if (player->CalculateSpellEffectValue(nullptr, spellInfo, SpellEffectIndex(i), nullptr) >= int32(lock->Skill[i]))
                             return spellInfo;

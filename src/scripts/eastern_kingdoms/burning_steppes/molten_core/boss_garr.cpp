@@ -50,7 +50,7 @@ struct boss_garrAI : ScriptedAI
 
         m_uiExplodeTimer        = 360000; // 6 Minutes
 
-        if (m_pInstance && m_creature->IsAlive())
+        if (m_creature->IsAlive() && m_pInstance && m_pInstance->GetData(TYPE_GARR) != DONE)
             m_pInstance->SetData(TYPE_GARR, NOT_STARTED);
     }
 
@@ -61,7 +61,10 @@ struct boss_garrAI : ScriptedAI
             if (m_pInstance->GetData(TYPE_GARR) != DONE)
                 m_pInstance->SetData(TYPE_GARR, IN_PROGRESS);
             else
+            {
                 m_creature->DeleteLater();
+                return;
+            }
 
             m_creature->SetInCombatWithZone();
 

@@ -47,7 +47,7 @@ enum EventAI_Type
     EVENT_T_EVADE                   = 7,                    // NONE
     EVENT_T_HIT_BY_SPELL            = 8,                    // SpellID, School, RepeatMin, RepeatMax
     EVENT_T_RANGE                   = 9,                    // MinDist, MaxDist, RepeatMin, RepeatMax
-    EVENT_T_OOC_LOS                 = 10,                   // NoHostile, MaxRnage, RepeatMin, RepeatMax
+    EVENT_T_OOC_LOS                 = 10,                   // Reaction, MaxRnage, RepeatMin, RepeatMax
     EVENT_T_SPAWNED                 = 11,                   // NONE
     EVENT_T_TARGET_HP               = 12,                   // HPMax%, HPMin%, RepeatMin, RepeatMax
     EVENT_T_TARGET_CASTING          = 13,                   // RepeatMin, RepeatMax
@@ -89,6 +89,13 @@ enum SpawnedEventMode
     SPAWNED_EVENT_ALWAY = 0,
     SPAWNED_EVENT_MAP   = 1,
     SPAWNED_EVENT_ZONE  = 2
+};
+
+enum UnitInLosReaction
+{
+    ULR_ANY             = 0,
+    ULR_HOSTILE         = 1,
+    ULR_NON_HOSTILE     = 2
 };
 
 struct CreatureEventAI_Event
@@ -153,7 +160,7 @@ struct CreatureEventAI_Event
         // EVENT_T_OOC_LOS                                  = 10
         struct
         {
-            uint32 noHostile;
+            uint32 reaction;
             uint32 maxRange;
             uint32 repeatMin;
             uint32 repeatMax;

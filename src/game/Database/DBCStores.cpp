@@ -107,6 +107,8 @@ DBCStorage <TaxiPathEntry> sTaxiPathStore(TaxiPathEntryfmt);
 TaxiPathNodesByPath sTaxiPathNodesByPath;
 DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
 
+DBCStorage <TransportAnimationEntry> sTransportAnimationStore(TransportAnimationfmt);
+
 DBCStorage <WMOAreaTableEntry>  sWMOAreaTableStore(WMOAreaTableEntryfmt);
 std::map<WMOAreaTableTripple, WMOAreaTableEntry const*> sWMOAreaInfoByTripple;
 DBCStorage <WorldMapAreaEntry>  sWorldMapAreaStore(WorldMapAreaEntryfmt);
@@ -182,7 +184,7 @@ void LoadDBCStores(std::string const& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    uint32 const DBCFilesCount = 43;
+    uint32 const DBCFilesCount = 44;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -363,7 +365,7 @@ void LoadDBCStores(std::string const& dataPath)
         std::set<uint32> spellPaths;
         for (uint32 i = 1; i < sSpellMgr.GetMaxSpellId(); ++i)
             if (SpellEntry const* sInfo = sSpellMgr.GetSpellEntry(i))
-                for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+                for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
                     if (sInfo->Effect[j] == 123 /*SPELL_EFFECT_SEND_TAXI*/)
                         spellPaths.insert(sInfo->EffectMiscValue[j]);
 
@@ -398,6 +400,8 @@ void LoadDBCStores(std::string const& dataPath)
             sTaxiNodesMask[field] |= submask;
         }
     }
+
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sTransportAnimationStore, dbcPath, "TransportAnimation.dbc");
 
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sWorldMapAreaStore,        dbcPath, "WorldMapArea.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sWMOAreaTableStore,        dbcPath, "WMOAreaTable.dbc");

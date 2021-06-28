@@ -388,7 +388,7 @@ class Spell
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
         void SendSpellStart();
-        void SendSpellGo(bool SendToCaster = true);
+        void SendSpellGo();
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);
@@ -410,12 +410,13 @@ class Spell
 
         int32 GetCastTime() const { return m_casttime; }
         uint32 GetCastedTime() { return m_timer; }
+        bool IsChanneled() const { return m_channeled; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
         void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
         bool IsChannelActive() const { return m_casterUnit ? m_casterUnit->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0 : false; }
-        bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK);  }
-        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && m_spellInfo->IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
+        bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_COMBAT);  }
+        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && m_spellInfo->IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_COMBAT); }
 
         bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executeStack; }
         void SetReferencedFromCurrent(bool yes) { m_referencedFromCurrentSpell = yes; }
@@ -489,6 +490,7 @@ class Spell
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
+        void UpdateCastStartPosition();
 
         SpellCaster* const m_caster = nullptr;
         Unit* const m_casterUnit = nullptr;
@@ -643,10 +645,7 @@ class Spell
         uint32 m_timer = 0;
         uint32 m_triggeredByAuraBasePoints = 0;
 
-        float m_castPositionX = 0;
-        float m_castPositionY = 0;
-        float m_castPositionZ = 0;
-        float m_castOrientation = 0;
+        Position m_castPosition;
         bool m_IsTriggeredSpell = false;
         bool m_IsCastByItem = false;
 

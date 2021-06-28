@@ -174,7 +174,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
 
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
-        CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'", auction->bidder, pItem->GetGUIDLow());
+        CharacterDatabase.PExecute("UPDATE `item_instance` SET `owner_guid` = '%u' WHERE `guid`='%u'", auction->bidder, pItem->GetGUIDLow());
         CharacterDatabase.CommitTransaction();
 
         if (bidder)
@@ -190,7 +190,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
     // receiver not exist
     else
     {
-        CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid='%u'", pItem->GetGUIDLow());
+        CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `guid`='%u'", pItem->GetGUIDLow());
         RemoveAItem(pItem->GetGUIDLow());                   // we have to remove the item, before we delete it !!
         delete pItem;
     }
@@ -273,7 +273,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
     // owner not found
     else
     {
-        CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid='%u'", pItem->GetGUIDLow());
+        CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `guid`='%u'", pItem->GetGUIDLow());
         RemoveAItem(pItem->GetGUIDLow());                   // we have to remove the item, before we delete it !!
         delete pItem;
     }
@@ -344,8 +344,8 @@ void AuctionHouseMgr::LoadAuctionHouses()
 
 void AuctionHouseMgr::LoadAuctionItems()
 {
-    //               0                1      2         3        4      5             6                 7           8           9       10       11
-    QueryResult* result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, itemguid, itemEntry FROM auction JOIN item_instance ON itemguid = guid");
+    //                                                     0               1                    2        3           4          5        6               7                     8             9       10                           11
+    QueryResult* result = CharacterDatabase.Query("SELECT `creator_guid`, `gift_creator_guid`, `count`, `duration`, `charges`, `flags`, `enchantments`, `random_property_id`, `durability`, `text`, `item_guid`, `item_instance`.`item_id` FROM `auction` JOIN `item_instance` ON `item_guid` = `guid`");
 
     if (!result)
     {
@@ -366,20 +366,20 @@ void AuctionHouseMgr::LoadAuctionItems()
         bar.step();
 
         fields = result->Fetch();
-        uint32 item_guid        = fields[10].GetUInt32();
-        uint32 item_template    = fields[11].GetUInt32();
+        uint32 itemGuid = fields[10].GetUInt32();
+        uint32 itemId = fields[11].GetUInt32();
 
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_template);
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId);
 
         if (!proto)
         {
-            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
+            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", itemGuid, itemId);
             continue;
         }
 
         Item *item = NewItemOrBag(proto);
 
-        if (!item->LoadFromDB(item_guid, ObjectGuid(), fields, item_template))
+        if (!item->LoadFromDB(itemGuid, ObjectGuid(), fields, itemId))
         {
             delete item;
             continue;
@@ -420,7 +420,7 @@ void AuctionHouseMgr::LoadAuctions()
         return;
     }
 
-    result = CharacterDatabase.Query("SELECT id,houseid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit FROM auction");
+    result = CharacterDatabase.Query("SELECT `id`, `house_id`, `item_guid`, `item_id`, `seller_guid`, `buyout_price`, `expire_time`, `buyer_guid`, `last_bid`, `start_bid`, `deposit` FROM `auction`");
     if (!result)
     {
         BarGoLink bar(1);
@@ -440,7 +440,7 @@ void AuctionHouseMgr::LoadAuctions()
 
         AuctionEntry* auction = new AuctionEntry;
         auction->Id = fields[0].GetUInt32();
-        uint32 houseid  = fields[1].GetUInt32();
+        uint32 houseId  = fields[1].GetUInt32();
         auction->itemGuidLow = fields[2].GetUInt32();
         auction->itemTemplate = fields[3].GetUInt32();
         auction->owner = fields[4].GetUInt32();
@@ -466,9 +466,9 @@ void AuctionHouseMgr::LoadAuctions()
             continue;
         }
 
-        auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(houseid);
+        auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(houseId);
 
-        if (!houseid)
+        if (!houseId)
         {
             // need for send mail, use goblin auctionhouse
             auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(7);
@@ -544,65 +544,65 @@ uint32 AuctionHouseMgr::GetAuctionHouseTeam(AuctionHouseEntry const* house)
 
 uint32 AuctionHouseMgr::GetAuctionHouseId(uint32 factionTemplateId)
 {
-    uint32 houseid = 1;
+    uint32 houseId = 1;
     switch (factionTemplateId)
     {
         case   11:
         case   12:
-            houseid = 1; // Human
+            houseId = 1; // Human
             break;
         case   29:
         case   85:
-            houseid = 6; // Orc
+            houseId = 6; // Orc
             break;
         case   55:
         case   57:
-            houseid = 2; // Dwarf
+            houseId = 2; // Dwarf
             break;
         case   68:
         case   71:
-            houseid = 4; // Undead
+            houseId = 4; // Undead
             break;
         case   79:
         case   80:
-            houseid = 3; // Night Elf
+            houseId = 3; // Night Elf
             break;
         case  104:
         case  105:
-            houseid = 5; // Tauren
+            houseId = 5; // Tauren
             break;
         case  120:
-            houseid = 7; // Booty Bay
+            houseId = 7; // Booty Bay
             break;
         case  474:
-            houseid = 7; // Gadgetzan
+            houseId = 7; // Gadgetzan
             break;
         case  534:
-            houseid = 2; // Alliance Generic
+            houseId = 2; // Alliance Generic
             break;
         case  855:
-            houseid = 7; // Everlook
+            houseId = 7; // Everlook
             break;
         default:                                    // for unknown case
         {
             FactionTemplateEntry const* u_entry = sObjectMgr.GetFactionTemplateEntry(factionTemplateId);
             if (!u_entry)
-                houseid = 7;                        // goblin auction house
+                houseId = 7;                        // goblin auction house
             else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
-                houseid = 1;                        // human auction house
+                houseId = 1;                        // human auction house
             else if (u_entry->ourMask & FACTION_MASK_HORDE)
-                houseid = 6;                        // orc auction house
+                houseId = 6;                        // orc auction house
             else
-                houseid = 7;                        // goblin auction house
+                houseId = 7;                        // goblin auction house
             break;
         }
     }
-    return houseid;
+    return houseId;
 }
 
 AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
 {
-    uint32 houseid = 1;                                     // dwarf auction house (used for normal cut/etc percents)
+    uint32 houseId = 1;                                     // dwarf auction house (used for normal cut/etc percents)
 
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
     {
@@ -611,36 +611,36 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
             // FIXME: found way for proper auctionhouse selection by another way
             // AuctionHouse.dbc have faction field with _player_ factions associated with auction house races.
             // but no easy way convert creature faction to player race faction for specific city
-            houseid = GetAuctionHouseId(unit->GetFactionTemplateId());
+            houseId = GetAuctionHouseId(unit->GetFactionTemplateId());
         }
         else
         {
             Player* player = (Player*)unit;
             if (player->GetAuctionAccessMode() > 0)
-                houseid = 7;
+                houseId = 7;
             else
             {
                 switch (((Player*)unit)->GetTeam())
                 {
                     case ALLIANCE:
-                        houseid = player->GetAuctionAccessMode() == 0 ? 1 : 6;
+                        houseId = player->GetAuctionAccessMode() == 0 ? 1 : 6;
                         break;
                     case HORDE:
-                        houseid = player->GetAuctionAccessMode() == 0 ? 6 : 1;
+                        houseId = player->GetAuctionAccessMode() == 0 ? 6 : 1;
                         break;
                 }
             }
         }
     }
 
-    return sAuctionHouseStore.LookupEntry(houseid);
+    return sAuctionHouseStore.LookupEntry(houseId);
 }
 
 AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
 {
-    uint32 houseid = GetAuctionHouseId(factionTemplateId);
+    uint32 houseId = GetAuctionHouseId(factionTemplateId);
 
-    return sAuctionHouseStore.LookupEntry(houseid);
+    return sAuctionHouseStore.LookupEntry(houseId);
 }
 
 void AuctionHouseObject::Update()
@@ -881,13 +881,13 @@ uint32 AuctionEntry::GetAuctionOutBid() const
 void AuctionEntry::DeleteFromDB() const
 {
     //No SQL injection (Id is integer)
-    CharacterDatabase.PExecute("DELETE FROM auction WHERE id = '%u'", Id);
+    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `id` = '%u'", Id);
 }
 
 void AuctionEntry::SaveToDB() const
 {
     //No SQL injection (no strings)
-    CharacterDatabase.PExecute("INSERT INTO auction (id,houseid,itemguid,item_template,itemowner,buyoutprice,time,buyguid,lastbid,startbid,deposit) "
+    CharacterDatabase.PExecute("INSERT INTO `auction` (`id`, `house_id`, `item_guid`, `item_id`, `seller_guid`, `buyout_price`, `expire_time`, `buyer_guid`, `last_bid`, `start_bid`, `deposit`) "
                                "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '" UI64FMTD "', '%u', '%u', '%u', '%u')",
                                Id, auctionHouseEntry->houseId, itemGuidLow, itemTemplate, owner, buyout, (uint64)expireTime, bidder, bid, startbid, deposit);
 }

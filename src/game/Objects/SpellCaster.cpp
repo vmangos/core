@@ -257,8 +257,9 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
 
     if (data.procFlagsVictim && data.pVictim && data.pVictim->IsAlive())
         data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
-
-    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
+    
+    // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) || (data.procFlagsAttacker & PROC_FLAG_KILL))
         ProcDamageAndSpell_real(data);
     else
         m_pendingProcChecks.emplace_back(std::move(data));
@@ -1716,11 +1717,18 @@ void SpellCaster::InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except)
 {
     for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
         if (Spell* spell = GetCurrentSpell(CurrentSpellTypes(i)))
-            if (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime())
+            if (spell->GetCastedTime() && (spell->getState() == SPELL_STATE_PREPARING || (spell->IsChanneled() && spell->getState() == SPELL_STATE_CASTING)))
                 if (!spell->m_spellInfo->IsNextMeleeSwingSpell() && !spell->IsAutoRepeat() && !spell->IsTriggered() && (spell->m_spellInfo->InterruptFlags & flags) && spell->m_spellInfo->Id != except)
                     InterruptSpell(CurrentSpellTypes(i));
 }
 
+void SpellCaster::InterruptSpellsWithChannelFlags(uint32 flags, uint32 except)
+{
+    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+        if (spell->getState() == SPELL_STATE_CASTING)
+            if ((spell->m_spellInfo->ChannelInterruptFlags & flags) && spell->m_spellInfo->Id != except)
+                InterruptSpell(CURRENT_CHANNELED_SPELL);
+}
 
 void SpellCaster::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id)
 {

@@ -89,47 +89,47 @@ public:
     GmTicket(Player* player);
     ~GmTicket();
 
-    bool IsClosed() const { return !_closedBy.IsEmpty(); }
-    bool IsCompleted() const { return _completed; }
-    bool IsFromPlayer(ObjectGuid guid) const { return guid == _playerGuid; }
-    bool IsAssigned() const { return !_assignedTo.IsEmpty(); }
-    bool IsAssignedTo(ObjectGuid guid) const { return guid == _assignedTo; }
+    bool IsClosed() const { return !m_closedBy.IsEmpty(); }
+    bool IsCompleted() const { return m_completed; }
+    bool IsFromPlayer(ObjectGuid guid) const { return guid == m_playerGuid; }
+    bool IsAssigned() const { return !m_assignedTo.IsEmpty(); }
+    bool IsAssignedTo(ObjectGuid guid) const { return guid == m_assignedTo; }
     bool IsAssignedNotTo(ObjectGuid guid) const { return IsAssigned() && !IsAssignedTo(guid); }
 
-    uint32 GetId() const { return _id; }
+    uint32 GetId() const { return m_id; }
     Player* GetPlayer() const;
-    std::string const& GetPlayerName() const { return _playerName; }
-    std::string const& GetMessage() const { return _message; }
+    std::string const& GetPlayerName() const { return m_playerName; }
+    std::string const& GetMessage() const { return m_message; }
     Player* GetAssignedPlayer() const;
-    ObjectGuid GetAssignedToGUID() const { return _assignedTo; }
+    ObjectGuid GetAssignedToGUID() const { return m_assignedTo; }
     std::string GetAssignedToName() const;
-    uint64 GetLastModifiedTime() const { return _lastModifiedTime; }
-    GMTicketEscalationStatus GetEscalatedStatus() const { return _escalatedStatus; }
+    uint64 GetLastModifiedTime() const { return m_lastModifiedTime; }
+    GMTicketEscalationStatus GetEscalatedStatus() const { return m_escalatedStatus; }
 
-    void SetEscalatedStatus(GMTicketEscalationStatus escalatedStatus) { _escalatedStatus = escalatedStatus; }
+    void SetEscalatedStatus(GMTicketEscalationStatus escalatedStatus) { m_escalatedStatus = escalatedStatus; }
     void SetAssignedTo(ObjectGuid guid, bool isAdmin)
     {
-        _assignedTo = guid;
-        if (isAdmin && _escalatedStatus == TICKET_IN_ESCALATION_QUEUE)
-            _escalatedStatus = TICKET_ESCALATED_ASSIGNED;
-        else if (_escalatedStatus == TICKET_UNASSIGNED)
-            _escalatedStatus = TICKET_ASSIGNED;
+        m_assignedTo = guid;
+        if (isAdmin && m_escalatedStatus == TICKET_IN_ESCALATION_QUEUE)
+            m_escalatedStatus = TICKET_ESCALATED_ASSIGNED;
+        else if (m_escalatedStatus == TICKET_UNASSIGNED)
+            m_escalatedStatus = TICKET_ASSIGNED;
     }
-    void SetClosedBy(ObjectGuid value) { _closedBy = value; }
-    void SetCompleted() { _completed = true; }
+    void SetClosedBy(ObjectGuid value) { m_closedBy = value; }
+    void SetCompleted() { m_completed = true; }
     void SetMessage(std::string const& message)
     {
-        _message = message;
-        _lastModifiedTime = uint64(time(nullptr));
+        m_message = message;
+        m_lastModifiedTime = uint64(time(nullptr));
     }
-    void SetComment(std::string const& comment) { _comment = comment; }
-    void SetViewed() { _viewed = true; }
+    void SetComment(std::string const& comment) { m_comment = comment; }
+    void SetViewed() { m_viewed = true; }
     void SetUnassigned();
     void SetPosition(uint32 mapId, float x, float y, float z);
     void SetGmAction(uint32 needResponse, bool needMoreHelp);
 
-    void AppendResponse(std::string const& response) { _response += response; }
-    void ResetResponse() { _response.clear(); }
+    void AppendResponse(std::string const& response) { m_response += response; }
+    void ResetResponse() { m_response.clear(); }
 
     bool LoadFromDB(Field* fields);
     void SaveToDB() const;
@@ -144,36 +144,36 @@ public:
     char const* GetTicketCategoryName(TicketType category) const;
 
     void SetChatLog(std::list<uint32> time, std::string const& log);
-    std::string const& GetChatLog() const { return _chatLog; }
+    std::string const& GetChatLog() const { return m_chatLog; }
 
-    TicketType GetTicketType() const { return _ticketType; }
-    void SetTicketType(TicketType type) { _ticketType = type; }
+    TicketType GetTicketType() const { return m_ticketType; }
+    void SetTicketType(TicketType type) { m_ticketType = type; }
 
-    void SetNeededSecurityLevel(uint8 sec) { _securityNeeded = sec; }
-    uint8 GetNeededSecurityLevel() const { return _securityNeeded; }
+    void SetNeededSecurityLevel(uint8 sec) { m_securityNeeded = sec; }
+    uint8 GetNeededSecurityLevel() const { return m_securityNeeded; }
 private:
-    uint32 _id;
-    ObjectGuid _playerGuid;
-    std::string _playerName;
-    float _posX;
-    float _posY;
-    float _posZ;
-    uint16 _mapId;
-    std::string _message;
-    uint64 _createTime;
-    uint64 _lastModifiedTime;
-    ObjectGuid _closedBy; // 0 = Open, -1 = Console, playerGuid = player abandoned ticket, other = GM who closed it.
-    ObjectGuid _assignedTo;
-    std::string _comment;
-    bool _completed;
-    GMTicketEscalationStatus _escalatedStatus;
-    bool _viewed;
-    bool _needResponse; /// @todo find out the use of this, and then store it in DB
-    bool _needMoreHelp;
-    uint8 _securityNeeded;
-    TicketType _ticketType;
-    std::string _response;
-    std::string _chatLog; // No need to store in db, will be refreshed every session client side
+    uint32 m_id = 0;
+    ObjectGuid m_playerGuid;
+    std::string m_playerName;
+    float m_posX = 0.0f;
+    float m_posY = 0.0f;
+    float m_posZ = 0.0f;
+    uint16 m_mapId = 0;
+    std::string m_message;
+    uint64 m_createTime = 0;
+    uint64 m_lastModifiedTime = 0;
+    ObjectGuid m_closedBy; // 0 = Open, -1 = Console, playerGuid = player abandoned ticket, other = GM who closed it.
+    ObjectGuid m_assignedTo;
+    std::string m_comment;
+    bool m_completed = false;
+    GMTicketEscalationStatus m_escalatedStatus;
+    bool m_viewed = false;
+    bool m_needResponse = false; /// @todo find out the use of this, and then store it in DB
+    bool m_needMoreHelp = false;
+    uint8 m_securityNeeded = 0;
+    TicketType m_ticketType;
+    std::string m_response;
+    std::string m_chatLog; // No need to store in db, will be refreshed every session client side
 };
 typedef std::map<uint32, GmTicket*> GmTicketList;
 

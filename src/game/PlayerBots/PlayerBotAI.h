@@ -41,7 +41,7 @@ class PlayerBotAI: public PlayerAI
         virtual void OnPlayerLogin() {}
         virtual void BeforeAddToMap(Player* player) {} // me=nullptr at call
         // Helpers
-        bool SpawnNewPlayer(WorldSession* sess, uint8 _class, uint32 _race, uint32 mapId, uint32 instanceId, float dx, float dy, float dz, float o, Player* pClone = nullptr);
+        bool SpawnNewPlayer(WorldSession* sess, uint8 classId, uint32 raceId, uint32 mapId, uint32 instanceId, float dx, float dy, float dz, float o, Player* pClone = nullptr);
         PlayerBotEntry* botEntry;
 };
 
@@ -49,23 +49,23 @@ class PlayerCreatorAI: public PlayerBotAI
 {
     public:
         explicit PlayerCreatorAI(Player* pPlayer, uint8 _race_, uint8 _class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o) :
-            PlayerBotAI(pPlayer), _race(_race_), _class(_class_), _mapId(mapId), _instanceId(instanceId), _x(x), _y(y), _z(z), _o(o)
+            PlayerBotAI(pPlayer), m_race(_race_), m_class(_class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o)
         {
         }
         ~PlayerCreatorAI() override {}
         bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override
         {
-            return SpawnNewPlayer(sess, _class, _race, _mapId, _instanceId, _x, _y, _z, _o);
+            return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o);
         }
     protected:
-        uint8 _race;
-        uint8 _class;
-        uint32 _mapId;
-        uint32 _instanceId;
-        float _x;
-        float _y;
-        float _z;
-        float _o;
+        uint8 m_race;
+        uint8 m_class;
+        uint32 m_mapId;
+        uint32 m_instanceId;
+        float m_x;
+        float m_y;
+        float m_z;
+        float m_o;
 };
 
 class PlayerBotFleeingAI : public PlayerBotAI

@@ -439,12 +439,12 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             case SCRIPT_COMMAND_REMOVE_ITEM:
             case SCRIPT_COMMAND_CREATE_ITEM:
             {
-                if (!ObjectMgr::GetItemPrototype(tmp.createItem.itemEntry))
+                if (!ObjectMgr::GetItemPrototype(tmp.createItem.itemId))
                 {
-                    if (!sObjectMgr.IsExistingItemId(tmp.createItem.itemEntry))
+                    if (!sObjectMgr.IsExistingItemId(tmp.createItem.itemId))
                     {
                         sLog.outErrorDb("Table `%s` has nonexistent item (entry: %u) in SCRIPT_COMMAND_*_ITEM for script id %u",
-                            tablename, tmp.createItem.itemEntry, tmp.id);
+                            tablename, tmp.createItem.itemId, tmp.id);
                         continue;
                     }
                     else
@@ -473,7 +473,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     {
                         if (!ObjectMgr::GetItemPrototype(tmp.setEquipment.slot[i]))
                         {
-                            if (!sObjectMgr.IsExistingItemId(tmp.createItem.itemEntry))
+                            if (!sObjectMgr.IsExistingItemId(tmp.createItem.itemId))
                             {
                                 sLog.outErrorDb("Table `%s` has nonexistent item (dataint%i: %u) in SCRIPT_COMMAND_SET_EQUIPMENT for script id %u",
                                     tablename, i, tmp.setEquipment.slot[i], tmp.id);
@@ -1246,6 +1246,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
             break;
         }
         case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
+        case TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY:
         {
             if (!ObjectMgr::GetGameObjectInfo(targetParam1))
             {
@@ -2495,7 +2496,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         SpellEntry const* spell = sSpellMgr.GetSpellEntry(i);
         if (spell)
         {
-            for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+            for (uint8 j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
                 if (spell->Effect[j] == SPELL_EFFECT_SEND_EVENT)
                 {
@@ -2784,6 +2785,13 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pM
             if (!((pSearcher = pSource) || (pSearcher = pTarget)))
                 return nullptr;
             return pSearcher->FindNearestGameObject(param1, param2);
+        }
+        case TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY:
+        {
+            WorldObject* pSearcher;
+            if (!((pSearcher = pSource) || (pSearcher = pTarget)))
+                return nullptr;
+            return pSearcher->FindRandomGameObject(param1, param2);
         }
         case TARGET_T_GAMEOBJECT_WITH_GUID:
         {

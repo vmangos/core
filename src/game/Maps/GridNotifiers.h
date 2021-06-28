@@ -850,6 +850,49 @@ namespace MaNGOS
             float i_range;
     };
 
+    class AnySameFactionUnitInObjectRangeCheck
+    {
+    public:
+        AnySameFactionUnitInObjectRangeCheck(SpellCaster const* obj, float range) : i_obj(obj), i_range(range) {}
+        WorldObject const& GetFocusObject() const { return *i_obj; }
+        bool operator()(Unit* u)
+        {
+            return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && (i_obj->GetFactionTemplateId() == u->GetFactionTemplateId()) && u->CanSeeInWorld(i_obj);
+        }
+    private:
+        SpellCaster const* i_obj;
+        float i_range;
+    };
+
+    class AnyCreatureGroupMembersInObjectRangeCheck
+    {
+    public:
+        AnyCreatureGroupMembersInObjectRangeCheck(Creature const* obj, float range) : i_obj(obj), i_range(range) {}
+        WorldObject const& GetFocusObject() const { return *i_obj; }
+        bool operator()(Unit* u)
+        {
+            if (!u->IsAlive())
+                return false;
+            if (!u->IsCreature())
+                return false;
+            if (!i_obj->IsWithinDistInMap(u, i_range))
+                return false;
+            if (!u->CanSeeInWorld(i_obj))
+                return false;
+
+            if (i_obj->GetCreatureGroup() == static_cast<Creature*>(u)->GetCreatureGroup())
+                return true;
+
+            if (Creature* pOwner = u->GetOwnerCreature())
+                return i_obj->GetCreatureGroup() == static_cast<Creature*>(pOwner)->GetCreatureGroup();
+
+            return false;
+        }
+    private:
+        Creature const* i_obj;
+        float i_range;
+    };
+
     class AnyUnitInObjectRangeCheck
     {
         public:
@@ -1315,6 +1358,27 @@ namespace MaNGOS
             WorldObject const* m_pObject;
             uint32 m_uiEntry;
             float m_fRange;
+    };
+
+    class AllGameObjectsMatchingOneEntryInRange
+    {
+    public:
+        AllGameObjectsMatchingOneEntryInRange(WorldObject const* pObject, std::vector<uint32> const& entries, float fMaxRange)
+            : m_pObject(pObject), entries(entries), m_fRange(fMaxRange) {}
+        bool operator() (GameObject* pGo)
+        {
+            for (const auto entry : entries) {
+                if (pGo->GetEntry() == entry && m_pObject->IsWithinDist(pGo, m_fRange, false)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> entries;
+        float m_fRange;
     };
 
     class AllCreaturesOfEntryInRange

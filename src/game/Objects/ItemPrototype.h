@@ -528,6 +528,8 @@ struct ItemPrototype
         return false;
     }
 
+    void GetAllowedEquipSlots(uint8 slots[4], uint8 classId, bool canDualWield) const;
+
     uint32 GetMaxStackSize() const { return Stackable; }
 
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }

@@ -33,6 +33,7 @@
 #include "Util.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "Cell.h"
 
 #include <string>
 
@@ -50,7 +51,7 @@ class UpdateMask;
 class InstanceData;
 class TerrainInfo;
 class ZoneScript;
-class Transport;
+class GenericTransport;
 struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
@@ -143,7 +144,7 @@ enum SplineFlags
 class MovementInfo
 {
     public:
-        MovementInfo() : moveFlags(MOVEFLAG_NONE), time(0), ctime(0),
+        MovementInfo() : moveFlags(MOVEFLAG_NONE), stime(0), ctime(0),
             t_time(0), s_pitch(0.0f), fallTime(0), splineElevation(0.0f) {}
 
         // Read/Write methods
@@ -159,7 +160,7 @@ class MovementInfo
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
 
         // Position manipulations
-        Position const* GetPos() const { return &pos; }
+        Position const& GetPos() const { return pos; }
         void SetTransportData(ObjectGuid guid, float x, float y, float z, float o, uint32 time)
         {
             t_guid = guid;
@@ -179,13 +180,13 @@ class MovementInfo
             t_time = 0;
         }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
-        Position const* GetTransportPos() const { return &t_pos; }
-        Position* GetTransportPos() { return &t_pos; }
+        Position const& GetTransportPos() const { return t_pos; }
+        Position& GetTransportPos() { return t_pos; }
         uint32 GetTransportTime() const { return t_time; }
         uint32 GetFallTime() const { return fallTime; }
         void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
-        void UpdateTime(uint32 _time) { time = _time; }
+        void UpdateTime(uint32 _time) { stime = _time; }
 
         struct JumpInfo
         {
@@ -199,7 +200,7 @@ class MovementInfo
     //private:
         // common
         uint32  moveFlags;                                  // see enum MovementFlags
-        uint32  time;
+        uint32  stime; // Server time
         uint32  ctime; // Client time
         Position pos;
         // transport
@@ -278,9 +279,10 @@ class Object
         void SetObjectScale(float newScale);
 
         uint8 GetTypeId() const { return m_objectTypeId; }
+        uint8 GetTypeMask() const { return m_objectType; }
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
-        virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
+        virtual void BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) const;
         void SendCreateUpdateToPlayer(Player* player);
 
         // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
@@ -292,9 +294,10 @@ class Object
         void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
         void ExecuteDelayedActions();
 
-        void BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const;
-        void BuildOutOfRangeUpdateBlock(UpdateData* data) const;
-        void BuildMovementUpdateBlock(UpdateData* data, uint8 flags = 0) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const;
+        void BuildOutOfRangeUpdateBlock(UpdateData& data) const;
+        void BuildMovementUpdateBlock(UpdateData& data, uint8 flags = 0) const;
 
         void BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const;
         void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const;
@@ -361,6 +364,7 @@ class Object
         void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
+        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag);
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
@@ -533,13 +537,12 @@ class Object
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
 
-        virtual void _SetUpdateBits(UpdateMask* updateMask, Player* target) const;
+        uint16 GetUpdateFieldFlagsForTarget(Player const* target, uint16 const*& flags) const;
+        void _SetCreateBits(UpdateMask& updateMask, Player* target) const;
+        void _SetUpdateBits(UpdateMask& updateMask, Player* target) const;
         void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
-        virtual void _SetCreateBits(UpdateMask* updateMask, Player* target) const;
-
         uint16 m_objectType;
-
         uint8 m_objectTypeId;
         uint8 m_updateFlag = 0;
 
@@ -621,8 +624,8 @@ class WorldObject : public Object
         float GetPositionX() const { return m_position.x; }
         float GetPositionY() const { return m_position.y; }
         float GetPositionZ() const { return m_position.z; }
-        virtual void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
-        void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
+        virtual void GetSafePosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
+        void GetPosition(float &x, float &y, float &z, GenericTransport* onTransport = nullptr) const;
         void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
         float GetOrientation() const { return m_position.o; }
         void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const
@@ -750,14 +753,18 @@ class WorldObject : public Object
         void GetNearRandomPositions(float distance, float &x, float &y, float &z);
         void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);
 
-        // Transports / Movement
-        Transport* GetTransport() const { return m_transport; }
-        virtual void SetTransport(Transport* t) { m_transport = t; }
+        // for use only in LoadHelper, Map::Add Map::CreatureCellRelocation
+        Cell const& GetCurrentCell() const { return m_currentCell; }
+        void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
 
-        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
-        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
-        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos()->z; }
-        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos()->o; }
+        // Transports / Movement
+        GenericTransport* GetTransport() const { return m_transport; }
+        virtual void SetTransport(GenericTransport* t) { m_transport = t; }
+
+        float GetTransOffsetX() const { return m_movementInfo.GetTransportPos().x; }
+        float GetTransOffsetY() const { return m_movementInfo.GetTransportPos().y; }
+        float GetTransOffsetZ() const { return m_movementInfo.GetTransportPos().z; }
+        float GetTransOffsetO() const { return m_movementInfo.GetTransportPos().o; }
         uint32 GetTransTime() const { return m_movementInfo.GetTransportTime(); }
 
         void AddUnitMovementFlag(uint32 f) { m_movementInfo.moveFlags |= f; }
@@ -775,7 +782,7 @@ class WorldObject : public Object
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
         MovementInfo m_movementInfo;
-        Transport* m_transport;
+        GenericTransport* m_transport;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
@@ -857,12 +864,13 @@ class WorldObject : public Object
         void RemoveFromClientUpdateList() override;
         void BuildUpdateData(UpdateDataMapType &) override;
 
-        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN,uint32 despwtime = 25000, bool asActiveObject = false, uint32 pacifiedTimer = 0, CreatureAiSetter pFuncAiSetter = nullptr);
+        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN,uint32 despwtime = 25000, bool asActiveObject = false, uint32 pacifiedTimer = 0, CreatureAiSetter pFuncAiSetter = nullptr, GenericTransport* pTransport = nullptr);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 25000, bool attach = true);
 
         Creature* FindNearestCreature(uint32 entry, float range, bool alive = true, Creature const* except = nullptr) const;
         Creature* FindRandomCreature(uint32 entry, float range, bool alive = true, Creature const* except = nullptr) const;
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
+        GameObject* FindRandomGameObject(uint32 entry, float range) const;
         Player* FindNearestPlayer(float range) const;
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
@@ -887,7 +895,7 @@ class WorldObject : public Object
         //these functions are used mostly for Relocate() and Corpse/Player specific stuff...
         //use them ONLY in LoadFromDB()/Create() funcs and nowhere else!
         //mapId/instanceId should be set in SetMap() function!
-        void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
+        void SetLocationMapId(uint32 mapId) { m_mapId = mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
 
         bool IsWithinLootXPDist(WorldObject const* objToLoot) const;
@@ -919,6 +927,7 @@ class WorldObject : public Object
         uint32 m_InstanceId;                                // in map copy with instance id
 
         Position m_position;
+        Cell m_currentCell;                                 // store current cell where object listed
 
         ViewPoint m_viewPoint;
 

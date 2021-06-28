@@ -81,8 +81,39 @@ bool Map::ScriptCommand_Emote(ScriptInfo const& script, WorldObject* source, Wor
 
     uint32 emoteCount = 1;
     for (; emoteCount < MAX_EMOTE_ID && script.emote.emoteId[emoteCount]; ++emoteCount);
+    uint32 const emoteId = script.emote.emoteId[urand(0, emoteCount - 1)];
 
-    pSource->HandleEmote(script.emote.emoteId[urand(0, emoteCount-1)]);
+    // This is a targeted emote.
+    if (script.emote.isTargeted)
+    {
+        Creature* pCreatureSource = pSource->ToCreature();
+        if (!pCreatureSource)
+        {
+            sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for targeted emote with non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+            return ShouldAbortScript(script);
+        }
+
+        Unit* pTarget = ToUnit(target);
+        if (!pTarget)
+        {
+            sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for targeted emote with non-unit target (TypeId: %u), skipping.", script.id, target ? target->GetTypeId() : 0);
+            return ShouldAbortScript(script);
+        }
+
+        // Abort if target is in combat, or already doing a targeted emote.
+        if (pCreatureSource->IsInCombat() || pCreatureSource->HasCreatureState(CSTATE_TARGETED_EMOTE))
+            return ShouldAbortScript(script);
+
+        pCreatureSource->PauseOutOfCombatMovement(8 * IN_MILLISECONDS);
+        pCreatureSource->AddCreatureState(CSTATE_TARGETED_EMOTE);
+
+        TargetedEmoteEvent *pEmoteEvent = new TargetedEmoteEvent(*pCreatureSource, pTarget->GetObjectGuid(), emoteId);
+        pCreatureSource->m_Events.AddEvent(pEmoteEvent, pCreatureSource->m_Events.CalculateTime(2000));
+        TargetedEmoteCleanupEvent *pCleanupEvent = new TargetedEmoteCleanupEvent(*pCreatureSource, pCreatureSource->GetOrientation());
+        pCreatureSource->m_Events.AddEvent(pCleanupEvent, pCreatureSource->m_Events.CalculateTime(6000));
+    }
+    else
+        pSource->HandleEmote(emoteId);
 
     return false;
 }
@@ -625,7 +656,7 @@ bool Map::ScriptCommand_CreateItem(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    if (Item* pItem = pReceiver->StoreNewItemInInventorySlot(script.createItem.itemEntry, script.createItem.amount))
+    if (Item* pItem = pReceiver->StoreNewItemInInventorySlot(script.createItem.itemId, script.createItem.amount))
         pReceiver->SendNewItem(pItem, script.createItem.amount, true, false);
 
     return false;
@@ -1264,7 +1295,7 @@ bool Map::ScriptCommand_RemoveItem(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    pPlayer->DestroyItemCount(script.createItem.itemEntry, script.createItem.amount, true);
+    pPlayer->DestroyItemCount(script.createItem.itemId, script.createItem.amount, true);
 
     return false;
 }
@@ -2264,7 +2295,7 @@ bool Map::ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* so
     if (GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, script.loadGo.goGuid)))
         return ShouldAbortScript(script); // already spawned
 
-    GameObject* pGameobject = new GameObject;
+    GameObject* pGameobject = GameObject::CreateGameObject(pGameObjectData->id);
     if (!pGameobject->LoadFromDB(script.loadGo.goGuid, this))
         delete pGameobject;
     else
@@ -2346,5 +2377,20 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
     if (script.setPvP.enabled)
         pSource->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
+    return false;
+}
+
+// SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (87)
+bool Map::ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    GameObject* pGo = nullptr;
+
+    if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
+    {
+        sLog.outError("SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (script id %u) call for a nullptr gameobject, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    pGo->ResetDoorOrButton();
     return false;
 }

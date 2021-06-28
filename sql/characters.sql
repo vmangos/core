@@ -13,61 +13,19 @@
 -- Dumping structure for table characters.auction
 CREATE TABLE IF NOT EXISTS `auction` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
-  `houseid` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemguid` int(11) unsigned NOT NULL DEFAULT '0',
-  `item_template` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
-  `itemowner` int(11) unsigned NOT NULL DEFAULT '0',
-  `buyoutprice` int(11) NOT NULL DEFAULT '0',
-  `time` bigint(40) NOT NULL DEFAULT '0',
-  `buyguid` int(11) unsigned NOT NULL DEFAULT '0',
-  `lastbid` int(11) NOT NULL DEFAULT '0',
-  `startbid` int(11) NOT NULL DEFAULT '0',
+  `house_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `seller_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `buyout_price` int(11) NOT NULL DEFAULT '0',
+  `expire_time` bigint(40) NOT NULL DEFAULT '0',
+  `buyer_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `last_bid` int(11) NOT NULL DEFAULT '0',
+  `start_bid` int(11) NOT NULL DEFAULT '0',
   `deposit` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key_item_guid` (`itemguid`)
+  UNIQUE KEY `key_item_guid` (`item_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table characters.bugreport
-CREATE TABLE IF NOT EXISTS `bugreport` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
-  `type` longtext NOT NULL,
-  `content` longtext NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Debug System';
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table characters.bugreports
-CREATE TABLE IF NOT EXISTS `bugreports` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `reportTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `playerGuid` int(11) DEFAULT NULL,
-  `playerMap` int(11) DEFAULT NULL,
-  `playerInstanceId` int(11) DEFAULT NULL,
-  `playerX` float DEFAULT NULL,
-  `playerY` float DEFAULT NULL,
-  `playerZ` float DEFAULT NULL,
-  `clientIp` varchar(100) DEFAULT NULL,
-  `reportType` tinyint(4) DEFAULT NULL,
-  `reportText` text,
-  `serverInformation` text,
-  `bugStatus` enum('New','NeedTest','Fixed','Invalid','Duplicate','Confirmed') NOT NULL DEFAULT 'New',
-  KEY `idx_id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table characters.census
-CREATE TABLE IF NOT EXISTS `census` (
-  `time` datetime DEFAULT NULL,
-  `race` int(11) DEFAULT NULL,
-  `onlineCount` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
 
@@ -80,46 +38,50 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `gender` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `skin` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `face` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `hair_style` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `hair_color` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `facial_hair` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `xp` int(10) unsigned NOT NULL DEFAULT '0',
   `money` int(10) unsigned NOT NULL DEFAULT '0',
-  `playerBytes` int(10) unsigned NOT NULL DEFAULT '0',
-  `playerBytes2` int(10) unsigned NOT NULL DEFAULT '0',
-  `playerFlags` int(10) unsigned NOT NULL DEFAULT '0',
+  `player_flags` int(10) unsigned NOT NULL DEFAULT '0',
+  `zone` int(11) unsigned NOT NULL DEFAULT '0',
+  `map` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
   `position_x` float NOT NULL DEFAULT '0',
   `position_y` float NOT NULL DEFAULT '0',
   `position_z` float NOT NULL DEFAULT '0',
-  `map` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
   `orientation` float NOT NULL DEFAULT '0',
-  `taximask` longtext,
+  `transport_guid` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `transport_x` float NOT NULL DEFAULT '0',
+  `transport_y` float NOT NULL DEFAULT '0',
+  `transport_z` float NOT NULL DEFAULT '0',
+  `transport_o` float NOT NULL DEFAULT '0',
+  `known_taxi_mask` longtext COMMENT 'discovered flight points',
+  `current_taxi_path` text COMMENT 'flight destination',
   `online` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `cinematic` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `totaltime` int(11) unsigned NOT NULL DEFAULT '0',
-  `leveltime` int(11) unsigned NOT NULL DEFAULT '0',
+  `played_time_total` int(11) unsigned NOT NULL DEFAULT '0',
+  `played_time_level` int(11) unsigned NOT NULL DEFAULT '0',
+  `create_time` bigint(20) unsigned NOT NULL DEFAULT '0',
   `logout_time` bigint(20) unsigned NOT NULL DEFAULT '0',
   `is_logout_resting` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `rest_bonus` float NOT NULL DEFAULT '0',
-  `resettalents_multiplier` int(11) unsigned NOT NULL DEFAULT '0',
-  `resettalents_time` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `trans_x` float NOT NULL DEFAULT '0',
-  `trans_y` float NOT NULL DEFAULT '0',
-  `trans_z` float NOT NULL DEFAULT '0',
-  `trans_o` float NOT NULL DEFAULT '0',
-  `transguid` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `extra_flags` int(11) unsigned NOT NULL DEFAULT '0',
-  `stable_slots` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `at_login` int(11) unsigned NOT NULL DEFAULT '0',
-  `zone` int(11) unsigned NOT NULL DEFAULT '0',
+  `reset_talents_multiplier` int(11) unsigned NOT NULL DEFAULT '0',
+  `reset_talents_time` bigint(20) unsigned NOT NULL DEFAULT '0',
   `death_expire_time` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `taxi_path` text,
-  `honorRankPoints` float NOT NULL DEFAULT '0',
-  `honorHighestRank` int(11) unsigned NOT NULL DEFAULT '0',
-  `honorStanding` int(11) unsigned NOT NULL DEFAULT '0',
-  `honorLastWeekHK` int(11) unsigned NOT NULL DEFAULT '0',
-  `honorLastWeekCP` float NOT NULL DEFAULT '0',
-  `honorStoredHK` int(11) NOT NULL DEFAULT '0',
-  `honorStoredDK` int(11) NOT NULL DEFAULT '0',
-  `watchedFaction` int(10) unsigned NOT NULL DEFAULT '0',
+  `stable_slots` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `bank_bag_slots` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `at_login_flags` int(11) unsigned NOT NULL DEFAULT '0',
+  `extra_flags` int(11) unsigned NOT NULL DEFAULT '0',
+  `honor_rank_points` float NOT NULL DEFAULT '0',
+  `honor_highest_rank` int(11) unsigned NOT NULL DEFAULT '0',
+  `honor_standing` int(11) unsigned NOT NULL DEFAULT '0',
+  `honor_last_week_hk` int(11) unsigned NOT NULL DEFAULT '0',
+  `honor_last_week_cp` float NOT NULL DEFAULT '0',
+  `honor_stored_hk` int(11) NOT NULL DEFAULT '0',
+  `honor_stored_dk` int(11) NOT NULL DEFAULT '0',
+  `watched_faction` int(11) NOT NULL DEFAULT '-1',
   `drunk` smallint(5) unsigned NOT NULL DEFAULT '0',
   `health` int(10) unsigned NOT NULL DEFAULT '0',
   `power1` int(10) unsigned NOT NULL DEFAULT '0',
@@ -127,16 +89,14 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `power3` int(10) unsigned NOT NULL DEFAULT '0',
   `power4` int(10) unsigned NOT NULL DEFAULT '0',
   `power5` int(10) unsigned NOT NULL DEFAULT '0',
-  `exploredZones` longtext,
-  `equipmentCache` longtext,
-  `ammoId` int(10) unsigned NOT NULL DEFAULT '0',
-  `actionBars` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `deleteInfos_Account` int(11) unsigned DEFAULT NULL,
-  `deleteInfos_Name` varchar(12) DEFAULT NULL,
-  `deleteDate` bigint(20) DEFAULT NULL,
-  `area` int(11) unsigned NOT NULL DEFAULT '0',
+  `explored_zones` longtext,
+  `equipment_cache` longtext,
+  `ammo_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `action_bars` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `deleted_account` int(11) unsigned DEFAULT NULL,
+  `deleted_name` varchar(12) DEFAULT NULL,
+  `deleted_time` bigint(20) DEFAULT NULL,
   `world_phase_mask` int(11) DEFAULT '0',
-  `customFlags` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`),
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),
@@ -182,17 +142,17 @@ CREATE TABLE IF NOT EXISTS `character_aura` (
   `caster_guid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
   `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
   `spell` int(11) unsigned NOT NULL DEFAULT '0',
-  `stackcount` int(11) unsigned NOT NULL DEFAULT '1',
-  `remaincharges` int(11) unsigned NOT NULL DEFAULT '0',
-  `basepoints0` int(11) NOT NULL DEFAULT '0',
-  `basepoints1` int(11) NOT NULL DEFAULT '0',
-  `basepoints2` int(11) NOT NULL DEFAULT '0',
-  `periodictime0` int(11) unsigned NOT NULL DEFAULT '0',
-  `periodictime1` int(11) unsigned NOT NULL DEFAULT '0',
-  `periodictime2` int(11) unsigned NOT NULL DEFAULT '0',
-  `maxduration` int(11) NOT NULL DEFAULT '0',
-  `remaintime` int(11) NOT NULL DEFAULT '0',
-  `effIndexMask` int(11) unsigned NOT NULL DEFAULT '0',
+  `stacks` int(11) unsigned NOT NULL DEFAULT '1',
+  `charges` int(11) unsigned NOT NULL DEFAULT '0',
+  `base_points0` float NOT NULL DEFAULT '0',
+  `base_points1` float NOT NULL DEFAULT '0',
+  `base_points2` float NOT NULL DEFAULT '0',
+  `periodic_time0` int(11) unsigned NOT NULL DEFAULT '0',
+  `periodic_time1` int(11) unsigned NOT NULL DEFAULT '0',
+  `periodic_time2` int(11) unsigned NOT NULL DEFAULT '0',
+  `max_duration` int(11) NOT NULL DEFAULT '0',
+  `duration` int(11) NOT NULL DEFAULT '0',
+  `effect_index_mask` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`caster_guid`,`item_guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
@@ -215,25 +175,11 @@ CREATE TABLE IF NOT EXISTS `character_battleground_data` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table characters.character_bgqueue
-CREATE TABLE IF NOT EXISTS `character_bgqueue` (
-  `PlayerGUID` int(11) NOT NULL DEFAULT '0',
-  `playerName` varchar(12) CHARACTER SET latin1 NOT NULL,
-  `playerIP` int(11) NOT NULL,
-  `BGtype` int(11) NOT NULL,
-  `action` int(11) NOT NULL,
-  `time` int(11) NOT NULL,
-  PRIMARY KEY (`PlayerGUID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
-
 -- Dumping structure for table characters.character_deleted_items
 CREATE TABLE IF NOT EXISTS `character_deleted_items` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `player_guid` int(11) unsigned NOT NULL DEFAULT '0',
-  `item_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `item_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `stack_count` mediumint(8) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -264,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `character_forgotten_skills` (
 CREATE TABLE IF NOT EXISTS `character_gifts` (
   `guid` int(20) unsigned NOT NULL DEFAULT '0',
   `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
-  `entry` int(20) unsigned NOT NULL DEFAULT '0',
+  `item_id` int(20) unsigned NOT NULL DEFAULT '0',
   `flags` int(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`item_guid`),
   KEY `idx_guid` (`guid`)
@@ -290,8 +236,8 @@ CREATE TABLE IF NOT EXISTS `character_homebind` (
 -- Dumping structure for table characters.character_honor_cp
 CREATE TABLE IF NOT EXISTS `character_honor_cp` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `victimType` tinyint(3) unsigned NOT NULL DEFAULT '4',
-  `victim` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Creature / Player Identifier',
+  `victim_type` tinyint(3) unsigned NOT NULL DEFAULT '4' COMMENT 'Object Type Id',
+  `victim_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Creature Id / Player Guid',
   `cp` float NOT NULL DEFAULT '0',
   `date` int(11) unsigned NOT NULL DEFAULT '0',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -318,9 +264,9 @@ CREATE TABLE IF NOT EXISTS `character_inventory` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `bag` int(11) unsigned NOT NULL DEFAULT '0',
   `slot` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `item` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Global Unique Identifier',
-  `item_template` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
-  PRIMARY KEY (`item`),
+  `item_guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Global Unique Identifier',
+  `item_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
+  PRIMARY KEY (`item_guid`),
   KEY `idx_guid` (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
@@ -331,29 +277,29 @@ CREATE TABLE IF NOT EXISTS `character_inventory` (
 CREATE TABLE IF NOT EXISTS `character_pet` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `entry` int(11) unsigned NOT NULL DEFAULT '0',
-  `owner` int(11) unsigned NOT NULL DEFAULT '0',
-  `modelid` int(11) unsigned DEFAULT '0',
-  `CreatedBySpell` int(11) unsigned NOT NULL DEFAULT '0',
-  `PetType` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `owner_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `display_id` int(11) unsigned DEFAULT '0',
+  `created_by_spell` int(11) unsigned NOT NULL DEFAULT '0',
+  `pet_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `level` int(11) unsigned NOT NULL DEFAULT '1',
-  `exp` int(11) unsigned NOT NULL DEFAULT '0',
-  `Reactstate` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `loyaltypoints` int(11) NOT NULL DEFAULT '0',
+  `xp` int(11) unsigned NOT NULL DEFAULT '0',
+  `react_state` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `loyalty_points` int(11) NOT NULL DEFAULT '0',
   `loyalty` int(11) unsigned NOT NULL DEFAULT '0',
-  `trainpoint` int(11) NOT NULL DEFAULT '0',
+  `training_points` int(11) NOT NULL DEFAULT '0',
   `name` varchar(100) DEFAULT 'Pet',
   `renamed` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `slot` int(11) unsigned NOT NULL DEFAULT '0',
-  `curhealth` int(11) unsigned NOT NULL DEFAULT '1',
-  `curmana` int(11) unsigned NOT NULL DEFAULT '0',
-  `curhappiness` int(11) unsigned NOT NULL DEFAULT '0',
-  `savetime` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `resettalents_cost` int(11) unsigned NOT NULL DEFAULT '0',
-  `resettalents_time` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `abdata` longtext,
-  `teachspelldata` longtext,
+  `current_health` int(11) unsigned NOT NULL DEFAULT '1',
+  `current_mana` int(11) unsigned NOT NULL DEFAULT '0',
+  `current_happiness` int(11) unsigned NOT NULL DEFAULT '0',
+  `save_time` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `reset_talents_cost` int(11) unsigned NOT NULL DEFAULT '0',
+  `reset_talents_time` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `action_bar_data` longtext,
+  `teach_spell_data` longtext,
   PRIMARY KEY (`id`),
-  KEY `idx_owner` (`owner`)
+  KEY `idx_owner` (`owner_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
 
 -- Data exporting was unselected.
@@ -367,14 +313,14 @@ CREATE TABLE IF NOT EXISTS `character_queststatus` (
   `rewarded` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `explored` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `timer` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `mobcount1` int(11) unsigned NOT NULL DEFAULT '0',
-  `mobcount2` int(11) unsigned NOT NULL DEFAULT '0',
-  `mobcount3` int(11) unsigned NOT NULL DEFAULT '0',
-  `mobcount4` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemcount1` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemcount2` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemcount3` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemcount4` int(11) unsigned NOT NULL DEFAULT '0',
+  `mob_count1` int(11) unsigned NOT NULL DEFAULT '0',
+  `mob_count2` int(11) unsigned NOT NULL DEFAULT '0',
+  `mob_count3` int(11) unsigned NOT NULL DEFAULT '0',
+  `mob_count4` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_count1` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_count2` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_count3` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_count4` int(11) unsigned NOT NULL DEFAULT '0',
   `reward_choice` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
@@ -437,12 +383,12 @@ CREATE TABLE IF NOT EXISTS `character_spell` (
 -- Dumping structure for table characters.character_spell_cooldown
 CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
-  `SpellId` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
-  `SpellExpireTime` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell cooldown expire time',
-  `Category` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category',
-  `CategoryExpireTime` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category cooldown expire time',
-  `ItemId` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
-  PRIMARY KEY (`guid`,`SpellId`)
+  `spell` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell Identifier',
+  `spell_expire_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell cooldown expire time',
+  `category` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category',
+  `category_expire_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell category cooldown expire time',
+  `item_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Item Identifier',
+  PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
@@ -451,48 +397,35 @@ CREATE TABLE IF NOT EXISTS `character_spell_cooldown` (
 -- Dumping structure for table characters.character_stats
 CREATE TABLE IF NOT EXISTS `character_stats` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier, Low part',
-  `maxhealth` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower1` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower2` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower3` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower4` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower5` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower6` int(10) unsigned NOT NULL DEFAULT '0',
-  `maxpower7` int(10) unsigned NOT NULL DEFAULT '0',
-  `strength` int(10) unsigned NOT NULL DEFAULT '0',
-  `agility` int(10) unsigned NOT NULL DEFAULT '0',
-  `stamina` int(10) unsigned NOT NULL DEFAULT '0',
-  `intellect` int(10) unsigned NOT NULL DEFAULT '0',
-  `spirit` int(10) unsigned NOT NULL DEFAULT '0',
-  `armor` int(10) unsigned NOT NULL DEFAULT '0',
-  `resHoly` int(10) unsigned NOT NULL DEFAULT '0',
-  `resFire` int(10) unsigned NOT NULL DEFAULT '0',
-  `resNature` int(10) unsigned NOT NULL DEFAULT '0',
-  `resFrost` int(10) unsigned NOT NULL DEFAULT '0',
-  `resShadow` int(10) unsigned NOT NULL DEFAULT '0',
-  `resArcane` int(10) unsigned NOT NULL DEFAULT '0',
-  `blockPct` float unsigned NOT NULL DEFAULT '0',
-  `dodgePct` float unsigned NOT NULL DEFAULT '0',
-  `parryPct` float unsigned NOT NULL DEFAULT '0',
-  `critPct` float unsigned NOT NULL DEFAULT '0',
-  `rangedCritPct` float unsigned NOT NULL DEFAULT '0',
-  `attackPower` int(10) unsigned NOT NULL DEFAULT '0',
-  `rangedAttackPower` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_health` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power1` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power2` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power3` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power4` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power5` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power6` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_power7` int(10) unsigned NOT NULL DEFAULT '0',
+  `strength` float NOT NULL DEFAULT '0',
+  `agility` float NOT NULL DEFAULT '0',
+  `stamina` float NOT NULL DEFAULT '0',
+  `intellect` float NOT NULL DEFAULT '0',
+  `spirit` float NOT NULL DEFAULT '0',
+  `armor` int(10) NOT NULL DEFAULT '0',
+  `holy_res` int(10) NOT NULL DEFAULT '0',
+  `fire_res` int(10) NOT NULL DEFAULT '0',
+  `nature_res` int(10) NOT NULL DEFAULT '0',
+  `frost_res` int(10) NOT NULL DEFAULT '0',
+  `shadow_res` int(10) NOT NULL DEFAULT '0',
+  `arcane_res` int(10) NOT NULL DEFAULT '0',
+  `block_chance` float NOT NULL DEFAULT '0',
+  `dodge_chance` float NOT NULL DEFAULT '0',
+  `parry_chance` float NOT NULL DEFAULT '0',
+  `crit_chance` float NOT NULL DEFAULT '0',
+  `ranged_crit_chance` float NOT NULL DEFAULT '0',
+  `attack_power` int(10) unsigned NOT NULL DEFAULT '0',
+  `ranged_attack_power` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
-
--- Dumping structure for table characters.character_ticket
-CREATE TABLE IF NOT EXISTS `character_ticket` (
-  `ticket_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `guid` int(11) unsigned NOT NULL DEFAULT '0',
-  `ticket_text` text,
-  `response_text` text,
-  `ticket_lastchange` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`ticket_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 -- Data exporting was unselected.
 
@@ -517,7 +450,7 @@ CREATE TABLE IF NOT EXISTS `character_tutorial` (
 -- Dumping structure for table characters.corpse
 CREATE TABLE IF NOT EXISTS `corpse` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `player` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
+  `player_guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   `position_x` float NOT NULL DEFAULT '0',
   `position_y` float NOT NULL DEFAULT '0',
   `position_z` float NOT NULL DEFAULT '0',
@@ -529,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
   PRIMARY KEY (`guid`),
   KEY `idx_type` (`corpse_type`),
   KEY `idx_instance` (`instance`),
-  KEY `idx_player` (`player`),
+  KEY `idx_player` (`player_guid`),
   KEY `idx_time` (`time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Death System';
 
@@ -539,7 +472,7 @@ CREATE TABLE IF NOT EXISTS `corpse` (
 -- Dumping structure for table characters.creature_respawn
 CREATE TABLE IF NOT EXISTS `creature_respawn` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `respawntime` bigint(20) NOT NULL DEFAULT '0',
+  `respawn_time` bigint(20) NOT NULL DEFAULT '0',
   `instance` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `map` int(5) unsigned DEFAULT '0',
   PRIMARY KEY (`guid`,`instance`),
@@ -552,7 +485,7 @@ CREATE TABLE IF NOT EXISTS `creature_respawn` (
 -- Dumping structure for table characters.gameobject_respawn
 CREATE TABLE IF NOT EXISTS `gameobject_respawn` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `respawntime` bigint(20) NOT NULL DEFAULT '0',
+  `respawn_time` bigint(20) NOT NULL DEFAULT '0',
   `instance` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `map` int(5) unsigned DEFAULT '0',
   PRIMARY KEY (`guid`,`instance`),
@@ -573,11 +506,11 @@ CREATE TABLE IF NOT EXISTS `game_event_status` (
 
 -- Dumping structure for table characters.gm_subsurveys
 CREATE TABLE IF NOT EXISTS `gm_subsurveys` (
-  `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `subsurveyId` int(10) unsigned NOT NULL DEFAULT '0',
+  `survey_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `subsurvey_id` int(10) unsigned NOT NULL DEFAULT '0',
   `rank` int(10) unsigned NOT NULL DEFAULT '0',
   `comment` text NOT NULL,
-  PRIMARY KEY (`surveyId`,`subsurveyId`)
+  PRIMARY KEY (`survey_id`,`subsurvey_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 -- Data exporting was unselected.
@@ -585,12 +518,12 @@ CREATE TABLE IF NOT EXISTS `gm_subsurveys` (
 
 -- Dumping structure for table characters.gm_surveys
 CREATE TABLE IF NOT EXISTS `gm_surveys` (
-  `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `survey_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `mainSurvey` int(10) unsigned NOT NULL DEFAULT '0',
-  `overallComment` longtext NOT NULL,
-  `createTime` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`surveyId`)
+  `main_survey` int(10) unsigned NOT NULL DEFAULT '0',
+  `overall_comment` longtext NOT NULL,
+  `create_time` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`survey_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 -- Data exporting was unselected.
@@ -598,27 +531,27 @@ CREATE TABLE IF NOT EXISTS `gm_surveys` (
 
 -- Dumping structure for table characters.gm_tickets
 CREATE TABLE IF NOT EXISTS `gm_tickets` (
-  `ticketId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `ticket_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier of ticket creator',
   `name` varchar(12) NOT NULL COMMENT 'Name of ticket creator',
   `message` text NOT NULL,
-  `createTime` int(10) unsigned NOT NULL DEFAULT '0',
-  `mapId` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `posX` float NOT NULL DEFAULT '0',
-  `posY` float NOT NULL DEFAULT '0',
-  `posZ` float NOT NULL DEFAULT '0',
-  `lastModifiedTime` int(10) unsigned NOT NULL DEFAULT '0',
-  `closedBy` int(10) NOT NULL DEFAULT '0',
-  `assignedTo` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'GUID of admin to whom ticket is assigned',
+  `create_time` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `map` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `position_x` float NOT NULL DEFAULT '0',
+  `position_y` float NOT NULL DEFAULT '0',
+  `position_z` float NOT NULL DEFAULT '0',
+  `last_modified_time` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `closed_by` int(10) NOT NULL DEFAULT '0',
+  `assigned_to` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'GUID of admin to whom ticket is assigned',
   `comment` text NOT NULL,
   `response` text NOT NULL,
   `completed` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `escalated` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `viewed` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `haveTicket` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `ticketType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `securityNeeded` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ticketId`)
+  `have_ticket` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `ticket_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `security_needed` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ticket_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
 
 -- Data exporting was unselected.
@@ -626,13 +559,13 @@ CREATE TABLE IF NOT EXISTS `gm_tickets` (
 
 -- Dumping structure for table characters.groups
 CREATE TABLE IF NOT EXISTS `groups` (
-  `groupId` int(11) unsigned NOT NULL,
-  `leaderGuid` int(11) unsigned NOT NULL,
-  `mainTank` int(11) unsigned NOT NULL,
-  `mainAssistant` int(11) unsigned NOT NULL,
-  `lootMethod` tinyint(4) unsigned NOT NULL,
-  `looterGuid` int(11) unsigned NOT NULL,
-  `lootThreshold` tinyint(4) unsigned NOT NULL,
+  `group_id` int(11) unsigned NOT NULL,
+  `leader_guid` int(11) unsigned NOT NULL,
+  `main_tank_guid` int(11) unsigned NOT NULL,
+  `main_assistant_guid` int(11) unsigned NOT NULL,
+  `loot_method` tinyint(4) unsigned NOT NULL,
+  `loot_threshold` tinyint(4) unsigned NOT NULL,
+  `looter_guid` int(11) unsigned NOT NULL,
   `icon1` int(11) unsigned NOT NULL,
   `icon2` int(11) unsigned NOT NULL,
   `icon3` int(11) unsigned NOT NULL,
@@ -641,9 +574,9 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `icon6` int(11) unsigned NOT NULL,
   `icon7` int(11) unsigned NOT NULL,
   `icon8` int(11) unsigned NOT NULL,
-  `isRaid` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`groupId`),
-  UNIQUE KEY `key_leaderGuid` (`leaderGuid`)
+  `is_raid` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`group_id`),
+  UNIQUE KEY `key_leaderGuid` (`leader_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Groups';
 
 -- Data exporting was unselected.
@@ -651,10 +584,10 @@ CREATE TABLE IF NOT EXISTS `groups` (
 
 -- Dumping structure for table characters.group_instance
 CREATE TABLE IF NOT EXISTS `group_instance` (
-  `leaderGuid` int(11) unsigned NOT NULL DEFAULT '0',
+  `leader_guid` int(11) unsigned NOT NULL DEFAULT '0',
   `instance` int(11) unsigned NOT NULL DEFAULT '0',
   `permanent` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`leaderGuid`,`instance`),
+  PRIMARY KEY (`leader_guid`,`instance`),
   KEY `idx_instance` (`instance`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -663,12 +596,12 @@ CREATE TABLE IF NOT EXISTS `group_instance` (
 
 -- Dumping structure for table characters.group_member
 CREATE TABLE IF NOT EXISTS `group_member` (
-  `groupId` int(11) unsigned NOT NULL,
-  `memberGuid` int(11) unsigned NOT NULL,
+  `group_id` int(11) unsigned NOT NULL,
+  `member_guid` int(11) unsigned NOT NULL,
   `assistant` tinyint(1) unsigned NOT NULL,
   `subgroup` smallint(6) unsigned NOT NULL,
-  PRIMARY KEY (`groupId`,`memberGuid`),
-  KEY `idx_memberGuid` (`memberGuid`)
+  PRIMARY KEY (`group_id`,`member_guid`),
+  KEY `idx_memberGuid` (`member_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Groups';
 
 -- Data exporting was unselected.
@@ -676,18 +609,18 @@ CREATE TABLE IF NOT EXISTS `group_member` (
 
 -- Dumping structure for table characters.guild
 CREATE TABLE IF NOT EXISTS `guild` (
-  `guildid` int(6) unsigned NOT NULL DEFAULT '0',
+  `guild_id` int(6) unsigned NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `leaderguid` int(6) unsigned NOT NULL DEFAULT '0',
-  `EmblemStyle` int(5) NOT NULL DEFAULT '0',
-  `EmblemColor` int(5) NOT NULL DEFAULT '0',
-  `BorderStyle` int(5) NOT NULL DEFAULT '0',
-  `BorderColor` int(5) NOT NULL DEFAULT '0',
-  `BackgroundColor` int(5) NOT NULL DEFAULT '0',
+  `leader_guid` int(6) unsigned NOT NULL DEFAULT '0',
+  `emblem_style` int(5) NOT NULL DEFAULT '0',
+  `emblem_color` int(5) NOT NULL DEFAULT '0',
+  `border_style` int(5) NOT NULL DEFAULT '0',
+  `border_color` int(5) NOT NULL DEFAULT '0',
+  `background_color` int(5) NOT NULL DEFAULT '0',
   `info` text NOT NULL,
   `motd` varchar(255) NOT NULL DEFAULT '',
-  `createdate` bigint(20) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guildid`)
+  `create_date` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guild_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
@@ -695,17 +628,17 @@ CREATE TABLE IF NOT EXISTS `guild` (
 
 -- Dumping structure for table characters.guild_eventlog
 CREATE TABLE IF NOT EXISTS `guild_eventlog` (
-  `guildid` int(11) NOT NULL COMMENT 'Guild Identificator',
-  `LogGuid` int(11) NOT NULL COMMENT 'Log record identificator - auxiliary column',
-  `EventType` tinyint(1) NOT NULL COMMENT 'Event type',
-  `PlayerGuid1` int(11) NOT NULL COMMENT 'Player 1',
-  `PlayerGuid2` int(11) NOT NULL COMMENT 'Player 2',
-  `NewRank` tinyint(2) NOT NULL COMMENT 'New rank(in case promotion/demotion)',
-  `TimeStamp` bigint(20) NOT NULL COMMENT 'Event UNIX time',
-  PRIMARY KEY (`guildid`,`LogGuid`),
-  KEY `idx_PlayerGuid1` (`PlayerGuid1`),
-  KEY `idx_PlayerGuid2` (`PlayerGuid2`),
-  KEY `idx_LogGuid` (`LogGuid`)
+  `guild_id` int(11) NOT NULL COMMENT 'Guild Identificator',
+  `log_guid` int(11) NOT NULL COMMENT 'Log record identificator - auxiliary column',
+  `event_type` tinyint(1) NOT NULL COMMENT 'Event type',
+  `player_guid1` int(11) NOT NULL COMMENT 'Player 1',
+  `player_guid2` int(11) NOT NULL COMMENT 'Player 2',
+  `new_rank` tinyint(2) NOT NULL COMMENT 'New rank(in case promotion/demotion)',
+  `timestamp` bigint(20) NOT NULL COMMENT 'Event UNIX time',
+  PRIMARY KEY (`guild_id`,`log_guid`),
+  KEY `idx_PlayerGuid1` (`player_guid1`),
+  KEY `idx_PlayerGuid2` (`player_guid2`),
+  KEY `idx_LogGuid` (`log_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Guild Eventlog';
 
 -- Data exporting was unselected.
@@ -713,14 +646,14 @@ CREATE TABLE IF NOT EXISTS `guild_eventlog` (
 
 -- Dumping structure for table characters.guild_member
 CREATE TABLE IF NOT EXISTS `guild_member` (
-  `guildid` int(6) unsigned NOT NULL DEFAULT '0',
+  `guild_id` int(6) unsigned NOT NULL DEFAULT '0',
   `guid` int(11) unsigned NOT NULL DEFAULT '0',
   `rank` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `pnote` varchar(255) NOT NULL DEFAULT '',
-  `offnote` varchar(255) NOT NULL DEFAULT '',
+  `player_note` varchar(255) NOT NULL DEFAULT '',
+  `officer_note` varchar(255) NOT NULL DEFAULT '',
   UNIQUE KEY `key_guid` (`guid`),
-  KEY `idx_guildid` (`guildid`),
-  KEY `idx_guildid_rank` (`guildid`,`rank`)
+  KEY `idx_guildid` (`guild_id`),
+  KEY `idx_guildid_rank` (`guild_id`,`rank`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Guild System';
 
 -- Data exporting was unselected.
@@ -728,12 +661,12 @@ CREATE TABLE IF NOT EXISTS `guild_member` (
 
 -- Dumping structure for table characters.guild_rank
 CREATE TABLE IF NOT EXISTS `guild_rank` (
-  `guildid` int(6) unsigned NOT NULL DEFAULT '0',
-  `rid` int(11) unsigned NOT NULL,
-  `rname` varchar(255) NOT NULL DEFAULT '',
+  `guild_id` int(6) unsigned NOT NULL DEFAULT '0',
+  `id` int(11) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT '',
   `rights` int(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guildid`,`rid`),
-  KEY `idx_rid` (`rid`)
+  PRIMARY KEY (`guild_id`,`id`),
+  KEY `idx_rid` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
@@ -743,11 +676,11 @@ CREATE TABLE IF NOT EXISTS `guild_rank` (
 CREATE TABLE IF NOT EXISTS `instance` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `map` int(11) unsigned NOT NULL DEFAULT '0',
-  `resettime` bigint(40) NOT NULL DEFAULT '0',
+  `reset_time` bigint(40) NOT NULL DEFAULT '0',
   `data` longtext,
   PRIMARY KEY (`id`),
   KEY `idx_map` (`map`),
-  KEY `idx_resettime` (`resettime`)
+  KEY `idx_resettime` (`reset_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
@@ -755,9 +688,9 @@ CREATE TABLE IF NOT EXISTS `instance` (
 
 -- Dumping structure for table characters.instance_reset
 CREATE TABLE IF NOT EXISTS `instance_reset` (
-  `mapid` int(11) unsigned NOT NULL DEFAULT '0',
-  `resettime` bigint(40) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`mapid`)
+  `map` int(11) unsigned NOT NULL DEFAULT '0',
+  `reset_time` bigint(40) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
@@ -766,22 +699,22 @@ CREATE TABLE IF NOT EXISTS `instance_reset` (
 -- Dumping structure for table characters.item_instance
 CREATE TABLE IF NOT EXISTS `item_instance` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `itemEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `item_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `owner_guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `creatorGuid` int(10) unsigned NOT NULL DEFAULT '0',
-  `giftCreatorGuid` int(10) unsigned NOT NULL DEFAULT '0',
+  `creator_guid` int(10) unsigned NOT NULL DEFAULT '0',
+  `gift_creator_guid` int(10) unsigned NOT NULL DEFAULT '0',
   `count` int(10) unsigned NOT NULL DEFAULT '1',
   `duration` int(10) NOT NULL DEFAULT '0',
   `charges` tinytext,
   `flags` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `enchantments` text NOT NULL,
-  `randomPropertyId` smallint(5) NOT NULL DEFAULT '0',
+  `random_property_id` smallint(5) NOT NULL DEFAULT '0',
   `durability` smallint(5) unsigned NOT NULL DEFAULT '0',
   `text` int(10) unsigned NOT NULL DEFAULT '0',
   `generated_loot` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`guid`),
   KEY `idx_owner_guid` (`owner_guid`),
-  KEY `idx_itemEntry` (`itemEntry`)
+  KEY `idx_itemEntry` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Item System';
 
 -- Data exporting was unselected.
@@ -791,10 +724,10 @@ CREATE TABLE IF NOT EXISTS `item_instance` (
 CREATE TABLE IF NOT EXISTS `item_loot` (
   `guid` int(11) unsigned NOT NULL DEFAULT '0',
   `owner_guid` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemid` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_id` int(11) unsigned NOT NULL DEFAULT '0',
   `amount` int(11) unsigned NOT NULL DEFAULT '0',
   `property` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guid`,`itemid`),
+  PRIMARY KEY (`guid`,`item_id`),
   KEY `idx_owner_guid` (`owner_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Item System';
 
@@ -814,13 +747,13 @@ CREATE TABLE IF NOT EXISTS `item_text` (
 -- Dumping structure for table characters.mail
 CREATE TABLE IF NOT EXISTS `mail` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
-  `messageType` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `message_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `stationery` tinyint(3) NOT NULL DEFAULT '41',
-  `mailTemplateId` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `sender` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
-  `receiver` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
+  `mail_template_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `sender_guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
+  `receiver_guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   `subject` longtext,
-  `itemTextId` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_text_id` int(11) unsigned NOT NULL DEFAULT '0',
   `has_items` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `expire_time` bigint(40) NOT NULL DEFAULT '0',
   `deliver_time` bigint(40) NOT NULL DEFAULT '0',
@@ -828,7 +761,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `cod` int(11) unsigned NOT NULL DEFAULT '0',
   `checked` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `idx_receiver` (`receiver`)
+  KEY `idx_receiver` (`receiver_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Mail System';
 
 -- Data exporting was unselected.
@@ -838,10 +771,10 @@ CREATE TABLE IF NOT EXISTS `mail` (
 CREATE TABLE IF NOT EXISTS `mail_items` (
   `mail_id` int(11) unsigned NOT NULL DEFAULT '0',
   `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
-  `item_template` int(11) unsigned NOT NULL DEFAULT '0',
-  `receiver` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
+  `item_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `receiver_guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   PRIMARY KEY (`mail_id`,`item_guid`),
-  KEY `idx_receiver` (`receiver`),
+  KEY `idx_receiver` (`receiver_guid`),
   KEY `idx_item_guid` (`item_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
@@ -859,13 +792,13 @@ CREATE TABLE IF NOT EXISTS `migrations` (
 
 -- Dumping structure for table characters.petition
 CREATE TABLE IF NOT EXISTS `petition` (
-  `ownerguid` int(10) unsigned NOT NULL,
-  `petitionguid` int(10) unsigned DEFAULT '0',
-  `charterguid` int(10) unsigned DEFAULT NULL COMMENT 'Charter item GUID',
+  `owner_guid` int(10) unsigned NOT NULL,
+  `petition_guid` int(10) unsigned DEFAULT '0',
+  `charter_guid` int(10) unsigned DEFAULT NULL COMMENT 'Charter item GUID',
   `name` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`ownerguid`),
-  UNIQUE KEY `key_ownerguid_petitionguid` (`ownerguid`,`petitionguid`),
-  UNIQUE KEY `charterguid` (`charterguid`)
+  PRIMARY KEY (`owner_guid`),
+  UNIQUE KEY `key_ownerguid_petitionguid` (`owner_guid`,`petition_guid`),
+  UNIQUE KEY `charterguid` (`charter_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
@@ -873,13 +806,13 @@ CREATE TABLE IF NOT EXISTS `petition` (
 
 -- Dumping structure for table characters.petition_sign
 CREATE TABLE IF NOT EXISTS `petition_sign` (
-  `ownerguid` int(10) unsigned NOT NULL,
-  `petitionguid` int(11) unsigned NOT NULL DEFAULT '0',
-  `playerguid` int(11) unsigned NOT NULL DEFAULT '0',
+  `owner_guid` int(10) unsigned NOT NULL,
+  `petition_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `player_guid` int(11) unsigned NOT NULL DEFAULT '0',
   `player_account` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`petitionguid`,`playerguid`),
-  KEY `idx_playerguid` (`playerguid`),
-  KEY `idx_ownerguid` (`ownerguid`)
+  PRIMARY KEY (`petition_guid`,`player_guid`),
+  KEY `idx_playerguid` (`player_guid`),
+  KEY `idx_ownerguid` (`owner_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
 -- Data exporting was unselected.
@@ -891,17 +824,17 @@ CREATE TABLE IF NOT EXISTS `pet_aura` (
   `caster_guid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
   `item_guid` int(11) unsigned NOT NULL DEFAULT '0',
   `spell` int(11) unsigned NOT NULL DEFAULT '0',
-  `stackcount` int(11) unsigned NOT NULL DEFAULT '1',
-  `remaincharges` int(11) unsigned NOT NULL DEFAULT '0',
-  `basepoints0` int(11) NOT NULL DEFAULT '0',
-  `basepoints1` int(11) NOT NULL DEFAULT '0',
-  `basepoints2` int(11) NOT NULL DEFAULT '0',
-  `periodictime0` int(11) unsigned NOT NULL DEFAULT '0',
-  `periodictime1` int(11) unsigned NOT NULL DEFAULT '0',
-  `periodictime2` int(11) unsigned NOT NULL DEFAULT '0',
-  `maxduration` int(11) NOT NULL DEFAULT '0',
-  `remaintime` int(11) NOT NULL DEFAULT '0',
-  `effIndexMask` int(11) unsigned NOT NULL DEFAULT '0',
+  `stacks` int(11) unsigned NOT NULL DEFAULT '1',
+  `charges` int(11) unsigned NOT NULL DEFAULT '0',
+  `base_points0` float NOT NULL DEFAULT '0',
+  `base_points1` float NOT NULL DEFAULT '0',
+  `base_points2` float NOT NULL DEFAULT '0',
+  `periodic_time0` int(11) unsigned NOT NULL DEFAULT '0',
+  `periodic_time1` int(11) unsigned NOT NULL DEFAULT '0',
+  `periodic_time2` int(11) unsigned NOT NULL DEFAULT '0',
+  `max_duration` int(11) NOT NULL DEFAULT '0',
+  `duration` int(11) NOT NULL DEFAULT '0',
+  `effect_index_mask` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`caster_guid`,`item_guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
 
@@ -946,9 +879,9 @@ CREATE TABLE IF NOT EXISTS `playerbot` (
 CREATE TABLE IF NOT EXISTS `saved_variables` (
   `key` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `cleaning_flags` int(11) unsigned NOT NULL DEFAULT '0',
-  `lastHonorMaintenanceDay` int(11) unsigned NOT NULL DEFAULT '0',
-  `nextHonorMaintenanceDay` int(11) unsigned NOT NULL DEFAULT '0',
-  `honorMaintenanceMarker` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `honor_last_maintenance_day` int(11) unsigned NOT NULL DEFAULT '0',
+  `honor_next_maintenance_day` int(11) unsigned NOT NULL DEFAULT '0',
+  `honor_maintenance_marker` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Variable Saves';
 

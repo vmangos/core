@@ -90,7 +90,6 @@ void Camera::SetView(WorldObject* obj, bool update_far_sight_field /*= true*/)
         m_owner.SetGuidValue(PLAYER_FARSIGHT, (m_source == &m_owner ? ObjectGuid() : m_source->GetObjectGuid()));
 
     UpdateForCurrentViewPoint();
-    m_owner.SendCreateUpdateToPlayer(&m_owner);
 }
 
 void Camera::Event_ViewPointVisibilityChanged()
