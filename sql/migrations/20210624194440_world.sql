@@ -64,6 +64,15 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (191, 52, 91605, 91623, 0, 0, 1);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (192, -1, 187, 191, 0, 0, 0);
 
+-- Updates to Durotar Raiders
+DELETE FROM `creature_movement` WHERE `id` = 3256;
+UPDATE `creature` SET `movement_type` = 0 WHERE `guid` = 3256;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(3254, 3254, 4, 6.25244, 11),
+(3254, 3256, 4, 4.71, 11);
+UPDATE `creature_movement` SET `script_id` = 11 WHERE `id` = 3254 AND `point` IN (5,69); -- Run from here
+UPDATE `creature_movement` SET `script_id` = 13 WHERE `id` = 3254 AND `point` IN (32,93); -- Walk from here
+
 
 -- End of migration.
 END IF;
