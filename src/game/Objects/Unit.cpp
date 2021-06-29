@@ -6209,8 +6209,9 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
     TEST RESULTS FROM CLASSIC WITH SNIFFED EXACT POSITIONS TO MEASURE DISTANCES
 
     Level 1 Rogue vs Level 1 Rogue from behind - detected at 1.49299 yards
+    Level 2 Tauren vs Level 3 Rogue from behind - detected at 1.46318 yards
     Level 4 Creature vs Level 4 Rogue - aggro at 1.48306 yards
-    Conclusion: target is always detectable below 1.5 yards
+    Conclusion: target is always detectable below 1.5 yards, combat reach or bounding radius do not matter
 
     Level 4 Creature vs Level 1 Rogue - aggro at 3.23737 yards
     Level 4 Creature vs Level 2 Rogue - aggro at 2.38938 yards
