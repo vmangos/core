@@ -149,9 +149,9 @@ namespace MaNGOS
     struct DynamicObjectUpdater
     {
         DynamicObject &i_dynobject;
-        WorldObject* i_check;
+        SpellCaster* i_check;
         bool i_positive;
-        DynamicObjectUpdater(DynamicObject &dynobject, WorldObject* caster, bool positive) : i_dynobject(dynobject), i_positive(positive)
+        DynamicObjectUpdater(DynamicObject &dynobject, SpellCaster* caster, bool positive) : i_dynobject(dynobject), i_positive(positive)
         {
             i_check = caster;
             Unit* owner = i_check->IsUnit() ? static_cast<Unit*>(i_check)->GetOwner() : nullptr;
@@ -791,7 +791,7 @@ namespace MaNGOS
     class FriendlyCCedInRangeCheck
     {
         public:
-            FriendlyCCedInRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) {}
+            FriendlyCCedInRangeCheck(SpellCaster const* obj, float range) : i_obj(obj), i_range(range) {}
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
@@ -799,14 +799,14 @@ namespace MaNGOS
                     (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT));
             }
         private:
-            WorldObject const* i_obj;
+            SpellCaster const* i_obj;
             float i_range;
     };
 
     class FriendlyMissingBuffInRangeCheck
     {
         public:
-            FriendlyMissingBuffInRangeCheck(WorldObject const* obj, float range, uint32 spellid) : i_obj(obj), i_range(range), i_spell(spellid) {}
+            FriendlyMissingBuffInRangeCheck(SpellCaster const* obj, float range, uint32 spellid) : i_obj(obj), i_range(range), i_spell(spellid) {}
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
@@ -814,7 +814,7 @@ namespace MaNGOS
                     !(u->HasAura(i_spell, EFFECT_INDEX_0) || u->HasAura(i_spell, EFFECT_INDEX_1) || u->HasAura(i_spell, EFFECT_INDEX_2));
             }
         private:
-            WorldObject const* i_obj;
+            SpellCaster const* i_obj;
             float i_range;
             uint32 i_spell;
     };
@@ -858,15 +858,58 @@ namespace MaNGOS
     class AnyFriendlyUnitInObjectRangeCheck
     {
         public:
-            AnyFriendlyUnitInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) {}
+            AnyFriendlyUnitInObjectRangeCheck(SpellCaster const* obj, float range) : i_obj(obj), i_range(range) {}
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
                 return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_obj->IsFriendlyTo(u) && u->CanSeeInWorld(i_obj);
             }
         private:
-            WorldObject const* i_obj;
+            SpellCaster const* i_obj;
             float i_range;
+    };
+
+    class AnySameFactionUnitInObjectRangeCheck
+    {
+    public:
+        AnySameFactionUnitInObjectRangeCheck(SpellCaster const* obj, float range) : i_obj(obj), i_range(range) {}
+        WorldObject const& GetFocusObject() const { return *i_obj; }
+        bool operator()(Unit* u)
+        {
+            return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && (i_obj->GetFactionTemplateId() == u->GetFactionTemplateId()) && u->CanSeeInWorld(i_obj);
+        }
+    private:
+        SpellCaster const* i_obj;
+        float i_range;
+    };
+
+    class AnyCreatureGroupMembersInObjectRangeCheck
+    {
+    public:
+        AnyCreatureGroupMembersInObjectRangeCheck(Creature const* obj, float range) : i_obj(obj), i_range(range) {}
+        WorldObject const& GetFocusObject() const { return *i_obj; }
+        bool operator()(Unit* u)
+        {
+            if (!u->IsAlive())
+                return false;
+            if (!u->IsCreature())
+                return false;
+            if (!i_obj->IsWithinDistInMap(u, i_range))
+                return false;
+            if (!u->CanSeeInWorld(i_obj))
+                return false;
+
+            if (i_obj->GetCreatureGroup() == static_cast<Creature*>(u)->GetCreatureGroup())
+                return true;
+
+            if (Creature* pOwner = u->GetOwnerCreature())
+                return i_obj->GetCreatureGroup() == static_cast<Creature*>(pOwner)->GetCreatureGroup();
+
+            return false;
+        }
+    private:
+        Creature const* i_obj;
+        float i_range;
     };
 
     class AnyUnitInObjectRangeCheck
@@ -916,7 +959,7 @@ namespace MaNGOS
     class AnyAoEVisibleTargetUnitInObjectRangeCheck
     {
         public:
-            AnyAoEVisibleTargetUnitInObjectRangeCheck(WorldObject const* obj, WorldObject const* originalCaster, float range)
+            AnyAoEVisibleTargetUnitInObjectRangeCheck(WorldObject const* obj, SpellCaster const* originalCaster, float range)
                 : i_obj(obj), i_originalCaster(originalCaster), i_range(range)
             {
             }
@@ -941,14 +984,14 @@ namespace MaNGOS
             }
         private:
             WorldObject const* i_obj;
-            WorldObject const* i_originalCaster;
+            SpellCaster const* i_originalCaster;
             float i_range;
     };
 
     class AnyAoETargetUnitInObjectRangeCheck
     {
         public:
-            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, WorldObject const* originalCaster, float range)
+            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, SpellCaster const* originalCaster, float range)
                 : i_obj(obj), i_originalCaster(originalCaster), i_range(range)
             {
             }
@@ -969,7 +1012,7 @@ namespace MaNGOS
             }
         private:
             WorldObject const* i_obj;
-            WorldObject const* i_originalCaster;
+            SpellCaster const* i_originalCaster;
             float i_range;
     };
 
@@ -1334,6 +1377,27 @@ namespace MaNGOS
             WorldObject const* m_pObject;
             uint32 m_uiEntry;
             float m_fRange;
+    };
+
+    class AllGameObjectsMatchingOneEntryInRange
+    {
+    public:
+        AllGameObjectsMatchingOneEntryInRange(WorldObject const* pObject, std::vector<uint32> const& entries, float fMaxRange)
+            : m_pObject(pObject), entries(entries), m_fRange(fMaxRange) {}
+        bool operator() (GameObject* pGo)
+        {
+            for (const auto entry : entries) {
+                if (pGo->GetEntry() == entry && m_pObject->IsWithinDist(pGo, m_fRange, false)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> entries;
+        float m_fRange;
     };
 
     class AllCreaturesOfEntryInRange

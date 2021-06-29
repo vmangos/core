@@ -100,6 +100,9 @@ enum ConditionType
     CONDITION_SOURCE_ENTRY          = 16,                   // Check's if the source's entry id matches the one specified.
                                                             // Requirement: WorldObject Source
                                                             // Value1: entry
+                                                            // Value2: entry (optional)
+                                                            // Value3: entry (optional)
+                                                            // Value4: entry (optional)
     CONDITION_SPELL                 = 17,                   // Checks if the player has learned the given spell.
                                                             // Requirement: Player Target
                                                             // Value1: spell_id

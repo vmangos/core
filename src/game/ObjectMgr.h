@@ -600,8 +600,8 @@ class ObjectMgr
 
         static GameObjectInfo const* GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
 
-        void LoadGameobjectInfo();
-        void CheckGameObjectInfos();
+        std::set<uint32> LoadGameobjectInfo();
+        std::set<uint32> CheckGameObjectInfos();
         void AddGameobjectInfo(GameObjectInfo* goinfo);
         void LoadGameObjectDisplayInfoAddon();
         void LoadGameobjectsRequirements();
@@ -670,6 +670,8 @@ class ObjectMgr
 		void SetTaxiNodeEntry(uint32 nodeId, std::unique_ptr<TaxiNodesEntry> &nodeEntry);
 
         uint32 GetMaxTaxiNodeId() const { return m_TaxiNodes.size(); }
+
+        ObjectGuid GetFullTransportGuidFromLowGuid(uint32 lowGuid);
 
         Quest const* GetQuestTemplate(uint32 quest_id) const
         {

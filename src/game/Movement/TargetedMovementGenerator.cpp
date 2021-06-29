@@ -47,10 +47,33 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     bool losChecked = false;
     bool losResult = false;
 
-    Transport* transport = nullptr;
+    GenericTransport* transport = owner.GetTransport();
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
-    if (isPet)
+
+    // Can switch transports during follow movement.
+    if (this->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+    {
         transport = i_target.getTarget()->GetTransport();
+
+        if (transport != owner.GetTransport())
+        {
+            if (owner.GetTransport())
+                owner.GetTransport()->RemoveFollowerFromTransport(i_target.getTarget(), &owner);
+
+            if (transport)
+                transport->AddFollowerToTransport(i_target.getTarget(), &owner);
+        }
+    }
+
+    m_bTargetOnTransport = i_target.getTarget()->GetTransport();
+    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, i_target.getTarget()->GetTransport());
+
+    // Can't path to target if transports are still different.
+    if (owner.GetTransport() != i_target.getTarget()->GetTransport())
+    {
+        m_bReachable = false;
+        return;
+    }
 
     if (!m_fOffset)
     {
@@ -89,7 +112,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         {
             float o;
             if (!(sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_EXTRAPOLATION_PET) &&
-                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.time) + 500, x, y, z, o)))
+                  i_target->ExtrapolateMovement(i_target->m_movementInfo, (WorldTimer::getMSTime() - i_target->m_movementInfo.stime) + 500, x, y, z, o)))
             {
                 i_target->GetPosition(x, y, z);
                 o = i_target->GetOrientation();
@@ -102,9 +125,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
                 i_target->GetSafePosition(x, y, z);
     }
-
-    m_bTargetOnTransport = transport;
-    i_target->GetPosition(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ, transport);
 
     PathFinder path(&owner);
 
@@ -185,15 +205,20 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         }
         else if (dist < 2.0f)
             init.SetWalk(true);
-        float facing = i_target->GetOrientation();
-        if (transport)
-            facing -= transport->GetOrientation();
-        init.SetFacing(facing);
+        init.SetFacing(i_target->GetOrientation());
     }
     else
+    { 
         init.SetWalk(((D*)this)->EnableWalking());
+
+        // Make player face target he is chasing (player does not automatically face target like creature).
+        if (owner.IsPlayer() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)
+            init.SetFacingGUID(i_target->GetGUID());
+    }
+
     init.Launch();
     m_checkDistanceTimer.Reset(500);
+
     // Fly-hack
     if (Player* player = i_target->ToPlayer())
     {
@@ -313,7 +338,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
                 float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
                 bool targetMoved = false;
                 G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
-                if (Transport* ownerTransport = owner.GetTransport())
+                if (GenericTransport* ownerTransport = owner.GetTransport())
                 {
                     if (m_bTargetOnTransport)
                         ownerTransport->CalculatePassengerPosition(dest.x, dest.y, dest.z);
@@ -349,22 +374,8 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
     if (owner.movespline->Finalized())
     {
-        if (owner.IsPlayer())
-        {
-            // For players need to actually send the new orientation.
-            // Creatures automatically face their target in client.
-            if (!owner.HasInArc(i_target.getTarget(), 2 * M_PI_F / 3))
-            {
-                owner.SetInFront(i_target.getTarget());
-                owner.SetFacingTo(owner.GetAngle(i_target.getTarget()));
-            }
-        }
-        else
-        {
-            if (!owner.HasInArc(i_target.getTarget(), 0.01f))
-                owner.SetInFront(i_target.getTarget());
-        }
-        
+        if (!owner.HasInArc(i_target.getTarget(), 0.01f))
+            owner.SetInFront(i_target.getTarget());
 
         if (m_bIsSpreading)
             m_bIsSpreading = false;
@@ -632,7 +643,7 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         {
             bool targetMoved = false;
             G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
-            if (Transport* ownerTransport = owner.GetTransport())
+            if (GenericTransport* ownerTransport = owner.GetTransport())
             {
                 if (m_bTargetOnTransport)
                     ownerTransport->CalculatePassengerPosition(dest.x, dest.y, dest.z);

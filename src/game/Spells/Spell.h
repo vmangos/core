@@ -160,7 +160,7 @@ class SpellCastTargets
 
         bool IsEmpty() const { return !m_GOTargetGUID && !m_unitTargetGUID && !m_itemTarget && !m_CorpseTargetGUID; }
 
-        void Update(WorldObject* caster);
+        void Update(SpellCaster* caster);
 
         float m_srcX, m_srcY, m_srcZ;
         float m_destX, m_destY, m_destZ;
@@ -222,7 +222,7 @@ class Spell
 {
     friend struct MaNGOS::SpellNotifierPlayer;
     friend struct MaNGOS::SpellNotifierCreatureAndPlayer;
-    friend void WorldObject::SetCurrentCastedSpell(Spell* pSpell);
+    friend void SpellCaster::SetCurrentCastedSpell(Spell* pSpell);
     public:
 
         void EffectEmpty(SpellEffectIndex eff_idx);
@@ -377,7 +377,7 @@ class Spell
         void FillTargetMap();
         void SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList &targetUnitMap);
 
-        void FillAreaTargets(UnitList &targetUnitMap, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = nullptr);
+        void FillAreaTargets(UnitList &targetUnitMap, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, SpellCaster* originalCaster = nullptr);
         void FillRaidOrPartyTargets(UnitList &TagUnitMap, Unit* target, float radius, bool raid, bool withPets, bool withcaster) const;
 
         template<typename T> WorldObject* FindCorpseUsing();
@@ -388,7 +388,7 @@ class Spell
         static void SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result);
         void SendCastResult(SpellCastResult result);
         void SendSpellStart();
-        void SendSpellGo(bool SendToCaster = true);
+        void SendSpellGo();
         void SendSpellCooldown();
         void SendLogExecute();
         void SendInterrupted(uint8 result);
@@ -410,12 +410,13 @@ class Spell
 
         int32 GetCastTime() const { return m_casttime; }
         uint32 GetCastedTime() { return m_timer; }
+        bool IsChanneled() const { return m_channeled; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
         void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
         bool IsChannelActive() const { return m_casterUnit ? m_casterUnit->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0 : false; }
-        bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK);  }
-        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && m_spellInfo->IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
+        bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_COMBAT);  }
+        bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && m_spellInfo->IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_COMBAT); }
         const SpellEntry* GetSpellInfo() const { return m_spellInfo; }
 
         bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executeStack; }
@@ -432,13 +433,13 @@ class Spell
 
         // caster types:
         // formal spell caster, in game source of spell affects cast
-        WorldObject* GetCaster() const { return m_caster; }
+        SpellCaster* GetCaster() const { return m_caster; }
         // real source of cast affects, explicit caster, or DoT/HoT applier, or GO owner, or wild GO itself. Can be nullptr
-        WorldObject* GetAffectiveCasterObject() const;
+        SpellCaster* GetAffectiveCasterObject() const;
         // limited version returning nullptr in cases wild gameobject caster object, need for Aura (auras currently not support non-Unit caster)
         Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_casterUnit; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
-        WorldObject* GetCastingObject() const;
+        SpellCaster* GetCastingObject() const;
 
         uint32 GetPowerCost() const { return m_powerCost; }
 
@@ -490,8 +491,9 @@ class Spell
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
+        void UpdateCastStartPosition();
 
-        WorldObject* const m_caster = nullptr;
+        SpellCaster* const m_caster = nullptr;
         Unit* const m_casterUnit = nullptr;
         GameObject* const m_casterGo = nullptr;
 
@@ -632,7 +634,7 @@ class Spell
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
-        uint32 GetSpellBatchingEffectDelay(WorldObject const* pTarget) const;
+        uint32 GetSpellBatchingEffectDelay(SpellCaster const* pTarget) const;
         // -------------------------------------------
 
         //List For Triggered Spells
@@ -644,10 +646,7 @@ class Spell
         uint32 m_timer = 0;
         uint32 m_triggeredByAuraBasePoints = 0;
 
-        float m_castPositionX = 0;
-        float m_castPositionY = 0;
-        float m_castPositionZ = 0;
-        float m_castOrientation = 0;
+        Position m_castPosition;
         bool m_IsTriggeredSpell = false;
         bool m_IsCastByItem = false;
 
@@ -736,7 +735,7 @@ namespace MaNGOS
         Spell &i_spell;
         uint32 const& i_index;
         float i_radius;
-        WorldObject* i_originalCaster;
+        SpellCaster* i_originalCaster;
 
         SpellNotifierPlayer(Spell &spell, Spell::UnitList &data, uint32 const& i, float radius)
             : i_data(data), i_spell(spell), i_index(i), i_radius(radius)

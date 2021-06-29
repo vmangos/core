@@ -518,6 +518,7 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
             return;
     }
 
+    _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_ANIM_CANCELS);
     _player->SetStandState(animstate);
 }
 

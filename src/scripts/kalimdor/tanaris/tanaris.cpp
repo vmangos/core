@@ -254,14 +254,15 @@ CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
 
 enum
 {
-    SAY_TOOG_THIRST             = -1000391,
-    SAY_TOOG_WORRIED            = -1000392,
-    SAY_TOOG_POST_1             = -1000393,
-    SAY_TORT_POST_2             = -1000394,
-    SAY_TOOG_POST_3             = -1000395,
-    SAY_TORT_POST_4             = -1000396,
-    SAY_TOOG_POST_5             = -1000397,
-    SAY_TORT_POST_6             = -1000398,
+    SAY_TOOGA_RANDOM_START      = 2221,
+    SAY_TOOGA_RANDOM_END        = 2228,
+
+    SAY_TOOG_POST_1             = 2137,
+    SAY_TORT_POST_2             = 2138,
+    SAY_TOOG_POST_3             = 2139,
+    SAY_TORT_POST_4             = 2140,
+    SAY_TOOG_POST_5             = 2141,
+    SAY_TORT_POST_6             = 2145,
 
     QUEST_TOOGA                 = 1560,
     NPC_TORTA                   = 6015,
@@ -286,7 +287,7 @@ struct npc_toogaAI : public FollowerAI
 
     void Reset() override
     {
-        m_uiCheckSpeechTimer = 2500;
+        m_uiCheckSpeechTimer = urand(30000, 60000);
         m_uiPostEventTimer = 1000;
         m_uiPhasePostEvent = 0;
 
@@ -376,17 +377,10 @@ struct npc_toogaAI : public FollowerAI
             {
                 if (m_uiCheckSpeechTimer < uiDiff)
                 {
-                    m_uiCheckSpeechTimer = 5000;
+                    m_uiCheckSpeechTimer = urand(30000, 60000);
 
-                    switch (urand(0, 50))
-                    {
-                        case 10:
-                            DoScriptText(SAY_TOOG_THIRST, m_creature);
-                            break;
-                        case 25:
-                            DoScriptText(SAY_TOOG_WORRIED, m_creature);
-                            break;
-                    }
+                    if (Player* pPlayer = GetLeaderForFollower())
+                        DoScriptText(urand(SAY_TOOGA_RANDOM_START, SAY_TOOGA_RANDOM_END), m_creature, pPlayer);
                 }
                 else
                     m_uiCheckSpeechTimer -= uiDiff;

@@ -41,6 +41,15 @@ void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList , WorldObjec
     Cell::VisitGridObjects(pSource, searcher, fMaxSearchRange);
 }
 
+void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, WorldObject* pSource, std::vector<uint32> const& entries, float fMaxSearchRange)
+{
+    ASSERT(pSource);
+    MaNGOS::AllGameObjectsMatchingOneEntryInRange check(pSource, entries, fMaxSearchRange);
+    MaNGOS::GameObjectListSearcher<MaNGOS::AllGameObjectsMatchingOneEntryInRange> searcher(lList, check);
+
+    Cell::VisitGridObjects(pSource, searcher, fMaxSearchRange);
+}
+
 void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, WorldObject* pSource, uint32 uiEntry, float fMaxSearchRange)
 {
     ASSERT(pSource);

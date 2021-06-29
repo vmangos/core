@@ -136,6 +136,35 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
+bool TargetedEmoteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (!m_owner.IsInCombat() && !m_owner.IsMoving())
+    {
+        if (Unit* pTarget = m_owner.GetMap()->GetUnit(m_targetGuid))
+        {
+            m_owner.SetFacingToObject(pTarget);
+            m_owner.HandleEmote(m_emoteId);
+            return true;
+        }
+    }
+
+    m_owner.ClearCreatureState(CSTATE_TARGETED_EMOTE);
+    return true;
+}
+
+bool TargetedEmoteCleanupEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (m_owner.HasCreatureState(CSTATE_TARGETED_EMOTE))
+    {
+        if (!m_owner.IsInCombat() && !m_owner.IsMoving())
+            m_owner.SetFacingTo(m_orientation);
+        m_owner.HandleEmoteState(0);
+        m_owner.ClearCreatureState(CSTATE_TARGETED_EMOTE);
+    }
+
+    return true;
+}
+
 void CreatureCreatePos::SelectFinalPoint(Creature* cr)
 {
     // if object provided then selected point at specific dist/angle from object forward look
@@ -930,7 +959,7 @@ void Creature::RegenerateMana()
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
-    if (IsInCombat() || GetCharmerOrOwnerGuid())
+    if (IsInCombat() || GetCharmerOrOwnerGuid().IsPlayer())
     {
         if (!IsUnderLastManaUseEffect())
             addvalue = m_manaRegen;
@@ -955,7 +984,7 @@ void Creature::RegenerateHealth()
     uint32 addvalue = 0;
 
     // Not only pet, but any controlled creature
-    if (GetCharmerOrOwnerGuid())
+    if (GetCharmerOrOwnerGuid().IsPlayer())
     {
         if (IsPolymorphed())
         {
@@ -1361,7 +1390,7 @@ void Creature::SetLootRecipient(Unit* unit)
         return;
 
     // set player for non group case or if group will disbanded
-    if (unit->IsPet())
+    if (unit->IsPet() && player->GetPetGuid() == unit->GetObjectGuid())
         m_lootRecipientGuid = unit->GetObjectGuid();
     else
         m_lootRecipientGuid = player->GetObjectGuid();
@@ -2216,12 +2245,16 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (!IsHostileTo(enemy))
         return false;
 
+    // prevent player from being stuck in combat with creature out of visibility radius
+    if (enemy->IsCharmerOrOwnerPlayerOrPlayerItself() && !isWithinVisibilityDistanceOf(enemy, enemy) && !GetMap()->IsDungeon())
+        return false;
+
     return true;
 }
 
 bool Creature::CanInitiateAttack()
 {
-    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED))
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_FEIGN_DEATH))
         return false;
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
@@ -3582,7 +3615,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
     // if the target cannot be attacked, the target is not acceptable
     if (IsFriendlyTo(target)
             || !target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself())
-            || target->HasUnitState(UNIT_STAT_DIED))
+            || target->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         return false;
 
     Unit* myVictim = GetAttackerForHelper();

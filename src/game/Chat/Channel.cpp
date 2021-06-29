@@ -825,7 +825,6 @@ void Channel::MakeYouJoined(WorldPacket* data)
     MakeNotifyPacket(data, CHAT_YOU_JOINED_NOTICE);
     *data << uint32(GetFlags());
     *data << uint32(0);                                     // the non-zero number will be appended to the channel name
-    *data << uint8(0);                                      // CString max length 512, conditional read
 }
 
 void Channel::MakeYouLeft(WorldPacket* data)

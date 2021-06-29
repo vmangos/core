@@ -94,6 +94,18 @@ Map::~Map()
     m_weatherSystem = nullptr;
 }
 
+GenericTransport* Map::GetTransport(ObjectGuid guid)
+{
+    if (Transport* transport = HashMapHolder<Transport>::Find(guid))
+        return transport;
+
+    if (guid.GetEntry())
+        if (GameObject* go = GetGameObject(guid))
+            if (go->IsTransport())
+                return static_cast<GenericTransport*>(go);
+    return nullptr;
+}
+
 void Map::LoadMapAndVMap(int gx, int gy)
 {
     if (m_bLoadedGrids[gx][gx])
@@ -211,6 +223,13 @@ template<class T>
 void Map::AddToGrid(T* obj, NGridType* grid, Cell const& cell)
 {
     (*grid)(cell.CellX(), cell.CellY()).template AddGridObject<T>(obj);
+}
+
+template<>
+void Map::AddToGrid(GameObject* obj, NGridType* grid, Cell const& cell)
+{
+    (*grid)(cell.CellX(), cell.CellY()).AddGridObject<GameObject>(obj);
+    obj->SetCurrentCell(cell);
 }
 
 template<>
@@ -1056,9 +1075,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
     m_bEnded = true;
 
     if (bSuccess && m_uiSuccessScript)
-        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, m_Source, m_Target);
     else if (!bSuccess && m_uiFailureScript)
-        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, m_Source, m_Target);
 
     for (const auto& target : m_vTargets)
     {
@@ -1068,9 +1087,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
             continue;
 
         if (bSuccess && target.uiSuccessScript)
-            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, target.target, m_Target);
         else if (!bSuccess && target.uiFailureScript)
-            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, target.target, m_Target);
     }
 }
 
@@ -1347,6 +1366,41 @@ void Map::DoPlayerGridRelocation(Player* player, float x, float y, float z, floa
     }
 }
 
+void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float orientation, bool respawnRelocationOnFail)
+{
+    Cell new_cell(MaNGOS::ComputeCellPair(x, y));
+    Cell old_cell = go->GetCurrentCell();
+
+    if (!respawnRelocationOnFail && !getNGrid(new_cell.GridX(), new_cell.GridY()))
+        return;
+
+    if (old_cell.DiffGrid(new_cell))
+    {
+        if ((!go->isActiveObject() || IsUnloading()) && !loaded(new_cell.gridPair()))
+        {
+            DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "GameObject (GUID: %u Entry: %u) attempt move from grid[%u,%u]cell[%u,%u] to unloaded grid[%u,%u]cell[%u,%u].", go->GetGUIDLow(), go->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
+            return;
+        }
+        EnsureGridLoadedAtEnter(new_cell);
+    }
+
+    // delay creature move for grid/cell to grid/cell moves
+    if (old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell))
+    {
+        NGridType* oldGrid = getNGrid(old_cell.GridX(), old_cell.GridY());
+        NGridType* newGrid = getNGrid(new_cell.GridX(), new_cell.GridY());
+        RemoveFromGrid(go, oldGrid, old_cell);
+        AddToGrid(go, newGrid, new_cell);
+        go->GetViewPoint().Event_GridChanged(&(*newGrid)(new_cell.CellX(), new_cell.CellY()));
+    }
+    else
+    {
+        go->Relocate(x, y, z, orientation);
+        go->UpdateModelPosition();
+        go->UpdateObjectVisibility();
+    }
+}
+
 void Map::CreatureRelocation(Creature* creature, float x, float y, float z, float ang)
 {
     MANGOS_ASSERT(CheckGridIntegrity(creature, false));
@@ -1579,22 +1633,22 @@ void Map::SendInitSelf(Player* player)
     bool hasTransport = false;
 
     // attach to player data current transport data
-    if (Transport* transport = player->GetTransport())
+    if (GenericTransport* transport = player->GetTransport())
     {
         hasTransport = true;
-        transport->BuildCreateUpdateBlockForPlayer(&data, player);
+        transport->BuildCreateUpdateBlockForPlayer(data, player);
     }
 
     // build data for self presence in world at own client (one time for map)
-    player->BuildCreateUpdateBlockForPlayer(&data, player);
+    player->BuildCreateUpdateBlockForPlayer(data, player);
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
-    if (Transport* transport = player->GetTransport())
+    if (GenericTransport* transport = player->GetTransport())
         for (const auto itr : transport->GetPassengers())
             if (player != itr && player->IsInVisibleList(itr))
             {
                 hasTransport = true;
-                itr->BuildCreateUpdateBlockForPlayer(&data, player);
+                itr->BuildCreateUpdateBlockForPlayer(data, player);
             }
 
     data.Send(player->GetSession(), hasTransport);
@@ -1610,7 +1664,7 @@ void Map::SendInitTransports(Player* player)
         if (itr != player->GetTransport())
         {
             hasTransport = true;
-            itr->BuildCreateUpdateBlockForPlayer(&transData, player);
+            itr->BuildCreateUpdateBlockForPlayer(transData, player);
         }
     }
     transData.Send(player->GetSession(), hasTransport);
@@ -1626,7 +1680,7 @@ void Map::SendRemoveTransports(Player* player)
         if (itr != player->GetTransport())
         {
             hasTransport = true;
-            itr->BuildOutOfRangeUpdateBlock(&transData);
+            itr->BuildOutOfRangeUpdateBlock(transData);
         }
     }
     transData.Send(player->GetSession(), hasTransport);
@@ -2347,16 +2401,12 @@ void BattleGroundMap::UnloadAll(bool pForce)
 }
 
 /// Put scripts in the execution queue
-void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, WorldObject* source, WorldObject* target)
+void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid)
 {
     ///- Find the script map
     ScriptMapMap::const_iterator s = scripts.find(id);
     if (s == scripts.end())
         return;
-
-    // prepare static data
-    ObjectGuid sourceGuid = source->GetObjectGuid();
-    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
 
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
@@ -2378,13 +2428,9 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, WorldObject* sour
     }
 }
 
-void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, WorldObject* source, WorldObject* target)
+void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, ObjectGuid sourceGuid, ObjectGuid targetGuid)
 {
     // NOTE: script record _must_ exist until command executed
-
-    // prepare static data
-    ObjectGuid sourceGuid = source->GetObjectGuid();
-    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
 
     ScriptAction sa;
     sa.sourceGuid = sourceGuid;
@@ -2440,6 +2486,7 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, Scr
                 case TARGET_T_CREATURE_WITH_GUID:
                 case TARGET_T_CREATURE_FROM_INSTANCE_DATA:
                 case TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY:
+                case TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY:
                 case TARGET_T_GAMEOBJECT_WITH_GUID:
                 case TARGET_T_GAMEOBJECT_FROM_INSTANCE_DATA:
                 {
@@ -2489,7 +2536,7 @@ void Map::ScriptsProcess()
     // ok as multimap is a *sorted* associative container
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
-         ScriptAction const step = iter->second;
+        ScriptAction const step = iter->second;
         lock.unlock();
 
         WorldObject* source = nullptr;
@@ -2568,15 +2615,6 @@ Creature* Map::GetAnyTypeCreature(ObjectGuid guid)
     return nullptr;
 }
 
-Transport* Map::GetTransport(ObjectGuid guid)
-{
-    if (!guid.IsMOTransport())
-        return nullptr;
-
-    GameObject* go = GetGameObject(guid);
-    return go ? go->ToTransport() : nullptr;
-}
-
 /**
  * Function return dynamic object that in world at CURRENT map
  *
@@ -2612,6 +2650,7 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
     {
         case HIGHGUID_PLAYER:
             return GetPlayer(guid);
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             return GetGameObject(guid);
         case HIGHGUID_UNIT:
@@ -2627,7 +2666,6 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
             return corpse && corpse->IsInWorld() ? corpse : nullptr;
         }
         case HIGHGUID_MO_TRANSPORT:
-        case HIGHGUID_TRANSPORT:
         default:
             break;
     }
@@ -2856,6 +2894,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
         case HIGHGUID_UNIT:
             guid = m_CreatureGuids.Generate();
             break;
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             guid = m_GameObjectGuids.Generate();
             break;
@@ -3024,7 +3063,7 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
     return result0;
 }
 
-bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, uint32 moveAllowedFlags, float zSearchDist, bool locatedOnSteepSlope) const
+bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, uint32 moveAllowedFlags, float zSearchDist, bool locatedOnSteepSlope) const
 {
     if (!MaNGOS::IsValidMapCoord(srcX, srcY, srcZ))
     {
@@ -3134,7 +3173,7 @@ bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float
 }
 
 
-bool Map::GetWalkRandomPosition(Transport* transport, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags) const
+bool Map::GetWalkRandomPosition(GenericTransport* transport, float &x, float &y, float &z, float maxRadius, uint32 moveAllowedFlags) const
 {
     ASSERT(MaNGOS::IsValidMapCoord(x, y, z));
 
@@ -3320,9 +3359,9 @@ void Map::BindToInstanceOrRaid(Player* player, time_t objectResetTime, bool perm
             DungeonPersistentState* save = ((DungeonMap*)this)->GetPersistanceState();
             // the reset time is set but not added to the scheduler
             // until the players leave the instance
-            time_t resettime = objectResetTime + 2 * HOUR;
-            if (save->GetResetTime() < resettime)
-                save->SetResetTime(resettime);
+            time_t resetTime = objectResetTime + 2 * HOUR;
+            if (save->GetResetTime() < resetTime)
+                save->SetResetTime(resetTime);
         }
     }
 }
@@ -3503,7 +3542,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
         sLog.outErrorDb("Gameobject template %u not found in database!", entry);
         return nullptr;
     }
-    GameObject* go = new GameObject();
+    GameObject* go = GameObject::CreateGameObject(entry);
     if (!go->Create(GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), entry, this, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, 100, GO_STATE_READY))
     {
         delete go;

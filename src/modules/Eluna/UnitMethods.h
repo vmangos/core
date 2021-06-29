@@ -463,7 +463,7 @@ namespace LuaUnit
      */
     int IsUnderWater(lua_State* L, Unit* unit)
     {
-        Eluna::Push(L, unit->IsUnderWater());
+        Eluna::Push(L, unit->IsUnderwater());
         return 1;
     }
     

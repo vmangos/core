@@ -243,7 +243,7 @@ bool ItemCanGoIntoBag(ItemPrototype const* proto, ItemPrototype const* pBagProto
 class Item : public Object
 {
     public:
-        static Item* CreateItem(uint32 item, uint32 count, Player const* player = nullptr);
+        static Item* CreateItem(uint32 item, uint32 count, ObjectGuid playerGuid = ObjectGuid());
         Item* CloneItem(uint32 count, Player const* player = nullptr) const;
 
         Item();

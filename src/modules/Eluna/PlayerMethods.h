@@ -3375,7 +3375,7 @@ namespace LuaPlayer
         if (!item)
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(L, 2);
-            item = Item::CreateItem(entry, 1, player);
+            item = Item::CreateItem(entry, 1, player->GetObjectGuid());
             if (!item)
                 return 1;
 

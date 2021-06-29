@@ -174,10 +174,12 @@ set (game_SRCS
     Objects/Object.cpp
     Objects/Pet.cpp
     Objects/Player.cpp
+    Objects/SpellCaster.cpp
     Objects/TemporarySummon.cpp
     Objects/Totem.cpp
     Objects/Unit.cpp
     Objects/UpdateData.cpp
+    Objects/UpdateFields.cpp
     OutdoorPvP/OutdoorPvPEP.cpp
     OutdoorPvP/OutdoorPvPSI.cpp
     OutdoorPvP/Register.cpp
@@ -362,6 +364,7 @@ set (game_SRCS
     Objects/ObjectDefines.h
     Objects/Pet.h
     Objects/Player.h
+    Objects/SpellCaster.h
     Objects/TemporarySummon.h
     Objects/Totem.h
     Objects/Unit.h

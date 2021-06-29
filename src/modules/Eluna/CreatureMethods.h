@@ -1389,7 +1389,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
         if (cInfo)
         {
 #ifdef VMANGOS
-            Eluna::Push(L, cInfo->beast_family);
+            Eluna::Push(L, cInfo->pet_family); 
 #else            
             Eluna::Push(L, cInfo->Family);
 #endif

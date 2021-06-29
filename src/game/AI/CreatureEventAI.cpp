@@ -703,9 +703,9 @@ void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
             //if range is ok and we are actually in LOS
             if (m_creature->IsWithinDistInMap(pWho, fMaxAllowedRange))
             {
-                //if friendly event&&who is not hostile OR hostile event&&who is hostile
-                if ((itr.Event.ooc_los.noHostile && !m_creature->IsHostileTo(pWho)) ||
-                    (!itr.Event.ooc_los.noHostile && m_creature->IsHostileTo(pWho)))
+                if ((itr.Event.ooc_los.reaction == ULR_ANY) ||
+                    (itr.Event.ooc_los.reaction == ULR_NON_HOSTILE && !m_creature->IsHostileTo(pWho)) ||
+                    (itr.Event.ooc_los.reaction == ULR_HOSTILE && m_creature->IsHostileTo(pWho)))
                     if (m_creature->IsWithinLOSInMap(pWho))
                         ProcessEvent(itr, pWho);
             }

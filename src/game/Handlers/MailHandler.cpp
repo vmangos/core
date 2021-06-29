@@ -241,7 +241,7 @@ void WorldSession::HandleSendMail(WorldPacket& recv_data)
     {
         req->rcTeam = sObjectMgr.GetPlayerTeamByGUID(req->receiver);
         // Unsafe query: can modify items, accesses online players ...
-        CharacterDatabase.AsyncPQueryUnsafe(req, &WorldSession::AsyncMailSendRequest::Callback, "SELECT COUNT(*) FROM mail WHERE receiver = '%u'", req->receiver.GetCounter());
+        CharacterDatabase.AsyncPQueryUnsafe(req, &WorldSession::AsyncMailSendRequest::Callback, "SELECT COUNT(*) FROM `mail` WHERE `receiver_guid` = '%u'", req->receiver.GetCounter());
     }
 }
 
@@ -383,7 +383,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
             item->DeleteFromInventoryDB();                  // deletes item from character's inventory
             item->SaveToDB();                               // recursive and not have transaction guard into self, item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
-            CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'", req->receiver.GetCounter(), item->GetGUIDLow());
+            CharacterDatabase.PExecute("UPDATE `item_instance` SET `owner_guid` = '%u' WHERE `guid`='%u'", req->receiver.GetCounter(), item->GetGUIDLow());
             CharacterDatabase.CommitTransaction();
 
             draft.AddItem(item);
@@ -524,9 +524,9 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
     //we can return mail now
     //so firstly delete the old one
     CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
-    CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", mailId);
+    CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `id` = '%u'", mailId);
     // needed?
-    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE mail_id = '%u'", mailId);
+    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `mail_id` = '%u'", mailId);
     CharacterDatabase.CommitTransaction();
     pl->RemoveMail(mailId);
 
@@ -543,10 +543,10 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
         {
             for (const auto& itr2 : m->items)
             {
-                if (Item *item = pl->GetMItem(itr2.item_guid))
+                if (Item *item = pl->GetMItem(itr2.itemGuid))
                     draft.AddItem(item);
 
-                pl->RemoveMItem(itr2.item_guid);
+                pl->RemoveMItem(itr2.itemGuid);
             }
         }
 
@@ -602,8 +602,8 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recv_data)
         return;
     }
 
-    uint32 itemId = m->items[0].item_template;
-    uint32 itemGuid = m->items[0].item_guid;
+    uint32 itemId = m->items[0].itemId;
+    uint32 itemGuid = m->items[0].itemGuid;
 
     Item *it = pl->GetMItem(itemGuid);
 
@@ -788,7 +788,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
 
         // 1.12.1 can have only single item
-        Item *item = !(*itr)->items.empty() ? pl->GetMItem((*itr)->items[0].item_guid) : nullptr;
+        Item *item = !(*itr)->items.empty() ? pl->GetMItem((*itr)->items[0].itemGuid) : nullptr;
 
         if (item)
         {
@@ -922,53 +922,10 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket& /**recv_data*/)
     MasterPlayer* player = GetMasterPlayer();
     ASSERT(player);
     WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
-
     if (player->HasUnreadMail())
-    {
-        data << uint32(0);                                  // float
-        data << uint32(0);                                  // count
-
-        uint32 count = 0;
-        time_t now = time(nullptr);
-        for (PlayerMails::iterator itr = player->GetMailBegin(); itr != player->GetMailEnd(); ++itr)
-        {
-            Mail *m = (*itr);
-            // must be not checked yet
-            if (m->checked & MAIL_CHECK_MASK_READ)
-                continue;
-
-            // and already delivered
-            if (now < m->deliver_time)
-                continue;
-
-            data << ObjectGuid(HIGHGUID_PLAYER, m->sender); // sender guid
-
-            switch (m->messageType)
-            {
-                case MAIL_AUCTION:
-                    data << uint32(m->sender);              // auction house id
-                    data << uint32(MAIL_AUCTION);           // message type
-                    break;
-                default:
-                    data << uint32(0);
-                    data << uint32(0);
-                    break;
-            }
-
-            data << uint32(m->stationery);
-            data << uint32(0xC6000000);                     // float unk, time or something
-
-            ++count;
-            if (count == 2)                                 // do not display more than 2 mails
-                break;
-        }
-        data.put<uint32>(4, count);
-    }
+        data << float(0);
     else
-    {
-        data << uint32(0xC7A8C000);
-        data << uint32(0x00000000);
-    }
+        data << float(-86400.0f);
     SendPacket(&data);
 }
 

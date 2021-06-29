@@ -17,7 +17,6 @@
 /* ScriptData
 SDName: Boss_Buru
 SD%Complete: 100%
-SDComment: Ras, en attente de tests.
 SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
@@ -26,24 +25,24 @@ EndScriptData */
 
 enum
 {
-    EMOTE_TARGET                =   -1509002,
+    EMOTE_TARGET                = 11074,
 
-    SPELL_CREEPING_PLAGUE       =   20512,
-    SPELL_DISMEMBER             =   96,
-    SPELL_GAIN_SPEED            =   1834,
-    SPELL_FULL_SPEED            =   1557,
-    SPELL_THORNS                =   25640,
-    SPELL_BURU_TRANSFORM        =   24721,
-    SPELL_SELF_FREEZE           =   29826,
+    SPELL_CREEPING_PLAGUE       = 20512,
+    SPELL_DISMEMBER             = 96,
+    SPELL_GAIN_SPEED            = 1834,
+    SPELL_FULL_SPEED            = 1557,
+    SPELL_THORNS                = 25640,
+    SPELL_BURU_TRANSFORM        = 24721,
+    SPELL_SELF_FREEZE           = 29826,
 
-    NPC_BURU_EGG                =   15514,
-    SPELL_SUMMON_HATCHLING      =   1881,
-    SPELL_EXPLODE               =   19593,
-    NPC_BURU_EGG_TRIGGER        =   15964,
+    NPC_BURU_EGG                = 15514,
+    SPELL_SUMMON_HATCHLING      = 1881,
+    SPELL_EXPLODE               = 19593,
+    NPC_BURU_EGG_TRIGGER        = 15964,
 
-    NPC_HIVEZARA_HATCHLING      =   15521,
+    NPC_HIVEZARA_HATCHLING      = 15521,
 
-    MODEL_INVISIBLE             =   11686
+    MODEL_INVISIBLE             = 11686
 };
 
 float const THREAT_LOCK = FLT_MAX;
@@ -81,8 +80,9 @@ struct boss_buruAI : public ScriptedAI
     uint32 m_uiDismember_Timer;
     uint32 m_uiSpeed_Timer;
     uint32 m_uiCreepingPlague_Timer;
-    uint32 m_uiTransform_Timer;
+    uint32 m_uiTransformTimer;
     uint32 m_uiRespawnEgg_Timer[6];
+    uint8 m_transitionStep;
 
     uint64 m_eggsGUID[6];
 
@@ -96,6 +96,8 @@ struct boss_buruAI : public ScriptedAI
         m_uiDismember_Timer = 1000;
         m_uiSpeed_Timer = 30000;
         m_uiCreepingPlague_Timer = 6000;
+        m_uiTransformTimer = 0;
+        m_transitionStep = 0;
 
         for (uint32 & i : m_uiRespawnEgg_Timer)
             i = 120000;
@@ -114,24 +116,36 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, NOT_STARTED);
     }
 
-    void Aggro(Unit *pWho) override
+    void EnterCombat(Unit *pWho) override
     {
         m_creature->SetInCombatWithZone();
-        DoCast(m_creature, SPELL_THORNS);
         m_creature->SetArmor(20000);
+        DoCast(m_creature, SPELL_THORNS);
+        if (!IsMeleeAttackEnabled())
+            SetMeleeAttack(true);
+        if (!IsCombatMovementEnabled())
+            SetCombatMovement(true);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BURU, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller) override
     {
-        // Le debuff fade quand il est mort, sinon le raid se fait decimer
+        // The debuff should fade when dead, otherwise the raid gets decimated 
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (const auto& i : liste)
             i.getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BURU, DONE);
+    }
+
+    void AttackStart(Unit* pVictim) override
+    {
+        if (m_bIsEnraged && m_uiTransformTimer)
+            return;
+
+        ScriptedAI::AttackStart(pVictim);
     }
 
     void UpdateAI(uint32 const uiDiff) override
@@ -158,48 +172,56 @@ struct boss_buruAI : public ScriptedAI
             }
         }
 
-        // Transition de phase. Tout ca pour avoir un joli visuel :)
-        if (m_bIsEnraged && m_creature->HasAura(SPELL_SELF_FREEZE))
+        // Phase transition. All this to have a nice visual :)
+        if (m_bIsEnraged && m_uiTransformTimer)
         {
-            if (!m_uiTransform_Timer)
-                return;
-
-            if (m_uiTransform_Timer <= uiDiff)
+            if (m_uiTransformTimer <= uiDiff)
             {
-                m_creature->RemoveAllAuras(); // Delete Thorns ability during Phase 2
-                m_creature->AddAura(SPELL_BURU_TRANSFORM);
-                m_uiTransform_Timer = 0;
-                m_creature->SetInCombatWithZone(); // Arrive qu'il revienne a sa place si on ne le tape pas sans ca
+                switch (m_transitionStep)
+                {
+                    case 0:
+                    {    
+                        m_creature->RemoveAllAuras(); // Delete Thorns ability during Phase 2
+                        DoCastSpellIfCan(m_creature, SPELL_BURU_TRANSFORM);
+                        m_transitionStep = 1;
+                        m_uiTransformTimer = 5000;
+                        break;
+                    }
+                    case 1:
+                    {
+                        DoCastSpellIfCan(m_creature, SPELL_FULL_SPEED, CF_TRIGGERED);
+                        SetMeleeAttack(true);
+                        SetCombatMovement(true);
+                        m_creature->SetInCombatWithZone();
+                        m_transitionStep = 2;
+                        m_uiTransformTimer = 0;
+                        break;
+                    }
+                }
             }
             else
-                m_uiTransform_Timer -= uiDiff;
+                m_uiTransformTimer -= uiDiff;
+
             return;
         }
+
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        // Si il n'est pas enrage et qu'il n'a plus de threat list, il choisi une personne a focus au hasard
+        // If he is not enraged and no longer has a threat list, he chooses a person with focus at random 
         if (!m_bIsEnraged)
         {
             if (m_creature->GetHealthPercent() < 20)
             {
                 m_bIsEnraged = true;
 
-                // Freeze
-                if (SpellAuraHolder* aura = m_creature->AddAura(SPELL_SELF_FREEZE))
-                {
-                    // m_uiTransform_Timer + temps du visuel cote client. Le visuel se casse en cas de mvt.
-                    aura->SetAuraMaxDuration(5600);
-                    aura->SetAuraDuration(5600);
-                    aura->SetPassive(false);
-                    aura->SetPermanent(false);
-                }
-                // Le sort de transformation ne doit pas etre lance tout de suite si on veut avoir le visuel.
-                m_uiTransform_Timer = 200;
+                // The transformation spell should not be cast right away if you want to have the visual. 
+                m_uiTransformTimer = 200;
+                m_transitionStep = 0;
 
-                // Suppression de son armure, enrage, reset de la liste d'aggro et vitesse remise à la normal
+                // Removed armor, enrage, reset aggro list and reset speed to normal
                 m_creature->SetArmor(0);
                 m_creature->DeleteThreatList();
                 m_creature->RemoveAurasDueToSpell(SPELL_GAIN_SPEED);
@@ -208,7 +230,11 @@ struct boss_buruAI : public ScriptedAI
                 if (m_creature->GetVictim())
                     m_creature->SetFacingToObject(m_creature->GetVictim());
 
-                // Despawn des oeufs lors de l'enrage
+                SetMeleeAttack(false);
+                SetCombatMovement(false);
+                m_creature->AttackStop(true);
+
+                // Despawn eggs when enraged
                 for (uint64 & guid : m_eggsGUID)
                 {
                     if (guid)
@@ -243,7 +269,7 @@ struct boss_buruAI : public ScriptedAI
                     {
                         DoScriptText(EMOTE_TARGET, m_creature, pTarget);
 
-                        // Pour verouiller la cible, on applique une menace tres elevee
+                        // To lock the target, we apply a very high threat
                         m_creature->GetThreatManager().addThreat(pTarget, THREAT_LOCK);
 
                         m_creature->RemoveAurasDueToSpell(SPELL_GAIN_SPEED);
@@ -274,7 +300,7 @@ struct boss_buruAI : public ScriptedAI
             else
                 m_uiCreepingPlague_Timer -= uiDiff;
 
-            // Pop des add lors de l'enrage (3, mais je ne suis pas sur de ce nombre et ne sait pas s'ils arrivent tous d'un coup)
+            // Pop additions when enraged (3, but I'm not sure of this number and don't know if they all happen at once) 
             if (!m_HatchPop)
             {
                 for (const auto& i : AddPop)

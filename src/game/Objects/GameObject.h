@@ -25,7 +25,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "GameObjectDefines.h"
-#include "Object.h"
+#include "SpellCaster.h"
 #include "LootMgr.h"
 #include "Util.h"
 
@@ -38,23 +38,27 @@ class Unit;
 class GameObjectAI;
 class GameObjectModel;
 class Transport;
+struct TransportAnimation;
 
 struct GameObjectDisplayInfoEntry;
 
-class GameObject : public WorldObject
+class GameObject : public SpellCaster
 {
     public:
         explicit GameObject();
         ~GameObject() override;
 
+        static GameObject* CreateGameObject(uint32 entry);
+
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
+        virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
         void Update(uint32 update_diff, uint32 p_time) override;
         GameObjectInfo const* GetGOInfo() const;
 
         bool IsTransport() const;
+        bool IsMoTransport() const;
 
         bool HasStaticDBSpawnData() const;                  // listed in `gameobject` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const { return HasStaticDBSpawnData() ? GetGUIDLow() : 0; }
@@ -234,11 +238,16 @@ class GameObject : public WorldObject
         void AIM_Initialize();
         GameObjectAI* AI() { return i_AI; }
 
-        // NOSTALRIUS: GOCollision
         void UpdateCollisionState();
         void UpdateModel();                                 // updates model in case displayId were changed
         GameObjectModel* m_model;
         void UpdateModelPosition();
+
+        float GetStationaryX() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.x; return 0.f; }
+        float GetStationaryY() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.y; return 0.f; }
+        float GetStationaryZ() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.z; return 0.f; }
+        float GetStationaryO() const { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.o; return GetOrientation(); }
+
         GameObjectData const*  GetGOData() const;
 
         // Transports system
@@ -282,6 +291,8 @@ class GameObject : public WorldObject
         uint64 m_rotation;
         GameObjectInfo const* m_goInfo;
 
+        Position m_stationaryPosition;
+
         GameObjectAI* i_AI;
 
         uint32 m_playerGroupId;
@@ -294,4 +305,25 @@ class GameObject : public WorldObject
 
         GridReference<GameObject> m_gridRef;
 };
+
+inline GameObject* Object::ToGameObject()
+{
+    return IsGameObject() ? static_cast<GameObject*>(this) : nullptr;
+}
+
+inline GameObject const* Object::ToGameObject() const
+{
+    return IsGameObject() ? static_cast<GameObject const*>(this) : nullptr;
+}
+
+inline GameObject* ToGameObject(Object* object)
+{
+    return object && object->IsGameObject() ? static_cast<GameObject*>(object) : nullptr;
+}
+
+inline GameObject const* ToGameObject(Object const* object)
+{
+    return object && object->IsGameObject() ? static_cast<GameObject const*>(object) : nullptr;
+}
+
 #endif
