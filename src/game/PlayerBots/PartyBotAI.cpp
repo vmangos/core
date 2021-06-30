@@ -2003,7 +2003,7 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
         }
 
         if (m_spells.warlock.pBanish &&
-           !me->GetAttackers().empty())
+            me->GetAttackers().size() > 1)
         {
             Unit* pAttacker = *me->GetAttackers().begin();
             if ((pAttacker->GetHealth() > me->GetHealth()) &&
