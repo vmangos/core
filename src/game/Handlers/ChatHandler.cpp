@@ -468,7 +468,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                         return;
                     }
                 }
-            }
 
             if (!player || (tSecurity == SEC_PLAYER && pSecurity > SEC_PLAYER && !player->AcceptsWhispersFrom(masterPlr->GetObjectGuid())))
             {
