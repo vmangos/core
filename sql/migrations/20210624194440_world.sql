@@ -75,6 +75,9 @@ UPDATE `creature_movement` SET `script_id` = 11 WHERE `id` = 3254 AND `point` IN
 UPDATE `creature_movement` SET `script_id` = 13 WHERE `id` = 3254 AND `point` IN (32,93); -- Walk from here
 
 
+UPDATE `gameobject_template` SET `data2` = 2 WHERE `entry` = 180055;
+
+
 -- End of migration.
 END IF;
 END??
