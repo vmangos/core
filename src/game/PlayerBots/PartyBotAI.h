@@ -67,8 +67,9 @@ public:
     bool RunAwayFromTarget(Unit* pTarget);
     bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
+
     void OnWhisper(Player* pWho, std::string text) override;
-    
+
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
     void UpdateInCombatAI_Paladin() final;

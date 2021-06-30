@@ -407,6 +407,10 @@ class Unit : public SpellCaster
         bool HealthBelowPctDamaged(int32 pct, uint32 damage) const { return (int32(GetHealth()) - damage) * 100 < GetMaxHealth() * pct; }
         bool HealthAbovePct(int32 pct) const { return GetHealth() * 100 > GetMaxHealth() * pct; }
         uint32 CountPctFromMaxHealth(int32 pct) const { return uint32(float(pct) * GetMaxHealth() / 100.0f); }
+#ifdef ENABLE_ELUNA
+		uint32 CountPctFromCurHealth(int32 pct) const { return uint32(float(pct) * GetHealth() / 100.0f); }
+#endif
+
         void SetFullHealth() { SetHealth(GetMaxHealth()); }
 
         Powers GetPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE)); }
@@ -509,6 +513,11 @@ class Unit : public SpellCaster
             return creatureType ? (1 << (creatureType - 1)) : 0;
         }
         bool IsAlive() const { return m_deathState == ALIVE; }
+
+#ifdef ENABLE_ELUNA
+		bool IsDying() const { return m_deathState == JUST_DIED; }
+#endif
+
         bool IsDead() const { return m_deathState == DEAD || m_deathState == CORPSE; }
         DeathState GetDeathState() const { return m_deathState; }
         virtual void SetDeathState(DeathState s);           // overwritten in Creature/Player/Pet
@@ -1065,6 +1074,16 @@ class Unit : public SpellCaster
          * \see Unit::AttackStop
          */
         void RemoveAllAttackers();
+
+#ifdef ENABLE_ELUNA
+		/**
+		 * Checks if we are attacking a player.
+		 * Pets/minions etc attacking a player counts towards you attacking a player.
+		 * @return true if you and/or your pets/minions etc are attacking a player.
+		 */
+		bool isAttackingPlayer() const;
+#endif
+
 
         void _addAttacker(Unit* pAttacker)                  // (Internal Use) must be called only from Unit::Attack(Unit*)
         {

@@ -38,7 +38,11 @@
 #include "Util.h"
 #include "Anticheat.h"
 
-void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
+void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player  *player =   GetPlayer();
@@ -284,6 +288,11 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
         }
         else
             player->LootMoney(pLoot->gold, pLoot);
+
+        // Used by Eluna
+#ifdef ENABLE_ELUNA
+        sEluna->OnLootMoney(player, pLoot->gold);
+#endif /* ENABLE_ELUNA */
 
         pLoot->gold = 0;
 
@@ -612,6 +621,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
         sLog.out(LOG_LOOTS, "Master loot %s gives %ux%u to %s [loot from %s]", _player->GetShortDescription().c_str(), item.count, item.itemid, target->GetShortDescription().c_str(), lootguid.GetString().c_str());
         target->SendNewItem(newitem, uint32(item.count), false, false, true);
         target->OnReceivedItem(newitem);
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    	sEluna->OnLootItem(target, newitem, item.count, lootguid);
+#endif /* ENABLE_ELUNA */
+
     }
 
     // mark as looted

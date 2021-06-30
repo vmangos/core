@@ -178,7 +178,7 @@ void PartyBotAI::LearnPremadeSpecForClass()
         if (!gearId)
             gearId = SelectRandomContainerElement(vGear)->entry;
         sObjectMgr.ApplyPremadeGearTemplateToPlayer(gearId, me);
-    }    
+    }
 }
 
 Player* PartyBotAI::GetPartyLeader() const
@@ -366,7 +366,7 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
                 return pTarget;
         }
     }
-    
+
     // Stick to marked target in combat.
     if (me->IsInCombat() || pLeader->GetVictim())
     {
@@ -857,7 +857,7 @@ void PartyBotAI::UpdateInCombatAI()
                     return;
         }
     }
-      
+
     if (m_role == ROLE_TANK)
     {
         Unit* pVictim = me->GetVictim();

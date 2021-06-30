@@ -33,6 +33,10 @@
 #include "Opcodes.h"
 #include "MangosSocketImpl.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
 template class MangosSocket<WorldSession, WorldSocket, AuthCrypt>;
 
 int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
@@ -72,6 +76,10 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                     sLog.outError("WorldSocket::ProcessIncoming: Player send CMSG_AUTH_SESSION again");
                     return -1;
                 }
+#ifdef ENABLE_ELUNA
+                if (!sEluna->OnPacketReceive(m_Session, *new_pct))
+                    return 0;
+#endif /* ENABLE_ELUNA */
 
                 return HandleAuthSession(*new_pct);
             default:

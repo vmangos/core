@@ -44,6 +44,9 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
 
 class LoginQueryHolder : public SqlQueryHolder
 {
@@ -345,6 +348,18 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         data << (uint8)CHAR_CREATE_ERROR;
         SendPacket(&data);
     }
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+	Player* pNewChar = new Player(this);
+	if (!pNewChar->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
+	{
+		// Player not create (race/class problem?)
+		delete pNewChar;
+		return;
+	}
+    sEluna->OnCreate(pNewChar);
+	delete pNewChar;
+#endif /* ENABLE_ELUNA */
 }
 
 void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
@@ -384,6 +399,11 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
     std::string IP_str = GetRemoteAddress();
     BASIC_LOG("Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
     sLog.out(LOG_CHAR, "Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    sEluna->OnDelete(lowguid);
+#endif /* ENABLE_ELUNA */
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -703,6 +723,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         SendNotification(LANG_RESET_TALENTS);               // we can use SMSG_TALENTS_INVOLUNTARILY_RESET here
     }
 
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
+        sEluna->OnFirstLogin(pCurrChar);
+#endif /* ENABLE_ELUNA */
+
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
@@ -750,6 +776,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     //if (GetWarden())
         //for (int i = 0; i < MAX_MOVE_TYPE; ++i)
             //GetWarden()->SendSpeedChange(UnitMoveType(i), pCurrChar->GetSpeed(UnitMoveType(i)));
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    sEluna->OnLogin(pCurrChar);
+#endif /* ENABLE_ELUNA */
 
     ALL_SESSION_SCRIPTS(this, OnLogin(pCurrChar));
 }

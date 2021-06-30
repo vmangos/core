@@ -290,6 +290,7 @@ class WorldSession
         void SendNotification(int32 string_id,...);
         void SendPetNameInvalid(uint32 error, std::string const& name);
         void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res);
+        void SendGuildInvite(Player* player, bool alreadyInGuild = false);
         void SendAreaTriggerMessage(char const* Text, ...) ATTR_PRINTF(2,3);
         void SendQueryTimeResponse();
 

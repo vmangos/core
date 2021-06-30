@@ -25,6 +25,9 @@
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include <numeric>
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
 
 int32 const ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
 
@@ -230,6 +233,9 @@ void ReputationMgr::Initialize()
 
 bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool noSpillover)
 {
+#ifdef ENABLE_ELUNA
+    sEluna->OnReputationChange(m_player, factionEntry->ID, standing, incremental);
+#endif /* ENABLE_ELUNA */
     bool res = false;
     // if spillover definition exists in DB
     if (RepSpilloverTemplate const* repTemplate = sObjectMgr.GetRepSpilloverTemplate(factionEntry->ID))

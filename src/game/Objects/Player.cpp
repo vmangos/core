@@ -6650,6 +6650,11 @@ void Player::RewardReputation(Unit* pVictim, float rate)
     if (pVictim->IsPet() && sWorld.GetWowPatch() >= WOW_PATCH_110)
         return;
 
+#ifdef ENABLE_ELUNA
+    if (((Creature*)pVictim)->IsReputationGainDisabled())
+        return;
+#endif
+
     ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKillEntry(((Creature*)pVictim)->GetEntry());
 
     if (!Rep)
@@ -7854,6 +7859,14 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                 }
 
             loot = &go->loot;
+#ifdef ENABLE_ELUNA
+            Player* recipient = go->GetLootRecipient();
+            if (!recipient)
+            {
+                go->SetLootRecipient(this);
+                recipient = this;
+            }
+#endif
 
             // generate loot only if ready for open and spawned in world
             if (go->getLootState() == GO_READY && go->isSpawned())
@@ -8711,6 +8724,24 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
 
     return count;
 }
+
+#ifdef ENABLE_ELUNA
+Item* Player::GetItemByEntry(uint32 itemEntry) const
+{
+	for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+		if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+			if (pItem->GetEntry() == itemEntry)
+				return pItem;
+
+	for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+		if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+			if (Item* itemPtr = pBag->GetItemByEntry(itemEntry))
+				return itemPtr;
+
+	return NULL;
+}
+
+#endif
 
 Item* Player::GetItemByGuid(ObjectGuid guid) const
 {
@@ -17342,6 +17373,38 @@ void Player::TextEmote(std::string const& text) const
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, text.c_str(), LANG_UNIVERSAL, GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
+
+#ifdef ENABLE_ELUNA
+void Player::Whisper(const std::string& text, uint32 language, ObjectGuid receiver)
+{
+	if (language != LANG_ADDON)                             // if not addon data
+	{
+		language = LANG_UNIVERSAL;
+	}                      // whispers should always be readable
+
+	Player* rPlayer = sObjectMgr.GetPlayer(receiver);
+
+	if (!rPlayer) // Player is offline/not available.
+		return;
+
+	WorldPacket data;
+	ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
+	rPlayer->GetSession()->SendPacket(&data);
+}
+/* removed from v18,but need's in eluna */
+void Player::RemoveAllSpellCooldown()
+{
+	if (!m_cooldownMap.IsEmpty())
+	{
+		if (Player* player = GetAffectingPlayer())
+			for (CooldownContainer::ConstIterator itr = m_cooldownMap.begin(); itr != m_cooldownMap.end(); ++itr)
+				player->SendClearCooldown(itr->first, this);
+
+		m_cooldownMap.clear();
+	}
+}
+
+#endif /* ENABLE_ELUNA */
 
 void Player::PetSpellInitialize()
 {

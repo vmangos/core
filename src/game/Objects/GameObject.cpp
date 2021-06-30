@@ -48,6 +48,10 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
 bool QuaternionData::isUnit() const
 {
     return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
@@ -117,6 +121,11 @@ GameObject* GameObject::CreateGameObject(uint32 entry)
 
 void GameObject::AddToWorld()
 {
+
+#ifdef ENABLE_ELUNA
+    bool inWorld = IsInWorld();
+#endif /* ENABLE_ELUNA */
+
     ///- Register the gameobject for guid lookup
     if (!IsInWorld())
     {
@@ -137,6 +146,10 @@ void GameObject::AddToWorld()
 
     if (sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY))
         m_procsUpdateTimer = sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) - (WorldTimer::getMSTime() % sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY));
+#ifdef ENABLE_ELUNA
+    if (!inWorld)
+        sEluna->OnAddToWorld(this);
+#endif /* ENABLE_ELUNA */  
 }
 
 void GameObject::AIM_Initialize()
@@ -150,6 +163,9 @@ void GameObject::RemoveFromWorld()
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
+#ifdef ENABLE_ELUNA
+        sEluna->OnRemoveFromWorld(this);
+#endif /* ENABLE_ELUNA */
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
 
@@ -262,6 +278,12 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     }
+	
+	// Used by Eluna
+#ifdef ENABLE_ELUNA
+    sEluna->OnSpawn(this);
+#endif /* ENABLE_ELUNA */    
+
 
     //Notify the map's instance data.
     //Only works if you create the object in it, not if it is moves to that map.
@@ -339,6 +361,11 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
     ///- UpdateAI
     if (i_AI)
         i_AI->UpdateAI(update_diff);
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    sEluna->UpdateAI(this, update_diff);
+#endif /* ENABLE_ELUNA */
 
     switch (m_lootState)
     {
@@ -629,6 +656,9 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
             }
 
             loot.clear();
+            #ifdef ENABLE_ELUNA
+            SetLootRecipient(NULL);
+            #endif
             SetLootState(GO_READY);
 
             if (!m_respawnDelayTime)
@@ -2251,6 +2281,9 @@ bool GameObject::PlayerCanUse(Player* pl)
 void GameObject::SetLootState(LootState state)
 {
     m_lootState = state;
+#ifdef ENABLE_ELUNA
+    sEluna->OnLootStateChanged(this, state);
+#endif /* ENABLE_ELUNA */
     UpdateCollisionState();
 }
 
@@ -2258,6 +2291,9 @@ void GameObject::SetGoState(GOState state)
 {
     //SetByteValue(GAMEOBJECT_BYTES_1, 0, state); // 3.3.5
     SetUInt32Value(GAMEOBJECT_STATE, state);
+#ifdef ENABLE_ELUNA
+    sEluna->OnGameObjectStateChanged(this, state);
+#endif /* ENABLE_ELUNA */
     UpdateCollisionState();
 }
 
@@ -2388,6 +2424,70 @@ GameObjectData const* GameObject::GetGOData() const
 {
     return sObjectMgr.GetGOData(GetGUIDLow());
 }
+#ifdef ENABLE_ELUNA
+
+Player* GameObject::GetOriginalLootRecipient() const
+{
+    return m_lootRecipientGuid ? sObjectAccessor.FindPlayer(m_lootRecipientGuid) : NULL;
+}
+
+Group* GameObject::GetGroupLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    return m_lootGroupRecipientId ? sObjectMgr.GetGroupById(m_lootGroupRecipientId) : NULL;
+}
+
+Player* GameObject::GetLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    Group* group = GetGroupLootRecipient();
+
+    // original recipient player if online
+    Player* player = GetOriginalLootRecipient();
+
+    // if group not set or disbanded return original recipient player if any
+    if (!group)
+        { return player; }
+
+    // group case
+
+    // return player if it still be in original recipient group
+    if (player && player->GetGroup() == group)
+        { return player; }
+
+    // find any in group
+    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        if (Player* newPlayer = itr->getSource())
+            { return newPlayer; }
+
+    return NULL;
+}
+
+void GameObject::SetLootRecipient(Unit* pUnit)
+{
+    // set the player whose group should receive the right
+    // to loot the gameobject after its used
+    // should be set to NULL after the loot disappears
+
+    if (!pUnit)
+    {
+        m_lootRecipientGuid.Clear();
+        m_lootGroupRecipientId = 0;
+        return;
+    }
+
+    Player* player = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (!player)                                            // normal creature, no player involved
+        { return; }
+
+    // set player for non group case or if group will disbanded
+    m_lootRecipientGuid = player->GetObjectGuid();
+
+    // set group for group existed case including if player will leave group at loot time
+    if (Group* group = player->GetGroup())
+        { m_lootGroupRecipientId = group->GetId(); }
+}
+#endif
 
 bool GameObject::HasCustomAnim() const
 {

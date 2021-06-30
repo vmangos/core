@@ -54,6 +54,9 @@
 #include "TemporarySummon.h"
 #include "GuardMgr.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
     TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
@@ -225,6 +228,11 @@ Creature::~Creature()
 
 void Creature::AddToWorld()
 {
+
+#ifdef ENABLE_ELUNA
+    bool inWorld = IsInWorld();
+#endif /* ENABLE_ELUNA */
+
     bool bWasInWorld = IsInWorld();
 
     ///- Register the creature for guid lookup
@@ -240,10 +248,22 @@ void Creature::AddToWorld()
         AIM_Initialize();
     if (!bWasInWorld && m_zoneScript)
         m_zoneScript->OnCreatureCreate(this);
+
+#ifdef ENABLE_ELUNA
+    if (!inWorld)
+        sEluna->OnAddToWorld(this);
+#endif /* ENABLE_ELUNA */
+
 }
 
 void Creature::RemoveFromWorld()
 {
+
+#ifdef ENABLE_ELUNA
+    if (IsInWorld())
+        sEluna->OnRemoveFromWorld(this);
+#endif /* ENABLE_ELUNA */
+
     ///- Remove the creature from the accessor
     if (IsInWorld())
     {

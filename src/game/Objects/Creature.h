@@ -139,6 +139,7 @@ class Creature : public Unit
         bool IsCorpse() const { return GetDeathState() ==  CORPSE; }
         bool IsDespawned() const { return GetDeathState() ==  DEAD; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
+		uint32 GetCorpseDelay() const { return m_corpseDelay; }
         bool IsRacialLeader() const { return GetCreatureInfo()->racial_leader; }
         bool IsCivilian() const { return GetCreatureInfo()->civilian; }
         bool IsTrigger() const { return HasExtraFlag(CREATURE_FLAG_EXTRA_INVISIBLE); }
@@ -557,6 +558,10 @@ class Creature : public Unit
         bool CanAssistPlayers() { return HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
         bool CanSummonGuards() { return HasExtraFlag(CREATURE_FLAG_EXTRA_SUMMON_GUARD); }
         uint32 GetOriginalEntry() const { return m_originalEntry; }
+#ifdef ENABLE_ELUNA
+        void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
+        bool IsReputationGainDisabled() { return DisableReputationGain; }
+#endif
 
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
@@ -622,6 +627,9 @@ class Creature : public Unit
         float m_callForHelpDist;
         float m_leashDistance;
         float m_detectionDistance;
+#ifdef ENABLE_ELUNA
+        bool DisableReputationGain;
+#endif
 
     private:
         GridReference<Creature> m_gridRef;
