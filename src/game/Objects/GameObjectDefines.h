@@ -658,6 +658,7 @@ struct GameObjectInfo
         switch (type)
         {
             case GAMEOBJECT_TYPE_DOOR:                  return true;
+            case GAMEOBJECT_TYPE_TRANSPORT:             return true;
             case GAMEOBJECT_TYPE_FLAGSTAND:             return true;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:              return true;

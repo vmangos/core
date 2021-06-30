@@ -93,7 +93,6 @@ class BattleGroundQueue
         void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
-        void LogQueueInscription(Player* plr, BattleGroundTypeId BgTypeId, uint32 uiAction);
         bool IsPlayerInvited(ObjectGuid guid, uint32 const bgInstanceGuid, uint32 const removeTime);
         bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
         void PlayerLoggedOut(ObjectGuid guid);

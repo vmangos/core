@@ -771,7 +771,7 @@ void BattleGround::SendRewardMarkByMail(Player* pPlayer, uint32 mark, uint32 cou
     if (!markProto)
         return;
 
-    if (Item* markItem = Item::CreateItem(mark, count, pPlayer))
+    if (Item* markItem = Item::CreateItem(mark, count, pPlayer->GetObjectGuid()))
     {
         // save new item before send
         markItem->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted

@@ -128,7 +128,7 @@ void AuctionHouseBotMgr::AddItem(AuctionHouseBotEntry e, AuctionHouseObject *auc
         return;
     }
 
-    Item* item = Item::CreateItem(e.item, 1, nullptr);
+    Item* item = Item::CreateItem(e.item, 1);
     if (!item)
     {
         sLog.outInfo("AHBot::AddItem() : Cannot create item.");

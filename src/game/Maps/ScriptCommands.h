@@ -40,6 +40,7 @@ enum eScriptCommand
                                                             // dataint = broadcast_text id. dataint2-4 optional for random selected text.
     SCRIPT_COMMAND_EMOTE                    = 1,            // source = Unit
                                                             // datalong1-4 = emote_id
+                                                            // dataint = (bool) is_targeted
     SCRIPT_COMMAND_FIELD_SET                = 2,            // source = Object
                                                             // datalong = field_id
                                                             // datalong2 = value
@@ -105,7 +106,7 @@ enum eScriptCommand
                                                             // datalong = sound_id
                                                             // datalong2 = ePlaySoundFlags
     SCRIPT_COMMAND_CREATE_ITEM              = 17,           // source = Player (from provided source or target)
-                                                            // datalong = item_entry
+                                                            // datalong = item_id
                                                             // datalong2 = amount
     SCRIPT_COMMAND_DESPAWN_CREATURE         = 18,           // source = Creature
                                                             // datalong = despawn_delay
@@ -139,7 +140,6 @@ enum eScriptCommand
                                                             // target = Player
     SCRIPT_COMMAND_UPDATE_ENTRY             = 27,           // source = Creature
                                                             // datalong = creature_entry
-                                                            // datalong2 = team for display_id (0 = alliance, 1 = horde)
     SCRIPT_COMMAND_STAND_STATE              = 28,           // source = Unit
                                                             // datalong = stand_state (enum UnitStandStateType)
     SCRIPT_COMMAND_MODIFY_THREAT            = 29,           // source = Creature
@@ -177,7 +177,7 @@ enum eScriptCommand
                                                             // datalong1-4 = event_script id
                                                             // dataint1-4 = chance (total cant be above 100)
     SCRIPT_COMMAND_REMOVE_ITEM              = 40,           // source = Player (from provided source or target)
-                                                            // datalong = item_entry
+                                                            // datalong = item_id
                                                             // datalong2 = amount
     SCRIPT_COMMAND_REMOVE_OBJECT            = 41,           // source = GameObject
                                                             // target = Unit
@@ -527,6 +527,8 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_EMOTE (1)
         {
             uint32 emoteId[MAX_EMOTE_ID];                   // datalong to datalong4
+            uint32 unused;                                  // data_flags
+            int32  isTargeted;                              // dataint
         } emote;
 
         struct                                              // SCRIPT_COMMAND_FIELD_SET (2)
@@ -629,7 +631,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_CREATE_ITEM (17)
         {
-            uint32 itemEntry;                               // datalong
+            uint32 itemId;                                  // datalong
             uint32 amount;                                  // datalong2
         } createItem;
 
@@ -690,7 +692,6 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_UPDATE_ENTRY (27)
         {
             uint32 creatureEntry;                           // datalong
-            uint32 team;                                    // datalong2
         } updateEntry;
 
         struct                                              // SCRIPT_COMMAND_STAND_STATE (28)
@@ -762,7 +763,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_REMOVE_ITEM (40)
         {
-            uint32 itemEntry;                               // datalong
+            uint32 itemId;                                  // datalong
             uint32 amount;                                  // datalong2
         } removeItem;
 
@@ -1112,7 +1113,7 @@ enum ScriptTarget
     TARGET_T_CREATURE_FROM_INSTANCE_DATA    = 10,           //Find creature by guid stored in instance data.
                                                             //Param1 = instance_data_field
 
-    TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY          = 11,           //Searches for closest nearby gameobject with the given entry.
+    TARGET_T_NEAREST_GAMEOBJECT_WITH_ENTRY  = 11,           //Searches for closest nearby gameobject with the given entry.
                                                             //Param1 = gameobject_entry
                                                             //Param2 = search_radius
 
@@ -1154,6 +1155,9 @@ enum ScriptTarget
                                                             //Param1 = search-radius
     TARGET_T_RANDOM_CREATURE_WITH_ENTRY     = 26,           //Searches for random nearby creature with the given entry. Not Self.
                                                             //Param1 = creature_entry
+                                                            //Param2 = search_radius
+    TARGET_T_RANDOM_GAMEOBJECT_WITH_ENTRY   = 27,           //Searches for random nearby gameobject with the given entry.
+                                                            //Param1 = gameobject_entry
                                                             //Param2 = search_radius
     TARGET_T_END
 };

@@ -22,6 +22,7 @@
 #include "MotionMaster.h"
 #include "CreatureAISelector.h"
 #include "Creature.h"
+#include "Transport.h"
 
 #include "ConfusedMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
@@ -371,6 +372,9 @@ void MotionMaster::MoveTargetedHome()
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s refollowed linked master", m_owner->GetGuidStr().c_str());
         else
         {
+            if (m_owner->GetTransport())
+                m_owner->GetTransport()->RemovePassenger(m_owner);
+
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted home", m_owner->GetGuidStr().c_str());
             Mutate(new HomeMovementGenerator<Creature>());
         }
@@ -868,7 +872,7 @@ void MotionMaster::ReInitializePatrolMovement()
     }
 }
 
-void Creature::PauseOutOfCombatMovement()
+void Creature::PauseOutOfCombatMovement(uint32 pauseTime)
 {
     if (IsInCombat())
         return;
@@ -879,14 +883,14 @@ void Creature::PauseOutOfCombatMovement()
         {
             if (!IsStopped())
                 StopMoving();
-            ((RandomMovementGenerator*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(NPC_MOVEMENT_PAUSE_TIME);
+            ((RandomMovementGenerator*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(pauseTime);
             break;
         }
         case WAYPOINT_MOTION_TYPE:
         {
             if (!IsStopped())
                 StopMoving();
-            ((WaypointMovementGenerator<Creature>*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(NPC_MOVEMENT_PAUSE_TIME);
+            ((WaypointMovementGenerator<Creature>*)(GetMotionMaster()->GetCurrent()))->AddPauseTime(pauseTime);
             break;
         }
     }

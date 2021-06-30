@@ -422,7 +422,7 @@ enum
     SPELL_FRENZY        = 8599,
 
     EMOTE_EMIT          = 10755,
-    EMOTE_FRENZY        = -1000002,
+    EMOTE_FRENZY        = 10645,
     SOUND_CHARGE        = 3330,
 };
 

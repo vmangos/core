@@ -276,7 +276,7 @@ void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
-    GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().time + GetLastMovementInfo().ctime;
+    GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().stime + GetLastMovementInfo().ctime;
     GetLastMovementInfo().jump.start.x = me->GetPositionX();
     GetLastMovementInfo().jump.start.y = me->GetPositionY();
     GetLastMovementInfo().jump.start.z = me->GetPositionZ();
@@ -322,10 +322,7 @@ void MovementAnticheat::OnExplore(AreaEntry const* pArea)
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
 
-// Deeprun tram is not properly handled as a transport.
-#define MAP_DEEPRUN_TRAM 369
-
-void MovementAnticheat::OnTransport(Player* plMover, ObjectGuid transportGuid)
+void MovementAnticheat::OnTransport(Player* pPlayer, ObjectGuid transportGuid)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED) ||
@@ -333,10 +330,9 @@ void MovementAnticheat::OnTransport(Player* plMover, ObjectGuid transportGuid)
         return;
 
     // Do not allow bypassing anticheat by pretending to be on a transport.
-    GameObject* transportGobj = plMover->GetMap()->GetGameObject(transportGuid);
-    float const maxDist2d = (plMover->GetMapId() == MAP_DEEPRUN_TRAM) ? 3000.0f : 70.0f;
+    GameObject* pTransport = pPlayer->GetMap()->GetGameObject(transportGuid);
 
-    if (!transportGobj || !transportGobj->IsTransport() || !transportGobj->IsWithinDist(plMover, maxDist2d, false))
+    if (!pTransport || !pTransport->IsTransport() || !pTransport->IsWithinDist(pPlayer, 70.0f, false))
         AddCheats(1 << CHEAT_TYPE_FAKE_TRANSPORT);
 }
 
@@ -797,12 +793,12 @@ bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16
         m_jumpFlagCount++;
 
         if (!m_jumpFlagTime)
-            m_jumpFlagTime = movementInfo.time;
+            m_jumpFlagTime = movementInfo.stime;
     }
     
     return m_jumpFlagTime &&
        (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
-       (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
+       (movementInfo.stime - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
        (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
 }
@@ -816,7 +812,7 @@ uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)
     {
         if (GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
         {
-            int32 currentDesync = (int32)WorldTimer::getMSTimeDiff(GetLastMovementInfo().ctime, movementInfo.ctime) - WorldTimer::getMSTimeDiff(GetLastMovementInfo().time, movementInfo.time);
+            int32 currentDesync = (int32)WorldTimer::getMSTimeDiff(GetLastMovementInfo().ctime, movementInfo.ctime) - WorldTimer::getMSTimeDiff(GetLastMovementInfo().stime, movementInfo.stime);
             m_clientDesync += currentDesync;
             if (currentDesync > 1000)
                 APPEND_CHEAT(CHEAT_TYPE_NUM_DESYNC);
@@ -946,8 +942,7 @@ bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) con
 
 uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode)
 {
-    if ((movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) ||
-        (opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
+    if ((opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
         me->IsTaxiFlying() || 
         me->IsBeingTeleported())
         return 0;
@@ -955,19 +950,15 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
 
-    float allowedDXY = 0.0f;
-    float allowedDZ = 0.0f;
-    float realDistance2D_sq = 0.0f;
-
     int32 clientTimeDiff = movementInfo.ctime - GetLastMovementInfo().ctime;
     if (sWorld.getConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC) && clientTimeDiff > sWorld.getConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC))
         clientTimeDiff = sWorld.getConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC);
 
-    // Check vs extrapolation
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_SPEED_HACK_ENABLED))
     {
         float intX, intY, intZ, intO;
 
+        // Check vs extrapolation
         if (me->ExtrapolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
         {
             auto const intDX = intX - movementInfo.pos.x;
@@ -981,22 +972,34 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 
             float allowedDX = pow(intX - GetLastMovementInfo().pos.x, 2);
             float allowedDY = pow(intY - GetLastMovementInfo().pos.y, 2);
-            allowedDXY = sqrt(allowedDX + allowedDY);
-            realDistance2D_sq = pow(movementInfo.pos.x - GetLastMovementInfo().pos.x, 2) + pow(movementInfo.pos.y - GetLastMovementInfo().pos.y, 2);
+            float allowedDXY = sqrt(allowedDX + allowedDY);
+            float realDistance2D_sq = pow(movementInfo.pos.x - GetLastMovementInfo().pos.x, 2) + pow(movementInfo.pos.y - GetLastMovementInfo().pos.y, 2);
 
             if (realDistance2D_sq > (allowedDY + allowedDX) * 1.1f)
                 m_overspeedDistance += sqrt(realDistance2D_sq) - sqrt(allowedDY + allowedDX);
 
             DEBUG_UNIT(me, DEBUG_CHEAT, "[Opcode:%u:0x%x] Flags 0x%x [DT=%u:DR=%.2f]", opcode, opcode, movementInfo.moveFlags, movementInfo.ctime - GetLastMovementInfo().ctime, interpolDist);
         }
+        // Simple calculation for transports
+        else if (!movementInfo.t_guid.IsEmpty() && (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) &&
+                 !GetLastMovementInfo().t_guid.IsEmpty() && (GetLastMovementInfo().moveFlags & MOVEFLAG_ONTRANSPORT))
+        {
+            float const distanceTraveled = GetDistance2D(GetLastMovementInfo().t_pos, movementInfo.t_pos);
+            float const timeFactor = float(1 * IN_MILLISECONDS) / float(std::max(1, clientTimeDiff));
+            if (distanceTraveled > 0)
+            {
+                float const distanceAllowed1 = me->GetSpeedForMovementInfo(movementInfo) / timeFactor;
+                float const distanceAllowed2 = me->GetSpeedForMovementInfo(GetLastMovementInfo()) / timeFactor;
+                float const distanceAllowed = std::max(distanceAllowed1, distanceAllowed2);
+                if (distanceTraveled > distanceAllowed * 2.0f)
+                    m_overspeedDistance += (distanceTraveled - distanceAllowed);
+            }
+        }
     }
 
     // Client should send heartbeats every 500ms
     if (clientTimeDiff > 1000 && GetLastMovementInfo().ctime && GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
         APPEND_CHEAT(CHEAT_TYPE_SKIPPED_HEARTBEATS);
-
-    if (realDistance2D_sq > 20.0f*20.0f)
-        DEBUG_UNIT(me, DEBUG_CHEAT, "RealDist: %f AllowedXY: %f", sqrt(realDistance2D_sq), sqrt(allowedDXY));
 
     return cheatFlags;
 #undef APPEND_CHEAT
@@ -1041,7 +1044,7 @@ bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
 bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) const
 {
     if ((me->GetPositionX() == 0.0f || me->GetPositionY() == 0.0f || me->GetPositionZ() == 0.0f) ||
-       (movementInfo.GetPos()->x == 0.0f || movementInfo.GetPos()->y == 0.0f || movementInfo.GetPos()->z == 0.0f) ||
+       (movementInfo.GetPos().x == 0.0f || movementInfo.GetPos().y == 0.0f || movementInfo.GetPos().z == 0.0f) ||
        (me->IsLaunched()) || 
        (me->IsBeingTeleported()))
         return true;

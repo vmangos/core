@@ -302,7 +302,7 @@ struct boss_viscidusAI : public ScriptedAI
 
         DoResetThreat();
         m_creature->SetVisibility(VISIBILITY_ON);
-        m_creature->ClearUnitState(UNIT_STAT_DIED);
+        m_creature->ClearUnitState(UNIT_STAT_FEIGN_DEATH);
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_uiPhase = PHASE_NORMAL;

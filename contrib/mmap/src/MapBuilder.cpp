@@ -17,6 +17,7 @@
  */
 
 #include <list>
+#include <fstream>
 #include "MMapCommon.h"
 #include "MapBuilder.h"
 #include "MapTree.h"
@@ -222,21 +223,43 @@ void filterLedgeSpans(const int walkableHeight, const int walkableClimbTransitio
         (*it)->area = AREA_STEEP_SLOPE;
 }
 
+void from_json(const json& j, rcConfig& config)
+{
+    config.tileSize = MMAP::VERTEX_PER_TILE;
+    config.borderSize = j["borderSize"].get<int>();
+    config.cs = MMAP::BASE_UNIT_DIM;
+    config.ch = MMAP::BASE_UNIT_DIM;
+    config.walkableSlopeAngle = j["walkableSlopeAngle"].get<float>();
+    config.walkableHeight = j["walkableHeight"].get<int>();
+    config.walkableClimb = j["walkableClimb"].get<int>();
+    config.walkableRadius = j["walkableRadius"].get<int>();
+    config.maxEdgeLen = j["maxEdgeLen"].get<int>();
+    config.maxSimplificationError = j["maxSimplificationError"].get<float>();
+    config.minRegionArea = rcSqr(j["minRegionArea"].get<int>());
+    config.mergeRegionArea = rcSqr(j["mergeRegionArea"].get<int>());
+    config.maxVertsPerPoly = DT_VERTS_PER_POLYGON;
+    config.detailSampleDist = j["detailSampleDist"].get<float>();
+    config.detailSampleMaxError = j["detailSampleMaxError"].get<float>();
+}
+
 namespace MMAP
 {
-    MapBuilder::MapBuilder(bool skipLiquid,
+    MapBuilder::MapBuilder(char const* configInputPath, bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
-                           bool debugOutput, bool bigBaseUnit, bool quick, const char* offMeshFilePath) :
+                           bool debug, bool quick, const char* offMeshFilePath) :
         m_terrainBuilder(nullptr),
-        m_debugOutput(debugOutput),
+        m_debug(debug),
         m_offMeshFilePath(offMeshFilePath),
         m_skipContinents(skipContinents),
         m_skipJunkMaps(skipJunkMaps),
         m_skipBattlegrounds(skipBattlegrounds),
         m_quick(quick),
-        m_bigBaseUnit(bigBaseUnit),
         m_rcContext(nullptr)
     {
+        std::ifstream jsonConfig(configInputPath);
+        if (jsonConfig)
+            m_config = json::parse(jsonConfig);
+
         m_terrainBuilder = new TerrainBuilder(skipLiquid, quick);
 
         m_rcContext = new rcContext(false);
@@ -597,19 +620,13 @@ namespace MMAP
         int lTriCount = meshData.liquidTris.size() / 3;
         uint8* lTriAreas = meshData.liquidType.getCArray();
 
-        // these are WORLD UNIT based metrics
-        // this are basic unit dimentions
-        // value have to divide GRID_SIZE(533.33333f) ( aka: 0.5333, 0.2666, 0.3333, 0.1333, etc )
-        // WARNING: A bad 'BASE_UNIT_DIM' value will cause pathfinding issue between tiles.
-        const static float BASE_UNIT_DIM = m_bigBaseUnit ? 0.533333f : 0.2666666f;
-
-        // All are in UNIT metrics!
-        const static int VERTEX_PER_MAP = int(GRID_SIZE / BASE_UNIT_DIM + 0.5f);
-        const static int VERTEX_PER_TILE = m_bigBaseUnit ? 40 : 80; // must divide VERTEX_PER_MAP
-        const static int TILES_PER_MAP = VERTEX_PER_MAP / VERTEX_PER_TILE;
-
         rcConfig config;
         memset(&config, 0, sizeof(rcConfig));
+        json jsonTileConfig = getTileConfig(mapID, tileX, tileY);
+        int const quickFromConfig = jsonTileConfig["quick"].get<int>();
+        if (quickFromConfig >= 0)
+            m_quick = quickFromConfig == 0 ? false : true;
+        config = jsonTileConfig;
 
         rcVcopy(config.bmin, bmin);
         rcVcopy(config.bmax, bmax);
@@ -625,29 +642,28 @@ namespace MMAP
         if (!continent)
             agentRadius = 0.3f;
 
-        config.cs = BASE_UNIT_DIM;
         config.ch = 0.1f;
         // .go xyz 9612 410 1328
         // Prevent z overflow at big heights. We need at least 0.16 to handle teldrassil.
         if (continent)
             config.ch = 0.25f;
-        config.walkableSlopeAngle = 75.0f;
-        config.walkableHeight = (int)ceilf(agentHeight / config.ch);
-        config.walkableClimb = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch); // For models
+        
+        if (config.walkableHeight == 0)
+            config.walkableHeight = (int)ceilf(agentHeight / config.ch);
+        if (config.walkableClimb == 0)
+            config.walkableClimb = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch); // For models
         uint32 walkableClimbTerrain = (int)floorf(agentMaxClimbTerrain / config.ch);
         uint32 walkableClimbModelTransition = (int)floorf(agentMaxClimbModelTerrainTransition / config.ch);
-        config.walkableRadius = (int)ceilf(agentRadius / config.cs);
-        config.maxEdgeLen = (int)(12 / config.cs);
-        config.maxSimplificationError = 1.8f;       // eliminates most jagged edges (tinny polygons)
-        config.minRegionArea = (int)rcSqr(30);
-        config.mergeRegionArea = (int)rcSqr(10);
-        config.maxVertsPerPoly = DT_VERTS_PER_POLYGON; // = 6
-        config.tileSize = VERTEX_PER_TILE;
-        config.borderSize = config.walkableRadius + 3;
+        if (config.walkableRadius == 0)
+            config.walkableRadius = (int)ceilf(agentRadius / config.cs);
+        if (config.maxEdgeLen == 0)
+            config.maxEdgeLen = (int)(12 / config.cs);
+        if (config.borderSize == 0)
+            config.borderSize = config.walkableRadius + 3;
+        
         config.width = config.tileSize + config.borderSize*2;
         config.height = config.tileSize + config.borderSize*2;
-        config.detailSampleDist = 2.0f; // sampling distance to use when generating the detail mesh
-        config.detailSampleMaxError = 0.5f; // Vertical precision
+
         int inWaterGround = config.walkableHeight;
         int stepForGroundInheriteWater = (int)ceilf(30.0f / config.ch);
 
@@ -669,10 +685,10 @@ namespace MMAP
                 Tile liquidsTile;
 
                 // Calculate the per tile bounding box.
-                tileCfg.bmin[0] = config.bmin[0] + float(x*config.tileSize - config.borderSize)*config.cs;
-                tileCfg.bmin[2] = config.bmin[2] + float(y*config.tileSize - config.borderSize)*config.cs;
-                tileCfg.bmax[0] = config.bmin[0] + float((x + 1)*config.tileSize + config.borderSize)*config.cs;
-                tileCfg.bmax[2] = config.bmin[2] + float((y + 1)*config.tileSize + config.borderSize)*config.cs;
+                tileCfg.bmin[0] = config.bmin[0] + float(x * config.tileSize - config.borderSize) * config.cs;
+                tileCfg.bmin[2] = config.bmin[2] + float(y * config.tileSize - config.borderSize) * config.cs;
+                tileCfg.bmax[0] = config.bmin[0] + float((x + 1) * config.tileSize + config.borderSize) * config.cs;
+                tileCfg.bmax[2] = config.bmin[2] + float((y + 1) * config.tileSize + config.borderSize) * config.cs;
 
                 float tbmin[2], tbmax[2];
                 tbmin[0] = tileCfg.bmin[0];
@@ -779,7 +795,6 @@ namespace MMAP
                 // (We dont care if a poly comes from Terrain or Model at runtime)
                 filterRemoveUselessAreas(*tile.solid);
                 rcFilterWalkableLowHeightSpans(m_rcContext, tileCfg.walkableHeight, *tile.solid);
-
 
                 /// 7. Let's process water now.
                 // When water is not deep, we have a transition area (AREA_WATER_TRANSITION)
@@ -958,9 +973,9 @@ namespace MMAP
         params.offMeshConAreas = meshData.offMeshConnectionsAreas.getCArray();
         params.offMeshConFlags = meshData.offMeshConnectionsFlags.getCArray();
 
-        params.walkableHeight = agentHeight;  // agent height
-        params.walkableRadius = agentRadius;  // agent radius
-        params.walkableClimb = agentMaxClimbTerrain;    // keep less that walkableHeight (aka agent height)!
+        params.walkableHeight = agentHeight;
+        params.walkableRadius = agentRadius;
+        params.walkableClimb = agentMaxClimbTerrain;
         params.tileX = (((bmin[0] + bmax[0]) / 2) - navMesh->getParams()->orig[0]) / GRID_SIZE;
         params.tileY = (((bmin[2] + bmax[2]) / 2) - navMesh->getParams()->orig[2]) / GRID_SIZE;
         params.tileLayer = 0;
@@ -1056,7 +1071,7 @@ namespace MMAP
             fwrite(navData, sizeof(unsigned char), navDataSize, file);
             fclose(file);
 
-            if (m_debugOutput)
+            if (m_debug)
             {
                 //Generate 3D obj files
                 //VMAP
@@ -1186,12 +1201,12 @@ namespace MMAP
      * This is basically a copy-paste of buildMoveMapTile with slightly diff parameters
      * .. and without worrying about model/terrain, undermap or liquids.
      */
-    void MapBuilder::buildGameObject(std::string model, uint32 displayId)
+    void MapBuilder::buildGameObject(std::string modelName, uint32 displayId)
     {
-        printf("Building GameObject model %s\n", model.c_str());
+        printf("Building GameObject model %s\n", modelName.c_str());
         WorldModel m;
         MeshData meshData;
-        if (!m.readFile("vmaps/" + model))
+        if (!m.readFile("vmaps/" + modelName))
         {
             printf("* Unable to open file\n");
             return;
@@ -1202,7 +1217,7 @@ namespace MMAP
         m.getGroupModels(groupModels);
 
         // all M2s need to have triangle indices reversed
-        bool isM2 = model.find(".m2") != model.npos || model.find(".M2") != model.npos;
+        bool isM2 = modelName.find(".m2") != modelName.npos || modelName.find(".M2") != modelName.npos;
 
         for (vector<GroupModel>::iterator it = groupModels.begin(); it != groupModels.end(); ++it)
         {
@@ -1235,10 +1250,10 @@ namespace MMAP
 
         printf("* Model opened (%u vertices)\n", allVerts.size());
 
-        float* verts = meshData.solidVerts.getCArray();
-        int nverts = meshData.solidVerts.size() / 3;
-        int* tris = meshData.solidTris.getCArray();
-        int ntris = meshData.solidTris.size() / 3;
+        float* tVerts = meshData.solidVerts.getCArray();
+        int tVertCount = meshData.solidVerts.size() / 3;
+        int* tTris = meshData.solidTris.getCArray();
+        int tTriCount = meshData.solidTris.size() / 3;
 
         // get bounds of current tile
         rcConfig config;
@@ -1256,14 +1271,14 @@ namespace MMAP
         config.walkableRadius = (int)ceilf(agentRadius / config.cs);
         config.maxEdgeLen = (int)(12 / config.cs);
         config.maxSimplificationError = 1.5f;
-        config.minRegionArea = (int)rcSqr(30);
+        config.minRegionArea = (int)rcSqr(30) / 2;
         config.mergeRegionArea = (int)rcSqr(10);
         config.maxVertsPerPoly = 6;
         config.detailSampleDist = config.cs*6.0f; // sampling distance to use when generating the detail mesh
         config.detailSampleMaxError = 0.0f;
 
         // this sets the dimensions of the heightfield - should maybe happen before border padding
-        rcCalcBounds(verts, nverts, config.bmin, config.bmax);
+        rcCalcBounds(tVerts, tVertCount, config.bmin, config.bmax);
         rcCalcGridSize(config.bmin, config.bmax, config.cs, &config.width, &config.height);
 
         Tile tile;
@@ -1273,10 +1288,10 @@ namespace MMAP
             printf("* Failed building heightfield!            \n");
             return;
         }
-        unsigned char* m_triareas = new unsigned char[ntris];
-        memset(m_triareas, 0, ntris*sizeof(unsigned char));
-        rcMarkWalkableTriangles(m_rcContext, config.walkableSlopeAngle, verts, nverts, tris, ntris, m_triareas);
-        rcRasterizeTriangles(m_rcContext, verts, nverts, tris, m_triareas, ntris, *tile.solid, config.walkableClimb);
+        unsigned char* m_triareas = new unsigned char[tTriCount];
+        memset(m_triareas, 0, tTriCount*sizeof(unsigned char));
+        rcMarkWalkableTriangles(m_rcContext, config.walkableSlopeAngle, tVerts, tVertCount, tTris, tTriCount, m_triareas);
+        rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, m_triareas, tTriCount, *tile.solid, config.walkableClimb);
         rcFilterLowHangingWalkableObstacles(m_rcContext, config.walkableClimb, *tile.solid);
         rcFilterLedgeSpans(m_rcContext, config.walkableHeight, config.walkableClimb, *tile.solid);
         rcFilterWalkableLowHeightSpans(m_rcContext, config.walkableHeight, *tile.solid);
@@ -1337,16 +1352,8 @@ namespace MMAP
         iv.polyMeshDetail = tile.dmesh;
         for (int i = 0; i < iv.polyMesh->npolys; ++i)
         {
-            if (iv.polyMesh->areas[i] == RC_WALKABLE_AREA)
-            {
-                iv.polyMesh->areas[i] = 0; // =SAMPLE_POLYAREA_GROUND in RecastDemo
-                iv.polyMesh->flags[i] = NAV_GROUND;
-            }
-            else
-            {
-                iv.polyMesh->areas[i] = 0;
-                iv.polyMesh->flags[i] = 0;
-            }
+            if (iv.polyMesh->areas[i] & RC_WALKABLE_AREA)
+                iv.polyMesh->flags[i] = iv.polyMesh->areas[i];
         }
 
         // Will be deleted by IntermediateValues
@@ -1418,7 +1425,7 @@ namespace MMAP
             return;
         }
         char fileName[255];
-        sprintf(fileName, "mmaps/go%4u.mmap", displayId);
+        sprintf(fileName, "mmaps/go%04u.mmtile", displayId);
         FILE* file = fopen(fileName, "wb");
         if (!file)
         {
@@ -1439,11 +1446,11 @@ namespace MMAP
         // write data
         fwrite(navData, sizeof(unsigned char), navDataSize, file);
         fclose(file);
-        if (m_debugOutput)
+        if (m_debug)
         {
-            iv.generateObjFile(model, meshData);
+            iv.generateObjFile(modelName, meshData);
             // Write navmesh data
-            std::string fname = "meshes/" + model + ".nav";
+            std::string fname = "meshes/" + modelName + ".nav";
             FILE* file = fopen(fname.c_str(), "wb");
             if (file)
             {
@@ -1455,9 +1462,22 @@ namespace MMAP
     }
     void MapBuilder::buildTransports()
     {
-        // List here Transport gameobjects you want to extract.
+        // List of MO Transport gameobjects
         buildGameObject("Transportship.wmo.vmo", 3015);
         buildGameObject("Transport_Zeppelin.wmo.vmo", 3031);
+        // List of Transport gameobjects
+        buildGameObject("Elevatorcar.m2.vmo", 360);
+        buildGameObject("Undeadelevator.m2.vmo", 455);
+        // buildGameObject("Undeadelevatordoor.m2.vmo", 462); // no model on which to path
+        buildGameObject("Ironforgeelevator.m2.vmo", 561);
+        // buildGameObject("Ironforgeelevatordoor.m2.vmo", 562); // no model on which to path
+        buildGameObject("Gnomeelevatorcar01.m2.vmo", 807);
+        buildGameObject("Gnomeelevatorcar02.m2.vmo", 808);
+        buildGameObject("Gnomeelevatorcar03.m2.vmo", 827); // missing vmap - reusing 03
+        buildGameObject("Gnomeelevatorcar03.m2.vmo", 852);
+        buildGameObject("Gnomehutelevator.m2.vmo", 1587);
+        buildGameObject("Burningsteppselevator.m2.vmo", 2454);
+        buildGameObject("Subwaycar.m2.vmo", 3831);
     }
 
     bool MapBuilder::duDumpPolyMeshToObj(rcPolyMesh& pmesh, uint32 mapID, uint32 tileY, uint32 tileX)
@@ -1494,7 +1514,6 @@ namespace MMAP
 
         fprintf(objFile, "\n");
 
-        float norm[3];
         for (int i = 0; i < pmesh.npolys; ++i)
         {
             const unsigned short* p = &pmesh.polys[i * nvp * 2];
@@ -1553,4 +1572,51 @@ namespace MMAP
         return true;
     }
 
+    json MapBuilder::getDefaultConfig()
+    {
+        return 
+        {
+                { "borderSize", 0 },  // placeholder
+                { "detailSampleDist", 2.0f },
+                { "detailSampleMaxError", 0.5f },
+                { "maxEdgeLen", 0 },  // placeholder
+                { "maxSimplificationError", 1.8f },
+                { "mergeRegionArea", 10 },
+                { "minRegionArea", 30 },
+                { "walkableClimb", 0 },  // placeholder
+                { "walkableHeight", 0 }, // placeholder
+                { "walkableRadius", 0 }, // placeholder
+                { "walkableSlopeAngle", 75.0f },
+                { "quick", -1 },
+        };
+    }
+
+    json MapBuilder::getMapIdConfig(uint32 mapId)
+    {
+        std::string key = std::to_string(mapId);
+
+        json config = getDefaultConfig();
+        if (m_config.find(key) != m_config.end())
+            config.update(m_config.at(key));
+
+        return config;
+    }
+
+    json MapBuilder::getTileConfig(uint32 mapId, uint32 tileX, uint32 tileY)
+    {
+        std::string key = std::to_string(tileX) + std::to_string(tileY);
+
+        json config = getMapIdConfig(mapId);
+        if (config.find(key) != config.end())
+            config.update(config.at(key));
+
+        for (json::iterator it = config.begin(); it != config.end();) {
+            if ((*it).is_object())
+                it = config.erase(it);
+            else
+                ++it;
+        }
+
+        return config;
+    }
 }

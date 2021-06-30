@@ -966,7 +966,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
 
     for (const auto& itr : items)
     {
-        if (Item* item = Item::CreateItem(itr.first, itr.second, m_session ? m_session->GetPlayer() : 0))
+        if (Item* item = Item::CreateItem(itr.first, itr.second, m_session ? m_session->GetPlayer()->GetObjectGuid() : ObjectGuid()))
         {
             item->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted
             draft.AddItem(item);

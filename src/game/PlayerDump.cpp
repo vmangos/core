@@ -53,7 +53,6 @@ static DumpTable dumpTables[] =
     { "character_skills",                 DTT_CHAR_TABLE },
     { "character_spell",                  DTT_CHAR_TABLE },
     { "character_spell_cooldown",         DTT_CHAR_TABLE },
-    { "character_ticket",                 DTT_CHAR_TABLE },
     { "mail",                             DTT_MAIL       }, // -> mail guids
     { "mail_items",                       DTT_MAIL_ITEM  }, // -> item guids    <- mail guids
     { "pet_aura",                         DTT_PET_TABLE  }, //                  <- pet number
@@ -299,14 +298,14 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
             guids = &items;
             break;
         case DTT_PET:
-            fieldname = "owner";
+            fieldname = "owner_guid";
             break;
         case DTT_PET_TABLE:
             fieldname = "guid";
             guids = &pets;
             break;
         case DTT_MAIL:
-            fieldname = "receiver";
+            fieldname = "receiver_guid";
             break;
         case DTT_MAIL_ITEM:
             fieldname = "mail_id";
@@ -357,7 +356,7 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
                 // item text id collection
                 case DTT_PET:
                     StoreGUID(result, 0, pets);
-                    break;       // pet petnumber collection (character_pet.id)
+                    break;       // pet pet number collection (character_pet.id)
                 case DTT_MAIL:
                     StoreGUID(result, 0, mails);            // mail id collection (mail.id)
                     StoreGUID(result, 7, texts);
@@ -385,34 +384,6 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
 
     dump += "IMPORTANT NOTE: This sql queries not created for apply directly, use '.pdump load' command in console or client chat instead.\n";
     dump += "IMPORTANT NOTE: NOT APPLY ITS DIRECTLY to character DB or you will DAMAGE and CORRUPT character DB\n\n";
-
-    // revision check guard
-    QueryNamedResult* result = CharacterDatabase.QueryNamed("SELECT * FROM character_db_version LIMIT 1");
-    if (result)
-    {
-        QueryFieldNames const& namesMap = result->GetFieldNames();
-        std::string reqName;
-        for (const auto& itr : namesMap)
-        {
-            if (itr.substr(0, 9) == "required_")
-            {
-                reqName = itr;
-                break;
-            }
-        }
-
-        if (!reqName.empty())
-        {
-            // this will fail at wrong character DB version
-            dump += "UPDATE character_db_version SET " + reqName + " = 1 WHERE FALSE;\n\n";
-        }
-        else
-            sLog.outError("Table 'character_db_version' not have revision guard field, revision guard query not added to pdump.");
-
-        delete result;
-    }
-    else
-        sLog.outError("Character DB not have 'character_db_version' table, revision guard query not added to pdump.");
 
     for (DumpTable* itr = &dumpTables[0]; itr->isValid(); ++itr)
         DumpTableContent(dump, guid, itr->name, itr->name, itr->type);
@@ -457,7 +428,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     bool incHighest = true;
     if (guid != 0 && guid < sObjectMgr.m_CharGuids.GetNextAfterMaxUsed())
     {
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE guid = '%u'", guid);
+        result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `guid` = '%u'", guid);
         if (result)
         {
             guid = sObjectMgr.m_CharGuids.GetNextAfterMaxUsed();
@@ -475,7 +446,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
         CharacterDatabase.escape_string(name);              // for safe, we use name only for sql quearies anyway
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
+        result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `name` = '%s'", name.c_str());
         if (result)
         {
             name.clear();                                      // use the one from the dump
@@ -521,15 +492,6 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
         // skip NOTE
         if (line.substr(nw_pos, 15) == "IMPORTANT NOTE:")
             continue;
-
-        // add required_ check
-        if (line.substr(nw_pos, 41) == "UPDATE character_db_version SET required_")
-        {
-            if (!CharacterDatabase.Execute(line.c_str()))
-                ROLLBACK(DUMP_FILE_BROKEN);
-
-            continue;
-        }
 
         // determine table name and load type
         std::string tn = gettablename(line);
@@ -578,12 +540,12 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                     name = getnth(line, 3);                 // characters.name
                     CharacterDatabase.escape_string(name);
 
-                    result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
+                    result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `name` = '%s'", name.c_str());
                     if (result)
                     {
                         delete result;
 
-                        if (!changenth(line, 35, "1"))      // characters.at_login set to "rename on login"
+                        if (!changenth(line, 35, "1"))      // characters.at_login_flags set to "rename on login"
                             ROLLBACK(DUMP_FILE_BROKEN);
                     }
                 }
@@ -654,7 +616,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
 
                 if (!changenth(line, 1, newpetid))          // character_pet.id update
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 3, newguid))           // character_pet.owner update
+                if (!changenth(line, 3, newguid))           // character_pet.owner_guid update
                     ROLLBACK(DUMP_FILE_BROKEN);
 
                 break;
@@ -691,7 +653,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                     ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.id
                 if (!changeGuid(line, 2, items, sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed()))
                     ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.item_guid
-                if (!changenth(line, 4, newguid))           // mail_items.receiver
+                if (!changenth(line, 4, newguid))           // mail_items.receiver_guid
                     ROLLBACK(DUMP_FILE_BROKEN);
                 break;
             }

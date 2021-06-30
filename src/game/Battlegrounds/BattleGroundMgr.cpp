@@ -292,24 +292,7 @@ uint32 BattleGroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleG
         return 0;
 }
 
-// Ivina <Nostalrius> : log player inscription to bg queue.
-void BattleGroundQueue::LogQueueInscription(Player* plr, BattleGroundTypeId BgTypeId, uint32 uiAction)
-{
-    std::string sPName = plr->GetName();
-    std::string last_ip;
-    time_t queuing_time = time(nullptr);
-    if (WorldSession* session = plr->GetSession())
-        last_ip = session->GetRemoteAddress();
-
-    CharacterDatabase.escape_string(sPName);
-    CharacterDatabase.escape_string(last_ip);
-    CharacterDatabase.PExecute("INSERT INTO `character_bgqueue` (`playerGUID`, `playerName`, `playerIP`, `BGtype`, `action`, `time`) "
-                               " VALUES ('%u', '%s', '%s', '%u', '%u', '%u')",
-                               plr->GetGUIDLow(), sPName.c_str(), last_ip.c_str(), BgTypeId, uiAction, queuing_time);
-    // CharacterDatabase.CommitTransaction(); // Pas de commit de transaction sans un BeginTransaction avant.
-}
-
-//remove player from queue and from group info, if group info is empty then remove it too
+// remove player from queue and from group info, if group info is empty then remove it too
 void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 {
     //Player* plr = sObjectMgr.GetPlayer(guid);
