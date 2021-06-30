@@ -1378,6 +1378,9 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     : 
+#ifdef ENABLE_ELUNA
+	elunaEvents(NULL),
+#endif /* ENABLE_ELUNA */
     m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
         m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0), worldMask(WORLD_DEFAULT_OBJECT), m_zoneScript(nullptr),
         m_transport(nullptr)
