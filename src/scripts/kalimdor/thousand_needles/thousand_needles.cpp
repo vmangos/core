@@ -88,7 +88,10 @@ struct npc_lakota_windsongAI : public npc_escortAI
                 break;
             case 45:
                 if (Player* pPlayer = GetPlayerForEscort())
+                {
+                    DoScriptText(SAY_LAKO_END, m_creature);
                     pPlayer->GroupEventHappens(QUEST_FREE_AT_LAST, m_creature);
+                }
                 break;
         }
     }
