@@ -4813,7 +4813,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    m_caster->CastSpell(unitTarget, 26005, true);
+                    unitTarget->CastSpell(unitTarget, 26005, true);
                     return;
                 }
                 case 26137:                                 // Rotate Trigger
