@@ -74,6 +74,16 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 UPDATE `creature_movement` SET `script_id` = 11 WHERE `id` = 3254 AND `point` IN (5,69); -- Run from here
 UPDATE `creature_movement` SET `script_id` = 13 WHERE `id` = 3254 AND `point` IN (32,93); -- Walk from here
 
+-- Add Missing Spawns to Gnomer
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1070, 6221, 0, 0, 0, 0, -5166.34, 700.808, 247.369, 3.24715, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1115, 6221, 0, 0, 0, 0, -5163.22, 686.593, 247.369, 4.71333, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1158, 6221, 0, 0, 0, 0, -5157.94, 679.544, 247.369, 4.71333, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1162, 6221, 0, 0, 0, 0, -5159.34, 708.808, 247.369, 3.24715, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1215, 6221, 0, 0, 0, 0, -5152.34, 695.808, 247.369, 3.24715, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1237, 6221, 0, 0, 0, 0, -5164.34, 730.808, 247.369, 3.24715, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1312, 6221, 0, 0, 0, 0, -5143.34, 724.808, 247.369, 3.24715, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10),
+(1317, 6221, 0, 0, 0, 0, -5154.34, 726.808, 247.369, 3.24715, 300, 300, 2, 100, 100, 1, 0, 0, 0, 10);
 
 UPDATE `gameobject_template` SET `data2` = 2 WHERE `entry` = 180055;
 
