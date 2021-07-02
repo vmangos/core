@@ -493,6 +493,14 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
+        case SMSG_LEARNED_SPELL:
+        case SMSG_SUPERCEDED_SPELL:
+        case SMSG_REMOVED_SPELL:
+        {
+            if (m_initialized)
+                m_resetSpellData = true;
+            return;
+        }
         case SMSG_LOOT_START_ROLL:
         {
             uint64 guid = *((uint64*)(*packet).contents());
@@ -548,6 +556,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
         m_initialized = true;
         return;
+    }
+
+    if (m_resetSpellData)
+    {
+        ResetSpellData();
+        PopulateSpellData();
+        m_resetSpellData = false;
     }
 
     Player* pLeader = GetPartyLeader();
