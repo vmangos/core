@@ -880,6 +880,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.mage.pBlastWave->Id < pSpellEntry->Id)
                         m_spells.mage.pBlastWave = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Combustion") != std::string::npos)
+                {
+                    if (!m_spells.mage.pCombustion ||
+                        m_spells.mage.pCombustion->Id < pSpellEntry->Id)
+                        m_spells.mage.pCombustion = pSpellEntry;
+                }
                 break;
             }
             case CLASS_PRIEST:
