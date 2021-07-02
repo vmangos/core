@@ -350,6 +350,13 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     if (Unit* pPartyAttacker = SelectPartyAttackTarget())
         return pPartyAttacker;
 
+    // Assist pet if its in combat.
+    if (Pet* pPet = me->GetPet())
+    {
+        if (Unit* pPetAttacker = pPet->GetAttackerForHelper())
+            return pPetAttacker;
+    }
+
     return nullptr;
 }
 
