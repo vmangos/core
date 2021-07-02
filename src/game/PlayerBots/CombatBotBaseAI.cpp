@@ -1022,6 +1022,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.priest.pShackleUndead->Id < pSpellEntry->Id)
                         m_spells.priest.pShackleUndead = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Smite") != std::string::npos)
+                {
+                    if (!m_spells.priest.pSmite ||
+                        m_spells.priest.pSmite->Id < pSpellEntry->Id)
+                        m_spells.priest.pSmite = pSpellEntry;
+                }
                 break;
             }
             case CLASS_WARLOCK:

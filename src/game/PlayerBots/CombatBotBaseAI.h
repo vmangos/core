@@ -370,6 +370,7 @@ public:
             SpellEntry const* pSilence;
             SpellEntry const* pFade;
             SpellEntry const* pShackleUndead;
+            SpellEntry const* pSmite;
         } priest;
         struct
         {
