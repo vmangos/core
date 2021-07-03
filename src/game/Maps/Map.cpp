@@ -535,7 +535,7 @@ void Map::Add(ElevatorTransport* obj)
 
 void Map::LoadElevatorTransports()
 {
-    ElevatorTransportMapIterator itrPair = sMapMgr.GetElevatorTransportsForMap(GetId());
+    ElevatorTransportMapBounds itrPair = sTransportMgr.GetElevatorTransportsForMap(GetId());
     for (auto itr = itrPair.first; itr != itrPair.second; itr++)
     {
         GameObjectData const* pData = sObjectMgr.GetGOData(itr->second);
@@ -2706,7 +2706,6 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
         case HIGHGUID_TRANSPORT:
             return GetElevatorTransport(guid);
         case HIGHGUID_MO_TRANSPORT:
-            break;
         default:
             break;
     }

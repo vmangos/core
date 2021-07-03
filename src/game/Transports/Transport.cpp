@@ -280,7 +280,7 @@ void Transport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     if (GetKeyFrames().size() <= 1)
         return;
 
-    uint32 currentMsTime = sWorld.GetCurrentMSTime() - m_movementStarted;
+    uint32 currentMsTime = sWorld.GetCurrentMSTime();
     if (m_pathProgress >= currentMsTime) // map transition and update happened in same tick due to MT
         return;
 
@@ -376,7 +376,7 @@ bool ElevatorTransport::Create(uint32 guidlow, uint32 name_id, Map* map, float x
     if (GenericTransport::Create(guidlow, name_id, map, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state))
     {
         m_animationInfo = sTransportMgr.GetTransportAnimInfo(GetGOInfo()->id);
-        m_pathProgress = m_animationInfo ? ((sWorld.GetCurrentMSTime() - m_movementStarted) % m_animationInfo->TotalTime) : 0;
+        m_pathProgress = m_animationInfo ? (sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime) : 0;
         m_currentSeg = 0;
         return true;
     }
@@ -388,7 +388,7 @@ void ElevatorTransport::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
     if (!m_animationInfo)
         return;
 
-    m_pathProgress = (sWorld.GetCurrentMSTime() - m_movementStarted) % m_animationInfo->TotalTime;
+    m_pathProgress = sWorld.GetCurrentMSTime() % m_animationInfo->TotalTime;
     TransportAnimationEntry const* nodeNext = m_animationInfo->GetNextAnimNode(m_pathProgress);
     TransportAnimationEntry const* nodePrev = m_animationInfo->GetPrevAnimNode(m_pathProgress);
     if (nodeNext && nodePrev)

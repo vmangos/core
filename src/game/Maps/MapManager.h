@@ -28,8 +28,6 @@
 #include "Map.h"
 #include "GridStates.h"
 
-#include <map>
-
 class BattleGround;
 
 enum
@@ -73,9 +71,6 @@ struct MapID
     uint32 nMapId;
     uint32 nInstanceId;
 };
-
-typedef std::multimap<uint32 /*mapId*/, uint32 /*guidLow*/> ElevatorTransportMap;
-typedef std::pair<ElevatorTransportMap::const_iterator, ElevatorTransportMap::const_iterator> ElevatorTransportMapIterator;
 
 class ThreadPool;
 struct ScheduledTeleportData;
@@ -176,21 +171,6 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         uint32 GetNumInstances();
         uint32 GetNumPlayersInInstances();
 
-        // elevator transports
-        ElevatorTransportMapIterator GetElevatorTransportsForMap(uint32 mapId) const
-        {
-            return m_elevatorTransportsByMap.equal_range(mapId);
-        }
-        void AddElevatorTransportForMap(uint32 mapId, uint32 guidLow)
-        {
-            for (auto itr : m_elevatorTransportsByMap)
-            {
-                if (itr.first == mapId && itr.second == guidLow)
-                    return;
-            }
-            m_elevatorTransportsByMap.insert(std::make_pair(mapId, guidLow));
-        }
-
         //get list of all maps
         const MapMapType& Maps() const { return i_maps; }
 
@@ -244,8 +224,6 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         std::unique_ptr<ThreadPool> m_threads;
         std::unique_ptr<ThreadPool> m_continentThreads;
         bool asyncMapUpdating = false;
-
-        ElevatorTransportMap m_elevatorTransportsByMap;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;

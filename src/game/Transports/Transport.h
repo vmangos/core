@@ -31,7 +31,7 @@ typedef std::set<Unit*> PassengerSet;
 class GenericTransport : public GameObject
 {
 public:
-    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0), m_movementStarted(0) {}
+    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0) {}
     void CleanupsBeforeDelete() override;
 
     void SendOutOfRangeUpdateToMap();
@@ -73,7 +73,6 @@ protected:
     PassengerSet::iterator m_passengerTeleportItr;
 
     uint32 m_pathProgress; // for MO transport its full time since start for normal time in cycle
-    uint32 m_movementStarted;
 };
 
 class ElevatorTransport : public GenericTransport
@@ -114,7 +113,6 @@ private:
 
     KeyFrameVec::const_iterator m_currentFrame;
     KeyFrameVec::const_iterator m_nextFrame;
-    uint32 m_pathTime;
 
     uint32 m_period;
 
