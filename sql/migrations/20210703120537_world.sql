@@ -1096,6 +1096,9 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (6525, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
 (7173, 3, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440);
 
+-- Correct Scale for Peddlefeet
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 16085;
+
 
 -- End of migration.
 END IF;
