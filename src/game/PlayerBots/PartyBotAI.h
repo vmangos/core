@@ -54,6 +54,7 @@ public:
     void AddToPlayerGroup();
     void LearnPremadeSpecForClass();
 
+    bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const final;
     Player* GetPartyLeader() const;
     bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget(Player* pLeader) const;
