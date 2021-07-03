@@ -61,6 +61,7 @@ class ChatHandler;
 class BattleGround;
 class WeatherSystem;
 class GenericTransport;
+class ElevatorTransport;
 class Transport;
 
 namespace VMAP
@@ -498,6 +499,7 @@ class Map : public GridRefManager<NGridType>
         Pet* GetPet(ObjectGuid const& guid) { return GetObject<Pet>(guid); }
         Creature* GetAnyTypeCreature(ObjectGuid guid);      // normal creature or pet
         GenericTransport* GetTransport(ObjectGuid guid);
+        ElevatorTransport* GetElevatorTransport(ObjectGuid);
         DynamicObject* GetDynamicObject(ObjectGuid guid);
         Corpse* GetCorpse(ObjectGuid guid);                   // !!! find corpse can be not in world
         Unit* GetUnit(ObjectGuid guid);                       // only use if sure that need objects at current map, specially for player case
@@ -687,9 +689,9 @@ class Map : public GridRefManager<NGridType>
         MapStoredObjectTypesContainer   m_objectsStore;
 
         // Objects that must update even in inactive grids without activating them
-        typedef std::set<Transport*> TransportsContainer;
-        TransportsContainer _transports;
-        TransportsContainer::iterator _transportsUpdateIter;
+        typedef std::set<GenericTransport*> TransportsContainer;
+        TransportsContainer m_transports;
+        TransportsContainer::iterator m_transportsUpdateIter;
         bool m_unloading = false;
         bool m_crashed = false;
         bool m_updateFinished = false;
@@ -730,6 +732,7 @@ class Map : public GridRefManager<NGridType>
 
         template<class T>
             void RemoveFromGrid(T*, NGridType*, Cell const&);
+
         // Custom
         uint32 _lastMapUpdate = 0;
         uint32 _lastPlayerLeftTime = 0;
@@ -738,6 +741,9 @@ class Map : public GridRefManager<NGridType>
         uint32 _lastCellsUpdate;
 
         int8 _updateIdx;
+
+        // Elevators are not loaded normally.
+        void LoadElevatorTransports();
 
         // Holder for information about linked mobs
         CreatureLinkingHolder m_creatureLinkingHolder;

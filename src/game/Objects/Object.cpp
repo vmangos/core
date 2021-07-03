@@ -289,9 +289,6 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
         updateFlags |= UPDATEFLAG_SELF;
 #endif
 
-    if (isType(TYPEMASK_GAMEOBJECT) && static_cast<GameObject const*>(this)->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT)
-        updateFlags |= UPDATEFLAG_TRANSPORT;
-
     //DEBUG_LOG("BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
 
     ByteBuffer buf(500);

@@ -2184,7 +2184,10 @@ void ObjectMgr::LoadGameobjects(bool reload)
             continue;
         }
 
-        if (!alreadyPresent && gameEvent == 0 && GuidPoolId == 0 && EntryPoolId == 0) // if not this is to be managed by GameEvent System or Pool system
+        if (gInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+            sMapMgr.AddElevatorTransportForMap(data.position.mapId, guid);
+        // if not this is to be managed by GameEvent System or Pool system
+        else if (!alreadyPresent && gameEvent == 0 && GuidPoolId == 0 && EntryPoolId == 0)
             AddGameobjectToGrid(guid, &data);
         ++count;
 
