@@ -168,13 +168,7 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 AND `text_id` = 8244;
 
 
-
-
-
-
-
-
-
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` IN (14378, 14379, 14380);
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1437801, 14378, 0, 10, 0, 100, 1, 2, 30, 10000, 10000, 1437801, 0, 0, 'Huntress Skymane - Add Aura Love is in the Air on Enter Los');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1437801, 0, 74, 27741, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 471, 'Huntress Skymane - Add Aura Love is in the Air');
 
