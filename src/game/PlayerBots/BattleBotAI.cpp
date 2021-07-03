@@ -1088,6 +1088,9 @@ void BattleBotAI::UpdateInCombatAI()
             UpdateInCombatAI_Druid();
             break;
     }
+
+    if (me->GetVictim())
+        UseTrinketEffects();
 }
 
 void BattleBotAI::UpdateOutOfCombatAI_Paladin()

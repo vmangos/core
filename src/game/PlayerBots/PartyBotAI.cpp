@@ -869,6 +869,9 @@ void PartyBotAI::UpdateInCombatAI()
             UpdateInCombatAI_Druid();
             break;
     }
+
+    if (me->GetVictim())
+        UseTrinketEffects();
 }
 
 void PartyBotAI::UpdateOutOfCombatAI_Paladin()
