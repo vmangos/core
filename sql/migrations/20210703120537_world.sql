@@ -13,8 +13,6 @@ INSERT INTO `migrations` VALUES ('20210703120537');
 UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 269,
 347,
-347,
-347,
 361,
 436,
 1007,
@@ -22,12 +20,11 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 1403,
 1482,
 1581,
-1581,
-1581,
 1630,
 1662,
 1922,
 2021,
+2352,
 2404,
 2541,
 2561,
@@ -35,12 +32,12 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 3072,
 3131,
 3185,
+3580,
 3643,
 3923,
 3924,
 4008,
 4009,
-4019,
 4019,
 4046,
 4092,
@@ -51,6 +48,7 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 4131,
 4133,
 4155,
+4156,
 4163,
 4164,
 4174,
@@ -66,13 +64,10 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 4304,
 4305,
 4308,
-4308,
 4349,
 4571,
 4572,
 4573,
-4576,
-4576,
 4576,
 4578,
 4579,
@@ -80,40 +75,28 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 4621,
 4688,
 4689,
-4691,
+4690,
 4691,
 4693,
 4694,
+4695,
+4696,
 4697,
 4744,
 4783,
-4783,
-4783,
-4783,
-4821,
 4821,
 4863,
 5273,
-5665,
+5502,
 5665,
 5741,
 5782,
 5853,
 5855,
-5855,
 6044,
 6563,
 6787,
 6803,
-6803,
-6944,
-6944,
-6944,
-6944,
-6944,
-6944,
-6944,
-6944,
 6944,
 9096,
 9198,
@@ -159,95 +142,409 @@ UPDATE `gossip_menu` SET `text_id` = 8255 WHERE `entry` IN (
 9489,
 9492,
 9494,
+9504,
 9505,
 9524,
 9538,
 9574,
 9575
 )
-AND `text_id` = 8244;
+AND `text_id` IN (8244, 8251, 8254);
 
+-- Correct Gossip For Ironforge NPCs
+UPDATE `gossip_menu` SET `text_id` = 8251 WHERE `entry` IN (
+345,
+4047,
+4090,
+4115,
+4116,
+4135,
+4150,
+4154,
+4182,
+4264,
+4306,
+4322,
+4345,
+4358,
+4359,
+4360,
+4361,
+4549,
+4550,
+4551,
+4552,
+4556,
+4557,
+4558,
+4560,
+4562,
+4566,
+4567,
+4569,
+4570,
+4674,
+4675,
+4676,
+4677,
+4678,
+4680,
+4683,
+4684,
+4742,
+4744,
+4748,
+4762,
+4783,
+4823,
+4841,
+4845,
+5275,
+5277,
+5348,
+5462,
+5782,
+5853,
+5855,
+5902,
+5967,
+6043,
+6343,
+6513,
+6565,
+6597,
+6623,
+6772,
+6805,
+6923,
+6944,
+7034,
+7071,
+7326,
+9007,
+9013,
+9057,
+9073,
+9083,
+9090,
+9092,
+9093,
+9094,
+9101,
+9103,
+9203,
+9205,
+9251,
+9321,
+9322,
+9323,
+9324,
+9325,
+9326,
+9327,
+9328,
+9329,
+9330,
+9331,
+9332,
+9333,
+9334,
+9335,
+9336,
+9337,
+9339,
+9340,
+9343,
+9344,
+9345,
+9346,
+9350,
+9351,
+9352,
+9356,
+9361,
+9372,
+9374,
+9395,
+9399,
+9406,
+9452,
+9455,
+9461,
+9464,
+9465,
+9467,
+9470,
+9477,
+9487,
+9491,
+9499,
+9502,
+9506,
+9520,
+9521,
+9534,
+9581,
+9582,
+9598
+)
+AND `text_id` IN (8244, 8255, 8254);
 
-UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` IN (14378, 14379, 14380);
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1437801, 14378, 0, 10, 0, 100, 1, 2, 30, 10000, 10000, 1437801, 0, 0, 'Huntress Skymane - Add Aura Love is in the Air on Enter Los');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1437801, 0, 74, 27741, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 471, 'Huntress Skymane - Add Aura Love is in the Air');
+-- Correct Gossip For Stormwind NPCs
+UPDATE `gossip_menu` SET `text_id` = 8244 WHERE `entry` IN (
+301,
+342,
+381,
+435,
+581,
+643,
+645,
+646,
+648,
+657,
+660,
+681,
+682,
+683,
+684,
+685,
+686,
+687,
+688,
+689,
+690,
+691,
+692,
+693,
+699,
+700,
+701,
+702,
+703,
+704,
+705,
+706,
+707,
+708,
+1291,
+1503,
+1631,
+1781,
+1965,
+2044,
+2601,
+2744,
+2745,
+2781,
+2943,
+3042,
+3067,
+3070,
+3133,
+3184,
+3228,
+3506,
+3821,
+4004,
+4018,
+4048,
+4086,
+4106,
+4107,
+4110,
+4112,
+4153,
+4161,
+4169,
+4172,
+4173,
+4201,
+4203,
+4261,
+4262,
+4309,
+4343,
+4344,
+4353,
+4466,
+4467,
+4468,
+4469,
+4470,
+4471,
+4472,
+4473,
+4474,
+4475,
+4481,
+4482,
+4484,
+4485,
+4486,
+4502,
+4503,
+4504,
+4505,
+4507,
+4508,
+4649,
+4650,
+4659,
+4660,
+4661,
+4663,
+4664,
+4665,
+4666,
+4667,
+4782,
+4822,
+4844,
+4941,
+5061,
+5271,
+5641,
+5665,
+5753,
+5782,
+5849,
+5853,
+5855,
+5901,
+6028,
+6041,
+6538,
+6592,
+6786,
+6806,
+6944,
+6951,
+9002,
+9003,
+9004,
+9005,
+9006,
+9009,
+9010,
+9019,
+9040,
+9060,
+9061,
+9062,
+9064,
+9065,
+9066,
+9068,
+9069,
+9070,
+9071,
+9074,
+9075,
+9077,
+9079,
+9086,
+9088,
+9089,
+9091,
+9095,
+9201,
+9202,
+9207,
+9312,
+9319,
+9373,
+9454,
+9460,
+9462,
+9463,
+9466,
+9533,
+9567,
+9576,
+9577,
+9580,
+9587
+)
+AND `text_id` IN (8255, 8251, 8254);
 
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1437901, 14379, 0, 10, 0, 100, 1, 2, 30, 10000, 10000, 1437901, 0, 0, 'Huntress Ravenoak - Add Aura Love is in the Air on Enter Los');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1437901, 0, 74, 27741, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 471, 'Huntress Ravenoak - Add Aura Love is in the Air');
+-- Correct Gossip For Gnome NPCs
+UPDATE `gossip_menu` SET `text_id` = 8254 WHERE `entry` IN (
+268,
+698,
+1468,
+1601,
+1721,
+2381,
+2405,
+2464,
+3186,
+4016,
+4123,
+4136,
+4137,
+4138,
+4139,
+4145,
+4146,
+4147,
+4160,
+4205,
+4552,
+4553,
+4554,
+4561,
+4568,
+4681,
+4682,
+4685,
+4782,
+5763,
+5855,
+6042,
+6589,
+6785,
+6804,
+9208,
+9320,
+9342,
+9347,
+9348,
+9354,
+9358,
+9359,
+9360,
+9363,
+9365,
+9456,
+9459,
+9503,
+9525,
+9544,
+9545,
+9586
+)
+AND `text_id` IN (8244, 8251, 8255);
 
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1438001, 14380, 0, 10, 0, 100, 1, 2, 30, 10000, 10000, 1438001, 0, 0, 'Huntress Leafrunner - Add Aura Love is in the Air on Enter Los');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1438001, 0, 74, 27741, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 471, 'Huntress Leafrunner - Add Aura Love is in the Air');
+-- Kwee Q Peddlefeet Gossip Menus
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(7054, 8316),
+(7053, 8312);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(7054, 0, 0, 'How are the gift standings?  Who\'s the most popular?', 0, 1, 1, 7053, 0, 0, 0, 0, \N, 0, 0);
 
-
-
-
-
-
-
-UPDATE `creature_template` SET `ai_name`='' WHERE `entry` IN (4090, 11401, 7740, 7313, 4091, 4165);
-
-
-
--- Events list for Astarii Starseeker
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001262);
-DELETE FROM `creature_ai_events` WHERE `creature_id` = 4090;
-DELETE FROM `gossip_menu` WHERE `entry` = 4691 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298, 4092);
-
-
-
+-- Kwee Q Peddlefeet Coords
+UPDATE `creature` SET `position_x` = -4867.87, `position_y` = -1032.22, `position_z` = 502.273, `orientation` = 5.49779 WHERE `guid` = 60101;
+UPDATE `creature` SET `position_x` = 1302.19, `position_y` = 343.649, `position_z` = -64.944, `orientation` = 1.55334 WHERE `guid` = 60105;
+UPDATE `creature` SET `position_x` = -8435.29, `position_y` = 323.431, `position_z` = 121.829, `orientation` = 1.7526 WHERE `guid` = 60100;
+UPDATE `creature` SET `position_x` = 1918.24, `position_y` = -4139.84, `position_z` = 40.4727, `orientation` = 4.84821 WHERE `guid` = 60103;
+UPDATE `creature` SET `position_x` = -1199.99, `position_y` = -118.787, `position_z` = 163.882, `orientation` = 3.10669 WHERE `guid` = 60104;
+UPDATE `creature` SET `position_x` = 9670.28, `position_y` = 2534.94, `position_z` = 1360.08, `orientation` = 5.34071 WHERE `guid` = 60102;
 
 -- Events list for Tyrande Whisperwind
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001639);
 DELETE FROM `creature_ai_events` WHERE `creature_id` = 7999;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (799901, 7999, 0, 4, 0, 100, 0, 0, 0, 0, 0, 799901, 0, 0, 'Tyrande Whisperwind - Play Sound 5885 on Aggro');
-
-
-
-
--- Events list for Priestess Alathea
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001715);
-DELETE FROM `creature_ai_events` WHERE `creature_id` = 11401;
-DELETE FROM `gossip_menu` WHERE `entry` = 4691 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298);
-
-
-
-
-
--- Events list for Gracina Spiritmight
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001629);
-DELETE FROM `creature_ai_events` WHERE `creature_id` = 7740;
-DELETE FROM `gossip_menu` WHERE `entry` = 9494 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298);
-
-
--- Events list for Priestess A'moora
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001626);
-DELETE FROM `creature_ai_events` WHERE `creature_id` = 7313;
-DELETE FROM `gossip_menu` WHERE `entry` = 9492 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298);
-
-
-
-
-
--- Events list for Lariia
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001264);
-DELETE FROM `creature_ai_events` WHERE `creature_id` = 4092;
-DELETE FROM `gossip_menu` WHERE `entry` = 4572 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298);
-
-
-
--- Events list for Jandria
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001263);
-DELETE FROM `creature_ai_events` WHERE `creature_id` = 4091;
-DELETE FROM `gossip_menu` WHERE `entry` = 4573 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298);
-
-
-
--- Events list for Elissa Dumas
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001273);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=4165;
-DELETE FROM `gossip_menu` WHERE `entry` = 4821 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298);
-
-
+DELETE FROM `gossip_menu` WHERE `entry` = 9504 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298, 4092);
 
 
 -- End of migration.
