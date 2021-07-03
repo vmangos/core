@@ -546,6 +546,60 @@ DELETE FROM `creature_ai_events` WHERE `creature_id` = 7999;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (799901, 7999, 0, 4, 0, 100, 0, 0, 0, 0, 0, 799901, 0, 0, 'Tyrande Whisperwind - Play Sound 5885 on Aggro');
 DELETE FROM `gossip_menu` WHERE `entry` = 9504 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298, 4092);
 
+-- Add Love is in the Air Aura to Innkeepers
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (46343, 0, 0, 0, 27741, 0, 8); -- Keldamyr
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (37069, 0, 0, 0, 27741, 0, 8); -- Shaussiy
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (32451, 0, 0, 0, 27741, 0, 8); -- Kimlya
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (42181, 0, 0, 0, 27741, 0, 8); -- Vizzie
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (29239, 0, 0, 0, 27741, 0, 8); -- Faralia
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (28304, 0, 0, 0, 27741, 0, 8); -- Lyshaerya
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (14986, 0, 0, 0, 27741, 0, 8); -- Wiley
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (30676, 0, 0, 0, 27741, 0, 8); -- Janene
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (50059, 0, 0, 0, 27741, 0, 8); -- Shyria
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (42755, 0, 0, 0, 27741, 0, 8); -- Calandrath
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (22681, 0, 0, 0, 27741, 0, 8); -- Fizzgrimble
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (33073, 0, 0, 0, 27741, 0, 8); -- Kaylisk
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (7671, 0, 0, 0, 27741, 0, 8); -- Grosk
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (14139, 0, 0, 0, 27741, 0, 8); -- Booran Plainswind
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (13550, 0, 0, 0, 27741, 0, 8); -- Byula
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (24774, 0, 0, 0, 27741, 0, 8); -- Kauth
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (29233, 0, 0, 0, 27741, 0, 8); -- Jayka
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (28340, 0, 0, 0, 27741, 0, 8); -- Sikewa
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (50060, 0, 0, 0, 27741, 0, 8); -- Greul
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (21575, 0, 0, 0, 27741, 0, 8); -- Abeqwa
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (80346, 0, 0, 0, 27741, 0, 8); -- Farley
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (66978, 0, 0, 0, 27741, 0, 8); -- Heather
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (10076, 0, 0, 0, 27741, 0, 8); -- Brianna
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (4208, 0, 0, 0, 27741, 0, 8); -- Trelayne
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (537, 0, 0, 0, 27741, 0, 8); -- Skindle
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (8219, 0, 0, 0, 27741, 0, 8); -- Hearthstove
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (199, 0, 0, 0, 27741, 0, 8); -- Belm
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (9460, 0, 0, 0, 27741, 0, 8); -- Helbrek
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (15326, 0, 0, 0, 27741, 0, 8); -- Anderson
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (92923, 0, 0, 0, 27741, 0, 8); -- Thulfram
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (54188, 0, 0, 0, 27741, 0, 8); -- Jessica Chambers
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (28474, 0, 0, 0, 27741, 0, 8); -- Renee
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (17865, 0, 0, 0, 27741, 0, 8); -- Bates
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (15287, 0, 0, 0, 27741, 0, 8); -- Shay
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (92884, 0, 0, 0, 27741, 0, 8); -- Lard
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (11273, 0, 0, 0, 27741, 0, 8); -- Adegwa
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (6889, 0, 0, 0, 27741, 0, 8); -- Shul'kar
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (31947, 0, 0, 0, 27741, 0, 8); -- Karakul
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (690, 0, 0, 0, 27741, 0, 8); -- Thulbek
+
+-- Add Missing Gossip Menu Options to Innkeepers
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `condition_id`) VALUES
+(347, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(349, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(1291, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(1293, 4, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(1294, 4, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(1297, 4, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(2890, 3, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(6059, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(6525, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
+(7173, 3, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440);
+
 
 -- End of migration.
 END IF;
