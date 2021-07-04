@@ -1101,6 +1101,71 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (6525, 5, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440),
 (7173, 3, 0, 'Does that heart mean you\'re looking for love?', 1, 1, 5110, 0, 0, 0, 0, NULL, 440);
 
+-- Add Missing Vendor Items
+-- Belm
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (1247, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (1247, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (1247, 21833, 0, 0, 440);
+
+-- Skindle
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6807, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6807, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6807, 21833, 0, 0, 440);
+
+-- Wiley
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6791, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6791, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6791, 21833, 0, 0, 440);
+
+-- Fizzgrimble
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (7733, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (7733, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (7733, 21833, 0, 0, 440);
+
+-- Shaussiy
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6737, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6737, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6737, 21833, 0, 0, 440);
+
+-- Vizzie
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (11118, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (11118, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (11118, 21833, 0, 0, 440);
+
+-- Calandrath
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (15174, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (15174, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (15174, 21833, 0, 0, 440);
+
+-- Keldamyr
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6736, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6736, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6736, 21833, 0, 0, 440);
+
+-- Jessica Chambers
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (16256, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (16256, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (16256, 21833, 0, 0, 440);
+
+-- Farley
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (295, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (295, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (295, 21833, 0, 0, 440);
+
+-- Kauth
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6747, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6747, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (6747, 21833, 0, 0, 440);
+
+-- Lard
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (14731, 21815, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (14731, 21829, 0, 0, 440);
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `condition_id`) VALUES (14731, 21833, 0, 0, 440);
+
+-- Add Some Missing Vendor ID
+UPDATE `creature_template` SET `vendor_id` = 100 WHERE `entry` IN (6790, 6734, 6727, 2352);
+UPDATE `creature_template` SET `gossip_menu_id` = 1581 WHERE `entry` IN (7736, 6738);
+
 -- Correct Scale for Peddlefeet
 UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 16085;
 
