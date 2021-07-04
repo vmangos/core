@@ -154,7 +154,7 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
                 DoScriptText(SAY_DORIUS_RUN, m_creature);
                 break;
             case 25:
-                m_creature->SetWalk(false);
+                SetRun(true);
                 break;
             case 38:
                 DoScriptText(SAY_DORIUS_NEED_A_BREATHER, m_creature);
