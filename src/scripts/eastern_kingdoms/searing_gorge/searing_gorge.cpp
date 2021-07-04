@@ -79,6 +79,14 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
         }
     }
 
+    void SpawnMarksman()
+    {
+        // Spawns on the hill facing Dorius, to the north.
+        float fX = -6369.524414f, fY = -1974.548340f, fZ = 256.675995f, fAng = 3.623531f;
+        Creature* marksman = m_creature->SummonCreature(NPC_DARK_IRON_MARKSMAN, fX, fY, fZ, fAng, TEMPSUMMON_TIMED_DESPAWN, 10000, false, 10000);
+        marksman->SetSheath(SHEATH_STATE_RANGED);
+    }
+
     void Reset() override { }
 
     void ResetCreature() override
@@ -150,7 +158,7 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
                 break;
             case 38:
                 DoScriptText(SAY_DORIUS_NEED_A_BREATHER, m_creature);
-                // TODO: Spawn Dark Iron Marksman to kill Dorius from hill.
+                SpawnMarksman();
                 break;
             case 39:
                 // TODO: Remove permanently spawned Singed Letter (which grants the next part of the quest chain) and only spawn when Dorius is killed.
@@ -166,6 +174,12 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_STEELSHIFTER)
             pSummoned->AI()->AttackStart(m_creature);
+
+        if (pSummoned->GetEntry() == NPC_DARK_IRON_MARKSMAN) {
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
     }
 
     void UpdateEscortAI(uint32 const uiDiff) override
