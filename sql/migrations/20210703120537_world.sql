@@ -1022,11 +1022,13 @@ UPDATE `gossip_menu` SET `text_id` = 8254 WHERE `entry` IN (
 AND `text_id` IN (8244, 8251, 8255);
 
 -- Kwee Q Peddlefeet Gossip Menus
+DELETE FROM `gossip_menu` WHERE `entry` = 7054 AND `text_id` = 8312;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(7054, 8316),
-(7053, 8312);
+(7054, 8313);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (7054, 0, 0, 'How are the gift standings?  Who\'s the most popular?', 0, 1, 1, 7053, 0, 0, 0, 0, \N, 0, 0);
+-- Gossip For Popularity Contest
+-- (7054, 8316)
 
 -- Events list for Tyrande Whisperwind
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001639);
@@ -1797,7 +1799,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@LOVE_IS_IN_THE_AIR_OGUID+635, 181060, 1, 10139.1, 2227.24, 1330.96, 4.50295, 0, 0, -0.777145, 0.629321, 0, 0, 100, 1, 7),
 (@LOVE_IS_IN_THE_AIR_OGUID+636, 181073, 0, 98.9861, -1720.18, 220.223, 4.95674, 0, 0, -0.615661, 0.788011, 0, 0, 100, 1, 7); 
 
--- Gobjects Used for winner of popularity contest
+-- Gobjects Used for Winner of Popularity Contest
 -- INSERT INTO `gameobject` (@LOVE_IS_IN_THE_AIR_OGUID+`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 -- (@LOVE_IS_IN_THE_AIR_OGUID+1, 181086, 1, 1920.9, -4138.83, 40.3446, 4.76475, 0, 0, -0.688354, 0.725375, 0, 0, 100, 1, 7),
 -- (@LOVE_IS_IN_THE_AIR_OGUID+2, 181086, 1, 9666.13, 2524.86, 1360, 6.26573, 0, 0, -0.00872612, 0.999962, 0, 0, 100, 1, 7);
