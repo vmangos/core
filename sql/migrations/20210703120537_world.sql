@@ -1024,7 +1024,8 @@ AND `text_id` IN (8244, 8251, 8255);
 -- Kwee Q Peddlefeet Gossip Menus
 DELETE FROM `gossip_menu` WHERE `entry` = 7054 AND `text_id` = 8312;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(7054, 8313);
+(7054, 8313),
+(7053, 8312);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (7054, 0, 0, 'How are the gift standings?  Who\'s the most popular?', 0, 1, 1, 7053, 0, 0, 0, 0, \N, 0, 0);
 -- Gossip For Popularity Contest
