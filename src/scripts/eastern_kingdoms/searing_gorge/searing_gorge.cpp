@@ -126,11 +126,11 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
                 if (Player* pPlayer = GetPlayerForEscort()) {
                     m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
                     DoScriptText(SAY_DORIUS_THIS_IS_THE_PLACE, m_creature, pPlayer);
-				}
+                }
                 break;
             case 15:
-				if (Player* pPlayer = GetPlayerForEscort())
-					m_creature->SetFacingToObject(pPlayer);
+                if (Player* pPlayer = GetPlayerForEscort())
+                    m_creature->SetFacingToObject(pPlayer);
                 DoScriptText(SAY_DORIUS_ONWARD, m_creature);
                 break;
             case 19:
