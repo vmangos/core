@@ -1042,6 +1042,11 @@ DELETE FROM `creature_ai_events` WHERE `creature_id` = 7999;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (799901, 7999, 0, 4, 0, 100, 0, 0, 0, 0, 0, 799901, 0, 0, 'Tyrande Whisperwind - Play Sound 5885 on Aggro');
 DELETE FROM `gossip_menu` WHERE `entry` = 9504 AND `text_id` IN (8255, 8283, 8285, 8291, 8296, 8298, 4092);
 
+-- Events list for Springspindle Fizzlegear
+UPDATE `creature_template` SET `ai_name` = '' WHERE `entry` IN (5174);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=5174;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001464);
+
 -- Add Love is in the Air Aura to Innkeepers
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (46343, 0, 0, 0, 27741, 0, 8); -- Keldamyr
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (37069, 0, 0, 0, 27741, 0, 8); -- Shaussiy
