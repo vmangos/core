@@ -52,7 +52,7 @@ enum DoriusStonetenderData
     SAY_DORIUS_ARRRRRGH             = 4359,
 
     SAY_DARK_IRON_MARKSMAN_HES_MINE = 4358,
-    NPC_DARK_IRON_MARKSMAN          = 8337,
+    NPC_DARK_IRON_MARKSMAN          = 8338,
 
     NPC_DARK_IRON_STEELSHIFTER      = 8337,
 
@@ -115,44 +115,44 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
     {
         switch (uiPointId)
         {
-            case 10:
+            case 11:
                 DoScriptText(SAY_DORIUS_CATCH_MY_BREATH, m_creature);
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
                 break;
-            case 11:
+            case 12:
                 SpawnSteelshifterWave(STEELSHIFTERS_COUNT_A);
                 break;
-            case 14:
+            case 15:
                 if (Player* pPlayer = GetPlayerForEscort()) {
                     m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
                     DoScriptText(SAY_DORIUS_THIS_IS_THE_PLACE, m_creature, pPlayer);
                 }
                 break;
-            case 15:
+            case 16:
                 if (Player* pPlayer = GetPlayerForEscort())
                     m_creature->SetFacingToObject(pPlayer);
                 DoScriptText(SAY_DORIUS_ONWARD, m_creature);
                 break;
-            case 19:
+            case 20:
                 if (Player* pPlayer = GetPlayerForEscort())
                     m_creature->SetFacingToObject(pPlayer);
                 DoScriptText(SAY_DORIUS_QUIT_SMOKING, m_creature);
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
                 break;
-            case 20:
+            case 21:
                 SpawnSteelshifterWave(STEELSHIFTERS_COUNT_B);
                 break;
-            case 23:
+            case 24:
                 DoScriptText(SAY_DORIUS_RUN, m_creature);
                 break;
-            case 24:
-                // TODO: Start running from this point.
-                break;
-            case 37:
-                DoScriptText(SAY_DORIUS_NEED_A_BREATHER, m_creature);
+            case 25:
+                m_creature->SetWalk(false);
                 break;
             case 38:
+                DoScriptText(SAY_DORIUS_NEED_A_BREATHER, m_creature);
                 // TODO: Spawn Dark Iron Marksman to kill Dorius from hill.
+                break;
+            case 39:
                 // TODO: Remove permanently spawned Singed Letter (which grants the next part of the quest chain) and only spawn when Dorius is killed.
                 if (Player* pPlayer = GetPlayerForEscort())
                     pPlayer->GroupEventHappens(QUEST_ID_SUNTARA_STONES, m_creature);
