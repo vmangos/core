@@ -50,6 +50,7 @@ enum DoriusStonetenderData
 
     SAY_DORIUS_NEED_A_BREATHER      = 4363,
     SAY_DORIUS_ARRRRRGH             = 4359,
+    ACTION_DORIUS_POINTS            = 5944,
 
     SAY_DARK_IRON_MARKSMAN_HES_MINE = 4358,
     NPC_DARK_IRON_MARKSMAN          = 8338,
@@ -166,6 +167,7 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
                     pPlayer->GroupEventHappens(QUEST_ID_SUNTARA_STONES, m_creature);
                 DoScriptText(SAY_DORIUS_ARRRRRGH, m_creature);
                 m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
+                DoScriptText(ACTION_DORIUS_POINTS, m_creature, m_creature);
                 break;
         }
     }
