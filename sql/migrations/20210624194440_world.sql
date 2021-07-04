@@ -171,7 +171,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1440406, 14404, 0, 7, 0, 100, 0, 0, 0, 0, 0, 1440406, 0, 0, 'Seeker Thompson - Set Phase to 0 on Evade');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1440406, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeker Thompson - Set Phase to 0');
 
-Remove Incorrect Gossip Menu Option
+-- Remove Incorrect Gossip Menu Option
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 6059 AND `id` = 2;
 
 -- Add Quest Complete Script to The Divination
