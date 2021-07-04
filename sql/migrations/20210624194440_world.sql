@@ -89,7 +89,6 @@ UPDATE `gameobject_template` SET `data2` = 2 WHERE `entry` = 180055;
 
 -- Shyria is not a Vendor
 DELETE FROM `npc_vendor` WHERE `entry` = 7736;
-DELETE FROM `gossip_menu_option` WHERE `id` IN (0, 3) AND `menu_id` = 347;
 UPDATE `creature_template` SET `npc_flags` = 131, `vendor_id` = 0 WHERE `entry` = 7736;
 
 
