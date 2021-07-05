@@ -63,11 +63,23 @@ enum DoriusStonetenderData
     QUEST_ID_SUNTARA_STONES         = 3367
 };
 
+uint32 GAMEOBJECT_ID_SINGED_LETTER = 175704;
+uint32 GAMEOBJECT_GUID_SINGED_LETTER = 10106;
+
 struct npc_dorius_stonetenderAI : public npc_escortAI
 {
     npc_dorius_stonetenderAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
         Reset();
+    }
+
+    void SpawnSingedLetter()
+    {
+        if (auto pGo = m_creature->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, GAMEOBJECT_ID_SINGED_LETTER, GAMEOBJECT_GUID_SINGED_LETTER)))
+        {
+            pGo->SetLootState(GO_READY);
+            pGo->SetRespawnTime(1);
+        }
     }
 
     void SpawnSteelshifterWave(int count)
@@ -162,12 +174,12 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
                 SpawnMarksman();
                 break;
             case 39:
-                // TODO: Remove permanently spawned Singed Letter (which grants the next part of the quest chain) and only spawn when Dorius is killed.
                 if (Player* pPlayer = GetPlayerForEscort())
                     pPlayer->GroupEventHappens(QUEST_ID_SUNTARA_STONES, m_creature);
                 DoScriptText(SAY_DORIUS_ARRRRRGH, m_creature);
                 m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
                 DoScriptText(ACTION_DORIUS_POINTS, m_creature, m_creature);
+                SpawnSingedLetter();
                 break;
         }
     }
