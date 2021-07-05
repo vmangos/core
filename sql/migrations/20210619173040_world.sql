@@ -1043,7 +1043,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (54340, 13, -1553.39, 157.301, -7.79254, 100, 0, 0, 0),
 (54340, 14, -1554.58, 162.176, -7.79279, 100, 0, 0, 0),
 (54340, 15, -1559.56, 162.824, -7.79261, 100, 0, 0, 0),
-(54340, 16, -1561.79, 161.125, -7.79269, 100, 0, 0, 0),
+(54340, 16, -1561.79, 161.125, -7.79269, 100, 0, 0, 1482304),
 (54340, 17, -1565.79, 155.577, -7.79271, 100, 60000, 0, 1482303),
 (54340, 18, -1564.03, 158.032, -7.7925, 100, 0, 0, 0),
 (54340, 19, -1562.37, 160.57, -7.79273, 100, 0, 0, 0),
@@ -1060,6 +1060,7 @@ UPDATE `creature` SET `position_x` = -1583.19, `position_y` = 118.398, `position
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (54340, 54340, 6, 6.25244, 11),
 (54340, 54382, 6, 3.14, 11);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1482304, 0, 3, 0, 0, 0, 0, 14827, 30, 8, 2, 0, 0, 0, 0, -1562.75, 159.7, -6.2327, 4.1312, 0, 'Burth - Move');
 
 -- Flick Waypoints and Scripts
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
