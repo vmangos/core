@@ -9,6 +9,29 @@ INSERT INTO `migrations` VALUES ('20210703120537');
 -- Add your query below.
 
 
+SET @LOVE_IS_IN_THE_AIR_EVENT = 8;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT = 100;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_EVENT = 101;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_EVENT = 102;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT = 103;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER BLUFF_EVENT = 104;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_EVENT = 105;
+SET @LOVE_IS_IN_THE_AIR_OGUID = 24166;
+SET @LOVE_IS_IN_THE_AIR_CGUID = 3484;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID = 9768;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_OGUID = WIP;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_OGUID = WIP;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID = 1266;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER BLUFF_OGUID = WIP;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_OGUID = WIP;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_CGUID = 3500;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_CGUID = 3501;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_CGUID = 3502;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_CGUID = 3503;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER CGUID = 3504;
+SET @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_CGUID = 3505;
+
+-- (credit NickTyrer)
 -- Correct Gossip For Undercity NPCs
 UPDATE `gossip_menu` SET `text_id` = 8270 WHERE `entry` IN (
 63,
@@ -1184,11 +1207,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9028, 68, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Staffron Lerent: Add Quest Flags');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9028, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11847, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Staffron Lerent says: You there. You\'re welcome to take the contents of my cauldron. It was to be the second stage of my plan - amorous clothing.');
 
--- Update Gameobjects (credit Oroxzy)
-SET @LOVE_IS_IN_THE_AIR_EVENT = 8;
-SET @LOVE_IS_IN_THE_AIR_OGUID = 24166;
-SET @LOVE_IS_IN_THE_AIR_CGUID = 3484;
-
+-- Update Gameobjects
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT);
 
 DELETE FROM `game_event_gameobject` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT;
@@ -1817,7 +1836,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@LOVE_IS_IN_THE_AIR_OGUID+636, 181073, 0, 98.9861, -1720.18, 220.223, 4.95674, 0, 0, -0.615661, 0.788011, 120, 120, 100, 1, 7);
 
 -- Gobjects Used for Winner of Popularity Contest
--- INSERT INTO `gameobject` (@LOVE_IS_IN_THE_AIR_OGUID+`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
+-- INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 -- (@LOVE_IS_IN_THE_AIR_OGUID+1, 181086, 1, 1920.9, -4138.83, 40.3446, 4.76475, 0, 0, -0.688354, 0.725375, 0, 0, 100, 1, 7),
 -- (@LOVE_IS_IN_THE_AIR_OGUID+2, 181086, 1, 9666.13, 2524.86, 1360, 6.26573, 0, 0, -0.00872612, 0.999962, 0, 0, 100, 1, 7);
 -- (@LOVE_IS_IN_THE_AIR_OGUID+272, 181024, 1, -1203.54, -108.963, 170.828, 1.3439, 0, 0, 0.622514, 0.782609, 0, 0, 100, 1, 7),
@@ -1853,7 +1872,7 @@ DELETE FROM `game_event_creature` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `movement_type`, `patch_min`) VALUES
 -- Kwee Q. Peddlefeet.
 (@LOVE_IS_IN_THE_AIR_CGUID+1, 16075, 1, -1199.99, -118.787, 163.882, 3.10669, 120, 120, 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CGUID+2, 16075, 1, 1918.24, -4139.84, 40.4727, 4.84821, 120, 120, 0, 0, 7),
+(@LOVE_IS_IN_THE_AIR_CGUID+2, 16075, 1, 1929.58, -4137.4, 40.4708, 4.17134, 120, 120, 0, 0, 7),
 (@LOVE_IS_IN_THE_AIR_CGUID+3, 16075, 1, 9670.28, 2534.94, 1360.08, 5.34071, 120, 120, 0, 0, 7),
 (@LOVE_IS_IN_THE_AIR_CGUID+4, 16075, 0, -8435.29, 323.431, 121.829, 1.7526, 120, 120, 0, 0, 7),
 (@LOVE_IS_IN_THE_AIR_CGUID+5, 16075, 0, -4867.87, -1032.22, 502.273, 5.49779, 120, 120, 0, 0, 7),
@@ -1896,6 +1915,70 @@ INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES
 (@LOVE_IS_IN_THE_AIR_CGUID+13, 1),
 (@LOVE_IS_IN_THE_AIR_CGUID+14, 1),
 (@LOVE_IS_IN_THE_AIR_CGUID+15, 1);
+
+-- Delete weird peddle event.
+DELETE FROM `game_event` WHERE  `entry`=140;
+
+-- Add new game_events for each Winner of the Popularity Contest which remains 7 days if activated.
+INSERT INTO `game_event` (`entry`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`) VALUES
+(100, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Darnassus', 0, 0, 7),
+(101, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Ironforge', 0, 0, 7),
+(102, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Stormwind', 0, 0, 7),
+(103, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Orgrimmar', 0, 0, 7),
+(104, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Thunder Bluff', 0, 0, 7),
+(105, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Undercity', 0, 0, 7);
+
+-- Popularity Contest Winner Orgrimmar.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zone_id`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+1, 181021, 1, 1637, 1381.49, -4369.8, 52.8347, 3.28124, 0, 0, -0.997563, 0.0697661, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+2, 181021, 1, 1637, 1484.87, -4416.72, 53.1904, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+3, 181021, 1, 1637, 1659.82, -4329.04, 75.2346, 2.68781, 0, 0, 0.97437, 0.224951, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+4, 181021, 1, 1637, 1661.55, -4344.48, 75.2458, 3.7001, 0, 0, -0.961261, 0.27564, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+5, 181021, 1, 1637, 1672.88, -4320.48, 74.9852, 1.64061, 0, 0, 0.731353, 0.681999, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+6, 181021, 1, 1637, 1685.85, -4327.43, 74.8583, 0.698131, 0, 0, 0.34202, 0.939693, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+7, 181021, 1, 1637, 1687.43, -4340.12, 74.9505, 5.79449, 0, 0, -0.241921, 0.970296, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+8, 181021, 1, 17, 1706.77, -3929.71, 71.8858, 5.2709, 0, 0, -0.484809, 0.87462, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+9, 181025, 1, 1637, 1910.07, -4126.43, 42.8192, 5.09636, 0, 0, -0.559193, 0.829038, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+10, 181025, 1, 1637, 1916.17, -4252.84, 40.584, 4.72984, 0, 0, -0.700909, 0.713251, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+11, 181016, 1, 1637, 1917.01, -4138.25, 40.3796, 4.41568, 0, 0, -0.803857, 0.594823, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+12, 181086, 1, 1637, 1920.9, -4138.83, 40.3446, 4.76475, 0, 0, -0.688354, 0.725375, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+13, 181016, 1, 1637, 1924.46, -4137.94, 40.3811, 4.99164, 0, 0, -0.601814, 0.798636, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+14, 181025, 1, 1637, 1930, -4125.44, 42.9065, 4.57276, 0, 0, -0.754709, 0.656059, 120, 120, 100, 1, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+15, 181025, 1, 1637, 1941.24, -4251.97, 39.8368, 4.60767, 0, 0, -0.743144, 0.669132, 120, 120, 100, 1, 7);
+
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+1 AND @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_OGUID+15;
+
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `movement_type`, `patch_min`) VALUES
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_CGUID, 16075, 1, 1918.24, -4139.84, 40.4727, 4.85202, 120, 120, 0, 0, 7);
+
+INSERT INTO `game_event_creature` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT FROM `gameobject` WHERE gameobject.guid = @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_CGUID;
+
+-- Popularity Contest Winner Darnassus.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zone_id`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+1, 181016, 1, 0, 9667.78, 2529.11, 1360, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+2, 181016, 1, 0, 9668.83, 2521.06, 1360, 5.88176, 0, 0, -0.199367, 0.979925, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+3, 181021, 1, 0, 9892.4, 2238.72, 1343.61, 6.19592, 0, 0, -0.0436192, 0.999048, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+4, 181021, 1, 0, 9892.59, 2223.51, 1343.63, 0.0174525, 0, 0, 0.00872612, 0.999962, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+5, 181021, 1, 0, 9893.36, 2207.54, 1343.76, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+6, 181021, 1, 0, 9985.94, 1978.34, 1352.14, 4.67748, 0, 0, -0.719339, 0.694659, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+7, 181021, 1, 0, 9986.28, 2022.9, 1351.84, 1.6057, 0, 0, 0.719339, 0.694659, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+8, 181021, 1, 0, 10013.6, 2242.08, 1343.92, 3.24635, 0, 0, -0.998629, 0.0523532, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+9, 181021, 1, 0, 10014, 2226.74, 1343.69, 3.15906, 0, 0, -0.999962, 0.00873464, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+10, 181021, 1, 0, 10014.4, 2211.14, 1343.83, 3.10665, 0, 0, 0.999847, 0.0174693, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+11, 181024, 1, 0, 9657.08, 2523.52, 1372, 3.15906, 0, 0, -0.999962, 0.00873464, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+12, 181024, 1, 0, 9663.88, 2525.11, 1369.32, 0.0523589, 0, 0, 0.0261765, 0.999657, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+13, 181025, 1, 0, 9655.11, 2530.81, 1360.8, 3.4383, 0, 0, -0.989016, 0.147811, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+14, 181025, 1, 0, 9657.18, 2516.03, 1361, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+15, 181025, 1, 0, 9663.72, 2531.88, 1361.8, 0.0174525, 0, 0, 0.00872612, 0.999962, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+16, 181025, 1, 0, 9664.04, 2517.89, 1361.6, 0.279252, 0, 0, 0.139173, 0.990268, 120, 120, 100, 1, 0),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+17, 181086, 1, 0, 9666.13, 2524.86, 1360, 6.26573, 0, 0, -0.00872612, 0.999962, 120, 120, 100, 1, 0);
+
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+1 AND @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_OGUID+17;
+
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `movement_type`, `patch_min`) VALUES
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_CGUID, 16075, 1, 9666.29, 2518.08, 1360.08, 0.610865, 120, 120, 0, 0, 7);
+
+INSERT INTO `game_event_creature` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT FROM `gameobject` WHERE gameobject.guid = @LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_CGUID;
 
 
 -- End of migration.
