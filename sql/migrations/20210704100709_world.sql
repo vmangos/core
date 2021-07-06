@@ -55,12 +55,7 @@ VALUES
     ('8284', '39', '-6387.385742', '-1983.494263', '246.722427', '30000', 'death');
 
 -- Disable initial spawn of 'Singed Letter', in order to create it at the end of 'Suntara Stones'.
-UPDATE gameobject
-SET
-    spawntimesecsmin = -10,
-    spawntimesecsmax = -10
-WHERE
-    guid = '10106';
+UPDATE `gameobject` SET `spawntimesecsmin`=-10, `spawntimesecsmax`=-10 WHERE `guid`=10106;
 
 -- End of migration.
 END IF;
