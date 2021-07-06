@@ -36,9 +36,32 @@ enum DoriusStonetenderData
 {
     SAY_DORIUS_AGGRO_1              = 4353,
     SAY_DORIUS_AGGRO_2              = 4351,
+    SAY_DORIUS_INJURED_DWARF        = 4352,
+
+
+    SAY_DORIUS_CATCH_MY_BREATH      = 4345,
+
+    SAY_DORIUS_QUIT_SMOKING         = 4356,
+
+    SAY_DORIUS_THIS_IS_THE_PLACE    = 4354,
+    SAY_DORIUS_ONWARD               = 4355,
+
+    SAY_DORIUS_RUN                  = 4357,
+
+    SAY_DORIUS_NEED_A_BREATHER      = 4363,
+    SAY_DORIUS_ARRRRRGH             = 4359,
+    ACTION_DORIUS_POINTS            = 5944,
+
+    SAY_DARK_IRON_MARKSMAN_HES_MINE = 4358,
+    NPC_DARK_IRON_MARKSMAN          = 8338,
+
+    GAMEOBJECT_ID_SINGED_LETTER     = 175704,
+    GAMEOBJECT_GUID_SINGED_LETTER   = 10106,
 
     NPC_DARK_IRON_STEELSHIFTER      = 8337,
-    MAX_STEELSHIFTERS               = 4,
+
+    STEELSHIFTERS_COUNT_A           = 2,
+    STEELSHIFTERS_COUNT_B           = 4,
 
     QUEST_ID_SUNTARA_STONES         = 3367
 };
@@ -48,6 +71,33 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
     npc_dorius_stonetenderAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
         Reset();
+    }
+
+    void SpawnSingedLetter()
+    {
+        if (GameObject* pGo = m_creature->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, static_cast<uint32>(GAMEOBJECT_ID_SINGED_LETTER), static_cast<uint32>(GAMEOBJECT_GUID_SINGED_LETTER))))
+        {
+            pGo->SetLootState(GO_READY);
+            pGo->SetRespawnTime(0);
+        }
+    }
+
+    void SpawnSteelshifterWave(int count)
+    {
+        float fX, fY, fZ;
+        for (uint8 i = 0; i < count; ++i)
+        {
+            m_creature->GetNearPoint(m_creature, fX, fY, fZ, 0, 15.0f, i * M_PI_F / 2);
+            m_creature->SummonCreature(NPC_DARK_IRON_STEELSHIFTER, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+        }
+    }
+
+    void SpawnMarksman()
+    {
+        // Spawns on the hill facing Dorius, to the north.
+        float fX = -6369.524414f, fY = -1974.548340f, fZ = 256.675995f, fAng = 3.623531f;
+        Creature* marksman = m_creature->SummonCreature(NPC_DARK_IRON_MARKSMAN, fX, fY, fZ, fAng, TEMPSUMMON_TIMED_DESPAWN, 10000, false, 10000);
+        marksman->SetSheath(SHEATH_STATE_RANGED);
     }
 
     void Reset() override { }
@@ -68,27 +118,68 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
 
     void Aggro(Unit* pWho) override
     {
-        DoScriptText(urand(0, 1) ? SAY_DORIUS_AGGRO_1 : SAY_DORIUS_AGGRO_2, m_creature, pWho);
+        switch (urand(0, 3))
+        {
+            case 0:
+                DoScriptText(SAY_DORIUS_AGGRO_1, m_creature, pWho);
+                break;
+            case 1:
+                DoScriptText(SAY_DORIUS_AGGRO_2, m_creature, pWho);
+                break;
+            case 2:
+                DoScriptText(SAY_DORIUS_INJURED_DWARF, m_creature);
+                break;
+        }
     }
 
     void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
-            case 20:
-                // ToDo: research if there is any text here!
-                float fX, fY, fZ;
-                for (uint8 i = 0; i < MAX_STEELSHIFTERS; ++i)
-                {
-                    m_creature->GetNearPoint(m_creature, fX, fY, fZ, 0, 15.0f, i * M_PI_F / 2);
-                    m_creature->SummonCreature(NPC_DARK_IRON_STEELSHIFTER, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+            case 11:
+                DoScriptText(SAY_DORIUS_CATCH_MY_BREATH, m_creature);
+                m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                break;
+            case 12:
+                SpawnSteelshifterWave(STEELSHIFTERS_COUNT_A);
+                break;
+            case 15:
+                if (Player* pPlayer = GetPlayerForEscort()) {
+                    m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
+                    DoScriptText(SAY_DORIUS_THIS_IS_THE_PLACE, m_creature, pPlayer);
                 }
                 break;
-            case 33:
-                // ToDo: research if there is any event and text here!
+            case 16:
+                if (Player* pPlayer = GetPlayerForEscort())
+                    m_creature->SetFacingToObject(pPlayer);
+                DoScriptText(SAY_DORIUS_ONWARD, m_creature);
+                break;
+            case 20:
+                if (Player* pPlayer = GetPlayerForEscort())
+                    m_creature->SetFacingToObject(pPlayer);
+                DoScriptText(SAY_DORIUS_QUIT_SMOKING, m_creature);
+                m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                break;
+            case 21:
+                SpawnSteelshifterWave(STEELSHIFTERS_COUNT_B);
+                break;
+            case 24:
+                DoScriptText(SAY_DORIUS_RUN, m_creature);
+                break;
+            case 25:
+                SetRun(true);
+                break;
+            case 38:
+                DoScriptText(SAY_DORIUS_NEED_A_BREATHER, m_creature);
+                SpawnMarksman();
+                break;
+            case 39:
                 if (Player* pPlayer = GetPlayerForEscort())
                     pPlayer->GroupEventHappens(QUEST_ID_SUNTARA_STONES, m_creature);
+                DoScriptText(SAY_DORIUS_ARRRRRGH, m_creature);
                 m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
+                DoScriptText(ACTION_DORIUS_POINTS, m_creature, m_creature);
+                SpawnSingedLetter();
                 break;
         }
     }
@@ -97,6 +188,12 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_STEELSHIFTER)
             pSummoned->AI()->AttackStart(m_creature);
+
+        if (pSummoned->GetEntry() == NPC_DARK_IRON_MARKSMAN) {
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        }
     }
 
     void UpdateEscortAI(uint32 const uiDiff) override
@@ -119,7 +216,6 @@ bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, Qu
     {
         if (npc_dorius_stonetenderAI* pStonetenderAI = dynamic_cast<npc_dorius_stonetenderAI*>(pCreature->AI()))
         {
-            // ToDo: research if there is any text here
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
             pCreature->SetFactionTemporary(FACTION_ESCORT_A_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
             pStonetenderAI->Start(false, pPlayer->GetGUID(), pQuest);
