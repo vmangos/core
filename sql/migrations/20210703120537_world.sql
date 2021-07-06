@@ -1051,8 +1051,6 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (7053, 8312);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (7054, 0, 0, 'How are the gift standings?  Who\'s the most popular?', 0, 1, 1, 7053, 0, 0, 0, 0, \N, 0, 0);
--- Gossip For Popularity Contest
--- (7054, 8316)
 
 -- Events list for Tyrande Whisperwind
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001639);
@@ -1066,45 +1064,46 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=5174;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (3001464);
 
 -- Add Love is in the Air Aura to Innkeepers
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (46343, 0, 0, 0, 27741, 0, 8); -- Keldamyr
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (37069, 0, 0, 0, 27741, 0, 8); -- Shaussiy
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (32451, 0, 0, 0, 27741, 0, 8); -- Kimlya
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (42181, 0, 0, 0, 27741, 0, 8); -- Vizzie
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (29239, 0, 0, 0, 27741, 0, 8); -- Faralia
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (28304, 0, 0, 0, 27741, 0, 8); -- Lyshaerya
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (14986, 0, 0, 0, 27741, 0, 8); -- Wiley
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (30676, 0, 0, 0, 27741, 0, 8); -- Janene
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (50059, 0, 0, 0, 27741, 0, 8); -- Shyria
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (42755, 0, 0, 0, 27741, 0, 8); -- Calandrath
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (22681, 0, 0, 0, 27741, 0, 8); -- Fizzgrimble
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (33073, 0, 0, 0, 27741, 0, 8); -- Kaylisk
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (7671, 0, 0, 0, 27741, 0, 8); -- Grosk
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (14139, 0, 0, 0, 27741, 0, 8); -- Booran Plainswind
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (13550, 0, 0, 0, 27741, 0, 8); -- Byula
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (24774, 0, 0, 0, 27741, 0, 8); -- Kauth
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (29233, 0, 0, 0, 27741, 0, 8); -- Jayka
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (28340, 0, 0, 0, 27741, 0, 8); -- Sikewa
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (50060, 0, 0, 0, 27741, 0, 8); -- Greul
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (21575, 0, 0, 0, 27741, 0, 8); -- Abeqwa
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (80346, 0, 0, 0, 27741, 0, 8); -- Farley
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (66978, 0, 0, 0, 27741, 0, 8); -- Heather
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (10076, 0, 0, 0, 27741, 0, 8); -- Brianna
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (4208, 0, 0, 0, 27741, 0, 8); -- Trelayne
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (537, 0, 0, 0, 27741, 0, 8); -- Skindle
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (8219, 0, 0, 0, 27741, 0, 8); -- Hearthstove
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (199, 0, 0, 0, 27741, 0, 8); -- Belm
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (9460, 0, 0, 0, 27741, 0, 8); -- Helbrek
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (15326, 0, 0, 0, 27741, 0, 8); -- Anderson
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (92923, 0, 0, 0, 27741, 0, 8); -- Thulfram
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (54188, 0, 0, 0, 27741, 0, 8); -- Jessica Chambers
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (28474, 0, 0, 0, 27741, 0, 8); -- Renee
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (17865, 0, 0, 0, 27741, 0, 8); -- Bates
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (15287, 0, 0, 0, 27741, 0, 8); -- Shay
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (92884, 0, 0, 0, 27741, 0, 8); -- Lard
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (11273, 0, 0, 0, 27741, 0, 8); -- Adegwa
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (6889, 0, 0, 0, 27741, 0, 8); -- Shul'kar
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (31947, 0, 0, 0, 27741, 0, 8); -- Karakul
-INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES (690, 0, 0, 0, 27741, 0, 8); -- Thulbek
+INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
+(46343, 0, 0, 0, 27741, 0, 8), -- Keldamyr
+(37069, 0, 0, 0, 27741, 0, 8), -- Shaussiy
+(32451, 0, 0, 0, 27741, 0, 8), -- Kimlya
+(42181, 0, 0, 0, 27741, 0, 8), -- Vizzie
+(29239, 0, 0, 0, 27741, 0, 8), -- Faralia
+(28304, 0, 0, 0, 27741, 0, 8), -- Lyshaerya
+(14986, 0, 0, 0, 27741, 0, 8), -- Wiley
+(30676, 0, 0, 0, 27741, 0, 8), -- Janene
+(50059, 0, 0, 0, 27741, 0, 8), -- Shyria
+(42755, 0, 0, 0, 27741, 0, 8), -- Calandrath
+(22681, 0, 0, 0, 27741, 0, 8), -- Fizzgrimble
+(33073, 0, 0, 0, 27741, 0, 8), -- Kaylisk
+(7671, 0, 0, 0, 27741, 0, 8), -- Grosk
+(14139, 0, 0, 0, 27741, 0, 8), -- Booran Plainswind
+(13550, 0, 0, 0, 27741, 0, 8), -- Byula
+(24774, 0, 0, 0, 27741, 0, 8), -- Kauth
+(29233, 0, 0, 0, 27741, 0, 8), -- Jayka
+(28340, 0, 0, 0, 27741, 0, 8), -- Sikewa
+(50060, 0, 0, 0, 27741, 0, 8), -- Greul
+(21575, 0, 0, 0, 27741, 0, 8), -- Abeqwa
+(80346, 0, 0, 0, 27741, 0, 8), -- Farley
+(66978, 0, 0, 0, 27741, 0, 8), -- Heather
+(10076, 0, 0, 0, 27741, 0, 8), -- Brianna
+(4208, 0, 0, 0, 27741, 0, 8), -- Trelayne
+(537, 0, 0, 0, 27741, 0, 8), -- Skindle
+(8219, 0, 0, 0, 27741, 0, 8), -- Hearthstove
+(199, 0, 0, 0, 27741, 0, 8), -- Belm
+(9460, 0, 0, 0, 27741, 0, 8), -- Helbrek
+(15326, 0, 0, 0, 27741, 0, 8), -- Anderson
+(92923, 0, 0, 0, 27741, 0, 8), -- Thulfram
+(54188, 0, 0, 0, 27741, 0, 8), -- Jessica Chambers
+(28474, 0, 0, 0, 27741, 0, 8), -- Renee
+(17865, 0, 0, 0, 27741, 0, 8), -- Bates
+(15287, 0, 0, 0, 27741, 0, 8), -- Shay
+(92884, 0, 0, 0, 27741, 0, 8), -- Lard
+(11273, 0, 0, 0, 27741, 0, 8), -- Adegwa
+(6889, 0, 0, 0, 27741, 0, 8), -- Shul'kar
+(31947, 0, 0, 0, 27741, 0, 8), -- Karakul
+(690, 0, 0, 0, 27741, 0, 8); -- Thulbek
 
 -- Add Missing Gossip Menu Options to Innkeepers
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `condition_id`) VALUES
@@ -1884,15 +1883,17 @@ INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES
 
 -- Remove the old Kwee Q. Peddlefeet event.
 DELETE FROM `game_event` WHERE `entry`=140;
+DELETE FROM `game_event_creature` WHERE `event`=140;
+DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=140);
 
--- Add new game_events for each Winner of the Popularity Contest which remains 7 days if activated (604800 seconds = 7 days).
+-- Add new game_events for each Winner of the Popularity Contest which remains 7 days if activated (10080 minutes = 7 days).
 INSERT INTO `game_event` (`entry`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`) VALUES
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Darnassus', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_EVENT, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Ironforge', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_EVENT, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Stormwind', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Orgrimmar', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF_EVENT, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Thunder Bluff', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_EVENT, 525600, 604800, 335, 'Love is in the Air - Popularity Contest Winner: Undercity', 0, 0, 7);
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Darnassus', 0, 0, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Ironforge', 0, 0, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Stormwind', 0, 0, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Orgrimmar', 0, 0, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Thunder Bluff', 0, 0, 7),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Undercity', 0, 0, 7);
 
 -- Popularity Contest Winner Orgrimmar.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
