@@ -55,6 +55,9 @@ enum DoriusStonetenderData
     SAY_DARK_IRON_MARKSMAN_HES_MINE = 4358,
     NPC_DARK_IRON_MARKSMAN          = 8338,
 
+    GAMEOBJECT_ID_SINGED_LETTER     = 175704,
+    GAMEOBJECT_GUID_SINGED_LETTER   = 10106,
+
     NPC_DARK_IRON_STEELSHIFTER      = 8337,
 
     STEELSHIFTERS_COUNT_A           = 2,
@@ -62,9 +65,6 @@ enum DoriusStonetenderData
 
     QUEST_ID_SUNTARA_STONES         = 3367
 };
-
-uint32 GAMEOBJECT_ID_SINGED_LETTER = 175704;
-uint32 GAMEOBJECT_GUID_SINGED_LETTER = 10106;
 
 struct npc_dorius_stonetenderAI : public npc_escortAI
 {
@@ -75,10 +75,10 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
 
     void SpawnSingedLetter()
     {
-        if (auto pGo = m_creature->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, GAMEOBJECT_ID_SINGED_LETTER, GAMEOBJECT_GUID_SINGED_LETTER)))
+        if (GameObject* pGo = m_creature->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, static_cast<uint32>(GAMEOBJECT_ID_SINGED_LETTER), static_cast<uint32>(GAMEOBJECT_GUID_SINGED_LETTER))))
         {
             pGo->SetLootState(GO_READY);
-            pGo->SetRespawnTime(1);
+            pGo->SetRespawnTime(0);
         }
     }
 
