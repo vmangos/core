@@ -239,9 +239,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (600, 1, 10794, 0, 0, 0, 0);
 
 
-
-INSERT INTO `page_text` VALUES (874, 'Smithing Hammer - Before the coming of the Plague and Arthas\' betrayal, I lived in a town called Pyrewood, deep within the beautiful forest of Silverpine. The forest isn\'t nearly as beautiful as it once was, and the keep where I learned the secret of steel has long since become corrupt and foul, overrun with creatures of unimaginable evil.$B$BWhen my wife and I made our escape from what is now called Shadowfang Keep, we left some of our most precious possessions.', 875);
-
 -- End of migration.
 END IF;
 END??
