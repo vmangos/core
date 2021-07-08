@@ -41,7 +41,14 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (532, -1, 519, 501, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (533, -1, 519, 502, 0, 0, 0);
 
-
+-- Lomac Gearstrip AI
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (408101, 4081, 535, 1, 0, 100, 1, 0, 10000, 5000, 10000, 408101, 0, 0, 'Lomac Gearstrip - Despawn Gameobject (180763) - OOC');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (408102, 4081, 536, 1, 0, 100, 1, 0, 10000, 5000, 10000, 408102, 0, 0, 'Lomac Gearstrip - Despawn Gameobject (180764) - OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (408101, 0, 81, 0, 11, 0, 0, 180763, 5000, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lomac Gearstrip - Despawn Gameobject (180763)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (408102, 0, 81, 0, 11, 0, 0, 180764, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lomac Gearstrip - Despawn Gameobject (180764)');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (534, 52, 40, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (535, -1, 534, 501, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (536, -1, 534, 502, 0, 0, 0);
 
 -- Respawn Firecrackers (Entry 180763 and 180764)
 SET @LUNAR_FESTIVAL_OGUID = 22202;
