@@ -310,6 +310,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@LUNAR_FESTIVAL_OGUID+280, 180763, 1, -1037.81, -221.848, 161.319, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 1, 100, 0, 10),
 (@LUNAR_FESTIVAL_OGUID+281, 180763, 1, 1985.12, -4245.31, 32.6182, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 1, 100, 0, 10),
 (@LUNAR_FESTIVAL_OGUID+282, 180764, 1, -1022.06, -231.753, 161.152, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 1, 100, 0, 10);
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, 7 FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+282;
 
 
 -- End of migration.
