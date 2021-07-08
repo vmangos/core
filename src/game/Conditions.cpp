@@ -104,6 +104,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_SOURCE_WORLDOBJECT, //  52
     CONDITION_REQ_NONE,               //  53
     CONDITION_REQ_TARGET_WORLDOBJECT, //  54
+    CONDITION_REQ_TARGET_GAMEOBJECT,  //  55
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -586,6 +587,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_DISTANCE_TO_POSITION:
         {
             return target->GetDistance3dToCenter(m_value1, m_value2, m_value3) <= m_value4;
+        }
+        case CONDITION_OBJECT_GO_STATE:
+        {
+            return target->ToGameObject()->GetGoState() == m_value1;
         }
     }
     return false;
@@ -1198,6 +1203,15 @@ bool ConditionEntry::IsValid()
             if (m_value4 <= 0)
             {
                 sLog.outErrorDb("CONDITION_DISTANCE_TO_POSITION (entry %u, type %d) does not have max distance set in value4, skipped", m_entry, m_condition);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_OBJECT_GO_STATE:
+        {
+            if (m_value1 > GO_STATE_ACTIVE_ALTERNATIVE)
+            {
+                sLog.outErrorDb("CONDITION_OBJECT_GO_STATE (entry %u, type %u) has invalid GO state %u, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
             break;
