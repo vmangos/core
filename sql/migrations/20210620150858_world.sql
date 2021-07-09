@@ -487,7 +487,9 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) V
 (@LUNAR_FESTIVAL_POOL_TEMPLATE+138, 1, 'Firecrackers', 10),
 (@LUNAR_FESTIVAL_POOL_TEMPLATE+139, 1, 'Firecrackers', 10),
 (@LUNAR_FESTIVAL_POOL_TEMPLATE+140, 1, 'Firecrackers', 10),
-(@LUNAR_FESTIVAL_POOL_TEMPLATE+141, 1, 'Firecrackers', 10);
+(@LUNAR_FESTIVAL_POOL_TEMPLATE+141, 1, 'Firecrackers', 10),
+(@LUNAR_FESTIVAL_POOL_TEMPLATE+142, 1, 'Firecrackers', 10),
+(@LUNAR_FESTIVAL_POOL_TEMPLATE+143, 1, 'Firecrackers', 10);
 
 -- ADD POOL GAMEOBJECTS
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
