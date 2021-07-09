@@ -8,10 +8,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210620150858');
 -- Add your query below.
 
-
+/*
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` IN (15892);
-UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` IN (180871, 180872, 180763, 180873, 180870, 180764);
-
 -- Lunar Festival Emissary AI
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589201, 15892, 503, 1, 0, 100, 1, 0, 10000, 5000, 10000, 1589201, 0, 0, 'Lunar Festival Emissary - Despawn Gameobject (180763) - OOC');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589202, 15892, 504, 1, 0, 100, 1, 0, 10000, 5000, 10000, 1589202, 0, 0, 'Lunar Festival Emissary - Despawn Gameobject (180764) - OOC');
@@ -49,10 +47,12 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (534, 52, 40, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (535, -1, 534, 501, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (536, -1, 534, 502, 0, 0, 0);
+*/
 
 -- Respawn Firecrackers (Entry 180763 and 180764)
 SET @LUNAR_FESTIVAL_OGUID = 22202;
 SET @LUNAR_FESTIVAL_POOL_TEMPLATE = 521;
+UPDATE `gameobject_template` SET `faction` = 114 WHERE `entry` IN (180871, 180872, 180763, 180873, 180870, 180764);
 DELETE FROM `game_event_gameobject` WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180763, 180764));
 DELETE FROM `gameobject` WHERE `id` IN (180763, 180764);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
