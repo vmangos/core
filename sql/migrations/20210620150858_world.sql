@@ -342,7 +342,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@LUNAR_FESTIVAL_OGUID+284, 180764, 1, 10148.6, 2610.28, 1332.4, 4.93928, 0, 0, -0.622514, 0.782609, 120, 120, 1, 100, 0, 10),
 (@LUNAR_FESTIVAL_OGUID+285, 180764, 1, 10154.5, 2593.53, 1332.05, 3.28124, 0, 0, -0.997563, 0.0697661, 120, 120, 1, 100, 0, 10),
 (@LUNAR_FESTIVAL_OGUID+286, 180764, 1, 10159.8, 2604.5, 1332.37, 3.4034, 0, 0, -0.991445, 0.130528, 120, 120, 1, 100, 0, 10);
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, 7 FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+285;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, 7 FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+286;
 
 -- ADD POOL TEMPLATE
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
