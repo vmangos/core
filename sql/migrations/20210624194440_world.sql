@@ -238,6 +238,12 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (767105, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3685, 3681, 3641, 3683, 0, 0, 0, 0, 0, 'Servant of Sevine - Talk');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (600, 1, 10794, 0, 0, 0, 0);
 
+-- Add Missing Quest and Add Correct Requirements
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(11555, 8484, 7, 10);
+UPDATE `quest_template` SET `PrevQuestId` = 8481 WHERE `entry` = 8484;
+UPDATE `quest_template` SET `PrevQuestId` = 8481 WHERE `entry` = 8485;
+
 
 -- End of migration.
 END IF;
