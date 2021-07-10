@@ -31,8 +31,8 @@ DELETE FROM `creature_ai_scripts` WHERE `id` = 4507*100+01;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4507*100+01, 0, 39, 4507*100+01, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, "Daisy - Start Event");
 
-DELETE FROM `event_scripts` WHERE `id` IN (4507*100+01, 4507*100+02, 4507*100+03);
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+DELETE FROM `generic_scripts` WHERE `id` IN (4507*100+01, 4507*100+02, 4507*100+03);
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4507*100+01, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6181.54, -3901.89, -60.0522, 3.13433, 0, "Daisy - Teleport"),
 (4507*100+01, 60, 60, 3, 1, 0, 0, 21682, 0, 9, 2, 0, 4252*100, 0, 0, 0, 0, 0, 0, 0, "Daisy - Start Waypoint (Gnome Racer)"),
 (4507*100+01, 60, 60, 3, 1, 0, 0, 21680, 0, 9, 2, 0, 4251*100, 0, 0, 0, 0, 0, 0, 0, "Daisy - Start Waypoint (Goblin Racer)"),
@@ -66,8 +66,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (4251*100+03, 0, 15, 6602, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Goblin Racer - Cast Spell 'Salt Flats Racer Normal'"),
 (4251*100+04, 0, 39, 4251*100+04, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, "Goblin Racer - Start Event");
 
-DELETE FROM `event_scripts` WHERE `id` = 4251*100+04;
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+DELETE FROM `generic_scripts` WHERE `id` = 4251*100+04;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4251*100+04, 1, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6225.51, -3941.11, -58.6251, 0.171547, 0, "Goblin Racer - Teleport");
 
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE `entry` = 4252;
@@ -83,8 +83,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (4252*100+03, 0, 15, 6602, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Gnome Racer - Cast Spell 'Salt Flats Racer Normal'"),
 (4252*100+04, 0, 39, 4252*100+04, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, "Gnome Racer - Start Event");
 
-DELETE FROM `event_scripts` WHERE `id` = 4252*100+04;
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+DELETE FROM `generic_scripts` WHERE `id` = 4252*100+04;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4252*100+04, 1, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6213.07, -3849.85, -58.6251, 4.79829, 0, "Gnome Racer - Teleport");
 
 DELETE FROM `creature_movement_scripts` WHERE `id` IN (4251*100+01, 4251*100+02, 4251*100+03);
