@@ -244,6 +244,10 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 UPDATE `quest_template` SET `PrevQuestId` = 8481 WHERE `entry` = 8484;
 UPDATE `quest_template` SET `PrevQuestId` = 8481 WHERE `entry` = 8485;
 
+-- Remove Some Low Level Loot From Tanaris Mobs
+DELETE FROM `creature_loot_template` WHERE `entry` = 5426 AND `item` = 30019;
+DELETE FROM `creature_loot_template` WHERE `entry` = 5429 AND `item` IN (30017, 30019);
+
 
 -- End of migration.
 END IF;
