@@ -5042,8 +5042,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 {
                     if (unitTarget && !sGameEventMgr.IsActiveEvent(8))
                     {
-                        unitTarget->RemoveAurasDueToSpell(26869);
-                        unitTarget->RemoveAurasDueToSpell(27741);
+                        unitTarget->RemoveAurasDueToSpell(26870); // Amorous Timer, Standard Test
+                        unitTarget->RemoveAurasDueToSpell(27742); // Amorous Timer, Standard
+                        unitTarget->RemoveAurasDueToSpell(26869); // Amorous
+                        unitTarget->RemoveAurasDueToSpell(27741); // Love is in the Air
                     }
                     return;
                 }
