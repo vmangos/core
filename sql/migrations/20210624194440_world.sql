@@ -9,9 +9,6 @@ INSERT INTO `migrations` VALUES ('20210624194440');
 -- Add your query below.
 
 
--- Correct Barbs Aura Passive for Mudrock Spikeshell 4397 (credit cmangos)
-UPDATE `creature_template` SET `auras` = '9464' WHERE `entry` = 4397;
-
 -- Fix Creature Stuck Underground
 UPDATE `creature` SET `position_z` = 79.5248, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 15226;
 UPDATE `creature` SET `position_x` = -4268.95, `position_y` = 36.598, `position_z` = 55.1443, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 50875;
