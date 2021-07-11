@@ -323,6 +323,13 @@ UPDATE `creature` SET `position_x` = 1819.71, `position_y` = 196.531, `position_
 UPDATE `creature` SET `position_x` = -5028.83, `position_y` = -814.463, `position_z` = 495.248, `orientation` = 4.087082 WHERE `guid` = 208350;
 UPDATE `creature` SET `position_x` = 8597.74, `position_y` = 1008.65, `position_z` = 5.78136, `orientation` = 4.087082 WHERE `guid` = 208900;
 
+-- Delete Arathi PVP supplies from Warpwood Stomper, Desert Rumbler, Vekniss Soldier
+DELETE FROM `creature_loot_template` WHERE `entry` IN (11465, 11746, 15229) AND `item` IN (20062, 20066);
+
+-- Delete loot table for Field Marshal Oslight 
+UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 14983;
+DELETE FROM `creature_loot_template` WHERE `entry` = 14983;
+
 
 -- End of migration.
 END IF;
