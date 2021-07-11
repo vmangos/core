@@ -330,6 +330,9 @@ DELETE FROM `creature_loot_template` WHERE `entry` IN (11465, 11746, 15229) AND 
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 14983;
 DELETE FROM `creature_loot_template` WHERE `entry` = 14983;
 
+-- Add Correct Completion Text to Quest
+UPDATE `quest_template` SET `OfferRewardText` = 'Hm... $N. You are still new to your path, but I sense the possibility for greatness in you.$B$BYou were born with gifts, $N. See that they do not go to waste.' WHERE `entry` = 1507;
+
 
 -- End of migration.
 END IF;
