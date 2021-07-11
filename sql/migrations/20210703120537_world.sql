@@ -1860,7 +1860,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 -- Aldris Fourclouds - Darnassus.
 (@LOVE_IS_IN_THE_AIR_CGUID+15, 16001, 1, 9939.5, 2494.36, 1317.69, 0.785398, 120, 120, 0, 0, 7);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @LOVE_IS_IN_THE_AIR_CGUID+1 AND @LOVE_IS_IN_THE_AIR_CGUID+15 AND `event`=@LOVE_IS_IN_THE_AIR_EVENT;
 INSERT INTO `game_event_creature` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LOVE_IS_IN_THE_AIR_CGUID+1 AND @LOVE_IS_IN_THE_AIR_CGUID+15;
 
 -- All NPC's from this event has sheath_state = 1 in sniffs.
@@ -1885,15 +1884,19 @@ INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES
 DELETE FROM `game_event` WHERE `entry`=140;
 DELETE FROM `game_event_creature` WHERE `event`=140;
 DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=140);
+UPDATE `game_event` SET `start_time`='2022-02-11 22:00:00' WHERE `entry`=8;
 
--- Add new game_events for each Winner of the Popularity Contest which remains 7 days if activated (10080 minutes = 7 days).
-INSERT INTO `game_event` (`entry`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`) VALUES
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Darnassus', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Ironforge', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Stormwind', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Orgrimmar', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Thunder Bluff', 0, 0, 7),
-(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_EVENT, 525600, 10080, 335, 'Love is in the Air - Popularity Contest Winner: Undercity', 0, 0, 7);
+-- Add new game_events for each Winner of the Popularity Contest which remains 360 days if activated (Yes it was really the case in 2006).
+-- https://classic.wowhead.com/blue-tracker/topic/us/kwee-q-peddlefeet-still-in-game-562661
+UPDATE `game_event` SET `start_time`='2021-02-11 22:00:00', `end_time`='2030-02-16 22:00:00' WHERE `entry`=8;
+
+INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS_EVENT, '2021-02-16 22:00:00', '2030-02-11 22:00:00', 525600, 525600, 335, 'Love is in the Air - Popularity Contest Winner: Darnassus', 0, 1, 7, 10),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE_EVENT, '2021-02-16 22:00:00', '2030-02-11 22:00:00', 525600, 525600, 335, 'Love is in the Air - Popularity Contest Winner: Ironforge', 0, 1, 7, 10),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND_EVENT, '2021-02-16 22:00:00', '2030-02-11 22:00:00', 525600, 525600, 335, 'Love is in the Air - Popularity Contest Winner: Stormwind', 0, 1, 7, 10),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR_EVENT, '2021-02-16 22:00:00', '2030-02-11 22:00:00', 525600, 525600, 335, 'Love is in the Air - Popularity Contest Winner: Orgrimmar', 0, 1, 7, 10),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF_EVENT, '2021-02-16 22:00:00', '2030-02-11 22:00:00', 525600, 525600, 335, 'Love is in the Air - Popularity Contest Winner: Thunder Bluff', 0, 1, 7, 10),
+(@LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY_EVENT, '2021-02-16 22:00:00', '2030-02-11 22:00:00', 525600, 525600, 335, 'Love is in the Air - Popularity Contest Winner: Undercity', 0, 1, 7, 10);
 
 -- Popularity Contest Winner Orgrimmar.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
