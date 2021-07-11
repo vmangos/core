@@ -250,6 +250,9 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 5429 AND `item` IN (30017, 
 UPDATE `game_event_gameobject` SET `event` = 28 WHERE `guid` IN (3996165, 3996166, 3996167, 3996168, 3996169) AND `event` = 9;
 DELETE FROM `game_event` WHERE  `entry` = 9;
 
+-- Reduce Wander Distance of Honored Hero
+UPDATE `creature` SET `wander_distance` = 2 WHERE `id` IN (15115,15113);
+
 
 -- End of migration.
 END IF;
