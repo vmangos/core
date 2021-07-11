@@ -246,6 +246,10 @@ UPDATE `quest_template` SET `PrevQuestId` = 8481 WHERE `entry` = 8485;
 DELETE FROM `creature_loot_template` WHERE `entry` = 5426 AND `item` = 30019;
 DELETE FROM `creature_loot_template` WHERE `entry` = 5429 AND `item` IN (30017, 30019);
 
+-- Remove Duplicate Noblegarden Event
+UPDATE `game_event_gameobject` SET `event` = 28 WHERE `guid` IN (3996165, 3996166, 3996167, 3996168, 3996169) AND `event` = 9;
+DELETE FROM `game_event` WHERE  `entry` = 9;
+
 
 -- End of migration.
 END IF;
