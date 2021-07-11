@@ -310,6 +310,19 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (9126, 11),
 (9128, 11);
 
+-- Update Spawn Locations For New Year's Eve Creatures
+UPDATE `creature` SET `position_x` = 1426.79, `position_y` = -4402.28, `position_z` = 25.3187, `orientation` = 0.056569 WHERE `guid` = 212459;
+UPDATE `creature` SET `position_x` = -9071.54, `position_y` = 500.753, `position_z` = 75.906, `orientation` = 2.087082 WHERE `guid` = 206411;
+UPDATE `creature` SET `position_x` = -9021.04, `position_y` = 477.321, `position_z` = 96.1096, `orientation` = 5.087082 WHERE `guid` = 206209;
+UPDATE `creature` SET `position_x` = -8991.48, `position_y` = 395.316, `position_z` = 72.8041, `orientation` = 4.087082 WHERE `guid` = 206458;
+UPDATE `creature` SET `position_x` = -9019.42, `position_y` = 477.873, `position_z` = 96.3053, `orientation` = 5.70223 WHERE `guid` = 206212;
+UPDATE `creature` SET `position_x` = -1279.88, `position_y` = 107.271, `position_z` = 130.178, `orientation` = 0.70223 WHERE `guid` = 217036;
+UPDATE `creature` SET `position_x` = -1278.62, `position_y` = 108.554, `position_z` = 130.052, `orientation` = 5.70223, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 208688;
+UPDATE `creature` SET `position_x` = -1200.63, `position_y` = -95.5286, `position_z` = 162.652, `orientation` = 6.70223, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 216589;
+UPDATE `creature` SET `position_x` = 1819.71, `position_y` = 196.531, `position_z` = 70.483, `orientation` = 4.087082 WHERE `guid` = 202847;
+UPDATE `creature` SET `position_x` = -5028.83, `position_y` = -814.463, `position_z` = 495.248, `orientation` = 4.087082 WHERE `guid` = 208350;
+UPDATE `creature` SET `position_x` = 8597.74, `position_y` = 1008.65, `position_z` = 5.78136, `orientation` = 4.087082 WHERE `guid` = 208900;
+
 
 -- End of migration.
 END IF;
