@@ -1923,12 +1923,15 @@ SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, SpellEntry const* s
     // as soon as the target dies or leaves the area of the effect
     if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
         targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
-    else if (Unit* pUnitTarget = pTarget->ToUnit())
-        targets.setUnitTarget(pUnitTarget);
-    else if (GameObject* pGoTarget = pTarget->ToGameObject())
-        targets.setGOTarget(pGoTarget);
-    else
-        return SPELL_FAILED_ERROR;
+    else if (pTarget)
+    {
+        if (Unit* pUnitTarget = pTarget->ToUnit())
+            targets.setUnitTarget(pUnitTarget);
+        else if (GameObject* pGoTarget = pTarget->ToGameObject())
+            targets.setGOTarget(pGoTarget);
+        else
+            return SPELL_FAILED_ERROR;
+    }
 
     if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
         if (SpellCaster* caster = spell->GetCastingObject())
