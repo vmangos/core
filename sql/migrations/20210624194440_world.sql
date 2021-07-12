@@ -333,6 +333,23 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 14983;
 -- Add Correct Completion Text to Quest
 UPDATE `quest_template` SET `OfferRewardText` = 'Hm... $N. You are still new to your path, but I sense the possibility for greatness in you.$B$BYou were born with gifts, $N. See that they do not go to waste.' WHERE `entry` = 1507;
 
+-- Add Some MIssing Auras (credit cmangos)
+-- Syndicate Rogue
+UPDATE `creature_template` SET `auras = '7276' WHERE `entry` = 2260;
+-- Syndicate Watchman
+UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 2261;
+-- Jailor Eston
+UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 2427;
+-- Dark Strand Excavator
+UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 3730;
+-- Sloth
+UPDATE `creature_template` SET `auras` = '3509' WHERE `entry` = 2475;
+-- Sludge
+UPDATE `creature_template` SET `auras` = '3512' WHERE `entry` = 2479;
+-- Cracked Golem
+-- Stone Behemoth
+UPDATE `creature_template` SET `auras` = '5811' WHERE `entry` IN (2156, 2157);
+
 
 -- End of migration.
 END IF;
