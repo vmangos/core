@@ -1919,13 +1919,13 @@ SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, SpellEntry const* s
 
     SpellCastTargets targets;
 
-    // Don't set unit target on destination target based spells, otherwise the spell will cancel
-    // as soon as the target dies or leaves the area of the effect
-    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-        targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
-    else if (pTarget)
+    if (pTarget)
     {
-        if (Unit* pUnitTarget = pTarget->ToUnit())
+        // Don't set unit target on destination target based spells, otherwise the spell will cancel
+        // as soon as the target dies or leaves the area of the effect
+        if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+            targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
+        else if (Unit* pUnitTarget = pTarget->ToUnit())
             targets.setUnitTarget(pUnitTarget);
         else if (GameObject* pGoTarget = pTarget->ToGameObject())
             targets.setGOTarget(pGoTarget);
