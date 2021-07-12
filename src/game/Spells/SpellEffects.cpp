@@ -1610,6 +1610,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 26879: // Love is in the Air - Remove Amorous
+                {
+                    unitTarget->RemoveAurasDueToSpell(26869);
+                    return;
+                }
                 case 17190: // Ras Frostwhisper Visual Dummy
                 {
                     if (unitTarget)
@@ -4870,6 +4875,98 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 26923:                                 // Valentin (Guards)
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (unitTarget->HasAura(26898)) // Heartbroken
+                        return;
+
+                    if (!((Player*)unitTarget)->HasItemCount(21815, 1, false)) // Love Token
+                        return;
+
+                    // Guard spellIds map [Pledge of Friendship , Pledge of Adoration]
+                    std::map<uint32, std::vector<uint32>> loveAirSpellsMapForFaction = {
+                            {11, {27242, 27510}},   // Stormwind
+                            {85, {27247, 27507}},   // Orgrimmar
+                            {57, {27244, 27506}},   // Ironforge
+                            {68, {27246, 27515}},   // Undercity Guardian
+                            {71, {27246, 27515}},   // Undercity Seeker
+                            {79, {27245, 27504}},   // Darnassus
+                            {105, {27248, 27513}}   // Thunderbluff
+                    };
+
+                    uint32 AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];
+                    uint32 AdoredOrBroken = 26680;      // Adored as default.
+
+                    if (loveAirSpellsMapForFaction.count(m_caster->GetFactionTemplateId()))
+                    {
+                        if (!urand(0, 5))               // Sets 1 in 6 chance to cast Heartbroken.
+                        {
+                            AdoredOrBroken = 26898;     // Heartbroken.
+                        }
+                        else if (!unitTarget->HasAura(26680))
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][1];    // Pledge of Adoration for related faction.
+                        }
+                        else
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];    // Pledge of Friendship for related faction.
+                        }
+
+                        unitTarget->CastSpell(unitTarget, AdoredOrBroken, false);           // Cast Adored or Broken.
+                        unitTarget->CastSpell(unitTarget, AdorationOrFriendship, true);     // Get a Pledge.
+                        unitTarget->CastSpell(unitTarget, 26879, true);                     // Remove Amorous.
+                    }
+                    return;
+                }
+                case 26663:                     // Valentin (Citizens)
+                case 27541:
+                case 27547:
+                case 27548:
+                case 27549:
+                case 27550:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Civilian spellIds map [Gift of Friendship , Gift of Adoration]
+                    std::map<uint32, std::vector<uint32>> loveAirSpellsMapForFaction = {
+                            {12, {27525, 27509}},   // Stormwind
+                            {29, {27523, 27505}},   // Orgrimmar orcs
+                            {55, {27520, 27503}},   // Ironforge dwarves
+                            {68, {27529, 27512}},   // Undercity
+                            {80, {27519, 26901}},   // Darnassus
+                            {104, {27524, 27511}},  // Thunderbluff
+                            {126, {27523, 27505}},  // Orgrimmar trolls
+                            {875, {27520, 27503}}   // Ironforge gnomes
+                    };
+
+                    uint32 AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];
+                    uint32 AdoredOrBroken = 26680;      // Adored as default.
+
+                    if (loveAirSpellsMapForFaction.count(m_caster->GetFactionTemplateId()))
+                    {
+                        if (!urand(0, 5))               // Sets 1 in 6 chance to cast Heartbroken.
+                        {
+                            AdoredOrBroken = 26898;     // Heartbroken.
+                        }
+                        else if (!unitTarget->HasAura(26680))
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][1];    // Gift of Adoration for related faction
+                        }
+                        else
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];    // Gift of Friendship for related faction
+                        }
+
+                        unitTarget->CastSpell(unitTarget, AdoredOrBroken, false);           // Cast Adored or Broken.
+                        unitTarget->CastSpell(unitTarget, AdorationOrFriendship, true);     // Get a Pledge.
+                        unitTarget->CastSpell(unitTarget, 26879, true);                     // Remove Amorous.
+                    }
+                    return;
+                }
                 case 27687:                                 // Summon Bone Minions
                 {
                     if (!unitTarget)
@@ -5040,12 +5137,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 27657:                                 // Valentine End Check
                 {
-                    if (unitTarget && !sGameEventMgr.IsActiveEvent(8))
+                    if (m_casterUnit && !sGameEventMgr.IsActiveEvent(8))
                     {
-                        unitTarget->RemoveAurasDueToSpell(26870); // Amorous Timer, Standard Test
-                        unitTarget->RemoveAurasDueToSpell(27742); // Amorous Timer, Standard
-                        unitTarget->RemoveAurasDueToSpell(26869); // Amorous
-                        unitTarget->RemoveAurasDueToSpell(27741); // Love is in the Air
+                        m_casterUnit->RemoveAurasDueToSpell(26870); // Amorous Timer, Standard Test
+                        m_casterUnit->RemoveAurasDueToSpell(27742); // Amorous Timer, Standard
+                        m_casterUnit->RemoveAurasDueToSpell(26869); // Amorous
+                        m_casterUnit->RemoveAurasDueToSpell(27654); // Love is in the Air Test
+                        m_casterUnit->RemoveAurasDueToSpell(27741); // Love is in the Air
                     }
                     return;
                 }
