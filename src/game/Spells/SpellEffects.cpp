@@ -4967,6 +4967,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 26870:                         // Amorous Timer, Standard Test
+                {
+                    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+                    {
+                        unitTarget->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP); // Add gossip flag for NPC missing it
+                    }
+                    return;
+                }
                 case 27687:                                 // Summon Bone Minions
                 {
                     if (!unitTarget)
