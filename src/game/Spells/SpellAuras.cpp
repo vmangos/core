@@ -2032,6 +2032,20 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->RemoveAurasDueToSpell(24659);
                     return;
                 }
+                case 26681:                             // Love is in the Air - Cologne
+                case 26682:                             // Love is in the Air - Perfume
+                {
+                    if (Player* pPlayer = ToPlayer(target))
+                    {
+                        if (apply)
+                        {
+                            pPlayer->CastSpell(pPlayer, 26802, true, nullptr, nullptr, GetCasterGuid()); // Detect Amore
+                        }
+                        else
+                            pPlayer->RemoveAurasDueToSpell(26802);
+                    }
+                    return;
+                }
                 case 24661:                                 // Restless Strength
                 {
                     if (apply)
