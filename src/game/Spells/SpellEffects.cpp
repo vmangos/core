@@ -4875,7 +4875,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     return;
                 }
-                case 26923:                                 // Valentin (Guards)
+                case 26923:                                 // Valentine (Guards)
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
@@ -4921,7 +4921,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
-                case 26663:                     // Valentin (Citizens)
+                case 26663:                     // Valentine (Citizens)
                 case 27541:
                 case 27547:
                 case 27548:
