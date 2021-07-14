@@ -269,7 +269,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 pUnitTarget = nullptr;
 
             // make sure pet is facing target
-            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pUnitTarget->HasUnitState(UNIT_STAT_CAN_NOT_REACT) &&
+            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pCharmedUnit->HasUnitState(UNIT_STAT_CAN_NOT_REACT) &&
                 spellInfo->IsNeedFaceTarget() && !pCharmedUnit->IsFacingTarget(pUnitTarget))
             {
                 float orientation = pCharmedUnit->GetAngle(pUnitTarget);
