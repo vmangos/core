@@ -335,7 +335,7 @@ UPDATE `quest_template` SET `OfferRewardText` = 'Hm... $N. You are still new to 
 
 -- Add Some MIssing Auras (credit cmangos)
 -- Syndicate Rogue
-UPDATE `creature_template` SET `auras = '7276' WHERE `entry` = 2260;
+UPDATE `creature_template` SET `auras` = '7276' WHERE `entry` = 2260;
 -- Syndicate Watchman
 UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 2261;
 -- Jailor Eston
