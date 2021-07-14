@@ -68,6 +68,7 @@ enum SpellNotifyPushType
     PUSH_IN_FRONT_15,
     PUSH_IN_BACK,
     PUSH_SELF_CENTER,
+    PUSH_SRC_CENTER,
     PUSH_DEST_CENTER,
     PUSH_TARGET_CENTER
 };

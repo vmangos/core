@@ -220,9 +220,9 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
         case ACT_PASSIVE:                                   // 0x01
         case ACT_ENABLED:                                   // 0xC1    spell
         {
-            Unit* unit_target = nullptr;
+            Unit* pUnitTarget = nullptr;
             if (targetGuid)
-                unit_target = _player->GetMap()->GetUnit(targetGuid);
+                pUnitTarget = _player->GetMap()->GetUnit(targetGuid);
 
             // do not cast unknown spells
             SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid);
@@ -233,88 +233,56 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             }
 
             if (!pCharmedUnit->IsSpellReady(*spellInfo))
-                return;
-
-            // Why is this here?
-            for (uint32 i : spellInfo->EffectImplicitTargetA)
             {
-                if (i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC || i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC || i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC)
-                    return;
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_NOT_READY);
+                return;
             }
 
             // do not cast not learned spells
             if (!pCharmedUnit->HasSpell(spellid) || spellInfo->IsPassiveSpell())
+            {
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_NOT_KNOWN);
                 return;
+            }
+
+            bool const explicitlySelectedTarget = Spells::IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]);
+
+            if (!pUnitTarget && explicitlySelectedTarget)
+            {
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+                return;
+            }
+            
+            if (pUnitTarget == pCharmedUnit && 
+                // Cannot cast negative spells on yourself. Handle it here since casting negative
+                // spells on yourself is frequently used within the core itself for certain mechanics.
+                ((explicitlySelectedTarget && !spellInfo->IsPositiveSpell(pCharmedUnit, pUnitTarget)) ||
+                // spells not castable on self like Fire Shield
+                spellInfo->HasAttribute(SPELL_ATTR_EX_CANT_TARGET_SELF)))
+            {
+                pCharmedUnit->SendPetCastFail(spellid, SPELL_FAILED_BAD_TARGETS);
+                return;
+            }
+
+            // remove not needed target
+            if (pUnitTarget && pUnitTarget != pCharmedUnit && !explicitlySelectedTarget)
+                pUnitTarget = nullptr;
+
+            // make sure pet is facing target
+            if (pUnitTarget && pUnitTarget != pCharmedUnit && !pUnitTarget->HasUnitState(UNIT_STAT_CAN_NOT_REACT) &&
+                spellInfo->IsNeedFaceTarget() && !pCharmedUnit->IsFacingTarget(pUnitTarget))
+            {
+                float orientation = pCharmedUnit->GetAngle(pUnitTarget);
+                pCharmedUnit->SetFacingTo(orientation);
+                pCharmedUnit->SetOrientation(orientation);
+            }
 
             pCharmedUnit->ClearUnitState(UNIT_STAT_MOVING);
-
-            Spell* spell = new Spell(pCharmedUnit, spellInfo, false);
-
-            SpellCastResult result = spell->CheckPetCast(unit_target);
-
-            // auto turn to target unless possessed
-            if (result == SPELL_FAILED_UNIT_NOT_INFRONT && !pCharmedUnit->HasAuraType(SPELL_AURA_MOD_POSSESS))
-            {
-                if (unit_target)
-                {
-                    pCharmedUnit->SetInFront(unit_target);
-                    if (unit_target->GetTypeId() == TYPEID_PLAYER)
-                        pCharmedUnit->SendCreateUpdateToPlayer((Player*)unit_target);
-                }
-                else if (Unit* unit_target2 = spell->m_targets.getUnitTarget())
-                {
-                    pCharmedUnit->SetInFront(unit_target2);
-                    if (unit_target2->GetTypeId() == TYPEID_PLAYER)
-                        pCharmedUnit->SendCreateUpdateToPlayer((Player*)unit_target2);
-                }
-                if (Unit* powner = pCharmedUnit->GetCharmerOrOwner())
-                    if (powner->GetTypeId() == TYPEID_PLAYER)
-                        pCharmedUnit->SendCreateUpdateToPlayer((Player*)powner);
-                result = SPELL_CAST_OK;
-            }
-
-            if (result == SPELL_CAST_OK)
-            {
-                if (((Creature*)pCharmedUnit)->IsPet())
-                    ((Pet*)pCharmedUnit)->CheckLearning(spellid);
-
-                unit_target = spell->m_targets.getUnitTarget();
-
-                // 10% chance to play special pet attack talk, else growl
-                // actually this only seems to happen on special spells, fire shield for imp, torment for voidwalker, but it's stupid to check every spell
-                if (((Creature*)pCharmedUnit)->IsPet() && (((Pet*)pCharmedUnit)->getPetType() == SUMMON_PET) && (pCharmedUnit != unit_target) && (urand(0, 100) < 10))
-                    pCharmedUnit->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
-                else
-                    pCharmedUnit->SendPetAIReaction();
-
-                if (unit_target && !GetPlayer()->IsFriendlyTo(unit_target) && !pCharmedUnit->HasAuraType(SPELL_AURA_MOD_POSSESS))
-                {
-                    // This is true if pet has no target or has target but targets differs.
-                    if (pCharmedUnit->GetVictim() != unit_target)
-                    {
-                        if (pCharmedUnit->GetVictim())
-                            pCharmedUnit->AttackStop();
-                        pCharmedUnit->GetMotionMaster()->Clear();
-                        if (((Creature*)pCharmedUnit)->AI())
-                            ((Creature*)pCharmedUnit)->AI()->AttackStart(unit_target);
-                    }
-                }
-
-                spell->prepare();
-            }
-            else
-            {
-                if (pCharmedUnit->HasAuraType(SPELL_AURA_MOD_POSSESS))
-                    Spell::SendCastResult(GetPlayer(), spellInfo, result);
-                else
-                    pCharmedUnit->SendPetCastFail(spellid, result);
-
-                if (((Creature*)pCharmedUnit)->IsSpellReady(*spellInfo))
-                    GetPlayer()->SendClearCooldown(spellid, ((Creature*)pCharmedUnit));
-
-                spell->finish(false);
-                spell->Delete();
-            }
+            auto result = pCharmedUnit->CastSpell(pUnitTarget, spellInfo, false);
+            if (result != SPELL_CAST_OK)
+                pCharmedUnit->SendPetCastFail(spellid, result);
+            else if (((Creature*)pCharmedUnit)->IsPet())
+                ((Pet*)pCharmedUnit)->CheckLearning(spellid);
             break;
         }
         default:

@@ -2406,7 +2406,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
         {
-            FillAreaTargets(targetUnitMap, radius, PUSH_DEST_CENTER, SPELL_TARGETS_AOE_DAMAGE);
+            FillAreaTargets(targetUnitMap, radius, PUSH_SRC_CENTER, SPELL_TARGETS_AOE_DAMAGE);
             float minDist = -1;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -2449,7 +2449,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
             // fill real target list if no spell script target defined
             FillAreaTargets(bounds.first != bounds.second ? tempTargetUnitMap : targetUnitMap,
-                            radius, PUSH_DEST_CENTER, SPELL_TARGETS_ALL);
+                            radius, PUSH_SRC_CENTER, SPELL_TARGETS_ALL);
 
             if (!tempTargetUnitMap.empty())
             {
@@ -2636,7 +2636,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             break;
         case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
             // selected friendly units (for casting objects) around casting object
-            FillAreaTargets(targetUnitMap, radius, PUSH_SELF_CENTER, SPELL_TARGETS_FRIENDLY, GetCastingObject());
+            FillAreaTargets(targetUnitMap, radius, PUSH_SRC_CENTER, SPELL_TARGETS_FRIENDLY, GetCastingObject());
             break;
         case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
             FillAreaTargets(targetUnitMap, radius, PUSH_DEST_CENTER, SPELL_TARGETS_FRIENDLY);
@@ -6136,8 +6136,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // hart version required facing
                     if (m_targets.getUnitTarget() &&
                        !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) &&
-                       (m_caster->GetDistance2dToCenter(m_targets.getUnitTarget()) > NO_FACING_CHECKS_DISTANCE) &&
-                       !m_caster->HasInArc(m_targets.getUnitTarget()))
+                       !m_caster->IsFacingTarget(m_targets.getUnitTarget()))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
                 }
                 else if (m_spellInfo->Id == 13278) // Gnomish Death Ray
@@ -7276,8 +7275,7 @@ SpellCastResult Spell::CheckRange(bool strict)
                     return SPELL_CAST_OK;
 
                 // Requires target forward for these spells
-                if ((m_caster->GetDistance2dToCenter(target) > NO_FACING_CHECKS_DISTANCE) &&
-                    !m_caster->HasInArc(target))
+                if (!m_caster->IsFacingTarget(target))
                     return SPELL_FAILED_UNIT_NOT_INFRONT;
 
                 float range_mod = 1.0f;
@@ -7330,8 +7328,7 @@ SpellCastResult Spell::CheckRange(bool strict)
             return SPELL_FAILED_TOO_CLOSE;
         if (m_caster->IsPlayer() &&
            (m_spellInfo->Custom & SPELL_CUSTOM_FACE_TARGET) &&
-           (m_caster->GetDistance2dToCenter(target) > NO_FACING_CHECKS_DISTANCE) &&
-           !m_caster->HasInArc(target))
+           !m_caster->IsFacingTarget(target))
             return SPELL_FAILED_UNIT_NOT_INFRONT;
     }
 
@@ -8406,6 +8403,10 @@ public:
                     i_centerY = i_castingObject->GetPositionY();
                 }
                 break;
+            case PUSH_SRC_CENTER:
+                i_centerX = i_spell.m_targets.m_srcX;
+                i_centerY = i_spell.m_targets.m_srcY;
+                break;
             case PUSH_DEST_CENTER:
                 i_centerX = i_spell.m_targets.m_destX;
                 i_centerY = i_spell.m_targets.m_destY;
@@ -8507,23 +8508,27 @@ public:
             switch (i_push_type)
             {
                 case PUSH_IN_FRONT:
-                    if (i_castingObject->isInFront(unit, i_radius, 2 * M_PI_F / 3))
+                    if (i_castingObject->IsWithinDist(unit, i_radius) && i_castingObject->HasInArc(unit, 2 * M_PI_F / 3))
                         i_data->push_back(unit);
                     break;
                 case PUSH_IN_FRONT_90:
-                    if (i_castingObject->isInFront(unit, i_radius, M_PI_F / 2))
+                    if (i_castingObject->IsWithinDist(unit, i_radius) && i_castingObject->HasInArc(unit, M_PI_F / 2))
                         i_data->push_back(unit);
                     break;
                 case PUSH_IN_FRONT_15:
-                    if (i_castingObject->isInFront(unit, i_radius, M_PI_F / 12))
+                    if (i_castingObject->IsWithinDist(unit, i_radius) && i_castingObject->HasInArc(unit, M_PI_F / 12))
                         i_data->push_back(unit);
                     break;
                 case PUSH_IN_BACK: // 75
-                    if (i_castingObject->isInBack(unit, i_radius, 5 * M_PI_F / 12))
+                    if (i_castingObject->IsWithinDist(unit, i_radius) && !i_castingObject->HasInArc(unit, 2 * M_PI_F - 5 * M_PI_F / 12))
                         i_data->push_back(unit);
                     break;
                 case PUSH_SELF_CENTER:
                     if (i_castingObject->IsWithinDist(unit, i_radius))
+                        i_data->push_back(unit);
+                    break;
+                case PUSH_SRC_CENTER:
+                    if (itr->getSource()->IsWithinDist3d(i_spell.m_targets.m_srcX, i_spell.m_targets.m_srcY, i_spell.m_targets.m_srcZ, i_radius))
                         i_data->push_back(unit);
                     break;
                 case PUSH_DEST_CENTER:
