@@ -221,6 +221,9 @@ class Creature : public Unit
 
         bool HasSpell(uint32 spellId) const override;
 
+        void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
+        void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) final;
+
         bool UpdateEntry(uint32 entry, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
 
         void ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated);

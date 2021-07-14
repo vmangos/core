@@ -1491,12 +1491,12 @@ class Player final: public Unit
         void DropModCharge(SpellModifier* mod, Spell* spell);
 
         // cooldown system
-        virtual void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false) override;
-        virtual void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) override;
-        virtual void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true) override;
-        virtual void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true) override;
-        virtual void RemoveAllCooldowns(bool sendOnly = false) override;
-        virtual void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) override;
+        void AddGCD(SpellEntry const& spellEntry, uint32 forcedDuration = 0, bool updateClient = false) final;
+        void AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* itemProto = nullptr, bool permanent = false, uint32 forcedDuration = 0) final;
+        void RemoveSpellCooldown(SpellEntry const& spellEntry, bool updateClient = true) final;
+        void RemoveSpellCategoryCooldown(uint32 category, bool updateClient = true) final;
+        void RemoveAllCooldowns(bool sendOnly = false) final;
+        void LockOutSpells(SpellSchoolMask schoolMask, uint32 duration) final;
         void RemoveSpellLockout(SpellSchoolMask spellSchoolMask, std::set<uint32>* spellAlreadySent = nullptr);
         void SendClearCooldown(uint32 spellId, Unit* target) const;
         void SendClearAllCooldowns(Unit* target) const;
