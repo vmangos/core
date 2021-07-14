@@ -80,7 +80,7 @@ class Creature : public Unit
     public:
 
         explicit Creature(CreatureSubtype subtype = CREATURE_SUBTYPE_GENERIC);
-        ~Creature() override;
+        virtual ~Creature() override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;
