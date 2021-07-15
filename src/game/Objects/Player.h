@@ -2075,7 +2075,6 @@ class Player final: public Unit
         // Stealth detection system
         void HandleStealthedUnitsDetection();
     public:
-        bool IsTotalImmune() const;
         AutoAttackCheckResult GetLastSwingErrorMsg() const { return m_swingErrorMsg; }
         void SetSwingErrorMsg(AutoAttackCheckResult val) { m_swingErrorMsg = val; }
         void SendAttackSwingCantAttack() const;
