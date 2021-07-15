@@ -803,12 +803,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @LOVE_IS_IN_THE_AIR_OGUID+1 AND @LOVE_IS_IN_THE_AIR_OGUID+606 AND `event`=@LOVE_IS_IN_THE_AIR_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LOVE_IS_IN_THE_AIR_OGUID+1 AND @LOVE_IS_IN_THE_AIR_OGUID+606;
 
--- Fragrant Cauldron wrong positioned and should be spawned by the event.
+-- Fragrant Cauldron is wrong positioned and should be spawned by the event.
 DELETE FROM `gameobject` WHERE `guid`=121618;
-UPDATE `gameobject_template` SET `flags`='4', `data0`='93', `data1`='7244', `data2`='4' WHERE `entry`=181073;
+UPDATE `gameobject_template` SET `flags`=4, `data0`=93, `data1`=7244, `data2`=4 WHERE `entry`=181073;
 
 -- Fix NPC's.
-UPDATE `creature_template` SET `health_min`='100', `health_max`='100', `unit_flags`='768', `civilian`='1' WHERE `entry` in (16001,16002,16003,16004,16105,16106,16107,16108,16109);
+UPDATE `creature_template` SET `health_min`=100, `health_max`=100, `unit_flags`=768, `civilian`=1 WHERE `entry` in (16001,16002,16003,16004,16105,16106,16107,16108,16109);
 DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT);
 DELETE FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT);
 
