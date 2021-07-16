@@ -234,10 +234,11 @@ namespace Spells
             case TARGET_UNIT_ENEMY:
             case TARGET_UNIT_FRIEND:
             case TARGET_UNIT:
+            case TARGET_UNIT_PARTY:
             case TARGET_UNIT_FRIEND_CHAIN_HEAL:
             case TARGET_LOCATION_CASTER_TARGET_POSITION :
             case TARGET_UNIT_RAID:
-            //case TARGET_UNIT_RAID_AND_CLASS:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
         }
         return false;
@@ -888,6 +889,11 @@ class SpellEntry
                 }
             }
             return false;
+        }
+
+        inline bool IsNeedFaceTarget() const
+        {
+            return ((Custom & SPELL_CUSTOM_FACE_TARGET) || (rangeIndex == SPELL_RANGE_IDX_COMBAT));
         }
 
         inline bool IsNeedCastSpellAtFormApply(ShapeshiftForm form) const

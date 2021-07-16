@@ -358,7 +358,6 @@ enum eModifyFlagsOptions
 };
 
 // Flags used by SCRIPT_COMMAND_TEMP_SUMMON_CREATURE
-// Must start from 0x8 because of target selection flags.
 enum eSummonCreatureFlags
 {
     SF_SUMMONCREATURE_SET_RUN     = 0x01,                       // makes creature move at run speed

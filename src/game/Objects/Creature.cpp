@@ -2864,6 +2864,32 @@ bool Creature::HasSpell(uint32 spellId) const
     return i < CREATURE_MAX_SPELLS;                         // break before end of iteration of known spells
 }
 
+void Creature::LockOutSpells(SpellSchoolMask schoolMask, uint32 duration)
+{
+    if (GetCreatureInfo()->mechanic_immune_mask & (1 << (MECHANIC_SILENCE - 1)))
+        return;
+
+    SpellCaster::LockOutSpells(schoolMask, duration);
+}
+
+void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*itemProto*/, bool /*permanent*/, uint32 forcedDuration)
+{
+    uint32 recTime = forcedDuration ? forcedDuration : spellEntry.RecoveryTime;
+    if (recTime || spellEntry.CategoryRecoveryTime)
+    {
+        uint32 categoryRecTime = spellEntry.CategoryRecoveryTime;
+        if (Player* modOwner = GetSpellModOwner())
+        {
+            if (recTime)
+                modOwner->ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, recTime);
+            else if (spellEntry.Category && categoryRecTime)
+                modOwner->ApplySpellMod(spellEntry.Id, SPELLMOD_COOLDOWN, categoryRecTime);
+        }
+
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
+    }
+}
+
 time_t Creature::GetRespawnTimeEx() const
 {
     time_t now = time(nullptr);

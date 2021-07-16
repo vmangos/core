@@ -178,7 +178,6 @@ bool PartyBotAI::RunAwayFromTarget(Unit* pTarget)
             if (distance >= 15.0f && distance <= 30.0f &&
                 pLeader->GetDistance(pTarget) >= 15.0f)
             {
-                me->GetMotionMaster()->MoveIdle();
                 me->MonsterMove(pLeader->GetPositionX(), pLeader->GetPositionY(), pLeader->GetPositionZ());
                 return true;
             }
@@ -210,6 +209,7 @@ bool PartyBotAI::DrinkAndEat()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             me->StopMoving();
+            me->GetMotionMaster()->Clear(false, true);
             me->GetMotionMaster()->MoveIdle();
         }
         if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_FOOD))
@@ -225,6 +225,7 @@ bool PartyBotAI::DrinkAndEat()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             me->StopMoving();
+            me->GetMotionMaster()->Clear(false, true);
             me->GetMotionMaster()->MoveIdle();
         }
         if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(PB_SPELL_DRINK))
@@ -607,7 +608,10 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (pLeader->IsTaxiFlying())
     {
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+        {
+            me->GetMotionMaster()->Clear(false, true);
             me->GetMotionMaster()->MoveIdle();
+        }
         return;
     }
 
@@ -674,7 +678,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         {
             if (!me->IsStopped())
                 me->StopMoving();
-            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->Clear(false, true);
             me->GetMotionMaster()->MoveIdle();
             char name[128] = {};
             strcpy(name, pLeader->GetName());
@@ -754,8 +758,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 AttackStart(pVictim))
                 return;
 
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                me->GetMotionMaster()->MoveChase(pVictim);
+            switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+            {
+                case IDLE_MOTION_TYPE:
+                case FOLLOW_MOTION_TYPE:
+                    me->GetMotionMaster()->MoveChase(pVictim);
+                    break;
+            }
         }
     }
 
@@ -1529,7 +1538,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                     CanTryToCastSpell(me, m_spells.mage.pBlink))
                 {
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                        me->GetMotionMaster()->MoveIdle();
+                        me->GetMotionMaster()->Clear();
 
                     if (DoCastSpell(me, m_spells.mage.pBlink) == SPELL_CAST_OK)
                         return;

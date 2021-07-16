@@ -932,7 +932,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         if (me->IsNonMeleeSpellCasted())
             return;
 
-        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
+        if (!pVictim || !IsValidHostileTarget(pVictim))
         {
             if (pVictim = SelectAttackTarget(pVictim))
             {
@@ -967,7 +967,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
-    if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
+    if (!pVictim || !IsValidHostileTarget(pVictim) || 
         !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
     {
         if (pVictim = SelectAttackTarget(pVictim))

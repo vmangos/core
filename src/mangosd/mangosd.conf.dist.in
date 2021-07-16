@@ -2313,10 +2313,6 @@ Visibility.ForceActiveObjects      = 1
 #        Health and power regeneration and rage income from damage.
 #        Default: 1
 #
-#    Rate.Skill.Discovery
-#         Skill Discovery Rates
-#         Default: 1
-#
 #    Rate.Drop.Item.Poor
 #    Rate.Drop.Item.Normal
 #    Rate.Drop.Item.Uncommon
@@ -2486,7 +2482,6 @@ Rate.Rage.Loss = 1
 Rate.Focus = 1
 Rate.Loyalty = 1
 Rate.Energy = 1
-Rate.Skill.Discovery = 1
 Rate.Drop.Item.Poor = 1
 Rate.Drop.Item.Normal = 1
 Rate.Drop.Item.Uncommon = 1
