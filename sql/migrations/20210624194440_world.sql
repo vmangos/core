@@ -334,7 +334,7 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 14983;
 -- Add Correct Completion Text to Quest
 UPDATE `quest_template` SET `OfferRewardText` = 'Hm... $N. You are still new to your path, but I sense the possibility for greatness in you.$B$BYou were born with gifts, $N. See that they do not go to waste.' WHERE `entry` = 1507;
 
--- Add Some MIssing Auras (credit cmangos)
+-- Add Some Missing Auras (credit cmangos)
 -- Syndicate Rogue
 UPDATE `creature_template` SET `auras` = '7276' WHERE `entry` = 2260;
 -- Syndicate Watchman
@@ -350,6 +350,18 @@ UPDATE `creature_template` SET `auras` = '3512' WHERE `entry` = 2479;
 -- Cracked Golem
 -- Stone Behemoth
 UPDATE `creature_template` SET `auras` = '5811' WHERE `entry` IN (2156, 2157);
+-- Elder Ashenvale Bear
+-- Giant Ashenvale Bear
+UPDATE `creature_template` SET `auras` = '6923' WHERE `entry` IN (3810, 3811);
+-- Add missing aura 7276 (Poison Proc) for creature 6201 (Legashi Rogue)
+UPDATE `creature_template` SET `auras` = '7276' WHERE `entry` = 6201;
+-- Add missing aura 7999 (Soot Covering Proc) for creature 4029 (Blackened Ancient)
+UPDATE `creature_template` SET `auras` = '7999' WHERE `entry` = 4029;
+-- Add missing aura 8247 (Wandering Plague) for creature 4248 (Pesterhide Hyena)
+UPDATE `creature_template` SET `auras` = '8247' WHERE `entry` = 4248;
+-- Irradiated Invader
+-- Irradiated Pillager
+UPDATE `creature_template` SET `auras` = '9769 21862' WHERE `entry` IN (6213, 6329);
 
 -- Add Missing Abilities to Rot Hide Creatures (credit cmangos)
 --Rot Hide Gladerunner
