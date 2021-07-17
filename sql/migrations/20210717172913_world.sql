@@ -161,6 +161,14 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (1145601, 1145604);
 DELETE FROM `creature_ai_events` WHERE `id` IN (1145601, 1145604);
 UPDATE `creature_template` SET `auras` = '8601 18950 22766' WHERE `entry` = 11456;
 
+-- Magrami Spectre
+UPDATE `creature_template` SET `auras` = '17327' WHERE `entry` = 11560;
+
+-- Whirlwind Stormwalker
+UPDATE `creature_template` SET `auras` = '18148' WHERE `entry` = 11577;
+
+
+
 
 
 
