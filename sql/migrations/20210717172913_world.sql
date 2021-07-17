@@ -167,7 +167,91 @@ UPDATE `creature_template` SET `auras` = '17327' WHERE `entry` = 11560;
 -- Whirlwind Stormwalker
 UPDATE `creature_template` SET `auras` = '18148' WHERE `entry` = 11577;
 
+-- Nefarian
+UPDATE `creature_template` SET `auras` = '19818 22992 25184' WHERE `entry` = 11583;
 
+-- Sentinel Aynasha
+UPDATE `creature_template` SET `auras` = '18373' WHERE `entry` = 11711;
+
+-- Putridus Satyr
+UPDATE `creature_template` SET `auras` = '21061' WHERE `entry` = 11790;
+
+-- Lava Elemental
+UPDATE `creature_template` SET `auras` = '19640' WHERE `entry` = 12076;
+
+-- Lava Elemental
+UPDATE `creature_template` SET `auras` = '8876 15733' WHERE `entry` = 12099;
+
+-- Eris Havenfire
+UPDATE `creature_template` SET `auras` = '23196 23199' WHERE `entry` = 14494;
+
+-- Hakkar
+UPDATE `creature_template` SET `auras` = '19818 24692' WHERE `entry` = 14834;
+
+-- Voodoo Spirit
+UPDATE `creature_template` SET `auras` = '24051' WHERE `entry` = 15009;
+
+-- Spawn of Mar'li
+UPDATE `creature_template` SET `auras` = '24087' WHERE `entry` = 15041;
+
+-- Vekniss Soldier
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1522904);
+DELETE FROM `creature_ai_events` WHERE `id`=1522904;
+UPDATE `creature_template` SET `auras` = '25801' WHERE `entry` = 15229;
+
+-- Spirit Shade
+UPDATE `creature_template` SET `auras` = '24313' WHERE `entry` = 15261;
+
+-- Hive'Zara Sandstalker
+UPDATE `creature_template` SET `auras` = '25592' WHERE `entry` = 15323;
+
+-- Ossirian the Unscarred
+UPDATE `creature_template` SET `auras` = '25176 19818' WHERE `entry` = 15339;
+
+-- Poison Cloud
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1593301, 1593301);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15933;
+UPDATE `creature_template` SET `auras` = '25786 26575', `ai_name`='' WHERE `entry` = 15933;
+
+-- The Master's Eye
+UPDATE `creature_template` SET `auras` = '18430' WHERE `entry` = 15963;
+
+-- Patchwork Golem
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1601703);
+DELETE FROM `creature_ai_events` WHERE `id`=1601703;
+UPDATE `creature_template` SET `auras` = '16017' WHERE `entry` = 27793;
+
+-- Sludge Belcher
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1602903);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16029;
+UPDATE `creature_template` SET `auras` = '28362', `ai_name`='' WHERE `entry` = 16029;
+
+-- Annalise Lerent
+UPDATE `creature_template` SET `auras` = '10848' WHERE `entry` = 16110;
+
+-- Unrelenting Rider
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1612601);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16126;
+UPDATE `creature_template` SET `auras` = '27987', `ai_name`='' WHERE `entry` = 16126;
+
+-- Soldier of the Frozen Wastes
+UPDATE `creature_template` SET `auras` = '28458' WHERE `entry` = 16427;
+
+-- Soldier of the Frozen Wastes
+UPDATE `creature_template` SET `auras` = '28460' WHERE `entry` = 16429;
+
+-- Blizzard
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1647401);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16474;
+UPDATE `creature_template` SET `auras` = '28534', `ai_name`='' WHERE `entry` = 16474;
+
+-- Void Zone
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1669701);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=16697;
+UPDATE `creature_template` SET `auras` = '28874' WHERE `entry` = 16697;
+
+-- Sapphiron's Wing Buffet
+UPDATE `creature_template` SET `auras` = '29327' WHERE `entry` = 17025;
 
 
 
@@ -199,6 +283,20 @@ UPDATE `creature_template` SET `auras` = '3616 6718', `ai_name`='' WHERE `entry`
 
 -- Jaguero Stalker 
 UPDATE `creature_template` SET `auras` = '7939 22766 3417' WHERE `entry` = 2522;
+
+-- Putridus Trickster
+UPDATE `creature_template` SET `auras` = '21157 13299 21061' WHERE `entry` = 11791;
+
+-- Death Talon Wyrmguard
+UPDATE `creature_template` SET `auras` = '19818 22276 22282' WHERE `entry` = 12460;
+
+-- Death Talon Overseer
+UPDATE `creature_template` SET `auras` = '22276' WHERE `entry` = 12461;
+
+-- Portal of Madness
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1514101);
+DELETE FROM `creature_ai_events` WHERE `id`=1514101;
+UPDATE `creature_template` SET `auras` = '15141', `ai_name`='' WHERE `entry` = 24620;
 
 
 -- End of migration.
