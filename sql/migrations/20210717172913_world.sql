@@ -42,9 +42,6 @@ UPDATE `creature_template` SET `auras` = '13236' WHERE `entry` = 3671;
 -- Bleakheart Satyr
 UPDATE `creature_template` SET `auras` = '6947' WHERE `entry` = 3765;
 
--- Blackened Ancient
-UPDATE `creature_template` SET `auras` = '7999' WHERE `entry` = 4029;
-
 -- Fardel Dabyrie
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (447901);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4479;
@@ -84,6 +81,69 @@ UPDATE `creature_template` SET `auras` = '7351' WHERE `entry` = 7351;
 -- Plaguemaw the Rotting
 UPDATE `creature_template` SET `auras` = '12947' WHERE `entry` = 7356;
 
+-- Diseased Flayer
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (853202);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=8532;
+UPDATE `creature_template` SET `auras` = '8876 12539' WHERE `entry` = 8532;
+
+-- Stitched Horror
+UPDATE `creature_template` SET `auras` = '14775' WHERE `entry` = 8543;
+
+-- Dark Adept
+UPDATE `creature_template` SET `auras` = '3417 8734' WHERE `entry` = 8546;
+
+-- Dreadlord
+UPDATE `creature_template` SET `auras` = '20809' WHERE `entry` = 8716;
+
+-- Molten War Golem
+UPDATE `creature_template` SET `auras` = '13377 15506' WHERE `entry` = 8908;
+
+-- Hedrum the Creeper
+UPDATE `creature_template` SET `auras` = '13767' WHERE `entry` = 9032;
+
+-- Plague Ghoul
+UPDATE `creature_template` SET `auras` = '15088 15097 18950' WHERE `entry` = 10405;
+
+-- Crypt Beast
+UPDATE `creature_template` SET `auras` = '16428' WHERE `entry` = 10413;
+
+-- Syndicate Rogue
+UPDATE `creature_template` SET `auras` = '7276' WHERE `entry` = 2260;
+
+-- Syndicate Watchman
+UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 2261;
+
+-- Jailor Eston
+UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 2427;
+
+-- Dark Strand Excavator
+UPDATE `creature_template` SET `auras` = '3582' WHERE `entry` = 3730;
+
+-- Sloth
+UPDATE `creature_template` SET `auras` = '3509' WHERE `entry` = 2475;
+
+-- Sludge
+UPDATE `creature_template` SET `auras` = '3512' WHERE `entry` = 2479;
+
+-- Stone Behemoth / Cracked Golem
+UPDATE `creature_template` SET `auras` = '5811' WHERE `entry` IN (2156, 2157);
+
+-- Giant Ashenvale Bear / Elder Ashenvale Bear
+UPDATE `creature_template` SET `auras` = '6923' WHERE `entry` IN (3810, 3811);
+
+-- Legashi Rogue
+UPDATE `creature_template` SET `auras` = '7276' WHERE `entry` = 6201;
+
+-- Blackened Ancient
+UPDATE `creature_template` SET `auras` = '7999' WHERE `entry` = 4029;
+
+-- Pesterhide Hyena
+UPDATE `creature_template` SET `auras` = '8247' WHERE `entry` = 4248;
+
+-- Irradiated Pillager / Irradiated Invader
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (621301, 632901);
+DELETE FROM `creature_ai_events` WHERE `creature_id` IN (6213, 6329);
+UPDATE `creature_template` SET `auras` = '9769 21862' WHERE `entry` IN (6213, 6329);
 
 
 
@@ -116,8 +176,6 @@ UPDATE `creature_template` SET `auras` = '3616 6718', `ai_name`='' WHERE `entry`
 
 -- Jaguero Stalker 
 UPDATE `creature_template` SET `auras` = '7939 22766 3417' WHERE `entry` = 2522;
-
-
 
 
 -- End of migration.
