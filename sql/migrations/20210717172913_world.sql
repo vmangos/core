@@ -81,6 +81,12 @@ UPDATE `creature_template` SET `auras` = '12246' WHERE `entry` = 7332;
 -- Tomb Reaver
 UPDATE `creature_template` SET `auras` = '7351' WHERE `entry` = 7351;
 
+-- Plaguemaw the Rotting
+UPDATE `creature_template` SET `auras` = '12947' WHERE `entry` = 7356;
+
+
+
+
 
 
 
@@ -88,6 +94,10 @@ UPDATE `creature_template` SET `auras` = '7351' WHERE `entry` = 7351;
 
 
 -- NOT SURE IF THESE ARE CORRECT
+
+-- Grimtotem Raider
+UPDATE `creature_template` SET `auras` = '7366 7381' WHERE `entry` = 7725;
+
 -- Jadefire Shadowstalker
 UPDATE `creature_template` SET `auras` = '77939 22766 8601' WHERE `entry` = 7110;
 
