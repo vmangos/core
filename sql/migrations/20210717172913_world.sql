@@ -11,12 +11,12 @@ INSERT INTO `migrations` VALUES ('20210717172913');
 
 -- Defias Night Blade
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (90901);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=909;
+DELETE FROM `creature_ai_events` WHERE `id`=90901;
 UPDATE `creature_template` SET `auras` = '8601' WHERE `entry` = 909;
 
 -- Dragonmaw Shadowwarder
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (103802);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=1038;
+DELETE FROM `creature_ai_events` WHERE `id`=103802;
 UPDATE `creature_template` SET `auras` = '643' WHERE `entry` = 1038;
 
 -- Negolash
@@ -44,7 +44,7 @@ UPDATE `creature_template` SET `auras` = '6947' WHERE `entry` = 3765;
 
 -- Fardel Dabyrie
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (447901);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=4479;
+DELETE FROM `creature_ai_events` WHERE `id`=447901;
 UPDATE `creature_template` SET `auras` = '8876 10022', `ai_name`='' WHERE `entry` = 4479;
 
 -- Old Serra'kis
@@ -61,12 +61,12 @@ UPDATE `creature_template` SET `auras` = '7974 15097' WHERE `entry` = 5760;
 
 -- Ashmane Boar
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (599201);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=5992;
+DELETE FROM `creature_ai_events` WHERE `id`=599201;
 UPDATE `creature_template` SET `auras` = '12898 11966' WHERE `entry` = 5992;
 
 -- Bloodpetal Thresher
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (651101);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=6511;
+DELETE FROM `creature_ai_events` WHERE `id`=651101;
 UPDATE `creature_template` SET `auras` = '8876 14111', `ai_name`='' WHERE `entry` = 6511;
 
 -- Sandfury Guardian
@@ -83,7 +83,7 @@ UPDATE `creature_template` SET `auras` = '12947' WHERE `entry` = 7356;
 
 -- Diseased Flayer
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (853202);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=8532;
+DELETE FROM `creature_ai_events` WHERE `id`=853202;
 UPDATE `creature_template` SET `auras` = '8876 12539' WHERE `entry` = 8532;
 
 -- Stitched Horror
@@ -142,9 +142,24 @@ UPDATE `creature_template` SET `auras` = '8247' WHERE `entry` = 4248;
 
 -- Irradiated Pillager / Irradiated Invader
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (621301, 632901);
-DELETE FROM `creature_ai_events` WHERE `creature_id` IN (6213, 6329);
+DELETE FROM `creature_ai_events` WHERE `id` IN (621301, 632901);
 UPDATE `creature_template` SET `auras` = '9769 21862' WHERE `entry` IN (6213, 6329);
 
+-- Crimson Sorcerer
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1042201, 1042202);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=10422;
+UPDATE `creature_template` SET `auras` = '17150 12544', `ai_name`='' WHERE `entry` = 10422;
+
+-- Ramstein the Gorger
+UPDATE `creature_template` SET `auras` = '15088' WHERE `entry` = 10439;
+
+-- Lazy Peon
+UPDATE `creature_template` SET `auras` = '17743' WHERE `entry` = 10556;
+
+-- Wildspawn Shadowstalker
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1145601, 1145604);
+DELETE FROM `creature_ai_events` WHERE `id` IN (1145601, 1145604);
+UPDATE `creature_template` SET `auras` = '8601 18950 22766' WHERE `entry` = 11456;
 
 
 
@@ -166,12 +181,12 @@ UPDATE `creature_template` SET `auras` = '9095' WHERE `entry` = 6492;
 
 -- Forsaken Assassin
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (380701);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=3807;
+DELETE FROM `creature_ai_events` WHERE `id`=380701;
 UPDATE `creature_template` SET `auras` = '6718 8601', `ai_name`='' WHERE `entry` = 3807;
 
 -- Forsaken Infiltrator
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (380601);
-DELETE FROM `creature_ai_events` WHERE `creature_id`=3806;
+DELETE FROM `creature_ai_events` WHERE `id`=380601;
 UPDATE `creature_template` SET `auras` = '3616 6718', `ai_name`='' WHERE `entry` = 3806;
 
 -- Jaguero Stalker 
