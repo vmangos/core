@@ -87,31 +87,7 @@ UPDATE `creature_template` SET `auras` = '7351' WHERE `entry` = 7351;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+-- NOT SURE IF THESE ARE CORRECT
 -- Jadefire Shadowstalker
 UPDATE `creature_template` SET `auras` = '77939 22766 8601' WHERE `entry` = 7110;
 
