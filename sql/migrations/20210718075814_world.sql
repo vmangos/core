@@ -179,6 +179,15 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (81802, 0, 15, 8398, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Zoth - Cast Spell Frostbolt Volley');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (81802, 818, 0, 9, 0, 100, 1, 0, 30, 6000, 12000, 81802, 0, 0, 'Mai\'Zoth - Cast Frostbolt Volley');
 
+-- Events list for Veyzhak the Cannibal
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 5399;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(539901, 0, 15, 8599, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Veyzhak the Cannibal - Cast Spell Enrage'),
+(539901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7798, 0, 0, 0, 0, 0, 0, 0, 0, 'Veyzhak the Cannibal - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (539901, 5399, 0, 2, 0, 100, 0, 30, 0, 0, 0, 539901, 0, 0, 'Veyzhak the Cannibal - Cast Enrage at 30% HP');
+
+
+
 
 
 
@@ -186,7 +195,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 
 -- Add Spell Lists
-UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818);
+UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399);
 
 -- Spell list for Bloodscalp Headhunter
 UPDATE `creature_template` SET `spell_list_id`=6670 WHERE `entry`=671;
@@ -259,6 +268,10 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 -- Spell list for Mai'Zoth
 UPDATE `creature_template` SET `spell_list_id`=8180 WHERE `entry`=818;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (8180, 'Stranglethorn Vale - Mai\'Zoth', 8814, 100, 1, 0, 0, 0, 5, 9, 12, 15);
+
+-- Spell list for Veyzhak the Cannibal
+UPDATE `creature_template` SET `spell_list_id`=53990 WHERE `entry`=5399;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (53990, 'ZonePlaceholder - Veyzhak the Cannibal', 11977, 100, 1, 0, 0, 96, 0, 0, 7, 14);
 
 
 -- End of migration.
