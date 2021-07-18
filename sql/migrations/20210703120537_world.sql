@@ -1343,7 +1343,7 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equip
 (1819, 14723, 0, 0, 26870, 0, 8),
 (3491, 16002, 0, 0, 26870, 0, 8);
 
--- Innkeepers start with aura 27654 (Love is in the Air).
+-- Innkeepers start with aura 27654 (Love is in the Air Test).
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `display_id`, `equipment_id`, `spell_start`, `spell_end`, `event`) VALUES
 (80346, 295, 0, 0, 27654, 0, 8),
 (199, 1247, 0, 0, 27654, 0, 8),
