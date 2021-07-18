@@ -220,7 +220,7 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 
 -- Spell list for Mosh'Ogg Spellcrafter
 UPDATE `creature_template` SET `spell_list_id`=7100 WHERE `entry`=710;
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (7100, 'ZonePlaceholder - Mosh\'Ogg Spellcrafter', 11829, 100, 1, 0, 0, 0, 5, 9, 12, 15, 9053, 100, 1, 0, 0, 8, 0, 0, 3, 4);
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (7100, 'Stranglethorn Vale - Mosh\'Ogg Spellcrafter', 11829, 100, 1, 0, 0, 0, 5, 9, 12, 15, 9053, 100, 1, 0, 0, 8, 0, 0, 3, 4);
 
 -- Spell list for Mosh'Ogg Butcher
 UPDATE `creature_template` SET `spell_list_id`=7230 WHERE `entry`=723;
