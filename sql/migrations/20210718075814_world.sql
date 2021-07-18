@@ -55,9 +55,6 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=1773;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (177301, 0, 31, 1983, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Rot Hide Mystic - Check Nightlash Spawn');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (177301, 0, 10, 1983, 150000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 1078.49, 1541.23, 28.9379, 0.113425, 0, 'Rot Hide Mystic - Summon Creature Nightlash');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (177301, 1773, 0, 6, 0, 20, 0, 0, 0, 0, 0, 177301, 0, 0, 'Rot Hide Mystic - Spawn Nightlash on Death');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(177302, 0, 15, 332, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Rot Hide Mystic - Cast Spell Healing Wave');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (177302, 1773, 0, 14, 0, 100, 1, 150, 40, 24400, 32900, 177302, 0, 0, 'Rot Hide Mystic - Cast Healing Wave on Friendlies');
 
 -- Events list for Rot Hide Gnoll
 UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 1674;
@@ -209,10 +206,6 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 -- Spell list for Rot Hide Gladerunner
 UPDATE `creature_template` SET `spell_list_id`=17720 WHERE `entry`=1772;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (17720, 'Silverpine Forest - Rot Hide Gladerunner', 3237, 100, 1, 0, 0, 32, 21, 34, 10, 45);
-
--- Spell list for Rot Hide Mystic
-UPDATE `creature_template` SET `spell_list_id`=17730 WHERE `entry`=1773;
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (17730, 'Silverpine Forest - Rot Hide Mystic', 3237, 100, 1, 0, 0, 32, 7, 20, 35, 44);
 
 -- Spell list for Rot Hide Plague Weaver
 UPDATE `creature_template` SET `spell_list_id`=19400 WHERE `entry`=1940;
