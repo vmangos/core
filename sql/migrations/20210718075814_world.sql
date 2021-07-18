@@ -150,16 +150,34 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (71002, 0, 15, 12544, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mosh\'Ogg Spellcrafter - Cast Spell Frost Armor');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (71002, 710, 0, 27, 0, 100, 1, 12544, 1, 15000, 30000, 71002, 0, 0, 'Mosh\'Ogg Spellcrafter - Cast Frost Armor on Missing Buff');
 
-
-
-
-
 -- Events list for Mosh'Ogg Butcher
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 723;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (72301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1925, 1926, 1927, 0, 0, 0, 0, 0, 0, 'Mosh\'Ogg Butcher - Say Text');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (72301, 723, 0, 4, 0, 15, 0, 0, 0, 0, 0, 72301, 0, 0, 'Mosh\'Ogg Butcher - Say on Aggro');
 
+-- Events list for Colonel Kurzen
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 813;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(81301, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Kurzen - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (81301, 813, 0, 4, 0, 100, 0, 0, 0, 0, 0, 81301, 0, 0, 'Colonel Kurzen - Set Phase 1 on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(81302, 0, 15, 8817, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Kurzen - Cast Spell Smoke Bomb'),
+(81302, 0, 44, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Kurzen - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (81302, 813, 0, 0, 5, 100, 1, 8000, 12000, 18000, 25000, 81302, 0, 0, 'Colonel Kurzen - Cast Smoke Bomb (Phase 1)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(81303, 0, 15, 8818, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Kurzen - Cast Spell Garrote'),
+(81303, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Kurzen - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (81303, 813, 0, 27, 3, 100, 1, 8822, 1, 100, 100, 81303, 0, 0, 'Colonel Kurzen - Cast Garrote (Rank 4) on Missing Stealth Buff (Phase 2)');
+
+-- Events list for Mai'Zoth
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 818;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(81801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1925, 1926, 1927, 0, 0, 0, 0, 0, 0, 'Mai\'Zoth - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (81801, 818, 0, 4, 0, 15, 0, 0, 0, 0, 0, 81801, 0, 0, 'Mai\'Zoth - Say on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(81802, 0, 15, 8398, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Zoth - Cast Spell Frostbolt Volley');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (81802, 818, 0, 9, 0, 100, 1, 0, 30, 6000, 12000, 81802, 0, 0, 'Mai\'Zoth - Cast Frostbolt Volley');
 
 
 
@@ -168,7 +186,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 
 -- Add Spell Lists
-UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723);
+UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818);
 
 -- Spell list for Bloodscalp Headhunter
 UPDATE `creature_template` SET `spell_list_id`=6670 WHERE `entry`=671;
@@ -225,6 +243,22 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 -- Spell list for Mosh'Ogg Butcher
 UPDATE `creature_template` SET `spell_list_id`=7230 WHERE `entry`=723;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (7230, 'Stranglethorn Vale - Mosh\'Ogg Butcher', 15496, 100, 1, 0, 0, 0, 5, 7, 7, 11);
+
+-- Spell list for Tethis
+UPDATE `creature_template` SET `spell_list_id`=7300 WHERE `entry`=730;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (7300, 'Stranglethorn Vale - Tethis', 3604, 100, 1, 0, 0, 0, 0, 5, 11, 14);
+
+-- Spell list for Skullsplitter Headhunter
+UPDATE `creature_template` SET `spell_list_id`=7810 WHERE `entry`=781;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (7810, 'Stranglethorn Vale - Skullsplitter Headhunter', 3148, 100, 1, 0, 0, 32, 5, 7, 23, 26, 6533, 100, 4, 0, 0, 0, 1, 10, 18, 29, 6660, 100, 1, 0, 0, 136, 0, 0, 2, 3);
+
+-- Spell list for Skullsplitter Scout
+UPDATE `creature_template` SET `spell_list_id`=7820 WHERE `entry`=782;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (7820, 'Stranglethorn Vale - Skullsplitter Scout', 3148, 100, 1, 0, 0, 32, 5, 7, 23, 26);
+
+-- Spell list for Mai'Zoth
+UPDATE `creature_template` SET `spell_list_id`=8180 WHERE `entry`=818;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (8180, 'Stranglethorn Vale - Mai\'Zoth', 8814, 100, 1, 0, 0, 0, 5, 9, 12, 15);
 
 
 -- End of migration.
