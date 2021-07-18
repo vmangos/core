@@ -207,14 +207,6 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 UPDATE `creature_template` SET `spell_list_id`=17720 WHERE `entry`=1772;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (17720, 'Silverpine Forest - Rot Hide Gladerunner', 3237, 100, 1, 0, 0, 32, 21, 34, 10, 45);
 
--- Spell list for Rot Hide Plague Weaver
-UPDATE `creature_template` SET `spell_list_id`=19400 WHERE `entry`=1940;
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (19400, 'Silverpine Forest - Rot Hide Plague Weaver', 3256, 100, 4, 0, 0, 1, 24, 34, 106, 244, 3237, 100, 1, 0, 0, 32, 7, 20, 32, 59);
-
--- Spell list for Rot Hide Savage
-UPDATE `creature_template` SET `spell_list_id`=19420 WHERE `entry`=1942;
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (19420, ' Silverpine Forest - Rot Hide Savage', 3258, 100, 0, 0, 0, 1, 11, 16, 31, 37, 3237, 100, 1, 0, 0, 32, 7, 20, 32, 54);
-
 -- Spell list for Rot Hide Gnoll
 UPDATE `creature_template` SET `spell_list_id`=16740 WHERE `entry`=1674;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (16740, ' Tirisfal Glades - Rot Hide Gnoll', 3237, 100, 1, 0, 0, 32, 7, 21, 30, 45);
