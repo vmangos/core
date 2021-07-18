@@ -262,10 +262,6 @@ UPDATE `creature_template` SET `auras` = '12544' WHERE `entry` = 677;
 -- Mosh'Ogg Mauler
 UPDATE `creature_template` SET `auras` = '7095' WHERE `entry` = 678;
 
--- Mosh'Ogg Spellcrafter
-UPDATE `creature_template` SET `auras` = '12544' WHERE `entry` = 710;
-
-
 
 
 -- NOT SURE IF THESE ARE CORRECT
