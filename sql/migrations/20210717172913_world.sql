@@ -253,9 +253,6 @@ UPDATE `creature_template` SET `auras` = '28874' WHERE `entry` = 16697;
 -- Sapphiron's Wing Buffet
 UPDATE `creature_template` SET `auras` = '29327' WHERE `entry` = 17025;
 
--- Venture Co. Foreman
-UPDATE `creature_template` SET `auras` = '8258' WHERE `entry` = 675;
-
 -- Mosh'Ogg Mauler
 UPDATE `creature_template` SET `auras` = '7095' WHERE `entry` = 678;
 
