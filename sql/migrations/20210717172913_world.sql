@@ -256,7 +256,8 @@ UPDATE `creature_template` SET `auras` = '29327' WHERE `entry` = 17025;
 -- Venture Co. Foreman
 UPDATE `creature_template` SET `auras` = '8258' WHERE `entry` = 675;
 
-
+-- Venture Co. Tinkerer
+UPDATE `creature_template` SET `auras` = '12544' WHERE `entry` = 677;
 
 
 
