@@ -196,7 +196,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399);
 
 -- Spell list for Bloodscalp Headhunter
-UPDATE `creature_template` SET `spell_list_id`=6670 WHERE `entry`=671;
+UPDATE `creature_template` SET `spell_list_id`=6710 WHERE `entry`=671;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (6710, 'Stranglethorn Vale - Bloodscalp Headhunter', 10277, 100, 1, 0, 0, 136, 0, 0, 2, 3);
 
 -- Spell list for Skullsplitter Warrior
