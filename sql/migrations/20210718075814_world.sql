@@ -272,7 +272,7 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 
 -- Spell list for Veyzhak the Cannibal
 UPDATE `creature_template` SET `spell_list_id`=53990 WHERE `entry`=5399;
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (53990, 'ZonePlaceholder - Veyzhak the Cannibal', 11977, 100, 1, 0, 0, 96, 0, 0, 7, 14);
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (53990, 'Temple of Atal\'Hakkar - Veyzhak the Cannibal', 11977, 100, 1, 0, 0, 96, 0, 0, 7, 14);
 
 
 -- End of migration.
