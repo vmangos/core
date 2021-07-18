@@ -4967,6 +4967,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 27654:                         // Love is in the Air Test
                 case 26870:                         // Amorous Timer, Standard Test
                 {
                     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
