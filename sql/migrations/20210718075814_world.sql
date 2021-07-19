@@ -202,6 +202,135 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (87901, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Saltscale Hunter - Flee');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (87901, 879, 0, 2, 0, 100, 0, 15, 0, 0, 0, 87901, 0, 0, 'Saltscale Hunter - Flee at 15% HP');
 
+-- Events list for Mogh the Undying
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 1060;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(106001, 0, 15, 20798, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogh the Undying - Cast Spell Demon Skin');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (106001, 1060, 0, 1, 0, 100, 1, 1000, 1000, 1800000, 1800000, 106001, 0, 0, 'Mogh the Undying - Cast Demon Skin OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(106002, 0, 15, 8813, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogh the Undying - Cast Spell Summon Kurzen Mindslave');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (106002, 1060, 0, 1, 0, 100, 0, 2000, 2000, 0, 0, 106002, 0, 0, 'Mogh the Undying - Cast Summon Kurzen Mindslave OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(106003, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogh the Undying - Despawn Guardians');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (106003, 1060, 0, 7, 0, 100, 0, 0, 0, 0, 0, 106003, 0, 0, 'Mogh the Undying - Despawn Guardians on Evade');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(106004, 0, 15, 8809, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogh the Undying - Cast Spell Slave Drain');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (106004, 1060, 0, 2, 0, 100, 1, 50, 0, 12000, 16000, 106004, 0, 0, 'Mogh the Undying - Cast Slave Drain at 50% HP');
+
+-- Events list for Zanzil the Outcast
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 2534;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(253401, 0, 15, 8832, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Zanzil the Outcast - Cast Spell Ward of Zanzil');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (253401, 2534, 0, 0, 0, 100, 0, 5000, 10000, 0, 0, 253401, 0, 0, 'Zanzil the Outcast - Cast Ward of Zanzil');
+
+-- Events list for Lord Sakrasis
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 2541;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(254101, 0, 15, 7160, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Sakrasis - Cast Spell Execute');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (254101, 2541, 0, 12, 0, 100, 1, 20, 0, 30000, 30000, 254101, 0, 0, 'Lord Sakrasis - Cast Execute when Target HP below 20%');
+
+-- Events list for Witchwing Ambusher
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 3279;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(327901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -200, -201, -202, 0, 0, 0, 0, 0, 0, 'Witchwing Ambusher - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (327901, 3279, 0, 4, 0, 20, 0, 0, 0, 0, 0, 327901, 0, 0, 'Witchwing Ambusher - Say on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(327902, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Witchwing Ambusher - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (327902, 3279, 0, 2, 0, 100, 0, 15, 0, 0, 0, 327902, 0, 0, 'Witchwing Ambusher - Flee at 15% HP');
+
+-- Events list for Witchwing Windcaller
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 3280;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(328001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2229, 2230, 2231, 0, 0, 0, 0, 0, 0, 'Witchwing Windcaller - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (328001, 3280, 0, 4, 0, 20, 0, 0, 0, 0, 0, 328001, 0, 0, 'Witchwing Windcaller - Say on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(328002, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Witchwing Windcaller - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (328002, 3280, 0, 2, 0, 100, 0, 15, 0, 0, 0, 328002, 0, 0, 'Witchwing Windcaller - Flee at 15% HP');
+
+-- Events list for War Golem
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 2751;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(275101, 0, 15, 9576, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'War Golem - Cast Spell Lock Down');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (275101, 2751, 0, 9, 0, 100, 1, 0, 5, 25000, 28000, 275101, 0, 0, 'War Golem - Cast Lock Down');
+
+-- Events list for Southsea Cannoneer
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 3382;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(338201, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southsea Cannoneer - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (338201, 3382, 0, 2, 0, 100, 0, 15, 0, 0, 0, 338201, 0, 0, 'Southsea Cannoneer - Flee at 15% HP');
+
+-- Events list for Southsea Privateer
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 3384;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(338401, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southsea Privateer - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (338401, 3384, 0, 2, 0, 100, 0, 15, 0, 0, 0, 338401, 0, 0, 'Southsea Privateer - Flee at 15% HP');
+
+-- Events list for Salt Flats Scavenger
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 4154;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(415401, 0, 15, 7160, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Salt Flats Scavenger - Cast Spell Execute');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (415401, 4154, 0, 12, 0, 100, 1, 20, 0, 30000, 30000, 415401, 0, 0, 'Salt Flats Scavenger - Cast Execute when Target HP below 20%');
+
+-- Events list for Foreman Cozzle
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 4723;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(472301, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Foreman Cozzle - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (472301, 4723, 0, 2, 0, 100, 0, 15, 0, 0, 0, 472301, 0, 0, 'Foreman Cozzle - Flee at 15% HP');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(472302, 0, 15, 4979, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Foreman Cozzle - Cast Spell Quick Flame Ward');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (472302, 4723, 0, 2, 0, 100, 1, 50, 0, 10100, 19800, 472302, 0, 0, 'Foreman Cozzle - Cast Quick Flame Ward at 50% HP');
+
+-- Events list for Blackfathom Oracle
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 4803;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(480301, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blackfathom Oracle - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (480301, 4803, 0, 2, 0, 100, 0, 15, 0, 0, 0, 480301, 0, 0, 'Blackfathom Oracle - Flee at 15% HP');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(480302, 0, 15, 11986, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blackfathom Oracle - Cast Spell Healing Wave');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (480302, 4803, 0, 14, 0, 100, 1, 280, 40, 18000, 24000, 480302, 0, 0, 'Blackfathom Oracle - Cast Healing Wave on Friendly Missing HP');
+
+-- Events list for Takk the Leaper
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 5842;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(584201, 0, 15, 6268, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Takk the Leaper - Cast Spell Rushing Charge');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (584201, 5842, 0, 4, 0, 100, 0, 0, 0, 0, 0, 584201, 0, 0, 'Takk the Leaper - Cast Rushing Charge');
+
+-- Events list for Captain Gerogg Hammertoe
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 5851;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(585101, 0, 15, 871, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Gerogg Hammertoe - Cast Spell Shield Wall');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (585101, 5851, 0, 2, 0, 100, 1, 30, 0, 30000, 40000, 585101, 0, 0, 'Captain Gerogg Hammertoe - Cast Shield Wall at 30% HP');
+
+-- Events list for Achellios the Banished
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 5933;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(593301, 0, 15, 9128, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Achellios the Banished - Cast Spell Battle Shout');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (593301, 5933, 0, 4, 0, 100, 0, 0, 0, 0, 0, 593301, 0, 0, 'Achellios the Banished - Cast Battle Shout on Aggro');
+
+-- Events list for Vile Sting
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 5937;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(593701, 0, 15, 8257, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Vile Sting - Cast Spell Venom Sting');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (593701, 5937, 0, 28, 0, 100, 1, 8257, 3, 25000, 35000, 593701, 0, 0, 'Vile Sting - Cast Venom Sting on Target Missing Aura Stack');
+
+-- Events list for Kurzen Mindslave
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 6366;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(636601, 0, 15, 11642, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzen Mindslave - Cast Spell Heal');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (636601, 6366, 0, 14, 0, 100, 1, 825, 40, 15300, 22900, 636601, 0, 0, 'Kurzen Mindslave - Cast Heal on Friendly Missing HP');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(636602, 0, 15, 7964, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzen Mindslave - Cast Spell Smoke Bomb'),
+(636602, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzen Mindslave - Flee');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (636602, 6366, 0, 2, 0, 100, 0, 15, 0, 0, 0, 636602, 0, 0, 'Kurzen Mindslave - Cast Smoke Bomb and Flee at 15% HP');
+
+-- Events list for Digmaster Shovelphlange
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 7057;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(705701, 0, 15, 7164, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Digmaster Shovelphlange - Cast Spell Defensive Stance');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (705701, 7057, 0, 4, 0, 100, 0, 0, 0, 0, 0, 705701, 0, 0, 'Digmaster Shovelphlange - Cast Defensive Stance on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(705702, 0, 15, 8380, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Digmaster Shovelphlange - Cast Spell Sunder Armor');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (705702, 7057, 0, 28, 0, 100, 1, 8380, 5, 10000, 10000, 705702, 0, 0, 'Digmaster Shovelphlange - Cast Sunder Armor on Target Missing Aura Stack');
 
 
 
@@ -213,7 +342,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 
 -- Add Spell Lists
-UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399, 875, 877, 879);
+UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399, 875, 877, 879, 978, 1060, 1094, 2534, 2541, 2635, 2749, 3101, 3280, 3382, 3384, 4249, 4723, 4803, 4807, 5256, 5345, 5401, 5851, 5934, 6231, 6494);
 
 -- Spell list for Bloodscalp Headhunter
 UPDATE `creature_template` SET `spell_list_id`=6710 WHERE `entry`=671;
@@ -293,6 +422,98 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 -- Spell list for Saltscale Hunter
 UPDATE `creature_template` SET `spell_list_id`=8790 WHERE `entry`=879;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (8790, ' Stranglethorn Vale - Saltscale Hunter', 10277, 100, 1, 0, 0, 136, 0, 0, 2, 4);
+
+-- Spell list for Kurzen Subchief
+UPDATE `creature_template` SET `spell_list_id`=9780 WHERE `entry`=978;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (9780, 'Stranglethorn Vale - Kurzen Subchief', 8053, 100, 1, 0, 0, 0, 6, 11, 20, 30);
+
+-- Spell list for Mogh the Undying
+UPDATE `creature_template` SET `spell_list_id`=10600 WHERE `entry`=1060;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (10600, 'Stranglethorn Vale - Mogh the Undying', 12471, 100, 1, 0, 0, 8, 0, 0, 2, 4);
+
+-- Spell list for Venture Co. Miner
+UPDATE `creature_template` SET `spell_list_id`=10940 WHERE `entry`=1094;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (10940, 'Stranglethorn Vale - Venture Co. Miner', 6016, 100, 1, 0, 0, 96, 0, 0, 45, 45);
+
+-- Spell list for Zanzil the Outcast
+UPDATE `creature_template` SET `spell_list_id`=25340 WHERE `entry`=2534;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (25340, 'Stranglethorn Vale - Zanzil the Outcast', 9532, 100, 1, 0, 0, 0, 3, 4, 5, 6);
+
+-- Spell list for Lord Sakrasis
+UPDATE `creature_template` SET `spell_list_id`=25410 WHERE `entry`=2541;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (25410, 'Stranglethorn Vale - Lord Sakrasis', 15496, 100, 1, 0, 0, 0, 5, 7, 7, 11);
+
+-- Spell list for Elder Saltwater Crocolisk
+UPDATE `creature_template` SET `spell_list_id`=26350 WHERE `entry`=2635;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (26350, 'Stranglethorn Vale - Elder Saltwater Crocolisk', 3604, 100, 1, 0, 0, 0, 3, 8, 13, 24);
+
+-- Spell list for Siege Golem
+UPDATE `creature_template` SET `spell_list_id`=27490 WHERE `entry`=2749;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (27490, 'Badlands - Siege Golem', 10578, 100, 1, 0, 0, 0, 2, 5, 8, 12);
+
+-- Spell list for Vile Familiar
+UPDATE `creature_template` SET `spell_list_id`=31010 WHERE `entry`=3101;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (31010, 'Durotar - Vile Familiar', 11921, 50, 1, 0, 0, 0, 5, 15, 5, 15);
+
+-- Spell list for Witchwing Windcaller
+UPDATE `creature_template` SET `spell_list_id`=32800 WHERE `entry`=3280;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (32800, 'The Barrens - Witchwing Windcaller', 6728, 100, 5, 0, 0, 32, 4, 7, 12, 15);
+
+-- Spell list for Southsea Cannoneer
+UPDATE `creature_template` SET `spell_list_id`=33820 WHERE `entry`=3382;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (33820, 'The Barrens - Southsea Cannoneer', 6660, 100, 1, 0, 0, 136, 0, 0, 2, 3);
+
+-- Spell list for Southsea Privateer
+UPDATE `creature_template` SET `spell_list_id`=33840 WHERE `entry`=3384;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (33840, 'The Barrens - Southsea Privateer', 3011, 100, 1, 0, 0, 0, 4, 6, 9, 13, 6660, 100, 1, 0, 0, 136, 0, 0, 2, 3);
+
+-- Spell list for Pesterhide Snarler
+UPDATE `creature_template` SET `spell_list_id`=42490 WHERE `entry`=4249;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (42490, 'Thousand Needles - Pesterhide Snarler', 6576, 100, 5, 0, 0, 0, 5, 10, 12, 16);
+
+-- Spell list for Foreman Cozzle
+UPDATE `creature_template` SET `spell_list_id`=47230 WHERE `entry`=4723;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (47230, 'Stranglethorn Vale - Foreman Cozzle', 184, 100, 0, 0, 0, 32, 5, 9, 24, 37, 9532, 100, 1, 0, 0, 8, 0, 0, 3, 4);
+
+-- Spell list for Blackfathom Oracle
+UPDATE `creature_template` SET `spell_list_id`=48030 WHERE `entry`=4803;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (48030, 'Blackfathom Deeps - Blackfathom Oracle', 8363, 100, 1, 0, 0, 0, 3, 6, 25, 30);
+
+-- Spell list for Blackfathom Myrmidon
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (480701);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=4807;
+UPDATE `creature_template` SET `spell_list_id`=48070, `ai_name`='' WHERE `entry`=4807;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (48070, 'Blackfathom Deeps - Blackfathom Myrmidon', 8379, 100, 1, 0, 0, 0, 5, 9, 16, 20);
+
+-- Spell list for Atal'ai Warrior
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (525601, 525602);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=5256;
+UPDATE `creature_template` SET `spell_list_id`=52560, `ai_name`='' WHERE `entry`=5256;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (52560, 'Sunken Temple - Atal\'ai Warrior', 13446, 100, 1, 0, 0, 0, 7, 15, 12, 17, 13445, 100, 1, 0, 0, 0, 7, 16, 19, 20);
+
+-- Spell list for Diamond Head
+UPDATE `creature_template` SET `spell_list_id`=53450 WHERE `entry`=5345;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (53450, 'Feralas - Diamond Head', 5164, 100, 1, 0, 0, 64, 0, 0, 15, 20);
+
+-- Spell list for Kazkaz the Unholy
+UPDATE `creature_template` SET `spell_list_id`=54010 WHERE `entry`=5401;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (54010, 'Sunken Temple - Kazkaz the Unholy', 7645, 100, 2, 0, 0, 0, 14, 28, 24, 30, 9081, 100, 1, 0, 0, 0, 5, 9, 15, 32, 11639, 100, 4, 0, 0, 32, 2, 5, 10, 10);
+
+-- Spell list for Captain Gerogg Hammertoe
+UPDATE `creature_template` SET `spell_list_id`=58510 WHERE `entry`=5851;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (58510, 'The Barrens - Captain Gerogg Hammertoe', 7164, 100, 0, 0, 0, 0, 1, 5, 180, 180, 11972, 100, 1, 0, 0, 256, 0, 0, 11, 13);
+
+-- Spell list for Heartrazor
+UPDATE `creature_template` SET `spell_list_id`=59340 WHERE `entry`=5934;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (59340, 'Thousand Needles - Heartrazor', 8256, 100, 4, 0, 0, 32, 10, 16, 12, 24);
+
+-- Spell list for Techbot
+UPDATE `creature_template` SET `spell_list_id`=62310 WHERE `entry`=6231;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (62310, 'Gnomeregan - Techbot', 10852, 100, 0, 0, 0, 0, 5, 5, 19, 19, 10855, 100, 1, 0, 0, 0, 4, 8, 15, 25, 10858, 100, 1, 0, 0, 0, 10, 10, 22, 22);
+
+-- Spell list for Tazan
+UPDATE `creature_template` SET `spell_list_id`=64940 WHERE `entry`=6494;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (64940, 'The Barrens - Tazan', 6253, 80, 1, 0, 0, 64, 0, 0, 6, 10);
 
 
 -- End of migration.
