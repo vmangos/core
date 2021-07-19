@@ -331,10 +331,10 @@ DELETE FROM `creature_loot_template` WHERE `entry` IN (11465, 11746, 15229) AND 
 UPDATE `creature_template` SET `loot_id` = 0 WHERE `entry` = 14983;
 DELETE FROM `creature_loot_template` WHERE `entry` = 14983;
 
--- Add Correct Completion Text to Quests
+-- Correct Some Quest Texts
 UPDATE `quest_template` SET `OfferRewardText` = 'Hm... $N. You are still new to your path, but I sense the possibility for greatness in you.$B$BYou were born with gifts, $N. See that they do not go to waste.' WHERE `entry` = 1507;
 UPDATE `quest_template` SET `OfferRewardText` = 'Incredible! Improbable! Simply amazing! You\'ve got talent, $N. Either that or you\'re the luckiest $gman:woman; alive!$b$bHere\'s your cut of the action. I\'m sure you would make better use of this stuff than I could.$b$b' WHERE `entry`=2381;
-
+UPDATE `quest_template` SET `RequestItemsText` = 'This is going to be a tough battle...' WHERE `entry` = 3382;
 
 
 -- End of migration.
