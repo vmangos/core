@@ -277,11 +277,14 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 
 -- Spell list for Veyzhak the Cannibal
 UPDATE `creature_template` SET `spell_list_id`=53990 WHERE `entry`=5399;
-INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (53990, 'Temple of Atal\'Hakkar - Veyzhak the Cannibal', 11977, 100, 1, 0, 0, 96, 0, 0, 7, 14);
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (53990, 'Sunken Temple - Veyzhak the Cannibal', 11977, 100, 1, 0, 0, 96, 0, 0, 7, 14);
 
 -- Spell list for Saltscale Tide Lord
 UPDATE `creature_template` SET `spell_list_id`=8750 WHERE `entry`=875;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (8750, ' Stranglethorn Vale - Saltscale Tide Lord', 11831, 100, 4, 0, 0, 0, 6, 9, 15, 18, 9672, 100, 1, 0, 0, 8, 0, 0, 3, 4);
+
+-- Correct zone name in spell list for Zekkis.
+UPDATE `creature_spells` SET `name`='Sunken Temple - Zekkis' WHERE `entry`=54000;
 
 -- Spell list for Saltscale Forager
 UPDATE `creature_template` SET `spell_list_id`=8770 WHERE `entry`=877;
