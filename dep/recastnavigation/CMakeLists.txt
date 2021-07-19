@@ -16,5 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+cmake_minimum_required(VERSION 2.6...3.20)
+
 add_subdirectory(Detour)
 add_subdirectory(Recast)

@@ -8,14 +8,14 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 2.6...3.20)
 
-project( MoveMapGen )
+project(MoveMapGen)
 
 ADD_DEFINITIONS(-DMMAP_GENERATOR -DDEBUG)
 
 # zlib
-ADD_DEFINITIONS( -DNO_vsnprintf )
+ADD_DEFINITIONS(-DNO_vsnprintf)
 
 if(NOT MSVC)
     ADD_DEFINITIONS("-Wall")
