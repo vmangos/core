@@ -265,6 +265,12 @@ UPDATE `creature_template` SET `auras` = '3418' WHERE `entry` = 5851;
 -- Swinegart Spearhide
 UPDATE `creature_template` SET `auras` = '7165' WHERE `entry` = 5864;
 
+-- Anvilrage Overseer
+UPDATE `creature_template` SET `auras` = '13589' WHERE `entry` = 8889;
+
+
+
+
 
 
 
