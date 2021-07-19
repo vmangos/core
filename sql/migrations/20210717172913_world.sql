@@ -262,9 +262,10 @@ UPDATE `creature_template` SET `auras` = '7165 21156' WHERE `entry` = 5842;
 -- Captain Gerogg Hammertoe
 UPDATE `creature_template` SET `auras` = '3418' WHERE `entry` = 5851;
 
+-- Swinegart Spearhide
+UPDATE `creature_template` SET `auras` = '7165' WHERE `entry` = 5864;
 
 
-3418
 
 
 -- NOT SURE IF THESE ARE CORRECT
