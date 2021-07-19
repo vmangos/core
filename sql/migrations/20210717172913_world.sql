@@ -259,8 +259,12 @@ UPDATE `creature_template` SET `auras` = '7095' WHERE `entry` = 678;
 -- Takk the Leaper
 UPDATE `creature_template` SET `auras` = '7165 21156' WHERE `entry` = 5842;
 
+-- Captain Gerogg Hammertoe
+UPDATE `creature_template` SET `auras` = '3418' WHERE `entry` = 5851;
 
 
+
+3418
 
 
 -- NOT SURE IF THESE ARE CORRECT
