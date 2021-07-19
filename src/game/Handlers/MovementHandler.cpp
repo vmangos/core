@@ -805,7 +805,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
     HandleMoverRelocation(pMover, movementInfo);
 
-    MovementPacketSender::SendKnockBackToObservers(pMover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.velocity);
+    MovementPacketSender::SendKnockBackToObservers(pMover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.zspeed);
 }
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
