@@ -256,6 +256,11 @@ UPDATE `creature_template` SET `auras` = '29327' WHERE `entry` = 17025;
 -- Mosh'Ogg Mauler
 UPDATE `creature_template` SET `auras` = '7095' WHERE `entry` = 678;
 
+-- Takk the Leaper
+UPDATE `creature_template` SET `auras` = '7165 21156' WHERE `entry` = 5842;
+
+
+
 
 
 -- NOT SURE IF THESE ARE CORRECT
