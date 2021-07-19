@@ -268,7 +268,8 @@ UPDATE `creature_template` SET `auras` = '7165' WHERE `entry` = 5864;
 -- Anvilrage Overseer
 UPDATE `creature_template` SET `auras` = '13589' WHERE `entry` = 8889;
 
-
+-- Entropic Horror
+UPDATE `creature_template` SET `auras` = '11966' WHERE `entry` = 9879;
 
 
 
