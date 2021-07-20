@@ -282,6 +282,8 @@ UPDATE `creature_template` SET `auras` = '19818 21857', `ai_name`='' WHERE `entr
 -- Shanda the Spinner
 UPDATE `creature_template` SET `auras` = '11919' WHERE `entry` = 14266;
 
+-- Gretheer
+UPDATE `creature_template` SET `auras` = '21788' WHERE `entry` = 14472;
 
 
 
