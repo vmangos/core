@@ -274,6 +274,10 @@ UPDATE `creature_template` SET `auras` = '11966' WHERE `entry` = 9879;
 -- Hive'Regal Ambusher
 UPDATE `creature_template` SET `auras` = '22766' WHERE `entry` = 11730;
 
+-- Son of Flame
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1214301);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=12143;
+UPDATE `creature_template` SET `auras` = '19818 21857', `ai_name`='' WHERE `entry` = 12143;
 
 
 
