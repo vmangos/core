@@ -591,6 +591,47 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (1135601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10435, 10434, 1908, 1909, 0, 0, 0, 0, 0, 'Gurubashi Champion - Say Text');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1135601, 11356, 0, 4, 0, 15, 0, 0, 0, 0, 0, 1135601, 0, 0, 'Gurubashi Champion - Say on Aggro');
 
+-- Events list for High Priestess Hai'watna
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11383;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1138301, 0, 15, 15982, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Priestess Hai\'watna - Cast Spell Healing Wave');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1138301, 11383, 0, 14, 0, 100, 1, 1000, 40, 10000, 20000, 1138301, 0, 0, 'High Priestess Hai\'watna - Cast Healing Wave on Friendly Missing HP');
+
+-- Events list for Witherbark Speaker
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11388;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1138801, 0, 15, 12492, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Witherbark Speaker - Cast Spell Healing Wave');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1138801, 11388, 0, 2, 0, 100, 1, 50, 0, 15000, 20000, 1138801, 0, 0, 'Witherbark Speaker - Cast Healing Wave at 50% HP');
+
+-- Events list for Hive'Zora Wasp
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11727;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1172701, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zora Wasp - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1172701, 11727, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1172701, 0, 0, 'Hive\'Zora Wasp - Set Phase 1 on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1172702, 0, 15, 19448, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zora Wasp - Cast Spell Poison');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1172702, 11727, 0, 9, 5, 100, 1, 0, 5, 7000, 11000, 1172702, 0, 0, 'Hive\'Zora Wasp - Cast Poison (Phase 1)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1172703, 0, 44, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zora Wasp - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1172703, 11727, 0, 24, 5, 100, 1, 19448, 10, 5000, 5000, 1172703, 0, 0, 'Hive\'Zora Wasp - Set Phase 2 on Target Max Poison Aura Stack (Phase 1)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1172704, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zora Wasp - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1172704, 11727, 0, 28, 3, 100, 1, 19448, 1, 5000, 5000, 1172704, 0, 0, 'Hive\'Zora Wasp - Set Phase 1 on Target Missing Poison Aura Stack (Phase 2)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1172705, 0, 44, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Zora Wasp - Decrement Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1172705, 11727, 0, 7, 0, 100, 0, 0, 0, 0, 0, 1172705, 0, 0, 'Hive\'Zora Wasp - Set Phase to 0 on Evade');
+
+-- Events list for Hive'Regal Spitfire
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11732;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1173201, 0, 15, 5708, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hive\'Regal Spitfire - Cast Spell Swoop');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1173201, 11732, 0, 9, 0, 100, 1, 0, 5, 8000, 17800, 1173201, 0, 0, 'Hive\'Regal Spitfire - Cast Swoop');
+
+-- Events list for Stonelash Flayer
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11737;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1173701, 0, 15, 3417, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stonelash Flayer - Cast Spell Thrash');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1173701, 11737, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1173701, 0, 0, 'Stonelash Flayer - Cast Thrash on Spawn');
 
 
 
@@ -600,7 +641,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 
 -- Add Spell Lists
-UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399, 875, 877, 879, 978, 1060, 1094, 2534, 2541, 2635, 2749, 3101, 3280, 3382, 3384, 4249, 4723, 4803, 4807, 5256, 5345, 5401, 5851, 5934, 6231, 6494, 7235, 7404, 7433, 7435, 7436, 7437, 7439, 7442, 7448, 7449, 7451, 7453, 7457, 7458, 7460, 7523, 7524, 7895, 8889, 8891, 8897, 8898, 8899, 8900, 8909, 8910, 8912, 8914, 8922, 9596, 9956, 10043, 10196, 10197, 10198, 10201, 10660, 10661, 10684, 10738, 10806, 10807, 11338, 11339, 11346, 11356, 11365);
+UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399, 875, 877, 879, 978, 1060, 1094, 2534, 2541, 2635, 2749, 3101, 3280, 3382, 3384, 4249, 4723, 4803, 4807, 5256, 5345, 5401, 5851, 5934, 6231, 6494, 7235, 7404, 7433, 7435, 7436, 7437, 7439, 7442, 7448, 7449, 7451, 7453, 7457, 7458, 7460, 7523, 7524, 7895, 8889, 8891, 8897, 8898, 8899, 8900, 8909, 8910, 8912, 8914, 8922, 9596, 9956, 10043, 10196, 10197, 10198, 10201, 10660, 10661, 10684, 10738, 10806, 10807, 11338, 11339, 11346, 11356, 11365, 11371, 11374, 11383, 11388, 11552, 11722, 11729, 11730, 11732, 11734, 11735, 11736, 11737, 11738, 11740, 11741);
 
 -- Spell list for Bloodscalp Headhunter
 UPDATE `creature_template` SET `spell_list_id`=6710 WHERE `entry`=671;
@@ -962,6 +1003,70 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 -- Spell list for Zulian Panther
 UPDATE `creature_template` SET `spell_list_id`=113650 WHERE `entry`=11365;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (113650, 'ZonePlaceholder - Zulian Panther', 24333, 100, 1, 0, 0, 0, 3, 3, 15, 20);
+
+-- Spell list for Razzashi Serpent
+UPDATE `creature_template` SET `spell_list_id`=113710 WHERE `entry`=11371;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (113710, 'Zul'Gurub - Razzashi Serpent', 12097, 100, 1, 0, 0, 32, 1, 5, 20, 25, 24002, 100, 1, 0, 0, 32, 5, 8, 17, 25, 20539, 100, 1, 0, 0, 0, 7, 12, 15, 17);
+
+-- Spell list for Hooktooth Frenzy
+UPDATE `creature_template` SET `spell_list_id`=113740 WHERE `entry`=11374;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (113740, 'Zul'Gurub - Hooktooth Frenzy', 12097, 75, 1, 0, 0, 32, 1, 3, 3, 5);
+
+-- Spell list for High Priestess Hai'watna
+UPDATE `creature_template` SET `spell_list_id`=113830 WHERE `entry`=11383;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (113830, 'Stranglethorn Vale - High Priestess Hai\'watna', 18503, 100, 4, 0, 0, 0, 0, 10, 15, 30);
+
+-- Spell list for Witherbark Speaker
+UPDATE `creature_template` SET `spell_list_id`=113880 WHERE `entry`=11388;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`) VALUES (113880, 'Zul'Gurub - Witherbark Speaker', 15869, 100, 0, 0, 0, 0, 8, 12, 30, 35, 13281, 100, 4, 262, 0, 0, 8, 16, 10, 20, 12548, 100, 1, 0, 0, 0, 5, 10, 10, 20, 15801, 100, 1, 0, 0, 8, 0, 0, 3, 4);
+
+-- Spell list for Timbermaw Mystic
+UPDATE `creature_template` SET `spell_list_id`=115520 WHERE `entry`=11552;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (115520, 'Felwood - Timbermaw Mystic', 10946, 100, 1, 0, 0, 0, 0, 0, 3, 6, 10934, 100, 1, 0, 0, 0, 0, 0, 4, 8);
+
+-- Spell list for Hive'Ashi Defender
+UPDATE `creature_template` SET `spell_list_id`=117220 WHERE `entry`=11722;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117220, 'Silithus - Hive\'Ashi Defender', 6713, 100, 1, 0, 0, 1, 2, 12, 36, 46);
+
+-- Spell list for Hive'Zora Hive Sister
+UPDATE `creature_template` SET `spell_list_id`=117290 WHERE `entry`=11729;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117290, 'Silithus - Hive\'Zora Hive Sister', 7951, 100, 1, 0, 0, 0, 0, 0, 4, 6);
+
+-- Spell list for Hive'Regal Ambusher
+UPDATE `creature_template` SET `spell_list_id`=117300 WHERE `entry`=11730;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117300, 'Silithus - Hive\'Regal Ambusher', 744, 100, 1, 0, 0, 0, 7, 14, 120, 125);
+
+-- Spell list for Hive'Regal Spitfire
+UPDATE `creature_template` SET `spell_list_id`=117320 WHERE `entry`=11732;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117320, 'Silithus - Hive\'Regal Spitfire', 21047, 100, 4, 0, 0, 32, 8, 17, 21, 28);
+
+-- Spell list for Hive'Regal Hive Lord
+UPDATE `creature_template` SET `spell_list_id`=117340 WHERE `entry`=11734;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117340, 'Silithus - Hive\'Regal Hive Lord', 19471, 100, 4, 0, 0, 0, 9, 12, 9, 12);
+
+-- Spell list for Stonelash Scorpid
+UPDATE `creature_template` SET `spell_list_id`=117350 WHERE `entry`=11735;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117350, 'Silithus - Stonelash Scorpid', 5416, 100, 1, 0, 0, 0, 3, 7, 14, 17);
+
+-- Spell list for Stonelash Pincer
+UPDATE `creature_template` SET `spell_list_id`=117360 WHERE `entry`=11736;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (117360, 'Silithus - Stonelash Pincer', 5416, 100, 1, 0, 0, 0, 3, 7, 14, 17, 3604, 100, 1, 0, 0, 64, 0, 0, 20, 23);
+
+-- Spell list for Stonelash Flayer
+UPDATE `creature_template` SET `spell_list_id`=117370 WHERE `entry`=11737;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117370, 'Silithus - Stonelash Flayer', 5416, 100, 1, 0, 0, 0, 3, 7, 14, 17);
+
+-- Spell list for Sand Skitterer
+UPDATE `creature_template` SET `spell_list_id`=117380 WHERE `entry`=11738;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117380, 'Silithus - Sand Skitterer', 744, 100, 1, 0, 0, 0, 7, 14, 120, 125);
+
+-- Spell list for Dredge Striker
+UPDATE `creature_template` SET `spell_list_id`=117400 WHERE `entry`=11740;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117400, 'Silithus - Dredge Striker', 22911, 100, 1, 0, 0, 1, 0, 0, 5, 5);
+
+-- Spell list for Dredge Crusher
+UPDATE `creature_template` SET `spell_list_id`=117410 WHERE `entry`=11741;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (117410, 'ZonePlaceholder - Dredge Crusher', 6607, 100, 1, 0, 0, 65, 0, 0, 20, 25);
 
 
 -- End of migration.
