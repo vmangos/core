@@ -279,6 +279,14 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (1214301);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=12143;
 UPDATE `creature_template` SET `auras` = '19818 21857', `ai_name`='' WHERE `entry` = 12143;
 
+-- Shanda the Spinner
+UPDATE `creature_template` SET `auras` = '11919' WHERE `entry` = 14266;
+
+
+
+
+
+
 
 
 -- NOT SURE IF THESE ARE CORRECT
