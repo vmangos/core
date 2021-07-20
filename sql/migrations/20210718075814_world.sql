@@ -487,6 +487,110 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (959601, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bannok Grimaxe - Set Stand State');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (959601, 9596, 0, 4, 0, 100, 0, 0, 0, 0, 0, 959601, 0, 0, 'Bannok Grimaxe - Set Stand State on Aggro');
 
+-- Events list for Shadowforge Flame Keeper
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 9956;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(995601, 0, 15, 9128, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowforge Flame Keeper - Cast Spell Battle Shout');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (995601, 9956, 0, 4, 0, 100, 0, 0, 0, 0, 0, 995601, 0, 0, 'Shadowforge Flame Keeper - Enable Range Mode and Cast Battle Shout on Aggro');
+
+-- Events list for Ribbly's Crony
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 10043;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1004301, 0, 15, 13299, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ribbly\'s Crony - Cast Spell Poison Proc');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1004301, 10043, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1004301, 0, 0, 'Ribbly\'s Crony - Cast Poison Proc on Spawn');
+
+-- Events list for General Colbatann
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 10196;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1019601, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'General Colbatann - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1019601, 10196, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1019601, 0, 0, 'General Cobaltann - Set Phase 1 on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1019602, 0, 15, 11971, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'General Colbatann - Cast Spell Sunder Armor');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1019602, 10196, 0, 9, 5, 100, 1, 0, 5, 5000, 9000, 1019602, 0, 0, 'General Cobaltann - Cast Sunder Armor (Phase 1)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1019603, 0, 44, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'General Colbatann - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1019603, 10196, 0, 24, 5, 100, 1, 11971, 5, 5000, 5000, 1019603, 0, 0, 'General Cobaltann - Set Phase 2 on Target Max Sunder Armor Aura Stack (Phase 1)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1019604, 0, 44, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'General Colbatann - Increment Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1019604, 10196, 0, 28, 3, 100, 1, 11971, 1, 5000, 5000, 1019604, 0, 0, 'General Cobaltann - Set Phase 1 on Target Missing Sunder Armor Aura Stack (Phase 2)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1019605, 0, 44, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'General Colbatann - Decrement Phase');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1019605, 10196, 0, 7, 0, 100, 0, 0, 0, 0, 0, 1019605, 0, 0, 'General Cobaltann - Set Phase to 0 on Evade');
+
+-- Events list for Cobalt Whelp
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 10659;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1065901, 0, 15, 13443, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cobalt Whelp - Cast Spell Rend'),
+(1065902, 0, 15, 15089, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cobalt Whelp - Cast Spell Frost Shock');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1065901, 10659, 0, 0, 0, 100, 3, 3000, 3000, 15000, 20000, 1065901, 1065902, 0, 'Cobalt Whelp - Random Cast Rend or Frost Shock');
+
+-- Events list for Cobalt Broodling
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 10660;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1066001, 0, 15, 17682, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cobalt Broodling - Cast Spell Drain Mana');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1066001, 10660, 0, 18, 0, 100, 1, 100, 1, 10000, 10000, 1066002, 0, 0, 'Cobalt Broodling - Cast Drain Mana on Target Mana User');
+
+-- Events list for Scalding Elemental
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 107560;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1075601, 0, 15, 17276, 1, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scalding Elemental - Cast Spell Scald');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1075601, 10756, 0, 9, 0, 100, 1, 0, 20, 15000, 18000, 1075601, 0, 0, 'Scalding Elemental - Cast Scald');
+
+-- Events list for Boiling Elemental
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 107570;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1075701, 0, 15, 11983, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Boiling Elemental - Cast Spell Steam Jet');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1075701, 10757, 0, 9, 0, 100, 1, 0, 5, 12000, 15000, 1075701, 0, 0, 'Boiling Elemental - Cast Steam Jet');
+
+-- Events list for Brumeran
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 10807;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1080701, 0, 15, 8599, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brumeran - Cast Spell Enrage'),
+(1080701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10645, 0, 0, 0, 0, 0, 0, 0, 0, 'Brumeran - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1080701, 10807, 0, 2, 0, 100, 1, 20, 0, 120000, 120000, 1080701, 0, 0, 'Brumeran - Cast Enrage at 20% HP');
+
+-- Events list for Hakkari Shadowcaster
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11338;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1133801, 0, 15, 22947, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hakkari Shadowcaster - Cast Spell Mana Burn');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1133801, 11338, 0, 8, 0, 75, 1, 0, 127, 5000, 8000, 1133801, 0, 0, 'Hakkari Shadowcaster - Cast Mana Burn on Spellhit');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1133802, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10438, 10437, 10436, 10435, 0, 0, 0, 0, 0, 'Hakkari Shadowcaster - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1133802, 11338, 0, 4, 0, 20, 0, 0, 0, 0, 0, 1133802, 0, 0, 'Hakkari Shadowcaster - Random Say on Aggro');
+
+-- Events list for Hakkari Shadow Hunter
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11339;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1133901, 0, 15, 22908, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hakkari Shadow Hunter - Cast Spell Volley');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1133901, 11339, 0, 9, 0, 100, 1, 5, 30, 65000, 85000, 1133901, 0, 0, 'Hakkari Shadow Hunter - Cast Volley');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1133902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10438, 10437, 10436, 10435, 0, 0, 0, 0, 0, 'Hakkari Shadowcaster - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1133902, 11338, 0, 4, 0, 20, 0, 0, 0, 0, 0, 1133902, 0, 0, 'Hakkari Shadowcaster - Random Say on Aggro');
+
+-- Events list for Hakkari Oracle
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11346;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1134601, 0, 15, 15982, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Hakkari Oracle - Cast Spell Healing Wave');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1134601, 11346, 0, 14, 0, 100, 1, 4500, 30, 15000, 25000, 1134601, 0, 0, 'Hakkari Oracle - Cast Healing Wave on friendly lost about 70% health');
+
+-- Events list for Zulian Panther
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11365;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1136501, 0, 15, 24332, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Zulian Panther - Cast Spell Rake');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1136501, 11365, 0, 28, 0, 100, 1, 24332, 1, 1000, 3000, 1136501, 0, 0, 'Zulian Panther - Cast Rake on Missing Aura Rake');
+
+-- Events list for Bloodseeker Bat
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11368;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1136801, 0, 15, 24023, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodseeker Bat - Cast Spell Charge');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1136801, 11368, 0, 4, 0, 100, 0, 0, 0, 0, 0, 1136801, 0, 0, 'Bloodseeker Bat - Cast Charge on Aggro');
+
+-- Events list for Gurubashi Champion
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 11356;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1135601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10435, 10434, 1908, 1909, 0, 0, 0, 0, 0, 'Gurubashi Champion - Say Text');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1135601, 11356, 0, 4, 0, 15, 0, 0, 0, 0, 0, 1135601, 0, 0, 'Gurubashi Champion - Say on Aggro');
+
 
 
 
@@ -496,7 +600,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 
 -- Add Spell Lists
-UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399, 875, 877, 879, 978, 1060, 1094, 2534, 2541, 2635, 2749, 3101, 3280, 3382, 3384, 4249, 4723, 4803, 4807, 5256, 5345, 5401, 5851, 5934, 6231, 6494, 7235, 7404, 7433, 7435, 7436, 7437, 7439, 7442, 7448, 7449, 7451, 7453, 7457, 7458, 7460, 7523, 7524, 7895, 8889, 8891, 8897, 8898, 8899, 8900, 8909, 8910, 8912, 8914, 8922, 9596);
+UPDATE `creature_template` SET `script_name` = '' WHERE `entry` IN (667, 1772, 1773, 1940, 1942, 1674, 677, 679, 680, 702, 709, 710, 723, 730, 781, 782, 818, 5399, 875, 877, 879, 978, 1060, 1094, 2534, 2541, 2635, 2749, 3101, 3280, 3382, 3384, 4249, 4723, 4803, 4807, 5256, 5345, 5401, 5851, 5934, 6231, 6494, 7235, 7404, 7433, 7435, 7436, 7437, 7439, 7442, 7448, 7449, 7451, 7453, 7457, 7458, 7460, 7523, 7524, 7895, 8889, 8891, 8897, 8898, 8899, 8900, 8909, 8910, 8912, 8914, 8922, 9596, 9956, 10043, 10196, 10197, 10198, 10201, 10660, 10661, 10684, 10738, 10806, 10807, 11338, 11339, 11346, 11356, 11365);
 
 -- Spell list for Bloodscalp Headhunter
 UPDATE `creature_template` SET `spell_list_id`=6710 WHERE `entry`=671;
@@ -790,6 +894,74 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 -- Spell list for Bannok Grimaxe
 UPDATE `creature_template` SET `spell_list_id`=95960 WHERE `entry`=9596;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (95960, 'Blackrock Spire - Bannok Grimaxe', 13737, 100, 1, 0, 0, 64, 0, 0, 7, 11);
+
+-- Spell list for Shadowforge Flame Keeper
+UPDATE `creature_template` SET `spell_list_id`=99560 WHERE `entry`=9956;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (99560, 'Blackrock Depths - Shadowforge Flame Keeper', 9080, 100, 1, 0, 0, 64, 0, 0, 12, 15, 11976, 100, 1, 0, 0, 64, 0, 0, 7, 12, 6660, 100, 1, 0, 0, 136, 0, 0, 2, 3);
+
+-- Spell list for Ribbly's Crony
+UPDATE `creature_template` SET `spell_list_id`=100430 WHERE `entry`=10043;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (100430, 'Blackrock Depths - Ribbly\'s Crony', 15581, 100, 1, 0, 0, 0, 5, 7, 6, 9);
+
+-- Spell list for General Colbatann
+UPDATE `creature_template` SET `spell_list_id`=101960 WHERE `entry`=10196;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (101960, 'Winterspring - General Colbatann', 9128, 100, 0, 0, 0, 0, 2, 5, 13, 18);
+
+-- Spell list for Mezzir the Howler
+UPDATE `creature_template` SET `spell_list_id`=101970 WHERE `entry`=10197;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (101970, 'Winterspring - Mezzir the Howler', 15971, 100, 0, 0, 0, 0, 5, 9, 16, 24, 3131, 100, 1, 0, 0, 0, 1, 7, 10, 20, 14100, 100, 0, 0, 0, 0, 8, 12, 12, 20);
+
+-- Spell list for Kashoch the Reaver
+UPDATE `creature_template` SET `spell_list_id`=101980 WHERE `entry`=10198;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (101980, 'Winterspring - Kashoch the Reaver', 15584, 100, 1, 0, 0, 64, 0, 0, 6, 9);
+
+-- Spell list for Lady Hederine
+UPDATE `creature_template` SET `spell_list_id`=102010 WHERE `entry`=10201;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (102010, 'Winterspring - Lady Hederine', 7645, 100, 2, 0, 0, 0, 14, 28, 24, 30, 17146, 100, 4, 0, 0, 32, 3, 9, 12, 25, 12096, 100, 5, 0, 0, 1, 9, 15, 16, 21);
+
+-- Spell list for Cobalt Broodling
+UPDATE `creature_template` SET `spell_list_id`=106600 WHERE `entry`=10660;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (106600, 'Winterspring - Cobalt Broodling', 9672, 100, 1, 0, 0, 8, 0, 0, 3, 4);
+
+-- Spell list for Spell Eater
+UPDATE `creature_template` SET `spell_list_id`=106610 WHERE `entry`=10661;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (106610, 'Winterspring - Spell Eater', 16340, 100, 1, 0, 0, 0, 5, 7, 5, 15);
+
+-- Spell list for Remorseful Highborne
+UPDATE `creature_template` SET `spell_list_id`=106840 WHERE `entry`=10684;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (106840, 'Winterspring - Remorseful Highborne', 17194, 100, 1, 0, 0, 8, 0, 0, 3, 4);
+
+-- Spell list for High Chief Winterfall
+UPDATE `creature_template` SET `spell_list_id`=107380 WHERE `entry`=10738;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (107380, 'Winterspring - High Chief Winterfall', 8364, 100, 4, 0, 0, 0, 9, 14, 16, 21, 12548, 100, 1, 0, 0, 0, 0, 0, 9, 13, 15793, 100, 1, 0, 0, 64, 0, 0, 5, 8);
+
+-- Spell list for Ursius
+UPDATE `creature_template` SET `spell_list_id`=108060 WHERE `entry`=10806;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (108060, 'Winterspring - Ursius', 15971, 100, 0, 0, 0, 0, 5, 9, 16, 24, 15793, 100, 1, 0, 0, 64, 0, 0, 5, 9);
+
+-- Spell list for Brumeran
+UPDATE `creature_template` SET `spell_list_id`=108070 WHERE `entry`=10807;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (108070, 'Winterspring - Brumeran', 15797, 100, 4, 0, 0, 1, 8, 13, 12, 15, 16552, 100, 4, 0, 0, 1, 3, 6, 12, 15);
+
+-- Spell list for Hakkari Shadowcaster
+UPDATE `creature_template` SET `spell_list_id`=113380 WHERE `entry`=11338;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (113380, 'Zul\'Gurub - Hakkari Shadowcaster', 20741, 100, 0, 0, 0, 0, 3, 7, 10, 20, 15232, 100, 1, 0, 0, 8, 1, 2, 3, 4);
+
+-- Spell list for Hakkari Shadow Hunter
+UPDATE `creature_template` SET `spell_list_id`=113390 WHERE `entry`=11339;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (113390, 'Zul\'Gurub - Hakkari Shadow Hunter', 24335, 75, 1, 0, 0, 32, 6, 12, 12, 24, 21390, 100, 1, 0, 0, 128, 0, 0, 10, 15, 16496, 100, 1, 0, 0, 136, 0, 0, 1, 2);
+
+-- Spell list for Hakkari Oracle
+UPDATE `creature_template` SET `spell_list_id`=113460 WHERE `entry`=11346;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`) VALUES (113460, 'Stranglethorn Vale - Hakkari Oracle', 16006, 75, 1, 0, 0, 0, 1, 4, 6, 9, 15501, 100, 1, 0, 0, 256, 0, 0, 15, 20);
+
+-- Spell list for Gurubashi Champion
+UPDATE `creature_template` SET `spell_list_id`=113560 WHERE `entry`=11356;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`) VALUES (113560, 'Zul\'Gurub - Gurubashi Champion', 22591, 100, 0, 0, 0, 0, 1, 3, 3, 6, 15655, 100, 0, 0, 0, 0, 1, 3, 3, 6, 24438, 100, 0, 0, 0, 32, 0, 2, 2, 4, 22886, 100, 4, 2, 0, 0, 0, 0, 15, 20);
+
+-- Spell list for Zulian Panther
+UPDATE `creature_template` SET `spell_list_id`=113650 WHERE `entry`=11365;
+INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`) VALUES (113650, 'ZonePlaceholder - Zulian Panther', 24333, 100, 1, 0, 0, 0, 3, 3, 15, 20);
 
 
 -- End of migration.
