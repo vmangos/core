@@ -271,6 +271,8 @@ UPDATE `creature_template` SET `auras` = '13589' WHERE `entry` = 8889;
 -- Entropic Horror
 UPDATE `creature_template` SET `auras` = '11966' WHERE `entry` = 9879;
 
+-- Hive'Regal Ambusher
+UPDATE `creature_template` SET `auras` = '22766' WHERE `entry` = 11730;
 
 
 
