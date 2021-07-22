@@ -22,6 +22,11 @@ UPDATE `creature` SET `position_z` = 16.25, `movement_type` = 1, `wander_distanc
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 42304;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 2634;
 UPDATE `creature` SET `movemtnt_type` = 1, `wander_distance` = 2 WHERE `guid` IN (373 ,612, 756, 981, 1062);
+UPDATE `creature` SET `position_x` = -5231.283, `position_y` = 1287.122, `position_z` = 55.708 WHERE `guid` = 51210;
+
+-- Correct faction for creatures (credit cmangos)
+UPDATE `creature_template` SET `faction` = 103 WHERE `entry`=10202;
+UPDATE `creature_template` SET `faction`= 14 WHERE `entry`=8212;
 
 -- Shellfish Trap Summons Drysnap Crawler
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (32555, 0, 39, 176582, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 'Shellfish Trap - Start Script');
