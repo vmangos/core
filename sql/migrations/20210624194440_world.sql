@@ -23,7 +23,7 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` =
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 2634;
 UPDATE `creature` SET `movemtnt_type` = 1, `wander_distance` = 2 WHERE `guid` IN (373 ,612, 756, 981, 1062);
 UPDATE `creature` SET `position_x` = -5231.283, `position_y` = 1287.122, `position_z` = 55.708 WHERE `guid` = 51210;
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE  id = 3695;
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `id` = 3695;
 
 -- Correct faction for creatures (credit cmangos)
 UPDATE `creature_template` SET `faction` = 103 WHERE `entry`=10202;
