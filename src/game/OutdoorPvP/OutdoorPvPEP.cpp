@@ -156,6 +156,9 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
         {
             DelCreature(i);
             AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000);
+
+            // Add pathing later.
+            // Unit->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, pathID, false);
         }
     }
 }
@@ -559,46 +562,15 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
         m_FlightMasterSpawned = team;
         DelCreature(EP_PWT_FLIGHTMASTER);
         AddCreature(EP_PWT_FLIGHTMASTER, EP_PWT_FlightMaster.entry, team, EP_PWT_FlightMaster.map, EP_PWT_FlightMaster.x, EP_PWT_FlightMaster.y, EP_PWT_FlightMaster.z, EP_PWT_FlightMaster.o);
-        /*
-        // sky - we need update gso code
-
-        Creature* c = HashMapHolder<Creature>::Find(m_Creatures[EP_PWT_FLIGHTMASTER]);
-        //Spawn flight master as friendly to capturing team
-        c->SetUInt32Value(GAMEOBJECT_FACTION,(team == ALLIANCE ? 55 : 68));
-        if (c)
-        {
-            GossipOption gso;
-            gso.Action = GOSSIP_OPTION_OUTDOORPVP;
-            gso.GossipId = 0;
-            gso.OptionText.assign(sObjectMgr.GetMangosStringForDBCLocale(LANG_OPVP_EP_FLIGHT_NPT));
-            gso.Id = 50;
-            gso.Icon = 0;
-            gso.NpcFlag = 0;
-            gso.BoxMoney = 0;
-            gso.Coded = false;
-            c->addGossipOption(gso);
-
-            gso.Action = GOSSIP_OPTION_OUTDOORPVP;
-            gso.GossipId = 0;
-            gso.OptionText.assign(sObjectMgr.GetMangosStringForDBCLocale(LANG_OPVP_EP_FLIGHT_EWT));
-            gso.Id = 50;
-            gso.Icon = 0;
-            gso.NpcFlag = 0;
-            gso.BoxMoney = 0;
-            gso.Coded = false;
-            c->addGossipOption(gso);
-
-            gso.Action = GOSSIP_OPTION_OUTDOORPVP;
-            gso.GossipId = 0;
-            gso.OptionText.assign(sObjectMgr.GetMangosStringForDBCLocale(LANG_OPVP_EP_FLIGHT_CGT));
-            gso.Id = 50;
-            gso.Icon = 0;
-            gso.NpcFlag = 0;
-            gso.BoxMoney = 0;
-            gso.Coded = false;
-            c->addGossipOption(gso);
-        }
-        */
+        
+        if (Map* map = sMapMgr.FindMap(0, NULL))
+            if (Creature* pCreature = map->GetCreature(m_Creatures[EP_PWT_FLIGHTMASTER]))
+                if (pCreature)
+                {
+                    pCreature->SetFactionTemplateId(team == ALLIANCE ? 774 : 775);
+                    pCreature->RemoveAllAuras();
+                    pCreature->AddAura(team == ALLIANCE ? 17327 : 31309);
+                }
     }
 }
 
