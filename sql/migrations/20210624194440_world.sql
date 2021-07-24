@@ -343,6 +343,7 @@ UPDATE `quest_template` SET `OfferRewardText` = 'Incredible! Improbable! Simply 
 UPDATE `quest_template` SET `RequestItemsText` = 'This is going to be a tough battle...' WHERE `entry` = 3382;
 
 -- Update script for The Test of Righteousness
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES (8912, 0, -5095.6, -785.673, 496.287, 3.1526);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES (22030, 102413, 0, -5095.61, -785.424, 496.288, 1.37889, 0, 0, 0.636107, 0.771601, -10, -10, 255, 1);
 DELETE FROM `quest_start_scripts` WHERE `id`=1806;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1806, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Test of Righteousness - Jordan Stilwell - Modify Flags');
