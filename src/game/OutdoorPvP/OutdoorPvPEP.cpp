@@ -206,10 +206,9 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
                 {
                     pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
                     pCreature->SetActiveObjectState(true);
-                    pCreature->SetWalk(false);
                     DoScriptText(BCT_EP_EWT_SPAWN_YELL, pCreature, pCreature, CHAT_TYPE_ZONE_YELL);
                     pCreature->GetMotionMaster()->Clear(false, true);
-                    pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 7200, 0, 176350, false);
+                    pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 5000, 0, 176350, false);
                 }
             }
             if (i > 0)
