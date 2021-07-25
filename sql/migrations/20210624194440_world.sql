@@ -9,12 +9,12 @@ INSERT INTO `migrations` VALUES ('20210624194440');
 -- Add your query below.
 
 
--- Fix Creature Stuck Underground
+-- Fix Creatures
 UPDATE `creature` SET `position_z` = 79.5248, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 15226;
 UPDATE `creature` SET `position_x` = -4268.95, `position_y` = 36.598, `position_z` = 55.1443, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 50875;
 UPDATE `creature` SET `position_x` = -6695.45, `position_y` = -3014.05, `position_z` = 261.037, `movement_type` = 1, `wander_distance` = 4 WHERE `guid` = 6910;
 UPDATE `creature` SET `position_x` = -269.935, `position_y` = -1409.396, `position_z` = 91.607, `orientation` = 1.929 WHERE `guid`= 14851;
-DELETE FROM `creature` WHERE `guid` IN  (92880, 51693, 51699, 51704);
+DELETE FROM `creature` WHERE `guid` IN  (92880, 51693, 51699, 51704, 3901);
 UPDATE `creature` SET `position_x` = -1813.75, `position_y` = 2889.85, `position_z` = 50.971, `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 28907;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 10105;
 UPDATE `creature` SET `position_x` = 52.892, `position_y` = 1563.021, `position_z` = 124.512, `orientation` = 3.459 WHERE `guid`= 27980;
