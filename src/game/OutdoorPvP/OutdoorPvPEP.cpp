@@ -221,7 +221,7 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
                     {
                         float angle = (float(i) * (M_PI / (4 / static_cast<float>(2)))) + pCommander->GetOrientation();
-                        pCreature->JoinCreatureGroup(pCommander, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
+                        pCreature->JoinCreatureGroup(pCommander, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE);
                     }
                 }
             }
