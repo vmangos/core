@@ -240,7 +240,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             m_TowerState = EP_TS_A;
             artkit = 2;
             animation = 1;
-            SummonGO(ALLIANCE);
+            SummonCuringShrine(ALLIANCE);
             DelCreature(EP_NPT_BUFFER);
             AddCreature(EP_NPT_BUFFER, EPBufferNPCs[EP_BUFFER_NPT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_NPT_A].map, EPBufferNPCs[EP_BUFFER_NPT_A].x, EPBufferNPCs[EP_BUFFER_NPT_A].y, EPBufferNPCs[EP_BUFFER_NPT_A].z, EPBufferNPCs[EP_BUFFER_NPT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_NPT_BUFFER]))
@@ -257,7 +257,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             m_TowerState = EP_TS_H;
             artkit = 1;
             animation = 0;
-            SummonGO(HORDE);
+            SummonCuringShrine(HORDE);
             DelCreature(EP_NPT_BUFFER);
             AddCreature(EP_NPT_BUFFER, EPBufferNPCs[EP_BUFFER_NPT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_NPT_H].map, EPBufferNPCs[EP_BUFFER_NPT_H].x, EPBufferNPCs[EP_BUFFER_NPT_H].y, EPBufferNPCs[EP_BUFFER_NPT_H].z, EPBufferNPCs[EP_BUFFER_NPT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_NPT_BUFFER]))
@@ -384,7 +384,7 @@ void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* plr)
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
-void OPvPCapturePointEP_NPT::SummonGO(uint32 team)
+void OPvPCapturePointEP_NPT::SummonCuringShrine(uint32 team)
 {
     if (m_SummonedGOSide != team)
     {
@@ -398,8 +398,9 @@ void OPvPCapturePointEP_NPT::SummonGO(uint32 team)
 
 // CGT
 OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NONE)
+    : OPvPCapturePoint(pvp), m_SpiritOfVictorySpawned(0), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NONE)
 {
+    UnLinkGraveYard();
     SetCapturePointData(EPCapturePoints[EP_CGT].entry, EPCapturePoints[EP_CGT].map, EPCapturePoints[EP_CGT].x, EPCapturePoints[EP_CGT].y, EPCapturePoints[EP_CGT].z, EPCapturePoints[EP_CGT].o, EPCapturePoints[EP_CGT].rot0, EPCapturePoints[EP_CGT].rot1, EPCapturePoints[EP_CGT].rot2, EPCapturePoints[EP_CGT].rot3);
     AddObject(EP_CGT_FLAG1, EPTowerFlags[EP_CGT_FLAG1].entry, EPTowerFlags[EP_CGT_FLAG1].map, EPTowerFlags[EP_CGT_FLAG1].x, EPTowerFlags[EP_CGT_FLAG1].y, EPTowerFlags[EP_CGT_FLAG1].z, EPTowerFlags[EP_CGT_FLAG1].o, EPTowerFlags[EP_CGT_FLAG1].rot0, EPTowerFlags[EP_CGT_FLAG1].rot1, EPTowerFlags[EP_CGT_FLAG1].rot2, EPTowerFlags[EP_CGT_FLAG1].rot3);
     AddObject(EP_CGT_FLAG2, EPTowerFlags[EP_CGT_FLAG2].entry, EPTowerFlags[EP_CGT_FLAG2].map, EPTowerFlags[EP_CGT_FLAG2].x, EPTowerFlags[EP_CGT_FLAG2].y, EPTowerFlags[EP_CGT_FLAG2].z, EPTowerFlags[EP_CGT_FLAG2].o, EPTowerFlags[EP_CGT_FLAG2].rot0, EPTowerFlags[EP_CGT_FLAG2].rot1, EPTowerFlags[EP_CGT_FLAG2].rot2, EPTowerFlags[EP_CGT_FLAG2].rot3);
@@ -428,6 +429,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             artkit = 2;
             animation = 1;
             LinkGraveYard(ALLIANCE);
+            SummonSpiritOfVictory(ALLIANCE);
             DelCreature(EP_CGT_BUFFER);
             AddCreature(EP_CGT_BUFFER, EPBufferNPCs[EP_BUFFER_CGT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_CGT_A].map, EPBufferNPCs[EP_BUFFER_CGT_A].x, EPBufferNPCs[EP_BUFFER_CGT_A].y, EPBufferNPCs[EP_BUFFER_CGT_A].z, EPBufferNPCs[EP_BUFFER_CGT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_BUFFER]))
@@ -445,6 +447,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             artkit = 1;
             animation = 0;
             LinkGraveYard(HORDE);
+            SummonSpiritOfVictory(HORDE);
             DelCreature(EP_CGT_BUFFER);
             AddCreature(EP_CGT_BUFFER, EPBufferNPCs[EP_BUFFER_CGT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_CGT_H].map, EPBufferNPCs[EP_BUFFER_CGT_H].x, EPBufferNPCs[EP_BUFFER_CGT_H].y, EPBufferNPCs[EP_BUFFER_CGT_H].z, EPBufferNPCs[EP_BUFFER_CGT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_BUFFER]))
@@ -458,18 +461,35 @@ void OPvPCapturePointEP_CGT::ChangeState()
         }
         case OBJECTIVESTATE_NEUTRAL:
         {
+            DelCreature(EP_CGT_SPIRITOFVICTORY);
+            m_SpiritOfVictorySpawned = 0;
+            UnLinkGraveYard();
             m_TowerState = EP_TS_N;
             break;
         }
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
-        case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
         {
             m_TowerState = EP_TS_N_A;
             break;
         }
+        case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
+        {
+            DelCreature(EP_CGT_SPIRITOFVICTORY);
+            m_SpiritOfVictorySpawned = 0;
+            UnLinkGraveYard();
+            m_TowerState = EP_TS_N_A;
+            break;
+        }
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
+        {
+            m_TowerState = EP_TS_N_H;
+            break;
+        }
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
         {
+            DelCreature(EP_CGT_SPIRITOFVICTORY);
+            m_SpiritOfVictorySpawned = 0;
+            UnLinkGraveYard();
             m_TowerState = EP_TS_N_H;
             break;
         }
@@ -560,6 +580,29 @@ void OPvPCapturePointEP_CGT::LinkGraveYard(Team team)
         m_GraveyardSide = team;
         sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, team, false);
         sObjectMgr.AddGraveYardLink(EP_GraveYardId, EP_GraveYardZone, team, false);
+    }
+}
+
+void OPvPCapturePointEP_CGT::UnLinkGraveYard()
+{
+    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, ALLIANCE, false);
+    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, HORDE, false);
+}
+
+void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
+{
+    if (m_SpiritOfVictorySpawned != team)
+    {
+        m_SpiritOfVictorySpawned = team;
+        DelCreature(EP_CGT_SPIRITOFVICTORY);
+        AddCreature(EP_CGT_SPIRITOFVICTORY, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].entry, team, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].map, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].x, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].y, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].z, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].o);
+
+        if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_SPIRITOFVICTORY]))
+        {
+            pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
+            pCreature->RemoveAllAuras();
+            pCreature->AddAura(team == ALLIANCE ? 31954 : 31951);
+        }
     }
 }
 
