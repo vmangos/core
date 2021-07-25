@@ -101,24 +101,86 @@ enum EP_Summons
     EP_EWT_SOLDIER3,
     EP_EWT_SOLDIER4,
     EP_PWT_FLIGHTMASTER,
+    EP_PWT_BUFFER,
+    EP_CGT_BUFFER,
+    EP_EWT_BUFFER,
+    EP_NPT_BUFFER
 };
 
 enum EP_GoSummons
 {
-    EP_NPT_BUFF = 0,
-    EP_NPT_FLAGS,
-    EP_EWT_FLAGS,
-    EP_CGT_FLAGS,
-    EP_PWT_FLAGS
+    EP_CGT_FLAG1            = 0,
+    EP_CGT_FLAG2            = 1,
+    EP_EWT_FLAG1            = 2,
+    EP_EWT_FLAG2            = 3,
+    EP_PWT_FLAG1            = 4,
+    EP_PWT_FLAG2            = 5,
+    EP_NPT_FLAG1            = 6,
+    EP_NPT_FLAG2            = 7,
+    EP_NPT_CURING_SHRINE    = 8,
+    EP_NPT_BANNER_AURA      = 9
+};
+
+enum EP_BroadCastTexts
+{
+    BCT_EP_PWT_TAKEN_A      = 13629, // |cffffff00The Plaguewood Tower has been taken by the Alliance!| r
+    BCT_EP_NPT_TAKEN_A      = 13630, // |cffffff00Northpass Tower has been taken by the Alliance!| r
+    BCT_EP_EWT_TAKEN_A      = 13631, // |cffffff00Eastwall Tower has been taken by the Alliance!| r
+    BCT_EP_CGT_TAKEN_A      = 13632, // |cffffff00Crown Guard Tower has been taken by the Alliance!| r
+    BCT_EP_CGT_TAKEN_H      = 13633, // |cffffff00Crown Guard Tower has been taken by the Horde!| r
+    BCT_EP_PWT_TAKEN_H      = 13634, // |cffffff00The Plaguewood Tower has been taken by the Horde!| r
+    BCT_EP_NPT_TAKEN_H      = 13635, // |cffffff00Northpass Tower has been taken by the Horde!| r
+    BCT_EP_EWT_TAKEN_H      = 13636, // |cffffff00Eastwall Tower has been taken by the Horde!| r
+    BCT_EP_ALL_TAKEN_H      = 13637, // |cffff0000All four towers are now in control of the Horde!| r
+    BCT_EP_ALL_TAKEN_A      = 13638, // |cff33ccffAll four towers are now in control of the Alliance!| r
+    BCT_EP_EWT_SPAWN_YELL   = 14746  // The Northpass tower needs our aid!  Once again, let us charge and do proud or liege!
+};
+
+enum EP_Sounds
+{
+    SOUND_PVPWARNINGHORDELONG       = 8457,
+    SOUND_PVPFLAGCAPTUREDALLIANCE   = 8173
+};
+
+enum EP_Spells
+{
+    SPELL_TXT_TOWOW_TOWER_KILL_CREDIT_DND   = 32061, // Caster by Players which have the Quest on Eastwall Capture Quest Doodad. 
+    SPELL_TOWER_CAPTURE_TEST_DND            = 30882, // Casted by 17794 and 17795 on all Players within 100 yards (77) Script Effect. 
+    SPELL_TOWER_CAPTURE_DND                 = 31929, // Caster by Players self.
 };
 
 enum EP_Towers
 {
     EP_EWT = 0, // plaguelands 03
-    EP_NPT,// plaguelands 01
-    EP_PWT,// plaguelands 04
-    EP_CGT,// plaguelands 02
-    EP_TOWER_NUM
+    EP_NPT,     // plaguelands 01
+    EP_PWT,     // plaguelands 04
+    EP_CGT,     // plaguelands 02
+    EP_TOWER_NUM,
+    EP_FLAG_NUM = 8
+};
+
+enum EP_Buffers
+{
+    EP_BUFFER_CGT_A = 0,
+    EP_BUFFER_EWT_A,
+    EP_BUFFER_PWT_A,
+    EP_BUFFER_NPT_A,
+    EP_BUFFER_CGT_H,
+    EP_BUFFER_EWT_H,
+    EP_BUFFER_PWT_H,
+    EP_BUFFER_NPT_H
+};
+
+const creature_type EPBufferNPCs[8] =
+{
+    {17794, 469, 0, 1860.59f, -3730.8f, 197.854f, 2.54818f},
+    {17794, 469, 0, 2574.12f, -4795.33f, 145.871f, 5.11381f},
+    {17794, 469, 0, 2962.6f, -3041.96f, 155.835f, 3.00197f},
+    {17794, 469, 0, 3180.54f, -4379.31f, 175.275f, 3.57792f},
+    {17795, 67, 0, 1860.48f, -3731.34f, 197.778f, 2.42601f},
+    {17795, 67, 0, 2574.0f, -4794.79f, 145.881f, 1.95477f},
+    {17795, 67, 0, 2963.02f, -3041.9f, 155.965f, 4.27606f},
+    {17795, 67, 0, 3180.48f, -4379.07f, 174.995f, 2.74017f}
 };
 
 const go_type EPCapturePoints[EP_TOWER_NUM] =
@@ -129,12 +191,16 @@ const go_type EPCapturePoints[EP_TOWER_NUM] =
     {182096,0,1860.85f,-3731.23f,196.716f,-2.53214f,0.033967f,-0.131914f,0.944741f,-0.298177f}
 };
 
-const go_type EPTowerFlags[EP_TOWER_NUM] =
+const go_type EPTowerFlags[EP_FLAG_NUM] =
 {
-    {182106,0,2569.60f,-4772.93f,115.399f,2.72271f,0.0f,0.0f,0.978148f,0.207912f},
-    {182106,0,3148.17f,-4365.51f,145.029f,1.53589f,0.0f,0.0f,0.694658f,0.71934f},
-    {182106,0,2992.63f,-3022.95f,125.593f,3.03687f,0.0f,0.0f,0.99863f,0.052336f},
-    {182106,0,1838.42f,-3703.56f,167.713f,0.890118f,0.0f,0.0f,0.430511f,0.902585f}
+    {182106, 0, 1838.42f, -3703.56f, 167.713f, 0.890117f, 0.0f, 0.0f, 0.43051f, 0.902586f},
+    {182106, 0, 1877.6f, -3716.76f, 167.188f, 1.74533f, 0.0f, 0.0f, 0.766044f, 0.642789f},
+    {182106, 0, 2539.61f, -4801.55f, 115.766f, 2.00713f, 0.0f, 0.0f, 0.843391f, 0.5373f},
+    {182106, 0, 2569.6f, -4772.93f, 115.399f, 2.72271f, 0.0f, 0.0f, 0.978148f, 0.207912f},
+    {182106, 0, 2975.5f, -3060.36f, 125.108f, 5.23599f, 0.0f, 0.0f, -0.5f, 0.866025f},
+    {182106, 0, 2992.63f, -3022.95f, 125.593f, 3.03684f, 0.0f, 0.0f, 0.998629f, 0.0523532f},
+    {182106, 0, 3148.17f, -4365.51f, 145.029f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f},
+    {182106, 0, 3188.76f, -4358.5f, 144.555f, 1.97222f, 0.0f, 0.0f, 0.833885f, 0.551938f}
 };
 
 uint32 const EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691,10699,10701,10705};
@@ -155,20 +221,20 @@ uint8 const EP_EWT_NUM_CREATURES = 5;
 */
 const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
 {
-    {17635,469,0, 3167.61f,-4352.09f,138.20f,4.5811f},
-    {17647,469,0, 3172.74f,-4352.99f,139.14f,4.9873f},
-    {17647,469,0, 3165.89f,-4354.46f,138.67f,3.7244f},
-    {17647,469,0, 3164.65f,-4350.26f,138.22f,2.4794f},
-    {17647,469,0, 3169.91f,-4349.68f,138.37f,0.7444f}
+    {17635, 469, 0, 3167.61f, -4352.09f, 138.20f, 4.5811f},
+    {17647, 469, 0, 3172.74f, -4352.99f, 139.14f, 4.9873f},
+    {17647, 469, 0, 3165.89f, -4354.46f, 138.67f, 3.7244f},
+    {17647, 469, 0, 3164.65f, -4350.26f, 138.22f, 2.4794f},
+    {17647, 469, 0, 3169.91f, -4349.68f, 138.37f, 0.7444f}
 };
 
 const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
 {
-    {17995,67,0, 3167.61f,-4352.09f,138.20f,4.5811f},
-    {17996,67,0, 3172.74f,-4352.99f,139.14f,4.9873f},
-    {17996,67,0, 3165.89f,-4354.46f,138.67f,3.7244f},
-    {17996,67,0, 3164.65f,-4350.26f,138.22f,2.4794f},
-    {17996,67,0, 3169.91f,-4349.68f,138.37f,0.7444f}
+    {17995, 67, 0, 3167.61f, -4352.09f, 138.20f, 4.5811f},
+    {17996, 67, 0, 3172.74f, -4352.99f, 139.14f, 4.9873f},
+    {17996, 67, 0, 3165.89f, -4354.46f, 138.67f, 3.7244f},
+    {17996, 67, 0, 3164.65f, -4350.26f, 138.22f, 2.4794f},
+    {17996, 67, 0, 3169.91f, -4349.68f, 138.37f, 0.7444f}
 };
 
 enum EP_TowerStates
@@ -183,10 +249,16 @@ enum EP_TowerStates
 };
 
 // when spawning, pay attention at setting the faction manually!
-const creature_type EP_PWT_FlightMaster = {17209,0,0,2987.5f,-3049.11f,120.126f,5.75959f};
+const creature_type EP_PWT_FlightMaster = {17209, 0, 0, 2987.5f, -3049.11f, 120.126f, 5.75959f};
 
-// after spawning, modify the faction so that only the controller will be able to use it with SetUInt32Value(GAMEOBJECT_FACTION, faction_id);
-const go_type EP_NPT_LordaeronShrine = {181682,0,3167.72f,-4355.91f,138.785f,1.69297f,0.0f,0.0f,0.748956f,0.66262f};
+// Sniffed positions.
+const go_type EP_NPT_LordaeronShrine[4] =
+{
+    {181682, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f},
+    {180100, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f},
+    {181955, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f},
+    {180101, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f}
+};
 
 class OutdoorPvPEP;
 
@@ -336,6 +408,7 @@ class OutdoorPvPEP : public OutdoorPvP
 
         void SendRemoveWorldStates(Player* plr);
 
+        void BuffTower(uint32 team);
         void BuffTeams();
 
     private:
