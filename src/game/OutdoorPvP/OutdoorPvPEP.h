@@ -104,7 +104,8 @@ enum EP_Summons
     EP_PWT_BUFFER,
     EP_CGT_BUFFER,
     EP_EWT_BUFFER,
-    EP_NPT_BUFFER
+    EP_NPT_BUFFER,
+    EP_CGT_SPIRITOFVICTORY,
 };
 
 enum EP_GoSummons
@@ -144,9 +145,10 @@ enum EP_Sounds
 
 enum EP_Spells
 {
-    SPELL_TXT_TOWOW_TOWER_KILL_CREDIT_DND   = 32061, // Caster by Players which have the Quest on Eastwall Capture Quest Doodad. 
+    SPELL_TXT_TOWOW_TOWER_KILL_CREDIT_DND   = 32061, // Casted by Players which have the Quest on Eastwall Capture Quest Doodad. 
     SPELL_TOWER_CAPTURE_TEST_DND            = 30882, // Casted by 17794 and 17795 on all Players within 100 yards (77) Script Effect. 
-    SPELL_TOWER_CAPTURE_DND                 = 31929, // Caster by Players self.
+    SPELL_TOWER_CAPTURE_DND                 = 31929, // Casted by Players.
+    SPELL_SPIRIT_SPAWN_IN                   = 17321, // Casted by 18039.
 };
 
 enum EP_Towers
@@ -210,31 +212,22 @@ uint32 const EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692,10698,10700,10704};
 uint8 const EP_NUM_CREATURES = 6;
 uint8 const EP_EWT_NUM_CREATURES = 5;
 
-// one lordaeron commander, 4 soldiers
-// should be spawned at EWT and follow a path, but trans-grid pathing isn't safe, so summon them directly at NPT
-/* Sniffed spawn positions:
-    {17647,469,0, 2533.33f, -4769.31f, 104.396f, 2.37365f},
-    {17647,469,0, 2537.34f, -4773.92f, 105.941f, 2.21657f},
-    {17647,469,0, 2537.77f, -4765.94f, 104.432f, 2.3911f},
-    {17647,469,0, 2542.57f, -4770.22f, 106.145f, 2.42601f},
-    {17635,469,0, 2532.85f, -4764.92f, 103.617f, 2.35619f}
-*/
 const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
 {
-    {17635, 469, 0, 3167.61f, -4352.09f, 138.20f, 4.5811f},
-    {17647, 469, 0, 3172.74f, -4352.99f, 139.14f, 4.9873f},
-    {17647, 469, 0, 3165.89f, -4354.46f, 138.67f, 3.7244f},
-    {17647, 469, 0, 3164.65f, -4350.26f, 138.22f, 2.4794f},
-    {17647, 469, 0, 3169.91f, -4349.68f, 138.37f, 0.7444f}
+    {17635, 469, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f},
+    {17647, 469, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f},
+    {17647, 469, 0, 2537.34f, -4773.92f, 105.941f, 2.21657f},
+    {17647, 469, 0, 2537.77f, -4765.94f, 104.432f, 2.3911f},
+    {17647, 469, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f}
 };
 
 const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
 {
-    {17995, 67, 0, 3167.61f, -4352.09f, 138.20f, 4.5811f},
-    {17996, 67, 0, 3172.74f, -4352.99f, 139.14f, 4.9873f},
-    {17996, 67, 0, 3165.89f, -4354.46f, 138.67f, 3.7244f},
-    {17996, 67, 0, 3164.65f, -4350.26f, 138.22f, 2.4794f},
-    {17996, 67, 0, 3169.91f, -4349.68f, 138.37f, 0.7444f}
+    {17995, 67, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f},
+    {17996, 67, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f},
+    {17996, 67, 0, 2537.34f, -4773.92f, 105.941f, 2.21657f},
+    {17996, 67, 0, 2537.77f, -4765.94f, 104.432f, 2.3911f},
+    {17996, 67, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f}
 };
 
 enum EP_TowerStates
@@ -248,8 +241,13 @@ enum EP_TowerStates
     EP_TS_H = 64
 };
 
-// when spawning, pay attention at setting the faction manually!
 const creature_type EP_PWT_FlightMaster = {17209, 0, 0, 2987.5f, -3049.11f, 120.126f, 5.75959f};
+
+const creature_type EP_CGT_SpiritOfVictory[2] =
+{
+    {18039, 0, 0, 1856.58f, -3714.72f, 194.637f, 0.762214f},
+    {18039, 0, 0, 1856.74f, -3714.51f, 194.26f, 4.35575f}
+};
 
 // Sniffed positions.
 const go_type EP_NPT_LordaeronShrine[4] =
@@ -313,7 +311,7 @@ class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 
     protected:
 
-        void SummonGO(uint32 team);
+        void SummonCuringShrine(uint32 team);
 
         void UpdateTowerState();
 
@@ -346,11 +344,17 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 
         void LinkGraveYard(Team team);
 
+        void UnLinkGraveYard();
+
+        void SummonSpiritOfVictory(uint32 team);
+
         void UpdateTowerState();
 
     protected:
 
         uint32 m_TowerState;
+
+        uint32 m_SpiritOfVictorySpawned;
 
         Team m_GraveyardSide;
 };
