@@ -2311,6 +2311,68 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
     return new npc_oozeling_jubjubAI(pCreature);
 }
 
+struct npc_epl_tower_summonAI : public ScriptedAI
+{
+    npc_epl_tower_summonAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    void Reset() override
+    {
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == WAYPOINT_MOTION_TYPE)
+        {
+            m_creature->SetSpeedRate(MOVE_RUN, 1.38571);
+            std::list<Creature*> minionList;
+            GetCreatureListWithEntryInGrid(minionList, m_creature, { 17647, 17996 }, 15.0f);
+            for (const auto pMinion : minionList)
+            {
+                if (!pMinion->IsMounted())
+                {
+                    pMinion->Mount(pMinion->GetEntry() == 17647 ? 2410 : 2);
+                }
+            }
+            if (!m_creature->IsMounted())
+            {
+                m_creature->Mount(m_creature->GetEntry() == 17635 ? 2410 : 2);
+            }
+        }
+        if (id >= 38)
+        {
+            std::list<Creature*> minionList;
+            GetCreatureListWithEntryInGrid(minionList, m_creature, { 17647, 17996 }, 15.0f);
+            for (const auto pMinion : minionList)
+            {
+                if (pMinion->IsMounted())
+                {
+                    pMinion->Unmount();
+                }
+            }
+            if (m_creature->IsMounted())
+            {
+                m_creature->Unmount();
+            }
+        }
+    }
+
+    void UpdateAI(uint32 const uiDiff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_npc_epl_tower_summon(Creature* pCreature)
+{
+    return new npc_epl_tower_summonAI(pCreature);
+}
+
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -2452,5 +2514,10 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";
     newscript->GetAI = &GetAI_npc_oozeling_jubjub;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_epl_tower_summon";
+    newscript->GetAI = &GetAI_npc_epl_tower_summon;
     newscript->RegisterSelf();
 }
