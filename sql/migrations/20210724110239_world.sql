@@ -10,20 +10,39 @@ INSERT INTO `migrations` VALUES ('20210724110239');
 
 
 -- William Kielar.
-UPDATE `creature_template` SET `faction`='774', `speed_walk`='1', `unit_flags`='768', `movement_type`='0', `civilian`='1' WHERE  `entry`=17209 AND `patch`=10;
+UPDATE `creature_template` SET `faction`=774, `speed_walk`=1, `unit_flags`=768, `movement_type`=0, `civilian`=1 WHERE  `entry`=17209 AND `patch`=10;
+
+-- Lordaeron Commander.
+UPDATE `creature_template` SET `health_min`=3175, `health_max`=3175, `faction`=123, `speed_walk`=1, `speed_run`=1.38571, `unit_flags`=0, `auras`=31748 WHERE `entry`=17635;
+
+-- Lordaeron Soldier.
+UPDATE `creature_template` SET `faction`=123, `speed_walk`=1, `movement_type`=0, `unit_flags`=0, `auras`=31748 WHERE `entry`=17647;
+
+-- Lordaeron Veteran.
+UPDATE `creature_template` SET `faction`=118, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `movement_type`=0, `auras`=31309 WHERE `entry`=17995;
+
+-- Lordaeron Fighter.
+UPDATE `creature_template` SET `faction`=118, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `movement_type`=0, `auras`=31309 WHERE  `entry`=17996;
 
 -- Spectral Gryphon.
 INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES 
-(16081, 0, 17328, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Spectral Gryphon', NULL, 0, 60, 60, 3052, 3052, 0, 0, 3791, 35, 0, 0, 0, 20, 0, 0, 0, 1, 104, 138, 0, 252, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
+(16081, 10, 17328, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Spectral Gryphon', NULL, 0, 60, 60, 3052, 3052, 0, 0, 3791, 35, 0, 0, 0, 20, 0, 0, 0, 1, 104, 138, 0, 252, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
 
 -- Add correct mount.
-UPDATE `taxi_nodes` SET `mount_creature_id1`='16081', `mount_creature_id2`='16081' WHERE `id` in (84,85,86,87);
+UPDATE `taxi_nodes` SET `mount_creature_id1`=16081, `mount_creature_id2`=16081 WHERE `id` in (84,85,86,87);
 
 -- Spirit of Victory.
-INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_probability1`, `display_total_probability`, `name`, `level_min`, `level_max`, `faction`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `type`, `auras`, `civilian`) VALUES ('18039', '10', '17548', '1', '1', 'Spirit of Victory', '60', '60', '35', '2000', '2000', '1', '33555200', '10', '31951', '1');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES
+(18039, 10, 17548, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Spirit of Victory', NULL, 0, 60, 60, 0, 0, 0, 0, 0, 35, 0, 1, 1.14286, 20, 5, 0, 0, 1, 0, 0, 0, 0, 1, 2000, 2000, 1, 33555200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '31951', 0, 0, '', 0, 3, 1, 0, 3, 0, 0, 0, 0, 0, 0, '');
 
 -- Fix buffers.
-UPDATE `creature_template` SET `display_id1`='16925', `display_id2`='0', `display_probability1`='1', `display_probability2`='0' WHERE `entry` in (17794,17795);
+UPDATE `creature_template` SET `display_id1`=16925, `display_id2`=0, `display_probability1`=1, `display_probability2`=0, `movement_type`=0 WHERE `entry` in (17794, 17795);
+
+-- Fix Horde Curing Shrine.
+UPDATE `gameobject_template` SET `faction`=1314 WHERE `entry`=181955;
+
+-- Delete unnecessary GameObjects.
+DELETE FROM `gameobject` WHERE  `guid`=45864;
 
 -- William Kielar Gossips.
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `action_script_id`) VALUES (7379, 0, 0, 'Take me to Northpass Tower.', 13562, 1, 1, 0, 0, 0, 0, NULL, 0, 737901);
@@ -84,6 +103,13 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (176350, 46, 3156.22, -4326.74, 133.165, 100),
 (176350, 47, 3154.74, -4326.06, 133.142, 100),
 (176350, 48, 3156.97, -4327.02, 133.179, 100);
+
+-- Remove endless channel from Tower Capture (DND).
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (31929, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
+
+-- Modify Spell Tower Capture (DND) to can be casted by the Tower Buffer NPC and buff only friendly players in 100 yards.
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (30882, 0, 64, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 0, 0, -1, -1, -1, 31929, NULL);
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (31929, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 22, 30, 12, -1, -1, -1, -1, NULL);
 
 
 -- End of migration.
