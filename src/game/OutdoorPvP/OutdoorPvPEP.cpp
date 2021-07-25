@@ -805,6 +805,7 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
 
         if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_PWT_FLIGHTMASTER]))
         {
+            pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->SetFactionTemplateId(team == ALLIANCE ? 774 : 775);
             pCreature->RemoveAllAuras();
             pCreature->AddAura(team == ALLIANCE ? 17327 : 31309);
