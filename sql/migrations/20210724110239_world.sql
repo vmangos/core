@@ -93,16 +93,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (176350, 36, 3104.95, -4316.07, 106.771, 100),
 (176350, 37, 3116.2, -4312.54, 117.187, 100),
 (176350, 38, 3129.67, -4309.93, 123.121, 100),
-(176350, 39, 3154.63, -4326.59, 133.206, 100),
-(176350, 40, 3156.28, -4325.02, 132.952, 100),
-(176350, 41, 3155.12, -4326.89, 133.242, 100),
-(176350, 42, 3153.64, -4329.49, 133.656, 100),
-(176350, 43, 3157.17, -4327.59, 133.142, 100),
-(176350, 44, 3154.72, -4326.05, 133.142, 100),
-(176350, 45, 3154.63, -4326.59, 133.206, 100),
-(176350, 46, 3156.22, -4326.74, 133.165, 100),
-(176350, 47, 3154.74, -4326.06, 133.142, 100),
-(176350, 48, 3156.97, -4327.02, 133.179, 100);
+(176350, 39, 3154.63, -4326.59, 133.206, 100);
 
 -- Remove endless channel from Tower Capture (DND).
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (31929, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
