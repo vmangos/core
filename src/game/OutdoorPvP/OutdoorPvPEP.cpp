@@ -205,6 +205,7 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
                     pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
+                    pCreature->SetActiveObjectState(true);
                     pCreature->SetWalk(false);
                     DoScriptText(BCT_EP_EWT_SPAWN_YELL, pCreature, pCreature, CHAT_TYPE_ZONE_YELL);
                     pCreature->GetMotionMaster()->Clear(false, true);
@@ -215,6 +216,7 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
             {
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
+                    pCreature->SetActiveObjectState(true);
                     pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
                     {
