@@ -182,7 +182,6 @@ UPDATE `creature` SET `spawntimesecsmin` = 18000, `spawntimesecsmax` = 28800 WHE
 "FOREMAN JERRIS"
 ));
 
-
 -- SEMI-RARE
 -- Semi-Rare Lvl 16-20
 UPDATE `creature` SET `spawntimesecsmin` = 14400, `spawntimesecsmax` = 21600 WHERE `id` IN (SELECT `entry` FROM `creature_template` WHERE `name` IN (
@@ -254,27 +253,6 @@ UPDATE `creature` SET `spawntimesecsmin` = 37800, `spawntimesecsmax` = 57600 WHE
 "SCARLET JUDGE"
 ));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- AVERAGE-RARE
 -- Average Rare Lvl 21-25
 UPDATE `creature` SET `spawntimesecsmin` = 61200, `spawntimesecsmax` = 91800 WHERE `id` IN (SELECT `entry` FROM `creature_template` WHERE `name` IN (
@@ -330,9 +308,6 @@ UPDATE `creature` SET `spawntimesecsmin` = 75600, `spawntimesecsmax` = 115200 WH
 "SCARLET HIGH CLERIST"
 ));
 
-
-
-
 -- VERY-RARE
 -- Very Rare Lvl 31+
 UPDATE `creature` SET `spawntimesecsmin` = 115200, `spawntimesecsmax` = 172800 WHERE `id` IN (SELECT `entry` FROM `creature_template` WHERE `name` IN (
@@ -366,11 +341,6 @@ UPDATE `creature` SET `spawntimesecsmin` = 115200, `spawntimesecsmax` = 172800 W
 "THE HUSK"
 ));
 
-
-
-
-
-
 -- UBER-RARE
 -- Uber-Rare Lvl 36+
 UPDATE `creature` SET `spawntimesecsmin` = 172800, `spawntimesecsmax` = 259200 WHERE `id` IN (SELECT `entry` FROM `creature_template` WHERE `name` IN (
@@ -379,7 +349,6 @@ UPDATE `creature` SET `spawntimesecsmin` = 172800, `spawntimesecsmax` = 259200 W
 "PUTRIDIUS",
 "SETIS"
 ));
-
 
 
 -- End of migration.
