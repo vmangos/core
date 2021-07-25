@@ -24,6 +24,7 @@
 #include "Language.h"
 #include "World.h"
 #include "WaypointManager.h"
+#include "CreatureGroups.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
@@ -197,14 +198,31 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
         for (uint8 i = 0; i < EP_EWT_NUM_CREATURES; ++i)
         {
             DelCreature(i);
-            AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 0);
+            AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000);
 
-            /* TODO: add pathing.
-                movement is starting 7285 ms after spawn.
-
-            if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
-                pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 0, 0, 176350, false);
-            */
+            if (i == 0)
+            {
+                if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
+                {
+                    pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
+                    pCreature->SetWalk(false);
+                    DoScriptText(BCT_EP_EWT_SPAWN_YELL, pCreature, pCreature, CHAT_TYPE_ZONE_YELL);
+                    pCreature->GetMotionMaster()->Clear(false, true);
+                    pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 7200, 0, 176350, false);
+                }
+            }
+            if (i > 0)
+            {
+                if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
+                {
+                    pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
+                    if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
+                    {
+                        float angle = (float(i) * (M_PI / (4 / static_cast<float>(2)))) + pCommander->GetOrientation();
+                        pCreature->JoinCreatureGroup(pCommander, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
+                    }
+                }
+            }
         }
     }
 }
