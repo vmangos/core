@@ -32,7 +32,7 @@ DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobj
 
 DELETE FROM `game_event_gameobject` WHERE `event`=@FEAST_OF_WINTER_VEIL_GIFTS_EVENT;
 
-INSERT INTO `gameobject` (`id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (@FEAST_OF_WINTER_VEIL_GIFTS_OGUID+1, 180793, 1, 1627.26, -4414.72, 15.8731, 4.90438, 0, 0, -0.636078, 0.771625, 120, 120, 100, 1, 0),
 (@FEAST_OF_WINTER_VEIL_GIFTS_OGUID+2, 180793, 0, -4917.09, -981.593, 501.838, 2.40855, 0, 0, 0.93358, 0.358368, 120, 120, 100, 1, 0),
 (@FEAST_OF_WINTER_VEIL_GIFTS_OGUID+3, 180748, 1, 1626.39, -4412.09, 15.6993, 3.08918, 0, 0, 0.999657, 0.0262017, 120, 120, 100, 1, 0),
@@ -1283,8 +1283,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@FEAST_OF_WINTER_VEIL_OGUID+1228, 180844, 1, 6690.82, -4679.31, 727.253, 2.23402, 0, 0, 0.898793, 0.438373, 120, 120, 100, 1, 0),
 (@FEAST_OF_WINTER_VEIL_OGUID+1229, 180844, 1, 10129.5, 2218.1, 1336.3, 2.23402, 0, 0, 0.898793, 0.438373, 120, 120, 100, 1, 0),
 (@FEAST_OF_WINTER_VEIL_OGUID+1230, 178558, 0, -5617.38, -507.915, 403.614, 1.11701, 0, 0, 0.529919, 0.848048, 120, 120, 100, 1, 0),
-(@FEAST_OF_WINTER_VEIL_OGUID+1231, 178668, 0, -8872.71, 680.677, 104.949, 6.24828, 0, 0, -0.0174522, 0.999848, 120, 120, 100, 1, 0)
-(@FEAST_OF_WINTER_VEIL_OGUID+1232, 178924, 0, -9004.31, 940.953, 122.217, 2.74016, 0, 0, 0.979924, 0.19937, 120, 120, 100, 1, 0)
+(@FEAST_OF_WINTER_VEIL_OGUID+1231, 178668, 0, -8872.71, 680.677, 104.949, 6.24828, 0, 0, -0.0174522, 0.999848, 120, 120, 100, 1, 0),
+(@FEAST_OF_WINTER_VEIL_OGUID+1232, 178924, 0, -9004.31, 940.953, 122.217, 2.74016, 0, 0, 0.979924, 0.19937, 120, 120, 100, 1, 0),
 (@FEAST_OF_WINTER_VEIL_OGUID+1233, 178924, 0, -9003.21, 943.705, 122.143, 2.70526, 0, 0, 0.976295, 0.216442, 120, 120, 100, 1, 0);
 
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @FEAST_OF_WINTER_VEIL_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @FEAST_OF_WINTER_VEIL_OGUID+1 AND @FEAST_OF_WINTER_VEIL_OGUID+1233;
