@@ -57,9 +57,9 @@ enum LoveIsInTheAirSpells
 
 
 /*
-SELECT * FROM `creature_template` WHERE `ai_name`='EventAI' AND NOT EXISTS (
+SELECT entry FROM `creature_template` WHERE `ai_name`='EventAI' AND NOT EXISTS (
     SELECT *
     FROM creature_ai_events
     WHERE creature_id=creature_template.entry
-)
+) group by entry
 */
