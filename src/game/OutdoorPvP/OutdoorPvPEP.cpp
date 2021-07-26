@@ -58,7 +58,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
             m_TowerState = EP_TS_A;
             artkit = 2;
             animation = 1;
-            SummonSupportUnitAtNorthpassTower(ALLIANCE);
+            SummonSquadAtEastWallTower(ALLIANCE);
             DelCreature(EP_EWT_BUFFER);
             AddCreature(EP_EWT_BUFFER, EPBufferNPCs[EP_BUFFER_EWT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_EWT_A].map, EPBufferNPCs[EP_BUFFER_EWT_A].x, EPBufferNPCs[EP_BUFFER_EWT_A].y, EPBufferNPCs[EP_BUFFER_EWT_A].z, EPBufferNPCs[EP_BUFFER_EWT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_EWT_BUFFER]))
@@ -75,7 +75,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
             m_TowerState = EP_TS_H;
             artkit = 1;
             animation = 0;
-            SummonSupportUnitAtNorthpassTower(HORDE);
+            SummonSquadAtEastWallTower(HORDE);
             DelCreature(EP_EWT_BUFFER);
             AddCreature(EP_EWT_BUFFER, EPBufferNPCs[EP_BUFFER_EWT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_EWT_H].map, EPBufferNPCs[EP_BUFFER_EWT_H].x, EPBufferNPCs[EP_BUFFER_EWT_H].y, EPBufferNPCs[EP_BUFFER_EWT_H].z, EPBufferNPCs[EP_BUFFER_EWT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_EWT_BUFFER]))
@@ -140,7 +140,7 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
     // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
@@ -170,7 +170,7 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* plr)
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
         return true;
@@ -184,7 +184,7 @@ void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* plr)
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
-void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(uint32 team)
+void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
 {
     if (m_UnitsSummonedSide != team)
     {
@@ -359,7 +359,7 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
     // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
@@ -389,7 +389,7 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* plr)
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
         return true;
@@ -548,7 +548,7 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
     // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
@@ -578,7 +578,7 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* plr)
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
         return true;
@@ -620,7 +620,7 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
         {
             pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->RemoveAllAuras();
-            pCreature->AddAura(team == ALLIANCE ? 31954 : 31951);
+            pCreature->AddAura(team == ALLIANCE ? SPELL_SPIRIT_PARTICLES_SUPER_BIG_DND : SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND);
         }
     }
 }
@@ -752,7 +752,7 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
     // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
@@ -782,7 +782,7 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* plr)
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
         return true;
@@ -809,7 +809,7 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
             pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->SetFactionTemplateId(team == ALLIANCE ? 774 : 775);
             pCreature->RemoveAllAuras();
-            pCreature->AddAura(team == ALLIANCE ? 17327 : 31309);
+            pCreature->AddAura(team == ALLIANCE ? SPELL_SPIRIT_PARTICLES : SPELL_SPIRIT_PARTICLES_RED_BIG);
         }
     }
 }
