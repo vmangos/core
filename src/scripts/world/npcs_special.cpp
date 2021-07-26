@@ -2328,7 +2328,7 @@ struct npc_epl_tower_summonAI : public ScriptedAI
         /*
         ( Lordaeron Commander / Lordaeron Veteran ) Spawns with 4 ( Lordaeron Soldier / Lordaeron Fighter ).
         After 5 seconds they mount up and walk/ride towards the Nortpass Tower.
-        If they arrive the final Waypoint they dismount.
+        If they arrive the final Waypoint, they dismount.
         */
         if (type == WAYPOINT_MOTION_TYPE)
         {
