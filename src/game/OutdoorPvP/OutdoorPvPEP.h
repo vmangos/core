@@ -139,26 +139,42 @@ enum EP_BroadCastTexts
 
 enum EP_Sounds
 {
-    SOUND_PVPWARNINGHORDELONG       = 8457,
-    SOUND_PVPFLAGCAPTUREDALLIANCE   = 8173
+    SOUND_PVPWARNINGHORDELONG       = 8457, // This is played by Horde Tower Buffer on capturing a Tower. 
+    SOUND_PVPFLAGCAPTUREDALLIANCE   = 8173  // This is played by Horde Alliance Tower Buffer on capturing a Tower. 
 };
 
 enum EP_Spells
 {
-    SPELL_TXT_TOWOW_TOWER_KILL_CREDIT_DND   = 32061, // Casted by Players which have the Quest on Eastwall Capture Quest Doodad. 
-    SPELL_TOWER_CAPTURE_TEST_DND            = 30882, // Casted by 17794 and 17795 on all Players within 100 yards (77) Script Effect. 
-    SPELL_TOWER_CAPTURE_DND                 = 31929, // Casted by Players.
-    SPELL_SPIRIT_SPAWN_IN                   = 17321, // Casted by 18039.
+    SPELL_TXT_TOWOW_TOWER_KILL_CREDIT_DND       = 32061, // Casted by Players which have the Quest on Eastwall Capture Quest Doodad. 
+    SPELL_TOWER_CAPTURE_TEST_DND                = 30882, // Casted by Alliance Tower Buffer and Horde Tower Buffer on all Players within 100 yards (77) Script Effect. 
+    SPELL_TOWER_CAPTURE_DND                     = 31929, // Casted by Players.
+    SPELL_SPIRIT_SPAWN_IN                       = 17321, // Casted by Spirit of Victory.
+    SPELL_SPIRIT_PARTICLES                      = 17327,
+    SPELL_SPIRIT_PARTICLES_RED_BIG              = 31309,
+    SPELL_SPIRIT_PARTICLES_SUPER_BIG_DND        = 31954,
+    SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND    = 31951
+};
+
+enum EP_NPCs
+{
+    NPC_SPIRIT_OF_VICTORY       = 18039,
+    NPC_WILLIAM_KIELAR          = 17209,
+    NPC_ALLIANCE_TOWER_BUFFER   = 17794,
+    NPC_HORDE_TOWER_BUFFER      = 17795,
+    NPC_LORDAERON_COMMANDER     = 17635,
+    NPC_LORDAERON_SOLDIER       = 17647,
+    NPC_LORDAERON_VETERAN       = 17995,
+    NPC_LORDAERON_FIGHTER       = 17996
 };
 
 enum EP_Towers
 {
-    EP_EWT = 0, // plaguelands 03
-    EP_NPT,     // plaguelands 01
-    EP_PWT,     // plaguelands 04
-    EP_CGT,     // plaguelands 02
+    EP_EWT          = 0,    // plaguelands 03
+    EP_NPT,                 // plaguelands 01
+    EP_PWT,                 // plaguelands 04
+    EP_CGT,                 // plaguelands 02
     EP_TOWER_NUM,
-    EP_FLAG_NUM = 8
+    EP_FLAG_NUM     = 8
 };
 
 enum EP_Buffers
@@ -173,63 +189,6 @@ enum EP_Buffers
     EP_BUFFER_NPT_H
 };
 
-const creature_type EPBufferNPCs[8] =
-{
-    {17794, 469, 0, 1860.59f, -3730.8f, 197.854f, 2.54818f},
-    {17794, 469, 0, 2574.12f, -4795.33f, 145.871f, 5.11381f},
-    {17794, 469, 0, 2962.6f, -3041.96f, 155.835f, 3.00197f},
-    {17794, 469, 0, 3180.54f, -4379.31f, 175.275f, 3.57792f},
-    {17795, 67, 0, 1860.48f, -3731.34f, 197.778f, 2.42601f},
-    {17795, 67, 0, 2574.0f, -4794.79f, 145.881f, 1.95477f},
-    {17795, 67, 0, 2963.02f, -3041.9f, 155.965f, 4.27606f},
-    {17795, 67, 0, 3180.48f, -4379.07f, 174.995f, 2.74017f}
-};
-
-const go_type EPCapturePoints[EP_TOWER_NUM] =
-{
-    {182097,0,2574.51f,-4794.89f,144.704f,-1.45003f,-0.097056f,0.095578f,-0.656229f,0.742165f},
-    {181899,0,3181.08f,-4379.36f,174.123f,-2.03472f,-0.065392f,0.119494f,-0.842275f,0.521553f},
-    {182098,0,2962.71f,-3042.31f,154.789f,2.08426f,-0.074807f,-0.113837f,0.855928f,0.49883f},
-    {182096,0,1860.85f,-3731.23f,196.716f,-2.53214f,0.033967f,-0.131914f,0.944741f,-0.298177f}
-};
-
-const go_type EPTowerFlags[EP_FLAG_NUM] =
-{
-    {182106, 0, 1838.42f, -3703.56f, 167.713f, 0.890117f, 0.0f, 0.0f, 0.43051f, 0.902586f},
-    {182106, 0, 1877.6f, -3716.76f, 167.188f, 1.74533f, 0.0f, 0.0f, 0.766044f, 0.642789f},
-    {182106, 0, 2539.61f, -4801.55f, 115.766f, 2.00713f, 0.0f, 0.0f, 0.843391f, 0.5373f},
-    {182106, 0, 2569.6f, -4772.93f, 115.399f, 2.72271f, 0.0f, 0.0f, 0.978148f, 0.207912f},
-    {182106, 0, 2975.5f, -3060.36f, 125.108f, 5.23599f, 0.0f, 0.0f, -0.5f, 0.866025f},
-    {182106, 0, 2992.63f, -3022.95f, 125.593f, 3.03684f, 0.0f, 0.0f, 0.998629f, 0.0523532f},
-    {182106, 0, 3148.17f, -4365.51f, 145.029f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f},
-    {182106, 0, 3188.76f, -4358.5f, 144.555f, 1.97222f, 0.0f, 0.0f, 0.833885f, 0.551938f}
-};
-
-uint32 const EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691,10699,10701,10705};
-
-uint32 const EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692,10698,10700,10704};
-
-uint8 const EP_NUM_CREATURES = 6;
-uint8 const EP_EWT_NUM_CREATURES = 5;
-
-const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
-{
-    {17635, 469, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f},
-    {17647, 469, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f},
-    {17647, 469, 0, 2537.34f, -4773.92f, 105.941f, 2.21657f},
-    {17647, 469, 0, 2537.77f, -4765.94f, 104.432f, 2.3911f},
-    {17647, 469, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f}
-};
-
-const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
-{
-    {17995, 67, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f},
-    {17996, 67, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f},
-    {17996, 67, 0, 2537.34f, -4773.92f, 105.941f, 2.21657f},
-    {17996, 67, 0, 2537.77f, -4765.94f, 104.432f, 2.3911f},
-    {17996, 67, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f}
-};
-
 enum EP_TowerStates
 {
     EP_TS_N = 1,
@@ -241,21 +200,91 @@ enum EP_TowerStates
     EP_TS_H = 64
 };
 
-const creature_type EP_PWT_FlightMaster = {17209, 0, 0, 2987.5f, -3049.11f, 120.126f, 5.75959f};
+enum EP_Gobjects
+{
+    GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS03   = 182097,
+    GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS01   = 181899,
+    GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS04   = 182098,
+    GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS02   = 182096,
+    GOBJECT_TOWER_BANNER                                        = 182106,
+    GOBJECT_CURING_SHRINE_ALLIANCE                              = 181682,
+    GOBJECT_ALLIANCE_BANNER_AURA                                = 180100,
+    GOBJECT_CURING_SHRINE_HORDE                                 = 181955,
+    GOBJECT_HORDE_BANNER_AURA                                   = 180101
+};
+
+uint32 const EPTowerPlayerEnterEvents[EP_TOWER_NUM] = { 10691, 10699, 10701, 10705 };
+
+uint32 const EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = { 10692, 10698, 10700, 10704 };
+
+uint8 const EP_EWT_NUM_CREATURES = 5;
+
+// All positions below are sniffed.
+
+const creature_type EPBufferNPCs[8] =
+{
+    { NPC_ALLIANCE_TOWER_BUFFER, 469, 0, 1860.59f, -3730.8f, 197.854f, 2.54818f },
+    { NPC_ALLIANCE_TOWER_BUFFER, 469, 0, 2574.12f, -4795.33f, 145.871f, 5.11381f },
+    { NPC_ALLIANCE_TOWER_BUFFER, 469, 0, 2962.6f, -3041.96f, 155.835f, 3.00197f },
+    { NPC_ALLIANCE_TOWER_BUFFER, 469, 0, 3180.54f, -4379.31f, 175.275f, 3.57792f },
+    { NPC_HORDE_TOWER_BUFFER, 67, 0, 1860.48f, -3731.34f, 197.778f, 2.42601f },
+    { NPC_HORDE_TOWER_BUFFER, 67, 0, 2574.0f, -4794.79f, 145.881f, 1.95477f },
+    { NPC_HORDE_TOWER_BUFFER, 67, 0, 2963.02f, -3041.9f, 155.965f, 4.27606f },
+    { NPC_HORDE_TOWER_BUFFER, 67, 0, 3180.48f, -4379.07f, 174.995f, 2.74017f }
+};
+
+const go_type EPCapturePoints[EP_TOWER_NUM] =
+{
+    { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS03, 0, 2574.51f, -4794.89f, 144.704f, -1.45003f, -0.097056f, 0.095578f, -0.656229f, 0.742165f },
+    { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS01, 0, 3181.08f, -4379.36f, 174.123f, -2.03472f, -0.065392f, 0.119494f, -0.842275f, 0.521553f },
+    { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS04, 0, 2962.71f, -3042.31f, 154.789f, 2.08426f, -0.074807f, -0.113837f, 0.855928f, 0.49883f },
+    { GOBJECT_DOODAD_BATTLEFIELDBANNER_STATE_BASE_PLAGUELANDS02, 0, 1860.85f, -3731.23f, 196.716f, -2.53214f, 0.033967f, -0.131914f, 0.944741f, -0.298177f }
+};
+
+const go_type EPTowerFlags[EP_FLAG_NUM] =
+{
+    { GOBJECT_TOWER_BANNER, 0, 1838.42f, -3703.56f, 167.713f, 0.890117f, 0.0f, 0.0f, 0.43051f, 0.902586f },
+    { GOBJECT_TOWER_BANNER, 0, 1877.6f, -3716.76f, 167.188f, 1.74533f, 0.0f, 0.0f, 0.766044f, 0.642789f },
+    { GOBJECT_TOWER_BANNER, 0, 2539.61f, -4801.55f, 115.766f, 2.00713f, 0.0f, 0.0f, 0.843391f, 0.5373f },
+    { GOBJECT_TOWER_BANNER, 0, 2569.6f, -4772.93f, 115.399f, 2.72271f, 0.0f, 0.0f, 0.978148f, 0.207912f },
+    { GOBJECT_TOWER_BANNER, 0, 2975.5f, -3060.36f, 125.108f, 5.23599f, 0.0f, 0.0f, -0.5f, 0.866025f },
+    { GOBJECT_TOWER_BANNER, 0, 2992.63f, -3022.95f, 125.593f, 3.03684f, 0.0f, 0.0f, 0.998629f, 0.0523532f },
+    { GOBJECT_TOWER_BANNER, 0, 3148.17f, -4365.51f, 145.029f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f },
+    { GOBJECT_TOWER_BANNER, 0, 3188.76f, -4358.5f, 144.555f, 1.97222f, 0.0f, 0.0f, 0.833885f, 0.551938f }
+};
+
+const go_type EP_NPT_LordaeronShrine[4] =
+{
+    { GOBJECT_CURING_SHRINE_ALLIANCE, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f },
+    { GOBJECT_ALLIANCE_BANNER_AURA, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f },
+    { GOBJECT_CURING_SHRINE_HORDE, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f },
+    { GOBJECT_HORDE_BANNER_AURA, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f }
+};
+
+const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
+{
+    { NPC_LORDAERON_COMMANDER, 469, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f },
+    { NPC_LORDAERON_SOLDIER, 469, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f },
+    { NPC_LORDAERON_SOLDIER, 469, 0, 2537.34f, -4773.92f, 105.941f, 2.21657f },
+    { NPC_LORDAERON_SOLDIER, 469, 0, 2537.77f, -4765.94f, 104.432f, 2.3911f },
+    { NPC_LORDAERON_SOLDIER, 469, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f }
+};
+
+const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
+{
+    { NPC_LORDAERON_VETERAN, 67, 0, 2532.85f, -4764.92f, 103.617f, 2.35619f },
+    { NPC_LORDAERON_FIGHTER, 67, 0, 2533.33f, -4769.31f, 104.396f, 2.37365f },
+    { NPC_LORDAERON_FIGHTER, 67, 0, 2537.34f, -4773.92f, 105.941f, 2.21657f },
+    { NPC_LORDAERON_FIGHTER, 67, 0, 2537.77f, -4765.94f, 104.432f, 2.3911f },
+    { NPC_LORDAERON_FIGHTER, 67, 0, 2542.57f, -4770.22f, 106.145f, 2.42601f }
+};
+
+const creature_type EP_PWT_FlightMaster = { NPC_WILLIAM_KIELAR, 0, 0, 2987.5f, -3049.11f, 120.126f, 5.75959f };
 
 const creature_type EP_CGT_SpiritOfVictory[2] =
 {
-    {18039, 0, 0, 1856.58f, -3714.72f, 194.637f, 0.762214f},
-    {18039, 0, 0, 1856.74f, -3714.51f, 194.26f, 4.35575f}
-};
-
-// Sniffed positions.
-const go_type EP_NPT_LordaeronShrine[4] =
-{
-    {181682, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f},
-    {180100, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f},
-    {181955, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f},
-    {180101, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f}
+    { NPC_SPIRIT_OF_VICTORY, 0, 0, 1856.58f, -3714.72f, 194.637f, 0.762214f },
+    { NPC_SPIRIT_OF_VICTORY, 0, 0, 1856.74f, -3714.51f, 194.26f, 4.35575f }
 };
 
 class OutdoorPvPEP;
@@ -280,7 +309,7 @@ class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 
     protected:
 
-        void SummonSupportUnitAtNorthpassTower(uint32 team);
+        void SummonSquadAtEastWallTower(uint32 team);
 
         void UpdateTowerState();
 
