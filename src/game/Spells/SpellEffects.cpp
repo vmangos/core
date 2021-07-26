@@ -4916,6 +4916,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         }
 
                         unitTarget->CastSpell(unitTarget, AdoredOrBroken, false);           // Cast Adored or Broken.
+
+                        if (AdoredOrBroken == 26898)
+                            return;
+
                         unitTarget->CastSpell(unitTarget, AdorationOrFriendship, true);     // Get a Pledge.
                         unitTarget->CastSpell(unitTarget, 26879, true);                     // Remove Amorous.
                     }
@@ -4962,6 +4966,10 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         }
 
                         unitTarget->CastSpell(unitTarget, AdoredOrBroken, false);           // Cast Adored or Broken.
+
+                        if (AdoredOrBroken == 26898)
+                            return;
+
                         unitTarget->CastSpell(unitTarget, AdorationOrFriendship, true);     // Get a Pledge.
                         unitTarget->CastSpell(unitTarget, 26879, true);                     // Remove Amorous.
                     }
