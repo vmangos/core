@@ -24,6 +24,7 @@ EndScriptData
 
 #include "scriptPCH.h"
 #include "../kalimdor/moonglade/boss_omen.h"
+#include "OutdoorPvPEP.h"
 #include "CritterAI.h"
 #include <array>
 
@@ -2324,32 +2325,37 @@ struct npc_epl_tower_summonAI : public ScriptedAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
+        /*
+        ( Lordaeron Commander / Lordaeron Veteran ) Spawns with 4 ( Lordaeron Soldier / Lordaeron Fighter ).
+        After 5 seconds they mount up and walk/ride towards the Nortpass Tower.
+        If they arrive the final Waypoint they dismount.
+        */
         if (type == WAYPOINT_MOTION_TYPE)
         {
-            m_creature->SetSpeedRate(MOVE_RUN, 1.38571);
+            m_creature->SetSpeedRate(MOVE_RUN, 1.38571f); // Sniffed.
             std::list<Creature*> minionList;
-            GetCreatureListWithEntryInGrid(minionList, m_creature, { 17647, 17996 }, 15.0f);
+            GetCreatureListWithEntryInGrid(minionList, m_creature, { NPC_LORDAERON_SOLDIER, NPC_LORDAERON_FIGHTER }, VISIBILITY_DISTANCE_TINY);
             for (const auto pMinion : minionList)
             {
                 if (!pMinion->IsMounted())
                 {
-                    pMinion->Mount(pMinion->GetEntry() == 17647 ? 2410 : 2);
+                    pMinion->Mount(pMinion->GetEntry() == NPC_LORDAERON_SOLDIER ? 2410 : 5228); // 5228 is a Placeholder until i got the real ID from sniffs.
                 }
             }
             if (!m_creature->IsMounted())
             {
-                m_creature->Mount(m_creature->GetEntry() == 17635 ? 2410 : 2);
+                m_creature->Mount(m_creature->GetEntry() == NPC_LORDAERON_COMMANDER ? 2410 : 5228); // 5228 is a Placeholder until i got the real ID from sniffs.
             }
         }
         if (id >= 38)
         {
-            std::list<Creature*> minionList;
-            GetCreatureListWithEntryInGrid(minionList, m_creature, { 17647, 17996 }, 15.0f);
-            for (const auto pMinion : minionList)
+            std::list<Creature*> followerList;
+            GetCreatureListWithEntryInGrid(followerList, m_creature, { 17647, 17996 }, VISIBILITY_DISTANCE_TINY);
+            for (const auto pFollower : followerList)
             {
-                if (pMinion->IsMounted())
+                if (pFollower->IsMounted())
                 {
-                    pMinion->Unmount();
+                    pFollower->Unmount();
                 }
             }
             if (m_creature->IsMounted())
