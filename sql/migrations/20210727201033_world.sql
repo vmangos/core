@@ -11,6 +11,7 @@ INSERT INTO `migrations` VALUES ('20210727201033');
 
 UPDATE `gameobject_template` SET `entry`=180891, `displayId`=327, `name`='Greater Moonlight Spell Focus', `data1`=4, `data3`=1 WHERE `entry`=300058;
 UPDATE `spell_script_target` SET `targetEntry`=180891 WHERE `entry`=26373 AND `targetEntry`=300058;
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (26373, 1, 15892, 0, 0, 0, 5875);
 
 
 -- End of migration.
