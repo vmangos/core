@@ -2332,6 +2332,7 @@ struct npc_epl_tower_summonAI : public ScriptedAI
         */
         if (type == WAYPOINT_MOTION_TYPE)
         {
+            m_creature->SetWalk(false);
             m_creature->SetSpeedRate(MOVE_RUN, 1.38571f); // Sniffed.
             std::list<Creature*> minionList;
             GetCreatureListWithEntryInGrid(minionList, m_creature, { NPC_LORDAERON_SOLDIER, NPC_LORDAERON_FIGHTER }, VISIBILITY_DISTANCE_TINY);
@@ -2339,12 +2340,12 @@ struct npc_epl_tower_summonAI : public ScriptedAI
             {
                 if (!pMinion->IsMounted())
                 {
-                    pMinion->Mount(pMinion->GetEntry() == NPC_LORDAERON_SOLDIER ? 2410 : 5228); // 5228 is a Placeholder until i got the real ID from sniffs.
+                    pMinion->Mount(pMinion->GetEntry() == NPC_LORDAERON_SOLDIER ? 2410 : 10671);
                 }
             }
             if (!m_creature->IsMounted())
             {
-                m_creature->Mount(m_creature->GetEntry() == NPC_LORDAERON_COMMANDER ? 2410 : 5228); // 5228 is a Placeholder until i got the real ID from sniffs.
+                m_creature->Mount(m_creature->GetEntry() == NPC_LORDAERON_COMMANDER ? 2410 : 10671);
             }
         }
         if (id >= 38)
@@ -2356,11 +2357,24 @@ struct npc_epl_tower_summonAI : public ScriptedAI
                 if (pFollower->IsMounted())
                 {
                     pFollower->Unmount();
+                    pFollower->SaveHomePosition();
+                    pFollower->SetWalk(true);
+                    pFollower->LeaveCreatureGroup();
+                    pFollower->SetWanderDistance(INTERACTION_DISTANCE);
+                    pFollower->SetDefaultMovementType(RANDOM_MOTION_TYPE);
+                    pFollower->GetMotionMaster()->Initialize();
                 }
             }
             if (m_creature->IsMounted())
             {
                 m_creature->Unmount();
+                m_creature->SaveHomePosition();
+                m_creature->SetWalk(true);
+                //m_creature->SetSpeedRate(MOVE_RUN, 1.14286);
+                //m_creature->GetMotionMaster()->Clear(false, true);
+                m_creature->SetWanderDistance(INTERACTION_DISTANCE);
+                m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
+                m_creature->GetMotionMaster()->Initialize();
             }
         }
     }
