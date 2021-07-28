@@ -204,9 +204,8 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
             {
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
-                    pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
                     pCreature->SetActiveObjectState(true);
-                    DoScriptText(BCT_EP_EWT_SPAWN_YELL, pCreature, pCreature, CHAT_TYPE_ZONE_YELL);
+                    DoScriptText(BCT_EP_EWT_SPAWN_SAY, pCreature, pCreature, CHAT_TYPE_SAY);
                     pCreature->GetMotionMaster()->Clear(false, true);
                     pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 5000, 0, 176350, false);
                 }
@@ -216,7 +215,6 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
                     pCreature->SetActiveObjectState(true);
-                    pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
                     {
                         float angle = (float(i) * (M_PI / (4 / static_cast<float>(2)))) + pCommander->GetOrientation();
@@ -230,7 +228,7 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
 
 // NPT
 OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_SummonedGOSide(0)
+    : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_SummonedShrineSide(0)
 {
     SetCapturePointData(EPCapturePoints[EP_NPT].entry, EPCapturePoints[EP_NPT].map, EPCapturePoints[EP_NPT].x, EPCapturePoints[EP_NPT].y, EPCapturePoints[EP_NPT].z, EPCapturePoints[EP_NPT].o, EPCapturePoints[EP_NPT].rot0, EPCapturePoints[EP_NPT].rot1, EPCapturePoints[EP_NPT].rot2, EPCapturePoints[EP_NPT].rot3);
     AddObject(EP_NPT_FLAG1, EPTowerFlags[EP_NPT_FLAG1].entry, EPTowerFlags[EP_NPT_FLAG1].map, EPTowerFlags[EP_NPT_FLAG1].x, EPTowerFlags[EP_NPT_FLAG1].y, EPTowerFlags[EP_NPT_FLAG1].z, EPTowerFlags[EP_NPT_FLAG1].o, EPTowerFlags[EP_NPT_FLAG1].rot0, EPTowerFlags[EP_NPT_FLAG1].rot1, EPTowerFlags[EP_NPT_FLAG1].rot2, EPTowerFlags[EP_NPT_FLAG1].rot3);
@@ -291,7 +289,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
         case OBJECTIVESTATE_NEUTRAL:
         {
             m_TowerState = EP_TS_N;
-            m_SummonedGOSide = 0;
+            m_SummonedShrineSide = 0;
             DelObject(EP_NPT_CURING_SHRINE);
             DelObject(EP_NPT_BANNER_AURA);
             break;
@@ -304,7 +302,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
         case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
         {
             m_TowerState = EP_TS_N_A;
-            m_SummonedGOSide = 0;
+            m_SummonedShrineSide = 0;
             DelObject(EP_NPT_CURING_SHRINE);
             DelObject(EP_NPT_BANNER_AURA);
             break;
@@ -317,7 +315,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
         {
             m_TowerState = EP_TS_N_H;
-            m_SummonedGOSide = 0;
+            m_SummonedShrineSide = 0;
             DelObject(EP_NPT_CURING_SHRINE);
             DelObject(EP_NPT_BANNER_AURA);
             break;
@@ -405,9 +403,9 @@ void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* plr)
 
 void OPvPCapturePointEP_NPT::SummonCuringShrine(uint32 team)
 {
-    if (m_SummonedGOSide != team)
+    if (m_SummonedShrineSide != team)
     {
-        m_SummonedGOSide = team;
+        m_SummonedShrineSide = team;
         DelObject(EP_NPT_CURING_SHRINE);
         DelObject(EP_NPT_BANNER_AURA);
         AddObject(EP_NPT_CURING_SHRINE, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].entry, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].map, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].x, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].y, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].z, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].o, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].rot0, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].rot1, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].rot2, EP_NPT_LordaeronShrine[team == ALLIANCE ? 0 : 2].rot3);
@@ -417,7 +415,7 @@ void OPvPCapturePointEP_NPT::SummonCuringShrine(uint32 team)
 
 // CGT
 OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
-    : OPvPCapturePoint(pvp), m_SpiritOfVictorySpawned(0), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NONE)
+    : OPvPCapturePoint(pvp), m_SpiritOfVictorySpawned(0), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NONE), m_SummonedBannerSide(0)
 {
     UnLinkGraveYard();
     SetCapturePointData(EPCapturePoints[EP_CGT].entry, EPCapturePoints[EP_CGT].map, EPCapturePoints[EP_CGT].x, EPCapturePoints[EP_CGT].y, EPCapturePoints[EP_CGT].z, EPCapturePoints[EP_CGT].o, EPCapturePoints[EP_CGT].rot0, EPCapturePoints[EP_CGT].rot1, EPCapturePoints[EP_CGT].rot2, EPCapturePoints[EP_CGT].rot3);
@@ -449,6 +447,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             animation = 1;
             LinkGraveYard(ALLIANCE);
             SummonSpiritOfVictory(ALLIANCE);
+            SummonBannerAura(ALLIANCE);
             DelCreature(EP_CGT_BUFFER);
             AddCreature(EP_CGT_BUFFER, EPBufferNPCs[EP_BUFFER_CGT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_CGT_A].map, EPBufferNPCs[EP_BUFFER_CGT_A].x, EPBufferNPCs[EP_BUFFER_CGT_A].y, EPBufferNPCs[EP_BUFFER_CGT_A].z, EPBufferNPCs[EP_BUFFER_CGT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_BUFFER]))
@@ -467,6 +466,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             animation = 0;
             LinkGraveYard(HORDE);
             SummonSpiritOfVictory(HORDE);
+            SummonBannerAura(HORDE);
             DelCreature(EP_CGT_BUFFER);
             AddCreature(EP_CGT_BUFFER, EPBufferNPCs[EP_BUFFER_CGT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_CGT_H].map, EPBufferNPCs[EP_BUFFER_CGT_H].x, EPBufferNPCs[EP_BUFFER_CGT_H].y, EPBufferNPCs[EP_BUFFER_CGT_H].z, EPBufferNPCs[EP_BUFFER_CGT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_BUFFER]))
@@ -482,6 +482,8 @@ void OPvPCapturePointEP_CGT::ChangeState()
         {
             DelCreature(EP_CGT_SPIRITOFVICTORY);
             m_SpiritOfVictorySpawned = 0;
+            m_SummonedBannerSide = 0;
+            DelObject(EP_CGT_BANNER_AURA);
             UnLinkGraveYard();
             m_TowerState = EP_TS_N;
             break;
@@ -495,6 +497,8 @@ void OPvPCapturePointEP_CGT::ChangeState()
         {
             DelCreature(EP_CGT_SPIRITOFVICTORY);
             m_SpiritOfVictorySpawned = 0;
+            m_SummonedBannerSide = 0;
+            DelObject(EP_CGT_BANNER_AURA);
             UnLinkGraveYard();
             m_TowerState = EP_TS_N_A;
             break;
@@ -508,6 +512,8 @@ void OPvPCapturePointEP_CGT::ChangeState()
         {
             DelCreature(EP_CGT_SPIRITOFVICTORY);
             m_SpiritOfVictorySpawned = 0;
+            m_SummonedBannerSide = 0;
+            DelObject(EP_CGT_BANNER_AURA);
             UnLinkGraveYard();
             m_TowerState = EP_TS_N_H;
             break;
@@ -606,6 +612,16 @@ void OPvPCapturePointEP_CGT::UnLinkGraveYard()
 {
     sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, ALLIANCE, false);
     sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, HORDE, false);
+}
+
+void OPvPCapturePointEP_CGT::SummonBannerAura(uint32 team)
+{
+    if (m_SummonedBannerSide != team)
+    {
+        m_SummonedBannerSide = team;
+        DelObject(EP_CGT_BANNER_AURA);
+        AddObject(EP_CGT_BANNER_AURA, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].entry, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].map, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].x, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].y, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].z, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].o, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].rot0, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].rot1, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].rot2, EP_CGT_BannerAuraGraveYard[team == ALLIANCE ? 1 : 0].rot3);
+    }
 }
 
 void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
@@ -806,7 +822,6 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
 
         if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_PWT_FLIGHTMASTER]))
         {
-            pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->SetFactionTemplateId(team == ALLIANCE ? 774 : 775);
             pCreature->RemoveAllAuras();
             pCreature->AddAura(team == ALLIANCE ? SPELL_SPIRIT_PARTICLES : SPELL_SPIRIT_PARTICLES_RED_BIG);
