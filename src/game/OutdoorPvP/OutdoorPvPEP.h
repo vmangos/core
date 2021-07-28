@@ -119,7 +119,8 @@ enum EP_GoSummons
     EP_NPT_FLAG1            = 6,
     EP_NPT_FLAG2            = 7,
     EP_NPT_CURING_SHRINE    = 8,
-    EP_NPT_BANNER_AURA      = 9
+    EP_NPT_BANNER_AURA      = 9,
+    EP_CGT_BANNER_AURA      = 10
 };
 
 enum EP_BroadCastTexts
@@ -134,7 +135,7 @@ enum EP_BroadCastTexts
     BCT_EP_EWT_TAKEN_H      = 13636, // |cffffff00Eastwall Tower has been taken by the Horde!| r
     BCT_EP_ALL_TAKEN_H      = 13637, // |cffff0000All four towers are now in control of the Horde!| r
     BCT_EP_ALL_TAKEN_A      = 13638, // |cff33ccffAll four towers are now in control of the Alliance!| r
-    BCT_EP_EWT_SPAWN_YELL   = 14746  // The Northpass tower needs our aid!  Once again, let us charge and do proud or liege!
+    BCT_EP_EWT_SPAWN_SAY    = 14746  // The Northpass tower needs our aid!  Once again, let us charge and do proud or liege!
 };
 
 enum EP_Sounds
@@ -210,7 +211,9 @@ enum EP_Gobjects
     GOBJECT_CURING_SHRINE_ALLIANCE                              = 181682,
     GOBJECT_ALLIANCE_BANNER_AURA                                = 180100,
     GOBJECT_CURING_SHRINE_HORDE                                 = 181955,
-    GOBJECT_HORDE_BANNER_AURA                                   = 180101
+    GOBJECT_HORDE_BANNER_AURA                                   = 180101,
+    GOBJECT_HORDE_BANNER_AURA_LARGE                             = 180422,
+    GOBJECT_ALLIANCE_BANNER_AURA_LARGE                          = 180421
 };
 
 uint32 const EPTowerPlayerEnterEvents[EP_TOWER_NUM] = { 10691, 10699, 10701, 10705 };
@@ -259,6 +262,12 @@ const go_type EP_NPT_LordaeronShrine[4] =
     { GOBJECT_ALLIANCE_BANNER_AURA, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f },
     { GOBJECT_CURING_SHRINE_HORDE, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f },
     { GOBJECT_HORDE_BANNER_AURA, 0, 3167.5f, -4356.25f, 138.821f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f }
+};
+
+const go_type EP_CGT_BannerAuraGraveYard[2] =
+{
+    { GOBJECT_HORDE_BANNER_AURA_LARGE, 0, 1985.47f, -3653.88f, 120.172f, 1.46608f, 0.0f, 0.0f, 0.66913f, 0.743145f },
+    { GOBJECT_ALLIANCE_BANNER_AURA_LARGE, 0, 1985.47f, -3653.88f, 120.172f, 1.46608f, 0.0f, 0.0f, 0.66913f, 0.743145f }
 };
 
 const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
@@ -348,7 +357,7 @@ class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 
         uint32 m_TowerState;
 
-        uint32 m_SummonedGOSide;
+        uint32 m_SummonedShrineSide;
 };
 
 class OPvPCapturePointEP_CGT : public OPvPCapturePoint
@@ -377,6 +386,8 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 
         void SummonSpiritOfVictory(uint32 team);
 
+        void SummonBannerAura(uint32 team);
+
         void UpdateTowerState();
 
     protected:
@@ -386,6 +397,8 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
         uint32 m_SpiritOfVictorySpawned;
 
         Team m_GraveyardSide;
+
+        uint32 m_SummonedBannerSide;
 };
 
 class OPvPCapturePointEP_PWT : public OPvPCapturePoint
