@@ -24,7 +24,6 @@ EndScriptData
 
 #include "scriptPCH.h"
 #include "../kalimdor/moonglade/boss_omen.h"
-#include "OutdoorPvPEP.h"
 #include "CritterAI.h"
 #include <array>
 
