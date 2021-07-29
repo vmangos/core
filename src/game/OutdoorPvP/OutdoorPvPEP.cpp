@@ -200,25 +200,15 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
             DelCreature(i);
             AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000);
 
-            if (i == 0)
-            {
-                if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
-                {
-                    pCreature->SetActiveObjectState(true);
-                    DoScriptText(BCT_EP_EWT_SPAWN_SAY, pCreature, pCreature, CHAT_TYPE_SAY);
-                    pCreature->GetMotionMaster()->Clear(false, true);
-                    pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 5000, 0, 176350, false);
-                }
-            }
             if (i > 0)
             {
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
-                    pCreature->SetActiveObjectState(true);
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
                     {
                         float angle = (float(i) * (M_PI / (4 / static_cast<float>(2)))) + pCommander->GetOrientation();
                         pCreature->JoinCreatureGroup(pCommander, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE);
+                        pCreature->SetActiveObjectState(true);
                     }
                 }
             }
@@ -637,6 +627,9 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
             pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->RemoveAllAuras();
             pCreature->AddAura(team == ALLIANCE ? SPELL_SPIRIT_PARTICLES_SUPER_BIG_DND : SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND);
+            pCreature->SetActiveObjectState(true);
+            pCreature->GetMotionMaster()->Clear(false, true);
+            pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 1000, 0, 180390, false);
         }
     }
 }
