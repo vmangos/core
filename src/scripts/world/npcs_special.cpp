@@ -2312,87 +2312,6 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
     return new npc_oozeling_jubjubAI(pCreature);
 }
 
-struct npc_epl_tower_summonAI : public ScriptedAI
-{
-    npc_epl_tower_summonAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-    }
-
-    void MovementInform(uint32 type, uint32 id) override
-    {
-        /*
-        ( Lordaeron Commander / Lordaeron Veteran ) Spawns with 4 ( Lordaeron Soldier / Lordaeron Fighter ).
-        After 5 seconds they mount up and walk/ride towards the Nortpass Tower.
-        If they arrive the final Waypoint, they dismount.
-        */
-        if (type == WAYPOINT_MOTION_TYPE)
-        {
-            m_creature->SetWalk(false);
-            m_creature->SetSpeedRate(MOVE_RUN, 1.38571f); // Sniffed.
-            std::list<Creature*> minionList;
-            GetCreatureListWithEntryInGrid(minionList, m_creature, { NPC_LORDAERON_SOLDIER, NPC_LORDAERON_FIGHTER }, VISIBILITY_DISTANCE_TINY);
-            for (const auto pMinion : minionList)
-            {
-                if (!pMinion->IsMounted())
-                {
-                    pMinion->Mount(pMinion->GetEntry() == NPC_LORDAERON_SOLDIER ? 2410 : 10671);
-                }
-            }
-            if (!m_creature->IsMounted())
-            {
-                m_creature->Mount(m_creature->GetEntry() == NPC_LORDAERON_COMMANDER ? 2410 : 10671);
-            }
-        }
-        if (id >= 38)
-        {
-            std::list<Creature*> followerList;
-            GetCreatureListWithEntryInGrid(followerList, m_creature, { 17647, 17996 }, VISIBILITY_DISTANCE_TINY);
-            for (const auto pFollower : followerList)
-            {
-                if (pFollower->IsMounted())
-                {
-                    pFollower->Unmount();
-                    pFollower->SaveHomePosition();
-                    pFollower->SetWalk(true);
-                    pFollower->LeaveCreatureGroup();
-                    pFollower->SetWanderDistance(INTERACTION_DISTANCE);
-                    pFollower->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-                    pFollower->GetMotionMaster()->Initialize();
-                }
-            }
-            if (m_creature->IsMounted())
-            {
-                m_creature->Unmount();
-                m_creature->SaveHomePosition();
-                m_creature->SetWalk(true);
-                //m_creature->SetSpeedRate(MOVE_RUN, 1.14286);
-                //m_creature->GetMotionMaster()->Clear(false, true);
-                m_creature->SetWanderDistance(INTERACTION_DISTANCE);
-                m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-                m_creature->GetMotionMaster()->Initialize();
-            }
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_epl_tower_summon(Creature* pCreature)
-{
-    return new npc_epl_tower_summonAI(pCreature);
-}
-
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -2534,10 +2453,5 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";
     newscript->GetAI = &GetAI_npc_oozeling_jubjub;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_epl_tower_summon";
-    newscript->GetAI = &GetAI_npc_epl_tower_summon;
     newscript->RegisterSelf();
 }
