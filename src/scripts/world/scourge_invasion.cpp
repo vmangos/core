@@ -384,9 +384,10 @@ struct NecropolisHealthAI : public ScriptedAI
 {
     NecropolisHealthAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        //m_creature->SetActiveObjectState(true);
         m_creature->SetVisibilityModifier(3000.0f);
     }
+
+    int zapped = 0; // 3 = death.
 
     void Reset() override {}
 
@@ -394,6 +395,15 @@ struct NecropolisHealthAI : public ScriptedAI
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->CastSpell(m_creature, SPELL_ZAP_NECROPOLIS, true);
+
+        // Just to make sure it finally dies!
+        if (spell->Id == SPELL_ZAP_NECROPOLIS)
+        {
+            ++zapped;
+
+            if (zapped >= 3)
+                m_creature->DoKillUnit(m_creature);
+        }
     }
 
     void JustDied(Unit* pKiller) override
