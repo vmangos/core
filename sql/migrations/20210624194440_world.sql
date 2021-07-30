@@ -375,6 +375,9 @@ INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 (4400, 8169, 4.735, 0, 1, 1, 0, 0, 10),
 (4400, 8167, 51.478, 0, 1, 1, 0, 0, 10);
 
+-- Stormwind Moonwell Gobjects Should be Invis
+UPDATE `gameobject` SET `position_z` = 91.219 WHERE `guid` IN (42907, 42910, 42908, 42909);
+
 
 -- End of migration.
 END IF;
