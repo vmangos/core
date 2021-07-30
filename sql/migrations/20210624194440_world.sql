@@ -363,6 +363,18 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1806, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2504, 0, 0, 0, 0, 0, 0, 0, 0, 'The Test of Righteousness - Jordan Stilwell - Talk');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1806, 28, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Test of Righteousness - Jordan Stilwell - Modify Flags');
 
+-- Mudrock Tortoise skinning Template
+UPDATE `creature_template` SET `skinning_loot_id`= 4397 WHERE `entry` = 4396;
+
+-- Mudrock Snapjaw Skinning Template
+UPDATE `creature_template` SET `skinning_loot_id`= 4400 WHERE `entry` = 4400;
+INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
+(4400, 4234, 44.643, 0, 1, 1, 0, 0, 10),
+(4400, 4235, 2.613, 0, 1, 1, 0, 0, 10),
+(4400, 4304, 49.735, 0, 1, 1, 0, 0, 10),
+(4400, 8169, 4.735, 0, 1, 1, 0, 0, 10),
+(4400, 8167, 51.478, 0, 1, 1, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
