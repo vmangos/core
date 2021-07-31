@@ -449,17 +449,18 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleDebugUpdateWorldStateCommand(char* args)
+bool ChatHandler::HandleDebugSendWorldStateCommand(char* args)
 {
-    uint32 world;
-    if (!ExtractUInt32(&args, world))
+    uint32 field;
+    if (!ExtractUInt32(&args, field))
         return false;
 
-    uint32 state;
-    if (!ExtractUInt32(&args, state))
+    uint32 value;
+    if (!ExtractUInt32(&args, value))
         return false;
 
-    m_session->GetPlayer()->SendUpdateWorldState(world, state);
+    m_session->GetPlayer()->SendUpdateWorldState(field, value);
+    PSendSysMessage("World state %u updated to %u.", field, value);
     return true;
 }
 
