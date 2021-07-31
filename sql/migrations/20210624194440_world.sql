@@ -262,7 +262,7 @@ UPDATE `creature` SET `wander_distance` = 2 WHERE `id` IN (15115,15113);
 
 -- Add Missing Harvest Festival Gameobjects
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(2555, 180206, 1, 1636.83, -3080.19, 87.6522, 2.1332, 0, 0, 0.875563, 0.483105, 120, 120, 1, 100, 0, 10),
+(9131, 180206, 1, 1636.83, -3080.19, 87.6522, 2.1332, 0, 0, 0.875563, 0.483105, 120, 120, 1, 100, 0, 10),
 (2892, 180207, 1, 1635.98, -3080.05, 87.5749, 2.05932, 0, 0, 0.857123, 0.515111, 120, 120, 1, 100, 0, 10),
 (4727, 180208, 1, 1635.09, -3081.46, 87.7099, 2.45359, 0, 0, 0.941412, 0.337259, 120, 120, 1, 100, 0, 10),
 (8902, 180209, 1, 1633.73, -3081.53, 87.5771, 1.69648, 0, 0, 0.750118, 0.661304, 120, 120, 1, 100, 0, 10),
