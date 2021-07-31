@@ -190,8 +190,8 @@ class MovementInfo
 
         struct JumpInfo
         {
-            JumpInfo() : velocity(0.f), sinAngle(0.f), cosAngle(0.f), xyspeed(0.f), startClientTime(0) {}
-            float   velocity, sinAngle, cosAngle, xyspeed;
+            JumpInfo() : zspeed(0.f), sinAngle(0.f), cosAngle(0.f), xyspeed(0.f), startClientTime(0) {}
+            float   zspeed, sinAngle, cosAngle, xyspeed;
             Position start;
             uint32 startClientTime;
         };
