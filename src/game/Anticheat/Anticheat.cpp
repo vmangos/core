@@ -44,6 +44,7 @@ void AnticheatManager::LoadAnticheatData()
     sLog.outString();
     sLog.outString("Loading warden checks...");
     sWardenScanMgr.loadFromDB();
+    Warden::LoadScriptedScans();
     
     sLog.outString();
     sLog.outString("Loading warden modules...");
