@@ -378,6 +378,10 @@ INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 -- Stormwind Moonwell Gobjects Should be Invis
 UPDATE `gameobject` SET `position_z` = 91.219 WHERE `guid` IN (42907, 42910, 42908, 42909);
 
+-- Fix The Perfect Stout Quest Chain 
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE  `entry` = 315;
+UPDATE `quest_template` SET `PrevQuestId` = 315 WHERE `entry` = 415;
+
 
 -- End of migration.
 END IF;
