@@ -60,7 +60,8 @@ class WardenMac final : public Warden
         // set pending character enum packet (to be sent once we are satisfied that Warden is loaded)
         virtual void SetCharEnumPacket(WorldPacket &&packet);
 
-        virtual void SendPlayerInfo(ChatHandler *handler, bool includeFingerprint) const {}
+        virtual void GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
+            std::string& endscene, std::string& proxifier) const {}
 };
 
 #endif /*!__WARDENMAC_HPP_*/

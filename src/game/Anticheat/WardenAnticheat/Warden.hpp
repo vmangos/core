@@ -153,7 +153,8 @@ class Warden
         // set pending character enum packet (to be sent once we are satisfied that Warden is loaded)
         virtual void SetCharEnumPacket(WorldPacket &&packet) = 0;
 
-        virtual void SendPlayerInfo(ChatHandler *handler, bool includeFingerprint) const = 0;
+        virtual void GetPlayerInfo(std::string &clock, std::string &fingerprint, std::string &hypervisors,
+            std::string &endscene, std::string &proxifier) const = 0;
 };
 
 #endif /*!__WARDEN_HPP_*/

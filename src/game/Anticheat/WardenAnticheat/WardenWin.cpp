@@ -1175,22 +1175,26 @@ void WardenWin::SetCharEnumPacket(WorldPacket &&packet)
         _charEnum = std::move(packet);
 }
 
-void WardenWin::SendPlayerInfo(ChatHandler *handler, bool includeFingerprint) const
+void WardenWin::GetPlayerInfo(std::string& clock, std::string& fingerprint, std::string& hypervisors,
+    std::string& endscene, std::string& proxifier) const
 {
     if (!!_lastTimeCheckServer)
     {
-        handler->PSendSysMessage("Last hardware action: %u client time: %u idle time: %u seconds info age: %u seconds",
-            _lastHardwareActionTime, _lastClientTime,
-            (_lastClientTime - _lastHardwareActionTime) / 1000,
-            WorldTimer::getMSTimeDiffToNow(_lastTimeCheckServer) / 1000);
+        std::stringstream s;
+        s << "Last hardware action: " << _lastHardwareActionTime
+            << " client time: " << _lastClientTime
+            << " idle time: " << (_lastClientTime - _lastHardwareActionTime) / 1000
+            << " seconds info age: " << WorldTimer::getMSTimeDiffToNow(_lastTimeCheckServer) / 1000
+            << " seconds";
+        clock = s.str();
     }
 
     // 'lpMaximumApplicationAddress' should never be zero if the structure has been read
-    if (includeFingerprint && !!_sysInfo.lpMaximumApplicationAddress)
+    if (!!_sysInfo.lpMaximumApplicationAddress)
     {
-        std::stringstream str;
+        std::stringstream s;
 
-        str << "Architecture: " << ArchitectureString(_sysInfo.wProcessorArchitecture)
+        s << "Architecture: " << ArchitectureString(_sysInfo.wProcessorArchitecture)
             << " CPU Type: " << CPUTypeAndRevision(_sysInfo.dwProcessorType, _sysInfo.wProcessorRevision)
             << " Page Size: 0x" << std::hex << std::uppercase << _sysInfo.dwPageSize << std::dec;
 
@@ -1199,18 +1203,22 @@ void WardenWin::SendPlayerInfo(ChatHandler *handler, bool includeFingerprint) co
             if (!!(_sysInfo.dwActiveProcessorMask & (1 << i)))
                 ++activeProcCount;
 
-        str << " Active CPUs: " << activeProcCount;
-        str << " Total CPUs: " << _sysInfo.dwNumberOfProcessors;
+        s << " Active CPUs: " << activeProcCount;
+        s << " Total CPUs: " << _sysInfo.dwNumberOfProcessors;
 
-        handler->SendSysMessage(str.str().c_str());
+        fingerprint = s.str();
     }
 
     if (_hypervisors.length() > 0)
-        handler->PSendSysMessage("Hypervisor(s) found: %s", _hypervisors.c_str());
+        hypervisors = "Hypervisor(s) found: " + _hypervisors;
 
     if (_endSceneFound)
-        handler->PSendSysMessage("EndScene: 0x%lx", _endSceneAddress);
+    {
+        std::stringstream s;
+        s << "EndScene: 0x" << std::hex << _endSceneAddress;
+        endscene = s.str();
+    }
 
     if (_proxifierFound)
-        handler->SendSysMessage("Proxifier is running");
+        proxifier = "Proxifier is running";
 }
