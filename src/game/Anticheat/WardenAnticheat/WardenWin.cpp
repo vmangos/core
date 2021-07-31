@@ -395,7 +395,7 @@ bool ValidateEndSceneHook(const std::vector<uint8> &code)
             str << " ";
     }
 
-    sLog.outWarden("Deobfuscate debug.  Original code size: %u deobfuscated size: %u Code:\n%s",
+    sLog.outWardenDebug("Deobfuscate debug.  Original code size: %u deobfuscated size: %u Code:\n%s",
         code.size(), copy.size(), str.str().c_str());
 
     // wrobot's deobfuscated endscene hook begins with pushfd, pushad.  if thats what this starts with,
