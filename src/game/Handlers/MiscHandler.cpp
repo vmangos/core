@@ -1245,5 +1245,5 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
         return;
     }
 
-    m_warden->HandleWardenDataOpcode(recv_data);
+    m_warden->HandlePacket(recv_data);
 }

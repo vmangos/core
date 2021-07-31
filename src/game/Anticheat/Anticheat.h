@@ -74,7 +74,7 @@ public:
 };
 
 #ifdef USE_ANTICHEAT
-#include "WardenAnticheat/Warden.h"
+#include "WardenAnticheat/Warden.hpp"
 #include "MovementAnticheat/MovementAnticheat.h"
 #else
 class Warden
