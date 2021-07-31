@@ -387,7 +387,7 @@ struct NecropolisHealthAI : public ScriptedAI
         m_creature->SetVisibilityModifier(3000.0f);
     }
 
-    int zapped = 0; // 3 = death.
+    int m_zapped = 0; // 3 = death.
 
     void Reset() override {}
 
@@ -399,9 +399,7 @@ struct NecropolisHealthAI : public ScriptedAI
         // Just to make sure it finally dies!
         if (spell->Id == SPELL_ZAP_NECROPOLIS)
         {
-            ++zapped;
-
-            if (zapped >= 3)
+            if (++m_zapped >= 3)
                 m_creature->DoKillUnit(m_creature);
         }
     }
