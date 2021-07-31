@@ -79,6 +79,20 @@ DELETE FROM `gossip_menu_option` WHERE `menu_id` = 7123 AND `id` = 0;
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`) VALUES
 (7125, 0, 0, 'Are these lands not beyond healing? They look pretty beat up.', 12017, 1, 1, 7124);
 
+-- Rimblat Earthshatter Gossip
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(7113, 8371),
+(7114, 8372),
+(7115, 8373);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`) VALUES
+(7103, 0, 0, 'What brings a tauren to the Plaguelands?', 11983, 1, 1, 7113),
+(7113, 0, 0, 'Continue please.', 11985, 1, 1, 7114),
+(7114, 0, 0, 'Continue please.', 11985, 1, 1, 7115);
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`) VALUES
+(8371, 11984),
+(8372, 11986),
+(8373, 11987);
+
 -- Increase Repeat Time For Chapel Event
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16115;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1611501, 16115, 0, 1, 0, 100, 1, 0, 0, 900000, 900000, 1611501, 0, 0, 'Commander Eligor Dawnbringer - OOC - Start Script');
