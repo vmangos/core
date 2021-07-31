@@ -21,7 +21,7 @@ UPDATE `creature` SET `position_x` = 52.892, `position_y` = 1563.021, `position_
 UPDATE `creature` SET `position_z` = 16.25, `movement_type` = 1, `wander_distance` = 25 where `id` = 5420 AND `guid` = 21996;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 42304;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 15 WHERE `guid` = 2634;
-UPDATE `creature` SET `movemtnt_type` = 1, `wander_distance` = 2 WHERE `guid` IN (373 ,612, 756, 981, 1062);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (373 ,612, 756, 981, 1062);
 UPDATE `creature` SET `position_x` = -5231.283, `position_y` = 1287.122, `position_z` = 55.708 WHERE `guid` = 51210;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `id` = 3695;
 
