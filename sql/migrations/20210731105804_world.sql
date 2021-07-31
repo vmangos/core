@@ -93,6 +93,10 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`) VALUES
 (8372, 11986),
 (8373, 11987);
 
+-- Craftsman Wilhelm Gossip
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
+(7219, 0, 1, 'Show me your wares, Wilhelm.', 12274, 3, 4);
+
 -- Increase Repeat Time For Chapel Event
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16115;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1611501, 16115, 0, 1, 0, 100, 1, 0, 0, 900000, 900000, 1611501, 0, 0, 'Commander Eligor Dawnbringer - OOC - Start Script');
