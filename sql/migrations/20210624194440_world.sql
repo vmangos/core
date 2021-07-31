@@ -290,7 +290,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (9128, 180214, 0, 975.173, -1824.7, 81.0833, 3.52148, 0, 0, -0.982015, 0.188805, 120, 120, 1, 100, 0, 10);
 
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
-(2555, 11),
+(9131, 11),
 (2892, 11),
 (4727, 11),
 (8902, 11),
