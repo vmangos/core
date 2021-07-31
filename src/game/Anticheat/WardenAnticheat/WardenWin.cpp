@@ -1132,11 +1132,11 @@ void WardenWin::Update()
             if (!!(_sysInfo.dwActiveProcessorMask & (1 << i)))
                 ++activeProcCount;
 
-        LoginDatabase.BeginTransaction();
+        LogsDatabase.BeginTransaction();
 
         static SqlStatementID fingerprintUpdate;
 
-        auto stmt = LoginDatabase.CreateStatement(fingerprintUpdate,
+        auto stmt = LogsDatabase.CreateStatement(fingerprintUpdate,
             "INSERT INTO system_fingerprint_usage (fingerprint, account, ip, realm, architecture, cputype, activecpus, totalcpus, pagesize) "
             "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -1151,7 +1151,7 @@ void WardenWin::Update()
         stmt.addUInt32(_sysInfo.dwPageSize);
         stmt.Execute();
 
-        LoginDatabase.CommitTransaction();
+        LogsDatabase.CommitTransaction();
 
         _session->CleanupFingerprintHistory();
 

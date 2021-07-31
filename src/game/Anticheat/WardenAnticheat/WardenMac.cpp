@@ -100,11 +100,11 @@ void WardenMac::Update()
 
     if (_fingerprintSaved)
     {
-        LoginDatabase.BeginTransaction();
+        LogsDatabase.BeginTransaction();
 
         static SqlStatementID fingerprintUpdate;
 
-        auto stmt = LoginDatabase.CreateStatement(fingerprintUpdate,
+        auto stmt = LogsDatabase.CreateStatement(fingerprintUpdate,
             "INSERT INTO system_fingerprint_usage (fingerprint, account, ip, realm) VALUES(?, ?, ?, ?)");
 
         stmt.addUInt32(_session->GetFingerprint());
@@ -113,7 +113,7 @@ void WardenMac::Update()
         stmt.addUInt32(realmID);
         stmt.Execute();
 
-        LoginDatabase.CommitTransaction();
+        LogsDatabase.CommitTransaction();
 
         _fingerprintSaved = true;
 
