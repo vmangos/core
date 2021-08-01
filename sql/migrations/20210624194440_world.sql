@@ -379,9 +379,9 @@ INSERT INTO `skinning_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `g
 UPDATE `gameobject` SET `position_z` = 91.219 WHERE `guid` IN (42907, 42910, 42908, 42909);
 
 -- Fix The Perfect Stout Quest Chain 
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE  `entry` = 315;
+UPDATE `quest_template` SET `PrevQuestId` = 0, `NextQuestInChain` = 413 WHERE `entry` = 315;
 UPDATE `quest_template` SET `PrevQuestId` = 315 WHERE `entry` = 415;
-
+UPDATE `quest_template` SET `PrevQuestId`= 315 WHERE `entry` = 413;
 
 -- End of migration.
 END IF;
