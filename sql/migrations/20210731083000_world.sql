@@ -13,17 +13,19 @@ DROP TABLE IF EXISTS `warden_checks`;
 DROP TABLE IF EXISTS `warden_scans`;
 
 CREATE TABLE `warden_scans` (
-  `id` smallint unsigned NOT NULL AUTO_INCREMENT,
-  `type` int DEFAULT '0',
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `type` int(11) DEFAULT '0',
   `str` text,
   `data` text,
-  `address` int DEFAULT '0',
-  `length` int DEFAULT '0',
+  `address` int(11) DEFAULT '0',
+  `length` int(11) DEFAULT '0',
   `result` tinytext NOT NULL,
-  `flags` mediumint unsigned NOT NULL,
+  `flags` mediumint(8) unsigned NOT NULL,
+  `penalty` tinyint(4) NOT NULL DEFAULT '-1' COMMENT 'Action to take if check fails',
   `comment` tinytext NOT NULL,
   UNIQUE KEY `id` (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 /*Data for the table `warden_scans` */
 

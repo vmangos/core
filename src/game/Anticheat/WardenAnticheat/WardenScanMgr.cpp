@@ -78,7 +78,8 @@ bool BuildRawData(const std::string &hexData, std::vector<uint8> &out)
 
 void WardenScanMgr::loadFromDB()
 {
-    auto result = WorldDatabase.Query("SELECT id,type,str,data,address,length,result,flags,comment FROM warden_scans");
+    //                                         0     1       2      3       4          5         6         7        8          9
+    auto result = WorldDatabase.Query("SELECT `id`, `type`, `str`, `data`, `address`, `length`, `result`, `flags`, `penalty`, `comment` FROM `warden_scans`");
 
     // copy any non-database scans into a placeholder
     std::vector<std::shared_ptr<const Scan> > new_scans;
@@ -108,7 +109,11 @@ void WardenScanMgr::loadFromDB()
         auto const offset = fields[4].GetUInt32();
         auto const length = fields[5].GetUInt32();
         auto const flags = static_cast<ScanFlags>(fields[7].GetUInt32()) | ScanFlags::FromDatabase;
-        auto const comment = fields[8].GetCppString();
+        int8 penalty = fields[8].GetUInt8();
+        auto const comment = fields[9].GetCppString();
+
+        if (penalty < WARDEN_ACTION_LOG || penalty >= WARDEN_ACTION_MAX)
+            penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
 
         switch (scanType)
         {
@@ -222,6 +227,11 @@ void WardenScanMgr::loadFromDB()
         {
             sLog.outError("Failed to allocate Warden scan type %u id %u", scanType, id);
             continue;
+        }
+        else
+        {
+            scan->checkId = id;
+            scan->penalty = WardenActions(penalty);
         }
 
         m_scans.emplace_back(std::shared_ptr<const Scan>(scan));

@@ -25,6 +25,7 @@
 #define __WARDENSCAN_HPP_
 
 #include "ByteBuffer.h"
+#include "World.h"
 
 #include <openssl/sha.h>
 
@@ -95,11 +96,16 @@ class Scan
 
     protected:  // should not be called by the user
         Scan(BuildT builder, CheckT checker, uint32 f, size_t req, size_t rep, const std::string &c)
-            : _builder(builder), _checker(checker), flags(f), comment(c), requestSize(req), replySize(rep)
-        { MANGOS_ASSERT(!((flags & WinAllBuild) && (flags & MacAllBuild))); }
+            : _builder(builder), _checker(checker), flags(f), comment(c), requestSize(req), replySize(rep), checkId(0)
+        { 
+            MANGOS_ASSERT(!((flags & WinAllBuild) && (flags & MacAllBuild)));
+            penalty = WardenActions(sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY));
+        }
 
     public:
+        uint32 checkId;
         uint32 flags;
+        WardenActions penalty;
         std::string comment;
         size_t requestSize;     // maximum size of request
         size_t replySize;       // maximum size of reply

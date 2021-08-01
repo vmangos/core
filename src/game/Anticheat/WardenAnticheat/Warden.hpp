@@ -119,6 +119,7 @@ class Warden
 
         // If no scan is passed, the default action from config is executed
         void ApplyPenalty(std::string message, std::shared_ptr<const Scan> scan);
+        void LogPositiveToDB(std::shared_ptr<const Scan> scan);
 
         WorldSession *const _session;
 

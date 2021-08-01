@@ -157,11 +157,11 @@ const ClientOffsets* GetClientOffets(uint32 build)
 }
 
 // returns ScanFlag mask for those builds which we have offsets
-constexpr ScanFlags GetScanFlagsByAvailableOffsets()
+ScanFlags GetScanFlagsByAvailableOffsets()
 {
     uint32 result = None;
 
-    auto constexpr offset_count = sizeof(Offsets) / sizeof(Offsets[0]);
+    auto offset_count = sizeof(Offsets) / sizeof(Offsets[0]);
 
     for (auto i = 0; i < offset_count; ++i)
     {
@@ -483,7 +483,7 @@ bool ValidateEndSceneHook(const std::vector<uint8> &code)
 
 void WardenWin::LoadScriptedScans()
 {
-    auto constexpr offset_flags = GetScanFlagsByAvailableOffsets();
+    auto offset_flags = GetScanFlagsByAvailableOffsets();
 
     // sys info locate phase 2
     auto const wardenSysInfo2 = std::make_shared<WindowsScan>(
@@ -1313,7 +1313,7 @@ void WardenWin::Update()
         static SqlStatementID fingerprintUpdate;
 
         auto stmt = LogsDatabase.CreateStatement(fingerprintUpdate,
-            "INSERT INTO system_fingerprint_usage (fingerprint, account, ip, realm, architecture, cputype, activecpus, totalcpus, pagesize) "
+            "INSERT INTO `system_fingerprint_usage` (`fingerprint`, `account`, `ip`, `realm`, `architecture`, `cputype`, `activecpus`, `totalcpus`, `pagesize`) "
             "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         stmt.addUInt32(_session->GetFingerprint());

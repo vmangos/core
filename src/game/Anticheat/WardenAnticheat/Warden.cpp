@@ -291,6 +291,7 @@ void Warden::ReadScanResults(ByteBuffer &buff)
 
             // TODO: logging (db?)
             ApplyPenalty("", s);
+            LogPositiveToDB(s);
         }
     }
 
@@ -328,7 +329,7 @@ void Warden::BeginTimeoutClock()
     _timeoutClock = 0;
 #else
     // we will expect a reply eventually
-    _timeoutClock = WorldTimer::getMSTime() + 1000 * sAnticheatConfig.GetWardenTimeout();
+    _timeoutClock = WorldTimer::getMSTime() + IN_MILLISECONDS * sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY);
 #endif
 }
 
@@ -545,4 +546,38 @@ void Warden::Update()
             }
         }
     }
+}
+
+void Warden::LogPositiveToDB(std::shared_ptr<const Scan> scan)
+{
+    if (!scan || !_session)
+        return;
+
+    if (uint32(scan->penalty) < sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL))
+        return;
+
+    static SqlStatementID insWardenPositive;
+
+    SqlStatement stmt = LogsDatabase.CreateStatement(insWardenPositive, "INSERT INTO `logs_warden` (`check`, `action`, `account`, `guid`, `map`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+    stmt.addUInt16(scan->checkId);
+    stmt.addInt8(scan->penalty);
+    stmt.addUInt32(_session->GetAccountId());
+    if (Player* pl = _session->GetPlayer())
+    {
+        stmt.addUInt64(pl->GetObjectGuid().GetRawValue());
+        stmt.addUInt32(pl->GetMapId());
+        stmt.addFloat(pl->GetPositionX());
+        stmt.addFloat(pl->GetPositionY());
+        stmt.addFloat(pl->GetPositionZ());
+    }
+    else
+    {
+        stmt.addUInt64(0);
+        stmt.addUInt32(0xFFFFFFFF);
+        stmt.addFloat(0.0f);
+        stmt.addFloat(0.0f);
+        stmt.addFloat(0.0f);
+    }
+    stmt.Execute();
 }
