@@ -175,6 +175,8 @@ class OPvPCapturePoint
 
         // neutral value on capture bar
         uint32 m_neutralValuePct;
+        uint32 m_ValuePct;
+        uint32 m_FactDiff;
 
         // pointer to the OutdoorPvP this objective belongs to
         OutdoorPvP* m_PvP;

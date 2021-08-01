@@ -22,35 +22,10 @@
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
-uint32 const EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
-
-uint32 const EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
-
-uint32 const EP_GraveYardZone = 139;
-
-uint32 const EP_GraveYardId = 927;
-
-uint8 const EPBuffZonesNum = 3;
-
-uint32 const EP_EWT_CM = 17690;
-uint32 const EP_CGT_CM = 17689;
-uint32 const EP_NPT_CM = 17696;
-uint32 const EP_PWT_CM = 17698;
-
-uint32 const EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
-
-enum EP_TaxiNodes
-{
-    EP_CGT_Taxi = 87,
-    EP_EWT_Taxi = 86,
-    EP_NPT_Taxi = 85,
-    EP_PWT_Taxi = 84
-};
-
 enum EP_EastwallTowerWorldStates
 {
-    EP_EWT_A = 2354,
-    EP_EWT_H = 2356,
+    EP_EWT_A = 2354, // EWT blue on map
+    EP_EWT_H = 2356, // EWT red on map
     EP_EWT_N_A = 2359, // ally conquested
     EP_EWT_N_H = 2360,
     EP_EWT_N = 2361
@@ -61,16 +36,16 @@ enum EP_NorthpassTowerWorldStates
     EP_NPT_N = 2352,
     EP_NPT_N_A = 2362,
     EP_NPT_N_H = 2363,
-    EP_NPT_A = 2372,
-    EP_NPT_H = 2373
+    EP_NPT_A = 2372, // NPT blue on map
+    EP_NPT_H = 2373 // NPT red on map
 };
 
 enum EP_PlagewoodTowerWorldStates
 {
     EP_PWT_N_A = 2366,
     EP_PWT_N_H = 2353, //2367 not present! use neutral!
-    EP_PWT_A = 2370,
-    EP_PWT_H = 2371,
+    EP_PWT_A = 2370, // PWT blue on map
+    EP_PWT_H = 2371, // PWT red on map
     EP_PWT_N = 2353
 };
 
@@ -79,7 +54,7 @@ enum EP_CrownGuardTowerWorldStates
     EP_CGT_N_A = 2374,
     EP_CGT_N_H = 2375,
     EP_CGT_A = 2378,
-    EP_CGT_H = 2379,
+    EP_CGT_H = 2379, // GCT blue on map
     EP_CGT_N = 2355
 };
 
@@ -90,7 +65,17 @@ enum EP_WorldStates
     EP_UI_TOWER_SLIDER_N = 2428,
 
     EP_UI_TOWER_COUNT_A = 2327,
-    EP_UI_TOWER_COUNT_H = 2328
+    EP_UI_TOWER_COUNT_H = 2328,
+
+    // Tower colors on Map
+    unk1 = 2358, // EFT horde
+    unk2 = 2357, // EFT alliance
+    unk3 = 2364, // NPT alliance
+    unk4 = 2365, // NPT horde
+    unk5 = 2368, // PWT alliance
+    unk6 = 2369, // PWT horde
+    unk7 = 2376, // CGT Alliance
+    unk8 = 2377  // CGT horde
 };
 
 enum EP_Summons
@@ -153,7 +138,15 @@ enum EP_Spells
     SPELL_SPIRIT_PARTICLES                      = 17327,
     SPELL_SPIRIT_PARTICLES_RED_BIG              = 31309,
     SPELL_SPIRIT_PARTICLES_SUPER_BIG_DND        = 31954,
-    SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND    = 31951
+    SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND    = 31951,
+    SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_1      = 30880,
+    SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_2      = 30683,
+    SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_3      = 30682,
+    SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_4      = 29520,
+    SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_1   = 11413,
+    SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_2   = 11414,
+    SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_3   = 11415,
+    SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_4   = 1386
 };
 
 enum EP_NPCs
@@ -215,6 +208,23 @@ enum EP_Gobjects
     GOBJECT_HORDE_BANNER_AURA_LARGE                             = 180422,
     GOBJECT_ALLIANCE_BANNER_AURA_LARGE                          = 180421
 };
+
+uint32 const EP_AllianceBuffs[4] = { SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_1, SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_2, SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_3, SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_4 };
+
+uint32 const EP_HordeBuffs[4] = { SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_1, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_2, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_3, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_4 };
+
+uint32 const EP_GraveYardZone = 139; // Eastern Plaguelands.
+
+uint32 const EP_GraveYardId = 927;
+
+uint8 const EPBuffZonesNum = 3;
+
+uint32 const EP_EWT_CM = 17690;
+uint32 const EP_CGT_CM = 17689;
+uint32 const EP_NPT_CM = 17696;
+uint32 const EP_PWT_CM = 17698;
+
+uint32 const EPBuffZones[EPBuffZonesNum] = { 139, 2017, 2057 };
 
 uint32 const EPTowerPlayerEnterEvents[EP_TOWER_NUM] = { 10691, 10699, 10701, 10705 };
 
@@ -290,11 +300,7 @@ const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
 
 const creature_type EP_PWT_FlightMaster = { NPC_WILLIAM_KIELAR, 0, 0, 2987.5f, -3049.11f, 120.126f, 5.75959f };
 
-const creature_type EP_CGT_SpiritOfVictory[2] =
-{
-    { NPC_SPIRIT_OF_VICTORY, 0, 0, 1856.58f, -3714.72f, 194.637f, 0.762214f },
-    { NPC_SPIRIT_OF_VICTORY, 0, 0, 1856.74f, -3714.51f, 194.26f, 4.35575f }
-};
+const creature_type EP_CGT_SpiritOfVictory = { NPC_SPIRIT_OF_VICTORY, 0, 0, 1856.58f, -3714.72f, 194.637f, 0.762214f };
 
 class OutdoorPvPEP;
 

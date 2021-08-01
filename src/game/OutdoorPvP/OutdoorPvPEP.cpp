@@ -114,8 +114,6 @@ void OPvPCapturePointEP_EWT::ChangeState()
         flag->SetGoArtKit(artkit);
         flag->SendGameObjectCustomAnim(animation);
     }
-    else
-        sLog.outBasic("[OPvPCapturePointEP_EWT::ChangeState] no flag");
 
     if (flag2)
     {
@@ -137,13 +135,9 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
-    // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-    // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
 uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
@@ -162,17 +156,18 @@ void OPvPCapturePointEP_EWT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_EWT_H , bool(m_TowerState & EP_TS_H));
     m_PvP->SendUpdateWorldState(EP_EWT_N_A , bool(m_TowerState & EP_TS_N_A));
     m_PvP->SendUpdateWorldState(EP_EWT_N_H , bool(m_TowerState & EP_TS_N_H));
-    m_PvP->SendUpdateWorldState(EP_EWT_N , bool(m_TowerState & EP_TS_N));
+    m_PvP->SendUpdateWorldState(EP_EWT_N, bool(m_TowerState & EP_TS_N));
 }
 
 bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
+        /*
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        */
         return true;
     }
     return false;
@@ -180,7 +175,7 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* plr)
 {
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -206,8 +201,8 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
                 {
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
                     {
-                        float angle = (float(i) * (M_PI / (4 / static_cast<float>(2)))) + pCommander->GetOrientation();
-                        pCreature->JoinCreatureGroup(pCommander, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE);
+                        float angle = (float(i) * (M_PI / 4)) + pCommander->GetOrientation();
+                        pCreature->JoinCreatureGroup(pCommander, ATTACK_DISTANCE, angle - M_PI, OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
                         pCreature->SetActiveObjectState(true);
                     }
                 }
@@ -320,8 +315,6 @@ void OPvPCapturePointEP_NPT::ChangeState()
         flag->SetGoArtKit(artkit);
         flag->SendGameObjectCustomAnim(animation);
     }
-    else
-        sLog.outBasic("[OPvPCapturePointEP_EWT::ChangeState] no flag");
 
     if (flag2)
     {
@@ -344,13 +337,9 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
 void OPvPCapturePointEP_NPT::SendChangePhase()
 {
-    // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-    // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
 uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
@@ -376,10 +365,11 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
+        /*
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        */
         return true;
     }
     return false;
@@ -387,7 +377,7 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* plr)
 {
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -518,8 +508,6 @@ void OPvPCapturePointEP_CGT::ChangeState()
         flag->SetGoArtKit(artkit);
         flag->SendGameObjectCustomAnim(animation);
     }
-    else
-        sLog.outBasic("[OPvPCapturePointEP_EWT::ChangeState] no flag");
 
     if (flag2)
     {
@@ -541,13 +529,9 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
-    // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-    // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
 uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
@@ -573,10 +557,11 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
+        /*
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        */
         return true;
     }
     return false;
@@ -584,7 +569,7 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player* plr)
 {
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -620,7 +605,7 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
     {
         m_SpiritOfVictorySpawned = team;
         DelCreature(EP_CGT_SPIRITOFVICTORY);
-        AddCreature(EP_CGT_SPIRITOFVICTORY, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].entry, team, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].map, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].x, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].y, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].z, EP_CGT_SpiritOfVictory[team == ALLIANCE ? 0 : 1].o);
+        AddCreature(EP_CGT_SPIRITOFVICTORY, EP_CGT_SpiritOfVictory.entry, team, EP_CGT_SpiritOfVictory.map, EP_CGT_SpiritOfVictory.x, EP_CGT_SpiritOfVictory.y, EP_CGT_SpiritOfVictory.z, EP_CGT_SpiritOfVictory.o);
 
         if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_SPIRITOFVICTORY]))
         {
@@ -735,8 +720,6 @@ void OPvPCapturePointEP_PWT::ChangeState()
         flag->SetGoArtKit(artkit);
         flag->SendGameObjectCustomAnim(animation);
     }
-    else
-        sLog.outBasic("[OPvPCapturePointEP_PWT::ChangeState] no flag");
 
     if (flag2)
     {
@@ -758,13 +741,9 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
-    // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-    // send this too, sometimes it resets :S
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
 uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
@@ -790,10 +769,11 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
+        /*
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * DEFAULT_VISIBILITY_DISTANCE);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
         plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        */
         return true;
     }
     return false;
@@ -801,7 +781,7 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* plr)
 {
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -822,7 +802,6 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
     }
 }
 
-// ep
 OutdoorPvPEP::OutdoorPvPEP()
 {
     m_TypeId = OUTDOOR_PVP_EP;
@@ -865,7 +844,7 @@ void OutdoorPvPEP::Update(uint32 diff)
 
 void OutdoorPvPEP::OnPlayerEnter(Player* plr)
 {
-    // add buffs
+    // Add buffs.
     if (plr->GetTeam() == ALLIANCE)
     {
         if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
@@ -881,7 +860,7 @@ void OutdoorPvPEP::OnPlayerEnter(Player* plr)
 
 void OutdoorPvPEP::OnPlayerLeave(Player* plr)
 {
-    // remove buffs
+    // Remove buffs.
     if (plr->GetTeam() == ALLIANCE)
     {
         for (uint32 i : EP_AllianceBuffs)
