@@ -35,20 +35,35 @@
 
 enum ScanFlags
 {
-    None            = 0x00,
+    None            = 0x00000,
 
-    FromDatabase    = 0x01,     // this scan came from the database, and should be deleted on reload
+    FromDatabase    = 0x00001,  // this scan came from the database, and should be deleted on reload
 
-    WinBuild5875    = 0x02,     // 1.12.1
-    WinBuild6005    = 0x04,     // 1.12.2
-    WinBuild6141    = 0x08,     // 1.12.3
+    WinBuild5875    = 0x00002,  // 1.12.1
+    WinBuild6005    = 0x00004,  // 1.12.2
+    WinBuild6141    = 0x00008,  // 1.12.3
 
-    MacBuild5875    = 0x10,     // 1.12.1
+    MacBuild5875    = 0x00010,  // 1.12.1
 
-    InitialLogin    = 0x20,     // scans when world session is first created
-    InWorld         = 0x40,     // scans run whenever the player is in the world
+    InitialLogin    = 0x00020,  // scans when world session is first created
+    InWorld         = 0x00040,  // scans run whenever the player is in the world
 
-    WinAllBuild     = (WinBuild5875|WinBuild6005|WinBuild6141),
+    WinBuild4222    = 0x00080,  // 1.2.4
+    WinBuild4297    = 0x00100,  // 1.3.1
+    WinBuild4375    = 0x00200,  // 1.4.2
+    WinBuild4449    = 0x00400,  // 1.5.1
+    WinBuild4544    = 0x00800,  // 1.6.1
+    WinBuild4695    = 0x01000,  // 1.7.1
+    WinBuild4878    = 0x02000,  // 1.8.4
+    WinBuild5086    = 0x04000,  // 1.9.4
+    WinBuild5302    = 0x08000,  // 1.10.2
+    WinBuild5464    = 0x10000,  // 1.11.2
+
+    WinAllBuild     = (
+        WinBuild5875|WinBuild6005|WinBuild6141|WinBuild4222|WinBuild4297|WinBuild4375|
+        WinBuild4449|WinBuild4544|WinBuild4695|WinBuild4878|WinBuild5086|WinBuild5302|
+        WinBuild5464
+        ),
     MacAllBuild     = (MacBuild5875),
 };
 

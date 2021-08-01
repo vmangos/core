@@ -9,17 +9,18 @@ INSERT INTO `migrations` VALUES ('20210731083000');
 -- Add your query below.
 
 
+DROP TABLE IF EXISTS `warden_checks`;
 DROP TABLE IF EXISTS `warden_scans`;
 
 CREATE TABLE `warden_scans` (
-  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `type` int(2) DEFAULT '0',
+  `id` smallint unsigned NOT NULL AUTO_INCREMENT,
+  `type` int DEFAULT '0',
   `str` text,
   `data` text,
-  `address` int(8) DEFAULT '0',
-  `length` int(2) DEFAULT '0',
+  `address` int DEFAULT '0',
+  `length` int DEFAULT '0',
   `result` tinytext NOT NULL,
-  `flags` smallint(5) unsigned NOT NULL,
+  `flags` mediumint unsigned NOT NULL,
   `comment` tinytext NOT NULL,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=utf8;
@@ -31,9 +32,9 @@ insert  into `warden_scans`(`id`,`type`,`str`,`data`,`address`,`length`,`result`
 (2,0,NULL,NULL,8696620,6,'686561646572',8,'Packet internal sign - \"header\"'),
 (3,0,NULL,NULL,8530960,6,'53595354454D',6,'Packet internal sign - \"SYSTEM\"'),
 (4,0,NULL,NULL,8547832,6,'53595354454D',8,'Packet internal sign - \"SYSTEM\"'),
-(5,2,NULL,'82D7E5CBC8D2F78A791E189BAB3FD5D4342BF7EB0CA3F129',74044,NULL,'0',14,'Cheat Engine dll'),
-(6,2,NULL,'A444519CC419521B6D39990C1D95329C8D94B59226CBAA98',16507,NULL,'0',14,'WPE PRO dll'),
-(7,2,NULL,'3A0F8985E701343E439C74B675C72BBE2D8810A745569913',372624,NULL,'0',14,'rPE dll'),
+(5,2,NULL,'82D7E5CBC8D2F78A791E189BAB3FD5D4342BF7EB0CA3F129',74044,NULL,'0',130830,'Cheat Engine dll'),
+(6,2,NULL,'A444519CC419521B6D39990C1D95329C8D94B59226CBAA98',16507,NULL,'0',130830,'WPE PRO dll'),
+(7,2,NULL,'3A0F8985E701343E439C74B675C72BBE2D8810A745569913',372624,NULL,'0',130830,'rPE dll'),
 (8,0,NULL,NULL,8151666,4,'D893FEC0',2,'Jump gravity'),
 (9,0,NULL,NULL,8151646,2,'3075',2,'Jump gravity water'),
 (10,0,NULL,NULL,6382555,2,'8A47',2,'Anti root'),
@@ -100,11 +101,11 @@ insert  into `warden_scans`(`id`,`type`,`str`,`data`,`address`,`length`,`result`
 (71,0,NULL,NULL,4729827,1,'5E',2,'Daylight hack'),
 (72,0,NULL,NULL,6354512,6,'0F84EA000000',2,'Ranged attack stop hack'),
 (73,0,NULL,NULL,5053463,2,'7415',2,'Officer note hack'),
-(74,4,'World\\Lordaeron\\stratholme\\Activedoodads\\doors\\nox_door_plague.m2',NULL,0,0,'B4452B6D95C98B186A70B008FA07BBAEF30DF7A2',14,'Stratholme door'),
-(75,4,'World\\Kalimdor\\onyxiaslair\\doors\\OnyxiasGate01.m2',NULL,0,0,'75195E4AEDA0BCAF048CA0E34D95A70D4F53C746',14,'Onyxia gate'),
-(76,4,'World\\Generic\\Human\\Activedoodads\\doors\\deadminedoor02.m2',NULL,0,0,'3DFF011B9AB134F37F885097E695351B91953564',14,'Deadmines door'),
-(77,4,'World\\Kalimdor\\silithus\\activedoodads\\ahnqirajdoor\\ahnqirajdoor02.m2',NULL,0,0,'DBD4F407C468CC36134E621D160178FDA4D0D249',14,'AQ door'),
-(78,4,'World\\Kalimdor\\diremaul\\activedoodads\\doors\\diremaulsmallinstancedoor.m2',NULL,0,0,'0DC8DB46C85549C0FF1A600F6C236357C305781A',14,'Dire Maul Gordok Inner Door'),
+(74,4,'World\\Lordaeron\\stratholme\\Activedoodads\\doors\\nox_door_plague.m2',NULL,0,0,'B4452B6D95C98B186A70B008FA07BBAEF30DF7A2',130830,'Stratholme door'),
+(75,4,'World\\Kalimdor\\onyxiaslair\\doors\\OnyxiasGate01.m2',NULL,0,0,'75195E4AEDA0BCAF048CA0E34D95A70D4F53C746',130830,'Onyxia gate'),
+(76,4,'World\\Generic\\Human\\Activedoodads\\doors\\deadminedoor02.m2',NULL,0,0,'3DFF011B9AB134F37F885097E695351B91953564',130830,'Deadmines door'),
+(77,4,'World\\Kalimdor\\silithus\\activedoodads\\ahnqirajdoor\\ahnqirajdoor02.m2',NULL,0,0,'DBD4F407C468CC36134E621D160178FDA4D0D249',130830,'AQ door'),
+(78,4,'World\\Kalimdor\\diremaul\\activedoodads\\doors\\diremaulsmallinstancedoor.m2',NULL,0,0,'0DC8DB46C85549C0FF1A600F6C236357C305781A',130830,'Dire Maul Gordok Inner Door'),
 (79,0,NULL,NULL,8139737,5,'D84E14DEC1',2,'UNKNOWN movement hack?'),
 (80,0,NULL,NULL,8902804,4,'8E977042',2,'Wall climb hack'),
 (81,0,NULL,NULL,8902808,4,'0000E040',2,'Run speed hack'),
@@ -112,10 +113,10 @@ insert  into `warden_scans`(`id`,`type`,`str`,`data`,`address`,`length`,`result`
 (83,0,NULL,NULL,8445948,4,'BB8D243F',2,'Wall climb hack'),
 (84,0,NULL,NULL,6493717,2,'741D',2,'Speed hack'),
 (85,2,NULL,'33D233C9E887071B00E8',13856,NULL,'1',14,'Warden packet process code search sanity check'),
-(86,1,'kernel32.dll',NULL,0,0,'1',14,'Warden module search bypass sanity check'),
-(87,1,'wpespy.dll',NULL,0,0,'0',14,'WPE Pro'),
-(88,1,'speedhack-i386.dll',NULL,0,0,'0',14,'CheatEngine'),
-(89,1,'tamia.dll',NULL,0,0,'0',14,'Tamia hack');
+(86,1,'kernel32.dll',NULL,0,0,'1',130830,'Warden module search bypass sanity check'),
+(87,1,'wpespy.dll',NULL,0,0,'0',130830,'WPE Pro'),
+(88,1,'speedhack-i386.dll',NULL,0,0,'0',130830,'CheatEngine'),
+(89,1,'tamia.dll',NULL,0,0,'0',130830,'Tamia hack');
 
 DROP TABLE IF EXISTS `cheat_response_rules`;
 

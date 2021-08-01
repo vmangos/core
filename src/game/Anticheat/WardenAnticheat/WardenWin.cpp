@@ -37,6 +37,7 @@
 #include "ByteBuffer.h"
 #include "Database/DatabaseEnv.h"
 #include "Player.h"
+#include "Progression.h"
 
 #include <string>
 #include <vector>
@@ -47,41 +48,53 @@
 namespace
 {
 // fixed offsets for classic client(s):
-static constexpr uint32 sOfsGetText = 0x303BF0;
+static constexpr struct ClientOffsets
+{
+    uint32 Build;
 
-static constexpr uint32 sOfsOpen = 0x2477A0;
-static constexpr uint32 sOfsSize = 0x2487F0;
-static constexpr uint32 sOfsRead = 0x248460;
-static constexpr uint32 sOfsClose = 0x253900;
+    // LuaScan
+    uint32 GetText;
 
-static constexpr uint32 sOfsTickCount = 0x2C010;
+    // FileHashScan
+    uint32 Open;
+    uint32 Size;
+    uint32 Read;
+    uint32 Close;
 
-static constexpr uint32 sOfsCWorld__enables = 0xC7B2A4;
-static constexpr uint32 sOfsCWorldScene__camTargEntity = 0xC7BCD4;
-static constexpr uint32 sOfsCWorldScene__camTargEntity6141 = 0xC803F4;
-static constexpr uint32 sOfsEntityOffset = 0x88;
-static constexpr uint32 sOfsPlayerOffset = 0x28;
+    // TimeScan
+    uint32 TickCount;
 
-static constexpr uint32 sOfsCSimpleTop__m_eventTime = 0xCF0BC8;
+    // CWorld::enables memory scan
+    uint32 WorldEnables;
 
-static constexpr uint32 sOfsMoveSpeed = 0xA30;
-static constexpr uint32 sOfsUnitTrack = 0x2EB0;
-static constexpr uint32 sOfsMoveFlags = 0x9E8;
-static constexpr uint32 sOfsResourceTrack = 0x2EB4;
+    // LastHardwareAction memory scan (CSimpleTop::m_eventTime)
+    uint32 LastHardwareAction;
 
-// TODO: check this value for 1.12.2 and 1.12.3!
-static constexpr uint32 sOfsg_theGxDevicePtr = 0xC0ED38;
-static constexpr uint32 sOfsDevice2 = 0x38A8;
-static constexpr uint32 sOfsDevice3 = 0x0;
-static constexpr uint32 sOfsDevice4 = 0xA8;
+    // EndScene memory scan
+    uint32 g_theGxDevicePtr;
+    uint32 OfsDevice2;
+    uint32 OfsDevice3;
+    uint32 OfsDevice4;
 
-// TODO: check this value for 1.12.2 and 1.12.3!
-static constexpr uint32 sOfsWardenModule = 0xCE897C;
-static constexpr uint32 sOfsWardenSysInfo = 0x228;
-static constexpr uint32 sOfsWardenWinSysInfo = 0x08;
+    // Warden memory scan
+    uint32 WardenModule;
+    uint32 OfsWardenSysInfo;
+    uint32 OfsWardenWinSysInfo;
+} Offsets[] = {
+    {
+        5875,
+        0x303BF0,
+        0x2477A0, 0x2487F0, 0x248460, 0x253900,
+        0x2C010,
+        0xC7B2A4,
+        0xCF0BC8,
+        0xC0ED38, 0x38A8, 0x0, 0xA8,
+        0xCE897C, 0x228, 0x08
+    }
+};
 
 // TODO: Identify drivers for other hypervisors and add detections for them too
-constexpr struct
+static constexpr struct
 {
     const char *Name;
     const char *Driver;
@@ -92,7 +105,7 @@ constexpr struct
     { "ESXi", "vmmemctl", "\\Device\\vmmemctl"},
 };
 
-auto constexpr HypervisorCount = sizeof(Hypervisors) / sizeof(Hypervisors[0]);
+static auto constexpr HypervisorCount = sizeof(Hypervisors) / sizeof(Hypervisors[0]);
 
 enum WorldEnables
 {
@@ -131,6 +144,67 @@ enum WorldEnables
     Required = (TerrainDoodads|Terrain| MapObjects| MapObjectLighting| MapObjectTextures| Water),
     Prohibited = (TerrainDoodadCollisionVisuals|CrappyBatches|ZoneBoundaryVisuals|BSPRender|ShowQuery|TerrainDoodadAABoxVisuals|Unknown6737F9|Unknown673820),
 };
+
+const ClientOffsets* GetClientOffets(uint32 build)
+{
+    static auto constexpr offset_count = sizeof(Offsets) / sizeof(Offsets[0]);
+
+    for (auto i = 0; i < offset_count; ++i)
+        if (Offsets[i].Build == build)
+            return &Offsets[i];
+
+    return nullptr;
+}
+
+// returns ScanFlag mask for those builds which we have offsets
+constexpr ScanFlags GetScanFlagsByAvailableOffsets()
+{
+    uint32 result = None;
+
+    auto constexpr offset_count = sizeof(Offsets) / sizeof(Offsets[0]);
+
+    for (auto i = 0; i < offset_count; ++i)
+    {
+        switch (Offsets[i].Build)
+        {
+        case CLIENT_BUILD_1_2_4:
+            result |= WinBuild4222;
+            break;
+        case CLIENT_BUILD_1_3_1:
+            result |= WinBuild4297;
+            break;
+        case CLIENT_BUILD_1_4_2:
+            result |= WinBuild4375;
+            break;
+        case CLIENT_BUILD_1_5_1:
+            result |= WinBuild4449;
+            break;
+        case CLIENT_BUILD_1_6_1:
+            result |= WinBuild4544;
+            break;
+        case CLIENT_BUILD_1_7_1:
+            result |= WinBuild4695;
+            break;
+        case CLIENT_BUILD_1_8_4:
+            result |= WinBuild4878;
+            break;
+        case CLIENT_BUILD_1_9_4:
+            result |= WinBuild5086;
+            break;
+        case CLIENT_BUILD_1_10_2:
+            result |= WinBuild5302;
+            break;
+        case CLIENT_BUILD_1_11_2:
+            result |= WinBuild5464;
+            break;
+        case CLIENT_BUILD_1_12_1:
+            result |= WinBuild5875 | WinBuild6005 | WinBuild6141;
+            break;
+        }
+    }
+
+    return static_cast<ScanFlags>(result);
+}
 
 std::string ArchitectureString(uint16 arch)
 {
@@ -409,16 +483,22 @@ bool ValidateEndSceneHook(const std::vector<uint8> &code)
 
 void WardenWin::LoadScriptedScans()
 {
+    auto constexpr offset_flags = GetScanFlagsByAvailableOffsets();
+
     // sys info locate phase 2
     auto const wardenSysInfo2 = std::make_shared<WindowsScan>(
     // builder
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_sysInfo.dwOemId + sOfsWardenWinSysInfo
+             << wardenWin->_sysInfo.dwOemId + offsets->OfsWardenWinSysInfo
              << static_cast<uint8>(sizeof(wardenWin->_sysInfo));
     },
     // checker
@@ -470,10 +550,14 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_wardenAddress + sOfsWardenSysInfo
+             << wardenWin->_wardenAddress + offsets->OfsWardenSysInfo
              << static_cast<uint8>(sizeof(wardenWin->_sysInfo.dwOemId));
     },
     // checker
@@ -507,10 +591,15 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << sOfsWardenModule << static_cast<uint8>(sizeof(wardenWin->_wardenAddress));
+             << offsets->WardenModule
+             << static_cast<uint8>(sizeof(wardenWin->_wardenAddress));
     },
     // checker
     [wardenSysInfo1](const Warden *warden, ByteBuffer &buff)
@@ -534,9 +623,23 @@ void WardenWin::LoadScriptedScans()
 
         return false;
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
-        "Warden locate", InitialLogin|WinAllBuild));
+        "Warden locate", InitialLogin|offset_flags));
 
-    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsMemoryScan>(sOfsCWorld__enables, sizeof(uint32),
+    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
+    // builder
+    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    {
+        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
+
+        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
+             << static_cast<uint8>(0)
+             << offsets->WorldEnables
+             << static_cast<uint8>(sizeof(wardenWin->_wardenAddress));
+    },
     [](const Warden *warden, ByteBuffer &buff)
     {
         auto const wardenWin = const_cast<WardenWin *>(reinterpret_cast<const WardenWin *>(warden));
@@ -563,7 +666,8 @@ void WardenWin::LoadScriptedScans()
         }
 
         return false;
-    } , "CWorld::enables hack", WinBuild5875));
+    }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
+    sizeof(uint32), "CWorld::enables hack", offset_flags));
 
     // read game time and last hardware action time together
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -571,6 +675,10 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         // NOTE: the order of these two scans is important because the client will not perform the checks
         // at the same time, and we want to safely assume that the last hardware action time is not
@@ -579,7 +687,7 @@ void WardenWin::LoadScriptedScans()
         // last hardware action time
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << sOfsCSimpleTop__m_eventTime
+             << offsets->LastHardwareAction
              << static_cast<uint8>(sizeof(uint32));
 
         // game time
@@ -626,7 +734,7 @@ void WardenWin::LoadScriptedScans()
         wardenWin->_lastTimeCheckServer = WorldTimer::getMSTime();
 
         return false;
-    }, 11, 10, "Anti-AFK hack", WinBuild5875));
+    }, 11, 10, "Anti-AFK hack", offset_flags));
 
     // check for hypervisors
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
@@ -770,10 +878,14 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + sOfsDevice4
+             << wardenWin->_endSceneAddress + offsets->OfsDevice4
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
@@ -807,10 +919,14 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + sOfsDevice3
+             << wardenWin->_endSceneAddress + offsets->OfsDevice3
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
@@ -843,10 +959,14 @@ void WardenWin::LoadScriptedScans()
     [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
     {
         auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
 
         scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
              << static_cast<uint8>(0)
-             << wardenWin->_endSceneAddress + sOfsDevice2
+             << wardenWin->_endSceneAddress + offsets->OfsDevice2
              << static_cast<uint8>(sizeof(uint32));
     },
     // checker
@@ -873,7 +993,21 @@ void WardenWin::LoadScriptedScans()
     }, sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8), sizeof(uint8) + sizeof(uint32),
     "EndScene locate stage 2", None);
 
-    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsMemoryScan>(sOfsg_theGxDevicePtr, sizeof(uint32),
+    sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsScan>(
+    // builder
+    [](const Warden *warden, std::vector<std::string> &, ByteBuffer &scan)
+    {
+        auto const wardenWin = reinterpret_cast<const WardenWin *>(warden);
+        auto const offsets = GetClientOffets(wardenWin->_session->GetGameBuild());
+
+        if (!offsets)
+            return;
+
+        scan << static_cast<uint8>(wardenWin->GetModule()->opcodes[READ_MEMORY] ^ wardenWin->GetXor())
+             << static_cast<uint8>(0)
+             << offsets->g_theGxDevicePtr
+             << static_cast<uint8>(sizeof(uint32));
+    },
     // checker
     [endSceneLocate2](const Warden *warden, ByteBuffer &buff)
     {
@@ -903,7 +1037,10 @@ void WardenWin::LoadScriptedScans()
         wardenWin->EnqueueScans({ endSceneLocate2 });
 
         return false;
-    }, "EndScene locate stage 1", WinBuild5875|InitialLogin));
+    },
+    sizeof(uint8) + sizeof(uint8) + sizeof(uint32) + sizeof(uint8),
+    sizeof(uint8) + sizeof(uint32),
+    "EndScene locate stage 1", InitialLogin|offset_flags));
 
     sWardenScanMgr.AddWindowsScan(std::make_shared<WindowsModuleScan>("prxdrvpe.dll",
     // checker
@@ -1070,49 +1207,88 @@ void WardenWin::ValidateEndScene(const std::vector<uint8> &code)
 
 uint32 WardenWin::GetScanFlags() const
 {
-    uint32 result = ScanFlags::None;
+    auto const game_build = _session->GetGameBuild();
+
+    constexpr int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    // for some reason these arrays are null terminated
+    auto constexpr num_accepted_versions = (sizeof(accepted_versions) / sizeof(accepted_versions[0])) - 1;
+
+    bool found = false;
+    for (auto i = 0; i < num_accepted_versions; ++i)
+    {
+        if (accepted_versions[i] == game_build)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        sLog.outWarden("Invalid client build %u for account %u", _session->GetGameBuild(), _session->GetAccountId());
+        _session->KickPlayer();
+        return ScanFlags::None;
+    }
+
+    // at this point we know the game build is accepted
 
     switch (_session->GetGameBuild())
     {
+        case 4222:
+            return ScanFlags::WinBuild4222;
+        case 4297:
+            return ScanFlags::WinBuild4297;
+        case 4375:
+            return ScanFlags::WinBuild4375;
+        case 4499:
+            return ScanFlags::WinBuild4449;
+        case 4544:
+            return ScanFlags::WinBuild4544;
+        case 4695:
+            return ScanFlags::WinBuild4695;
+        case 4878:
+            return ScanFlags::WinBuild4878;
+        case 5086:
+            return ScanFlags::WinBuild5086;
+        case 5302:
+            return ScanFlags::WinBuild5302;
+        case 5464:
+            return ScanFlags::WinBuild5464;
         case 5875:
-            result |= ScanFlags::WinBuild5875;
-            break;
+            return ScanFlags::WinBuild5875;
         case 6005:
-            result |= ScanFlags::WinBuild6005;
-            break;
+            return ScanFlags::WinBuild6005;
         case 6141:
-            result |= ScanFlags::WinBuild6141;
-            break;
-        default:
-            sLog.outWarden("Invalid client build %u for account %u", _session->GetGameBuild(), _session->GetAccountId());
-            _session->KickPlayer();
-            return ScanFlags::None;
+            return ScanFlags::WinBuild6141;
     }
 
-    return result;
+    return ScanFlags::None;
 }
 
 void WardenWin::InitializeClient()
 {
-    // initialize lua
-    ByteBuffer lua;
-    BuildLuaInit("", true, sOfsGetText, lua);
+    if (auto const offsets = GetClientOffets(_session->GetGameBuild()))
+    {
+        // initialize lua
+        ByteBuffer lua;
+        BuildLuaInit("", true, offsets->GetText, lua);
 
-    // initialize SFile*
-    ByteBuffer file;
-    BuildFileHashInit("", true, sOfsOpen, sOfsSize, sOfsRead, sOfsClose, file);
+        // initialize SFile*
+        ByteBuffer file;
+        BuildFileHashInit("", true, offsets->Open, offsets->Size, offsets->Read, offsets->Close, file);
 
-    // initialize timing check
-    ByteBuffer timing;
-    BuildTimingInit("", sOfsTickCount, true, timing);
+        // initialize timing check
+        ByteBuffer timing;
+        BuildTimingInit("", offsets->TickCount, true, timing);
 
-    ByteBuffer pkt(lua.wpos() + file.wpos() + timing.wpos());
+        ByteBuffer pkt(lua.wpos() + file.wpos() + timing.wpos());
 
-    pkt.append(lua);
-    pkt.append(file);
-    pkt.append(timing);
+        pkt.append(lua);
+        pkt.append(file);
+        pkt.append(timing);
 
-    SendPacket(pkt);
+        SendPacket(pkt);
+    }
 
     _initialized = true;
 }
