@@ -33,7 +33,7 @@
 #include "GuildMgr.h"
 #include "ObjectGuid.h"
 #include "AsyncCommandHandlers.h"
-#include "WardenAnticheat/Warden.hpp"
+#include "Anticheat.h"
 
 void PInfoHandler::HandlePInfoCommand(WorldSession* session, Player* target, ObjectGuid& target_guid, std::string& name)
 {
