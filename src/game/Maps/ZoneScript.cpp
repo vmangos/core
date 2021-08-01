@@ -39,7 +39,6 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* plr)
 {
     if (m_capturePoint)
     {
-        sLog.outBasic("[OPvPCapturePoint::HandlePlayerEnter] m_ValuePct = %d", m_ValuePct);
         plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
         plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
         /* IMPORTANT!
@@ -74,8 +73,6 @@ void OPvPCapturePoint::SendChangePhase()
     if (!m_capturePoint)
         return;
 
-    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
-    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_ValuePct);
 }
 
@@ -390,12 +387,8 @@ bool OPvPCapturePoint::Update(uint32 diff)
     m_FactDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
 
     // Only send World Updates if the Slider value actually changes or Faction difference changed to avoid sending unnecessary packets.
-    if (m_ValuePct != m_OldValuePct || m_OldFactDiff != m_FactDiff || m_OldState != m_State)
-    {
-        //sLog.outBasic("[OPvPCapturePoint::Update] m_OldFactDiff = %d, m_FactDiff = %d", m_OldFactDiff, m_FactDiff);
-        //sLog.outBasic("[OPvPCapturePoint::Update] m_ValuePct = %d, m_OldValuePct = %d", m_ValuePct, m_OldValuePct);
+    if (m_ValuePct != m_OldValuePct || m_OldFactDiff != m_FactDiff && !m_FactDiff)
         SendChangePhase();
-    }
 
     return false;
 }
