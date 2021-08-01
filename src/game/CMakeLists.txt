@@ -599,7 +599,3 @@ else()
       )
   endif()
 endif()
-
-if(USE_ANTICHEAT)
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Anticheat/WardenAnticheat/modules/ DESTINATION ${BIN_DIR}/warden_modules)
-endif()
