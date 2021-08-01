@@ -38,7 +38,7 @@ OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP *pvp)
 
 void OPvPCapturePointEP_EWT::ChangeState()
 {
-    // if changing from controlling alliance to horde or vice versa
+    // If changing from controlling alliance to horde or vice versa.
     if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = 0;
@@ -128,15 +128,13 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
     UpdateTowerState();
 
-    // complete quest objective
+    // Complete quest objective.
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
         SendObjectiveComplete(EP_EWT_CM, 0);
 }
 
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
@@ -175,7 +173,6 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* plr)
 {
-    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -201,8 +198,8 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
                 {
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
                     {
-                        float angle = (float(i) * (M_PI / 4)) + pCommander->GetOrientation();
-                        pCreature->JoinCreatureGroup(pCommander, ATTACK_DISTANCE, angle - M_PI, OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
+                        float angle = (float(i) * (M_PI / static_cast<float>(2))) + pCommander->GetOrientation();
+                        pCreature->JoinCreatureGroup(pCommander, ATTACK_DISTANCE, (angle - M_PI), OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
                         pCreature->SetActiveObjectState(true);
                     }
                 }
@@ -211,7 +208,6 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
     }
 }
 
-// NPT
 OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_SummonedShrineSide(0)
 {
@@ -222,7 +218,7 @@ OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP *pvp)
 
 void OPvPCapturePointEP_NPT::ChangeState()
 {
-    // if changing from controlling alliance to horde or vice versa
+    // If changing from controlling alliance to horde or vice versa.
     if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = 0;
@@ -329,7 +325,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
     UpdateTowerState();
 
-    // complete quest objective
+    // Complete quest objective.
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
         SendObjectiveComplete(EP_NPT_CM, 0);
 
@@ -337,8 +333,6 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
 void OPvPCapturePointEP_NPT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
@@ -377,7 +371,6 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* plr)
 {
-    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -393,7 +386,6 @@ void OPvPCapturePointEP_NPT::SummonCuringShrine(uint32 team)
     }
 }
 
-// CGT
 OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_SpiritOfVictorySpawned(0), m_TowerState(EP_TS_N), m_GraveyardSide(TEAM_NONE), m_SummonedBannerSide(0)
 {
@@ -405,7 +397,7 @@ OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
 
 void OPvPCapturePointEP_CGT::ChangeState()
 {
-    // if changing from controlling alliance to horde or vice versa
+    // If changing from controlling alliance to horde or vice versa.
     if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = 0;
@@ -522,15 +514,13 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
     UpdateTowerState();
 
-    // complete quest objective
+    // Complete quest objective.
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
         SendObjectiveComplete(EP_CGT_CM, 0);
 }
 
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
@@ -569,7 +559,6 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player* plr)
 {
-    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -619,7 +608,6 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
     }
 }
 
-// PWT
 OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_FlightMasterSpawned(0), m_TowerState(EP_TS_N)
 {
@@ -630,7 +618,7 @@ OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP *pvp)
 
 void OPvPCapturePointEP_PWT::ChangeState()
 {
-    // if changing from controlling alliance to horde or vice versa
+    // If changing from controlling alliance to horde or vice versa.
     if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = 0;
@@ -734,15 +722,13 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
     UpdateTowerState();
 
-    // complete quest objective
+    // Complete quest objective.
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
         SendObjectiveComplete(EP_PWT_CM, 0);
 }
 
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
 }
 
@@ -781,7 +767,6 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* plr)
 
 void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* plr)
 {
-    //plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
 }
 
@@ -824,7 +809,6 @@ bool OutdoorPvPEP::SetupZoneScript()
 
 void OutdoorPvPEP::Update(uint32 diff)
 {
-    OutdoorPvP::Update(diff);
     if (m_objective_changed)
     {
         m_AllianceTowersControlled = 0;
@@ -840,6 +824,7 @@ void OutdoorPvPEP::Update(uint32 diff)
             BuffTeams();
         }
     }
+    OutdoorPvP::Update(diff);
 }
 
 void OutdoorPvPEP::OnPlayerEnter(Player* plr)
