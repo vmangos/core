@@ -2915,13 +2915,7 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
 
 bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
 {
-    for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
-    {
-        if (aura->GetCasterGuid() == this->GetObjectGuid())
-            return true;
-    }
-
-    return false;
+    return pTarget->HasAuraTypeByCaster(SPELL_AURA_EMPATHY, GetObjectGuid());
 }
 
 struct SetGameMasterOnHelper
