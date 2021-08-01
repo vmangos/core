@@ -44,6 +44,9 @@ UPDATE `gameobject_template` SET `faction`=1314 WHERE `entry`=181955;
 -- Delete unnecessary GameObjects.
 DELETE FROM `gameobject` WHERE  `guid`=45864;
 
+-- Delete unnecessary Creatures.
+DELETE FROM `creature` WHERE `id`=17795;
+
 -- William Kielar Gossips.
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `action_script_id`) VALUES (7379, 0, 0, 'Take me to Northpass Tower.', 13562, 1, 1, 0, 0, 0, 0, NULL, 0, 737901);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `action_script_id`) VALUES (7379, 1, 0, 'Take me to Eastwall Tower.', 13563, 1, 1, 0, 0, 0, 0, NULL, 0, 737902);
