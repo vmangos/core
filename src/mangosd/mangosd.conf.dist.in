@@ -1495,6 +1495,11 @@ Antiflood.Sanction = 4
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 #
+#    Warden.DebugLog
+#        Description: Prints additional information about performed checks.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
 #    Warden.DBLogLevel
 #        Description: The minimal WardenActions value of Warden check to be logged into realmd.warden_log table.
 #                     WardenActions: 0 - log, 1 - kick, 2 - ban
@@ -1513,9 +1518,10 @@ Warden.OSXEnabled            = 1
 Warden.PlayersOnly           = 0
 Warden.NumScans              = 10
 Warden.ClientResponseDelay   = 20
-Warden.ScanFrequency		     = 15
+Warden.ScanFrequency         = 15
 Warden.DefaultPenalty        = 0
 Warden.BanDuration           = 86400
+Warden.DebugLog              = 0
 Warden.DBLogLevel            = 0
 Warden.ModuleDir             = "warden_modules"
 

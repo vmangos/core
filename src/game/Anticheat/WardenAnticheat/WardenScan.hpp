@@ -99,13 +99,13 @@ class Scan
             : _builder(builder), _checker(checker), flags(f), comment(c), requestSize(req), replySize(rep), checkId(0)
         { 
             MANGOS_ASSERT(!((flags & WinAllBuild) && (flags & MacAllBuild)));
-            penalty = WardenActions(sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY));
+            penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
         }
 
     public:
         uint32 checkId;
         uint32 flags;
-        WardenActions penalty;
+        uint8 penalty;
         std::string comment;
         size_t requestSize;     // maximum size of request
         size_t replySize;       // maximum size of reply

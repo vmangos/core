@@ -126,16 +126,14 @@ void Warden::HandleChallengeResponse(ByteBuffer &buff)
     // shouldn't happen under normal conditions
     if (!_crk)
     {
-        sLog.outWarden("Challenge response without request being sent");
-        _session->KickPlayer();
+        ApplyPenalty("sent challenge response without request having been made", WARDEN_ACTION_KICK);
         return;
     }
 
     // Verify key
     if (buff.wpos() != 1 + sizeof(_crk->reply) || !!memcmp(buff.contents() + 1, _crk->reply, sizeof(_crk->reply)))
     {
-        sLog.outWarden("Challenge response failed");
-        _session->KickPlayer();
+        ApplyPenalty("failed challenge response", WARDEN_ACTION_KICK);
         return;
     }
 
@@ -289,8 +287,7 @@ void Warden::ReadScanResults(ByteBuffer &buff)
             if (!!(s->flags & InWorld) && !inWorld)
                 continue;
 
-            // TODO: logging (db?)
-            ApplyPenalty("", s);
+            ApplyPenalty("", WARDEN_ACTION_MAX, s);
             LogPositiveToDB(s);
         }
     }
@@ -361,21 +358,21 @@ uint32 Warden::BuildChecksum(const uint8* data, size_t size)
     return checkSum;
 }
 
-void Warden::ApplyPenalty(std::string message, std::shared_ptr<const Scan> scan)
+void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::shared_ptr<const Scan> scan)
 {
-    WardenActions action;
-
-    /* TODO
-    if (scan)
-        action = check->Action;
-    else */
-        action = WardenActions(sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY));
+    if (penalty >= WARDEN_ACTION_MAX)
+    {
+        if (scan && scan->penalty < WARDEN_ACTION_MAX)
+            penalty = WardenActions(scan->penalty);
+        else
+            penalty = WardenActions(sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY));
+    }
 
     std::string playerName = _session->GetPlayerName();
     std::string accountName = std::to_string(_session->GetAccountId());
     sAccountMgr.GetName(_session->GetAccountId(), accountName);
 
-    switch (action)
+    switch (penalty)
     {
     case WARDEN_ACTION_KICK:
         _session->KickPlayer();
@@ -393,6 +390,18 @@ void Warden::ApplyPenalty(std::string message, std::shared_ptr<const Scan> scan)
     }
     default:
         break;
+    }
+
+    if (message.empty())
+    {
+        if (scan)
+        {
+            message = "failed check " + std::to_string(scan->checkId);
+            if (!scan->comment.empty())
+                message += " (" + scan->comment + ")";
+        }
+        else
+            message = "failed an internal warden check";
     }
 
     // Append names to message.
@@ -413,9 +422,9 @@ void Warden::HandlePacket(WorldPacket& recvData)
     // when there is a challenge/response pending, the only packet we expect is the hash result
     if (!!_crk && opcode != WARDEN_CMSG_HASH_RESULT)
     {
-        sLog.outWarden("Unexpected opcode (%u) received while awaiting hash challenge response", opcode);
         recvData.rpos(recvData.wpos());
-        _session->KickPlayer();
+        std::string msg = "sent unexpected opcode (" + std::to_string(opcode) + ") while awaiting hash challenge response";
+        ApplyPenalty(msg, WARDEN_ACTION_KICK);
         return;
     }
 
@@ -454,8 +463,7 @@ void Warden::HandlePacket(WorldPacket& recvData)
         if (BuildChecksum(recvData.contents() + recvData.rpos(), length) != checksum)
         {
             recvData.rpos(recvData.wpos());
-            sLog.outWarden("Packet checksum fail");
-            _session->KickPlayer();
+            ApplyPenalty("failed packet checksum", WARDEN_ACTION_KICK);
             return;
         }
 
@@ -507,8 +515,8 @@ void Warden::HandlePacket(WorldPacket& recvData)
 
     default:
     {
-        sLog.outWarden("Received unknown opcode %02X of size %u.", opcode, recvData.size() - 1);
-        _session->KickPlayer();
+        std::string msg = "sent unknown opcode " + std::to_string(opcode) + " of size " + std::to_string(recvData.size() - 1);
+        ApplyPenalty(msg, WARDEN_ACTION_KICK);
         break;
     }
     }

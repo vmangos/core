@@ -118,7 +118,7 @@ class Warden
         static uint32 BuildChecksum(const uint8* data, size_t size);
 
         // If no scan is passed, the default action from config is executed
-        void ApplyPenalty(std::string message, std::shared_ptr<const Scan> scan);
+        void ApplyPenalty(std::string message, WardenActions penalty = WARDEN_ACTION_MAX,  std::shared_ptr<const Scan> scan = nullptr);
         void LogPositiveToDB(std::shared_ptr<const Scan> scan);
 
         WorldSession *const _session;

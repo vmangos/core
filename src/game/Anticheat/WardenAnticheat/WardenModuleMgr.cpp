@@ -83,8 +83,9 @@ WardenModuleMgr::WardenModuleMgr()
             else
                 _macModules.emplace_back(std::move(newMod));
         }
-        catch (const std::runtime_error &)
+        catch (const std::runtime_error & e)
         {
+            sLog.outError("Failed to load %s - %s\n", mod.c_str(), e.what());
             continue;
         }
     }
