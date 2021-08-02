@@ -328,7 +328,6 @@ void OPvPCapturePointEP_NPT::ChangeState()
     // Complete quest objective.
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
         SendObjectiveComplete(EP_NPT_CM, 0);
-
 }
 
 void OPvPCapturePointEP_NPT::SendChangePhase()
