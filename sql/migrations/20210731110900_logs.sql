@@ -17,7 +17,7 @@ CREATE TABLE `system_fingerprint_usage` (
   `account` int(10) unsigned NOT NULL,
   `ip` varchar(16) NOT NULL,
   `realm` int(10) unsigned NOT NULL,
-  `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `architecture` varchar(16) DEFAULT NULL,
   `cputype` varchar(64) DEFAULT NULL,
   `activecpus` int(10) unsigned DEFAULT NULL,
