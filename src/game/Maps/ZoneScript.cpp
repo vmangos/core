@@ -53,10 +53,7 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* plr)
             If any other UI element gets updated (SendUpdateWorldState) after the Slider it gets also deleted.
             The reason for this is client-specific and has nothing to do with the core.
         */
-        if (m_ValuePct < 100 && m_ValuePct > 0 && !m_FactDiff) // Set the indicator 1 point to the other faction to show the indicator instantly.
-            plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, (plr->GetTeam() == ALLIANCE ? (m_ValuePct - 1) : (m_ValuePct + 1)));
-        else
-            plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_ValuePct);
+        plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_ValuePct);
     }
     return m_activePlayers[plr->GetTeamId()].insert(plr).second;
 }
