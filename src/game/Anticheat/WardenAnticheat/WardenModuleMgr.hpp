@@ -14,25 +14,36 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _WARDEN_MAC_H
-#define _WARDEN_MAC_H
+ /*
+  *
+  * This code was written by namreeb (legal@namreeb.org) and is released with
+  * permission as part of vmangos (https://github.com/vmangos/core)
+  *
+  */
 
-#include "Warden.h"
+#ifndef __WARDENMODULEMGR_HPP_
+#define __WARDENMODULEMGR_HPP_
 
-class WorldSession;
+#include "WardenModule.hpp"
 
-class WardenMac : public Warden
+#include "Policies/Singleton.h"
+#include "Platform/Define.h"
+
+#include <vector>
+
+class WardenModuleMgr
 {
-    public:
-        WardenMac();
-        ~WardenMac();
+private:
+    std::vector<WardenModule> _winModules;
+    std::vector<WardenModule> _macModules;
 
-        void Init(WorldSession* session, BigNumber* k) override;
-        ClientWardenModule* GetModuleForClient() override;
-        void InitializeModule() override;
-        void HandleHashResult(ByteBuffer& buff) override;
-        void RequestData() override;
-        void HandleData(ByteBuffer& buff) override;
+public:
+    WardenModuleMgr();
+
+    const WardenModule *GetWindowsModule() const;
+    const WardenModule *GetMacModule() const;
 };
 
-#endif
+#define sWardenModuleMgr MaNGOS::Singleton<WardenModuleMgr>::Instance()
+
+#endif /* !__WARDENMODULEMGR_HPP_ */

@@ -1131,15 +1131,14 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY, "Anticheat.ForbiddenArea.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
 
     // Warden Anticheat
-    setConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED, "Warden.WinEnabled", false);
-    setConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED, "Warden.OSXEnabled", false);
-    setConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY, "Warden.PlayersOnly", true);
-    setConfig(CONFIG_UINT32_AC_WARDEN_NUM_MEM_CHECKS, "Warden.NumMemChecks", 3);
-    setConfig(CONFIG_UINT32_AC_WARDEN_NUM_OTHER_CHECKS, "Warden.NumOtherChecks", 7);
-    setConfigMinMax(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY, "Warden.DefaultPenalty", WARDEN_ACTION_BAN, WARDEN_ACTION_LOG, WARDEN_ACTION_BAN);
+    setConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED, "Warden.WinEnabled", true);
+    setConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED, "Warden.OSXEnabled", true);
+    setConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY, "Warden.PlayersOnly", false);
+    setConfig(CONFIG_UINT32_AC_WARDEN_NUM_SCANS, "Warden.NumScans", 10);
+    setConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 20);
+    setConfig(CONFIG_UINT32_AC_WARDEN_SCAN_FREQUENCY, "Warden.ScanFrequency", 15);
+    setConfigMinMax(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY, "Warden.DefaultPenalty", WARDEN_ACTION_LOG, WARDEN_ACTION_LOG, WARDEN_ACTION_BAN);
     setConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION, "Warden.BanDuration", 86400);
-    setConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_CHECK_HOLDOFF, "Warden.ClientCheckHoldOff", 30);
-    setConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 120);
     setConfig(CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL, "Warden.DBLogLevel", 0);
     m_wardenModuleDirectory = sConfig.GetStringDefault("Warden.ModuleDir", "warden_modules");
 

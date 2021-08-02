@@ -36,12 +36,12 @@ ARC4::~ARC4()
     EVP_CIPHER_CTX_free(m_ctx);
 }
 
-void ARC4::Init(uint8* seed)
+void ARC4::Init(const uint8* seed)
 {
     EVP_EncryptInit_ex(m_ctx, nullptr, nullptr, seed, nullptr);
 }
 
-void ARC4::UpdateData(int len, uint8* data)
+void ARC4::UpdateData(uint8* data, size_t len)
 {
     int outlen = 0;
     EVP_EncryptUpdate(m_ctx, data, &outlen, data, len);

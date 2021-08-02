@@ -1455,47 +1455,39 @@ Antiflood.Sanction = 4
 #
 #    Warden.WinEnabled
 #        Description: Enables Warden checks for Windows clients.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-#
-#    Warden.OSXEnabled
-#        Description: Enables Warden checks for OSX clients.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-#
-#    Warden.PlayersOnly
-#        Description: Ignore game master accounts.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Warden.NumMemChecks
-#        Description: Number of Warden memory checks that are sent to the client each cycle.
-#        Default:     3 - (Enabled)
+#    Warden.OSXEnabled
+#        Description: Enables Warden checks for OSX clients.
+#        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Warden.NumOtherChecks
-#        Description: Number of Warden checks other than memory checks that are added to request
-#                     each checking cycle.
-#        Default:     7 - (Enabled)
-#                     0 - (Disabled)
+#    Warden.PlayersOnly
+#        Description: Ignore game master accounts.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+#    Warden.NumScans
+#        Description: Number of Warden memory checks that are sent to the client each cycle.
+#        Default:     10
 #
 #    Warden.ClientResponseDelay
 #        Description: Time (in seconds) before client is getting disconnecting for not responding.
-#        Default:     120 - (2 Minutes)
+#        Default:     20 - (20 Seconds)
 #                     0 - (Disabled, client won't be kicked)
 #
-#    Warden.ClientCheckHoldOff
+#    Warden.ScanFrequency
 #        Description: Time (in seconds) to wait before sending the next check request to the client.
 #                     A low number increases traffic and load on client and server side.
-#        Default:     30 - (30 Seconds)
-#                     0  - (Send check as soon as possible)
+#        Default:     15 - (15 Seconds)
 #
 #    Warden.DefaultPenalty
 #        Description: Default action being taken if a client check failed. Penalties can be
 #                     customized per check id in the warden_checks table.
-#        Default:     2 - (Ban)
-#                     0 - (Disabled, Logging only)
+#        Default:     0 - (Disabled, Logging only)
 #                     1 - (Kick)
+#                     2 - (Ban)
 #
 #    Warden.BanDuration
 #        Description: Time (in seconds) an account will be banned if Penalty is set
@@ -1521,14 +1513,13 @@ Antiflood.Sanction = 4
 #
 ###################################################################################################
 
-Warden.WinEnabled            = 0
-Warden.OSXEnabled            = 0
-Warden.PlayersOnly           = 1
-Warden.NumMemChecks          = 3
-Warden.NumOtherChecks        = 7
-Warden.ClientResponseDelay   = 120
-Warden.ClientCheckHoldOff    = 30
-Warden.DefaultPenalty        = 2
+Warden.WinEnabled            = 1
+Warden.OSXEnabled            = 1
+Warden.PlayersOnly           = 0
+Warden.NumScans              = 10
+Warden.ClientResponseDelay   = 20
+Warden.ScanFrequency         = 15
+Warden.DefaultPenalty        = 0
 Warden.BanDuration           = 86400
 Warden.DebugLog              = 0
 Warden.DBLogLevel            = 0

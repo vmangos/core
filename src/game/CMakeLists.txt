@@ -450,14 +450,20 @@ if(USE_ANTICHEAT)
       Anticheat/MovementAnticheat/MovementAnticheat.cpp
       Anticheat/MovementAnticheat/MovementAnticheat.h
       Anticheat/WardenAnticheat/Warden.cpp
-      Anticheat/WardenAnticheat/Warden.h
+      Anticheat/WardenAnticheat/Warden.hpp
+      Anticheat/WardenAnticheat/WardenKeyGeneration.h
       Anticheat/WardenAnticheat/WardenMac.cpp
-      Anticheat/WardenAnticheat/WardenMac.h
+      Anticheat/WardenAnticheat/WardenMac.hpp
+      Anticheat/WardenAnticheat/WardenModule.cpp
+      Anticheat/WardenAnticheat/WardenModule.hpp
+      Anticheat/WardenAnticheat/WardenModuleMgr.cpp
+      Anticheat/WardenAnticheat/WardenModuleMgr.hpp
+      Anticheat/WardenAnticheat/WardenScan.cpp
+      Anticheat/WardenAnticheat/WardenScan.hpp
+      Anticheat/WardenAnticheat/WardenScanMgr.cpp
+      Anticheat/WardenAnticheat/WardenScanMgr.hpp
       Anticheat/WardenAnticheat/WardenWin.cpp
-      Anticheat/WardenAnticheat/WardenWin.h
-      Anticheat/WardenAnticheat/WardenMgr.cpp
-      Anticheat/WardenAnticheat/WardenMgr.h
-      Anticheat/WardenAnticheat/WardenKeyGen.h
+      Anticheat/WardenAnticheat/WardenWin.hpp
   )
 endif()
 
@@ -593,7 +599,3 @@ else()
       )
   endif()
 endif()
-
-
-
-
