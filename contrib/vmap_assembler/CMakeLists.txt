@@ -9,7 +9,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 2.6...3.20)
 project (MANGOS_VMAP_ASSEMB_IO)
 
 #set(CMAKE_VERBOSE_MAKEFILE true)

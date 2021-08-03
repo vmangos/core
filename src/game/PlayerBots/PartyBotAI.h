@@ -68,6 +68,8 @@ public:
     bool RunAwayFromTarget(Unit* pTarget);
     bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
+    bool ShouldEnterStealth() const;
+    bool EnterStealthIfNeeded(SpellEntry const* pStealthSpell);
 
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;

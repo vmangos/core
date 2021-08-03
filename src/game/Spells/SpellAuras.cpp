@@ -3695,7 +3695,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (target->GetTypeId() == TYPEID_PLAYER && GetId() == 20580)
                 target->CastSpell(target, 21009, true, nullptr, this);
 
-            target->InterruptSpellsCastedOnMe();
+            target->InterruptSpellsCastedOnMe(false, false, true);
         }
     }
     else
