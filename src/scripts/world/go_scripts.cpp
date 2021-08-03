@@ -432,16 +432,16 @@ struct go_bells : public GameObjectAI
 
     void UpdateAI(uint32 const diff) override
     {
-        _events.Update(diff);
+        m_events.Update(diff);
 
         if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
         {
             // Reset
             once = false;
-            _events.ScheduleEvent(EVENT_TIME, Seconds(1));
+            m_events.ScheduleEvent(EVENT_TIME, Seconds(1));
         }
 
-        while (uint32 eventId = _events.ExecuteEvent())
+        while (uint32 eventId = m_events.ExecuteEvent())
         {
             switch (eventId)
             {
@@ -458,7 +458,7 @@ struct go_bells : public GameObjectAI
                     }
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
-                        _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
+                        m_events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
 
                     break;
                 }
@@ -471,7 +471,7 @@ struct go_bells : public GameObjectAI
         }
     }
 private:
-    EventMap _events;
+    EventMap m_events;
     uint32 _soundId;
     bool once;
 };
@@ -501,13 +501,13 @@ struct go_darkmoon_faire_music : public GameObjectAI
 {
     go_darkmoon_faire_music(GameObject* gobj) : GameObjectAI(gobj)
     {
-        _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(1));
+        m_events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(1));
     }
 
     void UpdateAI(uint32 const diff) override
     {
-        _events.Update(diff);
-        while (uint32 eventId = _events.ExecuteEvent())
+        m_events.Update(diff);
+        while (uint32 eventId = m_events.ExecuteEvent())
         {
             switch (eventId)
             {
@@ -515,7 +515,7 @@ struct go_darkmoon_faire_music : public GameObjectAI
                     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_DARKMOON_FAIRE_ELWYNN) || sGameEventMgr.IsActiveEvent(GAME_EVENT_DARKMOON_FAIRE_THUNDER))
                         me->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
 
-                    _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(5));  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    m_events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(5));  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                     break;
                 default:
                     break;
@@ -523,12 +523,63 @@ struct go_darkmoon_faire_music : public GameObjectAI
         }
     }
 private:
-    EventMap _events;
+    EventMap m_events;
 };
 
 GameObjectAI* GetAI_go_darkmoon_faire_music(GameObject* gameobject)
 {
     return new go_darkmoon_faire_music(gameobject);
+}
+
+/*####
+## go_lunar_festival_firecracker
+####*/
+
+enum
+{
+    EVENT_FIRECRACKER_DESPAWN = 1,
+};
+
+struct go_lunar_festival_firecracker : public GameObjectAI
+{
+    go_lunar_festival_firecracker(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(10,20)));
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!me->isSpawned())
+            return;
+
+        m_events.Update(diff);
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_FIRECRACKER_DESPAWN:    
+                {
+                    me->Despawn();
+                    uint32 respawnTime = me->GetRespawnDelay();
+                    if (!respawnTime)
+                        respawnTime = me->GetGOData()->GetRandomRespawnTime();
+
+                    me->UseDoorOrButton(respawnTime);
+                    me->UpdateObjectVisibility();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+private:
+    EventMap m_events;
+};
+
+GameObjectAI* GetAI_go_lunar_festival_firecracker(GameObject* gameobject)
+{
+    return new go_lunar_festival_firecracker(gameobject);
 }
 
 void AddSC_go_scripts()
@@ -622,5 +673,10 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_darkmoon_faire_music";
     newscript->GOGetAI = &GetAI_go_darkmoon_faire_music;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_lunar_festival_firecracker";
+    newscript->GOGetAI = &GetAI_go_lunar_festival_firecracker;
     newscript->RegisterSelf();
 }
