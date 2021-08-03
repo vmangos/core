@@ -372,6 +372,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
         m_team = TEAM_NEUTRAL;
     }
 
+    m_ValuePct = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    m_FactDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
+
     if (m_OldState != m_State)
     {
         if (oldTeam != m_team)
@@ -379,12 +382,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
         ChangeState();
         return true;
     }
-
-    m_ValuePct = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
-    m_FactDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
-
-    // Only send World Updates if the Slider value actually changes or Faction difference changed to avoid sending unnecessary packets.
-    if (m_ValuePct != m_OldValuePct || m_OldFactDiff != m_FactDiff && !m_FactDiff)
+    else if (m_ValuePct != m_OldValuePct || m_OldFactDiff != m_FactDiff && !m_FactDiff) // Only send World Updates if the Slider value actually changes or Faction difference changed to avoid sending unnecessary packets.
         SendChangePhase();
 
     return false;
