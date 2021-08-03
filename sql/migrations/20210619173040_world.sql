@@ -54,7 +54,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 
 -- Add Missing Gossip Menu Options
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(6214, 1, 0, 'The Darkmoon Faire has already arrived, you say?  Where is it located?', 0, 1, 1, 6222, 0, 0, 0, 0, \N, 0, 946);
+(6214, 1, 0, 'The Darkmoon Faire has already arrived, you say?  Where is it located?', 10110, 1, 1, 6222, 0, 0, 0, 0, '', 0, 946);
 
 -- Add Conditions
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (953, 12, 23, 0, 0, 0, 0);
@@ -90,7 +90,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 
 -- Add Missing Gossip Menu Options
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(6213, 1, 0, 'When the Darkmoon Faire arrives, where will it be located?', 0, 1, 1, 6221, 0, 0, 0, 0, \N, 0, 955);
+(6213, 1, 0, 'When the Darkmoon Faire arrives, where will it be located?', 10109, 1, 1, 6221, 0, 0, 0, 0, '', 0, 955);
 
 -- Update Existing Gossip Menus
 UPDATE `gossip_menu` SET `condition_id` = 946 WHERE `entry` = 6213 AND `text_id` = 7375;
@@ -613,7 +613,7 @@ DELETE FROM `npc_vendor` WHERE `entry` = 14846 AND `item` = 13456;
 -- Add Some Missing Gobjects
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (2517, 180005, 0, -9590.03, 57.8195, 63.2871, 4.38078, 0, 0, -0.814116, 0.580703, 180, 180, 100, 1, 0, 0, 4, 10),
-(2603, 180045, 0, -9588.16, 41.7611, 59.8424, 4.88692, 0, 0, -0.642787, 0.766045, 180, 180, 100, 1, 0, 0, 0, 10);
+(2603, 180045, 0, -9588.16, 41.7611, 59.8424, 4.88692, 0, 0, -0.642787, 0.766045, 180, 180, 100, 1, 0, 0, 4, 10);
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (2517, 23),
 (2603, 23);
@@ -1426,3 +1426,5 @@ END??
 delimiter ; 
 CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;
+
+
