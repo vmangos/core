@@ -5457,6 +5457,19 @@ bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
     return false;
 }
 
+bool Unit::IsTotalImmune() const
+{
+    AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
+
+    uint32 immuneMask = 0;
+    for (const auto itr : immune)
+    {
+        immuneMask |= itr->GetModifier()->m_miscvalue;
+    }
+
+    return (immuneMask == SPELL_SCHOOL_MASK_ALL);
+}
+
 /**
  * Calculates target part of melee damage bonuses,
  * will be called on each tick for periodic damage over time auras
@@ -6062,6 +6075,10 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
     if (m_Visibility == VISIBILITY_OFF)
         return false;
 
+    // Hunter's Mark makes target always visible to caster.
+    if (HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, pDetector->GetObjectGuid()))
+        return true;
+
     // raw invisibility
     bool invisible = m_invisibilityMask != 0;
 
@@ -6204,44 +6221,73 @@ bool Unit::CanDetectInvisibilityOf(Unit const* u) const
 
 bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) const
 {
+    /*
+
+    TEST RESULTS FROM CLASSIC WITH SNIFFED EXACT POSITIONS TO MEASURE DISTANCES
+
+    Level 1 Rogue vs Level 1 Rogue from behind - detected at 1.49299 yards
+    Level 2 Tauren vs Level 3 Rogue from behind - detected at 1.46318 yards
+    Level 4 Creature vs Level 4 Rogue - aggro at 1.48306 yards
+    Conclusion: target is always detectable below 1.5 yards, combat reach or bounding radius do not matter
+
+    Level 4 Creature vs Level 1 Rogue - aggro at 3.23737 yards
+    Level 4 Creature vs Level 2 Rogue - aggro at 2.38938 yards
+    Level 4 Creature vs Level 3 Rogue - aggro at 1.58823 yards
+    Conclusion: aggro distance increases by 5/6 yards per level for creature detector
+
+    Level 4 Creature vs Level 1 Rogue - alerted at 8.23134 yards
+    Level 4 Creature vs Level 2 Rogue - alerted at 7.37808 yards
+    Level 4 Creature vs Level 3 Rogue - alerted at 6.64495 yards
+    Conclusion: alert distance is 5 yards longer than aggro distance
+
+    Level 1 Rogue vs Level 1 Rogue - detected at 8.97499 yards (approaching 9)
+    Level 1 Rogue with Perception vs Level 1 Rogue - detected at 23.973 yards (approaching 24)
+    Level 1 Rogue vs Level 2 Rogue - detected at 7.48335 yards (approaching 7.5)
+    Level 1 Rogue with Perception vs Level 2 Rogue - detected at 22.382 yards (approaching 22.5)
+    Level 1 Rogue vs Level 3 Rogue - detected at 5.96001 yards (approaching 6)
+    Level 1 Rogue with Perception vs Level 3 Rogue - detected at 20.8784 yards (approaching 21)
+    Conclusion: detection distance increases by 1.5 per level for player detector
+
+    Level 32 Hunter vs Level 1 Rogue - detected at 29.9698 yards (approaching 30)
+    Conclusion: max detection distance cap due to level difference is 30
+
+    Level 32 Hunter vs Level 1 Rogue from behind - detected at 20.9902 yards (approaching 21)
+    Conclusion: distance is reduced by 9 yards if target is behind you, applied after the cap
+
+    Level 32 Hunter with Hunter's Mark vs Level 1 Rogue - detected at 99.682 yards (approaching 100)
+    Conclusion: target is detectable all the way to max visibility distance
+
+    */
+
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
         return false;
-    if (distance < 1.5f) //collision
+
+    if (distance < 1.5f) // collision
         return true;
 
-    // Hunter mark functionality.
-    AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
-    for (const auto& iter : auras)
-        if (iter->GetCasterGuid() == GetObjectGuid())
-            return true;
-
-    if (distance > sWorld.getConfig(IsPlayer()?CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE:CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
+    if (distance > sWorld.getConfig(IsPlayer() ? CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE : CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
         return false;
 
-    float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.f : 21.f) : 0.f;
-    //Always invisible from back (when stealth detection is on), also filter max distance cases
-    float yardsPerLevel = 5.f/6.f;
+    float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.0f : 21.f) : (5.0f / 6.0f);
+    float yardsPerLevel = IsPlayer() ? 1.5f : 5.0f / 6.0f;
     int32 stealthSkill = target->IsPlayer() ? target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) : target->GetLevelForTarget(this) * 5;
     stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
-    int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
-
-    if (level_diff > 3)
+    int32 const levelDiff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
+    if (levelDiff > 3)
         yardsPerLevel *= 2;
 
-    // stealth level: 5 points -> 1 level
-    visibleDistance += ((detectSkill - stealthSkill) + 5) * yardsPerLevel / 5.f;
+    visibleDistance += (detectSkill - stealthSkill) * yardsPerLevel / 5.0f;
 
-    visibleDistance = std::min(visibleDistance, 30.f);
-
-    visibleDistance = std::max(visibleDistance, 1.f);
+    if (visibleDistance > 30.0f)
+        visibleDistance = 30.0f;
+    else if (visibleDistance < 0.0f)
+        visibleDistance = 0.0f;
 
     if (!HasInArc(target))
-        visibleDistance -= 9.f;
+        visibleDistance -= 9.0f;
 
-
-    float alertRange = visibleDistance + 5.f;
-
+    float alertRange = visibleDistance + 5.0f;
 
     // recheck new distance
     if (alert)
@@ -6520,7 +6566,7 @@ bool Unit::FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32
 
         if (pendingChange->movementCounter != movementCounter || pendingChange->movementChangeType != KNOCK_BACK
             || std::fabs(pendingChange->knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
-            || std::fabs(pendingChange->knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
+            || std::fabs(pendingChange->knockbackInfo.speedZ - movementInfo.jump.zspeed) > 0.01f
             || std::fabs(pendingChange->knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
             || std::fabs(pendingChange->knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f)
             continue;
@@ -9473,7 +9519,7 @@ void Unit::ProcessRelocationVisibilityUpdates()
 }
 
 // BEGIN Nostalrius specific functions
-void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpells)
+void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpells, bool onlyIfNotStalked)
 {
     std::list<Unit*> targets;
     // Maximum spell range=100m ?
@@ -9481,18 +9527,25 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, u_check);
     // Don't need to use visibility modifier, units won't be able to cast outside of draw distance
     Cell::VisitAllObjects(this, searcher, GetMap()->GetVisibilityDistance());
+
     for (const auto& iter : targets)
     {
         if (!interruptPositiveSpells && IsFriendlyTo(iter))
             continue;
+
+        if (onlyIfNotStalked && HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, iter->GetObjectGuid()))
+            continue;
+
         for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; i++)
             if (Spell* spell = iter->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (spell->m_targets.getUnitTargetGuid() == GetObjectGuid())
                     if (killDelayed || (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime()) || i == CURRENT_CHANNELED_SPELL)
                         iter->InterruptSpell(CurrentSpellTypes(i), true);
+
         if (!killDelayed)
             continue;
-        // 2/ Interruption des sorts qui ne sont plus reference, mais dont il reste un event (ceux en parcours par exemple)
+
+        // Interruption of spells which are no longer referenced, but for which there is still an event (not yet hit the target for example) 
         auto i_Events = iter->m_Events.GetEvents().begin();
         for (; i_Events != iter->m_Events.GetEvents().end(); ++i_Events)
             if (SpellEvent* event = dynamic_cast<SpellEvent*>(i_Events->second))

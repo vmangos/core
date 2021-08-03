@@ -31,8 +31,11 @@ typedef std::set<Unit*> PassengerSet;
 class GenericTransport : public GameObject
 {
 public:
-    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0), m_movementStarted(0) {}
+    GenericTransport() : m_passengerTeleportItr(m_passengers.end()), m_pathProgress(0) {}
     void CleanupsBeforeDelete() override;
+
+    void SendOutOfRangeUpdateToMap();
+    void SendCreateUpdateToMap();
 
     void AddPassenger(Unit* passenger, bool adjustCoords = true);
     void RemovePassenger(Unit* passenger);
@@ -70,7 +73,6 @@ protected:
     PassengerSet::iterator m_passengerTeleportItr;
 
     uint32 m_pathProgress; // for MO transport its full time since start for normal time in cycle
-    uint32 m_movementStarted;
 };
 
 class ElevatorTransport : public GenericTransport
@@ -93,9 +95,6 @@ public:
     bool Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void Update(uint32 update_diff, uint32 /*time_diff*/) override;
 
-    void SendOutOfRangeUpdateToMap();
-    void SendCreateUpdateToMap();
-
     uint32 GetPeriod() const { return m_period; }
     void SetPeriod(uint32 period) { m_period = period; }
 
@@ -114,11 +113,20 @@ private:
 
     KeyFrameVec::const_iterator m_currentFrame;
     KeyFrameVec::const_iterator m_nextFrame;
-    uint32 m_pathTime;
 
     uint32 m_period;
 
     TransportTemplate const& m_transportTemplate;
 };
+
+inline GenericTransport* GameObject::ToTransport()
+{
+    return IsTransport() ? static_cast<GenericTransport*>(this) : nullptr;
+}
+
+inline GenericTransport const* GameObject::ToTransport() const
+{
+    return IsTransport() ? static_cast<GenericTransport const*>(this) : nullptr;
+}
 
 #endif

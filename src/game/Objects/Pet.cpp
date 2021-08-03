@@ -2331,6 +2331,14 @@ void Pet::CastPetAura(PetAura const* aura)
         CastSpell(this, auraId, true);
 }
 
+void Pet::RemoveAllCooldowns(bool sendOnly)
+{
+    SpellCaster::RemoveAllCooldowns(sendOnly);
+
+    if (Player const* pOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
+        pOwner->SendClearAllCooldowns(this);
+}
+
 void Pet::SynchronizeLevelWithOwner()
 {
     Unit* owner = GetOwner();

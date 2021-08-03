@@ -54,6 +54,7 @@ public:
     void AddToPlayerGroup();
     void LearnPremadeSpecForClass();
 
+    bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const final;
     Player* GetPartyLeader() const;
     bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget(Player* pLeader) const;
@@ -67,6 +68,8 @@ public:
     bool RunAwayFromTarget(Unit* pTarget);
     bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
+    bool ShouldEnterStealth() const;
+    bool EnterStealthIfNeeded(SpellEntry const* pStealthSpell);
 
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
@@ -104,6 +107,7 @@ public:
     float m_y = 0.0f;
     float m_z = 0.0f;
     float m_o = 0.0f;
+    bool m_resetSpellData = false;
 };
 
 #endif

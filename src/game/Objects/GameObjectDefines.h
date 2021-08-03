@@ -658,7 +658,6 @@ struct GameObjectInfo
         switch (type)
         {
             case GAMEOBJECT_TYPE_DOOR:                  return true;
-            case GAMEOBJECT_TYPE_TRANSPORT:             return true;
             case GAMEOBJECT_TYPE_FLAGSTAND:             return true;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:              return true;
@@ -677,6 +676,16 @@ struct GameObjectInfo
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
             case GAMEOBJECT_TYPE_AURA_GENERATOR: return auraGenerator.serverOnly;
 #endif
+            default: return false;
+        }
+    }
+
+    bool IsTransport() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_TRANSPORT:             return true;
+            case GAMEOBJECT_TYPE_MO_TRANSPORT:          return true;
             default: return false;
         }
     }

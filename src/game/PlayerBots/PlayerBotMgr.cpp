@@ -14,6 +14,7 @@
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
 #include "Language.h"
+#include "Spell.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);
 
@@ -1009,6 +1010,59 @@ bool ChatHandler::HandlePartyBotAttackStopCommand(char* args)
     }
 
     PSendSysMessage("All party bots have stopped attacking %s.", pTarget->GetName());
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotAoECommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget || !pPlayer->IsValidAttackTarget(pTarget, true))
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    for (auto const& pSpell : pAI->m_spells.raw.spells)
+                    {
+                        if (pSpell && pSpell->IsAreaOfEffectSpell() &&
+                           !pSpell->IsPositiveSpell() &&
+                            pSpell->IsTargetInRange(pMember, pTarget))
+                        {
+                            if (pMember->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
+                               !pMember->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->IsAreaOfEffectSpell())
+                                pMember->InterruptSpell(CURRENT_GENERIC_SPELL);
+
+                            if (pMember->CastSpell(pTarget, pSpell, false) == SPELL_CAST_OK)
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    PSendSysMessage("All party bots are casting AoE spells at %s.", pTarget->GetName());
     return true;
 }
 

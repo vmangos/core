@@ -1875,7 +1875,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         caster->CastSpell(target, 11828, true, caster->ToPlayer()->GetItemByGuid(GetCastItemGuid()), this);
                 break;
             case 12479:                                     // Hex of Jammal'an
-                target->CastSpell(target, 12480, true, nullptr, this);
+                if (Unit* caster = GetCaster())
+                {
+                    caster->CastSpell(target, 12480, true, nullptr, this);
+                    caster->CastSpell(target, 12483, true, nullptr, this);
+                }
                 return;
             case 12774:                                     // (DND) Belnistrasz Idol Shutdown Visual
             {
@@ -3699,7 +3703,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (target->GetTypeId() == TYPEID_PLAYER && GetId() == 20580)
                 target->CastSpell(target, 21009, true, nullptr, this);
 
-            target->InterruptSpellsCastedOnMe();
+            target->InterruptSpellsCastedOnMe(false, false, true);
         }
     }
     else

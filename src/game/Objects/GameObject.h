@@ -52,9 +52,6 @@ class GameObject : public SpellCaster
         void Update(uint32 update_diff, uint32 p_time) override;
         GameObjectInfo const* GetGOInfo() const;
 
-        bool IsTransport() const;
-        bool IsMoTransport() const;
-
         bool HasStaticDBSpawnData() const;                  // listed in `gameobject` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const { return HasStaticDBSpawnData() ? GetGUIDLow() : 0; }
 
@@ -237,9 +234,11 @@ class GameObject : public SpellCaster
         GameObjectData const*  GetGOData() const;
 
         // Transports system
+        bool IsTransport() const;
+        bool IsMoTransport() const;
+        GenericTransport* ToTransport();
+        GenericTransport const* ToTransport() const;
         uint64 GetRotation() const { return m_rotation; }
-        Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<Transport*>(this); else return nullptr; }
-        Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return nullptr; }
 
         bool IsVisible() const { return m_visible; }
         void SetVisible(bool b);

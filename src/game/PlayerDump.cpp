@@ -298,14 +298,14 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
             guids = &items;
             break;
         case DTT_PET:
-            fieldname = "owner";
+            fieldname = "owner_guid";
             break;
         case DTT_PET_TABLE:
             fieldname = "guid";
             guids = &pets;
             break;
         case DTT_MAIL:
-            fieldname = "receiver";
+            fieldname = "receiver_guid";
             break;
         case DTT_MAIL_ITEM:
             fieldname = "mail_id";
@@ -385,34 +385,6 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     dump += "IMPORTANT NOTE: This sql queries not created for apply directly, use '.pdump load' command in console or client chat instead.\n";
     dump += "IMPORTANT NOTE: NOT APPLY ITS DIRECTLY to character DB or you will DAMAGE and CORRUPT character DB\n\n";
 
-    // revision check guard
-    QueryNamedResult* result = CharacterDatabase.QueryNamed("SELECT * FROM character_db_version LIMIT 1");
-    if (result)
-    {
-        QueryFieldNames const& namesMap = result->GetFieldNames();
-        std::string reqName;
-        for (const auto& itr : namesMap)
-        {
-            if (itr.substr(0, 9) == "required_")
-            {
-                reqName = itr;
-                break;
-            }
-        }
-
-        if (!reqName.empty())
-        {
-            // this will fail at wrong character DB version
-            dump += "UPDATE character_db_version SET " + reqName + " = 1 WHERE FALSE;\n\n";
-        }
-        else
-            sLog.outError("Table 'character_db_version' not have revision guard field, revision guard query not added to pdump.");
-
-        delete result;
-    }
-    else
-        sLog.outError("Character DB not have 'character_db_version' table, revision guard query not added to pdump.");
-
     for (DumpTable* itr = &dumpTables[0]; itr->isValid(); ++itr)
         DumpTableContent(dump, guid, itr->name, itr->name, itr->type);
 
@@ -456,7 +428,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     bool incHighest = true;
     if (guid != 0 && guid < sObjectMgr.m_CharGuids.GetNextAfterMaxUsed())
     {
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE guid = '%u'", guid);
+        result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `guid` = '%u'", guid);
         if (result)
         {
             guid = sObjectMgr.m_CharGuids.GetNextAfterMaxUsed();
@@ -474,7 +446,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
         CharacterDatabase.escape_string(name);              // for safe, we use name only for sql quearies anyway
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
+        result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `name` = '%s'", name.c_str());
         if (result)
         {
             name.clear();                                      // use the one from the dump
@@ -520,15 +492,6 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
         // skip NOTE
         if (line.substr(nw_pos, 15) == "IMPORTANT NOTE:")
             continue;
-
-        // add required_ check
-        if (line.substr(nw_pos, 41) == "UPDATE character_db_version SET required_")
-        {
-            if (!CharacterDatabase.Execute(line.c_str()))
-                ROLLBACK(DUMP_FILE_BROKEN);
-
-            continue;
-        }
 
         // determine table name and load type
         std::string tn = gettablename(line);
@@ -577,7 +540,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                     name = getnth(line, 3);                 // characters.name
                     CharacterDatabase.escape_string(name);
 
-                    result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
+                    result = CharacterDatabase.PQuery("SELECT * FROM `characters` WHERE `name` = '%s'", name.c_str());
                     if (result)
                     {
                         delete result;

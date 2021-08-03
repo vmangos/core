@@ -95,6 +95,9 @@ struct TransportTemplate
     uint32 entry;
 };
 
+typedef std::multimap<uint32 /*mapId*/, uint32 /*guidLow*/> ElevatorTransportMap;
+typedef std::pair<ElevatorTransportMap::const_iterator, ElevatorTransportMap::const_iterator> ElevatorTransportMapBounds;
+
 class TransportMgr
 {
 public:
@@ -116,12 +119,28 @@ public:
     void SpawnContinentTransports();
     Transport* CreateTransport(uint32 entry, Map* map = nullptr);
 
+    // elevator transports
+    ElevatorTransportMapBounds GetElevatorTransportsForMap(uint32 mapId) const
+    {
+        return m_elevatorTransportsByMap.equal_range(mapId);
+    }
+    void AddElevatorTransportForMap(uint32 mapId, uint32 guidLow)
+    {
+        for (auto itr : m_elevatorTransportsByMap)
+        {
+            if (itr.first == mapId && itr.second == guidLow)
+                return;
+        }
+        m_elevatorTransportsByMap.insert(std::make_pair(mapId, guidLow));
+    }
+
 private:
     void AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg, TransportAnimationEntry const* node);
     bool GenerateWaypoints(GameObjectInfo const* goinfo, TransportTemplate& transportTemplate);
 
     TransportAnimationContainer m_transportAnimations;
     std::unordered_map<uint32, TransportTemplate> m_transportTemplates;
+    ElevatorTransportMap m_elevatorTransportsByMap;
 };
 
 #define sTransportMgr MaNGOS::Singleton<TransportMgr>::Instance()

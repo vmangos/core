@@ -77,12 +77,12 @@ class BigNumber
         BigNumber ModExp(BigNumber const& bn1, BigNumber const& bn2);
         BigNumber Exp(BigNumber const&);
 
-        int GetNumBytes(void);
+        int GetNumBytes(void) const;
 
         struct bignum_st* BN() { return _bn; }
 
         uint32 AsDword();
-        std::vector<uint8> AsByteArray(int minSize = 0, bool reverse = true);
+        std::vector<uint8> AsByteArray(int minSize = 0, bool reverse = true) const;
 
         char const* AsHexStr();
         char const* AsDecStr();
