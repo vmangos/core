@@ -544,7 +544,7 @@ struct go_lunar_festival_firecracker : public GameObjectAI
 {
     go_lunar_festival_firecracker(GameObject* gobj) : GameObjectAI(gobj)
     {
-        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(10,20)));
+        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(30,60)));
     }
 
     void UpdateAI(uint32 const diff) override
