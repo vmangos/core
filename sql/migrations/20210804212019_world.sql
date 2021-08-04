@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210804212019');
 
 
 -- Update Firecrackers Respawn Times
-UPDATE `gameobject` SET `spawntimesecsmin` = 3, `spawntimesecsmax` = 3 WHERE `id` IN (180763, 180764);
+UPDATE `gameobject` SET `spawntimesecsmin` = 10, `spawntimesecsmax` = 10 WHERE `id` IN (180763, 180764);
 
 
 -- End of migration.
