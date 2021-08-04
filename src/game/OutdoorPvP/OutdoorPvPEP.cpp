@@ -72,7 +72,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = ALLIANCE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_A, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_A, EP_Zone);
 
             break;
         }
@@ -95,7 +95,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = HORDE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_H, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_H, EP_Zone);
 
             break;
         }
@@ -200,14 +200,13 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
             DelCreature(i);
             AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000);
 
-            if (i > 0)
+            if (ct[i].entry == NPC_LORDAERON_SOLDIER || ct[i].entry == NPC_LORDAERON_FIGHTER)
             {
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
-                    if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0]))
+                    if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0])) // 0 = Lordaeron Commander (Alliance) or Lordaeron Veteran (Horde).
                     {
-                        float angle = (float(i) * (M_PI / static_cast<float>(2))) + pCommander->GetOrientation();
-                        pCreature->JoinCreatureGroup(pCommander, ATTACK_DISTANCE, (angle - M_PI), OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
+                        pCreature->JoinCreatureGroup(pCommander, ATTACK_DISTANCE, pCommander->GetAngle(pCreature) - (pCreature)->GetOrientation(), OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
                         pCreature->SetActiveObjectState(true);
                     }
                 }
@@ -260,7 +259,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = ALLIANCE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_A, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_A, EP_Zone);
 
             break;
         }
@@ -283,7 +282,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = HORDE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_H, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_H, EP_Zone);
 
             break;
         }
@@ -448,7 +447,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = ALLIANCE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_A, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_A, EP_Zone);
 
             break;
         }
@@ -473,7 +472,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = HORDE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_H, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_H, EP_Zone);
 
             break;
         }
@@ -590,15 +589,15 @@ void OPvPCapturePointEP_CGT::LinkGraveYard(Team team)
     if (m_GraveyardSide != team)
     {
         m_GraveyardSide = team;
-        sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, team, false);
-        sObjectMgr.AddGraveYardLink(EP_GraveYardId, EP_GraveYardZone, team, false);
+        sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_Zone, team, false);
+        sObjectMgr.AddGraveYardLink(EP_GraveYardId, EP_Zone, team, false);
     }
 }
 
 void OPvPCapturePointEP_CGT::UnLinkGraveYard()
 {
-    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, ALLIANCE, false);
-    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_GraveYardZone, HORDE, false);
+    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_Zone, ALLIANCE, false);
+    sObjectMgr.RemoveGraveYardLink(EP_GraveYardId, EP_Zone, HORDE, false);
 }
 
 void OPvPCapturePointEP_CGT::SummonBannerAura(uint32 team)
@@ -675,7 +674,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = ALLIANCE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_A, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_A, EP_Zone);
 
             break;
         }
@@ -698,7 +697,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = HORDE;
 
             if (m_OldState != m_State)
-                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_H, 139);
+                ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_H, EP_Zone);
 
             break;
         }
@@ -856,9 +855,9 @@ void OutdoorPvPEP::Update(uint32 diff)
         }
 
         if (m_AllianceTowersControlled == 4)
-            GetMap()->SendDefenseMessage(BCT_EP_ALL_TAKEN_A, 139);
+            GetMap()->SendDefenseMessage(BCT_EP_ALL_TAKEN_A, EP_Zone);
         else if (m_HordeTowersControlled == 4)
-            GetMap()->SendDefenseMessage(BCT_EP_ALL_TAKEN_H, 139);
+            GetMap()->SendDefenseMessage(BCT_EP_ALL_TAKEN_H, EP_Zone);
     }
     OutdoorPvP::Update(diff);
 }
