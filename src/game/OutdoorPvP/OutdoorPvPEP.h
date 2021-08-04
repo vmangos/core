@@ -24,48 +24,48 @@
 
 enum EP_EastwallTowerWorldStates
 {
-    EP_EWT_A = 2354, // EWT blue on map
-    EP_EWT_H = 2356, // EWT red on map
-    EP_EWT_N_A = 2359, // ally conquested
-    EP_EWT_N_H = 2360,
-    EP_EWT_N = 2361
+    EP_EWT_A    = 2354, // EWT blue on map
+    EP_EWT_H    = 2356, // EWT red on map
+    EP_EWT_N_A  = 2359, // ally conquested
+    EP_EWT_N_H  = 2360,
+    EP_EWT_N    = 2361
 };
 
 enum EP_NorthpassTowerWorldStates
 {
-    EP_NPT_N = 2352,
-    EP_NPT_N_A = 2362,
-    EP_NPT_N_H = 2363,
-    EP_NPT_A = 2372, // NPT blue on map
-    EP_NPT_H = 2373 // NPT red on map
+    EP_NPT_N    = 2352,
+    EP_NPT_N_A  = 2362,
+    EP_NPT_N_H  = 2363,
+    EP_NPT_A    = 2372, // NPT blue on map
+    EP_NPT_H    = 2373  // NPT red on map
 };
 
 enum EP_PlagewoodTowerWorldStates
 {
-    EP_PWT_N_A = 2366,
-    EP_PWT_N_H = 2353, //2367 not present! use neutral!
-    EP_PWT_A = 2370, // PWT blue on map
-    EP_PWT_H = 2371, // PWT red on map
-    EP_PWT_N = 2353
+    EP_PWT_N_A  = 2366,
+    EP_PWT_N_H  = 2353, // 2367 not present! use neutral!
+    EP_PWT_A    = 2370, // PWT blue on map
+    EP_PWT_H    = 2371, // PWT red on map
+    EP_PWT_N    = 2353
 };
 
 enum EP_CrownGuardTowerWorldStates
 {
-    EP_CGT_N_A = 2374,
-    EP_CGT_N_H = 2375,
-    EP_CGT_A = 2378,
-    EP_CGT_H = 2379, // GCT blue on map
-    EP_CGT_N = 2355
+    EP_CGT_N_A  = 2374,
+    EP_CGT_N_H  = 2375,
+    EP_CGT_A    = 2378,
+    EP_CGT_H    = 2379, // GCT blue on map
+    EP_CGT_N    = 2355
 };
 
 enum EP_WorldStates
 {
-    EP_UI_TOWER_SLIDER_DISPLAY = 2426,
-    EP_UI_TOWER_SLIDER_POS = 2427,
-    EP_UI_TOWER_SLIDER_N = 2428,
+    EP_UI_TOWER_SLIDER_DISPLAY  = 2426,
+    EP_UI_TOWER_SLIDER_POS      = 2427,
+    EP_UI_TOWER_SLIDER_N        = 2428,
 
-    EP_UI_TOWER_COUNT_A = 2327,
-    EP_UI_TOWER_COUNT_H = 2328,
+    EP_UI_TOWER_COUNT_A         = 2327,
+    EP_UI_TOWER_COUNT_H         = 2328,
 
     // Tower colors on Map
     unk1 = 2358, // EFT horde
@@ -213,7 +213,7 @@ uint32 const EP_AllianceBuffs[4] = { SPELL_ALLIANCE_ECHOES_OF_LORDAERON_RANK_1, 
 
 uint32 const EP_HordeBuffs[4] = { SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_1, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_2, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_3, SPELL_HORDE_ECHOES_OF_LORDAERON_RANK_4 };
 
-uint32 const EP_GraveYardZone = 139; // Eastern Plaguelands.
+uint32 const EP_Zone = 139; // Eastern Plaguelands.
 
 uint32 const EP_GraveYardId = 927;
 
