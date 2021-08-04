@@ -209,8 +209,6 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (180390, 12,  1975.98,  -3655.29,  120.599, 100, 0, 0, 0),
 (180390, 13,  1975.98,  -3655.29,  120.599, 100, 0, 0, 0);
 
-UPDATE `broadcast_text` SET `male_text`='The Northpass tower needs our aid!  Once again, let us charge and do proud our liege!', `chat_type`='12' WHERE `entry`=14746;
-
 
 -- End of migration.
 END IF;
