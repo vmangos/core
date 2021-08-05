@@ -40,6 +40,7 @@ set (game_SRCS
     QuestDef.cpp
     ReputationMgr.cpp
     ScriptMgr.cpp
+    SniffFile.cpp
     SocialMgr.cpp
     StatSystem.cpp
     UnitAuraProcHandler.cpp
@@ -243,6 +244,7 @@ set (game_SRCS
     ScriptedGossip.h
     ScriptMgr.h
     SharedDefines.h
+    SniffFile.h
     SocialMgr.h
     UnitEvents.h
     Weather.h

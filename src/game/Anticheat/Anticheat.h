@@ -116,8 +116,9 @@ public:
     movementInfo - new movement info that was just received
     opcode - the packet we are checking
     */
-    bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
-    bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
+    bool HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
+    bool HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
+    void LogMovementPacket(bool /*isClientPacket*/, WorldPacket& /*packet*/) {}
 };
 #endif
 
