@@ -2401,6 +2401,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 data << uint32(m_transport->GetEntry());
                 data << uint32(GetMapId());
             }
+            GetCheatData()->LogMovementPacket(false, data);
             GetSession()->SendPacket(&data);
         }
 
@@ -19864,6 +19865,7 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
     data << uint8(allowMove);
+    GetCheatData()->LogMovementPacket(false, data);
     GetSession()->SendPacket(&data);
 #endif
 }
