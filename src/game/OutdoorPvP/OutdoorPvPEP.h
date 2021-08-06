@@ -461,6 +461,7 @@ class OutdoorPvPEP : public OutdoorPvP
         void SendRemoveWorldStates(Player* plr);
 
         void BuffTeams();
+        void TowerBuff(Creature* pCreature);
 
     private:
 
