@@ -65,8 +65,8 @@ void OPvPCapturePointEP_EWT::ChangeState()
             AddCreature(EP_EWT_BUFFER, EPBufferNPCs[EP_BUFFER_EWT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_EWT_A].map, EPBufferNPCs[EP_BUFFER_EWT_A].x, EPBufferNPCs[EP_BUFFER_EWT_A].y, EPBufferNPCs[EP_BUFFER_EWT_A].z, EPBufferNPCs[EP_BUFFER_EWT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_EWT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPFLAGCAPTUREDALLIANCE);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = ALLIANCE;
@@ -88,8 +88,8 @@ void OPvPCapturePointEP_EWT::ChangeState()
             AddCreature(EP_EWT_BUFFER, EPBufferNPCs[EP_BUFFER_EWT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_EWT_H].map, EPBufferNPCs[EP_BUFFER_EWT_H].x, EPBufferNPCs[EP_BUFFER_EWT_H].y, EPBufferNPCs[EP_BUFFER_EWT_H].z, EPBufferNPCs[EP_BUFFER_EWT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_EWT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPWARNINGHORDELONG);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = HORDE;
@@ -165,23 +165,23 @@ void OPvPCapturePointEP_EWT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_EWT_N, bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* plr)
+bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* pPlayer)
 {
-    if (OPvPCapturePoint::HandlePlayerEnter(plr))
+    if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
         /*
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
         */
         return true;
     }
     return false;
 }
 
-void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* plr)
+void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* pPlayer)
 {
-    OPvPCapturePoint::HandlePlayerLeave(plr);
+    OPvPCapturePoint::HandlePlayerLeave(pPlayer);
 }
 
 void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
@@ -252,8 +252,8 @@ void OPvPCapturePointEP_NPT::ChangeState()
             AddCreature(EP_NPT_BUFFER, EPBufferNPCs[EP_BUFFER_NPT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_NPT_A].map, EPBufferNPCs[EP_BUFFER_NPT_A].x, EPBufferNPCs[EP_BUFFER_NPT_A].y, EPBufferNPCs[EP_BUFFER_NPT_A].z, EPBufferNPCs[EP_BUFFER_NPT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_NPT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPFLAGCAPTUREDALLIANCE);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = ALLIANCE;
@@ -275,8 +275,8 @@ void OPvPCapturePointEP_NPT::ChangeState()
             AddCreature(EP_NPT_BUFFER, EPBufferNPCs[EP_BUFFER_NPT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_NPT_H].map, EPBufferNPCs[EP_BUFFER_NPT_H].x, EPBufferNPCs[EP_BUFFER_NPT_H].y, EPBufferNPCs[EP_BUFFER_NPT_H].z, EPBufferNPCs[EP_BUFFER_NPT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_NPT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPWARNINGHORDELONG);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = HORDE;
@@ -369,23 +369,23 @@ void OPvPCapturePointEP_NPT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_NPT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* plr)
+bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* pPlayer)
 {
-    if (OPvPCapturePoint::HandlePlayerEnter(plr))
+    if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
         /*
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
         */
         return true;
     }
     return false;
 }
 
-void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* plr)
+void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* pPlayer)
 {
-    OPvPCapturePoint::HandlePlayerLeave(plr);
+    OPvPCapturePoint::HandlePlayerLeave(pPlayer);
 }
 
 void OPvPCapturePointEP_NPT::SummonCuringShrine(uint32 team)
@@ -440,8 +440,8 @@ void OPvPCapturePointEP_CGT::ChangeState()
             AddCreature(EP_CGT_BUFFER, EPBufferNPCs[EP_BUFFER_CGT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_CGT_A].map, EPBufferNPCs[EP_BUFFER_CGT_A].x, EPBufferNPCs[EP_BUFFER_CGT_A].y, EPBufferNPCs[EP_BUFFER_CGT_A].z, EPBufferNPCs[EP_BUFFER_CGT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPFLAGCAPTUREDALLIANCE);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = ALLIANCE;
@@ -465,8 +465,8 @@ void OPvPCapturePointEP_CGT::ChangeState()
             AddCreature(EP_CGT_BUFFER, EPBufferNPCs[EP_BUFFER_CGT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_CGT_H].map, EPBufferNPCs[EP_BUFFER_CGT_H].x, EPBufferNPCs[EP_BUFFER_CGT_H].y, EPBufferNPCs[EP_BUFFER_CGT_H].z, EPBufferNPCs[EP_BUFFER_CGT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPWARNINGHORDELONG);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = HORDE;
@@ -565,23 +565,23 @@ void OPvPCapturePointEP_CGT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_CGT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* plr)
+bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* pPlayer)
 {
-    if (OPvPCapturePoint::HandlePlayerEnter(plr))
+    if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
         /*
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
         */
         return true;
     }
     return false;
 }
 
-void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player* plr)
+void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player* pPlayer)
 {
-    OPvPCapturePoint::HandlePlayerLeave(plr);
+    OPvPCapturePoint::HandlePlayerLeave(pPlayer);
 }
 
 void OPvPCapturePointEP_CGT::LinkGraveYard(Team team)
@@ -667,8 +667,8 @@ void OPvPCapturePointEP_PWT::ChangeState()
             AddCreature(EP_PWT_BUFFER, EPBufferNPCs[EP_BUFFER_PWT_A].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_PWT_A].map, EPBufferNPCs[EP_BUFFER_PWT_A].x, EPBufferNPCs[EP_BUFFER_PWT_A].y, EPBufferNPCs[EP_BUFFER_PWT_A].z, EPBufferNPCs[EP_BUFFER_PWT_A].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_PWT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPFLAGCAPTUREDALLIANCE);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = ALLIANCE;
@@ -685,13 +685,13 @@ void OPvPCapturePointEP_PWT::ChangeState()
             animation = 0;
 
             SummonFlightMaster(HORDE);
-            DelCreature(EP_PWT_BUFFER);
 
+            DelCreature(EP_PWT_BUFFER);
             AddCreature(EP_PWT_BUFFER, EPBufferNPCs[EP_BUFFER_PWT_H].entry, ALLIANCE, EPBufferNPCs[EP_BUFFER_PWT_H].map, EPBufferNPCs[EP_BUFFER_PWT_H].x, EPBufferNPCs[EP_BUFFER_PWT_H].y, EPBufferNPCs[EP_BUFFER_PWT_H].z, EPBufferNPCs[EP_BUFFER_PWT_H].o);
             if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_PWT_BUFFER]))
             {
-                pCreature->CastSpell(pCreature, SPELL_TOWER_CAPTURE_TEST_DND, true);
                 pCreature->PlayDirectSound(SOUND_PVPWARNINGHORDELONG);
+                ((OutdoorPvPEP*)m_PvP)->TowerBuff(pCreature);
             }
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = HORDE;
@@ -781,23 +781,23 @@ void OPvPCapturePointEP_PWT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_PWT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* plr)
+bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* pPlayer)
 {
-    if (OPvPCapturePoint::HandlePlayerEnter(plr))
+    if (OPvPCapturePoint::HandlePlayerEnter(pPlayer))
     {
         /*
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
         */
         return true;
     }
     return false;
 }
 
-void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* plr)
+void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* pPlayer)
 {
-    OPvPCapturePoint::HandlePlayerLeave(plr);
+    OPvPCapturePoint::HandlePlayerLeave(pPlayer);
 }
 
 void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
@@ -862,58 +862,74 @@ void OutdoorPvPEP::Update(uint32 diff)
     OutdoorPvP::Update(diff);
 }
 
-void OutdoorPvPEP::OnPlayerEnter(Player* plr)
+void OutdoorPvPEP::OnPlayerEnter(Player* pPlayer)
 {
     // Add buffs.
-    if (plr->GetTeam() == ALLIANCE)
+    if (pPlayer->GetTeam() == ALLIANCE)
     {
         if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
-            plr->CastSpell(plr, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
+            pPlayer->CastSpell(pPlayer, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
     }
     else
     {
         if (m_HordeTowersControlled && m_HordeTowersControlled < 5)
-            plr->CastSpell(plr, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
+            pPlayer->CastSpell(pPlayer, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
     }
-    OutdoorPvP::OnPlayerEnter(plr);
+    OutdoorPvP::OnPlayerEnter(pPlayer);
 }
 
-void OutdoorPvPEP::OnPlayerLeave(Player* plr)
+void OutdoorPvPEP::OnPlayerLeave(Player* pPlayer)
 {
     // Remove buffs.
-    if (plr->GetTeam() == ALLIANCE)
+    if (pPlayer->GetTeam() == ALLIANCE)
     {
         for (uint32 i : EP_AllianceBuffs)
-            plr->RemoveAurasDueToSpell(i);
+            pPlayer->RemoveAurasDueToSpell(i);
     }
     else
     {
         for (uint32 i : EP_HordeBuffs)
-            plr->RemoveAurasDueToSpell(i);
+            pPlayer->RemoveAurasDueToSpell(i);
     }
-    OutdoorPvP::OnPlayerLeave(plr);
+    OutdoorPvP::OnPlayerLeave(pPlayer);
+}
+
+void OutdoorPvPEP::TowerBuff(Creature* pCreature)
+{
+    std::list<Player*> players;
+    pCreature->GetAlivePlayerListInRange(pCreature, players, VISIBILITY_DISTANCE_NORMAL);
+    for (const auto& pTarget : players)
+    {
+        if (!pTarget->IsFriendlyTo(pCreature))
+            continue;
+
+        if (pTarget->HasStealthAura())
+            continue;
+
+        pTarget->CastSpell(pTarget, SPELL_TOWER_CAPTURE_DND, true);
+    }
 }
 
 void OutdoorPvPEP::BuffTeams()
 {
-    for (const auto plr : m_players[0])
+    for (const auto pPlayer : m_players[0])
     {
         {
             for (uint32 i : EP_AllianceBuffs)
-                plr->RemoveAurasDueToSpell(i);
+                pPlayer->RemoveAurasDueToSpell(i);
 
             if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
-                plr->CastSpell(plr, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
+                pPlayer->CastSpell(pPlayer, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
         }
     }
-    for (const auto plr : m_players[1])
+    for (const auto pPlayer : m_players[1])
     {
         {
             for (uint32 i : EP_HordeBuffs)
-                plr->RemoveAurasDueToSpell(i);
+                pPlayer->RemoveAurasDueToSpell(i);
 
             if (m_HordeTowersControlled && m_HordeTowersControlled < 5)
-                plr->CastSpell(plr, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
+                pPlayer->CastSpell(pPlayer, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
         }
     }
 }
@@ -931,37 +947,37 @@ uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
     return count;
 }
 
-void OutdoorPvPEP::SendRemoveWorldStates(Player* plr)
+void OutdoorPvPEP::SendRemoveWorldStates(Player* pPlayer)
 {
-    plr->SendUpdateWorldState(EP_UI_TOWER_COUNT_A, 0);
-    plr->SendUpdateWorldState(EP_UI_TOWER_COUNT_H, 0);
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, 0);
-    plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_COUNT_A, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_COUNT_H, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, 0);
+    pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, 0);
 
-    plr->SendUpdateWorldState(EP_EWT_A, 0);
-    plr->SendUpdateWorldState(EP_EWT_H, 0);
-    plr->SendUpdateWorldState(EP_EWT_N, 0);
-    plr->SendUpdateWorldState(EP_EWT_N_A, 0);
-    plr->SendUpdateWorldState(EP_EWT_N_H, 0);
+    pPlayer->SendUpdateWorldState(EP_EWT_A, 0);
+    pPlayer->SendUpdateWorldState(EP_EWT_H, 0);
+    pPlayer->SendUpdateWorldState(EP_EWT_N, 0);
+    pPlayer->SendUpdateWorldState(EP_EWT_N_A, 0);
+    pPlayer->SendUpdateWorldState(EP_EWT_N_H, 0);
 
-    plr->SendUpdateWorldState(EP_PWT_A, 0);
-    plr->SendUpdateWorldState(EP_PWT_H, 0);
-    plr->SendUpdateWorldState(EP_PWT_N, 0);
-    plr->SendUpdateWorldState(EP_PWT_N_A, 0);
-    plr->SendUpdateWorldState(EP_PWT_N_H, 0);
+    pPlayer->SendUpdateWorldState(EP_PWT_A, 0);
+    pPlayer->SendUpdateWorldState(EP_PWT_H, 0);
+    pPlayer->SendUpdateWorldState(EP_PWT_N, 0);
+    pPlayer->SendUpdateWorldState(EP_PWT_N_A, 0);
+    pPlayer->SendUpdateWorldState(EP_PWT_N_H, 0);
 
-    plr->SendUpdateWorldState(EP_NPT_A, 0);
-    plr->SendUpdateWorldState(EP_NPT_H, 0);
-    plr->SendUpdateWorldState(EP_NPT_N, 0);
-    plr->SendUpdateWorldState(EP_NPT_N_A, 0);
-    plr->SendUpdateWorldState(EP_NPT_N_H, 0);
+    pPlayer->SendUpdateWorldState(EP_NPT_A, 0);
+    pPlayer->SendUpdateWorldState(EP_NPT_H, 0);
+    pPlayer->SendUpdateWorldState(EP_NPT_N, 0);
+    pPlayer->SendUpdateWorldState(EP_NPT_N_A, 0);
+    pPlayer->SendUpdateWorldState(EP_NPT_N_H, 0);
 
-    plr->SendUpdateWorldState(EP_CGT_A, 0);
-    plr->SendUpdateWorldState(EP_CGT_H, 0);
-    plr->SendUpdateWorldState(EP_CGT_N, 0);
-    plr->SendUpdateWorldState(EP_CGT_N_A, 0);
-    plr->SendUpdateWorldState(EP_CGT_N_H, 0);
+    pPlayer->SendUpdateWorldState(EP_CGT_A, 0);
+    pPlayer->SendUpdateWorldState(EP_CGT_H, 0);
+    pPlayer->SendUpdateWorldState(EP_CGT_N, 0);
+    pPlayer->SendUpdateWorldState(EP_CGT_N_A, 0);
+    pPlayer->SendUpdateWorldState(EP_CGT_N_H, 0);
 }
 
 class OutdoorPvP_eastern_plaguelands : public ZoneScript_Script
