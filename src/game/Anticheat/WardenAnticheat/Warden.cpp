@@ -47,7 +47,7 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 #include <algorithm>
 #include <memory>

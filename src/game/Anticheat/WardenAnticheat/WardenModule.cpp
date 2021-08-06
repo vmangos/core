@@ -24,9 +24,10 @@
 #include "WardenModule.hpp"
 
 #include "Platform/Define.h"
-#include "zlib/zlib.h"
 
 #include <openssl/md5.h>
+
+#include <zlib.h>
 
 #include <string>
 #include <vector>
