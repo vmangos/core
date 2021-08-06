@@ -404,6 +404,11 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 UPDATE `game_event` SET `description`='Darkmoon Faire Building (Elwynn)' WHERE  `entry`=23;
 UPDATE `game_event` SET `description`='Darkmoon Faire Building (Mulgore)' WHERE  `entry`=24;
 
+-- correct items shadi mistrunner
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(8363, 2605);
+DELETE FROM `npc_vendor` WHERE `entry` = 8363 AND `item` = 785);
+
 
 -- End of migration.
 END IF;
