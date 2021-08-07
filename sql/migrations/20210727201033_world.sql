@@ -536,7 +536,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`)
 (@LUNAR_FESTIVAL_LAUNCHER_OGUID+198, @LUNAR_FESTIVAL_POOL_TEMPLATE+99, 'Lunar Festival - Cluster and Firework Launchers', 7);
 
 -- Respawn everything except Crackers and Launchers, which are already done.
-INSERT INTO `gameobject_lunar` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`) VALUES
 (@LUNAR_FESTIVAL_OGUID+1, 173047, 1, 1894.97, -4553.88, 29.1535, 2.15548, 0, 0, 0.880891, 0.47332, 120, 120, 100, 1, 7),
 (@LUNAR_FESTIVAL_OGUID+2, 180757, 0, -8934.87, 617.982, 102.707, 3.63029, 0, 0, -0.970295, 0.241925, 120, 120, 100, 1, 7),
 (@LUNAR_FESTIVAL_OGUID+3, 180757, 0, -8870.13, 672.571, 101.514, 0.628317, 0, 0, 0.309016, 0.951057, 120, 120, 100, 1, 7),
