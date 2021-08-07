@@ -404,10 +404,13 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 UPDATE `game_event` SET `description`='Darkmoon Faire Building (Elwynn)' WHERE  `entry`=23;
 UPDATE `game_event` SET `description`='Darkmoon Faire Building (Mulgore)' WHERE  `entry`=24;
 
--- correct items shadi mistrunner
+-- Correct Items Shadi Mistrunner
 INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
 (8363, 2605);
 DELETE FROM `npc_vendor` WHERE `entry` = 8363 AND `item` = 785);
+
+-- Reduce Schematic: Ice Deflector Restock Time
+UPDATE `npc_vendor` SET `incrtime` = 7200 WHERE `entry` = 2684 AND `item` = 13308;
 
 
 -- End of migration.
