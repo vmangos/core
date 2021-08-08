@@ -20,16 +20,408 @@ SET @LUNAR_FESTIVAL_CGUID = 12409;
 SET @LUNAR_FESTIVAL_EVENT = 7;
 
 -- Delete old event stuff, except the Firecrackers, which are already done by Nickyt8.
-DELETE FROM `game_event_gameobject` WHERE `event` = @LUNAR_FESTIVAL_EVENT AND NOT `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180763,180764));
-DELETE FROM `game_event_creature` WHERE `event` = @LUNAR_FESTIVAL_EVENT;
-DELETE FROM `creature` WHERE `guid`  IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
+DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
 DELETE FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
 DELETE FROM `gameobject` WHERE NOT `id` IN (180763,180764) AND `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
+DELETE FROM `game_event_gameobject` WHERE `event` = @LUNAR_FESTIVAL_EVENT AND NOT `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180763,180764));
+DELETE FROM `game_event_creature` WHERE `event` = @LUNAR_FESTIVAL_EVENT;
+
+-- Revelers don't cast "Small Red Rocket".
+DELETE FROM `creature_ai_events` WHERE `id` IN (1590709,1590609,1569409,1571909,1590509,1590809);
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1590709,1590609,1569409,1571909,1590509,1590809);
+
+-- Dance added in creature_addon.
+DELETE FROM `creature_ai_events` WHERE `id` IN (1569407,1571907,1590507,1590607,1590707,1590807,1572307);
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1569407,1571907,1590507,1590607,1590707,1590807,1572307);
+
+-- Conditions from stuff above.
+DELETE FROM `conditions` WHERE `condition_entry` IN (220554,220558,220574,220577,220590,220584);
 
 -- Misc.
 UPDATE `gameobject_template` SET `entry`=180891, `displayId`=327, `name`='Greater Moonlight Spell Focus', `data1`=4, `data3`=1 WHERE `entry`=300058;
 UPDATE `spell_script_target` SET `targetEntry`=180891, `build_min`=5086 WHERE `entry`=26373 AND `targetEntry`=300058;
-INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (26373, 1, 15892, 0, 0, 5086, 5875);
+
+-- Update all SpellFocus objects.
+DELETE FROM spell_script_target WHERE targetEntry IN (15872,15873,15874,15879,15880,15882,15883,15884,15886,15888,15893,15918);
+DELETE FROM `spell_script_target` WHERE `targetEntry` IN (180771,180850,180868,180772,180859,180869,180874);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
+(26373, 1, 15892, 0, 0, 5086, 5875),
+-- (requiresSpellFocus 1351) 
+-- 180771 Firework Launcher
+(30163, 0, 180771, 0, 0, 5086, 5875), -- Copy of Rocket, PURPLE Launches a firework at a launcher.
+(26333, 0, 180771, 0, 0, 5086, 5875), -- Large Blue Rocket Throw into a firework launcher!
+(26334, 0, 180771, 0, 0, 5086, 5875), -- Large Green Rocket Throw into a firework launcher!
+(26335, 0, 180771, 0, 0, 5086, 5875), -- Large Purple Rocket Throw into a firework launcher!
+(26336, 0, 180771, 0, 0, 5086, 5875), -- Large Red Rocket Throw into a firework launcher!
+(26337, 0, 180771, 0, 0, 5086, 5875), -- Large White Rocket Throw into a firework launcher!
+(26338, 0, 180771, 0, 0, 5086, 5875), -- Large Yellow Rocket Throw into a firework launcher!
+(26344, 0, 180771, 0, 0, 5086, 5875), -- Rocket, BLUE Launches a firework at a launcher.
+(26351, 0, 180771, 0, 0, 5086, 5875), -- Rocket, BLUE BIG Launches a firework at a launcher.
+(26345, 0, 180771, 0, 0, 5086, 5875), -- Rocket, GREEN Launches a firework at a launcher.
+(26352, 0, 180771, 0, 0, 5086, 5875), -- Rocket, GREEN BIG Launches a firework at a launcher.
+(26346, 0, 180771, 0, 0, 5086, 5875), -- Rocket, PURPLE Launches a firework at a launcher.
+(26353, 0, 180771, 0, 0, 5086, 5875), -- Rocket, PURPLE BIG Launches a firework at a launcher.
+(26347, 0, 180771, 0, 0, 5086, 5875), -- Rocket, RED Launches a firework at a launcher.
+(26354, 0, 180771, 0, 0, 5086, 5875), -- Rocket, RED BIG Launches a firework at a launcher.
+(26348, 0, 180771, 0, 0, 5086, 5875), -- Rocket, WHITE Launches a firework at a launcher.
+(26355, 0, 180771, 0, 0, 5086, 5875), -- Rocket, WHITE BIG Launches a firework at a launcher.
+(26349, 0, 180771, 0, 0, 5086, 5875), -- Rocket, YELLOW Launches a firework at a launcher.
+(26356, 0, 180771, 0, 0, 5086, 5875), -- Rocket, YELLOW BIG Launches a firework at a launcher.
+(26291, 0, 180771, 0, 0, 5086, 5875), -- Small Blue Rocket Throw into a firework launcher!
+(26292, 0, 180771, 0, 0, 5086, 5875), -- Small Green Rocket Throw into a firework launcher!
+(26293, 0, 180771, 0, 0, 5086, 5875), -- Small Purple Rocket Throw into a firework launcher!
+(26286, 0, 180771, 0, 0, 5086, 5875), -- Small Red Rocket Throw into a firework launcher!
+(26294, 0, 180771, 0, 0, 5086, 5875), -- Small White Rocket Throw into a firework launcher!
+(26295, 0, 180771, 0, 0, 5086, 5875), -- Small Yellow Rocket Throw into a firework launcher!
+-- 180850 Firework Launcher
+(30163, 0, 180850, 0, 0, 5086, 5875), -- Copy of Rocket, PURPLE Launches a firework at a launcher.
+(26333, 0, 180850, 0, 0, 5086, 5875), -- Large Blue Rocket Throw into a firework launcher!
+(26334, 0, 180850, 0, 0, 5086, 5875), -- Large Green Rocket Throw into a firework launcher!
+(26335, 0, 180850, 0, 0, 5086, 5875), -- Large Purple Rocket Throw into a firework launcher!
+(26336, 0, 180850, 0, 0, 5086, 5875), -- Large Red Rocket Throw into a firework launcher!
+(26337, 0, 180850, 0, 0, 5086, 5875), -- Large White Rocket Throw into a firework launcher!
+(26338, 0, 180850, 0, 0, 5086, 5875), -- Large Yellow Rocket Throw into a firework launcher!
+(26344, 0, 180850, 0, 0, 5086, 5875), -- Rocket, BLUE Launches a firework at a launcher.
+(26351, 0, 180850, 0, 0, 5086, 5875), -- Rocket, BLUE BIG Launches a firework at a launcher.
+(26345, 0, 180850, 0, 0, 5086, 5875), -- Rocket, GREEN Launches a firework at a launcher.
+(26352, 0, 180850, 0, 0, 5086, 5875), -- Rocket, GREEN BIG Launches a firework at a launcher.
+(26346, 0, 180850, 0, 0, 5086, 5875), -- Rocket, PURPLE Launches a firework at a launcher.
+(26353, 0, 180850, 0, 0, 5086, 5875), -- Rocket, PURPLE BIG Launches a firework at a launcher.
+(26347, 0, 180850, 0, 0, 5086, 5875), -- Rocket, RED Launches a firework at a launcher.
+(26354, 0, 180850, 0, 0, 5086, 5875), -- Rocket, RED BIG Launches a firework at a launcher.
+(26348, 0, 180850, 0, 0, 5086, 5875), -- Rocket, WHITE Launches a firework at a launcher.
+(26355, 0, 180850, 0, 0, 5086, 5875), -- Rocket, WHITE BIG Launches a firework at a launcher.
+(26349, 0, 180850, 0, 0, 5086, 5875), -- Rocket, YELLOW Launches a firework at a launcher.
+(26356, 0, 180850, 0, 0, 5086, 5875), -- Rocket, YELLOW BIG Launches a firework at a launcher.
+(26291, 0, 180850, 0, 0, 5086, 5875), -- Small Blue Rocket Throw into a firework launcher!
+(26292, 0, 180850, 0, 0, 5086, 5875), -- Small Green Rocket Throw into a firework launcher!
+(26293, 0, 180850, 0, 0, 5086, 5875), -- Small Purple Rocket Throw into a firework launcher!
+(26286, 0, 180850, 0, 0, 5086, 5875), -- Small Red Rocket Throw into a firework launcher!
+(26294, 0, 180850, 0, 0, 5086, 5875), -- Small White Rocket Throw into a firework launcher!
+(26295, 0, 180850, 0, 0, 5086, 5875), -- Small Yellow Rocket Throw into a firework launcher!
+-- 180868 Firework Launcher
+(30163, 0, 180868, 0, 0, 5086, 5875), -- Copy of Rocket, PURPLE Launches a firework at a launcher.
+(26333, 0, 180868, 0, 0, 5086, 5875), -- Large Blue Rocket Throw into a firework launcher!
+(26334, 0, 180868, 0, 0, 5086, 5875), -- Large Green Rocket Throw into a firework launcher!
+(26335, 0, 180868, 0, 0, 5086, 5875), -- Large Purple Rocket Throw into a firework launcher!
+(26336, 0, 180868, 0, 0, 5086, 5875), -- Large Red Rocket Throw into a firework launcher!
+(26337, 0, 180868, 0, 0, 5086, 5875), -- Large White Rocket Throw into a firework launcher!
+(26338, 0, 180868, 0, 0, 5086, 5875), -- Large Yellow Rocket Throw into a firework launcher!
+(26344, 0, 180868, 0, 0, 5086, 5875), -- Rocket, BLUE Launches a firework at a launcher.
+(26351, 0, 180868, 0, 0, 5086, 5875), -- Rocket, BLUE BIG Launches a firework at a launcher.
+(26345, 0, 180868, 0, 0, 5086, 5875), -- Rocket, GREEN Launches a firework at a launcher.
+(26352, 0, 180868, 0, 0, 5086, 5875), -- Rocket, GREEN BIG Launches a firework at a launcher.
+(26346, 0, 180868, 0, 0, 5086, 5875), -- Rocket, PURPLE Launches a firework at a launcher.
+(26353, 0, 180868, 0, 0, 5086, 5875), -- Rocket, PURPLE BIG Launches a firework at a launcher.
+(26347, 0, 180868, 0, 0, 5086, 5875), -- Rocket, RED Launches a firework at a launcher.
+(26354, 0, 180868, 0, 0, 5086, 5875), -- Rocket, RED BIG Launches a firework at a launcher.
+(26348, 0, 180868, 0, 0, 5086, 5875), -- Rocket, WHITE Launches a firework at a launcher.
+(26355, 0, 180868, 0, 0, 5086, 5875), -- Rocket, WHITE BIG Launches a firework at a launcher.
+(26349, 0, 180868, 0, 0, 5086, 5875), -- Rocket, YELLOW Launches a firework at a launcher.
+(26356, 0, 180868, 0, 0, 5086, 5875), -- Rocket, YELLOW BIG Launches a firework at a launcher.
+(26291, 0, 180868, 0, 0, 5086, 5875), -- Small Blue Rocket Throw into a firework launcher!
+(26292, 0, 180868, 0, 0, 5086, 5875), -- Small Green Rocket Throw into a firework launcher!
+(26293, 0, 180868, 0, 0, 5086, 5875), -- Small Purple Rocket Throw into a firework launcher!
+(26286, 0, 180868, 0, 0, 5086, 5875), -- Small Red Rocket Throw into a firework launcher!
+(26294, 0, 180868, 0, 0, 5086, 5875), -- Small White Rocket Throw into a firework launcher!
+(26295, 0, 180868, 0, 0, 5086, 5875), -- Small Yellow Rocket Throw into a firework launcher!
+-- (requiresSpellFocus 1352)
+-- 180772 Cluster Launcher
+(26304, 0, 180772, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
+(26301, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+(26300, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+(26302, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+(26303, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+(26357, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+(26483, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+(26484, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+(26485, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+(26486, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+(26487, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+(26309, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+(26310, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+(26311, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+(26312, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+(26358, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+(26491, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+(26492, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+(26493, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+(26494, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+(26495, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+(26313, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+(26314, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+(26315, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+(26316, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+(26359, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+(26496, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+(26497, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+(26498, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+(26499, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+(26500, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+(26305, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+(26306, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+(26307, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+(26308, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+(26360, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+(26501, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+(26502, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+(26503, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+(26504, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+(26505, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+(26317, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+(26318, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+(26319, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+(26320, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+(26361, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+(26506, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+(26507, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+(26508, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+(26509, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+(26510, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+(26321, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+(26322, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+(26323, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+(26324, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+(26362, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+(26511, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+(26512, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+(26513, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+(26514, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+(26515, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+(26325, 0, 180772, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
+(26488, 0, 180772, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
+(26490, 0, 180772, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
+(26516, 0, 180772, 0, 0, 5086, 5875), -- Large Purple Firework Cluster Throw into a cluster launcher!
+(26517, 0, 180772, 0, 0, 5086, 5875), -- Large Red Firework Cluster Throw into a cluster launcher!
+(26518, 0, 180772, 0, 0, 5086, 5875), -- Large White Firework Cluster Throw into a cluster launcher!
+(26519, 0, 180772, 0, 0, 5086, 5875), -- Large Yellow Firework Cluster Throw into a cluster launcher!
+(26521, 0, 180772, 0, 0, 5086, 5875), -- Lucky Lunar Rocket You're in luck!  Throw into a cluster launcher!
+(26326, 0, 180772, 0, 0, 5086, 5875), -- Purple Firework Cluster Throw into a cluster launcher!
+(26327, 0, 180772, 0, 0, 5086, 5875), -- Red Firework Cluster Throw into a cluster launcher!
+(26328, 0, 180772, 0, 0, 5086, 5875), -- White Firework Cluster Throw into a cluster launcher!
+(26329, 0, 180772, 0, 0, 5086, 5875), -- Yellow Firework Cluster Throw into a cluster launcher!
+-- 180859 Cluster Launcher
+(26304, 0, 180859, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
+(26301, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+(26300, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+(26302, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+(26303, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+(26357, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+(26483, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+(26484, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+(26485, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+(26486, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+(26487, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+(26309, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+(26310, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+(26311, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+(26312, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+(26358, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+(26491, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+(26492, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+(26493, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+(26494, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+(26495, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+(26313, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+(26314, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+(26315, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+(26316, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+(26359, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+(26496, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+(26497, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+(26498, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+(26499, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+(26500, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+(26305, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+(26306, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+(26307, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+(26308, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+(26360, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+(26501, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+(26502, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+(26503, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+(26504, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+(26505, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+(26317, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+(26318, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+(26319, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+(26320, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+(26361, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+(26506, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+(26507, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+(26508, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+(26509, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+(26510, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+(26321, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+(26322, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+(26323, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+(26324, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+(26362, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+(26511, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+(26512, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+(26513, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+(26514, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+(26515, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+(26325, 0, 180859, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
+(26488, 0, 180859, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
+(26490, 0, 180859, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
+(26516, 0, 180859, 0, 0, 5086, 5875), -- Large Purple Firework Cluster Throw into a cluster launcher!
+(26517, 0, 180859, 0, 0, 5086, 5875), -- Large Red Firework Cluster Throw into a cluster launcher!
+(26518, 0, 180859, 0, 0, 5086, 5875), -- Large White Firework Cluster Throw into a cluster launcher!
+(26519, 0, 180859, 0, 0, 5086, 5875), -- Large Yellow Firework Cluster Throw into a cluster launcher!
+(26521, 0, 180859, 0, 0, 5086, 5875), -- Lucky Lunar Rocket You're in luck!  Throw into a cluster launcher!
+(26326, 0, 180859, 0, 0, 5086, 5875), -- Purple Firework Cluster Throw into a cluster launcher!
+(26327, 0, 180859, 0, 0, 5086, 5875), -- Red Firework Cluster Throw into a cluster launcher!
+(26328, 0, 180859, 0, 0, 5086, 5875), -- White Firework Cluster Throw into a cluster launcher!
+(26329, 0, 180859, 0, 0, 5086, 5875), -- Yellow Firework Cluster Throw into a cluster launcher!
+-- 180869 Cluster Launcher
+(26304, 0, 180869, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
+(26301, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+(26300, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+(26302, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+(26303, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+(26357, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+(26483, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+(26484, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+(26485, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+(26486, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+(26487, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+(26309, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+(26310, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+(26311, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+(26312, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+(26358, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+(26491, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+(26492, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+(26493, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+(26494, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+(26495, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+(26313, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+(26314, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+(26315, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+(26316, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+(26359, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+(26496, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+(26497, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+(26498, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+(26499, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+(26500, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+(26305, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+(26306, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+(26307, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+(26308, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+(26360, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+(26501, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+(26502, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+(26503, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+(26504, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+(26505, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+(26317, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+(26318, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+(26319, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+(26320, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+(26361, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+(26506, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+(26507, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+(26508, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+(26509, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+(26510, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+(26321, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+(26322, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+(26323, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+(26324, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+(26362, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+(26511, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+(26512, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+(26513, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+(26514, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+(26515, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+(26325, 0, 180869, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
+(26488, 0, 180869, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
+(26490, 0, 180869, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
+(26516, 0, 180869, 0, 0, 5086, 5875), -- Large Purple Firework Cluster Throw into a cluster launcher!
+(26517, 0, 180869, 0, 0, 5086, 5875), -- Large Red Firework Cluster Throw into a cluster launcher!
+(26518, 0, 180869, 0, 0, 5086, 5875), -- Large White Firework Cluster Throw into a cluster launcher!
+(26519, 0, 180869, 0, 0, 5086, 5875), -- Large Yellow Firework Cluster Throw into a cluster launcher!
+(26521, 0, 180869, 0, 0, 5086, 5875), -- Lucky Lunar Rocket You're in luck!  Throw into a cluster launcher!
+(26326, 0, 180869, 0, 0, 5086, 5875), -- Purple Firework Cluster Throw into a cluster launcher!
+(26327, 0, 180869, 0, 0, 5086, 5875), -- Red Firework Cluster Throw into a cluster launcher!
+(26328, 0, 180869, 0, 0, 5086, 5875), -- White Firework Cluster Throw into a cluster launcher!
+(26329, 0, 180869, 0, 0, 5086, 5875), -- Yellow Firework Cluster Throw into a cluster launcher!
+-- 180874 Cluster Launcher
+(26304, 0, 180874, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
+(26301, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+(26300, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+(26302, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+(26303, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+(26357, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+(26483, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+(26484, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+(26485, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+(26486, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+(26487, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+(26309, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+(26310, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+(26311, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+(26312, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+(26358, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+(26491, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+(26492, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+(26493, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+(26494, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+(26495, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+(26313, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+(26314, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+(26315, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+(26316, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+(26359, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+(26496, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+(26497, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+(26498, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+(26499, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+(26500, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+(26305, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+(26306, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+(26307, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+(26308, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+(26360, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+(26501, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+(26502, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+(26503, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+(26504, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+(26505, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+(26317, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+(26318, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+(26319, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+(26320, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+(26361, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+(26506, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+(26507, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+(26508, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+(26509, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+(26510, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+(26321, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+(26322, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+(26323, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+(26324, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+(26362, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+(26511, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+(26512, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+(26513, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+(26514, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+(26515, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+(26325, 0, 180874, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
+(26488, 0, 180874, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
+(26490, 0, 180874, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
+(26516, 0, 180874, 0, 0, 5086, 5875), -- Large Purple Firework Cluster Throw into a cluster launcher!
+(26517, 0, 180874, 0, 0, 5086, 5875), -- Large Red Firework Cluster Throw into a cluster launcher!
+(26518, 0, 180874, 0, 0, 5086, 5875), -- Large White Firework Cluster Throw into a cluster launcher!
+(26519, 0, 180874, 0, 0, 5086, 5875), -- Large Yellow Firework Cluster Throw into a cluster launcher!
+(26521, 0, 180874, 0, 0, 5086, 5875), -- Lucky Lunar Rocket You're in luck!  Throw into a cluster launcher!
+(26326, 0, 180874, 0, 0, 5086, 5875), -- Purple Firework Cluster Throw into a cluster launcher!
+(26327, 0, 180874, 0, 0, 5086, 5875), -- Red Firework Cluster Throw into a cluster launcher!
+(26328, 0, 180874, 0, 0, 5086, 5875), -- White Firework Cluster Throw into a cluster launcher!
+(26329, 0, 180874, 0, 0, 5086, 5875); -- Yellow Firework Cluster Throw into a cluster launcher!
 
 -- Cluster and Firework Launcher pools.
 SET @LUNAR_FESTIVAL_LAUNCHER_OGUID = 22489;
