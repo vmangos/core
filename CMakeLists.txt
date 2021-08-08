@@ -18,7 +18,12 @@
 project(MaNGOS)
 
 # CMake policies
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.1...3.20)
+
+# Allow -DACE_ROOT, -DTBB_ROOT, etc.
+if(${CMAKE_VERSION} VERSION_GREATER "3.11")
+  cmake_policy(SET CMP0074 NEW)
+endif()
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}

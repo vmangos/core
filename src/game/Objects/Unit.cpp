@@ -6075,6 +6075,10 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
     if (m_Visibility == VISIBILITY_OFF)
         return false;
 
+    // Hunter's Mark makes target always visible to caster.
+    if (HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, pDetector->GetObjectGuid()))
+        return true;
+
     // raw invisibility
     bool invisible = m_invisibilityMask != 0;
 
@@ -6260,12 +6264,6 @@ bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) c
 
     if (distance < 1.5f) // collision
         return true;
-
-    // Hunter's Mark makes target always visible to caster.
-    AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
-    for (const auto& iter : auras)
-        if (iter->GetCasterGuid() == GetObjectGuid())
-            return true;
 
     if (distance > sWorld.getConfig(IsPlayer() ? CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE : CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
         return false;
@@ -9521,7 +9519,7 @@ void Unit::ProcessRelocationVisibilityUpdates()
 }
 
 // BEGIN Nostalrius specific functions
-void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpells)
+void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpells, bool onlyIfNotStalked)
 {
     std::list<Unit*> targets;
     // Maximum spell range=100m ?
@@ -9529,18 +9527,25 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, u_check);
     // Don't need to use visibility modifier, units won't be able to cast outside of draw distance
     Cell::VisitAllObjects(this, searcher, GetMap()->GetVisibilityDistance());
+
     for (const auto& iter : targets)
     {
         if (!interruptPositiveSpells && IsFriendlyTo(iter))
             continue;
+
+        if (onlyIfNotStalked && HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, iter->GetObjectGuid()))
+            continue;
+
         for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; i++)
             if (Spell* spell = iter->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (spell->m_targets.getUnitTargetGuid() == GetObjectGuid())
                     if (killDelayed || (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime()) || i == CURRENT_CHANNELED_SPELL)
                         iter->InterruptSpell(CurrentSpellTypes(i), true);
+
         if (!killDelayed)
             continue;
-        // 2/ Interruption des sorts qui ne sont plus reference, mais dont il reste un event (ceux en parcours par exemple)
+
+        // Interruption of spells which are no longer referenced, but for which there is still an event (not yet hit the target for example) 
         auto i_Events = iter->m_Events.GetEvents().begin();
         for (; i_Events != iter->m_Events.GetEvents().end(); ++i_Events)
             if (SpellEvent* event = dynamic_cast<SpellEvent*>(i_Events->second))

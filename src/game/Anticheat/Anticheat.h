@@ -74,7 +74,7 @@ public:
 };
 
 #ifdef USE_ANTICHEAT
-#include "WardenAnticheat/Warden.h"
+#include "WardenAnticheat/Warden.hpp"
 #include "MovementAnticheat/MovementAnticheat.h"
 #else
 class Warden
@@ -82,9 +82,9 @@ class Warden
 public:
     Warden() = default;
     ~Warden() = default;
-    void HandleWardenDataOpcode(WorldPacket& recv_data) {}
-    void Update() {}
-    WorldSession* GetSession() { return nullptr; }
+    void HandlePacket(WorldPacket&) {}
+    virtual void Update() {}
+    virtual void GetPlayerInfo(std::string&, std::string&, std::string&, std::string&, std::string&) const {}
 };
 
 class MovementAnticheat

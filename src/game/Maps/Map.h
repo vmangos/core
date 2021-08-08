@@ -450,6 +450,7 @@ class Map : public GridRefManager<NGridType>
         void SendToPlayers(WorldPacket const* data, Team team = TEAM_NONE) const;
         // Send a Packet to all players in a zone. Return false if no player found
         bool SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const;
+        void SendDefenseMessage(int32 textId, uint32 zoneId) const;
 
         typedef MapRefManager PlayerList;
         PlayerList const& GetPlayers() const { return m_mapRefManager; }

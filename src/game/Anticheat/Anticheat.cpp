@@ -33,19 +33,22 @@ AnticheatManager* GetAnticheatLib()
 #include "WorldSession.h"
 
 #include "MovementAnticheat/MovementAnticheat.h"
-#include "WardenAnticheat/Warden.h"
-#include "WardenAnticheat/WardenWin.h"
-#include "WardenAnticheat/WardenMac.h"
+#include "WardenAnticheat/Warden.hpp"
+#include "WardenAnticheat/WardenScanMgr.hpp"
+#include "WardenAnticheat/WardenModuleMgr.hpp"
+#include "WardenAnticheat/WardenWin.hpp"
+#include "WardenAnticheat/WardenMac.hpp"
 
 void AnticheatManager::LoadAnticheatData()
 {
     sLog.outString();
     sLog.outString("Loading warden checks...");
-    sWardenMgr->LoadWardenChecks();
+    sWardenScanMgr.loadFromDB();
+    Warden::LoadScriptedScans();
     
     sLog.outString();
     sLog.outString("Loading warden modules...");
-    sWardenMgr->LoadWardenModules();
+    sWardenModuleMgr;
 }
 
 MovementAnticheat* AnticheatManager::CreateAnticheatFor(Player* player)
@@ -61,19 +64,14 @@ Warden* AnticheatManager::CreateWardenFor(WorldSession* client, BigNumber* K)
         sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY))
         return nullptr;
 
-    Warden* warden;
     ClientOSType os = client->GetOS();
 
     if (os == CLIENT_OS_MAC && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED))
-        warden = new WardenMac();
+        return new WardenMac(client, *K);
     else if (os == CLIENT_OS_WIN && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED))
-        warden = new WardenWin();
-    else
-        return nullptr;
+        return new WardenWin(client, *K);
 
-    warden->Init(client, K);
-
-    return warden;
+    return nullptr;
 }
 
 #endif

@@ -625,6 +625,13 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
             }
 
+            if ((cheatFlags & (1 << CHEAT_TYPE_WALL_CLIMB)) &&
+                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_REJECT))
+            {
+                // Prevent false positive detection loop on auto run against wall while afk.
+                me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
+            }
+
             if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
             {
@@ -836,7 +843,7 @@ bool MovementAnticheat::CheckMultiJump(uint16 opcode)
         case MSG_MOVE_JUMP:
         {
             m_jumpCount++;
-            if (m_jumpCount > 2)
+            if (m_jumpCount > 1)
                 return true;
             break;
         }
@@ -858,7 +865,6 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
 {
     // Not currently handled cases.
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_ENABLED) ||
-       (opcode != MSG_MOVE_HEARTBEAT) ||
        (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (me->HasFlag(UNIT_FIELD_FLAGS, NO_WALL_CLIMB_CHECK_UNIT_FLAGS)) ||

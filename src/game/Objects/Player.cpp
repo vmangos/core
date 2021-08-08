@@ -2915,13 +2915,7 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
 
 bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
 {
-    for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
-    {
-        if (aura->GetCasterGuid() == this->GetObjectGuid())
-            return true;
-    }
-
-    return false;
+    return pTarget->HasAuraTypeByCaster(SPELL_AURA_EMPATHY, GetObjectGuid());
 }
 
 struct SetGameMasterOnHelper
@@ -8263,11 +8257,11 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendUpdateWorldState(uint32 Field, uint32 Value) const
+void Player::SendUpdateWorldState(uint32 field, uint32 value) const
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    data << Field;
-    data << Value;
+    data << field;
+    data << value;
     GetSession()->SendPacket(&data);
 }
 

@@ -230,23 +230,6 @@ bool ChatHandler::HandleAntiSpamRemoveReplace(char* args)
     return true;
 }
 
-bool ChatHandler::HandleUpdateWorldStateCommand(char *args)
-{
-    uint32 value = 0;
-    uint32 index = 0;
-    sscanf(args, "%u %u", &index, &value);
-    if (index == 0)
-    {
-        SendSysMessage("Usage :");
-        SendSysMessage(".ws update index [value=0]");
-        SetSentErrorMessage(true);
-        return false;
-    }
-    m_session->GetPlayer()->SendUpdateWorldState(index, value);
-    PSendSysMessage("WorldState %u is %u for player.", index, value);
-    return true;
-}
-
 bool ChatHandler::HandleWorldUpdateCommand(char *args)
 {
     bool modify = true;

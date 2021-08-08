@@ -300,6 +300,8 @@ class WorldSession
         Player* GetPlayer() const { return _player; }
         char const* GetPlayerName() const;
         void SetSecurity(AccountTypes security) { _security = security; }
+        uint32 GetFingerprint() const { return 0; } // TODO
+        void CleanupFingerprintHistory() {} // TODO
         std::string const& GetRemoteAddress() const { return m_Address; }
         std::string const& GetClientHash() const { return _clientHash; }
         void SetPlayer(Player* plr) { _player = plr; }

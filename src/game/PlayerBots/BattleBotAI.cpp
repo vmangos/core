@@ -2963,7 +2963,7 @@ void BattleBotAI::UpdateInCombatAI_Druid()
     {
         if (me->HasUnitState(UNIT_STAT_ROOT) &&
             me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
-            me->RemoveAurasDueToSpellByCancel(me->GetAurasByType(SPELL_AURA_MOD_SHAPESHIFT).front()->GetId());
+            me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
     }
     
     if (Unit* pVictim = me->GetVictim())
