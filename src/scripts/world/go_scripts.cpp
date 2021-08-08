@@ -156,13 +156,13 @@ bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
         {
             switch (pGo->GetGUIDLow())
             {
-                case 3998422: // Darnassus
+                case 65603: // Darnassus
                     pPlayer->TeleportTo(WorldLocation(1, 10150.45f, 2602.12f, 1330.82f, 5.03f));
                     break;
-                case 3998424: // Stormwind
+                case 65600: // Stormwind
                     pPlayer->TeleportTo(WorldLocation(0, -8748.27f, 1074.27f, 90.52f, 4.17f));
                     break;
-                case 3998425: // Ironforge
+                case 65598: // Ironforge
                     pPlayer->TeleportTo(WorldLocation(0, -4663.39f, -956.23f, 500.37f, 5.73f));
                     break;
                 default:
@@ -173,13 +173,13 @@ bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
         {
             switch(pGo->GetGUID())
             {
-                case 3998423: // Thunderbluff
+                case 65602: // Thunderbluff
                     pPlayer->TeleportTo(WorldLocation(1, -1031.73f, -230.42f, 160.18f, 3.12f));
                     break;
-                case 3998426: // Undercity
+                case 65599: // Undercity
                     pPlayer->TeleportTo(WorldLocation(0, 1642.41f, 239.9f, 62.59f, 3.01f));
                     break;
-                case 3998427: // Orgrimmar
+                case 65601: // Orgrimmar
                     pPlayer->TeleportTo(WorldLocation(1, 1971.18f, -4259.45f, 32.21f, 4.0f));
                     break;
                 default:
