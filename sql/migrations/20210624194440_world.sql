@@ -413,6 +413,9 @@ DELETE FROM `npc_vendor` WHERE `entry` = 8363 AND `item` = 785);
 -- Reduce Schematic: Ice Deflector Restock Time
 UPDATE `npc_vendor` SET `incrtime` = 7200 WHERE `entry` = 2684 AND `item` = 13308;
 
+-- Increase Dropchance for Lake Skulker Moss
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`= -50 WHERE `entry` IN (1953, 1954) AND `item` = 3256;
+
 
 -- End of migration.
 END IF;
