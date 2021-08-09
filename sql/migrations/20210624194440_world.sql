@@ -424,6 +424,20 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 (294, 109, 0, 10),
 (963, 109, 0, 10);
 
+-- Remove Duplicate Spawns From Cave
+DELETE FROM `creature` WHERE `guid` IN (
+21011,
+13097,
+21759,
+13096,
+13083,
+21766,
+13094,
+13085,
+21765,
+21029
+);
+
 
 -- End of migration.
 END IF;
