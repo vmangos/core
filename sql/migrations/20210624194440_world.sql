@@ -416,6 +416,14 @@ UPDATE `npc_vendor` SET `incrtime` = 7200 WHERE `entry` = 2684 AND `item` = 1330
 -- Increase Dropchance for Lake Skulker Moss
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`= -50 WHERE `entry` IN (1953, 1954) AND `item` = 3256;
 
+-- Quest 109 Should be Started by Multiple NPCs
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(233, 109, 0, 10),
+(237, 109, 0, 10),
+(240, 109, 0, 10),
+(294, 109, 0, 10),
+(963, 109, 0, 10);
+
 
 -- End of migration.
 END IF;
