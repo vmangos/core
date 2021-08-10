@@ -170,13 +170,13 @@ class OPvPCapturePoint
         TeamId m_team;
 
         // objective states
-        ObjectiveStates m_OldState;
-        ObjectiveStates m_State;
+        ObjectiveStates m_oldState;
+        ObjectiveStates m_state;
 
         // neutral value on capture bar
         uint32 m_neutralValuePct;
-        uint32 m_ValuePct;
-        uint32 m_FactDiff;
+        uint32 m_valuePct;
+        uint32 m_factDiff;
 
         // pointer to the OutdoorPvP this objective belongs to
         OutdoorPvP* m_PvP;
