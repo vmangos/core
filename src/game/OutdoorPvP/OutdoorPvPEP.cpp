@@ -39,11 +39,11 @@ OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP *pvp)
 void OPvPCapturePointEP_EWT::ChangeState()
 {
     // If changing from controlling alliance to horde or vice versa.
-    if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
+    if (m_oldState == OBJECTIVESTATE_ALLIANCE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = 0;
     }
-    else if (m_OldState == OBJECTIVESTATE_HORDE && m_OldState != m_State)
+    else if (m_oldState == OBJECTIVESTATE_HORDE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = 0;
     }
@@ -51,7 +51,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
     uint32 artkit = 21;
     uint32 animation = 2;
 
-    switch (m_State)
+    switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
@@ -71,7 +71,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = ALLIANCE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_A, EP_Zone);
 
             break;
@@ -94,7 +94,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_EWT] = HORDE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_EWT_TAKEN_H, EP_Zone);
 
             break;
@@ -143,7 +143,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
 }
 
 uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
@@ -172,7 +172,7 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* pPlayer)
         /*
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
         */
         return true;
     }
@@ -226,11 +226,11 @@ OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP *pvp)
 void OPvPCapturePointEP_NPT::ChangeState()
 {
     // If changing from controlling alliance to horde or vice versa.
-    if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
+    if (m_oldState == OBJECTIVESTATE_ALLIANCE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = 0;
     }
-    else if (m_OldState == OBJECTIVESTATE_HORDE && m_OldState != m_State)
+    else if (m_oldState == OBJECTIVESTATE_HORDE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = 0;
     }
@@ -238,7 +238,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
     uint32 artkit = 21;
     uint32 animation = 2;
 
-    switch (m_State)
+    switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
@@ -258,7 +258,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = ALLIANCE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_A, EP_Zone);
 
             break;
@@ -281,7 +281,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_NPT] = HORDE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_NPT_TAKEN_H, EP_Zone);
 
             break;
@@ -347,7 +347,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
 void OPvPCapturePointEP_NPT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
 }
 
 uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
@@ -376,7 +376,7 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* pPlayer)
         /*
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
         */
         return true;
     }
@@ -412,11 +412,11 @@ OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP *pvp)
 void OPvPCapturePointEP_CGT::ChangeState()
 {
     // If changing from controlling alliance to horde or vice versa.
-    if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
+    if (m_oldState == OBJECTIVESTATE_ALLIANCE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = 0;
     }
-    else if (m_OldState == OBJECTIVESTATE_HORDE && m_OldState != m_State)
+    else if (m_oldState == OBJECTIVESTATE_HORDE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = 0;
     }
@@ -424,7 +424,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
     uint32 artkit = 21;
     uint32 animation = 2;
 
-    switch (m_State)
+    switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
@@ -446,7 +446,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = ALLIANCE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_A, EP_Zone);
 
             break;
@@ -471,7 +471,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_CGT] = HORDE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_CGT_TAKEN_H, EP_Zone);
 
             break;
@@ -543,7 +543,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
 }
 
 uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
@@ -572,7 +572,7 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* pPlayer)
         /*
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
         */
         return true;
     }
@@ -641,11 +641,11 @@ OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP *pvp)
 void OPvPCapturePointEP_PWT::ChangeState()
 {
     // If changing from controlling alliance to horde or vice versa.
-    if (m_OldState == OBJECTIVESTATE_ALLIANCE && m_OldState != m_State)
+    if (m_oldState == OBJECTIVESTATE_ALLIANCE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = 0;
     }
-    else if (m_OldState == OBJECTIVESTATE_HORDE && m_OldState != m_State)
+    else if (m_oldState == OBJECTIVESTATE_HORDE && m_oldState != m_state)
     {
         ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = 0;
     }
@@ -653,7 +653,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
     uint32 artkit = 21;
     uint32 animation = 2;
 
-    switch (m_State)
+    switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         {
@@ -673,7 +673,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = ALLIANCE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_A, EP_Zone);
 
             break;
@@ -696,7 +696,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
             ((OutdoorPvPEP*)m_PvP)->EP_Controls[EP_PWT] = HORDE;
 
-            if (m_OldState != m_State)
+            if (m_oldState != m_state)
                 ((OutdoorPvPEP*)m_PvP)->GetMap()->SendDefenseMessage(BCT_EP_PWT_TAKEN_H, EP_Zone);
 
             break;
@@ -759,7 +759,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
 }
 
 uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
@@ -788,7 +788,7 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* pPlayer)
         /*
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
         pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
-        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_ValuePct);
+        pPlayer->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, m_valuePct);
         */
         return true;
     }
