@@ -13,15 +13,15 @@ UPDATE `gameobject_template` SET `Data8` = 6142, `data9` = 0, `flags` = 4 WHERE 
 
 UPDATE `gameobject` SET `spawntimesecsmin`= 120, `spawntimesecsmax`= 120 WHERE id = 177784;
 
-UPDATE `creature` SET `movement_type` = 1, `wander_distance`= 40 WHERE `id` = 12347;
+UPDATE `creature` SET `movement_type` = 1, `wander_distance`= 50 WHERE `id` = 12347;
 
 INSERT INTO `creature` (`guid`, `id`,`map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(1345, 12347, 1, -709.65, 3079.03, -30.12, 3.16598, 300, 300, 40, 100, 0, 1, 0, 0, 0, 10),
-(1361, 12347, 1, -732.872, 3116.84, -25.9876, 3.16598, 300, 300, 40, 100, 0, 1, 0, 0, 0, 10),
-(1369, 12347, 1, -819.322, 3151.19, -29.0014, 3.16598, 300, 300, 40, 100, 0, 1, 0, 0, 0, 10),
-(1374, 12347, 1, -927.963, 3116.89, -25.2395, 3.16598, 300, 300, 40, 100, 0, 1, 0, 0, 0, 10),
-(1377, 12347, 1, -779.266, 3044.03, -22.1945, 3.16598, 300, 300, 40, 100, 0, 1, 0, 0, 0, 10),
-(1382, 12347, 1, -672.3, 2973.36, -21.8494, 3.16598, 300, 300, 40, 100, 0, 1, 0, 0, 0, 10);
+(1345, 12347, 1, -709.65, 3079.03, -30.12, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10),
+(1361, 12347, 1, -732.872, 3116.84, -25.9876, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10),
+(1369, 12347, 1, -819.322, 3151.19, -29.0014, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10),
+(1374, 12347, 1, -927.963, 3116.89, -25.2395, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10),
+(1377, 12347, 1, -779.266, 3044.03, -22.1945, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10),
+(1382, 12347, 1, -672.3, 2973.36, -21.8494, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10);
 
 INSERT INTO `gameobject` (guid, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (2555, 177784, 1, -979.745, 3089.43, -23.5718, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 1, 100, 0, 10),
