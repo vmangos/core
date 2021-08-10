@@ -30,8 +30,8 @@
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
     m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0), m_minValue(0), m_maxSpeed(0),
-    m_value(0), m_team(TEAM_NEUTRAL), m_OldState(OBJECTIVESTATE_NEUTRAL),
-    m_State(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_ValuePct(50), m_FactDiff(0), m_PvP(pvp)
+    m_value(0), m_team(TEAM_NEUTRAL), m_oldState(OBJECTIVESTATE_NEUTRAL),
+    m_state(OBJECTIVESTATE_NEUTRAL), m_neutralValuePct(0), m_valuePct(50), m_factDiff(0), m_PvP(pvp)
 {
 }
 
@@ -42,7 +42,7 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* plr)
         plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
         plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
         /* IMPORTANT!
-        EP_UI_TOWER_SLIDER_POS: Should always be sent last and only when the value (m_ValuePct) has been updated.
+        EP_UI_TOWER_SLIDER_POS: Should always be sent last and only when the value (m_valuePct) has been updated.
                                 
             Alliance [100] <---------[50]---------> [0] Horde
             
@@ -53,7 +53,7 @@ bool OPvPCapturePoint::HandlePlayerEnter(Player* plr)
             If any other UI element gets updated (SendUpdateWorldState) after the Slider it gets also deleted.
             The reason for this is client-specific and has nothing to do with the core.
         */
-        plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_ValuePct);
+        plr->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_valuePct);
     }
     return m_activePlayers[plr->GetTeamId()].insert(plr).second;
 }
@@ -70,7 +70,7 @@ void OPvPCapturePoint::SendChangePhase()
     if (!m_capturePoint)
         return;
 
-    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_ValuePct);
+    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_valuePct);
 }
 
 void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
@@ -309,7 +309,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     if (fact_diff < 0)
     {
         // Horde is in majority, but it's already Horde-controlled -> no change.
-        if (m_State == OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
+        if (m_state == OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
             return false;
 
         if (fact_diff < -maxDiff)
@@ -320,7 +320,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     else
     {
         // Alliance is in majority, but it's already Alliance-controlled -> no change.
-        if (m_State == OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
+        if (m_state == OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
             return false;
 
         if (fact_diff > maxDiff)
@@ -329,12 +329,12 @@ bool OPvPCapturePoint::Update(uint32 diff)
         Challenger = ALLIANCE;
     }
 
-    uint32 m_OldValuePct = m_ValuePct;
-    uint32 m_OldFactDiff = m_FactDiff;
+    uint32 OldValuePct = m_valuePct;
+    uint32 OldFactDiff = m_factDiff;
     float oldValue = m_value;
     TeamId oldTeam = m_team;
 
-    m_OldState = m_State;
+    m_oldState = m_state;
 
     m_value += fact_diff;
 
@@ -342,47 +342,47 @@ bool OPvPCapturePoint::Update(uint32 diff)
     {
         if (m_value < -m_maxValue)
             m_value = -m_maxValue;
-        m_State = OBJECTIVESTATE_HORDE;
+        m_state = OBJECTIVESTATE_HORDE;
         m_team = TEAM_HORDE;
     }
     else if (m_value > m_minValue) // Blue.
     {
         if (m_value > m_maxValue)
             m_value = m_maxValue;
-        m_State = OBJECTIVESTATE_ALLIANCE;
+        m_state = OBJECTIVESTATE_ALLIANCE;
         m_team = TEAM_ALLIANCE;
     }
     else if (oldValue * m_value <= 0) // Grey, go through mid point.
     {
         // If challenger is ally, then N->A challenge.
         if (Challenger == ALLIANCE)
-            m_State = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
+            m_state = OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
         // If challenger is horde, then N->H challenge.
         else if (Challenger == HORDE)
-            m_State = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
+            m_state = OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
         m_team = TEAM_NEUTRAL;
     }
     else // Grey, did not go through mid point.
     {
         // Old phase and current are on the same side, so one team challenges the other.
-        if (Challenger == ALLIANCE && (m_OldState == OBJECTIVESTATE_HORDE || m_OldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE))
-            m_State = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
-        else if (Challenger == HORDE && (m_OldState == OBJECTIVESTATE_ALLIANCE || m_OldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE))
-            m_State = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
+        if (Challenger == ALLIANCE && (m_oldState == OBJECTIVESTATE_HORDE || m_oldState == OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE))
+            m_state = OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
+        else if (Challenger == HORDE && (m_oldState == OBJECTIVESTATE_ALLIANCE || m_oldState == OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE))
+            m_state = OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE;
         m_team = TEAM_NEUTRAL;
     }
 
-    m_ValuePct = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
-    m_FactDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
+    m_valuePct = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    m_factDiff = (m_activePlayers[0].size() - m_activePlayers[1].size());
 
-    if (m_OldState != m_State)
+    if (m_oldState != m_state)
     {
         if (oldTeam != m_team)
             ChangeTeam(oldTeam);
         ChangeState();
         return true;
     }
-    else if (m_ValuePct != m_OldValuePct || m_OldFactDiff != m_FactDiff && !m_FactDiff) // Only send World Updates if the Slider value actually changes or Faction difference changed to avoid sending unnecessary packets.
+    else if (m_valuePct != OldValuePct || OldFactDiff != m_factDiff && !m_factDiff) // Only send World Updates if the Slider value actually changes or Faction difference changed to avoid sending unnecessary packets.
         SendChangePhase();
 
     return false;
@@ -401,7 +401,7 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
 void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
 {
     uint32 team;
-    switch (m_State)
+    switch (m_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
             team = 0;
