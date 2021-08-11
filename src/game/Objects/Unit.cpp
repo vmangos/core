@@ -489,12 +489,11 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType)
     }
 }
 
-void Unit::RemoveNegativeSpellsCausingAura(AuraType auraType)
+void Unit::RemoveSpellsCausingAuraWithMechanic(AuraType auraType)
 {
     for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
-        // forced debuff auras skipped too
-        if ((*iter)->GetHolder()->IsPositive() || (*iter)->GetHolder()->GetSpellProto()->HasAttribute(SPELL_ATTR_NEGATIVE))
+        if ((*iter)->GetSpellProto()->GetAllSpellMechanicMask() == 0)
         {
             ++iter;
             continue;

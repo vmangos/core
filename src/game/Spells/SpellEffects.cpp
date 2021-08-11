@@ -5151,20 +5151,19 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 Unit* target = unitTarget ? unitTarget : m_casterUnit;
                 if (!target)
                     return;
-                target->RemoveNegativeSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                target->RemoveSpellsCausingAuraWithMechanic(SPELL_AURA_MOD_ROOT);
                 Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                 for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
                 {
                     SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
 
-                    // skip positive and forced debuff auras
-                    if ((*iter)->IsPositive() || aurSpellInfo->HasAttribute(SPELL_ATTR_NEGATIVE))
+                    // all shapeshift removing spells have some mechanic mask. 33572 and 38132 confirmed not removed on poly
+                    if (aurMechMask == 0)
                     {
                         ++iter;
                         continue;
                     }
-
-                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
 
                     // If spell that caused this aura has Croud Control or Daze effect
                     if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
