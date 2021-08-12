@@ -1236,7 +1236,7 @@ std::array<FireworkStruct, 25> const Fireworks =
     { 15914, {26505, 26504, 26503, 26502, 26501}, true }, // Large Red Firework Cluster
     { 15915, {26510, 26509, 26508, 26507, 26506}, true }, // Large White Firework Cluster
     { 15916, {26515, 26514, 26513, 26512, 26511}, true }, // Large Yellow Firework Cluster
-    { 15918, {26487, 26509, 26508, 26507, 26483}, true }, // Lucky Rocket Cluster
+    { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
 }};
 
 std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
@@ -1307,22 +1307,23 @@ struct npc_pats_firework_guyAI : ScriptedAI
                 switch (i)
                 {
                     case 0:
-                        m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
+                        m_creature->NearTeleportTo(x, y, z + float(urand(3, 12)), 0.0f);
                         break;
                     case 1:
-                        m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
+                        m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + float(urand(3, 12)), 0.0f);
                         break;
                     case 2:
-                        m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
+                        m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + float(urand(3, 12)), 0.0f);
                         break;
                     case 3:
-                        m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
+                        m_creature->NearTeleportTo(x + 1.5f, y, z + float(urand(3, 12)), 0.0f);
                         break;
                     case 4:
-                        m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
+                        m_creature->NearTeleportTo(x, y + 1.5f, z + float(urand(3, 12)), 0.0f);
                         break;
                 }
                 m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                sLog.outBasic("[npc_pats_firework_guyAI] Spawn Gameobject at: x %f, y %f, z %f", x, y, z);
             }
         }
         else
