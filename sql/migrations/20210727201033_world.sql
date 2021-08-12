@@ -64,26 +64,26 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=15892;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589201, 15892, 0, 8, 0, 100, 1, 26373, 64, 0, 0, 1589201, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary on SpellHit Lunar Invititation (26373)');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1589201;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 0, 15, 13540, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Green Channeling');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 0, 39, 1589201, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary start Fireworks in 5 seconds');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 1, 15, 13540, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Green Channeling');
 
 DELETE FROM `generic_scripts` WHERE `id`=1589201;
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 4, 14, 13540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary stop Green Channeling');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 5, 15, 26304, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Blue Firework Cluster');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 5, 15, 26291, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Small Blue Rocket');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 3, 14, 13540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary stop Green Channeling');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 5, 15, 26304, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Blue Firework Cluster');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 5, 15, 26291, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Small Blue Rocket');
 
 -- Events list for Lunar Festival Herald
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15891;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589101, 15891, 0, 8, 0, 100, 1, 26373, 64, 0, 0, 1589101, 0, 0, 'Lunar Festival Event - Lunar Festival Herald on SpellHit Lunar Invititation (26373)');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1589101;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 0, 15, 13540, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Green Channeling');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 0, 39, 1589101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald start Fireworks in 5 seconds');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 1, 15, 13540, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Green Channeling');
 
 DELETE FROM `generic_scripts` WHERE `id`=1589101;
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 4, 14, 13540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald stop Green Channeling');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 5, 15, 26304, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Blue Firework Cluster');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 5, 15, 26291, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Small Blue Rocket');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 3, 14, 13540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald stop Green Channeling');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 5, 15, 26304, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Blue Firework Cluster');
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 5, 15, 26291, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Small Blue Rocket');
 
 -- Update some spell_script_targets.
 DELETE FROM spell_script_target WHERE targetEntry IN (15872,15873,15874,15879,15880,15882,15883,15884,15886,15888,15893,15918);
@@ -173,66 +173,66 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 -- (requiresSpellFocus 1352)
 -- 180772 Cluster Launcher
 (26304, 0, 180772, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
-(26301, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
-(26300, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
-(26302, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
-(26303, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
-(26357, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
-(26483, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
-(26484, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
-(26485, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
-(26486, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
-(26487, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
-(26309, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
-(26310, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
-(26311, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
-(26312, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
-(26358, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
-(26491, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
-(26492, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
-(26493, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
-(26494, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
-(26495, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
-(26313, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
-(26314, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
-(26315, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
-(26316, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
-(26359, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
-(26496, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
-(26497, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
-(26498, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
-(26499, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
-(26500, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
-(26305, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
-(26306, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
-(26307, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
-(26308, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
-(26360, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
-(26501, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
-(26502, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
-(26503, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
-(26504, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
-(26505, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
-(26317, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
-(26318, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
-(26319, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
-(26320, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
-(26361, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
-(26506, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
-(26507, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
-(26508, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
-(26509, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
-(26510, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
-(26321, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
-(26322, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
-(26323, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
-(26324, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
-(26362, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
-(26511, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
-(26512, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
-(26513, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
-(26514, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
-(26515, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+-- (26301, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+-- (26300, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+-- (26302, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+-- (26303, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+-- (26357, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+-- (26483, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+-- (26484, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+-- (26485, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+-- (26486, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+-- (26487, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+-- (26309, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+-- (26310, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+-- (26311, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+-- (26312, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+-- (26358, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+-- (26491, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+-- (26492, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+-- (26493, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+-- (26494, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+-- (26495, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+-- (26313, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+-- (26314, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+-- (26315, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+-- (26316, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+-- (26359, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+-- (26496, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+-- (26497, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+-- (26498, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+-- (26499, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+-- (26500, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+-- (26305, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+-- (26306, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+-- (26307, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+-- (26308, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+-- (26360, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+-- (26501, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+-- (26502, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+-- (26503, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+-- (26504, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+-- (26505, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+-- (26317, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+-- (26318, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+-- (26319, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+-- (26320, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+-- (26361, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+-- (26506, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+-- (26507, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+-- (26508, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+-- (26509, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+-- (26510, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+-- (26321, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+-- (26322, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+-- (26323, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+-- (26324, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+-- (26362, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+-- (26511, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+-- (26512, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+-- (26513, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+-- (26514, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+-- (26515, 0, 180772, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
 (26325, 0, 180772, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
 (26488, 0, 180772, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
 (26490, 0, 180772, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
@@ -247,66 +247,66 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 (26329, 0, 180772, 0, 0, 5086, 5875), -- Yellow Firework Cluster Throw into a cluster launcher!
 -- 180859 Cluster Launcher
 (26304, 0, 180859, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
-(26301, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
-(26300, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
-(26302, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
-(26303, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
-(26357, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
-(26483, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
-(26484, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
-(26485, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
-(26486, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
-(26487, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
-(26309, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
-(26310, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
-(26311, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
-(26312, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
-(26358, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
-(26491, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
-(26492, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
-(26493, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
-(26494, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
-(26495, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
-(26313, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
-(26314, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
-(26315, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
-(26316, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
-(26359, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
-(26496, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
-(26497, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
-(26498, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
-(26499, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
-(26500, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
-(26305, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
-(26306, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
-(26307, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
-(26308, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
-(26360, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
-(26501, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
-(26502, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
-(26503, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
-(26504, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
-(26505, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
-(26317, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
-(26318, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
-(26319, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
-(26320, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
-(26361, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
-(26506, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
-(26507, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
-(26508, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
-(26509, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
-(26510, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
-(26321, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
-(26322, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
-(26323, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
-(26324, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
-(26362, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
-(26511, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
-(26512, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
-(26513, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
-(26514, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
-(26515, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+-- (26301, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+-- (26300, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+-- (26302, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+-- (26303, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+-- (26357, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+-- (26483, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+-- (26484, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+-- (26485, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+-- (26486, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+-- (26487, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+-- (26309, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+-- (26310, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+-- (26311, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+-- (26312, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+-- (26358, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+-- (26491, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+-- (26492, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+-- (26493, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+-- (26494, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+-- (26495, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+-- (26313, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+-- (26314, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+-- (26315, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+-- (26316, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+-- (26359, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+-- (26496, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+-- (26497, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+-- (26498, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+-- (26499, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+-- (26500, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+-- (26305, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+-- (26306, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+-- (26307, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+-- (26308, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+-- (26360, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+-- (26501, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+-- (26502, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+-- (26503, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+-- (26504, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+-- (26505, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+-- (26317, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+-- (26318, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+-- (26319, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+-- (26320, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+-- (26361, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+-- (26506, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+-- (26507, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+-- (26508, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+-- (26509, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+-- (26510, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+-- (26321, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+-- (26322, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+-- (26323, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+-- (26324, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+-- (26362, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+-- (26511, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+-- (26512, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+-- (26513, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+-- (26514, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+-- (26515, 0, 180859, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
 (26325, 0, 180859, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
 (26488, 0, 180859, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
 (26490, 0, 180859, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
@@ -321,66 +321,66 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 (26329, 0, 180859, 0, 0, 5086, 5875), -- Yellow Firework Cluster Throw into a cluster launcher!
 -- 180869 Cluster Launcher
 (26304, 0, 180869, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
-(26301, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
-(26300, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
-(26302, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
-(26303, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
-(26357, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
-(26483, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
-(26484, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
-(26485, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
-(26486, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
-(26487, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
-(26309, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
-(26310, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
-(26311, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
-(26312, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
-(26358, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
-(26491, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
-(26492, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
-(26493, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
-(26494, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
-(26495, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
-(26313, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
-(26314, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
-(26315, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
-(26316, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
-(26359, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
-(26496, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
-(26497, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
-(26498, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
-(26499, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
-(26500, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
-(26305, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
-(26306, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
-(26307, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
-(26308, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
-(26360, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
-(26501, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
-(26502, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
-(26503, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
-(26504, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
-(26505, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
-(26317, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
-(26318, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
-(26319, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
-(26320, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
-(26361, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
-(26506, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
-(26507, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
-(26508, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
-(26509, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
-(26510, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
-(26321, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
-(26322, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
-(26323, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
-(26324, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
-(26362, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
-(26511, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
-(26512, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
-(26513, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
-(26514, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
-(26515, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+-- (26301, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+-- (26300, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+-- (26302, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+-- (26303, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+-- (26357, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+-- (26483, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+-- (26484, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+-- (26485, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+-- (26486, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+-- (26487, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+-- (26309, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+-- (26310, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+-- (26311, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+-- (26312, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+-- (26358, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+-- (26491, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+-- (26492, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+-- (26493, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+-- (26494, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+-- (26495, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+-- (26313, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+-- (26314, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+-- (26315, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+-- (26316, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+-- (26359, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+-- (26496, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+-- (26497, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+-- (26498, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+-- (26499, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+-- (26500, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+-- (26305, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+-- (26306, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+-- (26307, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+-- (26308, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+-- (26360, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+-- (26501, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+-- (26502, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+-- (26503, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+-- (26504, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+-- (26505, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+-- (26317, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+-- (26318, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+-- (26319, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+-- (26320, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+-- (26361, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+-- (26506, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+-- (26507, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+-- (26508, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+-- (26509, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+-- (26510, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+-- (26321, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+-- (26322, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+-- (26323, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+-- (26324, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+-- (26362, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+-- (26511, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+-- (26512, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+-- (26513, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+-- (26514, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+-- (26515, 0, 180869, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
 (26325, 0, 180869, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
 (26488, 0, 180869, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
 (26490, 0, 180869, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
@@ -395,66 +395,66 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 (26329, 0, 180869, 0, 0, 5086, 5875), -- Yellow Firework Cluster Throw into a cluster launcher!
 -- 180874 Cluster Launcher
 (26304, 0, 180874, 0, 0, 5086, 5875), -- Blue Firework Cluster Throw into a cluster launcher!
-(26301, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
-(26300, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
-(26302, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
-(26303, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
-(26357, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
-(26483, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
-(26484, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
-(26485, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
-(26486, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
-(26487, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
-(26309, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
-(26310, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
-(26311, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
-(26312, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
-(26358, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
-(26491, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
-(26492, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
-(26493, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
-(26494, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
-(26495, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
-(26313, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
-(26314, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
-(26315, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
-(26316, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
-(26359, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
-(26496, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
-(26497, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
-(26498, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
-(26499, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
-(26500, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
-(26305, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
-(26306, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
-(26307, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
-(26308, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
-(26360, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
-(26501, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
-(26502, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
-(26503, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
-(26504, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
-(26505, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
-(26317, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
-(26318, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
-(26319, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
-(26320, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
-(26361, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
-(26506, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
-(26507, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
-(26508, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
-(26509, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
-(26510, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
-(26321, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
-(26322, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
-(26323, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
-(26324, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
-(26362, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
-(26511, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
-(26512, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
-(26513, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
-(26514, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
-(26515, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
+-- (26301, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - D The lower part of a firework cluster!
+-- (26300, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - N The north part of a firework cluster!
+-- (26302, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SE The southeast part of a firework cluster!
+-- (26303, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - SW The southwest part of a firework cluster!
+-- (26357, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE - U The upper part of a firework cluster!
+-- (26483, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - D The lower part of a firework cluster!
+-- (26484, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - N The north part of a firework cluster!
+-- (26485, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SE The southeast part of a firework cluster!
+-- (26486, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - SW The southwest part of a firework cluster!
+-- (26487, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, BLUE BIG - U The upper part of a firework cluster!
+-- (26309, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - D The lower part of a firework cluster!
+-- (26310, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - N The north part of a firework cluster!
+-- (26311, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SE The southeast part of a firework cluster!
+-- (26312, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - SW The southwest part of a firework cluster!
+-- (26358, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN - U The upper part of a firework cluster!
+-- (26491, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - D The lower part of a firework cluster!
+-- (26492, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - N The north part of a firework cluster!
+-- (26493, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SE The southeast part of a firework cluster!
+-- (26494, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - SW The southwest part of a firework cluster!
+-- (26495, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, GREEN BIG - U The upper part of a firework cluster!
+-- (26313, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - D The lower part of a firework cluster!
+-- (26314, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - N The north part of a firework cluster!
+-- (26315, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SE The southeast part of a firework cluster!
+-- (26316, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - SW The southwest part of a firework cluster!
+-- (26359, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE - U The upper part of a firework cluster!
+-- (26496, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - D The lower part of a firework cluster!
+-- (26497, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - N The north part of a firework cluster!
+-- (26498, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SE The southeast part of a firework cluster!
+-- (26499, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - SW The southwest part of a firework cluster!
+-- (26500, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, PURPLE BIG - U The upper part of a firework cluster!
+-- (26305, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - D The lower part of a firework cluster!
+-- (26306, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - N The north part of a firework cluster!
+-- (26307, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SE The southeast part of a firework cluster!
+-- (26308, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - SW The southwest part of a firework cluster!
+-- (26360, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED - U The upper part of a firework cluster!
+-- (26501, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - D The lower part of a firework cluster!
+-- (26502, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - N The north part of a firework cluster!
+-- (26503, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SE The southeast part of a firework cluster!
+-- (26504, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - SW The southwest part of a firework cluster!
+-- (26505, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, RED BIG - U The upper part of a firework cluster!
+-- (26317, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - D The lower part of a firework cluster!
+-- (26318, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - N The north part of a firework cluster!
+-- (26319, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SE The southeast part of a firework cluster!
+-- (26320, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - SW The southwest part of a firework cluster!
+-- (26361, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE - U The upper part of a firework cluster!
+-- (26506, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - D The lower part of a firework cluster!
+-- (26507, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - N The north part of a firework cluster!
+-- (26508, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SE The southeast part of a firework cluster!
+-- (26509, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - SW The southwest part of a firework cluster!
+-- (26510, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, WHITE BIG - U The upper part of a firework cluster!
+-- (26321, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - D The lower part of a firework cluster!
+-- (26322, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - N The north part of a firework cluster!
+-- (26323, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SE The southeast part of a firework cluster!
+-- (26324, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - SW The southwest part of a firework cluster!
+-- (26362, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW - U The upper part of a firework cluster!
+-- (26511, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - D The lower part of a firework cluster!
+-- (26512, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - N The north part of a firework cluster!
+-- (26513, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SE The southeast part of a firework cluster!
+-- (26514, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - SW The southwest part of a firework cluster!
+-- (26515, 0, 180874, 0, 0, 5086, 5875), -- Cluster Rocket, YELLOW BIG - U The upper part of a firework cluster!
 (26325, 0, 180874, 0, 0, 5086, 5875), -- Green Firework Cluster Throw into a cluster launcher!
 (26488, 0, 180874, 0, 0, 5086, 5875), -- Large Blue Firework Cluster Throw into a cluster launcher!
 (26490, 0, 180874, 0, 0, 5086, 5875), -- Large Green Firework Cluster Throw into a cluster launcher!
@@ -1685,280 +1685,198 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@LUNAR_FESTIVAL_OGUID+702, 180869, 1, 1987.88, -4258.21, 31.879, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 7),
 (@LUNAR_FESTIVAL_OGUID+703, 180869, 1, 10147.5, 2600.16, 1330.82, 0.645772, 0, 0, 0.317305, 0.948324, 120, 120, 100, 1, 7),
 (@LUNAR_FESTIVAL_OGUID+704, 180869, 1, 10153.8, 2601.12, 1330.82, 2.82743, 0, 0, 0.987688, 0.156436, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+705, 180870, 0, -8760.69, 1068.68, 92.3914, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+706, 180870, 0, -8734.83, 1076.31, 92.3113, 0.541051, 0, 0, 0.267238, 0.963631, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+707, 180870, 0, -8727.5, 1080.04, 92.3358, 3.75246, 0, 0, -0.953716, 0.300708, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+708, 180870, 0, -4669.9, -941.939, 503.624, 5.21854, 0, 0, -0.507538, 0.861629, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+709, 180870, 0, -4656.03, -941.379, 503.681, 1.23918, 0, 0, 0.580703, 0.814116, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+710, 180870, 0, -4650.28, -965.382, 503.618, 2.46091, 0, 0, 0.942641, 0.333808, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+711, 180870, 0, -4647.16, -951.983, 503.619, 3.28124, 0, 0, -0.997563, 0.0697661, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+712, 180870, 0, 1636.11, 237.332, 63.6332, 5.18363, 0, 0, -0.522498, 0.852641, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+713, 180870, 0, 1636.34, 242.429, 63.6819, 1.06465, 0, 0, 0.507538, 0.861629, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+714, 180870, 0, 1638.18, 234.78, 63.7027, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+715, 180870, 0, 1638.47, 244.872, 63.6263, 0.506145, 0, 0, 0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+716, 180870, 0, 1641.4, 233.697, 63.5916, 2.96704, 0, 0, 0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+717, 180870, 0, 1641.42, 246.193, 63.6263, 0.174532, 0, 0, 0.0871553, 0.996195, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+718, 180870, 1, -1046.3, -228.027, 160.915, 1.309, 0, 0, 0.608761, 0.793354, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+719, 180870, 1, -1041.37, -217.984, 160.875, 4.29351, 0, 0, -0.83867, 0.54464, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+720, 180870, 1, -1037.81, -221.848, 161.319, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+721, 180870, 1, -1024.76, -237.99, 160.385, 1.95477, 0, 0, 0.829038, 0.559193, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+722, 180870, 1, -1022.06, -231.753, 161.152, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+723, 180870, 1, 1942.81, -4279.42, 30.5777, 5.14872, 0, 0, -0.537299, 0.843392, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+724, 180870, 1, 1946.64, -4287.34, 28.96, 1.91986, 0, 0, 0.819152, 0.573577, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+725, 180870, 1, 1958.28, -4267.89, 32.3831, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+726, 180870, 1, 1963.55, -4275.2, 31.8062, 3.75246, 0, 0, -0.953716, 0.300708, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+727, 180870, 1, 1971.23, -4258.03, 33.1456, 0.610863, 0, 0, 0.300705, 0.953717, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+728, 180870, 1, 1976.55, -4265.19, 33.182, 3.80482, 0, 0, -0.945518, 0.325568, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+729, 180870, 1, 1985.12, -4245.31, 32.6182, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+730, 180870, 1, 1993.38, -4257.96, 32.903, 3.194, 0, 0, -0.999657, 0.0262017, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+731, 180870, 1, 10146.8, 2574.27, 1322.24, 4.34587, 0, 0, -0.824126, 0.566406, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+732, 180870, 1, 10148.6, 2610.28, 1332.4, 4.93928, 0, 0, -0.622514, 0.782609, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+733, 180870, 1, 10149.7, 2592.52, 1332.08, 3.35105, 0, 0, -0.994521, 0.104535, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+734, 180871, 0, -8769.58, 1069.28, 92.3428, 0, 0, 0, 0, 1, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+735, 180871, 0, -8734.83, 1076.31, 92.3113, 0.541051, 0, 0, 0.267238, 0.963631, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+736, 180871, 0, -4677.99, -959.548, 503.617, 0.314158, 0, 0, 0.156434, 0.987688, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+737, 180871, 0, -4669.02, -970.218, 503.601, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+738, 180871, 0, -4656.03, -941.379, 503.681, 1.23918, 0, 0, 0.580703, 0.814116, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+739, 180871, 0, 1636.11, 237.332, 63.6332, 5.18363, 0, 0, -0.522498, 0.852641, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+740, 180871, 0, 1636.34, 242.429, 63.6819, 1.06465, 0, 0, 0.507538, 0.861629, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+741, 180871, 0, 1638.18, 234.78, 63.7027, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+742, 180871, 0, 1638.47, 244.872, 63.6263, 0.506145, 0, 0, 0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+743, 180871, 0, 1641.4, 233.697, 63.5916, 2.96704, 0, 0, 0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+744, 180871, 0, 1641.42, 246.193, 63.6263, 0.174532, 0, 0, 0.0871553, 0.996195, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+745, 180871, 1, -1046.3, -228.027, 160.915, 1.309, 0, 0, 0.608761, 0.793354, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+746, 180871, 1, -1041.92, -229.486, 160.999, 2.05949, 0, 0, 0.857167, 0.515038, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+747, 180871, 1, -1037.81, -221.848, 161.319, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+748, 180871, 1, -1024.76, -237.99, 160.385, 1.95477, 0, 0, 0.829038, 0.559193, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+749, 180871, 1, -1022.06, -231.753, 161.152, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+750, 180871, 1, 1942.81, -4279.42, 30.5777, 5.14872, 0, 0, -0.537299, 0.843392, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+751, 180871, 1, 1958.28, -4267.89, 32.3831, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+752, 180871, 1, 1963.55, -4275.2, 31.8062, 3.75246, 0, 0, -0.953716, 0.300708, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+753, 180871, 1, 1971.23, -4258.03, 33.1456, 0.610863, 0, 0, 0.300705, 0.953717, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+754, 180871, 1, 1976.55, -4265.19, 33.182, 3.80482, 0, 0, -0.945518, 0.325568, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+755, 180871, 1, 1985.12, -4245.31, 32.6182, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+756, 180871, 1, 1993.38, -4257.96, 32.903, 3.194, 0, 0, -0.999657, 0.0262017, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+757, 180871, 1, 10149.7, 2592.52, 1332.08, 3.35105, 0, 0, -0.994521, 0.104535, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+758, 180872, 0, -8760.69, 1068.68, 92.3914, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+759, 180872, 0, -8735.24, 1066.74, 92.0709, 5.21854, 0, 0, -0.507538, 0.861629, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+760, 180872, 0, -8734.83, 1076.31, 92.3113, 0.541051, 0, 0, 0.267238, 0.963631, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+761, 180872, 0, -8731.79, 1060.77, 92.3128, 2.05949, 0, 0, 0.857167, 0.515038, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+762, 180872, 0, -8727.5, 1080.04, 92.3358, 3.75246, 0, 0, -0.953716, 0.300708, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+763, 180872, 0, -4677.99, -959.548, 503.617, 0.314158, 0, 0, 0.156434, 0.987688, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+764, 180872, 0, -4650.28, -965.382, 503.618, 2.46091, 0, 0, 0.942641, 0.333808, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+765, 180872, 0, -4647.16, -951.983, 503.619, 3.28124, 0, 0, -0.997563, 0.0697661, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+766, 180872, 0, 1636.11, 237.332, 63.6332, 5.18363, 0, 0, -0.522498, 0.852641, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+767, 180872, 0, 1636.34, 242.429, 63.6819, 1.06465, 0, 0, 0.507538, 0.861629, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+768, 180872, 0, 1638.18, 234.78, 63.7027, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+769, 180872, 0, 1638.47, 244.872, 63.6263, 0.506145, 0, 0, 0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+770, 180872, 0, 1641.4, 233.697, 63.5916, 2.96704, 0, 0, 0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+771, 180872, 0, 1641.42, 246.193, 63.6263, 0.174532, 0, 0, 0.0871553, 0.996195, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+772, 180872, 1, -1041.92, -229.486, 160.999, 2.05949, 0, 0, 0.857167, 0.515038, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+773, 180872, 1, -1041.37, -217.984, 160.875, 4.29351, 0, 0, -0.83867, 0.54464, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+774, 180872, 1, -1037.81, -221.848, 161.319, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+775, 180872, 1, -1024.76, -237.99, 160.385, 1.95477, 0, 0, 0.829038, 0.559193, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+776, 180872, 1, -1022.06, -231.753, 161.152, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+777, 180872, 1, 1942.81, -4279.42, 30.5777, 5.14872, 0, 0, -0.537299, 0.843392, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+778, 180872, 1, 1946.64, -4287.34, 28.96, 1.91986, 0, 0, 0.819152, 0.573577, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+779, 180872, 1, 1958.28, -4267.89, 32.3831, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+780, 180872, 1, 1963.55, -4275.2, 31.8062, 3.75246, 0, 0, -0.953716, 0.300708, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+781, 180872, 1, 1971.23, -4258.03, 33.1456, 0.610863, 0, 0, 0.300705, 0.953717, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+782, 180872, 1, 1976.55, -4265.19, 33.182, 3.80482, 0, 0, -0.945518, 0.325568, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+783, 180872, 1, 1985.12, -4245.31, 32.6182, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+784, 180872, 1, 1993.38, -4257.96, 32.903, 3.194, 0, 0, -0.999657, 0.0262017, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+785, 180872, 1, 10141.8, 2600.27, 1332.35, 0.296705, 0, 0, 0.147809, 0.989016, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+786, 180872, 1, 10154.5, 2593.53, 1332.05, 3.28124, 0, 0, -0.997563, 0.0697661, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+787, 180874, 1, 7531.66, -2851.23, 458.917, 3.97936, 0, 0, -0.913545, 0.406738, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+788, 180874, 1, 7561.15, -2872.45, 461.1, 4.17134, 0, 0, -0.870356, 0.492424, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+789, 180875, 1, 7531.75, -2851.11, 457.817, 2.40855, 0, 0, 0.93358, 0.358368, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+790, 180875, 1, 7561.2, -2872.2, 459.991, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+791, 180878, 0, -8739.89, 1075.47, 90.7259, 4.11898, 0, 0, -0.882947, 0.469473, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+792, 180878, 0, -8739.7, 1076.34, 90.7599, 2.11185, 0, 0, 0.870356, 0.492424, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+793, 180878, 0, -8739.33, 1077.06, 90.7803, 5.60251, 0, 0, -0.333807, 0.942641, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+794, 180878, 0, -8738.94, 1074.94, 90.7094, 5.74214, 0, 0, -0.267238, 0.963631, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+795, 180878, 0, -8737.99, 1077.35, 90.7803, 0.645772, 0, 0, 0.317305, 0.948324, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+796, 180878, 0, -8737.76, 1076.57, 90.7768, 0.087266, 0, 0, 0.0436192, 0.999048, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+797, 180878, 0, -8737.22, 1077.33, 90.7803, 4.27606, 0, 0, -0.843391, 0.5373, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+798, 180878, 0, -8737.03, 1076.28, 90.7685, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+799, 180878, 0, -8736.52, 1074.73, 90.7114, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+800, 180878, 0, -4646.26, -951.154, 502.147, 1.309, 0, 0, 0.608761, 0.793354, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+801, 180878, 0, -4646.24, -952.042, 502.146, 2.96704, 0, 0, 0.996194, 0.087165, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+802, 180878, 0, -4646.04, -952.816, 502.146, 5.84685, 0, 0, -0.216439, 0.976296, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+803, 180878, 0, -4645.99, -953.588, 502.146, 0.733038, 0, 0, 0.358368, 0.933581, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+804, 180878, 0, -4645.94, -954.439, 502.146, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+805, 180878, 0, -4645.78, -955.221, 502.146, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+806, 180878, 0, -4645.69, -950.103, 501.914, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+807, 180878, 0, -4645.46, -950.869, 501.914, 3.17653, 0, 0, -0.999847, 0.0174693, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+808, 180878, 0, -4645.03, -954.708, 501.914, 3.83973, 0, 0, -0.939692, 0.342021, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+809, 180878, 0, -4644.83, -949.221, 501.661, 0.261798, 0, 0, 0.130526, 0.991445, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+810, 180878, 0, -4644.64, -955.35, 501.914, 1.5708, 0, 0, 0.707107, 0.707107, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+811, 180878, 0, -4644.38, -953.24, 502.584, 4.97419, 0, 0, -0.608761, 0.793354, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+812, 180878, 0, -4643.89, -954.762, 501.661, 0.331611, 0, 0, 0.165047, 0.986286, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+813, 180878, 0, -4643.85, -953.568, 502.598, 3.22886, 0, 0, -0.999048, 0.0436193, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+814, 180878, 0, -4643.37, -955.283, 501.661, 2.84488, 0, 0, 0.989016, 0.147811, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+815, 180878, 0, -4643.13, -954.621, 501.661, 3.38594, 0, 0, -0.992546, 0.12187, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+816, 180878, 0, -4643.01, -950.559, 501.66, 4.18879, 0, 0, -0.866025, 0.500001, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+817, 180878, 0, 1645.92, 234.438, 62.5916, 2.16421, 0, 0, 0.882947, 0.469473, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+818, 180878, 0, 1646.28, 233.535, 62.5916, 2.89724, 0, 0, 0.992546, 0.12187, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+819, 180878, 0, 1646.8, 232.985, 62.5916, 4.20625, 0, 0, -0.861628, 0.507539, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+820, 180878, 0, 1647.32, 232.518, 62.5916, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+821, 180878, 0, 1647.58, 233.319, 63.6957, 3.22886, 0, 0, -0.999048, 0.0436193, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+822, 180878, 0, 1648.1, 232.49, 62.5916, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+823, 180878, 0, 1648.58, 234.882, 62.5916, 2.91469, 0, 0, 0.993571, 0.113208, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+824, 180878, 0, 1648.62, 233.049, 62.5916, 0.366518, 0, 0, 0.182235, 0.983255, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+825, 180878, 0, 1649.09, 233.546, 62.5916, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+826, 180878, 0, 1649.09, 234.271, 62.5916, 4.57276, 0, 0, -0.754709, 0.656059, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+827, 180878, 1, -1044.82, -217.274, 159.329, 3.21142, 0, 0, -0.999391, 0.0349061, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+828, 180878, 1, -1044.24, -216.621, 159.335, 5.16618, 0, 0, -0.529919, 0.848048, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+829, 180878, 1, -1043.68, -217.307, 160.241, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+830, 180878, 1, -1043.49, -216.356, 159.402, 1.09956, 0, 0, 0.522498, 0.852641, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+831, 180878, 1, -1043.08, -217.583, 160.261, 3.35105, 0, 0, -0.994521, 0.104535, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+832, 180878, 1, -1042.95, -218.214, 160.232, 0.226893, 0, 0, 0.113203, 0.993572, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+833, 180878, 1, -1042.72, -216.533, 159.549, 1.16937, 0, 0, 0.551936, 0.833886, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+834, 180878, 1, -1042.46, -218.979, 159.818, 5.25344, 0, 0, -0.492423, 0.870356, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+835, 180878, 1, -1042.2, -217.193, 159.714, 4.06662, 0, 0, -0.894934, 0.446199, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+836, 180878, 1, -1042.06, -218.223, 159.804, 0.209439, 0, 0, 0.104528, 0.994522, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+837, 180878, 1, 1968.22, -4258.56, 32.0273, 1.41372, 0, 0, 0.649447, 0.760406, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+838, 180878, 1, 1968.4, -4257.74, 32.0277, 3.08918, 0, 0, 0.999657, 0.0262017, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+839, 180878, 1, 1968.53, -4259.34, 32.0739, 4.24115, 0, 0, -0.85264, 0.522499, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+840, 180878, 1, 1968.91, -4257.11, 32.0645, 6.00393, 0, 0, -0.139173, 0.990268, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+841, 180878, 1, 1969.2, -4259.8, 32.1476, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+842, 180878, 1, 1969.63, -4256.93, 32.1302, 4.01426, 0, 0, -0.906307, 0.422619, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+843, 180878, 1, 1970.18, -4257.96, 32.8414, 3.85718, 0, 0, -0.936671, 0.35021, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+844, 180878, 1, 1970.37, -4257.01, 32.1565, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+845, 180878, 1, 7591.35, -2218.07, 470.125, 2.54818, 0, 0, 0.956305, 0.292372, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+846, 180878, 1, 7591.83, -2218.64, 469.931, 1.29154, 0, 0, 0.601814, 0.798636, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+847, 180878, 1, 7591.86, -2223.29, 469.716, 3.38594, 0, 0, -0.992546, 0.12187, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+848, 180878, 1, 7591.94, -2222.58, 469.657, 0.418879, 0, 0, 0.207912, 0.978148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+849, 180878, 1, 7591.99, -2219.29, 469.799, 0.715585, 0, 0, 0.350207, 0.936672, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+850, 180878, 1, 7592.02, -2223.97, 469.717, 5.86431, 0, 0, -0.207912, 0.978148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+851, 180878, 1, 7592.49, -2222.17, 469.499, 5.32326, 0, 0, -0.461748, 0.887011, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+852, 180878, 1, 7592.51, -2218.87, 469.764, 5.65487, 0, 0, -0.309016, 0.951057, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+853, 180878, 1, 7592.54, -2223.5, 469.563, 1.11701, 0, 0, 0.529919, 0.848048, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+854, 180878, 1, 7592.63, -2222.82, 469.503, 0.471238, 0, 0, 0.233445, 0.97237, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+855, 180878, 1, 7592.68, -2219.46, 469.637, 3.49067, 0, 0, -0.984807, 0.173652, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+856, 180878, 1, 7593.02, -2224.01, 469.455, 6.14356, 0, 0, -0.0697555, 0.997564, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+857, 180878, 1, 7593.15, -2223.35, 469.407, 4.39823, 0, 0, -0.809016, 0.587786, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+858, 180878, 1, 7593.37, -2219.57, 469.522, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+859, 180878, 1, 7593.41, -2217.43, 469.95, 5.18363, 0, 0, -0.522498, 0.852641, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+860, 180878, 1, 7593.45, -2226.54, 469.335, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+861, 180878, 1, 7593.46, -2220.96, 469.409, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+862, 180878, 1, 7593.46, -2218.19, 469.722, 1.15192, 0, 0, 0.544639, 0.838671, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+863, 180878, 1, 7593.5, -2222.48, 470.964, 3.38594, 0, 0, -0.992546, 0.12187, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+864, 180878, 1, 7593.65, -2219, 469.534, 2.65289, 0, 0, 0.970295, 0.241925, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+865, 180878, 1, 7593.7, -2225.91, 469.257, 2.60053, 0, 0, 0.96363, 0.267241, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+866, 180878, 1, 7593.75, -2221.61, 469.33, 1.41372, 0, 0, 0.649447, 0.760406, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+867, 180878, 1, 7593.85, -2223.05, 470.925, 5.75959, 0, 0, -0.258819, 0.965926, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+868, 180878, 1, 7593.99, -2217.05, 470.032, 2.40855, 0, 0, 0.93358, 0.358368, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+869, 180878, 1, 7594.02, -2217.78, 469.815, 4.43314, 0, 0, -0.798635, 0.601815, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+870, 180878, 1, 7594.09, -2218.45, 469.616, 5.28835, 0, 0, -0.477158, 0.878817, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+871, 180878, 1, 7594.13, -2226.66, 469.132, 3.6652, 0, 0, -0.965925, 0.258821, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+872, 180878, 1, 7594.18, -2228.04, 469.102, 3.83973, 0, 0, -0.939692, 0.342021, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+873, 180878, 1, 7594.19, -2227.33, 469.107, 3.50812, 0, 0, -0.983254, 0.182238, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+874, 180878, 1, 7594.19, -2220.7, 469.345, 3.50812, 0, 0, -0.983254, 0.182238, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+875, 180878, 1, 7594.24, -2222.51, 470.969, 0.383971, 0, 0, 0.190808, 0.981627, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+876, 180878, 1, 7594.29, -2225.31, 469.08, 5.68977, 0, 0, -0.292372, 0.956305, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+877, 180878, 1, 7594.37, -2222.91, 469.134, 1.97222, 0, 0, 0.833885, 0.551938, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+878, 180878, 1, 7594.44, -2221.37, 469.268, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+879, 180878, 1, 7594.47, -2225.95, 469.027, 3.61284, 0, 0, -0.972369, 0.233448, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+880, 180878, 1, 7594.76, -2228.44, 468.912, 4.99164, 0, 0, -0.601814, 0.798636, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+881, 180878, 1, 7594.82, -2222.37, 469.124, 0.174532, 0, 0, 0.0871553, 0.996195, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+882, 180878, 1, 7594.84, -2227.71, 468.895, 5.79449, 0, 0, -0.241921, 0.970296, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+883, 180878, 1, 7594.89, -2220.37, 469.289, 4.43314, 0, 0, -0.798635, 0.601815, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+884, 180878, 1, 7594.97, -2225.43, 468.876, 5.98648, 0, 0, -0.147809, 0.989016, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+885, 180878, 1, 7594.98, -2220.99, 469.232, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+886, 180878, 1, 7595.12, -2223.01, 468.992, 5.72468, 0, 0, -0.275637, 0.961262, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+887, 180878, 1, 7595.18, -2221.74, 469.144, 0.977383, 0, 0, 0.469471, 0.882948, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+888, 180878, 1, 7595.38, -2228.13, 468.719, 4.5204, 0, 0, -0.771625, 0.636078, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+889, 180878, 1, 7595.52, -2222.41, 469, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+890, 180878, 1, 7595.62, -2225.55, 468.68, 1.69297, 0, 0, 0.748956, 0.66262, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+891, 180878, 1, 7595.66, -2221.08, 469.144, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+892, 180878, 1, 7595.83, -2227.57, 468.584, 5.32326, 0, 0, -0.461748, 0.887011, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+893, 180878, 1, 7595.88, -2221.75, 469.039, 6.10865, 0, 0, -0.0871553, 0.996195, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+894, 180878, 1, 7596.22, -2225.96, 468.526, 0.226893, 0, 0, 0.113203, 0.993572, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+895, 180878, 1, 10144.8, 2572.77, 1321.07, 2.68781, 0, 0, 0.97437, 0.224951, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+896, 180878, 1, 10145, 2573.84, 1321.03, 5.5676, 0, 0, -0.350207, 0.936672, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+897, 180878, 1, 10145.3, 2572.1, 1320.98, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+898, 180878, 1, 10146.9, 2572.09, 1320.74, 3.54302, 0, 0, -0.979924, 0.19937, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+899, 180878, 1, 10147.6, 2574.05, 1320.64, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+900, 180878, 1, 10147.9, 2574.83, 1320.57, 5.58505, 0, 0, -0.34202, 0.939693, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+901, 180878, 1, 10148.3, 2574.19, 1320.52, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+902, 180879, 0, -8738.73, 1076.04, 90.4331, 2.75761, 0, 0, 0.981627, 0.190812, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+903, 180879, 1, 7592.46, -2218, 469.643, 2.19912, 0, 0, 0.891007, 0.453991, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+904, 180879, 1, 7593.81, -2222.59, 469.158, 3.80482, 0, 0, -0.945518, 0.325568, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+905, 180879, 1, 7595.46, -2226.8, 468.385, 4.76475, 0, 0, -0.688354, 0.725375, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+906, 180879, 1, 7946.62, -2621.16, 492.354, 1.85005, 0, 0, 0.798635, 0.601815, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+907, 180879, 1, 10146.3, 2573.1, 1320.68, 5.86431, 0, 0, -0.207912, 0.978148, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+908, 180880, 0, -8738.77, 1075.69, 92.2599, 3.24635, 0, 0, -0.998629, 0.0523532, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+909, 180880, 0, -4644.12, -952.062, 502.612, 6.02139, 0, 0, -0.130526, 0.991445, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+910, 180880, 0, -4643.9, -952.422, 502.605, 1.67551, 0, 0, 0.743144, 0.669132, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+911, 180880, 0, 1647.66, 234.401, 63.7235, 5.32326, 0, 0, -0.461748, 0.887011, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+912, 180880, 0, 1648.07, 234.222, 63.7166, 1.36136, 0, 0, 0.62932, 0.777146, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+913, 180880, 1, -1044.07, -217.743, 160.284, 1.27409, 0, 0, 0.594822, 0.803857, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+914, 180880, 1, 1969.09, -4258.67, 32.8777, 1.98967, 0, 0, 0.83867, 0.54464, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+915, 180880, 1, 1969.45, -4258.79, 32.8739, 2.74016, 0, 0, 0.979924, 0.19937, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+916, 180880, 1, 7591.98, -2217.98, 471.484, 1.46608, 0, 0, 0.66913, 0.743145, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+917, 180880, 1, 7593.2, -2221.99, 470.992, 2.32129, 0, 0, 0.91706, 0.39875, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+918, 180880, 1, 7593.21, -2218.24, 471.468, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+919, 180880, 1, 7596.01, -2226.96, 470.215, 4.7822, 0, 0, -0.681998, 0.731354, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+920, 180880, 1, 10146.5, 2572.52, 1322.5, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+921, 180881, 0, -8738.27, 1076.3, 92.2573, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+922, 180881, 0, -4644.7, -951.654, 502.587, 4.01426, 0, 0, -0.906307, 0.422619, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+923, 180881, 0, -4644.56, -952.65, 502.591, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+924, 180881, 0, 1648.17, 233.634, 63.7027, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+925, 180881, 1, -1043.5, -218.553, 160.27, 0.209439, 0, 0, 0.104528, 0.994522, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+926, 180881, 1, 1969.62, -4257.75, 32.8551, 4.57276, 0, 0, -0.754709, 0.656059, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+927, 180881, 1, 1970.29, -4258.61, 32.8617, 6.14356, 0, 0, -0.0697555, 0.997564, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+928, 180881, 1, 7592.44, -2217.56, 471.458, 0.733038, 0, 0, 0.358368, 0.933581, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+929, 180881, 1, 7592.76, -2218.32, 471.472, 5.39307, 0, 0, -0.43051, 0.902586, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+930, 180881, 1, 7594.06, -2222.04, 470.986, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+931, 180881, 1, 7595.16, -2227.19, 470.196, 4.13643, 0, 0, -0.878817, 0.47716, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+932, 180881, 1, 7595.48, -2226.67, 470.208, 2.02458, 0, 0, 0.848047, 0.529921, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+933, 180881, 1, 10146.3, 2573.47, 1322.49, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+934, 180882, 0, -8739.16, 1075.77, 92.2545, 5.55015, 0, 0, -0.358368, 0.933581, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+935, 180882, 0, -8738.39, 1075.74, 92.2494, 0.209439, 0, 0, 0.104528, 0.994522, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+936, 180882, 0, -4643.97, -951.592, 502.591, 5.06146, 0, 0, -0.573576, 0.819152, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+937, 180882, 0, -4643.6, -952.054, 502.585, 3.927, 0, 0, -0.923879, 0.382686, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+938, 180882, 0, 1647.69, 233.988, 63.7027, 3.57793, 0, 0, -0.976295, 0.216442, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+939, 180882, 1, -1044, -218.598, 160.261, 0.872664, 0, 0, 0.422618, 0.906308, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+940, 180882, 1, -1043.99, -218.147, 160.268, 1.91986, 0, 0, 0.819152, 0.573577, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+941, 180882, 1, 1969.73, -4258.31, 32.8562, 4.95674, 0, 0, -0.615661, 0.788011, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+942, 180882, 1, 1969.85, -4258.86, 32.8649, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+943, 180882, 1, 7592.15, -2218.3, 471.456, 2.18166, 0, 0, 0.887011, 0.461749, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+944, 180882, 1, 7592.4, -2218.57, 471.442, 2.91469, 0, 0, 0.993571, 0.113208, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+945, 180882, 1, 7593.62, -2221.83, 470.969, 6.10865, 0, 0, -0.0871553, 0.996195, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+946, 180882, 1, 7595.62, -2227.27, 470.217, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+947, 180882, 1, 7595.93, -2226.42, 470.189, 1.71042, 0, 0, 0.754709, 0.656059, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+948, 180882, 1, 10146.5, 2573.02, 1322.49, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+949, 180883, 0, -8738.83, 1076.39, 92.2447, 4.5204, 0, 0, -0.771625, 0.636078, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+950, 180883, 0, -4644.57, -952.231, 502.591, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+951, 180883, 0, -4643.86, -952.816, 502.591, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+952, 180883, 0, 1647.15, 233.797, 63.7027, 0.767944, 0, 0, 0.374606, 0.927184, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+953, 180883, 1, -1043.54, -217.954, 160.263, 5.35816, 0, 0, -0.446198, 0.894934, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+954, 180883, 1, 1969.13, -4258.17, 32.8577, 5.65487, 0, 0, -0.309016, 0.951057, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+955, 180883, 1, 7593.01, -2217.75, 471.467, 3.12412, 0, 0, 0.999962, 0.00873464, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+956, 180883, 1, 7594.82, -2226.71, 470.199, 0.279252, 0, 0, 0.139173, 0.990268, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+957, 180883, 1, 7595.27, -2226.16, 470.205, 3.24635, 0, 0, -0.998629, 0.0523532, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+958, 180883, 1, 10145.7, 2573.4, 1322.48, 5.44543, 0, 0, -0.406736, 0.913545, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+959, 180883, 1, 10145.9, 2572.75, 1322.49, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+960, 180884, 0, -4643.96, -952.775, 501.661, 1.67551, 0, 0, 0.743144, 0.669132, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+961, 180909, 1, 7946.25, -2621.75, 494.152, 6.16101, 0, 0, -0.0610485, 0.998135, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+962, 180909, 1, 7946.67, -2621.12, 494.207, 2.77507, 0, 0, 0.983254, 0.182238, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+963, 180909, 1, 7946.78, -2621.56, 494.199, 3.26377, 0, 0, -0.998135, 0.0610518, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+964, 180909, 1, 7947.24, -2621.35, 494.178, 3.82227, 0, 0, -0.942641, 0.333808, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+965, 180910, 1, 7946.68, -2621.33, 494.193, 5.13127, 0, 0, -0.544639, 0.838671, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+966, 180891, 0, -8748.48, 1074.25, 90.6195, 0.471239, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+967, 180891, 0, -4663.16, -956.235, 500.46, 0.0523599, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+968, 180891, 0, 1642.07, 239.839, 62.6749, 0.802851, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+969, 180891, 1, -1031.95, -230.513, 160.243, 3.9619, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+970, 180891, 1, 1983.05, -4255.89, 31.7698, 2.07694, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+971, 180891, 1, 7570.15, -2220.81, 473.521, 3.85718, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+972, 180891, 1, 7575.25, -2238.94, 469.853, 1.02974, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+973, 180891, 1, 7585.15, -2205.24, 475.369, 0.959931, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+974, 180891, 1, 7595.64, -2247.22, 466.956, 4.32842, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+975, 180891, 1, 7603.55, -2211.26, 471.745, 3.12414, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+976, 180891, 1, 7610.8, -2228.96, 468.761, 1.27409, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+977, 180891, 1, 10150.5, 2602.14, 1330.91, 1.76278, 0, 0, 0, 0, 120, 120, 100, 1, 7);
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LUNAR_FESTIVAL_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+977;
+(@LUNAR_FESTIVAL_OGUID+705, 180874, 1, 7531.66, -2851.23, 458.917, 3.97936, 0, 0, -0.913545, 0.406738, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+706, 180874, 1, 7561.15, -2872.45, 461.1, 4.17134, 0, 0, -0.870356, 0.492424, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+707, 180875, 1, 7531.75, -2851.11, 457.817, 2.40855, 0, 0, 0.93358, 0.358368, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+708, 180875, 1, 7561.2, -2872.2, 459.991, 2.58308, 0, 0, 0.961261, 0.27564, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+709, 180878, 0, -8739.89, 1075.47, 90.7259, 4.11898, 0, 0, -0.882947, 0.469473, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+710, 180878, 0, -8739.7, 1076.34, 90.7599, 2.11185, 0, 0, 0.870356, 0.492424, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+711, 180878, 0, -8739.33, 1077.06, 90.7803, 5.60251, 0, 0, -0.333807, 0.942641, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+712, 180878, 0, -8738.94, 1074.94, 90.7094, 5.74214, 0, 0, -0.267238, 0.963631, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+713, 180878, 0, -8737.99, 1077.35, 90.7803, 0.645772, 0, 0, 0.317305, 0.948324, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+714, 180878, 0, -8737.76, 1076.57, 90.7768, 0.087266, 0, 0, 0.0436192, 0.999048, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+715, 180878, 0, -8737.22, 1077.33, 90.7803, 4.27606, 0, 0, -0.843391, 0.5373, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+716, 180878, 0, -8737.03, 1076.28, 90.7685, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+717, 180878, 0, -8736.52, 1074.73, 90.7114, 3.07177, 0, 0, 0.999391, 0.0349061, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+718, 180878, 0, -4646.26, -951.154, 502.147, 1.309, 0, 0, 0.608761, 0.793354, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+719, 180878, 0, -4646.24, -952.042, 502.146, 2.96704, 0, 0, 0.996194, 0.087165, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+720, 180878, 0, -4646.04, -952.816, 502.146, 5.84685, 0, 0, -0.216439, 0.976296, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+721, 180878, 0, -4645.99, -953.588, 502.146, 0.733038, 0, 0, 0.358368, 0.933581, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+722, 180878, 0, -4645.94, -954.439, 502.146, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+723, 180878, 0, -4645.78, -955.221, 502.146, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+724, 180878, 0, -4645.69, -950.103, 501.914, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+725, 180878, 0, -4645.46, -950.869, 501.914, 3.17653, 0, 0, -0.999847, 0.0174693, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+726, 180878, 0, -4645.03, -954.708, 501.914, 3.83973, 0, 0, -0.939692, 0.342021, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+727, 180878, 0, -4644.83, -949.221, 501.661, 0.261798, 0, 0, 0.130526, 0.991445, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+728, 180878, 0, -4644.64, -955.35, 501.914, 1.5708, 0, 0, 0.707107, 0.707107, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+729, 180878, 0, -4644.38, -953.24, 502.584, 4.97419, 0, 0, -0.608761, 0.793354, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+730, 180878, 0, -4643.89, -954.762, 501.661, 0.331611, 0, 0, 0.165047, 0.986286, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+731, 180878, 0, -4643.85, -953.568, 502.598, 3.22886, 0, 0, -0.999048, 0.0436193, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+732, 180878, 0, -4643.37, -955.283, 501.661, 2.84488, 0, 0, 0.989016, 0.147811, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+733, 180878, 0, -4643.13, -954.621, 501.661, 3.38594, 0, 0, -0.992546, 0.12187, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+734, 180878, 0, -4643.01, -950.559, 501.66, 4.18879, 0, 0, -0.866025, 0.500001, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+735, 180878, 0, 1645.92, 234.438, 62.5916, 2.16421, 0, 0, 0.882947, 0.469473, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+736, 180878, 0, 1646.28, 233.535, 62.5916, 2.89724, 0, 0, 0.992546, 0.12187, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+737, 180878, 0, 1646.8, 232.985, 62.5916, 4.20625, 0, 0, -0.861628, 0.507539, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+738, 180878, 0, 1647.32, 232.518, 62.5916, 5.51524, 0, 0, -0.374606, 0.927184, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+739, 180878, 0, 1647.58, 233.319, 63.6957, 3.22886, 0, 0, -0.999048, 0.0436193, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+740, 180878, 0, 1648.1, 232.49, 62.5916, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+741, 180878, 0, 1648.58, 234.882, 62.5916, 2.91469, 0, 0, 0.993571, 0.113208, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+742, 180878, 0, 1648.62, 233.049, 62.5916, 0.366518, 0, 0, 0.182235, 0.983255, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+743, 180878, 0, 1649.09, 233.546, 62.5916, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+744, 180878, 0, 1649.09, 234.271, 62.5916, 4.57276, 0, 0, -0.754709, 0.656059, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+745, 180878, 1, -1044.82, -217.274, 159.329, 3.21142, 0, 0, -0.999391, 0.0349061, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+746, 180878, 1, -1044.24, -216.621, 159.335, 5.16618, 0, 0, -0.529919, 0.848048, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+747, 180878, 1, -1043.68, -217.307, 160.241, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+748, 180878, 1, -1043.49, -216.356, 159.402, 1.09956, 0, 0, 0.522498, 0.852641, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+749, 180878, 1, -1043.08, -217.583, 160.261, 3.35105, 0, 0, -0.994521, 0.104535, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+750, 180878, 1, -1042.95, -218.214, 160.232, 0.226893, 0, 0, 0.113203, 0.993572, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+751, 180878, 1, -1042.72, -216.533, 159.549, 1.16937, 0, 0, 0.551936, 0.833886, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+752, 180878, 1, -1042.46, -218.979, 159.818, 5.25344, 0, 0, -0.492423, 0.870356, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+753, 180878, 1, -1042.2, -217.193, 159.714, 4.06662, 0, 0, -0.894934, 0.446199, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+754, 180878, 1, -1042.06, -218.223, 159.804, 0.209439, 0, 0, 0.104528, 0.994522, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+755, 180878, 1, 1968.22, -4258.56, 32.0273, 1.41372, 0, 0, 0.649447, 0.760406, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+756, 180878, 1, 1968.4, -4257.74, 32.0277, 3.08918, 0, 0, 0.999657, 0.0262017, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+757, 180878, 1, 1968.53, -4259.34, 32.0739, 4.24115, 0, 0, -0.85264, 0.522499, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+758, 180878, 1, 1968.91, -4257.11, 32.0645, 6.00393, 0, 0, -0.139173, 0.990268, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+759, 180878, 1, 1969.2, -4259.8, 32.1476, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+760, 180878, 1, 1969.63, -4256.93, 32.1302, 4.01426, 0, 0, -0.906307, 0.422619, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+761, 180878, 1, 1970.18, -4257.96, 32.8414, 3.85718, 0, 0, -0.936671, 0.35021, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+762, 180878, 1, 1970.37, -4257.01, 32.1565, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+763, 180878, 1, 7591.35, -2218.07, 470.125, 2.54818, 0, 0, 0.956305, 0.292372, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+764, 180878, 1, 7591.83, -2218.64, 469.931, 1.29154, 0, 0, 0.601814, 0.798636, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+765, 180878, 1, 7591.86, -2223.29, 469.716, 3.38594, 0, 0, -0.992546, 0.12187, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+766, 180878, 1, 7591.94, -2222.58, 469.657, 0.418879, 0, 0, 0.207912, 0.978148, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+767, 180878, 1, 7591.99, -2219.29, 469.799, 0.715585, 0, 0, 0.350207, 0.936672, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+768, 180878, 1, 7592.02, -2223.97, 469.717, 5.86431, 0, 0, -0.207912, 0.978148, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+769, 180878, 1, 7592.49, -2222.17, 469.499, 5.32326, 0, 0, -0.461748, 0.887011, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+770, 180878, 1, 7592.51, -2218.87, 469.764, 5.65487, 0, 0, -0.309016, 0.951057, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+771, 180878, 1, 7592.54, -2223.5, 469.563, 1.11701, 0, 0, 0.529919, 0.848048, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+772, 180878, 1, 7592.63, -2222.82, 469.503, 0.471238, 0, 0, 0.233445, 0.97237, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+773, 180878, 1, 7592.68, -2219.46, 469.637, 3.49067, 0, 0, -0.984807, 0.173652, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+774, 180878, 1, 7593.02, -2224.01, 469.455, 6.14356, 0, 0, -0.0697555, 0.997564, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+775, 180878, 1, 7593.15, -2223.35, 469.407, 4.39823, 0, 0, -0.809016, 0.587786, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+776, 180878, 1, 7593.37, -2219.57, 469.522, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+777, 180878, 1, 7593.41, -2217.43, 469.95, 5.18363, 0, 0, -0.522498, 0.852641, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+778, 180878, 1, 7593.45, -2226.54, 469.335, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+779, 180878, 1, 7593.46, -2220.96, 469.409, 0.0349062, 0, 0, 0.0174522, 0.999848, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+780, 180878, 1, 7593.46, -2218.19, 469.722, 1.15192, 0, 0, 0.544639, 0.838671, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+781, 180878, 1, 7593.5, -2222.48, 470.964, 3.38594, 0, 0, -0.992546, 0.12187, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+782, 180878, 1, 7593.65, -2219, 469.534, 2.65289, 0, 0, 0.970295, 0.241925, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+783, 180878, 1, 7593.7, -2225.91, 469.257, 2.60053, 0, 0, 0.96363, 0.267241, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+784, 180878, 1, 7593.75, -2221.61, 469.33, 1.41372, 0, 0, 0.649447, 0.760406, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+785, 180878, 1, 7593.85, -2223.05, 470.925, 5.75959, 0, 0, -0.258819, 0.965926, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+786, 180878, 1, 7593.99, -2217.05, 470.032, 2.40855, 0, 0, 0.93358, 0.358368, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+787, 180878, 1, 7594.02, -2217.78, 469.815, 4.43314, 0, 0, -0.798635, 0.601815, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+788, 180878, 1, 7594.09, -2218.45, 469.616, 5.28835, 0, 0, -0.477158, 0.878817, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+789, 180878, 1, 7594.13, -2226.66, 469.132, 3.6652, 0, 0, -0.965925, 0.258821, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+790, 180878, 1, 7594.18, -2228.04, 469.102, 3.83973, 0, 0, -0.939692, 0.342021, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+791, 180878, 1, 7594.19, -2227.33, 469.107, 3.50812, 0, 0, -0.983254, 0.182238, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+792, 180878, 1, 7594.19, -2220.7, 469.345, 3.50812, 0, 0, -0.983254, 0.182238, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+793, 180878, 1, 7594.24, -2222.51, 470.969, 0.383971, 0, 0, 0.190808, 0.981627, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+794, 180878, 1, 7594.29, -2225.31, 469.08, 5.68977, 0, 0, -0.292372, 0.956305, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+795, 180878, 1, 7594.37, -2222.91, 469.134, 1.97222, 0, 0, 0.833885, 0.551938, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+796, 180878, 1, 7594.44, -2221.37, 469.268, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+797, 180878, 1, 7594.47, -2225.95, 469.027, 3.61284, 0, 0, -0.972369, 0.233448, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+798, 180878, 1, 7594.76, -2228.44, 468.912, 4.99164, 0, 0, -0.601814, 0.798636, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+799, 180878, 1, 7594.82, -2222.37, 469.124, 0.174532, 0, 0, 0.0871553, 0.996195, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+800, 180878, 1, 7594.84, -2227.71, 468.895, 5.79449, 0, 0, -0.241921, 0.970296, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+801, 180878, 1, 7594.89, -2220.37, 469.289, 4.43314, 0, 0, -0.798635, 0.601815, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+802, 180878, 1, 7594.97, -2225.43, 468.876, 5.98648, 0, 0, -0.147809, 0.989016, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+803, 180878, 1, 7594.98, -2220.99, 469.232, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+804, 180878, 1, 7595.12, -2223.01, 468.992, 5.72468, 0, 0, -0.275637, 0.961262, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+805, 180878, 1, 7595.18, -2221.74, 469.144, 0.977383, 0, 0, 0.469471, 0.882948, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+806, 180878, 1, 7595.38, -2228.13, 468.719, 4.5204, 0, 0, -0.771625, 0.636078, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+807, 180878, 1, 7595.52, -2222.41, 469, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+808, 180878, 1, 7595.62, -2225.55, 468.68, 1.69297, 0, 0, 0.748956, 0.66262, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+809, 180878, 1, 7595.66, -2221.08, 469.144, 1.44862, 0, 0, 0.66262, 0.748956, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+810, 180878, 1, 7595.83, -2227.57, 468.584, 5.32326, 0, 0, -0.461748, 0.887011, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+811, 180878, 1, 7595.88, -2221.75, 469.039, 6.10865, 0, 0, -0.0871553, 0.996195, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+812, 180878, 1, 7596.22, -2225.96, 468.526, 0.226893, 0, 0, 0.113203, 0.993572, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+813, 180878, 1, 10144.8, 2572.77, 1321.07, 2.68781, 0, 0, 0.97437, 0.224951, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+814, 180878, 1, 10145, 2573.84, 1321.03, 5.5676, 0, 0, -0.350207, 0.936672, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+815, 180878, 1, 10145.3, 2572.1, 1320.98, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+816, 180878, 1, 10146.9, 2572.09, 1320.74, 3.54302, 0, 0, -0.979924, 0.19937, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+817, 180878, 1, 10147.6, 2574.05, 1320.64, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+818, 180878, 1, 10147.9, 2574.83, 1320.57, 5.58505, 0, 0, -0.34202, 0.939693, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+819, 180878, 1, 10148.3, 2574.19, 1320.52, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+820, 180879, 0, -8738.73, 1076.04, 90.4331, 2.75761, 0, 0, 0.981627, 0.190812, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+821, 180879, 1, 7592.46, -2218, 469.643, 2.19912, 0, 0, 0.891007, 0.453991, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+822, 180879, 1, 7593.81, -2222.59, 469.158, 3.80482, 0, 0, -0.945518, 0.325568, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+823, 180879, 1, 7595.46, -2226.8, 468.385, 4.76475, 0, 0, -0.688354, 0.725375, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+824, 180879, 1, 7946.62, -2621.16, 492.354, 1.85005, 0, 0, 0.798635, 0.601815, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+825, 180879, 1, 10146.3, 2573.1, 1320.68, 5.86431, 0, 0, -0.207912, 0.978148, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+826, 180880, 0, -8738.77, 1075.69, 92.2599, 3.24635, 0, 0, -0.998629, 0.0523532, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+827, 180880, 0, -4644.12, -952.062, 502.612, 6.02139, 0, 0, -0.130526, 0.991445, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+828, 180880, 0, -4643.9, -952.422, 502.605, 1.67551, 0, 0, 0.743144, 0.669132, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+829, 180880, 0, 1647.66, 234.401, 63.7235, 5.32326, 0, 0, -0.461748, 0.887011, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+830, 180880, 0, 1648.07, 234.222, 63.7166, 1.36136, 0, 0, 0.62932, 0.777146, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+831, 180880, 1, -1044.07, -217.743, 160.284, 1.27409, 0, 0, 0.594822, 0.803857, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+832, 180880, 1, 1969.09, -4258.67, 32.8777, 1.98967, 0, 0, 0.83867, 0.54464, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+833, 180880, 1, 1969.45, -4258.79, 32.8739, 2.74016, 0, 0, 0.979924, 0.19937, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+834, 180880, 1, 7591.98, -2217.98, 471.484, 1.46608, 0, 0, 0.66913, 0.743145, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+835, 180880, 1, 7593.2, -2221.99, 470.992, 2.32129, 0, 0, 0.91706, 0.39875, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+836, 180880, 1, 7593.21, -2218.24, 471.468, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+837, 180880, 1, 7596.01, -2226.96, 470.215, 4.7822, 0, 0, -0.681998, 0.731354, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+838, 180880, 1, 10146.5, 2572.52, 1322.5, 3.42085, 0, 0, -0.990268, 0.139175, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+839, 180881, 0, -8738.27, 1076.3, 92.2573, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+840, 180881, 0, -4644.7, -951.654, 502.587, 4.01426, 0, 0, -0.906307, 0.422619, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+841, 180881, 0, -4644.56, -952.65, 502.591, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+842, 180881, 0, 1648.17, 233.634, 63.7027, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+843, 180881, 1, -1043.5, -218.553, 160.27, 0.209439, 0, 0, 0.104528, 0.994522, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+844, 180881, 1, 1969.62, -4257.75, 32.8551, 4.57276, 0, 0, -0.754709, 0.656059, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+845, 180881, 1, 1970.29, -4258.61, 32.8617, 6.14356, 0, 0, -0.0697555, 0.997564, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+846, 180881, 1, 7592.44, -2217.56, 471.458, 0.733038, 0, 0, 0.358368, 0.933581, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+847, 180881, 1, 7592.76, -2218.32, 471.472, 5.39307, 0, 0, -0.43051, 0.902586, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+848, 180881, 1, 7594.06, -2222.04, 470.986, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+849, 180881, 1, 7595.16, -2227.19, 470.196, 4.13643, 0, 0, -0.878817, 0.47716, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+850, 180881, 1, 7595.48, -2226.67, 470.208, 2.02458, 0, 0, 0.848047, 0.529921, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+851, 180881, 1, 10146.3, 2573.47, 1322.49, 4.79966, 0, 0, -0.67559, 0.737278, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+852, 180882, 0, -8739.16, 1075.77, 92.2545, 5.55015, 0, 0, -0.358368, 0.933581, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+853, 180882, 0, -8738.39, 1075.74, 92.2494, 0.209439, 0, 0, 0.104528, 0.994522, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+854, 180882, 0, -4643.97, -951.592, 502.591, 5.06146, 0, 0, -0.573576, 0.819152, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+855, 180882, 0, -4643.6, -952.054, 502.585, 3.927, 0, 0, -0.923879, 0.382686, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+856, 180882, 0, 1647.69, 233.988, 63.7027, 3.57793, 0, 0, -0.976295, 0.216442, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+857, 180882, 1, -1044, -218.598, 160.261, 0.872664, 0, 0, 0.422618, 0.906308, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+858, 180882, 1, -1043.99, -218.147, 160.268, 1.91986, 0, 0, 0.819152, 0.573577, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+859, 180882, 1, 1969.73, -4258.31, 32.8562, 4.95674, 0, 0, -0.615661, 0.788011, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+860, 180882, 1, 1969.85, -4258.86, 32.8649, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+861, 180882, 1, 7592.15, -2218.3, 471.456, 2.18166, 0, 0, 0.887011, 0.461749, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+862, 180882, 1, 7592.4, -2218.57, 471.442, 2.91469, 0, 0, 0.993571, 0.113208, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+863, 180882, 1, 7593.62, -2221.83, 470.969, 6.10865, 0, 0, -0.0871553, 0.996195, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+864, 180882, 1, 7595.62, -2227.27, 470.217, 3.9619, 0, 0, -0.91706, 0.39875, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+865, 180882, 1, 7595.93, -2226.42, 470.189, 1.71042, 0, 0, 0.754709, 0.656059, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+866, 180882, 1, 10146.5, 2573.02, 1322.49, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+867, 180883, 0, -8738.83, 1076.39, 92.2447, 4.5204, 0, 0, -0.771625, 0.636078, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+868, 180883, 0, -4644.57, -952.231, 502.591, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+869, 180883, 0, -4643.86, -952.816, 502.591, 0.104719, 0, 0, 0.0523357, 0.99863, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+870, 180883, 0, 1647.15, 233.797, 63.7027, 0.767944, 0, 0, 0.374606, 0.927184, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+871, 180883, 1, -1043.54, -217.954, 160.263, 5.35816, 0, 0, -0.446198, 0.894934, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+872, 180883, 1, 1969.13, -4258.17, 32.8577, 5.65487, 0, 0, -0.309016, 0.951057, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+873, 180883, 1, 7593.01, -2217.75, 471.467, 3.12412, 0, 0, 0.999962, 0.00873464, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+874, 180883, 1, 7594.82, -2226.71, 470.199, 0.279252, 0, 0, 0.139173, 0.990268, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+875, 180883, 1, 7595.27, -2226.16, 470.205, 3.24635, 0, 0, -0.998629, 0.0523532, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+876, 180883, 1, 10145.7, 2573.4, 1322.48, 5.44543, 0, 0, -0.406736, 0.913545, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+877, 180883, 1, 10145.9, 2572.75, 1322.49, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+878, 180884, 0, -4643.96, -952.775, 501.661, 1.67551, 0, 0, 0.743144, 0.669132, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+879, 180909, 1, 7946.25, -2621.75, 494.152, 6.16101, 0, 0, -0.0610485, 0.998135, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+880, 180909, 1, 7946.67, -2621.12, 494.207, 2.77507, 0, 0, 0.983254, 0.182238, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+881, 180909, 1, 7946.78, -2621.56, 494.199, 3.26377, 0, 0, -0.998135, 0.0610518, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+882, 180909, 1, 7947.24, -2621.35, 494.178, 3.82227, 0, 0, -0.942641, 0.333808, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+883, 180910, 1, 7946.68, -2621.33, 494.193, 5.13127, 0, 0, -0.544639, 0.838671, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+884, 180891, 0, -8748.48, 1074.25, 90.6195, 0.471239, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+885, 180891, 0, -4663.16, -956.235, 500.46, 0.0523599, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+886, 180891, 0, 1642.07, 239.839, 62.6749, 0.802851, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+887, 180891, 1, -1031.95, -230.513, 160.243, 3.9619, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+888, 180891, 1, 1983.05, -4255.89, 31.7698, 2.07694, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+889, 180891, 1, 7570.15, -2220.81, 473.521, 3.85718, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+890, 180891, 1, 7575.25, -2238.94, 469.853, 1.02974, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+891, 180891, 1, 7585.15, -2205.24, 475.369, 0.959931, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+892, 180891, 1, 7595.64, -2247.22, 466.956, 4.32842, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+893, 180891, 1, 7603.55, -2211.26, 471.745, 3.12414, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+894, 180891, 1, 7610.8, -2228.96, 468.761, 1.27409, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+895, 180891, 1, 10150.5, 2602.14, 1330.91, 1.76278, 0, 0, 0, 0, 120, 120, 100, 1, 7);
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LUNAR_FESTIVAL_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+895;
 
 -- Creatures.
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `movement_type`, `patch_min`) VALUES
@@ -2161,6 +2079,9 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `spell_start`, `even
 (@LUNAR_FESTIVAL_CGUID+104, 15898, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+119, 15898, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+125, 15895, 26383, 7);
+
+-- Cast Rocket Red OOC min is 30 seconds in sniffs.
+UPDATE `creature_ai_events` SET `event_param1`='30000', `event_param3`='30000' WHERE `id` IN (1569403,1571903,1572303,1590503,1590603,1590703,1590803);
 
 
 -- End of migration.
