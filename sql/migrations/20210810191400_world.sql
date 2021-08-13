@@ -547,7 +547,7 @@ UPDATE `creature` SET `position_x`=-9550.344, `position_y`=-685.855, `position_z
 UPDATE `creature` SET `position_x`=-8817.274, `position_y`=809.0402, `position_z`=98.72545, `orientation`=3.921446 WHERE `guid`=19272 AND `id`=68; -- Stormwind City Guard
 UPDATE `creature` SET `position_x`=-8803.506, `position_y`=862.7813, `position_z`=98.97499, `orientation`=2.286381 WHERE `guid`=19273 AND `id`=68; -- Stormwind City Guard
 UPDATE `creature` SET `position_x`=-8800.121, `position_y`=865.28, `position_z`=98.97421, `orientation`=2.199115 WHERE `guid`=26833 AND `id`=68; -- Stormwind City Guard
-
+DELETE FROM `creature` WHERE `guid` = 9678;
 
 -- End of migration.
 END IF;
