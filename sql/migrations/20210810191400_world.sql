@@ -465,8 +465,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`,`position_x`, `position_y`, `posit
 
 -- Update Creatures (credit cmangos)
 UPDATE `creature` SET `position_x` = -10581.95, `position_y` = -1185.32, `position_z` = 26.74362, `orientation` = 3.197518 WHERE `guid` = 5960 AND `id` = 2470; -- Watcher Fraizer <The Night Watch>
-UPDATE `creature` SET `position_x` = -3839.476, `position_y = -837.3205, `position_z` = 16.94844, `orientation` = 5.579004 WHERE `guid` = 9519 AND `id` = 3181; -- Fremal Doohickey <Bandage Trainer>
-UPDATE `creature` SET `position_x` = -10559.5, `position_y = -1152.25, `position_z` = 28.07649, `orientation` = 4.712389 WHERE `guid` = 4194 AND `id` = 264; -- Commander Althea Ebonlocke
+UPDATE `creature` SET `position_x` = -3839.476, `position_y` = -837.3205, `position_z` = 16.94844, `orientation` = 5.579004 WHERE `guid` = 9519 AND `id` = 3181; -- Fremal Doohickey <Bandage Trainer>
+UPDATE `creature` SET `position_x` = -10559.5, `position_y` = -1152.25, `position_z` = 28.07649, `orientation` = 4.712389 WHERE `guid` = 4194 AND `id` = 264; -- Commander Althea Ebonlocke
 UPDATE `creature` SET `position_x` = -8424.685, `position_y` = 608.8398, `position_z` = 95.30206, `orientation` = 3.228859 WHERE `guid` = 5169 AND `id` = 957; -- Dane Lindgren <Apprentice Blacksmith>
 UPDATE `creature` SET `position_x` = -8577.496, `position_y` = 881.4656, `position_z` = 106.602, `orientation` = 5.427974 WHERE `guid` = 5000 AND `id` = 928; -- Lord Grayson Shadowbreaker <Paladin Trainer>
 UPDATE `creature` SET `position_x` = -8799.62, `position_y` = 828.3229, `position_z` = 97.63464, `orientation` = 0.9684036 WHERE `guid` = 89325 AND `id` = 1719; -- Warden Thelwater
