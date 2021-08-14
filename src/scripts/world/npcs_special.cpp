@@ -1304,22 +1304,23 @@ struct npc_pats_firework_guyAI : ScriptedAI
         {
             for (int i = 0; i < 5; ++i)
             {
+                // These Positions are exactly the same in 2 sniffed cases.
                 switch (i)
                 {
                     case 0:
-                        m_creature->NearTeleportTo(x, y, z + float(urand(3, 12)), 0.0f);
+                        m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
                         break;
                     case 1:
-                        m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + float(urand(3, 12)), 0.0f);
+                        m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
                         break;
                     case 2:
-                        m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + float(urand(3, 12)), 0.0f);
+                        m_creature->NearTeleportTo(x, y - 3.0f, z + 8.0f, 0.0f);
                         break;
                     case 3:
-                        m_creature->NearTeleportTo(x + 1.5f, y, z + float(urand(3, 12)), 0.0f);
+                        m_creature->NearTeleportTo(x + 5.0f, y + 1.5f, z + 8.0f, 0.0f);
                         break;
                     case 4:
-                        m_creature->NearTeleportTo(x, y + 1.5f, z + float(urand(3, 12)), 0.0f);
+                        m_creature->NearTeleportTo(x - 5.0f, y + 1.5f, z + 8.0f, 0.0f);
                         break;
                 }
                 m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
@@ -1327,7 +1328,10 @@ struct npc_pats_firework_guyAI : ScriptedAI
             }
         }
         else
+        {
+            m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f); // Always 3.0f above Firework Launcher.
             m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
+        }
 
         if (m_bisLucky)
             m_creature->CastSpell(m_creature, SPELL_LUNAR_FORTUNE, true);
