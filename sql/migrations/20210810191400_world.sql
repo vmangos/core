@@ -552,6 +552,9 @@ DELETE FROM `creature` WHERE `guid` = 9678;
 -- Correct Loot Template For Riverpaw Gnoll
 DELETE FROM `creature_loot_template` WHERE `entry` = 117 AND `item` IN (30039, 1710);
 
+-- Update Quest Text
+UPDATE `quest_template` SET `OfferRewardText` = 'The humans have taught us a great deal about the Holy Light and how important their order is to them... and to protecting all of Azeroth. We have a great respect for how steeped in tradition it is, and how just one figure, one sacrifice, can make the difference between pain and salvation.$B$BThe two of us are gonna be working together for a bit. Any time you think you\'re ready, come back to me and we\'ll see about getting you some training. Can\'t have you go out into the world unprepared, now, can we?' WHERE `entry` = 3107;
+
 
 -- End of migration.
 END IF;
