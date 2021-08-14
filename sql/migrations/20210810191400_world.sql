@@ -569,6 +569,16 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3321, 9, 7, 3321, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Did You Lose This?: Trenton Lighthammer - Complete Quest');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3321, 9, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Did You Lose This?: Trenton Lighthammer - Modify Flags');
 
+-- Add Arygos Gossip
+UPDATE `creature_template` SET `gossip_menu_id` = 6767, `npc_flags` = 3 WHERE `entry` = 15380;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(6767, 8080);
+
+-- Add Merithra of the Dream Gossip
+UPDATE `creature_template` SET `gossip_menu_id` = 6766, `npc_flags` = 3 WHERE `entry`=15378;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(6766, 8079);
+
 
 -- End of migration.
 END IF;
