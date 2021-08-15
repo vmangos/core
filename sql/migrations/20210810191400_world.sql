@@ -625,6 +625,9 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4962;
 UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4963;
 
+-- Remove Some Skinning Loot IDs
+UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE entry IN (10116, 2230, 6728, 12202, 14646, 14869);
+
 -- Add Some Missing Gossips
 -- Arygos Gossip
 UPDATE `creature_template` SET `gossip_menu_id` = 6767, `npc_flags` = 3 WHERE `entry` = 15380;
