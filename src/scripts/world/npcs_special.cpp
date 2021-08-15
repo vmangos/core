@@ -1292,7 +1292,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         {
             if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
             {
-                pGo->SendGameObjectCustomAnim();
+                pGo->SendGameObjectCustomAnim(3);
                 break;
             }
         }
