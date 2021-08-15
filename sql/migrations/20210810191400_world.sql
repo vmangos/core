@@ -592,6 +592,8 @@ UPDATE `creature` SET `position_x`=-8817.274, `position_y`=809.0402, `position_z
 UPDATE `creature` SET `position_x`=-8803.506, `position_y`=862.7813, `position_z`=98.97499, `orientation`=2.286381 WHERE `guid`=19273 AND `id`=68; -- Stormwind City Guard
 UPDATE `creature` SET `position_x`=-8800.121, `position_y`=865.28, `position_z`=98.97421, `orientation`=2.199115 WHERE `guid`=26833 AND `id`=68; -- Stormwind City Guard
 DELETE FROM `creature` WHERE `guid` = 9678;
+UPDATE `creature` SET `position_x` = -108.08, `position_y` = -3529.83, `position_z` = 118.49  WHERE `id` = 2926 AND `guid` = 93058;
+UPDATE `creature` SET `position_x` = 182.04, `position_y` = -3549.64, `position_z` = 130, `movement_type` = 1, `wander_distance` = 5 WHERE `id` = 2928 AND `guid` = 92955;
 
 -- Correct Loot Template For Riverpaw Gnoll
 DELETE FROM `creature_loot_template` WHERE `entry` = 117 AND `item` IN (30039, 1710);
