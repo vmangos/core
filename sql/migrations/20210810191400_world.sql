@@ -575,6 +575,10 @@ UPDATE `creature_template` SET `gossip_menu_id` = 7168, `display_scale1` = 1, `f
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_min`, `patch_max`, `wander_distance`) VALUES
 (1383, 16226, 0, 2305.29, -5286.12, 82.0618, 4.83456, 120, 120, 100, 9, 10, 0);
 
+-- Correct Quest Requirements
+UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4962;
+UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4963;
+
 -- Add Some Missing Gossips
 -- Arygos Gossip
 UPDATE `creature_template` SET `gossip_menu_id` = 6767, `npc_flags` = 3 WHERE `entry` = 15380;
