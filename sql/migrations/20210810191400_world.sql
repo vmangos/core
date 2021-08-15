@@ -591,6 +591,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6766, 8079);
 
 -- Guard Didier Gossip
+UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 16226;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (7168, 8438);
 
