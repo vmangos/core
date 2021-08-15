@@ -615,7 +615,7 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3321, 9, 7, 3321, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Did You Lose This?: Trenton Lighthammer - Complete Quest');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3321, 9, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Did You Lose This?: Trenton Lighthammer - Modify Flags');
 
---NOTE: There seems to be a missing escort quest associated with this NPC
+-- NOTE: There seems to be a missing escort quest associated with this NPC
 -- Add Missing Creature Guard Didier
 UPDATE `creature_template` SET `gossip_menu_id` = 7168, `display_scale1` = 1, `faction` = 1624 WHERE `entry` = 16226;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_min`, `patch_max`, `wander_distance`) VALUES
