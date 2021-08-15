@@ -586,6 +586,10 @@ UPDATE `creature_template` SET `gossip_menu_id` = 6766, `npc_flags` = 3 WHERE `e
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6766, 8079);
 
+-- Add Guard Didier Gossip
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(7168, 8438);
+
 
 -- End of migration.
 END IF;
