@@ -575,20 +575,32 @@ UPDATE `creature_template` SET `gossip_menu_id` = 7168, `display_scale1` = 1, `f
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_min`, `patch_max`, `wander_distance`) VALUES
 (1383, 16226, 0, 2305.29, -5286.12, 82.0618, 4.83456, 120, 120, 100, 9, 10, 0);
 
-
--- Add Arygos Gossip
+-- Add Some Missing Gossips
+-- Arygos Gossip
 UPDATE `creature_template` SET `gossip_menu_id` = 6767, `npc_flags` = 3 WHERE `entry` = 15380;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6767, 8080);
 
--- Add Merithra of the Dream Gossip
+-- Merithra of the Dream Gossip
 UPDATE `creature_template` SET `gossip_menu_id` = 6766, `npc_flags` = 3 WHERE `entry`=15378;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6766, 8079);
 
--- Add Guard Didier Gossip
+-- Guard Didier Gossip
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (7168, 8438);
+
+-- Elder Torntusk
+UPDATE `creature_template` SET `gossip_menu_id` = 6102 WHERE `entry` = 14757;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(6102, 7257);
+
+-- Kelm Hargunth
+UPDATE `creature_template` SET `gossip_menu_id` = 6141, `npc_flags` = 16391 WHERE `entry` = 14754;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(6141, 7294);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
+(6141, 0, 1, 'What goods have I earned the right to purchase for use in Warsong Gulch?', 10021, 3, 4);
 
 
 -- End of migration.
