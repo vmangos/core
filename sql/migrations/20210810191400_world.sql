@@ -572,8 +572,8 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 --NOTE: There seems to be a missing escort quest associated with this NPC
 -- Add Missing Creature Guard Didier
 UPDATE `creature_template` SET `gossip_menu_id` = 7168, `display_scale1` = 1, `faction` = 1624 WHERE `entry` = 16226;
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_min`, `patch_max`) VALUES
-(1383, 16226, 0, 2305.29, -5286.12, 82.0618, 4.83456, 120, 120, 100, 9, 10);
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_min`, `patch_max`, `wander_distance`) VALUES
+(1383, 16226, 0, 2305.29, -5286.12, 82.0618, 4.83456, 120, 120, 100, 9, 10, 0);
 
 
 -- Add Arygos Gossip
