@@ -1324,7 +1324,6 @@ struct npc_pats_firework_guyAI : ScriptedAI
                         break;
                 }
                 m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
-                sLog.outBasic("[npc_pats_firework_guyAI] Spawn Gameobject at: x %f, y %f, z %f", x, y, z);
             }
         }
         else
