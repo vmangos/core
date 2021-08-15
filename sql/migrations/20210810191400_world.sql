@@ -617,6 +617,27 @@ UPDATE `creature_template` SET `gossip_menu_id` = 5081, `npc_flags` = 3 WHERE `e
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (5081, 6288);
 
+-- Seersa Copperpinch, Guchie Jinglepocket and Jaycrue Copperpinch
+UPDATE `creature_template` SET `gossip_menu_id` = 5181 WHERE `entry` IN (13432, 13436, 13430);
+UPDATE `creature_template` SET `npc_flags` = 7 WHERE `entry` = 13432;
+UPDATE `creature_template` SET `npc_flags` = 5 WHERE `entry` = 13436;
+UPDATE `creature_template` SET `npc_flags` = 5 WHERE `entry` = 13430;
+
+-- Scarshield Infiltrator
+UPDATE `creature_template` SET `gossip_menu_id` = 2630, `npc_flags` = 1 WHERE `entry`=10299;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(2630, 3301);
+
+-- Cyrus Therepentous
+UPDATE `creature_template` SET `gossip_menu_id` = 1841 WHERE `entry` = 9459;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(1841, 2493);
+
+-- Dreka'Sur
+UPDATE `creature_template` SET `gossip_menu_id` = 4067 WHERE `entry` = 9620;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(4067, 4960);
+
 
 -- End of migration.
 END IF;
