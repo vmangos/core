@@ -602,6 +602,16 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
 (6141, 0, 1, 'What goods have I earned the right to purchase for use in Warsong Gulch?', 10021, 3, 4);
 
+-- Primal Torntusk
+UPDATE `creature_template` SET `gossip_menu_id` = 6084 WHERE `entry` = 14736;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(6084, 7238);
+
+-- Corporal Noreg Stormpike
+UPDATE `creature_template` SET `gossip_menu_id` = 5081, `npc_flags` = 3 WHERE `entry`=13447;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(5081, 6288);
+
 
 -- End of migration.
 END IF;
