@@ -682,6 +682,15 @@ UPDATE `creature_template` SET `gossip_menu_id` = 4067 WHERE `entry` = 9620;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (4067, 4960);
 
+-- Fix drop rate of items used in quest 5725 (The Power to Destroy...) in Ragefire Chasm (credit cmangos)
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -5 WHERE `item` IN (14395, 14396);
+
+-- Fix drop rate of item used in quest 443 (Rot Hide Ichor) in Silverpine Forest (credit cmangos)
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -30 WHERE `item` = 3236;
+
+-- Fix drop rate of items used in quest 451 (A Recipe For Death) in Silverpine Forest (credit cmangos)
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3257;
+
 
 -- End of migration.
 END IF;
