@@ -672,11 +672,6 @@ UPDATE `creature_template` SET `npc_flags` = 7 WHERE `entry` = 13432;
 UPDATE `creature_template` SET `npc_flags` = 5 WHERE `entry` = 13436;
 UPDATE `creature_template` SET `npc_flags` = 5 WHERE `entry` = 13430;
 
--- Scarshield Infiltrator
-UPDATE `creature_template` SET `gossip_menu_id` = 2630, `npc_flags` = 1 WHERE `entry`=10299;
-INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(2630, 3301);
-
 -- Cyrus Therepentous
 UPDATE `creature_template` SET `gossip_menu_id` = 1841 WHERE `entry` = 9459;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
