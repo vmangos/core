@@ -833,6 +833,9 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -30 WHERE `item` = 3
 -- Fix drop rate of items used in quest 451 (A Recipe For Death) in Silverpine Forest (credit cmangos)
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3257;
 
+-- Correct Diplay ID For Energetic Rod
+UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
+
 
 -- End of migration.
 END IF;
