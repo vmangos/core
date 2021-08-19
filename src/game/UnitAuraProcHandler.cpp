@@ -363,6 +363,13 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, S
                 return true;
         }
 #endif
+
+        // SHAMAN
+        // Elemental Mastery
+        // Do not consume aura if spell did not benefit from crit chance bonus.
+        // Can happen if aura was cast after damaging spell was already launched.
+        if (spellProto->Id == 16166 && (procExtra & PROC_EX_NORMAL_HIT))
+            return false;
     }
 
     // Get proc Event Entry
