@@ -596,15 +596,15 @@ UPDATE `gameobject` SET `spawn_flags` = 0, `spawntimesecsmin` = 180, `spawntimes
 
 -- Add q.299 "Uncovering the Past" Objects & Add Pooling (credit cmangos)
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1806, 1, 'Wetlands - Loose Soil', 10),
-(1807, 1, 'Wetlands - Ancient Relic', 10),
-(1808, 1, 'Wetlands - Ancient Relic', 10),
-(1809, 1, 'Wetlands - Ancient Relic', 10);
+(152, 1, 'Wetlands - Loose Soil', 10),
+(162, 1, 'Wetlands - Ancient Relic', 10),
+(272, 1, 'Wetlands - Ancient Relic', 10),
+(273, 1, 'Wetlands - Ancient Relic', 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(331, 1806, 0, 'Wetlands - Loose Soil', 10),
-(333, 1807, 0, 'Wetlands - Ancient Relic', 10),
-(334, 1808, 0, 'Wetlands - Ancient Relic', 10),
-(35252, 1809, 0, 'Wetlands - Ancient Relic', 10);
+(331, 152, 0, 'Wetlands - Loose Soil', 10),
+(333, 162, 0, 'Wetlands - Ancient Relic', 10),
+(334, 272, 0, 'Wetlands - Ancient Relic', 10),
+(35252, 273, 0, 'Wetlands - Ancient Relic', 10);
 DELETE FROM `gameobject` WHERE `id` IN (331,333,334,35252);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (9733, 334, 0, -3568.39990234375, -1845.5574951171875, 24.36172676086425781, -2.967041015625, 0, 0, -0.99619388580322265, 0.087165042757987976, 300, 300, 255, 1, 10),
@@ -863,6 +863,121 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (10249, 3620, 20, 'Wetlands - Incendicite Mineral Vein', 10),
 (10250, 3620, 0, 'Wetlands - Incendicite Mineral Vein', 10);
 
+-- Add Missing Bijous Belongings Spawns (credit cmangos)
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(139, 1, 'LBRS - Bijous Belongings', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(175334, 139, 0, 'LBRS - Bijous Belongings', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10251, 175334, 229, -9.06949, -462.313, -18.6442, 3.13474, 0, 0, 0.999994, 0.00342519, 180, 180, 100, 1, 10),
+(10252, 175334, 229, -78.5492, -402.515, -18.935, 5.53805, 0, 0, 0.36401, -0.931395, 180, 180, 100, 1, 10),
+(10253, 175334, 229, -32.4305, -403.26, -18.935, -2.26892, 0, 0, 0, 1, 180, 180, 100, 1, 10),
+(10254, 175334, 229, 33.7166, -466.067, -18.4651, -1.53589, 0, 0, 0, 0, 180, 180, 0, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 25, `spawntimesecsmax` = 25 WHERE `id` = 175334;
+
+-- Add Missing Millys Harvest Spawns (credit cmangos)
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(140, 8, 'Elwynn Forest - Milly\'s Harvest', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(161557, 140, 0, 'Elwynn Forest - Milly\'s Harvest', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10255, 161557, 0, -9061.6, -372.468, 73.5147, 6.07375, 0, 0, -0.104528, 0.994522, 120, 120, 100, 1, 10),
+(10256, 161557, 0, -9052.86, -330.749, 73.4517, 2.05949, 0, 0, 0.857167, 0.515038, 120, 120, 100, 1, 10),
+(10257, 161557, 0, -9072.03, -361.706, 73.4517, 6.03884, 0, 0, -0.121869, 0.992546, 120, 120, 100, 1, 10),
+(10258, 161557, 0, -9027.71, -326.643, 73.6656, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 120, `spawn_flags` = 0 WHERE `id` = 161557;
+
+-- Add Missing Ripe Pumpkin Spawns (credit cmangos)
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10259, 2883, 0, -9787.88, -865.209, 39.4633, 2.28638, 0, 0, 0.909961, 0.414694, 120, 120, 100, 1, 10),
+(10261, 2883, 0, -9776.16, -926.959, 39.3057, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 10),
+(10263, 2883, 0, -9780.09, -884.75, 39.5662, 3.82227, 0, 0, -0.942641, 0.333808, 120, 120, 100, 1, 10),
+(10265, 2883, 0, -9791.55, -907.647, 40.134, 1.98967, 0, 0, 0.83867, 0.54464, 120, 120, 100, 1, 10),
+(10266, 2883, 0, -9773.85, -824.695, 39.6148, 3.90954, 0, 0, -0.927183, 0.374608, 120, 120, 100, 1, 10),
+(10267, 2883, 0, -9749.11, -907.516, 39.2338, 0.122173, 0, 0, 0.0610485, 0.998135, 120, 120, 100, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 900 WHERE `id` = 2883;
+
+-- Add Missing Enchanted Scarlet Thread (credit cmangos)
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(141, 2, 'Stratholme - Enchanted Scarlet Thread', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(175966, 141, 0, 'Stratholme - Enchanted Scarlet Thread', 10);
+REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(396272, 175966, 329, 3458.01, -3111.46, 137.434, 5.35816, 0, 0, -0.446198, 0.894934, 120, 120, 100, 1, 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10268, 175966, 329, 3625.63, -3123.89, 135.665, 5.77704, 0, 0, -0.25038, 0.968148, 180, 180, 100, 1, 10);
+
+-- Add Missing Glinting Mud (credit cmangos)
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(142, 2, 'Redridge Mountains - Glinting Mud', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(154357, 142, 0, 'Redridge Mountains - Glinting Mud', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES
+(10269, 154357, 0, -9386.96, -2175.24, 41.9997, 3.52557, 0, 0, -0.981627, 0.190812, 2, 5, 100, 1),
+(10270, 154357, 0, -9375.87, -2303.81, 45.5523, 3.927, 0, 0, -0.923879, 0.382686, 2, 5, 100, 1),
+(10271, 154357, 0, -9367.63, -2094.21, 45.349, 5.68977, 0, 0, -0.292372, 0.956305, 2, 5, 100, 1),
+(10272, 154357, 0, -9360.54, -2372.21, 40.8664, 2.47837, 0, 0, 0.945518, 0.325568, 2, 5, 100, 1),
+(10273, 154357, 0, -9360.17, -2243.55, 45.4954, 5.63741, 0, 0, -0.317305, 0.948324, 2, 5, 100, 1),
+(10274, 154357, 0, -9357.17, -2129.56, 42.3378, 5.09636, 0, 0, -0.559193, 0.829038, 2, 5, 100, 1),
+(10275, 154357, 0, -9344.8, -2042.31, 40.9412, 5.49779, 0, 0, -0.382683, 0.92388, 2, 5, 100, 1),
+(10276, 154357, 0, -9316.16, -2146.72, 45.9883, 4.01426, 0, 0, -0.906307, 0.422619, 2, 5, 100, 1);
+UPDATE `gameobject` SET `spawntimesecsmin` = 2, `spawntimesecsmax` = 5 WHERE `id` = 154357;
+
+-- Add Missing Incendia Agarve Spawns
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10277, 175928, 1, -5029.36, -2045.23, -51.6448, 1.91986, 0, 0, 0.819152, 0.573577, 30, 30, 100, 1, 10),
+(10279, 175928, 1, -5028.42, -2000.75, -53.1136, 5.37562, 0, 0, -0.438371, 0.898794, 30, 30, 100, 1, 10),
+(10280, 175928, 1, -4987.89, -1968.14, -53.3966, 1.13446, 0, 0, 0.537299, 0.843392, 30, 30, 100, 1, 10),
+(10281, 175928, 1, -4966.54, -1914.8, -41.1326, 3.78737, 0, 0, -0.948323, 0.317306, 30, 30, 100, 1, 10),
+(10282, 175928, 1, -4949.87, -2019.76, -53.3339, 1.51844, 0, 0, 0.688354, 0.725375, 30, 30, 100, 1, 10);
+
+-- Add Missing Scourge Data Spawns
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(143, 1, 'Stratholme - Scourge Data', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(176249, 143, 0, 'Stratholme - Scourge Data', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10284, 176249, 329, 3848.69, -3490.05, 141.21, 3.63029, 0, 0, -0.970295, 0.241925, 180, 180, 100, 1, 10),
+(10285, 176249, 329, 4053.1, -3678.55, 132.655, 1.01229, 0, 0, 0.484809, 0.87462, 180, 180, 100, 1, 10);
+
+-- Add Missing Bloodsail Charts Spawns
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(144, 1, 'Stranglethorn Vale - Bloodsail Charts', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(2086, 144, 0, 'Stranglethorn Vale - Bloodsail Charts', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10286, 2086, 0, -14703.8, 451.066, 0.649918, 2.77507, 0, 0, 0.983254, 0.182238, 120, 120, 100, 1, 10),
+(10287, 2086, 0, -14678.3, 500.529, 2.43489, 1.65806, 0, 0, 0.737277, 0.675591, 120, 120, 100, 1, 10),
+(10288, 2086, 0, -14607.7, 332.715, 3.69033, 1.83259, 0, 0, 0.793353, 0.608762, 120, 120, 100, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 120 WHERE `id` = 2086;
+
+-- Add Missing Bloodsail Orders Spawns
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(150, 1, 'Stranglethorn Vale - Bloodsail Orders', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(2087, 150, 0, 'Stranglethorn Vale - Bloodsail Orders', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10289, 2087, 0, -14705.2, 450.416, 0.157641, 2.75761, 0, 0, 0.981627, 0.190812, 120, 120, 100, 1, 10),
+(10290, 2087, 0, -14685.4, 486.472, 4.17982, 0.488691, 0, 0, 0.241921, 0.970296, 120, 120, 100, 1, 10),
+(10292, 2087, 0, -14612, 334.378, 2.46723, 4.5204, 0, 0, -0.771625, 0.636078, 120, 120, 100, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 120 WHERE `id` = 2087;
+
+-- Add Missing Musty Tome Spawns
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(151, 1, 'Western Plaguelands - Musty Tome', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(176150, 151, 0, 'Western Plaguelands - Musty Tome', 10);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(10293, 176150, 0, 1356.51, -1452.11, 57.8184, 5.98648, 0, 0, -0.147809, 0.989016, 120, 120, 100, 1, 10),
+(10295, 176150, 0, 1360.83, -1448.94, 56.969, 1.95477, 0, 0, 0.829038, 0.559193, 120, 120, 100, 1, 10),
+(10296, 176150, 0, 1374.15, -1448.33, 56.969, 1.69297, 0, 0, 0.748956, 0.66262, 120, 120, 100, 1, 10),
+(10297, 176150, 0, 1380.05, -1457.83, 56.9689, 1.71042, 0, 0, 0.754709, 0.656059, 120, 120, 100, 1, 10),
+(10298, 176150, 0, 1382.42, -1449.85, 56.969, 1.64061, 0, 0, 0.731353, 0.681999, 120, 120, 100, 1, 10),
+(10299, 176150, 0, 1385.29, -1455.31, 56.9689, 0.0174525, 0, 0, 0.00872612, 0.999962, 120, 120, 100, 1, 10),
+(10300, 176150, 0, 1393.88, -1457.68, 58.3282, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 10),
+(10301, 176150, 0, 1394.99, -1450.47, 58.3282, 0.85521, 0, 0, 0.414693, 0.909962, 120, 120, 100, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` = 176150;
+
 -- Update Creatures (credit cmangos)
 UPDATE `creature` SET `position_x` = -10581.95, `position_y` = -1185.32, `position_z` = 26.74362, `orientation` = 3.197518 WHERE `guid` = 5960 AND `id` = 2470; -- Watcher Fraizer <The Night Watch>
 UPDATE `creature` SET `position_x` = -3839.476, `position_y` = -837.3205, `position_z` = 16.94844, `orientation` = 5.579004 WHERE `guid` = 9519 AND `id` = 3181; -- Fremal Doohickey <Bandage Trainer>
@@ -1057,122 +1172,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) V
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
 (179548, 47289, 0, 'Dire Maul - Dusty Tome', 10);
 
-
-
-
-
-
-
-
--- TODO
--- Add Missing Bijous Belongings Spawns (credit cmangos)
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(46203, 1, 'LBRS - Bijous Belongings', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(175334, 46203, 0, 'LBRS - Bijous Belongings', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(2290286, 175334, 229, -9.06949, -462.313, -18.6442, 3.13474, 0, 0, 0.999994, 0.00342519, 180, 180, 100, 1, 10);
-(2290285, 175334, 229, -78.5492, -402.515, -18.935, 5.53805, 0, 0, 0.36401, -0.931395, 180, 180, 100, 1, 10);
-(2290283, 175334, 229, -32.4305, -403.26, -18.935, -2.26892, 0, 0, 0, 1, 180, 180, 100, 1, 10);
-(2290284, 175334, 229, 33.7166, -466.067, -18.4651, -1.53589, 0, 0, 0, 0, 180, 180, 0, 1, 10);
-
--- Add Missing Millys Harvest Spawns (credit cmangos)
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1669, 8, 'Elwynn Forest - Milly\'s Harvest', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(161557, 1669, 0, 'Elwynn Forest - Milly\'s Harvest', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(10687, 161557, 0, -9061.6, -372.468, 73.5147, 6.07375, 0, 0, -0.104528, 0.994522, 120, 120, 100, 1, 10),
-(10326, 161557, 0, -9052.86, -330.749, 73.4517, 2.05949, 0, 0, 0.857167, 0.515038, 120, 120, 100, 1, 10),
-(10680, 161557, 0, -9072.03, -361.706, 73.4517, 6.03884, 0, 0, -0.121869, 0.992546, 120, 120, 100, 1, 10),
-(2436, 161557, 0, -9027.71, -326.643, 73.6656, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 10);
-
--- Add Missing Ripe Pumpkin Spawns (credit cmangos)
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(27379, 2883, 0, -9787.88, -865.209, 39.4633, 2.28638, 0, 0, 0.909961, 0.414694, 120, 120, 100, 1, 10),
-(26907, 2883, 0, -9776.16, -926.959, 39.3057, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 10),
-(46825, 2883, 0, -9780.09, -884.75, 39.5662, 3.82227, 0, 0, -0.942641, 0.333808, 120, 120, 100, 1, 10),
-(145557, 2883, 0, -9791.55, -907.647, 40.134, 1.98967, 0, 0, 0.83867, 0.54464, 120, 120, 100, 1, 10),
-(46827, 2883, 0, -9773.85, -824.695, 39.6148, 3.90954, 0, 0, -0.927183, 0.374608, 120, 120, 100, 1, 10),
-(46824, 2883, 0, -9749.11, -907.516, 39.2338, 0.122173, 0, 0, 0.0610485, 0.998135, 120, 120, 100, 1, 10);
-
--- Add Missing Enchanted Scarlet Thread (credit cmangos)
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(46801, 2, 'Stratholme - Enchanted Scarlet Thread', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(175966, 46801, 0, 'Stratholme - Enchanted Scarlet Thread', 10);
-REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(396272, 175966, 329, 3458.01, -3111.46, 137.434, 5.35816, 0, 0, -0.446198, 0.894934, 120, 120, 100, 1, 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(60008, 175966, 329, 3625.63, -3123.89, 135.665, 5.77704, 0, 0, -0.25038, 0.968148, 120, 120, 100, 1, 10);
-
--- Add Missing Glinting Mud (credit cmangos)
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1174, 2, 'Redridge Mountains - Glinting Mud', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(154357, 1174, 0, 'Redridge Mountains - Glinting Mud', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES
-(55734, 154357, 0, -9386.96, -2175.24, 41.9997, 3.52557, 0, 0, -0.981627, 0.190812, 2, 5, 100, 1),
-(55739, 154357, 0, -9375.87, -2303.81, 45.5523, 3.927, 0, 0, -0.923879, 0.382686, 2, 5, 100, 1),
-(55735, 154357, 0, -9367.63, -2094.21, 45.349, 5.68977, 0, 0, -0.292372, 0.956305, 2, 5, 100, 1),
-(55741, 154357, 0, -9360.54, -2372.21, 40.8664, 2.47837, 0, 0, 0.945518, 0.325568, 2, 5, 100, 1),
-(55743, 154357, 0, -9360.17, -2243.55, 45.4954, 5.63741, 0, 0, -0.317305, 0.948324, 2, 5, 100, 1),
-(55736, 154357, 0, -9357.17, -2129.56, 42.3378, 5.09636, 0, 0, -0.559193, 0.829038, 2, 5, 100, 1),
-(55737, 154357, 0, -9344.8, -2042.31, 40.9412, 5.49779, 0, 0, -0.382683, 0.92388, 2, 5, 100, 1),
-(55740, 154357, 0, -9316.16, -2146.72, 45.9883, 4.01426, 0, 0, -0.906307, 0.422619, 2, 5, 100, 1);
-
--- Add Missing Incendia Agarve Spawns
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(67763, 175928, 1, -5029.36, -2045.23, -51.6448, 1.91986, 0, 0, 0.819152, 0.573577, 120, 120, 100, 1, 10),
-(31168, 175928, 1, -5028.42, -2000.75, -53.1136, 5.37562, 0, 0, -0.438371, 0.898794, 120, 120, 100, 1, 10),
-(31173, 175928, 1, -4987.89, -1968.14, -53.3966, 1.13446, 0, 0, 0.537299, 0.843392, 120, 120, 100, 1, 10),
-(52537, 175928, 1, -4966.54, -1914.8, -41.1326, 3.78737, 0, 0, -0.948323, 0.317306, 120, 120, 100, 1, 10),
-(31169, 175928, 1, -4949.87, -2019.76, -53.3339, 1.51844, 0, 0, 0.688354, 0.725375, 120, 120, 100, 1, 10);
-
--- Add Missing Scourge Data Spawns
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(46814, 1, 'Stratholme - Scourge Data', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(176249, 46814, 0, 'Stratholme - Scourge Data', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(92262, 176249, 329, 3848.69, -3490.05, 141.21, 3.63029, 0, 0, -0.970295, 0.241925, 120, 120, 100, 1, 10),
-(43301, 176249, 329, 4053.1, -3678.55, 132.655, 1.01229, 0, 0, 0.484809, 0.87462, 120, 120, 100, 1, 10);
-
--- Add Missing Bloodsail Charts Spawns
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1804, 1, 'Stranglethorn Vale - Bloodsail Charts', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(2086, 1804, 0, 'Stranglethorn Vale - Bloodsail Charts', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(1499, 2086, 0, -14703.8, 451.066, 0.649918, 2.77507, 0, 0, 0.983254, 0.182238, 120, 120, 100, 1, 10),
-(177698, 2086, 0, -14678.3, 500.529, 2.43489, 1.65806, 0, 0, 0.737277, 0.675591, 120, 120, 100, 1, 10),
-(1495, 2086, 0, -14607.7, 332.715, 3.69033, 1.83259, 0, 0, 0.793353, 0.608762, 120, 120, 100, 1, 10);
-
--- Add Missing Bloodsail Orders Spawns
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1805, 1, 'Stranglethorn Vale - Bloodsail Orders', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(2087, 1805, 0, 'Stranglethorn Vale - Bloodsail Orders', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(177694, 2087, 0, -14705.2, 450.416, 0.157641, 2.75761, 0, 0, 0.981627, 0.190812, 120, 120, 100, 1, 10),
-(267277, 2087, 0, -14685.4, 486.472, 4.17982, 0.488691, 0, 0, 0.241921, 0.970296, 120, 120, 100, 1, 10),
-(1496, 2087, 0, -14612, 334.378, 2.46723, 4.5204, 0, 0, -0.771625, 0.636078, 120, 120, 100, 1, 10);
-
--- Add Missing Musty Tome Spawns
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(16476, 1, 'Western Plaguelands - Musty Tome', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(176150, 16476, 0, 'Western Plaguelands - Musty Tome', 10);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(42656, 176150, 0, 1356.51, -1452.11, 57.8184, 5.98648, 0, 0, -0.147809, 0.989016, 120, 120, 100, 1, 10),
-(38353, 176150, 0, 1360.83, -1448.94, 56.969, 1.95477, 0, 0, 0.829038, 0.559193, 120, 120, 100, 1, 10),
-(20085, 176150, 0, 1374.15, -1448.33, 56.969, 1.69297, 0, 0, 0.748956, 0.66262, 120, 120, 100, 1, 10),
-(42649, 176150, 0, 1380.05, -1457.83, 56.9689, 1.71042, 0, 0, 0.754709, 0.656059, 120, 120, 100, 1, 10),
-(21008, 176150, 0, 1382.42, -1449.85, 56.969, 1.64061, 0, 0, 0.731353, 0.681999, 120, 120, 100, 1, 10),
-(39658, 176150, 0, 1385.29, -1455.31, 56.9689, 0.0174525, 0, 0, 0.00872612, 0.999962, 120, 120, 100, 1, 10),
-(21009, 176150, 0, 1393.88, -1457.68, 58.3282, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 10),
-(40465, 176150, 0, 1394.99, -1450.47, 58.3282, 0.85521, 0, 0, 0.414693, 0.909962, 120, 120, 100, 1, 10);
--- ---------------
 
 -- End of migration.
 END IF;
