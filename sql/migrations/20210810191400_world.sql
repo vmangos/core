@@ -611,15 +611,15 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (9748, 35252, 0, -3461.63, -1803.47, 25.7061, 4.45059, 0, 0, -0.793353, 0.608762, 10, 10, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 30, `spawntimesecsmax` = 60, `animprogress` = 100, `state` = 1 WHERE `id` IN (331,333,334,35252);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1806, 1, 'Wetlands (Whelgar''s Excavation Site) - Loose Soil (331)', 10),
-(1807, 1, 'Wetlands (Whelgar''s Excavation Site) - Ancient Relic (333)', 10),
-(1808, 1, 'Wetlands (Whelgar''s Excavation Site) - Ancient Relic (334)', 10),
-(1809, 1, 'Wetlands (Whelgar''s Excavation Site) - Ancient Relic (35252)', 10);
+(1806, 1, 'Wetlands - Loose Soil', 10),
+(1807, 1, 'Wetlands - Ancient Relic', 10),
+(1808, 1, 'Wetlands - Ancient Relic', 10),
+(1809, 1, 'Wetlands - Ancient Relic', 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(331, 1806, 0, 'Wetlands (Whelgar''s Excavation Site) - Loose Soil (331)', 10),
-(333, 1807, 0, 'Wetlands (Whelgar''s Excavation Site) - Ancient Relic (333)', 10),
-(334, 1808, 0, 'Wetlands (Whelgar''s Excavation Site) - Ancient Relic (334)', 10),
-(35252, 1809, 0, 'Wetlands (Whelgar''s Excavation Site) - Ancient Relic (35252)', 10);
+(331, 1806, 0, 'Wetlands - Loose Soil', 10),
+(333, 1807, 0, 'Wetlands - Ancient Relic', 10),
+(334, 1808, 0, 'Wetlands - Ancient Relic', 10),
+(35252, 1809, 0, 'Wetlands - Ancient Relic', 10);
 
 -- Add Missing Laden Mushroom Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
