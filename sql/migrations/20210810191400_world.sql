@@ -556,6 +556,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 4608;
 
 -- Add Missing Tirisfal Pumpkin Spawns
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(15014, 15, 'Tirisfal Glades - Tirisfal Pumpkin', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(375, 15014, 0, 'Tirisfal Glades - Tirisfal Pumpkin', 10);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `patch_max`) VALUES
 (9699, 375, 0, 2262.25, 1477.5, 33.4613, 0.523598, 0, 0, 0.258819, 0.965926, 300, 300, 100, 1, 8, 10),
 (9701, 375, 0, 2265.16, 1352.79, 33.4334, 2.04204, 0, 0, 0.85264, 0.522499, 300, 300, 100, 1, 8, 10),
@@ -591,6 +595,16 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 UPDATE `gameobject` SET `spawn_flags` = 0, `spawntimesecsmin` = 180, `spawntimesecsmax` = 300 WHERE `id` = 375;
 
 -- Add q.299 "Uncovering the Past" Objects & Add Pooling (credit cmangos)
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(1806, 1, 'Wetlands - Loose Soil', 10),
+(1807, 1, 'Wetlands - Ancient Relic', 10),
+(1808, 1, 'Wetlands - Ancient Relic', 10),
+(1809, 1, 'Wetlands - Ancient Relic', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(331, 1806, 0, 'Wetlands - Loose Soil', 10),
+(333, 1807, 0, 'Wetlands - Ancient Relic', 10),
+(334, 1808, 0, 'Wetlands - Ancient Relic', 10),
+(35252, 1809, 0, 'Wetlands - Ancient Relic', 10);
 DELETE FROM `gameobject` WHERE `id` IN (331,333,334,35252);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (9733, 334, 0, -3568.39990234375, -1845.5574951171875, 24.36172676086425781, -2.967041015625, 0, 0, -0.99619388580322265, 0.087165042757987976, 300, 300, 255, 1, 10),
@@ -610,16 +624,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (9747, 35252, 0, -3444.589111328125, -1833.8411865234375, 24.91058731079101562, -1.3962634801864624, 0, 0, 0.642787635326385498, -0.76604443788528442, 90, 90, 100, 1, 10),
 (9748, 35252, 0, -3461.63, -1803.47, 25.7061, 4.45059, 0, 0, -0.793353, 0.608762, 10, 10, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 30, `spawntimesecsmax` = 60, `animprogress` = 100, `state` = 1 WHERE `id` IN (331,333,334,35252);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(1806, 1, 'Wetlands - Loose Soil', 10),
-(1807, 1, 'Wetlands - Ancient Relic', 10),
-(1808, 1, 'Wetlands - Ancient Relic', 10),
-(1809, 1, 'Wetlands - Ancient Relic', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(331, 1806, 0, 'Wetlands - Loose Soil', 10),
-(333, 1807, 0, 'Wetlands - Ancient Relic', 10),
-(334, 1808, 0, 'Wetlands - Ancient Relic', 10),
-(35252, 1809, 0, 'Wetlands - Ancient Relic', 10);
 
 -- Add Missing Laden Mushroom Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
