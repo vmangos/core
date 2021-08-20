@@ -1051,6 +1051,12 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3
 -- Correct Diplay ID For Energetic Rod
 UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
 
+-- Add Dusty Tome Pool (credit cmagos)
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(47289, 2, 'Dire Maul - Dusty Tome', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(179548, 47289, 0, 'Dire Maul - Dusty Tome', 10);
+
 
 -- End of migration.
 END IF;
