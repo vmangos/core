@@ -557,9 +557,9 @@ UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 4608;
 
 -- Add Missing Tirisfal Pumpkin Spawns
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(15014, 15, 'Tirisfal Glades - Tirisfal Pumpkin', 10);
+(274, 15, 'Tirisfal Glades - Tirisfal Pumpkin', 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(375, 15014, 0, 'Tirisfal Glades - Tirisfal Pumpkin', 10);
+(375, 274, 0, 'Tirisfal Glades - Tirisfal Pumpkin', 10);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `patch_max`) VALUES
 (9699, 375, 0, 2262.25, 1477.5, 33.4613, 0.523598, 0, 0, 0.258819, 0.965926, 300, 300, 100, 1, 8, 10),
 (9701, 375, 0, 2265.16, 1352.79, 33.4334, 2.04204, 0, 0, 0.85264, 0.522499, 300, 300, 100, 1, 8, 10),
@@ -1168,9 +1168,9 @@ UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
 
 -- Add Dusty Tome Pool (credit cmagos)
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(47289, 2, 'Dire Maul - Dusty Tome', 10);
+(275, 2, 'Dire Maul - Dusty Tome', 10);
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(179548, 47289, 0, 'Dire Maul - Dusty Tome', 10);
+(179548, 275, 0, 'Dire Maul - Dusty Tome', 10);
 
 
 -- End of migration.
