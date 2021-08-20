@@ -1167,11 +1167,12 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3
 UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
 
 -- Add Dusty Tome Pool (credit cmagos)
+DELETE FROM `pool_template` WHERE `entry` = 1600;
 DELETE FROM `pool_gameobject` WHERE `description` = "Dusty Tome DM";
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
-(275, 2, 'Dire Maul - Dusty Tome', 10);
-INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
-(179548, 275, 0, 'Dire Maul - Dusty Tome', 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(275, 2, 'Dire Maul - Dusty Tome', 1, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(179548, 275, 0, 'Dire Maul - Dusty Tome', 1, 10);
 
 
 -- End of migration.
