@@ -36,6 +36,7 @@
 #include "SpellAuras.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
+#include "GameObjectAI.h"
 #include "TemporarySummon.h"
 #include "Formulas.h"
 #include "Util.h"
@@ -1182,9 +1183,17 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
         if (TemporarySummon* pSummon = pCreatureVictim->IsTemporarySummon() ? static_cast<TemporarySummon*>(pCreatureVictim) : nullptr)
         {
             if (pSummon->GetSummonerGuid().IsCreature())
+            {
                 if (Creature* pSummoner = pCreatureVictim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                     if (pSummoner->AI())
                         pSummoner->AI()->SummonedCreatureJustDied(pCreatureVictim);
+            }
+            else if (pSummon->GetSummonerGuid().IsGameObject())
+            {
+                if (GameObject* pSummoner = pCreatureVictim->GetMap()->GetGameObject(pSummon->GetSummonerGuid()))
+                    if (pSummoner->AI())
+                        pSummoner->AI()->SummonedCreatureJustDied(pCreatureVictim);
+            }
         }
         else if (Creature* pOwnerCreature = ::ToCreature(pVictim->GetCharmerOrOwner()))
         {
@@ -9591,40 +9600,6 @@ void Unit::CombatStopInRange(float dist)
     Cell::VisitAllObjects(this, searcher, dist);
     for (const auto& iter : targets)
         iter->CombatStopWithPets(true);
-}
-
-uint32 Unit::DespawnNearCreaturesByEntry(uint32 entry, float range)
-{
-    std::list<Creature*> creatures;
-    GetCreatureListWithEntryInGrid(creatures, entry, range);
-    uint32 count = 0;
-    for (const auto& it : creatures)
-    {
-        if (it->IsInWorld())
-        {
-            ++count;
-            it->DisappearAndDie();
-        }
-    }
-    return count;
-}
-
-uint32 Unit::RespawnNearCreaturesByEntry(uint32 entry, float range)
-{
-    if (range == 0.0f)
-        range = GetMap()->GetVisibilityDistance();
-    uint32 count = 0;
-    std::list<Creature*> lList;
-    GetCreatureListWithEntryInGrid(lList, entry, range);
-    for (const auto& it : lList)
-    {
-        if (!it->IsAlive())
-        {
-            it->Respawn();
-            ++count;
-        }
-    }
-    return count;
 }
 
 // TriniyCore

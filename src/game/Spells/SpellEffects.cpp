@@ -3085,7 +3085,7 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
     else
         spawnCreature->SetReactState(REACT_AGGRESSIVE);
 
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+    if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
         ((Creature*)m_casterUnit)->AI()->JustSummoned((Creature*)spawnCreature);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
@@ -3603,7 +3603,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         map->Add((Creature*)spawnCreature);
 
         // Notify Summoner
-        if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+        if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
             ((Creature*)m_casterUnit)->AI()->JustSummoned(spawnCreature);
 
         switch (m_spellInfo->Id)
@@ -4435,8 +4435,10 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     pGameObj->SetWorldMask(m_caster->GetWorldMask());
     pGameObj->SummonLinkedTrapIfAny();
 
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+    if (m_caster->IsCreature() && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
+    else if (m_caster->IsGameObject() && ((GameObject*)m_caster)->AI())
+        ((GameObject*)m_caster)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
 }
@@ -5939,7 +5941,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
 
     pGameObj->SummonLinkedTrapIfAny();
 
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+    if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
         ((Creature*)m_casterUnit)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
@@ -6213,7 +6215,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     critter->SetFacingToObject(player);
 
     // Notify Summoner
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+    if (m_caster->IsCreature() && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(critter);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(critter->GetObjectGuid()));

@@ -1156,10 +1156,6 @@ class Unit : public SpellCaster
         void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false, bool onlyIfNotStalked = false);
         void InterruptAttacksOnMe(float dist = 0.0f, bool guard_check = false); // Interrupt auto-attacks
         
-        // Script helpers.
-        uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
-        uint32 RespawnNearCreaturesByEntry(uint32 entry, float range);
-        
         /*********************************************************/
         /***                 RELATIONS SYSTEM                  ***/
         /*********************************************************/
