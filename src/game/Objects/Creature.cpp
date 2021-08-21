@@ -354,17 +354,18 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     // Load creature equipment
     if (eventData && eventData->equipment_id)
     {
-        LoadEquipment(eventData->equipment_id);             // use event equipment if any for active event
-    }
-    else if (!addon || addon->equipment_id < 0)
-    {
-        // use default from the template
-        LoadEquipment(cinfo->equipment_id);
+        // use event equipment if any for active event
+        LoadEquipment(eventData->equipment_id);
     }
     else if (addon && addon->equipment_id >= 0)
     {
-        // override
-        LoadEquipment(addon->equipment_id);
+        // override with per spawn data
+        LoadEquipment(addon->equipment_id, true);
+    }
+    else
+    {
+        // use default from the template
+        LoadEquipment(cinfo->equipment_id, true);
     }
 
     SetName(normalInfo->name);                              // at normal entry always
