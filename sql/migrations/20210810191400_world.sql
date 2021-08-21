@@ -21,7 +21,7 @@ INSERT INTO `creature` (`guid`, `id`,`map`, `position_x`, `position_y`, `positio
 (1377, 12347, 1, -779.266, 3044.03, -22.1945, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10),
 (1382, 12347, 1, -672.3, 2973.36, -21.8494, 3.16598, 300, 300, 50, 100, 0, 1, 0, 0, 0, 10);
 
-INSERT INTO `gameobject` (guid, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (2555, 177784, 1, -979.745, 3089.43, -23.5718, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 1, 100, 0, 10),
 (2892, 177784, 1, -867.013, 3126.95, -27.1865, 4.04917, 0, 0, -0.898793, 0.438373, 120, 120, 1, 100, 0, 10),
 (4727, 177784, 1, -778.617, 3046.94, -22.5933, 3.97936, 0, 0, -0.913545, 0.406738, 120, 120, 1, 100, 0, 10),
