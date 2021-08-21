@@ -590,6 +590,9 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3
 -- Correct Diplay ID For Energetic Rod
 UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
 
+-- Remove Teebus Blazing Longsword From Lockboxes
+DELETE FROM `reference_loot_template` WHERE `entry` = 1014 AND `item`=1728;
+
 
 -- End of migration.
 END IF;
