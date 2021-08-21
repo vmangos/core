@@ -593,6 +593,9 @@ UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
 -- Remove Teebus Blazing Longsword From Lockboxes
 DELETE FROM `reference_loot_template` WHERE `entry` = 1014 AND `item`=1728;
 
+-- Increase Dropchance for Crystallized Note
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `entry` IN (9676, 9820, 9819) AND `item`=10840;
+
 
 -- End of migration.
 END IF;
