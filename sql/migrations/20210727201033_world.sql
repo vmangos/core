@@ -2066,7 +2066,6 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `spell_start`, `even
 (@LUNAR_FESTIVAL_CGUID+68, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+104, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+119, 0, 26384, 7),
-(@LUNAR_FESTIVAL_CGUID+119, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+125, 0, 26383, 7);
 
 -- Cast Rocket Red OOC min is 30 seconds in sniffs.
