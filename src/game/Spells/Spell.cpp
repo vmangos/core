@@ -759,22 +759,24 @@ void Spell::prepareDataForTriggerSystem()
     switch (m_spellInfo->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_MELEE:
-            m_procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
-            if (m_attackType == OFF_ATTACK)
-                m_procAttacker |= PROC_FLAG_SUCCESSFUL_OFFHAND_HIT;
-            m_procVictim   = PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+            m_procAttacker = PROC_FLAG_DEAL_MELEE_ABILITY;
+            if (m_attackType == BASE_ATTACK)
+                m_procAttacker |= PROC_FLAG_MAIN_HAND_WEAPON_SWING;
+            else if (m_attackType == OFF_ATTACK)
+                m_procAttacker |= PROC_FLAG_OFF_HAND_WEAPON_SWING;
+            m_procVictim   = PROC_FLAG_TAKE_MELEE_ABILITY;
             if (m_spellInfo->IsNextMeleeSwingSpell())
             {
-                m_procAttacker |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
-                m_procVictim |= PROC_FLAG_TAKEN_MELEE_HIT;
+                m_procAttacker |= PROC_FLAG_DEAL_MELEE_SWING;
+                m_procVictim |= PROC_FLAG_TAKE_MELEE_SWING;
             }
             break;
         case SPELL_DAMAGE_CLASS_RANGED:
             // Auto attack
             if (m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG)
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_HIT;
-                m_procVictim   = PROC_FLAG_TAKEN_RANGED_HIT;
+                m_procAttacker = PROC_FLAG_DEAL_RANGED_ATTACK;
+                m_procVictim   = PROC_FLAG_TAKE_RANGED_ATTACK;
             }
             else // Ranged spell attack
             {
@@ -785,8 +787,8 @@ void Spell::prepareDataForTriggerSystem()
                     m_procVictim = PROC_FLAG_NONE;
                 }
                 else {
-                    m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
-                    m_procVictim   = PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+                    m_procAttacker = PROC_FLAG_DEAL_RANGED_ABILITY;
+                    m_procVictim   = PROC_FLAG_TAKE_RANGED_ABILITY;
                 }
 
                 if (m_spellInfo->IsAreaOfEffectSpell())
@@ -803,19 +805,19 @@ void Spell::prepareDataForTriggerSystem()
                 aoe = true;
 
             // Check for positive spell. 'Positive' spells include various things such as buffs, but
-            // they shouldn't proc with PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL. Note that some spells
+            // they shouldn't proc with PROC_FLAG_DEAL_HELPFUL_SPELL. Note that some spells
             // with SPELL_EFFECT_DISPEL are negative, such as Purge.
             if (positive)
             {
                 if (m_spellInfo->IsHealSpell())
                 {
-                    m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-                    m_procVictim = PROC_FLAG_TAKEN_POSITIVE_SPELL;
+                    m_procAttacker = PROC_FLAG_DEAL_HELPFUL_SPELL;
+                    m_procVictim = PROC_FLAG_TAKE_HELPFUL_SPELL;
                 }
                 else
                 {
-                    m_procAttacker = PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
-                    m_procVictim = PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL;
+                    m_procAttacker = PROC_FLAG_DEAL_HELPFUL_ABILITY;
+                    m_procVictim = PROC_FLAG_TAKE_HELPFUL_ABILITY;
                 }
 
                 if (m_spellInfo->IsDispel())
@@ -841,20 +843,20 @@ void Spell::prepareDataForTriggerSystem()
             // Wands auto attack
             else if (m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG)
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_HIT;
-                m_procVictim   = PROC_FLAG_TAKEN_RANGED_HIT;
+                m_procAttacker = PROC_FLAG_DEAL_RANGED_ATTACK;
+                m_procVictim   = PROC_FLAG_TAKE_RANGED_ATTACK;
             }
             else                                           // Negative spell
             {
                 if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
                 {
-                    m_procAttacker = PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
-                    m_procVictim = PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+                    m_procAttacker = PROC_FLAG_DEAL_HARMFUL_SPELL;
+                    m_procVictim = PROC_FLAG_TAKE_HARMFUL_SPELL;
                 }
                 else
                 {
-                    m_procAttacker = PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
-                    m_procVictim = PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+                    m_procAttacker = PROC_FLAG_DEAL_HARMFUL_ABILITY;
+                    m_procVictim = PROC_FLAG_TAKE_HARMFUL_ABILITY;
                 }
 
                 if (aoe)
@@ -1162,9 +1164,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // multiple targets, but not proc additional melee-only beneficial auras on the 
         // attacker like Sweeping Strikes. Leave the victim proc flags responding to a melee
         // spell.
-        if (procAttacker & PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT) {
-            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT);
-            procAttacker |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        if (procAttacker & PROC_FLAG_DEAL_MELEE_ABILITY) {
+            procAttacker &= ~(PROC_FLAG_DEAL_MELEE_ABILITY);
+            procAttacker |= PROC_FLAG_DEAL_HARMFUL_SPELL;
         }
         else if (procAttacker & (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST)) {
             // Secondary target on a successful spell cast. Remove these flags so we're not
@@ -1172,13 +1174,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             // chain lightning + clearcasting. Leave positive effects
             // eg. Chain heal/lightning & Zandalarian Hero Charm
             procAttacker &= ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | 
-                              PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+                              PROC_FLAG_DEAL_HARMFUL_SPELL);
         }
-        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)) {
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_DEAL_HARMFUL_SPELL)) {
             // Do not allow secondary hits for negative aoe spells (such as Arcane Explosion) 
             // to proc beneficial abilities such as Clearcasting. Positive aoe spells can
             // still trigger, as in the case of prayer of healing and inspiration...
-            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_DEAL_HARMFUL_SPELL);
         }
     }
 
@@ -1410,8 +1412,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         if ((m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25) || 
             (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && m_spellInfo->SpellIconID == 561 && m_spellInfo->SpellVisual == 0))
         {
-            procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
-            procVictim = PROC_FLAG_TAKEN_MELEE_SPELL_HIT | PROC_FLAG_TAKEN_ANY_DAMAGE;
+            procAttacker = PROC_FLAG_DEAL_MELEE_ABILITY;
+            procVictim = PROC_FLAG_TAKE_MELEE_ABILITY | PROC_FLAG_TAKEN_ANY_DAMAGE;
         }
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger)
@@ -1521,11 +1523,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             // Override proc flags for offensive dispel
             if (pCaster->IsHostileTo(unitTarget))
             {
-                procAttacker &= ~(PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL | PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST);
-                procAttacker |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+                procAttacker &= ~(PROC_FLAG_DEAL_HELPFUL_ABILITY | PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST);
+                procAttacker |= PROC_FLAG_DEAL_HARMFUL_SPELL;
 
-                procVictim &= ~PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL;
-                procVictim |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+                procVictim &= ~PROC_FLAG_TAKE_HELPFUL_ABILITY;
+                procVictim |= PROC_FLAG_TAKE_HARMFUL_SPELL;
             }
         }
 
