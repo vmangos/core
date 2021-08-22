@@ -1187,6 +1187,9 @@ uint32 Player::GetWaterBreathingInterval() const
 
 void Player::SetWaterBreathingIntervalMultiplier(float multiplier)
 {
+    if (m_environmentBreathingMultiplier == multiplier)
+        return;
+
     m_environmentBreathingMultiplier = multiplier;
 
     if (const uint32 interval = GetWaterBreathingInterval())
@@ -2401,6 +2404,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 data << uint32(m_transport->GetEntry());
                 data << uint32(GetMapId());
             }
+            GetCheatData()->LogMovementPacket(false, data);
             GetSession()->SendPacket(&data);
         }
 
@@ -15057,6 +15061,14 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     // update items with duration and realtime
     UpdateItemDuration(time_diff, true);
 
+    // After quests and inventory loaded: force update on quest item counters
+    // Fixes cases when quest status data was not correctly saved during last session (crash, db connection lost, etc)
+    for (auto& data : mQuestStatus)
+    {
+        if (Quest const* quest = sObjectMgr.GetQuestTemplate(data.first))
+            AdjustQuestReqItemCount(quest, data.second);
+    }
+
     if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeam()))
     {
         // problems with taxi path loading
@@ -19864,6 +19876,7 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
     data << uint8(allowMove);
+    GetCheatData()->LogMovementPacket(false, data);
     GetSession()->SendPacket(&data);
 #endif
 }
@@ -20782,9 +20795,6 @@ void Player::SetRestType(RestType n_r_type, uint32 areaTriggerId /*= 0*/)
     }
     else
     {
-        if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) && m_timeInnEnter == 0 || time(nullptr) - m_timeInnEnter > 180)
-            SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);
-
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
 
         m_innTriggerId = areaTriggerId;

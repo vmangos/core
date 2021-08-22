@@ -80,6 +80,7 @@ void MovementPacketSender::SendSpeedChangeToController(Unit* unit, Player* mover
 #endif
     data << float(pendingChange.newValue);
 
+    mover->GetCheatData()->LogMovementPacket(false, data);
     mover->GetSession()->SendPacket(&data);
 }
 
@@ -174,6 +175,7 @@ void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y
 #endif
     data << mi;
 
+    mover->GetCheatData()->LogMovementPacket(false, data);
     mover->GetSession()->SendPacket(&data);
 }
 
@@ -231,7 +233,8 @@ void MovementPacketSender::SendKnockBackToController(Unit* unit, float vcos, flo
     data << float(vcos);                                    // x direction
     data << float(vsin);                                    // y direction
     data << float(speedXY);                                 // Horizontal speed
-    data << float(speedZ);                                 // Z Movement speed (vertical)
+    data << float(speedZ);                                  // Z Movement speed (vertical)
+    mover->GetCheatData()->LogMovementPacket(false, data);
     mover->GetSession()->SendPacket(&data);
 }
 
@@ -317,7 +320,8 @@ void MovementPacketSender::SendMovementFlagChangeToController(Unit* unit, Player
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     data << pendingChange.movementCounter;
 #endif
-
+    
+    mover->GetCheatData()->LogMovementPacket(false, data);
     mover->GetSession()->SendPacket(&data);
 }
 

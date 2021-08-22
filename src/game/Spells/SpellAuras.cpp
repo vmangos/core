@@ -2256,18 +2256,14 @@ void Aura::HandleAuraHover(bool apply, bool Real)
 
 void Aura::HandleWaterBreathing(bool apply, bool /*Real*/)
 {
-    Unit* target = GetTarget();
-
-    if (target->GetTypeId() == TYPEID_PLAYER)
-        static_cast<Player*>(target)->SetWaterBreathingIntervalMultiplier(apply ? 0 : target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
+    if (Player* target = GetTarget()->ToPlayer())
+        target->SetWaterBreathingIntervalMultiplier(((apply || target->HasAuraType(SPELL_AURA_WATER_BREATHING)) ? 0.0f : target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING)));
 }
 
 void Aura::HandleModWaterBreathing(bool /*apply*/, bool /*Real*/)
 {
-    Unit* target = GetTarget();
-
-    if (target->GetTypeId() == TYPEID_PLAYER)
-        static_cast<Player*>(target)->SetWaterBreathingIntervalMultiplier(target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
+    if (Player* target = GetTarget()->ToPlayer())
+        target->SetWaterBreathingIntervalMultiplier(target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
 }
 
 std::pair<unsigned int, float> GetShapeshiftDisplayInfo(ShapeshiftForm form, Unit* target){
@@ -8112,6 +8108,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case SPELL_AURA_MOD_POWER_REGEN:                                // (Greater) Blessing of Wisdom
         case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:                       // Glyph of Salvation / Pain Suppression / Safeguard ?
         case SPELL_AURA_MOD_STAT:
+        case SPELL_AURA_WATER_BREATHING:
             return true;
         case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
             return true;
@@ -8167,7 +8164,7 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 0;
     if (other->GetSpellProto()->EffectItemType[other->GetEffIndex()] != GetSpellProto()->EffectItemType[GetEffIndex()])
         return 0;
-    if (other->IsPositive() != IsPositive())
+    if ((other->GetModifier()->m_amount > 0) != (GetModifier()->m_amount > 0))
         return 0;
 
     // Other aura is better.
