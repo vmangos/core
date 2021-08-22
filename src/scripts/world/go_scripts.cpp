@@ -545,11 +545,11 @@ enum
 
 struct go_firework_rocket : public GameObjectAI
 {
-    // In Videos and sniffs, it takes 1 second until the rockets launches.
+    // In videos and sniffs, it takes 0-1 second until a rocket fires up from the launcher.
     // Without this code it takes forever in vmangos for some reason.
     go_firework_rocket(GameObject* gobj) : GameObjectAI(gobj)
     {
-        m_events.ScheduleEvent(EVENT_ROCKET_DESPAWN, Seconds(1));
+        m_events.ScheduleEvent(EVENT_ROCKET_DESPAWN, Seconds(0));
     }
 
     void UpdateAI(uint32 const diff) override
