@@ -50,7 +50,7 @@ INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`
 (180894, 7, 8, 327, 'Lunar Teleport: Darnassus', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
 (180895, 7, 8, 327, 'Lunar Teleport: Orgrimmar', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
 (180896, 7, 8, 327, 'Lunar Teleport: Undercity', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180897, 7, 8, 327, 'Lunar Teleport: Thunder Bluff', 0, 0, 1, 1353, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight');
+(180897, 7, 8, 327, 'Lunar Teleport: Thunder Bluff', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight');
 
 UPDATE `gameobject_template` SET `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
 
