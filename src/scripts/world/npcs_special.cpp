@@ -1239,8 +1239,6 @@ std::array<FireworkStruct, 25> const Fireworks =
     { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
 }};
 
-std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
-
 struct npc_pats_firework_guyAI : ScriptedAI
 {
     explicit npc_pats_firework_guyAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1287,15 +1285,6 @@ struct npc_pats_firework_guyAI : ScriptedAI
     {
         if (!m_bExist || m_bDone)
             return;
-
-        for (uint32 goEntry : Launcher)
-        {
-            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
-            {
-                pGo->SendGameObjectCustomAnim(3);
-                break;
-            }
-        }
 
         float x, y, z;
         m_creature->GetPosition(x, y, z);
