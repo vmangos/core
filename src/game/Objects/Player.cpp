@@ -5695,7 +5695,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         return;
 
     // No weapon skill gain while in tree/feral form
-    if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
+    if (!defence && IsShapeShifted())
         return; 
 
     uint32 playerLevel      = GetLevel();

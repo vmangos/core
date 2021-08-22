@@ -96,18 +96,18 @@ enum ProcFlags
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_DEAL_MELEE_SWING        | \
-                                  PROC_FLAG_TAKE_MELEE_SWING             | \
-                                  PROC_FLAG_DEAL_MELEE_ABILITY  | \
-                                  PROC_FLAG_TAKE_MELEE_ABILITY       | \
-                                  PROC_FLAG_DEAL_RANGED_ATTACK       | \
-                                  PROC_FLAG_TAKE_RANGED_ATTACK            | \
-                                  PROC_FLAG_DEAL_RANGED_ABILITY | \
+                                  PROC_FLAG_TAKE_MELEE_SWING        | \
+                                  PROC_FLAG_DEAL_MELEE_ABILITY      | \
+                                  PROC_FLAG_TAKE_MELEE_ABILITY      | \
+                                  PROC_FLAG_DEAL_RANGED_ATTACK      | \
+                                  PROC_FLAG_TAKE_RANGED_ATTACK      | \
+                                  PROC_FLAG_DEAL_RANGED_ABILITY     | \
                                   PROC_FLAG_TAKE_RANGED_ABILITY)
 
-#define NEGATIVE_TRIGGER_MASK (MELEE_BASED_TRIGGER_MASK                | \
-                               PROC_FLAG_DEAL_HARMFUL_ABILITY     | \
-                               PROC_FLAG_TAKE_HARMFUL_ABILITY          | \
-                               PROC_FLAG_DEAL_HARMFUL_SPELL | \
+#define NEGATIVE_TRIGGER_MASK (MELEE_BASED_TRIGGER_MASK             | \
+                               PROC_FLAG_DEAL_HARMFUL_ABILITY       | \
+                               PROC_FLAG_TAKE_HARMFUL_ABILITY       | \
+                               PROC_FLAG_DEAL_HARMFUL_SPELL         | \
                                PROC_FLAG_TAKE_HARMFUL_SPELL)
 
 enum ProcFlagsEx
