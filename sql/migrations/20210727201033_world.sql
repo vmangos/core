@@ -55,7 +55,7 @@ INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`
 (180896, 7, 8, 327, 'Lunar Teleport: Undercity', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
 (180897, 7, 8, 327, 'Lunar Teleport: Thunder Bluff', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight');
 
-UPDATE `gameobject_template` SET `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
+UPDATE `gameobject_template` SET `faction`='1375', `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
 
 -- Target positions for teleport spells.
 INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `build_min`, `build_max`) VALUES
