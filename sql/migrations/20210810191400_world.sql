@@ -596,6 +596,9 @@ DELETE FROM `reference_loot_template` WHERE `entry` = 1014 AND `item`=1728;
 -- Increase Dropchance for Crystallized Note
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `entry` IN (9676, 9820, 9819) AND `item`=10840;
 
+-- Correct Requirements for Quest Grark Lorkrub
+UPDATE `quest_template` SET `PrevQuestId` = 4082 WHERE `entry` = 4122;
+
 
 -- End of migration.
 END IF;
