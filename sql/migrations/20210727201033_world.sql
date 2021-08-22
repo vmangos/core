@@ -21,6 +21,10 @@ DELETE FROM `gameobject` WHERE NOT `id` IN (180763,180764) AND `guid` IN (SELECT
 DELETE FROM `game_event_gameobject` WHERE `event` = @LUNAR_FESTIVAL_EVENT AND NOT `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180763,180764));
 DELETE FROM `game_event_creature` WHERE `event` = @LUNAR_FESTIVAL_EVENT;
 
+-- Fix flags.
+UPDATE `creature_template` SET `unit_flags`='512', `flags_extra`=131072 WHERE `entry` IN (15891,15892);
+UPDATE `creature_template` SET `unit_flags`='0' WHERE `entry` IN (15895,15907,15908,15906,15905,15719,15694);
+
 -- Revelers don't cast "Small Red Rocket".
 DELETE FROM `creature_ai_events` WHERE `id` IN (1590709,1590609,1569409,1571909,1590509,1590809);
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1590709,1590609,1569409,1571909,1590509,1590809);
@@ -35,22 +39,30 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (1569407,1571907,1590507,1590607
 -- Conditions from stuff above.
 DELETE FROM `conditions` WHERE `condition_entry` IN (220554,220558,220574,220577,220590,220584);
 
--- Misc.
-UPDATE `gameobject_template` SET `entry`=180891, `displayId`=327, `name`='Greater Moonlight Spell Focus', `data1`=4, `data3`=1 WHERE `entry`=300058;
+-- Teleport SpellFocus GameObjects.
 DELETE FROM `gameobject` WHERE `id`=300058;
-UPDATE `spell_script_target` SET `targetEntry`=180891, `build_min`=5086 WHERE `entry`=26373 AND `targetEntry`=300058;
+DELETE FROM `gameobject_template` WHERE `entry`=300058;
 
--- TODO:
--- Lunar Invititation (26373) hits:
--- In Citys:
---   180891 + 3 Lunar Festival Emissary / Lunar Festival Herald
--- In Moonglade one Gobject (not sniffable) for each city (OG,SW,DA,TB,UC,IF):
---   180892
---   180893
---   180894
---   180895
---   180896
---   180897
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES 
+(180891, 7, 8, 327, 'Lunar Teleport: Moonglade', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
+(180892, 7, 8, 327, 'Lunar Teleport: Stormwind', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
+(180893, 7, 8, 327, 'Lunar Teleport: Ironforge', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
+(180894, 7, 8, 327, 'Lunar Teleport: Darnassus', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
+(180895, 7, 8, 327, 'Lunar Teleport: Orgrimmar', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
+(180896, 7, 8, 327, 'Lunar Teleport: Undercity', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
+(180897, 7, 8, 327, 'Lunar Teleport: Thunder Bluff', 0, 0, 1, 1353, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight');
+
+UPDATE `gameobject_template` SET `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
+
+-- Target positions for teleport spells.
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `build_min`, `build_max`) VALUES
+(26450, 1, 10150.45, 2602.12, 1330.82, 5.03, 5086, 5875),
+(26451, 1, 7590, -2226, 471, 0, 5086, 5875),
+(26452, 0, -4663.39, -956.23, 500.37, 5.73, 5086, 5875),
+(26453, 1, 1983.0, -4256.0, 32.0, 3.5, 5086, 5875),
+(26454, 0, -8748.0, 1074.0, 91.0, 4.71, 5086, 5875),
+(26455, 1, -1031.73, -230.42, 160.18, 3.12, 5086, 5875),
+(26456, 0, 1642.41, 239.9, 62.59, 3.01, 5086, 5875);
 
 -- Lunar Festival Sentinel spelllist.
 UPDATE `creature_template` SET `unit_flags`='512', `dmg_min`='328', `dmg_max`='821', `spell_list_id`='159610' WHERE `entry`=15961;
@@ -68,7 +80,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1589201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 0, 39, 1589201, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary start Fireworks in 5 seconds');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 1, 15, 13540, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Green Channeling');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 0, 15, 13540, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary cast Green Channeling');
 
 DELETE FROM `generic_scripts` WHERE `id`=1589201;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589201, 3, 14, 13540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Emissary stop Green Channeling');
@@ -81,7 +93,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1589101;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 0, 39, 1589101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald start Fireworks in 5 seconds');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 1, 15, 13540, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Green Channeling');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 0, 15, 13540, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald cast Green Channeling');
 
 DELETE FROM `generic_scripts` WHERE `id`=1589101;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589101, 3, 14, 13540, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Event - Lunar Festival Herald stop Green Channeling');
@@ -90,10 +102,17 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 
 -- Update spell_script_targets.
 DELETE FROM spell_script_target WHERE targetEntry IN (15911,15872,15918,15912,15874,15913,15875,15914,15873,15915,15876,15916,15877,15879,15885,15880,15886,15881,15887,15882,15888,15884,15889,15883,15890);
-DELETE FROM `spell_script_target` WHERE `targetEntry` IN (180771,180850,180868,180772,180859,180869,180874);
+DELETE FROM `spell_script_target` WHERE `targetEntry` IN (180771,180850,180868,180772,180859,180869,180874,300058);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
-(26373, 1, 15892, 0, 0, 5086, 5875), -- Lunar Festival Emissary (Alliance).
-(26373, 1, 15891, 0, 0, 5086, 5875), -- Lunar Festival Herald (Horde).
+(26373, 1, 15892, 0, 1, 5086, 5875), -- Lunar Festival Emissary (Alliance).
+(26373, 1, 15891, 0, 1, 5086, 5875), -- Lunar Festival Herald (Horde).
+(26373, 0, 180891, 0, 2, 5086, 5875),
+(26373, 0, 180892, 0, 2, 5086, 5875),
+(26373, 0, 180893, 0, 2, 5086, 5875),
+(26373, 0, 180894, 0, 2, 5086, 5875),
+(26373, 0, 180895, 0, 2, 5086, 5875),
+(26373, 0, 180896, 0, 2, 5086, 5875),
+(26373, 0, 180897, 0, 2, 5086, 5875),
 -- (requiresSpellFocus 1351) 
 -- Pat's Firework Guy - *Colors
 (26344, 1, 15879, 0, 0, 5086, 5875), -- Rocket, BLUE Launches a firework at a launcher.
@@ -1809,19 +1828,22 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@LUNAR_FESTIVAL_OGUID+881, 180909, 1, 7946.78, -2621.56, 494.199, 3.26377, 0, 0, -0.998135, 0.0610518, 120, 120, 100, 1, 7),
 (@LUNAR_FESTIVAL_OGUID+882, 180909, 1, 7947.24, -2621.35, 494.178, 3.82227, 0, 0, -0.942641, 0.333808, 120, 120, 100, 1, 7),
 (@LUNAR_FESTIVAL_OGUID+883, 180910, 1, 7946.68, -2621.33, 494.193, 5.13127, 0, 0, -0.544639, 0.838671, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+884, 180891, 0, -8748.48, 1074.25, 90.6195, 0.471239, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+885, 180891, 0, -4663.16, -956.235, 500.46, 0.0523599, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+886, 180891, 0, 1642.07, 239.839, 62.6749, 0.802851, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+887, 180891, 1, -1031.95, -230.513, 160.243, 3.9619, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+888, 180891, 1, 1983.05, -4255.89, 31.7698, 2.07694, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+889, 180891, 1, 7570.15, -2220.81, 473.521, 3.85718, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+890, 180891, 1, 7575.25, -2238.94, 469.853, 1.02974, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+891, 180891, 1, 7585.15, -2205.24, 475.369, 0.959931, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+892, 180891, 1, 7595.64, -2247.22, 466.956, 4.32842, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+893, 180891, 1, 7603.55, -2211.26, 471.745, 3.12414, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+894, 180891, 1, 7610.8, -2228.96, 468.761, 1.27409, 0, 0, 0, 0, 120, 120, 100, 1, 7),
-(@LUNAR_FESTIVAL_OGUID+895, 180891, 1, 10150.5, 2602.14, 1330.91, 1.76278, 0, 0, 0, 0, 120, 120, 100, 1, 7);
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LUNAR_FESTIVAL_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+895;
+(@LUNAR_FESTIVAL_OGUID+884, 180885, 0, 1647.74, 233.823, 62.5916, 2.32129, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+885, 180894, 1, 7610.8, -2228.96, 468.761, 1.27409, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+886, 180897, 1, 7603.55, -2211.26, 471.745, 3.12414, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+887, 180892, 1, 7585.15, -2205.24, 475.369, 0.959931, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+888, 180893, 1, 7570.15, -2220.81, 473.521, 3.85718, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+889, 180896, 1, 7575.25, -2238.94, 469.853, 1.02974, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+890, 180895, 1, 7595.64, -2247.22, 466.956, 4.32842, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+891, 180891, 1, 10150.5, 2602.14, 1330.91, 1.76278, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+892, 180891, 0, -8748.48, 1074.25, 90.6195, 0.471239, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+893, 180891, 0, -4663.16, -956.235, 500.46, 0.0523599, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+894, 180891, 0, 1642.07, 239.839, 62.6749, 0.802851, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+895, 180891, 1, -1031.95, -230.513, 160.243, 3.9619, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+896, 180891, 1, 1983.05, -4255.89, 31.7698, 2.07694, 0, 0, 0, 0, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+897, 180888, 1, 1969.93, -4258.19, 32.157, 5.2709, 0, 0, -0.484809, 0.87462, 120, 120, 100, 1, 7),
+(@LUNAR_FESTIVAL_OGUID+898, 180888, 1, -1043.49, -217.67, 159.564, 5.98648, 0, 0, -0.147809, 0.989016, 120, 120, 100, 1, 7);
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LUNAR_FESTIVAL_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_OGUID+1 AND @LUNAR_FESTIVAL_OGUID+898;
 
 -- Creatures.
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `movement_type`, `patch_min`) VALUES
@@ -2015,13 +2037,35 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `emote_state`) VALUES
 (@LUNAR_FESTIVAL_CGUID+154, 7, 10),
 (@LUNAR_FESTIVAL_CGUID+155, 7, 10);
 
--- Auras.
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` IN (15898,15895);
+
+-- Some Lunar Festival Vendors have the Nightelf look (Yes they cast it every second).
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (15898, 52, @LUNAR_FESTIVAL_CGUID+59, @LUNAR_FESTIVAL_CGUID+68, @LUNAR_FESTIVAL_CGUID+104, @LUNAR_FESTIVAL_CGUID+119, 0);
+
+-- Events list for Lunar Festival Vendor
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15898;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589801, 15898, 0, 1, 0, 100, 0, 1000, 1000, 0, 0, 1589801, 0, 0, 'Lunar Festival Vendor - Cast Night Elf Lunar Festival Vendor');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1589801;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589801, 0, 15, 26384, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 15898, 'Lunar Festival Vendor - Cast Night Elf Lunar Festival Vendor');
+
+-- Some Lunar Festival Harbingers have the Nightelf look (Yes they cast it every second).
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (15895, 52, @LUNAR_FESTIVAL_CGUID+52, @LUNAR_FESTIVAL_CGUID+67, @LUNAR_FESTIVAL_CGUID+125, 0, 0);
+
+-- Events list for Lunar Festival Harbinger
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15895;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589501, 15895, 0, 1, 0, 100, 0, 1000, 1000, 0, 0, 1589501, 0, 0, 'Lunar Festival Harbinger - Cast Night Elf Harbinger');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1589501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589501, 0, 15, 26383, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 15895, 'Lunar Festival Harbinger - Cast Night Elf Harbinger');
+
 INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `spell_start`, `event`) VALUES
 (@LUNAR_FESTIVAL_CGUID+52, 0, 26383, 7),
 (@LUNAR_FESTIVAL_CGUID+59, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+67, 0, 26383, 7),
 (@LUNAR_FESTIVAL_CGUID+68, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+104, 0, 26384, 7),
+(@LUNAR_FESTIVAL_CGUID+119, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+119, 0, 26384, 7),
 (@LUNAR_FESTIVAL_CGUID+125, 0, 26383, 7);
 
