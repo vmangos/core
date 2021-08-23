@@ -271,7 +271,8 @@ struct Loot
         roundRobinPlayer(0),
         loot_type(LOOT_CORPSE),
         m_lootTarget(lootTarget),
-        m_groupTeam(TEAM_CROSSFACTION)
+        m_groupTeam(TEAM_CROSSFACTION),
+        m_hasFFAQuestItems(false)
     {
     }
     ~Loot() { clear(); }
@@ -313,6 +314,7 @@ struct Loot
         m_allowedLooters.clear();
         m_personal = true;
         m_groupTeam = TEAM_CROSSFACTION;
+        m_hasFFAQuestItems = false;
     }
 
     void leaveOnlyQuestItems()
@@ -322,6 +324,7 @@ struct Loot
 
     bool empty() const { return items.empty() && m_questItems.empty() && gold == 0; }
     bool isLooted() const { return gold == 0 && unlootedCount == 0; }
+    bool HasFFAQuestItems() const { return m_hasFFAQuestItems; }
 
     void NotifyItemRemoved(uint8 lootIndex);
     void NotifyQuestItemRemoved(uint8 questIndex);
@@ -371,6 +374,7 @@ struct Loot
         // What is looted
         WorldObject const* m_lootTarget;
         Team m_groupTeam;
+        bool m_hasFFAQuestItems;
 };
 
 struct LootView
