@@ -2889,6 +2889,14 @@ void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*
 
         m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
     }
+    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime())
+    {
+        // Forced cooldown on using instant spells during mind control to prevent abuse.
+        recTime = 10 * IN_MILLISECONDS;
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, 0, 0);
+        if (Player const* player = ::ToPlayer(GetCharmer()))
+            player->SendSpellCooldown(spellEntry.Id, recTime, GetObjectGuid());
+    }
 }
 
 time_t Creature::GetRespawnTimeEx() const
