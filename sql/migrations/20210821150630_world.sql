@@ -1379,7 +1379,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@FROZEN_RUNE+138, 181287, 533, 3540.13, -3939.25, 311.449, 2.16421, 0, 0, 0.882947, 0.469473, 120, 120, 100, 1, 10),
 (@FROZEN_RUNE+139, 181287, 533, 3555.52, -3863.91, 298.811, 3.59538, 0, 0, -0.97437, 0.224951, 120, 120, 100, 1, 10),
 (@FROZEN_RUNE+140, 181287, 533, 3558.18, -3914.61, 304.42, 2.68781, 0, 0, 0.97437, 0.224951, 120, 120, 100, 1, 10);
-UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `id` = 181287;
+UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800, `patch_min` = 9 WHERE `id` = 181287;
 
 
 -- End of migration.
