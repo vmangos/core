@@ -603,6 +603,12 @@ struct go_lunar_festival_firecracker : public GameObjectAI
         m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(30,60)));
     }
 
+    bool OnUse(Unit* /*user*/) override
+    {
+        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(1, 2)));
+        return true;
+    }
+
     void UpdateAI(uint32 const diff) override
     {
         if (!me->isSpawned())
