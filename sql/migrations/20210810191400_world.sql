@@ -40,11 +40,6 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Update Gameobjects
 UPDATE `gameobject_template` SET `flags` = 4, `data8` = 894 WHERE `entry` IN (4072, 61935);
 
--- Add Missing AI to Decrepit Guardian (credit cmangos)
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1094303, 10943, 0, 11, 0, 0, 1, 0, 0, 0, 0, 1094303, 0, 0, 'Decrepit Guardian - Cast Birth On Spawn');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1094303, 0, 15, 26047, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Decrepit Guardian - Cast Birth');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1094303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6282, 0, 0, 0, 0, 0, 0, 0, 0, 'Decrepit Guardian - Talk');
-
 -- Redo Devilsaur Movement (credit cmangos)
 DELETE FROM `creature` WHERE `guid` IN (23743, 23744, 23745, 23741, 95009, 24172);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
