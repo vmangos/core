@@ -1254,17 +1254,14 @@ struct npc_pats_firework_guyAI : ScriptedAI
     bool m_bDone;
     uint8 m_uiIndex;
 
-    void Reset() override
-    {
-
-    }
+    void Reset() override {}
 
     void ResetCreature() override
     {
         m_bExist = false;
         m_bisLucky = false;
         m_bDone = false;
-        m_uiIndex = 0;
+        m_uiIndex = NULL;
     }
 
     void IsUsable()
