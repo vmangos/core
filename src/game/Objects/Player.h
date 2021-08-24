@@ -1454,7 +1454,6 @@ class Player final: public Unit
         SpellModList m_spellMods[MAX_SPELLMOD];
         uint32 m_lastFromClientCastedSpellID;
         
-        
         bool IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const;
         void SendInitialSpells() const;
         bool AddSpell(uint32 spellId, bool active, bool learning, bool dependent, bool disabled);
@@ -1475,6 +1474,9 @@ class Player final: public Unit
 
         void CastItemCombatSpell(Unit* Target, WeaponAttackType attType);
         void CastItemUseSpell(Item* item, SpellCastTargets const& targets);
+
+        // needed by vanish and improved sap
+        void CastHighestStealthRank();
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }
         PlayerSpellMap      & GetSpellMap() { return m_spells; }

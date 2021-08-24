@@ -132,7 +132,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
             continue;
         if (spellInfo->Attributes & (SPELL_ATTR_PASSIVE | 0x80))
             continue;
-        if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE)
+        if (spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
             continue;
         if (Spells::IsPositiveSpell(spell.first) && !enablePositiveSpells)
             continue;

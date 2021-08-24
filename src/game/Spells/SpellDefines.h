@@ -463,63 +463,31 @@ enum SpellInterruptFlags
     SPELL_INTERRUPT_FLAG_DAMAGE_CANCELS  = 0x10, // Dmg Cancels(Player)
 };
 
-enum SpellChannelInterruptFlags
-{
-    CHANNEL_FLAG_HOSTILE_ACTION_RECEIVED_CANCELS = 0x00001, // Hostile Action Received Cancels
-    CHANNEL_FLAG_DAMAGE_CANCELS                  = 0x00002, // Damage Cancels
-    CHANNEL_FLAG_ACTION_CANCELS                  = 0x00004, // Action Cancels
-    CHANNEL_FLAG_MOVING_CANCELS                  = 0x00008, // Moving Cancels
-    CHANNEL_FLAG_TURNING_CANCELS                 = 0x00010, // Turning Cancels
-    CHANNEL_FLAG_ANIM_CANCELS                    = 0x00020, // Anim Cancels
-    CHANNEL_FLAG_DISMOUNT_CANCELS                = 0x00040, // Dismount Cancels
-    CHANNEL_FLAG_UNDER_WATER_CANCELS             = 0x00080, // Under Water Cancels
-    CHANNEL_FLAG_ABOVE_WATER_CANCELS             = 0x00100, // Above Water Cancels
-    CHANNEL_FLAG_SHEATHING_CANCELS               = 0x00200, // Sheathing Cancels
-    CHANNEL_FLAG_INTERACTING_CANCELS             = 0x00400, // Interacting Cancels
-    CHANNEL_FLAG_LOOTING_CANCELS                 = 0x00800, // Looting Cancels
-    CHANNEL_FLAG_ATTACKING_CANCELS               = 0x01000, // Attacking Cancels
-    CHANNEL_FLAG_ITEM_USE_CANCELS                = 0x02000, // Item Use Cancels
-    CHANNEL_FLAG_DAMAGE_CHANNEL_DURATION         = 0x04000, // Damage Channel Duration
-    CHANNEL_FLAG_SHAPESHIFTING_CANCELS           = 0x08000, // Shapeshifting Cancels
-    CHANNEL_FLAG_ACTION_CANCELS_LATE             = 0x10000, // Action Cancels - Late
-    CHANNEL_FLAG_MOUNT_CANCELS                   = 0x20000, // Mount Cancels
-};
-
 enum SpellAuraInterruptFlags
 {
-    // Certains ont ete repris de TrinityCore (3.3.5)
-    // ATTENTION: Tous ne sont pas encore implementes.
-    // TC: Par exemple buff BG restauration
-    AURA_INTERRUPT_FLAG_HITBYSPELL                  = 0x00000001,   // 0    removed when getting hit by a negative spell?
-    AURA_INTERRUPT_FLAG_DAMAGE                      = 0x00000002,   // 1    removed by any damage
-    // Non implemente
-    AURA_INTERRUPT_FLAG_CAST                        = 0x00000004,   // 2
-    AURA_INTERRUPT_FLAG_MOVE                        = 0x00000008,   // 3    removed by any movement
-    AURA_INTERRUPT_FLAG_TURNING                     = 0x00000010,   // 4    removed by any turning
-    AURA_INTERRUPT_FLAG_ENTER_COMBAT                = 0x00000020,   // 5    removed by entering combat - Feign death only
-    AURA_INTERRUPT_FLAG_NOT_MOUNTED                 = 0x00000040,   // 6    removed by unmounting
-    AURA_INTERRUPT_FLAG_NOT_ABOVEWATER              = 0x00000080,   // 7    removed by entering water
-    AURA_INTERRUPT_FLAG_NOT_UNDERWATER              = 0x00000100,   // 8    removed by leaving water
-    AURA_INTERRUPT_FLAG_NOT_SHEATHED                = 0x00000200,   // 9    removed by unsheathing
-    AURA_INTERRUPT_FLAG_TALK                        = 0x00000400,   // 10   on interact with NPC (gossip, trainer, stable pet ...) - implemented
-    AURA_INTERRUPT_FLAG_USE                         = 0x00000800,   // 11   on interact with GO - implement
-    // TC - implemente
-    AURA_INTERRUPT_FLAG_MELEE_ATTACK                = 0x00001000,   // 12   removed by attack?
-    // TC - non implemente
-    AURA_INTERRUPT_FLAG_SPELL_ATTACK                = 0x00002000,   // 13
-    AURA_INTERRUPT_FLAG_UNK14                       = 0x00004000,   // 14   unused in 1.12
-    // TC - non implemente
-    AURA_INTERRUPT_FLAG_TRANSFORM                   = 0x00008000,   // 15   removed by casting a spell?
-    AURA_INTERRUPT_FLAG_ON_CAST_SPELL               = 0x00010000,   // 16
-    AURA_INTERRUPT_FLAG_MOUNTING                    = 0x00020000,   // 17   removed by mounting
-    AURA_INTERRUPT_FLAG_NOT_SEATED                  = 0x00040000,   // 18   removed by standing up (used by food and drink mostly and sleep/Fake Death like)
-    AURA_INTERRUPT_FLAG_CHANGE_MAP                  = 0x00080000,   // 19   leaving map/getting teleported
-    AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION    = 0x00100000,   // 20   removed by auras that make you invulnerable, or make other to loose selection on you
-    AURA_INTERRUPT_FLAG_UNK21                       = 0x00200000,   // 21
-    AURA_INTERRUPT_FLAG_TELEPORTED                  = 0x00400000,   // 22
-    // TC - non implemente (9 sorts)
-    AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT            = 0x00800000,   // 23   removed by entering pvp combat
-    AURA_INTERRUPT_FLAG_DIRECT_DAMAGE               = 0x01000000    // 24   removed by any direct damage
+    AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS  = 0x00000001,   // 0    on being hit by spell from hostile caster
+    AURA_INTERRUPT_DAMAGE_CANCELS                   = 0x00000002,   // 1
+    AURA_INTERRUPT_ACTION_CANCELS                   = 0x00000004,   // 2    removed at the beginning of an action (spellcast, ability use etc...)
+    AURA_INTERRUPT_MOVING_CANCELS                   = 0x00000008,   // 3
+    AURA_INTERRUPT_TURNING_CANCELS                  = 0x00000010,   // 4
+    AURA_INTERRUPT_ANIM_CANCELS                     = 0x00000020,   // 5    used by Feign Death
+    AURA_INTERRUPT_DISMOUNT_CANCELS                 = 0x00000040,   // 6 
+    AURA_INTERRUPT_UNDER_WATER_CANCELS              = 0x00000080,   // 7    removed by entering water
+    AURA_INTERRUPT_ABOVE_WATER_CANCELS              = 0x00000100,   // 8    removed by leaving water
+    AURA_INTERRUPT_SHEATHING_CANCELS                = 0x00000200,   // 9
+    AURA_INTERRUPT_INTERACTING_CANCELS              = 0x00000400,   // 10   on interact with NPC (gossip, trainer, stable pet ...)
+    AURA_INTERRUPT_LOOTING_CANCELS                  = 0x00000800,   // 11   on interact with GO or looting
+    AURA_INTERRUPT_ATTACKING_CANCELS                = 0x00001000,   // 12
+    AURA_INTERRUPT_ITEM_USE_CANCELS                 = 0x00002000,   // 13
+    AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION          = 0x00004000,   // 14   only assigned in channel flags
+    AURA_INTERRUPT_SHAPESHIFTING_CANCELS            = 0x00008000,   // 15
+    AURA_INTERRUPT_ACTION_CANCELS_LATE              = 0x00010000,   // 16   removed at the completion of an action (spellcast, ability use etc...)
+    AURA_INTERRUPT_MOUNT_CANCELS                    = 0x00020000,   // 17
+    AURA_INTERRUPT_STANDING_CANCELS                 = 0x00040000,   // 18   used by food and drink mostly and sleep/Fake Death like
+    AURA_INTERRUPT_LEAVE_WORLD_CANCELS              = 0x00080000,   // 19
+    AURA_INTERRUPT_STEALTH_INVIS_CANCELS            = 0x00100000,   // 20
+    AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS     = 0x00200000,   // 21
+    AURA_INTERRUPT_ENTER_WORLD_CANCELS              = 0x00400000,   // 22
 };
 
 enum SpellModOp

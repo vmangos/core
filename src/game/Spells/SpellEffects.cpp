@@ -2073,39 +2073,9 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
 #endif
 
-            // if this spell is given to NPC it must handle rest by it's own AI
-            if (unitTarget->GetTypeId() != TYPEID_PLAYER)
-                return;
+            if (Player* pPlayer = unitTarget->ToPlayer())
+                pPlayer->CastHighestStealthRank();
 
-            // get highest rank of the Stealth spell
-            SpellEntry const* stealthSpellEntry = nullptr;
-            const PlayerSpellMap& sp_list = ((Player*)unitTarget)->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
-            {
-                // only highest rank is shown in spell book, so simply check if shown in spell book
-                if (!itr->second.active || itr->second.disabled || itr->second.state == PLAYERSPELL_REMOVED)
-                    continue;
-
-                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
-                if (!spellInfo)
-                    continue;
-
-                if (spellInfo->IsFitToFamily(SPELLFAMILY_ROGUE, uint64(0x0000000000400000)))
-                {
-                    stealthSpellEntry = spellInfo;
-                    break;
-                }
-            }
-
-            // no Stealth spell found
-            if (!stealthSpellEntry)
-                return;
-
-            // reset cooldown on it if needed
-            if (!unitTarget->IsSpellReady(*stealthSpellEntry))
-                unitTarget->RemoveSpellCooldown(*stealthSpellEntry);
-
-            m_caster->CastSpell(unitTarget, stealthSpellEntry, true);
             return;
         }
         // just skip
@@ -4133,7 +4103,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     {
         if (!m_casterUnit->IsAlive()) // CalculateMeleeDamage does not work in that case.
             return;
-        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
+        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ATTACKING_CANCELS);
         if (Spell* spell = m_casterUnit->GetCurrentSpell(CURRENT_MELEE_SPELL))
             spell->cast();
         CalcDamageInfo damageInfo;
@@ -4343,8 +4313,8 @@ void Spell::EffectInterruptCast(SpellEffectIndex eff_idx)
             if ((spell->getState() == SPELL_STATE_CASTING
                 || (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastTime() > 0.0f))
                 && curSpellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE
-                && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK)
-                || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->ChannelInterruptFlags & CHANNEL_FLAG_ACTION_CANCELS)))
+                && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
+                || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_ACTION_CANCELS))))
             {
                 unitTarget->LockOutSpells(curSpellInfo->GetSpellSchoolMask(), m_spellInfo->GetDuration());
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
@@ -5167,7 +5137,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         continue;
                     }
 
-                    // If spell that caused this aura has Croud Control or Daze effect
+                    // If spell that caused this aura has Crowd Control or Daze effect
                     if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
                         // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
                         (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&

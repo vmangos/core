@@ -1560,9 +1560,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // World of Warcraft Client Patch 1.8.0 (2005-10-11)
     // - Pets no longer break off attacks when their target is affected by Warlock Fear.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
-    if (((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_MOD_FEAR)) &&
+    if ((m_spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS) || m_spellInfo->HasAura(SPELL_AURA_MOD_FEAR)) &&
 #else
-    if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) &&
+    if (m_spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS) &&
 #endif
         m_casterUnit && unit->HasAuraPetShouldAvoidBreaking(m_casterUnit))
     {
@@ -1630,7 +1630,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
         if (!pRealCaster->IsFriendlyTo(unit))
         {
             if (m_damage) // Example: stealth.
-                unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+                unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS);
 
             // not break stealth by cast targeting
             if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH))
@@ -1890,7 +1890,8 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
     SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
 
     if (unit && !pCaster->IsFriendlyTo(unit))
-        unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+        unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS);
+
     if (missInfo == SPELL_MISS_NONE || (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE))
     {
         // we need index of damage dealing effect for CalculateSpellDamage to use right bonus coefficient
@@ -3525,23 +3526,20 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         // set timer base at cast time
         ReSetTimer();
 
-        // If timer = 0, it's an instant cast spell and will be casted on the next tick.
-        // Cast completion will remove all any stealth/invis auras
-        if (m_timer)
+        if (!m_IsTriggeredSpell && m_casterUnit)
         {
+            m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ACTION_CANCELS, m_spellInfo->Id, false, !ShouldRemoveStealthAuras());
+
             // World of Warcraft Client Patch 1.10.0 (2006-03-28)
             // - Stealth and Invisibility effects will now be canceled at the
             //   beginning of an action(spellcast, ability use etc...), rather than
             //   at the completion of the action.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            RemoveStealthAuras();
+            // If timer = 0, it's an instant cast spell and will be casted on the next tick.
+            // Cast completion will remove all any stealth/invis auras
+            if (m_timer)
+                m_casterUnit->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
 #endif
-            
-            // If using a game object we need to remove any remaining invis auras. Should only
-            // ever be Gnomish Cloaking Device, since it's a special case and not removed on
-            // opcode receive
-            if (m_caster->IsPlayer() && m_targets.getGOTarget())
-                m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
         }
 
         OnSpellLaunch();
@@ -3866,8 +3864,8 @@ void Spell::cast(bool skipCheck)
     SendSpellCooldown();
 
     // Remove any remaining invis auras on cast completion, should only be gnomish cloaking device
-    if (!m_IsTriggeredSpell  && !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH) && m_casterUnit)
-        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
+    if (!m_IsTriggeredSpell && m_casterUnit)
+        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ACTION_CANCELS_LATE, m_spellInfo->Id, false, !ShouldRemoveStealthAuras());
 
     TakePower();
     TakeReagents();                                         // we must remove reagents before HandleEffects to allow place crafted item in same slot
@@ -4183,7 +4181,7 @@ void Spell::update(uint32 difftime)
                 cancel();
         }
         // don't cancel for melee, autorepeat, triggered and instant spells
-        else if (!m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat() && !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
+        else if (!m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat() && !m_IsTriggeredSpell && m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_MOVEMENT))
             cancel();
     }
 
@@ -4219,7 +4217,7 @@ void Spell::update(uint32 difftime)
                 if (m_casterUnit && m_casterUnit->IsPlayer())
                 {
                     uint32 interruptStates = (UNIT_STAT_FEIGN_DEATH | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING);
-                    if (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_STUN)
+                    if (m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_STUN))
                         interruptStates |= UNIT_STAT_STUNNED;
                     if (m_casterUnit->HasUnitState(interruptStates))
                         cancel();
@@ -4233,7 +4231,6 @@ void Spell::update(uint32 difftime)
 
             if (m_timer == 0 && !m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat())
             {
-                RemoveStealthAuras();
                 cast();
 
                 // For channeled spells with a cast time, cast start position is set when channeling begins.
@@ -4266,7 +4263,7 @@ void Spell::update(uint32 difftime)
                         cancel();
 
                     // check if player has turned if flag is set
-                    if (m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_TURNING_CANCELS && m_castPosition.o != nowO)
+                    if (m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_TURNING_CANCELS) && m_castPosition.o != nowO)
                         cancel();
                 }
 
@@ -5542,7 +5539,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         {
             // skip stuck spell to allow use it in falling case and apply spell limitations at movement
             if ((!m_caster->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR) || m_spellInfo->Effect[EFFECT_INDEX_0] != SPELL_EFFECT_STUCK) &&
-                    (IsAutoRepeat() || m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED))
+                    (IsAutoRepeat() || m_spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS)))
                 return SPELL_FAILED_MOVING;
         }
 
@@ -5608,9 +5605,21 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     if (Unit* target = m_targets.getUnitTarget())
     {
-        // A more powerful spell is already active
-        if (m_spellInfo->IsSpellAppliesAura() && !m_spellInfo->IsAreaOfEffectSpell() && m_spellInfo->IsPositiveSpell() && target->HasMorePowerfulSpellActive(m_spellInfo))
-            return SPELL_FAILED_AURA_BOUNCED;
+        if (m_spellInfo->IsSpellAppliesAura() && !m_spellInfo->IsAreaOfEffectSpell())
+        {
+            // A more powerful spell is already active
+            if (m_spellInfo->IsPositiveSpell() && target->HasMorePowerfulSpellActive(m_spellInfo))
+                return SPELL_FAILED_AURA_BOUNCED;
+
+            // Not castable on shapeshifted targets
+            if (m_spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_SHAPESHIFTING_CANCELS) && target->IsShapeShifted())
+                return SPELL_FAILED_BAD_TARGETS;
+
+            // Not castable on mounted targets
+            if (m_spellInfo->HasAuraInterruptFlag(AURA_INTERRUPT_MOUNT_CANCELS) && target->IsMounted())
+                return SPELL_FAILED_BAD_TARGETS;
+        }
+        
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         // Swiftmend
@@ -6965,16 +6974,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             }
-            case SPELL_AURA_WATER_WALK:
-            {
-                if (Unit* pTarget = m_targets.getUnitTarget())
-                {
-                    // Player is not allowed to cast water walk on shapeshifted / mounted target
-                    if (pTarget->IsShapeShifted() || pTarget->IsMounted())
-                        return SPELL_FAILED_BAD_TARGETS;
-                }
-                break;
-            }
             default:
                 break;
         }
@@ -7122,7 +7121,7 @@ SpellCastResult Spell::CheckCasterAuras() const
     // Have to check if there is a stun aura. Otherwise will have problems with ghost aura apply while logging out
     uint32 unitflag = m_casterUnit->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
     if ((unitflag & UNIT_FLAG_STUNNED) && !(mechanic_immune & (1 << (MECHANIC_STUN - 1u))) && 
-        (!m_casttime || (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_STUN)))
+        (!m_casttime || m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_STUN)))
         prevented_reason = SPELL_FAILED_STUNNED;
     else if ((unitflag & UNIT_FLAG_CONFUSED) && !(mechanic_immune & CONFUSED_MECHANIC_MASK))
         prevented_reason = SPELL_FAILED_CONFUSED;
@@ -7896,7 +7895,7 @@ void Spell::Delayed()
         return;                                             // spell is active and can't be time-backed
 
     // spells not loosing casting time ( slam, dynamites, bombs.. )
-    if (!(m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
+    if (!m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
         return;
 
     //check resist chance
@@ -8713,40 +8712,38 @@ bool Spell::HasModifierApplied(SpellModifier* mod)
     return false;
 }
 
-void Spell::RemoveStealthAuras()
+bool Spell::ShouldRemoveStealthAuras()
 {
     if (!m_casterUnit)
-        return;
+        return false;
 
-    // stealth must be removed at cast starting (at show channel bar)
+    // Stealth must be removed at cast starting (at show channel bar)
     // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
-    if (!m_IsTriggeredSpell && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH) && m_casterUnit->IsPlayer()
-            && m_spellInfo->SpellIconID != 250 // Camouflage fufu
-            && m_spellInfo->SpellIconID != 103 // Roder ou Camouflage elfe de la nuit
-            && m_spellInfo->SpellIconID != 252 // Disparition
-       )
+    if (!m_IsTriggeredSpell && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH)
+        && m_spellInfo->SpellIconID != 250 // Camouflage
+        && m_spellInfo->SpellIconID != 103 // Shadowmeld
+        && m_spellInfo->SpellIconID != 252 // Vanish
+        )
     {
-        bool doUnaura = m_casterUnit->HasAuraType(SPELL_AURA_MOD_STEALTH);
+        bool doUnaura = true;
 
-        if (doUnaura && m_casterUnit->IsPlayer()
-                && m_spellInfo->SpellIconID == 249  // Assommer
-           )
+        // Sap
+        if (m_casterUnit->IsPlayer() && m_spellInfo->SpellIconID == 249)
         {
-            // Gestion de assommer ameliore
-            if (m_casterUnit->HasAura(14076))  // Rang 1
-                doUnaura = (urand(0, 99) > 30);
-            else if (m_casterUnit->HasAura(14094))  // Rang 2
-                doUnaura = (urand(0, 99) > 60);
-            else if (m_casterUnit->HasAura(14095))  // Rang 3
-                doUnaura = (urand(0, 99) > 90);
+            // Check for Improved Sap
+            if (m_casterUnit->HasAura(14076))  // Rank 1
+                doUnaura = !roll_chance_u(30);
+            else if (m_casterUnit->HasAura(14094))  // Rank 2
+                doUnaura = !roll_chance_u(60);
+            else if (m_casterUnit->HasAura(14095))  // Rank 3
+                doUnaura = !roll_chance_u(90);
         }
-        if (doUnaura)
-            m_casterUnit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+        
+        return doUnaura;
     }
-    if (!m_IsTriggeredSpell)
-        m_casterUnit->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
-}
 
+    return false;
+}
 void Spell::Delete() const
 {
     if (IsDeletable())

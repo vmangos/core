@@ -246,6 +246,17 @@ void SpellCaster::UpdatePendingProcs(uint32 diff)
     }
 }
 
+inline bool IsProcThatNeedsInstantProcessing(ProcSystemArguments& data)
+{
+    if (data.procFlagsAttacker & PROC_FLAG_KILL)
+        return true;
+
+    if (data.procSpell && data.procSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_SAP>())
+        return true;
+
+    return false;
+}
+
 void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
 {
     if ((data.pVictim && !IsInMap(data.pVictim)) || !IsInWorld())
@@ -259,7 +270,7 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
         data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
     
     // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
-    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) || (data.procFlagsAttacker & PROC_FLAG_KILL))
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) || IsProcThatNeedsInstantProcessing(data))
         ProcDamageAndSpell_real(data);
     else
         m_pendingProcChecks.emplace_back(std::move(data));
@@ -1702,11 +1713,11 @@ bool SpellCaster::IsNoMovementSpellCasted() const
     if (m_currentSpells[CURRENT_GENERIC_SPELL] &&
             (m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_FINISHED) &&
              m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_DELAYED &&
-             m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
+             m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_MOVEMENT))
         return (true);
     else if (m_currentSpells[CURRENT_CHANNELED_SPELL] &&
              m_currentSpells[CURRENT_CHANNELED_SPELL]->getState() != SPELL_STATE_FINISHED &&
-             m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
+             m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_MOVEMENT))
         return (true);
     // don't need to check for AUTOREPEAT_SPELL
 

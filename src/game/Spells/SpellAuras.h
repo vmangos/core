@@ -219,6 +219,7 @@ class SpellAuraHolder
             SetAuraDuration(duration);
         }
 
+        bool HasAuraType(AuraType auraType) const;
         bool HasMechanic(uint32 mechanic) const;
         bool HasMechanicMask(uint32 mechanicMask) const;
 
