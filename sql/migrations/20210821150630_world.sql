@@ -1332,6 +1332,10 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `pat
 
 -- Respawn Frozen Runes
 DELETE FROM `gameobject` WHERE `id` = 181287;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(276, 21, 'Naxxramas - Frozen Rune', 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
+(181287, 276, 0, 'Naxxramas - Frozen Rune', 10);
 SET @FROZEN_RUNE = 22490;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
