@@ -246,17 +246,6 @@ void SpellCaster::UpdatePendingProcs(uint32 diff)
     }
 }
 
-inline bool IsProcThatNeedsInstantProcessing(ProcSystemArguments& data)
-{
-    if (data.procFlagsAttacker & PROC_FLAG_KILL)
-        return true;
-
-    if (data.procSpell && data.procSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_SAP>())
-        return true;
-
-    return false;
-}
-
 void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
 {
     if ((data.pVictim && !IsInMap(data.pVictim)) || !IsInWorld())
@@ -270,7 +259,7 @@ void SpellCaster::ProcDamageAndSpell(ProcSystemArguments&& data)
         data.pVictim->ProcSkillsAndReactives(true, IsUnit() ? static_cast<Unit*>(this) : data.pVictim, data.procFlagsVictim, data.procExtra, data.attType);
     
     // Always execute On Kill procs instantly. Fixes Improved Drain Soul talent.
-    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) || IsProcThatNeedsInstantProcessing(data))
+    if (!sWorld.getConfig(CONFIG_UINT32_SPELL_PROC_DELAY) || (data.procFlagsAttacker & PROC_FLAG_KILL))
         ProcDamageAndSpell_real(data);
     else
         m_pendingProcChecks.emplace_back(std::move(data));
