@@ -564,12 +564,6 @@ struct go_firework_rocket : public GameObjectAI
             {
                 case EVENT_ROCKET_DESPAWN:
                 {
-                    // Every Rocket is triggering the animation on the Launcher.
-                    std::list<GameObject*> clusterList;
-                    GetGameObjectListWithEntryInGrid(clusterList, me, { 180772, 180859, 180869, 180874, 180771, 180850, 180868 }, CONTACT_DISTANCE);
-                    for (const auto pCluster : clusterList)
-                        pCluster->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
-
                     me->Despawn();
                     break;
                 }
@@ -605,7 +599,7 @@ struct go_lunar_festival_firecracker : public GameObjectAI
 
     bool OnUse(Unit* /*user*/) override
     {
-        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(1, 2)));
+        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(0, 2)));
         return true;
     }
 
