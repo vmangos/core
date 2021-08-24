@@ -1283,6 +1283,11 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
+        std::list<GameObject*> clusterList;
+        GetGameObjectListWithEntryInGrid(clusterList, me, { 180772, 180859, 180869, 180874, 180771, 180850, 180868 }, CONTACT_DISTANCE);
+        for (const auto pCluster : clusterList)
+            pCluster->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
+
         float x, y, z;
         m_creature->GetPosition(x, y, z);
 
