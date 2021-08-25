@@ -4939,6 +4939,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`)
 (@MAGENTA_CAP_OGUID+31, @MAGENTA_CAP_POOL_TEMPLATE+15, 'Uldaman - Magenta Cap Clusters', 10),
 (@MAGENTA_CAP_OGUID+32, @MAGENTA_CAP_POOL_TEMPLATE+16, 'Uldaman - Magenta Cap Clusters', 10);
 
+-- Update Related Templates
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=2554; -- Cortello's Riddle
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=17282; -- Plant Bundle
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=143980; -- Gordunni Scroll
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=181287; -- Frozen Rune
 
 -- End of migration.
 END IF;
