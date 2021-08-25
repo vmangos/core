@@ -1280,6 +1280,11 @@ INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `c
 UPDATE `creature_template` SET `spell_list_id`=177660 WHERE `entry`=17766;
 INSERT INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`) VALUES (177660, 'Silithus - Horde Silithyst Sentinel', 19643, 100, 1, 0, 0, 64, 0, 0, 12, 14, 18328, 100, 1, 0, 0, 0, 6, 8, 22, 24, 11972, 100, 1, 0, 0, 256, 0, 0, 20, 30);
 
+-- Removing useless AI from Zulian Tiger.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1136101);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=11361;
+UPDATE `creature_template` SET `ai_name`='', `script_name`='' WHERE `entry`=11361;
+
 
 -- End of migration.
 END IF;
