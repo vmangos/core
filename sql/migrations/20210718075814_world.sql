@@ -1285,6 +1285,9 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (1136101);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=11361;
 UPDATE `creature_template` SET `ai_name`='', `script_name`='' WHERE `entry`=11361;
 
+-- Remove AI from Kirtonos the Herald (Spell Visual) which already has a spell list.
+UPDATE `creature_template` SET `script_name`='' WHERE `entry`=10579;
+
 
 -- End of migration.
 END IF;
