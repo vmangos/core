@@ -1282,7 +1282,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // All weapon based abilities can trigger weapon procs,
     // even if they do no damage, or break on damage, like Sap.
     // https://www.youtube.com/watch?v=klMsyF_Kz5o
-    bool triggerWeaponProcs = m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON;
+    bool triggerWeaponProcs = m_casterUnit != unitTarget && m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON;
 
     // All calculated do it!
     // Do healing and triggers
