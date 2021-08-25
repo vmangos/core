@@ -1279,6 +1279,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
     }
 
+    // All weapon based abilities can trigger weapon procs,
+    // even if they do no damage, or break on damage, like Sap.
+    // https://www.youtube.com/watch?v=klMsyF_Kz5o
+    bool triggerWeaponProcs = m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON;
+
     // All calculated do it!
     // Do healing and triggers
     if (m_healing)
@@ -1419,37 +1424,31 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         if (m_canTrigger)
             pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, this));
         
-        if (m_caster->IsPlayer())
+        if (!triggerWeaponProcs && m_caster->IsPlayer())
         {
-            // trigger weapon enchants for weapon based spells; exclude spells that stop attack, because may break CC
-            if (m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET))
-                ((Player*)m_caster)->CastItemCombatSpell(unitTarget, m_attackType);
-
             // trigger mainhand weapon procs for shield attacks (Shield Bash, Shield Slam) NOTE: vanilla only mechanic, patched out in 2.0.1
-            else if (m_spellInfo->EquippedItemClass == ITEM_CLASS_ARMOR && m_spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_ARMOR_SHIELD)
+            if (m_spellInfo->EquippedItemClass == ITEM_CLASS_ARMOR && m_spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_ARMOR_SHIELD)
                 && (m_spellInfo->SpellIconID == 280 || m_spellInfo->SpellIconID == 413))
-                ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+                triggerWeaponProcs = true;
 
             // Bloodthirt triggers main hand despite not requiring weapon
             // Execute damage component triggers main hand
             else if ((m_spellInfo->SpellIconID == 38 && m_spellInfo->SpellVisual == 372) || //bloodthirst
                     m_spellInfo->Id == 20647) //execute (damage dealing component does not require weapon)
             {
-                 ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+                triggerWeaponProcs = true;
             }
 
             // special Paladin cases - trigger weapon procs despite not having EquippedItemClass
             else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
             {
                 // Seal of Command
-                if (m_spellInfo->Id == 20424)
-                    ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+                if ((m_spellInfo->Id == 20424) ||
                 // Judgement of Command
-                else if (m_spellInfo->SpellIconID == 561)
-                    ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+                    (m_spellInfo->SpellIconID == 561) ||
                 // Judgement of Righteousness
-                else if (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25)
-                    ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+                    (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25))
+                    triggerWeaponProcs = true;
             }
         }
 
@@ -1498,9 +1497,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 }
             }
         }
-        // Sunder Armor triggers weapon proc as well as normal procs despite dealing no damage
-        if (m_caster->IsPlayer() && m_spellInfo->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_SUNDER_ARMOR>() && missInfo == SPELL_MISS_NONE)
-            ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
 
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
@@ -1533,6 +1529,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         pCaster->ProcDamageAndSpell(ProcSystemArguments(unitTarget, pRealCaster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this));
     }
+
+    if (triggerWeaponProcs && m_caster->IsPlayer())
+        ((Player*)m_caster)->CastItemCombatSpell(unitTarget, m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON ? m_attackType : BASE_ATTACK);
 
     if (missInfo != SPELL_MISS_NONE)
         return;
