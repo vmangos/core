@@ -107,8 +107,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         }
     }
 
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ACTION_CANCELS | AURA_INTERRUPT_ITEM_USE_CANCELS);
-
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)
     if (pItem->GetProto()->Bonding == BIND_WHEN_USE || pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM)
     {

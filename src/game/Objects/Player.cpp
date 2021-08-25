@@ -7606,6 +7606,8 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
             continue;
         }
 
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ITEM_USE_CANCELS, 0, false, spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH));
+
         Spell* spell = new Spell(this, spellInfo, (count > 0));
         spell->SetCastItem(item);
         spell->prepare(targets);
