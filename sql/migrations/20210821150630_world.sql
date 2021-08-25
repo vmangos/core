@@ -1286,12 +1286,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (12980, 178184, 1, 4326.85, 911.72, -14.0457, 2.30383, 0, 0, 0.913545, 0.406738, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` IN (178184, 178185, 178186);
 
--- Add Missing Slagtree's Lost Tools 179908
+-- Add Missing Slagtrees Lost Tools Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12981, 179908, 0, 472.975, -3629.26, 118.734, 2.32129, 0, 0, 0.91706, 0.39875, 2, 2, 100, 1, 10),
 (12995, 179908, 0, 216.371, -4308.53, 117.824, 0.59341, 0, 0, 0.292371, 0.956305, 2, 2, 100, 1, 10);
 
-Vessel of Tainted Blood 179922
+-- Add Missing Vessel of Tainted Blood Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12999, 179922, 0, -417.801, -4022.03, 195.064, 2.91469, 0, 0, 0.993571, 0.113208, 120, 120, 100, 1, 10),
 (13024, 179922, 0, -559.271, -3857, 231.205, 3.31614, 0, 0, -0.996194, 0.087165, 120, 120, 100, 1, 10),
@@ -1322,7 +1322,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (13095, 179922, 0, -514.439, -4061.41, 216.334, 5.60251, 0, 0, -0.333807, 0.942641, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 179922;
 
-Basket of Bloodkelp 181053
+-- Add Missing Basket of Bloodkelp Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (13096, 181053, 1, -2706.82, -5042.55, 22.8474, 1.06465, 0, 0, 0.507538, 0.861629, 120, 120, 100, 1, 10),
 (13097, 181053, 1, -2689.38, -5033.86, 21.3356, 1.67551, 0, 0, 0.743144, 0.669132, 120, 120, 100, 1, 10),
@@ -4944,6 +4944,7 @@ UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=2554; -- Cortello's Rid
 UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=17282; -- Plant Bundle
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=143980; -- Gordunni Scroll
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=181287; -- Frozen Rune
+
 
 -- End of migration.
 END IF;
