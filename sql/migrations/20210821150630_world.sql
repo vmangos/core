@@ -1235,7 +1235,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (12320, 176630, 0, -1680.14, -1562.57, 56.2585, 4.29351, 0, 0, -0.83867, 0.54464, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 2, `spawntimesecsmax` = 2 WHERE `id` = 176630;
 
-Bundle of Wood 176793
+-- Add Missing Bundle of Wood Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12326, 176793, 0, -9364.32, -1387.31, 60.456, 3.6652, 0, 0, -0.965925, 0.258821, 120, 120, 100, 1, 10),
 (12331, 176793, 0, -9354.37, -1354.66, 61.4834, 5.72468, 0, 0, -0.275637, 0.961262, 120, 120, 100, 1, 10),
@@ -1243,14 +1243,14 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (12339, 176793, 0, -9318.07, -1207.99, 69.8322, 4.45059, 0, 0, -0.793353, 0.608762, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` = 176793;
 
-Gaea Seed 177926
+-- Add Missing Gaea Seed Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12368, 177926, 1, 1512.97, 1008.61, 140.362, 6.03884, 0, 0, -0.121869, 0.992546, 120, 120, 100, 1, 10),
 (12369, 177926, 1, 1590.55, 1001.08, 134.823, 0.663223, 0, 0, 0.325567, 0.945519, 120, 120, 100, 1, 10),
 (12494, 177926, 1, 1694.59, 965.637, 132.534, 0.872664, 0, 0, 0.422618, 0.906308, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `spawn_flags` = 0 WHERE `id` = 177926;
 
-Troll Chest 178144
+-- Add Missing Troll Chest Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12497, 178144, 1, 3328.89, -757.628, 166.867, 2.28638, 0, 0, 0.909961, 0.414694, 120, 120, 100, 1, 10),
 (12520, 178144, 1, 3359.89, -724.698, 165.48, 3.54302, 0, 0, -0.979924, 0.19937, 120, 120, 100, 1, 10),
@@ -1262,7 +1262,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (12596, 178144, 1, 3436.19, -685.118, 175.89, 1.16937, 0, 0, 0.551936, 0.833886, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `spawn_flags` = 0 WHERE `id` = 178144;
 
-Sapphire of Aku'Mai 178184 178185 178186
+-- Add Missing Sapphire of AkuMai Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12597, 178185, 1, 4154.23, 940.462, -18.1744, 0.85521, 0, 0, 0.414693, 0.909962, 120, 120, 100, 1, 10),
 (12604, 178184, 1, 4167.82, 916.03, -16.0543, 2.96704, 0, 0, 0.996194, 0.087165, 120, 120, 100, 1, 10),
@@ -1286,7 +1286,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (12980, 178184, 1, 4326.85, 911.72, -14.0457, 2.30383, 0, 0, 0.913545, 0.406738, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` IN (178184, 178185, 178186);
 
-Slagtree's Lost Tools 179908
+-- Add Missing Slagtree's Lost Tools 179908
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (12981, 179908, 0, 472.975, -3629.26, 118.734, 2.32129, 0, 0, 0.91706, 0.39875, 2, 2, 100, 1, 10),
 (12995, 179908, 0, 216.371, -4308.53, 117.824, 0.59341, 0, 0, 0.292371, 0.956305, 2, 2, 100, 1, 10);
