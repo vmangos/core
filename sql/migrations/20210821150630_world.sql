@@ -4956,6 +4956,100 @@ UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=17282; -- Plant Bundle
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=143980; -- Gordunni Scroll
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=181287; -- Frozen Rune
 
+-- Update Some Descriptions
+UPDATE `pool_gameobject` SET `description` ='Thousand Needles - Rocket Car Rubble' WHERE `guid` IN (
+170091,
+170114,
+17059, 
+170092,
+170111,
+17038, 
+170093,
+17058, 
+170094,
+17070, 
+170110,
+17049, 
+170112,
+17079 
+);
+
+UPDATE `pool_gameobject` SET `description` ='Redridge Mountains - Practice Lockbox' WHERE `guid` IN (
+20504,
+1553, 
+1614, 
+20434,
+1843, 
+1875, 
+31118,
+1876, 
+1877, 
+31117,
+1878, 
+1879, 
+31119,
+1880, 
+1881
+);
+
+UPDATE `pool_gameobject` SET `description` ='Barrens - Buccanner\'s Strongbox' WHERE `guid` IN (
+15121,
+978,
+1209, 
+1219, 
+15122,
+1231, 
+1243, 
+1246, 
+15702,
+1249, 
+1250, 
+1261, 
+15119,
+1298, 
+1299, 
+1300, 
+15125,
+15683,
+55911,
+1301, 
+15120,
+1302, 
+1303, 
+1304, 
+15145,
+1305, 
+1306, 
+1307, 
+15123,
+1308, 
+1309, 
+1310
+);
+
+UPDATE `pool_gameobject` SET `description` ='Darkshore - Cat Figurine' WHERE `guid` IN (
+399301,
+399311,
+399302,
+399312,
+399303,
+399313,
+399304,
+399314,
+399305,
+399315,
+399306,
+399316,
+399307,
+399317,
+399308,
+399318,
+399309,
+399319,
+399310,
+399320
+);
+
 UPDATE `pool_gameobject_template` SET `description` = 'Azshara - Patch of Elemental Water' WHERE `id` = 180753;
 
 
