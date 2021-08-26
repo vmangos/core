@@ -5052,6 +5052,67 @@ UPDATE `pool_gameobject` SET `description` ='Darkshore - Cat Figurine' WHERE `gu
 
 UPDATE `pool_gameobject_template` SET `description` = 'Azshara - Patch of Elemental Water' WHERE `id` = 180753;
 
+-- Add Missing Cat Figurine Spawns
+SET @CAT_OGUID = 13545;
+SET @CAT_POOL_TEMPLATE = 304;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(@CAT_OGUID+1, 13359, 1, 7408.95, -919.086, 13.3903, 3.97936, 0, 0, -0.913545, 0.406738, 120, 120, 100, 1, 10),
+(@CAT_OGUID+2, 13359, 1, 7416.46, -1061.45, 38.1163, 2.63544, 0, 0, 0.968147, 0.250381, 120, 120, 100, 1, 10),
+(@CAT_OGUID+3, 13359, 1, 7452.75, -842.502, 1.44652, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 10),
+(@CAT_OGUID+4, 13359, 1, 7456.14, -1012.32, -9.80946, 0, 0, 0, 0, 1, 120, 120, 100, 1, 10),
+(@CAT_OGUID+5, 13359, 1, 7474.54, -1069.02, 34.7748, 3.14159, 0, 0, -1, 0, 120, 120, 100, 1, 10),
+(@CAT_OGUID+6, 13359, 1, 7490.08, -818.734, 15.1527, 5.13127, 0, 0, -0.544639, 0.838671, 120, 120, 100, 1, 10),
+(@CAT_OGUID+7, 13359, 1, 7586.13, -1053.09, 37.5463, 1.78023, 0, 0, 0.777145, 0.629321, 120, 120, 100, 1, 10),
+(@CAT_OGUID+8, 13359, 1, 7537.63, -820.435, 16.0756, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 10),
+(@CAT_OGUID+9, 13359, 1, 7568.98, -874.125, 16.1728, 1.27409, 0, 0, 0.594822, 0.803857, 120, 120, 100, 1, 10),
+(@CAT_OGUID+10, 13873, 1, 7542.35, -968.103, -9.35254, 0.349065, 0, 0, 0.173648, 0.984808, 120, 120, 100, 1, 10),
+(@CAT_OGUID+11, 13873, 1, 7408.95, -919.086, 13.3903, 3.97936, 0, 0, -0.913545, 0.406738, 120, 120, 100, 1, 10),
+(@CAT_OGUID+12, 13873, 1, 7416.46, -1061.45, 38.1163, 2.63544, 0, 0, 0.968147, 0.250381, 120, 120, 100, 1, 10),
+(@CAT_OGUID+13, 13873, 1, 7452.75, -842.502, 1.44652, 2.33874, 0, 0, 0.920505, 0.390732, 120, 120, 100, 1, 10),
+(@CAT_OGUID+14, 13873, 1, 7456.14, -1012.32, -9.80946, 0, 0, 0, 0, 1, 120, 120, 100, 1, 10),
+(@CAT_OGUID+15, 13873, 1, 7474.54, -1069.02, 34.7748, 3.14159, 0, 0, -1, 0, 120, 120, 100, 1, 10),
+(@CAT_OGUID+16, 13873, 1, 7490.08, -818.734, 15.1527, 5.13127, 0, 0, -0.544639, 0.838671, 120, 120, 100, 1, 10),
+(@CAT_OGUID+17, 13873, 1, 7586.13, -1053.09, 37.5463, 1.78023, 0, 0, 0.777145, 0.629321, 120, 120, 100, 1, 10),
+(@CAT_OGUID+18, 13873, 1, 7537.63, -820.435, 16.0756, 2.1293, 0, 0, 0.874619, 0.48481, 120, 120, 100, 1, 10),
+(@CAT_OGUID+19, 13873, 1, 7568.98, -874.125, 16.1728, 1.27409, 0, 0, 0.594822, 0.803857, 120, 120, 100, 1, 10),
+(@CAT_OGUID+20, 13873, 1, 7542.35, -968.103, -9.35254, 0.349065, 0, 0, 0.173648, 0.984808, 120, 120, 100, 1, 10);
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` IN (13359, 13873);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@CAT_POOL_TEMPLATE+1, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+2, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+3, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+4, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+5, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+6, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+7, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+8, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+9, 1, 'Darkshore - Cat Figurine', 10),
+(@CAT_POOL_TEMPLATE+10, 1, 'Darkshore - Cat Figurine', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@CAT_OGUID+1, @CAT_POOL_TEMPLATE+1, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+2, @CAT_POOL_TEMPLATE+2, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+3, @CAT_POOL_TEMPLATE+3, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+4, @CAT_POOL_TEMPLATE+4, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+5, @CAT_POOL_TEMPLATE+5, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+6, @CAT_POOL_TEMPLATE+6, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+7, @CAT_POOL_TEMPLATE+7, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+8, @CAT_POOL_TEMPLATE+8, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+9, @CAT_POOL_TEMPLATE+9, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+10, @CAT_POOL_TEMPLATE+10, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+11, @CAT_POOL_TEMPLATE+1, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+12, @CAT_POOL_TEMPLATE+2, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+13, @CAT_POOL_TEMPLATE+3, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+14, @CAT_POOL_TEMPLATE+4, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+15, @CAT_POOL_TEMPLATE+5, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+16, @CAT_POOL_TEMPLATE+6, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+17, @CAT_POOL_TEMPLATE+7, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+18, @CAT_POOL_TEMPLATE+8, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+19, @CAT_POOL_TEMPLATE+9, 'Darkshore - Cat Figurine', 10),
+(@CAT_OGUID+20, @CAT_POOL_TEMPLATE+10, 'Darkshore - Cat Figurine', 10);
+
 
 -- End of migration.
 END IF;
