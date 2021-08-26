@@ -595,45 +595,6 @@ UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `entry` I
 -- Correct Requirements for Quest Grark Lorkrub
 UPDATE `quest_template` SET `PrevQuestId` = 4082 WHERE `entry` = 4122;
 
--- Move From pool_creature to pool_creature_template
-DELETE FROM `pool_creature` WHERE `pool_enty` IN (108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 521, 2598, 2605, 2606, 2779, 2850, 3200, 9002, 10003, 10004, 12902, 14222, 14281, 25468, 42939, 43157, 43525, 43517);
-DELETE FROM `pool_template` WHERE `entry` = 10003;
-INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
-(2038, 108, 0, 'Lord Melenas', 0, 0, 10),
-(7319, 109, 0, 'Lady Sathra', 0, 0, 10),
-(3467, 110, 0, 'Baron Longshore', 0, 0, 10),
-(3204, 111, 0, 'Gazz\'uz', 0, 0, 10),
-(2304, 112, 0, 'Captain Ironhill', 0, 0, 10),
-(5822, 113, 0, 'Felweaver Scornn', 0, 0, 10),
-(5808, 114, 0, 'Warlord Kolkanis', 0, 0, 10),
-(5824, 115, 0, 'Captain Flat Tusk', 0, 0, 10),
-(5826, 116, 0, 'Geolord Mottle', 0, 0, 10),
-(5809, 117, 0, 'Watch Commander Zalaphil', 0, 0, 10),
-(3392, 118, 0, 'Prospector Khazgorm', 0, 0, 10),
-(5847, 119, 0, 'Heggin Stonewhisker', 0, 0, 10),
-(5859, 120, 0, 'Hagg Taurenbane', 0, 0, 10),
-(3472, 121, 0, 'Washte Pawne', 0, 0, 10),
-(3473, 122, 0, 'Owatanka', 0, 0, 10),
-(3474, 123, 0, 'Lakota\'mani', 0, 0, 10),
-(14275, 124, 0, 'Tamra Stormpike', 0, 0, 10),
-(521, 521, 0, 'Lupos', 0, 0, 10),
-(2598, 2598, 0, 'Darbel Montrose', 0, 0, 10),
-(2605, 2605, 0, 'Zalas Witherbark', 0, 0, 10),
-(2606, 2606, 0, 'Nimar the Slayer', 0, 0, 10),
-(2779, 2779, 0, 'Prince Nazjak', 0, 0, 10),
-(2850, 2850, 0, 'Broken Tooth', 0, 0, 10),
-(61, 3200, 0, 'Thuros Lightfingers', 0, 0, 10),
-(7850, 9002, 0, 'Kernobee', 0, 0, 10),
-(3671, 10004, 0, 'Lady Anacondra', 0, 0, 10),
-(12902, 12902, 0, 'Lorgus Jett', 0, 0, 10),
-(14222, 14222, 0, 'Araga', 0, 0, 10),
-(14281, 14281, 0, 'Jimmy the Bleeder', 0, 0, 10),
-(10558, 25468, 25, 'Hearthsinger Forresten', 0, 0, 10),
-(14231, 42939, 0, 'Drogoth the Roamer', 0, 0, 10),
-(14233, 43157, 0, 'Ripscale', 0, 0, 10),
-(14230, 43517, 0, 'Burgle Eye', 0, 0, 10),
-(13602, 43525, 0, 'The Abominable Greench', 0, 0, 10);
-
 
 -- End of migration.
 END IF;
