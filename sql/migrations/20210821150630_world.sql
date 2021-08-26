@@ -5054,7 +5054,7 @@ UPDATE `pool_gameobject_template` SET `description` = 'Azshara - Patch of Elemen
 
 -- Add Missing Cat Figurine Spawns
 SET @CAT_OGUID = 13545;
-SET @CAT_POOL_TEMPLATE = 304;
+SET @CAT_POOL_TEMPLATE = 386;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (@CAT_OGUID+1, 13359, 1, 7408.95, -919.086, 13.3903, 3.97936, 0, 0, -0.913545, 0.406738, 120, 120, 100, 1, 10),
