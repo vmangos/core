@@ -636,7 +636,6 @@ UPDATE `pool_template` SET `description` = 'Eastern Plaguelands - Pamela\'s Doll
 INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `patch_max`) VALUES
 (176116, 3012, 0, 'Eastern Plaguelands - Pamela\'s Doll\'s Head', 10);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(10308, 176116, 0, 1411.16, -3657.82, 77.694, 4.67748, 0, 0, -0.719339, 0.694659, 2, 2, 100, 1, 10),
 (10309, 176116, 0, 1411.69, -3719.98, 78.1738, 1.09956, 0, 0, 0.522498, 0.852641, 2, 2, 100, 1, 10),
 (10310, 176116, 0, 1420.38, -3659.88, 82.0166, 2.74016, 0, 0, 0.979924, 0.19937, 2, 2, 100, 1, 10);
 
