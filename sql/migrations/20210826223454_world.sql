@@ -41,7 +41,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) V
 (@POOL_ENTRY+15, 1, 'Boss Galgosh (1398)', 10);
 (@POOL_ENTRY+16, 1, 'Boulderheart (14273)', 10);
 (@POOL_ENTRY+17, 1, 'Brack (520)', 10);
-(@POOL_ENTRY+18, 4, 'BRD - Shadowforge Flame Keeper', 10);
+(@POOL_ENTRY+18, 4, 'Shadowforge Flame Keeper', 10);
 (@POOL_ENTRY+19, 1, 'Broken Tooth (2850)', 10);
 (@POOL_ENTRY+20, 1, 'Captain Flat Tusk (5824)', 10);
 (@POOL_ENTRY+21, 1, 'Captain Ironhill (2304)', 10);
@@ -61,7 +61,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) V
 (@POOL_ENTRY+35, 1, 'Dreadscorn (8304)', 10);
 (@POOL_ENTRY+36, 1, 'Duggan Wildhammer (10817)', 10);
 (@POOL_ENTRY+37, 1, 'Edan the Howler (1137)', 10);
-(@POOL_ENTRY+38, 1, 'Elwynn Forest - Forest\'s Edge - Hogger (448)', 10);
+(@POOL_ENTRY+38, 1, 'Hogger (448)', 10);
 (@POOL_ENTRY+39, 1, 'Emogg the Crusher (14267)', 10);
 (@POOL_ENTRY+40, 1, 'Farmer Solliden (1936)', 10);
 (@POOL_ENTRY+41, 1, 'Faulty War Golem (8279)', 10);
@@ -248,7 +248,7 @@ INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description
 (1398, @POOL_ENTRY+15, 0, 'Boss Galgosh (1398)');
 (14273, @POOL_ENTRY+16, 0, 'Boulderheart (14273)');
 (520, @POOL_ENTRY+17, 0, 'Brack (520)');
-(9956, @POOL_ENTRY+18, 0, 'BRD - Shadowforge Flame Keeper');
+(9956, @POOL_ENTRY+18, 0, 'Shadowforge Flame Keeper');
 (2850, @POOL_ENTRY+19, 0, 'Broken Tooth (2850)');
 (5824, @POOL_ENTRY+20, 0, 'Captain Flat Tusk (5824)');
 (2304, @POOL_ENTRY+21, 0, 'Captain Ironhill (2304)');
@@ -268,7 +268,7 @@ INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description
 (8304, @POOL_ENTRY+35, 0, 'Dreadscorn (8304)');
 (10817, @POOL_ENTRY+36, 0, 'Duggan Wildhammer (10817)');
 (1137, @POOL_ENTRY+37, 0, 'Edan the Howler (1137)');
-(448, @POOL_ENTRY+38, 0, 'Elwynn Forest - Forest\'s Edge - Hogger (448)');
+(448, @POOL_ENTRY+38, 0, 'Hogger (448)');
 (14267, @POOL_ENTRY+39, 0, 'Emogg the Crusher (14267)');
 (1936, @POOL_ENTRY+40, 0, 'Farmer Solliden (1936)');
 (8279, @POOL_ENTRY+41, 0, 'Faulty War Golem (8279)');
