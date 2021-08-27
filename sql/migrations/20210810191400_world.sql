@@ -654,6 +654,9 @@ UPDATE `npc_vendor` SET `incrtime` = 1800 WHERE `entry` = 8139 AND `item` = 1676
 -- Remove Flags From npc_vendor
 UPDATE `npc_vendor` SET `itemflags` = 0 WHERE `itemflags` != 0;
 
+-- Remove Duplicate Spawns
+DELETE FROM `creature` WHERE `guid` IN (91936, 92482, 92471);
+
 
 -- End of migration.
 END IF;
