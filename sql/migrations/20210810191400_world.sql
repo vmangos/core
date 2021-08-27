@@ -642,6 +642,9 @@ INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description
 (14230, 43517, 0, 'Burgle Eye', 0, 0, 10),
 (13602, 43525, 0, 'The Abominable Greench', 0, 0, 10);
 
+-- Mudrock Borer Skinning Template
+UPDATE `creature_template` SET `skinning_loot_id`= 4400 WHERE `entry` = 4399;
+
 
 -- End of migration.
 END IF;
