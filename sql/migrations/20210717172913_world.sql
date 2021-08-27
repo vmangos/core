@@ -286,50 +286,6 @@ UPDATE `creature_template` SET `auras` = '11919' WHERE `entry` = 14266;
 UPDATE `creature_template` SET `auras` = '21788' WHERE `entry` = 14472;
 
 
-
-
-
-
-
--- NOT SURE IF THESE ARE CORRECT
-
--- Grimtotem Raider
-UPDATE `creature_template` SET `auras` = '7366 7381' WHERE `entry` = 7725;
-
--- Jadefire Shadowstalker
-UPDATE `creature_template` SET `auras` = '77939 22766 8601' WHERE `entry` = 7110;
-
--- Rift Spawn
-UPDATE `creature_template` SET `auras` = '9095' WHERE `entry` = 6492;
-
--- Forsaken Assassin
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (380701);
-DELETE FROM `creature_ai_events` WHERE `id`=380701;
-UPDATE `creature_template` SET `auras` = '6718 8601', `ai_name`='' WHERE `entry` = 3807;
-
--- Forsaken Infiltrator
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (380601);
-DELETE FROM `creature_ai_events` WHERE `id`=380601;
-UPDATE `creature_template` SET `auras` = '3616 6718', `ai_name`='' WHERE `entry` = 3806;
-
--- Jaguero Stalker 
-UPDATE `creature_template` SET `auras` = '7939 22766 3417' WHERE `entry` = 2522;
-
--- Putridus Trickster
-UPDATE `creature_template` SET `auras` = '21157 13299 21061' WHERE `entry` = 11791;
-
--- Death Talon Wyrmguard
-UPDATE `creature_template` SET `auras` = '19818 22276 22282' WHERE `entry` = 12460;
-
--- Death Talon Overseer
-UPDATE `creature_template` SET `auras` = '22276' WHERE `entry` = 12461;
-
--- Portal of Madness
-DELETE FROM `creature_ai_scripts` WHERE `id` IN (1514101);
-DELETE FROM `creature_ai_events` WHERE `id`=1514101;
-UPDATE `creature_template` SET `auras` = '15141', `ai_name`='' WHERE `entry` = 24620;
-
-
 -- End of migration.
 END IF;
 END??
