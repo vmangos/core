@@ -648,6 +648,12 @@ UPDATE `creature_template` SET `skinning_loot_id`= 4400 WHERE `entry` = 4399;
 -- Reduce droprate of Mistvale Giblets
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`= -20 WHERE `entry` = 1557 AND `item` = 3919;
 
+-- Recipe: Undermine Clam Chowder should have 30 min restock timer
+UPDATE `npc_vendor` SET `incrtime` = 1800 WHERE `entry` = 8139 AND `item` = 16767;
+
+-- Remove Flags From npc_vendor
+UPDATE `npc_vendor` SET `itemflags` = 0 WHERE `itemflags` != 0;
+
 
 -- End of migration.
 END IF;
