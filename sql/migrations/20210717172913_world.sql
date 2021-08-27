@@ -75,9 +75,6 @@ UPDATE `creature_template` SET `auras` = '7276' WHERE `entry` = 7268;
 -- Withered Spearhide
 UPDATE `creature_template` SET `auras` = '12246' WHERE `entry` = 7332;
 
--- Tomb Reaver
-UPDATE `creature_template` SET `auras` = '7351' WHERE `entry` = 7351;
-
 -- Plaguemaw the Rotting
 UPDATE `creature_template` SET `auras` = '12947' WHERE `entry` = 7356;
 
