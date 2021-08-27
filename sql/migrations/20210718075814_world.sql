@@ -232,7 +232,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 -- Events list for Witchwing Ambusher
 UPDATE `creature_template` SET `ai_name`='EventAI', `script_name` = '' WHERE `entry` = 3279;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(327901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -200, -201, -202, 0, 0, 0, 0, 0, 0, 'Witchwing Ambusher - Say Text');
+(327901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2229, 2230, 2231, 0, 0, 0, 0, 0, 0, 'Witchwing Ambusher - Say Text');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (327901, 3279, 0, 4, 0, 20, 0, 0, 0, 0, 0, 327901, 0, 0, 'Witchwing Ambusher - Say on Aggro');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (327902, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Witchwing Ambusher - Flee');
