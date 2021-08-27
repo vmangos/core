@@ -645,6 +645,9 @@ INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description
 -- Mudrock Borer Skinning Template
 UPDATE `creature_template` SET `skinning_loot_id`= 4400 WHERE `entry` = 4399;
 
+-- Reduce droprate of Mistvale Giblets
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`= -20 WHERE `entry` = 1557 AND `item` = 3919;
+
 
 -- End of migration.
 END IF;
