@@ -6379,7 +6379,7 @@ void Aura::PeriodicDummyTick()
                     }
                     return;
                 }
-                case 29705:  // Midsummer Pole Dancing
+                case 29705:  // Midsummer Summer Festival - Test Ribbon Pole Channel
                 case 29726:
                 case 29727:
                 {
@@ -6389,10 +6389,18 @@ void Aura::PeriodicDummyTick()
                     for (const auto& aura : uAuras)
                     {
                         if (ribbonCount < 2)
-                            if (aura.second->GetId() == 29705 || aura.second->GetId() == 29726 || aura.second->GetId() == 29727)
-                                ribbonCount++;
-                            else
-                                break;
+                        {
+                            switch (aura.second->GetId())
+                            {
+                                case 29705: // Red
+                                case 29726: // Purple
+                                case 29727: // Green
+                                    ribbonCount++;
+                                    break;
+                            }
+                        }
+                        else
+                            break;
                     }
 
                     if (ribbonCount > 1)
