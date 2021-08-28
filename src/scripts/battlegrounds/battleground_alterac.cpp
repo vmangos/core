@@ -5178,7 +5178,7 @@ struct MineNPC_AI : public ScriptedAI
                 Unit*   pPet    = pPlayer->GetPet();
 
                 /** Range limit set to 35 meters/yards */
-                if (pPlayer->IsInFeralForm() && m_creature->GetDistance2d(pPlayer) < 35.0f)
+                if (pPlayer->IsNoWeaponShapeShift() && m_creature->GetDistance2d(pPlayer) < 35.0f)
                 {
                     if (DoCastSpellIfCan(pPlayer, SPELL_FLASH_BOMB) == CAST_OK)
                         m_uiFlashBomb_Timer = 7500;

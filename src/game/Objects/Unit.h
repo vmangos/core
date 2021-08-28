@@ -532,11 +532,7 @@ class Unit : public SpellCaster
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM)); }
         void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM, form); }
         bool IsShapeShifted() const; // mirrors clientside logic, moonkin form not counted as shapeshift
-        bool IsInFeralForm() const
-        {
-            ShapeshiftForm form = GetShapeshiftForm();
-            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
-        }
+        bool IsNoWeaponShapeShift() const;
         bool IsInDisallowedMountForm() const;
         uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
         void SetDisplayId(uint32 displayId);
@@ -980,7 +976,7 @@ class Unit : public SpellCaster
          */
         bool CanUseEquippedWeapon(WeaponAttackType attackType) const
         {
-            if (IsInFeralForm())
+            if (IsNoWeaponShapeShift())
                 return false;
 
             switch(attackType)

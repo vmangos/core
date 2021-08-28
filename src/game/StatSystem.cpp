@@ -394,7 +394,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE, index);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE, index);
 
-    if (IsInFeralForm())                                    // check if player is druid and in cat or bear forms, non main hand attacks not allowed for this mode so not check attack type
+    if (IsNoWeaponShapeShift())                             // check if player is in shapeshift which doesnt use weapon
     {
         /* Druids don't use weapons so a weapon damage index > 0 
            should not affect their damage. Fixes crazy druid scaling

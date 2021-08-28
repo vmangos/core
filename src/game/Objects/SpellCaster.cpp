@@ -121,7 +121,7 @@ uint32 SpellCaster::GetWeaponSkillValue(WeaponAttackType attType, SpellCaster co
         if (attType != BASE_ATTACK && !item)
             return 0;
 
-        if (pPlayer->IsInFeralForm())
+        if (pPlayer->IsNoWeaponShapeShift())
             return GetSkillMaxForLevel();              // always maximized SKILL_FERAL_COMBAT in fact
 
         // weapon skill or (unarmed for base attack)

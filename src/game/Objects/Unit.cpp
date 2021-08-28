@@ -1312,7 +1312,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
     }
 
     bool immune = true;
-    bool feral = IsInFeralForm();
+    bool feral = IsNoWeaponShapeShift();
 
     // Only get one damage type for feral druids so they don't receive incorrect benefits
     // from weapons with multiple types of damage
@@ -5619,8 +5619,18 @@ bool Unit::IsShapeShifted() const
     if (ShapeshiftForm form = GetShapeshiftForm())
     {
         if (SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form))
-            return !(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY);
+            return !(ssEntry->flags1 & SHAPESHIFT_FLAG_STANCE);
     }
+    return false;
+}
+
+bool Unit::IsNoWeaponShapeShift() const
+{
+    // Mirroring clientside gameplay logic
+    if (ShapeshiftForm form = GetShapeshiftForm())
+        if (SpellShapeshiftFormEntry const* entry = sSpellShapeshiftFormStore.LookupEntry(form))
+            return entry->flags1 & SHAPESHIFT_FLAG_DONT_USE_WEAPON;
+
     return false;
 }
 

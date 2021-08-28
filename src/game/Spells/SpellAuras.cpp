@@ -2464,7 +2464,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         // remove other shapeshift before applying a new one
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT, GetHolder());
 
-        if (!(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY))
+        if (!(ssEntry->flags1 & SHAPESHIFT_FLAG_STANCE))
             target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_SHAPESHIFTING_CANCELS, GetId());
 
         if (PowerType != POWER_MANA)
@@ -3496,7 +3496,7 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     // https://www.youtube.com/watch?v=8TDUpudEL-M&t=6m5s
     // Furthermore, we need to apply/unapply weapon mods for players on disarm
     // so they don't have weapon stats (or talent boosts) whilst disarmed
-    if (target->GetTypeId() == TYPEID_PLAYER && !target->IsInFeralForm())
+    if (target->GetTypeId() == TYPEID_PLAYER && !target->IsNoWeaponShapeShift())
     {
         Player* pTarget = target->ToPlayer();
 
@@ -3534,7 +3534,7 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     }
 
     // Don't update damage if in feral
-    if (!target->IsInFeralForm())
+    if (!target->IsNoWeaponShapeShift())
         target->UpdateDamagePhysical(BASE_ATTACK);
 }
 
