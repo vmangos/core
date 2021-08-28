@@ -14,7 +14,6 @@ SET @LUNAR_FESTIVAL_OGUID = 64627;
 SET @LUNAR_FESTIVAL_FIRECRACKERS_OGUID = 10445;
 SET @LUNAR_FESTIVAL_FIRECRACKERS_SECOND_OGUID = 10294;
 SET @LUNAR_FESTIVAL_CGUID = 12409;
--- SET @FIREWORKS_FESTIVAL_CGUID = xxxx;
 SET @LUNAR_FESTIVAL_EVENT = 7;
 
 -- Delete old event stuff, except the Firecrackers, which are already done by Nickyt8.
@@ -78,6 +77,9 @@ INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `t
 (26454, 0, -8748.0, 1074.0, 91.0, 4.71, 5086, 5875),
 (26455, 1, -1031.73, -230.42, 160.18, 3.12, 5086, 5875),
 (26456, 0, 1642.41, 239.9, 62.59, 3.01, 5086, 5875);
+
+-- Lunar Festival Sentinel texts are chat_type 12.
+UPDATE `broadcast_text` SET `chat_type`='12' WHERE `entry` IN (10948,10949,10950,10951,10952,10953,10954,10955);
 
 -- Events list for Lunar Festival Sentinel
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15961;
