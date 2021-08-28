@@ -62,7 +62,7 @@ UPDATE `creature_template` SET `faction`=775, `civilian`=1, `ai_name`='EventAI' 
 UPDATE `creature_template` SET `display_scale1`=1.25 WHERE `entry`=16987;
 
 -- Undercity Fireeater
-UPDATE `creature_template` SET `unit_flags`=33536, `auras`=29402 WHERE `entry` in (17041,17050,17051,17038,17048,17049);
+UPDATE `creature_template` SET `unit_flags`=33536, `auras`='29402' WHERE `entry` in (17041,17050,17051,17038,17048,17049);
 
 -- Remove movement_type
 UPDATE `creature_template` SET `movement_type`=0 WHERE `entry` in (16592,16781,16788,16817,16818,17038,17041,17048,17049,17051,17066);
