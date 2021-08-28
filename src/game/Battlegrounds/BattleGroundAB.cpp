@@ -354,8 +354,6 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player* source, GameObject* target
         BG_AB_NODE_GOLD_MINE_CREDIT};
     source->KilledMonsterCredit(killCredits[node]);
 
-    source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
-
     uint32 sound = 0;
 
     // TODO in the following code we should restructure a bit to avoid

@@ -873,6 +873,10 @@ class WorldObject : public Object
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
         void GetAlivePlayerListInRange(WorldObject const* pSource, std::list<Player*>& lList, float fMaxSearchRange) const;
 
+        // Script helpers.
+        uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
+        uint32 RespawnNearCreaturesByEntry(uint32 entry, float range);
+
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
         void SetActiveObjectState(bool on);
 

@@ -480,7 +480,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellPr
     if (procEvent_procEx == PROC_EX_NONE)
     {
         // Don't allow proc from periodic heal if no extra requirement is defined
-        if (EventProcFlag & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC) && (procExtra & PROC_EX_PERIODIC_POSITIVE))
+        if (EventProcFlag & (PROC_FLAG_DEAL_HARMFUL_PERIODIC | PROC_FLAG_TAKE_HARMFUL_PERIODIC) && (procExtra & PROC_EX_PERIODIC_POSITIVE))
             return false;
 
         // No extra req, so can trigger for (damage/healing present) and hit/crit
@@ -493,7 +493,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellPr
         if (procEvent_procEx & PROC_EX_EX_TRIGGER_ALWAYS)
             return true;
         // Exist req for PROC_EX_NO_PERIODIC
-        if ((procEvent_procEx & PROC_EX_NO_PERIODIC) && (procFlags & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC | PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT | PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT)))
+        if ((procEvent_procEx & PROC_EX_NO_PERIODIC) && (procFlags & (PROC_FLAG_DEAL_HARMFUL_PERIODIC | PROC_FLAG_TAKE_HARMFUL_PERIODIC | PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT | PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT)))
             return false;
         // Check Extra Requirement like (hit/crit/miss/resist/parry/dodge/block/immune/reflect/absorb and other)
         if (procEvent_procEx & procExtra)
@@ -3417,14 +3417,14 @@ uint32 ReplaceOldSpellProcFlags(uint32 oldFlags)
 
     if (oldFlags & OLD_PROC_FLAG_DONE_MELEE_HIT)
     {
-        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_DEAL_MELEE_SWING;
+        newFlags |= PROC_FLAG_DEAL_MELEE_ABILITY;
     }
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_MELEE_HIT)
     {
-        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
-        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_SWING;
+        newFlags |= PROC_FLAG_TAKE_MELEE_ABILITY;
     }
 
     if (oldFlags & OLD_PROC_FLAG_KILL)
@@ -3435,63 +3435,63 @@ uint32 ReplaceOldSpellProcFlags(uint32 oldFlags)
 
     if (oldFlags & OLD_PROC_FLAG_DODGE)
     {
-        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
-        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_SWING;
+        newFlags |= PROC_FLAG_TAKE_MELEE_ABILITY;
     }
 
     if (oldFlags & OLD_PROC_FLAG_PARRY)
     {
-        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
-        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_SWING;
+        newFlags |= PROC_FLAG_TAKE_MELEE_ABILITY;
     }
 
     if (oldFlags & OLD_PROC_FLAG_BLOCK)
     {
-        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
-        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_SWING;
+        newFlags |= PROC_FLAG_TAKE_MELEE_ABILITY;
     }
 
     if (oldFlags & OLD_PROC_FLAG_ON_SWING)
-        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+        newFlags |= PROC_FLAG_DEAL_MELEE_SWING;
 
     if (oldFlags & OLD_PROC_FLAG_MAGIC_SPELL_CAST)
     {
-        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_SPELL;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_NON_MELEE_HIT)
     {
-        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
-        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_HARMFUL_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_HIT)
     {
-        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
-        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_HARMFUL_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_DONE_MELEE_CRIT)
-        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+        newFlags |= PROC_FLAG_DEAL_MELEE_SWING;
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_MELEE_CRIT)
-        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_SWING;
 
     if (oldFlags & OLD_PROC_FLAG_DONE_ANY_NOT_SWING)
     {
-        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        newFlags |= PROC_FLAG_DEAL_MELEE_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_SPELL;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_ANY_DAMAGE)
@@ -3499,45 +3499,45 @@ uint32 ReplaceOldSpellProcFlags(uint32 oldFlags)
 
     if (oldFlags & OLD_PROC_FLAG_DONE_SPELL_CRIT)
     {
-        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        newFlags |= PROC_FLAG_DEAL_MELEE_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_SPELL;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_DONE_SPELL_HIT)
     {
-        //newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
-        //newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        //newFlags |= PROC_FLAG_DEAL_MELEE_ABILITY;
+        //newFlags |= PROC_FLAG_DEAL_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_ABILITY;
+        newFlags |= PROC_FLAG_DEAL_HELPFUL_SPELL;
+        newFlags |= PROC_FLAG_DEAL_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_RANGED_CRIT)
     {
-        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
-        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
-        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_MELEE_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_HARMFUL_ABILITY;
+        newFlags |= PROC_FLAG_TAKE_HARMFUL_SPELL;
     }
 
     if (oldFlags & OLD_PROC_FLAG_DONE_RANGED_HIT)
     {
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
-        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_DEAL_RANGED_ABILITY;
     }
 
     if (oldFlags & OLD_PROC_FLAG_TAKEN_RANGED_HIT)
     {
-        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
-        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ATTACK;
+        newFlags |= PROC_FLAG_TAKE_RANGED_ABILITY;
     }
 
     return newFlags;

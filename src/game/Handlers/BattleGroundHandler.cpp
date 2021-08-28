@@ -68,8 +68,8 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recv_data)
         return;
     }
 
-    _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    _player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     SendBattleGroundList(guid, bgTypeId);
 }
 

@@ -740,10 +740,10 @@ class Unit : public SpellCaster
         void RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive = false);
         void RemoveSpellsCausingAura(AuraType auraType);
         void RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except);
-        void RemoveNegativeSpellsCausingAura(AuraType auraType);
+        void RemoveSpellsCausingAuraWithMechanic(AuraType auraType);
         void RemoveNonPassiveSpellsCausingAura(AuraType auraType);
         bool RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder);
-        void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false);
+        void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false, bool skipStealth = false);
         void RemoveAurasWithAttribute(uint32 flags);
         void RemoveAurasWithDispelType(DispelType type, ObjectGuid casterGuid = ObjectGuid());
         void RemoveAllAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -1155,10 +1155,6 @@ class Unit : public SpellCaster
         virtual void OnLeaveCombat() {}
         void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false, bool onlyIfNotStalked = false);
         void InterruptAttacksOnMe(float dist = 0.0f, bool guard_check = false); // Interrupt auto-attacks
-        
-        // Script helpers.
-        uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
-        uint32 RespawnNearCreaturesByEntry(uint32 entry, float range);
         
         /*********************************************************/
         /***                 RELATIONS SYSTEM                  ***/

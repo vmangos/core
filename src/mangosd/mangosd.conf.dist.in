@@ -1544,8 +1544,7 @@ Warden.ModuleDir             = "warden_modules"
 #                     1 - (Enabled)
 #
 #    Anticheat.BanDuration
-#        Description: Time (in seconds) an account will be banned if Penalty is set
-#                     to ban.
+#        Description: Time (in seconds) an account will be banned if Penalty is set to ban.
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 #
@@ -1553,6 +1552,12 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Save the result of every anticheat tick in the database.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
+#
+#    Anticheat.PacketLogSize
+#        Description: How many previous movement packets to dump to file upon detection resulting in kick or ban.
+#                     File is saved in pkt format that can be parsed with WowPacketParser.
+#        Default:     100
+#                     0 - (Disabled)
 #
 #    Anticheat.MaxAllowedDesync
 #        Description: Client time desynchronization allowed when doing movement extrapolation.
@@ -2017,6 +2022,7 @@ Anticheat.PlayersOnly = 1
 Anticheat.NotifyCheaters = 0
 Anticheat.BanDuration = 86400
 Anticheat.LogData = 0
+Anticheat.PacketLogSize = 100
 Anticheat.MaxAllowedDesync = 0
 Anticheat.ReverseTime.Enable = 1
 Anticheat.ReverseTime.Threshold = 1
