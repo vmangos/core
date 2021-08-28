@@ -137,6 +137,8 @@ INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `Durati
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (29831, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 536870912, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
 INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (29831, 0, -1, -1, -1, -1, -1, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, NULL);
 
+-- item_required_target fix.
+INSERT INTO `item_required_target` (`entry`, `type`, `target_entry`) VALUES (23247, 1, 16592);
 
 -- spell_script_target fix.
 DELETE FROM `spell_script_target` WHERE `entry` IN (29437,29726,29727,28806,29705,28861);
@@ -1438,7 +1440,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@MIDSUMMER_GAMEOBJECT_GUID+1108, 181288, 1, 6493.63, -2499.77, 568.318, 5.75959, 0, 0, -0.258819, 0.965926, 120, 120, 100, 1, 9),
     (@MIDSUMMER_GAMEOBJECT_GUID+1109, 181288, 1, 3882.52, -5379.73, 141.166, 4.01426, 0, 0, -0.906307, 0.422619, 120, 120, 100, 1, 9),
     (@MIDSUMMER_GAMEOBJECT_GUID+1110, 181288, 1, -7838.28, -2068.66, -271.804, 3.64774, 0, 0, -0.968147, 0.250381, 120, 120, 100, 1, 9);
-    
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110 AND `event`=@MIDSUMMER_EVENT;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @MIDSUMMER_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @MIDSUMMER_GAMEOBJECT_GUID+1 AND @MIDSUMMER_GAMEOBJECT_GUID+1110;
 
@@ -1456,7 +1457,7 @@ UPDATE `quest_template` SET `CompleteScript`=9323 WHERE `entry` in (9324,9325,93
 UPDATE `gameobject` SET `spawn_flags`=1 WHERE  `id`=181431;
 
 -- Cast Fire Festival Fortitude on all Players in Stormwind on Quests (9324,9325,9326,9330,9331,9332) turn in.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1519, 4, 1519, 0, 0, 0, 0); -- Only in AreaID Stormwind.
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1519, 4, 1519, 0, 0, 0, 0); -- Only in AreaID Stormwind.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1520, -1, 308, 990, 1519, 0, 0); -- Only if Event 1 active and map 0 and AreaID Undercity.
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (9323, 0, 39, 9330, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1520, 'Midsummer festival - Activate Fire Festival Fury Traps in Stormwind');
@@ -1491,7 +1492,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (9330, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+933, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Stormwind');
 
 -- Cast Fire Festival Fortitude on all Players in Undercity on Quests (9324,9325,9326,9330,9331,9332) turn in.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1497, 4, 1497, 0, 0, 0, 0); -- Only in AreaID Undercity.
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1497, 4, 1497, 0, 0, 0, 0); -- Only in AreaID Undercity.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1498, -1, 308, 990, 1497, 0, 0); -- Only if Event 1 active and map 0 and AreaID Undercity.
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (9323, 0, 39, 9326, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1498, 'Midsummer festival - Activate Fire Festival Fury Traps in Undercity');
@@ -1524,7 +1525,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (9326, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+973, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Undercity');
 
 -- Cast Fire Festival Fortitude on all Players in Thunder Bluff on Quests (9324,9325,9326,9330,9331,9332) turn in.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1638, 4, 1638, 0, 0, 0, 0); -- Only in AreaID Thunder Bluff.
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1638, 4, 1638, 0, 0, 0, 0); -- Only in AreaID Thunder Bluff.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1639, -1, 308, 991, 1638, 0, 0); -- Only if Event 1 active and map 1 and AreaID Thunder Bluff.
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (9323, 0, 39, 9325, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1639, 'Midsummer festival - Activate Fire Festival Fury Traps in Thunder Bluff');
@@ -1549,7 +1550,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (9325, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+991, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Thunder Bluff');
 
 -- Cast Fire Festival Fortitude on all Players in Ironforge on Quests (9324,9325,9326,9330,9331,9332) turn in.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1537, 4, 1537, 0, 0, 0, 0); -- Only in AreaID Ironforge.
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1537, 4, 1537, 0, 0, 0, 0); -- Only in AreaID Ironforge.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1538, -1, 308, 990, 1537, 0, 0); -- Only if Event 1 active and map 0 and AreaID Ironforge.
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (9323, 0, 39, 9331, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1538, 'Midsummer festival - Activate Fire Festival Fury Traps in Orgrimmar');
@@ -1570,7 +1571,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (9331, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+947, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Ironforge');
 
 -- Cast Fire Festival Fortitude on all Players in Orgrimmar on Quests (9324,9325,9326,9330,9331,9332) turn in.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1637, 4, 1637, 0, 0, 0, 0); -- Only in AreaID Orgrimmar.
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1637, 4, 1637, 0, 0, 0, 0); -- Only in AreaID Orgrimmar.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1640, -1, 308, 991, 1637, 0, 0); -- Only if Event 1 active and map 1 and AreaID Orgrimmar.
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (9323, 0, 39, 9324, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1640, 'Midsummer festival - Activate Fire Festival Fury Traps in Orgrimmar');
@@ -1605,7 +1606,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (9324, 0, 13, 0, 0, 0, 0, @MIDSUMMER_GAMEOBJECT_GUID+1019, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Midsummer festival - Activate Fire Festival Fury Trap in Orgrimmar');
 
 -- Cast Fire Festival Fortitude on all Players in Darnassus on Quests (9324,9325,9326,9330,9331,9332) turn in.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1657, 4, 1657, 0, 0, 0, 0); -- Only in AreaID Darnassus.
+-- INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1657, 4, 1657, 0, 0, 0, 0); -- Only in AreaID Darnassus.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (702, 4, 702, 0, 0, 0, 0); -- Only in AreaID Rut'theran (location of the quest giver).
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1658, -2, 1657, 702, 0, 0, 0); -- Only in AreaID Darnassus or Rut'theran.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1659, -1, 308, 991, 1658, 0, 0); -- Only if Event 1 active and map 1 and AreaID Darnassus or Rut'theran.
