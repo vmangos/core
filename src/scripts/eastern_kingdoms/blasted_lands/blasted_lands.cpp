@@ -21,140 +21,17 @@ SDCategory: Blasted Lands
 EndScriptData */
 
 /* ContentData
-npc_thadius_grimshade
 go_stone_of_binding
 EndContentData */
 
 #include "scriptPCH.h"
 
-struct ThadiusGrimshadeAI : public ScriptedAI
-{
-    ThadiusGrimshadeAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        underEvent = false;
-        m_uiBeginTimer = 3000;
-        m_uiTranceTimer = 8000;
-        grimshadeGUID = 0;
-        underTrance = false;
-        underSpeak = false;
-        m_uiSpeakTimer = 8000;
-        sentence = false;
-        createObject = false;
-        isStun = false;
-        playerGUID = 0;
-        Reset();
-    }
-
-    bool underEvent;
-    bool underTrance;
-    bool underSpeak;
-    bool sentence;
-    bool createObject;
-    bool isStun;
-    uint32 m_uiSpeakTimer;
-    uint32 m_uiBeginTimer;
-    uint32 m_uiTranceTimer;
-    uint64 grimshadeGUID;
-    uint64 playerGUID;
-
-    void Reset() override
-    {
-    }
-
-    void QuestCompleted(Player* pPlayer, Quest const* pQuest)
-    {
-        if (!underEvent)
-        {
-            playerGUID = pPlayer->GetGUID();
-            underEvent = true;
-        }
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (underEvent)
-        {
-            if (!createObject)
-            {
-                if (GameObject* pGo = m_creature->SummonGameObject(144069, -10999.166992f, -3484.187012f, 103.127243f, 2.592681f))
-                    grimshadeGUID = pGo->GetGUID();
-                createObject = true;
-            }
-            if (m_uiBeginTimer < uiDiff)
-                underTrance = true;
-            else
-                m_uiBeginTimer -= uiDiff;
-
-        }
-
-        if (underTrance)
-        {
-            if (!isStun)
-            {
-                m_creature->HandleEmote(EMOTE_STATE_STUN);
-                isStun = true;
-            }
-            if (m_uiTranceTimer < uiDiff)
-                underSpeak = true;
-            else
-                m_uiTranceTimer -= uiDiff;
-
-        }
-
-        if (underSpeak)
-        {
-            if (!sentence)
-            {
-                m_creature->MonsterSay("...Cage...temple...trolls...", 0, 0);
-                sentence = true;
-            }
-            if (m_uiSpeakTimer < uiDiff)
-            {
-                m_creature->HandleEmote(EMOTE_STATE_NONE);
-                if (GameObject* pVision = m_creature->GetMap()->GetGameObject(grimshadeGUID))
-                    pVision->Delete();
-
-                underEvent = false;
-                m_uiBeginTimer = 3000;
-                m_uiTranceTimer = 3000;
-                grimshadeGUID = 0;
-                underTrance = false;
-                underSpeak = false;
-                m_uiSpeakTimer = 3000;
-                sentence = false;
-                createObject = false;
-                isStun = false;
-
-                if (Player* player = m_creature->GetMap()->GetPlayer(playerGUID))
-                {
-                    if (player->GetQuestStatus(2992) == QUEST_STATUS_INCOMPLETE)
-                        player->AreaExploredOrEventHappens(2992);
-                }
-            }
-            else
-                m_uiSpeakTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_thadius_grimshade(Creature* pCreature)
-{
-    return new ThadiusGrimshadeAI(pCreature);
-}
-
-bool QuestAccept_npc_Thadius_Grimshade(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() != 2992)
-        return false;
-
-    if (ThadiusGrimshadeAI* pThadius = dynamic_cast<ThadiusGrimshadeAI*>(pQuestGiver->AI()))
-        pThadius->QuestCompleted(pPlayer, pQuest);
-    return true;
-}
 bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
 {
-// 141812 <= 7668 Servant of Razelikh   // 141857 <= 7669 Servant of Grol
-// 141858 <= 7670 Servant of Allistarj  // 141859 <= 7671 Servant of Sevine
+    // 141812 <= 7668 Servant of Razelikh
+    // 141857 <= 7669 Servant of Grol
+    // 141858 <= 7670 Servant of Allistarj
+    // 141859 <= 7671 Servant of Sevine
     Creature* pCreature = nullptr;
     switch(pGo->GetEntry())
     {
@@ -175,15 +52,10 @@ bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
         pCreature->CastSpell(pCreature, 12938, true);
     return false;
 }
+
 void AddSC_blasted_lands()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_thadius_grimshade";
-    newscript->GetAI = &GetAI_thadius_grimshade;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_Thadius_Grimshade;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_stone_of_binding";

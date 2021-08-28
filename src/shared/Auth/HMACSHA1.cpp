@@ -19,14 +19,14 @@
 #include "Auth/HMACSHA1.h"
 #include "BigNumber.h"
 
-HMACSHA1::HMACSHA1(uint32 len, uint8* seed)
+HMACSHA1::HMACSHA1(const uint8* seed, size_t len)
 {
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L
     m_ctx = HMAC_CTX_new();
     HMAC_Init_ex(m_ctx, seed, len, EVP_sha1(), nullptr);
 #else
     HMAC_CTX_init(&m_ctx);
-    HMAC_Init_ex(&m_ctx, seed, len, EVP_sha1(), nullptr);
+    HMAC_Init_ex(&m_ctx, seed, static_cast<int>(len), EVP_sha1(), nullptr);
 #endif
 }
 

@@ -334,7 +334,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         // Interrupt spell cast at move
         pMover->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
-        pMover->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_MOVING_CANCELS);
+        pMover->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOVING_CANCELS);
         // Fix bug after 1.11 where client doesn't send stand state update while casting.
         // Test case: Begin eating or drinking, then start casting Hearthstone and run.
         pMover->SetStandState(UNIT_STAND_STATE_STAND);
@@ -805,7 +805,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
     HandleMoverRelocation(pMover, movementInfo);
 
-    MovementPacketSender::SendKnockBackToObservers(pMover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.velocity);
+    MovementPacketSender::SendKnockBackToObservers(pMover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.zspeed);
 }
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)

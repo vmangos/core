@@ -113,7 +113,8 @@ public:
     bool IsWearingShield() const;
 
     void EquipOrUseNewItem();
-    void AddItemToInventory(uint32 itemId);
+    void AddItemToInventory(uint32 itemId, uint32 count = 1);
+    void AddHunterAmmo();
 
     bool SummonShamanTotems();
     SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot);

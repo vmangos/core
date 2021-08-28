@@ -461,6 +461,9 @@ void Loot::AddItem(LootStoreItem const& item)
     if (proto && !proto->m_bDiscovered)
         proto->m_bDiscovered = true;
 
+    if (item.needs_quest && proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT))
+        m_hasFFAQuestItems = true;
+
     if (item.needs_quest)                                   // Quest drop
     {
         if (m_questItems.size() < MAX_NR_QUEST_ITEMS)

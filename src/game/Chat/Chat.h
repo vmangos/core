@@ -201,7 +201,6 @@ class ChatHandler
 
         //Custom
         bool HandleListAddonsCommand(char *);
-        bool HandleUpdateWorldStateCommand(char *);
         bool HandleSendSpellVisualCommand(char *);
         bool HandleSendSpellImpactCommand(char *);
         bool HandleDebugUnitCommand(char *);
@@ -464,7 +463,6 @@ class ChatHandler
         bool HandleDebugSpellCheckCommand(char* args);
         bool HandleDebugSpellCoefsCommand(char* args);
         bool HandleDebugSpellModsCommand(char* args);
-        bool HandleDebugUpdateWorldStateCommand(char* args);
         bool HandleDebugOverflowCommand(char* args);
         bool HandleDebugChatFreezeCommand(char* args);
 
@@ -485,6 +483,7 @@ class ChatHandler
         bool HandleDebugSendSellErrorCommand(char* args);
         bool HandleDebugSendSpellFailCommand(char* args);
         bool HandleDebugSendOpenBagCommand(char* args);
+        bool HandleDebugSendWorldStateCommand(char* args);
 
         /*
         Send the visual of the next channeled spell after args, suggested macro :

@@ -4,9 +4,11 @@
 #include "Common.h"
 #include "UnitDefines.h"
 #include "Anticheat.h"
+#include "SniffFile.h"
 
 #include <array>
 #include <sstream>
+#include <deque>
 
 enum CheatType
 {
@@ -69,6 +71,7 @@ class MovementAnticheat
         // Public methods called from the movement handler upon received a packet.
         bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        void LogMovementPacket(bool isClientPacket, WorldPacket& packet);
 
         bool IsInKnockBack() const { return m_knockBack; }
 
@@ -89,6 +92,8 @@ private:
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
         uint32 CheckTimeDesync(MovementInfo const& movementInfo);
+
+        void AddMessageToPacketLog(std::string message);
 
         MovementInfo& GetLastMovementInfo();
         MovementInfo const& GetLastMovementInfo() const;
@@ -115,6 +120,7 @@ private:
         uint32 m_updateCheckTimer = 0;
         std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTick = {};    // gets reset every anticheat update tick
         std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTotal = {};   // gets reset when total treshold is reached
+        std::deque<LoggedPacket> m_packetLog;
 };
 
 #endif

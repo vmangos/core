@@ -510,7 +510,8 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
             return;
     }
 
-    _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_ANIM_CANCELS);
+    _player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_ANIM_CANCELS);
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ANIM_CANCELS);
     _player->SetStandState(animstate);
 }
 
@@ -1245,5 +1246,5 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
         return;
     }
 
-    m_warden->HandleWardenDataOpcode(recv_data);
+    m_warden->HandlePacket(recv_data);
 }

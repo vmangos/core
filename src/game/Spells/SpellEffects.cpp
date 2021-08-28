@@ -2070,41 +2070,17 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
         {
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+
+            // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+            // -  Vanish now removes effects that allow the caster to always remain
+            //    aware of their target(currently Hunter's Mark and Mind Vision).
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
+#endif
 
-            // if this spell is given to NPC it must handle rest by it's own AI
-            if (unitTarget->GetTypeId() != TYPEID_PLAYER)
-                return;
+            if (Player* pPlayer = unitTarget->ToPlayer())
+                pPlayer->CastHighestStealthRank();
 
-            // get highest rank of the Stealth spell
-            SpellEntry const* stealthSpellEntry = nullptr;
-            const PlayerSpellMap& sp_list = ((Player*)unitTarget)->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
-            {
-                // only highest rank is shown in spell book, so simply check if shown in spell book
-                if (!itr->second.active || itr->second.disabled || itr->second.state == PLAYERSPELL_REMOVED)
-                    continue;
-
-                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
-                if (!spellInfo)
-                    continue;
-
-                if (spellInfo->IsFitToFamily(SPELLFAMILY_ROGUE, uint64(0x0000000000400000)))
-                {
-                    stealthSpellEntry = spellInfo;
-                    break;
-                }
-            }
-
-            // no Stealth spell found
-            if (!stealthSpellEntry)
-                return;
-
-            // reset cooldown on it if needed
-            if (!unitTarget->IsSpellReady(*stealthSpellEntry))
-                unitTarget->RemoveSpellCooldown(*stealthSpellEntry);
-
-            m_caster->CastSpell(unitTarget, stealthSpellEntry, true);
             return;
         }
         // just skip
@@ -3084,7 +3060,7 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
     else
         spawnCreature->SetReactState(REACT_AGGRESSIVE);
 
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+    if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
         ((Creature*)m_casterUnit)->AI()->JustSummoned((Creature*)spawnCreature);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
@@ -3602,7 +3578,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         map->Add((Creature*)spawnCreature);
 
         // Notify Summoner
-        if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+        if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
             ((Creature*)m_casterUnit)->AI()->JustSummoned(spawnCreature);
 
         switch (m_spellInfo->Id)
@@ -4132,7 +4108,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     {
         if (!m_casterUnit->IsAlive()) // CalculateMeleeDamage does not work in that case.
             return;
-        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
+        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ATTACKING_CANCELS);
         if (Spell* spell = m_casterUnit->GetCurrentSpell(CURRENT_MELEE_SPELL))
             spell->cast();
         CalcDamageInfo damageInfo;
@@ -4342,8 +4318,8 @@ void Spell::EffectInterruptCast(SpellEffectIndex eff_idx)
             if ((spell->getState() == SPELL_STATE_CASTING
                 || (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastTime() > 0.0f))
                 && curSpellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE
-                && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK)
-                || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->ChannelInterruptFlags & CHANNEL_FLAG_ACTION_CANCELS)))
+                && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
+                || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_ACTION_CANCELS))))
             {
                 unitTarget->LockOutSpells(curSpellInfo->GetSpellSchoolMask(), m_spellInfo->GetDuration());
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
@@ -4434,8 +4410,10 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     pGameObj->SetWorldMask(m_caster->GetWorldMask());
     pGameObj->SummonLinkedTrapIfAny();
 
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+    if (m_caster->IsCreature() && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
+    else if (m_caster->IsGameObject() && ((GameObject*)m_caster)->AI())
+        ((GameObject*)m_caster)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
 }
@@ -5262,22 +5240,21 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 Unit* target = unitTarget ? unitTarget : m_casterUnit;
                 if (!target)
                     return;
-                target->RemoveNegativeSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                target->RemoveSpellsCausingAuraWithMechanic(SPELL_AURA_MOD_ROOT);
                 Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                 for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
                 {
                     SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
 
-                    // skip positive and forced debuff auras
-                    if ((*iter)->IsPositive() || aurSpellInfo->HasAttribute(SPELL_ATTR_NEGATIVE))
+                    // all shapeshift removing spells have some mechanic mask. 33572 and 38132 confirmed not removed on poly
+                    if (aurMechMask == 0)
                     {
                         ++iter;
                         continue;
                     }
 
-                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
-
-                    // If spell that caused this aura has Croud Control or Daze effect
+                    // If spell that caused this aura has Crowd Control or Daze effect
                     if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
                         // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
                         (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
@@ -6051,7 +6028,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
 
     pGameObj->SummonLinkedTrapIfAny();
 
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+    if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
         ((Creature*)m_casterUnit)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
@@ -6325,7 +6302,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     critter->SetFacingToObject(player);
 
     // Notify Summoner
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+    if (m_caster->IsCreature() && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(critter);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(critter->GetObjectGuid()));

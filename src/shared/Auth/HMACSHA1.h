@@ -30,7 +30,7 @@ class BigNumber;
 class HMACSHA1
 {
     public:
-        HMACSHA1(uint32 len, uint8* seed);
+        HMACSHA1(const uint8* seed, size_t len);
         ~HMACSHA1();
         void UpdateBigNumber(BigNumber* bn);
         void UpdateData(std::vector<uint8> const& data);

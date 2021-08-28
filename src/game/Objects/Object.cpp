@@ -27,6 +27,7 @@
 #include "World.h"
 #include "Creature.h"
 #include "Player.h"
+#include "GameObjectAI.h"
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "UpdateData.h"
@@ -47,6 +48,7 @@
 #include "ZoneScriptMgr.h"
 #include "InstanceData.h"
 #include "Chat.h"
+#include "Anticheat.h"
 
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
@@ -80,7 +82,7 @@ void MovementInfo::Read(ByteBuffer &data)
 
     if (HasMovementFlag(MOVEFLAG_JUMPING))
     {
-        data >> jump.velocity;
+        data >> jump.zspeed;
         data >> jump.cosAngle;
         data >> jump.sinAngle;
         data >> jump.xyspeed;
@@ -161,7 +163,7 @@ void MovementInfo::Write(ByteBuffer &data) const
 
     if (HasMovementFlag(MOVEFLAG_JUMPING))
     {
-        data << jump.velocity;
+        data << jump.zspeed;
         data << jump.cosAngle;
         data << jump.sinAngle;
         data << jump.xyspeed;
@@ -677,14 +679,13 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                 {
                     uint32 dynamicFlags = m_uint32Values[index];
                     if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TRACK_UNIT))
+                    {
                         if (Unit const* unit = ToUnit())
                         {
-                            Unit::AuraList auras = unit->GetAurasByType(SPELL_AURA_MOD_STALKED);
-                            if (std::find_if(auras.begin(), auras.end(),[target](Aura* a){
-                                return target->GetObjectGuid() == a->GetCasterGuid();
-                            }) == auras.end())
+                            if (!unit->HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, target->GetObjectGuid()))
                                 dynamicFlags &= ~UNIT_DYNFLAG_TRACK_UNIT;
                         }
+                    }
                     if (Creature const* creature = ToCreature())
                     {
                         if (creature->HasLootRecipient())
@@ -2021,6 +2022,9 @@ void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObje
 
 void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except)
 {
+    if (self && !except && IsPlayer())
+        static_cast<Player*>(this)->GetCheatData()->LogMovementPacket(false, data);
+
     if (!IsPlayer() || !sWorld.GetBroadcaster()->IsEnabled())
         SendObjectMessageToSet(&data, true, except);
     else
@@ -2280,8 +2284,10 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
     pCreature->Summon(spwtype, despwtime, pFuncAiSetter);
 
-    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
+    if (IsCreature() && ((Creature*)this)->AI())
         ((Creature*)this)->AI()->JustSummoned(pCreature);
+    else if (IsGameObject() && ((GameObject*)this)->AI())
+        ((GameObject*)this)->AI()->JustSummoned(pCreature);
 
     // Creature Linking, Initial load is handled like respawn
     if (pCreature->IsLinkingEventTrigger())
@@ -2318,8 +2324,10 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     else
         go->SetSpawnedByDefault(false);
 
-    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
+    if (IsCreature() && ((Creature*)this)->AI())
         ((Creature*)this)->AI()->JustSummoned(go);
+    else if (IsGameObject() && ((GameObject*)this)->AI())
+        ((GameObject*)this)->AI()->JustSummoned(go);
 
     map->Add(go);
     go->SetWorldMask(GetWorldMask());
@@ -2887,6 +2895,40 @@ void WorldObject::GetAlivePlayerListInRange(WorldObject const* pSource, std::lis
     MaNGOS::AnyPlayerInObjectRangeCheck check(pSource, fMaxSearchRange);
     MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(lList, check);
     Cell::VisitWorldObjects(pSource, searcher, fMaxSearchRange);
+}
+
+uint32 WorldObject::DespawnNearCreaturesByEntry(uint32 entry, float range)
+{
+    std::list<Creature*> creatures;
+    GetCreatureListWithEntryInGrid(creatures, entry, range);
+    uint32 count = 0;
+    for (const auto& it : creatures)
+    {
+        if (it->IsInWorld())
+        {
+            ++count;
+            it->DisappearAndDie();
+        }
+    }
+    return count;
+}
+
+uint32 WorldObject::RespawnNearCreaturesByEntry(uint32 entry, float range)
+{
+    if (range == 0.0f)
+        range = GetMap()->GetVisibilityDistance();
+    uint32 count = 0;
+    std::list<Creature*> lList;
+    GetCreatureListWithEntryInGrid(lList, entry, range);
+    for (const auto& it : lList)
+    {
+        if (!it->IsAlive())
+        {
+            it->Respawn();
+            ++count;
+        }
+    }
+    return count;
 }
 
 void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z)

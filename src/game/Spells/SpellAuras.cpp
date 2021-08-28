@@ -2270,18 +2270,14 @@ void Aura::HandleAuraHover(bool apply, bool Real)
 
 void Aura::HandleWaterBreathing(bool apply, bool /*Real*/)
 {
-    Unit* target = GetTarget();
-
-    if (target->GetTypeId() == TYPEID_PLAYER)
-        static_cast<Player*>(target)->SetWaterBreathingIntervalMultiplier(apply ? 0 : target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
+    if (Player* target = GetTarget()->ToPlayer())
+        target->SetWaterBreathingIntervalMultiplier(((apply || target->HasAuraType(SPELL_AURA_WATER_BREATHING)) ? 0.0f : target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING)));
 }
 
 void Aura::HandleModWaterBreathing(bool /*apply*/, bool /*Real*/)
 {
-    Unit* target = GetTarget();
-
-    if (target->GetTypeId() == TYPEID_PLAYER)
-        static_cast<Player*>(target)->SetWaterBreathingIntervalMultiplier(target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
+    if (Player* target = GetTarget()->ToPlayer())
+        target->SetWaterBreathingIntervalMultiplier(target->GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING));
 }
 
 std::pair<unsigned int, float> GetShapeshiftDisplayInfo(ShapeshiftForm form, Unit* target){
@@ -2483,7 +2479,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT, GetHolder());
 
         if (!(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY))
-            target->RemoveSpellsCausingAura(SPELL_AURA_WATER_WALK, GetHolder());
+            target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_SHAPESHIFTING_CANCELS, GetId());
 
         if (PowerType != POWER_MANA)
         {
@@ -3690,7 +3686,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
         }
 
         // drop flag at stealth in bg
-        target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+        target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_STEALTH_INVIS_CANCELS);
 
         // only at real aura add
         if (Real)
@@ -3709,7 +3705,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (target->GetTypeId() == TYPEID_PLAYER && GetId() == 20580)
                 target->CastSpell(target, 21009, true, nullptr, this);
 
-            target->InterruptSpellsCastedOnMe();
+            target->InterruptSpellsCastedOnMe(false, false, true);
         }
     }
     else
@@ -3757,7 +3753,7 @@ void Aura::HandleInvisibility(bool apply, bool Real)
     if (apply)
     {
         target->m_invisibilityMask |= (1 << m_modifier.m_miscvalue);
-        target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+        target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_STEALTH_INVIS_CANCELS);
 
         if (Real && target->GetTypeId() == TYPEID_PLAYER)
         {
@@ -4080,7 +4076,7 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
     Unit* target = GetTarget();
 
     // when removing flag aura, handle flag drop
-    if (target->IsPlayer() && !target->HasAuraType(SPELL_AURA_MOD_POSSESS) && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+    if (target->IsPlayer() && !target->HasAuraType(SPELL_AURA_MOD_POSSESS) && GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS))
     {
         Player* player = static_cast<Player*>(target);
 
@@ -4124,10 +4120,10 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
     target->ApplySpellImmune(GetId(), IMMUNITY_SCHOOL, m_modifier.m_miscvalue, apply);
 
     // remove all flag auras (they are positive, but they must be removed when you are immune)
-    if (apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY
-              && GetSpellProto()->AttributesEx2 & SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD
+    if (apply && GetSpellProto()->HasAttribute(SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
+              && GetSpellProto()->HasAttribute(SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD)
               && target->IsPlayer() && !target->IsCharmed())
-        target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+        target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS);
 
     // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
     if (Real && GetSpellProto()->HasAttribute(SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
@@ -5633,7 +5629,7 @@ void Aura::HandleModUnattackable(bool Apply, bool Real)
     if (Real && Apply)
     {
         GetTarget()->CombatStop();
-        GetTarget()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
+        GetTarget()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS);
     }
     GetTarget()->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE_2, Apply);
 }
@@ -5834,8 +5830,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             pCaster->DealDamageMods(target, pdamage, &absorb);
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
+            uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
 
             uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
             pdamage += bonus;
@@ -5914,8 +5910,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             float multiplier = spellProto->EffectMultipleValue[GetEffIndex()] > 0 ? spellProto->EffectMultipleValue[GetEffIndex()] : 1;
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
+            uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
 
             uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
             pdamage += bonus;
@@ -5963,8 +5959,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // to do procs on the tick, however
             if (target->GetHealth() == target->GetMaxHealth())
             {
-                uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
-                uint32 procVictim = PROC_FLAG_ON_TAKE_PERIODIC;
+                uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+                uint32 procVictim = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
                 uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
                 pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto));
 
@@ -6013,8 +6009,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             target->SendPeriodicAuraLog(&pInfo);
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
+            uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
             uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
             pCaster->ProcDamageAndSpell(ProcSystemArguments(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto));
 
@@ -6133,8 +6129,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             else if (improvedManaDrain1)
                 PeriodicTick(improvedManaDrain1->GetHolder()->GetSpellProto(), SPELL_AURA_PERIODIC_DAMAGE, drain_amount * 0.15f);
 
-            // Nostalrius: break des controles type 'AURA_INTERRUPT_FLAG_DAMAGE'
-            target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE);
+            target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS);
             break;
         }
         case SPELL_AURA_PERIODIC_ENERGIZE:
@@ -6261,8 +6256,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
+            uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
             uint32 procEx       = createProcExtendMask(&damageInfo, SPELL_MISS_NONE);
             if (damageInfo.damage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
@@ -6275,7 +6270,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
         case SPELL_AURA_MOD_REGEN:
         {
             // Eating anim
-            if (spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (spellProto->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
                 target->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
             break;
         }
@@ -6289,7 +6284,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (int32(pt) != m_modifier.m_miscvalue)
                 return;
 
-            if (spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (spellProto->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
             {
                 // eating anim
                 target->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
@@ -6565,7 +6560,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
 
     for (auto& aura : m_auras)
         aura = nullptr;
-    m_makesTargetSecondaryFocus = !GetSpellProto()->IsPositiveSpell() && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE
+    m_makesTargetSecondaryFocus = !GetSpellProto()->IsPositiveSpell() && (GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS)
                                                                     ||  m_spellProto->HasAura(SPELL_AURA_MOD_CONFUSE)
                                                                     ||  m_spellProto->HasAura(SPELL_AURA_MOD_FEAR));
 }
@@ -6648,7 +6643,7 @@ void SpellAuraHolder::_AddSpellAuraHolder()
     // TODO: Make it easer
     //*****************************************************
     // Sitdown on apply aura req seated
-    if (m_spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED && !m_target->IsSittingDown())
+    if (m_spellProto->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS) && !m_target->IsSittingDown())
         m_target->SetStandState(UNIT_STAND_STATE_SIT);
 
     // register aura diminishing on apply
@@ -7258,6 +7253,15 @@ void SpellAuraHolder::SetAuraMaxDuration(int32 duration)
         if (!(IsPassive() && GetSpellProto()->DurationIndex == 0))
             SetPermanent(false);
     }
+}
+
+bool SpellAuraHolder::HasAuraType(AuraType auraType) const
+{
+    for (const auto aura : m_auras)
+        if (aura)
+            if (aura->GetModifier()->m_auraname == auraType)
+                return true;
+    return false;
 }
 
 bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
@@ -8126,6 +8130,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case SPELL_AURA_MOD_POWER_REGEN:                                // (Greater) Blessing of Wisdom
         case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:                       // Glyph of Salvation / Pain Suppression / Safeguard ?
         case SPELL_AURA_MOD_STAT:
+        case SPELL_AURA_WATER_BREATHING:
             return true;
         case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
             return true;
@@ -8181,7 +8186,7 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 0;
     if (other->GetSpellProto()->EffectItemType[other->GetEffIndex()] != GetSpellProto()->EffectItemType[GetEffIndex()])
         return 0;
-    if (other->IsPositive() != IsPositive())
+    if ((other->GetModifier()->m_amount > 0) != (GetModifier()->m_amount > 0))
         return 0;
 
     // Other aura is better.

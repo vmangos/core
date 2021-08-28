@@ -354,17 +354,18 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     // Load creature equipment
     if (eventData && eventData->equipment_id)
     {
-        LoadEquipment(eventData->equipment_id);             // use event equipment if any for active event
-    }
-    else if (!addon || addon->equipment_id < 0)
-    {
-        // use default from the template
-        LoadEquipment(cinfo->equipment_id);
+        // use event equipment if any for active event
+        LoadEquipment(eventData->equipment_id);
     }
     else if (addon && addon->equipment_id >= 0)
     {
-        // override
-        LoadEquipment(addon->equipment_id);
+        // override with per spawn data
+        LoadEquipment(addon->equipment_id, true);
+    }
+    else
+    {
+        // use default from the template
+        LoadEquipment(cinfo->equipment_id, true);
     }
 
     SetName(normalInfo->name);                              // at normal entry always
@@ -2887,6 +2888,14 @@ void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*
         }
 
         m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
+    }
+    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime())
+    {
+        // Forced cooldown on using instant spells during mind control to prevent abuse.
+        recTime = 10 * IN_MILLISECONDS;
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, 0, 0);
+        if (Player const* player = ::ToPlayer(GetCharmer()))
+            player->SendSpellCooldown(spellEntry.Id, recTime, GetObjectGuid());
     }
 }
 

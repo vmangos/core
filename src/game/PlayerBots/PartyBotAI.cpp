@@ -280,7 +280,7 @@ bool PartyBotAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpell
 
 bool PartyBotAI::CanUseCrowdControl(SpellEntry const* pSpellEntry, Unit* pTarget) const
 {
-    if ((pSpellEntry->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) &&
+    if (pSpellEntry->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS) &&
         AreOthersOnSameTarget(pTarget->GetObjectGuid()))
         return false;
 
@@ -671,7 +671,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (!me->IsInCombat())
     {
         if (DrinkAndEat())
+        {
+            if (me->IsMounted())
+                me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
             return;
+        }
 
         // Teleport to leader if too far away.
         if (!me->IsWithinDistInMap(pLeader, 100.0f))
@@ -724,11 +728,17 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     if (!me->IsInCombat())
     {
-        // Mount if leader is mounted.
-        if (pLeader->IsMounted())
+        // Mount if leader is mounted and we don't have a target.
+        if (pLeader->IsMounted() && !me->GetVictim())
         {
             if (!me->IsMounted())
             {
+                // Leave shapeshift before mounting.
+                if (me->IsInDisallowedMountForm() &&
+                    me->GetDisplayId() != me->GetNativeDisplayId() &&
+                    me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+                    me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+
                 auto auraList = pLeader->GetAurasByType(SPELL_AURA_MOUNTED);
                 if (!auraList.empty())
                 {
@@ -1307,11 +1317,34 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
                 return;
         }
 
+        if (me->HasSpell(PB_SPELL_AUTO_SHOT) &&
+            !me->IsMoving() &&
+            (me->GetCombatDistance(pVictim) > 8.0f) &&
+            !me->IsNonMeleeSpellCasted())
+        {
+            switch (me->CastSpell(pVictim, PB_SPELL_AUTO_SHOT, false))
+            {
+                case SPELL_FAILED_NEED_AMMO:
+                case SPELL_FAILED_NO_AMMO:
+                {
+                    AddHunterAmmo();
+                    break;
+                }
+            }
+        }
+
         if (m_spells.hunter.pConcussiveShot &&
             pVictim->IsMoving() && (pVictim->GetVictim() == me) &&
             CanTryToCastSpell(pVictim, m_spells.hunter.pConcussiveShot))
         {
             if (DoCastSpell(pVictim, m_spells.hunter.pConcussiveShot) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.hunter.pAimedShot &&
+            CanTryToCastSpell(pVictim, m_spells.hunter.pAimedShot))
+        {
+            if (DoCastSpell(pVictim, m_spells.hunter.pAimedShot) == SPELL_CAST_OK)
                 return;
         }
 
@@ -1333,13 +1366,6 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             CanTryToCastSpell(pVictim, m_spells.hunter.pMultiShot))
         {
             if (DoCastSpell(pVictim, m_spells.hunter.pMultiShot) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (m_spells.hunter.pAimedShot &&
-            CanTryToCastSpell(pVictim, m_spells.hunter.pAimedShot))
-        {
-            if (DoCastSpell(pVictim, m_spells.hunter.pAimedShot) == SPELL_CAST_OK)
                 return;
         }
 
@@ -1418,12 +1444,6 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             if (RunAwayFromTarget(pVictim))
                 return;
         }
-
-        if (me->HasSpell(PB_SPELL_AUTO_SHOT) &&
-           !me->IsMoving() &&
-           (me->GetCombatDistance(pVictim) > 8.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-            me->CastSpell(pVictim, PB_SPELL_AUTO_SHOT, false);
     }
 }
 
@@ -2476,6 +2496,51 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
     }
 }
 
+bool PartyBotAI::ShouldEnterStealth() const
+{
+    if (me->IsMounted())
+        return false;
+
+    if (me->GetVictim() || me->InBattleGround() || me->IsFFAPvP())
+        return true;
+
+    if (me->GetHealthPercent() < 10.0f)
+        return true;
+
+    if (Player* pLeader = GetPartyLeader())
+    {
+        if (pLeader->IsDead() || pLeader->IsFeigningDeathSuccessfully() ||
+            pLeader->HasAuraType(SPELL_AURA_MOD_STEALTH) ||
+            pLeader->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+            return true;
+    }
+
+    return false;
+}
+
+bool PartyBotAI::EnterStealthIfNeeded(SpellEntry const* pStealthSpell)
+{
+    if (pStealthSpell)
+    {
+        bool const shouldStealth = ShouldEnterStealth();
+
+        if (me->HasAura(pStealthSpell->Id))
+        {
+            if (!shouldStealth)
+                me->RemoveAurasDueToSpellByCancel(pStealthSpell->Id);
+        }
+        else
+        {
+            if (shouldStealth &&
+                CanTryToCastSpell(me, pStealthSpell) &&
+                DoCastSpell(me, pStealthSpell) == SPELL_CAST_OK)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void PartyBotAI::UpdateOutOfCombatAI_Rogue()
 {
     if (m_spells.rogue.pMainHandPoison &&
@@ -2492,12 +2557,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Rogue()
             return;
     }
 
-    if (m_spells.rogue.pStealth &&
-        CanTryToCastSpell(me, m_spells.rogue.pStealth))
-    {
-        if (DoCastSpell(me, m_spells.rogue.pStealth) == SPELL_CAST_OK)
-            return;
-    }
+    if (EnterStealthIfNeeded(m_spells.rogue.pStealth))
+        return;
 
     if (me->GetVictim())
         UpdateInCombatAI_Rogue();
@@ -2730,7 +2791,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
     if (m_role == ROLE_HEALER && me->GetShapeshiftForm() != FORM_NONE &&
         me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
     {
-        me->RemoveAurasDueToSpellByCancel(me->GetAurasByType(SPELL_AURA_MOD_SHAPESHIFT).front()->GetId());
+        me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
         return;
     }
 
@@ -2803,12 +2864,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
     }
     else if (me->GetShapeshiftForm() == FORM_CAT)
     {
-        if (m_spells.druid.pProwl &&
-            CanTryToCastSpell(me, m_spells.druid.pProwl))
-        {
-            if (DoCastSpell(me, m_spells.druid.pProwl) == SPELL_CAST_OK)
-                return;
-        }
+        if (EnterStealthIfNeeded(m_spells.druid.pProwl))
+            return;
     }
 
     if (me->GetVictim())
@@ -2890,7 +2947,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         me->HasUnitState(UNIT_STAT_ROOT) &&
         me->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT) &&
         (m_role != ROLE_TANK || !me->CanReachWithMeleeAutoAttack(pVictim)))
-        me->RemoveAurasDueToSpellByCancel(me->GetAurasByType(SPELL_AURA_MOD_SHAPESHIFT).front()->GetId());
+        me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
 
     if (m_role == ROLE_HEALER)
         return;

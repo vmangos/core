@@ -1187,6 +1187,9 @@ uint32 Player::GetWaterBreathingInterval() const
 
 void Player::SetWaterBreathingIntervalMultiplier(float multiplier)
 {
+    if (m_environmentBreathingMultiplier == multiplier)
+        return;
+
     m_environmentBreathingMultiplier = multiplier;
 
     if (const uint32 interval = GetWaterBreathingInterval())
@@ -1221,8 +1224,8 @@ void Player::SetEnvironmentFlags(EnvironmentFlags flags, bool apply)
     // Remove auras that need land or water
     if (flags & ENVIRONMENT_FLAG_HIGH_LIQUID)
     {
-        InterruptSpellsWithChannelFlags(apply ? CHANNEL_FLAG_ABOVE_WATER_CANCELS : CHANNEL_FLAG_UNDER_WATER_CANCELS);
-        RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
+        InterruptSpellsWithChannelFlags(apply ? AURA_INTERRUPT_UNDER_WATER_CANCELS : AURA_INTERRUPT_ABOVE_WATER_CANCELS);
+        RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_UNDER_WATER_CANCELS : AURA_INTERRUPT_ABOVE_WATER_CANCELS);
     }
 
     // On moving in/out high sea area: affect fatigue timer
@@ -2148,7 +2151,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
         InterruptNonMeleeSpells(true);
 
     //remove auras before removing from map...
-    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS | AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
     RemoveCharmAuras();
     DisableSpline();
     SetMover(this);
@@ -2252,7 +2255,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         }
 
         if (!IsWithinDist3d(x, y, z, GetMap()->GetVisibilityDistance()))
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
         // this will be used instead of the current location in SaveToDB
         m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
@@ -2349,7 +2352,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         SetSelectionGuid(ObjectGuid());
         CombatStop();
         UpdatePvPContested(false, true);
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
         // reset extraAttack counter
         ResetExtraAttacks();
@@ -2387,7 +2390,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 InterruptNonMeleeSpells(true);
 
         //remove auras before removing from map...
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS | AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
         RemoveCharmAuras();
         ResolvePendingMovementChanges(false, false);
 
@@ -2401,6 +2404,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 data << uint32(m_transport->GetEntry());
                 data << uint32(GetMapId());
             }
+            GetCheatData()->LogMovementPacket(false, data);
             GetSession()->SendPacket(&data);
         }
 
@@ -2604,7 +2608,7 @@ void Player::HandleFoodEmotes(uint32 diff)
 
         for (const auto pAura : lModRegenAuras)
         {
-            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && pAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && pAura->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_FOOD);
                 break;
@@ -2613,7 +2617,7 @@ void Player::HandleFoodEmotes(uint32 diff)
 
         for (const auto pAura : lModPowerRegenAuras)
         {
-            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && pAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && pAura->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_DRINK);
                 break;
@@ -2915,13 +2919,7 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
 
 bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
 {
-    for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
-    {
-        if (aura->GetCasterGuid() == this->GetObjectGuid())
-            return true;
-    }
-
-    return false;
+    return pTarget->HasAuraTypeByCaster(SPELL_AURA_EMPATHY, GetObjectGuid());
 }
 
 struct SetGameMasterOnHelper
@@ -5697,7 +5695,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         return;
 
     // No weapon skill gain while in tree/feral form
-    if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
+    if (!defence && IsShapeShifted())
         return; 
 
     uint32 playerLevel      = GetLevel();
@@ -6291,9 +6289,9 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
     if (teleport || old_x != x || old_y != y || old_z != z || old_r != orientation)
     {
         if (teleport || old_x != x || old_y != y || old_z != z)
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
         else
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_TURNING_CANCELS);
 
         RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
@@ -7608,6 +7606,8 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
             continue;
         }
 
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ITEM_USE_CANCELS, 0, false, spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH));
+
         Spell* spell = new Spell(this, spellInfo, (count > 0));
         spell->SetCastItem(item);
         spell->prepare(targets);
@@ -7826,7 +7826,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
     DEBUG_LOG("Player::SendLoot");
 
     if (loot_type != LOOT_PICKPOCKETING)
-        RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH); // TODO: Utiliser AuraInterruptFlags ?
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LOOTING_CANCELS);
 
     switch (guid.GetHigh())
     {
@@ -8263,11 +8263,11 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendUpdateWorldState(uint32 Field, uint32 Value) const
+void Player::SendUpdateWorldState(uint32 field, uint32 value) const
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    data << Field;
-    data << Value;
+    data << field;
+    data << value;
     GetSession()->SendPacket(&data);
 }
 
@@ -15063,6 +15063,14 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     // update items with duration and realtime
     UpdateItemDuration(time_diff, true);
 
+    // After quests and inventory loaded: force update on quest item counters
+    // Fixes cases when quest status data was not correctly saved during last session (crash, db connection lost, etc)
+    for (auto& data : mQuestStatus)
+    {
+        if (Quest const* quest = sObjectMgr.GetQuestTemplate(data.first))
+            AdjustQuestReqItemCount(quest, data.second);
+    }
+
     if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeam()))
     {
         // problems with taxi path loading
@@ -19870,6 +19878,7 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
     data << uint8(allowMove);
+    GetCheatData()->LogMovementPacket(false, data);
     GetSession()->SendPacket(&data);
 #endif
 }
@@ -20788,9 +20797,6 @@ void Player::SetRestType(RestType n_r_type, uint32 areaTriggerId /*= 0*/)
     }
     else
     {
-        if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) && m_timeInnEnter == 0 || time(nullptr) - m_timeInnEnter > 180)
-            SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);
-
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
 
         m_innTriggerId = areaTriggerId;
@@ -21991,4 +21997,36 @@ bool Player::IsInCombatWithCreature(Creature const* pCreature)
     }
 
     return false;
+}
+
+void Player::CastHighestStealthRank()
+{
+    // get highest rank of the Stealth spell
+    SpellEntry const* stealthSpellEntry = nullptr;
+    for (const auto& itr : m_spells)
+    {
+        // only highest rank is shown in spell book, so simply check if shown in spell book
+        if (!itr.second.active || itr.second.disabled || itr.second.state == PLAYERSPELL_REMOVED)
+            continue;
+
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
+        if (!spellInfo)
+            continue;
+
+        if (spellInfo->IsFitToFamily(SPELLFAMILY_ROGUE, uint64(0x0000000000400000)))
+        {
+            stealthSpellEntry = spellInfo;
+            break;
+        }
+    }
+
+    // no Stealth spell found
+    if (!stealthSpellEntry)
+        return;
+
+    // reset cooldown on it if needed
+    if (!IsSpellReady(*stealthSpellEntry))
+        RemoveSpellCooldown(*stealthSpellEntry);
+
+    CastSpell(nullptr, stealthSpellEntry, true);
 }
