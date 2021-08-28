@@ -26,6 +26,7 @@ EndScriptData
 #include "../kalimdor/moonglade/boss_omen.h"
 #include "CritterAI.h"
 #include <array>
+#include "Utilities/EventMap.h"
 
 /* ContentData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
@@ -1200,7 +1201,10 @@ enum
     NPC_CLUSTER_CREDIT_MARKER       = 15894,
     GO_OMEN_CLUSTER_LAUNCHER        = 180874,
 
-    SPELL_LUNAR_FORTUNE             = 26522
+    SPELL_LUNAR_FORTUNE             = 26522,
+
+    EVENT_FIREWORK = 1,
+    EVENT_BUFF = 2
 };
 
 struct FireworkStruct
@@ -1243,26 +1247,12 @@ struct npc_pats_firework_guyAI : ScriptedAI
 {
     explicit npc_pats_firework_guyAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        npc_pats_firework_guyAI::Reset();
-        npc_pats_firework_guyAI::ResetCreature();
-
         IsUsable();
     }
 
-    bool m_bExist;
-    bool m_bisLucky;
-    bool m_bDone;
-    uint8 m_uiIndex;
+    uint8 m_uiIndex = NULL;
 
     void Reset() override {}
-
-    void ResetCreature() override
-    {
-        m_bExist = false;
-        m_bisLucky = false;
-        m_bDone = false;
-        m_uiIndex = NULL;
-    }
 
     void IsUsable()
     {
@@ -1270,74 +1260,97 @@ struct npc_pats_firework_guyAI : ScriptedAI
         {
             if (Fireworks[i].m_uiNpcEntry == m_creature->GetEntry())
             {
-                m_bExist = true;
-                m_bisLucky = m_creature->GetEntry() == NPC_FIREWORK_GUY_ELUNE;
                 m_uiIndex = i;
+
+                m_events.ScheduleEvent(EVENT_FIREWORK, Seconds(0));
+
+                if (m_creature->GetEntry() == NPC_FIREWORK_GUY_ELUNE)
+                    m_events.ScheduleEvent(EVENT_BUFF, Seconds(1));
+
                 break;
             }
         }
     }
 
-    void UpdateAI(uint32 const /*diff*/) override
+    void SendLauncherAnimation()
     {
-        if (!m_bExist || m_bDone)
-            return;
-
         std::list<GameObject*> clusterList;
-        GetGameObjectListWithEntryInGrid(clusterList, me, { 180772, 180859, 180869, 180874, 180771, 180850, 180868 }, CONTACT_DISTANCE);
+        GetGameObjectListWithEntryInGrid(clusterList, m_creature, { 180772, 180859, 180869, 180874, 180771, 180850, 180868 }, CONTACT_DISTANCE); // Any Firework or Cluster Launcher.
         for (const auto pCluster : clusterList)
             pCluster->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
+    }
 
-        float x, y, z;
-        m_creature->GetPosition(x, y, z);
+    void UpdateAI(uint32 const diff) override
+    {
+        m_events.Update(diff);
 
-        if (Fireworks[m_uiIndex].m_bIsCluster)
+        while (uint32 eventId = m_events.ExecuteEvent())
         {
-            for (int i = 0; i < 5; ++i)
+            switch (eventId)
             {
-                // These Positions are exactly the same in 2 sniffed cases.
-                switch (i)
+                case EVENT_FIREWORK:
                 {
-                    case 0:
-                        m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
-                        break;
-                    case 1:
-                        m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
-                        break;
-                    case 2:
-                        m_creature->NearTeleportTo(x, y - 3.0f, z + 8.0f, 0.0f);
-                        break;
-                    case 3:
-                        m_creature->NearTeleportTo(x + 5.0f, y + 1.5f, z + 8.0f, 0.0f);
-                        break;
-                    case 4:
-                        m_creature->NearTeleportTo(x - 5.0f, y + 1.5f, z + 8.0f, 0.0f);
-                        break;
+                    SendLauncherAnimation();
+
+                    float x, y, z;
+                    m_creature->GetPosition(x, y, z);
+
+                    if (Fireworks[m_uiIndex].m_bIsCluster)
+                    {
+                        for (int i = 0; i < 5; ++i)
+                        {
+                            // These Positions are exactly the same in 2 sniffed cases.
+                            switch (i)
+                            {
+                                case 0:
+                                    m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
+                                    break;
+                                case 1:
+                                    m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
+                                    break;
+                                case 2:
+                                    m_creature->NearTeleportTo(x, y - 3.0f, z + 8.0f, 0.0f);
+                                    break;
+                                case 3:
+                                    m_creature->NearTeleportTo(x + 5.0f, y + 1.5f, z + 8.0f, 0.0f);
+                                    break;
+                                case 4:
+                                    m_creature->NearTeleportTo(x - 5.0f, y + 1.5f, z + 8.0f, 0.0f);
+                                    break;
+                            }
+                            m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                        }
+                    }
+                    else
+                    {
+                        m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f); // Always 3.0f above Firework Launcher.
+                        m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
+                    }
+
+                    if (m_creature->IsTemporarySummon())
+                    {
+                        if (Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid()))
+                            if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
+                                pSummoner->KilledMonster(cInfo, ObjectGuid());
+                    }
+
+                    if (GetClosestGameObjectWithEntry(m_creature, GO_OMEN_CLUSTER_LAUNCHER, INTERACTION_DISTANCE))
+                        boss_omenAI::OnFireworkLaunch(m_creature);
+
+                    break;
                 }
-                m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                case EVENT_BUFF:
+                {
+                    m_creature->CastSpell(m_creature, SPELL_LUNAR_FORTUNE, true);
+                    break;
+                }
+                default:
+                    break;
             }
         }
-        else
-        {
-            m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f); // Always 3.0f above Firework Launcher.
-            m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
-        }
-
-        if (m_bisLucky)
-            m_creature->CastSpell(m_creature, SPELL_LUNAR_FORTUNE, true);
-
-        if (m_creature->IsTemporarySummon())
-        {
-            if (Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid()))
-                if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
-                    pSummoner->KilledMonster(cInfo, ObjectGuid());
-        }
-
-        if (GetClosestGameObjectWithEntry(m_creature, GO_OMEN_CLUSTER_LAUNCHER, INTERACTION_DISTANCE))
-            boss_omenAI::OnFireworkLaunch(m_creature);
-
-        m_bDone = true;
     }
+private:
+    EventMap m_events;
 };
 
 CreatureAI* GetAI_npc_pats_firework_guy(Creature* creature)
