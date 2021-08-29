@@ -83,8 +83,7 @@ UPDATE `broadcast_text` SET `chat_type`='12' WHERE `entry` IN (10948,10949,10950
 
 -- Events list for Lunar Festival Sentinel
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15961;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1596101, 15961, 0, 4, 0, 50, 0, 0, 0, 0, 0, 1596101, 0, 0, 'Lunar Festival Sentinel - Aggro');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1596102, 15961, 0, 4, 0, 50, 0, 0, 0, 0, 0, 1596102, 0, 0, 'Lunar Festival Sentinel - Aggro');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1596101, 15961, 0, 4, 0, 100, 2, 0, 0, 0, 0, 1596101, 1596102, 0, 'Lunar Festival Sentinel - Aggro');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1596101;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1596101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10948, 10949, 10950, 10951, 0, 0, 0, 0, 0, 'Lunar Festival Sentinel - Aggro');
@@ -93,14 +92,14 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1596102;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1596102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10952, 10953, 10954, 10955, 0, 0, 0, 0, 0, 'Lunar Festival Sentinel - Aggro');
 
 -- Lunar Festival Sentinel spelllist.
-UPDATE `creature_template` SET `unit_flags`=512, `dmg_min`=328, `dmg_max`=821, `spell_list_id`=159610 WHERE `entry`=15961;
+UPDATE `creature_template` SET `unit_flags`=512, `dmg_min`=328, `dmg_max`=821, `spell_list_id`=159610, `ai_name`='EventAI', `flags_extra`=1024 WHERE `entry`=15961;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
 (159610, 'Lunar Festival - Lunar Festival Sentinel', 15618, 100, 1, 0, 0, 322, 5, 10, 15, 30, 0, 18328, 100, 1, 0, 0, 34, 5, 15, 15, 30, 0, 19643, 100, 1, 0, 0, 66, 0, 2, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Correct mainhand for Lunar Festival Sentinel.
 UPDATE `creature_equip_template` SET `equipentry1`=14882 WHERE `entry`=15961;
 
-UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` IN (15891,15892,15961);
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` IN (15891,15892);
 
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7777, 16, 180870, 180871, 180872, 180873, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7778, 16, 180763, 180764, 0, 0, 0);
@@ -2354,7 +2353,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 (@LUNAR_FESTIVAL_CGUID+113, 15909, 1, 7947.82, -2622.94, 492.851, 2.80998, 120, 120, 0, 0, 7),
 (@LUNAR_FESTIVAL_CGUID+114, 15864, 1, 7948.88, -2619.7, 492.72, 2.30383, 120, 120, 0, 0, 7),
 (@LUNAR_FESTIVAL_CGUID+115, 15961, 1, 7949.41, -2616.75, 492.439, 2.77507, 120, 120, 0, 0, 7),
-(@LUNAR_FESTIVAL_CGUID+116, 15961, 1, 7949.62, -2616.5, 492.594, 2.77507, 120, 120, 0, 0, 7),
+-- (@LUNAR_FESTIVAL_CGUID+116, 15961, 1, 7949.62, -2616.5, 492.594, 2.77507, 120, 120, 0, 0, 7), -- Duplicate.
 (@LUNAR_FESTIVAL_CGUID+117, 15892, 1, 9927.99, 2492.17, 1317.66, 0.959931, 120, 120, 0, 0, 7),
 (@LUNAR_FESTIVAL_CGUID+118, 15892, 1, 10146.8, 2603.15, 1330.91, 6.03884, 120, 120, 0, 0, 7),
 (@LUNAR_FESTIVAL_CGUID+119, 15898, 1, 10148, 2572.63, 1320.7, 4.18879, 120, 120, 0, 0, 7),
