@@ -486,6 +486,8 @@ UPDATE `creature` SET `position_x` = -108.08, `position_y` = -3529.83, `position
 UPDATE `creature` SET `position_x` = 182.04, `position_y` = -3549.64, `position_z` = 130, `movement_type` = 1, `wander_distance` = 5 WHERE `id` = 2928 AND `guid` = 92955;
 UPDATE `creature` SET `position_z` = 12 WHERE `guid` = 9716;
 UPDATE `creature` SET `position_x` = -4166.32, `position_y` = -2899.79, `position_z` = 13.0099, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 9417;
+UPDATE `creature` SET `position_z` = 121 WHERE `guid`=92879;
+DELETE FROM `creature` WHERE `guid` IN (91936, 92482, 92471);
 
 -- Correct Loot Template For Riverpaw Gnoll
 DELETE FROM `creature_loot_template` WHERE `entry` = 117 AND `item` IN (30039, 1710);
@@ -653,9 +655,6 @@ UPDATE `npc_vendor` SET `incrtime` = 1800 WHERE `entry` = 8139 AND `item` = 1676
 
 -- Remove Flags From npc_vendor
 UPDATE `npc_vendor` SET `itemflags` = 0 WHERE `itemflags` != 0;
-
--- Remove Duplicate Spawns
-DELETE FROM `creature` WHERE `guid` IN (91936, 92482, 92471);
 
 -- Add Battle Under Blackwood Lake Script
 -- Remove Duplicate Spawns
