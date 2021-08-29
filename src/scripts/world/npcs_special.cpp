@@ -1272,12 +1272,12 @@ struct npc_pats_firework_guyAI : ScriptedAI
         }
     }
 
-    void SendLauncherAnimation()
+    void SendLauncherCustomAnim()
     {
-        std::list<GameObject*> clusterList;
-        GetGameObjectListWithEntryInGrid(clusterList, m_creature, { 180772, 180859, 180869, 180874, 180771, 180850, 180868 }, CONTACT_DISTANCE); // Any Firework or Cluster Launcher.
-        for (const auto pCluster : clusterList)
-            pCluster->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
+        std::list<GameObject*> launcherList;
+        GetGameObjectListWithEntryInGrid(launcherList, m_creature, { 180772, 180859, 180869, 180874, 180771, 180850, 180868 }, CONTACT_DISTANCE); // Any Firework or Cluster Launcher.
+        for (const auto pLauncher : launcherList)
+            pLauncher->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1290,7 +1290,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
             {
                 case EVENT_FIREWORK:
                 {
-                    SendLauncherAnimation();
+                    SendLauncherCustomAnim();
 
                     float x, y, z;
                     m_creature->GetPosition(x, y, z);
