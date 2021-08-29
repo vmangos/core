@@ -1265,7 +1265,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
                 m_events.ScheduleEvent(EVENT_FIREWORK, Seconds(0));
 
                 if (m_creature->GetEntry() == NPC_FIREWORK_GUY_ELUNE)
-                    m_events.ScheduleEvent(EVENT_BUFF, Seconds(1));
+                    m_events.ScheduleEvent(EVENT_BUFF, Seconds(3)); // Lunar Fortune is casted 3 seconds later.
 
                 break;
             }
