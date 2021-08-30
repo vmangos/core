@@ -695,6 +695,8 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 
 UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 10773 AND `item` IN 10780, 10781, 10782);
 
+UPDATE `gameobject_template` SET `flags` = 4 WHERE `entry` = 1761;
+
 
 -- End of migration.
 END IF;
