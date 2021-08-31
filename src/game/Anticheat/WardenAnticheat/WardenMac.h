@@ -14,22 +14,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _AUTH_SARC4_H
-#define _AUTH_SARC4_H
+#ifndef _WARDEN_MAC_H
+#define _WARDEN_MAC_H
 
-#include <openssl/evp.h>
-#include "Common.h"
+#include "Warden.h"
 
-class ARC4
+class WorldSession;
+
+class WardenMac : public Warden
 {
     public:
-        ARC4(uint8 len);
-        ARC4(uint8* seed, uint8 len);
-        ~ARC4();
-        void Init(uint8* seed);
-        void UpdateData(int len, uint8* data);
-    private:
-        EVP_CIPHER_CTX* m_ctx;
+        WardenMac();
+        ~WardenMac();
+
+        void Init(WorldSession* session, BigNumber* k) override;
+        ClientWardenModule* GetModuleForClient() override;
+        void InitializeModule() override;
+        void HandleHashResult(ByteBuffer& buff) override;
+        void RequestData() override;
+        void HandleData(ByteBuffer& buff) override;
 };
 
 #endif

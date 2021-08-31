@@ -146,7 +146,7 @@ BigNumber BigNumber::ModExp(BigNumber const& bn1, BigNumber const& bn2)
     return ret;
 }
 
-int BigNumber::GetNumBytes(void) const
+int BigNumber::GetNumBytes(void)
 {
     return BN_num_bytes(_bn);
 }
@@ -161,7 +161,7 @@ bool BigNumber::isZero() const
     return BN_is_zero(_bn)!=0;
 }
 
-std::vector<uint8> BigNumber::AsByteArray(int minSize, bool reverse) const
+std::vector<uint8> BigNumber::AsByteArray(int minSize, bool reverse)
 {
     int length = (minSize >= GetNumBytes()) ? minSize : GetNumBytes();
 

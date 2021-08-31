@@ -336,7 +336,7 @@ class Unit : public SpellCaster
         typedef std::set<uint32> ComboPointHolderSet;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
 
-        virtual ~Unit () override;
+        ~Unit () override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;
@@ -447,7 +447,7 @@ class Unit : public SpellCaster
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
         float GetTotalStatValue(Stats stat) const;
-        float GetTotalResistanceValue(SpellSchools school) const;
+        int32 GetTotalResistanceValue(SpellSchools school) const;
         float GetTotalAuraModValue(UnitMods unitMod) const;
 
         SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
@@ -532,7 +532,11 @@ class Unit : public SpellCaster
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM)); }
         void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM, form); }
         bool IsShapeShifted() const; // mirrors clientside logic, moonkin form not counted as shapeshift
-        bool IsNoWeaponShapeShift() const;
+        bool IsInFeralForm() const
+        {
+            ShapeshiftForm form = GetShapeshiftForm();
+            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
+        }
         bool IsInDisallowedMountForm() const;
         uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
         void SetDisplayId(uint32 displayId);
@@ -736,10 +740,10 @@ class Unit : public SpellCaster
         void RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive = false);
         void RemoveSpellsCausingAura(AuraType auraType);
         void RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except);
-        void RemoveSpellsCausingAuraWithMechanic(AuraType auraType);
+        void RemoveNegativeSpellsCausingAura(AuraType auraType);
         void RemoveNonPassiveSpellsCausingAura(AuraType auraType);
         bool RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder);
-        void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false, bool skipStealth = false);
+        void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false);
         void RemoveAurasWithAttribute(uint32 flags);
         void RemoveAurasWithDispelType(DispelType type, ObjectGuid casterGuid = ObjectGuid());
         void RemoveAllAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -889,7 +893,6 @@ class Unit : public SpellCaster
         virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr) const;
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
         bool IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const;
-        bool IsTotalImmune() const;
 
         void ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, MovementModType modType, uint32 time = 0);
         void SetFleeing(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0, uint32 time = 0);
@@ -976,7 +979,7 @@ class Unit : public SpellCaster
          */
         bool CanUseEquippedWeapon(WeaponAttackType attackType) const
         {
-            if (IsNoWeaponShapeShift())
+            if (IsInFeralForm())
                 return false;
 
             switch(attackType)
@@ -1149,8 +1152,12 @@ class Unit : public SpellCaster
         void CombatStopInRange(float dist = 0.0f); // CombatStop all enemies
         void ClearInCombat();
         virtual void OnLeaveCombat() {}
-        void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false, bool onlyIfNotStalked = false);
+        void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false);
         void InterruptAttacksOnMe(float dist = 0.0f, bool guard_check = false); // Interrupt auto-attacks
+        
+        // Script helpers.
+        uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
+        uint32 RespawnNearCreaturesByEntry(uint32 entry, float range);
         
         /*********************************************************/
         /***                 RELATIONS SYSTEM                  ***/

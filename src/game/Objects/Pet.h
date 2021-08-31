@@ -222,8 +222,6 @@ class Pet : public Creature
         void CastPetAuras(bool current);
         void CastPetAura(PetAura const* aura);
 
-        virtual void RemoveAllCooldowns(bool sendOnly = false) override;
-
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();
         void _LoadAuras(uint32 timediff);

@@ -880,12 +880,6 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.mage.pBlastWave->Id < pSpellEntry->Id)
                         m_spells.mage.pBlastWave = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Combustion") != std::string::npos)
-                {
-                    if (!m_spells.mage.pCombustion ||
-                        m_spells.mage.pCombustion->Id < pSpellEntry->Id)
-                        m_spells.mage.pCombustion = pSpellEntry;
-                }
                 break;
             }
             case CLASS_PRIEST:
@@ -1027,12 +1021,6 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (!m_spells.priest.pShackleUndead ||
                         m_spells.priest.pShackleUndead->Id < pSpellEntry->Id)
                         m_spells.priest.pShackleUndead = pSpellEntry;
-                }
-                else if (pSpellEntry->SpellName[0].find("Smite") != std::string::npos)
-                {
-                    if (!m_spells.priest.pSmite ||
-                        m_spells.priest.pSmite->Id < pSpellEntry->Id)
-                        m_spells.priest.pSmite = pSpellEntry;
                 }
                 break;
             }
@@ -2274,8 +2262,7 @@ bool CombatBotBaseAI::IsValidHostileTarget(Unit const* pTarget) const
 {
     return me->IsValidAttackTarget(pTarget) &&
            pTarget->IsVisibleForOrDetect(me, me, false) &&
-           !pTarget->HasBreakableByDamageCrowdControlAura() &&
-           !pTarget->IsTotalImmune();
+           !pTarget->HasBreakableByDamageCrowdControlAura();
 }
 
 bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const
@@ -2549,67 +2536,12 @@ SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pS
     return result;
 }
 
-void CombatBotBaseAI::AddItemToInventory(uint32 itemId, uint32 count)
+void CombatBotBaseAI::AddItemToInventory(uint32 itemId)
 {
     ItemPosCountVec dest;
-    uint8 msg = me->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count);
+    uint8 msg = me->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
     if (msg == EQUIP_ERR_OK)
-    {
-        if (Item* pItem = me->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId)))
-            pItem->SetCount(count);
-    }
-}
-
-void CombatBotBaseAI::AddHunterAmmo()
-{
-    if (Item* pWeapon = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-    {
-        if (ItemPrototype const* pWeaponProto = pWeapon->GetProto())
-        {
-            if (pWeaponProto->Class == ITEM_CLASS_WEAPON)
-            {
-                uint32 ammoType;
-                switch (pWeaponProto->SubClass)
-                {
-                    case ITEM_SUBCLASS_WEAPON_GUN:
-                        ammoType = ITEM_SUBCLASS_BULLET;
-                        break;
-                    case ITEM_SUBCLASS_WEAPON_BOW:
-                    case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-                        ammoType = ITEM_SUBCLASS_ARROW;
-                        break;
-                    default:
-                        return;
-                }
-
-                ItemPrototype const* pAmmoProto = nullptr;
-                for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
-                {
-                    ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(i);
-                    if (!pProto)
-                        continue;
-
-                    if (pProto->Class == ITEM_CLASS_PROJECTILE &&
-                        pProto->SubClass == ammoType &&
-                        pProto->RequiredLevel <= me->GetLevel() &&
-                        (!pAmmoProto || pAmmoProto->ItemLevel < pProto->ItemLevel) &&
-                        me->CanUseAmmo(pProto->ItemId) == EQUIP_ERR_OK)
-                    {
-                        pAmmoProto = pProto;
-                    }
-                }
-
-                if (pAmmoProto)
-                {
-                    if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
-                        me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
-
-                    AddItemToInventory(pAmmoProto->ItemId, pAmmoProto->GetMaxStackSize());
-                    me->SetAmmo(pAmmoProto->ItemId);
-                }
-            }  
-        }  
-    }
+        me->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
 }
 
 void CombatBotBaseAI::EquipOrUseNewItem()
@@ -2701,38 +2633,6 @@ SpellCastResult CombatBotBaseAI::CastWeaponBuff(SpellEntry const* pSpellEntry, E
     SpellCastTargets targets;
     targets.setItemTarget(pWeapon);
     return spell->prepare(std::move(targets), nullptr);
-}
-
-void CombatBotBaseAI::UseTrinketEffects()
-{
-    if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1))
-        if (UseItemEffect(pItem))
-            return;
-    if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2))
-        if (UseItemEffect(pItem))
-            return;
-}
-
-bool CombatBotBaseAI::UseItemEffect(Item* pItem)
-{
-    ItemPrototype const* pProto = pItem->GetProto();
-    for (auto const& itr : pProto->Spells)
-    {
-        if (itr.SpellId && itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
-        {
-            if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(itr.SpellId))
-            {
-                if (me->IsSpellReady(*pSpellEntry, pProto))
-                {
-                    if (pSpellEntry->IsPositiveSpell())
-                        return me->CastSpell(me, pSpellEntry, false, pItem) == SPELL_CAST_OK;
-                    else if (me->GetVictim())
-                        return me->CastSpell(me->GetVictim(), pSpellEntry, false, pItem) == SPELL_CAST_OK;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 bool CombatBotBaseAI::IsWearingShield() const

@@ -121,7 +121,7 @@ uint32 SpellCaster::GetWeaponSkillValue(WeaponAttackType attType, SpellCaster co
         if (attType != BASE_ATTACK && !item)
             return 0;
 
-        if (pPlayer->IsNoWeaponShapeShift())
+        if (pPlayer->IsInFeralForm())
             return GetSkillMaxForLevel();              // always maximized SKILL_FERAL_COMBAT in fact
 
         // weapon skill or (unarmed for base attack)
@@ -196,7 +196,7 @@ SpellMissInfo SpellCaster::SpellHitResult(Unit* pVictim, SpellEntry const* spell
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
-            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, BASE_ATTACK, spell));
+            ProcDamageAndSpell(ProcSystemArguments(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT, PROC_EX_REFLECT, 1, BASE_ATTACK, spell));
             return SPELL_MISS_REFLECT;
         }
     }
@@ -1702,11 +1702,11 @@ bool SpellCaster::IsNoMovementSpellCasted() const
     if (m_currentSpells[CURRENT_GENERIC_SPELL] &&
             (m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_FINISHED) &&
              m_currentSpells[CURRENT_GENERIC_SPELL]->getState() != SPELL_STATE_DELAYED &&
-             m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_MOVEMENT))
+             m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
         return (true);
     else if (m_currentSpells[CURRENT_CHANNELED_SPELL] &&
              m_currentSpells[CURRENT_CHANNELED_SPELL]->getState() != SPELL_STATE_FINISHED &&
-             m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_MOVEMENT))
+             m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
         return (true);
     // don't need to check for AUTOREPEAT_SPELL
 
@@ -1919,19 +1919,16 @@ SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, SpellEntry const* s
 
     SpellCastTargets targets;
 
-    if (pTarget)
-    {
-        // Don't set unit target on destination target based spells, otherwise the spell will cancel
-        // as soon as the target dies or leaves the area of the effect
-        if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-            targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
-        else if (Unit* pUnitTarget = pTarget->ToUnit())
-            targets.setUnitTarget(pUnitTarget);
-        else if (GameObject* pGoTarget = pTarget->ToGameObject())
-            targets.setGOTarget(pGoTarget);
-        else
-            return SPELL_FAILED_ERROR;
-    }
+    // Don't set unit target on destination target based spells, otherwise the spell will cancel
+    // as soon as the target dies or leaves the area of the effect
+    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
+    else if (Unit* pUnitTarget = pTarget->ToUnit())
+        targets.setUnitTarget(pUnitTarget);
+    else if (GameObject* pGoTarget = pTarget->ToGameObject())
+        targets.setGOTarget(pGoTarget);
+    else
+        return SPELL_FAILED_ERROR;
 
     if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
         if (SpellCaster* caster = spell->GetCastingObject())

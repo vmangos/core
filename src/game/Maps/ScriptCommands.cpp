@@ -2374,6 +2374,8 @@ bool Map::ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, Wo
     }
 
     pSource->UpdatePvP(script.setPvP.enabled);
+    if (script.setPvP.enabled)
+        pSource->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
     return false;
 }

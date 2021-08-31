@@ -36,7 +36,6 @@
 #include "SpellAuras.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
-#include "GameObjectAI.h"
 #include "TemporarySummon.h"
 #include "Formulas.h"
 #include "Util.h"
@@ -490,11 +489,12 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType)
     }
 }
 
-void Unit::RemoveSpellsCausingAuraWithMechanic(AuraType auraType)
+void Unit::RemoveNegativeSpellsCausingAura(AuraType auraType)
 {
     for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
-        if ((*iter)->GetSpellProto()->GetAllSpellMechanicMask() == 0)
+        // forced debuff auras skipped too
+        if ((*iter)->GetHolder()->IsPositive() || (*iter)->GetHolder()->GetSpellProto()->HasAttribute(SPELL_ATTR_NEGATIVE))
         {
             ++iter;
             continue;
@@ -685,7 +685,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                         pVictim->RemoveFearEffectsByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0, damagetype);
                 }
 
-                pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS, spellProto ? spellProto->Id : 0, true);
+                pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0, true);
 
                 // interrupt spells like trying to mount even through absorb shields
                 if (pVictim->IsPlayer() && damagetype != DOT)
@@ -808,6 +808,11 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 pVictim->AttackedBy(this);
         }
 
+        if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
+        {
+            if (!spellProto || !(spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DIRECT_DAMAGE))
+                pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DIRECT_DAMAGE);
+        }
         if (!pVictim->IsPlayer())
         {
             float threat = damage * sSpellMgr.GetSpellThreatMultiplier(spellProto);
@@ -845,9 +850,9 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             isProcSpell = spell->m_triggeredBySpellInfo->HasAuraWithSpellTriggerEffect();
 
         if (isProcSpell)
-            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS, spell->m_triggeredByParentSpellInfo->Id, true);
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spell->m_triggeredByParentSpellInfo->Id, true);
         else
-            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DAMAGE_CANCELS, spellProto ? spellProto->Id : 0, true);
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0, true);
 
         if (damagetype != NODAMAGE && damage && pVictim->IsPlayer())
         {
@@ -863,7 +868,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                     {
                         if (spell->getState() == SPELL_STATE_PREPARING)
                         {
-                            if (spell->m_spellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_DAMAGE_CANCELS))
+                            if (spell->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE_CANCELS)
                                 pVictim->InterruptSpell(CurrentSpellTypes(i));
                             else
                                 spell->Delayed();
@@ -875,12 +880,13 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 {
                     if (spell->getState() == SPELL_STATE_CASTING)
                     {
-                        if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION))
+                        uint32 channelInterruptFlags = spell->m_spellInfo->ChannelInterruptFlags;
+                        if (channelInterruptFlags & CHANNEL_FLAG_DAMAGE_CHANNEL_DURATION)
                         {
                             if (pVictim != this)                //don't shorten the duration of channeling if you damage yourself
                                 spell->DelayedChannel();
                         }
-                        else if (spell->m_spellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
+                        else if ((channelInterruptFlags & CHANNEL_FLAG_DAMAGE_CANCELS))
                         {
                             DETAIL_LOG("Spell %u canceled at damage!", spell->m_spellInfo->Id);
                             pVictim->InterruptSpell(CURRENT_CHANNELED_SPELL);
@@ -1177,17 +1183,9 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
         if (TemporarySummon* pSummon = pCreatureVictim->IsTemporarySummon() ? static_cast<TemporarySummon*>(pCreatureVictim) : nullptr)
         {
             if (pSummon->GetSummonerGuid().IsCreature())
-            {
                 if (Creature* pSummoner = pCreatureVictim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                     if (pSummoner->AI())
                         pSummoner->AI()->SummonedCreatureJustDied(pCreatureVictim);
-            }
-            else if (pSummon->GetSummonerGuid().IsGameObject())
-            {
-                if (GameObject* pSummoner = pCreatureVictim->GetMap()->GetGameObject(pSummon->GetSummonerGuid()))
-                    if (pSummoner->AI())
-                        pSummoner->AI()->SummonedCreatureJustDied(pCreatureVictim);
-            }
         }
         else if (Creature* pOwnerCreature = ::ToCreature(pVictim->GetCharmerOrOwner()))
         {
@@ -1293,18 +1291,18 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
     switch (attackType)
     {
         case BASE_ATTACK:
-            damageInfo->procAttacker = PROC_FLAG_DEAL_MELEE_SWING | PROC_FLAG_MAIN_HAND_WEAPON_SWING;
-            damageInfo->procVictim   = PROC_FLAG_TAKE_MELEE_SWING;
+            damageInfo->procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+            damageInfo->procVictim   = PROC_FLAG_TAKEN_MELEE_HIT;
             damageInfo->HitInfo      = HITINFO_NORMALSWING + HITINFO_AFFECTS_VICTIM;
             break;
         case OFF_ATTACK:
-            damageInfo->procAttacker = PROC_FLAG_DEAL_MELEE_SWING | PROC_FLAG_OFF_HAND_WEAPON_SWING;
-            damageInfo->procVictim   = PROC_FLAG_TAKE_MELEE_SWING;
+            damageInfo->procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_HIT | PROC_FLAG_SUCCESSFUL_OFFHAND_HIT;
+            damageInfo->procVictim   = PROC_FLAG_TAKEN_MELEE_HIT;//|PROC_FLAG_TAKEN_OFFHAND_HIT // not used
             damageInfo->HitInfo      = HITINFO_LEFTSWING + HITINFO_AFFECTS_VICTIM;
             break;
         case RANGED_ATTACK:
-            damageInfo->procAttacker = PROC_FLAG_DEAL_RANGED_ATTACK;
-            damageInfo->procVictim   = PROC_FLAG_TAKE_RANGED_ATTACK;
+            damageInfo->procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+            damageInfo->procVictim   = PROC_FLAG_TAKEN_RANGED_HIT;
             damageInfo->HitInfo      = HITINFO_UNK3;             // test (dev note: test what? HitInfo flag possibly not confirmed.)
             break;
         default:
@@ -1312,7 +1310,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
     }
 
     bool immune = true;
-    bool feral = IsNoWeaponShapeShift();
+    bool feral = IsInFeralForm();
 
     // Only get one damage type for feral druids so they don't receive incorrect benefits
     // from weapons with multiple types of damage
@@ -2102,7 +2100,7 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool che
 
     // if damage pVictim call AI reaction
     pVictim->AttackedBy(this);
-    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ATTACKING_CANCELS);
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
 }
 
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackType attType) const
@@ -3779,12 +3777,11 @@ void Unit::RemoveAurasDueToItemSpell(Item* castItem, uint32 spellId)
     }
 }
 
-void Unit::RemoveAurasWithInterruptFlags(uint32 flags, uint32 except, bool checkProcFlags, bool skipStealth)
+void Unit::RemoveAurasWithInterruptFlags(uint32 flags, uint32 except, bool checkProcFlags)
 {
     for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)
     {
         if ((!checkProcFlags || !iter->second->GetSpellProto()->procFlags) &&
-            (!skipStealth || !iter->second->HasAuraType(SPELL_AURA_MOD_STEALTH)) &&
             (iter->second->GetSpellProto()->AuraInterruptFlags & flags) &&
             (iter->second->GetSpellProto()->Id != except))
         {
@@ -3886,7 +3883,6 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
     }
     if (!foundInMap)
         sLog.outInfo("[Crash/Auras] Removing aura holder *not* in holders map ! Aura %u on %s", holder->GetId(), GetName());
-    
     holder->SetRemoveMode(mode);
     holder->UnregisterSingleCastHolder();
     holder->HandleCastOnAuraRemoval();
@@ -4393,7 +4389,8 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
         SubDamageInfo* subDamage = &damageInfo->subDamage[i];
 
         data << uint32(GetFirstSchoolInMask(subDamage->damageSchoolMask));
-        data << float(subDamage->damage);
+        // Float coefficient of sub damage
+        data << ((damageInfo->totalDamage != 0) ? (float(subDamage->damage) / float(damageInfo->totalDamage)) : 0);
         data << uint32(subDamage->damage);
         data << uint32(subDamage->absorb);
         data << int32(subDamage->resist);
@@ -5460,19 +5457,6 @@ bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
     return false;
 }
 
-bool Unit::IsTotalImmune() const
-{
-    AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
-
-    uint32 immuneMask = 0;
-    for (const auto itr : immune)
-    {
-        immuneMask |= itr->GetModifier()->m_miscvalue;
-    }
-
-    return (immuneMask == SPELL_SCHOOL_MASK_ALL);
-}
-
 /**
  * Calculates target part of melee damage bonuses,
  * will be called on each tick for periodic damage over time auras
@@ -5596,8 +5580,8 @@ UnitMountResult Unit::Mount(uint32 mount, uint32 spellId)
         }
     }
 
-    InterruptSpellsWithChannelFlags(AURA_INTERRUPT_MOUNT_CANCELS);
-    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOUNT_CANCELS);
+    InterruptSpellsWithChannelFlags(CHANNEL_FLAG_MOUNT_CANCELS);
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNTING);
     SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, mount);
     return MOUNTRESULT_OK;
 }
@@ -5607,8 +5591,8 @@ UnitDismountResult Unit::Unmount(bool from_aura)
     if (!IsMounted())
         return DISMOUNTRESULT_NOTMOUNTED;
 
-    InterruptSpellsWithChannelFlags(AURA_INTERRUPT_DISMOUNT_CANCELS);
-    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_DISMOUNT_CANCELS);
+    InterruptSpellsWithChannelFlags(CHANNEL_FLAG_DISMOUNT_CANCELS);
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_MOUNTED);
     SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
     return DISMOUNTRESULT_OK;
 }
@@ -5619,18 +5603,8 @@ bool Unit::IsShapeShifted() const
     if (ShapeshiftForm form = GetShapeshiftForm())
     {
         if (SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form))
-            return !(ssEntry->flags1 & SHAPESHIFT_FLAG_STANCE);
+            return !(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY);
     }
-    return false;
-}
-
-bool Unit::IsNoWeaponShapeShift() const
-{
-    // Mirroring clientside gameplay logic
-    if (ShapeshiftForm form = GetShapeshiftForm())
-        if (SpellShapeshiftFormEntry const* entry = sSpellShapeshiftFormStore.LookupEntry(form))
-            return entry->flags1 & SHAPESHIFT_FLAG_DONT_USE_WEAPON;
-
     return false;
 }
 
@@ -5713,7 +5687,7 @@ void Unit::SetInCombatState(bool bPvP, Unit* pEnemy)
         if (GetMap()->IsDungeon() && pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_AGGRO_ZONE) && pEnemy && pEnemy->IsControlledByPlayer())
             pCreature->SetInCombatWithZone();
 
-        InterruptSpellsWithChannelFlags(AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS);
+        InterruptSpellsWithChannelFlags(CHANNEL_FLAG_HOSTILE_ACTION_RECEIVED_CANCELS);
 
         if (m_isCreatureLinkingTrigger)
             GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_AGGRO, pCreature, pEnemy);
@@ -5738,6 +5712,7 @@ void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/
                 {
                     pThisPlayer->pvpInfo.inPvPCombat = (pThisPlayer->pvpInfo.inPvPCombat || !touchOnly);
                     pThisPlayer->UpdatePvP(true);
+                    pThisPlayer->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
                 }
             }
         }
@@ -5771,6 +5746,7 @@ void Unit::SetInCombatWithAssisted(Unit* pAssisted)
                         pThisPlayer->pvpInfo.inPvPCombat = true;
 
                     pThisPlayer->UpdatePvP(true);
+                    pThisPlayer->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
                     if (pAssistedPlayer->IsPvPContested())
                         pThisPlayer->UpdatePvPContested(true);
@@ -5798,6 +5774,8 @@ void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly
 
                 if (pVictimPlayer)
                     pThisPlayer->UpdatePvPContested(true);
+
+                pThisPlayer->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
             }
         }
     }
@@ -6084,10 +6062,6 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
     if (m_Visibility == VISIBILITY_OFF)
         return false;
 
-    // Hunter's Mark makes target always visible to caster.
-    if (HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, pDetector->GetObjectGuid()))
-        return true;
-
     // raw invisibility
     bool invisible = m_invisibilityMask != 0;
 
@@ -6230,73 +6204,44 @@ bool Unit::CanDetectInvisibilityOf(Unit const* u) const
 
 bool Unit::CanDetectStealthOf(Unit const* target, float distance, bool* alert) const
 {
-    /*
-
-    TEST RESULTS FROM CLASSIC WITH SNIFFED EXACT POSITIONS TO MEASURE DISTANCES
-
-    Level 1 Rogue vs Level 1 Rogue from behind - detected at 1.49299 yards
-    Level 2 Tauren vs Level 3 Rogue from behind - detected at 1.46318 yards
-    Level 4 Creature vs Level 4 Rogue - aggro at 1.48306 yards
-    Conclusion: target is always detectable below 1.5 yards, combat reach or bounding radius do not matter
-
-    Level 4 Creature vs Level 1 Rogue - aggro at 3.23737 yards
-    Level 4 Creature vs Level 2 Rogue - aggro at 2.38938 yards
-    Level 4 Creature vs Level 3 Rogue - aggro at 1.58823 yards
-    Conclusion: aggro distance increases by 5/6 yards per level for creature detector
-
-    Level 4 Creature vs Level 1 Rogue - alerted at 8.23134 yards
-    Level 4 Creature vs Level 2 Rogue - alerted at 7.37808 yards
-    Level 4 Creature vs Level 3 Rogue - alerted at 6.64495 yards
-    Conclusion: alert distance is 5 yards longer than aggro distance
-
-    Level 1 Rogue vs Level 1 Rogue - detected at 8.97499 yards (approaching 9)
-    Level 1 Rogue with Perception vs Level 1 Rogue - detected at 23.973 yards (approaching 24)
-    Level 1 Rogue vs Level 2 Rogue - detected at 7.48335 yards (approaching 7.5)
-    Level 1 Rogue with Perception vs Level 2 Rogue - detected at 22.382 yards (approaching 22.5)
-    Level 1 Rogue vs Level 3 Rogue - detected at 5.96001 yards (approaching 6)
-    Level 1 Rogue with Perception vs Level 3 Rogue - detected at 20.8784 yards (approaching 21)
-    Conclusion: detection distance increases by 1.5 per level for player detector
-
-    Level 32 Hunter vs Level 1 Rogue - detected at 29.9698 yards (approaching 30)
-    Conclusion: max detection distance cap due to level difference is 30
-
-    Level 32 Hunter vs Level 1 Rogue from behind - detected at 20.9902 yards (approaching 21)
-    Conclusion: distance is reduced by 9 yards if target is behind you, applied after the cap
-
-    Level 32 Hunter with Hunter's Mark vs Level 1 Rogue - detected at 99.682 yards (approaching 100)
-    Conclusion: target is detectable all the way to max visibility distance
-
-    */
-
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
         return false;
-
-    if (distance < 1.5f) // collision
+    if (distance < 1.5f) //collision
         return true;
 
-    if (distance > sWorld.getConfig(IsPlayer() ? CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE : CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
+    // Hunter mark functionality.
+    AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_STALKED);
+    for (const auto& iter : auras)
+        if (iter->GetCasterGuid() == GetObjectGuid())
+            return true;
+
+    if (distance > sWorld.getConfig(IsPlayer()?CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE:CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE))
         return false;
 
-    float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.0f : 21.f) : (5.0f / 6.0f);
-    float yardsPerLevel = IsPlayer() ? 1.5f : 5.0f / 6.0f;
+    float visibleDistance = IsPlayer() ? ((target->IsPlayer()) ? 9.f : 21.f) : 0.f;
+    //Always invisible from back (when stealth detection is on), also filter max distance cases
+    float yardsPerLevel = 5.f/6.f;
     int32 stealthSkill = target->IsPlayer() ? target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) : target->GetLevelForTarget(this) * 5;
     stealthSkill += target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL);
     int32 detectSkill = GetLevelForTarget(target) * 5 + int32(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_STEALTH_DETECT, 0));
-    int32 const levelDiff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
-    if (levelDiff > 3)
+    int32 level_diff = int32(GetLevelForTarget(target)) - int32(target->GetLevelForTarget(this));
+
+    if (level_diff > 3)
         yardsPerLevel *= 2;
 
-    visibleDistance += (detectSkill - stealthSkill) * yardsPerLevel / 5.0f;
+    // stealth level: 5 points -> 1 level
+    visibleDistance += ((detectSkill - stealthSkill) + 5) * yardsPerLevel / 5.f;
 
-    if (visibleDistance > 30.0f)
-        visibleDistance = 30.0f;
-    else if (visibleDistance < 0.0f)
-        visibleDistance = 0.0f;
+    visibleDistance = std::min(visibleDistance, 30.f);
+
+    visibleDistance = std::max(visibleDistance, 1.f);
 
     if (!HasInArc(target))
-        visibleDistance -= 9.0f;
+        visibleDistance -= 9.f;
 
-    float alertRange = visibleDistance + 5.0f;
+
+    float alertRange = visibleDistance + 5.f;
+
 
     // recheck new distance
     if (alert)
@@ -6575,7 +6520,7 @@ bool Unit::FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32
 
         if (pendingChange->movementCounter != movementCounter || pendingChange->movementChangeType != KNOCK_BACK
             || std::fabs(pendingChange->knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
-            || std::fabs(pendingChange->knockbackInfo.speedZ - movementInfo.jump.zspeed) > 0.01f
+            || std::fabs(pendingChange->knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
             || std::fabs(pendingChange->knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
             || std::fabs(pendingChange->knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f)
             continue;
@@ -7507,7 +7452,7 @@ float Unit::GetTotalStatValue(Stats stat) const
     return value;
 }
 
-float Unit::GetTotalResistanceValue(SpellSchools school) const
+int32 Unit::GetTotalResistanceValue(SpellSchools school) const
 {
     UnitMods unitMod = UnitMods(UNIT_MOD_RESISTANCE_START + school);
 
@@ -7534,7 +7479,7 @@ float Unit::GetTotalResistanceValue(SpellSchools school) const
         value = 0;
 #endif
 
-    return value;
+    return int32(value);
 }
 
 float Unit::GetTotalAuraModValue(UnitMods unitMod) const
@@ -8641,7 +8586,7 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
 
             AddUnitState(UNIT_STAT_FEIGN_DEATH);
             CombatStop();
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_STEALTH_INVIS_CANCELS);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
             GetHostileRefManager().deleteReferences();
         }
@@ -8697,7 +8642,7 @@ void Unit::SetStandState(uint8 state)
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, state);
 
     if (IsStandingUp())
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_STANDING_CANCELS);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_SEATED);
 
     if (IsPlayer())
     {
@@ -9528,7 +9473,7 @@ void Unit::ProcessRelocationVisibilityUpdates()
 }
 
 // BEGIN Nostalrius specific functions
-void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpells, bool onlyIfNotStalked)
+void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpells)
 {
     std::list<Unit*> targets;
     // Maximum spell range=100m ?
@@ -9536,25 +9481,18 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, u_check);
     // Don't need to use visibility modifier, units won't be able to cast outside of draw distance
     Cell::VisitAllObjects(this, searcher, GetMap()->GetVisibilityDistance());
-
     for (const auto& iter : targets)
     {
         if (!interruptPositiveSpells && IsFriendlyTo(iter))
             continue;
-
-        if (onlyIfNotStalked && HasAuraTypeByCaster(SPELL_AURA_MOD_STALKED, iter->GetObjectGuid()))
-            continue;
-
         for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; i++)
             if (Spell* spell = iter->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (spell->m_targets.getUnitTargetGuid() == GetObjectGuid())
                     if (killDelayed || (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime()) || i == CURRENT_CHANNELED_SPELL)
                         iter->InterruptSpell(CurrentSpellTypes(i), true);
-
         if (!killDelayed)
             continue;
-
-        // Interruption of spells which are no longer referenced, but for which there is still an event (not yet hit the target for example) 
+        // 2/ Interruption des sorts qui ne sont plus reference, mais dont il reste un event (ceux en parcours par exemple)
         auto i_Events = iter->m_Events.GetEvents().begin();
         for (; i_Events != iter->m_Events.GetEvents().end(); ++i_Events)
             if (SpellEvent* event = dynamic_cast<SpellEvent*>(i_Events->second))
@@ -9602,6 +9540,40 @@ void Unit::CombatStopInRange(float dist)
     Cell::VisitAllObjects(this, searcher, dist);
     for (const auto& iter : targets)
         iter->CombatStopWithPets(true);
+}
+
+uint32 Unit::DespawnNearCreaturesByEntry(uint32 entry, float range)
+{
+    std::list<Creature*> creatures;
+    GetCreatureListWithEntryInGrid(creatures, entry, range);
+    uint32 count = 0;
+    for (const auto& it : creatures)
+    {
+        if (it->IsInWorld())
+        {
+            ++count;
+            it->DisappearAndDie();
+        }
+    }
+    return count;
+}
+
+uint32 Unit::RespawnNearCreaturesByEntry(uint32 entry, float range)
+{
+    if (range == 0.0f)
+        range = GetMap()->GetVisibilityDistance();
+    uint32 count = 0;
+    std::list<Creature*> lList;
+    GetCreatureListWithEntryInGrid(lList, entry, range);
+    for (const auto& it : lList)
+    {
+        if (!it->IsAlive())
+        {
+            it->Respawn();
+            ++count;
+        }
+    }
+    return count;
 }
 
 // TriniyCore
@@ -10152,8 +10124,8 @@ bool Unit::HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const
 {
     AuraList const& auras = GetAurasByType(type);
     for (const auto& itr : auras)
-        if ((!excludeAura || excludeAura != itr->GetSpellProto()->Id) && // Avoid self interrupt of channeled Crowd Control spells like Seduction
-             itr->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
+        if ((!excludeAura || excludeAura != itr->GetSpellProto()->Id) && //Avoid self interrupt of channeled Crowd Control spells like Seduction
+                (itr->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE))
             return true;
     return false;
 }

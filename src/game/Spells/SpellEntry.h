@@ -234,11 +234,10 @@ namespace Spells
             case TARGET_UNIT_ENEMY:
             case TARGET_UNIT_FRIEND:
             case TARGET_UNIT:
-            case TARGET_UNIT_PARTY:
             case TARGET_UNIT_FRIEND_CHAIN_HEAL:
             case TARGET_LOCATION_CASTER_TARGET_POSITION :
             case TARGET_UNIT_RAID:
-            case TARGET_UNIT_RAID_AND_CLASS:
+            //case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
         }
         return false;
@@ -583,10 +582,6 @@ class SpellEntry
         bool HasAttribute(SpellAttributesEx3 attribute) const { return AttributesEx3 & attribute; }
         bool HasAttribute(SpellAttributesEx4 attribute) const { return AttributesEx4 & attribute; }
 
-        bool HasSpellInterruptFlag(SpellInterruptFlags flag) const { return InterruptFlags & flag; }
-        bool HasAuraInterruptFlag(SpellAuraInterruptFlags flag) const { return AuraInterruptFlags & flag; }
-        bool HasChannelInterruptFlag(SpellAuraInterruptFlags flag) const { return ChannelInterruptFlags & flag; }
-
         inline bool HasEffect(SpellEffects effect) const
         {
             for (uint32 i : Effect)
@@ -893,11 +888,6 @@ class SpellEntry
                 }
             }
             return false;
-        }
-
-        inline bool IsNeedFaceTarget() const
-        {
-            return ((Custom & SPELL_CUSTOM_FACE_TARGET) || (rangeIndex == SPELL_RANGE_IDX_COMBAT));
         }
 
         inline bool IsNeedCastSpellAtFormApply(ShapeshiftForm form) const

@@ -1828,7 +1828,7 @@ bool BattleBotAI::StartNewPathFromBeginning()
             break;
         }
         default:
-            return false;
+            break;
     }
 
     for (const auto& pPath : *vPaths)
@@ -1882,7 +1882,7 @@ void BattleBotAI::StartNewPathFromAnywhere()
             break;
         }
         default:
-            return;
+            break;
     }
 
     for (const auto& pPath : *vPaths)

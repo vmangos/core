@@ -91,8 +91,7 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recv_data)
     if (sheathed >= MAX_SHEATH_STATE)
         return;
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
+    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_SHEATHING_CANCELS);
     GetPlayer()->SetSheath(SheathState(sheathed));
 }
 

@@ -40,7 +40,6 @@ set (game_SRCS
     QuestDef.cpp
     ReputationMgr.cpp
     ScriptMgr.cpp
-    SniffFile.cpp
     SocialMgr.cpp
     StatSystem.cpp
     UnitAuraProcHandler.cpp
@@ -244,7 +243,6 @@ set (game_SRCS
     ScriptedGossip.h
     ScriptMgr.h
     SharedDefines.h
-    SniffFile.h
     SocialMgr.h
     UnitEvents.h
     Weather.h
@@ -449,23 +447,19 @@ endif()
 
 if(USE_ANTICHEAT)
   list(APPEND game_SRCS
+      Anticheat/Antispam/Antispam.cpp
+      Anticheat/Antispam/Antispam.h
       Anticheat/MovementAnticheat/MovementAnticheat.cpp
       Anticheat/MovementAnticheat/MovementAnticheat.h
       Anticheat/WardenAnticheat/Warden.cpp
-      Anticheat/WardenAnticheat/Warden.hpp
-      Anticheat/WardenAnticheat/WardenKeyGeneration.h
+      Anticheat/WardenAnticheat/Warden.h
       Anticheat/WardenAnticheat/WardenMac.cpp
-      Anticheat/WardenAnticheat/WardenMac.hpp
-      Anticheat/WardenAnticheat/WardenModule.cpp
-      Anticheat/WardenAnticheat/WardenModule.hpp
-      Anticheat/WardenAnticheat/WardenModuleMgr.cpp
-      Anticheat/WardenAnticheat/WardenModuleMgr.hpp
-      Anticheat/WardenAnticheat/WardenScan.cpp
-      Anticheat/WardenAnticheat/WardenScan.hpp
-      Anticheat/WardenAnticheat/WardenScanMgr.cpp
-      Anticheat/WardenAnticheat/WardenScanMgr.hpp
+      Anticheat/WardenAnticheat/WardenMac.h
       Anticheat/WardenAnticheat/WardenWin.cpp
-      Anticheat/WardenAnticheat/WardenWin.hpp
+      Anticheat/WardenAnticheat/WardenWin.h
+      Anticheat/WardenAnticheat/WardenMgr.cpp
+      Anticheat/WardenAnticheat/WardenMgr.h
+      Anticheat/WardenAnticheat/WardenKeyGen.h
   )
 endif()
 
@@ -601,3 +595,7 @@ else()
       )
   endif()
 endif()
+
+
+
+

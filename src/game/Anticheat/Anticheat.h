@@ -74,7 +74,7 @@ public:
 };
 
 #ifdef USE_ANTICHEAT
-#include "WardenAnticheat/Warden.hpp"
+#include "WardenAnticheat/Warden.h"
 #include "MovementAnticheat/MovementAnticheat.h"
 #else
 class Warden
@@ -82,9 +82,9 @@ class Warden
 public:
     Warden() = default;
     ~Warden() = default;
-    void HandlePacket(WorldPacket&) {}
-    virtual void Update() {}
-    virtual void GetPlayerInfo(std::string&, std::string&, std::string&, std::string&, std::string&) const {}
+    void HandleWardenDataOpcode(WorldPacket& recv_data) {}
+    void Update() {}
+    WorldSession* GetSession() { return nullptr; }
 };
 
 class MovementAnticheat
@@ -116,9 +116,8 @@ public:
     movementInfo - new movement info that was just received
     opcode - the packet we are checking
     */
-    bool HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
-    bool HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
-    void LogMovementPacket(bool /*isClientPacket*/, WorldPacket& /*packet*/) {}
+    bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
+    bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
 };
 #endif
 
@@ -128,8 +127,9 @@ public:
 #ifdef USE_ANTICHEAT
     void LoadAnticheatData();
 
-    Warden * CreateWardenFor(WorldSession* client, BigNumber* K);
+    Warden* CreateWardenFor(WorldSession* client, BigNumber* K);
     MovementAnticheat* CreateAnticheatFor(Player* player);
+    AntispamInterface* GetAntispam() const;
 #else
     void LoadAnticheatData() {}
 
@@ -141,10 +141,10 @@ public:
     {
         return new MovementAnticheat();
     }
+    AntispamInterface* GetAntispam() const { return nullptr; }
 #endif
 
     // Antispam wrappers
-    AntispamInterface* GetAntispam() const { return nullptr; }
     bool CanWhisper(AccountPersistentData const& data, MasterPlayer* player) { return true; }
 
     static AnticheatManager* instance();

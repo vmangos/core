@@ -87,22 +87,9 @@ GenericTransport* Map::GetTransport(ObjectGuid guid)
         return transport;
 
     if (guid.GetEntry())
-        return GetElevatorTransport(guid);
-
-    return nullptr;
-}
-
-ElevatorTransport* Map::GetElevatorTransport(ObjectGuid guid)
-{
-    for (auto pTransport : m_transports)
-    {
-        if (pTransport->GetObjectGuid() == guid)
-            return static_cast<ElevatorTransport*>(pTransport);
-    }
-
-    if (auto pTransport = GetGameObject(guid))
-        return static_cast<ElevatorTransport*>(pTransport);
-
+        if (GameObject* go = GetGameObject(guid))
+            if (go->IsTransport())
+                return static_cast<GenericTransport*>(go);
     return nullptr;
 }
 
@@ -120,7 +107,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     : i_mapEntry(sMapStorage.LookupEntry<MapEntry>(id)),
       i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
       m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), m_persistentState(nullptr),
-      m_activeNonPlayersIter(m_activeNonPlayers.end()), m_transportsUpdateIter(m_transports.end()),
+      m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
       i_gridExpiry(expiry), m_TerrainData(sTerrainMgr.LoadTerrain(id)),
       i_data(nullptr), i_script_id(0), m_unloading(false), m_crashed(false),
       _processingSendObjUpdates(false), _processingUnitsRelocation(false),
@@ -164,8 +151,6 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
         m_motionThreads->start();
         m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
     }
-
-    LoadElevatorTransports();
 }
 
 // Nostalrius
@@ -491,7 +476,7 @@ Map::Add(T* obj)
 }
 
 template<>
-void Map::Add(GenericTransport* obj)
+void Map::Add(Transport* obj)
 {
     MANGOS_ASSERT(obj);
     //TODO: Needs clean up. An object should not be added to map twice.
@@ -508,65 +493,16 @@ void Map::Add(GenericTransport* obj)
     obj->SetMap(this);
     obj->AddToWorld();
 
+    if (obj->isActiveObject() && !IsUnloading())
+        AddToActive(obj);
+
     //DEBUG_LOG("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
 
     //obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
-    m_transports.insert(obj);
-
-    // Make sure elevator position is right before sending create packet
-    if (obj->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT)
-        obj->Update(0, 0);
+    _transports.insert(obj);
 
     // Broadcast creation to players
     obj->SendCreateUpdateToMap();
-}
-
-template<>
-void Map::Add(Transport* obj)
-{
-    Add<GenericTransport>(obj);
-}
-
-template<>
-void Map::Add(ElevatorTransport* obj)
-{
-    Add<GenericTransport>(obj);
-}
-
-void Map::LoadElevatorTransports()
-{
-    ElevatorTransportMapBounds itrPair = sTransportMgr.GetElevatorTransportsForMap(GetId());
-    for (auto itr = itrPair.first; itr != itrPair.second; itr++)
-    {
-        GameObjectData const* pData = sObjectMgr.GetGOData(itr->second);
-        if (!pData)
-        {
-            sLog.outError("[Map::LoadElevatorTransports] Invalid elevator guid %u for map %u!", itr->second, itr->first);
-            continue;
-        }
-
-        GameObjectInfo const* pInfo = sObjectMgr.GetGameObjectInfo(pData->id);
-        if (!pInfo)
-        {
-            sLog.outError("[Map::LoadElevatorTransports] Missing gameobject template %u for guid %u!", pData->id, itr->second);
-            continue;
-        }
-
-        if (pInfo->type != GAMEOBJECT_TYPE_TRANSPORT)
-        {
-            sLog.outError("[Map::LoadElevatorTransports] Non-elevator guid %u for map %u!", itr->second, itr->first);
-            continue;
-        }
-
-        ElevatorTransport* pGo = new ElevatorTransport;
-        if (!pGo->LoadFromDB(itr->second, this))
-        {
-            delete pGo;
-            continue;
-        }
-
-        Add<ElevatorTransport>(pGo);
-    }
 }
 
 void Map::MessageBroadcast(Player const* player, WorldPacket* msg, bool to_self)
@@ -664,10 +600,10 @@ void Map::UpdateSync(uint32 const diff)
 {
     // Needs to be updated here.
     // Can lead to map <-> map teleports
-    for (m_transportsUpdateIter = m_transports.begin(); m_transportsUpdateIter != m_transports.end();)
+    for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
     {
-        WorldObject* obj = *m_transportsUpdateIter;
-        ++m_transportsUpdateIter;
+        WorldObject* obj = *_transportsUpdateIter;
+        ++_transportsUpdateIter;
 
         if (!obj->IsInWorld())
             continue;
@@ -1280,7 +1216,7 @@ Map::Remove(T* obj, bool remove)
 }
 
 template<>
-void Map::Remove(GenericTransport* obj, bool remove)
+void Map::Remove(Transport* obj, bool remove)
 {
     if (obj->isActiveObject())
         RemoveFromActive(obj);
@@ -1291,17 +1227,17 @@ void Map::Remove(GenericTransport* obj, bool remove)
 
     obj->SendOutOfRangeUpdateToMap();
 
-    if (m_transportsUpdateIter != m_transports.end())
+    if (_transportsUpdateIter != _transports.end())
     {
-        TransportsContainer::iterator itr = m_transports.find(obj);
-        if (itr == m_transports.end())
+        TransportsContainer::iterator itr = _transports.find(obj);
+        if (itr == _transports.end())
             return;
-        if (itr == m_transportsUpdateIter)
-            ++m_transportsUpdateIter;
-        m_transports.erase(itr);
+        if (itr == _transportsUpdateIter)
+            ++_transportsUpdateIter;
+        _transports.erase(itr);
     }
     else
-        m_transports.erase(obj);
+        _transports.erase(obj);
 
     obj->ResetMap();
 
@@ -1313,18 +1249,6 @@ void Map::Remove(GenericTransport* obj, bool remove)
 
         delete obj;
     }
-}
-
-template<>
-void Map::Remove(Transport* obj, bool remove)
-{
-    Remove<GenericTransport>(obj, remove);
-}
-
-template<>
-void Map::Remove(ElevatorTransport* obj, bool remove)
-{
-    Remove<GenericTransport>(obj, remove);
 }
 
 void
@@ -1575,12 +1499,12 @@ void Map::UnloadAll(bool pForce)
         ++i;
         UnloadGrid(grid.getX(), grid.getY(), pForce);       // deletes the grid and removes it from the GridRefManager
     }
-    for (TransportsContainer::iterator itr = m_transports.begin(); itr != m_transports.end();)
+    for (TransportsContainer::iterator itr = _transports.begin(); itr != _transports.end();)
     {
-        GenericTransport* transport = *itr;
+        Transport* transport = *itr;
         ++itr;
 
-        Remove<GenericTransport>(transport, true);
+        Remove<Transport>(transport, true);
     }
 
     // Bones list should be empty at this point.
@@ -1704,7 +1628,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     bool hasTransport = false;
-    for (const auto itr : m_transports)
+    for (const auto itr : _transports)
     {
         if (itr != player->GetTransport())
         {
@@ -1720,7 +1644,7 @@ void Map::SendRemoveTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     bool hasTransport = false;
-    for (const auto itr : m_transports)
+    for (const auto itr : _transports)
     {
         if (itr != player->GetTransport())
         {
@@ -1778,14 +1702,8 @@ void Map::RemoveAllObjectsInRemoveList()
             case TYPEID_GAMEOBJECT:
             {
                 GameObject* go = obj->ToGameObject();
-                if (GenericTransport* transport = go->ToTransport())
-                {
-                    if (transport->GetGoType() == GAMEOBJECT_TYPE_MO_TRANSPORT ||
-                       (transport->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT && m_transports.find(transport) != m_transports.end()))
-                        Remove(transport, true);
-                    else
-                        Remove(go, true);
-                }
+                if (Transport* transport = go->ToTransport())
+                    Remove(transport, true);
                 else
                     Remove(go, true);
                 break;
@@ -1830,24 +1748,6 @@ bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const
         }
     }
     return foundPlayer;
-}
-
-void Map::SendDefenseMessage(int32 textId, uint32 zoneId) const
-{
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    for (const auto& itr : m_mapRefManager)
-    {
-        Player* pPlayer = itr.getSource();
-        char const* text = textId > 0 ? sObjectMgr.GetBroadcastText(textId, pPlayer->GetSession()->GetSessionDbLocaleIndex(), pPlayer->GetGender()) : sObjectMgr.GetMangosString(textId, pPlayer->GetSession()->GetSessionDbLocaleIndex());
-        
-        WorldPacket data(SMSG_DEFENSE_MESSAGE);
-        data << uint32(zoneId);
-        data << uint32(strlen(text) + 1);
-        data << text;
-
-        pPlayer->GetSession()->SendPacket(&data);
-    }
-#endif
 }
 
 bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
@@ -2699,7 +2599,7 @@ Unit* Map::GetUnit(ObjectGuid guid)
 }
 
 /**
- * Function returns world object in world at CURRENT map, so any except MO transports
+ * Function returns world object in world at CURRENT map, so any except transports
  */
 WorldObject* Map::GetWorldObject(ObjectGuid guid)
 {
@@ -2707,6 +2607,7 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
     {
         case HIGHGUID_PLAYER:
             return GetPlayer(guid);
+        case HIGHGUID_TRANSPORT:
         case HIGHGUID_GAMEOBJECT:
             return GetGameObject(guid);
         case HIGHGUID_UNIT:
@@ -2721,8 +2622,6 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
             Corpse* corpse = GetCorpse(guid);
             return corpse && corpse->IsInWorld() ? corpse : nullptr;
         }
-        case HIGHGUID_TRANSPORT:
-            return GetElevatorTransport(guid);
         case HIGHGUID_MO_TRANSPORT:
         default:
             break;

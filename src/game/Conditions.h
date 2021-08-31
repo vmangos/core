@@ -242,9 +242,6 @@ enum ConditionType
                                                             // Value2: y
                                                             // Value3: z
                                                             // Value4: distance
-    CONDITION_OBJECT_GO_STATE       = 55,                   // Checks the current go state of a GameObject.
-                                                            // Requirement: GameObject Target
-                                                            // Value1: go_state (see enum GOState)
 };
 
 enum ConditionFlags

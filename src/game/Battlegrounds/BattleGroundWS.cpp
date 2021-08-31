@@ -180,6 +180,7 @@ void BattleGroundWS::EventPlayerCapturedFlag(Player* Source)
 
     Team winner = TEAM_NONE;
 
+    Source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
     if (Source->GetTeam() == ALLIANCE)
     {
         if (!IsHordeFlagPickedup())
@@ -429,6 +430,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         return;
 
     SendMessageToAll(message_id, type, Source);
+    Source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 }
 
 void BattleGroundWS::RemovePlayer(Player* plr, ObjectGuid guid)
