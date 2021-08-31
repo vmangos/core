@@ -767,6 +767,10 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (15424, 61, -326.524, -682.113, 54.5241, 4.32029, 0, 0, 0),
 (15424, 62, -336.3, -701.885, 57.7294, 4.24764, 0, 0, 0);
 
+-- Achellios Should Run
+UPDATE `creature_movement` SET `script_id` = 11 WHERE `id` = 21388 AND `point` = 1;
+UPDATE `creature` SET `position_x` = -5065.41, `position_y` = -1433.43, `position_z` = -52.0541 WHERE `guid` IN (21388, 21677, 21678, 21679);
+
 
 -- End of migration.
 END IF;
