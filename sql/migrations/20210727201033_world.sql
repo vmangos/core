@@ -31,7 +31,7 @@ UPDATE `creature_template` SET `unit_flags`=0 WHERE `entry` IN (15895,15907,1590
 UPDATE `creature_template` SET `dmg_min`=1210, `dmg_max`=2183, `dmg_multiplier`=1, `unit_flags`=2048 WHERE `entry`=15467;
 
 -- Minion of Omen.
-UPDATE `creature_template` SET `health_min`=4442, `speed_walk`=1 WHERE `entry`=15466;
+UPDATE `creature_template` SET `health_min`=4442, `speed_walk`=1, `dmg_min`=102, `dmg_max`=137 WHERE `entry`=15466;
 
 -- Revelers don't cast "Small Red Rocket".
 DELETE FROM `creature_ai_events` WHERE `id` IN (1590709,1590609,1569409,1571909,1590509,1590809);
@@ -48,7 +48,7 @@ DELETE FROM `gameobject` WHERE `id`=300058;
 DELETE FROM `gameobject_template` WHERE `entry`=300058;
 
 -- Firecrackers have no flags.
-UPDATE `gameobject_template` SET `flags`='0' WHERE `entry`=180763;
+UPDATE `gameobject_template` SET `flags`=0 WHERE `entry`=180763;
 
 -- Set script for the other Firecrackers.
 UPDATE `gameobject_template` SET `script_name`='go_lunar_festival_firecracker' WHERE `entry` IN (180870, 180871, 180872, 180873);
@@ -62,7 +62,7 @@ INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`
 (180896, 7, 8, 327, 'Lunar Teleport: Undercity', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
 (180897, 7, 8, 327, 'Lunar Teleport: Thunder Bluff', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight');
 
-UPDATE `gameobject_template` SET `faction`='1375', `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
+UPDATE `gameobject_template` SET `faction`=1375, `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
 
 -- Target positions for teleport spells.
 INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `build_min`, `build_max`) VALUES
@@ -75,7 +75,7 @@ INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `t
 (26456, 0, 1642.41, 239.9, 62.59, 3.01, 5086, 5875);
 
 -- Lunar Festival Sentinel texts are chat_type 12.
-UPDATE `broadcast_text` SET `chat_type`='12' WHERE `entry` IN (10948,10949,10950,10951,10952,10953,10954,10955);
+UPDATE `broadcast_text` SET `chat_type`=12 WHERE `entry` IN (10948,10949,10950,10951,10952,10953,10954,10955);
 
 -- Events list for Lunar Festival Sentinel
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15961;
