@@ -74,9 +74,6 @@ INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `t
 (26455, 1, -1031.73, -230.42, 160.18, 3.12, 5086, 5875),
 (26456, 0, 1642.41, 239.9, 62.59, 3.01, 5086, 5875);
 
--- Lunar Festival Sentinel texts are chat_type 12.
-UPDATE `broadcast_text` SET `chat_type`=12 WHERE `entry` IN (10948,10949,10950,10951,10952,10953,10954,10955);
-
 -- Events list for Lunar Festival Sentinel
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15961;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1596101, 15961, 0, 4, 0, 100, 2, 0, 0, 0, 0, 1596101, 1596102, 0, 'Lunar Festival Sentinel - Aggro');
