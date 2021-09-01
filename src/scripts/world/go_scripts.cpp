@@ -162,7 +162,8 @@ enum
     SPELL_HOLIDAY_LUNAR_TELEPORT_ORGRIMMAR      = 26453,
     SPELL_HOLIDAY_LUNAR_TELEPORT_STORMWIND      = 26454,
     SPELL_HOLIDAY_LUNAR_TELEPORT_THUNDERBLUFF   = 26455,
-    SPELL_HOLIDAY_LUNAR_TELEPORT_UNDERCITY      = 26456
+    SPELL_HOLIDAY_LUNAR_TELEPORT_UNDERCITY      = 26456,
+    SPELL_LUNAR_FESTIVAL_PORT_ERROR             = 26471
 };
 
 bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
@@ -173,22 +174,22 @@ bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
             pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_TELEPORT_MOONGLADE_SELF, true);
             break;
         case GOBJECT_LUNAR_TELEPORT_STORMWIND:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_LUNAR_TELEPORT_STORMWIND, true);
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == ALLIANCE ? SPELL_HOLIDAY_LUNAR_TELEPORT_STORMWIND : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
             break;
         case GOBJECT_LUNAR_TELEPORT_IRONFORGE:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_LUNAR_TELEPORT_IRONFORGE, true);
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == ALLIANCE ? SPELL_HOLIDAY_LUNAR_TELEPORT_IRONFORGE : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
             break;
         case GOBJECT_LUNAR_TELEPORT_DARNASSUS:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_LUNAR_TELEPORT_DARNASSUS, true);
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == ALLIANCE ? SPELL_HOLIDAY_LUNAR_TELEPORT_DARNASSUS : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
             break;
         case GOBJECT_LUNAR_TELEPORT_ORGRIMMAR:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_LUNAR_TELEPORT_ORGRIMMAR, true);
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == HORDE ? SPELL_HOLIDAY_LUNAR_TELEPORT_ORGRIMMAR : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
             break;
         case GOBJECT_LUNAR_TELEPORT_UNDERCITY:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_LUNAR_TELEPORT_UNDERCITY, true);
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == HORDE ? SPELL_HOLIDAY_LUNAR_TELEPORT_UNDERCITY : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
             break;
         case GOBJECT_LUNAR_TELEPORT_THUNDER_BLUFF:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_LUNAR_TELEPORT_THUNDERBLUFF, true);
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == HORDE ? SPELL_HOLIDAY_LUNAR_TELEPORT_THUNDERBLUFF : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
             break;
         default:
             return false;
@@ -594,7 +595,8 @@ struct go_lunar_festival_firecracker : public GameObjectAI
 {
     go_lunar_festival_firecracker(GameObject* gobj) : GameObjectAI(gobj)
     {
-        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(30,60)));
+        if (me->GetEntry() == 180763 || me->GetEntry() == 180764)
+            m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(30,60)));
     }
 
     bool OnUse(Unit* /*user*/) override
