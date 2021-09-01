@@ -698,13 +698,13 @@ UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 1077
 UPDATE `gameobject_template` SET `flags` = 4 WHERE `entry` = 1761;
 
 -- Add Zixil Missing Scripts
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (353701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1119, 0, 0, 0, 0, 0, 0, 0, 0, 'Zixil - Talk - Arriving - Southshore');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (353701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1119, 0, 0, 0, 0, 0, 0, 0, 0, 'Zixil - Talk - Arriving - Southshore / Tarren Mill');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (353702, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1122, 0, 0, 0, 0, 0, 0, 0, 0, 'Zixil - Talk - Leaving - Southshore');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (353703, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1123, 0, 0, 0, 0, 0, 0, 0, 0, 'Zixil - Talk - Leaving - Tarren Mill');
 
 DELETE FROM `creature_movement` WHERE `id` = 15424;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(15424, 1, -342.026, -714.092, 57.7331, 1.08443, 600000, 0, 0),
+(15424, 1, -342.026, -714.092, 57.7331, 1.08443, 600000, 0, 353701),
 (15424, 2, -336.671, -702.508, 57.7294, 1.2042, 0, 0, 0),
 (15424, 3, -326.701, -682.173, 54.5218, 4.2751, 0, 0, 0),
 (15424, 4, -305.659, -678.024, 55.4281, 3.33656, 0, 0, 0),
