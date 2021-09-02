@@ -589,7 +589,8 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3
 UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
 
 -- Remove Teebus Blazing Longsword, Alcors Sunrazor, Blanchards Stout and Shadowblade From Lockboxes
-DELETE FROM `reference_loot_template` WHERE `entry` = 1014 AND `item` IN (1728, 14555, 13046, 2163);
+DELETE FROM `item_loot_template` WHERE `entry` = 16885 AND `item` = 1014;
+DELETE FROM * FROM `reference_loot_template` WHERE `entry` = 1014;
 
 -- Increase Dropchance for Crystallized Note
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `entry` IN (9676, 9820, 9819) AND `item`=10840;
