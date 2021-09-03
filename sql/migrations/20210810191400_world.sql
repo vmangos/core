@@ -772,6 +772,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 UPDATE `creature_movement` SET `script_id` = 11 WHERE `id` = 21388 AND `point` = 1;
 UPDATE `creature` SET `position_x` = -5065.41, `position_y` = -1433.43, `position_z` = -52.0541 WHERE `guid` IN (21388, 21677, 21678, 21679);
 
+-- Update Hagg Taurenbane Spawn Points
+UPDATE `creature` SET `position_x` = -3988.903564453125, `position_y` = -1862.833740234375, `position_z` = 91.7680816650390625, `orientation` = 1.640609502792358398 WHERE `guid` = 20942;
+UPDATE `creature` SET `position_x` = -3709.73095703125, `position_y` = -1587.8887939453125, `position_z` = 91.9688873291015625, `orientation` = 0.05235987901687622 WHERE `guid` = 20941;
+UPDATE `creature` SET `position_x` = -3893.58642578125, `position_y` = -1627.259765625, `position_z` = 91.75, `orientation` = 4.886921882629394531 WHERE `guid` = 20943;
+
 
 -- End of migration.
 END IF;
