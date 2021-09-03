@@ -7,22 +7,20 @@ SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20210901122902');
 IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210901122902');
 -- Add your query below.
--- Added new events for Gazban(2624) event to cast his spell, change phase, and transform.
+-- Added new events for Gazban(2624) change phase, and transform.
 -- Events list for Gazban
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2624;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (262402, 2624, 0, 0, 0, 100, 1, 6100, 12800, 7200, 15700, 262402, 0, 0, 'Gazban - Cast Crash of Waves');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (262403, 2624, 0, 2, 0, 100, 0, 90, 10, 0, 0, 262403, 262401, 0, 'Gazban - Cast Gazban Transform Set Phase 1');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (262404, 2624, 0, 0, 1, 100, 0, 1000, 1000, 0, 0, 262404, 0, 0, 'Gazban - Cast Gazban Water Form (Phase 1)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (262401, 2624, 0, 2, 0, 100, 0, 90, 10, 0, 0, 262401, 0, 0, 'Gazban - Cast Gazban Transform and Set Phase 1');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (262402, 2624, 0, 0, 1, 100, 0, 1000, 1000, 0, 0, 262402, 0, 0, 'Gazban - Cast Gazban Water Form (Phase 1)');
+
 
 -- Scripts added that are triggered by the above events
-DELETE FROM `creature_ai_scripts` WHERE `id`=262402;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262402, 0, 15, 5403, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Cast Crash of Waves');
-DELETE FROM `creature_ai_scripts` WHERE `id`=262403;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262403, 0, 15, 5402, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Cast Gazban Transform Set Phase 1');
 DELETE FROM `creature_ai_scripts` WHERE `id`=262401;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262401, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Set Phase 1');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1113, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Say Text');
-DELETE FROM `creature_ai_scripts` WHERE `id`=262404;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262404, 0, 15, 5404, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Cast Gazban Water Form (Phase 1)');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262401, 0, 15, 5402, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Cast Gazban Transform');
+DELETE FROM `creature_ai_scripts` WHERE `id`=262402;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (262402, 0, 15, 5404, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gazban - Cast Gazban Water Form');
 
 -- Position of Gazban on spawn and add spawn condition
 DELETE FROM `event_scripts` WHERE `id`=364;
