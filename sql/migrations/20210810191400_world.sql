@@ -777,6 +777,18 @@ UPDATE `creature` SET `position_x` = -3988.903564453125, `position_y` = -1862.83
 UPDATE `creature` SET `position_x` = -3709.73095703125, `position_y` = -1587.8887939453125, `position_z` = 91.9688873291015625, `orientation` = 0.05235987901687622 WHERE `guid` = 20941;
 UPDATE `creature` SET `position_x` = -3893.58642578125, `position_y` = -1627.259765625, `position_z` = 91.75, `orientation` = 4.886921882629394531 WHERE `guid` = 20943;
 
+-- Add Serpent Statue Script (spell 19473 is not being cast by gameobject for some unknown reason)
+UPDATE `gameobject_template` SET `script_name`='' WHERE  `entry`=177673;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
+(202202, 177705, 1, 252.547, 2963.69, 1.64267, 5.58505, 0, 0, -0.34202, 0.939693, -120, -120, 100, 1, 10);
+
+DELETE FROM `gameobject_scripts` WHERE `id`=12609;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 1, 9, 202202, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Serpent Statue - Respawn Gameobject');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 3, 15, 19473, 0, 0, 0, 177705, 5, 11, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Serpent Statue - Cast Spell');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 4, 81, 12609, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Serpent Statue - Despawn Gameobject');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 5, 10, 12369, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 252.57, 2963.7, 1.72356, 1.29154, 0, 'Serpent Statue - Summon Creature');
+
 
 -- End of migration.
 END IF;
