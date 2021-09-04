@@ -777,7 +777,7 @@ UPDATE `creature` SET `position_x` = -3988.903564453125, `position_y` = -1862.83
 UPDATE `creature` SET `position_x` = -3709.73095703125, `position_y` = -1587.8887939453125, `position_z` = 91.9688873291015625, `orientation` = 0.05235987901687622 WHERE `guid` = 20941;
 UPDATE `creature` SET `position_x` = -3893.58642578125, `position_y` = -1627.259765625, `position_z` = 91.75, `orientation` = 4.886921882629394531 WHERE `guid` = 20943;
 
--- Add Serpent Statue Script (spell 19473 is not being cast by gameobject for some unknown reason)
+-- Add Serpent Statue Script (NOTE: spell 19473 is not being cast by gameobject for some unknown reason also cannot use gameobject guid 12609 when it respawns)
 UPDATE `gameobject_template` SET `script_name`='' WHERE  `entry`=177673;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
