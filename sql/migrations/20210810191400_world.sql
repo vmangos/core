@@ -805,6 +805,10 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (340101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3287, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Talk');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (340101, 1, 7, 2460, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Complete Quest');
 
+-- Correct Sunken Temple Quest Chain
+UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` = 3446;
+UPDATE `quest_template` SET `PrevQuestId` = 3444 WHERE `entry` = 3447;
+
 
 -- End of migration.
 END IF;
