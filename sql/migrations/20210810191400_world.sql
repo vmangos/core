@@ -808,6 +808,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 -- Correct Sunken Temple Quest Chain
 UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` = 3446;
 UPDATE `quest_template` SET `PrevQuestId` = 3444 WHERE `entry` = 3447;
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_max`)
+VALUES (7771, 3447, 10);
 
 
 -- End of migration.
