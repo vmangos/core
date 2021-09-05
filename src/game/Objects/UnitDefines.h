@@ -64,6 +64,8 @@ enum MovementChangeType
 // For this time difference is computed regen value
 #define REGEN_TIME_FULL     2000
 
+#define UNIT_PVP_COMBAT_TIMER 5500
+
 #define BASE_MELEERANGE_OFFSET 1.33f
 #define BASE_MINDAMAGE 1.0f
 #define BASE_MAXDAMAGE 2.0f

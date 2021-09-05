@@ -3919,6 +3919,19 @@ void Spell::cast(bool skipCheck)
         m_immediateHandled = false;
         m_spellState = SPELL_STATE_DELAYED;
         SetDelayStart(0);
+
+        // start combat at cast for delayed spells, only for explicit target
+        if (Unit* target = m_targets.getUnitTarget())
+        {
+            if (m_casterUnit && m_casterUnit->IsCharmerOrOwnerPlayerOrPlayerItself() &&
+                GetDelayMoment() > 0 && m_spellInfo->speed > 0.0f &&
+               (!m_spellInfo->IsPositiveSpell() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT))
+            {
+                m_casterUnit->SetInCombatWithVictim(target, false, uint32(GetDelayMoment() + 500));
+            }
+        }
     }
     else
     {
