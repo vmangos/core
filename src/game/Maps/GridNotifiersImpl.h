@@ -181,6 +181,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     // Enter combat
     if (pUnit && !i_positive &&
         !spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
+        !spellInfo->HasAttribute(SPELL_ATTR_EX_THREAT_ONLY_ON_MISS) &&
         !spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT) &&
         !spellInfo->HasAttribute(SPELL_ATTR_EX2_NOT_AN_ACTION))
     {

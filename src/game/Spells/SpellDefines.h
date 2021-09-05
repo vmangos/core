@@ -767,7 +767,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_UNK18                       = 0x00040000,            // 18 stun, polymorph, daze, sleep
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
     SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Req combo points on target
-    SPELL_ATTR_EX_UNK21                       = 0x00200000,            // 21
+    SPELL_ATTR_EX_THREAT_ONLY_ON_MISS         = 0x00200000,            // 21
     SPELL_ATTR_EX_REQ_COMBO_POINTS            = 0x00400000,            // 22 Use combo points (in 4.x not required combo point target selected)
     SPELL_ATTR_EX_UNK23                       = 0x00800000,            // 23
     SPELL_ATTR_EX_IS_FISHING                  = 0x01000000,            // 24 only fishing spells

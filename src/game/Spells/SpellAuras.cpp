@@ -7169,6 +7169,7 @@ void SpellAuraHolder::Update(uint32 diff)
 
         // enter combat
         if (!GetSpellProto()->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
+            !GetSpellProto()->HasAttribute(SPELL_ATTR_EX_THREAT_ONLY_ON_MISS) &&
             !GetSpellProto()->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT) &&
             !IsPositive() && caster->IsVisibleForOrDetect(m_target, m_target, false))
         {
