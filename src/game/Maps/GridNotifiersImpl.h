@@ -178,16 +178,20 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(i_dynobject.GetSpellId());
     SpellEffectIndex eff_index  = i_dynobject.GetEffIndex();
 
-    // Mise en combat
-    // Exception : fusee eclairante, piege de givre
-    if (pUnit && !i_positive && i_dynobject.GetSpellId() != 1543 && i_dynobject.GetSpellId() != 13810)
+    // Enter combat
+    if (pUnit && !i_positive &&
+        !spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
+        !spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT) &&
+        !spellInfo->HasAttribute(SPELL_ATTR_EX2_NOT_AN_ACTION))
     {
         if (CreatureAI* pAi = target->AI())
             pAi->AttackedBy(pUnit);
 
+        target->AddThreat(pUnit);
         target->SetInCombatWithAggressor(pUnit);
         pUnit->SetInCombatWithVictim(target);
     }
+
     // Check target immune to spell or aura
     if (target->IsImmuneToSpell(spellInfo, false) || target->IsImmuneToSpellEffect(spellInfo, eff_index, false))
         return;
