@@ -792,6 +792,19 @@ INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalon
 -- Giant PLains Creeper Should not be Skinnable
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry`=2565;
 
+-- Correct Quest Start Script fot The Shattered Salute
+UPDATE `quest_template` SET `StartScript` = 2460 WHERE `entry`= 2460;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2460, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3278, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Talk');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2460, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3279, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Talk');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2460, 18, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Emote');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2460, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3281, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Talk');
+
+UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE  `entry`=3401;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (806, 9, 2460, 1, 0, 0, 0);
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (340101, 3401, 806, 22, 0, 100, 1, 78, 0, 0, 0, 340101, 0, 0, 'The Shattered Salute: Shenthul - Talk - Recieved Emote');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (340101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3287, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Talk');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (340101, 1, 7, 2460, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Complete Quest');
+
 
 -- End of migration.
 END IF;
