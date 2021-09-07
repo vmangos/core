@@ -87,6 +87,7 @@ void ScriptedAI::UpdateAI(uint32 const uiDiff)
 
 void ScriptedAI::EnterEvadeMode()
 {
+    m_creature->ClearComboPointHolders();
     m_creature->RemoveAurasAtReset();
     m_creature->DeleteThreatList();
     m_creature->CombatStop(true);
