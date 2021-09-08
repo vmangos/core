@@ -56,7 +56,6 @@ public:
     bool DrinkAndEat();
     bool UseMount();
     uint32 GetMountSpellId() const;
-    void AddPremadeGearAndSpells();
     bool CheckForUnreachableTarget();
     float GetMaxAggroDistanceForMap() const;
     bool AttackStart(Unit* pVictim);

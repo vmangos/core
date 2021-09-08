@@ -52,7 +52,6 @@ public:
 
     void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
-    void LearnPremadeSpecForClass();
 
     bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const final;
     Player* GetPartyLeader() const;

@@ -919,9 +919,6 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     // original spells
     LearnDefaultSpells();
 
-    // original items
-    AddStartingItems();
-
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
 
@@ -8811,6 +8808,17 @@ uint32 Player::GetAttackBySlot(uint8 slot)
         default:
             return MAX_ATTACK;
     }
+}
+
+uint32 Player::GetHighestKnownArmorProficiency() const
+{
+    if (GetSkillValue(SKILL_PLATE_MAIL))
+        return SKILL_PLATE_MAIL;
+    if (GetSkillValue(SKILL_MAIL))
+        return SKILL_MAIL;
+    if (GetSkillValue(SKILL_LEATHER))
+        return SKILL_LEATHER;
+    return SKILL_CLOTH;
 }
 
 bool Player::IsInventoryPos(uint8 bag, uint8 slot)

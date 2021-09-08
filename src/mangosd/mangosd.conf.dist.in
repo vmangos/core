@@ -2841,6 +2841,18 @@ AHBot.itemcount = 50
 #        Default: 0 (restricted)
 #                 1 (no restrictions)
 #
+#    PartyBot.AutoEquip
+#        What gear will new partybots spawn with.
+#        Default: 1 (random items)
+#                 0 (normal starting items)
+#                 2 (premade gear template)
+#
+#    BattleBot.AutoEquip
+#        What gear will new battlebots spawn with.
+#        Default: 1 (random items)
+#                 0 (normal starting items)
+#                 2 (premade gear template)
+#
 ###################################################################################################################
 RandomBot.Enable = 0
 RandomBot.MinBots = 0
@@ -2851,6 +2863,8 @@ PlayerBot.UpdateMs = 1000
 PlayerBot.ShowInWhoList = 0
 PartyBot.MaxBots = 0
 PartyBot.SkipChecks = 0
+PartyBot.AutoEquip = 1
+BattleBot.AutoEquip = 1
 
 ###################################################################################################################
 #    Database-based chat

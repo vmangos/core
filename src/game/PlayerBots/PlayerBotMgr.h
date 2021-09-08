@@ -11,6 +11,13 @@ class PlayerBotAI;
 class WorldSession;
 class Player;
 
+enum PlayerBotAutoEquip
+{
+    PLAYER_BOT_AUTO_EQUIP_STARTING_GEAR = 0,
+    PLAYER_BOT_AUTO_EQUIP_RANDOM_GEAR = 1,
+    PLAYER_BOT_AUTO_EQUIP_PREMADE_GEAR = 2,
+};
+
 enum PlayerBotState
 {
     PB_STATE_OFFLINE,

@@ -90,58 +90,6 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
     }
 }
 
-void PartyBotAI::LearnPremadeSpecForClass()
-{
-    // First attempt to find a spec. Must be for correct class, level and role.
-    for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
-    {
-        if (itr.second.requiredClass == me->GetClass() &&
-           ((m_role == ROLE_INVALID) || (itr.second.role == m_role)) &&
-           (!m_level || (itr.second.level == m_level)))
-        {
-            if (m_role == ROLE_INVALID)
-                m_role = itr.second.role;
-
-            sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
-            return;
-        }
-    }
-
-    if (m_role != ROLE_INVALID)
-    {
-        // Second attempt, but this time we will accept any role, just so
-        // that we have level appropriate spells.
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
-        {
-            if (itr.second.requiredClass == me->GetClass() &&
-                (!m_level || (itr.second.level == m_level)))
-            {
-                sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
-                return;
-            }
-        }
-    }
-    
-    if (m_level > 1)
-    {
-        // Third attempt. Check for lower level specs. Better than nothing.
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
-        {
-            if (itr.second.requiredClass == me->GetClass() &&
-                itr.second.level < m_level)
-            {
-                sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
-                break;
-            }
-        }
-
-        me->MonsterSay("No spec template for this level found!");
-        me->GiveLevel(m_level);
-        me->InitTalentForLevel();
-        me->SetUInt32Value(PLAYER_XP, 0);
-    }
-}
-
 Player* PartyBotAI::GetPartyLeader() const
 {
     Group* pGroup = me->GetGroup();
@@ -551,13 +499,35 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         AddToPlayerGroup();
 
+        if (m_level && m_level != me->GetLevel())
+        {
+            me->GiveLevel(m_level);
+            me->InitTalentForLevel();
+            me->SetUInt32Value(PLAYER_XP, 0);
+        }
+
         if (!m_cloneGuid.IsEmpty())
+        {
             CloneFromPlayer(sObjectAccessor.FindPlayer(m_cloneGuid));
+            AutoAssignRole();
+        }
         else
+        {
             LearnPremadeSpecForClass();
 
-        if (m_role == ROLE_INVALID)
-            AutoAssignRole();
+            if (m_role == ROLE_INVALID)
+                AutoAssignRole();
+
+            AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP));
+
+            // fix client bug causing some item slots to not be visible
+            if (Player* pLeader = GetPartyLeader())
+            {
+                me->SetVisibility(VISIBILITY_OFF);
+                pLeader->UpdateVisibilityOf(pLeader, me);
+                me->SetVisibility(VISIBILITY_ON);
+            }
+        }
 
         ResetSpellData();
         PopulateSpellData();
@@ -565,6 +535,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SummonPetIfNeeded();
+        me->SetHealthPercent(100.0f);
+        me->SetPowerPercent(me->GetPowerType(), 100.0f);
 
         uint32 newzone, newarea;
         me->GetZoneAndAreaId(newzone, newarea);

@@ -89,6 +89,11 @@ public:
     void ResetSpellData();
     void AddAllSpellReagents();
     void SummonPetIfNeeded();
+    void LearnArmorProficiencies();
+    void LearnPremadeSpecForClass();
+    void EquipPremadeGearTemplate();
+    void EquipRandomGearInEmptySlots();
+    void AutoEquipGear(uint32 option);
     
     uint8 GetAttackersInRangeCount(float range) const;
     Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
@@ -190,6 +195,17 @@ public:
             case CLASS_WARRIOR:
             case CLASS_PALADIN:
             case CLASS_ROGUE:
+            case CLASS_SHAMAN:
+                return true;
+        }
+        return false;
+    }
+    static bool IsShieldClass(uint8 playerClass)
+    {
+        switch (playerClass)
+        {
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
             case CLASS_SHAMAN:
                 return true;
         }
