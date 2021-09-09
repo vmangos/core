@@ -2526,7 +2526,8 @@ void CombatBotBaseAI::LearnPremadeSpecForClass()
         if (!pSpec)
             pSpec = SelectRandomContainerElement(vSpecs);
         sObjectMgr.ApplyPremadeSpecTemplateToPlayer(pSpec->entry, me);
-        m_role = pSpec->role;
+        if (m_role == ROLE_INVALID)
+            m_role = pSpec->role;
     }
 }
 
