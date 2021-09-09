@@ -2584,22 +2584,22 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (!pProto)
             continue;
 
-        // only items that have already been obtained by someone
+        // Only items that have already been obtained by someone
         if (!pProto->m_bDiscovered)
             continue;
 
-        // only gear and weapons
+        // Only gear and weapons
         if (pProto->Class != ITEM_CLASS_WEAPON && pProto->Class != ITEM_CLASS_ARMOR)
             continue;
 
-        // no item level check for tabards and shirts
+        // No item level check for tabards and shirts
         if (pProto->InventoryType != INVTYPE_TABARD && pProto->InventoryType != INVTYPE_BODY)
         {
-            // avoid higher level items with no level requirement
+            // Avoid higher level items with no level requirement
             if (!pProto->RequiredLevel && pProto->ItemLevel > me->GetLevel())
                 continue;
 
-            // avoid low level items
+            // Avoid low level items
             if ((pProto->ItemLevel + 10) < me->GetLevel())
                 continue;
         }
@@ -2612,7 +2612,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 
         if (uint32 skill = pProto->GetProficiencySkill())
         {
-            // don't equip cloth items on warriors, etc unless bot is a healer
+            // Don't equip cloth items on warriors, etc unless bot is a healer
             if (pProto->Class == ITEM_CLASS_ARMOR &&
                 pProto->InventoryType != INVTYPE_CLOAK &&
                 pProto->InventoryType != INVTYPE_SHIELD &&
@@ -2660,7 +2660,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 
     for (auto const& itr : itemsPerSlot)
     {
-        // don't equip offhand if using 2 handed weapon
+        // Don't equip offhand if using 2 handed weapon
         if (itr.first == EQUIPMENT_SLOT_OFFHAND)
         {
             if (Item* pMainHandItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
