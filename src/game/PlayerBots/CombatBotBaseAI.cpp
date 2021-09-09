@@ -2612,11 +2612,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 
         if (uint32 skill = pProto->GetProficiencySkill())
         {
-            // don't equip cloth items on warriors, etc
+            // don't equip cloth items on warriors, etc unless bot is a healer
             if (pProto->Class == ITEM_CLASS_ARMOR &&
                 pProto->InventoryType != INVTYPE_CLOAK &&
                 pProto->InventoryType != INVTYPE_SHIELD &&
-                skill != me->GetHighestKnownArmorProficiency())
+                skill != me->GetHighestKnownArmorProficiency() &&
+                m_role != ROLE_HEALER)
                 continue;
 
             // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
@@ -2634,14 +2635,23 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
             if (slot >= EQUIPMENT_SLOT_START && slot < EQUIPMENT_SLOT_END &&
                 !me->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             {
-                // only allow shield in offhand for tanks
-                if (slot == EQUIPMENT_SLOT_OFFHAND && pProto->InventoryType != INVTYPE_SHIELD &&
-                    m_role == ROLE_TANK && IsShieldClass(me->GetClass()))
-                    continue;
+                // Offhand checks
+                if (slot == EQUIPMENT_SLOT_OFFHAND)
+                {
+                    // Only allow shield in offhand for tanks
+                    if (pProto->InventoryType != INVTYPE_SHIELD &&
+                        m_role == ROLE_TANK && IsShieldClass(me->GetClass()))
+                        continue;
+
+                    // Only equip holdables on mana users
+                    if (pProto->InventoryType == INVTYPE_HOLDABLE && me->GetPowerType() != POWER_MANA)
+                        continue;
+                }
+
 
                 itemsPerSlot[slot].push_back(pProto);
 
-                // unique item
+                // Unique item
                 if (pProto->MaxCount == 1)
                     break;
             }
