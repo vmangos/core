@@ -1,4 +1,5 @@
 #include "CombatBotBaseAI.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Group.h"
 #include "PlayerBotMgr.h"

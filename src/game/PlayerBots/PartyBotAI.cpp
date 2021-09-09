@@ -21,6 +21,7 @@
 #include "ObjectMgr.h"
 #include "PlayerBotMgr.h"
 #include "Opcodes.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "Spell.h"
 #include "SpellAuras.h"
