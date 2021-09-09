@@ -2644,7 +2644,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                         continue;
 
                     // Only equip holdables on mana users
-                    if (pProto->InventoryType == INVTYPE_HOLDABLE && me->GetPowerType() != POWER_MANA)
+                    if (pProto->InventoryType == INVTYPE_HOLDABLE && me->IsCaster())
                         continue;
                 }
 
