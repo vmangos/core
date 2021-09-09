@@ -2584,22 +2584,22 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (!pProto)
             continue;
 
-        // only items that have already been obtained by someone
+        // Only items that have already been obtained by someone
         if (!pProto->m_bDiscovered)
             continue;
 
-        // only gear and weapons
+        // Only gear and weapons
         if (pProto->Class != ITEM_CLASS_WEAPON && pProto->Class != ITEM_CLASS_ARMOR)
             continue;
 
-        // no item level check for tabards and shirts
+        // No item level check for tabards and shirts
         if (pProto->InventoryType != INVTYPE_TABARD && pProto->InventoryType != INVTYPE_BODY)
         {
-            // avoid higher level items with no level requirement
+            // Avoid higher level items with no level requirement
             if (!pProto->RequiredLevel && pProto->ItemLevel > me->GetLevel())
                 continue;
 
-            // avoid low level items
+            // Avoid low level items
             if ((pProto->ItemLevel + 10) < me->GetLevel())
                 continue;
         }
@@ -2612,11 +2612,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 
         if (uint32 skill = pProto->GetProficiencySkill())
         {
-            // don't equip cloth items on warriors, etc
+            // Don't equip cloth items on warriors, etc unless bot is a healer
             if (pProto->Class == ITEM_CLASS_ARMOR &&
                 pProto->InventoryType != INVTYPE_CLOAK &&
                 pProto->InventoryType != INVTYPE_SHIELD &&
-                skill != me->GetHighestKnownArmorProficiency())
+                skill != me->GetHighestKnownArmorProficiency() &&
+                m_role != ROLE_HEALER)
                 continue;
 
             // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
@@ -2634,14 +2635,23 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
             if (slot >= EQUIPMENT_SLOT_START && slot < EQUIPMENT_SLOT_END &&
                 !me->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             {
-                // only allow shield in offhand for tanks
-                if (slot == EQUIPMENT_SLOT_OFFHAND && pProto->InventoryType != INVTYPE_SHIELD &&
-                    m_role == ROLE_TANK && IsShieldClass(me->GetClass()))
-                    continue;
+                // Offhand checks
+                if (slot == EQUIPMENT_SLOT_OFFHAND)
+                {
+                    // Only allow shield in offhand for tanks
+                    if (pProto->InventoryType != INVTYPE_SHIELD &&
+                        m_role == ROLE_TANK && IsShieldClass(me->GetClass()))
+                        continue;
+
+                    // Only equip holdables on mana users
+                    if (pProto->InventoryType == INVTYPE_HOLDABLE && !me->IsCaster())
+                        continue;
+                }
+
 
                 itemsPerSlot[slot].push_back(pProto);
 
-                // unique item
+                // Unique item
                 if (pProto->MaxCount == 1)
                     break;
             }
@@ -2650,7 +2660,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 
     for (auto const& itr : itemsPerSlot)
     {
-        // don't equip offhand if using 2 handed weapon
+        // Don't equip offhand if using 2 handed weapon
         if (itr.first == EQUIPMENT_SLOT_OFFHAND)
         {
             if (Item* pMainHandItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
