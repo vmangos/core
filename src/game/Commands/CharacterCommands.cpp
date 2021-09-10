@@ -87,6 +87,8 @@ bool ChatHandler::HandleModifyXpRateCommand(char* args)
     }
 
     pPlayer->SetPersonalXpRate(xp);
+    pPlayer->SavePersonalXPRate();
+
     PSendSysMessage(LANG_XP_RATE_SET, (pPlayer != m_session->GetPlayer() ? (std::string(pPlayer->GetName()) + std::string("'s")).c_str() : "your"), xp);
     return true;
 }

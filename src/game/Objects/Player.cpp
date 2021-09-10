@@ -548,7 +548,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 Player::Player(WorldSession* session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this),
     m_enableInstanceSwitch(true), m_currentTicketCounter(0), m_castingSpell(0), m_repopAtGraveyardPending(false),
-    m_honorMgr(this), m_bNextRelocationsIgnored(0), m_personalXpRate(-1.0f), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
+    m_honorMgr(this), m_bNextRelocationsIgnored(0), m_isStandUpScheduled(false), m_foodEmoteTimer(0)
 {
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
@@ -3270,6 +3270,13 @@ void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP) const
         data << float(1);                                   // 1 - none 0 - 100% group bonus output
     }
     GetSession()->SendPacket(&data);
+}
+
+void Player::SavePersonalXPRate()
+{
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.PExecute("UPDATE `characters` SET `xp_rate` = '%f' WHERE `guid` = '%u'", GetPersonalXpRate(), GetGUIDLow());
+    CharacterDatabase.CommitTransaction();
 }
 
 void Player::GiveXP(uint32 xp, Unit* victim)
@@ -14799,6 +14806,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if (!_LoadHomeBind(holder->GetResult(PLAYER_LOGIN_QUERY_LOADHOMEBIND)))
         return false;
 
+    // Load personal XP rate from DB
+    if (!_LoadCustomXPRate(holder->GetResult(PLAYER_LOGIN_QUERY_CUSTOMXPRATE)))
+        m_personalXpRate = -1.0f;
+
     InitPrimaryProfessions();                               // to max set before any spell loaded
 
     // init saved position, and fix it later if problematic
@@ -16239,6 +16250,18 @@ void Player::_LoadGuild(QueryResult* result)
             SetRank(0);
         }
     }
+}
+
+bool Player::_LoadCustomXPRate(QueryResult *result)
+{
+    if (result)
+    {
+        Field *fields = result->Fetch();
+        m_personalXpRate = fields[0].GetFloat();
+        return true;
+    }
+
+    return false;
 }
 
 /*********************************************************/
