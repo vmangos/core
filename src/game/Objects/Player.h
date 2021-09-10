@@ -669,7 +669,6 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,
     PLAYER_LOGIN_QUERY_BATTLEGROUND_DATA,
     PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,
-    PLAYER_LOGIN_QUERY_CUSTOMXPRATE,
 
     MAX_PLAYER_LOGIN_QUERY
 };
@@ -1365,7 +1364,6 @@ class Player final: public Unit
         void _LoadBGData(QueryResult* result);
         void _LoadIntoDataField(char const* data, uint32 startOffset, uint32 count);
         void _LoadGuild(QueryResult* result);
-        bool _LoadCustomXPRate(QueryResult *result);
         uint32 m_atLoginFlags;
     public:
         bool LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder);
@@ -1594,7 +1592,6 @@ class Player final: public Unit
     public:
         void SetPersonalXpRate(float rate) { if (rate >= 0.0f) m_personalXpRate = rate; }
         float GetPersonalXpRate() const { return m_personalXpRate; }
-        void SavePersonalXPRate();
         void GiveXP(uint32 xp, Unit* victim);
         void GiveLevel(uint32 level);
         void InitStatsForLevel(bool reapplyMods = false);
