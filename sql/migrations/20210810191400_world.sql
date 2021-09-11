@@ -843,12 +843,18 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 -- Argent Dawn Shoulder enchants also require quest to unlock
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (551, 8, 5507, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (553, -1, 73, 551, 0, 0, 0);
-
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (552, 8, 5521, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (554, -1, 74, 552, 0, 0, 0);
-
 UPDATE `npc_vendor` SET `condition_id` = 553 WHERE `entry` = 10857 AND `item` IN (18169, 18170, 18171, 18172, 18173);
 UPDATE `npc_vendor` SET `condition_id` = 554 WHERE `entry` = 10857 AND `item` = 18182;
+
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (555, 8, 5504, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (557, -1, 73, 555, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (556, 8, 5524, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (558, -1, 74, 556, 0, 0, 0);
+UPDATE `npc_vendor` SET `condition_id` = 557 WHERE `entry` = 10856 AND `item` IN (18169, 18170, 18171, 18172, 18173);
+UPDATE `npc_vendor` SET `condition_id` = 558 WHERE `entry` = 10856 AND `item` = 18182;
+UPDATE `gossip_menu_option` SET `condition_id` = 0 WHERE `menu_id` = 3421 AND `id` = 1;
 
 
 -- End of migration.
