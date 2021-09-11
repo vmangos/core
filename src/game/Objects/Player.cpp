@@ -14738,6 +14738,13 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetUInt32Value(PLAYER_XP, fields[7].GetUInt32());
 
     m_personalXpRate = fields[8].GetFloat();
+    if (m_personalXpRate != -1.0f)
+    {
+        if (m_personalXpRate < sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MIN))
+            m_personalXpRate = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MIN);
+        if (m_personalXpRate > sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MAX))
+            m_personalXpRate = sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MAX);
+    }
 
     _LoadIntoDataField(fields[57].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
 
