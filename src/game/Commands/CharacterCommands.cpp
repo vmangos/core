@@ -87,9 +87,6 @@ bool ChatHandler::HandleModifyXpRateCommand(char* args)
     }
 
     pPlayer->SetPersonalXpRate(xp);
-    
-    // Save it to the DB
-    CharacterDatabase.PExecute("UPDATE `characters` SET `xp_rate` = '%f' WHERE `guid` = '%u'", pPlayer->GetPersonalXpRate(), pPlayer->GetGUIDLow());
 
     PSendSysMessage(LANG_XP_RATE_SET, (pPlayer != m_session->GetPlayer() ? (std::string(pPlayer->GetName()) + std::string("'s")).c_str() : "your"), xp);
     return true;
