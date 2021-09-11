@@ -856,6 +856,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `npc_vendor` SET `condition_id` = 560 WHERE `entry` IN (10856, 10857, 11536) AND `item` = 18182;
 UPDATE `gossip_menu_option` SET `condition_id` = 0, `action_script_id` = 0 WHERE `menu_id` = 3421 AND `id` = 1;
 
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
+
 
 -- End of migration.
 END IF;
