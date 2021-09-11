@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20210909163207');
 -- Add your query below.
 
 ALTER TABLE `characters`
-	ADD COLUMN `xp_rate` FLOAT DEFAULT '-1.0' AFTER `xp`;
+	ADD COLUMN `xp_rate` INT(10) NOT NULL DEFAULT '-1' AFTER `xp`;
 
 -- End of migration.
 END IF;
