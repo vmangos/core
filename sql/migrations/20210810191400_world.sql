@@ -833,13 +833,22 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 DELETE FROM `generic_scripts` WHERE `id`=233802;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (233802, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 837, 838, 839, 840, 0, 0, 0, 0, 0, 'Twilight Disciple - Talk');
 
-
 -- Events list for Twilight Thug
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2339;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233901, 2339, 0, 11, 0, 100, 0, 0, 0, 0, 0, 233901, 0, 0, 'Twilight Thug - Cast Battle Stance on Spawn');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233902, 2339, 0, 4, 0, 100, 2, 0, 0, 0, 0, 233902, 233903, 0, 'Twilight Thug - Say Text on Aggro');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233904, 2339, 0, 2, 0, 100, 0, 15, 0, 0, 0, 233904, 0, 0, 'Twilight Thug - Flee at 15% HP');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233905, 2339, 0, 6, 0, 100, 2, 0, 0, 0, 0, 233905, 233906, 0, 'Twilight Thug - Chance Say on Death');
+
+-- Argent Dawn Shoulder enchants also require quest to unlock
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (551, 8, 5507, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (553, -1, 73, 551, 0, 0, 0);
+
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (552, 8, 5521, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (554, -1, 74, 552, 0, 0, 0);
+
+UPDATE `npc_vendor` SET `condition_id` = 553 WHERE `entry` = 10857 AND `item` IN (18169, 18170, 18171, 18172, 18173);
+UPDATE `npc_vendor` SET `condition_id` = 554 WHERE `entry` = 10857 AND `item` = 18182;
 
 
 -- End of migration.
