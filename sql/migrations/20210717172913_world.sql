@@ -282,6 +282,65 @@ UPDATE `creature_template` SET `auras` = '11919' WHERE `entry` = 14266;
 -- Gretheer
 UPDATE `creature_template` SET `auras` = '21788' WHERE `entry` = 14472;
 
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6508;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (650801);
+-- Events list for Venomhide Ravasaur
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6508;
+
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6509;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (650901);
+-- Events list for Bloodpetal Lasher
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6509;
+
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6510;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (651001);
+-- Events list for Bloodpetal Flayer
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6510;
+
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6512;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (651201);
+-- Events list for Bloodpetal Trapper
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6512;
+
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6517;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (651701);
+-- Events list for Tar Beast
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6517;
+
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6518;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (651801);
+-- Events list for Tar Lurker
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6518;
+
+-- Removing unused script actions.
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry` = 6527;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (652701);
+-- Events list for Tar Creeper
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6527;
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (651901);
+-- Events list for Tar Lord
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6519;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (651903, 6519, 0, 2, 0, 100, 0, 40, 0, 0, 0, 651903, 0, 0, 'Tar Lord - Cast Renew');
+
+-- Add missing auras for NPC 6508 (Venomhide Ravasaur)
+UPDATE `creature_template` SET `auras`='14108' WHERE `entry`=6508;
+-- Add missing auras for NPC 6509 (Bloodpetal Lasher), 6510 (Bloodpetal Flayer), 6512 (Bloodpetal Trapper)
+UPDATE `creature_template` SET `auras`='14111' WHERE `entry` IN (6509, 6510, 6512);
+-- Add missing auras for NPC 6517 (Tar Beast), 6518 (Tar Lurker), 6519 (Tar Lord), 6527 (Tar Creeper)
+UPDATE `creature_template` SET `auras`='14178' WHERE `entry` IN (6517, 6518, 6519, 6527);
+-- Add missing aura for NPC 6556 (Muculent Ooze)
+UPDATE `creature_template` SET `auras`='14133' WHERE `entry`=6556;
+-- Add missing aura for NPC 10407 (Muculent Ooze)
+UPDATE `creature_template` SET `auras`='8876 18950' WHERE `entry`=10407;
+
 
 -- End of migration.
 END IF;
