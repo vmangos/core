@@ -1564,7 +1564,7 @@ class Player final: public Unit
         bool m_canBlock;
         bool m_canDualWield;
         float m_ammoDPS;
-        int m_personalXpRate;
+        float m_personalXpRate;
         uint32 m_foodEmoteTimer;
 
         void RegenerateAll();
@@ -1590,8 +1590,8 @@ class Player final: public Unit
         void _ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool apply);
         void _ApplyAmmoBonuses();
     public:
-        void SetPersonalXpRate(int rate) { if (rate >= 0) m_personalXpRate = rate; }
-        int GetPersonalXpRate() const { return m_personalXpRate; }
+        void SetPersonalXpRate(float rate) { if (rate >= 0.0f) m_personalXpRate = rate; }
+        float GetPersonalXpRate() const { return m_personalXpRate; }
         void GiveXP(uint32 xp, Unit* victim);
         void GiveLevel(uint32 level);
         void InitStatsForLevel(bool reapplyMods = false);

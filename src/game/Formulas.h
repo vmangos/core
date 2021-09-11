@@ -152,7 +152,7 @@ namespace MaNGOS
             xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
 
             Player* pPlayer = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
-            float personalRate = pPlayer ? pPlayer->GetPersonalXpRate() : -1;
+            float personalRate = pPlayer ? pPlayer->GetPersonalXpRate() : -1.0f;
 
             if (personalRate >= 0.0f)
                 xp_gain *= personalRate;
