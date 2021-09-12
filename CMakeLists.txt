@@ -37,7 +37,10 @@ option(USE_ANTICHEAT "Use anticheat" OFF)
 option(USE_SCRIPTS "Compile scripts" ON)
 option(USE_EXTRACTORS "Compile extractors" OFF)
 option(USE_LIBCURL "Compile with libcurl for email support" OFF)
-option(DEBUG_SYMBOLS "Include Debug Symbols" ON)
+
+if(UNIX)
+  option(DEBUG_SYMBOLS "Include Debug Symbols" ON)
+endif()
 
 find_package(PCHSupport)
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16")
