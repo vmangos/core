@@ -864,6 +864,9 @@ DELETE FROM `creature_loot_template` WHERE `entry`=2924 AND `item`=30011;
 -- Remove Incorrect Skinning Templates
 UPDATE `creature_template` SET `skinning_loot_id`='' WHERE `entry` IN (11788, 11787, 12218);
 
+-- Magistrate Marduke Should be a Questgiver
+UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 11286;
+
 
 -- End of migration.
 END IF;
