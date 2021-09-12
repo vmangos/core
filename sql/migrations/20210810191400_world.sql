@@ -858,6 +858,9 @@ UPDATE `gossip_menu_option` SET `condition_id` = 0, `action_script_id` = 0 WHERE
 
 UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
 
+-- Remove Low Level Loot from Silvermane Wolf
+DELETE FROM `creature_loot_template` WHERE `entry`=2924 AND `item`=30011;
+
 
 -- End of migration.
 END IF;
