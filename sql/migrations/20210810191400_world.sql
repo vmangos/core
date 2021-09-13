@@ -887,6 +887,10 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3365, 4128),
 (3364, 4129);
 
+-- Add Some More MIssing Text to Guard Howe
+DELETE FROM `creature_ai_scripts` WHERE `id`=90301;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (90301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 51, 52, 0, 0, 0, 0, 0, 0, 'Guard Howe - Say Text');
+
 
 -- End of migration.
 END IF;
