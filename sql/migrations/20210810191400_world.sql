@@ -864,8 +864,29 @@ DELETE FROM `creature_loot_template` WHERE `entry`=2924 AND `item`=30011;
 -- Remove Incorrect Skinning Templates
 UPDATE `creature_template` SET `skinning_loot_id`='' WHERE `entry` IN (11788, 11787, 12218);
 
--- Magistrate Marduke Should be a Questgiver
+-- Magistrate Marduke Should be a Questgiver and Add Missing Gossip
 UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 11286;
+-- Magistrate Marduke Should be a Questgiver
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3372, 0, 0, 'Tell me about the Cult of the Damned.', 0, 1, 1, 3371, 0, 0, 0, 0, NULL, 0, 0),
+(3371, 0, 0, 'Impossible.', 0, 1, 1, 3370, 0, 0, 0, 0, NULL, 0, 0),
+(3370, 0, 0, 'This is disheartening. Is there anything I can do to stop this?', 0, 1, 1, 3369, 0, 0, 0, 0, NULL, 0, 0),
+(3369, 0, 0, 'Who do I need to kill?', 0, 1, 1, 3368, 0, 0, 0, 0, NULL, 0, 0),
+(3368, 0, 0, 'What is this plan?', 0, 1, 1, 3367, 0, 0, 0, 0, NULL, 0, 0),
+(3367, 0, 0, 'Ras Frostwhat? Who is that?', 0, 1, 1, 3366, 0, 0, 0, 0, NULL, 0, 0),
+(3366, 0, 0, 'Continue, please.\n', 0, 1, 1, 3365, 0, 0, 0, 0, NULL, 0, 0),
+(3365, 0, 0, 'Yes I do.', 0, 1, 1, 3364, 0, 0, 0, 0, NULL, 0, 0),
+(3364, 0, 0, 'Yes I am.', 0, 1, 1, -1, 0, 0, 0, 0, NULL, 0, 0);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3371, 4122),
+(3370, 4123),
+(3369, 4124),
+(3368, 4125),
+(3367, 4126),
+(3366, 4127),
+(3365, 4128),
+(3364, 4129);
 
 
 -- End of migration.
