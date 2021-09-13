@@ -864,9 +864,8 @@ DELETE FROM `creature_loot_template` WHERE `entry`=2924 AND `item`=30011;
 -- Remove Incorrect Skinning Templates
 UPDATE `creature_template` SET `skinning_loot_id`='' WHERE `entry` IN (11788, 11787, 12218);
 
--- Magistrate Marduke Should be a Questgiver and Add Missing Gossip
+-- Magistrate Marduke Should be a Questgiver and Add Missing Gossip (he should only offer the quest once you have read through his gossip, not sure how to implement that)
 UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 11286;
--- Magistrate Marduke Should be a Questgiver
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (3372, 0, 0, 'Tell me about the Cult of the Damned.', 0, 1, 1, 3371, 0, 0, 0, 0, NULL, 0, 0),
 (3371, 0, 0, 'Impossible.', 0, 1, 1, 3370, 0, 0, 0, 0, NULL, 0, 0),
