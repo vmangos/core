@@ -845,8 +845,8 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-		if (!m_CreatureSpells.empty())
-			UpdateSpellsList(diff);
+        if (!m_CreatureSpells.empty())
+            UpdateSpellsList(diff);
 
         DoMeleeAttackIfReady();
     }
