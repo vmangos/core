@@ -607,7 +607,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (175891, 0, 10, 7523, 180000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Highborne Relic Fragment - Summon Creature');
 
 -- Move From pool_creature to pool_creature_template
-DELETE FROM `pool_creature` WHERE `pool_enty` IN (108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 521, 2598, 2605, 2606, 2779, 2850, 3200, 9002, 10003, 10004, 12902, 14222, 14281, 25468, 42939, 43157, 43525, 43517);
+DELETE FROM `pool_creature` WHERE `pool_entry` IN (108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 521, 2598, 2605, 2606, 2779, 2850, 3200, 9002, 10003, 10004, 12902, 14222, 14281, 25468, 42939, 43157, 43525, 43517);
 DELETE FROM `pool_template` WHERE `entry` = 10003;
 INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES
 (2038, 108, 0, 'Lord Melenas', 0, 0, 10),
