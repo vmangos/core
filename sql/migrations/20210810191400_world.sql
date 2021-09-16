@@ -788,8 +788,9 @@ INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalon
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 4, 81, 12609, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Serpent Statue - Despawn Gameobject');
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 5, 10, 12369, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 252.57, 2963.7, 1.72356, 1.29154, 0, 'Serpent Statue - Summon Creature');
 
--- Giant PLains Creeper Should not be Skinnable
+-- Giant Plains Creeper Should not be Skinnable
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry`=2565;
+DELETE FROM `skinning_loot_template` WHERE `entry`=2565 AND `item`=4234;
 
 -- Correct Quest Start Script fot The Shattered Salute
 UPDATE `quest_template` SET `StartScript` = 2460 WHERE `entry`= 2460;
