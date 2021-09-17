@@ -27,14 +27,14 @@ EndScriptData */
 enum
 {
     //Mograine says
-    SAY_MO_AGGRO                 = -1189005,
-    SAY_MO_KILL                  = -1189006,
-    SAY_MO_RESSURECTED           = -1189007,
+    SAY_MO_AGGRO                 = 2847, // Infidels! They must be purified!
+    SAY_MO_KILL                  = 6197, // Unworthy!
+    SAY_MO_RESSURECTED           = 6533, // At your side, milady!
 
     //Whitemane says
-    SAY_WH_INTRO                 = -1189008,
-    SAY_WH_KILL                  = -1189009,
-    SAY_WH_RESSURECT             = -1189010,
+    SAY_WH_INTRO                 = 2973, // Mograine has fallen? You shall pay for this treachery! sound: 5838, type: 1
+    SAY_WH_KILL                  = 6198, // The Light has spoken! sound: 5839, type: 1
+    SAY_WH_RESSURECT             = 6532, // Arise, my champion! sound: 5840, type: 1
 
     //Mograine Spells
     SPELL_CRUSADERSTRIKE         = 14518,
