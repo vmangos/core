@@ -32,9 +32,9 @@ enum
     SAY_MO_RESSURECTED           = 6533, // At your side, milady!
 
     //Whitemane says
-    SAY_WH_INTRO                 = 2973, // Mograine has fallen? You shall pay for this treachery! sound: 5838, type: 1
-    SAY_WH_KILL                  = 6198, // The Light has spoken! sound: 5839, type: 1
-    SAY_WH_RESSURECT             = 6532, // Arise, my champion! sound: 5840, type: 1
+    SAY_WH_INTRO                 = 2973, // Mograine has fallen? You shall pay for this treachery!
+    SAY_WH_KILL                  = 6198, // The Light has spoken!
+    SAY_WH_RESSURECT             = 6532, // Arise, my champion!
 
     //Mograine Spells
     SPELL_CRUSADERSTRIKE         = 14518,
