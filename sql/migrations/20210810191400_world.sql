@@ -915,7 +915,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (724, 23, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Prospect of Faith: Historian Karnik - Modify Flags');
 UPDATE `quest_template` SET `CompleteScript` = 724 WHERE `entry` = 724;
 
--- Add Missing Gossip For Get the Scoop
+-- Add Missing Gossip For Quest Get the Scoop
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (282, 779, 983), -- Goblin Pit Crewman
 (284, 781, 983), -- Gnome Pit Crewman
