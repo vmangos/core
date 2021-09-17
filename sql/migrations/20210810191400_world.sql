@@ -488,6 +488,9 @@ UPDATE `creature` SET `position_z` = 12 WHERE `guid` = 9716;
 UPDATE `creature` SET `position_x` = -4166.32, `position_y` = -2899.79, `position_z` = 13.0099, `movement_type` = 1, `wander_distance` = 10 WHERE `guid` = 9417;
 UPDATE `creature` SET `position_z` = 121 WHERE `guid`=92879;
 DELETE FROM `creature` WHERE `guid` IN (91936, 92482, 92471);
+UPDATE `creature` SET `position_z` = 10.097719 WHERE `guid` = 34164;
+UPDATE `creature` SET `position_z` = 0.982520 WHERE `guid` = 37376;
+UPDATE `creature` SET `position_z` = 2.425548 WHERE `guid` = 35251;
 
 -- Correct Loot Template For Riverpaw Gnoll
 DELETE FROM `creature_loot_template` WHERE `entry` = 117 AND `item` IN (30039, 1710);
