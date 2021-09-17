@@ -922,6 +922,37 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (433, 930, 983); -- Race Master Kronkrider
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (983, 9, 1950, 1, 0, 0, 0);
 
+-- Northern Crystal Pylon (Note: removing `script_name` enables gossip menus but wont complete the quest)
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(2177, 2810, 984), -- quest incomplete
+(2177, 2933, 4321), -- quest complete
+(2181, 2812, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (984, 22, 4321, 0, 0, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(2177, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2181, 0, 0, 0, 0, NULL, 0, 985);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (985, 9, 4285, 0, 0, 0, 0);
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164955;
+
+-- Eastern Crystal Pylon
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES 
+(2178, 2810, 0, 984),
+(2178, 2933, 0, 4321),
+(2180, 2811, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(2178, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2180, 0, 0, 0, 0, NULL, 0, 986);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (986, 9, 4287, 0, 0, 0, 0);
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164957;
+
+-- Western Crystal Pylon
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES 
+(2179, 2810, 984),
+(2179, 2933, 4321),
+(2182, 2813, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(2179, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2182, 0, 0, 0, 0, NULL, 0, 987);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (987, 9, 4288, 0, 0, 0, 0);
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164956;
+
 
 -- End of migration.
 END IF;
