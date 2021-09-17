@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210917103954');
 -- Add your query below.
 
--- Scarlet Monastery: Arcanist Doan https://youtu.be/eu0Q2uVvZdE?t=3137
+-- Scarlet Monastery: Arcanist Doan
 DELETE FROM `script_texts` WHERE `entry`= -1189019; 
 DELETE FROM `script_texts` WHERE `entry`= -1189020; 
 
@@ -45,6 +45,8 @@ UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=2655;
 
 UPDATE `broadcast_text` SET `sound_id`=5841 WHERE `entry`=2655;
 
+UPDATE `broadcast_text` SET `language_id`=0 WHERE `entry`=2655;
+
 -- Scarlet Monastery: Interrogator Vishas
 DELETE FROM `script_texts` WHERE `entry`= -1189011;
 DELETE FROM `script_texts` WHERE `entry`= -1189012; 
@@ -63,7 +65,7 @@ UPDATE `broadcast_text` SET `sound_id`=5849 WHERE `entry`=6206;
 UPDATE `broadcast_text` SET `sound_id`=5850 WHERE `entry`=6207;
 UPDATE `broadcast_text` SET `sound_id`=5848 WHERE `entry`=6205;
 
--- Scarlet Monastery: Mograine & Whitemane https://youtu.be/I5sa2M_-NXY?t=4715
+-- Scarlet Monastery: Mograine & Whitemane
 DELETE FROM `script_texts` WHERE `entry`= -1189005;
 DELETE FROM `script_texts` WHERE `entry`= -1189006; 
 DELETE FROM `script_texts` WHERE `entry`= -1189007;
