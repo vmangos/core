@@ -922,7 +922,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (433, 930, 983); -- Race Master Kronkrider
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (983, 9, 1950, 1, 0, 0, 0);
 
--- Northern Crystal Pylon (Note: removing `script_name` enables gossip menus but wont complete the quest)
+-- Northern Crystal Pylon
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2177, 2810, 984), -- quest incomplete
 (2177, 2933, 4321), -- quest complete
