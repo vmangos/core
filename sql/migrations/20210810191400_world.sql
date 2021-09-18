@@ -929,7 +929,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2181, 2812, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (984, 22, 4321, 0, 0, 0, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(2177, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2181, 0, 0, 0, 0, NULL, 0, 985);
+(2177, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2181, 0, 2177, 0, 0, NULL, 0, 985);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (985, 9, 4285, 0, 0, 0, 0);
 UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164955;
 
@@ -939,7 +939,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2178, 2933, 0, 4321),
 (2180, 2811, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(2178, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2180, 0, 0, 0, 0, NULL, 0, 986);
+(2178, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2180, 0, 2178, 0, 0, NULL, 0, 986);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (986, 9, 4287, 0, 0, 0, 0);
 UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164957;
 
@@ -949,9 +949,14 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (2179, 2933, 4321),
 (2182, 2813, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(2179, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2182, 0, 0, 0, 0, NULL, 0, 987);
+(2179, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2182, 0, 2179, 0, 0, NULL, 0, 987);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (987, 9, 4288, 0, 0, 0, 0);
 UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164956;
+
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(2177, 0, 7, 4285, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Northern Crystal Pylon - Complete Quest'),
+(2178, 0, 7, 4287, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastern Crystal Pylon - Complete Quest'),
+(2179, 0, 7, 4288, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Western Crystal Pylon - Complete Quest');
 
 
 -- End of migration.
