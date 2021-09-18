@@ -1006,6 +1006,25 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 -- Quest 4785 Should be Repeatable
 UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 4785;
 
+-- Corrections to Tome of Divinity (Dwarf) Quest
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1646;
+UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 970 WHERE `entry` = 1645;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (970, 22, 1646, 0, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 800 WHERE `entry` IN (2997, 2999, 3000);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (800, 22, 1645, 0, 0, 0, 1);
+
+-- Corrections to Tome of Divinity (Human) Quests
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1642;
+UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 971 WHERE `entry` = 1641;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (971, 22, 1642, 0, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 801 WHERE `entry` IN (2998, 3681);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (801, 22, 1641, 0, 0, 0, 1);
+DELETE FROM `conditions` WHERE `condition_entry` IN (164104, 164103, 164102, 164101);
+
+-- Corrections to Tome of Valor Quests
+UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 972 WHERE `entry` IN (1793, 1794);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (972, 22, 1649, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
