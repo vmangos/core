@@ -1003,6 +1003,9 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911701, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4852, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Talk - OOC');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911701, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4853, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Talk - OOC');
 
+-- Quest 4785 Should be Repeatable
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 4785;
+
 
 -- End of migration.
 END IF;
