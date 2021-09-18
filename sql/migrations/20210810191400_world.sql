@@ -8,6 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210810191400');
 -- Add your query below.
 
+
 -- Update Creatures and Gameobjects Associated With Quest Clam Bait 
 UPDATE `gameobject_template` SET `Data8` = 6142, `data9` = 0, `flags` = 4 WHERE `entry` = 177784;
 UPDATE `gameobject` SET `spawntimesecsmin`= 120, `spawntimesecsmax`= 120 WHERE id = 177784;
@@ -935,8 +936,8 @@ UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 164955;
 
 -- Eastern Crystal Pylon
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES 
-(2178, 2810, 0, 984),
-(2178, 2933, 0, 4321),
+(2178, 2810, 984),
+(2178, 2933, 4321),
 (2180, 2811, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (2178, 0, 0, 'I want to examine this pylon.', 0, 1, 1, 2180, 0, 2178, 0, 0, NULL, 0, 986);
