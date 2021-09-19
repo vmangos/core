@@ -1078,13 +1078,13 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 DELETE FROM `creature_movement` WHERE `id` IN (87092, 87091, 87090, 87089, 87082, 87088);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (84028, 84028, 2, 6.25244, 11),
-(84028, 87082, 2, 1.57, 11),
-(84028, 87088, 2, 3.14, 11),
 (84028, 87089, 2, 4.71, 11),
-(84028, 87090, 2, 2, 11),
 (84028, 87091, 2, 4, 11),
-(84028, 87023, 2, 0, 11),
-(84028, 87092, 2, 3.5, 11);
+(84028, 87092, 2, 3.5, 11),
+(84028, 87088, 2, 3.14, 11),
+(84028, 87023, 2, 2.5, 11),
+(84028, 87090, 2, 2, 11),
+(84028, 87082, 2, 1.57, 11);
 DELETE FROM `creature_movement_scripts` WHERE `id` IN (8708224, 8708942, 8708943);
 UPDATE `creature` SET `wander_distance` = 0, `movement_type` = 0 WHERE `guid` IN (87092, 87091, 87090, 87089, 87082, 87088, 87023);
 
