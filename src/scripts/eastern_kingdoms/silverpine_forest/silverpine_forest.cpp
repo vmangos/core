@@ -253,8 +253,6 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
         m_bEventStarted = false;
     }
 
-    void JustRespawned() override {}
-
     void FailQuestForPlayerOrGroup()
     {
         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
