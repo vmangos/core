@@ -1757,6 +1757,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         caster->HandleEmote(EMOTE_STATE_SUBMERGED);
                         break;
                     }
+                    case 29705: // Midsummer Pole Dancing
+                    case 29726:
+                    case 29727:
+                    {
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = 3000;
+                        break;
+                    }
                 }
                 break;
             }
@@ -6356,6 +6364,7 @@ void Aura::PeriodicDummyTick()
                     return;
                 }
                 case 24596:                                 // Intoxicating Venom
+                {
                     if (target->IsInCombat())
                     {
                         uint32 rand = urand(0, 99);
@@ -6365,6 +6374,36 @@ void Aura::PeriodicDummyTick()
                             target->CastSpell(target, 6869, true, nullptr, this);     // Fall Down
                     }
                     return;
+                }
+                case 29705:  // Midsummer Summer Festival - Test Ribbon Pole Channel
+                case 29726:
+                case 29727:
+                {
+                    int ribbonCount = 0;
+
+                    Unit::SpellAuraHolderMap const& uAuras = target->GetSpellAuraHolderMap();
+                    for (const auto& aura : uAuras)
+                    {
+                        if (ribbonCount < 2)
+                        {
+                            switch (aura.second->GetId())
+                            {
+                                case 29705: // Red
+                                case 29726: // Purple
+                                case 29727: // Green
+                                    ribbonCount++;
+                                    break;
+                            }
+                        }
+                        else
+                            break;
+                    }
+
+                    if (ribbonCount > 1)
+                        target->CastSpell(GetCaster(), 29175, true); // Midsummer Pole Buff
+
+                    return;
+                }
             }
             break;
         }

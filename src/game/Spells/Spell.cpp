@@ -499,7 +499,7 @@ void Spell::FillTargetMap()
             case TARGET_LOCATION_CASTER_DEST:
                 switch (m_spellInfo->EffectImplicitTargetB[i])
                 {
-                    case 0:
+                    case TARGET_NONE:
                     case TARGET_LOCATION_CASTER_DEST:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
@@ -597,7 +597,7 @@ void Spell::FillTargetMap()
                     case TARGET_LOCATION_CASTER_RIGHT:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;
-                    case 0:
+                    case TARGET_NONE:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         if (m_casterUnit)
                             tmpUnitMap.push_back(m_casterUnit);
@@ -613,7 +613,7 @@ void Spell::FillTargetMap()
             case TARGET_LOCATION_DATABASE:
                 switch (m_spellInfo->EffectImplicitTargetB[i])
                 {
-                    case 0:
+                    case TARGET_NONE:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
 
                         // need some target for processing
@@ -631,7 +631,7 @@ void Spell::FillTargetMap()
             case TARGET_LOCATION_UNIT_POSITION:
                 switch (m_spellInfo->EffectImplicitTargetB[i])
                 {
-                    case 0:
+                    case TARGET_NONE:
                     case TARGET_LOCATION_CASTER_DEST:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         if (Unit* currentTarget = m_targets.getUnitTarget())
@@ -3186,11 +3186,11 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case SPELL_EFFECT_REPUTATION:
                 case SPELL_EFFECT_ADD_HONOR:
                 case SPELL_EFFECT_SEND_TAXI:
-                    if (m_targets.getUnitTarget())
-                        targetUnitMap.push_back(m_targets.getUnitTarget());
-                    // Triggered spells have additional spell targets - cast them even if no explicit unit target is given (required for spell 50516 for example)
-                    else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_TRIGGER_SPELL && m_casterUnit)
+                    // Triggered spells have additional spell targets - cast them always on self (fixes 28806)
+                    if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_TRIGGER_SPELL && m_casterUnit)
                         targetUnitMap.push_back(m_casterUnit);
+                    else if (m_targets.getUnitTarget())
+                        targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
                 case SPELL_EFFECT_CREATE_HOUSE:
                     if (m_casterUnit)
@@ -6066,10 +6066,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                     else
                     {
                         if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_UNIT_SCRIPT_NEAR_CASTER ||
-                                m_spellInfo->EffectImplicitTargetB[j] == TARGET_UNIT_SCRIPT_NEAR_CASTER)
+                            m_spellInfo->EffectImplicitTargetB[j] == TARGET_UNIT_SCRIPT_NEAR_CASTER)
                         {
-                            // not sure if every TARGET_UNIT_SCRIPT_NEAR_CASTER requires the same, but this one definetely is checked wrong
-                            if (m_spellInfo->Id == 16053 && creatureScriptTarget->GetHealthPercent() < 11)
+                            // Fixes Toss Fuel on Bonfire (28806) and Dominion of Soul (16053)
+                            if (m_IsCastByItem)
                                 m_targets.setUnitTarget(creatureScriptTarget);
 
                             AddUnitTarget(creatureScriptTarget, SpellEffectIndex(j));                            
