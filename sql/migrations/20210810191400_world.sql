@@ -1073,7 +1073,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1070, 41, -1192.27, 120.281, 135.206, 100, 0, 0, 0),
 (1070, 42, -1184.28, 120.872, 135.206, 100, 0, 0, 0);
 
--- Convert Stormwind School Trip to Creature Groups (Maybe get correct waypoints for group leader and add missing RP Lines, also a creature is missing from the patrol)
+-- Convert Stormwind School Trip to Creature Groups (Maybe get correct waypoints for group leader and add missing RP Lines)
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `patch_min`, `patch_max`) VALUES (87023, 3509, 0, -8839.57, 666.54, 97.95, 0.48, 300, 300, 100, 0, 0, 10);
 DELETE FROM `creature_movement` WHERE `id` IN (87092, 87091, 87090, 87089, 87082, 87088);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
