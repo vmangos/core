@@ -9,6 +9,13 @@ INSERT INTO `migrations` VALUES ('20210623174520');
 -- Add your query below.
 
 
+-- Add health condition for Dominion of Soul spell used to control Emberstrife.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (16053, 41, 10, 2, 0, 0, 0);
+UPDATE `spell_script_target` SET `conditionId`=16053 WHERE `entry`=16053;
+
+-- Make Burning Blossom ignore LoS.
+INSERT INTO `spell_mod` (`Id`, `AttributesEx2`, `Comment`) VALUES (28806, 536870916, 'Toss Fuel on Bonfire - Ignore LoS');
+
 -- Remove wrongly spawned 181354 (Floating, medium) - Flowers in the canals of Stormwind
 DELETE FROM `gameobject` WHERE `guid`=26524;
 
