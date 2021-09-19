@@ -45,8 +45,6 @@ UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=2655;
 
 UPDATE `broadcast_text` SET `sound_id`=5841 WHERE `entry`=2655;
 
-UPDATE `broadcast_text` SET `language_id`=0 WHERE `entry`=2655;
-
 -- Scarlet Monastery: Interrogator Vishas
 DELETE FROM `script_texts` WHERE `entry`= -1189011;
 DELETE FROM `script_texts` WHERE `entry`= -1189012; 
