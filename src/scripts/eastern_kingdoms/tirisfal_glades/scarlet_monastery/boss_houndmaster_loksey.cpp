@@ -25,7 +25,7 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO                       = -1189021,
+    SAY_AGGRO                       = 2655, // Release the hounds!
     SPELL_SUMMONSCARLETHOUND        = 17164,
     SPELL_BLOODLUST                 = 6742
 };
