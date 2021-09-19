@@ -1074,6 +1074,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1070, 42, -1184.28, 120.872, 135.206, 100, 0, 0, 0);
 
 -- Convert Stormwind School Trip to Creature Groups (Maybe get correct waypoints for group leader and add missing RP Lines, also a creature is missing from the patrol)
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `patch_min`, `patch_max`) VALUES (87023, 3509, 0, -8839.57, 666.54, 97.95, 0.48, 300, 300, 100, 0, 0, 10);
 DELETE FROM `creature_movement` WHERE `id` IN (87092, 87091, 87090, 87089, 87082, 87088);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (84028, 84028, 2, 6.25244, 11),
@@ -1082,8 +1083,10 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (84028, 87089, 2, 4.71, 11),
 (84028, 87090, 2, 2, 11),
 (84028, 87091, 2, 4, 11),
+(84028, 87023, 2, 0, 11),
 (84028, 87092, 2, 3.5, 11);
 DELETE FROM `creature_movement_scripts` WHERE `id` IN (8708224, 8708942, 8708943);
+UPDATE `creature` SET `wander_distance` = 0, `movement_type` = 0 WHERE `guid` IN (87092, 87091, 87090, 87089, 87082, 87088, 87023);
 
 
 -- End of migration.
