@@ -1088,6 +1088,23 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 DELETE FROM `creature_movement_scripts` WHERE `id` IN (8708224, 8708942, 8708943);
 UPDATE `creature` SET `wander_distance` = 0, `movement_type` = 0 WHERE `guid` IN (87092, 87091, 87090, 87089, 87082, 87088, 87023);
 
+-- Update Some Midsummer Fire Festival Quest Chains
+-- Alliance
+UPDATE `creature_questrelation` SET `id` = 16817 WHERE `id` = 16818 AND `quest` = 9339;
+UPDATE `creature_involvedrelation` SET `id` = 16817 WHERE `id` = 16818 AND `quest` = 9339;
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` = 9339 AND `patch` = 9;
+UPDATE `quest_template` SET `Details`='' WHERE `entry` = 9339 AND `patch` = 9;
+UPDATE `quest_template` SET `Objectives`='' WHERE `entry` = 9339 AND `patch` = 9;
+UPDATE `quest_template` SET `OfferRewardText`='You\'ve proven yourself today, $n.$b$bWhile I have little else to give you, I do have this crown; a fitting gift for a conqueror. May it light your way.' WHERE `entry` = 9339 AND `patch`=9;
+
+-- Horde
+UPDATE `creature_questrelation` SET `id` = 16818 WHERE `id` = 16817 AND `quest` = 9365;
+UPDATE `creature_involvedrelation` SET `id` = 16818 WHERE `id` = 16817 AND `quest` = 9365;
+UPDATE `quest_template` SET `RequiredRaces`= 178 WHERE `entry` = 9365 AND `patch` = 9;
+UPDATE `quest_template` SET `Details`='' WHERE `entry` = 9365 AND `patch`=9;
+UPDATE `quest_template` SET `Objectives`='' WHERE `entry` = 9365 AND `patch`=9;
+UPDATE `quest_template` SET `OfferRewardText`='You\'ve proven yourself today, $n.$b$bWhile I have little else to give you, I do have this crown; a fitting gift for a conqueror. May it light your way.' WHERE `entry` = 9365 AND `patch`=9;
+
 
 -- End of migration.
 END IF;
