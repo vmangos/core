@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210922073106');
 -- Add your query below.
 
--- Razorfren Kraul - Willix the Importer
+-- Razorfren Kraul - Willix the Importer https://youtu.be/oJ7aszDQcQQ?t=75
 DELETE FROM `script_texts` WHERE `entry`= -1047000; 
 DELETE FROM `script_texts` WHERE `entry`= -1047001; 
 DELETE FROM `script_texts` WHERE `entry`= -1047002; 
@@ -19,8 +19,8 @@ DELETE FROM `script_texts` WHERE `entry`= -1047006;
 DELETE FROM `script_texts` WHERE `entry`= -1047007; 
 DELETE FROM `script_texts` WHERE `entry`= -1047008; 
 
-UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=1545;
-UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=1547;
+UPDATE `broadcast_text` SET `chat_type`=0 WHERE `entry`=1544;
+UPDATE `broadcast_text` SET `chat_type`=0 WHERE `entry`=1546;
 
 -- Razorfren Kraul - Snufflenose Gopher
 DELETE FROM `script_texts` WHERE `entry`= -1780223; 
