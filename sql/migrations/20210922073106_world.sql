@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210922073106');
 -- Add your query below.
 
--- Razorfren Kraul - Willix the Importer https://youtu.be/oJ7aszDQcQQ?t=75
+-- Razorfren Kraul - Willix the Importer
 DELETE FROM `script_texts` WHERE `entry`= -1047000; 
 DELETE FROM `script_texts` WHERE `entry`= -1047001; 
 DELETE FROM `script_texts` WHERE `entry`= -1047002; 
