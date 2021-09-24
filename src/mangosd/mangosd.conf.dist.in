@@ -2847,6 +2847,11 @@ AHBot.itemcount = 50
 #                 0 (normal starting items)
 #                 2 (premade gear template)
 #
+#    PartyBot.RandomGearLevelDifference
+#        Item level difference for random items that will bots equip. Has only effect if PartyBot.AutoEquip is set to 1.
+#        A lower number equals to gear being more close to the bot level.
+#        Default: 10 (bots will equip gear down to a minimum of 10 item level difference)
+#
 #    BattleBot.AutoEquip
 #        What gear will new battlebots spawn with.
 #        Default: 1 (random items)
@@ -2858,12 +2863,16 @@ RandomBot.Enable = 0
 RandomBot.MinBots = 0
 RandomBot.MaxBots = 0
 RandomBot.Refresh = 60000
+
 PlayerBot.Debug = 0
 PlayerBot.UpdateMs = 1000
 PlayerBot.ShowInWhoList = 0
+
 PartyBot.MaxBots = 0
 PartyBot.SkipChecks = 0
 PartyBot.AutoEquip = 1
+PartyBot.RandomGearLevelDifference = 10
+
 BattleBot.AutoEquip = 1
 
 ###################################################################################################################
