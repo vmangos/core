@@ -510,6 +510,9 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
             return;
     }
 
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM))
+        return;
+
     _player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_ANIM_CANCELS);
     _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ANIM_CANCELS);
     _player->SetStandState(animstate);

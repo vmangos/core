@@ -6667,6 +6667,9 @@ void SpellAuraHolder::_AddSpellAuraHolder()
     if (m_spellProto->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS) && !m_target->IsSittingDown())
         m_target->SetStandState(UNIT_STAND_STATE_SIT);
 
+    if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM))
+        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM);
+
     // register aura diminishing on apply
     if (getDiminishGroup() != DIMINISHING_NONE)
         m_target->ApplyDiminishingAura(getDiminishGroup(), true);
@@ -6729,9 +6732,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         if (slot < MAX_AURAS)
             m_target->UpdateAuraForGroup(slot);
 
-        //*****************************************************
         // Update target aura state flag (at last aura remove)
-        //*****************************************************
         uint32 removeState = 0;
         uint64 removeFamilyFlag = m_spellProto->SpellFamilyFlags;
         switch (m_spellProto->SpellFamilyName)
@@ -6743,23 +6744,31 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         }
 
         // Remove state (but need check other auras for it)
-        if (removeState)
+        if (removeState || m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM))
         {
-            bool found = false;
+            bool foundAuraWithSameAuraState = false;
+            bool foundAuraWithPreventsAnimAttribute = false;
             Unit::SpellAuraHolderMap const& holders = m_target->GetSpellAuraHolderMap();
             for (const auto& holder : holders)
             {
                 SpellEntry const* auraSpellInfo = holder.second->GetSpellProto();
-                if (auraSpellInfo->IsFitToFamily(SpellFamily(m_spellProto->SpellFamilyName), removeFamilyFlag))
-                {
-                    found = true;
+
+                if (removeState && !foundAuraWithSameAuraState)
+                    foundAuraWithSameAuraState = auraSpellInfo->IsFitToFamily(SpellFamily(m_spellProto->SpellFamilyName), removeFamilyFlag);
+                
+                if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM) && !foundAuraWithPreventsAnimAttribute)
+                    foundAuraWithPreventsAnimAttribute = auraSpellInfo->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM);
+
+                if ((!removeState || foundAuraWithSameAuraState) &&
+                    (!m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM) || foundAuraWithPreventsAnimAttribute))
                     break;
-                }
             }
 
             // this has been last aura
-            if (!found)
+            if (removeState && !foundAuraWithSameAuraState)
                 m_target->ModifyAuraState(AuraState(removeState), false);
+            if (m_spellProto->HasAttribute(SPELL_ATTR_EX_PREVENTS_ANIM) && !foundAuraWithPreventsAnimAttribute)
+                m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM);
         }
 
         // reset cooldown state for spells

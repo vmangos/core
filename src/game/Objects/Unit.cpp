@@ -8650,7 +8650,6 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
             GetHostileRefManager().deleteReferences();
         }
 
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
 
         // prevent interrupt message
@@ -8660,7 +8659,6 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
     }
     else
     {
-        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
         // blizz like 2.0.x
         //SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH); [-ZERO] remove/replace ?
 
