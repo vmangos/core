@@ -492,6 +492,7 @@ DELETE FROM `creature` WHERE `guid` IN (91936, 92482, 92471);
 UPDATE `creature` SET `position_z` = 10.097719 WHERE `guid` = 34164;
 UPDATE `creature` SET `position_z` = 0.982520 WHERE `guid` = 37376;
 UPDATE `creature` SET `position_z` = 2.425548 WHERE `guid` = 35251;
+DELETE FROM `creature` WHERE `guid` IN (34193);
 
 -- Correct Loot Template For Riverpaw Gnoll
 DELETE FROM `creature_loot_template` WHERE `entry` = 117 AND `item` IN (30039, 1710);
