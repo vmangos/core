@@ -651,19 +651,6 @@ struct boss_sapphironAI : public ScriptedAI
     }
 };
 
-struct npc_wing_buffetAI : public ScriptedAI
-{
-    npc_wing_buffetAI(Creature* pCreature) : ScriptedAI(pCreature) { }
-    
-    void Reset() override { }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->HasAura(SPELL_PERIODIC_BUFFET))
-            m_creature->CastSpell(m_creature, SPELL_PERIODIC_BUFFET, true);
-    }
-};
-
 struct npc_sapphiron_blizzardAI : public ScriptedAI
 {
     npc_sapphiron_blizzardAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -671,13 +658,11 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         m_creature->SetWanderDistance(60.0f);
         m_creature->SetReactState(ReactStates::REACT_PASSIVE);
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        checkAuraTimer = 0;
         events.ScheduleEvent(1, 10);
     }
 
     EventMap events;
     instance_naxxramas* m_pInstance;
-    uint32 checkAuraTimer;
     std::vector<ObjectGuid> previousTargets;
 
     void Reset() override { }
@@ -755,15 +740,6 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (checkAuraTimer < uiDiff)
-        {
-            if (!m_creature->HasAura(SPELL_BLIZZARD_PERIODIC))
-                m_creature->CastSpell(m_creature, SPELL_BLIZZARD_PERIODIC, true);
-            checkAuraTimer = 2000;
-        }
-        else
-            checkAuraTimer -= uiDiff;
-
         events.Update(uiDiff);
 
         if (events.ExecuteEvent())
@@ -779,11 +755,6 @@ CreatureAI* GetAI_boss_sapphiron(Creature* pCreature)
     return new boss_sapphironAI(pCreature);
 }
 
-CreatureAI* GetAI_npc_wing_buffet(Creature* pCreature)
-{
-    return new npc_wing_buffetAI(pCreature);
-}
-
 CreatureAI* GetAI_npc_sapphironBlizzard(Creature* pCreature)
 {
     return new npc_sapphiron_blizzardAI(pCreature);
@@ -795,11 +766,6 @@ void AddSC_boss_sapphiron()
     NewScript = new Script;
     NewScript->Name = "boss_sapphiron";
     NewScript->GetAI = &GetAI_boss_sapphiron;
-    NewScript->RegisterSelf();
-
-    NewScript = new Script;
-    NewScript->Name = "npc_sapphiron_wing_buffet";
-    NewScript->GetAI = &GetAI_npc_wing_buffet;
     NewScript->RegisterSelf();
 
     NewScript = new Script;

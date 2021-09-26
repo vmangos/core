@@ -64,15 +64,8 @@ enum KelthuzadData
 
 enum AddSpells
 {
-    // guardian of icecrown
+    // Guardian of Icecrown
     SPELL_BLOOD_TAP = 28470, 
-
-    // Soul Weaver
-    SPELL_WAIL_SOULS_AUR = 28460,
-
-    // Warrior
-    SPELL_DARK_BLAST_AUR  = 28458,
-    SPELL_DARK_BLAST_TRIG = 28457,
 
     // Abomination
     SPELL_MORTAL_WOUND = 28467
@@ -870,22 +863,13 @@ struct mob_soldierAI : public kt_p1AddAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (!m_creature->HasAura(SPELL_DARK_BLAST_AUR))
-            m_creature->CastSpell(m_creature, SPELL_DARK_BLAST_AUR, true);
-
-        //if (m_creature->GetVictim() && m_creature->GetVictim()->IsPlayer()) 
-        //{
-        //    bool inVisibleList = m_creature->GetVictim()->ToPlayer()->IsInVisibleList(m_creature);
-        //    sLog.outBasic("%s visible: %d", m_creature->GetVictim()->GetName(), inVisibleList);
-        //}
-        //m_creature->ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
-
         // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
-        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+        if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
         {
-            if (m_creature->GetVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
+            if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
             {
-                ScriptedAI::AttackStart(pNearest);
+                if (m_creature->GetVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
+                    ScriptedAI::AttackStart(pNearest);
             }
         }
 
@@ -909,15 +893,13 @@ struct mob_soulweaverAI : public kt_p1AddAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (!m_creature->HasAura(SPELL_WAIL_SOULS_AUR))
-            m_creature->CastSpell(m_creature, SPELL_WAIL_SOULS_AUR, true);
-
         // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
-        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+        if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
         {
-            if (m_creature->GetVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
+            if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
             {
-                ScriptedAI::AttackStart(pNearest);
+                if (m_creature->GetVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
+                    ScriptedAI::AttackStart(pNearest);
             }
         }
 

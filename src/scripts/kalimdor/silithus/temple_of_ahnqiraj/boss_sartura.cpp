@@ -45,8 +45,8 @@ enum
 
     TAUNT_IMMUNE                    = 26602,
 
-    EMOTE_ENRAGE                    = -1000003,
-    EMOTE_ENRAGEHARD                = -1000004,
+    EMOTE_ENRAGE                    = 2384,
+    EMOTE_ENRAGEHARD                = 4428,
 
     // Royal Guard
     SPELL_KNOCKBACK                 = 19813,
