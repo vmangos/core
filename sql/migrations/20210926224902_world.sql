@@ -26,7 +26,7 @@ UPDATE `quest_template` SET `Details`='' WHERE `entry` = 9365 AND `patch`=9;
 UPDATE `quest_template` SET `Objectives`='' WHERE `entry` = 9365 AND `patch`=9;
 UPDATE `quest_template` SET `OfferRewardText`='You\'ve proven yourself today, $n.$b$bWhile I have little else to give you, I do have this crown; a fitting gift for a conqueror. May it light your way.' WHERE `entry` = 9365 AND `patch`=9;
 
-
+-- INCORRECT
 UPDATE `gameobject_template` SET `data12` = 181290 WHERE `entry` = 181347;
 UPDATE `gameobject_template` SET `patch` = 9 WHERE `entry` = 181346
 UPDATE `quest_template` SET `SpecialFlags` = 0, `PrevQuestId` = 0 WHERE `entry` = 9386;
