@@ -47,14 +47,12 @@ enum ErisHavenfireData
 
     DEATH_POST_SPAWNS_COUNT = 14,
 
-    SPELL_PESTE             = 23072,
-    SPELL_TIR_FLECHE        = 22121,
-    SPELL_ENTRE_LUMIERE     = 23107,
-    SPELL_BUFF              = 23108,
-    SPELL_INVOC_PAYSANTS    = 23119,
-    SPELL_PORTE_MORT        = 23127,
-    SPELL_FUFU              = 23196,
-    SPELL_SEE               = 23199,        // Pas sur de son utilité
+    SPELL_SEETHING_PLAGUE        = 23072,
+    SPELL_SHOOT                  = 22121,
+    SPELL_ENTER_THE_LIGHT        = 23107,
+    SPELL_BLESSING_OF_NORDRASSIL = 23108,
+    SPELL_CONJURE_PEASANT        = 23119,
+    SPELL_DEATHS_DOOR            = 23127,
 
     SAY_PEASANT_RANDOM_3    = 9683,
     SAY_PEASANT_RANDOM_2    = 9680,
@@ -156,7 +154,6 @@ struct npc_eris_havenfireAI : public ScriptedAI
     explicit npc_eris_havenfireAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
-        m_creature->CastSpell(m_creature, SPELL_FUFU, true);
         m_creature->SetCreatureSummonLimit(200);
     }
 
@@ -316,7 +313,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 SetAttackOnPeasantOrPlayer(summoned);
                 break;
             case NPC_PAYSANT_1:
-                summoned->CastSpell(summoned, SPELL_PESTE, true);
+                summoned->CastSpell(summoned, SPELL_SEETHING_PLAGUE, true);
             // no break
             case NPC_PAYSANT_0:
                 while (VillagerGUIDs[Var] && Var < 49)
@@ -628,7 +625,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
         if (BuffTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_BUFF) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_BLESSING_OF_NORDRASSIL) == CAST_OK)
             {
                 if (Player* player = GetPlayer())
                     DoScriptText(SAY_ERIS_HEAL, m_creature, player);
@@ -673,7 +670,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
                         Unit* Target = m_creature->GetMap()->GetCreature(GUIDs[urand(0, var - 1)]);
                         if (Target)
-                            Crea->CastCustomSpell(Target, SPELL_TIR_FLECHE, Damage, {}, {}, true);
+                            Crea->CastCustomSpell(Target, SPELL_SHOOT, Damage, {}, {}, true);
                         TimerArcher[i] = urand(3000, 4400);
                     }
                 }
@@ -742,10 +739,10 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
-        if (pSpell->Id == SPELL_TIR_FLECHE)
+        if (pSpell->Id == SPELL_SHOOT)
         {
             if (!urand(0, 10))
-                m_creature->CastSpell(m_creature, SPELL_PORTE_MORT, true);
+                m_creature->CastSpell(m_creature, SPELL_DEATHS_DOOR, true);
         }
         else if (pCaster && pCaster->GetTypeId() == TYPEID_PLAYER)
         {
