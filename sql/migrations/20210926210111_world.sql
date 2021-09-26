@@ -67,14 +67,6 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (6981, 8296, 0, 460),
 (6981, 8298, 0, 455);
 
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
-(7017, 8270, 0, 461),
-(7017, 8283, 0, 459),
-(7017, 8285, 0, 454),
-(7017, 8291, 0, 458),
-(7017, 8296, 0, 460),
-(7017, 8298, 0, 455);
-
 
 -- End of migration.
 END IF;
