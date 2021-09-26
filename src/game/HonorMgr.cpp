@@ -866,7 +866,7 @@ void HonorMgr::Update()
     honorBar = uint8(((honorBar - m_rank.minRP) / (m_rank.maxRP - m_rank.minRP)) * (m_rank.positive ? 255 : -255));
 
     // PLAYER_FIELD_HONOR_BAR
-    m_owner->SetUInt32Value(PLAYER_FIELD_BYTES2, honorBar);
+    m_owner->SetByteValue(PLAYER_FIELD_BYTES2, 0, honorBar);
 
     // TODAY
     m_owner->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, todayHK);
