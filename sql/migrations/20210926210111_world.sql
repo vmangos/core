@@ -1,0 +1,84 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20210926210111');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20210926210111');
+-- Add your query below.
+
+
+-- Add Missing Creatures
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(3526, 16005, 0, 0, 0, 0, -8813.1, 613.857, 95.2532, 3.15905, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+(3527, 16007, 0, 0, 0, 1, 1617.32, -4399.98, 11.5139, 2.94961, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+(3528, 16008, 0, 0, 0, 1, -1268.37, 49.4112, 128.258, 5.51524, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+(3529, 16009, 0, 0, 0, 0, -4918.69, -971.674, 501.555, 2.11185, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10);
+
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(3526, 8),
+(3527, 8),
+(3528, 8),
+(3529, 8);
+
+-- Add Missing Gossips
+UPDATE `creature_template` SET `gossip_menu_id` = 7081 WHERE `entry` = 1328;
+UPDATE `creature_template` SET `gossip_menu_id` = 6959 WHERE `entry` = 1402;
+UPDATE `creature_template` SET `gossip_menu_id` = 6976 WHERE `entry` = 1405;
+UPDATE `creature_template` SET `gossip_menu_id` = 6976 WHERE `entry` = 1719;
+UPDATE `creature_template` SET `gossip_menu_id` = 6981 WHERE `entry` = 1750;
+UPDATE `creature_template` SET `gossip_menu_id` = 6976 WHERE `entry` = 3628;
+UPDATE `creature_template` SET `gossip_menu_id` = 6976 WHERE `entry` = 7917;
+UPDATE `creature_template` SET `gossip_menu_id` =  7017 WHERE `entry` = 11750;
+UPDATE `creature_template` SET `gossip_menu_id` =  7081 WHERE `entry` = 12805;
+UPDATE `creature_template` SET `gossip_menu_id` =  6981 WHERE `entry` = 16002;
+
+-- NOTE: MOST OF THESE ARE PLACEHOLDERS AS FULL GOSSIP MENU ENTRIES FOR THIS EVENT ARENT AVAILABLE
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(7081, 8244, 0, 461),
+(7081, 8283, 0, 459),
+(7081, 8285, 0, 454),
+(7081, 8291, 0, 458),
+(7081, 8296, 0, 460),
+(7081, 8298, 0, 455);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(6959, 8244, 0, 461),
+(6959, 8283, 0, 459),
+(6959, 8285, 0, 454),
+(6959, 8291, 0, 458),
+(6959, 8296, 0, 460),
+(6959, 8298, 0, 455);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(6976, 8244, 0, 461),
+(6976, 8283, 0, 459),
+(6976, 8285, 0, 454),
+(6976, 8291, 0, 458),
+(6976, 8296, 0, 460),
+(6976, 8298, 0, 455);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(6981, 8244, 0, 461),
+(6981, 8283, 0, 459),
+(6981, 8285, 0, 454),
+(6981, 8291, 0, 458),
+(6981, 8296, 0, 460),
+(6981, 8298, 0, 455);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(7017, 8270, 0, 461),
+(7017, 8283, 0, 459),
+(7017, 8285, 0, 454),
+(7017, 8291, 0, 458),
+(7017, 8296, 0, 460),
+(7017, 8298, 0, 455);
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
