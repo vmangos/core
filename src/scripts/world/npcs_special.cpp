@@ -2090,25 +2090,31 @@ CreatureAI* GetAI_npc_explosive_sheep(Creature* pCreature)
 
 enum
 {
-    EVENT_VALENTINE_KWEE = 140,
+    EVENT_LOVE_IS_IN_THE_AIR                                    = 8,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS           = 110,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE           = 111,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND           = 112,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR           = 113,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF       = 114,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY           = 115,
 
-    SPELL_SMITTEN = 27572,
-    QUEST_GIFT_H = 8981,
-    QUEST_GIFT_A = 8993,
+    SPELL_SMITTEN       = 27572,
+    QUEST_GIFT_H        = 8981,
+    QUEST_GIFT_A        = 8993,
 
-    VAR_KWEE_THRALL = 2200,
-    VAR_KWEE_CAIRNE = 2201,
-    VAR_KWEE_SYLVANAS = 2202,
-    VAR_KWEE_HORDE = 2207,
+    VAR_KWEE_THRALL     = 2200,
+    VAR_KWEE_CAIRNE     = 2201,
+    VAR_KWEE_SYLVANAS   = 2202,
+    VAR_KWEE_HORDE      = 2207,
 
-    VAR_KWEE_BOLVAR = 2203,
-    VAR_KWEE_MAGNI = 2204,
-    VAR_KWEE_TYRANDE = 2205,
-    VAR_KWEE_ALLIANCE = 2206,
+    VAR_KWEE_BOLVAR     = 2203,
+    VAR_KWEE_MAGNI      = 2204,
+    VAR_KWEE_TYRANDE    = 2205,
+    VAR_KWEE_ALLIANCE   = 2206,
 
-    TEXT_ID_VICTORY_A = 8315,
-    TEXT_ID_VICTORY_H = 8316,
-    TEXT_ID_TIE = 8320,
+    TEXT_ID_VICTORY_A   = 8315,
+    TEXT_ID_VICTORY_H   = 8316,
+    TEXT_ID_TIE         = 8320,
 
 };
 
@@ -2126,12 +2132,11 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
 {
     npc_kwee_peddlefeetAI(Creature* pCreature) : ScriptedAI(pCreature), winningFaction(0), winningZone(0)
     {
-        if (sGameEventMgr.CheckOneGameEvent(EVENT_VALENTINE_KWEE, time(nullptr)))
+        // If event 8 (Love is in the Air) isn't active, Kwee Q. Peddlefeet is summoned by a winner event and should not have the Quest giver flag.
+        if (!sGameEventMgr.IsActiveEvent(EVENT_LOVE_IS_IN_THE_AIR))
         {
             SetVariables();
             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            if (m_creature->GetZoneId() != winningZone && winningZone != 0)
-                m_creature->DespawnOrUnsummon();
         }
         Reset();
     }
@@ -2139,7 +2144,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
     uint32 winningFaction;
     uint32 winningZone;
 
-    void Reset() override { }
+    void Reset() override {}
 
     void SetVariables()
     {
@@ -2173,6 +2178,74 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
         }
     }
 
+    void ResetVariablesAndDisableWinnerEvents()
+    {
+        // Reset all variables if available.
+        for (uint32 i = VAR_KWEE_THRALL; i < VAR_KWEE_HORDE; i++)
+        {
+            if (sObjectMgr.GetSavedVariable(i, 0))
+                sObjectMgr.SetSavedVariable(i, 0, true);
+        }
+
+        // Disable all Winner events.
+        for (uint32 i = EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS; i < EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY; i++)
+        {
+            sGameEventMgr.EnableEvent(i, false);
+        }
+    }
+
+    void OnRemoveFromWorld() override
+    {
+        SetVariables();
+
+        // If Kwee Q. Peddlefeet has no quest giver flag, he is already summoned by a contest Winner event.
+        // If he despawns without the flag, the variables should be reseted for next Year's votings.
+        // Also the Winner events needs to be disabled again.
+        if (!m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+        {
+            ResetVariablesAndDisableWinnerEvents();
+            return;
+        }
+
+        if (m_creature->GetZoneId() != winningZone && winningZone != 0)
+            return;
+        
+        // If Kwee Q. Peddlefeet is in the winner Zone, start the winner event here.
+        switch (winningZone)
+        {
+            case 1637: // Orgrimmar
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR, true);
+                break;
+            }
+            case 1638: // Thunder Bluff
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF, true);
+                break;
+            }
+            case 1497: // Undercity
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY, true);
+                break;
+            }
+            case 1519: // Stormwind
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND, true);
+                break;
+            }
+            case 1537: // Ironforge
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE, true);
+                break;
+            }
+            case 1657: // Darnassus
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS, true);
+                break;
+            }
+        }
+    }
+
     void ReceiveEmote(Player* pPlayer, uint32 uiEmote) override
     {
         if (uiEmote == TEXTEMOTE_KISS)
@@ -2190,16 +2263,12 @@ CreatureAI* GetAI_npc_kwee_peddlefeet(Creature* pCreature)
 
 bool GossipHello_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature)
 {
-    pPlayer->SendUpdateWorldState(VAR_KWEE_THRALL, sObjectMgr.GetSavedVariable(VAR_KWEE_THRALL, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_CAIRNE, sObjectMgr.GetSavedVariable(VAR_KWEE_CAIRNE, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_SYLVANAS, sObjectMgr.GetSavedVariable(VAR_KWEE_SYLVANAS, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_HORDE, sObjectMgr.GetSavedVariable(VAR_KWEE_HORDE, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_BOLVAR, sObjectMgr.GetSavedVariable(VAR_KWEE_BOLVAR, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_MAGNI, sObjectMgr.GetSavedVariable(VAR_KWEE_MAGNI, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_TYRANDE, sObjectMgr.GetSavedVariable(VAR_KWEE_TYRANDE, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_ALLIANCE, sObjectMgr.GetSavedVariable(VAR_KWEE_ALLIANCE, 0));
+    for (uint32 i = VAR_KWEE_THRALL; i < VAR_KWEE_HORDE; i++)
+    {
+        pPlayer->SendUpdateWorldState(i, sObjectMgr.GetSavedVariable(i, 0));
+    }
 
-    if (sGameEventMgr.IsActiveEvent(EVENT_VALENTINE_KWEE))
+    if (!sGameEventMgr.IsActiveEvent(EVENT_LOVE_IS_IN_THE_AIR))
     {
         if (npc_kwee_peddlefeetAI* kweeAI = dynamic_cast<npc_kwee_peddlefeetAI*>(pCreature->AI()))
         {
