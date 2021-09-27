@@ -32,11 +32,12 @@ UPDATE `quest_template` SET `ObjectiveText2`='Flame of Blackrock Spire', `ReqCre
 UPDATE `quest_template` SET `ObjectiveText3`='Flame of Stratholme', `ReqCreatureOrGOId3`=-181348 WHERE `entry`=9319;
 UPDATE `quest_template` SET `ObjectiveText4`='Flame of the Scholomance', `ReqCreatureOrGOId4`=-181349 WHERE `entry`=9319;
 
--- INCORRECT
+-- Misc
 UPDATE `gameobject_template` SET `data12` = 181290 WHERE `entry` = 181347;
-UPDATE `gameobject_template` SET `patch` = 9 WHERE `entry` = 181346
+UPDATE `gameobject_template` SET `patch` = 9 WHERE `entry` = 181346;
 UPDATE `quest_template` SET `OfferRewardText` = 'Your essence sings with the energy of the flames you found, $n. The fire you encountered is potent, and with the right knowledge, its power can be harnessed...$b$b<The Flamekeeper mutters an incantation in a strange, arcane tongue. then pulls out a glowing bottle.>$b$bAh! Here we are. May this light your path, no matter where you tread.' WHERE `entry` = 9319;
 UPDATE `quest_template` SET `RequiredRaces` = 255 WHERE `entry` IN (9386, 9319);
+UPDATE `quest_template` SET `RequestItemsText` = 'Have you found your way through the dark?' WHERE `entry` = 9386;
 
 
 -- End of migration.
