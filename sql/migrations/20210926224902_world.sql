@@ -39,6 +39,9 @@ UPDATE `quest_template` SET `OfferRewardText` = 'Your essence sings with the ene
 UPDATE `quest_template` SET `RequiredRaces` = 255 WHERE `entry` IN (9386, 9319);
 UPDATE `quest_template` SET `RequestItemsText` = 'Have you found your way through the dark?' WHERE `entry` = 9386;
 
+- Correct Scale For Cinder Elemental
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` = 17003;
+
 
 -- End of migration.
 END IF;
