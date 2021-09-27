@@ -27,10 +27,10 @@ UPDATE `quest_template` SET `Objectives`='' WHERE `entry` = 9365 AND `patch`=9;
 UPDATE `quest_template` SET `OfferRewardText`='You\'ve proven yourself today, $n.$b$bWhile I have little else to give you, I do have this crown; a fitting gift for a conqueror. May it light your way.' WHERE `entry` = 9365 AND `patch`=9;
 
 -- Fix order of objectives for quest A Light in Dark Places.
-UPDATE `quest_template` SET `ObjectiveText1`='Flame of Dire Maul', `ReqCreatureOrGOId1`=-181346 WHERE `entry`=9319;
-UPDATE `quest_template` SET `ObjectiveText2`='Flame of Blackrock Spire', `ReqCreatureOrGOId2`=-181347 WHERE `entry`=9319;
-UPDATE `quest_template` SET `ObjectiveText3`='Flame of Stratholme', `ReqCreatureOrGOId3`=-181348 WHERE `entry`=9319;
-UPDATE `quest_template` SET `ObjectiveText4`='Flame of the Scholomance', `ReqCreatureOrGOId4`=-181349 WHERE `entry`=9319;
+UPDATE `quest_template` SET `ObjectiveText1`='Flame of Dire Maul', `ReqCreatureOrGOId1`=-181346 WHERE `entry` IN (9319, 9386);
+UPDATE `quest_template` SET `ObjectiveText2`='Flame of Blackrock Spire', `ReqCreatureOrGOId2`=-181347 WHERE `entry` IN (9319, 9386);
+UPDATE `quest_template` SET `ObjectiveText3`='Flame of Stratholme', `ReqCreatureOrGOId3`=-181348 WHERE `entry` IN (9319, 9386);
+UPDATE `quest_template` SET `ObjectiveText4`='Flame of the Scholomance', `ReqCreatureOrGOId4`=-181349 WHERE `entry` IN (9319, 9386);
 
 -- Misc
 UPDATE `gameobject_template` SET `data12` = 181290 WHERE `entry` = 181347;
