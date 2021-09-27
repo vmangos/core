@@ -2995,20 +2995,14 @@ void Aura::HandleModPossess(bool apply, bool Real)
         if (apply && pCaster->IsPlayer())
         {
             Player* pPlayerCaster = static_cast<Player*>(pCaster);
-            UpdateMask updateMask;
-            updateMask.SetCount(pTarget->GetValuesCount());
-            pTarget->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
-            if (updateMask.HasData())
-            {
-                UpdateData newData;
-                pTarget->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
 
-                if (newData.HasData())
-                {
-                    WorldPacket newDataPacket;
-                    newData.BuildPacket(&newDataPacket);
-                    pPlayerCaster->SendDirectMessage(&newDataPacket);
-                }
+            UpdateData newData;
+            pTarget->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UF_FLAG_OWNER_ONLY);
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                pPlayerCaster->SendDirectMessage(&newDataPacket);
             }
         }
         pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
@@ -3343,21 +3337,14 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (Player* pPlayerCaster = caster->ToPlayer())
         {
             pPlayerCaster->CharmSpellInitialize();
-            
-            UpdateMask updateMask;
-            updateMask.SetCount(target->GetValuesCount());
-            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
-            if (updateMask.HasData())
-            {
-                UpdateData newData;
-                target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
 
-                if (newData.HasData())
-                {
-                    WorldPacket newDataPacket;
-                    newData.BuildPacket(&newDataPacket);
-                    pPlayerCaster->SendDirectMessage(&newDataPacket);
-                }
+            UpdateData newData;
+            target->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UF_FLAG_OWNER_ONLY);
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                pPlayerCaster->SendDirectMessage(&newDataPacket);
             }
         }
     }
@@ -5545,15 +5532,8 @@ void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
     {
         if (Player* pPlayerCaster = ToPlayer(GetCaster()))
         {
-            UpdateMask updateMask;
-            updateMask.SetCount(target->GetValuesCount());
-            updateMask.SetBit(UNIT_FIELD_HEALTH);
-            updateMask.SetBit(UNIT_FIELD_MAXHEALTH);
-            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_SPECIAL_INFO);
-
             UpdateData newData;
-            target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
-
+            target->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UpdateFieldFlags(UF_FLAG_SPECIAL_INFO | UF_FLAG_DYNAMIC));
             if (newData.HasData())
             {
                 WorldPacket newDataPacket;
