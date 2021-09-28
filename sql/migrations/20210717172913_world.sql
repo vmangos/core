@@ -239,7 +239,7 @@ UPDATE `creature_template` SET `auras` = '28534', `ai_name`='' WHERE `entry` = 1
 -- Void Zone
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1669701);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=16697;
-UPDATE `creature_template` SET `auras` = '28874' WHERE `entry` = 16697;
+UPDATE `creature_template` SET `auras` = '28874', `ai_name`='' WHERE `entry` = 16697;
 
 -- Sapphiron's Wing Buffet
 UPDATE `creature_template` SET `auras` = '29327', `ai_name`='NullAI', `script_name`='' WHERE `entry` = 17025;
