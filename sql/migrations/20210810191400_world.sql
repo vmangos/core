@@ -1261,6 +1261,22 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (351303, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1154, 0, 0, 0, 0, 0, 0, 0, 0, 'Miss Danna - Talk');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (351303, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1155, 0, 0, 0, 0, 0, 0, 0, 0, 'Miss Danna - Talk');
 
+-- Some Stormwind Despawn at Night
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(84028, -27),
+(87089, -27),
+(87091, -27),
+(87092, -27),
+(87088, -27),
+(87023, -27),
+(87090, -27),
+(87082, -27),
+(79720, -27),
+(79721, -27),
+(90439, -27),
+(90440, -27),
+(90443, -27);
+
 
 -- End of migration.
 END IF;
