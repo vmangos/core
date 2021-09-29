@@ -1277,6 +1277,14 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (90440, -27),
 (90443, -27);
 
+-- Some corrections to Karlee Chaddis Waypoints
+UPDATE `creature_movement` SET `waittime` = 0 WHERE `id` = 90439;
+UPDATE `creature_movement` SET `orientation` = 100 WHERE `id` = 90439;
+UPDATE `creature_movement` SET `orientation` = 1.17061 WHERE `id` = 90439 AND `point` = 28;
+UPDATE `creature_movement` SET `orientation` = 1.17061 WHERE `id` = 90439 AND `point` = 29;
+UPDATE `creature_movement` SET `orientation` = 1.17061 WHERE `id` = 90439 AND `point` = 30;
+UPDATE `creature_movement` SET `waittime` = 20000 WHERE `id` = 90439 AND `point`=29;
+
 
 -- End of migration.
 END IF;
