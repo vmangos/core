@@ -1073,7 +1073,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1070, 41, -1192.27, 120.281, 135.206, 100, 0, 0, 0),
 (1070, 42, -1184.28, 120.872, 135.206, 100, 0, 0, 0);
 
--- Convert Stormwind School Trip to Creature Groups (Maybe get correct waypoints for group leader and add missing RP Lines)
+-- Convert Stormwind School Trip to Creature Groups
 -- Add Missing Creature
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `mana_percent`, `patch_min`, `patch_max`) VALUES (87023, 3509, 0, -8839.57, 666.54, 97.95, 0.48, 300, 300, 100, 0, 0, 10);
 
@@ -1261,7 +1261,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (351303, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1154, 0, 0, 0, 0, 0, 0, 0, 0, 'Miss Danna - Talk');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (351303, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1155, 0, 0, 0, 0, 0, 0, 0, 0, 'Miss Danna - Talk');
 
--- Some Stormwind Despawn at Night
+-- Some Stormwind Creatures Despawn at Night
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (84028, -27),
 (87089, -27),
