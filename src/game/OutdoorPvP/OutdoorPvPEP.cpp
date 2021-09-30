@@ -198,17 +198,25 @@ void OPvPCapturePointEP_EWT::SummonSquadAtEastWallTower(uint32 team)
         for (uint8 i = 0; i < EP_EWT_NUM_CREATURES; ++i)
         {
             DelCreature(i);
-            AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000);
+
+            bool asActiveObject = false;
+            switch (ct[i].entry)
+            {
+                case NPC_LORDAERON_COMMANDER:
+                case NPC_LORDAERON_SOLDIER:
+                case NPC_LORDAERON_VETERAN:
+                case NPC_LORDAERON_FIGHTER:
+                    asActiveObject = true;
+            }
+
+            AddCreature(i, ct[i].entry, ct[i].teamval, ct[i].map, ct[i].x, ct[i].y, ct[i].z, ct[i].o, 1000000, asActiveObject);
 
             if (ct[i].entry == NPC_LORDAERON_SOLDIER || ct[i].entry == NPC_LORDAERON_FIGHTER)
             {
                 if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[i]))
                 {
                     if (Creature* pCommander = m_PvP->GetCreature(m_Creatures[0])) // 0 = Lordaeron Commander (Alliance) or Lordaeron Veteran (Horde).
-                    {
                         pCreature->JoinCreatureGroup(pCommander, ATTACK_DISTANCE, pCommander->GetAngle(pCreature) - pCreature->GetOrientation(), OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
-                        pCreature->SetActiveObjectState(true);
-                    }
                 }
             }
         }
@@ -616,16 +624,15 @@ void OPvPCapturePointEP_CGT::SummonSpiritOfVictory(uint32 team)
     {
         m_SpiritOfVictorySpawned = team;
         DelCreature(EP_CGT_SPIRITOFVICTORY);
-        AddCreature(EP_CGT_SPIRITOFVICTORY, EP_CGT_SpiritOfVictory.entry, team, EP_CGT_SpiritOfVictory.map, EP_CGT_SpiritOfVictory.x, EP_CGT_SpiritOfVictory.y, EP_CGT_SpiritOfVictory.z, EP_CGT_SpiritOfVictory.o);
+        AddCreature(EP_CGT_SPIRITOFVICTORY, EP_CGT_SpiritOfVictory.entry, team, EP_CGT_SpiritOfVictory.map, EP_CGT_SpiritOfVictory.x, EP_CGT_SpiritOfVictory.y, EP_CGT_SpiritOfVictory.z, EP_CGT_SpiritOfVictory.o, 0, true);
 
         if (Creature* pCreature = m_PvP->GetCreature(m_Creatures[EP_CGT_SPIRITOFVICTORY]))
         {
             pCreature->CastSpell(pCreature, SPELL_SPIRIT_SPAWN_IN, true);
             pCreature->RemoveAllAuras();
             pCreature->AddAura(team == ALLIANCE ? SPELL_SPIRIT_PARTICLES_SUPER_BIG_DND : SPELL_SPIRIT_PARTICLES_RED_SUPER_BIG_DND);
-            pCreature->SetActiveObjectState(true);
             pCreature->GetMotionMaster()->Clear(false, true);
-            pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 1000, 0, 180390, false);
+            pCreature->GetMotionMaster()->MoveWaypoint(0, PATH_FROM_SPECIAL, 1000, 0, 18039, false);
         }
     }
 }

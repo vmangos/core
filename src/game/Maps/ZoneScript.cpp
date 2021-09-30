@@ -25,6 +25,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include "TemporarySummon.h"
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
@@ -73,55 +74,61 @@ void OPvPCapturePoint::SendChangePhase()
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, m_valuePct);
 }
 
-void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
+bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 mapId, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    if (!entry)
+    GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectInfo(entry);
+    if (!goInfo)
     {
-        GameObjectData const* data = sObjectMgr.GetGOData(guid);
-        if (!data)
-            return;
-        entry = data->id;
+        sLog.outError("Invalid GameObject entry %u in OPvPCapturePoint::AddObject!", entry);
+        return false;
     }
-    m_Objects[type] = MAKE_NEW_GUID(guid, entry, HIGHGUID_GAMEOBJECT);
-    m_ObjectTypes[m_Objects[type]] = type;
-}
 
-void OPvPCapturePoint::AddCre(uint32 type, uint32 guid, uint32 entry)
-{
-    if (!entry)
+    Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
+    if (!map)
     {
-        CreatureData const* data = sObjectMgr.GetCreatureData(guid);
-        if (!data)
-            return;
-        entry = data->creature_id[0];
+        sLog.outError("Invalid Map id %u in OPvPCapturePoint::AddObject!", mapId);
+        return false;
     }
-    m_Creatures[type] = MAKE_NEW_GUID(guid, entry, HIGHGUID_UNIT);
-    m_CreatureTypes[m_Creatures[type]] = type;
-}
 
-bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
-{
-    if (uint32 guid = sObjectMgr.AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3))
+    if (GameObject* pGo = map->SummonGameObject(entry, x, y, z, o, rotation0, rotation1, rotation2, rotation3, 0, WORLD_DEFAULT_OBJECT))
     {
-        AddGO(type, guid, entry);
+        m_Objects[type] = pGo->GetObjectGuid();
+        m_ObjectTypes[m_Objects[type]] = type;
         return true;
     }
 
+    sLog.outError("Failed to create GameObject with entry %u in OPvPCapturePoint::AddObject!", entry);
     return false;
 }
 
-bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 team, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay)
+bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 team, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, bool asActiveObject)
 {
-    if (uint32 guid = sObjectMgr.AddCreData(entry, team, map, x, y, z, o, spawntimedelay))
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(entry);
+    if (!cInfo)
     {
-        AddCre(type, guid, entry);
+        sLog.outError("Invalid Creature entry %u in OPvPCapturePoint::AddCreature!", entry);
+        return false;
+    }
+
+    Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
+    if (!map)
+    {
+        sLog.outError("Invalid Map id %u in OPvPCapturePoint::AddCreature!", mapId);
+        return false;
+    }
+
+    if (Creature* pCreature = map->SummonCreature(entry, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN, spawntimedelay, asActiveObject))
+    {
+        m_Creatures[type] = pCreature->GetObjectGuid();
+        m_CreatureTypes[m_Creatures[type]] = type;
         return true;
     }
 
+    sLog.outError("Failed to create Creature with entry %u in OPvPCapturePoint::AddCreature!", entry);
     return false;
 }
 
-bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
+bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 mapId, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
     DEBUG_LOG("Creating capture point %u", entry);
 
@@ -133,9 +140,29 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, fl
         return false;
     }
 
-    m_capturePointGUID = sObjectMgr.AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3);
-    if (!m_capturePointGUID)
+    GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectInfo(entry);
+    if (!goInfo)
+    {
+        sLog.outError("Invalid GameObject entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
         return false;
+    }
+
+    Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
+    if (!map)
+    {
+        sLog.outError("Invalid Map id %u in OPvPCapturePoint::SetCapturePointData!", mapId);
+        return false;
+    }
+
+    GameObject* pGo = map->SummonGameObject(entry, x, y, z, o, rotation0, rotation1, rotation2, rotation3, 0, WORLD_DEFAULT_OBJECT);
+    if (!pGo)
+    {
+        sLog.outError("Failed to create GameObject with entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
+        return false;
+    }
+
+    m_capturePoint = pGo;
+    m_capturePointGUID = pGo->GetGUIDLow();
 
     // get the needed values from goinfo
     m_maxValue = (float)goinfo->capturePoint.maxTime;
@@ -161,20 +188,11 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         m_Creatures[type] = 0;
         return false;
     }
+
     DEBUG_LOG("deleting opvp creature type %u", type);
-    uint32 guid = cr->GetDBTableGUIDLow();
-    // Don't save respawn time.
-    cr->SetRespawnTime(0);
-    cr->RemoveCorpse();
-    // Explicit removal from map.
-    // Beats me why this is needed, but with the recent removal "cleanup" some creatures stay in the map if "properly" deleted
-    // so this is a big fat workaround, if AddObjectToRemoveList and DoDelayedMovesAndRemoves worked correctly, this wouldn't be needed
-    //if (Map* map = sMapMgr->FindMap(cr->GetMapId()))
-    //    map->Remove(cr,false);
-    // delete respawn time for this creature
-    CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u'", guid);
-    cr->AddObjectToRemoveList();
-    sObjectMgr.DeleteCreatureData(guid);
+    MANGOS_ASSERT(cr->IsTemporarySummon());
+    static_cast<TemporarySummon*>(cr)->UnSummon();
+
     m_CreatureTypes[m_Creatures[type]] = 0;
     m_Creatures[type] = 0;
     return true;
@@ -191,10 +209,8 @@ bool OPvPCapturePoint::DelObject(uint32 type)
         m_Objects[type] = 0;
         return false;
     }
-    uint32 guid = obj->GetDBTableGUIDLow();
     obj->SetRespawnTime(0);                 // Not save respawn time.
     obj->Delete();
-    sObjectMgr.DeleteGOData(guid);
     m_ObjectTypes[m_Objects[type]] = 0;
     m_Objects[type] = 0;
     return true;
@@ -202,7 +218,6 @@ bool OPvPCapturePoint::DelObject(uint32 type)
 
 bool OPvPCapturePoint::DelCapturePoint()
 {
-    sObjectMgr.DeleteGOData(m_capturePointGUID);
     m_capturePointGUID = 0;
 
     if (m_capturePoint)
@@ -527,23 +542,12 @@ bool OutdoorPvP::HandleAreaTrigger(Player* /*plr*/, uint32 /*trigger*/)
     return false;
 }
 
-
-void OutdoorPvP::OnGameObjectCreate(GameObject* go)
-{
-    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
-    {
-        if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
-            sLog.outError("OutdoorPvP : GameObject %u n'est pas de type GAMEOBJECT_TYPE_CAPTURE_POINT (%u)", go->GetEntry(), GAMEOBJECT_TYPE_CAPTURE_POINT);
-        cp->m_capturePoint = go;
-    }
-}
-
 void OutdoorPvP::OnGameObjectRemove(GameObject* go)
 {
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetGUIDLow()))
         cp->m_capturePoint = nullptr;
 }
 

@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20210724110239');
 
 
 -- William Kielar.
-UPDATE `creature_template` SET `faction`=774, `speed_walk`=1, `unit_flags`=768, `movement_type`=0, `civilian`=1 WHERE  `entry`=17209 AND `patch`=10;
+UPDATE `creature_template` SET `faction`=35, `speed_walk`=1, `unit_flags`=768, `movement_type`=0, `civilian`=1 WHERE  `entry`=17209 AND `patch`=10;
 
 -- Lordaeron Commander.
 UPDATE `creature_template` SET `health_min`=3175, `health_max`=3175, `faction`=123, `speed_walk`=1, `speed_run`=1.38571, `unit_flags`=0, `auras`=31748, `ai_name`='EventAI' WHERE `entry`=17635;
@@ -25,15 +25,13 @@ UPDATE `creature_template` SET `faction`=118, `speed_walk`=1, `base_attack_time`
 UPDATE `creature_template` SET `faction`=118, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `movement_type`=0, `auras`=31309 WHERE  `entry`=17996;
 
 -- Spectral Gryphon.
-INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES 
-(16081, 10, 17328, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Spectral Gryphon', NULL, 0, 60, 60, 3052, 3052, 0, 0, 3791, 35, 0, 0, 0, 20, 0, 0, 0, 1, 104, 138, 0, 252, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_total_probability`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `name`, `subname`, `unit_class`, `rank`, `pet_family`, `type`, `type_flags`, `level_min`, `level_max`, `health_min`, `health_max`, `armor`, `attack_power`, `dmg_min`, `dmg_max`, `faction`) VALUES (17660, 10, 0, 17328, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Gryphon', '', 1, 0, 0, 1, 134217728, 60, 60, 3052, 3052, 3791, 252, 103.9247, 137.887, 35);
 
 -- Add correct mount.
-UPDATE `taxi_nodes` SET `mount_creature_id1`=16081, `mount_creature_id2`=16081 WHERE `id` in (84,85,86,87);
+UPDATE `taxi_nodes` SET `mount_creature_id1`=17660, `mount_creature_id2`=17660 WHERE `id` in (84,85,86,87);
 
 -- Spirit of Victory.
-INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES
-(18039, 10, 17548, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 'Spirit of Victory', NULL, 0, 60, 60, 3052, 3052, 0, 0, 0, 35, 0, 1, 1.14286, 20, 5, 0, 0, 1, 0, 0, 0, 0, 1, 2000, 2000, 1, 33555200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '31951', 0, 0, '', 0, 3, 1, 0, 3, 0, 0, 0, 0, 0, 64, '');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `mount_display_id`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `pet_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `auras`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (18039, 10, 17548, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory', NULL, 0, 60, 60, 3052, 3052, 0, 0, 3791, 35, 0, 1, 1.14286, 20, 5, 0, 0, 1, 103.925, 137.887, 0, 252, 1, 2000, 2000, 1, 33555200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, '', 0, 3, 1, 0, 3, 0, 0, 0, 0, 0, 64, '');
 
 -- Fix buffers.
 UPDATE `creature_template` SET `movement_type`=0, `flags_extra`=2 WHERE `entry` in (17794, 17795);
@@ -52,9 +50,9 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `action_script_id`) VALUES (7379, 1, 0, 'Take me to Eastwall Tower.', 13563, 1, 1, 0, 0, 0, 0, NULL, 0, 737902);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `action_script_id`) VALUES (7379, 2, 0, 'Take me to Crown Guard Tower.', 13564, 1, 1, 0, 0, 0, 0, NULL, 0, 737903);
 
-INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (737901, 0, 15, 29931, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'William Kielar - Cast Spell: Flight Path (Northpass Tower)');
-INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (737902, 0, 15, 29934, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'William Kielar - Cast Spell: Flight Path (Eastwall Tower)');
-INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (737903, 0, 15, 29994, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'William Kielar - Cast Spell: Flight Path (Crown Guard Tower)');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (737901, 0, 15, 29931, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'William Kielar - Cast Spell Flight Path (Northpass Tower)');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (737902, 0, 15, 29934, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'William Kielar - Cast Spell Flight Path (Eastwall Tower)');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (737903, 0, 15, 29994, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'William Kielar - Cast Spell Flight Path (Crown Guard Tower)');
 
 -- Waypoints for Lordaeron Commander / Lordaeron Veteran from Eastwall Tower to Northpass Tower.
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -108,8 +106,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1763501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1763501, 0, 60, 3, 0, 7000, 0, 0, 0, 0, 0, 0, 176350, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Start Waypoints');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1763501, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Make Active Object');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1763501, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14746, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Say');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1763501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14746, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Say');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1763502;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1763502, 0, 39, 1763501, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Commander - Start Script');
@@ -133,7 +130,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 -- Lordaeron Soldier - Mount up.
 DELETE FROM `generic_scripts` WHERE `id`=1764701;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1764701, 0, 24, 2410, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Soldier - Mount up');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1764701, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Soldier - Make Active Object');
 
 -- Lordaeron Soldier - Dismount.
 DELETE FROM `generic_scripts` WHERE `id`=1764702;
@@ -151,8 +147,7 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1799501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799501, 0, 60, 3, 0, 7000, 0, 0, 0, 0, 0, 0, 176350, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Start Waypoints');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799501, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Make Active Object');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799501, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14746, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Say');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14746, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Say');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=1799502;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799502, 0, 39, 1799501, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Start Script');
@@ -176,7 +171,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 -- Lordaeron Fighter - Mount up.
 DELETE FROM `generic_scripts` WHERE `id`=1799601;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799601, 0, 24, 10671, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Fighter - Mount up');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799601, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Fighter - Make Active Object');
 
 -- Lordaeron Fighter - Dismount.
 DELETE FROM `generic_scripts` WHERE `id`=1799602;
@@ -187,23 +181,26 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1799602, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lordaeron Veteran - Leave Creature Group');
 
 -- Remove endless channel from Tower Capture (DND).
-INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (31929, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, NULL);
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `EquippedItemClass`, `Comment`) VALUES (31929, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, 'Tower Capture (DND) - Remove Channeled Flag');
 
 -- Waypoints for Spirit of Victory.
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(180390, 1,  1856.31,  -3714.78,  193.704, 100, 0, 0, 0),
-(180390, 2,  1857.34,  -3714,  194.264, 100, 0, 0, 0),
-(180390, 3,  1869.87,  -3702,  187.46, 100, 0, 0, 0),
-(180390, 4,  1885.12,  -3685.05,  177.598, 100, 0, 0, 0),
-(180390, 5,  1897.11,  -3670.92,  160.071, 100, 0, 0, 0),
-(180390, 6,  1917.23,  -3657.38,  146.376, 100, 0, 0, 0),
-(180390, 7,  1941.29,  -3652.43,  137.571, 100, 0, 0, 0),
-(180390, 8,  1964.66,  -3648.66,  133.432, 100, 0, 0, 0),
-(180390, 9,   1979.2,  -3645.12,  128.571, 100, 0, 0, 0),
-(180390, 10,  1981.82,  -3652.39,  124.21, 100, 0, 0, 0),
-(180390, 11,  1978.6,  -3654.43,  122.988, 100, 0, 0, 0),
-(180390, 12,  1975.98,  -3655.29,  120.599, 100, 0, 0, 0),
-(180390, 13,  1975.98,  -3655.29,  120.599, 100, 0, 0, 0);
+(18039, 1,  1856.31,  -3714.78,  193.704, 100, 0, 0, 0),
+(18039, 2,  1857.34,  -3714,  194.264, 100, 0, 0, 0),
+(18039, 3,  1869.87,  -3702,  187.46, 100, 0, 0, 0),
+(18039, 4,  1885.12,  -3685.05,  177.598, 100, 0, 0, 0),
+(18039, 5,  1897.11,  -3670.92,  160.071, 100, 0, 0, 0),
+(18039, 6,  1917.23,  -3657.38,  146.376, 100, 0, 0, 0),
+(18039, 7,  1941.29,  -3652.43,  137.571, 100, 0, 0, 0),
+(18039, 8,  1964.66,  -3648.66,  133.432, 100, 0, 0, 0),
+(18039, 9,   1979.2,  -3645.12,  128.571, 100, 0, 0, 0),
+(18039, 10,  1981.82,  -3652.39,  124.21, 100, 0, 0, 0),
+(18039, 11,  1978.6,  -3654.43,  122.988, 100, 0, 0, 0),
+(18039, 12,  1975.98,  -3655.29,  120.599, 100, 0, 0, 0),
+(18039, 13,  1975.98,  -3655.29,  120.599, 100, 0, 0, 1803913);
+DELETE FROM `creature_movement_scripts` WHERE `id`=1803913;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1803913, 0, 15, 24221, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory - Cast Spell Teleport Spawn-out');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1803913, 3, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of Victory - Despawn');
 
 
 -- End of migration.
