@@ -1721,7 +1721,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (46760, 104, 1429.47, -1461.47, 54.0895, 100, 0, 0, 0),
 (46760, 105, 1426.09, -1459.96, 53.9645, 100, 0, 0, 0),
 (46760, 106, 1426.51, -1460.04, 53.9645, 100, 0, 0, 0),
-(46760, 107, 1427.36, -1461.15, 53.9645, 100, 0, 0, 0);
+(46760, 107, 1427.36, -1461.15, 53.9645, 100, 5000, 0, 46760);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (46760, 0, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Hunter - Set Movement Type');
 
 
 -- End of migration.
