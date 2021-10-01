@@ -196,6 +196,9 @@ class ChatHandler
         bool HandleCheatAlwaysProcCommand(char *);
         bool HandleCheatTriggerPassCommand(char *);
         bool HandleCheatIgnoreTriggersCommand(char *);
+        bool HandleCheatImmuneToPlayersCommand(char *);
+        bool HandleCheatImmuneToCreaturesCommand(char *);
+        bool HandleCheatUntargetableCommand(char *);
         bool HandleCheatWaterwalkCommand(char* args);
         bool HandleCheatWallclimbCommand(char* args);
 
@@ -972,6 +975,7 @@ class ChatHandler
         bool HandleMaxSkillCommand(char* args);
         bool HandleSetSkillCommand(char* args);
         bool HandleRespawnCommand(char* args);
+        bool HandleChargeCommand(char* args);
         bool HandleComeToMeCommand(char* args);
         bool HandleCombatStopCommand(char* args);
         bool HandleRepairitemsCommand(char* args);

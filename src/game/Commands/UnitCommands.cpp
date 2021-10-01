@@ -760,6 +760,23 @@ bool ChatHandler::HandleListThreatCommand(char* /*args*/)
     return true;
 }
 
+
+bool ChatHandler::HandleChargeCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pUnit || pUnit == pPlayer)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pPlayer->GetMotionMaster()->MoveCharge(pUnit);
+
+    return true;
+}
+
 bool ChatHandler::HandleCastCommand(char* args)
 {
     if (!*args)

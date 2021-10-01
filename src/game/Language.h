@@ -691,7 +691,7 @@ enum MangosStrings
     LANG_YOU_SET_IGNORE_TRIGGERS        = 647,
     LANG_YOUR_IGNORE_TRIGGERS_SET       = 648,
 
-    // 639 - 649 not used
+    // 649 not used
     LANG_BG_ALLY                        = 650,
     LANG_BG_HORDE                       = 651,
 
@@ -734,6 +734,13 @@ enum MangosStrings
     //LANG_BG_EY_CAPTURED_FLAG_H        = 685,
     //LANG_BG_EY_DROPPED_FLAG           = 686,
     //LANG_BG_EY_RESETED_FLAG           = 687,
+
+    LANG_YOU_SET_IMMUNE_PC              = 688,
+    LANG_YOUR_IMMUNE_PC_SET             = 689,
+    LANG_YOU_SET_IMMUNE_NPC             = 690,
+    LANG_YOUR_IMMUNE_NPC_SET            = 691,
+    LANG_YOU_SET_UNTARGETABLE           = 692,
+    LANG_YOUR_UNTARGETABLE_SET          = 693,
 
     LANG_RESTORED_ITEM                  = 699,
     //LANG_ARENA_ONE_TOOLOW             = 700,
