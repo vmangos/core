@@ -23,7 +23,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (3529, 8);
 
 -- Quests 9024 and 9025 Should be Chained
-UPDATE `quest_template` SET `NextQuestInChain` = '9025' WHERE `entry` = 9024;
+UPDATE `quest_template` SET `NextQuestInChain` = 9025 WHERE `entry` = 9024;
 
 -- Add Missing Gossips
 UPDATE `creature_template` SET `gossip_menu_id` = 7081 WHERE `entry` = 1328;
