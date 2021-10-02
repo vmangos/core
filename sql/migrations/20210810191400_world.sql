@@ -1803,6 +1803,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5916, 74, 2388.61, 1660.39, 316.765, 100, 0, 0, 0),
 (5916, 75, 2409.46, 1672.53, 316.767, 100, 0, 0, 0);
 
+-- Update Gameobject
+UPDATE `gameobject_template` SET `name` = 'Lordaeron Shrine', `data3` = 500 WHERE `entry` IN (181955, 181682);
+
 
 -- End of migration.
 END IF;
