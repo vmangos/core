@@ -65,6 +65,9 @@ TotemAI::TotemAI(Creature* pCreature) : CreatureAI(pCreature)
 
 void TotemAI::UpdateAI(uint32 const /*diff*/)
 {
+    if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
+
     if (m_totemType != TOTEM_ACTIVE)
         return;
 
