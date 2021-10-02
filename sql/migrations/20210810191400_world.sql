@@ -1803,6 +1803,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5916, 74, 2388.61, 1660.39, 316.765, 100, 0, 0, 0),
 (5916, 75, 2409.46, 1672.53, 316.767, 100, 0, 0, 0);
 
+-- Update Bingles Blastenheimer Template
+UPDATE `creature_template` SET `faction` = 55, `unit_flags` = 512 WHERE `entry`=6577;
+
 
 -- End of migration.
 END IF;
