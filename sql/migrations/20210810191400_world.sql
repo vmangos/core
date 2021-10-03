@@ -1611,8 +1611,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 UPDATE `creature` SET `position_x` = 1854.4, `position_y` = -1337.17, `position_z` = 61.8205 WHERE `guid` IN (46760, 46761, 46762);
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 46760;
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
-(46760, 46760, 2, 6.25244, 11);
-(46760, 46761, 4, 3.14, 11);
+(46760, 46760, 2, 6.25244, 11),
+(46760, 46761, 4, 3.14, 11),
 (46760, 46762, 2, 2.57, 11);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (46760, 1, 1854.4, -1337.17, 61.8205, 100, 0, 0, 0),
@@ -1850,6 +1850,13 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5760, 38, -1827.48, 1674.13, 61.5692, 100, 0, 0, 0),
 (5760, 39, -1839.08, 1675.99, 61.3097, 100, 0, 0, 0),
 (5760, 40, -1852.29, 1684.86, 61.6812, 100, 0, 0, 0);
+
+-- Convert Another Patrol to Use Groups
+DELETE FROM `creature_movement` WHERE `id` = 90481;
+UPDATE `creature` SET `movement_type` = 0 WHERE `guid` = 90481;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(90482, 90482, 1, 6.25244, 11),
+(90482, 90481, 1, 4.71, 11);
 
 
 -- End of migration.
