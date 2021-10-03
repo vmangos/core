@@ -1074,7 +1074,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
 void Aura::TriggerSpell()
 {
-    ObjectGuid casterGUID = GetCasterGuid();
+    ObjectGuid casterGUID = GetSpellProto()->HasAttribute(SPELL_ATTR_WEARER_CASTS_PROC_TRIGGER) ? GetTarget()->GetObjectGuid() : GetCasterGuid();
     Unit* triggerTarget = GetTriggerTarget();
 
     if (!casterGUID || !triggerTarget)

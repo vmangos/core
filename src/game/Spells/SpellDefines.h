@@ -721,7 +721,7 @@ enum SpellAttributes
     SPELL_ATTR_HIDE_IN_COMBAT_LOG             = 0x00000100,            // 8 this attributes controls whether spell appears in combat logs
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
     SPELL_ATTR_ON_NEXT_SWING_2                = 0x00000400,            // 10 on next swing 2
-    SPELL_ATTR_UNK11                          = 0x00000800,            // 11
+    SPELL_ATTR_WEARER_CASTS_PROC_TRIGGER      = 0x00000800,            // 11
     SPELL_ATTR_DAYTIME_ONLY                   = 0x00001000,            // 12 only useable at daytime, not set in 2.4.2
     SPELL_ATTR_NIGHT_ONLY                     = 0x00002000,            // 13 only useable at night, not set in 2.4.2
     SPELL_ATTR_INDOORS_ONLY                   = 0x00004000,            // 14 only useable indoors, not set in 2.4.2
