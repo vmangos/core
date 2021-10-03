@@ -1807,7 +1807,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 UPDATE `creature_template` SET `faction` = 55, `unit_flags` = 512 WHERE `entry`=6577;
 
 -- Update Lord Azrethoc
-UPDATE `creature_template` SET `display_scale1` = 1 WHERE `entry`=5760;
 DELETE FROM `creature_movement` WHERE `id` = 29062;
 DELETE FROM `creature_movement_template` WHERE `entry` = 5760;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
