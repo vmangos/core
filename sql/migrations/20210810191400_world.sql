@@ -1858,6 +1858,10 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (90482, 90482, 1, 6.25244, 11),
 (90482, 90481, 1, 4.71, 11);
 
+-- Quests 4022 and 4023 Should not both be available (it is dependant on the completion status of 3481)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (208, 8, 3481, 0, 0, 0, 1);
+UPDATE `quest_template` SET `RequiredCondition` = 208 WHERE `entry` = 4023;
+
 
 -- End of migration.
 END IF;
