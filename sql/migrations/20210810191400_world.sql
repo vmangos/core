@@ -1862,6 +1862,10 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (208, 8, 3481, 0, 0, 0, 1);
 UPDATE `quest_template` SET `RequiredCondition` = 208 WHERE `entry` = 4023;
 
+-- Add correct pre quest requirement to some paladin quest chains
+UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1442 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1655 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
