@@ -1902,6 +1902,12 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 -- Add Script to Complete Quest
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4022, 0, 7, 4022, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cyrus Therepentous - Complete Quest');
 
+-- Quest 2024 Should only unlock if Either 4022 or 4023 has been completed
+UPDATE `quest_template` SET `PrevQuestId` = 0, `RequiredCondition` = 220 WHERE `entry` = 4024;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (218, 8, 4022, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (219, 8, 4023, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (220, -2, 218, 219, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
