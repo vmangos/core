@@ -9304,7 +9304,7 @@ void Unit::SetPvP(bool state)
 
 void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed)
 {
-    if (IsRooted())
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
         return;
 
     float angle = this == target ? GetOrientation() + M_PI_F : target->GetAngle(this);
@@ -9321,7 +9321,7 @@ void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verti
 
 void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
 {
-    if (IsRooted() || !movespline->Finalized())
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT) || !movespline->Finalized())
         return;
 
     InterruptNonMeleeSpells(false);

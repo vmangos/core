@@ -1202,8 +1202,10 @@ void Aura::TriggerSpell()
 //                    case 24716: break;
 //                    // Dream Fog
 //                    case 24780: break;
-//                    // Cannon Prep
-//                    case 24832: break;
+                    case 24743:                             // Cannon Prep
+                    case 24832:                             // Cannon Prep
+                        trigger_spell_id = 24731;
+                        break;
                     case 24834:                             // Shadow Bolt Whirl
                     {
                         uint32 spellForTick[8] = { 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 };
