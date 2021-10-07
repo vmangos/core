@@ -2083,7 +2083,6 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
 
             return;
         }
-        // just skip
         // Brittle Armor - (need add max stack of 24575 Brittle Armor)
         case 29284:
             m_caster->CastSpell(unitTarget, 24575, true, m_CastItem, nullptr, m_originalCasterGUID);
