@@ -1908,6 +1908,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (219, 8, 4023, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (220, -2, 218, 219, 0, 0, 0);
 
+-- Add Correct Prequest to 5041
+UPDATE `quest_template` SET `PrevQuestId` = 871 WHERE `entry` = 5041;
+
 
 -- End of migration.
 END IF;
