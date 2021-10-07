@@ -68,6 +68,19 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (12436, 4);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (12437, 5);
 UPDATE `creature_template` SET `faction`=114, `level_min`=60, `level_max`=60, `health_min`=4120, `health_max`=4120, `unit_flags`=33555200, `speed_walk`=1, `speed_run`=1.14286, `base_attack_time`=2000 WHERE `entry`=15218;
 
+-- Fix cooldown check for Sayge's Buff.
+DELETE FROM `conditions` WHERE `condition_entry` IN (863, 864, 865, 866, 867, 868, 869, 870);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(863, -2, 855, 856, 857, 858, 0),
+(864, -2, 859, 860, 861, 862, 0),
+(865, 1, 23770, 0, 0, 0, 0),
+(866, -2, 863, 864, 865, 0, 1);
+UPDATE `gossip_menu` SET `condition_id`=866 WHERE `condition_id`=870;
+UPDATE `gossip_menu_option` SET `condition_id`=866 WHERE `condition_id`=870;
+
+-- Remove orphaned addon row for Ribbon Pole Debug Target which was respawned with a different guid.
+DELETE FROM `creature_addon` WHERE `guid`=1886;
+
 
 -- End of migration.
 END IF;
