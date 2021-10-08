@@ -9,6 +9,8 @@ INSERT INTO `migrations` VALUES ('20210810191400');
 -- Add your query below.
 
 
+-- -----------------------------------------------------------------------------------------
+
 -- Update Creatures and Gameobjects Associated With Quest Clam Bait 
 UPDATE `gameobject_template` SET `Data8` = 6142, `data9` = 0, `flags` = 4 WHERE `entry` = 177784;
 UPDATE `gameobject` SET `spawntimesecsmin`= 120, `spawntimesecsmax`= 120 WHERE id = 177784;
@@ -40,6 +42,8 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- Update Gameobjects
 UPDATE `gameobject_template` SET `flags` = 4, `data8` = 894 WHERE `entry` IN (4072, 61935);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Redo Devilsaur Movement (credit cmangos)
 DELETE FROM `creature` WHERE `guid` IN (23743, 23744, 23745, 23741, 95009, 24172);
@@ -398,6 +402,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (24172, 57, -6581.49, -1593.33, -272.097, 0, 0, 0),
 (24172, 58, -6555.97, -1586.05, -272.097, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Update Creatures (credit cmangos)
 UPDATE `creature` SET `position_x` = -10581.95, `position_y` = -1185.32, `position_z` = 26.74362, `orientation` = 3.197518 WHERE `guid` = 5960 AND `id` = 2470; -- Watcher Fraizer <The Night Watch>
 UPDATE `creature` SET `position_x` = -3839.476, `position_y` = -837.3205, `position_z` = 16.94844, `orientation` = 5.579004 WHERE `guid` = 9519 AND `id` = 3181; -- Fremal Doohickey <Bandage Trainer>
@@ -495,11 +501,17 @@ UPDATE `creature` SET `position_z` = 2.425548 WHERE `guid` = 35251;
 DELETE FROM `creature` WHERE `guid` IN (34193);
 UPDATE `creature` SET `position_x` = -831.5, `position_y` = -2614.1, `position_z` = 91.9, `orientation` = 3 WHERE `guid` = 18658;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Correct Loot Template For Riverpaw Gnoll
 DELETE FROM `creature_loot_template` WHERE `entry` = 117 AND `item` IN (30039, 1710);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Update Quest Text
 UPDATE `quest_template` SET `OfferRewardText` = 'The humans have taught us a great deal about the Holy Light and how important their order is to them... and to protecting all of Azeroth. We have a great respect for how steeped in tradition it is, and how just one figure, one sacrifice, can make the difference between pain and salvation.$B$BThe two of us are gonna be working together for a bit. Any time you think you\'re ready, come back to me and we\'ll see about getting you some training. Can\'t have you go out into the world unprepared, now, can we?' WHERE `entry` = 3107;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Update Quest Start Script For Did You Lose This?
 UPDATE `quest_template` SET `CompleteScript` = 0 WHERE `entry` = 3321;
@@ -515,18 +527,26 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3321, 9, 7, 3321, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Did You Lose This?: Trenton Lighthammer - Complete Quest');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3321, 9, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Did You Lose This?: Trenton Lighthammer - Modify Flags');
 
+-- -----------------------------------------------------------------------------------------
+
 -- NOTE: There seems to be a missing escort quest associated with this NPC
 -- Add Missing Creature Guard Didier
 UPDATE `creature_template` SET `gossip_menu_id` = 7168, `display_scale1` = 1, `faction` = 1624 WHERE `entry` = 16226;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `health_percent`, `patch_min`, `patch_max`, `wander_distance`) VALUES
 (1383, 16226, 0, 2305.29, -5286.12, 82.0618, 4.83456, 120, 120, 100, 9, 10, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Correct Quest Requirements
 UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4962;
 UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4963;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Remove Some Skinning Loot IDs
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE entry IN (10116, 2230, 6728, 12202, 14646, 14869);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add Some Missing Gossips
 -- Arygos Gossip
@@ -582,27 +602,43 @@ UPDATE `creature_template` SET `gossip_menu_id` = 4067 WHERE `entry` = 9620;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (4067, 4960);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Fix drop rate of items used in quest 5725 (The Power to Destroy...) in Ragefire Chasm (credit cmangos)
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -5 WHERE `item` IN (14395, 14396);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Fix drop rate of item used in quest 443 (Rot Hide Ichor) in Silverpine Forest (credit cmangos)
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -30 WHERE `item` = 3236;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Fix drop rate of items used in quest 451 (A Recipe For Death) in Silverpine Forest (credit cmangos)
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3257;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Correct Diplay ID For Energetic Rod
 UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Remove Teebus Blazing Longsword, Alcors Sunrazor, Blanchards Stout and Shadowblade From Lockboxes
 DELETE FROM `item_loot_template` WHERE `entry` = 16885 AND `item` = 1014;
 DELETE FROM `reference_loot_template` WHERE `entry` = 1014;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Increase Dropchance for Crystallized Note
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `entry` IN (9676, 9820, 9819) AND `item`=10840;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Correct Requirements for Quest Grark Lorkrub
 UPDATE `quest_template` SET `PrevQuestId` = 4082 WHERE `entry` = 4122;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Highborne Relic Summons Creature
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (48995, 0, 39, 175891, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Highborne Relic Fragment - Start Script');
@@ -611,6 +647,8 @@ INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalon
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (48998, 0, 39, 175891, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Highborne Relic Fragment - Start Script');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (175891, 0, 10, 7524, 180000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Highborne Relic Fragment - Summon Creature');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (175891, 0, 10, 7523, 180000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Highborne Relic Fragment - Summon Creature');
+
+-- -----------------------------------------------------------------------------------------
 
 -- Move From pool_creature to pool_creature_template
 DELETE FROM `pool_creature` WHERE `pool_entry` IN (108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 521, 2598, 2605, 2606, 2779, 2850, 3200, 9002, 10003, 10004, 12902, 14222, 14281, 25468, 42939, 43157, 43525, 43517);
@@ -651,17 +689,27 @@ INSERT INTO `pool_creature_template` (`id`, `pool_entry`, `chance`, `description
 (14230, 43517, 0, 'Burgle Eye', 0, 0, 10),
 (13602, 43525, 0, 'The Abominable Greench', 0, 0, 10);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Mudrock Borer Skinning Template
 UPDATE `creature_template` SET `skinning_loot_id`= 4400 WHERE `entry` = 4399;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Reduce droprate of Mistvale Giblets
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`= -20 WHERE `entry` = 1557 AND `item` = 3919;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Recipe: Undermine Clam Chowder should have 30 min restock timer
 UPDATE `npc_vendor` SET `incrtime` = 1800 WHERE `entry` = 8139 AND `item` = 16767;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Remove Flags From npc_vendor
 UPDATE `npc_vendor` SET `itemflags` = 0 WHERE `itemflags` != 0;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add Battle Under Blackwood Lake Script
 -- Remove Duplicate Spawns
@@ -699,9 +747,15 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6840, 6836, 6841, 6837, 0, 0, 0, 0, 0, 'Scarlet Defender - Talk');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1128903, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6838, 6835, 6842, 6839, 0, 0, 0, 0, 0, 'Spectral Defender - Talk');
 
+-- -----------------------------------------------------------------------------------------
+
 UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 10773 AND `item` IN (10780, 10781, 10782);
 
+-- -----------------------------------------------------------------------------------------
+
 UPDATE `gameobject_template` SET `flags` = 4 WHERE `entry` = 1761;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add Zixil Missing Scripts
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (353701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1119, 0, 0, 0, 0, 0, 0, 0, 0, 'Zixil - Talk - Arriving - Southshore / Tarren Mill');
@@ -773,6 +827,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (15424, 61, -326.524, -682.113, 54.5241, 4.32029, 0, 0, 0),
 (15424, 62, -336.3, -701.885, 57.7294, 4.24764, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Achellios Should Run
 DELETE FROM `creature_movement` WHERE `id` = 21388;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -825,10 +881,14 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 UPDATE `creature_movement_template` SET `script_id` = 11 WHERE `entry` = 5933 AND `point` = 1;
 UPDATE `creature` SET `position_x` = -5056.58, `position_y` = -1539.16, `position_z` = -49.074 WHERE `guid` IN (21388, 21677, 21678, 21679);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Update Hagg Taurenbane Spawn Points
 UPDATE `creature` SET `position_x` = -3988.903564453125, `position_y` = -1862.833740234375, `position_z` = 91.7680816650390625, `orientation` = 1.640609502792358398 WHERE `guid` = 20942;
 UPDATE `creature` SET `position_x` = -3709.73095703125, `position_y` = -1587.8887939453125, `position_z` = 91.9688873291015625, `orientation` = 0.05235987901687622 WHERE `guid` = 20941;
 UPDATE `creature` SET `position_x` = -3893.58642578125, `position_y` = -1627.259765625, `position_z` = 91.75, `orientation` = 4.886921882629394531 WHERE `guid` = 20943;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add Serpent Statue Script (NOTE: spell 19473 is not being cast by gameobject for some unknown reason also cannot use gameobject guid 12609 when it respawns)
 UPDATE `gameobject_template` SET `script_name`='' WHERE  `entry`=177673;
@@ -842,9 +902,13 @@ INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalon
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 4, 81, 12609, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Serpent Statue - Despawn Gameobject');
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (12609, 5, 10, 12369, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 252.57, 2963.7, 1.72356, 1.29154, 0, 'Serpent Statue - Summon Creature');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Giant Plains Creeper Should not be Skinnable
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE `entry`=2565;
 DELETE FROM `skinning_loot_template` WHERE `entry`=2565 AND `item`=4234;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Correct Quest Start Script fot The Shattered Salute
 UPDATE `quest_template` SET `StartScript` = 2460 WHERE `entry`= 2460;
@@ -859,6 +923,8 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (340101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3287, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Talk');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (340101, 0, 7, 2460, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Shattered Salute: Shenthul - Complete Quest');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Correct Sunken Temple Quest Chain
 UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` = 3446;
 UPDATE `quest_template` SET `PrevQuestId` = 3444 WHERE `entry` = 3447;
@@ -866,6 +932,8 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_max`)
 VALUES (7771, 3447, 10);
 DELETE FROM `gameobject_questrelation` WHERE  `id` = 148836 AND `quest` = 3447;
 UPDATE `quest_template` SET `StartScript` = 0 WHERE `entry` = 3447;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Events list for Twilight Disciple
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2338;
@@ -894,6 +962,8 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233904, 2339, 0, 2, 0, 100, 0, 15, 0, 0, 0, 233904, 0, 0, 'Twilight Thug - Flee at 15% HP');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233905, 2339, 0, 6, 0, 100, 2, 0, 0, 0, 0, 233905, 233906, 0, 'Twilight Thug - Chance Say on Death');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Argent Dawn Shoulder enchants also require quest to unlock
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (551, 8, 5504, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (552, 8, 5507, 0, 0, 0, 0);
@@ -912,11 +982,17 @@ UPDATE `gossip_menu_option` SET `condition_id` = 0, `action_script_id` = 0 WHERE
 
 UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Remove Low Level Loot from Silvermane Wolf
 DELETE FROM `creature_loot_template` WHERE `entry`=2924 AND `item`=30011;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Remove Incorrect Skinning Templates
 UPDATE `creature_template` SET `skinning_loot_id`='' WHERE `entry` IN (11788, 11787, 12218);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Magistrate Marduke Should be a Questgiver and Add Missing Gossip (he should only offer the quest once you have read through his gossip, not sure how to implement that)
 UPDATE `creature_template` SET `npc_flags` = 3 WHERE `entry` = 11286;
@@ -941,9 +1017,13 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (3365, 4128),
 (3364, 4129);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add Some More Missing Text to Guard Howe
 DELETE FROM `creature_ai_scripts` WHERE `id`=90301;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (90301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 51, 52, 0, 0, 0, 0, 0, 0, 'Guard Howe - Say Text');
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add Scripts to Prospect of Faith Quests
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (723, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Prospect of Faith: Hammertoe Grez - Modify Flags');
@@ -964,12 +1044,16 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (724, 27, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Prospect of Faith: Historian Karnik - Modify Flags');
 UPDATE `quest_template` SET `CompleteScript` = 724 WHERE `entry` = 724;
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add Missing Gossip For Quest Get the Scoop
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (282, 779, 983), -- Goblin Pit Crewman
 (284, 781, 983), -- Gnome Pit Crewman
 (433, 930, 983); -- Race Master Kronkrider
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (983, 9, 1950, 1, 0, 0, 0);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Northern Crystal Pylon
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
@@ -1007,6 +1091,8 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 (2178, 0, 7, 4287, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastern Crystal Pylon - Complete Quest'),
 (2179, 0, 7, 4288, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Western Crystal Pylon - Complete Quest');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add Modify Flags Command to Script
 DELETE FROM `generic_scripts` WHERE `id`=2608;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2608, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doc Mixilpixil - Modify Flags');
@@ -1028,6 +1114,8 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2608, 33, 7, 2608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doc Mixilpixil - Complete Quest The Touch of Zanzil');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2608, 34, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doc Mixilpixil - Modify Flags');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Move Quest End Script 4321 to Quest Start Script
 UPDATE `quest_template` SET `StartScript` = 4321, `CompleteScript` = 0 WHERE `entry` = 4321;
 DELETE FROM `quest_end_scripts` WHERE `id`=4321;
@@ -1041,6 +1129,8 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4321, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5289, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Say Text 3');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4321, 11, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Add Gossip and Quest flags');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add JD Collie OOC Event
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` = 9117;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (911701, 9117, 0, 1, 0, 100, 1, 5000, 10000, 90000, 120000, 911701, 0, 0, 'J.D. Collie - Talk - Start Script');
@@ -1051,8 +1141,12 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911701, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4852, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Talk - OOC');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (911701, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4853, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Talk - OOC');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Quest 4785 Should be Repeatable
 UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 4785;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Corrections to Tome of Divinity (Dwarf) Quest
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1646;
@@ -1070,6 +1164,8 @@ DELETE FROM `conditions` WHERE `condition_entry` IN (164104, 164103, 164102, 164
 -- Corrections to Tome of Valor Quests
 UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 972 WHERE `entry` IN (1793, 1794);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (972, 22, 1649, 0, 0, 0, 0);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add Missing Creature and Waypoints
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -1120,6 +1216,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1070, 40, -1202.92, 119.533, 134.884, 100, 0, 0, 0),
 (1070, 41, -1192.27, 120.281, 135.206, 100, 0, 0, 0),
 (1070, 42, -1184.28, 120.872, 135.206, 100, 0, 0, 0);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Convert Stormwind School Trip to Creature Groups
 -- Add Missing Creature
@@ -1308,6 +1406,8 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (351303, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1154, 0, 0, 0, 0, 0, 0, 0, 0, 'Miss Danna - Talk');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (351303, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1155, 0, 0, 0, 0, 0, 0, 0, 0, 'Miss Danna - Talk');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Some Stormwind Creatures Despawn at Night
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (84028, -27),
@@ -1324,6 +1424,8 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (90440, -27),
 (90443, -27);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Some corrections to Karlee Chaddis Waypoints
 UPDATE `creature_movement` SET `waittime` = 0 WHERE `id` = 90439;
 UPDATE `creature_movement` SET `orientation` = 100 WHERE `id` = 90439;
@@ -1331,6 +1433,8 @@ UPDATE `creature_movement` SET `orientation` = 1.17061 WHERE `id` = 90439 AND `p
 UPDATE `creature_movement` SET `orientation` = 1.17061 WHERE `id` = 90439 AND `point` = 29;
 UPDATE `creature_movement` SET `orientation` = 1.17061 WHERE `id` = 90439 AND `point` = 30;
 UPDATE `creature_movement` SET `waittime` = 20000 WHERE `id` = 90439 AND `point`=29;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Convert Janey Anship to Use Creature Groups
 -- Remove Old Waypoints and Scripts
@@ -1506,6 +1610,8 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (141302, 5, 0, 0, 0, 0, 0, 1415, 10, 8, 2, 214, 215, 216, 217, 0, 0, 0, 0, 0, 'Suzanne - Talk');
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (141302, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 222, 223, 224, 225, 0, 0, 0, 0, 0, 'Janey Anship - Talk');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add Snarler Waypoints
 UPDATE `creature` SET `position_x` = -4142.19, `position_y` = -423.252, `position_z` = 24.9747, `movement_type` = 2 WHERE `id` = 5356;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -1559,6 +1665,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5356, 48, -4106.68, -482.678, 12.4655, 100, 0, 0, 0),
 (5356, 49, -4113.46, -456.848, 19.0156, 100, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Gnarl Leafbrother Correct Waypoints
 DELETE FROM `creature_movement` WHERE `id` = 51842;
 UPDATE `creature` SET `position_x` = -5074.64, `position_y` = 382.334, `position_z` = 12.3643 WHERE `id` = 5354;
@@ -1606,6 +1714,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5354, 41, -5077.47, 451.358, 15.9716, 100, 0, 0, 0),
 (5354, 42, -5090.56, 422.281, 12.1893, 100, 0, 0, 0),
 (5354, 43, -5076.26, 385.89, 11.3363, 100, 0, 0, 0);
+
+-- -----------------------------------------------------------------------------------------
 
 -- Add WPL Patrol
 UPDATE `creature` SET `position_x` = 1854.4, `position_y` = -1337.17, `position_z` = 61.8205 WHERE `guid` IN (46760, 46761, 46762);
@@ -1724,6 +1834,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (46760, 107, 1427.36, -1461.15, 53.9645, 100, 5000, 0, 46760);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (46760, 0, 20, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Hunter - Set Movement Type');
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add Sentinel Amarassan Waypoints
 UPDATE `creature` SET `position_x` = 2413.89, `position_y` = 1675.03, `position_z` = 316.675, `movement_type` = 2, `wander_distance` = 0 WHERE `id` = 5916;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -1803,8 +1915,12 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5916, 74, 2388.61, 1660.39, 316.765, 100, 0, 0, 0),
 (5916, 75, 2409.46, 1672.53, 316.767, 100, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Update Bingles Blastenheimer Template
 UPDATE `creature_template` SET `faction` = 55, `unit_flags` = 512 WHERE `entry`=6577;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Update Lord Azrethoc
 DELETE FROM `creature_movement` WHERE `id` = 29062;
@@ -1851,6 +1967,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5760, 39, -1839.08, 1675.99, 61.3097, 100, 0, 0, 0),
 (5760, 40, -1852.29, 1684.86, 61.6812, 100, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Convert Another Patrol to Use Groups
 DELETE FROM `creature_movement` WHERE `id` = 90481;
 UPDATE `creature` SET `movement_type` = 0 WHERE `guid` = 90481;
@@ -1858,9 +1976,13 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (90482, 90482, 1, 6.25244, 11),
 (90482, 90481, 1, 4.71, 11);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add correct pre quest requirement to some paladin quest chains
 UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1442 AND `patch`=0;
 UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1655 AND `patch`=0;
+
+-- -----------------------------------------------------------------------------------------
 
 -- Cyrus Therepentous
 -- Add Gossips
@@ -1908,8 +2030,205 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (219, 8, 4023, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (220, -2, 218, 219, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
 -- Add Correct Prequest to 5041
 UPDATE `quest_template` SET `PrevQuestId` = 871 WHERE `entry` = 5041;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Add Harves Festival Feast Pools
+-- IRONFORGE
+DELETE FROM `gameobject` WHERE `id` IN (180370, 180371, 180372);
+-- HARVEST FRUIT
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(9862, 180370, 0, -5089.05, -799.469, 496.03, -2.11185, 0, 0, 0.870356, -0.492423, 180, 180, 100, 1, 0, 0, 5, 10),
+(9863, 180370, 0, -5085.64, -799.931, 496.03, -0.226893, 0, 0, 0.113203, -0.993572, 180, 180, 100, 1, 0, 0, 5, 10),
+(9864, 180370, 0, -5082.25, -800.448, 496.03, -0.191986, 0, 0, 0.095846, -0.995396, 180, 180, 100, 1, 0, 0, 5, 10),
+(9865, 180370, 0, -5080.8, -799.561, 496.03, 1.8675, 0, 0, 0.803857, 0.594823, 180, 180, 100, 1, 0, 0, 5, 10),
+(9866, 180370, 0, -5077.29, -800.179, 496.03, 2.32129, 0, 0, 0.91706, 0.398749, 180, 180, 100, 1, 0, 0, 5, 10),
+(9867, 180370, 0, -5075.2, -799.255, 496.038, -1.29154, 0, 0, 0.601815, -0.798635, 180, 180, 100, 1, 0, 0, 5, 10),
+(9868, 180370, 0, -5073.67, -799.944, 496.03, -0.15708, 0, 0, 0.078459, -0.996917, 180, 180, 100, 1, 0, 0, 5, 10);
+
+-- HARVEST BOAR
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(9869, 180371, 0, -5089.05, -799.469, 496.03, -2.11185, 0, 0, 0.870356, -0.492423, 180, 180, 100, 1, 0, 0, 5, 10),
+(9870, 180371, 0, -5085.64, -799.931, 496.03, -0.226893, 0, 0, 0.113203, -0.993572, 180, 180, 100, 1, 0, 0, 5, 10),
+(9871, 180371, 0, -5082.25, -800.448, 496.03, -0.191986, 0, 0, 0.095846, -0.995396, 180, 180, 100, 1, 0, 0, 5, 10),
+(9872, 180371, 0, -5080.8, -799.561, 496.03, 1.8675, 0, 0, 0.803857, 0.594823, 180, 180, 100, 1, 0, 0, 5, 10),
+(9873, 180371, 0, -5077.29, -800.179, 496.03, 2.32129, 0, 0, 0.91706, 0.398749, 180, 180, 100, 1, 0, 0, 5, 10),
+(9874, 180371, 0, -5075.2, -799.255, 496.038, -1.29154, 0, 0, 0.601815, -0.798635, 180, 180, 100, 1, 0, 0, 5, 10),
+(9875, 180371, 0, -5073.67, -799.944, 496.03, -0.15708, 0, 0, 0.078459, -0.996917, 180, 180, 100, 1, 0, 0, 5, 10);
+
+-- HARVEST FISH
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(9876, 180372, 0, -5089.05, -799.469, 496.03, -2.11185, 0, 0, 0.870356, -0.492423, 180, 180, 100, 1, 0, 0, 5, 10),
+(9877, 180372, 0, -5085.64, -799.931, 496.03, -0.226893, 0, 0, 0.113203, -0.993572, 180, 180, 100, 1, 0, 0, 5, 10),
+(9878, 180372, 0, -5082.25, -800.448, 496.03, -0.191986, 0, 0, 0.095846, -0.995396, 180, 180, 100, 1, 0, 0, 5, 10),
+(9879, 180372, 0, -5080.8, -799.561, 496.03, 1.8675, 0, 0, 0.803857, 0.594823, 180, 180, 100, 1, 0, 0, 5, 10),
+(9880, 180372, 0, -5077.29, -800.179, 496.03, 2.32129, 0, 0, 0.91706, 0.398749, 180, 180, 100, 1, 0, 0, 5, 10),
+(9881, 180372, 0, -5075.2, -799.255, 496.038, -1.29154, 0, 0, 0.601815, -0.798635, 180, 180, 100, 1, 0, 0, 5, 10),
+(9882, 180372, 0, -5073.67, -799.944, 496.03, -0.15708, 0, 0, 0.078459, -0.996917, 180, 180, 100, 1, 0, 0, 5, 10);
+
+-- ADD POOL TEMPLATE
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(272, 1, 'Harvest Festival Food - Ironforge', 5, 10),
+(273, 1, 'Harvest Festival Food - Ironforge', 5, 10),
+(274, 1, 'Harvest Festival Food - Ironforge', 5, 10),
+(275, 1, 'Harvest Festival Food - Ironforge', 5, 10),
+(276, 1, 'Harvest Festival Food - Ironforge', 5, 10),
+(277, 1, 'Harvest Festival Food - Ironforge', 5, 10),
+(278, 1, 'Harvest Festival Food - Ironforge', 5, 10);
+
+-- ADD POOL GAMEOBJECTS
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(9862, 272, 'Harvest Festival Food - Ironforge', 5, 10),
+(9869, 272, 'Harvest Festival Food - Ironforge', 5, 10),
+(9876, 272, 'Harvest Festival Food - Ironforge', 5, 10),
+(9863, 273, 'Harvest Festival Food - Ironforge', 5, 10),
+(9870, 273, 'Harvest Festival Food - Ironforge', 5, 10),
+(9877, 273, 'Harvest Festival Food - Ironforge', 5, 10),
+(9864, 274, 'Harvest Festival Food - Ironforge', 5, 10),
+(9871, 274, 'Harvest Festival Food - Ironforge', 5, 10),
+(9878, 274, 'Harvest Festival Food - Ironforge', 5, 10),
+(9865, 275, 'Harvest Festival Food - Ironforge', 5, 10),
+(9872, 275, 'Harvest Festival Food - Ironforge', 5, 10),
+(9879, 275, 'Harvest Festival Food - Ironforge', 5, 10),
+(9866, 276, 'Harvest Festival Food - Ironforge', 5, 10),
+(9873, 276, 'Harvest Festival Food - Ironforge', 5, 10),
+(9880, 276, 'Harvest Festival Food - Ironforge', 5, 10),
+(9867, 277, 'Harvest Festival Food - Ironforge', 5, 10),
+(9874, 277, 'Harvest Festival Food - Ironforge', 5, 10),
+(9881, 277, 'Harvest Festival Food - Ironforge', 5, 10),
+(9868, 278, 'Harvest Festival Food - Ironforge', 5, 10),
+(9875, 278, 'Harvest Festival Food - Ironforge', 5, 10),
+(9882, 278, 'Harvest Festival Food - Ironforge', 5, 10);
+
+-- ORGRIMMAR
+-- HARVEST FRUIT
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(9883, 180371, 1, 1326.97, -4416.36, 27.5984, -1.6057, 0, 0, 0.71934, -0.694658, 180, 180, 100, 1, 0, 0, 5, 10),
+(9884, 180371, 1, 1327.37, -4423.33, 27.4349, 2.53073, 0, 0, 0.953717, 0.300706, 180, 180, 100, 1, 0, 0, 5, 10),
+(9885, 180370, 1, 1329.31, -4413.13, 27.6023, 0.680678, 0, 0, 0.333807, 0.942641, 180, 180, 100, 1, 0, 0, 5, 10),
+(9886, 180371, 1, 1330.72, -4425.71, 27.4281, 0.750492, 0, 0, 0.366501, 0.930418, 180, 180, 100, 1, 0, 0, 5, 10),
+(9887, 180370, 1, 1336.56, -4426.84, 27.6309, -2.9147, 0, 0, 0.993572, -0.113203, 180, 180, 100, 1, 0, 0, 5, 10),
+(9888, 180370, 1, 1337.53, -4411.01, 28.0848, -0.680679, 0, 0, 0.333807, -0.942641, 180, 180, 100, 1, 0, 0, 5, 10),
+(9889, 180370, 1, 1340.36, -4414.08, 28.0881, 1.98968, 0, 0, 0.838671, 0.544639, 180, 180, 100, 1, 0, 0, 5, 10),
+(9890, 180370, 1, 1341.04, -4421.81, 27.6249, 0.383972, 0, 0, 0.190809, 0.981627, 180, 180, 100, 1, 0, 0, 5, 10);
+
+-- HARVEST BOAR
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(9891, 180371, 1, 1326.97, -4416.36, 27.5984, -1.6057, 0, 0, 0.71934, -0.694658, 180, 180, 100, 1, 0, 0, 5, 10),
+(9892, 180371, 1, 1327.37, -4423.33, 27.4349, 2.53073, 0, 0, 0.953717, 0.300706, 180, 180, 100, 1, 0, 0, 5, 10),
+(9893, 180370, 1, 1329.31, -4413.13, 27.6023, 0.680678, 0, 0, 0.333807, 0.942641, 180, 180, 100, 1, 0, 0, 5, 10),
+(9894, 180371, 1, 1330.72, -4425.71, 27.4281, 0.750492, 0, 0, 0.366501, 0.930418, 180, 180, 100, 1, 0, 0, 5, 10),
+(9895, 180370, 1, 1336.56, -4426.84, 27.6309, -2.9147, 0, 0, 0.993572, -0.113203, 180, 180, 100, 1, 0, 0, 5, 10),
+(9896, 180370, 1, 1337.53, -4411.01, 28.0848, -0.680679, 0, 0, 0.333807, -0.942641, 180, 180, 100, 1, 0, 0, 5, 10),
+(9897, 180370, 1, 1340.36, -4414.08, 28.0881, 1.98968, 0, 0, 0.838671, 0.544639, 180, 180, 100, 1, 0, 0, 5, 10),
+(9898, 180370, 1, 1341.04, -4421.81, 27.6249, 0.383972, 0, 0, 0.190809, 0.981627, 180, 180, 100, 1, 0, 0, 5, 10);
+
+-- HARVEST FISH
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(9899, 180371, 1, 1326.97, -4416.36, 27.5984, -1.6057, 0, 0, 0.71934, -0.694658, 180, 180, 100, 1, 0, 0, 5, 10),
+(9900, 180371, 1, 1327.37, -4423.33, 27.4349, 2.53073, 0, 0, 0.953717, 0.300706, 180, 180, 100, 1, 0, 0, 5, 10),
+(9901, 180370, 1, 1329.31, -4413.13, 27.6023, 0.680678, 0, 0, 0.333807, 0.942641, 180, 180, 100, 1, 0, 0, 5, 10),
+(9902, 180371, 1, 1330.72, -4425.71, 27.4281, 0.750492, 0, 0, 0.366501, 0.930418, 180, 180, 100, 1, 0, 0, 5, 10),
+(9903, 180370, 1, 1336.56, -4426.84, 27.6309, -2.9147, 0, 0, 0.993572, -0.113203, 180, 180, 100, 1, 0, 0, 5, 10),
+(9904, 180370, 1, 1337.53, -4411.01, 28.0848, -0.680679, 0, 0, 0.333807, -0.942641, 180, 180, 100, 1, 0, 0, 5, 10),
+(9905, 180370, 1, 1340.36, -4414.08, 28.0881, 1.98968, 0, 0, 0.838671, 0.544639, 180, 180, 100, 1, 0, 0, 5, 10),
+(9906, 180370, 1, 1341.04, -4421.81, 27.6249, 0.383972, 0, 0, 0.190809, 0.981627, 180, 180, 100, 1, 0, 0, 5, 10);
+
+-- ADD POOL TEMPLATE
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
+(280, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(281, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(282, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(283, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(284, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(285, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(286, 1, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(287, 1, 'Harvest Festival Food - Orgrimmar', 5, 10);
+
+-- ADD POOL GAMEOBJECTS
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_min`, `patch_max`) VALUES 
+(9883, 280, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9891, 280, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9899, 280, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9884, 281, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9892, 281, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9900, 281, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9885, 282, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9893, 282, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9901, 282, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9886, 283, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9894, 283, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9902, 283, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9887, 284, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9895, 284, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9903, 284, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9888, 285, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9896, 285, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9904, 285, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9889, 286, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9897, 286, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9905, 286, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9890, 287, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9898, 287, 'Harvest Festival Food - Orgrimmar', 5, 10),
+(9906, 287, 'Harvest Festival Food - Orgrimmar', 5, 10);
+
+-- UPDATE RESPAWN TIMES
+UPDATE `gameobject` SET `spawntimesecsmin` = 10, `spawntimesecsmax` = 10  WHERE `id` IN (180370, 180371, 180372, 180373, 180374);
+
+-- ADD GAMEOBJECTS TO EVENT
+INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
+(9862, 11),
+(9863, 11),
+(9864, 11),
+(9865, 11),
+(9866, 11),
+(9867, 11),
+(9868, 11),
+(9869, 11),
+(9870, 11),
+(9871, 11),
+(9872, 11),
+(9873, 11),
+(9874, 11),
+(9875, 11),
+(9876, 11),
+(9877, 11),
+(9878, 11),
+(9879, 11),
+(9880, 11),
+(9881, 11),
+(9882, 11),
+(9883, 11),
+(9884, 11),
+(9885, 11),
+(9886, 11),
+(9887, 11),
+(9888, 11),
+(9889, 11),
+(9890, 11),
+(9891, 11),
+(9892, 11),
+(9893, 11),
+(9894, 11),
+(9895, 11),
+(9896, 11),
+(9897, 11),
+(9898, 11),
+(9899, 11),
+(9900, 11),
+(9901, 11),
+(9902, 11),
+(9903, 11),
+(9904, 11),
+(9905, 11),
+(9906, 11);
+
+-- -----------------------------------------------------------------------------------------
+
 
 
 -- End of migration.
