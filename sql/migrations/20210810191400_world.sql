@@ -2235,6 +2235,35 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- -----------------------------------------------------------------------------------------
 
+-- Update Seeking Spiritual Aid End Script
+DELETE FROM `quest_end_scripts` WHERE `id`=5158;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5158, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid - Islen Waterseer - Remove Flags');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5158, 1, 60, 3, 1, 0, 0, 0, 0, 0, 0, 0, 13172, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid - Islen Waterseer - Start Waypoints');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (5158, 45, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid - Islen Waterseer - Modify Flags');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 2, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Islen Waterseer - Set Stand State');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6586, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Islen Waterseer - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 5, 9, 3, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Islen Waterseer - Respawn Gameobject');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 13, 10, 11256, 11000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -1344.85, -4072.3, -0.828955, 1.50098, 0, 'Seeking Spiritual Aid: Islen Waterseer - Summon Creature');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 16, 0, 0, 0, 0, 0, 11256, 10, 8, 2, 6607, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Manifestation of Water - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 17, 15, 18113, 0, 0, 0, 11256, 10, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Manifestation of Water - Cast Spell');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6599, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Islen Waterseer - Talk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1317201, 24, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seeking Spiritual Aid: Islen Waterseer - Set Stand State');
+
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(13172, 1, -1342.7, -4054.72, 3.7679, 100, 0, 0, 0),
+(13172, 2, -1344.13, -4065.49, -0.674068, 100, 26000, 0, 1317201),
+(13172, 3, -1342.68, -4054.67, 3.78157, 100, 0, 0, 0),
+(13172, 4, -1344, -4047.97, 5.80303, 100, 0, 0, 0),
+(13172, 5, -1345.12, -4047.61, 5.93119, 4.345870, 2000, 0, 0);
+
+UPDATE `creature_template` SET `faction` = 35, `unit_flags` = 832 WHERE `entry` = 11256;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(3, 106528, 1, -1344.85, -4072.3, -0.922163, 4.46804, 0, 0, -0.788011, 0.615662, -180, -180, 100, 1, 0, 0, 0, 10);
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
