@@ -2229,6 +2229,11 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 
 -- -----------------------------------------------------------------------------------------
 
+-- Add Missing Songflower Spawn
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(48957, 174713, 1, 6599.87, -1266.64, 448.412, 1.97222, 0, 0, 0.833885, 0.551938, 7200, 7200, 100, 1, 0, 0, 0, 10);
+
+-- -----------------------------------------------------------------------------------------
 
 
 -- End of migration.
