@@ -891,6 +891,7 @@ UPDATE `creature` SET `position_x` = -3893.58642578125, `position_y` = -1627.259
 -- -----------------------------------------------------------------------------------------
 
 -- Add Serpent Statue Script (NOTE: spell 19473 is not being cast by gameobject for some unknown reason also cannot use gameobject guid 12609 when it respawns)
+-- Does vmangos support Gameobject Casting?
 UPDATE `gameobject_template` SET `script_name`='' WHERE  `entry`=177673;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
