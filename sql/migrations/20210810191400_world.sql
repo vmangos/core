@@ -2659,6 +2659,11 @@ UPDATE `creature_movement_template` SET `script_id` = 11 WHERE `entry` = 8976 AN
 
 -- -----------------------------------------------------------------------------------------
 
+-- Quest 9223 Should be Repeatable
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
