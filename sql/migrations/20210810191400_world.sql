@@ -619,11 +619,6 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -50 WHERE `item` = 3
 
 -- -----------------------------------------------------------------------------------------
 
--- Correct Diplay ID For Energetic Rod
-UPDATE `item_template` SET `display_id` = 30915 WHERE `entry` = 18321;
-
--- -----------------------------------------------------------------------------------------
-
 -- Remove Teebus Blazing Longsword, Alcors Sunrazor, Blanchards Stout and Shadowblade From Lockboxes
 DELETE FROM `item_loot_template` WHERE `entry` = 16885 AND `item` = 1014;
 DELETE FROM `reference_loot_template` WHERE `entry` = 1014;
