@@ -2664,6 +2664,11 @@ UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
 
 -- -----------------------------------------------------------------------------------------
 
+-- Risen Aberration Should Not Be Immune to Physical and Holy
+UPDATE `creature_template` SET `auras`= '', `school_immune_mask` = 124 WHERE `entry`=10485;
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
