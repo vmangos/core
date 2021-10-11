@@ -2665,7 +2665,9 @@ UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
 -- -----------------------------------------------------------------------------------------
 
 -- Risen Aberration Should Not Be Immune to Physical and Holy
-UPDATE `creature_template` SET `auras`= '', `school_immune_mask` = 124 WHERE `entry`=10485;
+UPDATE `creature_template` SET `auras`='', `ai_name`= '', `school_immune_mask` = 124 WHERE `entry`=10485;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1048502, 1048503, 1048504);
+DELETE FROM `creature_ai_events` WHERE `creature_id` = 10485;
 
 -- -----------------------------------------------------------------------------------------
 
