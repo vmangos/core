@@ -2673,6 +2673,18 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- -----------------------------------------------------------------------------------------
 
+-- Quest 1130 Requires Quest 882
+UPDATE `quest_template` SET `PrevQuestId` = 882 WHERE `entry` = 1130;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 1130 is a breadcrumb quest and should be disabled if 1131 is taken or complete. Also quest 1131 should be available regardless of quest 1130 being taken
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 192 WHERE `entry`=1130;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1131;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (192, 22, 1131, 0, 0, 0, 0);
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
