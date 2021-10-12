@@ -2666,6 +2666,13 @@ DELETE FROM `creature_ai_events` WHERE `creature_id` = 10485;
 
 -- -----------------------------------------------------------------------------------------
 
+-- Skorn Whitecloud Should Call You A Stud if Quest 770 is Complete
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES 
+(24, 521, 187);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (187, 8, 770, 0, 0, 0, 0);
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
