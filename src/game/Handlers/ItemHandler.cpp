@@ -445,7 +445,13 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
     }
     else
     {
-        DEBUG_LOG("WORLD: CMSG_ITEM_QUERY_SINGLE - NO item INFO! (ENTRY: %u)", item);
+        if (pProto && !pProto->m_bDiscovered)
+        {
+            std::stringstream oss;
+            oss << "Requested info for undiscovered item " << pProto->ItemId;;
+            ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
+        }
+        
         WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
         data << uint32(item | 0x80000000);
         SendPacket(&data);
