@@ -2697,6 +2697,11 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 11881 AND `item` = 20679;
 
 -- -----------------------------------------------------------------------------------------
 
+-- Delete Plans: Corruption from various NPCs (credit Azerothcore)
+DELETE FROM `creature_loot_template` WHERE `entry` IN (10398, 10399, 10400, 10406, 10407, 10408, 10409, 10412, 10413, 10463, 10464) AND `item` = 12830;
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
