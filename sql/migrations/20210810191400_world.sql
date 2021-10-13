@@ -2685,6 +2685,18 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- -----------------------------------------------------------------------------------------
 
+-- Decoded Twilight Text Should Not Drop From Creatures (Ex 20545)
+DELETE FROM `creature_loot_template` WHERE `entry` = 11738 AND `item` = 20541;
+DELETE FROM `creature_loot_template` WHERE `entry` = 11881 AND `item` = 20541;
+DELETE FROM `creature_loot_template` WHERE `entry` = 11738 AND `item` = 20552;
+DELETE FROM `creature_loot_template` WHERE `entry` = 11881 AND `item` = 20678;
+DELETE FROM `creature_loot_template` WHERE `entry` = 7449 AND `item` = 20679;
+DELETE FROM `creature_loot_template` WHERE `entry` = 8602 AND `item` = 20679;
+DELETE FROM `creature_loot_template` WHERE `entry` = 11803 AND `item` = 20679;
+DELETE FROM `creature_loot_template` WHERE `entry` = 11881 AND `item` = 20679;
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
