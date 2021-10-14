@@ -2722,6 +2722,11 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 
 -- -----------------------------------------------------------------------------------------
 
+-- Remove Incorrect Aura
+UPDATE `creature_template` SET `auras`='' WHERE  `entry`=8543;
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
