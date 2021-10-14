@@ -2714,6 +2714,14 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- -----------------------------------------------------------------------------------------
 
+-- Add Missing Gossip Option to Fallen Hero of the Horde
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(840, 3, 0, 'I have destroyed my Azsharite weaponry! I need your assistance in defeating the triad of power.', 5260, 1, 1, -1, 0, 84001, 0, 0, NULL, 0, 333);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (333, 9, 3627, 0, 0, 0, 0);
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (84001, 0, 15, 15247, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Uniting the Shattered Amulet: Fallen Hero of the Horde - Cast Spell');
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
