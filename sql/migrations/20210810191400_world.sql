@@ -2727,6 +2727,13 @@ UPDATE `creature_template` SET `auras`='' WHERE  `entry`=8543;
 
 -- -----------------------------------------------------------------------------------------
 
+-- Update Loot For Item Cuergo's Hidden Treasure
+INSERT INTO `item_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES
+(9265, 9361, 9, 0, 1, 1, 0, 0, 10);
+UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 86 WHERE `entry` = 9265 AND `item` = 9360;
+
+-- -----------------------------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
