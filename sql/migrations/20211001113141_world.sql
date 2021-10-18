@@ -83,6 +83,11 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 -- This text should be yelled.
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=731;
 
+-- Remove EventAI from Negolash.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (149401);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1494;
+UPDATE `creature_template` SET `ai_name`='' WHERE `entry`=1494;
+
 
 -- End of migration.
 END IF;
