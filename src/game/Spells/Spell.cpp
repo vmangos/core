@@ -1126,7 +1126,19 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     target->processed = true;                               // Target checked in apply effects procedure
 
     // Get mask of effects for target
-    uint32 mask = target->effectMask;
+    uint32 effectMask = target->effectMask;
+    if (effectMask)
+    {
+        // Some persistent area aura spells target units in SMSG_SPELL_GO,
+        // but we do not want to execute the effect again for each unit.
+        for (int effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
+        {
+            if ((effectMask & (1 << effectNumber)) && m_spellInfo->Effect[effectNumber] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+                effectMask &= ~(1 << effectNumber);
+        }
+        if (!effectMask)
+            return;
+    }
 
     Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_casterUnit : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
     if (!unit)
@@ -1199,20 +1211,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // mark effects that were already handled in Spell::HandleDelayedSpellLaunch on spell launch as processed
         for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             if (m_spellInfo->IsEffectHandledOnDelayedSpellLaunch(SpellEffectIndex(i)))
-                mask &= ~(1 << i);
+                effectMask &= ~(1 << i);
 
         // maybe used in effects that are handled on hit
         m_damage += target->damage;
     }
 
     if (missInfo == SPELL_MISS_NONE)                        // In case spell hit target, do all effect on that target
-        DoSpellHitOnUnit(unit, mask);
+        DoSpellHitOnUnit(unit, effectMask);
     if (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE)
     {
         if (m_casterUnit)
         {
             isReflected = true;
-            DoSpellHitOnUnit(m_casterUnit, mask);
+            DoSpellHitOnUnit(m_casterUnit, effectMask);
             unitTarget = m_casterUnit;
         }
     }
@@ -1381,7 +1393,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
             for (uint8 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
             {
-                if ((mask & (1 << effectNumber)) &&
+                if ((effectMask & (1 << effectNumber)) &&
                     IsDirectDamageWithBonusEffect(m_spellInfo->Effect[effectNumber]))
                 {
                     damageEffectIndex = SpellEffectIndex(effectNumber);
@@ -2595,11 +2607,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
         {
-            // targets the ground, not the units in the area
             switch (m_spellInfo->Effect[effIndex])
             {
-                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                    break;
                 case SPELL_EFFECT_SUMMON:
                     if (m_casterUnit)
                         targetUnitMap.push_back(m_casterUnit);
