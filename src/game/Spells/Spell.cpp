@@ -6976,7 +6976,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!m_caster->IsPlayer() || m_CastItem)
                     break;
 
-                if (m_targets.getUnitTarget()->GetPowerType() != POWER_MANA)
+                if (m_targets.getUnitTarget() && m_targets.getUnitTarget()->GetPowerType() != POWER_MANA)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;
