@@ -2736,7 +2736,9 @@ UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 86 WHERE `entry` = 9265 
 
 -- Add Missing Ground Pounder (Uses Waypoints set to wander for now)
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `movement_type`,`patch_max`) VALUES 
-(3505, 9396, 1, -7359.93, -3739.76, 11.2501, 3.11049, 300, 300, 20, 100, 1, 10);
+(3505, 9396, 1, -7359.93, -3739.76, 11.2501, 3.11049, 300, 300, 20, 100, 1, 10),
+(3506, 9396, 1, -7333.07, -3590.84, 11.3300, 3.11049, 300, 300, 20, 100, 1, 10),
+(3507, 9396, 1, -7280.86, -3359.77, 9.7712, 3.11049, 300, 300, 20, 100, 1, 10);
 
 -- -----------------------------------------------------------------------------------------
 
