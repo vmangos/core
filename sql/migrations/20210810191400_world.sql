@@ -2748,6 +2748,11 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 UPDATE `gossip_menu_option` SET `action_menu_id` = 50237 WHERE `menu_id` = 50234 AND `id` = 1;
 DELETE FROM `gossip_menu` WHERE  `entry` = 50235 AND `text_id` = 7224;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Apple Bobs Should Not Despawn After Use
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` = 180523
+
 
 -- End of migration.
 END IF;
