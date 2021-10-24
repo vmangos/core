@@ -61,7 +61,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         bAshbringer = false;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 28441 && !bAshbringer && pCaster && me->IsWithinLOSInMap(pCaster))
         {

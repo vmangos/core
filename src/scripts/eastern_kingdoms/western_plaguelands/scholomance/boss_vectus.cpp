@@ -228,7 +228,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit *pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT)
         {

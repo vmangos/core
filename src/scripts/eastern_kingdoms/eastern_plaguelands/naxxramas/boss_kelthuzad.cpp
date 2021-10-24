@@ -262,10 +262,13 @@ struct kt_p1AddAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* unit, SpellEntry const*) override 
+    void SpellHit(SpellCaster* pCaster, SpellEntry const*) override 
     {
         if(!hasAggroed)
-            ActualAttack(unit);
+        {
+            if (Unit* pUnit = pCaster->ToUnit())
+                ActualAttack(pUnit);
+        }
     }
 };
 
@@ -941,7 +944,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
             pC->RemoveAurasDueToSpell(10955);
     }
 
-    void SpellHit(Unit*, SpellEntry const* spell) override 
+    void SpellHit(SpellCaster*, SpellEntry const* spell) override 
     {
         // if hit by any shackle spell we check how many other guardians are shackled.
         // If more than 3, we release everyone.

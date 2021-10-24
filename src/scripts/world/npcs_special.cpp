@@ -324,7 +324,7 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster *caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && spell->Id == 20804)
         {
@@ -814,23 +814,24 @@ struct rat_des_profondeursAI : public ScriptedAI
             QuestFinishCheck_Timer -= uiDiff;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpellInfo) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellInfo) override
     {
         // Ce rat est deja pris !
         if (!m_FollowingPlayerGuid.IsEmpty())
             return;
         if (!pSpellInfo || pSpellInfo->Id != SPELL_EXTASE_MELODIEUSE)
             return;
-        if (!pCaster->IsPlayer())
+        Player* pCasterPlayer = pCaster->ToPlayer();
+        if (!pCasterPlayer)
             return;
-        if (pCaster->ToPlayer()->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE)
+        if (pCasterPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE)
             return;
-        m_FollowingPlayerGuid = pCaster->GetObjectGuid();
+        m_FollowingPlayerGuid = pCasterPlayer->GetObjectGuid();
         m_creature->UpdateEntry(NPC_RAT_ENSORCELE);
         m_creature->CastSpell(m_creature, SPELL_EXTASE_MELO_VISU, true);
         m_creature->GetMotionMaster()->Clear(false);
-        m_creature->GetMotionMaster()->MoveFollow(pCaster, 1.0f, M_PI_F);
-        pCaster->ToPlayer()->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
+        m_creature->GetMotionMaster()->MoveFollow(pCasterPlayer, 1.0f, M_PI_F);
+        pCasterPlayer->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
     }
 
     void JustDied(Unit* pKiller) override
@@ -1884,7 +1885,7 @@ struct npc_sickly_critterAI : CritterAI
         m_uiTimer = 1500;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id != SPELL_APPLY_SALVE)
         {
@@ -2334,7 +2335,7 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
         m_uiReturnTimer = 0;
     }
 
-    void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_DARK_IRON_MUG)
             m_uiReturnTimer = 10000;

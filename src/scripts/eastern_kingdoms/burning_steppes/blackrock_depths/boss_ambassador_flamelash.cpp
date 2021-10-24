@@ -99,7 +99,7 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
             lBurningSpirits.remove(pSummoned->GetObjectGuid());
     }
 
-    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pWho, SpellEntry const* pSpell) override
     {
         if (pWho->GetEntry() == NPC_BURNING_SPIRIT && pSpell->Id == SPELL_BURNING_SPIRIT)
             m_creature->CastSpell(m_creature, SPELL_BURNING_SPIRIT_BUFF, true);

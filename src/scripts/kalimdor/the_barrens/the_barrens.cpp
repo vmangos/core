@@ -621,30 +621,30 @@ struct npc_mission_possible_but_not_probableAI : ScriptedAI
 
     }
 
-    void SpellHit(Unit* /*caster*/, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* /*caster*/, SpellEntry const* pSpell) override
     {
         uint32 spellId = 0;
 
         switch (m_creature->GetEntry())
         {
-        case NPC_MUTATED_VENTURE_CO_DRONE:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_GARROTE, CF_ROGUE_AMBUSH>())
-                spellId = SPELL_JUGGLER_VEIN_RUPTURE;
-            break;
-        case NPC_VENTURE_CO_PATROLLER:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_RUPTURE>())
-                spellId = SPELL_LUNG_PUNCTURE;
-            break;
-        case NPC_VENTURE_CO_LOOKOUT:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_EVISCERATE>())
-                spellId = SPELL_SLUSH;
-            break;
-        case NPC_GRAND_FOREMAN_PUZIK_GALLYWIX:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_AMBUSH>())
-                spellId = SPELL_DECIMATE;
-            break;
-        default:
-            return;
+            case NPC_MUTATED_VENTURE_CO_DRONE:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_GARROTE, CF_ROGUE_AMBUSH>())
+                    spellId = SPELL_JUGGLER_VEIN_RUPTURE;
+                break;
+            case NPC_VENTURE_CO_PATROLLER:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_RUPTURE>())
+                    spellId = SPELL_LUNG_PUNCTURE;
+                break;
+            case NPC_VENTURE_CO_LOOKOUT:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_EVISCERATE>())
+                    spellId = SPELL_SLUSH;
+                break;
+            case NPC_GRAND_FOREMAN_PUZIK_GALLYWIX:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_AMBUSH>())
+                    spellId = SPELL_DECIMATE;
+                break;
+            default:
+                return;
         }
 
         DoCastSpellIfCan(m_creature, spellId);

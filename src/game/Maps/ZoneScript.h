@@ -84,6 +84,7 @@ class GameObject;
 class WorldPacket;
 class Creature;
 class Unit;
+class SpellCaster;
 struct GossipMenuItems;
 class OutdoorPvP;
 class Map;
@@ -225,7 +226,7 @@ class ZoneScript
         virtual void OnCreatureEvade(Creature* /*creature*/)       {}
         virtual void OnCreatureRespawn(Creature* /*crea*/)         {}
         virtual void OnCreatureDeath(Creature* /*creature*/)       {}
-        virtual void OnCreatureSpellHit(Unit* /*caster*/,Creature* /*receiver*/, SpellEntry const*)    {}
+        virtual void OnCreatureSpellHit(SpellCaster* /*caster*/,Creature* /*receiver*/, SpellEntry const*)    {}
         virtual void OnPlayerEnter(Player*);
         virtual void OnPlayerLeave(Player*);
         

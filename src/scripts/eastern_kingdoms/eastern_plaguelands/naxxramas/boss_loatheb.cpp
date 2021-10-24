@@ -387,7 +387,7 @@ struct boss_loathebAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit*, SpellEntry const* pSpell) override 
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 15286) // vamperic embrace
         {

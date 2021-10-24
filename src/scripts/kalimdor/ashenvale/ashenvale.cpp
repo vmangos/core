@@ -657,7 +657,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_DESTROY_KARANG_S_BANNER_2)
         {
