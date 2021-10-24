@@ -2753,6 +2753,12 @@ DELETE FROM `gossip_menu` WHERE  `entry` = 50235 AND `text_id` = 7224;
 -- Apple Bobs Should Not Despawn After Use
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` = 180523
 
+-- -----------------------------------------------------------------------------------------
+
+-- Add Missing OOC Text
+DELETE FROM `creature_ai_scripts` WHERE `id`=112104;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (112104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10435, 1909, 10434, 1908, 0, 0, 0, 0, 0, 'Frostmane Snowstrider - Say Text');
+
 
 -- End of migration.
 END IF;
