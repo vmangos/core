@@ -2759,6 +2759,15 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id
 DELETE FROM `creature_ai_scripts` WHERE `id`=112104;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (112104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10435, 1909, 10434, 1908, 0, 0, 0, 0, 0, 'Frostmane Snowstrider - Say Text');
 
+-----------------------------------------------------------------------------------------
+
+-- First Aid Breadcrumb Quests Are Not Required to Unlock Triage
+UPDATE `quest_template` SET `NextQuestInChain` = 0 WHERE `entry` IN (6623, 6625);
+UPDATE `quest_template` SET `RequiredCondition` = 703 WHERE `entry` = 6625;
+UPDATE `quest_template` SET `RequiredCondition` = 704 WHERE `entry` = 6623;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (703, 22, 6624, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (704, 22, 6622, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
