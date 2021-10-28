@@ -2779,6 +2779,11 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quest 8469 Requires 8464
 UPDATE `quest_template` SET `PrevQuestId` = 8464 WHERE `entry` = 8469;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quests 103, 152, 104 are available to both factions
+UPDATE `quest_template` SET `RequiredRaces` = 255 WHERE `entry` IN (103, 152, 104);
+
 
 -- End of migration.
 END IF;
