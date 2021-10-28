@@ -2792,6 +2792,11 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (2283, 2283, 2, 6.25244, 11),
 (2283, 2284, 2, 1.57, 11);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Update Start and End Time For Night Event
+UPDATE `game_event` SET `start_time` = 2020-01-02 21:00:00, `end_time` = 2030-12-31 08:00:00 WHERE `entry`=27;
+
 
 -- End of migration.
 END IF;
