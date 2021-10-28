@@ -500,6 +500,7 @@ UPDATE `creature` SET `position_z` = 0.982520 WHERE `guid` = 37376;
 UPDATE `creature` SET `position_z` = 2.425548 WHERE `guid` = 35251;
 DELETE FROM `creature` WHERE `guid` IN (34193);
 UPDATE `creature` SET `position_x` = -831.5, `position_y` = -2614.1, `position_z` = 91.9, `orientation` = 3 WHERE `guid` = 18658;
+UPDATE `creature` SET `position_x` = -1736.846, `position_y` = 2867.57, `position_z` = 70.0435 WHERE `guid` = 28907;
 
 -- -----------------------------------------------------------------------------------------
 
