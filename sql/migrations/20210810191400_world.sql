@@ -2784,6 +2784,14 @@ UPDATE `quest_template` SET `PrevQuestId` = 8464 WHERE `entry` = 8469;
 -- Quests 103, 152, 104 are available to both factions
 UPDATE `quest_template` SET `RequiredRaces` = 255 WHERE `entry` IN (103, 152, 104);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Convert Patrol to Creature Groups
+DELETE FROM `creature_movement` WHERE `id` = 2284;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(2283, 2283, 2, 6.25244, 11),
+(2283, 2284, 2, 4.71, 11);
+
 
 -- End of migration.
 END IF;
