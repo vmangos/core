@@ -92,7 +92,7 @@ MovementInfo const& MovementAnticheat::GetLastMovementInfo() const
     return me->m_movementInfo;
 }
 
-uint32 MovementAnticheat::Update(uint32 diff, std::stringstream& reason)
+uint32 MovementAnticheat::Update(Player* pPlayer, uint32 diff, std::stringstream& reason)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED))
         return CHEAT_ACTION_NONE;
@@ -104,10 +104,10 @@ uint32 MovementAnticheat::Update(uint32 diff, std::stringstream& reason)
         return CHEAT_ACTION_NONE;
     }
 
-    return Finalize(reason);
+    return Finalize(pPlayer, reason);
 }
 
-uint32 MovementAnticheat::Finalize(std::stringstream& reason)
+uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
 {
     if (m_maxOverspeedDistance < fabs(m_overspeedDistance))
         m_maxOverspeedDistance = fabs(m_overspeedDistance);
@@ -117,20 +117,19 @@ uint32 MovementAnticheat::Finalize(std::stringstream& reason)
     m_cheatOccuranceTick[CHEAT_TYPE_OVERSPEED_DIST] = uint32(fabs(m_overspeedDistance));
     m_cheatOccuranceTick[CHEAT_TYPE_TIME_DESYNC] = abs(m_clientDesync);
 
-    DEBUG_UNIT(me, DEBUG_CHEAT, "Desync %ims / %fyards", m_clientDesync, m_overspeedDistance);
     m_updateCheckTimer = CHEATS_UPDATE_INTERVAL;
 
     // Add up penalties for all cheats detected
     uint32 result = ComputeCheatAction(reason);
 
     // Log data
-    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && me->IsInWorld())
+    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && pPlayer && pPlayer->IsInWorld())
     {
         LogsDatabase.PExecute("INSERT INTO logs_movement "
             "(account, guid, posx, posy, posz, map, desyncMs, desyncDist, cheats) VALUES "
             "(%u,      %u,   %f,   %f,   %f,   %u,  %i,       %f,         '%s');",
-            m_session->GetAccountId(), me->GetGUIDLow(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(),
-            me->GetMapId(), m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
+            m_session->GetAccountId(), pPlayer->GetGUIDLow(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
+            pPlayer->GetMapId(), m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
     }
 
     if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())

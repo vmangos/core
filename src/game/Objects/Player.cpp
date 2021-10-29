@@ -1710,7 +1710,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
         // Anticheat sanction
         std::stringstream reason;
-        uint32 cheatAction = GetCheatData()->Update(p_time, reason);
+        uint32 cheatAction = GetCheatData()->Update(this, p_time, reason);
         if (cheatAction)
             GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
     }
@@ -1720,7 +1720,7 @@ void Player::OnDisconnected()
 {
     // Anticheat sanction
     std::stringstream reason;
-    uint32 cheatAction = GetCheatData()->Finalize(reason);
+    uint32 cheatAction = GetCheatData()->Finalize(this, reason);
     if (cheatAction)
         GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
 
