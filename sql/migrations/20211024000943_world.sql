@@ -37,6 +37,9 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 -- Add cheer emote to text 10170.
 UPDATE `broadcast_text` SET `emote_id1`=4 WHERE `entry`=10170;
 
+-- Remove unused script.
+DELETE FROM `generic_scripts` WHERE `id`=10003;
+
 
 -- End of migration.
 END IF;
