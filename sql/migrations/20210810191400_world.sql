@@ -2797,6 +2797,209 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 -- Update Start and End Time For Night Event
 UPDATE `game_event` SET `start_time` = 2020-01-02 21:00:00, `end_time` = 2030-12-31 08:00:00 WHERE `entry`=27;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Add Script to To Serve Kum'isha (credit brotalnia) NOTE: This script seems to cause a lot of errors does this matter?
+-- Generic script for Creature Flawless Draenethyst Sphere (Entry: 7364 Guid: 561)
+DELETE FROM `generic_scripts` WHERE `id`=50001;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50001, 2, 15, 10387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flawless Draenethyst Sphere - Cast Spell Lightning Surge');
+
+-- Generic script for Creature Flawless Draenethyst Fragment (Entry: 7365 Guid: 562)
+DELETE FROM `generic_scripts` WHERE `id`=50002;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50002, 0, 15, 10387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flawless Draenethyst Fragment - Cast Spell Lightning Surge');
+
+-- Generic script for Creature Flawless Draenethyst Fragment (Entry: 7365 Guid: 563)
+DELETE FROM `generic_scripts` WHERE `id`=50003;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50003, 0, 15, 10387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flawless Draenethyst Fragment - Cast Spell Lightning Surge');
+
+-- Generic script for Creature Flawless Draenethyst Fragment (Entry: 7365 Guid: 564)
+DELETE FROM `generic_scripts` WHERE `id`=50004;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50004, 0, 15, 10387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flawless Draenethyst Fragment - Cast Spell Lightning Surge');
+
+-- Generic script for Creature Flawless Draenethyst Fragment (Entry: 7365 Guid: 565)
+DELETE FROM `generic_scripts` WHERE `id`=50005;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50005, 0, 15, 10387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Flawless Draenethyst Fragment - Cast Spell Lightning Surge');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 566)
+DELETE FROM `generic_scripts` WHERE `id`=50006;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50006, 0, 3, 0, 3245, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11348.5, -2953.11, 12.658, 0, 0, 'Draenei Refugee - Move'),
+(50006, 1, 3, 0, 4680, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11338.8, -2967.93, 5.33431, 0, 0, 'Draenei Refugee - Move'),
+(50006, 4, 3, 0, 3727, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11355.9, -2970.98, 3.94515, 0, 0, 'Draenei Refugee - Move'),
+(50006, 6, 3, 0, 3119, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11361.9, -2974.77, 0.459062, 0, 0, 'Draenei Refugee - Move'),
+(50006, 9, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.96035, 0, 'Draenei Refugee - Set Orientation'),
+(50006, 16, 3, 0, 1789, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11365.2, -2978.34, 0.422498, 0, 0, 'Draenei Refugee - Move'),
+(50006, 19, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 567)
+DELETE FROM `generic_scripts` WHERE `id`=50007;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50007, 0, 3, 0, 2530, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11349.7, -2939.2, 16.1839, 0, 0, 'Draenei Refugee - Move'),
+(50007, 1, 3, 0, 2466, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11350.9, -2949.05, 13.9437, 0, 0, 'Draenei Refugee - Move'),
+(50007, 3, 3, 0, 5474, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11345.8, -2979.93, 2.34017, 0, 0, 'Draenei Refugee - Move'),
+(50007, 4, 3, 0, 2957, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11328.9, -2978.01, 6.29086, 0, 0, 'Draenei Refugee - Move'),
+(50007, 6, 3, 0, 1863, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11341.1, -2974.63, 4.26326, 0, 0, 'Draenei Refugee - Move'),
+(50007, 8, 3, 0, 2614, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11370.3, -2977, 1.17285, 0, 0, 'Draenei Refugee - Move'),
+(50007, 9, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11358.6, -2975.7, 0.505263, 0, 0, 'Draenei Refugee - Move'),
+(50007, 9, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.57665, 0, 'Draenei Refugee - Set Orientation'),
+(50007, 17, 3, 0, 4969, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11370.8, -2980.29, 1.62647, 0, 0, 'Draenei Refugee - Move'),
+(50007, 18, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11360.4, -2976.36, -0.204024, 0, 0, 'Draenei Refugee - Move'),
+(50007, 19, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 568)
+DELETE FROM `generic_scripts` WHERE `id`=50008;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50008, 0, 3, 0, 4171, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11362.3, -2943.75, 11.5691, 0, 0, 'Draenei Refugee - Move'),
+(50008, 1, 3, 0, 5965, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11356.4, -2958.47, 8.06084, 0, 0, 'Draenei Refugee - Move'),
+(50008, 3, 3, 0, 3367, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11346.8, -2975.13, 4.92269, 0, 0, 'Draenei Refugee - Move'),
+(50008, 4, 3, 0, 4925, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11325.5, -2981.46, 5.90365, 0, 0, 'Draenei Refugee - Move'),
+(50008, 6, 3, 0, 1562, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11343.4, -2969.88, 6.56185, 0, 0, 'Draenei Refugee - Move'),
+(50008, 8, 3, 0, 3428, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11373.3, -2981.32, 1.25147, 0, 0, 'Draenei Refugee - Move'),
+(50008, 9, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11357, -2975.08, 1.37361, 0, 0, 'Draenei Refugee - Move'),
+(50008, 9, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.56286, 0, 'Draenei Refugee - Set Orientation'),
+(50008, 17, 3, 0, 4893, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11366.8, -2978.97, 0.703126, 0, 0, 'Draenei Refugee - Move'),
+(50008, 18, 3, 0, 1974, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11364.7, -2978.15, 0.210527, 0, 0, 'Draenei Refugee - Move'),
+(50008, 19, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11360.9, -2976.63, -0.183267, 0, 0, 'Draenei Refugee - Move'),
+(50008, 19, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 569)
+DELETE FROM `generic_scripts` WHERE `id`=50009;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50009, 0, 3, 0, 3412, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11313.6, -2963.89, 13.2191, 0, 0, 'Draenei Refugee - Move'),
+(50009, 1, 3, 0, 2900, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11318.9, -2968.2, 10.3099, 0, 0, 'Draenei Refugee - Move'),
+(50009, 3, 3, 0, 3184, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11333.5, -2967.46, 6.05769, 0, 0, 'Draenei Refugee - Move'),
+(50009, 5, 3, 0, 3700, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11349.8, -2968.26, 5.39607, 0, 0, 'Draenei Refugee - Move'),
+(50009, 6, 3, 0, 2882, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11355.3, -2971.07, 4.12825, 0, 0, 'Draenei Refugee - Move'),
+(50009, 10, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.79078, 0, 'Draenei Refugee - Set Orientation'),
+(50009, 16, 3, 0, 4808, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11365.1, -2978.47, 0.500289, 0, 0, 'Draenei Refugee - Move'),
+(50009, 23, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 570)
+DELETE FROM `generic_scripts` WHERE `id`=50010;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50010, 0, 3, 0, 4644, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11331.2, -2971.91, 6.30893, 0, 0, 'Draenei Refugee - Move'),
+(50010, 1, 3, 0, 652, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11320.7, -2951.67, 19.3695, 0, 0, 'Draenei Refugee - Move'),
+(50010, 3, 3, 0, 1082, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11314.7, -2961.97, 14.3817, 0, 0, 'Draenei Refugee - Move'),
+(50010, 5, 3, 0, 2600, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11334.7, -2982.36, 3.20003, 0, 0, 'Draenei Refugee - Move'),
+(50010, 6, 3, 0, 2746, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11355.5, -2961.02, 7.11431, 0, 0, 'Draenei Refugee - Move'),
+(50010, 8, 3, 0, 2506, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11355.1, -2965.21, 4.44267, 0, 0, 'Draenei Refugee - Move'),
+(50010, 10, 3, 0, 1599, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11355.2, -2970.92, 4.20467, 0, 0, 'Draenei Refugee - Move'),
+(50010, 10, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.88553, 0, 'Draenei Refugee - Set Orientation'),
+(50010, 10, 3, 0, 1599, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11355.2, -2970.92, 4.20467, 0, 0, 'Draenei Refugee - Move'),
+(50010, 18, 3, 0, 2911, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11358.2, -2973.6, 1.57649, 0, 0, 'Draenei Refugee - Move'),
+(50010, 19, 3, 0, 3759, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11366.7, -2979.83, 0.724122, 0, 0, 'Draenei Refugee - Move'),
+(50010, 21, 3, 0, 1443, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11364.3, -2977.86, 0.103105, 0, 0, 'Draenei Refugee - Move'),
+(50010, 21, 3, 0, 2308, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11367.1, -2979.92, 0.868654, 0, 0, 'Draenei Refugee - Move'),
+(50010, 23, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11364.6, -2978.09, 0.267391, 0, 0, 'Draenei Refugee - Move'),
+(50010, 23, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 571)
+DELETE FROM `generic_scripts` WHERE `id`=50011;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50011, 0, 3, 0, 2654, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11299.1, -2979.68, 12.1386, 0, 0, 'Draenei Refugee - Move'),
+(50011, 1, 3, 0, 3070, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11312, -2977.58, 5.92587, 0, 0, 'Draenei Refugee - Move'),
+(50011, 3, 3, 0, 3715, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11329.7, -2979.38, 5.9122, 0, 0, 'Draenei Refugee - Move'),
+(50011, 5, 3, 0, 3792, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11342.5, -2978.24, 2.99373, 0, 0, 'Draenei Refugee - Move'),
+(50011, 6, 3, 0, 3580, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11353.4, -2978.62, 1.41072, 0, 0, 'Draenei Refugee - Move'),
+(50011, 11, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.17752, 0, 'Draenei Refugee - Set Orientation'),
+(50011, 16, 3, 0, 4332, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11364.9, -2979.03, 0.251054, 0, 0, 'Draenei Refugee - Move'),
+(50011, 21, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 572)
+DELETE FROM `generic_scripts` WHERE `id`=50012;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50012, 0, 3, 0, 1707, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11284.5, -2982.16, 20.1828, 0, 0, 'Draenei Refugee - Move'),
+(50012, 1, 3, 0, 6001, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11311.7, -2978.35, 5.68393, 0, 0, 'Draenei Refugee - Move'),
+(50012, 3, 3, 0, 3314, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11325.2, -2979.2, 6.81064, 0, 0, 'Draenei Refugee - Move'),
+(50012, 5, 3, 0, 2455, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11321, -2975.09, 7.59311, 0, 0, 'Draenei Refugee - Move'),
+(50012, 6, 3, 0, 1453, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11326, -2979, 6.69443, 0, 0, 'Draenei Refugee - Move'),
+(50012, 8, 3, 0, 3788, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11359.7, -2974.61, 0.782793, 0, 0, 'Draenei Refugee - Move'),
+(50012, 10, 3, 0, 1606, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11350.8, -2978.32, 2.39949, 0, 0, 'Draenei Refugee - Move'),
+(50012, 10, 3, 0, 3211, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11353.4, -2978.62, 1.41072, 0, 0, 'Draenei Refugee - Move'),
+(50012, 11, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.20598, 0, 'Draenei Refugee - Set Orientation'),
+(50012, 18, 3, 0, 5917, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11357.4, -2977.98, 0.0071578, 0, 0, 'Draenei Refugee - Move'),
+(50012, 19, 3, 0, 5206, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11360, -2977.72, -0.576094, 0, 0, 'Draenei Refugee - Move'),
+(50012, 21, 3, 0, 1903, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11359.8, -2978.5, -0.481123, 0, 0, 'Draenei Refugee - Move'),
+(50012, 21, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 573)
+DELETE FROM `generic_scripts` WHERE `id`=50013;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50013, 0, 3, 0, 2849, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11291, -2985.36, 15.1545, 0, 0, 'Draenei Refugee - Move'),
+(50013, 1, 3, 0, 3076, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11299.2, -2986.88, 9.09321, 0, 0, 'Draenei Refugee - Move'),
+(50013, 3, 3, 0, 3968, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11326, -2973.74, 7.4144, 0, 0, 'Draenei Refugee - Move'),
+(50013, 5, 3, 0, 2490, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11317, -2982.33, 5.50229, 0, 0, 'Draenei Refugee - Move'),
+(50013, 6, 3, 0, 3974, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11344.4, -2978.03, 2.86263, 0, 0, 'Draenei Refugee - Move'),
+(50013, 8, 3, 0, 3777, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11357.5, -2982.74, 0.692216, 0, 0, 'Draenei Refugee - Move'),
+(50013, 10, 3, 0, 4455, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11369.5, -2980.78, 1.62647, 0, 0, 'Draenei Refugee - Move'),
+(50013, 10, 3, 0, 2104, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11348.6, -2979.74, 2.15193, 0, 0, 'Draenei Refugee - Move'),
+(50013, 11, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.02438, 0, 'Draenei Refugee - Set Orientation'),
+(50013, 18, 3, 0, 4789, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11357.4, -2981.32, 0.238359, 0, 0, 'Draenei Refugee - Move'),
+(50013, 19, 3, 0, 4352, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11361, -2981.5, 0.482988, 0, 0, 'Draenei Refugee - Move'),
+(50013, 21, 3, 0, 1922, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11360.7, -2980.06, 0.0288863, 0, 0, 'Draenei Refugee - Move'),
+(50013, 21, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Draenei Refugee (Entry: 7401 Guid: 574)
+DELETE FROM `generic_scripts` WHERE `id`=50014;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50014, 0, 3, 0, 2808, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11296.8, -2980.83, 13.6188, 0, 0, 'Draenei Refugee - Move'),
+(50014, 1, 3, 0, 3053, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11302.3, -2981.52, 9.18246, 0, 0, 'Draenei Refugee - Move'),
+(50014, 3, 3, 0, 2753, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11314.9, -2980.12, 5.34286, 0, 0, 'Draenei Refugee - Move'),
+(50014, 5, 3, 0, 2401, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11322.8, -2979.72, 6.19955, 0, 0, 'Draenei Refugee - Move'),
+(50014, 6, 3, 0, 1225, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11326, -2979, 6.69443, 0, 0, 'Draenei Refugee - Move'),
+(50014, 8, 3, 0, 3723, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11359.7, -2973.27, 1.31282, 0, 0, 'Draenei Refugee - Move'),
+(50014, 10, 3, 0, 1285, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11350.8, -2978.32, 2.39949, 0, 0, 'Draenei Refugee - Move'),
+(50014, 10, 3, 0, 2204, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11350.6, -2978.15, 2.58602, 0, 0, 'Draenei Refugee - Move'),
+(50014, 11, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.22069, 0, 'Draenei Refugee - Set Orientation'),
+(50014, 18, 3, 0, 4928, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11359.9, -2977.36, -0.520674, 0, 0, 'Draenei Refugee - Move'),
+(50014, 19, 3, 0, 4737, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11364.1, -2977.47, 0.0489058, 0, 0, 'Draenei Refugee - Move'),
+(50014, 21, 3, 0, 2309, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -11362.4, -2978.61, -0.218916, 0, 0, 'Draenei Refugee - Move'),
+(50014, 21, 15, 10454, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draenei Refugee - Cast Spell Into the Rift');
+
+-- Generic script for Creature Faltering Draenethyst Sphere (Entry: 7409 Guid: 575)
+DELETE FROM `generic_scripts` WHERE `id`=50015;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(50015, 0, 15, 10451, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Faltering Draenethyst Sphere - Cast Spell Implosion');
+
+-- Main script
+DELETE FROM `quest_end_scripts` WHERE `id`=2521;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(2521, 104, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Remove Npc Flags'),
+(2521, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3441, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Say Text'),
+(2521, 112, 10, 7364, 15797, 0, 0, 0, 0, 0, 0, 0, 50001, -1, 1, -11366.8, -2979.6, -0.198364, 0.628319, 0, 'Summon Creature Flawless Draenethyst Sphere'),
+(2521, 114, 1, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Emote OneShotSpellCast'),
+(2521, 114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3442, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Say Text'),
+(2521, 115, 10, 7365, 1609, 0, 0, 0, 0, 0, 0, 0, 50002, -1, 1, -11364.8, -2978.08, 0.21003, 0.523599, 0, 'Summon Creature Flawless Draenethyst Fragment'),
+(2521, 117, 10, 7365, 3235, 0, 0, 0, 0, 0, 0, 0, 50003, -1, 1, -11365.2, -2981.1, 0.722663, 1.01229, 0, 'Summon Creature Flawless Draenethyst Fragment'),
+(2521, 121, 10, 7365, 2828, 0, 0, 0, 0, 0, 0, 0, 50004, -1, 1, -11367.9, -2980.55, 1.2531, 0.610865, 0, 'Summon Creature Flawless Draenethyst Fragment'),
+(2521, 124, 10, 7365, 2438, 0, 0, 0, 0, 0, 0, 0, 50005, -1, 1, -11367.9, -2977.98, 0.831891, 0.226893, 0, 'Summon Creature Flawless Draenethyst Fragment'),
+(2521, 129, 76, 137167, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11365.9, -2979.07, 0.413705, 2.02458, 0, 'Summon GameObject Nether Rift'),
+(2521, 132, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3475, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Say Text'),
+(2521, 134, 10, 7401, 20641, 0, 0, 0, 0, 0, 0, 0, 50014, -1, 1, -11283.3, -2978.3, 21.7695, 3.327, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 20641, 0, 0, 0, 0, 0, 0, 0, 50013, -1, 1, -11281.2, -2979.6, 21.7026, 3.67157, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 20641, 0, 0, 0, 0, 0, 0, 0, 50012, -1, 1, -11278.9, -2978.77, 22.0463, 3.69067, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 20641, 0, 0, 0, 0, 0, 0, 0, 50011, -1, 1, -11283, -2977.42, 21.7573, 3.28084, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 22250, 0, 0, 0, 0, 0, 0, 0, 50010, -1, 1, -11326.5, -2940.2, 26.2404, 4.56531, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 22250, 0, 0, 0, 0, 0, 0, 0, 50009, -1, 1, -11326.9, -2945.39, 22.8358, 5.49779, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 18610, 0, 0, 0, 0, 0, 0, 0, 50008, -1, 1, -11346.9, -2926.89, 20.1307, 3.9705, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 18610, 0, 0, 0, 0, 0, 0, 0, 50007, -1, 1, -11350, -2927.87, 19.9723, 4.73971, 0, 'Summon Creature Draenei Refugee'),
+(2521, 134, 10, 7401, 18610, 0, 0, 0, 0, 0, 0, 0, 50006, -1, 1, -11353.1, -2930.6, 19.0882, 4.99767, 0, 'Summon Creature Draenei Refugee'),
+(2521, 147, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3476, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Say Text'),
+(2521, 162, 10, 7409, 10890, 0, 0, 0, 0, 0, 0, 0, 50015, -1, 1, -11366.1, -2979.03, 1.05193, 0.541052, 0, 'Summon Creature Faltering Draenethyst Sphere'),
+(2521, 172, 28, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Set Stand State to UNIT_STAND_STATE_DEAD'),
+(2521, 174, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3477, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Say Text'),
+(2521, 177, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Set Stand State to UNIT_STAND_STATE_STAND'),
+(2521, 177, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kum\'isha the Collector - Add Npc Flags');
+
+-- Misc
+UPDATE `quest_template` SET `CompleteScript`= 2521 WHERE `entry` = 2521;
+UPDATE `creature_template` SET `faction` = 120, `unit_flags` = 768 WHERE `entry` IN (7401, 7365, 7364);
+
 
 -- End of migration.
 END IF;
