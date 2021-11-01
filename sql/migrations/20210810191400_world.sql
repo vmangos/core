@@ -2797,6 +2797,12 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 -- Update Start and End Time For Night Event
 UPDATE `game_event` SET `start_time` = 2020-01-02 21:00:00, `end_time` = 2030-12-31 08:00:00 WHERE `entry`=27;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Remove Loot for Rookery Whelp 10161 (credit cmangos)
+UPDATE `creature_template` SET `gold_min` = 0, `gold_max` = 0, `loot_id` = 0 WHERE `entry`=10161;
+DELETE FROM `creature_loot_template` WHERE `entry` = 10161;
+
 
 -- End of migration.
 END IF;
