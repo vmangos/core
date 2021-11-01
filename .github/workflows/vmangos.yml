@@ -6,7 +6,10 @@
 # Builds are set to use 2 threads per type
 name: vmangos CI build
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - 'sql/**'
 
 jobs:
   build:
