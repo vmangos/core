@@ -2859,6 +2859,36 @@ UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1882 WHERE `en
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1959 WHERE `entry` = 1959;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1959, 22, 1960, 0, 0, 0, 0);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Update Priest Quest Chains
+-- Horde
+-- Quest 5651 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5651 WHERE `entry` = 5651;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5650;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5651, 22, 5650, 0, 0, 0, 0);
+
+-- Quest 5649 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5649 WHERE `entry` = 5649;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5648;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5649, 22, 5648, 0, 0, 0, 0);
+
+-- Alliance
+-- Quest 5623 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5623 WHERE `entry` = 5623;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5624;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5623, 22, 5624, 0, 0, 0, 0);
+
+-- Quest 5626 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5626 WHERE `entry` = 5626;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5625;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5626, 22, 5625, 0, 0, 0, 0);
+
+-- Quest 5622 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5622 WHERE `entry` = 5622;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5621;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5622, 22, 5621, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
