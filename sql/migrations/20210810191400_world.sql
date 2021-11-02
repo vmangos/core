@@ -2816,10 +2816,8 @@ UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501
 
 -- Update Mage Quest Chains
 -- Alliance
--- Quest 1919 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1919 WHERE `entry` = 1919;
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1920;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1919, 22, 1920, 0, 0, 0, 0);
+-- Quest 1920 Should not Require Pre Quest
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry` = 1920;
 
 -- Quests 1860 and 1879 Should be Breadcrumb Quests and Be Exclusive
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1862 WHERE `entry` IN (1860, 1879);
@@ -2840,40 +2838,15 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1884 and 1882 Should be Exclusive
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1882 WHERE `entry` IN (1884, 1882);
 
--- Quest 1959 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1959 WHERE `entry` = 1959;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1959, 22, 1960, 0, 0, 0, 0);
+-- Quest 1960 Should not Require Pre Quest
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1960;
 
 -- -----------------------------------------------------------------------------------------
 
 -- Update Priest Quest Chains
 -- Horde
--- Quest 5651 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5651 WHERE `entry` = 5651;
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5650;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5651, 22, 5650, 0, 0, 0, 0);
-
--- Quest 5649 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5649 WHERE `entry` = 5649;
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5648;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5649, 22, 5648, 0, 0, 0, 0);
-
--- Alliance
--- Quest 5623 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5623 WHERE `entry` = 5623;
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5624;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5623, 22, 5624, 0, 0, 0, 0);
-
--- Quest 5626 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5626 WHERE `entry` = 5626;
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5625;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5626, 22, 5625, 0, 0, 0, 0);
-
--- Quest 5622 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5622 WHERE `entry` = 5622;
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5621;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5622, 22, 5621, 0, 0, 0, 0);
+-- Garment Quests Should not Require a Pre Quest
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (5650, 5648, 5624, 5625, 5621);
 
 -- Update Race Requirement
 UPDATE `quest_template` SET `RequiredRaces` = 16 WHERE `entry`= 5650;
