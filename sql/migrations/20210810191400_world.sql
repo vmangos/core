@@ -2684,10 +2684,8 @@ UPDATE `quest_template` SET `PrevQuestId` = 882 WHERE `entry` = 1130;
 
 -- -----------------------------------------------------------------------------------------
 
--- Quest 1130 is a breadcrumb quest and should be disabled if 1131 is taken or complete. Also quest 1131 should be available regardless of quest 1130 being taken
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 192 WHERE `entry`=1130;
+-- Quest 1131 should be available regardless of quest 1130 being taken
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1131;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (192, 22, 1131, 0, 0, 0, 0);
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2767,15 +2765,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- -----------------------------------------------------------------------------------------
 
--- First Aid Breadcrumb Quests Are Not Required to Unlock Triage
-UPDATE `quest_template` SET `NextQuestInChain` = 0 WHERE `entry` IN (6623, 6625);
-UPDATE `quest_template` SET `RequiredCondition` = 703 WHERE `entry` = 6625;
-UPDATE `quest_template` SET `RequiredCondition` = 704 WHERE `entry` = 6623;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (703, 22, 6624, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (704, 22, 6622, 0, 0, 0, 0);
-
--- -----------------------------------------------------------------------------------------
-
 -- Quest 8469 Requires 8464
 UPDATE `quest_template` SET `PrevQuestId` = 8464 WHERE `entry` = 8469;
 
@@ -2807,10 +2796,6 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 10161;
 
 -- Update Warlock Quest Chains
 -- Alliance
--- Quest 1717 Should be a Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1717 WHERE `entry` = 1717;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1717, 22, 1716, 0, 0, 0, 0);
-
 -- Quests 1685 and 1715 Should be Breadcrumb Quests
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1685 WHERE `entry` IN (1685, 1715);
 UPDATE `quest_template` SET `RequiredRaces` = 64 WHERE `entry` = 1715;
