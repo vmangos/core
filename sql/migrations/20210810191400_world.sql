@@ -2927,6 +2927,13 @@ UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1498 WHERE `en
 -- Quests 1516 and 1519 Should be Exclusive
 UPDATE `quest_template` SET `ExclusiveGroup` = 1516 WHERE `entry` IN (1516, 1519);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Update Rogue Quest Chains
+-- Quests 2380 and 2378 Should be Breadcrumb Quests
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 2378 WHERE `entry` IN (2380, 2378);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (2378, 22, 2379, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
