@@ -2827,6 +2827,38 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1473 and 1501 Should be Exclusive
 UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Update Mage Quest Chains
+-- Alliance
+-- Quest 1919 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1919 WHERE `entry` = 1919;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1919, 22, 1920, 0, 0, 0, 0);
+
+-- Quests 1860 and 1879 Should be Breadcrumb Quests and Be Exclusive
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1862 WHERE `entry` IN (1860, 1879);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1860, 22, 1861, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1861, 22, 1880, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1862, -2, 1860, 1861, 0, 0, 1);
+
+-- Quests 1861 and 1880 Should be Exclusive
+UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1861 WHERE `entry` IN (1861, 1880);
+
+
+-- Horde
+-- Quests 1883 and 1881 Should be Breadcrumb Quests and Be Exclusive
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1883 WHERE `entry` IN (1881, 1883);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1881, 22, 1884, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1882, 22, 1882, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1883, -2, 1881, 1882, 0, 0, 1);
+
+-- Quests 1861 and 1880 Should be Exclusive
+UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1882 WHERE `entry` IN (1884, 1882);
+
+-- Quest 1959 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1959 WHERE `entry` = 1959;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1959, 22, 1960, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
