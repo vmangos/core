@@ -1138,6 +1138,7 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1646;
 UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 970 WHERE `entry` = 1645;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (970, 22, 1646, 0, 0, 0, 0);
 UPDATE `quest_template` SET `RequiredCondition` = 970 WHERE `entry` IN (2997, 2999, 3000);
+DELETE FROM `conditions` WHERE `condition_entry` IN (164501, 164502, 164503, 164504);
 
 -- Corrections to Tome of Divinity (Human) Quests
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1642;
