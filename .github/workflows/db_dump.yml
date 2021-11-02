@@ -10,7 +10,7 @@ env:
   WORLD_DB : "world_full_14_june_2021"
 jobs:
   build:
-    runs-on: ubuntu-latest # is Ubuntu environment
+    runs-on: ubuntu-18.04 # 18.04 has mysql5.7 and latest(20.04) has mysql8
 
     # ... some other config ...
 
@@ -48,9 +48,13 @@ jobs:
     - name: Apply Migration
       run: |
         cd ${{github.workspace}}/sql/migrations/ && chmod +x merge.sh && ./merge.sh
+        echo "apply world_db_updates"
         mysql -u root -proot mangos < ${{github.workspace}}/sql/migrations/world_db_updates.sql
+        echo "apply logon_db_updates"
         mysql -u root -proot realmd < ${{github.workspace}}/sql/migrations/logon_db_updates.sql
+        echo "apply logs_db_updates"
         mysql -u root -proot logs < ${{github.workspace}}/sql/migrations/logs_db_updates.sql
+        echo "apply characters_db_updates"
         mysql -u root -proot characters < ${{github.workspace}}/sql/migrations/characters_db_updates.sql
           
     - name: Export Dump
@@ -62,7 +66,14 @@ jobs:
         mysqldump -u root -proot realmd > ${{github.workspace}}/dbexport/db_dump/logon.sql
         mysqldump -u root -proot logs > ${{github.workspace}}/dbexport/db_dump/logs.sql
         mysqldump -u root -proot characters > ${{github.workspace}}/dbexport/db_dump/characters.sql
-          
+        
+        
+        # cd db_dump
+        # mkdir update_check_only_do_not_import
+        # cp ${{github.workspace}}/sql/migrations/world_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/world_db_updates.sql 
+        # cp ${{github.workspace}}/sql/migrations/logon_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logon_db_updates.sql
+        # cp ${{github.workspace}}/sql/migrations/logs_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logs_db_updates.sql
+        # cp ${{github.workspace}}/sql/migrations/characters_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/characters_db_updates.sql
     - name: Set sha short outputs
       id: vars
       run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
