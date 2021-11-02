@@ -48,15 +48,10 @@ jobs:
     - name: Apply Migration
       run: |
         cd ${{github.workspace}}/sql/migrations/ && chmod +x merge.sh && ./merge.sh
-        echo "apply world_db_updates"
-        mysql -u root -proot mangos < ${{github.workspace}}/sql/migrations/world_db_updates.sql
-        echo "apply logon_db_updates"
-        mysql -u root -proot realmd < ${{github.workspace}}/sql/migrations/logon_db_updates.sql
-        echo "apply logs_db_updates"
-        mysql -u root -proot logs < ${{github.workspace}}/sql/migrations/logs_db_updates.sql
-        echo "apply characters_db_updates"
-        mysql -u root -proot characters < ${{github.workspace}}/sql/migrations/characters_db_updates.sql
-          
+        [ -f "${{github.workspace}}/sql/migrations/world_db_updates.sql" ] && mysql -u root -proot mangos < ${{github.workspace}}/sql/migrations/world_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/characters_db_updates.sql" ] && mysql -u root -proot characters < ${{github.workspace}}/sql/migrations/characters_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/logon_db_updates.sql" ] && mysql -u root -proot realmd < ${{github.workspace}}/sql/migrations/logon_db_updates.sql
+        [ -f "${{github.workspace}}/sql/migrations/logs_db_updates.sql" ] && mysql -u root -proot logs < ${{github.workspace}}/sql/migrations/logs_db_updates.sql
     - name: Export Dump
       run: |
         mkdir dbexport
