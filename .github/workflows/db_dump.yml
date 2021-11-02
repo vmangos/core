@@ -2,8 +2,8 @@ name: vmangos Development DB Dump
 
 on:
   push:
-#    paths:
-#      - '**.sql'
+    paths:
+      - '**.sql'
 
 env:
   REPO_DIR : ${{github.workspace}}
