@@ -2819,7 +2819,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Horde
 -- Quests 1478 and 1506 Should be Breadcrumb Quests and Be Exclusive
 UPDATE `quest_template` SET `NextQuestId` = 0, `NextQuestInChain` = 0, `RequiredCondition` = 1480 WHERE `entry` = 1478;
-UPDATE `quest_template` SET `NextQuestId` = 0, `ExclusiveGroup` = 1478, `NextQuestInChain` = 0, `RequiredCondition`='1480' WHERE `entry` = 1506;
+UPDATE `quest_template` SET `NextQuestId` = 0, `ExclusiveGroup` = 1478, `NextQuestInChain` = 0, `RequiredCondition` = 1480 WHERE `entry` = 1506;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1478, 22, 1473, 0, 0, 0, 1);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1479, 22, 1501, 0, 0, 0, 1);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1480, -2, 1478, 1479, 0, 0, 1);
@@ -2894,6 +2894,30 @@ UPDATE `quest_template` SET `RequiredRaces` = 128 WHERE `entry`= 5648;
 UPDATE `quest_template` SET `RequiredRaces` = 1 WHERE `entry` = 5624;
 UPDATE `quest_template` SET `RequiredRaces` = 4 WHERE `entry` = 5625;
 UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` = 5621;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Update Warrior Quest Chains
+-- Alliance
+-- Quests 1638, 1684 and 1679 Should be Breadcrumb Quests
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1641 WHERE `entry` IN (1638, 1684, 1679);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1638, 22, 1639, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1639, 22, 1683, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1640, 22, 1678, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1641, -2, 1638, 1639, 1640, 0, 1);
+
+-- Quests 1639, 1683 and 1678 Should be Exclusive
+UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1639 WHERE `entry` IN (1639, 1683, 1678);
+
+-- Horde
+-- Quests 1505 and 1818 Should be Breadcrumb Quests
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1507 WHERE `entry` IN (1505, 1818);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1505, 22, 1498, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1506, 22, 1819, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1507, -2, 1505, 1506, 0, 0, 1);
+
+-- Quests 1498 and 1819 Should be Exclusive
+UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1498 WHERE `entry` IN (1498, 1819);
 
 
 -- End of migration.
