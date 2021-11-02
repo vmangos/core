@@ -2860,11 +2860,11 @@ UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` = 5621;
 -- Update Warrior Quest Chains
 -- Alliance
 -- Quests 1638, 1684 and 1679 Should be Breadcrumb Quests
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1641 WHERE `entry` IN (1638, 1684, 1679);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1638, 22, 1639, 0, 0, 0, 1);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1639, 22, 1683, 0, 0, 0, 1);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1640, 22, 1678, 0, 0, 0, 1);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1641, -2, 1638, 1639, 1640, 0, 1);
+UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1653 WHERE `entry` IN (1638, 1684, 1679);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1650, 22, 1639, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1651, 22, 1683, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1652, 22, 1678, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1653, -2, 1650, 1651, 1652, 0, 1);
 
 -- Quests 1639, 1683 and 1678 Should be Exclusive
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1639 WHERE `entry` IN (1639, 1683, 1678);
