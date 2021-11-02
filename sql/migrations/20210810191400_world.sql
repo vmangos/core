@@ -2796,10 +2796,8 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 10161;
 
 -- Update Warlock Quest Chains
 -- Alliance
--- Quests 1685 and 1715 Should be Breadcrumb Quests
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1685 WHERE `entry` IN (1685, 1715);
-UPDATE `quest_template` SET `RequiredRaces` = 64 WHERE `entry` = 1715;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1685, 22, 1688, 0, 0, 0, 0);
+-- Quest 1715 Should be a Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 1688 WHERE `entry` = 1715;
 
 -- Horde
 -- Quests 1478 and 1506 Should be Breadcrumb Quests and Be Exclusive
@@ -2884,13 +2882,6 @@ UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1498 WHERE `en
 -- Update Shaman Quest Chains
 -- Quests 1516 and 1519 Should be Exclusive
 UPDATE `quest_template` SET `ExclusiveGroup` = 1516 WHERE `entry` IN (1516, 1519);
-
--- -----------------------------------------------------------------------------------------
-
--- Update Rogue Quest Chains
--- Quests 2380 and 2378 Should be Breadcrumb Quests
-UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 2378 WHERE `entry` IN (2380, 2378);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (2378, 22, 2379, 0, 0, 0, 0);
 
 
 -- End of migration.
