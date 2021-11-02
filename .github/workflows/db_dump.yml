@@ -1,0 +1,98 @@
+name: vmangos Development DB Dump
+
+on:
+  push:
+#    paths:
+#      - '**.sql'
+
+env:
+  REPO_DIR : ${{github.workspace}}
+  WORLD_DB : "world_full_14_june_2021"
+jobs:
+  build:
+    runs-on: ubuntu-latest # is Ubuntu environment
+
+    # ... some other config ...
+
+    steps:
+
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+
+    - name: Start Ubuntu MySQL (SUDO)
+      run: sudo service mysql start
+    
+    - name: Checkout update sql
+      uses: actions/checkout@v2
+      
+    - name: Checkout base sql
+      run: |
+        cd ${{github.workspace}}
+        git clone https://github.com/brotalnia/database
+        pwd
+        7z e -y ${{github.workspace}}/database/${{env.WORLD_DB}}.7z
+        ls
+    - name: Create tables
+      run: |
+        mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS realmd DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+        mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS characters DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+        mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS mangos DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+        mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS logs DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+    - name: Import data
+      run: |
+        mysql -u root -proot realmd < ${{github.workspace}}/sql/logon.sql
+        mysql -u root -proot logs < ${{github.workspace}}/sql/logs.sql
+        mysql -u root -proot mangos < ${{github.workspace}}/${{env.WORLD_DB}}.sql
+        mysql -u root -proot characters < ${{github.workspace}}/sql/characters.sql
+
+    - name: Apply Migration
+      run: |
+        cd ${{github.workspace}}/sql/migrations/ && chmod +x merge.sh && ./merge.sh
+        mysql -u root -proot mangos < ${{github.workspace}}/sql/migrations/world_db_updates.sql
+        mysql -u root -proot realmd < ${{github.workspace}}/sql/migrations/logon_db_updates.sql
+        mysql -u root -proot logs < ${{github.workspace}}/sql/migrations/logs_db_updates.sql
+        mysql -u root -proot characters < ${{github.workspace}}/sql/migrations/characters_db_updates.sql
+          
+    - name: Export Dump
+      run: |
+        mkdir dbexport
+        cd ${{github.workspace}}/dbexport
+        mkdir db_dump
+        mysqldump -u root -proot mangos > ${{github.workspace}}/dbexport/db_dump/mangos.sql
+        mysqldump -u root -proot realmd > ${{github.workspace}}/dbexport/db_dump/logon.sql
+        mysqldump -u root -proot logs > ${{github.workspace}}/dbexport/db_dump/logs.sql
+        mysqldump -u root -proot characters > ${{github.workspace}}/dbexport/db_dump/characters.sql
+          
+    - name: Set sha short outputs
+      id: vars
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      
+    - name: Archive files
+      run: |
+        cd ${{github.workspace}}/dbexport
+        7z a -tzip db-${{steps.vars.outputs.sha_short}}.zip db_dump
+          
+    - name: Archive this artefact
+      uses: actions/upload-artifact@v2
+      with:
+          name: snapshot-db-dump
+          path: "${{github.workspace}}/dbexport/db-${{steps.vars.outputs.sha_short}}.zip"
+
+    - name: Download artifact snapshot-db-dump
+      uses: actions/download-artifact@v1
+      with:
+        name: snapshot-db-dump
+        path: all_snapshots
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: Upload snapshot
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "db_latest"
+        prerelease: true
+        title: "Development DB Dump(${{ steps.date.outputs.date }})"
+        files: all_snapshots
