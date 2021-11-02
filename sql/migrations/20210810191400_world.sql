@@ -2844,7 +2844,6 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1861 and 1880 Should be Exclusive
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1861 WHERE `entry` IN (1861, 1880);
 
-
 -- Horde
 -- Quests 1883 and 1881 Should be Breadcrumb Quests and Be Exclusive
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1883 WHERE `entry` IN (1881, 1883);
