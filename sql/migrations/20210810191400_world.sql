@@ -2833,6 +2833,7 @@ UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501
 -- Alliance
 -- Quest 1919 Should be a Breadcrumb Quest
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1919 WHERE `entry` = 1919;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1920;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1919, 22, 1920, 0, 0, 0, 0);
 
 -- Quests 1860 and 1879 Should be Breadcrumb Quests and Be Exclusive
@@ -2851,12 +2852,13 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1882, 22, 1882, 0, 0, 0, 1);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1883, -2, 1881, 1882, 0, 0, 1);
 
--- Quests 1861 and 1880 Should be Exclusive
+-- Quests 1884 and 1882 Should be Exclusive
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1882 WHERE `entry` IN (1884, 1882);
 
 -- Quest 1959 Should be a Breadcrumb Quest
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1959 WHERE `entry` = 1959;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1959, 22, 1960, 0, 0, 0, 0);
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1960;
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2918,6 +2920,12 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- Quests 1498 and 1819 Should be Exclusive
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1498 WHERE `entry` IN (1498, 1819);
+
+-- -----------------------------------------------------------------------------------------
+
+-- Update Shaman Quest Chains
+-- Quests 1516 and 1519 Should be Exclusive
+UPDATE `quest_template` SET `ExclusiveGroup` = 1516 WHERE `entry` IN (1516, 1519);
 
 
 -- End of migration.
