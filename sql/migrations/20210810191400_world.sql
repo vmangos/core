@@ -2889,6 +2889,13 @@ UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 5622 W
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 5621;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (5622, 22, 5621, 0, 0, 0, 0);
 
+-- Update Race Requirement
+UPDATE `quest_template` SET `RequiredRaces` = 16 WHERE `entry`= 5650;
+UPDATE `quest_template` SET `RequiredRaces` = 128 WHERE `entry`= 5648;
+UPDATE `quest_template` SET `RequiredRaces` = 1 WHERE `entry` = 5624;
+UPDATE `quest_template` SET `RequiredRaces` = 4 WHERE `entry` = 5625;
+UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` = 5621;
+
 
 -- End of migration.
 END IF;
