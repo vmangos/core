@@ -23,6 +23,9 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - Full progression: The ultimate goal of this project is to have complete progression starting from patch 1.2 through 1.12. This means every piece of data must be marked with the patch in which it was added or changed to it's current state.
 - Tools are great: Content creation should not require programming knowledge. We hope to eventually provide tools that allow for user-friendly editing of database scripts and content, with all data presented in human-readable form.
 
+### Downloads
+- Latest development binary(Windows)[![vmangos CI build](https://github.com/coolzoom/w1x-vmcore/actions/workflows/vmangos.yml/badge.svg)](https://github.com/coolzoom/w1x-vmcore/releases/tag/latest)
+- Latest development full database(no update needed)[![vmangos Development DB Dump](https://github.com/coolzoom/w1x-vmcore/actions/workflows/db_dump.yml/badge.svg)](https://github.com/coolzoom/w1x-vmcore/releases/tag/db_latest)
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
