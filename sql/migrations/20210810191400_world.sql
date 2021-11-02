@@ -2820,9 +2820,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1478 and 1506 Should be Breadcrumb Quests and Be Exclusive
 UPDATE `quest_template` SET `NextQuestId` = 0, `NextQuestInChain` = 0, `RequiredCondition` = 1480 WHERE `entry` = 1478;
 UPDATE `quest_template` SET `NextQuestId` = 0, `ExclusiveGroup` = 1478, `NextQuestInChain` = 0, `RequiredCondition`='1480' WHERE `entry` = 1506;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1478, 22, 1473, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1479, 22, 1501, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1480, -2, 1478, 1479, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1478, 22, 1473, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1479, 22, 1501, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1480, -2, 1478, 1479, 0, 0, 1);
 
 -- Quests 1473 and 1501 Should be Exclusive
 UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501);
