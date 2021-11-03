@@ -1269,7 +1269,8 @@ uint32 Unit::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
-    CalculateSpellDamage(&damageInfo, damage, spellInfo, EFFECT_INDEX_0);
+    bool isCrit = IsSpellCrit(damageInfo.target, spellInfo, GetSchoolMask(damageInfo.school), BASE_ATTACK);
+    CalculateSpellDamage(&damageInfo, damage, spellInfo, EFFECT_INDEX_0, BASE_ATTACK, nullptr, isCrit);
     damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
     DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
     SendSpellNonMeleeDamageLog(&damageInfo);
@@ -8228,7 +8229,7 @@ bool CharmInfo::IsReturning()
     return m_isReturning;
 }
 
-uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
+uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
 {
     uint32 procEx = PROC_EX_NONE;
     switch (missCondition)
@@ -8267,17 +8268,20 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
             procEx |= PROC_EX_REFLECT;
         // no break
         case SPELL_MISS_NONE:
-            // On block
-            if (damageInfo->blocked)
-                procEx |= PROC_EX_BLOCK;
-            // On absorb
-            if (damageInfo->absorb)
-                procEx |= PROC_EX_ABSORB;
-            // On crit
-            if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
-                procEx |= PROC_EX_CRITICAL_HIT;
-            else
-                procEx |= PROC_EX_NORMAL_HIT;
+            if (damageInfo)
+            {
+                // On block
+                if (damageInfo->blocked)
+                    procEx |= PROC_EX_BLOCK;
+                // On absorb
+                if (damageInfo->absorb)
+                    procEx |= PROC_EX_ABSORB;
+                // On crit
+                if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
+                    procEx |= PROC_EX_CRITICAL_HIT;
+                else
+                    procEx |= PROC_EX_NORMAL_HIT;
+            }
             break;
     }
     return procEx;

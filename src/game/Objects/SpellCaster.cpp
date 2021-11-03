@@ -899,7 +899,7 @@ float SpellCaster::CalculateSpellEffectValue(Unit const* target, SpellEntry cons
     return value;
 }
 
-void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType, Spell* spell)
+void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType, Spell* spell, bool crit)
 {
     SpellSchoolMask damageSchoolMask = GetSchoolMask(damageInfo->school);
     Unit* pVictim = damageInfo->target;
@@ -911,9 +911,6 @@ void SpellCaster::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float da
 
     if (!pVictim->IsAlive())
         return;
-
-    // Check spell crit chance
-    bool crit = IsSpellCrit(pVictim, spellInfo, damageSchoolMask, attackType, spell);
 
     // damage bonus (per damage class)
     switch (spellInfo->DmgClass)

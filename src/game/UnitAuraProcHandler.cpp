@@ -1244,6 +1244,12 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                     trigger_spell_id = 22588;
                     break;
                 }
+                case 28200:                                 // Talisman of Ascendance
+                {
+                    if (procFlags & (PROC_FLAG_SUCCESSFUL_AOE))
+                        return SPELL_AURA_PROC_FAILED;
+                    break;
+                }
             }
             break;
         case SPELLFAMILY_MAGE:

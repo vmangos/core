@@ -165,7 +165,7 @@ struct SpellPeriodicAuraLogInfo
     float  multiplier;
 };
 
-uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
+uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
 
 enum SpellAuraProcResult
 {

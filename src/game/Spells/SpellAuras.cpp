@@ -6241,7 +6241,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             SpellNonMeleeDamage damageInfo(pCaster, target, spellProto->Id, SpellSchools(spellProto->School));
             damageInfo.periodicLog = true;
 
-            pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex());
+            bool isCrit = pCaster->IsSpellCrit(damageInfo.target, spellProto, GetSchoolMask(damageInfo.school), BASE_ATTACK);
+            pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex(), BASE_ATTACK, nullptr, isCrit);
 
             damageInfo.target->CalculateAbsorbResistBlock(pCaster, &damageInfo, spellProto);
 
@@ -6252,7 +6253,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Set trigger flag
             uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
-            uint32 procEx       = createProcExtendMask(&damageInfo, SPELL_MISS_NONE);
+            uint32 procEx       = CreateProcExtendMask(&damageInfo, SPELL_MISS_NONE);
             if (damageInfo.damage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 
