@@ -1,4 +1,4 @@
-name: vmangos CI build
+name: Windows Development Release
 
 on:
   push:
