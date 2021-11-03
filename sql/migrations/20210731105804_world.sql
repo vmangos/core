@@ -30,16 +30,9 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (7137, 1, 0, 'I also seek such power.', 12043, 1, 1, 7136);
 
 -- Jessica Chambers Gossip
-INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(6064, 7180);
-INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`) VALUES
-(7173, 3, 0, 'Tell me about dungeons I could explore.', 9882, 1, 1, 6064),
-(6064, 1, 0, 'Stratholme', 9948, 1, 1, 50232),
-(6064, 2, 0, 'Scholomance', 9945, 1, 1, 50234),
-(6064, 3, 0, 'Dire Maul', 9942, 1, 1, 50230),
-(6064, 4, 0, 'Blackrock Spire', 9940, 1, 1, 50228),
-(6064, 5, 0, 'Blackrock Depths', 9937, 1, 1, 50224),
-(6064, 6, 0, 'Sunken Temple', 9934, 1, 1, 50226);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
+(7173, 5, 0, 'Tell me about dungeons I could explore.', 0, 1, 1);
+UPDATE `gossip_menu_option` SET `action_menu_id`=6064, `action_poi_id`=0, `option_id`=1, `npc_option_npcflag`=1 WHERE `menu_id`=7173 && `id`=5;
 
 -- Korfax Gossip
 UPDATE `gossip_menu_option` SET `action_menu_id` = 7108 WHERE `menu_id` = 7099 AND `id` = 0;
