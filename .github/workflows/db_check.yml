@@ -1,12 +1,15 @@
-# check runs only for push
-name: vmangos Development DB Dump
+# check runs for push and pull request
+name: vmangos Development DB Check
 
 on:
   push:
     paths:
       - '**.sql'
       - '.github/workflows/**.yml'
-
+  pull_request:
+    paths:
+      - '**.sql'
+      - '.github/workflows/**.yml'
 env:
   REPO_DIR : ${{github.workspace}}
   WORLD_DB : "world_full_14_june_2021"
@@ -85,37 +88,3 @@ jobs:
         mysql -u root -proot logs2 < ${{github.workspace}}/dbexport/db_dump/logs.sql
         mysql -u root -proot mangos2 < ${{github.workspace}}/dbexport/db_dump/mangos.sql
         mysql -u root -proot characters2 < ${{github.workspace}}/dbexport/db_dump/characters.sql
-
-    - name: Set sha short outputs
-      id: vars
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-      
-    - name: Archive files
-      run: |
-        cd ${{github.workspace}}/dbexport
-        7z a -tzip db-${{steps.vars.outputs.sha_short}}.zip db_dump
-          
-    - name: Archive this artefact
-      uses: actions/upload-artifact@v2
-      with:
-          name: snapshot-db-dump
-          path: "${{github.workspace}}/dbexport/db-${{steps.vars.outputs.sha_short}}.zip"
-
-    - name: Download artifact snapshot-db-dump
-      uses: actions/download-artifact@v1
-      with:
-        name: snapshot-db-dump
-        path: all_snapshots
-
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
-    - name: Upload snapshot
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "db_latest"
-        prerelease: true
-        title: "Development DB Dump(${{ steps.date.outputs.date }})"
-        files: all_snapshots
