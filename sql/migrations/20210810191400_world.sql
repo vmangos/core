@@ -2889,7 +2889,7 @@ UPDATE `quest_template` SET `ExclusiveGroup` = 1516 WHERE `entry` IN (1516, 1519
 -- Update Roque Quest Chains
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (2300, 2298, 2299, 2260, 2259);
 UPDATE `quest_template` SET `NextQuestInChain` = 2281 WHERE `entry` IN (2298, 2260);
-UPDATE `quest_template` SET `ExclusiveGroup` = 2260 WHERE `entry` IN (2259, 2299);
+UPDATE `quest_template` SET `ExclusiveGroup` = 2259 WHERE `entry` IN (2259, 2299);
 UPDATE `quest_template` SET `ExclusiveGroup`= 2260  WHERE `entry` IN (2260, 2298, 2300);
 
 
