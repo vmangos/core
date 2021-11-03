@@ -10,7 +10,10 @@ on:
   push:
     paths-ignore:
       - 'sql/**'
-
+  pull_request:
+    paths-ignore:
+      - 'sql/**'
+      
 jobs:
   build:
     runs-on: ${{ matrix.os }}
