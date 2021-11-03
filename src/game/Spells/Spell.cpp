@@ -3893,31 +3893,24 @@ void Spell::cast(bool skipCheck)
     SendCastResult(castResult);
     InitializeDamageMultipliers();
 
-    // These proc flags should trigger on cast, not on spell hitting target.
+    // Trigger cast end procs
     if (m_canTrigger && m_casterUnit)
     {
-        uint32 procAttacker = m_procAttacker & ON_CAST_PROC_FLAGS;
-
-        if (procAttacker)
+        uint32 procEx = PROC_EX_CAST_END;
+        Unit* pTarget = m_targets.getUnitTarget() ? m_targets.getUnitTarget() : m_casterUnit;
+        for (const auto& target : m_UniqueTargetInfo)
         {
-            m_procAttacker &= ~(procAttacker);
-
-            uint32 procEx = PROC_EX_NONE;
-            Unit* pTarget = m_targets.getUnitTarget() ? m_targets.getUnitTarget() : m_casterUnit;
-            for (const auto& target : m_UniqueTargetInfo)
+            if (target.targetGUID == pTarget->GetObjectGuid())
             {
-                if (target.targetGUID == pTarget->GetObjectGuid())
-                {
-                    if (target.missCondition == SPELL_MISS_NONE)
-                        procEx = target.isCrit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT;
-                    else
-                        procEx = CreateProcExtendMask(nullptr, target.missCondition);
-                    break;
-                }
+                if (target.missCondition == SPELL_MISS_NONE)
+                    procEx |= target.isCrit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT;
+                else
+                    procEx |= CreateProcExtendMask(nullptr, target.missCondition);
+                break;
             }
-
-            m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(pTarget, procAttacker, PROC_FLAG_NONE, procEx, 1, m_attackType, m_spellInfo, this));
         }
+
+        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(pTarget, m_procAttacker, PROC_FLAG_NONE, procEx, 1, m_attackType, m_spellInfo, this));
     }
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
