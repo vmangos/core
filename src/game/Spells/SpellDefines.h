@@ -977,16 +977,6 @@ enum ProcFlags
     PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT       = 0x20000000    // 29 Taken spell periodic (procs only on initial cast)
 };
 
-#define ON_CAST_PROC_FLAGS (PROC_FLAG_DEAL_HELPFUL_ABILITY | \
-                            PROC_FLAG_DEAL_HARMFUL_ABILITY | \
-                            PROC_FLAG_DEAL_HELPFUL_SPELL | \
-                            PROC_FLAG_DEAL_HARMFUL_SPELL | \
-                            PROC_FLAG_SUCCESSFUL_AOE | \
-                            PROC_FLAG_SUCCESSFUL_SPELL_CAST | \
-                            PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | \
-                            PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST | \
-                            PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT)
-
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_DEAL_MELEE_SWING        | \
                                   PROC_FLAG_TAKE_MELEE_SWING        | \
                                   PROC_FLAG_DEAL_MELEE_ABILITY      | \
@@ -1022,9 +1012,9 @@ enum ProcFlagsEx
     PROC_EX_RESERVED2           = 0x0004000,
     PROC_EX_RESERVED3           = 0x0008000,
     PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                // If set trigger always ( no matter another flags) used for drop charges
-    PROC_EX_EX_ONE_TIME_TRIGGER = 0x0020000,                // If set trigger always but only one time (not used)
+    PROC_EX_NO_PERIODIC         = 0x0020000,                // Will never proc if periodic proc flag present
     PROC_EX_PERIODIC_POSITIVE   = 0x0040000,                // For periodic heal
-    PROC_EX_NO_PERIODIC         = 0x0080000,                // Will never proc if periodic proc flag present
+    PROC_EX_CAST_END            = 0x0080000,                // Procs on end of cast only
 };
 
 // original names, do not edit

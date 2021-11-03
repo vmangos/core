@@ -401,6 +401,28 @@ namespace Spells
         return false;
     }
 
+    // Spell deals damage directly and could kill target instantly.
+    inline bool IsEffectThatCanCrit(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            // damage
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+            // heal
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                return true;
+        }
+
+        return false;
+    }
+
     // Spell deals damage directly and can benefit from bonuses (spell power, attack power).
     inline bool IsDirectDamageWithBonusEffect(uint32 effectName)
     {
@@ -891,6 +913,16 @@ class SpellEntry
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         return true;
                 }
+            }
+            return false;
+        }
+
+        inline bool CanCrit() const
+        {
+            for (uint32 i : Effect)
+            {
+                if (Spells::IsEffectThatCanCrit(i))
+                    return true;
             }
             return false;
         }

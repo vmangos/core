@@ -441,11 +441,15 @@ void SpellMgr::LoadSpellProcItemEnchant()
 
 bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellEntry const* procSpell, uint32 procFlags, uint32 procExtra)
 {
-    // No extra req need
-    uint32 procEvent_procEx = PROC_EX_NONE;
+    // Store extra req
+    uint32 procEvent_procEx = spellProcEvent ? spellProcEvent->procEx : PROC_EX_NONE;
 
     // check prockFlags for condition
     if ((procFlags & EventProcFlag) == 0)
+        return false;
+
+    // Either procs only on cast end, or only on hit.
+    if ((procExtra & PROC_EX_CAST_END) != (procEvent_procEx & PROC_EX_CAST_END))
         return false;
 
     // Always trigger for this
@@ -454,9 +458,6 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellPr
 
     if (spellProcEvent)     // Exist event data
     {
-        // Store extra req
-        procEvent_procEx = spellProcEvent->procEx;
-
         // For melee triggers
         if (procSpell == nullptr)
         {
