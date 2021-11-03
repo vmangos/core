@@ -10,7 +10,10 @@ on:
   push:
     paths-ignore:
       - 'sql/**'
-
+  pull_request:
+    paths-ignore:
+      - 'sql/**'
+      
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -94,54 +97,3 @@ jobs:
         /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash
-    - name: Create Upload File Name
-      run: |
-          echo "ARCHIVE_FILENAME=${{ github.event.repository.name }}-$(git rev-parse --short HEAD).zip" >> $env:GITHUB_ENV
-    - name: Archive files
-      if: matrix.os == 'windows-latest'
-      run: |
-          #data is in Release folder
-          cd ${{github.workspace}}/bin
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb.dll ${{github.workspace}}/bin/Release/tbb.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_debug.dll ${{github.workspace}}/bin/Release/tbb_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview.dll ${{github.workspace}}/bin/Release/tbb_preview.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview_debug.dll ${{github.workspace}}/bin/Release/tbb_preview_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_debug.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy.dll
-          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy_debug.dll
-
-          copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
-          copy c:/mysql/lib/libmysql.dll ${{github.workspace}}/bin/Release/libmysql.dll
-          copy "c:/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" ${{github.workspace}}/bin/Release/libssl-1_1-x64.dll
-          copy "c:/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" ${{github.workspace}}/bin/Release/libcrypto-1_1-x64.dll
-
-          7z a -tzip ${{env.ARCHIVE_FILENAME}} Release
-    - name: Archive this artefact
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v2
-      with:
-          name: snapshot-devbuild
-          path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
-
-    - name: Download artifact snapshot-Release
-      if: matrix.os == 'windows-latest'
-      uses: actions/download-artifact@v1
-      with:
-        name: snapshot-devbuild
-        path: all_snapshots
-
-    - name: Get current date
-      if: matrix.os == 'windows-latest'
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-
-    - name: Upload snapshot
-      if: matrix.os == 'windows-latest'
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: true
-        title: "Development Build(${{ steps.date.outputs.date }})"
-        files: all_snapshots
