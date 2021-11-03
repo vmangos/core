@@ -4,7 +4,11 @@ on:
   push:
     paths:
       - '**.sql'
-
+      - '.github/workflows/**.yml'
+  pull_request:
+    paths:
+      - '**.sql'
+      - '.github/workflows/**.yml'
 env:
   REPO_DIR : ${{github.workspace}}
   WORLD_DB : "world_full_14_june_2021"
@@ -69,6 +73,14 @@ jobs:
         # cp ${{github.workspace}}/sql/migrations/logon_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logon_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/logs_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/logs_db_updates.sql
         # cp ${{github.workspace}}/sql/migrations/characters_db_updates.sql ${{github.workspace}}/dbexport/db_dump/update_check_only_do_not_import/characters_db_updates.sql
+
+    - name: Import data back in to verify the dump data
+      run: |
+        mysql -u root -proot realmd < ${{github.workspace}}/dbexport/db_dump/logon.sql
+        mysql -u root -proot logs < ${{github.workspace}}/dbexport/db_dump/logs.sql
+        mysql -u root -proot mangos < ${{github.workspace}}/dbexport/db_dump/mangos.sql
+        mysql -u root -proot characters < ${{github.workspace}}/dbexport/db_dump/characters.sql
+
     - name: Set sha short outputs
       id: vars
       run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
