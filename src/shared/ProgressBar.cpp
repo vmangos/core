@@ -50,6 +50,14 @@ BarGoLink::BarGoLink(uint64 row_count)
     init((int)row_count);
 }
 
+#ifdef __APPLE__
+BarGoLink::BarGoLink(size_t row_count)
+{
+    //MANGOS_ASSERT(row_count < (uint64)ACE_INT32_MAX);
+    init((int)row_count);
+}
+#endif
+
 BarGoLink::~BarGoLink()
 {
     if (!m_showOutput)

@@ -1244,17 +1244,6 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                     trigger_spell_id = 22588;
                     break;
                 }
-                // Nostalrius
-                case 28200:
-                {
-                    if (procFlags & (PROC_FLAG_SUCCESSFUL_AOE))
-                    {
-                        if (procFlags != PROC_FLAG_DEAL_HELPFUL_ABILITY &&
-                                procFlags != PROC_FLAG_DEAL_HARMFUL_ABILITY)
-                            return SPELL_AURA_PROC_FAILED;
-                    }
-                    break;
-                }
             }
             break;
         case SPELLFAMILY_MAGE:
