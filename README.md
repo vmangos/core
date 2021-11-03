@@ -25,7 +25,7 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 
 ### Downloads
 - Latest development binary(Windows)[![vmangos CI build](https://github.com/vmangos/core/actions/workflows/dev-release.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/latest)
-- Latest development full database(no update needed)[![vmangos Development DB Dump](https://github.com/vmangos/core/actions/workflows/db_dump.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/db_latest)
+- Latest development full database(mysql5.6 full dump, no update needed)[![vmangos Development DB Dump](https://github.com/vmangos/core/actions/workflows/db_dump.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/db_latest)
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
