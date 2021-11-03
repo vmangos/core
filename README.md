@@ -24,8 +24,8 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - Tools are great: Content creation should not require programming knowledge. We hope to eventually provide tools that allow for user-friendly editing of database scripts and content, with all data presented in human-readable form.
 
 ### Downloads
-- Latest development binary(Windows)[![vmangos CI build](https://github.com/vmangos/core/actions/workflows/dev-release.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/latest)
-- Latest development full database(mysql5.6 full dump, no update needed)[![vmangos Development DB Dump](https://github.com/vmangos/core/actions/workflows/db_dump.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/db_latest)
+- [![vmangos CI build](https://github.com/vmangos/core/actions/workflows/dev-release.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/latest)  Latest development binary
+- [![vmangos Development DB Dump](https://github.com/vmangos/core/actions/workflows/db_dump.yml/badge.svg)](https://github.com/vmangos/core/releases/tag/db_latest)  mysql5.6 full dump, no update needed.
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
