@@ -97,6 +97,18 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=16115;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1611501, 16115, 0, 1, 0, 100, 1, 0, 0, 900000, 900000, 1611501, 0, 0, 'Commander Eligor Dawnbringer - OOC - Start Script');
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1611502, 16115, 0, 1, 1, 100, 1, 1000, 3000, 3000, 5000, 1611502, 0, 0, 'Commander Eligor Dawnbringer - OOC (Phase 1) - Start Script');
 
+-- Assign broadcast text id for some options that are missing it.
+UPDATE `gossip_menu_option` SET `option_broadcast_text`=3370 WHERE `option_broadcast_text`=0 && `option_text`='I want to browse your goods.';
+UPDATE `gossip_menu_option` SET `option_broadcast_text`=4432 WHERE `option_broadcast_text`=0 && `option_text`='Continue please.';
+UPDATE `gossip_menu_option` SET `option_broadcast_text`=4657 WHERE `option_broadcast_text`=0 && `option_text`='I\'m not a journeyman herbalist -- am I able to still assist you in your work?';
+UPDATE `gossip_menu_option` SET `option_broadcast_text`=9882 WHERE `option_broadcast_text`=0 && `option_text`='Tell me about dungeons I could explore.';
+UPDATE `gossip_menu_option` SET `option_broadcast_text`=11823 WHERE `option_broadcast_text`=0 && `option_text`='Does that heart mean you\'re looking for love?';
+UPDATE `gossip_menu_option` SET `option_broadcast_text`=11835 WHERE `option_broadcast_text`=0 && `option_text`='How are the gift standings?  Who\'s the most popular?';
+
+-- Fix Scholomance option in innkeeper meetingstone menu.
+UPDATE `gossip_menu` SET `entry`=6074 WHERE `text_id`=7224;
+UPDATE `gossip_menu_option` SET `action_menu_id`=6074 WHERE `menu_id`=50234 && `id`=1;
+
 
 -- End of migration.
 END IF;
