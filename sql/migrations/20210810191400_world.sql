@@ -2756,7 +2756,7 @@ DELETE FROM `gossip_menu` WHERE  `entry` = 50235 AND `text_id` = 7224;
 -- -----------------------------------------------------------------------------------------
 
 -- Apple Bobs Should Not Despawn After Use
-UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` = 180523
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` = 180523;
 
 -- -----------------------------------------------------------------------------------------
 
