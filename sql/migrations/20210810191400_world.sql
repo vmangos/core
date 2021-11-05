@@ -2747,14 +2747,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 
 -- -----------------------------------------------------------------------------------------
 
--- Fix Dungeon Finder Gossip (Note: are the gossip menu entrys for this arbitrary? I have used 50237 which is not based on sniffs)
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
-(50237, 7224, 0, 0);
-UPDATE `gossip_menu_option` SET `action_menu_id` = 50237 WHERE `menu_id` = 50234 AND `id` = 1;
-DELETE FROM `gossip_menu` WHERE  `entry` = 50235 AND `text_id` = 7224;
-
--- -----------------------------------------------------------------------------------------
-
 -- Apple Bobs Should Not Despawn After Use
 UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id` = 180523;
 
