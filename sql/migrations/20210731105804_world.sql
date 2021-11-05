@@ -32,7 +32,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 -- Jessica Chambers Gossip
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
 (7173, 5, 0, 'Tell me about dungeons I could explore.', 0, 1, 1);
-UPDATE `gossip_menu_option` SET `action_menu_id`=6064, `action_poi_id`=0, `option_id`=1, `npc_option_npcflag`=1 WHERE `menu_id`=7173 && `id`=5;
+UPDATE `gossip_menu_option` SET `action_menu_id`=6025, `action_poi_id`=0, `option_id`=1, `npc_option_npcflag`=1 WHERE `menu_id`=7173 && `id`=5;
 
 -- Korfax Gossip
 UPDATE `gossip_menu_option` SET `action_menu_id` = 7108 WHERE `menu_id` = 7099 AND `id` = 0;
