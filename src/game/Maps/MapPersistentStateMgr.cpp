@@ -825,7 +825,7 @@ void MapPersistentStateManager::PackInstances()
         delete result;
     }
 
-    BarGoLink bar(InstanceSet.size() + 1);
+    BarGoLink bar((int)InstanceSet.size() + 1);
     bar.step();
 
     uint32 InstanceNumber = RESERVED_INSTANCES_LAST;

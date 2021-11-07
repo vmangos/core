@@ -6831,7 +6831,7 @@ void ObjectMgr::PackGroupIds()
         while (result->NextRow());
     }
 
-    BarGoLink bar(groupIds.size() + 1);
+    BarGoLink bar((int)groupIds.size() + 1);
     bar.step();
 
     uint32 groupId = 1;
