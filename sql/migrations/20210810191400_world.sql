@@ -2884,6 +2884,11 @@ UPDATE `quest_template` SET `NextQuestInChain` = 2281 WHERE `entry` IN (2298, 22
 UPDATE `quest_template` SET `ExclusiveGroup` = 2259 WHERE `entry` IN (2259, 2299);
 UPDATE `quest_template` SET `ExclusiveGroup`= 2260  WHERE `entry` IN (2260, 2298, 2300);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quests 5092 and 5096 Dont Require Breadcrumb Quests to Unlock
+UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` IN (5090, 5091, 5093, 5094, 5095);
+
 
 -- End of migration.
 END IF;
