@@ -2832,6 +2832,9 @@ UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1882 WHERE `en
 -- Quest 1960 Should not Require Pre Quest
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1960;
 
+-- Quest 1944 Should not Require Pre Quest
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1944;
+
 -- -----------------------------------------------------------------------------------------
 
 -- Update Priest Quest Chains
