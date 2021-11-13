@@ -2878,6 +2878,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1639, 1683 and 1678 Should be Exclusive
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1639 WHERE `entry` IN (1639, 1683, 1678);
 
+-- Quests Should Be Available to all Ally Races
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (1782, 1700, 1704, 1703);
+
 -- Horde
 -- Quests 1505 and 1818 Should be Breadcrumb Quests
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1507 WHERE `entry` IN (1505, 1818);
