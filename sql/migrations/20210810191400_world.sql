@@ -2838,13 +2838,6 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1944;
 -- -----------------------------------------------------------------------------------------
 
 -- Update Priest Quest Chains
--- Alliance
--- Breadcrumb Quests Should Be Disabled When Accepting or Completing 5634
-UPDATE `quest_template` SET `NextQuestInChain` = 5634 WHERE `entry` IN (5639, 5638, 5637, 5636, 5635, 5640);
-
--- 5634 Should Not Be In The Exclusive Group
-UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry` = 5634;
-
 -- Horde
 -- Garment Quests Should not Require a Pre Quest
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (5650, 5648, 5624, 5625, 5621);
