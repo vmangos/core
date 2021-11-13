@@ -2881,6 +2881,10 @@ UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1639 WHERE `en
 -- Quests Should Be Available to all Ally Races
 UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` IN (1782, 1700, 1704, 1703);
 
+-- Add Missing Quest Start NPC
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+VALUES (7315, 8417, 6, 10);
+
 -- Horde
 -- Quests 1505 and 1818 Should be Breadcrumb Quests
 UPDATE `quest_template` SET `NextQuestInChain` = 0, `RequiredCondition` = 1507 WHERE `entry` IN (1505, 1818);
