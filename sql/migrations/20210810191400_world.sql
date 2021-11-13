@@ -2838,7 +2838,6 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1944;
 -- -----------------------------------------------------------------------------------------
 
 -- Update Priest Quest Chains
--- Horde
 -- Garment Quests Should not Require a Pre Quest
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (5650, 5648, 5624, 5625, 5621);
 
@@ -2856,6 +2855,14 @@ VALUES (3044, 5656, 0, 10);
 -- Add Missing Quest Start NPC
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 VALUES (11407, 5655, 0, 10);
+
+-- Add Missing Quest Start NPC
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+VALUES (11407, 5661, 0, 10);
+
+-- Add Missing Quest Start NPC
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+VALUES (3600, 5674, 0, 10);
 
 -- -----------------------------------------------------------------------------------------
 
