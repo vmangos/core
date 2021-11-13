@@ -2945,6 +2945,13 @@ UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` IN (5066, 5090, 5091
 -- Quest Requires Leatherworking Skill of 70
 UPDATE `quest_template` SET `RequiredSkillValue` = 70 WHERE `entry` = 1582;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 691 does not Require Breadcrumb Quest 690
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE  `entry` = 691;
+UPDATE `quest_template` SET `RequiredCondition` = 790 WHERE `entry` = 690;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (790, 22, 691, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
