@@ -3037,7 +3037,7 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 -- -----------------------------------------------------------------------------------------
 
 -- Quest 466 Does Not Require Breadcrumb Quest 467
-UPDATE `mangos`.`quest_template` SET `PrevQuestId`='0' WHERE  `entry`=466 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 466;
 
 
 -- End of migration.
