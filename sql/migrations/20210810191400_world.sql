@@ -2967,6 +2967,51 @@ UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 10882;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1088201, 10882, 0, 11, 0, 100, 1, 0, 0, 0, 0, 1088201, 0, 0, 'Arikara - Cast Spell On Spawn');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1088201, 0, 15, 10389, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Arikara - Cast Spell');
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 1275 Does Not Require Breadcrumb Quest 3765
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1275;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 2922 Does Not Require Breadcrumb Quest 2923
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2922;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Add Missing Questgiver
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(415, 1097, 0, 10);
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 353 Does Not Require Breadcrumb Quest 1097
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 353;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 4764 Does Not Require Breadcrumb Quest 4766
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry` = 4764;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 1302 Does Not Require Breadcrumb Quest 1301 Also Quest 1301 Should Disable With Quests 1302 or 1282
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1302;
+UPDATE `quest_template` SET `RequiredCondition` = 1303 WHERE `entry` = 1301;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1301, 22, 1302, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1302, 22, 1282, 0, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1303, -2, 1301, 1302, 0, 0, 1);
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 1204 Does Not Require Breadcrumb Quest 1260
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1204;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 1395 Does Not Require Breadcrumb Quest 1477
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1395;
+
 
 -- End of migration.
 END IF;
