@@ -3049,6 +3049,22 @@ UPDATE `quest_template` SET `PrevQuestId` = 4267 WHERE `entry` = 4493;
 -- Quest 2518 Does Not Require Breadcrumb Quest 2519
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2518;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Add Missing Questgiver
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(4485, 1361, 0, 10);
+
+-- -----------------------------------------------------------------------------------------
+
+-- Update Start Script For Quest 2843
+DELETE FROM `quest_start_scripts` WHERE `id`=2843;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Modify Flags');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3904, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Talk');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 6, 7, 2843, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Complete Quest');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3905, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Talk');
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 9, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Modify Flags');
+
 
 -- End of migration.
 END IF;
