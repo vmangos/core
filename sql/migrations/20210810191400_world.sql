@@ -3039,6 +3039,16 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 -- Quest 466 Does Not Require Breadcrumb Quest 467
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 466;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 4493 Should Require 4267
+UPDATE `quest_template` SET `PrevQuestId` = 4267 WHERE `entry` = 4493;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 2518 Does Not Require Breadcrumb Quest 2519
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2518;
+
 
 -- End of migration.
 END IF;
