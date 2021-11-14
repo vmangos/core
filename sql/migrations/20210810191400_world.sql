@@ -2960,8 +2960,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- -----------------------------------------------------------------------------------------
 
--- Arikara should be Tameable and Cast Spell on Spawn (Credit Cmangos)
-UPDATE `creature_template` SET `unit_class` = 1, `ai_name` = 'EventAI' WHERE `entry` = 10882;
+-- Arikara Should Cast Spell on Spawn (Credit Cmangos)
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 10882;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1088201, 10882, 0, 11, 0, 100, 1, 0, 0, 0, 0, 1088201, 0, 0, 'Arikara - Cast Spell On Spawn');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1088201, 0, 15, 10389, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Arikara - Cast Spell');
 
