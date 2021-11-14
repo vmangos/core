@@ -2909,6 +2909,8 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` IN (2300, 2298, 2299
 UPDATE `quest_template` SET `NextQuestInChain` = 2281 WHERE `entry` IN (2298, 2260);
 UPDATE `quest_template` SET `ExclusiveGroup` = 2259 WHERE `entry` IN (2259, 2299);
 UPDATE `quest_template` SET `ExclusiveGroup`= 2260  WHERE `entry` IN (2260, 2298, 2300);
+UPDATE `quest_template` SET `PrevQuestId` = 2205 WHERE `entry`=2206;
+UPDATE `quest_template` SET `NextQuestId` = 2238 WHERE `entry`=2218;
 
 -- -----------------------------------------------------------------------------------------
 
