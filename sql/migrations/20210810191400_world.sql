@@ -3012,6 +3012,33 @@ UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1204;
 -- Quest 1395 Does Not Require Breadcrumb Quest 1477
 UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1395;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Add Missing Script
+UPDATE `quest_template` SET `CompleteScript` = 3448 WHERE `entry` = 3448;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3448, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4451, 0, 0, 0, 0, 0, 0, 0, 0, 'Tymor - Talk');
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 738 Does Not Require Breadcrumb Quest 707
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 738;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 2240 Does Not Require Breadcrumb Quest 2398
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2240;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Add Missing Questgiver
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(2092, 467, 0, 10);
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 466 Does Not Require Breadcrumb Quest 467
+UPDATE `mangos`.`quest_template` SET `PrevQuestId`='0' WHERE  `entry`=466 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
