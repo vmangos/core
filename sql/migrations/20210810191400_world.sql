@@ -2804,6 +2804,12 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1473 and 1501 Should be Exclusive
 UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501);
 
+-- Quest 1801 Requires Either 2996 or 3001
+UPDATE `quest_template` SET `RequiredCondition` = 1803 WHERE `entry` = 1801;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1801, 8, 2996, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1802, 8, 3001, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1803, -2, 1801, 1802, 0, 0, 0);
+
 -- -----------------------------------------------------------------------------------------
 
 -- Update Mage Quest Chains
@@ -3069,6 +3075,13 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- Quest 4494 Requires 7732
 UPDATE `quest_template` SET `PrevQuestId` = 7732 WHERE `entry` = 4494;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Update New Frontier Quest Chains
+UPDATE `quest_template` SET `NextQuestId` = 6761 WHERE  `entry` IN (1015, 1019, 1047);
+UPDATE `quest_template` SET `OfferRewardText`='Greetings, $C.$b$bI am pleased to see the likes of you taking an interest in the well being of nature; tales of your mighty deeds precede you, and you are welcomed here. Seeing you before me instills the feeling of confidence that the Cenarion Circle will get the proper aid it needs.$b$bOur connection with the Cenarion Circle in Moonglade transcends racial and political divides. Remember this as you work on behalf of the Circle, and you will do well.' WHERE  `entry`=1004;
+UPDATE `quest_template` SET `NextQuestId` = 1123 WHERE `entry` IN (1000, 1004, 1018);
 
 
 -- End of migration.
