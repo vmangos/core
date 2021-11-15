@@ -9,8 +9,6 @@ INSERT INTO `migrations` VALUES ('20211115170041');
 -- Add your query below.
 
 
--- -----------------------------------------------------------------------------------------
-
 -- Update Warlock Quest Chains
 -- Alliance
 -- Quest 1715 Should be a Breadcrumb Quest
@@ -188,8 +186,6 @@ DELETE FROM `conditions` WHERE `condition_entry` IN (164104, 164103, 164102, 164
 -- Corrections to Tome of Valor Quests
 UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 972 WHERE `entry` IN (1793, 1794);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (972, 22, 1649, 0, 0, 0, 0);
-
--- -----------------------------------------------------------------------------------------
 
 
 -- End of migration.
