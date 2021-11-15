@@ -3083,6 +3083,21 @@ UPDATE `quest_template` SET `NextQuestId` = 6761 WHERE  `entry` IN (1015, 1019, 
 UPDATE `quest_template` SET `OfferRewardText`='Greetings, $C.$b$bI am pleased to see the likes of you taking an interest in the well being of nature; tales of your mighty deeds precede you, and you are welcomed here. Seeing you before me instills the feeling of confidence that the Cenarion Circle will get the proper aid it needs.$b$bOur connection with the Cenarion Circle in Moonglade transcends racial and political divides. Remember this as you work on behalf of the Circle, and you will do well.' WHERE  `entry`=1004;
 UPDATE `quest_template` SET `NextQuestId` = 1123 WHERE `entry` IN (1000, 1004, 1018);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 4134 Does Not Require Breadcrumb Quest 4133
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 4134;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 4768 Does Not Require Breadcrumb Quest 4769
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 4768;
+
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 518 Does Not Require Breadcrumb Quest 495
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 518;
+
 
 -- End of migration.
 END IF;
