@@ -538,12 +538,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 
 -- -----------------------------------------------------------------------------------------
 
--- Correct Quest Requirements
-UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4962;
-UPDATE `quest_template` SET `PrevQuestId` = 1799 WHERE `entry` = 4963;
-
--- -----------------------------------------------------------------------------------------
-
 -- Remove Some Skinning Loot IDs
 UPDATE `creature_template` SET `skinning_loot_id` = 0 WHERE entry IN (10116, 2230, 6728, 12202, 14646, 14869);
 
@@ -628,11 +622,6 @@ DELETE FROM `reference_loot_template` WHERE `entry` = 1014;
 
 -- Increase Dropchance for Crystallized Note
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance` = 30 WHERE `entry` IN (9676, 9820, 9819) AND `item`=10840;
-
--- -----------------------------------------------------------------------------------------
-
--- Correct Requirements for Quest Grark Lorkrub
-UPDATE `quest_template` SET `PrevQuestId` = 4082 WHERE `entry` = 4122;
 
 -- -----------------------------------------------------------------------------------------
 
@@ -923,16 +912,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- -----------------------------------------------------------------------------------------
 
--- Correct Sunken Temple Quest Chain
-UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` = 3446;
-UPDATE `quest_template` SET `PrevQuestId` = 3444 WHERE `entry` = 3447;
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_max`)
-VALUES (7771, 3447, 10);
-DELETE FROM `gameobject_questrelation` WHERE  `id` = 148836 AND `quest` = 3447;
-UPDATE `quest_template` SET `StartScript` = 0 WHERE `entry` = 3447;
-
--- -----------------------------------------------------------------------------------------
-
 -- Events list for Twilight Disciple
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2338;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (233801, 2338, 0, 14, 0, 100, 1, 150, 40, 18000, 21000, 233801, 0, 0, 'Twilight Disciple - Cast Renew on Friendlies');
@@ -1126,31 +1105,6 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4321, 9, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.872, 0, 'J.D. Collie - Reset Orientation');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4321, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5289, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Say Text 3');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4321, 11, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'J.D. Collie - Add Gossip and Quest flags');
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 4785 Should be Repeatable
-UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 4785;
-
--- -----------------------------------------------------------------------------------------
-
--- Corrections to Tome of Divinity (Dwarf) Quest
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1646;
-UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 970 WHERE `entry` = 1645;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (970, 22, 1646, 0, 0, 0, 0);
-UPDATE `quest_template` SET `RequiredCondition` = 970 WHERE `entry` IN (2997, 2999, 3000);
-DELETE FROM `conditions` WHERE `condition_entry` IN (164501, 164502, 164503, 164504);
-
--- Corrections to Tome of Divinity (Human) Quests
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1642;
-UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 971 WHERE `entry` = 1641;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (971, 22, 1642, 0, 0, 0, 0);
-UPDATE `quest_template` SET `RequiredCondition` = 971 WHERE `entry` IN (2998, 3681);
-DELETE FROM `conditions` WHERE `condition_entry` IN (164104, 164103, 164102, 164101);
-
--- Corrections to Tome of Valor Quests
-UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 972 WHERE `entry` IN (1793, 1794);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (972, 22, 1649, 0, 0, 0, 0);
 
 -- -----------------------------------------------------------------------------------------
 
@@ -1909,7 +1863,6 @@ UPDATE `creature_template` SET `faction` = 55, `unit_flags` = 512 WHERE `entry`=
 
 -- -----------------------------------------------------------------------------------------
 
-
 -- Update Lord Azrethoc
 UPDATE `creature_template` SET `display_scale1` = 1 WHERE `entry`=5760;
 DELETE FROM `creature_movement` WHERE `id` = 29062;
@@ -1957,7 +1910,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (5760, 40, -1852.29, 1684.86, 61.6812, 100, 0, 0, 0);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (57601, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Azrethoc - Run');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (57602, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Azrethoc - Walk');
-
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2199,12 +2151,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 -- -----------------------------------------------------------------------------------------
 
--- Add correct pre quest requirement to some paladin quest chains
-UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1442 AND `patch`=0;
-UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1655 AND `patch`=0;
-
--- -----------------------------------------------------------------------------------------
-
 -- Cyrus Therepentous
 -- Add Gossips
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 9;
@@ -2250,11 +2196,6 @@ UPDATE `quest_template` SET `PrevQuestId` = 0, `RequiredCondition` = 220 WHERE `
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (218, 8, 4022, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (219, 8, 4023, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (220, -2, 218, 219, 0, 0, 0);
-
--- -----------------------------------------------------------------------------------------
-
--- Add Correct Prequest to 5041
-UPDATE `quest_template` SET `PrevQuestId` = 871 WHERE `entry` = 5041;
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2584,7 +2525,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (3301, 35, -8217.92, -1155.33, 142.764, 100, 0, 0),
 (3301, 36, -8239.12, -1189.42, 142.66, 100, 0, 0);
 
-
 -- -----------------------------------------------------------------------------------------
 
 -- Update Hematos Waypoints
@@ -2662,11 +2602,6 @@ UPDATE `creature_movement_template` SET `script_id` = 11 WHERE `entry` = 8976 AN
 
 -- -----------------------------------------------------------------------------------------
 
--- Quest 9223 Should be Repeatable
-UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 9223;
-
--- -----------------------------------------------------------------------------------------
-
 -- Risen Aberration Should Not Be Immune to Physical and Holy
 UPDATE `creature_template` SET `auras`='', `ai_name`= '', `school_immune_mask` = 124 WHERE `entry`=10485;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (1048502, 1048503, 1048504);
@@ -2678,16 +2613,6 @@ DELETE FROM `creature_ai_events` WHERE `creature_id` = 10485;
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES 
 (24, 521, 187);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (187, 8, 770, 0, 0, 0, 0);
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 1130 Requires Quest 882
-UPDATE `quest_template` SET `PrevQuestId` = 882 WHERE `entry` = 1130;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 1131 should be available regardless of quest 1130 being taken
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1131;
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2756,16 +2681,6 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `id
 -- Add Missing OOC Text
 DELETE FROM `creature_ai_scripts` WHERE `id`=112104;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (112104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10435, 1909, 10434, 1908, 0, 0, 0, 0, 0, 'Frostmane Snowstrider - Say Text');
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 8469 Requires 8464
-UPDATE `quest_template` SET `PrevQuestId` = 8464 WHERE `entry` = 8469;
-
--- -----------------------------------------------------------------------------------------
-
--- Quests 103, 152, 104 are available to both factions
-UPDATE `quest_template` SET `RequiredRaces` = 255 WHERE `entry` IN (103, 152, 104);
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2920,7 +2835,8 @@ UPDATE `quest_template` SET `NextQuestId` = 2238 WHERE `entry`=2218;
 
 -- -----------------------------------------------------------------------------------------
 
--- Correct Paladin Epic Mount Quest Chain
+-- Update Paladin Quest Chains
+-- Epic Mount Quest Chain
 UPDATE `quest_template` SET `PrevQuestId`= 0, `RequiredCondition` = 7643 WHERE `entry` = 7641;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7641, 8, 7638, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7642, 8, 7670, 0, 0, 0, 0);
@@ -2943,22 +2859,27 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
 (928, 7670, 2, 10);
 
--- -----------------------------------------------------------------------------------------
+-- Add Correct Quest Requirement to Paladin Quest Chains
+UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1442 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId` = 1654 WHERE `entry`= 1655 AND `patch`=0;
 
--- Quests 5092 and 5096 Dont Require Breadcrumb Quests to Unlock
-UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` IN (5066, 5090, 5091, 5093, 5094, 5095);
+-- Corrections to Tome of Divinity (Dwarf) Quest
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1646;
+UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 970 WHERE `entry` = 1645;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (970, 22, 1646, 0, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 970 WHERE `entry` IN (2997, 2999, 3000);
+DELETE FROM `conditions` WHERE `condition_entry` IN (164501, 164502, 164503, 164504);
 
--- -----------------------------------------------------------------------------------------
+-- Corrections to Tome of Divinity (Human) Quests
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1642;
+UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 971 WHERE `entry` = 1641;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (971, 22, 1642, 0, 0, 0, 0);
+UPDATE `quest_template` SET `RequiredCondition` = 971 WHERE `entry` IN (2998, 3681);
+DELETE FROM `conditions` WHERE `condition_entry` IN (164104, 164103, 164102, 164101);
 
--- Quest Requires Leatherworking Skill of 70
-UPDATE `quest_template` SET `RequiredSkillValue` = 70 WHERE `entry` = 1582;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 691 does not Require Breadcrumb Quest 690
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE  `entry` = 691;
-UPDATE `quest_template` SET `RequiredCondition` = 790 WHERE `entry` = 690;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (790, 22, 691, 0, 0, 0, 0);
+-- Corrections to Tome of Valor Quests
+UPDATE `quest_template` SET `SpecialFlags` = 1, `RequiredCondition` = 972 WHERE `entry` IN (1793, 1794);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (972, 22, 1649, 0, 0, 0, 0);
 
 -- -----------------------------------------------------------------------------------------
 
@@ -2975,94 +2896,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- -----------------------------------------------------------------------------------------
 
--- Quest 1275 Does Not Require Breadcrumb Quest 3765
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1275;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 2922 Does Not Require Breadcrumb Quest 2923
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2922;
-
--- -----------------------------------------------------------------------------------------
-
--- Add Missing Questgiver
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
-(415, 1097, 0, 10);
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 353 Does Not Require Breadcrumb Quest 1097
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 353;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 4764 Does Not Require Breadcrumb Quest 4766
-UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry` = 4764;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 1302 Does Not Require Breadcrumb Quest 1301 Also Quest 1301 Should Disable With Quests 1302 or 1282
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1302;
-UPDATE `quest_template` SET `RequiredCondition` = 1303 WHERE `entry` = 1301;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1301, 22, 1302, 0, 0, 0, 1);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1302, 22, 1282, 0, 0, 0, 1);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1303, -2, 1301, 1302, 0, 0, 1);
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 1204 Does Not Require Breadcrumb Quest 1260
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1204;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 1395 Does Not Require Breadcrumb Quest 1477
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1395;
-
--- -----------------------------------------------------------------------------------------
-
--- Add Missing Script
-UPDATE `quest_template` SET `CompleteScript` = 3448 WHERE `entry` = 3448;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3448, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4451, 0, 0, 0, 0, 0, 0, 0, 0, 'Tymor - Talk');
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 738 Does Not Require Breadcrumb Quest 707
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 738;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 2240 Does Not Require Breadcrumb Quest 2398
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2240;
-
--- -----------------------------------------------------------------------------------------
-
--- Add Missing Questgiver
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
-(2092, 467, 0, 10);
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 466 Does Not Require Breadcrumb Quest 467
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 466;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 4493 Should Require 4267
-UPDATE `quest_template` SET `PrevQuestId` = 4267 WHERE `entry` = 4493;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 2518 Does Not Require Breadcrumb Quest 2519
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 2518;
-
--- -----------------------------------------------------------------------------------------
-
--- Add Missing Questgiver
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
-(4485, 1361, 0, 10);
-
--- -----------------------------------------------------------------------------------------
-
 -- Update Start Script For Quest 2843
 DELETE FROM `quest_start_scripts` WHERE `id`=2843;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Modify Flags');
@@ -3070,33 +2903,6 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 6, 7, 2843, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Complete Quest');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3905, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Talk');
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2843, 9, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Scooty - Modify Flags');
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 4494 Requires 7732
-UPDATE `quest_template` SET `PrevQuestId` = 7732 WHERE `entry` = 4494;
-
--- -----------------------------------------------------------------------------------------
-
--- Update New Frontier Quest Chains
-UPDATE `quest_template` SET `NextQuestId` = 6761 WHERE  `entry` IN (1015, 1019, 1047);
-UPDATE `quest_template` SET `OfferRewardText`='Greetings, $C.$b$bI am pleased to see the likes of you taking an interest in the well being of nature; tales of your mighty deeds precede you, and you are welcomed here. Seeing you before me instills the feeling of confidence that the Cenarion Circle will get the proper aid it needs.$b$bOur connection with the Cenarion Circle in Moonglade transcends racial and political divides. Remember this as you work on behalf of the Circle, and you will do well.' WHERE  `entry`=1004;
-UPDATE `quest_template` SET `NextQuestId` = 1123 WHERE `entry` IN (1000, 1004, 1018);
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 4134 Does Not Require Breadcrumb Quest 4133
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 4134;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 4768 Does Not Require Breadcrumb Quest 4769
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 4768;
-
--- -----------------------------------------------------------------------------------------
-
--- Quest 518 Does Not Require Breadcrumb Quest 495
-UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 518;
 
 
 -- End of migration.
