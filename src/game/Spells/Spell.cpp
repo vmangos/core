@@ -3893,7 +3893,7 @@ void Spell::cast(bool skipCheck)
     SendCastResult(castResult);
     InitializeDamageMultipliers();
 
-    // Trigger cast end procs
+    // Trigger procs on cast end for caster.
     if (m_canTrigger && m_casterUnit)
     {
         uint32 procEx = PROC_EX_CAST_END;
@@ -3903,14 +3903,22 @@ void Spell::cast(bool skipCheck)
             if (target.targetGUID == pTarget->GetObjectGuid())
             {
                 if (target.missCondition == SPELL_MISS_NONE)
-                    procEx |= target.isCrit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT;
+                    procEx |= (target.isCrit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT);
                 else
                     procEx |= CreateProcExtendMask(nullptr, target.missCondition);
                 break;
             }
         }
 
+        // This will trigger only auras with PROC_EX_CAST_END.
         m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(pTarget, m_procAttacker, PROC_FLAG_NONE, procEx, 1, m_attackType, m_spellInfo, this));
+
+        // Trigger procs for spells with no unit targets at cast time.
+        if (m_UniqueTargetInfo.empty())
+        {
+            if (uint32 procAttacker = m_procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST))
+                m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(nullptr, procAttacker, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this));
+        }
     }
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
