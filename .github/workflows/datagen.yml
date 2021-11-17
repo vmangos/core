@@ -1,0 +1,194 @@
+name: Client Data Extractor
+
+on:
+  push:
+    paths:
+      - '.github/workflows/datagen.yml'
+      - 'contrib/extractor/*.*'
+      - 'contrib/vmap_assembler/*.*'
+      - 'contrib/vmap_extractor/*.*'
+      - 'contrib/mmap/*.*'
+      - 'src/game/Maps/*.*'
+      - 'src/game/vmap/*.*'
+      - 'dep/include/g3dlite/G3D/*.*'
+      - 'dep/src/g3dlite/*.*'
+      - 'dep/recastnavigation/Detour/Include/*.*'
+      - 'dep/recastnavigation/Detour/Source/*.*'
+      - 'dep/recastnavigation/Recast/Include/*.*'
+      - 'dep/recastnavigation/Recast/Source/*.*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    #git checkout
+    - uses: actions/checkout@v2
+    
+    - name: build extractors
+      #Sets versions for ACE/TBB
+      env:
+        ACE_VERSION: 6.5.11
+        ACE_VERSION2: 6_5_11
+        TBB_VERSION: 2020.3
+      
+      run: |
+        #directory variables
+        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
+        #wget
+        choco install -y wget
+        #ACE package download
+        wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
+        unzip ACE-$ACE_VERSION.zip
+        rm ACE-$ACE_VERSION.zip
+        #configuration of ACE header
+        echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
+        #TBB package download
+        wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        unzip tbb-$TBB_VERSION-win.zip
+        rm tbb-$TBB_VERSION-win.zip
+        #make
+        choco install -y make
+        #cmake
+        choco install -y cmake
+        #openssl
+        choco install -y openssl
+        #directory variables
+        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        cd $GITHUB_WORKSPACE/ACE_wrappers
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
+        cd $GITHUB_WORKSPACE
+        mkdir build
+        cd build
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
+      #git bash shell
+      shell: bash
+
+    - name: copy bin files
+      run: |
+          #data is in Release folder
+          cd ${{github.workspace}}/bin
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
+          copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
+ 
+    - name: make junk folder to remove later
+      run: |
+          cd ${{github.workspace}}
+          mkdir junk
+          move ${{github.workspace}}/ACE_wrappers ${{github.workspace}}/junk/ACE_wrappers
+          move ${{github.workspace}}/tbb ${{github.workspace}}/junk/tbb
+          move ${{github.workspace}}/build ${{github.workspace}}/junk/build
+          move ${{github.workspace}}/sql ${{github.workspace}}/junk/sql
+          move ${{github.workspace}}/src ${{github.workspace}}/junk/src
+          move ${{github.workspace}}/cmake ${{github.workspace}}/junk/cmake
+          move ${{github.workspace}}/dep ${{github.workspace}}/junk/dep
+          move ${{github.workspace}}/.github ${{github.workspace}}/junk/.github
+      
+      
+    - name: Remove junk dir
+      uses: JesseTG/rm@v1.0.2
+      with:
+        path: ${{github.workspace}}/junk
+
+  
+    #download small client, notice the extractor doesn't look dbc.mpq so copy it to patch2.mpq
+    - name: checkout
+      run: |
+          dir
+          cd ${{github.workspace}}
+          git clone https://github.com/coolzoom/smallvanilla
+
+    - name: Remove .git File
+      uses: JesseTG/rm@v1.0.2
+      with:
+        path: ${{github.workspace}}/smallvanilla/.git      
+
+ 
+    - name: copy tools
+      run: |   
+          cd ${{github.workspace}}
+          cd smallvanilla
+          cd 7z
+          7z x small_vanilla.7z.001
+          del small_vanilla.7z.*
+          dir
+          cd small_vanilla
+          copy Data/dbc.mpq Data/patch-2.mpq
+          cd ${{github.workspace}}
+          copy ${{github.workspace}}/bin/Release/ACE.dll ${{github.workspace}}/smallvanilla/7z/small_vanilla/ACE.dll
+          copy ${{github.workspace}}/bin/Release/tbbmalloc.dll ${{github.workspace}}/smallvanilla/7z/small_vanilla/tbbmalloc.dll
+          copy ${{github.workspace}}/bin/Release/mapextractor.exe ${{github.workspace}}/smallvanilla/7z/small_vanilla/mapextractor.exe
+          copy ${{github.workspace}}/bin/Release/vmapextractor.exe ${{github.workspace}}/smallvanilla/7z/small_vanilla/vmapextractor.exe
+          copy ${{github.workspace}}/bin/Release/vmap_assembler.exe ${{github.workspace}}/smallvanilla/7z/small_vanilla/vmap_assembler.exe
+          copy ${{github.workspace}}/bin/Release/MoveMapGen.exe ${{github.workspace}}/smallvanilla/7z/small_vanilla/MoveMapGen.exe
+          copy ${{github.workspace}}/contrib/mmap/MoveMapGen.sh ${{github.workspace}}/smallvanilla/7z/small_vanilla/MoveMapGen.sh
+          copy ${{github.workspace}}/contrib/mmap/offmesh.txt ${{github.workspace}}/smallvanilla/7z/small_vanilla/offmesh.txt
+      
+    - name: extract
+      run: |
+          cd ${{github.workspace}}/smallvanilla/7z/small_vanilla
+          ./mapextractor.exe
+          ./vmapextractor.exe
+          mkdir vmaps
+          ./vmap_assembler.exe Buildings vmaps
+          #./MoveMapGen.sh 8 MaNGOSExtractor.log MaNGOSExtractor_Detailed.log
+          dir
+          fsutil volume diskfree D:
+          #./MoveMapGen.sh 8
+    #build and install
+    - name: extract mmap
+      run: |
+        cd $GITHUB_WORKSPACE/smallvanilla/7z/small_vanilla
+        ./MoveMapGen.sh 8
+      #git bash shell
+      shell: bash          
+          
+    - name: move data file
+      run: |
+          cd ${{github.workspace}}
+          mkdir datapackage
+          cd datapackage
+          mkdir data
+          cd data
+          move ${{github.workspace}}/smallvanilla/7z/small_vanilla/dbc ${{github.workspace}}/datapackage/data/dbc
+          move ${{github.workspace}}/smallvanilla/7z/small_vanilla/maps ${{github.workspace}}/datapackage/data/maps
+          move ${{github.workspace}}/smallvanilla/7z/small_vanilla/vmaps ${{github.workspace}}/datapackage/data/vmaps
+          move ${{github.workspace}}/smallvanilla/7z/small_vanilla/mmaps ${{github.workspace}}/datapackage/data/mmaps
+          
+    - name: Remove client File
+      uses: JesseTG/rm@v1.0.2
+      with:
+        path: ${{github.workspace}}/smallvanilla
+        
+    - name: make data zip
+      run: |   
+          fsutil volume diskfree D:      
+          cd ${{github.workspace}}/datapackage
+          7z a -tzip data.zip data
+          
+    - name: Archive this artefact
+      uses: actions/upload-artifact@v2
+      with:
+          name: snapshot-datapackage
+          path: "${{github.workspace}}/datapackage/data.zip"
+
+    - name: Download artifact snapshot-datapackage
+      uses: actions/download-artifact@v1
+      with:
+        name: snapshot-datapackage
+        path: all_snapshots
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: Upload snapshot
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "data-latest"
+        prerelease: true
+        title: "Data Files (${{ steps.date.outputs.date }})"
+        files: all_snapshots
