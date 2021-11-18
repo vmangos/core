@@ -1599,14 +1599,12 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                 return;
         }
 
-        if (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 2)
+        if (m_spells.mage.pBlizzard &&
+           (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 2) &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pBlizzard))
         {
-            if (m_spells.mage.pBlizzard &&
-                CanTryToCastSpell(pVictim, m_spells.mage.pBlizzard))
-            {
-                if (DoCastSpell(pVictim, m_spells.mage.pBlizzard) == SPELL_CAST_OK)
-                    return;
-            }
+            if (DoCastSpell(pVictim, m_spells.mage.pBlizzard) == SPELL_CAST_OK)
+                return;
         }
 
         if (m_spells.mage.pPolymorph)
@@ -1935,7 +1933,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pMindFlay &&
-           !pVictim->CanReachWithMeleeAutoAttack(me) &&
+           (!GetAttackersInRangeCount(10.0f) || me->HasAuraType(SPELL_AURA_SCHOOL_ABSORB)) &&
             CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pMindFlay) == SPELL_CAST_OK)
@@ -1968,7 +1966,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
 
         if (me->HasSpell(PB_SPELL_SHOOT_WAND) &&
            !me->IsMoving() &&
-           (me->GetPowerPercent(POWER_MANA) < 5.0f) &&
+           (me->GetPowerPercent(POWER_MANA) < 10.0f) &&
            !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
             me->CastSpell(pVictim, PB_SPELL_SHOOT_WAND, false);
     }
@@ -2602,16 +2600,24 @@ void PartyBotAI::UpdateInCombatAI_Rogue()
         if (me->GetComboPoints() > 4)
         {
             std::vector<SpellEntry const*> vSpells;
-            if (m_spells.rogue.pSliceAndDice)
+
+            // Give priority to Slice and Dice over other finishing moves.
+            if (m_spells.rogue.pSliceAndDice &&
+               !me->HasAura(m_spells.rogue.pSliceAndDice->Id) &&
+                pVictim->GetHealthPercent() > 10.0f)
                 vSpells.push_back(m_spells.rogue.pSliceAndDice);
-            if (m_spells.rogue.pEviscerate)
-                vSpells.push_back(m_spells.rogue.pEviscerate);
-            if (m_spells.rogue.pKidneyShot)
-                vSpells.push_back(m_spells.rogue.pKidneyShot);
-            if (m_spells.rogue.pExposeArmor)
-                vSpells.push_back(m_spells.rogue.pExposeArmor);
-            if (m_spells.rogue.pRupture)
-                vSpells.push_back(m_spells.rogue.pRupture);
+            else
+            {
+                if (m_spells.rogue.pEviscerate)
+                    vSpells.push_back(m_spells.rogue.pEviscerate);
+                if (m_spells.rogue.pKidneyShot && !pVictim->IsImmuneToMechanic(MECHANIC_STUN))
+                    vSpells.push_back(m_spells.rogue.pKidneyShot);
+                if (m_spells.rogue.pExposeArmor)
+                    vSpells.push_back(m_spells.rogue.pExposeArmor);
+                if (m_spells.rogue.pRupture)
+                    vSpells.push_back(m_spells.rogue.pRupture);
+            }
+            
             if (!vSpells.empty())
             {
                 SpellEntry const* pComboSpell = SelectRandomContainerElement(vSpells);
@@ -3138,6 +3144,14 @@ void PartyBotAI::UpdateInCombatAI_Druid()
 
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
                 return;
+
+            if (m_spells.druid.pHurricane &&
+               (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 2) &&
+                CanTryToCastSpell(pVictim, m_spells.druid.pHurricane))
+            {
+                if (DoCastSpell(pVictim, m_spells.druid.pHurricane) == SPELL_CAST_OK)
+                    return;
+            }
 
             if (m_spells.druid.pMoonfire &&
                 CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))

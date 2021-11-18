@@ -1910,7 +1910,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pPsychicScream &&
-            pVictim->CanReachWithMeleeAutoAttack(me) &&
+            GetAttackersInRangeCount(10.0f) &&
             CanTryToCastSpell(me, m_spells.priest.pPsychicScream))
         {
             if (DoCastSpell(me, m_spells.priest.pPsychicScream) == SPELL_CAST_OK)
@@ -1926,7 +1926,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pMindFlay &&
-           !pVictim->CanReachWithMeleeAutoAttack(me) &&
+           (!GetAttackersInRangeCount(10.0f) || me->HasAuraType(SPELL_AURA_SCHOOL_ABSORB)) &&
             CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pMindFlay) == SPELL_CAST_OK)
