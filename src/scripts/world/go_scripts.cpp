@@ -17,15 +17,12 @@
 /* ScriptData
 SDName: GO_Scripts
 SD%Complete: 100
-SDComment: Quest support: 4285,4287,4288(crystal pylons), 4296, 5088, 6481, 10990, 10991, 10992. Field_Repair_Bot->Teaches spell 22704. Barov_journal->Teaches spell 26089
+SDComment: Quest support: 4296, 5088, 6481, 10990, 10991, 10992. Field_Repair_Bot->Teaches spell 22704. Barov_journal->Teaches spell 26089
 SDCategory: Game Objects
 EndScriptData */
 
 /* ContentData
 go_cat_figurine (the "trap" version of GO, two different exist)
-go_northern_crystal_pylon
-go_eastern_crystal_pylon
-go_western_crystal_pylon
 go_barov_journal
 go_field_repair_bot_74A
 go_orb_of_command
@@ -57,54 +54,6 @@ bool GOHello_go_cat_figurine(Player* pPlayer, GameObject* pGo)
     pPlayer->CastSpell(pPlayer, SPELL_SUMMON_GHOST_SABER, true);
     return false;
 }
-
-/*######
-## go_crystal_pylons (3x)
-######*/
-
-
-bool GOHello_go_eastern_crystal_pylon(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-    {
-        pPlayer->PrepareQuestMenu(pGo->GetGUID());
-        pPlayer->SendPreparedQuest(pGo->GetGUID());
-    }
-
-    if (pPlayer->GetQuestStatus(4287) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4287);
-
-    return true;
-}
-
-bool GOHello_go_western_crystal_pylon(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-    {
-        pPlayer->PrepareQuestMenu(pGo->GetGUID());
-        pPlayer->SendPreparedQuest(pGo->GetGUID());
-    }
-
-    if (pPlayer->GetQuestStatus(4288) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4288);
-
-    return true;
-}
-
-bool GOHello_go_northern_crystal_pylon(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-    {
-        pPlayer->PrepareQuestMenu(pGo->GetGUID());
-        pPlayer->SendPreparedQuest(pGo->GetGUID());
-    }
-
-    if (pPlayer->GetQuestStatus(4285) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4285);
-
-    return true;
-}
-
 
 /*######
 ## go_barov_journal
@@ -594,21 +543,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_cat_figurine";
     newscript->pGOHello =           &GOHello_go_cat_figurine;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_eastern_crystal_pylon";
-    newscript->pGOHello =           &GOHello_go_eastern_crystal_pylon;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_northern_crystal_pylon";
-    newscript->pGOHello =           &GOHello_go_northern_crystal_pylon;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_western_crystal_pylon";
-    newscript->pGOHello =           &GOHello_go_western_crystal_pylon;
     newscript->RegisterSelf();
 
     newscript = new Script;
