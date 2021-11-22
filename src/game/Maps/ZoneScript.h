@@ -84,6 +84,7 @@ class GameObject;
 class WorldPacket;
 class Creature;
 class Unit;
+class SpellCaster;
 struct GossipMenuItems;
 class OutdoorPvP;
 class Map;
@@ -137,17 +138,14 @@ class OPvPCapturePoint
 
         GameObject* m_capturePoint;
 
-        void AddGO(uint32 type, uint32 guid, uint32 entry = 0);
-        void AddCre(uint32 type, uint32 guid, uint32 entry = 0);
-
-        bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o = 0,
+        bool SetCapturePointData(uint32 entry, uint32 mapId, float x, float y, float z, float o = 0,
             float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
 
     protected:
 
-        bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
+        bool AddObject(uint32 type, uint32 entry, uint32 mapId, float x, float y, float z, float o,
             float rotation0, float rotation1, float rotation2, float rotation3);
-        bool AddCreature(uint32 type, uint32 entry, uint32 teamval, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
+        bool AddCreature(uint32 type, uint32 entry, uint32 teamval, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay = 0, bool asActiveObject = false);
 
         bool DelCreature(uint32 type);
         bool DelObject(uint32 type);
@@ -170,11 +168,13 @@ class OPvPCapturePoint
         TeamId m_team;
 
         // objective states
-        ObjectiveStates m_OldState;
-        ObjectiveStates m_State;
+        ObjectiveStates m_oldState;
+        ObjectiveStates m_state;
 
         // neutral value on capture bar
         uint32 m_neutralValuePct;
+        uint32 m_valuePct;
+        uint32 m_factDiff;
 
         // pointer to the OutdoorPvP this objective belongs to
         OutdoorPvP* m_PvP;
@@ -226,7 +226,7 @@ class ZoneScript
         virtual void OnCreatureEvade(Creature* /*creature*/)       {}
         virtual void OnCreatureRespawn(Creature* /*crea*/)         {}
         virtual void OnCreatureDeath(Creature* /*creature*/)       {}
-        virtual void OnCreatureSpellHit(Unit* /*caster*/,Creature* /*receiver*/, SpellEntry const*)    {}
+        virtual void OnCreatureSpellHit(SpellCaster* /*caster*/,Creature* /*receiver*/, SpellEntry const*)    {}
         virtual void OnPlayerEnter(Player*);
         virtual void OnPlayerLeave(Player*);
         
@@ -297,7 +297,6 @@ class OutdoorPvP : public ZoneScript
         //  stuff
         bool SetupZoneScript() override { return true; }
 
-        void OnGameObjectCreate(GameObject* go) override;
         void OnGameObjectRemove(GameObject* go) override;
         void OnCreatureCreate(Creature*) override {}
 

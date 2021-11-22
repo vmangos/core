@@ -360,7 +360,7 @@ struct NecropolisAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster*, SpellEntry const* spell) override
     {
         if (m_creature->HasAura(SPELL_COMMUNIQUE_TIMER_NECROPOLIS))
             return;
@@ -391,7 +391,7 @@ struct NecropolisHealthAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->CastSpell(m_creature, SPELL_ZAP_NECROPOLIS, true);
@@ -471,7 +471,7 @@ struct NecropolisProxyAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -517,7 +517,7 @@ struct NecropolisRelayAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -581,7 +581,7 @@ struct NecroticShard : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -969,7 +969,7 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pUnit, SpellEntry const* spell) override
+    void SpellHit(SpellCaster*, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {

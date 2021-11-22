@@ -27,6 +27,7 @@ npc_deathstalker_faerleia
 EndContentData */
 
 #include "scriptPCH.h"
+#include "Group.h"
 
 /*#####
 ## npc_deathstalker_erland
@@ -222,7 +223,10 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
         m_bEventStarted = false;
     }
 
-    void Reset() override { }
+    void Reset() override 
+    {
+        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+    }
 
     uint64 m_uiPlayerGUID;
     uint32 m_uiWaveTimer;
@@ -249,16 +253,32 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
         m_bEventStarted = false;
     }
 
-    void JustRespawned() override
+    void FailQuestForPlayerOrGroup()
     {
-        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
+        {
+            if (Group* pGroup = pPlayer->GetGroup())
+            {
+                for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
+                {
+                    if (Player* pMember = pRef->getSource())
+                    {
+                        if (pMember->GetQuestStatus(QUEST_PYREWOOD_AMBUSH) == QUEST_STATUS_INCOMPLETE)
+                            pMember->FailQuest(QUEST_PYREWOOD_AMBUSH);
+                    }
+                }
+            }
+            else
+            {
+                if (pPlayer->GetQuestStatus(QUEST_PYREWOOD_AMBUSH) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->FailQuest(QUEST_PYREWOOD_AMBUSH);
+            }
+        }
     }
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
-            pPlayer->SendQuestFailed(QUEST_PYREWOOD_AMBUSH);
-
+        FailQuestForPlayerOrGroup();
         FinishEvent();
     }
 

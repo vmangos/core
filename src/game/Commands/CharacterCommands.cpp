@@ -351,6 +351,93 @@ bool ChatHandler::HandleCheatIgnoreTriggersCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCheatImmuneToPlayersCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        if (value)
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+
+        PSendSysMessage(LANG_YOU_SET_IMMUNE_PC, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_IMMUNE_PC_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleCheatImmuneToCreaturesCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        if (value)
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
+        PSendSysMessage(LANG_YOU_SET_IMMUNE_NPC, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_IMMUNE_NPC_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleCheatUntargetableCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        if (value)
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+        PSendSysMessage(LANG_YOU_SET_UNTARGETABLE, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_UNTARGETABLE_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleCheatWaterwalkCommand(char* args)
 {
     bool value;
@@ -452,6 +539,12 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Areatrigger pass");
     if (target->HasCheatOption(PLAYER_CHEAT_IGNORE_TRIGGERS))
         SendSysMessage("- Ignore areatriggers");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+        SendSysMessage("- Immune to players");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+        SendSysMessage("- Immune to creatures");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+        SendSysMessage("- Untargetable");
     if (target->HasMovementFlag(MOVEFLAG_WATERWALKING) && !target->HasAuraType(SPELL_AURA_WATER_WALK))
         SendSysMessage("- Water walking");
     if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0))

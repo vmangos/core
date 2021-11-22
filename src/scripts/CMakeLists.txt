@@ -214,7 +214,6 @@ set (SCRIPTS_SRCS
     kalimdor/moonglade/boss_omen.cpp
     kalimdor/moonglade/moonglade.cpp
     kalimdor/mulgore/mulgore.cpp
-    kalimdor/orgrimmar/orgrimmar.cpp
     kalimdor/silithus/silithus.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_ayamiss.cpp
     kalimdor/silithus/ruins_of_ahnqiraj/boss_buru.cpp

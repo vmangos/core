@@ -99,7 +99,7 @@ struct boss_archaedasAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    void SpellHit(Unit* /*caster*/, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* /*caster*/, SpellEntry const* spell) override
     {
         // Being woken up from the altar, start the awaken sequence
         if (spell->Id == SPELL_ARCHAEDAS_AWAKEN && !bWakingUp)
@@ -313,7 +313,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* /*caster*/, SpellEntry const* spell) override
     {
         // time to wake up, start animation
         if (spell->Id == SPELL_AWAKEN_EARTHEN_DWARF

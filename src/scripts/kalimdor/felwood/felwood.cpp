@@ -177,7 +177,7 @@ struct npc_cursed_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_CURSED_JAR)
             m_creature->ForcedDespawn();
@@ -217,7 +217,7 @@ struct npc_tainted_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_TAINTED_JAR)
             m_creature->ForcedDespawn();

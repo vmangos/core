@@ -356,6 +356,13 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
 
             loot = &go->loot;
 
+            // Don't despawn temporarily spawned chests that contain group wide quest items.
+            if (loot->HasFFAQuestItems() && !go->isSpawnedByDefault() && go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+            {
+                go->SetLootState(GO_READY);
+                break;
+            }
+
             if (go->GetGoType() == GAMEOBJECT_TYPE_DOOR)
             {
                 // locked doors are opened with spelleffect openlock, prevent remove its as looted

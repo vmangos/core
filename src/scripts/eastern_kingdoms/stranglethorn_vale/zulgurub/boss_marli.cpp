@@ -46,9 +46,6 @@ enum
     SPELL_TRASH                 = 3391,
     SPELL_HATCH                 = 24083,                    //visual
     SPELL_AGGRANDIR             = 24109,
-
-    //The Spider Spells
-    SPELL_LEVELUP               = 24312                     //visual
 };
 
 struct boss_marliAI : public ScriptedAI
@@ -362,49 +359,9 @@ struct boss_marliAI : public ScriptedAI
     }
 };
 
-//Spawn of Marli
-struct mob_spawn_of_marliAI : public ScriptedAI
-{
-    mob_spawn_of_marliAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        m_pInstance = (ScriptedInstance*)m_creature->GetInstanceData();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 m_uiLevelUp_Timer;
-
-    void Reset() override
-    {
-        m_uiLevelUp_Timer = 3000;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_uiLevelUp_Timer < uiDiff)
-        {
-            DoCastSpellIfCan(m_creature, SPELL_LEVELUP);
-            m_creature->SetLevel(m_creature->GetLevel() + 1);
-            m_uiLevelUp_Timer = 3000;
-        }
-        else
-            m_uiLevelUp_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
 CreatureAI* GetAI_boss_marli(Creature* pCreature)
 {
     return new boss_marliAI(pCreature);
-}
-
-CreatureAI* GetAI_mob_spawn_of_marli(Creature* pCreature)
-{
-    return new mob_spawn_of_marliAI(pCreature);
 }
 
 void AddSC_boss_marli()
@@ -414,10 +371,5 @@ void AddSC_boss_marli()
     newscript = new Script;
     newscript->Name = "boss_marli";
     newscript->GetAI = &GetAI_boss_marli;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_spawn_of_marli";
-    newscript->GetAI = &GetAI_mob_spawn_of_marli;
     newscript->RegisterSelf();
 }

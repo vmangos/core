@@ -71,96 +71,6 @@ enum BattleBotSpells
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
 
-void BattleBotAI::AddPremadeGearAndSpells()
-{
-    uint8 const level = m_level ? m_level : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
-
-    std::vector<PlayerPremadeSpecTemplate const*> vSpecs;
-    for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
-    {
-        if (itr.second.requiredClass == me->GetClass() &&
-            itr.second.level == level)
-            vSpecs.push_back(&itr.second);
-    }
-    // Use lower level spec template if there are no templates for the current level.
-    if (vSpecs.empty())
-    {
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
-        {
-            if (itr.second.requiredClass == me->GetClass() &&
-                itr.second.level < level)
-                vSpecs.push_back(&itr.second);
-        }
-    }
-    if (!vSpecs.empty())
-    {
-        PlayerPremadeSpecTemplate const* pSpec = SelectRandomContainerElement(vSpecs);
-        sObjectMgr.ApplyPremadeSpecTemplateToPlayer(pSpec->entry, me);
-        m_role = pSpec->role;
-    }
-
-    if (m_role == ROLE_INVALID)
-        AutoAssignRole();
-
-    std::vector<PlayerPremadeGearTemplate const*> vGear;
-    for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
-    {
-        if (itr.second.requiredClass == me->GetClass() &&
-            itr.second.level == level)
-            vGear.push_back(&itr.second);
-    }
-    // Use lower level gear template if there are no templates for the current level.
-    if (vGear.empty())
-    {
-        for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
-        {
-            if (itr.second.requiredClass == me->GetClass() &&
-                itr.second.level < level)
-                vGear.push_back(&itr.second);
-        }
-    }
-    if (!vGear.empty())
-    {
-        uint32 gearId = 0;
-        // Try to find a role appropriate gear template.
-        for (const auto itr : vGear)
-        {
-            if (itr->role == m_role)
-            {
-                gearId = itr->entry;
-                break;
-            }
-        }
-        // There is no gear template for this role, pick randomly.
-        if (!gearId)
-            gearId = SelectRandomContainerElement(vGear)->entry;
-        sObjectMgr.ApplyPremadeGearTemplateToPlayer(gearId, me);
-    } 
-
-    switch (me->GetClass())
-    {
-        case CLASS_HUNTER:
-        {
-            if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-            {
-                if (pItem->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
-                    me->StoreNewItemInBestSlots(BB_ITEM_BULLET, 200);
-                else
-                    me->StoreNewItemInBestSlots(BB_ITEM_ARROW, 200);
-            }
-            break;
-        }
-    }
-
-    if (level != me->GetLevel())
-    {
-        sLog.outError("BattleBotAI::AddPremadeGearAndSpells - No level %u templates found!", level);
-        me->GiveLevel(level);
-        me->InitTalentForLevel();
-        me->SetUInt32Value(PLAYER_XP, 0);
-    }
-}
-
 uint32 BattleBotAI::GetMountSpellId() const
 {
     if (me->GetLevel() >= 60)
@@ -761,8 +671,20 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!m_initialized)
     {
+        if (m_level && m_level != me->GetLevel())
+        {
+            me->GiveLevel(m_level);
+            me->InitTalentForLevel();
+            me->SetUInt32Value(PLAYER_XP, 0);
+        }
+
+        LearnPremadeSpecForClass();
+
+        if (m_role == ROLE_INVALID)
+            AutoAssignRole();
+
+        AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_BATTLE_BOT_AUTO_EQUIP));
         ResetSpellData();
-        AddPremadeGearAndSpells();
         PopulateSpellData();
         AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
@@ -1988,7 +1910,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pPsychicScream &&
-            pVictim->CanReachWithMeleeAutoAttack(me) &&
+            GetAttackersInRangeCount(10.0f) &&
             CanTryToCastSpell(me, m_spells.priest.pPsychicScream))
         {
             if (DoCastSpell(me, m_spells.priest.pPsychicScream) == SPELL_CAST_OK)
@@ -2004,7 +1926,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pMindFlay &&
-           !pVictim->CanReachWithMeleeAutoAttack(me) &&
+           (!GetAttackersInRangeCount(10.0f) || me->HasAuraType(SPELL_AURA_SCHOOL_ABSORB)) &&
             CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pMindFlay) == SPELL_CAST_OK)

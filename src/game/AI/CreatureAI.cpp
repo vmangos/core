@@ -472,6 +472,7 @@ void CreatureAI::EnterEvadeMode()
         m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
+    m_creature->ClearComboPointHolders();
     m_creature->DeleteThreatList();
     m_creature->CombatStop(true);
     m_creature->SetLootRecipient(nullptr);

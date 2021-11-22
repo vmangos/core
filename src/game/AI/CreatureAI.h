@@ -33,6 +33,7 @@ class GameObject;
 class Unit;
 class Creature;
 class Player;
+class SpellCaster;
 class SpellEntry;
 class ChatHandler;
 struct Loot;
@@ -129,7 +130,7 @@ class CreatureAI
         virtual void SummonedCreatureDespawn(Creature* /*unit*/) {}
 
         // Called when hit by a spell
-        virtual void SpellHit(Unit*, SpellEntry const*) {}
+        virtual void SpellHit(SpellCaster*, SpellEntry const*) {}
 
         // Called when spell hits creature's target
         virtual void SpellHitTarget(Unit*, SpellEntry const*) {}

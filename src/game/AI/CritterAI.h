@@ -29,7 +29,7 @@ class CritterAI : public CreatureAI
         void AttackStart(Unit*) override {};
 
         void DamageTaken(Unit*, uint32&) override;
-        void SpellHit(Unit*, SpellEntry const*) override;
+        void SpellHit(SpellCaster*, SpellEntry const*) override;
         void UpdateAI(uint32 const) override;
     private:
         uint32 m_uiCombatTimer = 0;

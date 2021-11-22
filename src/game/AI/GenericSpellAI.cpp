@@ -507,7 +507,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
                 }
             }
         }
-        if (spellInfos->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE)
+        if (spellInfos->HasAuraInterruptFlag(AURA_INTERRUPT_DAMAGE_CANCELS))
             spellToModify->spellFlags |= SPELL_FLAG_STOP_ATTACK_TARGET;
         // Bouclier divin, bene de protection, bloc de glace et autres : CD different
         // SELECT field0, field6, field7, field8, field122 FROM spells WHERE field8 & 0x200000 AND field6 & 0x50000 AND (field7 & 0x8000 OR field7=0) limit 0,50;

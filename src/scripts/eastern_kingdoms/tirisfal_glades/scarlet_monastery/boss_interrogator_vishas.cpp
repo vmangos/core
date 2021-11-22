@@ -26,11 +26,11 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO               = -1189011,
-    SAY_HEALTH1             = -1189012,
-    SAY_HEALTH2             = -1189013,
-    SAY_KILL                = -1189014,
-    SAY_TRIGGER_VORREL      = -1189015,
+    SAY_AGGRO               = 6204, // Tell me... tell me everything!
+    SAY_HEALTH1             = 6206, // Naughty secrets!
+    SAY_HEALTH2             = 6207, // I'll rip the secrets from your flesh!
+    SAY_KILL                = 6205, // Purged by pain!
+    SAY_TRIGGER_VORREL      = 1376, // Finally. The bastard got what he deserved. 
 
     SPELL_SHADOWWORDPAIN    = 2767,
 };

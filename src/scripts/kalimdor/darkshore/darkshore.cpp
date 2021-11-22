@@ -99,7 +99,7 @@ struct npc_kerlonianAI : public FollowerAI
         }
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_AWAKEN)
             ClearSleeping();
@@ -810,7 +810,6 @@ bool QuestAccept_npc_volcor(Player* pPlayer, Creature* pCreature, Quest const* p
 
 enum RabidThistleBearData
 {
-    SPELL_RAGE         = 3150,
     SPELL_TRAPPED_BEAR = 9439,
     NPC_CAPTURED_RABID_THISTLE_BEAR = 11836,
 };
@@ -823,12 +822,10 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
         Captured_Timer = -1;
     }
 
-    int32 Rage_Timer;
     int32 Captured_Timer;
 
     void Reset() override
     {
-        Rage_Timer = 5000;
     }
 
     void UpdateFollowerAI(uint32 const diff) override
@@ -848,13 +845,9 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (Rage_Timer < SignedDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RAGE) == CAST_OK)
-                Rage_Timer = 60000;
-        }
-        else
-            Rage_Timer -= SignedDiff;
+        if (!m_CreatureSpells.empty())
+            UpdateSpellsList(diff);
+
         DoMeleeAttackIfReady();
     }
 

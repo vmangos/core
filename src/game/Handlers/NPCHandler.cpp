@@ -58,8 +58,8 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     SendTabardVendorActivate(guid);
 }
@@ -178,8 +178,8 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     uint32 maxcount = (cSpells ? cSpells->spellList.size() : 0) + (tSpells ? tSpells->spellList.size() : 0);
     uint32 trainer_type = cSpells && cSpells->trainerType ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
@@ -334,8 +334,8 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
     }
 
     // All is good. Spell can be learned if we reach this point.
-    _player->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    _player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     Spell* spell;
@@ -374,8 +374,8 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     if (!pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE))
         pCreature->PauseOutOfCombatMovement();
@@ -406,8 +406,8 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
         DEBUG_LOG("Gossip code: %s", code.c_str());
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     uint32 sender = _player->PlayerTalkClass->GossipOptionSender(gossipListId);
     uint32 action = _player->PlayerTalkClass->GossipOptionAction(gossipListId);
@@ -458,8 +458,8 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     SendSpiritResurrect();
 }
 
@@ -527,8 +527,8 @@ void WorldSession::HandleBinderActivateOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     SendBindPoint(unit);
 }
 
@@ -558,8 +558,8 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
     SendStablePet(npcGUID);
 }
 
@@ -671,8 +671,8 @@ void WorldSession::HandleStablePet(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     Pet* pet = _player->GetPet();
 
@@ -719,8 +719,8 @@ void WorldSession::HandleUnstablePet(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     CharacterPetCache const* petData = sCharacterDatabaseCache.GetCharacterPetCacheByOwnerAndId(_player->GetGUIDLow(), petNumber);
 
@@ -771,8 +771,8 @@ void WorldSession::HandleBuyStableSlot(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     if (GetPlayer()->m_stableSlots < MAX_PET_STABLES)
     {
@@ -809,8 +809,8 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     Pet* pet = _player->GetPet();
 
@@ -873,8 +873,8 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_INTERACTING_CANCELS);
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_INTERACTING_CANCELS);
 
     // reputation discount
     float discountMod = _player->GetReputationPriceDiscount(unit);

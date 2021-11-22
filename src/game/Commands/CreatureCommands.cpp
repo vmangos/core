@@ -1164,9 +1164,9 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
 
 bool ChatHandler::HandleComeToMeCommand(char *args)
 {
-    Creature* caster = GetSelectedCreature();
+    Creature* creature = GetSelectedCreature();
 
-    if (!caster)
+    if (!creature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
@@ -1175,7 +1175,7 @@ bool ChatHandler::HandleComeToMeCommand(char *args)
 
     Player* pl = m_session->GetPlayer();
 
-    caster->GetMotionMaster()->MovePoint(0, pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), true);
+    creature->GetMotionMaster()->MovePoint(0, pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), true);
     return true;
 }
 

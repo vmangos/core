@@ -162,7 +162,7 @@ struct mob_restless_soulAI : public ScriptedAI
         Tagged = false;
     }
 
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -237,7 +237,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         Tagged = false;
     }
 
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         if (!Tagged && spell->Id == SPELL_EGAN_BLASTER)
             Tagged = true;

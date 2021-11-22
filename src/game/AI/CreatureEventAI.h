@@ -311,7 +311,7 @@ class CreatureEventAI : public CreatureAI
         void JustSummoned(Creature* pUnit) override;
         void AttackStart(Unit* who) override;
         void MoveInLineOfSight(Unit* who) override;
-        void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override;
+        void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override;
         void MovementInform(uint32 type, uint32 id) override;
         void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(uint32 const diff) override;
@@ -323,8 +323,8 @@ class CreatureEventAI : public CreatureAI
 
         static int Permissible(Creature const*);
 
-        bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = nullptr);
-        void ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker);
+        bool ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker = nullptr);
+        void ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
         void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases
