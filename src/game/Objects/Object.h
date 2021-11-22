@@ -295,7 +295,7 @@ class Object
         void ExecuteDelayedActions();
 
         void BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const;
-        void BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* target, UpdateFieldFlags flags) const;
+        void BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* target, UpdateFieldFlags flags, bool includingEmpty = false) const;
         void BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const;
         void BuildOutOfRangeUpdateBlock(UpdateData& data) const;
         void BuildMovementUpdateBlock(UpdateData& data, uint8 flags = 0) const;
@@ -365,7 +365,7 @@ class Object
         void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
-        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag) const;
+        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag, bool includingEmpty = false) const;
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {

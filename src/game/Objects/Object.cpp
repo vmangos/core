@@ -380,11 +380,11 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) c
         BuildValuesUpdateBlockForPlayer(data, updateMask, target);
 }
 
-void Object::BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* target, UpdateFieldFlags flags) const
+void Object::BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* target, UpdateFieldFlags flags, bool includingEmpty) const
 {
     UpdateMask updateMask;
     updateMask.SetCount(GetValuesCount());
-    MarkUpdateFieldsWithFlagForUpdate(updateMask, (uint16)flags);
+    MarkUpdateFieldsWithFlagForUpdate(updateMask, (uint16)flags, includingEmpty);
     if (updateMask.HasData())
         BuildValuesUpdateBlockForPlayer(data, updateMask, target);
 }
@@ -1004,14 +1004,14 @@ void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uin
     }
 }
 
-void Object::MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag) const
+void Object::MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag, bool includingEmpty) const
 {
     uint16 const* flags = UpdateFields::GetUpdateFieldFlagsArray(GetTypeId());
     ASSERT(flags);
 
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
-        if ((m_uint32Values[index] != 0) && (flags[index] & flag))
+        if ((includingEmpty || (m_uint32Values[index] != 0)) && (flags[index] & flag))
             updateMask.SetBit(index);
     }
 }
