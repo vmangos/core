@@ -961,7 +961,7 @@ DELETE FROM `creature_loot_template` WHERE `entry`=2924 AND `item`=30011;
 -- -----------------------------------------------------------------------------------------
 
 -- Remove Incorrect Skinning Templates
-UPDATE `creature_template` SET `skinning_loot_id`='' WHERE `entry` IN (11788, 11787, 12218);
+UPDATE `creature_template` SET `skinning_loot_id`=0 WHERE `entry` IN (11788, 11787, 12218);
 
 -- -----------------------------------------------------------------------------------------
 
