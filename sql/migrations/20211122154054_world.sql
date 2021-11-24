@@ -24,7 +24,7 @@ UPDATE `pool_template` SET `description` = 'Hearthsinger Forresten (25468)' WHER
 UPDATE `pool_template` SET `description` = 'Drogoth the Roamer (42939)' WHERE  `entry`=42939;
 UPDATE `pool_template` SET `description` = 'Ripscale (43157)' WHERE  `entry`=43157;
 UPDATE `pool_template` SET `description` = 'Burgle Eye (43517)' WHERE  `entry`=43517;
-UPDATE `pool_template` SET `description` = 'The Abominable Greench (43517)' WHERE  `entry`=43525;
+UPDATE `pool_template` SET `description` = 'The Abominable Greench (13602)' WHERE  `entry`=43525;
 
 
 -- End of migration.
