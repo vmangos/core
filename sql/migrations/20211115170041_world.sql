@@ -34,6 +34,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Correct Race Requirement
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4737;
 
+-- Correct Orientation
+UPDATE `creature` SET `orientation` = 4.43314 WHERE `guid` = 41833;
+
 -- -----------------------------------------------------------------------------------------
 
 -- Update Mage Quest Chains
