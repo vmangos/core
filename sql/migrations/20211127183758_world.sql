@@ -22,7 +22,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALU
 (2913, 3587, 0, 0);
 
 -- Menara Voidrender
--- Should Become Default Gossip Once Quest 4786 Is Complete But Should Be Overrided By Gossip 3594 Only When Quest 1799 Is Accepted/Incomplete And Quest 4962 Or 4963 Is Not Complete/Accepted
+-- Gossip Text 3299 Should Become Default Gossip Once Quest 4786 Is Complete But Should Be Overrided By Gossip 3594 Only When Quest 1799 Is Accepted/Incomplete And Quest 4962 Or 4963 Is Not Complete/Accepted
 UPDATE `gossip_menu` SET `condition_id` = 4788 WHERE `entry` = 2603 AND `text_id` = 3299;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4786, 8, 4786, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4787, -3, 1803, 0, 0, 0, 0);
