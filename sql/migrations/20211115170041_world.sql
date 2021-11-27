@@ -26,7 +26,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501);
 
 -- Quest 1801 Does Not Require Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 1801 WHERE `entry` IN (2996, 3001);
+UPDATE `quest_template` SET `NextQuestInChain` = 1801 WHERE `entry` IN (2996, 3001, 1798);
 
 -- Correct Race Requirement
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4737;
