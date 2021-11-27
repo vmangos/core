@@ -31,6 +31,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1802, 8, 3001, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1803, -2, 1801, 1802, 0, 0, 0);
 
+-- Correct Race Requirement
+UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4737;
+
 -- -----------------------------------------------------------------------------------------
 
 -- Update Mage Quest Chains
