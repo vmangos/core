@@ -25,14 +25,14 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Quests 1473 and 1501 Should be Exclusive
 UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501);
 
--- Quest 1801 Requires Either 2996 or 3001
-UPDATE `quest_template` SET `RequiredCondition` = 1803 WHERE `entry` = 1801;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1801, 8, 2996, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1802, 8, 3001, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1803, -2, 1801, 1802, 0, 0, 0);
+-- Quest 1801 Does Not Require Breadcrumb Quest
+UPDATE `quest_template` SET `NextQuestInChain` = 1801 WHERE `entry` IN (2996, 3001);
 
 -- Correct Race Requirement
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4737;
+
+-- quest 1799 requires prequest
+UPDATE `quest_template` SET `NextQuestId` = 1799 WHERE `entry` IN (4965, 4967, 4968, 4969);
 
 -- Correct Orientation
 UPDATE `creature` SET `orientation` = 4.43314 WHERE `guid` = 41833;
