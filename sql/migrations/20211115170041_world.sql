@@ -14,6 +14,10 @@ INSERT INTO `migrations` VALUES ('20211115170041');
 -- Quest 1715 Should be a Breadcrumb Quest
 UPDATE `quest_template` SET `NextQuestInChain` = 1688 WHERE `entry` = 1715;
 
+-- Quest 1758 Should Not Require Breadcrumb Quest 1798
+UPDATE `quest_template` SET `NextQuestInChain` = 1758 WHERE `entry` = 1798;
+UPDATE `quest_template` SET `PrevQuestId` = 0 WHERE `entry` = 1758;
+
 -- Horde
 -- Quests 1478 and 1506 Should be Breadcrumb Quests and Be Exclusive
 UPDATE `quest_template` SET `NextQuestId` = 0, `NextQuestInChain` = 0, `RequiredCondition` = 1480 WHERE `entry` = 1478;
@@ -26,7 +30,9 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `quest_template` SET `ExclusiveGroup` = 1473 WHERE `entry` IN (1473, 1501);
 
 -- Quest 1801 Does Not Require Breadcrumb Quest
-UPDATE `quest_template` SET `NextQuestInChain` = 1801 WHERE `entry` IN (2996, 3001, 1798);
+UPDATE `quest_template` SET `NextQuestInChain` = 1801 WHERE `entry` IN (2996, 3001);
+
+
 
 -- Correct Race Requirement
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4737;
