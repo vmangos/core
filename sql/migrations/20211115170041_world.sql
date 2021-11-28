@@ -10,6 +10,17 @@ INSERT INTO `migrations` VALUES ('20211115170041');
 
 
 -- Update Warlock Quest Chains
+-- Quest 4964 Requires 4976 AND 4962
+UPDATE `mangos`.`quest_template` SET `RequiredCondition`='537' WHERE  `entry`=4964 AND `patch`=0;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (535, 8, 4976, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (536, 8, 4962, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (537, -1, 535, 536, 0, 0, 0);
+
+-- Quest 4975 Requires 4976 AND 4963
+UPDATE `mangos`.`quest_template` SET `RequiredCondition`='539' WHERE  `entry`=4975 AND `patch`=0;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (538, 8, 4963, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (539, -1, 535, 538, 0, 0, 0);
+
 -- Alliance
 -- Quest 1715 Should be a Breadcrumb Quest
 UPDATE `quest_template` SET `NextQuestInChain` = 1688 WHERE `entry` = 1715;
@@ -34,8 +45,9 @@ UPDATE `quest_template` SET `NextQuestInChain` = 1801 WHERE `entry` IN (2996, 30
 
 -- Correct Race Requirement
 UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` = 4737;
+UPDATE `quest_template` SET `RequiredRaces` = 77 WHERE `entry` = 4736;
 
--- quest 1799 requires prequest
+-- Quest 1799 Requires Prequest
 UPDATE `quest_template` SET `NextQuestId` = 1799 WHERE `entry` IN (4965, 4967, 4968, 4969);
 
 -- Correct Orientation
