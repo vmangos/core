@@ -1622,7 +1622,7 @@ struct npc_shahramAI : ScriptedPetAI
         m_creature->SetCanModifyStats(true);
 
         m_creature->ToPet()->InitStatsForLevel(63);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
         if (m_creature->GetCharmInfo())
             m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);

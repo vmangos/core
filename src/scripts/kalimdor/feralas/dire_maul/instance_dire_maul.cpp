@@ -10,7 +10,7 @@
 void EnableCreature(Creature* pCreature)
 {
     pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
     pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 }
 
@@ -217,7 +217,7 @@ void instance_dire_maul::OnCreatureCreate(Creature* pCreature)
         case NPC_IMMOL_THAR:
             m_uiImmolTharGUID   = pCreature->GetGUID();
             if (GetData(TYPE_CRISTAL_EVENT) != DONE)
-                pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
             break;
         case NPC_TORTHELDRIN:
             m_uiTortheldrinGUID = pCreature->GetGUID();
@@ -1350,7 +1350,7 @@ struct go_fixed_trap : public GameObjectAI
                 pSlipkik->CombatStop(true);
                 pSlipkik->DeleteThreatList();
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, nullptr);
                 me->SendGameObjectCustomAnim();
@@ -1416,7 +1416,7 @@ struct boss_kromcrushAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_ENRAGE);
         m_creature->SetWalk(false);
         m_creature->GetMotionMaster()->MovePoint(0, 501.971f, 482.321f, 29.463f);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
     }
 
@@ -1441,7 +1441,7 @@ struct boss_kromcrushAI : public ScriptedAI
                     DoScriptText(SAY_FIND_FURGUS, m_creature);
                     m_creature->GetMotionMaster()->Clear();
                     m_creature->Relocate(383.887f, 258.610f, 11.440f);
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE);
                     break;
                 }
             }

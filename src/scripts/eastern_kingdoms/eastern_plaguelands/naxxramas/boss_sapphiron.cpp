@@ -106,7 +106,7 @@ struct boss_sapphironAI : public ScriptedAI
             if (m_pInstance->GetData(TYPE_SAPPHIRON) != DONE)
             {
                 phase = PHASE_SKELETON;
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 m_creature->SetVisibility(VISIBILITY_OFF);
             }
             else
@@ -200,7 +200,7 @@ struct boss_sapphironAI : public ScriptedAI
     void MakeVisible()
     {
         phase = PHASE_GROUND;
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         m_creature->SetVisibility(VISIBILITY_ON);
         m_creature->SetInCombatWithZone();
         if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST,0))

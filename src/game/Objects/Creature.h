@@ -348,6 +348,7 @@ class Creature : public Unit
         void Respawn();
         void SaveRespawnTime() override;
         void ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data);
+        void CastSpawnSpell();
 
         uint32 GetRespawnDelay() const { return m_respawnDelay; }
         void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }

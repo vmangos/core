@@ -205,7 +205,7 @@ struct boss_buruAI : public ScriptedAI
             return;
         }
 
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

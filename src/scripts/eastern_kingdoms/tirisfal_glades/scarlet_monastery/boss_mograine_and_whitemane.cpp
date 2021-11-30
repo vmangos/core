@@ -84,7 +84,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_uiHammerOfJustice_Timer = 15000;
 
         //Incase wipe during phase that mograine fake death
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
 
         m_bDivineShield = false;
@@ -148,7 +148,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_creature->RemoveAllAuras();
         m_creature->ClearAllReactives();
 
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
 
@@ -201,7 +201,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //When hit with ressurection stop fake death and say text
         if (pSpell->Id == SPELL_SCARLETRESURRECTION)
         {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             m_creature->SetHealth(m_creature->GetMaxHealth());
 
@@ -365,7 +365,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         {
             if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
             {
-                if (pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                if (pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING))
                     pKiller->DealDamage(pMograine, 1, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }

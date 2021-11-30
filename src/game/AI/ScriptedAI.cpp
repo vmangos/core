@@ -388,7 +388,7 @@ void ScriptedAI::DoTeleportAll(float fX, float fY, float fZ, float fO)
 void ScriptedAI::EnterVanish()
 {
     m_creature->SetVisibility(VISIBILITY_OFF);
-    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
     m_creature->InterruptSpellsCastedOnMe(true);
     m_creature->InterruptAttacksOnMe();
     m_creature->AttackStop();

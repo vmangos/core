@@ -488,6 +488,9 @@ Map::Add(T* obj)
     obj->SetIsNewObject(true);
     UpdateObjectVisibility(obj, cell, p);
     obj->SetIsNewObject(false);
+
+    if (Creature* pCreature = obj->ToCreature())
+        pCreature->CastSpawnSpell();
 }
 
 template<>

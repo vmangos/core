@@ -236,6 +236,7 @@ struct CreatureInfo
     uint32  spells[CREATURE_MAX_SPELLS];
     uint32  spell_list_id;
     uint32  pet_spell_list_id;
+    uint32  spawn_spell_id;
     uint32 const* auras;
     uint32  gold_min;
     uint32  gold_max;

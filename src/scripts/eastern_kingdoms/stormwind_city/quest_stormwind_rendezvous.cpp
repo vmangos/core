@@ -597,7 +597,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
             if (Creature* Onyxia = m_creature->FindNearestCreature(NPC_KATRANA_PRESTOR, 150.0f))
             {
                 Onyxia->UpdateEntry(NPC_LADY_ONYXIA);
-                Onyxia->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                Onyxia->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
             }
             Timer = 1000;
             break;
@@ -640,7 +640,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
                     DragsGUIDs[Var] = itr->GetGUID();
                     itr->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
                     itr->AIM_Initialize();
-                    itr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    itr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     if (!urand(0, 2))
                         DoScriptText(SAY_HISS, itr);
                     Var++;
@@ -671,7 +671,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
                     {
                         if (Creature* crea = me->GetMap()->GetCreature(DragsGUIDs[Var]))
                         {
-                            crea->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            crea->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                             crea->GetThreatManager().addThreatDirectly(Bolvar, 5000.0f);
                             crea->SetTargetGuid(Bolvar->GetGUID());
                             Bolvar->AddThreat(crea);

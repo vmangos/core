@@ -1376,6 +1376,18 @@ void ObjectMgr::CheckCreatureTemplates()
             }
         }
 
+        if (cInfo->spawn_spell_id)
+        {
+            SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(cInfo->spawn_spell_id);
+            if (!pSpellEntry || !pSpellEntry->HasEffect(SPELL_EFFECT_SPAWN))
+            {
+                sLog.outErrorDb("Creature (Entry: %u) has invalid spawn_spell_id (%u), set to 0", cInfo->entry, cInfo->spawn_spell_id);
+                sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `spawn_spell_id`=0 WHERE `entry`=%u;",  cInfo->entry);
+                const_cast<CreatureInfo*>(cInfo)->spawn_spell_id = 0;
+            }
+        }
+        
+
         for (int j = 0; j < CREATURE_MAX_SPELLS; ++j)
         {
             if (cInfo->spells[j] && !sSpellMgr.GetSpellEntry(cInfo->spells[j]))

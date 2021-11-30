@@ -425,13 +425,13 @@ struct instance_blackwing_lair : public ScriptedInstance
                 else if (m_auiEncounter[TYPE_LASHLAYER] == IN_PROGRESS)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
                     pCreature->ForcedDespawn(1000);
                 }
                 else if (m_auiEncounter[TYPE_LASHLAYER] == FAIL)
                 {
                     pCreature->SetVisibility(VISIBILITY_ON);
-                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
                 }
                 break;
             case MOB_EVEILLEUR_GRIFFEMORT:
@@ -590,7 +590,7 @@ struct instance_blackwing_lair : public ScriptedInstance
                         break;
                     }
                     if (m_auiEncounter[TYPE_RAZORGORE] != DONE)
-                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     m_lVaelGobs.push_back(pCreature->GetObjectGuid());
                  }
             case MOB_DEMONISTE_AILE_NOIRE:
@@ -662,7 +662,7 @@ struct instance_blackwing_lair : public ScriptedInstance
                 {
                     if (Creature *pCreature = instance->GetCreature(guid))
                     {
-                        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     }
                 }
             }

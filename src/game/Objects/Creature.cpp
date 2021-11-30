@@ -1969,6 +1969,20 @@ bool Creature::FallGround()
     return true;
 }
 
+void Creature::CastSpawnSpell()
+{
+    if (GetCreatureInfo()->spawn_spell_id)
+    {
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+        SpellCastResult result = CastSpell(this, GetCreatureInfo()->spawn_spell_id, false);
+        if (result != SPELL_CAST_OK)
+        {
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+            sLog.outError("%s failed to cast spawn spell %u due to reason %u.", GetGuidStr().c_str(), GetCreatureInfo()->spawn_spell_id, result);
+        }
+    }
+}
+
 void Creature::Respawn()
 {
     RemoveCorpse();
@@ -2192,7 +2206,7 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
         return false;
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
         return false;
 
     // skip fighting creature
@@ -2238,7 +2252,7 @@ bool Creature::CanInitiateAttack()
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_FEIGN_DEATH))
         return false;
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE))
         return false;
 
     if (IsPassiveToHostile())

@@ -1413,7 +1413,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Fake death
                     //m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEING_DEATH);
-                    m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     m_casterUnit->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     m_casterUnit->AddUnitState(UNIT_STAT_FEIGN_DEATH);
 
@@ -3708,7 +3708,9 @@ void Spell::EffectSpawn(SpellEffectIndex /*eff_idx*/)
     if (!unitTarget || (unitTarget->GetTypeId() != TYPEID_UNIT))
         return;
 
-    unitTarget->SetVisibility(VISIBILITY_ON);
+    if (unitTarget->GetVisibility() != VISIBILITY_ON)
+        unitTarget->SetVisibility(VISIBILITY_ON);
+    unitTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 }
 
 void Spell::EffectTradeSkill(SpellEffectIndex /*eff_idx*/)
