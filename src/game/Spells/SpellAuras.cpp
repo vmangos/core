@@ -1721,6 +1721,18 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         GetHolder()->SetAuraDuration(0); // Remove aura (else stays for ever, and casts at login)
                         return;
                     }
+                    case 13910: // Force Create Elemental Totem
+                    {
+                        if (Player* pPlayer = ToPlayer(target))
+                        {
+                            if (Unit* caster = GetCaster())
+                                DoScriptText(5428, caster, pPlayer);
+
+                            // Create Elemental Totem
+                            pPlayer->CastSpell(pPlayer, 13909, false);
+                        }
+                        return;
+                    }
                     case 16336: // Haunting Phantoms
                     {
                         m_isPeriodic = true;
