@@ -19,7 +19,7 @@ UPDATE `gossip_menu_option` SET `option_text` = 'Access secret goblin engineerin
 
 -- Tinkmaster Overspark
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(1468, 4552, 1368);
+(1468, 2134, 1368);
 
 -- Tinkmaster Overspark and Oglethorpe Obnoticus
 UPDATE `gossip_menu_option` SET `option_text` = 'Access secret gnome engineering schemata!', `option_broadcast_text` = 4553 WHERE `menu_id` IN (1467, 1468) AND `id` = 0;
