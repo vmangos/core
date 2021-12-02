@@ -35,6 +35,8 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=442106;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (442106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6180, 0, 0, 0, 0, 0, 0, 0, 0, 'Charlga Razorflank - Say Text');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (442106, 0, 16, 5814, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Charlga Razorflank - Play Sound');
 
+-- Correct Scale for Dark Assassin
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` IN (5946, 5947);
 
 
 -- End of migration.
