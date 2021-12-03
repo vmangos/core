@@ -188,6 +188,11 @@ VALUES (7771, 3447, 10);
 DELETE FROM `gameobject_questrelation` WHERE  `id` = 148836 AND `quest` = 3447;
 UPDATE `quest_template` SET `StartScript` = 0 WHERE `entry` = 3447;
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quest 6383 Does Not Require Breadcrumb Quests
+UPDATE `quest_template` SET `NextQuestId` = 0, `NextQuestInChain` = 6383 WHERE `entry` IN (235, 742, 6382);
+
 
 -- End of migration.
 END IF;
