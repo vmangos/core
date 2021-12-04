@@ -327,10 +327,17 @@ void SpellEntry::ComputeBinary()
 
 void SpellEntry::ComputeNonPeriodicDispel()
 {
-    _isNonPeriodicDispel = true;
-    for (int i = 0; i < 3; ++i)
-        if (_isNonPeriodicDispel && Effect[i] != 0 && (Effect[i] != SPELL_EFFECT_DISPEL || EffectRadiusIndex[i] != 0))
-            _isNonPeriodicDispel = false;
+    if (_isNonPeriodicDispel = HasEffect(SPELL_EFFECT_DISPEL)) // assignment
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (Effect[i] != 0 && (Effect[i] != SPELL_EFFECT_DISPEL || EffectRadiusIndex[i] != 0))
+            {
+                _isNonPeriodicDispel = false;
+                return;
+            }
+        }
+    }
 }
 
 void SpellEntry::ComputeDispel()

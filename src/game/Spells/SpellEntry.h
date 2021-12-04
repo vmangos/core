@@ -599,6 +599,15 @@ class SpellEntry
             return mask;
         }
 
+        uint8 GetEffectsCount() const
+        {
+            uint8 count = 0;
+            for (uint32 i : Effect)
+                if (i)
+                    count++;
+            return count;
+        }
+
         bool HasAttribute(SpellAttributes attribute) const { return Attributes & attribute; }
         bool HasAttribute(SpellAttributesEx attribute) const { return AttributesEx & attribute; }
         bool HasAttribute(SpellAttributesEx2 attribute) const { return AttributesEx2 & attribute; }
@@ -946,6 +955,9 @@ class SpellEntry
         // Spell effects require a specific power type on the target
         inline bool IsTargetPowerTypeValid(Powers powerType) const
         {
+            if (!GetEffectsCount())
+                return true;
+
             for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if (Effect[i] == SPELL_EFFECT_NONE)
