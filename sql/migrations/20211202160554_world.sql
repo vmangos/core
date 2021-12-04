@@ -38,6 +38,9 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 -- Correct Scale for Dark Assassin
 UPDATE `creature_template` SET `display_scale1` = 0 WHERE `entry` IN (5946, 5947);
 
+-- Correct Scale for Pirate
+UPDATE `creature_template` SET `display_scale1` = 0 WHERE entry IN (5949, 5948);
+
 
 -- End of migration.
 END IF;
