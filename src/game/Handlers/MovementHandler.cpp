@@ -259,9 +259,11 @@ void Player::ExecuteTeleportNear()
 
     SetSemaphoreTeleportNear(false);
 
+    // send MSG_MOVE_TELEPORT to observers around both old and new position
     WorldLocation const& dest = GetTeleportDest();
+    MovementPacketSender::SendTeleportToObservers(this, dest.x, dest.y, dest.z, dest.o);
     TeleportPositionRelocation(dest);
-    MovementPacketSender::SendTeleportToObservers(this);
+    MovementPacketSender::SendTeleportToObservers(this, dest.x, dest.y, dest.z, dest.o);
 
     // resummon pet, if the destination is in another continent instance, let Player::SwitchInstance do it
     // because the client will request the name for the old pet guid and receive no answer
