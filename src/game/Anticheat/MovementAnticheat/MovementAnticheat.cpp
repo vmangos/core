@@ -1098,7 +1098,7 @@ bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) cons
         return true;
 
     float const distance = GetDistance3D(me->GetPosition(), movementInfo.pos);
-    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.1f);
+    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.2f);
 
     // Exclude elevators
     uint32 destZoneId = 0;
