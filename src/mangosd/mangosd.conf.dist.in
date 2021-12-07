@@ -1474,7 +1474,7 @@ Antiflood.Sanction = 4
 #
 #    Warden.ClientResponseDelay
 #        Description: Time (in seconds) before client is getting disconnecting for not responding.
-#        Default:     20 - (20 Seconds)
+#        Default:     30 - (30 Seconds)
 #                     0 - (Disabled, client won't be kicked)
 #
 #    Warden.ScanFrequency
@@ -1517,7 +1517,7 @@ Warden.WinEnabled            = 1
 Warden.OSXEnabled            = 1
 Warden.PlayersOnly           = 0
 Warden.NumScans              = 10
-Warden.ClientResponseDelay   = 20
+Warden.ClientResponseDelay   = 30
 Warden.ScanFrequency         = 15
 Warden.DefaultPenalty        = 0
 Warden.BanDuration           = 86400
