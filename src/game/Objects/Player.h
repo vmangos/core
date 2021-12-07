@@ -330,6 +330,45 @@ enum PlayerFlags
     PLAYER_FLAGS_PVP_TIMER              = 0x00040000,       // 3.0.2, pvp timer active (after you disable pvp manually)
 };
 
+enum PlayerBytesOffsets
+{
+    PLAYER_BYTES_OFFSET_SKIN_ID         = 0,
+    PLAYER_BYTES_OFFSET_FACE_ID         = 1,
+    PLAYER_BYTES_OFFSET_HAIR_STYLE_ID   = 2,
+    PLAYER_BYTES_OFFSET_HAIR_COLOR_ID   = 3
+};
+
+enum PlayerBytes2Offsets
+{
+    PLAYER_BYTES_2_OFFSET_FACIAL_STYLE   = 0,
+    PLAYER_BYTES_2_OFFSET_UNK1           = 1,
+    PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS = 2,
+    PLAYER_BYTES_2_OFFSET_REST_STATE     = 3
+};
+
+enum PlayerBytes3Offsets
+{
+    PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION = 0, // uint16, 1 bit for gender, rest for drunk state
+    PLAYER_BYTES_3_OFFSET_CITY_PROTECTOR_TITLE   = 2, // race id
+    PLAYER_BYTES_3_OFFSET_HONOR_RANK             = 3
+};
+
+enum PlayerFieldBytesOffsets
+{
+    PLAYER_FIELD_BYTES_OFFSET_FLAGS              = 0,
+    PLAYER_FIELD_BYTES_OFFSET_COMBO_POINTS       = 1,
+    PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS        = 2,
+    PLAYER_FIELD_BYTES_OFFSET_HIGHEST_HONOR_RANK = 3
+};
+
+enum PlayerFieldBytes2Offsets
+{
+    PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR = 0,
+    PLAYER_FIELD_BYTES_2_OFFSET_FLAGS          = 1,
+    PLAYER_FIELD_BYTES_2_OFFSET_UNK2           = 2,
+    PLAYER_FIELD_BYTES_2_OFFSET_UNK3           = 3
+};
+
 // used in (PLAYER_FIELD_BYTES, 0) byte values
 enum PlayerFieldByteFlags
 {
@@ -1063,8 +1102,8 @@ class Player final: public Unit
         static bool IsBankPos(uint8 bag, uint8 slot);
         bool IsValidPos(uint16 pos, bool explicit_pos) const { return IsValidPos(pos >> 8, pos & 255, explicit_pos); }
         bool IsValidPos(uint8 bag, uint8 slot, bool explicit_pos) const;
-        uint8 GetBankBagSlotCount() const { return GetByteValue(PLAYER_BYTES_2, 2); }
-        void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, 2, count); }
+        uint8 GetBankBagSlotCount() const { return GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS); }
+        void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS, count); }
         bool HasItemCount(uint32 item, uint32 count = 1, bool inBankAlso = false) const;
         bool HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem = nullptr);
         bool HasItemWithIdEquipped(uint32 item, uint32 count = 1, uint8 except_slot = NULL_SLOT) const;

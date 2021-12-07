@@ -2209,11 +2209,11 @@ bool ChatHandler::HandleCharacterCopySkinCommand(char* args)
         uint8 hairColor = fields[3].GetUInt32();
         uint8 facialHair = fields[4].GetUInt32();
         uint8 gender = fields[5].GetUInt8();
-        target->SetByteValue(PLAYER_BYTES, 0, skin);
-        target->SetByteValue(PLAYER_BYTES, 1, face);
-        target->SetByteValue(PLAYER_BYTES, 2, hairStyle);
-        target->SetByteValue(PLAYER_BYTES, 3, hairColor);
-        target->SetByteValue(PLAYER_BYTES_2, 0, facialHair);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, skin);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID, face);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, hairStyle);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, hairColor);
+        target->SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, facialHair);
         target->SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender);
         SendSysMessage("Modification du skin/genre OK.");
         return true;
@@ -2427,13 +2427,13 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
         if (amount < 0 || amount > 255)
             return false;
         // rank points is sent to client with same size of uint8(255) for each rank
-        target->SetByteValue(PLAYER_FIELD_BYTES2, 0, amount);
+        target->SetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR, amount);
     }
     else if (hasStringAbbr(field, "rank"))
     {
         if (amount < 0 || amount >= HONOR_RANK_COUNT)
             return false;
-        target->SetByteValue(PLAYER_BYTES_3, 3, amount);
+        target->SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, amount);
     }
     else if (hasStringAbbr(field, "todaykills"))
         target->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, (uint32)amount);
@@ -4062,7 +4062,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
 
     // Set gender
     player->SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender);
-    player->SetUInt16Value(PLAYER_BYTES_3, 0, uint16(gender) | (player->GetDrunkValue() & 0xFFFE));
+    player->SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, uint16(gender) | (player->GetDrunkValue() & 0xFFFE));
 
     // Change display ID
     player->InitPlayerDisplayIds();
@@ -4657,7 +4657,7 @@ bool ChatHandler::HandleModifyHairStyleCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES, 2, hairstyle);
+    target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, hairstyle);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
@@ -4677,7 +4677,7 @@ bool ChatHandler::HandleModifyHairColorCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES, 3, haircolor);
+    target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, haircolor);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
@@ -4697,7 +4697,7 @@ bool ChatHandler::HandleModifySkinColorCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES, 0, skincolor);
+    target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, skincolor);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
@@ -4717,7 +4717,7 @@ bool ChatHandler::HandleModifyAccessoriesCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES_2, 0, accessories);
+    target->SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, accessories);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
