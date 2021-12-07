@@ -379,8 +379,7 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     UpdateSpeed(MOVE_RUN,  false);
     SetFly(CanFly());
 
-    if (!data)
-        m_defaultMovementType = MovementGeneratorType(cinfo->movement_type);
+    m_defaultMovementType = MovementGeneratorType(data ? data->movement_type : cinfo->movement_type);
 
     return true;
 }

@@ -8229,6 +8229,139 @@ bool CharmInfo::IsReturning()
     return m_isReturning;
 }
 
+void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
+{
+    Creature* pCharmedCreature = ToCreature();
+
+    CharmInfo* charmInfo = GetCharmInfo();
+    if (!charmInfo)
+    {
+        sLog.outError("Unit::HandlePetCommand - %s doesn't have a charminfo!", GetGuidStr().c_str());
+        return;
+    }
+
+    Unit* pCharmer = GetCharmerOrOwner();
+    if (!pCharmer)
+    {
+        sLog.outError("Unit::HandlePetCommand - %s doesn't have a charmer or owner!", GetGuidStr().c_str());
+        return;
+    }
+
+    switch (command)
+    {
+        case COMMAND_STAY:
+            if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                StopMoving();
+                GetMotionMaster()->Clear(false);
+                GetMotionMaster()->MoveIdle();
+                charmInfo->SetIsAtStay(true);
+            }
+            charmInfo->SetCommandState(COMMAND_STAY);
+
+            charmInfo->SetIsCommandAttack(false);
+            charmInfo->SetIsCommandFollow(false);
+            charmInfo->SetIsFollowing(false);
+            charmInfo->SetIsReturning(false);
+            charmInfo->SaveStayPosition();
+            break;
+        case COMMAND_FOLLOW:
+            if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                AttackStop();
+                InterruptNonMeleeSpells(false);
+                GetMotionMaster()->MoveFollow(pCharmer, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            }
+            charmInfo->SetCommandState(COMMAND_FOLLOW);
+
+            charmInfo->SetIsCommandAttack(false);
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsReturning(true);
+            charmInfo->SetIsCommandFollow(true);
+            charmInfo->SetIsFollowing(false);
+            break;
+        case COMMAND_ATTACK:
+        {
+            if (!pTarget)
+            {
+                SendPetActionFeedback(FEEDBACK_NOTHING_TO_ATT);
+                return;
+            }
+
+            if (!pCharmer->IsValidAttackTarget(pTarget) || pCharmer->HasAuraType(SPELL_AURA_MOD_PACIFY))
+            {
+                SendPetActionFeedback(FEEDBACK_CANT_ATT_TARGET);
+                return;
+            }
+
+            if (GetTransport() != pTarget->GetTransport())
+            {
+                SendPetActionFeedback(FEEDBACK_NO_PATH_TO);
+                return;
+            }
+
+            ClearUnitState(UNIT_STAT_FOLLOW);
+            // This is true if pet has no target or has target but targets differs.
+            if (GetVictim() != pTarget || (GetVictim() == pTarget && !GetCharmInfo()->IsCommandAttack()) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                if (GetVictim())
+                    AttackStop();
+
+                if (pCharmedCreature)
+                {
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    pCharmedCreature->AI()->AttackStart(pTarget);
+
+                    //10% chance to play special pet attack talk, else growl
+                    if (pCharmedCreature->IsPet() && ((Pet*)this)->getPetType() == SUMMON_PET && this != pTarget && urand(0, 100) < 10)
+                        SendPetTalk((uint32)PET_TALK_ATTACK);
+                    else
+                    {
+                        // 90% chance for pet and 100% chance for charmed creature
+                        SendPetAIReaction();
+                    }
+                }
+                else                                // charmed player
+                {
+                    if (GetVictim() && GetVictim() != pTarget)
+                        AttackStop();
+
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    Attack(pTarget, true);
+                    SendPetAIReaction();
+                    GetMotionMaster()->MoveChase(pTarget);
+                }
+            }
+            break;
+        }
+        case COMMAND_DISMISS:                       // pet dismiss (summoned pet)
+        {
+            if (Pet* pPet = ToPet())
+            {
+                // Hunter pets are dismissed with a spell with a cast time
+                if (pPet->getPetType() != HUNTER_PET)
+                    // dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
+                    pPet->Unsummon(PET_SAVE_NOT_IN_SLOT);
+            }
+            else                                    // charmed
+                pCharmer->Uncharm();
+            break;
+        }  
+        default:
+            sLog.outError("Unit::HandlePetCommand - Unknown command state %u.", uint32(command));
+    }
+}
+
 uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
 {
     uint32 procEx = PROC_EX_NONE;

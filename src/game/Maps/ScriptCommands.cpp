@@ -363,7 +363,7 @@ bool Map::ScriptCommand_RespawnGameObject(ScriptInfo const& script, WorldObject*
 
     if (!pGo)
     {
-        sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) failed for gameobject(guid: %u).", script.id, guidlow);
+        sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
@@ -480,7 +480,7 @@ bool Map::ScriptCommand_OpenDoor(ScriptInfo const& script, WorldObject* source, 
 
     if (!pDoor)
     {
-        sLog.outError("SCRIPT_COMMAND_OPEN_DOOR (script id %u) failed for gameobject(guid: %u).", script.id, guidlow);
+        sLog.outError("SCRIPT_COMMAND_OPEN_DOOR (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
@@ -524,7 +524,7 @@ bool Map::ScriptCommand_CloseDoor(ScriptInfo const& script, WorldObject* source,
 
     if (!pDoor)
     {
-        sLog.outError("SCRIPT_COMMAND_CLOSE_DOOR (script id %u) failed for gameobject(guid: %u).", script.id, guidlow);
+        sLog.outError("SCRIPT_COMMAND_CLOSE_DOOR (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
     if (pDoor->GetGoType() != GAMEOBJECT_TYPE_DOOR)
@@ -2267,7 +2267,7 @@ bool Map::ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject*
 
     if (!pGo)
     {
-        sLog.outError("SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (script id %u) failed for gameobject(guid: %u).", script.id, guidlow);
+        sLog.outError("SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (script id %u) failed for gameobject (guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
@@ -2390,5 +2390,21 @@ bool Map::ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject*
     }
 
     pGo->ResetDoorOrButton();
+    return false;
+}
+
+// SCRIPT_COMMAND_SET_COMMAND_STATE (88)
+bool Map::ScriptCommand_SetCommandState(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_COMMAND_STATE (script id %u) call for a nullptr or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->HandlePetCommand((CommandStates)script.setCommandState.commandState, ToUnit(target));
+
     return false;
 }
