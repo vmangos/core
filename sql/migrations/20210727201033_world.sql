@@ -19,8 +19,9 @@ SET @LUNAR_FESTIVAL_EVENT = 7;
 -- Delete old event stuff, except the Firecrackers, which are already done by Nickyt8.
 DELETE FROM `creature` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
 DELETE FROM `creature_addon` WHERE `guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
-DELETE FROM `gameobject` WHERE NOT `id` IN (180763,180764) AND `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
-DELETE FROM `game_event_gameobject` WHERE `event` = @LUNAR_FESTIVAL_EVENT AND NOT `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180763,180764));
+DELETE FROM `npc_gossip` WHERE `npc_guid` IN (SELECT `guid` FROM `game_event_creature` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
+DELETE FROM `gameobject` WHERE NOT `id` IN (180763,180764,300058) AND `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@LUNAR_FESTIVAL_EVENT);
+DELETE FROM `game_event_gameobject` WHERE `event` = @LUNAR_FESTIVAL_EVENT AND NOT `guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180763,180764,300058));
 DELETE FROM `game_event_creature` WHERE `event` = @LUNAR_FESTIVAL_EVENT;
 
 -- Fix flags.
@@ -43,9 +44,12 @@ UPDATE `creature_ai_scripts` SET `datalong`=26286, `datalong2`=0 WHERE `id` IN (
 -- Conditions from stuff above.
 DELETE FROM `conditions` WHERE `condition_entry` IN (220554,220558,220574,220577,220590,220584);
 
--- Teleport SpellFocus GameObjects.
-DELETE FROM `gameobject` WHERE `id`=300058;
+-- Greater Moonlight Spell Focus
+UPDATE `gameobject` SET `id`=180867 WHERE `id`=300058;
+INSERT IGNORE INTO `game_event_gameobject` (`guid`, `event`) SELECT guid, @LUNAR_FESTIVAL_EVENT FROM gameobject WHERE id=180867;
 DELETE FROM `gameobject_template` WHERE `entry`=300058;
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `script_name`) VALUES
+(180867, 7, 8, 327, 'Greater Moonlight Spell Focus', 1, 1353, 4, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 
 -- Firecrackers have no flags.
 UPDATE `gameobject_template` SET `flags`=0 WHERE `entry`=180763;
@@ -53,19 +57,36 @@ UPDATE `gameobject_template` SET `flags`=0 WHERE `entry`=180763;
 -- Set script for the other Firecrackers.
 UPDATE `gameobject_template` SET `script_name`='go_lunar_festival_firecracker' WHERE `entry` IN (180870, 180871, 180872, 180873);
 
+-- Serverside traps. We know about them from spell 26373 which hits them in SMSG_SPELL_GO.
 INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES 
-(180891, 7, 8, 327, 'Lunar Teleport: Moonglade', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180892, 7, 8, 327, 'Lunar Teleport: Stormwind', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180893, 7, 8, 327, 'Lunar Teleport: Ironforge', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180894, 7, 8, 327, 'Lunar Teleport: Darnassus', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180895, 7, 8, 327, 'Lunar Teleport: Orgrimmar', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180896, 7, 8, 327, 'Lunar Teleport: Undercity', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight'),
-(180897, 7, 8, 327, 'Lunar Teleport: Thunder Bluff', 0, 0, 1, 1353, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_greater_moonlight');
+(180891, 7, 6, 327, 'Lunar Teleport: Moonglade', 35, 0, 1, 0, 0, 0, 26448, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(180892, 7, 6, 327, 'Lunar Teleport: Stormwind', 35, 0, 1, 0, 0, 0, 26406, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(180893, 7, 6, 327, 'Lunar Teleport: Ironforge', 35, 0, 1, 0, 0, 0, 26408, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(180894, 7, 6, 327, 'Lunar Teleport: Darnassus', 35, 0, 1, 0, 0, 0, 26409, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(180895, 7, 6, 327, 'Lunar Teleport: Orgrimmar', 35, 0, 1, 0, 0, 0, 26414, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(180896, 7, 6, 327, 'Lunar Teleport: Undercity', 35, 0, 1, 0, 0, 0, 26410, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(180897, 7, 6, 327, 'Lunar Teleport: Thunderbluff', 35, 0, 1, 0, 0, 0, 26412, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+DELETE FROM `spell_scripts` WHERE `id` IN (26406, 26408, 26409, 26414, 26410, 26412);
+INSERT INTO `spell_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(26406, 0, 15, 26454, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 'Lunar Teleport Cap: Stormwind - Teleport Alliance Player'),
+(26406, 0, 15, 26471, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 'Lunar Teleport Cap: Stormwind - Send Error to Horde Player'),
+(26408, 0, 15, 26452, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 'Lunar Teleport Cap: Ironforge - Teleport Alliance Player'),
+(26408, 0, 15, 26471, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 'Lunar Teleport Cap: Ironforge - Send Error to Horde Player'),
+(26409, 0, 15, 26450, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 'Lunar Teleport Cap: Darnassus - Teleport Alliance Player'),
+(26409, 0, 15, 26471, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 'Lunar Teleport Cap: Darnassus - Send Error to Horde Player'),
+(26414, 0, 15, 26453, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 'Lunar Teleport Cap: Orgrimmar - Teleport Horde Player'),
+(26414, 0, 15, 26471, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 'Lunar Teleport Cap: Orgrimmar - Send Error to Alliance Player'),
+(26410, 0, 15, 26456, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 'Lunar Teleport Cap: Undercity - Teleport Horde Player'),
+(26410, 0, 15, 26471, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 'Lunar Teleport Cap: Undercity - Send Error to Alliance Player'),
+(26412, 0, 15, 26455, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 'Lunar Teleport Cap: Thunderbluff - Teleport Horde Player'),
+(26412, 0, 15, 26471, 2, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 'Lunar Teleport Cap: Thunderbluff - Send Error to Alliance Player');
 
 UPDATE `gameobject_template` SET `faction`=1375, `script_name`='go_firework_rocket' WHERE `entry` IN (180851,180854,180855,180856,180857,180858,180860,180861,180862,180863,180864,180865);
 
 -- Target positions for teleport spells.
 INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `build_min`, `build_max`) VALUES
+(26448, 1, 7590, -2226, 471, 0, 5086, 5875),
 (26450, 1, 10150.45, 2602.12, 1330.82, 5.03, 5086, 5875),
 (26451, 1, 7590, -2226, 471, 0, 5086, 5875),
 (26452, 0, -4663.39, -956.23, 500.37, 5.73, 5086, 5875),
@@ -87,7 +108,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 -- Lunar Festival Sentinel spelllist.
 UPDATE `creature_template` SET `unit_flags`=512, `dmg_min`=328, `dmg_max`=821, `spell_list_id`=159610, `ai_name`='EventAI', `flags_extra`=1024 WHERE `entry`=15961;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
-(159610, 'Lunar Festival - Lunar Festival Sentinel', 15618, 100, 1, 0, 0, 322, 5, 10, 15, 30, 0, 18328, 100, 1, 0, 0, 34, 5, 15, 15, 30, 0, 19643, 100, 1, 0, 0, 66, 0, 2, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(159610, 'Lunar Festival - Lunar Festival Sentinel', 15618, 100, 1, 0, 0, 256, 5, 10, 15, 30, 0, 18328, 100, 1, 0, 0, 32, 5, 15, 15, 30, 0, 19643, 100, 1, 0, 0, 0, 0, 2, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Correct mainhand for Lunar Festival Sentinel.
 UPDATE `creature_equip_template` SET `equipentry1`=14882 WHERE `entry`=15961;
@@ -138,7 +159,7 @@ DELETE FROM `spell_script_target` WHERE `targetEntry` IN (180771,180850,180868,1
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
 (26373, 1, 15892, 0, 1, 5086, 5875), -- Lunar Festival Emissary (Alliance).
 (26373, 1, 15891, 0, 1, 5086, 5875), -- Lunar Festival Herald (Horde).
--- Teleport SpellFocus.
+-- Teleport Traps.
 (26373, 0, 180891, 0, 2, 5086, 5875),
 (26373, 0, 180892, 0, 2, 5086, 5875),
 (26373, 0, 180893, 0, 2, 5086, 5875),
@@ -160,7 +181,7 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 (26355, 1, 15889, 0, 0, 5086, 5875), -- Rocket, WHITE BIG Launches a firework at a launcher.
 (26349, 1, 15883, 0, 0, 5086, 5875), -- Rocket, YELLOW Launches a firework at a launcher.
 (26356, 1, 15890, 0, 0, 5086, 5875), -- Rocket, YELLOW BIG Launches a firework at a launcher.
-(30163, 1, 26346, 0, 0, 5086, 5875), -- Copy of Rocket, PURPLE Launches a firework at a launcher.
+(30163, 1, 15881, 0, 0, 5086, 5875), -- Copy of Rocket, PURPLE Launches a firework at a launcher.
 -- 180771 Firework Launcher
 -- (26347, 0, 180771, 0, 0, 5086, 5875), -- Special Case! Revelers casting this in Moonglade directly, no Firework Guy spawned and only on 180771.
 (26333, 0, 180771, 0, 0, 5086, 5875), -- Large Blue Rocket Throw into a firework launcher!
@@ -2421,6 +2442,9 @@ INSERT INTO `game_event_creature_data` (`guid`, `entry_id`, `spell_start`, `even
 
 -- Cast Rocket Red OOC min is 30 seconds in sniffs.
 UPDATE `creature_ai_events` SET `event_param1`=30000, `event_param3`=30000 WHERE `id` IN (1569403,1571903,1572303,1590503,1590603,1590703,1590803);
+
+-- Remove guid check condition for deleted spawns.
+DELETE FROM `conditions` WHERE `condition_entry` IN (260, 261, 262);
 
 
 -- End of migration.

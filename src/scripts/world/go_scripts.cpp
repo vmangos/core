@@ -92,62 +92,6 @@ bool GossipSelect_go_barov_journal(Player* pPlayer, GameObject* pGo, uint32 uiSe
 }
 
 /*######
-## go_greater_moonlight
-######*/
-
-enum
-{
-    GOBJECT_LUNAR_TELEPORT_MOONGLADE            = 180891,
-    GOBJECT_LUNAR_TELEPORT_STORMWIND            = 180892,
-    GOBJECT_LUNAR_TELEPORT_IRONFORGE            = 180893,
-    GOBJECT_LUNAR_TELEPORT_DARNASSUS            = 180894,
-    GOBJECT_LUNAR_TELEPORT_ORGRIMMAR            = 180895,
-    GOBJECT_LUNAR_TELEPORT_UNDERCITY            = 180896,
-    GOBJECT_LUNAR_TELEPORT_THUNDER_BLUFF        = 180897,
-
-    SPELL_HOLIDAY_LUNAR_TELEPORT_DARNASSUS      = 26450,
-    SPELL_HOLIDAY_TELEPORT_MOONGLADE_SELF       = 26451,
-    SPELL_HOLIDAY_LUNAR_TELEPORT_IRONFORGE      = 26452,
-    SPELL_HOLIDAY_LUNAR_TELEPORT_ORGRIMMAR      = 26453,
-    SPELL_HOLIDAY_LUNAR_TELEPORT_STORMWIND      = 26454,
-    SPELL_HOLIDAY_LUNAR_TELEPORT_THUNDERBLUFF   = 26455,
-    SPELL_HOLIDAY_LUNAR_TELEPORT_UNDERCITY      = 26456,
-    SPELL_LUNAR_FESTIVAL_PORT_ERROR             = 26471
-};
-
-bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
-
-    switch (pGo->GetEntry())
-    {
-        case GOBJECT_LUNAR_TELEPORT_MOONGLADE:
-            pPlayer->CastSpell(pPlayer, SPELL_HOLIDAY_TELEPORT_MOONGLADE_SELF, true);
-            break;
-        case GOBJECT_LUNAR_TELEPORT_STORMWIND:
-            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == ALLIANCE ? SPELL_HOLIDAY_LUNAR_TELEPORT_STORMWIND : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
-            break;
-        case GOBJECT_LUNAR_TELEPORT_IRONFORGE:
-            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == ALLIANCE ? SPELL_HOLIDAY_LUNAR_TELEPORT_IRONFORGE : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
-            break;
-        case GOBJECT_LUNAR_TELEPORT_DARNASSUS:
-            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == ALLIANCE ? SPELL_HOLIDAY_LUNAR_TELEPORT_DARNASSUS : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
-            break;
-        case GOBJECT_LUNAR_TELEPORT_ORGRIMMAR:
-            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == HORDE ? SPELL_HOLIDAY_LUNAR_TELEPORT_ORGRIMMAR : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
-            break;
-        case GOBJECT_LUNAR_TELEPORT_UNDERCITY:
-            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == HORDE ? SPELL_HOLIDAY_LUNAR_TELEPORT_UNDERCITY : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
-            break;
-        case GOBJECT_LUNAR_TELEPORT_THUNDER_BLUFF:
-            pPlayer->CastSpell(pPlayer, (pPlayer->GetTeam() == HORDE ? SPELL_HOLIDAY_LUNAR_TELEPORT_THUNDERBLUFF : SPELL_LUNAR_FESTIVAL_PORT_ERROR), true);
-            break;
-        default:
-            return false;
-    }
-
-    return true;
-}
-
-/*######
 ## go_field_repair_bot_74A
 ######*/
 
@@ -592,11 +536,6 @@ GameObjectAI* GetAI_go_lunar_festival_firecracker(GameObject* gameobject)
 void AddSC_go_scripts()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "go_greater_moonlight";
-    newscript->pGOHello = &GOHello_go_greater_moonlight;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_cat_figurine";
