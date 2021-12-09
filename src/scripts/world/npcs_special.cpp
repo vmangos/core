@@ -26,6 +26,7 @@ EndScriptData
 #include "../kalimdor/moonglade/boss_omen.h"
 #include "CritterAI.h"
 #include <array>
+#include "Utilities/EventMap.h"
 
 /* ContentData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
@@ -1201,7 +1202,7 @@ enum
     NPC_CLUSTER_CREDIT_MARKER       = 15894,
     GO_OMEN_CLUSTER_LAUNCHER        = 180874,
 
-    SPELL_LUNAR_FORTUNE             = 26522
+    SPELL_LUNAR_FORTUNE             = 26522,
 };
 
 struct FireworkStruct
@@ -1237,10 +1238,10 @@ std::array<FireworkStruct, 25> const Fireworks =
     { 15914, {26505, 26504, 26503, 26502, 26501}, true }, // Large Red Firework Cluster
     { 15915, {26510, 26509, 26508, 26507, 26506}, true }, // Large White Firework Cluster
     { 15916, {26515, 26514, 26513, 26512, 26511}, true }, // Large Yellow Firework Cluster
-    { 15918, {26487, 26509, 26508, 26507, 26483}, true }, // Lucky Rocket Cluster
+    { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
 }};
 
-std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
+static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1293,7 +1294,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         {
             if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
             {
-                pGo->SendGameObjectCustomAnim();
+                pGo->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
                 break;
             }
         }
@@ -1307,21 +1308,21 @@ struct npc_pats_firework_guyAI : ScriptedAI
             {
                 switch (i)
                 {
-                    case 0:
-                        m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
-                        break;
-                    case 1:
-                        m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
-                        break;
-                    case 2:
-                        m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
-                        break;
-                    case 3:
-                        m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
-                        break;
-                    case 4:
-                        m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
-                        break;
+                case 0:
+                    m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
+                    break;
+                case 1:
+                    m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
+                    break;
+                case 2:
+                    m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
+                    break;
+                case 3:
+                    m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
+                    break;
+                case 4:
+                    m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
+                    break;
                 }
                 m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
             }
@@ -1329,8 +1330,15 @@ struct npc_pats_firework_guyAI : ScriptedAI
         else
             m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
 
+        // Lunar Fortune is casted 3 seconds later.
         if (m_bisLucky)
-            m_creature->CastSpell(m_creature, SPELL_LUNAR_FORTUNE, true);
+        {
+            Creature* caster = m_creature;
+            m_creature->m_Events.AddLambdaEventAtOffset([caster]
+            {
+                caster->CastSpell(caster, SPELL_LUNAR_FORTUNE, true);
+            }, 3 * IN_MILLISECONDS);
+        }
 
         if (m_creature->IsTemporarySummon())
         {

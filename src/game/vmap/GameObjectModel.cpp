@@ -131,6 +131,8 @@ GameObjectModel* GameObjectModel::construct(GameObject const* const object)
             return nullptr;
         if (gobjInfo->type == GAMEOBJECT_TYPE_GOOBER && gobjInfo->goober.losOK)
             return nullptr;
+        if (gobjInfo->IsServerOnly())
+            return nullptr;
     }
     GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(object->GetDisplayId());
     if (!info)
