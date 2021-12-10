@@ -912,7 +912,7 @@ struct npc_infantrymanAI : ScriptedAI
 
     void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false) && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
         {
             if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
@@ -1388,7 +1388,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
     void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false) && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
         {
             if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {

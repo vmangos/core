@@ -934,7 +934,7 @@ bool Map::ScriptCommand_AttackStart(ScriptInfo const& script, WorldObject* sourc
     if (!pAttacker->IsAlive())
         return ShouldAbortScript(script);
 
-    if (!pAttacker->IsValidAttackTarget(pTarget) || !pAttacker->IsInMap(pTarget))
+    if (!pAttacker->IsValidAttackTarget(pTarget))
     {
         sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) for an invalid attack target, skipping.", script.id);
         return ShouldAbortScript(script);
@@ -2067,27 +2067,13 @@ bool Map::ScriptCommand_AssistUnit(ScriptInfo const& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->IsInMap(pTarget))
-        return ShouldAbortScript(script);
-
     Unit* pAttacker = pTarget->GetAttackerForHelper();
 
     if (!pAttacker)
         return false;
 
-    if (Unit* pVictim = pSource->GetVictim())
-    {
-        if (pVictim == pAttacker)
-            return false;
-
-        if (pSource->IsValidAttackTarget(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
-            pSource->AddThreat(pAttacker);
-    }
-    else
-    {
-        if (pSource->AI() && pSource->IsValidAttackTarget(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
-            pSource->AI()->AttackStart(pAttacker);
-    }
+    if (pSource->IsValidAttackTarget(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        pSource->EnterCombatWithTarget(pAttacker);
 
     return false;
 }
@@ -2150,7 +2136,7 @@ bool Map::ScriptCommand_AddThreat(ScriptInfo const& script, WorldObject* source,
         return ShouldAbortScript(script);
     }
 
-    if (pSource->IsValidAttackTarget(pTarget) && pSource->IsInMap(pTarget))
+    if (pSource->IsValidAttackTarget(pTarget))
         pSource->AddThreat(pTarget);
 
     return false;

@@ -5,7 +5,7 @@
 #ifndef SC_CREATURE_H
 #define SC_CREATURE_H
 
-#include "CreatureAI.h"
+#include "BasicAI.h"
 
 #define CAST_AI(a,b)    (dynamic_cast<a*>(b))
 
@@ -15,7 +15,7 @@ enum SCEquip
     EQUIP_UNEQUIP   = 0
 };
 
-struct ScriptedAI : CreatureAI
+struct ScriptedAI : BasicAI
 {
     explicit ScriptedAI(Creature* pCreature);
     ~ScriptedAI() override {}
@@ -23,12 +23,6 @@ struct ScriptedAI : CreatureAI
     //*************
     //CreatureAI Functions
     //*************
-
-    // Called when an unit moves within visibility distance
-    void MoveInLineOfSight(Unit*) override;
-
-    // Called at each attack of m_creature by any victim
-    void AttackStart(Unit*) override;
 
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void EnterCombat(Unit*) override;
@@ -38,9 +32,6 @@ struct ScriptedAI : CreatureAI
 
     // Called when the creature leaves combat
     void OnCombatStop() override {}
-
-    // Called at World update tick
-    void UpdateAI(uint32 const) override;
 
     // Called when creature is spawned or respawned (for reseting variables)
     void JustRespawned() override;

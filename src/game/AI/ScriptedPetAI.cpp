@@ -98,7 +98,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
 
     if (Unit* const pTarget = m_creature->GetVictim())                            // in combat
     {
-        if (!pTarget->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()))
+        if (!pTarget->IsTargetableBy(m_creature))
         {
             // target no longer valid for pet, so either attack stops or new target are selected
             // doesn't normally reach this, because of how petAi is designed in Mangos. CombatStop
@@ -137,7 +137,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
                     // Main target is CC-ed, so pick another attacker.
                     for (const auto pAttacker : pOwner->GetAttackers())
                     {
-                        if (pAttacker->IsInMap(m_creature) && pAttacker->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()) && !pAttacker->HasAuraPetShouldAvoidBreaking())
+                        if (pAttacker->IsInMap(m_creature) && pAttacker->IsTargetableBy(m_creature) && !pAttacker->HasAuraPetShouldAvoidBreaking())
                         { 
                             AttackStart(pAttacker);
                             return;

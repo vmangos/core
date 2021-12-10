@@ -66,16 +66,12 @@ class CreatureAI
         explicit CreatureAI(Creature* creature);
 
         virtual ~CreatureAI();
-        virtual void OnRemoveFromWorld() {}
-
-        virtual uint32 GetData(uint32 /*type*/) { return 0; }
-
-        virtual void InformGuid(ObjectGuid const /*guid*/, uint32 /*type*/=0) {}
-        virtual void DoAction(uint32 const /*type*/=0) {}
-        virtual void DoAction(Unit* /*pUnit*/, uint32 /*type*/) {}
 
         ///== Information about AI ========================
+
         virtual void GetAIInformation(ChatHandler& /*reader*/) {}
+
+        virtual uint32 GetData(uint32 /*type*/) { return 0; }
 
         ///== Reactions At =================================
 
@@ -154,11 +150,20 @@ class CreatureAI
         virtual void OwnerAttackedBy(Unit* /*attacker*/) {}
         virtual void OwnerAttacked(Unit* /*target*/) {}
 
+        // Called by another script
+        virtual void OnScriptEventHappened(uint32 /*uiEvent*/ = 0, uint32 /*uiData*/ = 0, WorldObject* /*pInvoker*/ = nullptr) {};
+
+        // Called before being removed from the map
+        virtual void OnRemoveFromWorld() {}
+
+        // called when the corpse of this creature gets removed
+        virtual void CorpseRemoved(uint32& /*respawnDelay*/) {}
+
         ///== Triggered Actions Requested ==================
 
         // Called when creature attack expected (if creature can and no have current victim)
         // Note: for reaction at hostile action must be called AttackedBy function.
-        virtual void AttackStart(Unit*) {}
+        virtual void AttackStart(Unit*);
 
         // Called at World update tick
         virtual void UpdateAI(uint32 const /*diff*/) {}
@@ -166,13 +171,13 @@ class CreatureAI
         // Like UpdateAI, but only when the creature is a dead corpse
         virtual void UpdateAI_corpse(uint32 const /*uiDiff*/) {}
 
-        // Called by another script
-        virtual void OnScriptEventHappened(uint32 /*uiEvent*/, uint32 /*uiData*/, WorldObject* /*pInvoker*/) {};
+        // Triggers an alert when a Unit moves near stealth detection range.
+        virtual void TriggerAlert(Unit const* who);
 
+        // Will auto attack if the swing timer is ready.
+        bool DoMeleeAttackIfReady();
+        
         ///== State checks =================================
-
-        // called when the corpse of this creature gets removed
-        virtual void CorpseRemoved(uint32& /*respawnDelay*/) {}
 
         // Is corpse looting allowed ?
         virtual bool CanBeLooted() const { return true; }
@@ -186,26 +191,17 @@ class CreatureAI
         // Does the creature melee attack.
         bool IsMeleeAttackEnabled() const { return m_bMeleeAttack; }
 
-        // Triggers an alert when a Unit moves near stealth detection range.
-        virtual void TriggerAlert(Unit const* who);
-
-        // TrinityCore
-        void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
-        void DoCastAOE(uint32 spellId, bool triggered = false);
-        bool UpdateVictim();
-        bool UpdateVictimWithGaze();
-        void SetGazeOn(Unit* target);
-
         ///== Helper functions =============================
-
-        // Will auto attack if the swing timer is ready.
-        bool DoMeleeAttackIfReady();
 
         // Attempts to cast a spell and returns the result.
         CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, ObjectGuid uiOriginalCasterGUID = ObjectGuid());
 
         // Helper functions for cast spell
         virtual CanCastResult CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered);
+
+        // TrinityCore
+        void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
+        void DoCastAOE(uint32 spellId, bool triggered = false);
 
         // Clears any group/raid icons this creature may have
         void ClearTargetIcon();
@@ -221,7 +217,7 @@ class CreatureAI
         // Enables or disables melee attacks.
         void SetMeleeAttack(bool enabled);
 
-        // Enables or disabled combat movement.
+        // Enables or disables combat movement.
         void SetCombatMovement(bool enabled);
         
         // Pointer to controlled by AI creature
@@ -257,10 +253,8 @@ enum Permitions
 {
     PERMIT_BASE_NO                 = -1,
     PERMIT_BASE_IDLE               = 1,
-    PERMIT_BASE_REACTIVE           = 100,
-    PERMIT_BASE_PROACTIVE          = 200,
-    PERMIT_BASE_FACTION_SPECIFIC   = 400,
-    PERMIT_BASE_SPECIAL            = 800
+    PERMIT_BASE_NORMAL             = 100,
+    PERMIT_BASE_SPECIAL            = 200
 };
 
 typedef FactoryHolder<CreatureAI> CreatureAICreator;

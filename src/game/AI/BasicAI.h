@@ -1,9 +1,4 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
- * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -19,28 +14,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef MANGOS_REACTORAI_H
-#define MANGOS_REACTORAI_H
+#ifndef MANGOS_AGGRESSORAI_H
+#define MANGOS_AGGRESSORAI_H
 
 #include "CreatureAI.h"
 
-class Creature;
-
-class ReactorAI : public CreatureAI
+class BasicAI : public CreatureAI
 {
     public:
 
-        explicit ReactorAI(Creature* c);
+        explicit BasicAI(Creature* c);
 
         void MoveInLineOfSight(Unit*) override;
-        void AttackStart(Unit*) override;
+        bool IsProximityAggroAllowedFor(Unit*) const;
         void UpdateAI(uint32 const) override;
-        void JustRespawned() override;
 
+        // Used for civillians that can summon guards.
+        void JustRespawned() override;
+        virtual void SummonedCreatureDespawn(Creature* /*pSummon*/) override;
         bool CanSummonGuards() const { return m_bCanSummonGuards; }
+        void SummonGuard(Unit* /*pEnemy*/);
 
         static int Permissible(Creature const*);
-    private:
+    protected:
         bool m_bCanSummonGuards;
 };
 

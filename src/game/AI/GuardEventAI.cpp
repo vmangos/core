@@ -47,9 +47,6 @@ bool GuardEventAI::IsAttackingPlayerOrFriendly(Unit const* pWho) const
 
 void GuardEventAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (!pWho)
-        return;
-
     if (m_creature->GetVictim())
         return;
 

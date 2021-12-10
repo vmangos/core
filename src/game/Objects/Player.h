@@ -2324,7 +2324,7 @@ class Player final: public Unit
         bool m_DbSaveDisabled; // used for faction change
     public:
         static Team TeamForRace(uint8 race);
-        Team GetTeam() const { return m_team; }
+        Team GetTeam() const final { return m_team; }
         TeamId GetTeamId() const { return m_team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
         static uint32 GetFactionForRace(uint8 race);
         void SetFactionForRace(uint8 race);

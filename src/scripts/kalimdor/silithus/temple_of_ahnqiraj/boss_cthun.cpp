@@ -434,7 +434,7 @@ struct cthunTentacle : public ScriptedAI
             Unit* caster = (*it)->GetCaster();
             if (!caster) continue;
 
-            if (caster->IsInMap(m_creature) && caster->IsTargetable(true, false) && m_creature->CanReachWithMeleeAutoAttack(caster))
+            if (caster->IsInMap(m_creature) && caster->IsTargetableBy(m_creature) && m_creature->CanReachWithMeleeAutoAttack(caster))
             {
                 target = caster;
                 break;

@@ -23,7 +23,7 @@
 #define MANGOS_CREATURE_EAI_H
 
 #include "Common.h"
-#include "CreatureAI.h"
+#include "BasicAI.h"
 #include "ScriptMgr.h"
 
 class Unit;
@@ -289,7 +289,7 @@ struct CreatureEventAIHolder
     bool UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax);
 };
 
-class CreatureEventAI : public CreatureAI
+class CreatureEventAI : public BasicAI
 {
     public:
         explicit CreatureEventAI(Creature* c);
@@ -309,7 +309,6 @@ class CreatureEventAI : public CreatureAI
         void JustDied(Unit* killer) override;
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
-        void AttackStart(Unit* who) override;
         void MoveInLineOfSight(Unit* who) override;
         void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override;
         void MovementInform(uint32 type, uint32 id) override;
@@ -337,10 +336,7 @@ class CreatureEventAI : public CreatureAI
         //Variables used by Events themselves
         typedef std::vector<CreatureEventAIHolder> CreatureEventAIList;
         CreatureEventAIList m_CreatureEventAIList;          //Holder for events (stores enabled, time, and eventid)
-        float  m_AttackDistance;                            // Distance to attack from
-        float  m_AttackAngle;                               // Angle of attack
         uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
-        bool m_bCanSummonGuards;
 
         void UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);

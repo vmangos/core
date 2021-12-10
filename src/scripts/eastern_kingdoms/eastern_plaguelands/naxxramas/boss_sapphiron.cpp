@@ -280,7 +280,7 @@ struct boss_sapphironAI : public ScriptedAI
             if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 continue;
 
-            if (!pPlayer->IsTargetable(true, false) || !m_creature->IsHostileTo(pPlayer))
+            if (!pPlayer->IsTargetableBy(m_creature) || !m_creature->IsHostileTo(pPlayer))
                 continue;
 
             if (phase == PHASE_SKELETON)

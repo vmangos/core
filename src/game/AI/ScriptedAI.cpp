@@ -10,7 +10,7 @@
 #include "ScriptedAI.h"
 #include "GridSearchers.h"
 
-ScriptedAI::ScriptedAI(Creature* pCreature) : CreatureAI(pCreature),
+ScriptedAI::ScriptedAI(Creature* pCreature) : BasicAI(pCreature),
     me(pCreature),
     m_uiEvadeCheckCooldown(2500),
     m_uiHomeArea(m_creature->GetAreaId())
@@ -24,44 +24,6 @@ ScriptedAI::ScriptedAI(Creature* pCreature) : CreatureAI(pCreature),
     }
 }
 
-void ScriptedAI::MoveInLineOfSight(Unit* pWho)
-{
-    if (!m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho), true, false))
-        return;
-
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()) && m_creature->IsHostileTo(pWho))
-    {
-        if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
-        {
-            if (!m_creature->GetVictim())
-                AttackStart(pWho);
-            else if (m_creature->GetMap()->IsDungeon())
-            {
-                pWho->SetInCombatWith(m_creature);
-                m_creature->AddThreat(pWho);
-            }
-        }
-    }
-}
-
-void ScriptedAI::AttackStart(Unit* pWho)
-{
-    if (!pWho)
-        return;
-
-    if (m_creature->Attack(pWho, true))
-    {
-        m_creature->AddThreat(pWho);
-        m_creature->SetInCombatWith(pWho);
-        pWho->SetInCombatWith(m_creature);
-
-        if (m_bCombatMovement)
-            m_creature->GetMotionMaster()->MoveChase(pWho);
-    }
-    else
-        DEBUG_UNIT(m_creature, DEBUG_AI, "AttackStart %s impossible.", pWho->GetName());
-}
-
 void ScriptedAI::EnterCombat(Unit* pEnemy)
 {
     if (!pEnemy)
@@ -72,17 +34,6 @@ void ScriptedAI::EnterCombat(Unit* pEnemy)
 
 void ScriptedAI::Aggro(Unit* pEnemy)
 {
-}
-
-void ScriptedAI::UpdateAI(uint32 const uiDiff)
-{
-    //Check if we have a current target
-    m_creature->SelectHostileTarget();
-
-    if (!m_CreatureSpells.empty() && m_creature->IsInCombat())
-        UpdateSpellsList(uiDiff);
-
-    DoMeleeAttackIfReady();
 }
 
 void ScriptedAI::EnterEvadeMode()

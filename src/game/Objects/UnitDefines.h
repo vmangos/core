@@ -474,6 +474,20 @@ enum ReactStates
     REACT_AGGRESSIVE = 2
 };
 
+inline char const* ReactStateToString(uint32 reactState)
+{
+    switch (reactState)
+    {
+        case REACT_PASSIVE:
+            return "Passive";
+        case REACT_DEFENSIVE:
+            return "Defensive";
+        case REACT_AGGRESSIVE:
+            return "Aggressive";
+    }
+    return "UNKNOWN";
+}
+
 enum CommandStates
 {
     COMMAND_STAY    = 0,

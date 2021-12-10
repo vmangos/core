@@ -150,7 +150,7 @@ struct boss_archaedasAI : public ScriptedAI
         }
 
         //Return since we have no target
-        if (!UpdateVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
@@ -386,7 +386,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         else if (bAwake) uiReconstruct_Timer -= uiDiff;
 
         //Return since we have no target
-        if (!UpdateVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }

@@ -744,7 +744,7 @@ struct instance_stratholme : public ScriptedInstance
             {
                 if (Player* pPlayer = player.getSource())
                 {
-                    if (pPlayer->IsTargetable(true, false) &&
+                    if (pPlayer->IsTargetableBy(nullptr) &&
                         pPlayer->GetDistance3dToCenter(unforgivenTriggerSpot) < 10.0f)
                     {
                         SetData(TYPE_UNFORGIVEN, DONE);
