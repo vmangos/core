@@ -14,8 +14,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef MANGOS_AGGRESSORAI_H
-#define MANGOS_AGGRESSORAI_H
+#ifndef MANGOS_BASICAI_H
+#define MANGOS_BASICAI_H
 
 #include "CreatureAI.h"
 

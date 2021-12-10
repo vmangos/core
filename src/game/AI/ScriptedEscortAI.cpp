@@ -100,7 +100,7 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* pWho)
         return false;
 
     //never attack friendly
-    if (m_creature->IsFriendlyTo(pWho))
+    if (!pWho->IsTargetableBy(m_creature) || m_creature->IsFriendlyTo(pWho))
         return false;
 
     //too far away and no free sight?

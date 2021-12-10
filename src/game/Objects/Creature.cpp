@@ -3710,7 +3710,7 @@ void Creature::EnterCombatWithTarget(Unit* pVictim)
 {
     if (!GetVictim() && AI())
         AI()->AttackStart(pVictim);
-    else
+    else if (GetVictim() != pVictim)
     {
         AddThreat(pVictim);
         pVictim->SetInCombatWith(this);
