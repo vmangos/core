@@ -193,6 +193,24 @@ UPDATE `quest_template` SET `StartScript` = 0 WHERE `entry` = 3447;
 -- Quest 6383 Does Not Require Breadcrumb Quests
 UPDATE `quest_template` SET `NextQuestId` = 0, `NextQuestInChain` = 6383 WHERE `entry` IN (235, 742, 6382);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Remove Incorrect Questgivers
+DELETE FROM `creature_questrelation` WHERE `id` IN (10857, 11536) AND `quest` = 5524;
+DELETE FROM `creature_involvedrelation` WHERE  `id` IN (10857, 11536) AND `quest` = 5524;
+
+-- Add Quest 5521 to 10857
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(10857, 5521, 1, 10);
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(10857, 5521, 1, 10);
+
+-- Add Quest 5517 to 11536
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(11536, 5517, 1, 10);
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(11536, 5517, 1, 10);
+
 
 -- End of migration.
 END IF;
