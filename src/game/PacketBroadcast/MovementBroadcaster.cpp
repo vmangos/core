@@ -38,7 +38,7 @@ void MovementBroadcaster::StartThreads()
 
 }
 
-void MovementBroadcaster::RegisterPlayer(const std::shared_ptr<PlayerBroadcaster>& player)
+void MovementBroadcaster::RegisterPlayer(std::shared_ptr<PlayerBroadcaster> const& player)
 {
     if (!m_num_threads)
         return;
@@ -48,7 +48,7 @@ void MovementBroadcaster::RegisterPlayer(const std::shared_ptr<PlayerBroadcaster
     m_thread_players[index].insert(player);
 }
 
-void MovementBroadcaster::RemovePlayer(const std::shared_ptr<PlayerBroadcaster>& player)
+void MovementBroadcaster::RemovePlayer(std::shared_ptr<PlayerBroadcaster> const& player)
 {
     if (!m_num_threads)
         return;
