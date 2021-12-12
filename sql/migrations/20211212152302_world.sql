@@ -73,6 +73,9 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -817.583, -505.381, 15.2609, 3.03687, 0, 'Summon Creature Southshore Guard');
 
 
+-- Farmer Kent Scripts
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (243601, 2436, 0, 4, 0, 100, 1, 0, 0, 0, 0, 243601, 0, 0, 'Farmer Kent - Talk on Aggro');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (243601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 628, 627, 0, 0, 0, 0, 0, 0, 0, 'Farmer Kent - Talk');
 
 
 
