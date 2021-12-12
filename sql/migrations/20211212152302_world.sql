@@ -45,6 +45,39 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 (243501, 27, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Despawn Creature');
 
 
+
+
+
+
+
+
+
+
+
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+-- group1 
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -850.748, -561.89, 11.6908, 3.14159, 0, 'Summon Creature Southshore Guard'),
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -852.268, -560.181, 11.6908, 3.82227, 0, 'Summon Creature Southshore Guard'),
+
+-- group2
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -863.394, -494.436, 13.4375, 5.53269, 0, 'Summon Creature Southshore Guard'),
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -863.81, -496.398, 13.4382, 5.34071, 0, 'Summon Creature Southshore Guard'),
+
+
+--  group3
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -874.746, -573.897, 11.6758, 2.28638, 0, 'Summon Creature Southshore Guard'),
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -877.416, -574.223, 11.5033, 1.0821, 0, 'Summon Creature Southshore Guard'),
+
+-- group4
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -818.436, -503.501, 15.3768, 3.71755, 0, 'Summon Creature Southshore Guard'),
+(1, 0, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -817.583, -505.381, 15.2609, 3.03687, 0, 'Summon Creature Southshore Guard');
+
+
+
+
+
+
+
 -- End of migration.
 END IF;
 END??
