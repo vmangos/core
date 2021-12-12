@@ -745,13 +745,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     if (sWorld.getConfig(CONFIG_BOOL_SEND_LOOT_ROLL_UPON_RECONNECT) && alreadyOnline)
         if (Group* pGroup = pCurrChar->GetGroup())
             pGroup->SendLootStartRollsForPlayer(pCurrChar);
-
-    // Update warden speeds
-    //if (GetWarden())
-        //for (int i = 0; i < MAX_MOVE_TYPE; ++i)
-            //GetWarden()->SendSpeedChange(UnitMoveType(i), pCurrChar->GetSpeed(UnitMoveType(i)));
-
-    ALL_SESSION_SCRIPTS(this, OnLogin(pCurrChar));
 }
 
 void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)

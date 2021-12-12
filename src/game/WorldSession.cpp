@@ -357,7 +357,6 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
         if (!AllowPacket(packet->GetOpcode()))
             break;
 
-        ALL_SESSION_SCRIPTS(this, OnPacket(packet->GetOpcode()));
         OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         try
         {
