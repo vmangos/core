@@ -276,16 +276,6 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
     if (value)
         SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
 
-    if (m_session->IsReplaying())
-    {
-        MovementInfo movementInfo = m_session->GetPlayer()->m_movementInfo;
-        movementInfo.UpdateTime(WorldTimer::getMSTime());
-        WorldPacket data(MSG_MOVE_HEARTBEAT, 31);
-        data << m_session->GetRecorderGuid().WriteAsPacked();
-        data << movementInfo;
-        m_session->SendPacket(&data);
-    }
-
     PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, GetNameLink(target).c_str(), args);
     return true;
 }
@@ -1665,76 +1655,6 @@ bool ChatHandler::HandleCinematicListWpCommand(char *args)
     // Exemple :
     // .cine listwp 41
     //
-    return true;
-}
-
-bool ChatHandler::HandleReplayPlayCommand(char* c)
-{
-    if (!c || !*c || strchr(c, '/') != nullptr || strchr(c, '.') != nullptr)
-        return false;
-    WorldSession* sess = m_session;
-    if (Player* player = GetSelectedPlayer())
-        sess = player->GetSession();
-    std::string filename = "replays/";
-    filename += c;
-    sess->SetReadPacket(filename.c_str());
-    if (m_session->IsReplaying())
-        PSendSysMessage("Starting replay %s for %s", c, playerLink(sess->GetPlayerName()).c_str());
-    else
-        PSendSysMessage("Could not start replay %s", c);
-    return true;
-}
-
-bool ChatHandler::HandleReplayForwardCommand(char* c)
-{
-    if (!m_session->IsReplaying())
-    {
-        SendSysMessage("Not replaying currently");
-        SetSentErrorMessage(true);
-        return false;
-    }
-    int32 secsToSkip = 0;
-    ExtractInt32(&c, secsToSkip);
-    m_session->ReplaySkipTime(secsToSkip);
-    PSendSysMessage("Skipping %i ms", secsToSkip);
-    return true;
-}
-
-bool ChatHandler::HandleReplaySpeedCommand(char* c)
-{
-    if (!m_session->IsReplaying())
-    {
-        SendSysMessage("Not currently replaying");
-        SetSentErrorMessage(true);
-        return false;
-    }
-    float newRate = 1.0f;
-    ExtractFloat(&c, newRate);
-    m_session->SetReplaySpeedRate(newRate);
-    PSendSysMessage("Read speed rate changed to %f", newRate);
-    return true;
-}
-
-bool ChatHandler::HandleReplayStopCommand(char* c)
-{
-    if (!m_session->IsReplaying())
-    {
-        SendSysMessage("Not replaying currently");
-        SetSentErrorMessage(true);
-        return false;
-    }
-    m_session->SetReadPacket(nullptr);
-    SendSysMessage("Replay stopped");
-    return true;
-}
-
-bool ChatHandler::HandleReplayRecordCommand(char* c)
-{
-    WorldSession* sess = m_session;
-    if (Player* player = GetSelectedPlayer())
-        sess = player->GetSession();
-    PSendSysMessage("Starting replay recording for %s", playerLink(sess->GetPlayerName()).c_str());
-    sess->SetDumpPacket(c);
     return true;
 }
 

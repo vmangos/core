@@ -4363,21 +4363,6 @@ bool ChatHandler::HandleModifySpeedCommand(char* args)
     if (modSpeed > 4.0f && GetAccessLevel() < SEC_BASIC_ADMIN)
         modSpeed = 4.0f;
 
-    if (m_session->IsReplaying())
-    {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        WorldPacket dataForMe(SMSG_FORCE_RUN_SPEED_CHANGE, 18);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-        dataForMe << uint32(0);
-#else
-        WorldPacket dataForMe(SMSG_FORCE_RUN_SPEED_CHANGE, 14);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-#endif
-        dataForMe << float(7 * modSpeed);
-        m_session->SendPacket(&dataForMe);
-        return true;
-    }
-
     if (modSpeed > 100 || modSpeed < 0.1)
     {
         SendSysMessage(LANG_BAD_VALUE);
@@ -4425,21 +4410,6 @@ bool ChatHandler::HandleModifySwimCommand(char* args)
     if (modSpeed > 4.0f && GetAccessLevel() < SEC_BASIC_ADMIN)
         modSpeed = 4.0f;
 
-    if (m_session->IsReplaying())
-    {
-        
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        WorldPacket dataForMe(SMSG_FORCE_SWIM_SPEED_CHANGE, 18);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-        dataForMe << uint32(0);
-#else
-        WorldPacket dataForMe(SMSG_FORCE_SWIM_SPEED_CHANGE, 14);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-#endif
-        dataForMe << float(4.722222f * modSpeed);
-        m_session->SendPacket(&dataForMe);
-        return true;
-    }
     if (modSpeed > 100.0f || modSpeed < 0.01f)
     {
         SendSysMessage(LANG_BAD_VALUE);

@@ -227,18 +227,10 @@ class ChatHandler
         bool HandleAntiSpamReplace(char* args);
         bool HandleAntiSpamRemoveReplace(char* args);
 
-        // Packet dump
-        bool HandleReplayPlayCommand(char *);
-        bool HandleReplayRecordCommand(char *);
-        bool HandleReplayForwardCommand(char*);
-        bool HandleReplayStopCommand(char*);
-        bool HandleReplaySpeedCommand(char*);
-        bool HandleDebugRecvPacketDumpWrite(char *);
         // Mmaps
         bool HandleMmap(char* args);
         bool HandleMmapConnection(char* args);
         bool HandleMmapTestArea(char* args);
-        bool HandleMmapDebug(char* args);
         bool HandleMmapUnload(char *args);
         bool HandleMmapLoad(char* args);
         bool HandleMmapPathCommand(char* args);

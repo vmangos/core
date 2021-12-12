@@ -463,24 +463,6 @@ class WorldSession
         time_t GetLastPubChanMsgTime() { return m_lastPubChannelMsgTime; }
         void SetLastPubChanMsgTime(time_t time) { m_lastPubChannelMsgTime = time; }
 
-        bool IsReplaying() const { return _pcktReading != nullptr; }
-        ObjectGuid GetRecorderGuid() const { return _recorderGuid; }
-        void ReplaySkipTime(int32 delay) { _pcktReadTimer += delay; }
-        void SetReplaySpeedRate(float r) { _pcktReadSpeedRate = r; }
-        void SetDumpPacket(char const* file);
-        void SetPacketsDumpFlags(uint32 flags) { _pcktDumpFlags = flags; }
-        void SetReadPacket(char const* file);
-        void SetDumpRecvPackets(char const* file);
-
-        FILE* _pcktReading;
-        FILE* _pcktWriting;
-        FILE* _pcktRecvDump;
-        uint32 _pcktDumpFlags;
-        float  _pcktReadSpeedRate;
-        uint32 _pcktReadTimer;
-        uint32 _pcktReadLastUpdate;
-        ObjectGuid _recorderGuid;
-
         // Bot system
         std::stringstream _chatBotHistory;
         PlayerBotEntry* GetBot() { return m_bot; }

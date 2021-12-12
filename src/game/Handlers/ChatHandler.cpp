@@ -155,7 +155,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         SendNotification(LANG_UNKNOWN_LANGUAGE);
         return;
     }
-    if (_player && !IsReplaying() && langDesc->skill_id != 0 && !_player->HasSkill(langDesc->skill_id))
+    if (_player && langDesc->skill_id != 0 && !_player->HasSkill(langDesc->skill_id))
     {
         SendNotification(LANG_NOT_LEARNED_LANGUAGE);
         return;
