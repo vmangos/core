@@ -222,7 +222,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
         if (m_uiRandomDebuffTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, RandDebuff) == CAST_OK)
-                m_uiRandomDebuffTimer = urand(14000, 24000);;
+                m_uiRandomDebuffTimer = urand(14000, 24000);
         }
         else m_uiRandomDebuffTimer -= uiDiff;
 

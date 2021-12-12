@@ -448,7 +448,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         if (pProto && !pProto->m_bDiscovered)
         {
             std::stringstream oss;
-            oss << "Requested info for undiscovered item " << pProto->ItemId;;
+            oss << "Requested info for undiscovered item " << pProto->ItemId;
             ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
         }
         

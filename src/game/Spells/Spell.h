@@ -467,7 +467,7 @@ class Spell
             m_IsCastByItem = item ? true : false;
             m_CastItem = item;
         }
-        bool ShouldRemoveStealthAuras();;
+        bool ShouldRemoveStealthAuras();
 
         void AddChanneledAuraHolder(SpellAuraHolder* holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);

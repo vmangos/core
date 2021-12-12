@@ -184,7 +184,7 @@ void WorldSession::HandleChannelUnmoderatorOpcode(WorldPacket& recvPacket)
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
     {
         if (Channel *chn = cMgr->GetChannel(channelname, player))
-            chn->UnsetModerator(player->GetObjectGuid(), otp.c_str());;
+            chn->UnsetModerator(player->GetObjectGuid(), otp.c_str());
     } 
 }
 

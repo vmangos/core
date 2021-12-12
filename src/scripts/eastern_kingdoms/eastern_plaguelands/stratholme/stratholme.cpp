@@ -828,7 +828,7 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;;
+    ScriptedInstance* m_pInstance;
     uint32 m_uiScourgeTimer;
     bool ScourgeStarted;
 

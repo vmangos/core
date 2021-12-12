@@ -1718,7 +1718,7 @@ void ObjectMgr::LoadCreatureSpells()
         do
         {
             Field* fields = result->Fetch();
-            uint32 id = fields[0].GetUInt32();;
+            uint32 id = fields[0].GetUInt32();
             spellScriptSet.insert(id);
         } while (result->NextRow());
     }
@@ -1762,7 +1762,7 @@ void ObjectMgr::LoadCreatureSpells()
         bar.step();
         Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();;
+        uint32 entry = fields[0].GetUInt32();
 
         CreatureSpellsList spellsList;
 
@@ -4461,7 +4461,7 @@ void ObjectMgr::LoadPlayerInfo()
             m_PlayerXPperLevel[current_level] = current_xp;
             ++count;
         }
-        while (result->NextRow());;
+        while (result->NextRow());
 
         sLog.outString();
         sLog.outString(">> Loaded %u xp for level definitions", count);
@@ -10999,7 +10999,7 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
                     break;
                 default:
                     sLog.outErrorDb("Wrong class %hhu for entry %u in table `player_premade_template`", requiredClass, entry);
-                    continue;;
+                    continue;
             }
 
             if (!(level >= 1 && level <= PLAYER_MAX_LEVEL))
@@ -11122,7 +11122,7 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
                     break;
                 default:
                     sLog.outErrorDb("Wrong class %hhu for entry %u in table `player_premade_template`", requiredClass, entry);
-                    continue;;
+                    continue;
             }
 
             if (!(level >= 1 && level <= PLAYER_MAX_LEVEL))

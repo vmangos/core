@@ -1698,7 +1698,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 8067:                              // Party Time!
                     {
                         m_isPeriodic = true;
-                        m_modifier.periodictime = 10 * IN_MILLISECONDS;;
+                        m_modifier.periodictime = 10 * IN_MILLISECONDS;
                         return;
                     }
                     case 10255:                             // Stoned
@@ -1736,7 +1736,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 16336: // Haunting Phantoms
                     {
                         m_isPeriodic = true;
-                        m_modifier.periodictime = urand(30, 90) * IN_MILLISECONDS;;
+                        m_modifier.periodictime = urand(30, 90) * IN_MILLISECONDS;
                         return;
                     }
                     case 26234:                             // Ragnaros Submerge Visual
