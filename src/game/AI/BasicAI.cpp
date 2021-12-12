@@ -16,6 +16,8 @@
 
 #include "BasicAI.h"
 #include "Creature.h"
+#include "Player.h"
+#include "Map.h"
 #include "GuardMgr.h"
 
 BasicAI::BasicAI(Creature* c) : CreatureAI(c), m_bCanSummonGuards(c->CanSummonGuards())
