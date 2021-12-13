@@ -164,14 +164,14 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 -- timings off due to incomplete sniff
 DELETE FROM `generic_scripts` WHERE `id`=243510;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(243510, 0, 3, 0, 2758, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -782.269, -509.026, 18.8601, 0, 0, 'Southshore Guard - Move'),
-(243510, 2, 3, 0, 5177, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -788.217, -517.664, 17.7153, 0, 0, 'Southshore Guard - Move'),
-(243510, 4, 3, 0, 8404, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -799.213, -527.854, 16.7172, 0, 0, 'Southshore Guard - Move'),
-(243510, 6, 3, 0, 4332, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -797.417, -534.636, 16.543, 0, 0, 'Southshore Guard - Move'),
-(243510, 8, 3, 0, 7015, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -784.416, -541.493, 18.103, 0, 0, 'Southshore Guard - Move'),
-(243510, 10, 3, 0, 8914, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -763.778, -545.218, 17.9648, 0, 0, 'Southshore Guard - Move'),
-(243510, 13, 3, 0, 9932, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -744.096, -534.273, 20.9565, 0, 0, 'Southshore Guard - Move'),
-(243510, 16, 3, 0, 1660, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -733.222, -529.082, 22.755, 0, 0, 'Southshore Guard - Move'),
+(243510, 0, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -782.269, -509.026, 18.8601, 0, 0, 'Southshore Guard - Move'),
+(243510, 2, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -788.217, -517.664, 17.7153, 0, 0, 'Southshore Guard - Move'),
+(243510, 4, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -799.213, -527.854, 16.7172, 0, 0, 'Southshore Guard - Move'),
+(243510, 6, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -797.417, -534.636, 16.543, 0, 0, 'Southshore Guard - Move'),
+(243510, 8, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -784.416, -541.493, 18.103, 0, 0, 'Southshore Guard - Move'),
+(243510, 10, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -763.778, -545.218, 17.9648, 0, 0, 'Southshore Guard - Move'),
+(243510, 13, 3, 0, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -744.096, -534.273, 20.9565, 0, 0, 'Southshore Guard - Move'),
+(243510, 16, 3, 0, 2000, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -733.222, -529.082, 22.755, 0, 0, 'Southshore Guard - Move'),
 (243510, 19, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 'Southshore Guard - Set Movement Type');
 
 -- timings off due to incomplete sniff
