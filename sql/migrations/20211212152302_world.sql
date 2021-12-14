@@ -18,7 +18,9 @@ DELETE FROM `creature_movement_scripts` WHERE `id` = 14;
 DELETE FROM `creature_movement` WHERE  `id` IN (301764, 301765, 301761, 301763, 301762);
 
 -- Misc
-UPDATE `creature_template` SET `movement_type` = '0' WHERE `entry` = 2434;
+UPDATE `creature_template` SET `movement_type` = '0', `faction` = 108, `npc_flags` = 0, `ai_name` = '', `auras`='1785 3616' WHERE `entry` = 2434;
+DELETE FROM `creature_ai_scripts` WHERE `id` = 243401;
+DELETE FROM `creature_ai_events` WHERE `creature_id` = 2434;
 UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733 WHERE `id` = 2435;
 UPDATE `broadcast_text` SET `chat_type` = 2 WHERE `entry` = 623;
 
@@ -32,15 +34,6 @@ DELETE FROM `creature_ai_events` WHERE `creature_id`=2435;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (243502, 243503, 243504);
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
 (243501, 2435, 0, 1, 0, 100, 0, 2000, 2000, 0, 0, 243501, 0, 0, 'Southshore Crier - Yell on Spawn');
-
-
-
-
-
-
-
-
-
 
 -- Main script
 DELETE FROM `creature_movement` WHERE `id` = 301755;
