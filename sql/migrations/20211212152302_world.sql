@@ -254,24 +254,34 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 
 DELETE FROM `generic_scripts` WHERE `id` BETWEEN 243513 AND 243526;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(243513, 0, 60, 3, 0, 60000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243514, 0, 60, 3, 0, 60000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243515, 0, 60, 3, 0, 120000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243516, 0, 60, 3, 0, 120000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243517, 0, 60, 3, 0, 180000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243518, 0, 60, 3, 0, 180000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243519, 0, 60, 3, 0, 240000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243520, 0, 60, 3, 0, 240000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243521, 0, 60, 3, 0, 300000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243522, 0, 60, 3, 0, 300000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243523, 0, 60, 3, 0, 360000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243524, 0, 60, 3, 0, 360000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243525, 0, 60, 3, 0, 420000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243526, 0, 60, 3, 0, 420000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints');
-
-
-
-
+(243513, 60, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243513, 120, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243514, 62, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243514, 122, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243515, 120, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243515, 180, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243516, 122, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243516, 182, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243517, 180, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243517, 240, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243518, 182, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243518, 242, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243519, 240, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243519, 300, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243520, 242, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243520, 302, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243521, 300, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243521, 360, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243522, 302, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243522, 362, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243523, 360, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243523, 420, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243524, 362, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243524, 422, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243525, 420, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243525, 480, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243525, 422, 3, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, -858, -531.3, 9.63, 1.56626, 0, 'Shadowy Assassin - Move'),
+(243526, 482, 60, 3, 0, 2000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints');
 
 
 -- End of migration.
