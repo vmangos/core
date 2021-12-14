@@ -21,7 +21,7 @@ DELETE FROM `creature_movement` WHERE  `id` IN (301764, 301765, 301761, 301763, 
 UPDATE `creature_template` SET `movement_type` = '0', `faction` = 108, `npc_flags` = 0, `ai_name` = '', `auras`='1785 3616' WHERE `entry` = 2434;
 DELETE FROM `creature_ai_scripts` WHERE `id` = 243401;
 DELETE FROM `creature_ai_events` WHERE `creature_id` = 2434;
-UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733 WHERE `id` = 2435;
+UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733, `spawntimesecsmin` = 720, `spawntimesecsmax` = 720 WHERE `id` = 2435;
 UPDATE `broadcast_text` SET `chat_type` = 2 WHERE `entry` = 623;
 
 -- Events List for Farmer Kent
