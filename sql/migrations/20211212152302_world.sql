@@ -15,6 +15,7 @@ DELETE FROM `game_event` WHERE `entry` = 153;
 DELETE FROM `game_event_creature` WHERE `event` = 153;
 
 -- Misc
+UPDATE `creature_template` SET `movement_type` = '0' WHERE `entry` = 2434;
 UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733 WHERE `id` = 2435;
 UPDATE `broadcast_text` SET `chat_type` = 2 WHERE `entry` = 623;
 
