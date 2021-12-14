@@ -76,37 +76,36 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 (243501, 8, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 243507, -1, 1, -863.394, -494.436, 13.4375, 5.53269, 0, 'Summon Creature Southshore Guard'),
 (243501, 8, 10, 2386, 60000, 0, 0, 0, 0, 0, 0, 0, 243506, -1, 1, -863.81, -496.398, 13.4382, 5.34071, 0, 'Summon Creature Southshore Guard'),
 (243501, 21, 15, 2596, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Cast Spell Touch of the Black Claw'),
-(243501, 21, 15, 2596, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Cast Spell Touch of the Black Claw'),
 (243501, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 626, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Say Text'),
 (243501, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 623, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Say Text'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -775.546, -441.894, 21.8413, 0.456332, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -874.898, -543.902, 8.1009, 2.6314, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -874.686, -543.904, 8.11303, 2.65715, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -722.296, -626.843, 21.2373, 4.2949, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -722.225, -627.343, 21.2852, 5.99603, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -830.498, -675.663, 11.4526, 1.83392, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -832.882, -666.844, 12.3942, 1.82468, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -757.291, -425, 20.5991, 4.43955, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -759.857, -421.127, 20.7913, 3.24438, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -863.397, -420.184, 12.1807, 5.33287, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -862.454, -416.289, 12.1807, 3.79291, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -774.61, -682.655, 10.2871, 0.20944, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -775.028, -681.441, 10.5779, 0.763972, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -879.583, -506.974, 12.0944, 4.32519, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -879.434, -507.08, 12.0944, 1.861, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -863.649, -538.335, 8.72452, 0.311862, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -860.799, -537.438, 9.01221, 0.313721, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -864.073, -420.33, 12.208, 5.61996, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -862.443, -418.923, 12.1787, 5.51524, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -826.355, -514.603, 13.2019, 3.24146, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -826.566, -514.741, 13.1909, 3.22376, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -772.994, -529.219, 20.8964, 5.34041, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -773.472, -526.871, 21.3032, 4.91285, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -915.314, -416.524, 8.04292, 5.74213, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -915.724, -418.445, 7.44239, 4.92183, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -776.995, -681.734, 10.645, 1.14385, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -769.896, -676.539, 11.8627, 0.92749, 0, 'Summon Creature Shadowy Assassin'),
-(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -781.113, -441.065, 21.0467, 2.06222, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243513, -1, 1, -775.546, -441.894, 21.8413, 0.456332, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243513, -1, 1, -781.113, -441.065, 21.0467, 2.06222, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243514, -1, 1, -874.898, -543.902, 8.1009, 2.6314, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243514, -1, 1, -874.686, -543.904, 8.11303, 2.65715, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243515, -1, 1, -722.296, -626.843, 21.2373, 4.2949, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243515, -1, 1, -722.225, -627.343, 21.2852, 5.99603, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243516, -1, 1, -830.498, -675.663, 11.4526, 1.83392, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243516, -1, 1, -832.882, -666.844, 12.3942, 1.82468, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243517, -1, 1, -757.291, -425, 20.5991, 4.43955, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243517, -1, 1, -759.857, -421.127, 20.7913, 3.24438, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243518, -1, 1, -863.397, -420.184, 12.1807, 5.33287, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243518, -1, 1, -862.454, -416.289, 12.1807, 3.79291, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243519, -1, 1, -774.61, -682.655, 10.2871, 0.20944, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243519, -1, 1, -775.028, -681.441, 10.5779, 0.763972, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243520, -1, 1, -879.583, -506.974, 12.0944, 4.32519, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243520, -1, 1, -879.434, -507.08, 12.0944, 1.861, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243521, -1, 1, -863.649, -538.335, 8.72452, 0.311862, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243521, -1, 1, -860.799, -537.438, 9.01221, 0.313721, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243522, -1, 1, -864.073, -420.33, 12.208, 5.61996, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243522, -1, 1, -862.443, -418.923, 12.1787, 5.51524, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243523, -1, 1, -826.355, -514.603, 13.2019, 3.24146, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243523, -1, 1, -826.566, -514.741, 13.1909, 3.22376, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243524, -1, 1, -772.994, -529.219, 20.8964, 5.34041, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243524, -1, 1, -773.472, -526.871, 21.3032, 4.91285, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243525, -1, 1, -915.314, -416.524, 8.04292, 5.74213, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243525, -1, 1, -915.724, -418.445, 7.44239, 4.92183, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243526, -1, 1, -776.995, -681.734, 10.645, 1.14385, 0, 'Summon Creature Shadowy Assassin'),
+(243501, 22, 10, 2434, 60000, 0, 0, 0, 0, 0, 0, 0, 243526, -1, 1, -769.896, -676.539, 11.8627, 0.92749, 0, 'Summon Creature Shadowy Assassin'),
 (243501, 27, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Despawn Creature');
 
 -- Spawn scripts for Creature Southshore Guards
@@ -241,7 +240,34 @@ DELETE FROM `generic_scripts` WHERE `id`=243512;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (243512, 14, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 'Southshore Guard - Set Movement Type');
 
+-- Spawn Scripts for Creature Shadowy Assassin
+DELETE FROM `creature_movement_template` WHERE `entry` = 2434;
+DELETE FROM `creature_movement_special` WHERE `id` = 2434;
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(2434, 1, -858, -531.3, 9.63, 1.56626, 0, 0, 0),
+(2434, 2, -861.027, -517.187, 11.0524, 1.56626, 0, 0, 0),
+(2434, 3, -861.321, -504.393, 13.354, 1.5643, 0, 0, 0),
+(2434, 4, -861.605, -490.402, 13.354, 3.05655, 0, 0, 0),
+(2434, 5, -875.778, -490.327, 12.4535, 0.074002, 0, 0, 0),
+(2434, 6, -875.742, -481.577, 13.3555, 1.56233, 0, 0, 0),
+(2434, 7, -865.25, -475.264, 13.3555, 0.399942, 600000, 0, 0);
 
+DELETE FROM `generic_scripts` WHERE `id` BETWEEN 243513 AND 243526;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(243513, 0, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243514, 0, 60, 3, 0, 10000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243515, 0, 60, 3, 0, 40000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243516, 0, 60, 3, 0, 40000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243517, 0, 60, 3, 0, 70000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243518, 0, 60, 3, 0, 70000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243519, 0, 60, 3, 0, 100000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243520, 0, 60, 3, 0, 100000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243521, 0, 60, 3, 0, 130000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243522, 0, 60, 3, 0, 130000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243523, 0, 60, 3, 0, 160000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243524, 0, 60, 3, 0, 160000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243525, 0, 60, 3, 0, 190000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243526, 0, 60, 3, 0, 190000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints');
 
 
 
