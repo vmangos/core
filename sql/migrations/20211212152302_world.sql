@@ -15,7 +15,7 @@ DELETE FROM `game_event` WHERE `entry` = 153;
 DELETE FROM `game_event_creature` WHERE `event` = 153;
 
 -- Misc
-UPDATE `creature` SET `position_x` = -668.636, `position_y` = -562.703, `position_z` = 25.3622 WHERE `id` = 2435;
+UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733 WHERE `id` = 2435;
 UPDATE `broadcast_text` SET `chat_type` = 2 WHERE `entry` = 623;
 
 -- Events list for Farmer Kent
@@ -41,14 +41,19 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 -- Main script
 DELETE FROM `creature_movement` WHERE `id` = 301755;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(2435, 1, -668.636, -562.703, 25.3622, 100, 0, 0, 11),
-(2435, 2, -680.996, -566.52, 25.2009, 100, 0, 0, 0),
-(2435, 3, -693.22, -569.418, 24.4536, 100, 0, 0, 0),
-(2435, 4, -723.958, -551.954, 20.5542, 100, 0, 0, 0),
-(2435, 5, -764.897, -546.37, 17.9831, 100, 0, 0, 0),
-(2435, 6, -809.579, -528.999, 15.3876, 100, 0, 0, 0),
-(2435, 7, -821.22, -524.994, 13.8281, 100, 0, 0, 0),
-(2435, 8, -856.326, -532.717, 9.74993, 100, 30000, 5, 243501);
+(2435, 1, -576.589, -555.617, 33.4733, 100, 0, 0, 11),
+(2435, 2, -584.442, -565.827, 32.8548, 100, 0, 0, 0),
+(2435, 3, -590.498, -573.355, 32.4334, 100, 0, 0, 0),
+(2435, 4, -627.736, -566.756, 27.9208, 100, 0, 0, 0),
+(2435, 5, -652.486, -561.351, 26.2017, 100, 0, 0, 0),
+(2435, 6, -668.636, -562.703, 25.3622, 100, 0, 0, 0),
+(2435, 7, -680.996, -566.52, 25.2009, 100, 0, 0, 0),
+(2435, 8, -693.22, -569.418, 24.4536, 100, 0, 0, 0),
+(2435, 9, -723.958, -551.954, 20.5542, 100, 0, 0, 0),
+(2435, 10, -764.897, -546.37, 17.9831, 100, 0, 0, 0),
+(2435, 11, -809.579, -528.999, 15.3876, 100, 0, 0, 0),
+(2435, 12, -821.22, -524.994, 13.8281, 100, 0, 0, 0),
+(2435, 13, -856.326, -532.717, 9.74993, 100, 30000, 5, 243501);
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=243501;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
