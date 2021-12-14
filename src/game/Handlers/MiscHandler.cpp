@@ -434,7 +434,7 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket& recv_data)
     // Trigger a client camera reset by sending an `SMSG_STANDSTATE_UPDATE'
     // event. See `WorldSession::HandleMoveWorldportAckOpcode'.
     // Note: There might be a better place to perform this trigger
-    if (_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    if (m_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
         WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
         data << GetPlayer()->GetStandState();

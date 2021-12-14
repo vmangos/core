@@ -276,8 +276,8 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
         // Retrieve messages in queue
         if (messageType == OFFLINE_CHAT_GET_MESSAGES)
         {
-            out << player->GetSession()->_chatBotHistory.str();
-            player->GetSession()->_chatBotHistory.str("");
+            out << player->GetSession()->m_chatBotHistory.str();
+            player->GetSession()->m_chatBotHistory.str("");
         }
         else if (messageType == OFFLINE_CHAT_GM_COMMAND)
         {

@@ -210,7 +210,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // ignores any movement from the transport object. Triggering
     // `SMSG_STANDSTATE_UPDATE' with its current state resets the camera
     // (implemented in `WorldSession::HandleZoneUpdateOpcode').
-    if (_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    if (m_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
         GetPlayer()->SendHeartBeat(true);
     }
@@ -295,7 +295,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     Unit* pMover = _player->GetMover();
 
-    if (pMover->GetObjectGuid() != _clientMoverGuid)
+    if (pMover->GetObjectGuid() != m_clientMoverGuid)
         return;
         
     Player* pPlayerMover = pMover->ToPlayer();
@@ -364,9 +364,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     WorldPacket data(opcode, recvData.size());
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << _clientMoverGuid.WriteAsPacked();
+    data << m_clientMoverGuid.WriteAsPacked();
 #else
-    data << _clientMoverGuid.GetRawValue();
+    data << m_clientMoverGuid.GetRawValue();
 #endif
     movementInfo.Write(data);
 
@@ -394,7 +394,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (opcode2)
         {
             WorldPacket data(opcode2, recvData.size());
-            data << _clientMoverGuid.WriteAsPacked();             // write guid
+            data << m_clientMoverGuid.WriteAsPacked();             // write guid
             movementInfo.Write(data);                             // write data
 
             pMover->SendMovementMessageToSet(std::move(data), true, _player);
@@ -432,7 +432,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
     /*----------------*/
 
     // now can skip not our packet
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != m_clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     UnitMoveType move_type;
@@ -556,7 +556,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
     /*----------------*/
 
     // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != m_clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     Unit* pMover = _player->GetMap()->GetUnit(guid);
@@ -674,7 +674,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     /*----------------*/
 
     // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != m_clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     Unit* pMover = _player->GetMap()->GetUnit(guid);
@@ -761,7 +761,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     movementInfo.UpdateTime(recvData.GetPacketTime());
     /*----------------*/
 
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != m_clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     Unit* pMover = _player->GetMap()->GetUnit(guid);
@@ -845,7 +845,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     {
         sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
                       _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
-        _clientMoverGuid = _player->GetMover()->GetObjectGuid();
+        m_clientMoverGuid = _player->GetMover()->GetObjectGuid();
         return;
     }
 
@@ -859,7 +859,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 
     // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
     // Check if we actually have a pet before looking up
-    if (_player->GetPetGuid() && _player->GetPetGuid() == _clientMoverGuid)
+    if (_player->GetPetGuid() && _player->GetPetGuid() == m_clientMoverGuid)
     {
         if (Pet* pet = _player->GetPet())
         {
@@ -871,7 +871,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
         }
     }
 
-    _clientMoverGuid = guid;
+    m_clientMoverGuid = guid;
 }
 
 void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
@@ -885,7 +885,7 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
     ObjectGuid old_mover_guid;
     recvData >> old_mover_guid;
     recvData >> movementInfo;
-    _clientMoverGuid = ObjectGuid();
+    m_clientMoverGuid = ObjectGuid();
 
     // Client sent not active mover, but maybe the mover is actually set?
     if (_player->GetMover() && _player->GetMover()->GetObjectGuid() == old_mover_guid)
@@ -899,7 +899,7 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
     }
 #else
     recvData >> movementInfo;
-    _clientMoverGuid = ObjectGuid();
+    m_clientMoverGuid = ObjectGuid();
 #endif
     
     if (!_player->GetCheatData()->HandleFlagTests(_player, movementInfo, recvData.GetOpcode()) ||
@@ -945,7 +945,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     uint32 lag;
     recvData >> lag;
 
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != m_clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     Unit* pMover = _player->GetMap()->GetUnit(guid);
@@ -975,15 +975,6 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
         pMover->SendMovementMessageToSet(std::move(data), true, _player);
     }
 #endif
-}
-
-bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo, ObjectGuid const& guid) const
-{
-    // ignore wrong guid (player attempt cheating own session for not own guid possible...)
-    if (guid != _player->GetMover()->GetObjectGuid())
-        return false;
-
-    return VerifyMovementInfo(movementInfo);
 }
 
 bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo) const
