@@ -834,6 +834,18 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (21058, 3620, 20, 'Wetlands - Incendicite Mineral Vein', 10),
 (21059, 3620, 0, 'Wetlands - Incendicite Mineral Vein', 10);
 
+-- Add Missing Syndicate Documents
+UPDATE `gameobject_template` SET `faction` = 84 WHERE `entry` = 1740;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(13788, 1738, 0, 231.099, -849.387, 147.583, 3.6652, 0, 0, -0.965925, 0.258821, 7200, 7200, 100, 1, 0, 0, 0, 10),
+(13789, 1739, 0, 231.55, -850.062, 147.57, 2.60053, 0, 0, 0.96363, 0.267241, 7200, 7200, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `gameobject_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(1738, 510, 0, 10),
+(1738, 511, 0, 10),
+(1739, 510, 0, 10),
+(1739, 511, 0, 10);
+
 
 -- End of migration.
 END IF;
