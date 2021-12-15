@@ -273,8 +273,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 DELETE FROM `generic_scripts` WHERE `id` BETWEEN 243513 AND 243526;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(243513, 0, 60, 2, 0, 60000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243514, 0, 60, 2, 0, 60000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243513, 0, 60, 2, 0, 180000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243514, 0, 60, 2, 0, 180000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
 (243515, 0, 60, 2, 0, 300000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
 (243516, 0, 60, 2, 0, 300000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
 (243517, 0, 60, 2, 0, 600000, 0, 0, 0, 0, 0, 0, 2434, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
