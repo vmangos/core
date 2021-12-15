@@ -6582,31 +6582,39 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         float max_dis = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
         float dis = rand_norm_f() * (max_dis - min_dis) + min_dis;
 
+        float max_angle = (max_dis - min_dis) / (max_dis + m_caster->GetObjectBoundingRadius());
+        float angle_offset = max_angle * (rand_norm_f() - 0.5f);
+
         float x, y, z;
         m_casterUnit->GetPosition(x, y, z);
-        fx = x + dis * cos(m_casterUnit->GetOrientation());
-        fy = y + dis * sin(m_casterUnit->GetOrientation());
+        fx = x + dis * cos(m_casterUnit->GetOrientation()+ angle_offset);
+        fy = y + dis * sin(m_casterUnit->GetOrientation()+ angle_offset);
         fz = z;
-        m_casterUnit->GetMap()->GetLosHitPosition(x, y, z + 0.5f, fx, fy, fz, -1.5f);
+        m_casterUnit->GetMap()->GetLosHitPosition(x, y, z + 2.0f, fx, fy, fz, -1.5f);
     }
 
     Map* cMap = m_casterUnit->GetMap();
 
     if (goinfo->type == GAMEOBJECT_TYPE_FISHINGNODE)
     {
-        float waterLevel = m_casterUnit->GetTerrain()->GetWaterLevel(fx, fy, fz);
-        if (waterLevel == VMAP_INVALID_HEIGHT_VALUE)             // Hack to prevent fishing bobber from failing to land on fishing hole
+        GridMapLiquidData liqData;
+
+        if (!m_caster->GetTerrain()->IsSwimmable(fx, fy, m_caster->GetPositionZ() + 1.0f, 1.5f, &liqData))
+            m_caster->GetTerrain()->IsSwimmable(fx, fy, liqData.level, 1.5f, &liqData);
+
+        float x, y, z;
+        m_casterUnit->GetPosition(x, y, z);
+        if ((abs(liqData.depth_level) < 1) || !(m_caster->GetMap()->isInLineOfSight(x, y, z + 2.0f, fx, fy, liqData.level))) // Hack to prevent fishing bobber from failing to land on fishing hole
         {
-            // but this is not proper, we really need to ignore not materialized objects
+            // But this is not proper, we really need to ignore not materialized objects
             SendCastResult(SPELL_FAILED_NOT_FISHABLE);
             SendChannelUpdate(0);
             finish();
             return;
         }
 
-        // replace by water level in this case
-        //fz = cMap->GetWaterLevel(fx, fy);
-        fz = waterLevel;
+        // Replace by water level in this case
+        fz = liqData.level;
     }
 
     GameObject* pGameObj = new GameObject;
