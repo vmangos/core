@@ -222,7 +222,6 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243510, 9, -733.027, -533.149, 22.9293, 100, 0, 0, 0),
 (243510, 10, -734.124, -532.319, 22.8824, 100, 720000, 3, 0);
 
-
 DELETE FROM `generic_scripts` WHERE `id`=243511;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (243511, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 243511, 0, 0, 0, 0, 0, 0, 0, 'Southshore Guard - Start Waypoints');
