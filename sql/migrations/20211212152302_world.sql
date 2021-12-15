@@ -21,7 +21,7 @@ DELETE FROM `creature_movement` WHERE  `id` IN (301764, 301765, 301761, 301763, 
 UPDATE `creature_template` SET `movement_type` = '0', `faction` = 108, `npc_flags` = 0, `ai_name` = '', `auras`='1785 3616' WHERE `entry` = 2434;
 DELETE FROM `creature_ai_scripts` WHERE `id` = 243401;
 DELETE FROM `creature_ai_events` WHERE `creature_id` = 2434;
-UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733, `spawntimesecsmin` = 720, `spawntimesecsmax` = 720 WHERE `id` = 2435;
+UPDATE `creature` SET `position_x` = -576.589, `position_y` = -555.617, `position_z` = 33.4733, `spawntimesecsmin` = 2100, `spawntimesecsmax` = 2100 WHERE `id` = 2435;
 UPDATE `broadcast_text` SET `chat_type` = 2 WHERE `entry` = 623;
 
 -- Events List for Farmer Kent
@@ -56,18 +56,18 @@ DELETE FROM `creature_movement_scripts` WHERE `id`=243501;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (243501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 620, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Say Text'),
 (243501, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 621, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Say Text'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243511, -1, 9, -787.574, -504.358, 18.9435, 5.79449, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243510, -1, 9, -787.598, -505.655, 18.9435, 6.05629, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243512, -1, 9, -726.914, -575.805, 25.4761, 4.03917, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243512, -1, 9, -726.371, -574.912, 25.5261, 4.16828, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243505, -1, 9, -877.416, -574.223, 11.5033, 1.0821, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243504, -1, 9, -874.746, -573.897, 11.6758, 2.28638, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243509, -1, 9, -817.583, -505.381, 15.2609, 3.03687, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243508, -1, 9, -818.436, -503.501, 15.3768, 3.71755, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243503, -1, 9, -850.748, -561.89, 11.6908, 3.14159, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243502, -1, 9, -852.268, -560.181, 11.6908, 3.82227, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243507, -1, 9, -863.394, -494.436, 13.4375, 5.53269, 0, 'Summon Creature Southshore Guard'),
-(243501, 8, 10, 2386, 660000, 0, 0, 0, 0, 0, 0, 0, 243506, -1, 9, -863.81, -496.398, 13.4382, 5.34071, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243511, -1, 9, -787.574, -504.358, 18.9435, 5.79449, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243510, -1, 9, -787.598, -505.655, 18.9435, 6.05629, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243512, -1, 9, -726.914, -575.805, 25.4761, 4.03917, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243512, -1, 9, -726.371, -574.912, 25.5261, 4.16828, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243505, -1, 9, -877.416, -574.223, 11.5033, 1.0821, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243504, -1, 9, -874.746, -573.897, 11.6758, 2.28638, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243509, -1, 9, -817.583, -505.381, 15.2609, 3.03687, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243508, -1, 9, -818.436, -503.501, 15.3768, 3.71755, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243503, -1, 9, -850.748, -561.89, 11.6908, 3.14159, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243502, -1, 9, -852.268, -560.181, 11.6908, 3.82227, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243507, -1, 9, -863.394, -494.436, 13.4375, 5.53269, 0, 'Summon Creature Southshore Guard'),
+(243501, 8, 10, 2386, 2100000, 0, 0, 0, 0, 0, 0, 0, 243506, -1, 9, -863.81, -496.398, 13.4382, 5.34071, 0, 'Summon Creature Southshore Guard'),
 (243501, 21, 15, 2596, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Cast Spell Touch of the Black Claw'),
 (243501, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 626, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Say Text'),
 (243501, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 623, 0, 0, 0, 0, 0, 0, 0, 0, 'Southshore Crier - Say Text'),
@@ -110,7 +110,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243502, 2, -849.097, -544.966, 11.1183, 100, 0, 0, 0),
 (243502, 3, -870.534, -538.675, 8.21938, 100, 0, 0, 0),
 (243502, 4, -902.927, -544.349, 6.87962, 100, 0, 0, 0),
-(243502, 5, -900.795, -545.331, 6.87962, 100, 720000, 3, 0);
+(243502, 5, -900.795, -545.331, 6.87962, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243503;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -123,7 +123,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243503, 5, -866.533, -538.207, 8.49329, 100, 0, 0, 0),
 (243503, 6, -885.609, -542.527, 7.21792, 100, 0, 0, 0),
 (243503, 7, -897.598, -544.321, 6.87962, 100, 0, 0, 0),
-(243503, 8, -902.318, -544.345, 6.87962, 100, 720000, 3, 0);
+(243503, 8, -902.318, -544.345, 6.87962, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243504;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -133,7 +133,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243504, 2, -878.976, -614.334, 6.35845, 100, 0, 0, 0),
 (243504, 3, -867.666, -629.993, 7.5186, 100, 0, 0, 0),
 (243504, 4, -867.149, -645.85, 10.1492, 100, 0, 0, 0),
-(243504, 5, -843.583, -645.406, 16.4311, 100, 720000, 3, 0);
+(243504, 5, -843.583, -645.406, 16.4311, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243505;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -145,7 +145,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243505, 4, -879.883, -593.102, 9.9001, 100,0, 0, 0),
 (243505, 5, -879.029, -612.981, 6.19609, 100, 0, 0, 0),
 (243505, 6, -870.367, -626.243, 6.61821, 100, 0, 0, 0),
-(243505, 7, -841.871, -640.051, 16.0813, 100, 720000, 3, 0);
+(243505, 7, -841.871, -640.051, 16.0813, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243506;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -159,7 +159,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243506, 6, -860.812, -449.905, 11.5171, 100, 0, 0, 0),
 (243506, 7, -876.748, -424.008, 10.6959, 100, 0, 0, 0),
 (243506, 8, -880.01, -417.176, 10.6465, 100, 0, 0, 0),
-(243506, 9, -880.184, -419.371, 10.3621, 100, 720000, 3, 0);
+(243506, 9, -880.184, -419.371, 10.3621, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243507;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -177,7 +177,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243507, 10, -861.375, -429.504, 11.5338, 100, 0, 0, 0),
 (243507, 11, -885.691, -450.73, 10.2349, 100, 0, 0, 0),
 (243507, 12, -868.993, -414.111, 12.0528, 100, 0, 0, 0),
-(243507, 13, -873.529, -420.94, 11.4227, 100, 720000, 3, 0);
+(243507, 13, -873.529, -420.94, 11.4227, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243508;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -190,7 +190,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243508, 5, -801.218, -460.606, 16.3138, 100, 0, 0, 0),
 (243508, 6, -801.012, -446.868, 17.879, 100, 0, 0, 0),
 (243508, 7, -794.068, -432.563, 19.2965, 100, 0, 0, 0),
-(243508, 8, -791.534, -432.07, 19.6855, 100, 720000, 3, 0);
+(243508, 8, -791.534, -432.07, 19.6855, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243509;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -205,7 +205,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243509, 7, -785.893, -449.136, 22.1255, 100, 0, 0, 0),
 (243509, 8, -819.587, -438.019, 13.9894, 100, 0, 0, 0),
 (243509, 9, -781.496, -437.445, 21.333, 100, 0, 0, 0),
-(243509, 10, -796.634, -433.713, 18.7880, 100, 720000, 3, 0);
+(243509, 10, -796.634, -433.713, 18.7880, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243510;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -220,7 +220,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243510, 7, -763.778, -545.218, 17.9648, 100, 0, 0, 0),
 (243510, 8, -744.096, -534.273, 20.9565, 100, 0, 0, 0),
 (243510, 9, -733.027, -533.149, 22.9293, 100, 0, 0, 0),
-(243510, 10, -734.124, -532.319, 22.8824, 100, 720000, 3, 0);
+(243510, 10, -734.124, -532.319, 22.8824, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243511;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -254,7 +254,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243511, 26, -739.572, -531.611, 22.0098, 100, 0, 0, 0),
 (243511, 27, -741.6, -533.912, 21.4738, 100, 0, 0, 0),
 (243511, 28, -731.052, -532.607, 22.9293, 100, 0, 0, 0),
-(243511, 29, -733.662, -533.042, 22.878, 100, 720000, 3, 0);
+(243511, 29, -733.662, -533.042, 22.878, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243512;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
