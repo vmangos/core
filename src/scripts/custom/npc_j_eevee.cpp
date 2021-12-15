@@ -38,7 +38,7 @@ enum
 npc_j_eevee_dreadsteedAI::npc_j_eevee_dreadsteedAI(Creature* pCreature) : ScriptedAI(pCreature)
 {
     //m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
-    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED);
     m_creature->SetFactionTemplateId(35); //friendly to everyone
     m_creature->SetWalk(true);
     Reset();

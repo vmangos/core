@@ -230,7 +230,7 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
         {

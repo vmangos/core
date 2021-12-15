@@ -42,7 +42,7 @@ struct npc_narm_faulkAI : ScriptedAI
         }
     }
 
-    void SpellHit(Unit *Hitter, SpellEntry const* Spellkind) override
+    void SpellHit(SpellCaster* Hitter, SpellEntry const* Spellkind) override
     {
         if (Spellkind->Id == 8593 && !spellHit)
         {
@@ -50,7 +50,7 @@ struct npc_narm_faulkAI : ScriptedAI
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
             //m_creature->RemoveAllAuras();
-            DoScriptText(SAY_HEAL, m_creature, Hitter);
+            DoScriptText(SAY_HEAL, m_creature, Hitter->ToUnit());
             spellHit = true;
         }
     }
@@ -1405,7 +1405,7 @@ npc_mortar_team_target_dummyAI::npc_mortar_team_target_dummyAI(Creature* pCreatu
 
 void npc_mortar_team_target_dummyAI::Reset() { }
 
-void npc_mortar_team_target_dummyAI::SpellHit(Unit*, SpellEntry const* pSpell)
+void npc_mortar_team_target_dummyAI::SpellHit(SpellCaster*, SpellEntry const* pSpell)
 {
     if (pSpell->Id == SPELL_MORTAR_SHOT)
     {

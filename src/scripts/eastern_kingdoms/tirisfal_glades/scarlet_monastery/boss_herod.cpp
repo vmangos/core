@@ -4,13 +4,13 @@
 
 #include "scriptPCH.h"
 
-#define SAY_AGGRO                   -1189000
-#define SAY_WHIRLWIND               -1189001
-#define SAY_ENRAGE                  -1189002
-#define SAY_KILL                    -1189003
-#define EMOTE_ENRAGE                -1189004
+#define SAY_AGGRO                   6194 // Ah - I've been waiting for a real challenge!
+#define SAY_WHIRLWIND               6534 // Blades of light!
+#define SAY_ENRAGE                  6195 // Light, give me strength!
+#define SAY_KILL                    6196 // Is that all?
+#define EMOTE_ENRAGE                7798 // %s becomes enraged!
 
-#define SAY_TRAINEE_SPAWN           -1189022
+#define SAY_TRAINEE_SPAWN           2842 // The master has fallen!  Avenge him, my brethren!
 
 #define SPELL_RUSHINGCHARGE         8260
 #define SPELL_CLEAVE                15496

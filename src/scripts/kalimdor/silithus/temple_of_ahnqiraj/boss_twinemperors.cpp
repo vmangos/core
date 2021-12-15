@@ -247,7 +247,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!who || m_creature->GetVictim() || m_creature->IsInCombat())
             return;
 
-        if (who->IsTargetable(true, false) && who->IsInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+        if (who->IsTargetableBy(m_creature) && who->IsInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
         {
             float attackRadius = m_creature->GetAttackDistance(who);
             if (attackRadius < PULL_RANGE)
@@ -923,44 +923,6 @@ struct boss_veknilashAI : public boss_twinemperorsAI
     }
 };
 
-struct mob_mastersEye : public ScriptedAI {
-    mob_mastersEye(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        sLog.outBasic("Masters Eye ctor!");
-        Reset();
-    }
-    
-    instance_temple_of_ahnqiraj* m_pInstance;
-    uint32 flightUpdate;
-
-    void Reset() override
-    {
-        instance_temple_of_ahnqiraj* tmpPTr = dynamic_cast<instance_temple_of_ahnqiraj*>(m_creature->GetInstanceData());
-        if (!tmpPTr) {
-            sLog.outError("boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
-            m_pInstance = nullptr;
-        }
-        else {
-            m_pInstance = (instance_temple_of_ahnqiraj*)m_creature->GetInstanceData();
-        }
-        flightUpdate = 0;
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (m_creature->IsDespawned() || m_pInstance->TwinsDialogueStartedOrDone())
-            return;
-        if (flightUpdate < diff) {
-            m_creature->CastSpell(m_creature, 17131, true); // Start flying 
-            m_creature->GetMotionMaster()->MovePoint(0, -8952.7f, 1235.39f, -102.0f, MOVE_FLY_MODE, 0.0f, 4.896f);
-            flightUpdate = 5000;
-        }
-        else {
-            flightUpdate -= diff;
-        }
-    }
-};
-
 CreatureAI* GetAI_boss_veknilash(Creature* pCreature)
 {
     return new boss_veknilashAI(pCreature);
@@ -969,11 +931,6 @@ CreatureAI* GetAI_boss_veknilash(Creature* pCreature)
 CreatureAI* GetAI_boss_veklor(Creature* pCreature)
 {
     return new boss_veklorAI(pCreature);
-}
-
-CreatureAI* GetAI_masters_eye(Creature* pCreature)
-{
-    return new mob_mastersEye(pCreature);
 }
 
 CreatureAI* GetAI_twinsBug(Creature* pCreature)
@@ -993,11 +950,6 @@ void AddSC_boss_twinemperors()
     newscript = new Script;
     newscript->Name = "boss_veklor";
     newscript->GetAI = &GetAI_boss_veklor;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_masters_eye";
-    newscript->GetAI = &GetAI_masters_eye;
     newscript->RegisterSelf();
 
     newscript = new Script;

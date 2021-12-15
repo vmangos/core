@@ -340,8 +340,9 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     }
 
     // instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
-    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->IsTaxiFlying() ||
-            GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
+    if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ||
+        GetPlayer()->IsTaxiFlying() ||
+        GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
         WorldPacket data(SMSG_LOGOUT_RESPONSE, 1 + 4);
         data << uint32(0);
@@ -354,8 +355,9 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     // not set flags if player can't free move to prevent lost state at logout cancel
     if (GetPlayer()->CanFreeMove())
     {
-        float height = GetPlayer()->GetMap()->GetHeight(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY(), GetPlayer()->GetPositionZ());
-        if ((GetPlayer()->GetPositionZ() < height + 0.1f) && !(GetPlayer()->IsInWater()) && GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND)
+        if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND &&
+           !GetPlayer()->IsMounted() &&
+           !(GetPlayer()->GetUnitMovementFlags() & (MOVEFLAG_SWIMMING | MOVEFLAG_SPLINE_ENABLED)))
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
         GetPlayer()->SetRooted(true);
@@ -432,7 +434,7 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket& recv_data)
     // Trigger a client camera reset by sending an `SMSG_STANDSTATE_UPDATE'
     // event. See `WorldSession::HandleMoveWorldportAckOpcode'.
     // Note: There might be a better place to perform this trigger
-    if (_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    if (m_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
         WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
         data << GetPlayer()->GetStandState();
@@ -509,6 +511,9 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
         default:
             return;
     }
+
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_ANIM))
+        return;
 
     _player->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_ANIM_CANCELS);
     _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ANIM_CANCELS);
@@ -974,7 +979,7 @@ void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket& recv_data)
         return;
     }
 
-    GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, 2, actionBar);
+    GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS, actionBar);
 }
 
 void WorldSession::HandlePlayedTime(WorldPacket& /*recv_data*/)
@@ -1071,7 +1076,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
     // Rank progress bar
-    data << (uint8)pTarget->GetByteValue(PLAYER_FIELD_BYTES2, 0);
+    data << (uint8)pTarget->GetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR);
 
     SendPacket(&data);
 }

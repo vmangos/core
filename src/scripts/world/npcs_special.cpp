@@ -26,6 +26,7 @@ EndScriptData
 #include "../kalimdor/moonglade/boss_omen.h"
 #include "CritterAI.h"
 #include <array>
+#include "Utilities/EventMap.h"
 
 /* ContentData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
@@ -324,7 +325,7 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster *caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && spell->Id == 20804)
         {
@@ -814,23 +815,24 @@ struct rat_des_profondeursAI : public ScriptedAI
             QuestFinishCheck_Timer -= uiDiff;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpellInfo) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpellInfo) override
     {
         // Ce rat est deja pris !
         if (!m_FollowingPlayerGuid.IsEmpty())
             return;
         if (!pSpellInfo || pSpellInfo->Id != SPELL_EXTASE_MELODIEUSE)
             return;
-        if (!pCaster->IsPlayer())
+        Player* pCasterPlayer = pCaster->ToPlayer();
+        if (!pCasterPlayer)
             return;
-        if (pCaster->ToPlayer()->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE)
+        if (pCasterPlayer->GetQuestStatus(QUEST_CHASSE_AU_RAT) != QUEST_STATUS_INCOMPLETE)
             return;
-        m_FollowingPlayerGuid = pCaster->GetObjectGuid();
+        m_FollowingPlayerGuid = pCasterPlayer->GetObjectGuid();
         m_creature->UpdateEntry(NPC_RAT_ENSORCELE);
         m_creature->CastSpell(m_creature, SPELL_EXTASE_MELO_VISU, true);
         m_creature->GetMotionMaster()->Clear(false);
-        m_creature->GetMotionMaster()->MoveFollow(pCaster, 1.0f, M_PI_F);
-        pCaster->ToPlayer()->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
+        m_creature->GetMotionMaster()->MoveFollow(pCasterPlayer, 1.0f, M_PI_F);
+        pCasterPlayer->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
     }
 
     void JustDied(Unit* pKiller) override
@@ -1200,7 +1202,7 @@ enum
     NPC_CLUSTER_CREDIT_MARKER       = 15894,
     GO_OMEN_CLUSTER_LAUNCHER        = 180874,
 
-    SPELL_LUNAR_FORTUNE             = 26522
+    SPELL_LUNAR_FORTUNE             = 26522,
 };
 
 struct FireworkStruct
@@ -1236,10 +1238,10 @@ std::array<FireworkStruct, 25> const Fireworks =
     { 15914, {26505, 26504, 26503, 26502, 26501}, true }, // Large Red Firework Cluster
     { 15915, {26510, 26509, 26508, 26507, 26506}, true }, // Large White Firework Cluster
     { 15916, {26515, 26514, 26513, 26512, 26511}, true }, // Large Yellow Firework Cluster
-    { 15918, {26487, 26509, 26508, 26507, 26483}, true }, // Lucky Rocket Cluster
+    { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
 }};
 
-std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
+static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1292,7 +1294,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         {
             if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
             {
-                pGo->SendGameObjectCustomAnim();
+                pGo->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
                 break;
             }
         }
@@ -1306,21 +1308,21 @@ struct npc_pats_firework_guyAI : ScriptedAI
             {
                 switch (i)
                 {
-                    case 0:
-                        m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
-                        break;
-                    case 1:
-                        m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
-                        break;
-                    case 2:
-                        m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
-                        break;
-                    case 3:
-                        m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
-                        break;
-                    case 4:
-                        m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
-                        break;
+                case 0:
+                    m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
+                    break;
+                case 1:
+                    m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
+                    break;
+                case 2:
+                    m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
+                    break;
+                case 3:
+                    m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
+                    break;
+                case 4:
+                    m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
+                    break;
                 }
                 m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
             }
@@ -1328,8 +1330,15 @@ struct npc_pats_firework_guyAI : ScriptedAI
         else
             m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
 
+        // Lunar Fortune is casted 3 seconds later.
         if (m_bisLucky)
-            m_creature->CastSpell(m_creature, SPELL_LUNAR_FORTUNE, true);
+        {
+            Creature* caster = m_creature;
+            m_creature->m_Events.AddLambdaEventAtOffset([caster]
+            {
+                caster->CastSpell(caster, SPELL_LUNAR_FORTUNE, true);
+            }, 3 * IN_MILLISECONDS);
+        }
 
         if (m_creature->IsTemporarySummon())
         {
@@ -1621,7 +1630,7 @@ struct npc_shahramAI : ScriptedPetAI
         m_creature->SetCanModifyStats(true);
 
         m_creature->ToPet()->InitStatsForLevel(63);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
         if (m_creature->GetCharmInfo())
             m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
@@ -1884,7 +1893,7 @@ struct npc_sickly_critterAI : CritterAI
         m_uiTimer = 1500;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id != SPELL_APPLY_SALVE)
         {
@@ -2090,25 +2099,31 @@ CreatureAI* GetAI_npc_explosive_sheep(Creature* pCreature)
 
 enum
 {
-    EVENT_VALENTINE_KWEE = 140,
+    EVENT_LOVE_IS_IN_THE_AIR                                    = 8,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS           = 110,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE           = 111,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND           = 112,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR           = 113,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF       = 114,
+    EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY           = 115,
 
-    SPELL_SMITTEN = 27572,
-    QUEST_GIFT_H = 8981,
-    QUEST_GIFT_A = 8993,
+    SPELL_SMITTEN       = 27572,
+    QUEST_GIFT_H        = 8981,
+    QUEST_GIFT_A        = 8993,
 
-    VAR_KWEE_THRALL = 2200,
-    VAR_KWEE_CAIRNE = 2201,
-    VAR_KWEE_SYLVANAS = 2202,
-    VAR_KWEE_HORDE = 2207,
+    VAR_KWEE_THRALL     = 2200,
+    VAR_KWEE_CAIRNE     = 2201,
+    VAR_KWEE_SYLVANAS   = 2202,
+    VAR_KWEE_HORDE      = 2207,
 
-    VAR_KWEE_BOLVAR = 2203,
-    VAR_KWEE_MAGNI = 2204,
-    VAR_KWEE_TYRANDE = 2205,
-    VAR_KWEE_ALLIANCE = 2206,
+    VAR_KWEE_BOLVAR     = 2203,
+    VAR_KWEE_MAGNI      = 2204,
+    VAR_KWEE_TYRANDE    = 2205,
+    VAR_KWEE_ALLIANCE   = 2206,
 
-    TEXT_ID_VICTORY_A = 8315,
-    TEXT_ID_VICTORY_H = 8316,
-    TEXT_ID_TIE = 8320,
+    TEXT_ID_VICTORY_A   = 8315,
+    TEXT_ID_VICTORY_H   = 8316,
+    TEXT_ID_TIE         = 8320,
 
 };
 
@@ -2126,12 +2141,11 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
 {
     npc_kwee_peddlefeetAI(Creature* pCreature) : ScriptedAI(pCreature), winningFaction(0), winningZone(0)
     {
-        if (sGameEventMgr.CheckOneGameEvent(EVENT_VALENTINE_KWEE, time(nullptr)))
+        // If event 8 (Love is in the Air) isn't active, Kwee Q. Peddlefeet is summoned by a winner event and should not have the Quest giver flag.
+        if (!sGameEventMgr.IsActiveEvent(EVENT_LOVE_IS_IN_THE_AIR))
         {
             SetVariables();
             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            if (m_creature->GetZoneId() != winningZone && winningZone != 0)
-                m_creature->DespawnOrUnsummon();
         }
         Reset();
     }
@@ -2139,7 +2153,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
     uint32 winningFaction;
     uint32 winningZone;
 
-    void Reset() override { }
+    void Reset() override {}
 
     void SetVariables()
     {
@@ -2173,6 +2187,74 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
         }
     }
 
+    void ResetVariablesAndDisableWinnerEvents()
+    {
+        // Reset all variables if available.
+        for (uint32 i = VAR_KWEE_THRALL; i < VAR_KWEE_HORDE; i++)
+        {
+            if (sObjectMgr.GetSavedVariable(i, 0))
+                sObjectMgr.SetSavedVariable(i, 0, true);
+        }
+
+        // Disable all Winner events.
+        for (uint32 i = EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS; i < EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY; i++)
+        {
+            sGameEventMgr.EnableEvent(i, false);
+        }
+    }
+
+    void OnRemoveFromWorld() override
+    {
+        SetVariables();
+
+        // If Kwee Q. Peddlefeet has no quest giver flag, he is already summoned by a contest Winner event.
+        // If he despawns without the flag, the variables should be reseted for next Year's votings.
+        // Also the Winner events needs to be disabled again.
+        if (!m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+        {
+            ResetVariablesAndDisableWinnerEvents();
+            return;
+        }
+
+        if (m_creature->GetZoneId() != winningZone && winningZone != 0)
+            return;
+        
+        // If Kwee Q. Peddlefeet is in the winner Zone, start the winner event here.
+        switch (winningZone)
+        {
+            case 1637: // Orgrimmar
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_ORGRIMMAR, true);
+                break;
+            }
+            case 1638: // Thunder Bluff
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_THUNDER_BLUFF, true);
+                break;
+            }
+            case 1497: // Undercity
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_UNDERCITY, true);
+                break;
+            }
+            case 1519: // Stormwind
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_STORMWIND, true);
+                break;
+            }
+            case 1537: // Ironforge
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_IRONFORGE, true);
+                break;
+            }
+            case 1657: // Darnassus
+            {
+                sGameEventMgr.EnableEvent(EVENT_LOVE_IS_IN_THE_AIR_CONTEST_WINNER_DARNASSUS, true);
+                break;
+            }
+        }
+    }
+
     void ReceiveEmote(Player* pPlayer, uint32 uiEmote) override
     {
         if (uiEmote == TEXTEMOTE_KISS)
@@ -2190,16 +2272,12 @@ CreatureAI* GetAI_npc_kwee_peddlefeet(Creature* pCreature)
 
 bool GossipHello_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature)
 {
-    pPlayer->SendUpdateWorldState(VAR_KWEE_THRALL, sObjectMgr.GetSavedVariable(VAR_KWEE_THRALL, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_CAIRNE, sObjectMgr.GetSavedVariable(VAR_KWEE_CAIRNE, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_SYLVANAS, sObjectMgr.GetSavedVariable(VAR_KWEE_SYLVANAS, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_HORDE, sObjectMgr.GetSavedVariable(VAR_KWEE_HORDE, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_BOLVAR, sObjectMgr.GetSavedVariable(VAR_KWEE_BOLVAR, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_MAGNI, sObjectMgr.GetSavedVariable(VAR_KWEE_MAGNI, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_TYRANDE, sObjectMgr.GetSavedVariable(VAR_KWEE_TYRANDE, 0));
-    pPlayer->SendUpdateWorldState(VAR_KWEE_ALLIANCE, sObjectMgr.GetSavedVariable(VAR_KWEE_ALLIANCE, 0));
+    for (uint32 i = VAR_KWEE_THRALL; i < VAR_KWEE_HORDE; i++)
+    {
+        pPlayer->SendUpdateWorldState(i, sObjectMgr.GetSavedVariable(i, 0));
+    }
 
-    if (sGameEventMgr.IsActiveEvent(EVENT_VALENTINE_KWEE))
+    if (!sGameEventMgr.IsActiveEvent(EVENT_LOVE_IS_IN_THE_AIR))
     {
         if (npc_kwee_peddlefeetAI* kweeAI = dynamic_cast<npc_kwee_peddlefeetAI*>(pCreature->AI()))
         {
@@ -2265,7 +2343,7 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
         m_uiReturnTimer = 0;
     }
 
-    void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_DARK_IRON_MUG)
             m_uiReturnTimer = 10000;

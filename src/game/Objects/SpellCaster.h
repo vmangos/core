@@ -334,7 +334,7 @@ public:
     void ProcDamageAndSpell(ProcSystemArguments&& data);
     void ProcDamageAndSpell_real(ProcSystemArguments& data);
     void ProcDamageAndSpell_delayed(ProcSystemArguments& data);
-    void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+    void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, float damage, SpellEntry const* spellInfo, SpellEffectIndex effectIndex, WeaponAttackType attackType, Spell* spell, bool crit);
     float CalculateSpellEffectValue(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr) const;
     float SpellBonusWithCoeffs(SpellEntry const* spellProto, SpellEffectIndex effectIndex, float total, float benefit, float ap_benefit, DamageEffectType damagetype, bool donePart, SpellCaster* pCaster, Spell* spell = nullptr) const;
     static float CalculateLevelPenalty(SpellEntry const* spellProto);

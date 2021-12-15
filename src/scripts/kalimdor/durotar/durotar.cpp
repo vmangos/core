@@ -67,14 +67,14 @@ struct LazyPeonAI : public ScriptedAI
     uint8      state;
     ObjectGuid playerGuid;
 
-    void DoAction(uint32 const state) override
+    void OnScriptEventHappened(uint32 uiEvent, uint32 /*uiData*/, WorldObject* /*pInvoker*/) override
     {
-        this->state = state;
+        this->state = uiEvent;
     }
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_AWAKEN_PEON && m_creature->GetEntry() == LAZY_PEON_ENTRY && m_creature->HasAura(SPELL_BUFF_SLEEP))
         {

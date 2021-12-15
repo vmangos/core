@@ -476,9 +476,8 @@ struct npc_solenorAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
-
         if (pSpell && pSpell->Id == 14268)   // Wing Clip (Rank 3)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_CRIPPLING_CLIP, CF_TRIGGERED) == CAST_OK)
@@ -1147,7 +1146,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
     npc_Emissary_RomankhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         pCreature->SetVisibility(VISIBILITY_OFF);
 
@@ -1190,7 +1189,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         if (OverlordCount >= 3)
         {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_creature->SetVisibility(VISIBILITY_ON);
         }
@@ -1508,7 +1507,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         AQopen = true;
 
         m_creature->SetRespawnDelay(DAY);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
     }
 
     void BeginScene()
@@ -1762,7 +1761,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                 // Stop movement/attacks and freeze whole combat
                 pTemp->RemoveAllAttackers();
                 pTemp->AttackStop();
-                pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 pTemp->AI()->EnterEvadeMode();
                 pTemp->StopMoving();
@@ -1927,7 +1926,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pMerithra->SetWalk(false);
                                 pMerithra->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                                 pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
@@ -1980,7 +1979,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pArygos->SetWalk(false);
                                 pArygos->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                                 pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
@@ -2036,7 +2035,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pCaelestrasz->SetWalk(false);
                                 pCaelestrasz->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                                 pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
@@ -2238,7 +2237,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         //m_creature->SetDisplayId(DISPLAY_ID_BRONZE_DRAGON);
                         m_creature->SetWalk(true);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                         m_creature->CastSpell(m_creature, SPELL_BRONZE_DRAGON_TRANSFORM, false);
                         m_uiEventTimer = 1000;

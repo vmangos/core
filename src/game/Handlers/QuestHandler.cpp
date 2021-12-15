@@ -59,7 +59,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
                 dialogStatus = sScriptMgr.GetDialogStatus(_player, cr_questgiver);
 
                 if (dialogStatus > 6)
-                    dialogStatus = getDialogStatus(_player, cr_questgiver, DIALOG_STATUS_NONE);
+                    dialogStatus = GetDialogStatus(_player, cr_questgiver, DIALOG_STATUS_NONE);
             }
             break;
         }
@@ -68,7 +68,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
             GameObject* go_questgiver = (GameObject*)questgiver;
             dialogStatus = sScriptMgr.GetDialogStatus(_player, go_questgiver);
             if (dialogStatus > 6)
-                dialogStatus = getDialogStatus(_player, go_questgiver, DIALOG_STATUS_NONE);
+                dialogStatus = GetDialogStatus(_player, go_questgiver, DIALOG_STATUS_NONE);
             break;
         }
         default:
@@ -508,7 +508,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
 * @param questgiver - from whom
 * @param defstatus - initial set status (usually it will be called with DIALOG_STATUS_NONE) - must not be DIALOG_STATUS_UNDEFINED
 */
-uint32 WorldSession::getDialogStatus(Player* pPlayer, Object* questgiver, uint32 defstatus)
+uint32 WorldSession::GetDialogStatus(Player* pPlayer, Object* questgiver, uint32 defstatus)
 {
     uint32 dialogStatus = defstatus;
 

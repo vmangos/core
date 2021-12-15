@@ -1047,19 +1047,6 @@ bool ChatHandler::HandleAnticheatCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleListAddonsCommand(char* args)
-{
-    Player* player = GetSelectedPlayer();
-    if (!player)
-        return false;
-
-    std::set<std::string> const& addons = player->GetSession()->GetAddons();
-    PSendSysMessage("%u addons on target.", addons.size());
-    for (const auto& addon : addons)
-        PSendSysMessage(">> %s", addon.c_str());
-    return true;
-}
-
 bool ChatHandler::HandleClientInfosCommand(char* args)
 {
     Player* player = nullptr;

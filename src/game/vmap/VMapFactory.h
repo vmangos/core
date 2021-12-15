@@ -34,9 +34,6 @@ namespace VMAP
         public:
             static IVMapManager* createOrGetVMapManager();
             static void clear();
-
-            static void preventSpellsFromBeingTestedForLoS(char const* pSpellIdString);
-            static bool checkSpellForLoS(unsigned int pSpellId);
     };
 }
 #endif

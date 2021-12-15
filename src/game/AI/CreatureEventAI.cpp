@@ -59,7 +59,7 @@ void CreatureEventAI::GetAIInformation(ChatHandler& reader)
     reader.PSendSysMessage(LANG_NPC_EVENTAI_PHASE, (uint32)m_Phase);
 }
 
-CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
+CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
 {
     // Need make copy for filter unneeded steps and safe in case table reload
     CreatureEventAI_Event_Map::const_iterator creatureEventsItr = sEventAIMgr.GetCreatureEventAIMap().find(m_creature->GetEntry());
@@ -101,9 +101,6 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
 
     m_bEmptyList = m_CreatureEventAIList.empty();
     m_Phase = 0;
-    m_AttackDistance = 0.0f;
-    m_AttackAngle = 0.0f;
-    m_bCanSummonGuards = c->CanSummonGuards();
     m_InvinceabilityHpLevel = 0;
 
     //Handle Spawned Events
@@ -117,7 +114,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
     Reset();
 }
 
-bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker)
+bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker)
 {
     if (!pHolder.Enabled || pHolder.Time)
         return false;
@@ -427,7 +424,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     return true;
 }
 
-void CreatureEventAI::ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker)
+void CreatureEventAI::ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker)
 {
     if (!action)
         return;
@@ -445,9 +442,7 @@ void CreatureEventAI::JustRespawned()
 {
     Reset();
 
-    CreatureAI::JustRespawned();
-
-    m_bCanSummonGuards = m_creature->CanSummonGuards();
+    BasicAI::JustRespawned();
 
     if (m_bEmptyList)
         return;
@@ -499,7 +494,7 @@ void CreatureEventAI::JustReachedHome()
 
 void CreatureEventAI::EnterEvadeMode()
 {
-    CreatureAI::EnterEvadeMode();
+    BasicAI::EnterEvadeMode();
 
     if (m_bEmptyList)
         return;
@@ -514,7 +509,7 @@ void CreatureEventAI::EnterEvadeMode()
 
 void CreatureEventAI::OnCombatStop()
 {
-    CreatureAI::OnCombatStop();
+    BasicAI::OnCombatStop();
 
     if (m_bEmptyList)
         return;
@@ -583,7 +578,9 @@ void CreatureEventAI::SummonedCreatureJustDied(Creature* pUnit)
 
 void CreatureEventAI::SummonedCreatureDespawn(Creature* pUnit)
 {
-    if (m_bEmptyList || !pUnit)
+    BasicAI::SummonedCreatureDespawn(pUnit);
+
+    if (m_bEmptyList)
         return;
 
     for (auto& i : m_CreatureEventAIList)
@@ -625,70 +622,13 @@ void CreatureEventAI::EnterCombat(Unit* enemy)
     m_EventDiff = 0;
 }
 
-void CreatureEventAI::AttackStart(Unit* who)
-{
-    if (!who)
-        return;
-
-    if (m_creature->Attack(who, m_bMeleeAttack))
-    {
-        m_creature->AddThreat(who);
-        m_creature->SetInCombatWith(who);
-        who->SetInCombatWith(m_creature);
-
-        if (m_bCombatMovement)
-            m_creature->GetMotionMaster()->MoveChase(who, m_AttackDistance, m_AttackAngle);
-    }
-}
-
 void CreatureEventAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (!pWho)
-        return;
+    // Check for OOC LOS Event
+    if (!m_creature->GetVictim() && !m_bEmptyList)
+        UpdateEventsOn_MoveInLineOfSight(pWho);
 
-    //Check for OOC LOS Event
-    if (!m_creature->GetVictim())
-    {
-        if (!m_bEmptyList)
-            UpdateEventsOn_MoveInLineOfSight(pWho);
-
-        if (m_bCanSummonGuards && pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()) &&
-            m_creature->IsHostileTo(pWho) && pWho->IsTargetable(true, false) && m_creature->IsWithinLOSInMap(pWho))
-        {
-            m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
-        } 
-    }
-
-    if (m_creature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO) || m_creature->IsNeutralToAll())
-        return;
-
-    // Check this now to prevent calling expensive functions (IsInAccessablePlaceFor / IsWithinLOSInMap)
-    if (m_creature->GetVictim() && !m_creature->GetMap()->IsDungeon())
-        return;
-
-    if (!m_creature->CanFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
-        return;
-
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false))
-    {
-        float attackRadius = m_creature->GetAttackDistance(pWho);
-        if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, false) && m_creature->IsHostileTo(pWho))
-        {
-            if (!m_creature->GetVictim())
-            {
-                if (m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
-                    AttackStart(pWho);
-            }
-            else if (m_creature->GetMap()->IsDungeon())
-            {
-                if (m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
-                {
-                    m_creature->AddThreat(pWho);
-                    pWho->SetInCombatWith(m_creature);
-                }
-            }
-        }
-    }
+    BasicAI::MoveInLineOfSight(pWho);
 }
 
 void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
@@ -713,7 +653,7 @@ void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
     }
 }
 
-void CreatureEventAI::SpellHit(Unit* pUnit, SpellEntry const* pSpell)
+void CreatureEventAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
 {
     if (m_bEmptyList)
         return;
@@ -727,13 +667,13 @@ void CreatureEventAI::SpellHit(Unit* pUnit, SpellEntry const* pSpell)
                 //If spell id matches (or no spell id) & if spell school matches (or no spell school)
                 if (!i.Event.hit_by_spell.spellId || pSpell->Id == i.Event.hit_by_spell.spellId)
                     if (GetSchoolMask(pSpell->School) & i.Event.hit_by_spell.schoolMask)
-                        ProcessEvent(i, pUnit);
+                        ProcessEvent(i, pCaster);
                 break;
             }
             case EVENT_T_HIT_BY_AURA:
             {
                 if (!i.Event.hit_by_aura.auraType || pSpell->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
-                    ProcessEvent(i, pUnit);
+                    ProcessEvent(i, pCaster);
                 break;
             }
         }

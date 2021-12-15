@@ -47,7 +47,7 @@ struct boss_omenAI : ScriptedAI
     void OnRemoveFromWorld() override;
     void MovementInform(uint32 movementType, uint32 data) override;
     void UpdateAI(uint32 const uiDiff) override;
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override;
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override;
     void JustDied(Unit* pKiller) override;
     
     static void OnFireworkLaunch(Unit* pSummoner);

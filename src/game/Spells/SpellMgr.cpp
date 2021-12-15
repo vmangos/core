@@ -441,11 +441,15 @@ void SpellMgr::LoadSpellProcItemEnchant()
 
 bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellEntry const* procSpell, uint32 procFlags, uint32 procExtra)
 {
-    // No extra req need
-    uint32 procEvent_procEx = PROC_EX_NONE;
+    // Store extra req
+    uint32 procEvent_procEx = spellProcEvent ? spellProcEvent->procEx : PROC_EX_NONE;
 
     // check prockFlags for condition
     if ((procFlags & EventProcFlag) == 0)
+        return false;
+
+    // Either procs only on cast end, or only on hit.
+    if ((procExtra & PROC_EX_CAST_END) != (procEvent_procEx & PROC_EX_CAST_END))
         return false;
 
     // Always trigger for this
@@ -454,9 +458,6 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellPr
 
     if (spellProcEvent)     // Exist event data
     {
-        // Store extra req
-        procEvent_procEx = spellProcEvent->procEx;
-
         // For melee triggers
         if (procSpell == nullptr)
         {
@@ -3336,6 +3337,113 @@ namespace SpellInternal
 
         return true;
     }
+
+    bool IsBinary(SpellEntry const* spellInfo)
+    {
+        bool isBinary = false;
+
+        // Non-magic spells are not affected
+        if (spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MAGIC)
+            return false;
+
+        // Same for physical spells (charges)
+        if (spellInfo->School == SPELL_SCHOOL_NORMAL)
+            return false;
+
+        bool foundNoDamageAura = false;
+        for (int eff = 0; eff < 3; ++eff)
+        {
+            // Micro opt - don't iterate anymore if we already have an aura
+            if (foundNoDamageAura)
+                break;
+
+            switch (spellInfo->Effect[eff])
+            {
+                case SPELL_EFFECT_INTERRUPT_CAST:
+                    foundNoDamageAura = true;
+                    break;
+                case SPELL_EFFECT_APPLY_AURA:
+                    switch (spellInfo->EffectApplyAuraName[eff])
+                    {
+                        case SPELL_AURA_MOD_DECREASE_SPEED:
+                        case SPELL_AURA_MOD_FEAR:
+                        case SPELL_AURA_MOD_STUN:
+                        case SPELL_AURA_MOD_PACIFY:
+                        case SPELL_AURA_MOD_ROOT:
+                        case SPELL_AURA_MOD_SILENCE:
+                        case SPELL_AURA_MOD_DISARM:
+                        case SPELL_AURA_MOD_RESISTANCE:
+                        case SPELL_AURA_MOD_DAMAGE_TAKEN:
+                            foundNoDamageAura = true;
+                            break;
+                    }
+                    break;
+                case SPELL_EFFECT_KNOCK_BACK:
+                    foundNoDamageAura = true;
+                    break;
+            }
+        }
+        isBinary = foundNoDamageAura;
+
+        if (spellInfo->Id == 26143)    // SPELL_MIND_FLAY (C'Thuns Eye Tentacles)
+            isBinary = true;
+        else if (spellInfo->Id == 26478)
+            isBinary = true;           // SPELL_GROUND_RUPTURE_NATURE (C'thuns Giant tentacles ground rupture)
+    
+        return isBinary;
+    }
+
+    bool IsNonPeriodicDispel(SpellEntry const* spellInfo)
+    {
+        if (spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
+        {
+            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (spellInfo->Effect[i] != 0 && (spellInfo->Effect[i] != SPELL_EFFECT_DISPEL || spellInfo->EffectRadiusIndex[i] != 0))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    bool IsPvEHeartBeat(SpellEntry const* spellInfo)
+    {
+        if (!spellInfo->HasAttribute(SPELL_ATTR_DIMINISHING_RETURNS))
+            return false;
+
+        for (uint32 i : spellInfo->EffectApplyAuraName)
+        {
+            switch (i)
+            {
+                case SPELL_AURA_MOD_FEAR:
+                case SPELL_AURA_MOD_ROOT:
+                case SPELL_AURA_MOD_PACIFY_SILENCE:
+                case SPELL_AURA_MOD_CONFUSE:
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool IsCCSpell(SpellEntry const* spellInfo)
+    {
+        if (spellInfo->IsChanneledSpell())
+            return false;
+        if (spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST))
+            return false;
+
+        switch (spellInfo->GetDiminishingReturnsGroup(false))
+        {
+            case DIMINISHING_NONE:
+            case DIMINISHING_LIMITONLY:
+                return false;
+        }
+        return true;
+    }
 }
 
 void SpellMgr::AssignInternalSpellFlags()
@@ -3382,6 +3490,18 @@ void SpellMgr::AssignInternalSpellFlags()
 
             if (sWorld.getConfig(CONFIG_UINT32_SPELL_EFFECT_DELAY) && SpellInternal::IsSpellWithDelayableEffects(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_DELAYABLE_EFFECTS;
+
+            if (SpellInternal::IsBinary(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_BINARY;
+
+            if (SpellInternal::IsNonPeriodicDispel(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_NON_PERIODIC_DISPEL;
+
+            if (SpellInternal::IsPvEHeartBeat(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_PVE_HEARTBEAT;
+
+            if (SpellInternal::IsCCSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_CROWD_CONTROL;
         }
     }
 }
@@ -3812,7 +3932,6 @@ void SpellMgr::LoadSpells()
         spell->procFlags = ReplaceOldSpellProcFlags(spell->procFlags);
 #endif
 
-        spell->InitCachedValues();
         mSpellEntryMap[spellId] = std::move(spell);
 
     } while (result->NextRow());

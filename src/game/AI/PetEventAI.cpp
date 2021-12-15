@@ -33,18 +33,12 @@ int PetEventAI::Permissible(Creature const* creature)
 
 void PetEventAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (!pWho)
-        return;
-
     if (m_creature->GetVictim())
         return;
 
     //Check for OOC LOS Event
     if (!m_bEmptyList)
         UpdateEventsOn_MoveInLineOfSight(pWho);
-
-    if (!m_creature->HasReactState(REACT_AGGRESSIVE))
-        return;
 
     if (m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->IsReturning())
         return;
@@ -59,7 +53,7 @@ void PetEventAI::MoveInLineOfSight(Unit* pWho)
         return;
 #endif
 
-    if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, m_creature->IsCharmerOrOwnerPlayerOrPlayerItself()))
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature))
     {
         float const attackRadius = m_creature->GetAttackDistance(pWho);
         if (m_creature->IsWithinDistInMap(pWho, attackRadius, true, false) && m_creature->IsHostileTo(pWho) &&

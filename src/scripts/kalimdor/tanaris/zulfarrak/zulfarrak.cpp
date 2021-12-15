@@ -111,7 +111,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
                         //weegli doesn't fight - he goes & blows up the door
                         if (Creature* weegli = pInstance->instance->GetCreature(pInstance->GetData64(ENTRY_WEEGLI)))
                         {
-                            weegli->AI()->DoAction();
+                            weegli->AI()->OnScriptEventHappened();
                             DoScriptText(SAY_WEEGLI, weegli);
                         }
 
@@ -147,7 +147,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void DoAction(uint32 const param) override
+    void OnScriptEventHappened(uint32 /*uiEvent*/ = 0, uint32 /*uiData*/ = 0, WorldObject* /*pInvoker*/ = 0) override
     {
         postGossipStep = 1;
         Text_Timer = 0;
@@ -169,7 +169,7 @@ bool OnGossipSelect_npc_sergeant_bly(Player* pPlayer, Creature* pCreature, uint3
         if (npc_sergeant_blyAI* ai = dynamic_cast<npc_sergeant_blyAI*>(pCreature->AI()))
         {
             ai->PlayerGUID = pPlayer->GetGUID();
-            ai->DoAction(0);
+            ai->OnScriptEventHappened();
         }
     }
     return true;
@@ -433,9 +433,9 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         }
     }
 
-    void DoAction(uint32 const param) override
+    void OnScriptEventHappened(uint32 /*uiEvent*/ = 0, uint32 /*uiData*/ = 0, WorldObject* /*pInvoker*/ = 0) override
     {
-        sLog.outString("DoAction de npc_weegli_blastfuse : Destruction porte");
+        sLog.outString("OnScriptEventHappened de npc_weegli_blastfuse : Destruction porte");
         DestroyDoor();
     }
 
@@ -482,7 +482,7 @@ bool OnGossipSelect_npc_weegli_blastfuse(Player* pPlayer, Creature* pCreature, u
     {
         pPlayer->CLOSE_GOSSIP_MENU();
         //here we make him run to door, set the charge and run away off to nowhere
-        pCreature->AI()->DoAction();
+        pCreature->AI()->OnScriptEventHappened();
     }
     return true;
 }

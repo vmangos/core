@@ -351,6 +351,93 @@ bool ChatHandler::HandleCheatIgnoreTriggersCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCheatImmuneToPlayersCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        if (value)
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+
+        PSendSysMessage(LANG_YOU_SET_IMMUNE_PC, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_IMMUNE_PC_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleCheatImmuneToCreaturesCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        if (value)
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
+        PSendSysMessage(LANG_YOU_SET_IMMUNE_NPC, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_IMMUNE_NPC_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleCheatUntargetableCommand(char* args)
+{
+    if (*args)
+    {
+        bool value;
+        if (!ExtractOnOff(&args, value))
+        {
+            SendSysMessage(LANG_USE_BOL);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        if (value)
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        else
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+        PSendSysMessage(LANG_YOU_SET_UNTARGETABLE, value ? "on" : "off", GetNameLink(target).c_str());
+        if (needReportToTarget(target))
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_UNTARGETABLE_SET, value ? "on" : "off", GetNameLink().c_str());
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleCheatWaterwalkCommand(char* args)
 {
     bool value;
@@ -452,6 +539,12 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Areatrigger pass");
     if (target->HasCheatOption(PLAYER_CHEAT_IGNORE_TRIGGERS))
         SendSysMessage("- Ignore areatriggers");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+        SendSysMessage("- Immune to players");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+        SendSysMessage("- Immune to creatures");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+        SendSysMessage("- Untargetable");
     if (target->HasMovementFlag(MOVEFLAG_WATERWALKING) && !target->HasAuraType(SPELL_AURA_WATER_WALK))
         SendSysMessage("- Water walking");
     if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0))
@@ -2116,11 +2209,11 @@ bool ChatHandler::HandleCharacterCopySkinCommand(char* args)
         uint8 hairColor = fields[3].GetUInt32();
         uint8 facialHair = fields[4].GetUInt32();
         uint8 gender = fields[5].GetUInt8();
-        target->SetByteValue(PLAYER_BYTES, 0, skin);
-        target->SetByteValue(PLAYER_BYTES, 1, face);
-        target->SetByteValue(PLAYER_BYTES, 2, hairStyle);
-        target->SetByteValue(PLAYER_BYTES, 3, hairColor);
-        target->SetByteValue(PLAYER_BYTES_2, 0, facialHair);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, skin);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID, face);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, hairStyle);
+        target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, hairColor);
+        target->SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, facialHair);
         target->SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender);
         SendSysMessage("Modification du skin/genre OK.");
         return true;
@@ -2334,13 +2427,13 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
         if (amount < 0 || amount > 255)
             return false;
         // rank points is sent to client with same size of uint8(255) for each rank
-        target->SetByteValue(PLAYER_FIELD_BYTES2, 0, amount);
+        target->SetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR, amount);
     }
     else if (hasStringAbbr(field, "rank"))
     {
         if (amount < 0 || amount >= HONOR_RANK_COUNT)
             return false;
-        target->SetByteValue(PLAYER_BYTES_3, 3, amount);
+        target->SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, amount);
     }
     else if (hasStringAbbr(field, "todaykills"))
         target->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, (uint32)amount);
@@ -3969,7 +4062,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
 
     // Set gender
     player->SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER, gender);
-    player->SetUInt16Value(PLAYER_BYTES_3, 0, uint16(gender) | (player->GetDrunkValue() & 0xFFFE));
+    player->SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, uint16(gender) | (player->GetDrunkValue() & 0xFFFE));
 
     // Change display ID
     player->InitPlayerDisplayIds();
@@ -4270,21 +4363,6 @@ bool ChatHandler::HandleModifySpeedCommand(char* args)
     if (modSpeed > 4.0f && GetAccessLevel() < SEC_BASIC_ADMIN)
         modSpeed = 4.0f;
 
-    if (m_session->IsReplaying())
-    {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        WorldPacket dataForMe(SMSG_FORCE_RUN_SPEED_CHANGE, 18);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-        dataForMe << uint32(0);
-#else
-        WorldPacket dataForMe(SMSG_FORCE_RUN_SPEED_CHANGE, 14);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-#endif
-        dataForMe << float(7 * modSpeed);
-        m_session->SendPacket(&dataForMe);
-        return true;
-    }
-
     if (modSpeed > 100 || modSpeed < 0.1)
     {
         SendSysMessage(LANG_BAD_VALUE);
@@ -4332,21 +4410,6 @@ bool ChatHandler::HandleModifySwimCommand(char* args)
     if (modSpeed > 4.0f && GetAccessLevel() < SEC_BASIC_ADMIN)
         modSpeed = 4.0f;
 
-    if (m_session->IsReplaying())
-    {
-        
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        WorldPacket dataForMe(SMSG_FORCE_SWIM_SPEED_CHANGE, 18);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-        dataForMe << uint32(0);
-#else
-        WorldPacket dataForMe(SMSG_FORCE_SWIM_SPEED_CHANGE, 14);
-        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
-#endif
-        dataForMe << float(4.722222f * modSpeed);
-        m_session->SendPacket(&dataForMe);
-        return true;
-    }
     if (modSpeed > 100.0f || modSpeed < 0.01f)
     {
         SendSysMessage(LANG_BAD_VALUE);
@@ -4564,7 +4627,7 @@ bool ChatHandler::HandleModifyHairStyleCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES, 2, hairstyle);
+    target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, hairstyle);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
@@ -4584,7 +4647,7 @@ bool ChatHandler::HandleModifyHairColorCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES, 3, haircolor);
+    target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, haircolor);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
@@ -4604,7 +4667,7 @@ bool ChatHandler::HandleModifySkinColorCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES, 0, skincolor);
+    target->SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, skincolor);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();
@@ -4624,7 +4687,7 @@ bool ChatHandler::HandleModifyAccessoriesCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES_2, 0, accessories);
+    target->SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, accessories);
     target->SetDisplayId(DISPLAY_ID_BOX);
     target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
     target->DeMorph();

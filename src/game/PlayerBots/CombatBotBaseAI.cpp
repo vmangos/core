@@ -1,3 +1,4 @@
+#include <World.h>
 #include "CombatBotBaseAI.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -2573,6 +2574,38 @@ void CombatBotBaseAI::EquipPremadeGearTemplate()
     }
 }
 
+inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
+{
+    switch (playerClass)
+    {
+        case CLASS_WARRIOR:
+        {
+            return ITEM_MOD_STRENGTH;
+        }
+        case CLASS_PALADIN:
+        {
+            return ((role == ROLE_HEALER) ? ITEM_MOD_INTELLECT : ITEM_MOD_STRENGTH);
+        }
+        case CLASS_HUNTER:
+        case CLASS_ROGUE:
+        {
+            return ITEM_MOD_AGILITY;
+        }
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+        {
+            return ((role == ROLE_MELEE_DPS || role == ROLE_TANK) ? ITEM_MOD_AGILITY : ITEM_MOD_INTELLECT);
+        }
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+        {
+            return ITEM_MOD_INTELLECT;
+        }
+    }
+    return ITEM_MOD_STAMINA;
+}
+
 void CombatBotBaseAI::EquipRandomGearInEmptySlots()
 {
     LearnArmorProficiencies();
@@ -2584,8 +2617,12 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
         if (!pProto)
             continue;
 
-        // Only items that have already been obtained by someone
+        // Only items that have already been discovered by someone
         if (!pProto->m_bDiscovered)
+            continue;
+
+        // Skip unobtainable items
+        if (pProto->ExtraFlags & ITEM_EXTRA_NOT_OBTAINABLE)
             continue;
 
         // Only gear and weapons
@@ -2600,7 +2637,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                 continue;
 
             // Avoid low level items
-            if ((pProto->ItemLevel + 10) < me->GetLevel())
+            if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
                 continue;
         }
 
@@ -2644,7 +2681,8 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                         continue;
 
                     // Only equip holdables on mana users
-                    if (pProto->InventoryType == INVTYPE_HOLDABLE && !me->IsCaster())
+                    if (pProto->InventoryType == INVTYPE_HOLDABLE &&
+                        m_role != ROLE_HEALER && m_role != ROLE_RANGE_DPS)
                         continue;
                 }
 
@@ -2655,6 +2693,45 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                 if (pProto->MaxCount == 1)
                     break;
             }
+        }
+    }
+
+    // Remove items that don't have our primary stat from the list
+    uint32 const primaryStat = GetPrimaryItemStatForClassAndRole(me->GetClass(), m_role);
+    for (auto& itr : itemsPerSlot)
+    {
+        bool hasPrimaryStatItem = false;
+        
+        for (auto const& pItem : itr.second)
+        {
+            for (auto const& stat : pItem->ItemStat)
+            {
+                if (stat.ItemStatType == primaryStat && stat.ItemStatValue > 0)
+                {
+                    hasPrimaryStatItem = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasPrimaryStatItem)
+        {
+            itr.second.erase(std::remove_if(itr.second.begin(), itr.second.end(),
+            [primaryStat](ItemPrototype const* & pItem)
+            {
+                bool itemHasPrimaryStat = false;
+                for (auto const& stat : pItem->ItemStat)
+                {
+                    if (stat.ItemStatType == primaryStat && stat.ItemStatValue > 0)
+                    {
+                        itemHasPrimaryStat = true;
+                        break;
+                    }
+                }
+
+                return !itemHasPrimaryStat;
+            }),
+                itr.second.end());
         }
     }
 

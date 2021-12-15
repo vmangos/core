@@ -297,7 +297,7 @@ struct boss_skeramAI : public ScriptedAI
             maxHealthPct = 0.10f;
 
         // Set the same health percent as the original boss
-        skeramImage->SetMaxHealth(skeramImage->GetMaxHealth() * maxHealthPct);;
+        skeramImage->SetMaxHealth(skeramImage->GetMaxHealth() * maxHealthPct);
         skeramImage->SetHealthPercent(healthPct);
         skeramImage->SetInCombatWithZone();
         skeramImage->SetVisibility(VISIBILITY_OFF);

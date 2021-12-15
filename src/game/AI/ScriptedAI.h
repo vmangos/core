@@ -5,7 +5,7 @@
 #ifndef SC_CREATURE_H
 #define SC_CREATURE_H
 
-#include "CreatureAI.h"
+#include "BasicAI.h"
 
 #define CAST_AI(a,b)    (dynamic_cast<a*>(b))
 
@@ -15,7 +15,7 @@ enum SCEquip
     EQUIP_UNEQUIP   = 0
 };
 
-struct ScriptedAI : CreatureAI
+struct ScriptedAI : BasicAI
 {
     explicit ScriptedAI(Creature* pCreature);
     ~ScriptedAI() override {}
@@ -23,12 +23,6 @@ struct ScriptedAI : CreatureAI
     //*************
     //CreatureAI Functions
     //*************
-
-    // Called when an unit moves within visibility distance
-    void MoveInLineOfSight(Unit*) override;
-
-    // Called at each attack of m_creature by any victim
-    void AttackStart(Unit*) override;
 
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void EnterCombat(Unit*) override;
@@ -39,38 +33,8 @@ struct ScriptedAI : CreatureAI
     // Called when the creature leaves combat
     void OnCombatStop() override {}
 
-    // Called at any heal cast/item used (call non implemented in mangos)
-    void HealedBy(Unit* /*pHealer*/, uint32& /*uiAmountHealed*/) override {}
-
-    // Called at any Damage to any victim (before damage apply)
-    void DamageDeal(Unit* /*pDoneTo*/, uint32& /*uiDamage*/) override {}
-
-    // Called at any Damage from any attacker (before damage apply)
-    void DamageTaken(Unit* /*pDoneBy*/, uint32& /*uiDamage*/) override {}
-
-    // Called at World update tick
-    void UpdateAI(uint32 const) override;
-
-    // Called at creature death
-    void JustDied(Unit*) override {}
-
-    // Called at creature killing another unit
-    void KilledUnit(Unit*) override {}
-
-    // Called when the creature summon successfully other creature
-    void JustSummoned(Creature*) override {}
-
-    // Called when a summoned creature is despawned
-    void SummonedCreatureDespawn(Creature*) override {}
-
-    // Called when hit by a spell
-    void SpellHit(Unit*, SpellEntry const*) override {}
-
     // Called when creature is spawned or respawned (for reseting variables)
     void JustRespawned() override;
-
-    // Called at waypoint reached or PointMovement end
-    void MovementInform(uint32, uint32) override {}
 
     //*************
     // Variables
