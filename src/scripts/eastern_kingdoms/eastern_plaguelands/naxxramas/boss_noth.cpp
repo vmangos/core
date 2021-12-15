@@ -124,7 +124,7 @@ struct boss_nothAI : public ScriptedAI
 {
     boss_nothAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        m_pInstance = static_cast<instance_naxxramas*>(pCreature->GetInstanceData());
         Reset();
     }
 
@@ -261,18 +261,17 @@ struct boss_nothAI : public ScriptedAI
     {
         // We need to spawn 4 champions. We have 10 different possible locations,
         // and the adds need to be somewhat evenly spread out, yet somewhat randomized.
-
-        std::vector<uint32> champs(ChampionSpells, ChampionSpells + sizeof(ChampionSpells)/sizeof(uint32));
+        std::vector<uint32> champs(ChampionSpells, ChampionSpells + sizeof(ChampionSpells) / sizeof(uint32));
         
         // First selecting one random champ from each of the 3 main groups
-        uint32 champ1 = champs[urand(g1_start, g1_start+g1_size-1)];
-        uint32 champ2 = champs[urand(g2_start, g2_start+g2_size-1)];
-        uint32 champ3 = champs[urand(g3_start, g3_start+g3_size-1)];
+        uint32 champ1 = champs[urand(g1_start, g1_start + g1_size - 1)];
+        uint32 champ2 = champs[urand(g2_start, g2_start + g2_size - 1)];
+        uint32 champ3 = champs[urand(g3_start, g3_start + g3_size - 1)];
         
         // Moving the selected champions to the end of the vector
-        std::remove(champs.begin(), champs.end(), champ1);
-        std::remove(champs.begin(), champs.end(), champ2);
-        std::remove(champs.begin(), champs.end(), champ3);
+        auto nend = std::remove(champs.begin(), champs.end(), champ1);
+        nend = std::remove(champs.begin(), nend, champ2);
+        nend = std::remove(champs.begin(), nend, champ3);
 
         // Summoning the selected 3 guardians
         DoCastSpellIfCan(m_creature, champ1, CF_TRIGGERED);
@@ -280,14 +279,14 @@ struct boss_nothAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, champ3, CF_TRIGGERED);
         
         // Choosing the final champion at random between the remaining 7 locations
-        uint32 champ4 = champs[urand(0, 6)];
+        uint32 champ4 = champs[urand(0, std::distance(champs.begin(), nend))];
         DoCastSpellIfCan(m_creature, champ4, CF_TRIGGERED);
     }
 
     void Summon2Guardians()
     {
         // Choose one of two locations south-west, and either the north-east or north-west location
-        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW1, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW2, CF_TRIGGERED);
         DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_NE : SPELL_SUM_GUARD_NW, CF_TRIGGERED);
     }
 
