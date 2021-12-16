@@ -680,6 +680,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `f
 (@GUID+502, 296, 0, 'Supply Crate : piege', 0, 0, 10),
 (@GUID+503, 297, 0, 'Supply Crate : piege', 0, 0, 10);
 
+UPDATE `pool_gameobject` SET `description` = 'Supply Crate : trapped' WHERE `description` LIKE 'Supply Crate : piege';
+
 -- Add Missing Incendicite Mineral Vein (credit cmangos)
 DELETE FROM `gameobject` WHERE `id` IN (1610, 1667);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
