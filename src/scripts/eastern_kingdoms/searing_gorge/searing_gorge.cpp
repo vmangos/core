@@ -29,108 +29,6 @@ EndContentData */
 #include "Group.h"
 
 /*######
-## npc_dorius_stonetender
-######*/
-
-enum DoriusStonetenderData
-{
-    SAY_DORIUS_AGGRO_1              = 4353,
-    SAY_DORIUS_AGGRO_2              = 4351,
-
-    NPC_DARK_IRON_STEELSHIFTER      = 8337,
-    MAX_STEELSHIFTERS               = 4,
-
-    QUEST_ID_SUNTARA_STONES         = 3367
-};
-
-struct npc_dorius_stonetenderAI : public npc_escortAI
-{
-    npc_dorius_stonetenderAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override { }
-
-    void ResetCreature() override
-    {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-    }
-
-    void JustStartedEscort() override
-    {
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-    }
-
-    void Aggro(Unit* pWho) override
-    {
-        DoScriptText(urand(0, 1) ? SAY_DORIUS_AGGRO_1 : SAY_DORIUS_AGGRO_2, m_creature, pWho);
-    }
-
-    void WaypointReached(uint32 uiPointId) override
-    {
-        switch (uiPointId)
-        {
-            case 20:
-                // ToDo: research if there is any text here!
-                float fX, fY, fZ;
-                for (uint8 i = 0; i < MAX_STEELSHIFTERS; ++i)
-                {
-                    m_creature->GetNearPoint(m_creature, fX, fY, fZ, 0, 15.0f, i * M_PI_F / 2);
-                    m_creature->SummonCreature(NPC_DARK_IRON_STEELSHIFTER, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
-                }
-                break;
-            case 33:
-                // ToDo: research if there is any event and text here!
-                if (Player* pPlayer = GetPlayerForEscort())
-                    pPlayer->GroupEventHappens(QUEST_ID_SUNTARA_STONES, m_creature);
-                m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-                break;
-        }
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        if (pSummoned->GetEntry() == NPC_DARK_IRON_STEELSHIFTER)
-            pSummoned->AI()->AttackStart(m_creature);
-    }
-
-    void UpdateEscortAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_dorius_stonetender(Creature* pCreature)
-{
-    return new npc_dorius_stonetenderAI(pCreature);
-}
-
-bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_ID_SUNTARA_STONES)
-    {
-        if (npc_dorius_stonetenderAI* pStonetenderAI = dynamic_cast<npc_dorius_stonetenderAI*>(pCreature->AI()))
-        {
-            // ToDo: research if there is any text here
-            pCreature->SetStandState(UNIT_STAND_STATE_STAND);
-            pCreature->SetFactionTemporary(FACTION_ESCORT_A_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
-            pStonetenderAI->Start(false, pPlayer->GetGUID(), pQuest);
-        }
-        return true;
-    }
-
-    return false;
-}
-
-/*######
 ## Quest 3566
 ######*/
 
@@ -331,12 +229,6 @@ CreatureAI* GetAI_npc_dorius(Creature* pCreature)
 void AddSC_searing_gorge()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_dorius_stonetender";
-    newscript->GetAI = &GetAI_npc_dorius_stonetender;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_dorius_stonetender;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_obsidion";
