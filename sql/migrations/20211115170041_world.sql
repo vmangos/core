@@ -129,7 +129,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 1639 WHERE `entry` IN (1639, 1683, 1678);
 
 -- Add Missing Quest Start NPC
-INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 VALUES (7315, 8417, 6, 10);
 
 -- Horde
