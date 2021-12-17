@@ -99,19 +99,19 @@ UPDATE `quest_template` SET `RequiredRaces` = 4 WHERE `entry` = 5625;
 UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` = 5621;
 
 -- Add Missing Quest Start NPC
-INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 VALUES (3044, 5656, 0, 10);
 
 -- Add Missing Quest Start NPC
-INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 VALUES (11407, 5655, 0, 10);
 
 -- Add Missing Quest Start NPC
-INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 VALUES (11407, 5661, 0, 10);
 
 -- Add Missing Quest Start NPC
-INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`)
 VALUES (3600, 5674, 0, 10);
 
 -- -----------------------------------------------------------------------------------------
