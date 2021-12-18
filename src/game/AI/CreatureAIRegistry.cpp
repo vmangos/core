@@ -20,8 +20,7 @@
  */
 
 #include "NullCreatureAI.h"
-#include "ReactorAI.h"
-#include "AggressorAI.h"
+#include "BasicAI.h"
 #include "CritterAI.h"
 #include "GuardAI.h"
 #include "GuardEventAI.h"
@@ -40,8 +39,7 @@ namespace AIRegistry
 void Initialize()
 {
     (new CreatureAIFactory<NullCreatureAI>("NullAI"))->RegisterSelf();
-    (new CreatureAIFactory<AggressorAI>("AggressorAI"))->RegisterSelf();
-    (new CreatureAIFactory<ReactorAI>("ReactorAI"))->RegisterSelf();
+    (new CreatureAIFactory<BasicAI>("BasicAI"))->RegisterSelf();
     (new CreatureAIFactory<CritterAI>("CritterAI"))->RegisterSelf();
     (new CreatureAIFactory<GuardAI>("GuardAI"))->RegisterSelf();
     (new CreatureAIFactory<PetAI>("PetAI"))->RegisterSelf();

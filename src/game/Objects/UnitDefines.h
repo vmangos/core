@@ -64,6 +64,8 @@ enum MovementChangeType
 // For this time difference is computed regen value
 #define REGEN_TIME_FULL     2000
 
+#define UNIT_PVP_COMBAT_TIMER 5500
+
 #define BASE_MELEERANGE_OFFSET 1.33f
 #define BASE_MINDAMAGE 1.0f
 #define BASE_MAXDAMAGE 2.0f
@@ -387,7 +389,7 @@ enum UnitFlags
 {
     UNIT_FLAG_NONE                  = 0x00000000,
     UNIT_FLAG_UNK_0                 = 0x00000001,           // Movement checks disabled, likely paired with loss of client control packet.
-    UNIT_FLAG_NON_ATTACKABLE        = 0x00000002,           // not attackable
+    UNIT_FLAG_SPAWNING              = 0x00000002,           // not attackable
     UNIT_FLAG_DISABLE_MOVE          = 0x00000004,
     UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // players, pets, totems, guardians, companions, charms, any units associated with players
     UNIT_FLAG_PET_RENAME            = 0x00000010,           // Old pet rename: moved to UNIT_FIELD_BYTES_2,2 in TBC+
@@ -410,6 +412,7 @@ enum UnitFlags
     UNIT_FLAG_NOT_SELECTABLE        = 0x02000000,
     UNIT_FLAG_SKINNABLE             = 0x04000000,
     UNIT_FLAG_AURAS_VISIBLE         = 0x08000000,           // magic detect
+    UNIT_FLAG_PREVENT_ANIM          = 0x20000000,           // Prevent automatically playing emotes from parsing chat text, for example "lol" in /say, ending message with ? or !, or using /yell
     UNIT_FLAG_SHEATHE               = 0x40000000,
     UNIT_FLAG_IMMUNE                = 0x80000000,           // Immune to damage
 
@@ -420,7 +423,6 @@ enum UnitFlags
     UNIT_FLAG_DISARMED              = 0x00200000,           // disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
 
     UNIT_FLAG_UNK_28                = 0x10000000,
-    UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
 };
 
 /// Non Player Character flags
@@ -471,6 +473,20 @@ enum ReactStates
     REACT_DEFENSIVE  = 1,
     REACT_AGGRESSIVE = 2
 };
+
+inline char const* ReactStateToString(uint32 reactState)
+{
+    switch (reactState)
+    {
+        case REACT_PASSIVE:
+            return "Passive";
+        case REACT_DEFENSIVE:
+            return "Defensive";
+        case REACT_AGGRESSIVE:
+            return "Aggressive";
+    }
+    return "UNKNOWN";
+}
 
 enum CommandStates
 {

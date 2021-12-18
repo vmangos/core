@@ -691,7 +691,7 @@ enum MangosStrings
     LANG_YOU_SET_IGNORE_TRIGGERS        = 647,
     LANG_YOUR_IGNORE_TRIGGERS_SET       = 648,
 
-    // 639 - 649 not used
+    // 649 not used
     LANG_BG_ALLY                        = 650,
     LANG_BG_HORDE                       = 651,
 
@@ -734,6 +734,13 @@ enum MangosStrings
     //LANG_BG_EY_CAPTURED_FLAG_H        = 685,
     //LANG_BG_EY_DROPPED_FLAG           = 686,
     //LANG_BG_EY_RESETED_FLAG           = 687,
+
+    LANG_YOU_SET_IMMUNE_PC              = 688,
+    LANG_YOUR_IMMUNE_PC_SET             = 689,
+    LANG_YOU_SET_IMMUNE_NPC             = 690,
+    LANG_YOUR_IMMUNE_NPC_SET            = 691,
+    LANG_YOU_SET_UNTARGETABLE           = 692,
+    LANG_YOUR_UNTARGETABLE_SET          = 693,
 
     LANG_RESTORED_ITEM                  = 699,
     //LANG_ARENA_ONE_TOOLOW             = 700,
@@ -1152,23 +1159,6 @@ enum MangosStrings
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)
     // For other tables maybe             2000010000-2147483647 (max index),
-    // opvp ep
-    LANG_OPVP_EP_CAPTURE_NPT_H          = 10033,
-    LANG_OPVP_EP_CAPTURE_NPT_A          = 10034,
-    LANG_OPVP_EP_CAPTURE_EWT_H          = 10035,
-    LANG_OPVP_EP_CAPTURE_EWT_A          = 10036,
-    LANG_OPVP_EP_CAPTURE_CGT_H          = 10037,
-    LANG_OPVP_EP_CAPTURE_CGT_A          = 10038,
-    LANG_OPVP_EP_CAPTURE_PWT_H          = 10039,
-    LANG_OPVP_EP_CAPTURE_PWT_A          = 10040,
-    LANG_OPVP_EP_LOSE_NPT_H            = 10041,
-    LANG_OPVP_EP_LOSE_NPT_A            = 10042,
-    LANG_OPVP_EP_LOSE_EWT_H            = 10043,
-    LANG_OPVP_EP_LOSE_EWT_A            = 10044,
-    LANG_OPVP_EP_LOSE_CGT_H            = 10045,
-    LANG_OPVP_EP_LOSE_CGT_A            = 10046,
-    LANG_OPVP_EP_LOSE_PWT_H            = 10047,
-    LANG_OPVP_EP_LOSE_PWT_A            = 10048,
     // opvp si
     LANG_OPVP_SI_CAPTURE_H              = 10049,
     LANG_OPVP_SI_CAPTURE_A              = 10050,

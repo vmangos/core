@@ -55,25 +55,6 @@ void npc_escortAI::setCurrentWP (uint32 idx)
     m_currentWaypointIdx = idx;
 }
 
-void npc_escortAI::AttackStart(Unit* pWho)
-{
-    if (!pWho)
-        return;
-
-    if (m_creature->Attack(pWho, true))
-    {
-        //if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-        //    m_creature->GetMotionMaster()->MovementExpired();
-
-        m_creature->AddThreat(pWho);
-        m_creature->SetInCombatWith(pWho);
-        pWho->SetInCombatWith(m_creature);
-
-        if (IsCombatMovementEnabled())
-            m_creature->GetMotionMaster()->MoveChase(pWho);
-    }
-}
-
 void npc_escortAI::EnterCombat(Unit* pEnemy)
 {
     if (!pEnemy)
@@ -119,7 +100,7 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* pWho)
         return false;
 
     //never attack friendly
-    if (m_creature->IsFriendlyTo(pWho))
+    if (!pWho->IsTargetableBy(m_creature) || m_creature->IsFriendlyTo(pWho))
         return false;
 
     //too far away and no free sight?
@@ -142,34 +123,10 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* pWho)
 
 void npc_escortAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (pWho->IsTargetable(true, false) && pWho->IsInAccessablePlaceFor(m_creature))
-    {
-        if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombat(pWho))
-            return;
+    if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombat(pWho))
+        return;
 
-        if (!m_creature->CanInitiateAttack())
-            return;
-       // if (!m_creature->canFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
-         //   return;
-
-        if (m_creature->IsHostileTo(pWho))
-        {
-            float fAttackRadius = m_creature->GetAttackDistance(pWho);
-            if (m_creature->IsWithinDistInMap(pWho, fAttackRadius, true, false) && m_creature->IsWithinLOSInMap(pWho))
-            {
-                if (!m_creature->GetVictim())
-                {
-                    //pWho->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                    AttackStart(pWho);
-                }
-                else
-                {
-                    pWho->SetInCombatWith(m_creature);
-                    m_creature->AddThreat(pWho);
-                }
-            }
-        }
-    }
+    BasicAI::MoveInLineOfSight(pWho);
 }
 
 void npc_escortAI::JustDied(Unit* /*pKiller*/)
@@ -203,6 +160,7 @@ void npc_escortAI::JustRespawned()
 
 void npc_escortAI::EnterEvadeMode()
 {
+    m_creature->ClearComboPointHolders();
     m_creature->RemoveAurasAtReset();
     m_creature->DeleteThreatList();
     m_creature->CombatStop(true);

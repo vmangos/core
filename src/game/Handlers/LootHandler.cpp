@@ -49,6 +49,9 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
     recv_data >> lootSlot;
 
+    if (lguid.IsEmpty())
+        return;
+
     switch (lguid.GetHigh())
     {
         case HIGHGUID_GAMEOBJECT:
@@ -355,6 +358,13 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 return;
 
             loot = &go->loot;
+
+            // Don't despawn temporarily spawned chests that contain group wide quest items.
+            if (loot->HasFFAQuestItems() && !go->isSpawnedByDefault() && go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+            {
+                go->SetLootState(GO_READY);
+                break;
+            }
 
             if (go->GetGoType() == GAMEOBJECT_TYPE_DOOR)
             {

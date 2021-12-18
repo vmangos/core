@@ -47,7 +47,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (_player->IsFriendlyTo(pEnemy) || pEnemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+    if (_player->IsFriendlyTo(pEnemy) || pEnemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE))
     {
         // stop attack state at client
         SendAttackStop(pEnemy);
@@ -91,7 +91,8 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recv_data)
     if (sheathed >= MAX_SHEATH_STATE)
         return;
 
-    GetPlayer()->InterruptSpellsWithChannelFlags(CHANNEL_FLAG_SHEATHING_CANCELS);
+    GetPlayer()->InterruptSpellsWithChannelFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_SHEATHING_CANCELS);
     GetPlayer()->SetSheath(SheathState(sheathed));
 }
 

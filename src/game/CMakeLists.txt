@@ -40,13 +40,14 @@ set (game_SRCS
     QuestDef.cpp
     ReputationMgr.cpp
     ScriptMgr.cpp
+    SniffFile.cpp
     SocialMgr.cpp
     StatSystem.cpp
     UnitAuraProcHandler.cpp
     Weather.cpp
     World.cpp
     WorldSession.cpp
-    AI/AggressorAI.cpp
+    AI/BasicAI.cpp
     AI/CreatureAI.cpp
     AI/CreatureAIRegistry.cpp
     AI/CreatureAISelector.cpp
@@ -60,7 +61,6 @@ set (game_SRCS
     AI/PetAI.cpp
     AI/PetEventAI.cpp
     AI/PlayerAI.cpp
-    AI/ReactorAI.cpp
     AI/ScriptedAI.cpp
     AI/ScriptedEscortAI.cpp
     AI/ScriptedFollowerAI.cpp
@@ -243,12 +243,13 @@ set (game_SRCS
     ScriptedGossip.h
     ScriptMgr.h
     SharedDefines.h
+    SniffFile.h
     SocialMgr.h
     UnitEvents.h
     Weather.h
     World.h
     WorldSession.h
-    AI/AggressorAI.h
+    AI/BasicAI.h
     AI/CreatureAI.h
     AI/CreatureAIImpl.h
     AI/CreatureAIRegistry.h
@@ -263,7 +264,6 @@ set (game_SRCS
     AI/PetAI.h
     AI/PetEventAI.h
     AI/PlayerAI.h
-    AI/ReactorAI.h
     AI/ScriptedAI.h
     AI/ScriptedEscortAI.h
     AI/ScriptedFollowerAI.h
@@ -450,14 +450,20 @@ if(USE_ANTICHEAT)
       Anticheat/MovementAnticheat/MovementAnticheat.cpp
       Anticheat/MovementAnticheat/MovementAnticheat.h
       Anticheat/WardenAnticheat/Warden.cpp
-      Anticheat/WardenAnticheat/Warden.h
+      Anticheat/WardenAnticheat/Warden.hpp
+      Anticheat/WardenAnticheat/WardenKeyGeneration.h
       Anticheat/WardenAnticheat/WardenMac.cpp
-      Anticheat/WardenAnticheat/WardenMac.h
+      Anticheat/WardenAnticheat/WardenMac.hpp
+      Anticheat/WardenAnticheat/WardenModule.cpp
+      Anticheat/WardenAnticheat/WardenModule.hpp
+      Anticheat/WardenAnticheat/WardenModuleMgr.cpp
+      Anticheat/WardenAnticheat/WardenModuleMgr.hpp
+      Anticheat/WardenAnticheat/WardenScan.cpp
+      Anticheat/WardenAnticheat/WardenScan.hpp
+      Anticheat/WardenAnticheat/WardenScanMgr.cpp
+      Anticheat/WardenAnticheat/WardenScanMgr.hpp
       Anticheat/WardenAnticheat/WardenWin.cpp
-      Anticheat/WardenAnticheat/WardenWin.h
-      Anticheat/WardenAnticheat/WardenMgr.cpp
-      Anticheat/WardenAnticheat/WardenMgr.h
-      Anticheat/WardenAnticheat/WardenKeyGen.h
+      Anticheat/WardenAnticheat/WardenWin.hpp
   )
 endif()
 
@@ -593,7 +599,3 @@ else()
       )
   endif()
 endif()
-
-
-
-

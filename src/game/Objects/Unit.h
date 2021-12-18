@@ -165,7 +165,7 @@ struct SpellPeriodicAuraLogInfo
     float  multiplier;
 };
 
-uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
+uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
 
 enum SpellAuraProcResult
 {
@@ -447,7 +447,7 @@ class Unit : public SpellCaster
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
         float GetTotalStatValue(Stats stat) const;
-        int32 GetTotalResistanceValue(SpellSchools school) const;
+        float GetTotalResistanceValue(SpellSchools school) const;
         float GetTotalAuraModValue(UnitMods unitMod) const;
 
         SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
@@ -532,11 +532,7 @@ class Unit : public SpellCaster
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM)); }
         void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_SHAPESHIFT_FORM, form); }
         bool IsShapeShifted() const; // mirrors clientside logic, moonkin form not counted as shapeshift
-        bool IsInFeralForm() const
-        {
-            ShapeshiftForm form = GetShapeshiftForm();
-            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
-        }
+        bool IsNoWeaponShapeShift() const;
         bool IsInDisallowedMountForm() const;
         uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
         void SetDisplayId(uint32 displayId);
@@ -740,10 +736,10 @@ class Unit : public SpellCaster
         void RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive = false);
         void RemoveSpellsCausingAura(AuraType auraType);
         void RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except);
-        void RemoveNegativeSpellsCausingAura(AuraType auraType);
+        void RemoveSpellsCausingAuraWithMechanic(AuraType auraType);
         void RemoveNonPassiveSpellsCausingAura(AuraType auraType);
         bool RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder);
-        void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false);
+        void RemoveAurasWithInterruptFlags(uint32 flags, uint32 except = 0, bool checkProcFlags = false, bool skipStealth = false);
         void RemoveAurasWithAttribute(uint32 flags);
         void RemoveAurasWithDispelType(DispelType type, ObjectGuid casterGuid = ObjectGuid());
         void RemoveAllAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -980,7 +976,7 @@ class Unit : public SpellCaster
          */
         bool CanUseEquippedWeapon(WeaponAttackType attackType) const
         {
-            if (IsInFeralForm())
+            if (IsNoWeaponShapeShift())
                 return false;
 
             switch(attackType)
@@ -1024,7 +1020,7 @@ class Unit : public SpellCaster
         void AddExtraAttackOnUpdate() { m_doExtraAttacks = true; };
 
         bool CanAttack(Unit const* target, bool force = false) const;
-        bool IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE = false, bool checkAlive = true) const;
+        bool IsTargetableBy(WorldObject const* pAttacker, bool forAoE = false, bool checkAlive = true) const;
 
         bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
@@ -1134,12 +1130,12 @@ class Unit : public SpellCaster
         void PetOwnerKilledUnit(Unit* pVictim);
         
         bool IsInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
-        void SetInCombatState(bool bPvP, Unit* pEnemy = nullptr);
+        void SetInCombatState(uint32 combatTimer = 0, Unit* pEnemy = nullptr);
         void SetInCombatWith(Unit* pEnemy);
         void SetInCombatWithAssisted(Unit* pAssisted);
         void SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly = false);
         inline void SetOutOfCombatWithAggressor(Unit* pAggressor) { SetInCombatWithAggressor(pAggressor, true); }
-        void SetInCombatWithVictim(Unit* pVictim, bool touchOnly = false);
+        void SetInCombatWithVictim(Unit* pVictim, bool touchOnly = false, uint32 combatTimer = 0);
         inline void SetOutOfCombatWithVictim(Unit* pVictim) { SetInCombatWithVictim(pVictim, true); }
         void TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly = false);
         uint32 GetCombatTimer() const { return m_CombatTimer; }
@@ -1153,12 +1149,8 @@ class Unit : public SpellCaster
         void CombatStopInRange(float dist = 0.0f); // CombatStop all enemies
         void ClearInCombat();
         virtual void OnLeaveCombat() {}
-        void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false);
+        void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false, bool onlyIfNotStalked = false);
         void InterruptAttacksOnMe(float dist = 0.0f, bool guard_check = false); // Interrupt auto-attacks
-        
-        // Script helpers.
-        uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
-        uint32 RespawnNearCreaturesByEntry(uint32 entry, float range);
         
         /*********************************************************/
         /***                 RELATIONS SYSTEM                  ***/
@@ -1177,6 +1169,7 @@ class Unit : public SpellCaster
         uint32 GetFactionTemplateId() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
         void SetFactionTemplateId(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
         void RestoreFaction();
+        virtual Team GetTeam() const;
 
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsHostileToPlayers() const;
@@ -1190,7 +1183,6 @@ class Unit : public SpellCaster
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
-        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC)); }
 
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
         ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }
@@ -1200,6 +1192,7 @@ class Unit : public SpellCaster
 
         CharmInfo* GetCharmInfo() const { return m_charmInfo; }
         CharmInfo* InitCharmInfo(Unit* charm);
+        void HandlePetCommand(CommandStates command, Unit* pTarget);
 
         Unit* GetOwner() const;
         Creature* GetOwnerCreature() const;

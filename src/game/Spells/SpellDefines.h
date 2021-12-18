@@ -463,63 +463,31 @@ enum SpellInterruptFlags
     SPELL_INTERRUPT_FLAG_DAMAGE_CANCELS  = 0x10, // Dmg Cancels(Player)
 };
 
-enum SpellChannelInterruptFlags
-{
-    CHANNEL_FLAG_HOSTILE_ACTION_RECEIVED_CANCELS = 0x00001, // Hostile Action Received Cancels
-    CHANNEL_FLAG_DAMAGE_CANCELS                  = 0x00002, // Damage Cancels
-    CHANNEL_FLAG_ACTION_CANCELS                  = 0x00004, // Action Cancels
-    CHANNEL_FLAG_MOVING_CANCELS                  = 0x00008, // Moving Cancels
-    CHANNEL_FLAG_TURNING_CANCELS                 = 0x00010, // Turning Cancels
-    CHANNEL_FLAG_ANIM_CANCELS                    = 0x00020, // Anim Cancels
-    CHANNEL_FLAG_DISMOUNT_CANCELS                = 0x00040, // Dismount Cancels
-    CHANNEL_FLAG_UNDER_WATER_CANCELS             = 0x00080, // Under Water Cancels
-    CHANNEL_FLAG_ABOVE_WATER_CANCELS             = 0x00100, // Above Water Cancels
-    CHANNEL_FLAG_SHEATHING_CANCELS               = 0x00200, // Sheathing Cancels
-    CHANNEL_FLAG_INTERACTING_CANCELS             = 0x00400, // Interacting Cancels
-    CHANNEL_FLAG_LOOTING_CANCELS                 = 0x00800, // Looting Cancels
-    CHANNEL_FLAG_ATTACKING_CANCELS               = 0x01000, // Attacking Cancels
-    CHANNEL_FLAG_ITEM_USE_CANCELS                = 0x02000, // Item Use Cancels
-    CHANNEL_FLAG_DAMAGE_CHANNEL_DURATION         = 0x04000, // Damage Channel Duration
-    CHANNEL_FLAG_SHAPESHIFTING_CANCELS           = 0x08000, // Shapeshifting Cancels
-    CHANNEL_FLAG_ACTION_CANCELS_LATE             = 0x10000, // Action Cancels - Late
-    CHANNEL_FLAG_MOUNT_CANCELS                   = 0x20000, // Mount Cancels
-};
-
 enum SpellAuraInterruptFlags
 {
-    // Certains ont ete repris de TrinityCore (3.3.5)
-    // ATTENTION: Tous ne sont pas encore implementes.
-    // TC: Par exemple buff BG restauration
-    AURA_INTERRUPT_FLAG_HITBYSPELL                  = 0x00000001,   // 0    removed when getting hit by a negative spell?
-    AURA_INTERRUPT_FLAG_DAMAGE                      = 0x00000002,   // 1    removed by any damage
-    // Non implemente
-    AURA_INTERRUPT_FLAG_CAST                        = 0x00000004,   // 2
-    AURA_INTERRUPT_FLAG_MOVE                        = 0x00000008,   // 3    removed by any movement
-    AURA_INTERRUPT_FLAG_TURNING                     = 0x00000010,   // 4    removed by any turning
-    AURA_INTERRUPT_FLAG_ENTER_COMBAT                = 0x00000020,   // 5    removed by entering combat - Feign death only
-    AURA_INTERRUPT_FLAG_NOT_MOUNTED                 = 0x00000040,   // 6    removed by unmounting
-    AURA_INTERRUPT_FLAG_NOT_ABOVEWATER              = 0x00000080,   // 7    removed by entering water
-    AURA_INTERRUPT_FLAG_NOT_UNDERWATER              = 0x00000100,   // 8    removed by leaving water
-    AURA_INTERRUPT_FLAG_NOT_SHEATHED                = 0x00000200,   // 9    removed by unsheathing
-    AURA_INTERRUPT_FLAG_TALK                        = 0x00000400,   // 10   on interact with NPC (gossip, trainer, stable pet ...) - implemented
-    AURA_INTERRUPT_FLAG_USE                         = 0x00000800,   // 11   on interact with GO - implement
-    // TC - implemente
-    AURA_INTERRUPT_FLAG_MELEE_ATTACK                = 0x00001000,   // 12   removed by attack?
-    // TC - non implemente
-    AURA_INTERRUPT_FLAG_SPELL_ATTACK                = 0x00002000,   // 13
-    AURA_INTERRUPT_FLAG_UNK14                       = 0x00004000,   // 14   unused in 1.12
-    // TC - non implemente
-    AURA_INTERRUPT_FLAG_TRANSFORM                   = 0x00008000,   // 15   removed by casting a spell?
-    AURA_INTERRUPT_FLAG_ON_CAST_SPELL               = 0x00010000,   // 16
-    AURA_INTERRUPT_FLAG_MOUNTING                    = 0x00020000,   // 17   removed by mounting
-    AURA_INTERRUPT_FLAG_NOT_SEATED                  = 0x00040000,   // 18   removed by standing up (used by food and drink mostly and sleep/Fake Death like)
-    AURA_INTERRUPT_FLAG_CHANGE_MAP                  = 0x00080000,   // 19   leaving map/getting teleported
-    AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION    = 0x00100000,   // 20   removed by auras that make you invulnerable, or make other to loose selection on you
-    AURA_INTERRUPT_FLAG_UNK21                       = 0x00200000,   // 21
-    AURA_INTERRUPT_FLAG_TELEPORTED                  = 0x00400000,   // 22
-    // TC - non implemente (9 sorts)
-    AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT            = 0x00800000,   // 23   removed by entering pvp combat
-    AURA_INTERRUPT_FLAG_DIRECT_DAMAGE               = 0x01000000    // 24   removed by any direct damage
+    AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS  = 0x00000001,   // 0    on being hit by spell from hostile caster
+    AURA_INTERRUPT_DAMAGE_CANCELS                   = 0x00000002,   // 1
+    AURA_INTERRUPT_ACTION_CANCELS                   = 0x00000004,   // 2    removed at the beginning of an action (spellcast, ability use etc...)
+    AURA_INTERRUPT_MOVING_CANCELS                   = 0x00000008,   // 3
+    AURA_INTERRUPT_TURNING_CANCELS                  = 0x00000010,   // 4
+    AURA_INTERRUPT_ANIM_CANCELS                     = 0x00000020,   // 5    used by Feign Death
+    AURA_INTERRUPT_DISMOUNT_CANCELS                 = 0x00000040,   // 6 
+    AURA_INTERRUPT_UNDER_WATER_CANCELS              = 0x00000080,   // 7    removed by entering water
+    AURA_INTERRUPT_ABOVE_WATER_CANCELS              = 0x00000100,   // 8    removed by leaving water
+    AURA_INTERRUPT_SHEATHING_CANCELS                = 0x00000200,   // 9
+    AURA_INTERRUPT_INTERACTING_CANCELS              = 0x00000400,   // 10   on interact with NPC (gossip, trainer, stable pet ...)
+    AURA_INTERRUPT_LOOTING_CANCELS                  = 0x00000800,   // 11   on interact with GO or looting
+    AURA_INTERRUPT_ATTACKING_CANCELS                = 0x00001000,   // 12
+    AURA_INTERRUPT_ITEM_USE_CANCELS                 = 0x00002000,   // 13
+    AURA_INTERRUPT_DAMAGE_CHANNEL_DURATION          = 0x00004000,   // 14   only assigned in channel flags
+    AURA_INTERRUPT_SHAPESHIFTING_CANCELS            = 0x00008000,   // 15
+    AURA_INTERRUPT_ACTION_CANCELS_LATE              = 0x00010000,   // 16   removed at the completion of an action (spellcast, ability use etc...)
+    AURA_INTERRUPT_MOUNT_CANCELS                    = 0x00020000,   // 17
+    AURA_INTERRUPT_STANDING_CANCELS                 = 0x00040000,   // 18   used by food and drink mostly and sleep/Fake Death like
+    AURA_INTERRUPT_LEAVE_WORLD_CANCELS              = 0x00080000,   // 19
+    AURA_INTERRUPT_STEALTH_INVIS_CANCELS            = 0x00100000,   // 20
+    AURA_INTERRUPT_INVULNERABILITY_BUFF_CANCELS     = 0x00200000,   // 21
+    AURA_INTERRUPT_ENTER_WORLD_CANCELS              = 0x00400000,   // 22
 };
 
 enum SpellModOp
@@ -753,7 +721,7 @@ enum SpellAttributes
     SPELL_ATTR_HIDE_IN_COMBAT_LOG             = 0x00000100,            // 8 this attributes controls whether spell appears in combat logs
     SPELL_ATTR_TARGET_MAINHAND_ITEM           = 0x00000200,            // 9 Client automatically selects item from mainhand slot as a cast target
     SPELL_ATTR_ON_NEXT_SWING_2                = 0x00000400,            // 10 on next swing 2
-    SPELL_ATTR_UNK11                          = 0x00000800,            // 11
+    SPELL_ATTR_WEARER_CASTS_PROC_TRIGGER      = 0x00000800,            // 11
     SPELL_ATTR_DAYTIME_ONLY                   = 0x00001000,            // 12 only useable at daytime, not set in 2.4.2
     SPELL_ATTR_NIGHT_ONLY                     = 0x00002000,            // 13 only useable at night, not set in 2.4.2
     SPELL_ATTR_INDOORS_ONLY                   = 0x00004000,            // 14 only useable indoors, not set in 2.4.2
@@ -796,10 +764,10 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY    = 0x00008000,            // 15 remove auras on immunity
     SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE = 0x00010000,            // 16 unaffected by school immunity
     SPELL_ATTR_EX_NOT_RESET_AUTO_ACTIONS      = 0x00020000,            // 17 for auras SPELL_AURA_TRACK_CREATURES, SPELL_AURA_TRACK_RESOURCES and SPELL_AURA_TRACK_STEALTHED select non-stacking tracking spells
-    SPELL_ATTR_EX_UNK18                       = 0x00040000,            // 18 stun, polymorph, daze, sleep
+    SPELL_ATTR_EX_PREVENTS_ANIM               = 0x00040000,            // 18 stun, polymorph, daze, sleep
     SPELL_ATTR_EX_CANT_TARGET_SELF            = 0x00080000,            // 19
     SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS     = 0x00100000,            // 20 Req combo points on target
-    SPELL_ATTR_EX_UNK21                       = 0x00200000,            // 21
+    SPELL_ATTR_EX_THREAT_ONLY_ON_MISS         = 0x00200000,            // 21
     SPELL_ATTR_EX_REQ_COMBO_POINTS            = 0x00400000,            // 22 Use combo points (in 4.x not required combo point target selected)
     SPELL_ATTR_EX_UNK23                       = 0x00800000,            // 23
     SPELL_ATTR_EX_IS_FISHING                  = 0x01000000,            // 24 only fishing spells
@@ -836,13 +804,13 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT        = 0x00080000,            // 19 does not necessary need shapeshift (pre-3.x not have passive spells with this attribute)
     SPELL_ATTR_EX2_UNK20                      = 0x00100000,            // 20
     SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD      = 0x00200000,            // 21 for ice blocks, pala immunity buffs, priest absorb shields, but used also for other spells -> not sure!
-    SPELL_ATTR_EX2_UNK22                      = 0x00400000,            // 22
+    SPELL_ATTR_EX2_NO_INITIAL_THREAT          = 0x00400000,            // 22
     SPELL_ATTR_EX2_IS_ARCANE_CONCENTRATION    = 0x00800000,            // 23 Only mage Arcane Concentration have this flag
     SPELL_ATTR_EX2_UNK24                      = 0x01000000,            // 24
     SPELL_ATTR_EX2_UNK25                      = 0x02000000,            // 25
     SPELL_ATTR_EX2_UNK26                      = 0x04000000,            // 26 unaffected by school immunity
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
-    SPELL_ATTR_EX2_UNK28                      = 0x10000000,            // 28 no breaks stealth if it fails??
+    SPELL_ATTR_EX2_NOT_AN_ACTION              = 0x10000000,            // 28 no breaks stealth if it fails??
     SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
     SPELL_ATTR_EX2_TRIGGERED_CAN_TRIGGER_PROC = 0x40000000,            // 30
     SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
@@ -866,8 +834,8 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_DONT_DISPLAY_CHANNEL_BAR   = 0x00002000,            // 13 Clientside attribute - will not display channeling bar
     SPELL_ATTR_EX3_IS_HONORLESS_TARGET        = 0x00004000,            // 14 "Honorless Target" only this spells have this flag
     SPELL_ATTR_EX3_UNK15                      = 0x00008000,            // 15 Auto Shoot, Shoot, Throw,  - this is autoshot flag
-    SPELL_ATTR_EX3_CANT_TRIGGER_PROC          = 0x00010000,            // 16 confirmed with many patchnotes
-    SPELL_ATTR_EX3_NO_INITIAL_AGGRO           = 0x00020000,            // 17 Causes no aggro if not missed
+    SPELL_ATTR_EX3_SUPPRESS_CASTER_PROCS      = 0x00010000,            // 16 confirmed with many patchnotes
+    SPELL_ATTR_EX3_SUPPRESS_TARGET_PROCS      = 0x00020000,            // 17
     SPELL_ATTR_EX3_CANT_MISS                  = 0x00040000,            // 18 Spell should always hit its target
     SPELL_ATTR_EX3_UNK19                      = 0x00080000,            // 19 during aura proc no spells can trigger (20178, 20375)
     SPELL_ATTR_EX3_DEATH_PERSISTENT           = 0x00100000,            // 20 Death persistent spells
@@ -940,20 +908,117 @@ enum SpellAttributesCustom
 // Custom flags assigned by the core based on spell template data
 enum SpellAttributesInternal
 {
-    SPELL_INTERNAL_APPLIES_AURA             = 0x0001,
-    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x0002,
-    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x0004,
-    SPELL_INTERNAL_POSITIVE                 = 0x0008,
-    SPELL_INTERNAL_HEAL                     = 0x0010,
-    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x0020,
-    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x0040,
-    SPELL_INTERNAL_AOE                      = 0x0080,
-    SPELL_INTERNAL_AOE_AURA                 = 0x0100,
-    SPELL_INTERNAL_DISMOUNT                 = 0x0200,
-    SPELL_INTERNAL_CHARM                    = 0x0400,
-    SPELL_INTERNAL_REFLECTABLE              = 0x0800,
-    SPELL_INTERNAL_CUSTOM                   = 0x1000,
-    SPELL_INTERNAL_DELAYABLE_EFFECTS        = 0x2000,
+    SPELL_INTERNAL_APPLIES_AURA             = 0x00001,
+    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x00002,
+    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x00004,
+    SPELL_INTERNAL_POSITIVE                 = 0x00008,
+    SPELL_INTERNAL_HEAL                     = 0x00010,
+    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x00020,
+    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x00040,
+    SPELL_INTERNAL_AOE                      = 0x00080,
+    SPELL_INTERNAL_AOE_AURA                 = 0x00100,
+    SPELL_INTERNAL_DISMOUNT                 = 0x00200,
+    SPELL_INTERNAL_CHARM                    = 0x00400,
+    SPELL_INTERNAL_REFLECTABLE              = 0x00800,
+    SPELL_INTERNAL_CUSTOM                   = 0x01000,
+    SPELL_INTERNAL_DELAYABLE_EFFECTS        = 0x02000,
+    SPELL_INTERNAL_BINARY                   = 0x04000,
+    SPELL_INTERNAL_NON_PERIODIC_DISPEL      = 0x08000,
+    SPELL_INTERNAL_PVE_HEARTBEAT            = 0x10000,
+    SPELL_INTERNAL_CROWD_CONTROL            = 0x20000,
+};
+
+// Spell proc event related declarations
+enum ProcFlags
+{
+    PROC_FLAG_NONE                           = 0x00000000,
+
+    PROC_FLAG_HEARTBEAT                      = 0x00000001,   // 00 On Tick
+    PROC_FLAG_KILL                           = 0x00000002,   // 01 Kill target (in most cases need XP/Honor reward, see Unit::IsTriggeredAtSpellProcEvent for additinoal check)
+
+    PROC_FLAG_DEAL_MELEE_SWING               = 0x00000004,   // 02 Successful melee auto attack
+    PROC_FLAG_TAKE_MELEE_SWING               = 0x00000008,   // 03 Taken damage from melee auto attack hit
+
+    PROC_FLAG_DEAL_MELEE_ABILITY             = 0x00000010,   // 04 Successful attack by Spell that use melee weapon
+    PROC_FLAG_TAKE_MELEE_ABILITY             = 0x00000020,   // 05 Taken damage by Spell that use melee weapon
+
+    PROC_FLAG_DEAL_RANGED_ATTACK             = 0x00000040,   // 06 Successful Ranged auto attack
+    PROC_FLAG_TAKE_RANGED_ATTACK             = 0x00000080,   // 07 Taken damage from ranged auto attack
+
+    PROC_FLAG_DEAL_RANGED_ABILITY            = 0x00000100,   // 08 Successful Ranged attack by Spell that use ranged weapon
+    PROC_FLAG_TAKE_RANGED_ABILITY            = 0x00000200,   // 09 Taken damage by Spell that use ranged weapon
+
+    PROC_FLAG_DEAL_HELPFUL_ABILITY           = 0x00000400,   // 10 Successful positive spell cast (no damage class, or not a healing spell)
+    PROC_FLAG_TAKE_HELPFUL_ABILITY           = 0x00000800,   // 11 Taken positive spell (no damage class)
+
+    PROC_FLAG_DEAL_HARMFUL_ABILITY           = 0x00001000,   // 12 Successful negative spell cast (no damage class)
+    PROC_FLAG_TAKE_HARMFUL_ABILITY           = 0x00002000,   // 13 Taken negative damage (no damage class)
+
+    PROC_FLAG_DEAL_HELPFUL_SPELL             = 0x00004000,   // 14 Successful cast positive spell (by default only on healing (direct and periodic))
+    PROC_FLAG_TAKE_HELPFUL_SPELL             = 0x00008000,   // 15 Taken positive spell hit (by default only on healing (direct and periodic))
+
+    PROC_FLAG_DEAL_HARMFUL_SPELL             = 0x00010000,   // 16 Successful negative spell cast (by default only on damage)
+    PROC_FLAG_TAKE_HARMFUL_SPELL             = 0x00020000,   // 17 Taken negative spell (by default only on damage)
+
+    PROC_FLAG_DEAL_HARMFUL_PERIODIC          = 0x00040000,   // 18 Successful do periodic (damage / healing, determined by PROC_EX_PERIODIC_POSITIVE or negative if no procEx)
+    PROC_FLAG_TAKE_HARMFUL_PERIODIC          = 0x00080000,   // 19 Taken spell periodic (damage / healing, determined by PROC_EX_PERIODIC_POSITIVE or negative if no procEx)
+
+    PROC_FLAG_TAKEN_ANY_DAMAGE               = 0x00100000,   // 20 Taken any damage
+    PROC_FLAG_ON_TRAP_ACTIVATION             = 0x00200000,   // 21 On trap activation (Deal Helpful Periodic in db2)
+
+    PROC_FLAG_MAIN_HAND_WEAPON_SWING         = 0x00400000,   // 22 Taken off-hand melee attacks (no spells have it)
+    PROC_FLAG_OFF_HAND_WEAPON_SWING          = 0x00800000,   // 23 Successful off-hand melee attacks  (no spells have it)
+
+    // CUSTOM FLAGS
+
+    PROC_FLAG_SUCCESSFUL_AOE                 = 0x01000000,   // 24 Nostalrius: AoE casted. Triggered only once, whatever the number of targets.
+    PROC_FLAG_SUCCESSFUL_SPELL_CAST          = 0x02000000,   // 25 Nostalrius: Spell cast successful (procs only once for AoE)
+
+    PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST     = 0x04000000,   // 26 Successful cast of a mana based spell (procs only once for AoE)
+    PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST     = 0x08000000,   // 27 Successful cast of curing spell (i.e. Cleanse)
+
+    PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT  = 0x10000000,   // 28 Successful do periodic (procs only on initial cast)
+    PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT       = 0x20000000    // 29 Taken spell periodic (procs only on initial cast)
+};
+
+#define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_DEAL_MELEE_SWING        | \
+                                  PROC_FLAG_TAKE_MELEE_SWING        | \
+                                  PROC_FLAG_DEAL_MELEE_ABILITY      | \
+                                  PROC_FLAG_TAKE_MELEE_ABILITY      | \
+                                  PROC_FLAG_DEAL_RANGED_ATTACK      | \
+                                  PROC_FLAG_TAKE_RANGED_ATTACK      | \
+                                  PROC_FLAG_DEAL_RANGED_ABILITY     | \
+                                  PROC_FLAG_TAKE_RANGED_ABILITY)
+
+#define NEGATIVE_TRIGGER_MASK (MELEE_BASED_TRIGGER_MASK             | \
+                               PROC_FLAG_DEAL_HARMFUL_ABILITY       | \
+                               PROC_FLAG_TAKE_HARMFUL_ABILITY       | \
+                               PROC_FLAG_DEAL_HARMFUL_SPELL         | \
+                               PROC_FLAG_TAKE_HARMFUL_SPELL)
+
+enum ProcFlagsEx
+{
+    PROC_EX_NONE                = 0x0000000,                // If none can tigger on Hit/Crit only (passive spells MUST defined by SpellFamily flag)
+    PROC_EX_NORMAL_HIT          = 0x0000001,                // If set only from normal hit (only damage spells)
+    PROC_EX_CRITICAL_HIT        = 0x0000002,
+    PROC_EX_MISS                = 0x0000004,
+    PROC_EX_RESIST              = 0x0000008,
+    PROC_EX_DODGE               = 0x0000010,
+    PROC_EX_PARRY               = 0x0000020,
+    PROC_EX_BLOCK               = 0x0000040,
+    PROC_EX_EVADE               = 0x0000080,
+    PROC_EX_IMMUNE              = 0x0000100,
+    PROC_EX_DEFLECT             = 0x0000200,
+    PROC_EX_ABSORB              = 0x0000400,
+    PROC_EX_REFLECT             = 0x0000800,
+    PROC_EX_INTERRUPT           = 0x0001000,                // Melee hit result can be Interrupt (not used)
+    PROC_EX_RESERVED1           = 0x0002000,
+    PROC_EX_RESERVED2           = 0x0004000,
+    PROC_EX_RESERVED3           = 0x0008000,
+    PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                // If set trigger always ( no matter another flags) used for drop charges
+    PROC_EX_NO_PERIODIC         = 0x0020000,                // Will never proc if periodic proc flag present
+    PROC_EX_PERIODIC_POSITIVE   = 0x0040000,                // For periodic heal
+    PROC_EX_CAST_END            = 0x0080000,                // Procs on end of cast only
 };
 
 // original names, do not edit

@@ -647,7 +647,7 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         isImmune = false;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
         if (!isImmune)
         {

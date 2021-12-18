@@ -60,6 +60,11 @@ struct PInfoData
     AccountTypes security = SEC_PLAYER;
     std::string last_login;
     std::string target_name;
+    std::string warden_clock;
+    std::string warden_fingerprint;
+    std::string warden_hypervisors;
+    std::string warden_endscene;
+    std::string warden_proxifier;
 };
 
 class WorldSession;

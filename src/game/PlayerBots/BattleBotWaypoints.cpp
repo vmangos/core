@@ -1633,6 +1633,13 @@ BattleBotPath vPath_AV_Stormpike_Crossroad_to_Stormpike_Flag =
     { 667.173f, -295.225f, 30.29f, &AV_AtFlag },
 };
 
+BattleBotPath vPath_AV_Stormpike_Graveyard_to_Stormpike_Flag =
+{
+    { 676.0f, -374.0f, 29.782f, nullptr },
+    { 665.922f, -347.777f, 29.493f, nullptr },
+    { 667.173f, -295.225f, 30.29f, &AV_AtFlag },
+};
+
 BattleBotPath vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad =
 {
     { 450.8f, -434.864f, 30.5126f, nullptr },
@@ -1736,6 +1743,7 @@ std::vector<BattleBotPath*> const vPaths_AV =
     &vPath_AV_Alliance_Slope_Crossroad_to_Stormpike_Crossroad,
     &vPath_AV_Stormpike_Crossroad_to_Alliance_Base_Bunker_First_Crossroad,
     &vPath_AV_Stormpike_Crossroad_to_Stormpike_Flag,
+    &vPath_AV_Stormpike_Graveyard_to_Stormpike_Flag,
     &vPath_AV_Alliance_Base_Bunker_First_Crossroad_to_Alliance_Base_North_Bunker,
     &vPath_AV_Alliance_Base_Bunker_First_Crossroad_to_Alliance_Base_Bunker_Second_Crossroad,
     &vPath_AV_Alliance_Base_Bunker_Second_Crossroad_to_Alliance_Base_South_Bunker,
@@ -1761,6 +1769,7 @@ std::vector<BattleBotPath*> const vPaths_NoReverseAllowed =
     &vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad,
     &vPath_AV_Horde_Cave_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad,
+    &vPath_AV_Stormpike_Graveyard_to_Stormpike_Flag,
 };
 
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)

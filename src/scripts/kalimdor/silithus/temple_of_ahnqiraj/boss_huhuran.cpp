@@ -30,7 +30,7 @@ EndScriptData */
 enum
 {
     EMOTE_GENERIC_FRENZY_KILL   = 7797,
-    EMOTE_GENERIC_BERSERK       = -1000004,
+    EMOTE_GENERIC_BERSERK       = 4428,
 
     SPELL_ACIDSPIT              = 26050,
     SPELL_FRENZY                = 26051,

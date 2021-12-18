@@ -69,9 +69,9 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *who) override
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && m_creature->IsWithinDistInMap(who, 10.0f))
+        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) && m_creature->IsWithinDistInMap(who, 10.0f))
         {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         }
         ScriptedAI::MoveInLineOfSight(who);
     }

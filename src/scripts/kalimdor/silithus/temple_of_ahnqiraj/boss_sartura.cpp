@@ -45,8 +45,8 @@ enum
 
     TAUNT_IMMUNE                    = 26602,
 
-    EMOTE_ENRAGE                    = -1000003,
-    EMOTE_ENRAGEHARD                = -1000004,
+    EMOTE_ENRAGE                    = 2384,
+    EMOTE_ENRAGEHARD                = 4428,
 
     // Royal Guard
     SPELL_KNOCKBACK                 = 19813,
@@ -81,7 +81,7 @@ struct boss_sarturaAI : public ScriptedAI
     void Reset() override
     {
         m_uiCleaveTimer = 4000;
-        m_uiWhirlWindTimer = urand(8000, 12000);;
+        m_uiWhirlWindTimer = urand(8000, 12000);
         m_uiWhirlWindEndTimer = 0;
         m_uiAggroResetTimer = urand(5000, 7500);
         

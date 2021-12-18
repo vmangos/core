@@ -1532,7 +1532,7 @@ namespace MaNGOS
                 if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, false))
                     return false;
 
-                if (!u->IsTargetable(true, m_me->IsCharmerOrOwnerPlayerOrPlayerItself()))
+                if (!u->IsTargetableBy(m_me))
                     return false;
 
                 if (m_ignoreCivilians && u->IsCreature() && static_cast<Creature*>(u)->IsCivilian())

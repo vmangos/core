@@ -25,8 +25,8 @@ EndScriptData */
 
 enum
 {
-    SAY_AGGRO                   = -1189019,
-    SAY_SPECIALAE               = -1189020,
+    SAY_AGGRO                   = 6199, // You will not defile these mysteries!
+    SAY_BURN_IN_FIRE            = 6200, // Burn in righteous fire!
 
     SPELL_POLYMORPH             = 13323,
     SPELL_AOESILENCE            = 8988,
@@ -69,6 +69,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
 
         if (bShielded && bCanDetonate)
         {
+            DoScriptText(SAY_BURN_IN_FIRE, m_creature);
             DoCastSpellIfCan(m_creature, SPELL_FIREAOE);
             bCanDetonate = false;
         }
@@ -83,7 +84,6 @@ struct boss_arcanist_doanAI : public ScriptedAI
             if (m_creature->IsNonMeleeSpellCasted(false))
                 return;
 
-            DoScriptText(SAY_SPECIALAE, m_creature);
             DoCastSpellIfCan(m_creature, SPELL_ARCANEBUBBLE);
 
             bCanDetonate = true;

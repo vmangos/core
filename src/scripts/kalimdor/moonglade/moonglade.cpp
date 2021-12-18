@@ -312,7 +312,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 pSummoned->AddAura(17131); // hover
                 pSummoned->SetFly(true);
                 pSummoned->MonsterMove(aEranikusLocations[0].m_fX, aEranikusLocations[0].m_fY, aEranikusLocations[0].m_fZ);
-                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 pSummoned->SetRespawnDelay(DAY);
                 break;
             case NPC_NIGHTMARE_PHANTASM:
@@ -593,7 +593,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                         m_uiTransitionTimer = 0;
 
                         pEranikus->SetWalk(true);
-                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                         pEranikus->AI()->AttackStart(m_creature);
                     }
                 }
@@ -1078,7 +1078,7 @@ struct boss_eranikusAI : public ScriptedAI
             // redeem eranikus
             m_uiEventTimer = 5000;
             m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED);
         }
         else
         {

@@ -11,6 +11,7 @@
 #include "World.h"
 #include "MovementPacketSender.h"
 #include "Geometry.h"
+#include "AccountMgr.h"
 
 using namespace Geometry;
 
@@ -91,7 +92,7 @@ MovementInfo const& MovementAnticheat::GetLastMovementInfo() const
     return me->m_movementInfo;
 }
 
-uint32 MovementAnticheat::Update(uint32 diff, std::stringstream& reason)
+uint32 MovementAnticheat::Update(Player* pPlayer, uint32 diff, std::stringstream& reason)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED))
         return CHEAT_ACTION_NONE;
@@ -103,10 +104,10 @@ uint32 MovementAnticheat::Update(uint32 diff, std::stringstream& reason)
         return CHEAT_ACTION_NONE;
     }
 
-    return Finalize(reason);
+    return Finalize(pPlayer, reason);
 }
 
-uint32 MovementAnticheat::Finalize(std::stringstream& reason)
+uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
 {
     if (m_maxOverspeedDistance < fabs(m_overspeedDistance))
         m_maxOverspeedDistance = fabs(m_overspeedDistance);
@@ -116,20 +117,27 @@ uint32 MovementAnticheat::Finalize(std::stringstream& reason)
     m_cheatOccuranceTick[CHEAT_TYPE_OVERSPEED_DIST] = uint32(fabs(m_overspeedDistance));
     m_cheatOccuranceTick[CHEAT_TYPE_TIME_DESYNC] = abs(m_clientDesync);
 
-    DEBUG_UNIT(me, DEBUG_CHEAT, "Desync %ims / %fyards", m_clientDesync, m_overspeedDistance);
     m_updateCheckTimer = CHEATS_UPDATE_INTERVAL;
 
     // Add up penalties for all cheats detected
     uint32 result = ComputeCheatAction(reason);
 
     // Log data
-    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && me->IsInWorld())
+    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && pPlayer && pPlayer->IsInWorld())
     {
         LogsDatabase.PExecute("INSERT INTO logs_movement "
             "(account, guid, posx, posy, posz, map, desyncMs, desyncDist, cheats) VALUES "
             "(%u,      %u,   %f,   %f,   %f,   %u,  %i,       %f,         '%s');",
-            m_session->GetAccountId(), me->GetGUIDLow(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(),
-            me->GetMapId(), m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
+            m_session->GetAccountId(), pPlayer->GetGUIDLow(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(),
+            pPlayer->GetMapId(), m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
+    }
+
+    if ((result & (CHEAT_ACTION_KICK | CHEAT_ACTION_BAN_ACCOUNT | CHEAT_ACTION_BAN_IP_ACCOUNT)) && !m_packetLog.empty())
+    {
+        AddMessageToPacketLog("End of packet log. Penalty: " + std::to_string(result) + ", Detected cheats: " + reason.str());
+        std::string fileName = "movement_log_" +  m_session->GetUsername() + "_" + std::to_string(time(nullptr)) + ".pkt";
+        SniffFile packetDump(fileName.c_str());
+        packetDump.WriteToFile(m_packetLog);
     }
 
     // Reset to zero tick counts
@@ -145,12 +153,28 @@ void MovementAnticheat::AddCheats(uint32 cheats, uint32 count)
     if (!cheats)
         return;
 
-    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS))
+    if (sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE) ||
+       (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS) && m_session->GetPlayer()))
     {
+        std::string cheatNames;
         for (uint32 i = 0; i < CHEATS_COUNT; ++i)
         {
-            if ((cheats & (1 << i)) && m_session->GetPlayer())
-                ChatHandler(m_session->GetPlayer()).PSendSysMessage("[AntiCheat] Cheat : %s", GetMovementCheatName(CheatType(i)));
+            if (cheats & (1 << i))
+            {
+                if (!cheatNames.empty())
+                    cheatNames += ", ";
+                cheatNames += GetMovementCheatName(CheatType(i));
+            }
+        }
+
+        if (!cheatNames.empty())
+        {
+            if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_NOTIFY_CHEATERS))
+                ChatHandler(m_session->GetPlayer()).PSendSysMessage("[AntiCheat] Detected cheats: %s", cheatNames.c_str());
+
+            // Print detected cheats in place inside packet log.
+            if (sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE))
+                AddMessageToPacketLog("Detected cheats: " + cheatNames);
         }
     }
 
@@ -224,6 +248,24 @@ uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(false, CHEAT_TYPE_FORBIDDEN_AREA, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY);
 
     return action;
+}
+
+void MovementAnticheat::AddMessageToPacketLog(std::string message)
+{
+    WorldPacket data(SMSG_NOTIFICATION, message.size() + 1);
+    data << message;
+    LogMovementPacket(false, data);
+}
+
+void MovementAnticheat::LogMovementPacket(bool isClientPacket, WorldPacket& packet)
+{
+    if (uint32 maxLogSize = sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_PACKET_LOG_SIZE))
+    {
+        if (m_packetLog.size() >= maxLogSize)
+            m_packetLog.pop_front();
+
+        m_packetLog.push_back(LoggedPacket(isClientPacket, packet));
+    }
 }
 
 void MovementAnticheat::HandleCommand(ChatHandler* handler) const
@@ -625,6 +667,13 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
             }
 
+            if ((cheatFlags & (1 << CHEAT_TYPE_WALL_CLIMB)) &&
+                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_REJECT))
+            {
+                // Prevent false positive detection loop on auto run against wall while afk.
+                me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
+            }
+
             if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
             {
@@ -836,7 +885,7 @@ bool MovementAnticheat::CheckMultiJump(uint16 opcode)
         case MSG_MOVE_JUMP:
         {
             m_jumpCount++;
-            if (m_jumpCount > 2)
+            if (m_jumpCount > 1)
                 return true;
             break;
         }
@@ -858,7 +907,6 @@ bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 
 {
     // Not currently handled cases.
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_ENABLED) ||
-       (opcode != MSG_MOVE_HEARTBEAT) ||
        (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
        (me->HasFlag(UNIT_FIELD_FLAGS, NO_WALL_CLIMB_CHECK_UNIT_FLAGS)) ||
@@ -1050,7 +1098,7 @@ bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) cons
         return true;
 
     float const distance = GetDistance3D(me->GetPosition(), movementInfo.pos);
-    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.1f);
+    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE) * std::max(1.0f, me->GetSpeedRate(GetMoveTypeForMovementInfo(movementInfo)) * 0.2f);
 
     // Exclude elevators
     uint32 destZoneId = 0;

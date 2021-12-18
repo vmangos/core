@@ -697,6 +697,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 26471: // Lunar Festival Port Error
+                {
+                    if (!m_caster->IsPlayer())
+                        return;
+
+                    m_caster->RemoveSpellCooldown(26373); // Remove cooldown from Lunar Invititation
+                    SendCastResult(SPELL_FAILED_NOT_HERE);
+                    return;
+                }
                 case 24531: // Refocus : "Instantly clears the cooldowns of Aimed Shot, Multishot, Volley, and Arcane Shot."
                 {
                     if (!m_caster->IsPlayer())
@@ -1413,7 +1422,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Fake death
                     //m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEING_DEATH);
-                    m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     m_casterUnit->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     m_casterUnit->AddUnitState(UNIT_STAT_FEIGN_DEATH);
 
@@ -1568,7 +1577,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 14813: // Dark Iron Drunk Mug
                 {
-                    if (unitTarget->HasAura(14823) || unitTarget->GetEntry() == 14871)
+                    if (unitTarget->HasAura(14823))
                         return;
 
                     if (m_originalCasterGUID && m_originalCasterGUID.IsGameObject())
@@ -1608,6 +1617,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 29519, true);
                     unitTarget->SetPvPContested(true);
 
+                    return;
+                }
+                case 26879: // Love is in the Air - Remove Amorous
+                {
+                    unitTarget->RemoveAurasDueToSpell(26869);
                     return;
                 }
                 case 17190: // Ras Frostwhisper Visual Dummy
@@ -2065,47 +2079,19 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
         {
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+
+            // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+            // -  Vanish now removes effects that allow the caster to always remain
+            //    aware of their target(currently Hunter's Mark and Mind Vision).
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STALKED);
+#endif
 
-            // if this spell is given to NPC it must handle rest by it's own AI
-            if (unitTarget->GetTypeId() != TYPEID_PLAYER)
-                return;
+            if (Player* pPlayer = unitTarget->ToPlayer())
+                pPlayer->CastHighestStealthRank();
 
-            // get highest rank of the Stealth spell
-            SpellEntry const* stealthSpellEntry = nullptr;
-            const PlayerSpellMap& sp_list = ((Player*)unitTarget)->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
-            {
-                // only highest rank is shown in spell book, so simply check if shown in spell book
-                if (!itr->second.active || itr->second.disabled || itr->second.state == PLAYERSPELL_REMOVED)
-                    continue;
-
-                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
-                if (!spellInfo)
-                    continue;
-
-                if (spellInfo->IsFitToFamily(SPELLFAMILY_ROGUE, uint64(0x0000000000400000)))
-                {
-                    stealthSpellEntry = spellInfo;
-                    break;
-                }
-            }
-
-            // no Stealth spell found
-            if (!stealthSpellEntry)
-                return;
-
-            // reset cooldown on it if needed
-            if (!unitTarget->IsSpellReady(*stealthSpellEntry))
-                unitTarget->RemoveSpellCooldown(*stealthSpellEntry);
-
-            m_caster->CastSpell(unitTarget, stealthSpellEntry, true);
             return;
         }
-        // just skip
-        case 23770:                                         // Sayge's Dark Fortune of *
-            // not exist, common cooldown can be implemented in scripts if need.
-            return;
         // Brittle Armor - (need add max stack of 24575 Brittle Armor)
         case 29284:
             m_caster->CastSpell(unitTarget, 24575, true, m_CastItem, nullptr, m_originalCasterGUID);
@@ -2702,7 +2688,7 @@ void Spell::EffectEnergize(SpellEffectIndex eff_idx)
         return;
 
     if (m_spellInfo->Id == 2687)
-        unitTarget->SetInCombatState(false, nullptr);
+        unitTarget->SetInCombatState();
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     ExecuteLogInfo info(unitTarget->GetObjectGuid());
@@ -3079,7 +3065,7 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
     else
         spawnCreature->SetReactState(REACT_AGGRESSIVE);
 
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+    if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
         ((Creature*)m_casterUnit)->AI()->JustSummoned((Creature*)spawnCreature);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
@@ -3597,7 +3583,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         map->Add((Creature*)spawnCreature);
 
         // Notify Summoner
-        if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+        if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
             ((Creature*)m_casterUnit)->AI()->JustSummoned(spawnCreature);
 
         switch (m_spellInfo->Id)
@@ -3731,7 +3717,9 @@ void Spell::EffectSpawn(SpellEffectIndex /*eff_idx*/)
     if (!unitTarget || (unitTarget->GetTypeId() != TYPEID_UNIT))
         return;
 
-    unitTarget->SetVisibility(VISIBILITY_ON);
+    if (unitTarget->GetVisibility() != VISIBILITY_ON)
+        unitTarget->SetVisibility(VISIBILITY_ON);
+    unitTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 }
 
 void Spell::EffectTradeSkill(SpellEffectIndex /*eff_idx*/)
@@ -4127,7 +4115,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     {
         if (!m_casterUnit->IsAlive()) // CalculateMeleeDamage does not work in that case.
             return;
-        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
+        m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ATTACKING_CANCELS);
         if (Spell* spell = m_casterUnit->GetCurrentSpell(CURRENT_MELEE_SPELL))
             spell->cast();
         CalcDamageInfo damageInfo;
@@ -4337,8 +4325,8 @@ void Spell::EffectInterruptCast(SpellEffectIndex eff_idx)
             if ((spell->getState() == SPELL_STATE_CASTING
                 || (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastTime() > 0.0f))
                 && curSpellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE
-                && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK)
-                || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->ChannelInterruptFlags & CHANNEL_FLAG_ACTION_CANCELS)))
+                && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->HasSpellInterruptFlag(SPELL_INTERRUPT_FLAG_DAMAGE_PUSHBACK))
+                || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->HasChannelInterruptFlag(AURA_INTERRUPT_ACTION_CANCELS))))
             {
                 unitTarget->LockOutSpells(curSpellInfo->GetSpellSchoolMask(), m_spellInfo->GetDuration());
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
@@ -4429,8 +4417,10 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     pGameObj->SetWorldMask(m_caster->GetWorldMask());
     pGameObj->SummonLinkedTrapIfAny();
 
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+    if (m_caster->IsCreature() && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
+    else if (m_caster->IsGameObject() && ((GameObject*)m_caster)->AI())
+        ((GameObject*)m_caster)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
 }
@@ -4453,7 +4443,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 2765: // SHOWLABEL Only ON
                 {
                     if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGMChat(true, true);;
+                        pPlayer->SetGMChat(true, true);
                     return;
                 }
                 case 1509: // GM Only OFF
@@ -4751,6 +4741,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, spellId, true);
                     return;
                 }
+                case 24731:                                    // Cannon Fire
+                {
+                    if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    unitTarget->CastSpell(m_caster, 24742, true);
+                    return;
+                }
                 case 24737:                                 // Ghost Costume
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
@@ -4762,6 +4760,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // Ghost Costume (male or female)
                     m_caster->CastSpell(unitTarget, unitTarget->GetGender() == GENDER_MALE ? 24735 : 24736, true);
+                    return;
+                }
+                case 24742:                                 // Magic Wings
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->RemoveAurasDueToSpell(24754);   // Darkmoon Faire Cannon root aura
                     return;
                 }
                 case 24751:                                 // Trick or Treat
@@ -4868,6 +4874,116 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     else
                         unitTarget->CastSpell(unitTarget, 26655, true, m_CastItem);
 
+                    return;
+                }
+                case 26923:                                 // Valentine (Guards)
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (unitTarget->HasAura(26898)) // Heartbroken
+                        return;
+
+                    if (!((Player*)unitTarget)->HasItemCount(21815, 1, false)) // Love Token
+                        return;
+
+                    // Guard spellIds map [Pledge of Friendship , Pledge of Adoration]
+                    std::map<uint32, std::vector<uint32>> loveAirSpellsMapForFaction = {
+                            {11, {27242, 27510}},   // Stormwind
+                            {85, {27247, 27507}},   // Orgrimmar
+                            {57, {27244, 27506}},   // Ironforge
+                            {68, {27246, 27515}},   // Undercity Guardian
+                            {71, {27246, 27515}},   // Undercity Seeker
+                            {79, {27245, 27504}},   // Darnassus
+                            {105, {27248, 27513}}   // Thunderbluff
+                    };
+
+                    uint32 AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];
+                    uint32 AdoredOrBroken = 26680;      // Adored as default.
+
+                    if (loveAirSpellsMapForFaction.count(m_caster->GetFactionTemplateId()))
+                    {
+                        if (!urand(0, 5))               // Sets 1 in 6 chance to cast Heartbroken.
+                        {
+                            AdoredOrBroken = 26898;     // Heartbroken.
+                        }
+                        else if (!unitTarget->HasAura(26680))
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][1];    // Pledge of Adoration for related faction.
+                        }
+                        else
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];    // Pledge of Friendship for related faction.
+                        }
+
+                        unitTarget->CastSpell(unitTarget, AdoredOrBroken, false);           // Cast Adored or Broken.
+
+                        if (AdoredOrBroken == 26898)
+                            return;
+
+                        unitTarget->CastSpell(unitTarget, AdorationOrFriendship, true);     // Get a Pledge.
+                        unitTarget->CastSpell(unitTarget, 26879, true);                     // Remove Amorous.
+                    }
+                    return;
+                }
+                case 26663:                     // Valentine (Citizens)
+                case 27541:
+                case 27547:
+                case 27548:
+                case 27549:
+                case 27550:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Civilian spellIds map [Gift of Friendship , Gift of Adoration]
+                    std::map<uint32, std::vector<uint32>> loveAirSpellsMapForFaction = {
+                            {12, {27525, 27509}},   // Stormwind
+                            {29, {27523, 27505}},   // Orgrimmar orcs
+                            {55, {27520, 27503}},   // Ironforge dwarves
+                            {68, {27529, 27512}},   // Undercity
+                            {80, {27519, 26901}},   // Darnassus
+                            {104, {27524, 27511}},  // Thunderbluff
+                            {126, {27523, 27505}},  // Orgrimmar trolls
+                            {875, {27520, 27503}}   // Ironforge gnomes
+                    };
+
+                    uint32 AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];
+                    uint32 AdoredOrBroken = 26680;      // Adored as default.
+
+                    if (loveAirSpellsMapForFaction.count(m_caster->GetFactionTemplateId()))
+                    {
+                        if (!urand(0, 5))               // Sets 1 in 6 chance to cast Heartbroken.
+                        {
+                            AdoredOrBroken = 26898;     // Heartbroken.
+                        }
+                        else if (!unitTarget->HasAura(26680))
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][1];    // Gift of Adoration for related faction
+                        }
+                        else
+                        {
+                            AdorationOrFriendship = loveAirSpellsMapForFaction[m_caster->GetFactionTemplateId()][0];    // Gift of Friendship for related faction
+                        }
+
+                        unitTarget->CastSpell(unitTarget, AdoredOrBroken, false);           // Cast Adored or Broken.
+
+                        if (AdoredOrBroken == 26898)
+                            return;
+
+                        unitTarget->CastSpell(unitTarget, AdorationOrFriendship, true);     // Get a Pledge.
+                        unitTarget->CastSpell(unitTarget, 26879, true);                     // Remove Amorous.
+                    }
+                    return;
+                }
+                case 27654:                         // Love is in the Air Test
+                case 26870:                         // Amorous Timer, Standard Test
+                {
+                    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+                    {
+                        unitTarget->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP); // Add gossip flag for NPC missing it
+                        unitTarget->CastSpell(unitTarget, m_spellInfo->Id == 26870 ? 26869 : 27741, true); // Apply aura instantly
+                    }
                     return;
                 }
                 case 27687:                                 // Summon Bone Minions
@@ -5040,10 +5156,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 27657:                                 // Valentine End Check
                 {
-                    if (unitTarget && !sGameEventMgr.IsActiveEvent(8))
+                    if (m_casterUnit && !sGameEventMgr.IsActiveEvent(8))
                     {
-                        unitTarget->RemoveAurasDueToSpell(26869);
-                        unitTarget->RemoveAurasDueToSpell(27741);
+                        m_casterUnit->RemoveAurasDueToSpell(26870); // Amorous Timer, Standard Test
+                        m_casterUnit->RemoveAurasDueToSpell(27742); // Amorous Timer, Standard
+                        m_casterUnit->RemoveAurasDueToSpell(26869); // Amorous
+                        m_casterUnit->RemoveAurasDueToSpell(27654); // Love is in the Air Test
+                        m_casterUnit->RemoveAurasDueToSpell(27741); // Love is in the Air
                     }
                     return;
                 }
@@ -5060,6 +5179,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                                     pGroupMember->CastSpell(pGroupMember, 13142, true); // Teleport to Razelikh
                             }
                         }
+                    }
+                    return;
+                }
+                case 29710:
+                {
+                    if (Player* pPlayerTarget = ToPlayer(unitTarget))
+                    {
+                        pPlayerTarget->CastSpell(pPlayerTarget, PickRandomValue(29705, 29726, 29727), false);
                     }
                     return;
                 }
@@ -5145,22 +5272,21 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 Unit* target = unitTarget ? unitTarget : m_casterUnit;
                 if (!target)
                     return;
-                target->RemoveNegativeSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                target->RemoveSpellsCausingAuraWithMechanic(SPELL_AURA_MOD_ROOT);
                 Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                 for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
                 {
                     SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
 
-                    // skip positive and forced debuff auras
-                    if ((*iter)->IsPositive() || aurSpellInfo->HasAttribute(SPELL_ATTR_NEGATIVE))
+                    // all shapeshift removing spells have some mechanic mask. 33572 and 38132 confirmed not removed on poly
+                    if (aurMechMask == 0)
                     {
                         ++iter;
                         continue;
                     }
 
-                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
-
-                    // If spell that caused this aura has Croud Control or Daze effect
+                    // If spell that caused this aura has Crowd Control or Daze effect
                     if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
                         // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
                         (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
@@ -5934,7 +6060,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
 
     pGameObj->SummonLinkedTrapIfAny();
 
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT && ((Creature*)m_casterUnit)->AI())
+    if (m_casterUnit->IsCreature() && ((Creature*)m_casterUnit)->AI())
         ((Creature*)m_casterUnit)->AI()->JustSummoned(pGameObj);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
@@ -6208,7 +6334,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     critter->SetFacingToObject(player);
 
     // Notify Summoner
-    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+    if (m_caster->IsCreature() && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(critter);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(critter->GetObjectGuid()));
@@ -6456,31 +6582,39 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         float max_dis = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
         float dis = rand_norm_f() * (max_dis - min_dis) + min_dis;
 
+        float max_angle = (max_dis - min_dis) / (max_dis + m_caster->GetObjectBoundingRadius());
+        float angle_offset = max_angle * (rand_norm_f() - 0.5f);
+
         float x, y, z;
         m_casterUnit->GetPosition(x, y, z);
-        fx = x + dis * cos(m_casterUnit->GetOrientation());
-        fy = y + dis * sin(m_casterUnit->GetOrientation());
+        fx = x + dis * cos(m_casterUnit->GetOrientation()+ angle_offset);
+        fy = y + dis * sin(m_casterUnit->GetOrientation()+ angle_offset);
         fz = z;
-        m_casterUnit->GetMap()->GetLosHitPosition(x, y, z + 0.5f, fx, fy, fz, -1.5f);
+        m_casterUnit->GetMap()->GetLosHitPosition(x, y, z + 2.0f, fx, fy, fz, -1.5f);
     }
 
     Map* cMap = m_casterUnit->GetMap();
 
     if (goinfo->type == GAMEOBJECT_TYPE_FISHINGNODE)
     {
-        float waterLevel = m_casterUnit->GetTerrain()->GetWaterLevel(fx, fy, fz);
-        if (waterLevel == VMAP_INVALID_HEIGHT_VALUE)             // Hack to prevent fishing bobber from failing to land on fishing hole
+        GridMapLiquidData liqData;
+
+        if (!m_caster->GetTerrain()->IsSwimmable(fx, fy, m_caster->GetPositionZ() + 1.0f, 1.5f, &liqData))
+            m_caster->GetTerrain()->IsSwimmable(fx, fy, liqData.level, 1.5f, &liqData);
+
+        float x, y, z;
+        m_casterUnit->GetPosition(x, y, z);
+        if ((abs(liqData.depth_level) < 1) || !(m_caster->GetMap()->isInLineOfSight(x, y, z + 2.0f, fx, fy, liqData.level))) // Hack to prevent fishing bobber from failing to land on fishing hole
         {
-            // but this is not proper, we really need to ignore not materialized objects
+            // But this is not proper, we really need to ignore not materialized objects
             SendCastResult(SPELL_FAILED_NOT_FISHABLE);
             SendChannelUpdate(0);
             finish();
             return;
         }
 
-        // replace by water level in this case
-        //fz = cMap->GetWaterLevel(fx, fy);
-        fz = waterLevel;
+        // Replace by water level in this case
+        fz = liqData.level;
     }
 
     GameObject* pGameObj = new GameObject;

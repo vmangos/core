@@ -488,6 +488,9 @@ Map::Add(T* obj)
     obj->SetIsNewObject(true);
     UpdateObjectVisibility(obj, cell, p);
     obj->SetIsNewObject(false);
+
+    if (Creature* pCreature = obj->ToCreature())
+        pCreature->CastSpawnSpell();
 }
 
 template<>
@@ -1830,6 +1833,24 @@ bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const
         }
     }
     return foundPlayer;
+}
+
+void Map::SendDefenseMessage(int32 textId, uint32 zoneId) const
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    for (const auto& itr : m_mapRefManager)
+    {
+        Player* pPlayer = itr.getSource();
+        char const* text = textId > 0 ? sObjectMgr.GetBroadcastText(textId, pPlayer->GetSession()->GetSessionDbLocaleIndex(), pPlayer->GetGender()) : sObjectMgr.GetMangosString(textId, pPlayer->GetSession()->GetSessionDbLocaleIndex());
+        
+        WorldPacket data(SMSG_DEFENSE_MESSAGE);
+        data << uint32(zoneId);
+        data << uint32(strlen(text) + 1);
+        data << text;
+
+        pPlayer->GetSession()->SendPacket(&data);
+    }
+#endif
 }
 
 bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const

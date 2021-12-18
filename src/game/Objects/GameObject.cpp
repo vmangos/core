@@ -150,6 +150,9 @@ void GameObject::RemoveFromWorld()
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
+        if (AI())
+            AI()->OnRemoveFromWorld();
+
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
 
@@ -599,7 +602,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 //any return here in case battleground traps
             }
 
-            if (GetOwnerGuid())
+            if (GetOwnerGuid() || (!m_spawnedByDefault && !GetGOData()))
             {
                 if (Unit* owner = GetOwner())
                     owner->RemoveGameObject(this, false);

@@ -75,11 +75,11 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     std::string name = sObjectMgr.GeneratePetName(1863); // Succubus name
     normalizePlayerName(name);
     uint8 gender = pClone ? pClone->GetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_GENDER) : urand(0, 1);
-    uint8 skin = pClone ? pClone->GetByteValue(PLAYER_BYTES, 0) : urand(0, 5);
-    uint8 face = pClone ? pClone->GetByteValue(PLAYER_BYTES, 1) : urand(0, 5);
-    uint8 hairStyle = pClone ? pClone->GetByteValue(PLAYER_BYTES, 2) : urand(0, 5);
-    uint8 hairColor = pClone ? pClone->GetByteValue(PLAYER_BYTES, 3) : urand(0, 5);
-    uint8 facialHair = pClone ? pClone->GetByteValue(PLAYER_BYTES_2, 0) : urand(0, 5);
+    uint8 skin = pClone ? pClone->GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID) : urand(0, 5);
+    uint8 face = pClone ? pClone->GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID) : urand(0, 5);
+    uint8 hairStyle = pClone ? pClone->GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID) : urand(0, 5);
+    uint8 hairColor = pClone ? pClone->GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID) : urand(0, 5);
+    uint8 facialHair = pClone ? pClone->GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE) : urand(0, 5);
     Player* newChar = new Player(sess);
     uint32 guid = botEntry->playerGUID;
     if (!newChar->Create(guid, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))

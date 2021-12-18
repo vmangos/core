@@ -52,7 +52,6 @@ public:
 
     void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
-    void LearnPremadeSpecForClass();
 
     bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const final;
     Player* GetPartyLeader() const;
@@ -68,6 +67,8 @@ public:
     bool RunAwayFromTarget(Unit* pTarget);
     bool CrowdControlMarkedTargets();
     bool EnterCombatDruidForm();
+    bool ShouldEnterStealth() const;
+    bool EnterStealthIfNeeded(SpellEntry const* pStealthSpell);
 
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;

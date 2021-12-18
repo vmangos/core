@@ -1,4 +1,6 @@
+#include <World.h>
 #include "CombatBotBaseAI.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Group.h"
 #include "PlayerBotMgr.h"
@@ -9,6 +11,9 @@
 
 enum CombatBotSpells
 {
+    SPELL_MAIL_PROFICIENCY = 8737,
+    SPELL_PLATE_PROFICIENCY = 750,
+
     SPELL_SHIELD_SLAM = 23922,
     SPELL_HOLY_SHIELD = 20925,
     SPELL_SANCTITY_AURA = 20218,
@@ -2461,6 +2466,310 @@ void CombatBotBaseAI::SummonPetIfNeeded()
             vSummons.push_back(SPELL_SUMMON_SUCCUBUS);
         if (!vSummons.empty())
             me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
+    }
+}
+
+void CombatBotBaseAI::LearnArmorProficiencies()
+{
+    switch (me->GetClass())
+    {
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        {
+            if (me->GetLevel() >= 40 && !me->HasSpell(SPELL_PLATE_PROFICIENCY))
+                me->LearnSpell(SPELL_PLATE_PROFICIENCY, false, false);
+            break;
+        }
+        case CLASS_HUNTER:
+        case CLASS_SHAMAN:
+        {
+            if (me->GetLevel() >= 40 && !me->HasSpell(SPELL_MAIL_PROFICIENCY))
+                me->LearnSpell(SPELL_MAIL_PROFICIENCY, false, false);
+            break;
+        }
+    }
+}
+
+void CombatBotBaseAI::LearnPremadeSpecForClass()
+{
+    std::vector<PlayerPremadeSpecTemplate const*> vSpecs;
+    for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+    {
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == me->GetLevel())
+            vSpecs.push_back(&itr.second);
+    }
+    // Use lower level spec template if there are no templates for the current level.
+    if (vSpecs.empty())
+    {
+        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass() &&
+                itr.second.level < me->GetLevel())
+                vSpecs.push_back(&itr.second);
+        }
+    }
+    if (!vSpecs.empty())
+    {
+        PlayerPremadeSpecTemplate const* pSpec = nullptr;
+        // Try to find a role appropriate gear template.
+        if (m_role != ROLE_INVALID)
+        {
+            for (const auto itr : vSpecs)
+            {
+                if (itr->role == m_role &&
+                   (!pSpec || pSpec->level < itr->level))
+                {
+                    pSpec = itr;
+                }
+            }
+        }
+        // There is no spec template for this role, pick randomly.
+        if (!pSpec)
+            pSpec = SelectRandomContainerElement(vSpecs);
+        sObjectMgr.ApplyPremadeSpecTemplateToPlayer(pSpec->entry, me);
+        if (m_role == ROLE_INVALID)
+            m_role = pSpec->role;
+    }
+}
+
+void CombatBotBaseAI::EquipPremadeGearTemplate()
+{
+    std::vector<PlayerPremadeGearTemplate const*> vGear;
+    for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+    {
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == me->GetLevel())
+            vGear.push_back(&itr.second);
+    }
+    // Use lower level gear template if there are no templates for the current level.
+    if (vGear.empty())
+    {
+        for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass() &&
+                itr.second.level < me->GetLevel())
+                vGear.push_back(&itr.second);
+        }
+    }
+    if (!vGear.empty())
+    {
+        PlayerPremadeGearTemplate const* pGear = nullptr;
+        // Try to find a role appropriate gear template.
+        if (m_role != ROLE_INVALID)
+        {
+            for (const auto itr : vGear)
+            {
+                if (itr->role == m_role &&
+                   (!pGear || pGear->level < itr->level))
+                {
+                    pGear = itr;
+                }
+            }
+        }
+        // There is no gear template for this role, pick randomly.
+        if (!pGear)
+            pGear = SelectRandomContainerElement(vGear);
+        sObjectMgr.ApplyPremadeGearTemplateToPlayer(pGear->entry, me);
+    }
+}
+
+inline uint32 GetPrimaryItemStatForClassAndRole(uint8 playerClass, uint8 role)
+{
+    switch (playerClass)
+    {
+        case CLASS_WARRIOR:
+        {
+            return ITEM_MOD_STRENGTH;
+        }
+        case CLASS_PALADIN:
+        {
+            return ((role == ROLE_HEALER) ? ITEM_MOD_INTELLECT : ITEM_MOD_STRENGTH);
+        }
+        case CLASS_HUNTER:
+        case CLASS_ROGUE:
+        {
+            return ITEM_MOD_AGILITY;
+        }
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+        {
+            return ((role == ROLE_MELEE_DPS || role == ROLE_TANK) ? ITEM_MOD_AGILITY : ITEM_MOD_INTELLECT);
+        }
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+        {
+            return ITEM_MOD_INTELLECT;
+        }
+    }
+    return ITEM_MOD_STAMINA;
+}
+
+void CombatBotBaseAI::EquipRandomGearInEmptySlots()
+{
+    LearnArmorProficiencies();
+
+    std::map<uint32 /*slot*/, std::vector<ItemPrototype const*>> itemsPerSlot;
+    for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
+    {
+        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(i);
+        if (!pProto)
+            continue;
+
+        // Only items that have already been discovered by someone
+        if (!pProto->m_bDiscovered)
+            continue;
+
+        // Skip unobtainable items
+        if (pProto->ExtraFlags & ITEM_EXTRA_NOT_OBTAINABLE)
+            continue;
+
+        // Only gear and weapons
+        if (pProto->Class != ITEM_CLASS_WEAPON && pProto->Class != ITEM_CLASS_ARMOR)
+            continue;
+
+        // No item level check for tabards and shirts
+        if (pProto->InventoryType != INVTYPE_TABARD && pProto->InventoryType != INVTYPE_BODY)
+        {
+            // Avoid higher level items with no level requirement
+            if (!pProto->RequiredLevel && pProto->ItemLevel > me->GetLevel())
+                continue;
+
+            // Avoid low level items
+            if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
+                continue;
+        }
+
+        if (me->CanUseItem(pProto) != EQUIP_ERR_OK)
+            continue;
+
+        if (pProto->RequiredReputationFaction && uint32(me->GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
+            continue;
+
+        if (uint32 skill = pProto->GetProficiencySkill())
+        {
+            // Don't equip cloth items on warriors, etc unless bot is a healer
+            if (pProto->Class == ITEM_CLASS_ARMOR &&
+                pProto->InventoryType != INVTYPE_CLOAK &&
+                pProto->InventoryType != INVTYPE_SHIELD &&
+                skill != me->GetHighestKnownArmorProficiency() &&
+                m_role != ROLE_HEALER)
+                continue;
+
+            // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
+            if (pProto->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
+                skill = SKILL_FIST_WEAPONS;
+            if (!me->GetSkillValue(skill))
+                continue;
+        }
+
+        uint8 slots[4];
+        pProto->GetAllowedEquipSlots(slots, me->GetClass(), me->CanDualWield());
+
+        for (uint8 slot : slots)
+        {
+            if (slot >= EQUIPMENT_SLOT_START && slot < EQUIPMENT_SLOT_END &&
+                !me->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            {
+                // Offhand checks
+                if (slot == EQUIPMENT_SLOT_OFFHAND)
+                {
+                    // Only allow shield in offhand for tanks
+                    if (pProto->InventoryType != INVTYPE_SHIELD &&
+                        m_role == ROLE_TANK && IsShieldClass(me->GetClass()))
+                        continue;
+
+                    // Only equip holdables on mana users
+                    if (pProto->InventoryType == INVTYPE_HOLDABLE &&
+                        m_role != ROLE_HEALER && m_role != ROLE_RANGE_DPS)
+                        continue;
+                }
+
+
+                itemsPerSlot[slot].push_back(pProto);
+
+                // Unique item
+                if (pProto->MaxCount == 1)
+                    break;
+            }
+        }
+    }
+
+    // Remove items that don't have our primary stat from the list
+    uint32 const primaryStat = GetPrimaryItemStatForClassAndRole(me->GetClass(), m_role);
+    for (auto& itr : itemsPerSlot)
+    {
+        bool hasPrimaryStatItem = false;
+        
+        for (auto const& pItem : itr.second)
+        {
+            for (auto const& stat : pItem->ItemStat)
+            {
+                if (stat.ItemStatType == primaryStat && stat.ItemStatValue > 0)
+                {
+                    hasPrimaryStatItem = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasPrimaryStatItem)
+        {
+            itr.second.erase(std::remove_if(itr.second.begin(), itr.second.end(),
+            [primaryStat](ItemPrototype const* & pItem)
+            {
+                bool itemHasPrimaryStat = false;
+                for (auto const& stat : pItem->ItemStat)
+                {
+                    if (stat.ItemStatType == primaryStat && stat.ItemStatValue > 0)
+                    {
+                        itemHasPrimaryStat = true;
+                        break;
+                    }
+                }
+
+                return !itemHasPrimaryStat;
+            }),
+                itr.second.end());
+        }
+    }
+
+    for (auto const& itr : itemsPerSlot)
+    {
+        // Don't equip offhand if using 2 handed weapon
+        if (itr.first == EQUIPMENT_SLOT_OFFHAND)
+        {
+            if (Item* pMainHandItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                if (pMainHandItem->GetProto()->InventoryType == INVTYPE_2HWEAPON)
+                    continue;
+        }
+
+        if (itr.second.empty())
+            continue;
+
+        ItemPrototype const* pProto = SelectRandomContainerElement(itr.second);
+        if (!pProto)
+            continue;
+
+        me->SatisfyItemRequirements(pProto);
+        me->StoreNewItemInBestSlots(pProto->ItemId, 1);
+    }
+}
+
+void CombatBotBaseAI::AutoEquipGear(uint32 option)
+{
+    switch (option)
+    {
+        case PLAYER_BOT_AUTO_EQUIP_STARTING_GEAR:
+            me->AddStartingItems();
+            break;
+        case PLAYER_BOT_AUTO_EQUIP_RANDOM_GEAR:
+            EquipRandomGearInEmptySlots();
+            break;
+        case PLAYER_BOT_AUTO_EQUIP_PREMADE_GEAR:
+            EquipPremadeGearTemplate();
+            break;
     }
 }
 

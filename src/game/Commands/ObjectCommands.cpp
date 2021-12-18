@@ -149,19 +149,19 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 
 bool ChatHandler::HandleGameObjectInfoCommand(char* args)
 {
+    GameObject* pGameObject = getSelectedGameObject();
+
     // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
     uint32 lowguid;
-    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
-        return false;
-
-    if (!lowguid)
-        return false;
-
-    GameObject* pGameObject = nullptr;
-
-    // by DB guid
-    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
-        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+    if (ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+    {
+        if (lowguid)
+        {
+            // by DB guid
+            if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+                pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+        }
+    }  
 
     if (!pGameObject)
     {

@@ -201,7 +201,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0), m_creatureStateFlags(CSTATE_REGEN_HEALTH | CSTATE_REGEN_MANA),
     m_AI_locked(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_creatureGroup(nullptr),
-    m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_PASSIVE),
+    m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_DEFENSIVE),
     m_lastLeashExtensionTime(nullptr), m_playerDamageTaken(0), m_nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
     m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_mountId(0),
     m_reputationId(-1), m_gossipMenuId(0), m_castingTargetGuid(0)
@@ -354,17 +354,18 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     // Load creature equipment
     if (eventData && eventData->equipment_id)
     {
-        LoadEquipment(eventData->equipment_id);             // use event equipment if any for active event
-    }
-    else if (!addon || addon->equipment_id < 0)
-    {
-        // use default from the template
-        LoadEquipment(cinfo->equipment_id);
+        // use event equipment if any for active event
+        LoadEquipment(eventData->equipment_id);
     }
     else if (addon && addon->equipment_id >= 0)
     {
-        // override
-        LoadEquipment(addon->equipment_id);
+        // override with per spawn data
+        LoadEquipment(addon->equipment_id, true);
+    }
+    else
+    {
+        // use default from the template
+        LoadEquipment(cinfo->equipment_id, true);
     }
 
     SetName(normalInfo->name);                              // at normal entry always
@@ -378,8 +379,7 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     UpdateSpeed(MOVE_RUN,  false);
     SetFly(CanFly());
 
-    if (!data)
-        m_defaultMovementType = MovementGeneratorType(cinfo->movement_type);
+    m_defaultMovementType = MovementGeneratorType(data ? data->movement_type : cinfo->movement_type);
 
     return true;
 }
@@ -515,6 +515,8 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
     else
         SetPvP(false);
 
+    InitializeReactState();
+
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = GetCreatureInfo()->spells[i];
 
@@ -546,6 +548,16 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
         ApplyGameEventSpells(eventData, true);
 
     return true;
+}
+
+void Creature::InitializeReactState()
+{
+    if (IsTotem() || IsTrigger() || !CanHaveTarget() || GetCreatureType() == CREATURE_TYPE_CRITTER)
+        SetReactState(REACT_PASSIVE);
+    else if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
+        SetReactState(REACT_DEFENSIVE);
+    else
+        SetReactState(REACT_AGGRESSIVE);
 }
 
 float Creature::GetScaleForDisplayId(uint32 displayId)
@@ -1122,7 +1134,6 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     }
 
     LoadCreatureAddon();
-    InitializeReactState();
     SetWalk(!HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_RUN), true);
     return true;
 }
@@ -1449,7 +1460,7 @@ void Creature::SaveToDB(uint32 mapid)
     data.position.o = GetOrientation();
     data.spawntimesecsmin = m_respawnDelay;
     data.spawntimesecsmax = m_respawnDelay;
-    data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_wanderDistance;;
+    data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_wanderDistance;
     data.movement_type = !m_wanderDistance && GetDefaultMovementType() == RANDOM_MOTION_TYPE
                         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
     data.spawn_flags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
@@ -1968,6 +1979,20 @@ bool Creature::FallGround()
     return true;
 }
 
+void Creature::CastSpawnSpell()
+{
+    if (GetCreatureInfo()->spawn_spell_id)
+    {
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+        SpellCastResult result = CastSpell(this, GetCreatureInfo()->spawn_spell_id, false);
+        if (result != SPELL_CAST_OK)
+        {
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+            sLog.outError("%s failed to cast spawn spell %u due to reason %u.", GetGuidStr().c_str(), GetCreatureInfo()->spawn_spell_id, result);
+        }
+    }
+}
+
 void Creature::Respawn()
 {
     RemoveCorpse();
@@ -2182,16 +2207,10 @@ void Creature::CallForHelp(float fRadius)
 
 bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /*= true*/) const
 {
-    if (!IsAlive())
-        return false;
-
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_ASSIST))
         return false;
 
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
-        return false;
-
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_NPC))
+    if (!CanInitiateAttack())
         return false;
 
     // skip fighting creature
@@ -2221,6 +2240,9 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
             return false;
     }
 
+    if (!enemy->IsTargetableBy(this))
+        return false;
+
     // skip non hostile to caster enemy creatures
     if (!IsHostileTo(enemy))
         return false;
@@ -2232,15 +2254,21 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     return true;
 }
 
-bool Creature::CanInitiateAttack()
+bool Creature::CanInitiateAttack() const
 {
+    if (!IsAlive())
+        return false;
+
     if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_FEIGN_DEATH))
         return false;
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE))
         return false;
 
-    if (IsPassiveToHostile())
+    if (!HasReactState(REACT_AGGRESSIVE))
+        return false;
+
+    if (IsNeutralToAll())
         return false;
 
     if (IsTempPacified())
@@ -2530,18 +2558,8 @@ void Creature::SetInCombatWithZone(bool initialPulse)
             if (!initialPulse && pPlayer->IsInCombat())
                 continue;
 
-            if (pPlayer->IsAlive() && !IsFriendlyTo(pPlayer))
-            {
-                if (IsInCombat())
-                {
-                    pPlayer->SetInCombatWith(this);
-                    AddThreat(pPlayer);
-                }
-                else if (AI())
-                {
-                    AI()->AttackStart(pPlayer);
-                }
-            }
+            if (IsValidAttackTarget(pPlayer))
+                EnterCombatWithTarget(pPlayer);
         }
     }
 }
@@ -2887,6 +2905,14 @@ void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*
         }
 
         m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
+    }
+    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime())
+    {
+        // Forced cooldown on using instant spells during mind control to prevent abuse.
+        recTime = 10 * IN_MILLISECONDS;
+        m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, 0, 0);
+        if (Player const* player = ::ToPlayer(GetCharmer()))
+            player->SendSpellCooldown(spellEntry.Id, recTime, GetObjectGuid());
     }
 }
 
@@ -3265,8 +3291,8 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
                     pPlayer->SendFactionAtWar(GetReputationId(), true);
         }
 
-        if (pWho->IsPlayer() && CanSummonGuards())
-            sGuardMgr.SummonGuard(this, static_cast<Player*>(pWho));
+        if (CanSummonGuards())
+            sGuardMgr.SummonGuard(this, pWho);
 
         if (IsPet())
             if (Creature* pOwner = GetOwnerCreature())
@@ -3619,9 +3645,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
     ASSERT(target);
 
     // if the target cannot be attacked, the target is not acceptable
-    if (IsFriendlyTo(target)
-            || !target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself())
-            || target->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (IsFriendlyTo(target) || !target->IsTargetableBy(this))
         return false;
 
     Unit* myVictim = GetAttackerForHelper();
@@ -3680,6 +3704,17 @@ void Creature::ResetCombatTime(bool combat)
         ++m_combatResetCount;
     else
         m_combatResetCount = 0;
+}
+
+void Creature::EnterCombatWithTarget(Unit* pVictim)
+{
+    if (!GetVictim() && AI())
+        AI()->AttackStart(pVictim);
+    else if (GetVictim() != pVictim)
+    {
+        AddThreat(pVictim);
+        pVictim->SetInCombatWith(this);
+    }
 }
 
 bool Creature::canStartAttack(Unit const* who, bool force) const

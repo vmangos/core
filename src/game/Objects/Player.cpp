@@ -871,16 +871,18 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, -1);  // -1 is default value
 #endif
 
-    SetByteValue(PLAYER_BYTES, 0, skin);
-    SetByteValue(PLAYER_BYTES, 1, face);
-    SetByteValue(PLAYER_BYTES, 2, hairStyle);
-    SetByteValue(PLAYER_BYTES, 3, hairColor);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, skin);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID, face);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, hairStyle);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, hairColor);
 
-    SetByteValue(PLAYER_BYTES_2, 0, facialHair);
-    SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, facialHair);
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_UNK1, 0xEE);
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_NORMAL);
 
-    SetUInt16Value(PLAYER_BYTES_3, 0, gender);              // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
-    SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
+    // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
+    SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, gender);
+    SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, 0);
 
     SetUInt32Value(PLAYER_GUILDID, 0);
     SetUInt32Value(PLAYER_GUILDRANK, 0);
@@ -918,9 +920,6 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
 
     // original spells
     LearnDefaultSpells();
-
-    // original items
-    AddStartingItems();
 
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
@@ -1169,7 +1168,7 @@ DrunkenState Player::GetDrunkenstateByValue(uint16 value)
 void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
 {
     m_drunk = newDrunkenValue;
-    SetUInt16Value(PLAYER_BYTES_3, 0, uint16(GetGender()) | (m_drunk & 0xFFFE));
+    SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, uint16(GetGender()) | (m_drunk & 0xFFFE));
 
     uint32 newDrunkenState = Player::GetDrunkenstateByValue(m_drunk);
 
@@ -1187,6 +1186,9 @@ uint32 Player::GetWaterBreathingInterval() const
 
 void Player::SetWaterBreathingIntervalMultiplier(float multiplier)
 {
+    if (m_environmentBreathingMultiplier == multiplier)
+        return;
+
     m_environmentBreathingMultiplier = multiplier;
 
     if (const uint32 interval = GetWaterBreathingInterval())
@@ -1221,8 +1223,8 @@ void Player::SetEnvironmentFlags(EnvironmentFlags flags, bool apply)
     // Remove auras that need land or water
     if (flags & ENVIRONMENT_FLAG_HIGH_LIQUID)
     {
-        InterruptSpellsWithChannelFlags(apply ? CHANNEL_FLAG_ABOVE_WATER_CANCELS : CHANNEL_FLAG_UNDER_WATER_CANCELS);
-        RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
+        InterruptSpellsWithChannelFlags(apply ? AURA_INTERRUPT_UNDER_WATER_CANCELS : AURA_INTERRUPT_ABOVE_WATER_CANCELS);
+        RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_UNDER_WATER_CANCELS : AURA_INTERRUPT_ABOVE_WATER_CANCELS);
     }
 
     // On moving in/out high sea area: affect fatigue timer
@@ -1462,13 +1464,13 @@ bool Player::IsCityProtector() { return m_ExtraFlags & PLAYER_EXTRA_CITY_PROTECT
 
 void Player::SetCityTitle()
 {
-    SetByteValue(PLAYER_BYTES_3, 2, GetRace());
+    SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_CITY_PROTECTOR_TITLE, GetRace());
     m_ExtraFlags |= PLAYER_EXTRA_CITY_PROTECTOR;
 }
 
 void Player::RemoveCityTitle()
 {
-    SetByteValue(PLAYER_BYTES_3, 2, 0);
+    SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_CITY_PROTECTOR_TITLE, 0);
     m_ExtraFlags &= ~PLAYER_EXTRA_CITY_PROTECTOR;
 }
 
@@ -1675,6 +1677,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     if (IsHasDelayedTeleport())
         TeleportTo(m_teleport_dest, m_teleport_options, m_teleportRecoverDelayed);
+
     // Movement extrapolation & cheat computation - only if not already kicked!
     if (!GetSession()->IsConnected())
         return;
@@ -1687,6 +1690,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             if (!transition || !IsInCombat())
                 sMapMgr.ScheduleInstanceSwitch(this, newInstanceId);
     }
+
     if (IsInWorld())
     {
         if (m_repopAtGraveyardPending && !HasPendingMovementChange())
@@ -1710,7 +1714,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
         // Anticheat sanction
         std::stringstream reason;
-        uint32 cheatAction = GetCheatData()->Update(p_time, reason);
+        uint32 cheatAction = GetCheatData()->Update(this, p_time, reason);
         if (cheatAction)
             GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
     }
@@ -1720,7 +1724,7 @@ void Player::OnDisconnected()
 {
     // Anticheat sanction
     std::stringstream reason;
-    uint32 cheatAction = GetCheatData()->Finalize(reason);
+    uint32 cheatAction = GetCheatData()->Finalize(this, reason);
     if (cheatAction)
         GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
 
@@ -2148,7 +2152,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
         InterruptNonMeleeSpells(true);
 
     //remove auras before removing from map...
-    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS | AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
     RemoveCharmAuras();
     DisableSpline();
     SetMover(this);
@@ -2252,7 +2256,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         }
 
         if (!IsWithinDist3d(x, y, z, GetMap()->GetVisibilityDistance()))
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
         // this will be used instead of the current location in SaveToDB
         m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
@@ -2349,7 +2353,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
         SetSelectionGuid(ObjectGuid());
         CombatStop();
         UpdatePvPContested(false, true);
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ENTER_WORLD_CANCELS);
 
         // reset extraAttack counter
         ResetExtraAttacks();
@@ -2387,7 +2391,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 InterruptNonMeleeSpells(true);
 
         //remove auras before removing from map...
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LEAVE_WORLD_CANCELS | AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
         RemoveCharmAuras();
         ResolvePendingMovementChanges(false, false);
 
@@ -2401,6 +2405,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                 data << uint32(m_transport->GetEntry());
                 data << uint32(GetMapId());
             }
+            GetCheatData()->LogMovementPacket(false, data);
             GetSession()->SendPacket(&data);
         }
 
@@ -2604,7 +2609,7 @@ void Player::HandleFoodEmotes(uint32 diff)
 
         for (const auto pAura : lModRegenAuras)
         {
-            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && pAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && pAura->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_FOOD);
                 break;
@@ -2613,7 +2618,7 @@ void Player::HandleFoodEmotes(uint32 diff)
 
         for (const auto pAura : lModPowerRegenAuras)
         {
-            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && pAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && pAura->GetSpellProto()->HasAuraInterruptFlag(AURA_INTERRUPT_STANDING_CANCELS))
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_DRINK);
                 break;
@@ -2763,6 +2768,24 @@ void Player::RegenerateHealth()
         addvalue = 0;
 
     ModifyHealth(int32(addvalue));
+}
+
+bool Player::CanUseBank(ObjectGuid bankerGUID) const
+{
+    // bankerGUID parameter is optional, set to 0 by default.
+    if (!bankerGUID)
+        bankerGUID = m_currentBankerGuid;
+
+    bool isUsingBankCommand = (bankerGUID == GetObjectGuid() && bankerGUID == m_currentBankerGuid);
+
+    if (!isUsingBankCommand)
+    {
+        Creature* creature = GetNPCIfCanInteractWith(bankerGUID, UNIT_NPC_FLAG_BANKER);
+        if (!creature)
+            return false;
+    }
+
+    return true;
 }
 
 bool Player::CanInteractWithQuestGiver(Object* questGiver) const
@@ -2915,13 +2938,7 @@ bool Player::CanSeeHealthOf(Unit const* pTarget) const
 
 bool Player::CanSeeSpecialInfoOf(Unit const* pTarget) const
 {
-    for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
-    {
-        if (aura->GetCasterGuid() == this->GetObjectGuid())
-            return true;
-    }
-
-    return false;
+    return pTarget->HasAuraTypeByCaster(SPELL_AURA_EMPATHY, GetObjectGuid());
 }
 
 struct SetGameMasterOnHelper
@@ -3448,9 +3465,6 @@ void Player::GiveLevel(uint32 level)
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
-
-    if (m_session->ShouldBeBanned(GetLevel()))
-        sWorld.BanAccount(BAN_ACCOUNT, m_session->GetUsername(), 0, m_session->GetScheduleBanReason(), "");
 }
 
 void Player::UpdateFreeTalentPoints(bool resetIfNeed)
@@ -3611,7 +3625,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // cleanup unit flags (will be re-applied if need at aura load).
     RemoveFlag(UNIT_FIELD_FLAGS,
-               UNIT_FLAG_NON_ATTACKABLE   | UNIT_FLAG_DISABLE_MOVE  | UNIT_FLAG_NOT_ATTACKABLE_1 |
+               UNIT_FLAG_SPAWNING   | UNIT_FLAG_DISABLE_MOVE  | UNIT_FLAG_NOT_ATTACKABLE_1 |
                UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_LOOTING          |
                UNIT_FLAG_PET_IN_COMBAT    | UNIT_FLAG_SILENCED      | UNIT_FLAG_PACIFIED         |
                UNIT_FLAG_STUNNED          | UNIT_FLAG_IN_COMBAT     | UNIT_FLAG_DISARMED         |
@@ -4844,7 +4858,7 @@ void Player::BuildPlayerRepop()
     SetHealth(1);
 
     SetWaterWalking(true);
-    if (!GetSession()->isLogingOut())
+    if (!GetSession()->IsLogingOut())
         SetRooted(false);
 
     // BG - remove insignia related
@@ -4934,7 +4948,7 @@ void Player::KillPlayer()
     //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_IN_PVP);
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-    ApplyModByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStorage.LookupEntry<MapEntry>(GetMapId())->Instanceable());
+    ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStorage.LookupEntry<MapEntry>(GetMapId())->Instanceable());
 
     // 6 minutes until repop at graveyard
     m_deathTimer = CORPSE_REPOP_TIME;
@@ -4961,11 +4975,11 @@ Corpse* Player::CreateCorpse()
         return nullptr;
     }
 
-    uint8 skin       = GetByteValue(PLAYER_BYTES, 0);
-    uint8 face       = GetByteValue(PLAYER_BYTES, 1);
-    uint8 hairstyle  = GetByteValue(PLAYER_BYTES, 2);
-    uint8 haircolor  = GetByteValue(PLAYER_BYTES, 3);
-    uint8 facialhair = GetByteValue(PLAYER_BYTES_2, 0);
+    uint8 skin       = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID);
+    uint8 face       = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID);
+    uint8 hairstyle  = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID);
+    uint8 haircolor  = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID);
+    uint8 facialhair = GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE);
 
     corpse->SetByteValue(CORPSE_FIELD_BYTES_1, 1, GetRace());
     corpse->SetByteValue(CORPSE_FIELD_BYTES_1, 2, GetGender());
@@ -5697,7 +5711,7 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
         return;
 
     // No weapon skill gain while in tree/feral form
-    if (!defence && (GetShapeshiftForm() == FORM_TREE || IsInFeralForm()))
+    if (!defence && IsShapeShifted())
         return; 
 
     uint32 playerLevel      = GetLevel();
@@ -6291,9 +6305,9 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
     if (teleport || old_x != x || old_y != y || old_z != z || old_r != orientation)
     {
         if (teleport || old_x != x || old_y != y || old_z != z)
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_MOVING_CANCELS | AURA_INTERRUPT_TURNING_CANCELS);
         else
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
+            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_TURNING_CANCELS);
 
         RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
@@ -7077,7 +7091,7 @@ void Player::DuelComplete(DuelCompleteType type)
     duel->opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 0);
 
     if (duel->opponent->duel)
-        duel->opponent->duel->finished = true;;
+        duel->opponent->duel->finished = true;
     duel->finished = true;
 }
 
@@ -7608,6 +7622,8 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
             continue;
         }
 
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ITEM_USE_CANCELS, 0, false, spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH));
+
         Spell* spell = new Spell(this, spellInfo, (count > 0));
         spell->SetCastItem(item);
         spell->prepare(targets);
@@ -7826,7 +7842,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
     DEBUG_LOG("Player::SendLoot");
 
     if (loot_type != LOOT_PICKPOCKETING)
-        RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH); // TODO: Utiliser AuraInterruptFlags ?
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_LOOTING_CANCELS);
 
     switch (guid.GetHigh())
     {
@@ -8211,7 +8227,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
     }
 
     SetLootGuid(guid);
-    ALL_SESSION_SCRIPTS(GetSession(), OnLoot(guid, loot_type));
 
     // need know for proper finish item loots (internal pre-switch loot type set in different from 3.x code version)
     // in fact this meaning that it send same loot types for interesting cases like 3.x version code (skip pre-3.x client loot type limitaitons)
@@ -8263,11 +8278,11 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendUpdateWorldState(uint32 Field, uint32 Value) const
+void Player::SendUpdateWorldState(uint32 field, uint32 value) const
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-    data << Field;
-    data << Value;
+    data << field;
+    data << value;
     GetSession()->SendPacket(&data);
 }
 
@@ -8811,6 +8826,17 @@ uint32 Player::GetAttackBySlot(uint8 slot)
         default:
             return MAX_ATTACK;
     }
+}
+
+uint32 Player::GetHighestKnownArmorProficiency() const
+{
+    if (GetSkillValue(SKILL_PLATE_MAIL))
+        return SKILL_PLATE_MAIL;
+    if (GetSkillValue(SKILL_MAIL))
+        return SKILL_MAIL;
+    if (GetSkillValue(SKILL_LEATHER))
+        return SKILL_LEATHER;
+    return SKILL_CLOTH;
 }
 
 bool Player::IsInventoryPos(uint8 bag, uint8 slot)
@@ -9900,7 +9926,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
                 }
 
                 // prevent equip item in process logout
-                if (GetSession()->isLogingOut())
+                if (GetSession()->IsLogingOut())
                     return EQUIP_ERR_YOU_ARE_STUNNED;
 
                 if (IsInCombat() && pProto->Class == ITEM_CLASS_WEAPON && m_weaponChangeTimer != 0)
@@ -10015,7 +10041,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
     }
 
     // prevent unequip item in process logout
-    if (GetSession()->isLogingOut())
+    if (GetSession()->IsLogingOut())
         return EQUIP_ERR_YOU_ARE_STUNNED;
 
     if (!swap && pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
@@ -14582,7 +14608,6 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid
     uint16 slot = FindQuestSlot(pQuest->GetQuestId());
     if (slot < MAX_QUEST_LOG_SIZE)
         SetQuestSlotCounter(slot, uint8(creatureOrGO_idx), uint8(count));
-    ALL_SESSION_SCRIPTS(GetSession(), OnQuestKillUpdated(guid));
 }
 
 /*********************************************************/
@@ -14738,16 +14763,18 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         money = MAX_MONEY_AMOUNT;
     SetMoney(money);
 
-    SetByteValue(PLAYER_BYTES, 0, fields[9].GetUInt8());  // skin
-    SetByteValue(PLAYER_BYTES, 1, fields[10].GetUInt8()); // face
-    SetByteValue(PLAYER_BYTES, 2, fields[11].GetUInt8()); // hair style
-    SetByteValue(PLAYER_BYTES, 3, fields[12].GetUInt8()); // hair color
-    SetByteValue(PLAYER_BYTES_2, 0, fields[13].GetUInt8()); // facial hair
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, fields[9].GetUInt8());
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID, fields[10].GetUInt8());
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, fields[11].GetUInt8());
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, fields[12].GetUInt8());
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, fields[13].GetUInt8());
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_UNK1, 0xEE);
     SetBankBagSlotCount(fields[14].GetUInt8());
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_NORMAL);
 
     m_drunk = fields[49].GetUInt16();
 
-    SetUInt16Value(PLAYER_BYTES_3, 0, (m_drunk & 0xFFFE) | gender);
+    SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, (m_drunk & 0xFFFE) | gender);
 
     SetUInt32Value(PLAYER_FLAGS, fields[15].GetUInt32());
 
@@ -14764,7 +14791,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetUInt32Value(PLAYER_AMMO_ID, fields[58].GetUInt32());
 
     // Action bars state
-    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[59].GetUInt8());
+    SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS, fields[59].GetUInt8());
 
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -15062,6 +15089,14 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     // update items with duration and realtime
     UpdateItemDuration(time_diff, true);
+
+    // After quests and inventory loaded: force update on quest item counters
+    // Fixes cases when quest status data was not correctly saved during last session (crash, db connection lost, etc)
+    for (auto& data : mQuestStatus)
+    {
+        if (Quest const* quest = sObjectMgr.GetQuestTemplate(data.first))
+            AdjustQuestReqItemCount(quest, data.second);
+    }
 
     if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeam()))
     {
@@ -15488,7 +15523,7 @@ void Player::LoadCorpse()
     else
     {
         if (Corpse* corpse = GetCorpse())
-            ApplyModByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStorage.LookupEntry<MapEntry>(corpse->GetMapId())->Instanceable());
+            ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStorage.LookupEntry<MapEntry>(corpse->GetMapId())->Instanceable());
         else
         {
             //Prevent Dead Player login without corpse
@@ -16449,12 +16484,12 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(GetLevel());
     uberInsert.addUInt32(GetUInt32Value(PLAYER_XP));
     uberInsert.addUInt32(GetMoney());
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 0));     // skin
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 1));     // face
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 2));     // hair style
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 3));     // hair color
-    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, 0));  // facial hair
-    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, 2));  // bank bag slots
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID));
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID));
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID));
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID));
+    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE));
+    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS));
 
     // Nostalrius: Fix toggled PvP flag after relog.
     uint32 playerFlags = GetUInt32Value(PLAYER_FLAGS) & ~(PLAYER_FLAGS_PVP_DESIRED);
@@ -16563,7 +16598,7 @@ void Player::SaveToDB(bool online, bool force)
 
     uberInsert.addUInt32(GetUInt32Value(PLAYER_AMMO_ID));
 
-    uberInsert.addUInt32(uint32(GetByteValue(PLAYER_FIELD_BYTES, 2)));
+    uberInsert.addUInt32(uint32(GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS)));
     uberInsert.addUInt32(GetWorldMask());
     uberInsert.addUInt64(uint64(m_createTime));
     uberInsert.Execute();
@@ -16586,7 +16621,7 @@ void Player::SaveToDB(bool online, bool force)
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
-    if (m_session->isLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
+    if (m_session->IsLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats();
 
     // save pet (hunter pet level and experience and all type pets health/mana).
@@ -17756,9 +17791,9 @@ void Player::SetRestBonus(float rest_bonus_new)
 
     // update data for client
     if (m_restBonus > 10)
-        SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);
+        SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_RESTED);
     else if (m_restBonus <= 1)
-        SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);
+        SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_NORMAL);
 
     // RestTickUpdate
     SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, uint32(m_restBonus));
@@ -17770,7 +17805,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
 
     // not let cheating with start flight in time of logout process || if casting not finished || while in combat || if not use Spell's with EffectSendTaxi
-    if (GetSession()->isLogingOut() || IsInCombat())
+    if (GetSession()->IsLogingOut() || IsInCombat())
     {
         WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
         data << uint32(ERR_TAXIPLAYERBUSY);
@@ -18843,7 +18878,7 @@ void Player::SetComboPoints()
     if (combotarget)
     {
         SetGuidValue(PLAYER_FIELD_COMBO_TARGET, combotarget->GetObjectGuid());
-        SetByteValue(PLAYER_FIELD_BYTES, 1, m_comboPoints);
+        SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_COMBO_POINTS, m_comboPoints);
     }
     /*else
     {
@@ -19400,25 +19435,25 @@ void Player::UpdateForQuestWorldObjects()
     if (!IsInWorld() || !FindMap())
         return;
 
-    uint32 count = 0;
-    UpdateData upd;
+    UpdateData updateData;
     std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
     for (const auto& guid : m_visibleGUIDs)
     {
         if (guid.IsGameObject())
         {
             if (GameObject* obj = GetMap()->GetGameObject(guid))
+            { 
                 if (!obj->IsTransport())
+                {
                     if (m_visibleGobjQuestActivated[obj->GetObjectGuid()] != obj->ActivateToQuest(this))
-                    {
-                        ++count;
-                        obj->BuildCreateUpdateBlockForPlayer(upd, this); //[-ZERO] we must send create packet because of GAMEOBJECT_FLAGS change (not dynamic) - probably incorrect
-                    }
+                        obj->BuildValuesUpdateBlockForPlayerWithFlags(updateData, this, UF_FLAG_DYNAMIC, true);
+                }
+            }
         }
     }
     lock.unlock();
-    if (count)
-        upd.Send(GetSession());
+    if (updateData.HasData())
+        updateData.Send(GetSession());
 }
 
 void Player::SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zoneId, float x, float y, float z)
@@ -19870,6 +19905,7 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
     data << uint8(allowMove);
+    GetCheatData()->LogMovementPacket(false, data);
     GetSession()->SendPacket(&data);
 #endif
 }
@@ -20788,9 +20824,6 @@ void Player::SetRestType(RestType n_r_type, uint32 areaTriggerId /*= 0*/)
     }
     else
     {
-        if (GetLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) && m_timeInnEnter == 0 || time(nullptr) - m_timeInnEnter > 180)
-            SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);
-
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
 
         m_innTriggerId = areaTriggerId;
@@ -21991,4 +22024,36 @@ bool Player::IsInCombatWithCreature(Creature const* pCreature)
     }
 
     return false;
+}
+
+void Player::CastHighestStealthRank()
+{
+    // get highest rank of the Stealth spell
+    SpellEntry const* stealthSpellEntry = nullptr;
+    for (const auto& itr : m_spells)
+    {
+        // only highest rank is shown in spell book, so simply check if shown in spell book
+        if (!itr.second.active || itr.second.disabled || itr.second.state == PLAYERSPELL_REMOVED)
+            continue;
+
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
+        if (!spellInfo)
+            continue;
+
+        if (spellInfo->IsFitToFamily(SPELLFAMILY_ROGUE, uint64(0x0000000000400000)))
+        {
+            stealthSpellEntry = spellInfo;
+            break;
+        }
+    }
+
+    // no Stealth spell found
+    if (!stealthSpellEntry)
+        return;
+
+    // reset cooldown on it if needed
+    if (!IsSpellReady(*stealthSpellEntry))
+        RemoveSpellCooldown(*stealthSpellEntry);
+
+    CastSpell(nullptr, stealthSpellEntry, true);
 }

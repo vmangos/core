@@ -95,7 +95,7 @@ namespace MovementPacketSender
 
         /* teleport */
         void SendTeleportToController(Unit* unit, float x, float y, float z, float ang);
-        void SendTeleportToObservers(Unit* unit);
+        void SendTeleportToObservers(Unit* unit, float x, float y, float z, float ang);
 
         /* knockback */
         void SendKnockBackToController(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);
