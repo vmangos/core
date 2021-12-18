@@ -1196,8 +1196,10 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 20577:                                 // Cannibalize
                 {
-                    if (m_casterUnit && (unitTarget || corpseTarget))
+                    if (m_casterUnit)
+                    {
                         m_casterUnit->CastSpell(m_casterUnit, 20578, true, nullptr);
+                    }
                     return;
                 }
                 case 21147:                                 // Arcane Vacuum

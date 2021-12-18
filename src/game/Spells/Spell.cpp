@@ -3147,39 +3147,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             {
                 case SPELL_EFFECT_DUMMY:
                 {
-                    switch (m_spellInfo->Id)
+                    if (m_targets.getUnitTarget())
                     {
-                        case 20577:                         // Cannibalize
-                        {
-                            WorldObject* result = FindCorpseUsing<MaNGOS::CannibalizeObjectCheck> ();
-
-                            if (result)
-                            {
-                                switch (result->GetTypeId())
-                                {
-                                    case TYPEID_UNIT:
-                                    case TYPEID_PLAYER:
-                                        targetUnitMap.push_back((Unit*)result);
-                                        break;
-                                    case TYPEID_CORPSE:
-                                        m_targets.setCorpseTarget((Corpse*)result);
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                // clear cooldown at fail
-                                if (m_caster->IsPlayer())
-                                    m_caster->RemoveSpellCooldown(*m_spellInfo, true);
-                                SendCastResult(SPELL_FAILED_NO_EDIBLE_CORPSES);
-                                finish(false);
-                            }
-                            break;
-                        }
-                        default:
-                            if (m_targets.getUnitTarget())
-                                targetUnitMap.push_back(m_targets.getUnitTarget());
-                            break;
+                        targetUnitMap.push_back(m_targets.getUnitTarget());
                     }
                     // Add AoE target-mask to self, if no target-dest provided already
                     if ((m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) == 0)
@@ -3621,6 +3591,12 @@ void Spell::cancel()
 
     // channeled spells don't display interrupted message even if they are interrupted, possible other cases with no "Interrupted" message
     bool sendInterrupt = !(m_channeled && m_spellState != SPELL_STATE_PREPARING);
+
+    // Hack: cannibalize should not send interrupt message
+    if (m_spellInfo->Id == 20577)
+    {
+        sendInterrupt = false;
+    }
 
     m_autoRepeat = false;
     switch (m_spellState)
@@ -6214,6 +6190,35 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // use cail as dithering might round up later.
                     if (int32(m_casterUnit->GetHealth()) <= std::ceil(dmg))
                         return SPELL_FAILED_FIZZLE;
+                }
+                else if (m_spellInfo->Id == 20577) // Cannibalize
+                {
+                    if (WorldObject* result = FindCorpseUsing<MaNGOS::CannibalizeObjectCheck>())
+                    {
+                        switch (result->GetTypeId())
+                        {
+                        case TYPEID_UNIT:
+                        case TYPEID_PLAYER:
+                            if (!CheckTarget(static_cast<Unit*>(result), SpellEffectIndex(i)))
+                            {
+                                return SPELL_FAILED_NO_EDIBLE_CORPSES;
+                            }
+                            break;
+                        case TYPEID_CORPSE:
+                            if (Player* owner = ObjectAccessor::FindPlayer(static_cast<Corpse*>(result)->GetOwnerGuid()))
+                            {
+                                if (!CheckTarget(owner, SpellEffectIndex(i)))
+                                {
+                                    return SPELL_FAILED_NO_EDIBLE_CORPSES;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        return SPELL_FAILED_NO_EDIBLE_CORPSES;
+                    }
                 }
                 break;
             }
