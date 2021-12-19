@@ -139,22 +139,21 @@ struct boss_patchwerkAI : public ScriptedAI
             if (threatListPosition > 0)
             {
                 // Only target players
-                if (!iter->getUnitGuid().IsPlayer())
-                    continue;
-
-                Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid());
-                if (!pTempTarget)
-                    continue;
-
-                // Player must be within map and within melee range
-                if(!m_creature->IsInMap(pTempTarget) || !m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
-                    continue;
-
-                // Check if target has higher hp than anyone checked so far
-                if (pTempTarget->GetHealth() > uiHighestHP)
+                if (iter->getUnitGuid().IsPlayer())
                 {
-                    pTarget = pTempTarget;
-                    uiHighestHP = pTarget->GetHealth();
+                    if (Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid()))
+                    {
+                        // Check if selected player is within melee range
+                        if (m_creature->IsInMap(pTempTarget) && m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
+                        {
+                            // Check if target has higher hp than anyone checked so far
+                            if (pTempTarget->GetHealth() > uiHighestHP)
+                            {
+                                pTarget = pTempTarget;
+                                uiHighestHP = pTarget->GetHealth();
+                            }
+                        }
+                    }
                 }
             }
             threatListPosition++;
