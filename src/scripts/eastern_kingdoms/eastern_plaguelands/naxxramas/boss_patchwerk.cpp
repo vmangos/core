@@ -144,7 +144,7 @@ struct boss_patchwerkAI : public ScriptedAI
                     if (Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid()))
                     {
                         // Check if selected player is within melee range
-                        if (m_creature->IsInMap(pTarget) && m_creature->CanReachWithMeleeSpellAttack(pTarget))
+                        if (m_creature->IsInMap(pTempTarget) && m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
                         {
                             // Check if target has higher hp than anyone checked so far
                             if (pTempTarget->GetHealth() > uiHighestHP)
