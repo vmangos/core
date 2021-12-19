@@ -163,6 +163,9 @@ struct boss_patchwerkAI : public ScriptedAI
             m_creature->SetInFront(pTarget);
             m_creature->SetTargetGuid(pTarget->GetObjectGuid());
 
+            // Update previousTarget for CustomGetTarget() - not sure if needed at all?
+            previousTarget = pTarget->GetObjectGuid();
+
             // Cast Hateful Strike
             DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
         }
