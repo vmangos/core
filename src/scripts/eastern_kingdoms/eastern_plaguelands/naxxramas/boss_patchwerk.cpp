@@ -40,8 +40,6 @@ enum PatchwerkData
     SPELL_SLIMEBOLT       = 32309  // Added in patch 1.12
 };
 
-constexpr float MELEE_DISTANCE = 5.0; 
-
 enum ePatchwerkEvents
 {
     EVENT_BERSERK       = 1,
