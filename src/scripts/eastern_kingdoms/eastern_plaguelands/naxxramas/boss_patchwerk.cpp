@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: Boss_Patchwerk
 SD%Complete: 80
-SDComment: TODO: confirm how hateful strike work
+SDComment:
 SDCategory: Naxxramas
 EndScriptData */
 
@@ -44,9 +44,9 @@ constexpr float MELEE_DISTANCE = 5.0;
 
 enum ePatchwerkEvents
 {
-    EVENT_BERSERK = 1,
-    EVENT_HATEFULSTRIKE,
-    EVENT_SLIMEBOLT
+    EVENT_BERSERK       = 1,
+    EVENT_HATEFULSTRIKE = 2,
+    EVENT_SLIMEBOLT     = 3
 };
 
 static constexpr uint32 BERSERK_TIMER           = 7 * 60 * 1000; // 7 minutes enrage
@@ -119,68 +119,55 @@ struct boss_patchwerkAI : public ScriptedAI
 
     void DoHatefulStrike()
     {
-        // The ability is used on highest HP target in melee
-        // current tank cannot be hit by hateful as long as there are other players in melee
-        
-        // todo: can it hit anything other than players?
+        // Hateful Strike: https://classic.wowhead.com/guides/patchwerk-naxxramas-raid-strategy
+        // 1) target players between second, third, and fourth on threat
+        // 2) only players within melee range
+        // 3) target player with the most health
 
-        Unit* mainTank = m_creature->GetVictim();
-        
-        // Shouldnt really be possible, but hey, weirder things have happened
-        if (!mainTank)
-            return;
-        ObjectGuid const& mainTankGuid = mainTank->GetObjectGuid();
-
-        Unit* pTarget = nullptr;
-        uint32 uiHighestHP = 0;
+        Unit* pTarget            = nullptr;
+        uint32 uiHighestHP       = 0;
         uint8 threatListPosition = 0;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (const auto iter : tList)
         {
-            // Only top 4 players on threat in melee range are targetted.
-            if (threatListPosition > 3)
+            // Only second, third, and fourth form threat list can be targeted
+            if (threatListPosition > 4)
                 break;
 
-            if (!iter->getUnitGuid().IsPlayer())
-                continue;
-            
-            Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid());
-            if (!pTempTarget)
-                continue;
-
-            if (!m_creature->IsInMap(pTempTarget))
-                continue;
-
-            if (!m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
-                continue;
-
-            // Skipping maintank, only using him if there is no other viable target 
-            // todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
-            if (iter->getUnitGuid() != mainTankGuid)
+            // Skip first from thread list
+            if (threatListPosition > 0)
             {
-                // target has higher hp than anyone checked so far
-                if (pTempTarget->GetHealth() > uiHighestHP)
+                // Only target players
+                if (iter->getUnitGuid().IsPlayer())
                 {
-                    pTarget = pTempTarget;
-                    uiHighestHP = pTarget->GetHealth();
+                    if (Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid()))
+                    {
+                        // Check if selected player is within melee range
+                        if (m_creature->IsInMap(pTarget) && m_creature->CanReachWithMeleeSpellAttack(pTarget))
+                        {
+                            // Check if target has higher hp than anyone checked so far
+                            if (pTempTarget->GetHealth() > uiHighestHP)
+                            {
+                                pTarget = pTempTarget;
+                                uiHighestHP = pTarget->GetHealth();
+                            }
+                        }
+                    }
                 }
             }
-
             threatListPosition++;
         }
 
-        // If we found no viable target, we choose the maintank
-        if (!pTarget)
-            pTarget = mainTank;
-
-        if (pTarget->GetObjectGuid() != previousTarget)
+        if (pTarget)
         {
+            // Face new target
             m_creature->SetInFront(pTarget);
             m_creature->SetTargetGuid(pTarget->GetObjectGuid());
-            previousTarget = pTarget->GetObjectGuid();
+
+            // Cast Hateful Strike
+            DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
         }
-        DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
     }
 
     bool CustomGetTarget()
