@@ -3508,7 +3508,7 @@ void Map::RemoveCorpses(bool unload)
             bones->Create(corpse->GetGUIDLow());
             if (owner)
             {
-                bones->SetFactionTemplate(owner->getFactionTemplateEntry());
+                bones->SetFactionTemplate(owner->GetFactionTemplateEntry());
                 if (looterGuid)
                 {
                     // Notify the client that the corpse is gone

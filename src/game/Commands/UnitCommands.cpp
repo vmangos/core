@@ -278,7 +278,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Channel object: %s", pTarget->GetChannelObjectGuid().GetString().c_str());
     PSendSysMessage("Scale: %g", pTarget->GetFloatValue(OBJECT_FIELD_SCALE_X));
     PSendSysMessage("Level: %u", pTarget->GetLevel());
-    if (auto pFactionTemplate = pTarget->getFactionTemplateEntry())
+    if (auto pFactionTemplate = pTarget->GetFactionTemplateEntry())
     {
         if (auto pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
             PSendSysMessage("Faction template: %u - %s", pTarget->GetFactionTemplateId(), pFaction->name[0].c_str());

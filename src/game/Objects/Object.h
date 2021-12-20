@@ -52,6 +52,7 @@ class InstanceData;
 class TerrainInfo;
 class ZoneScript;
 class GenericTransport;
+struct FactionEntry;
 struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
@@ -823,8 +824,11 @@ class WorldObject : public Object
         virtual bool IsCharmerOrOwnerPlayerOrPlayerItself() const { return IsPlayer(); }
         virtual bool IsHostileTo(WorldObject const* target) const = 0;
         virtual bool IsFriendlyTo(WorldObject const* target) const = 0;
-        FactionTemplateEntry const* getFactionTemplateEntry() const;
+        FactionTemplateEntry const* GetFactionTemplateEntry() const;
         virtual uint32 GetFactionTemplateId() const = 0;
+        bool HasFactionTemplateFlag(uint32 flag) const;
+        FactionEntry const* GetFactionEntry() const;
+        uint32 GetFactionId() const;
         virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         bool IsValidAttackTarget(Unit const* target, bool checkAlive = true) const;
