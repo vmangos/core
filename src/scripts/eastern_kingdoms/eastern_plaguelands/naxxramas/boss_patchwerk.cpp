@@ -48,7 +48,6 @@ enum ePatchwerkEvents
 };
 
 static constexpr uint32 BERSERK_TIMER           = 7 * 60 * 1000; // 7 minutes enrage
-static constexpr uint32 HATEFUL_CD              = 1200;
 
 // 30 sec after berserk he starts throwing slime at ppl
 // this was added in 1.12.1 to cope with guilds kiting him
@@ -109,7 +108,7 @@ struct boss_patchwerkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_PATCHWERK, IN_PROGRESS);
             
         m_events.ScheduleEvent(EVENT_BERSERK, BERSERK_TIMER);
-        m_events.ScheduleEvent(EVENT_HATEFULSTRIKE, HATEFUL_CD);
+        m_events.ScheduleEvent(EVENT_HATEFULSTRIKE, urand(1500, 2000));
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         m_events.ScheduleEvent(EVENT_SLIMEBOLT, SLIMEBOLT_INITIAL);
 #endif
@@ -163,12 +162,26 @@ struct boss_patchwerkAI : public ScriptedAI
             m_creature->SetInFront(pTarget);
             m_creature->SetTargetGuid(pTarget->GetObjectGuid());
 
-            // Update previousTarget for CustomGetTarget() - not sure if needed at all?
+            // Update previousTarget for CustomGetTarget() -> makes Patchwerk face the main tank again after Hateful Strike
             previousTarget = pTarget->GetObjectGuid();
 
             // Cast Hateful Strike
             DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
         }
+        /*
+        else
+        {
+            // TODO: confirm that this is correct
+            // Hateful Strike will target main tank if second, third, and fourth players form threat list are not within meele range.
+            if (Unit* mainTank = m_creature->GetVictim())
+            {
+                if (m_creature->CanReachWithMeleeSpellAttack(mainTank))
+                {
+                    DoCastSpellIfCan(mainTank, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
+                }
+            }
+        }
+        */
     }
 
     bool CustomGetTarget()
@@ -256,7 +269,7 @@ struct boss_patchwerkAI : public ScriptedAI
                     break;
                 case EVENT_HATEFULSTRIKE:
                     DoHatefulStrike();
-                    m_events.Repeat(HATEFUL_CD);
+                    m_events.Repeat(urand(1500, 2000));
                     break;
                 case EVENT_SLIMEBOLT:
                     if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIMEBOLT) == CAST_OK)
