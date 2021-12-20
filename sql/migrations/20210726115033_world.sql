@@ -1542,6 +1542,7 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`,
 
 INSERT INTO `creature_equip_template` (`entry`, `patch`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES (9550, 0, 5303, 0, 0);
 
+UPDATE `creature_template` SET `equipment_id`='9550' WHERE `entry`=9550;
 
 
 -- End of migration.
