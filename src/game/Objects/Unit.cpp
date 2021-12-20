@@ -4939,13 +4939,17 @@ void Unit::RestoreFaction()
 
 Team Unit::GetTeam() const
 {
-    switch (GetFactionId())
+    if (FactionEntry const* pFaction = GetFactionEntry())
     {
-        case HORDE:
-            return HORDE;
-        case ALLIANCE:
-            return ALLIANCE;
+        switch (pFaction->team)
+        {
+            case HORDE:
+                return HORDE;
+            case ALLIANCE:
+                return ALLIANCE;
+        }
     }
+    
     return TEAM_NONE;
 }
 
