@@ -1544,6 +1544,15 @@ INSERT INTO `creature_equip_template` (`entry`, `patch`, `equipentry1`, `equipen
 
 UPDATE `creature_template` SET `equipment_id`='9550' WHERE `entry`=9550;
 
+-- Winter Reveler correct emote
+DELETE FROM `creature_ai_scripts` WHERE `id`=1576002;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1576002, 0, 1, 24, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Winter Reveler - Random Emote');
+
+-- Winter Reveler correct timers
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15760;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1576001, 15760, 0, 22, 0, 100, 1, 58, 0, 0, 0, 1576001, 0, 0, 'Winter Reveler - Cast Mistletoe on Receive Kiss Emote');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1576002, 15760, 0, 1, 0, 100, 1, 3000, 60000, 3000, 60000, 1576002, 0, 0, 'Winter Reveler - Emote on OOC');
+
 
 -- End of migration.
 END IF;
