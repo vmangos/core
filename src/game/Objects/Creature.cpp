@@ -2170,7 +2170,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if (!HasCreatureState(CSTATE_ALREADY_CALL_ASSIST) && GetVictim() && !IsPet() && !IsCharmed())
+    if (!HasCreatureState(CSTATE_ALREADY_CALL_ASSIST) && GetVictim() && !IsPet() && !IsCharmed() && m_callForHelpDist > 0)
     {
         SetNoCallAssistance(true);
 
@@ -2195,14 +2195,14 @@ void Creature::CallAssistance()
     }
 }
 
-void Creature::CallForHelp(float fRadius)
+void Creature::CallForHelp(float radius)
 {
-    if (fRadius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
+    if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
-
-    MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), fRadius);
+    
+    MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
     MaNGOS::CreatureWorker<MaNGOS::CallOfHelpCreatureInRangeDo> worker(this, u_do);
-    Cell::VisitGridObjects(this, worker, fRadius);
+    Cell::VisitGridObjects(this, worker, radius);
 }
 
 bool Creature::CanAssistTo(Unit const* pFriend, Unit const* pEnemy, bool checkfaction /*= true*/) const

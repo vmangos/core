@@ -298,7 +298,7 @@ class Creature : public Unit
         void DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
         void MoveAwayFromTarget(Unit* pTarget, float distance);
-        void CallForHelp(float fRadius);
+        void CallForHelp(float radius);
         void CallAssistance();
         void SetNoCallAssistance(bool val)
         { 
