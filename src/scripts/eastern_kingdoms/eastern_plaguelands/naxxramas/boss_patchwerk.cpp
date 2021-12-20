@@ -168,10 +168,8 @@ struct boss_patchwerkAI : public ScriptedAI
             // Cast Hateful Strike
             DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
         }
-        /*
         else
         {
-            // TODO: confirm that this is correct
             // Hateful Strike will target main tank if second, third, and fourth players form threat list are not within meele range.
             if (Unit* mainTank = m_creature->GetVictim())
             {
@@ -181,7 +179,6 @@ struct boss_patchwerkAI : public ScriptedAI
                 }
             }
         }
-        */
     }
 
     bool CustomGetTarget()
