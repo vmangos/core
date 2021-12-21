@@ -41,37 +41,37 @@ INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLeve
 
 -- Add quest relations.
 DELETE FROM `creature_questrelation` WHERE `id` IN(16786,16787);
-INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`) VALUES
 -- alliance
-(16786, 9094),
-(16786, 9317),
-(16786, 9318),
-(16786, 9321),
-(16786, 9337),
-(16786, 9341),
+(16786, 9094, 9),
+(16786, 9317, 9),
+(16786, 9318, 9),
+(16786, 9321, 9),
+(16786, 9337, 9),
+(16786, 9341, 9),
 -- horde
-(16787, 9333),
-(16787, 9334),
-(16787, 9335),
-(16787, 9336),
-(16787, 9320),
-(16787, 9343);
+(16787, 9333, 9),
+(16787, 9334, 9),
+(16787, 9335, 9),
+(16787, 9336, 9),
+(16787, 9320, 9),
+(16787, 9343, 9);
 DELETE FROM `creature_involvedrelation` WHERE `id` IN(16786,16787);
-INSERT INTO `creature_involvedrelation` (`id`, `quest`) VALUES
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`) VALUES
 -- alliance
-(16786, 9094),
-(16786, 9317),
-(16786, 9318),
-(16786, 9321),
-(16786, 9337),
-(16786, 9341),
+(16786, 9094, 9),
+(16786, 9317, 9),
+(16786, 9318, 9),
+(16786, 9321, 9),
+(16786, 9337, 9),
+(16786, 9341, 9),
 -- horde
-(16787, 9333),
-(16787, 9334),
-(16787, 9335),
-(16787, 9336),
-(16787, 9320),
-(16787, 9343);
+(16787, 9333, 9),
+(16787, 9334, 9),
+(16787, 9335, 9),
+(16787, 9336, 9),
+(16787, 9320, 9),
+(16787, 9343, 9);
 
 
 -- End of migration.
