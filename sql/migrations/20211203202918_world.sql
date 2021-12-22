@@ -46,6 +46,11 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 
 UPDATE `quest_template` SET `CompleteScript` = 692, `StartScript` = 692 WHERE `entry` = 692;
 
+-- A Dark Threat Looms
+UPDATE `quest_template` SET `CompleteScript` = 283 WHERE `entry` = 283;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (283, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 546, 0, 0, 0, 0, 0, 0, 0, 0, 'A Dark Threat Looms:  Chief Engineer Hinderweir VII - Talk');
+UPDATE `broadcast_text` SET `chat_type` = 6 WHERE `entry` = 546;
+
 
 -- End of migration.
 END IF;
