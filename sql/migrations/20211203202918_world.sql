@@ -51,6 +51,18 @@ UPDATE `quest_template` SET `CompleteScript` = 283 WHERE `entry` = 283;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (283, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 546, 0, 0, 0, 0, 0, 0, 0, 0, 'A Dark Threat Looms:  Chief Engineer Hinderweir VII - Talk');
 UPDATE `broadcast_text` SET `chat_type` = 6 WHERE `entry` = 546;
 
+-- The Brokering of Peace Alliance
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(8484, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11308, 0, 0, 0, 0, 0, 0, 0, 0, 'The Brokering of Peace: King Magni Bronzebeard - Talk');
+UPDATE `quest_template` SET `CompleteScript` = 8484 WHERE `entry` = 8484;
+UPDATE `broadcast_text` SET `chat_type` = 6 WHERE `entry` = 11308;
+
+-- The Brokering of Peace Horde
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(8485, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11307, 0, 0, 0, 0, 0, 0, 0, 0, 'The Brokering of Peace: King Magni Bronzebeard - Talk');
+UPDATE `quest_template` SET `CompleteScript` = 8485 WHERE `entry` = 8485;
+UPDATE `broadcast_text` SET `chat_type` = 6 WHERE `entry` = 11307;
+
 
 -- End of migration.
 END IF;
