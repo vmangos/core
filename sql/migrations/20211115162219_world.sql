@@ -211,6 +211,11 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
 (11536, 5517, 1, 10);
 
+-- -----------------------------------------------------------------------------------------
+
+-- Quest Chain Should be Available to all Horde Races
+UPDATE `quest_template` SET `RequiredRaces` = 178 WHERE `entry` IN (367, 368, 369);
+
 
 -- End of migration.
 END IF;
