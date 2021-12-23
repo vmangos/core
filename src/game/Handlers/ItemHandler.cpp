@@ -1174,8 +1174,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    // cheating: non-wrapper wrapper (all empty wrappers is stackable)
-    if (!(gift->GetProto()->Flags & ITEM_FLAG_WRAPPER) || gift->GetMaxStackCount() == 1)
+    if (!(gift->GetProto()->Flags & ITEM_FLAG_WRAPPER) || !gift->GetProto()->WrappedGift)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
         return;
@@ -1242,29 +1241,8 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 
     CharacterDatabase.BeginTransaction(_player->GetGUIDLow());
     CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", item->GetOwnerGuid().GetCounter(), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
-    item->SetEntry(gift->GetEntry());
-
-    switch (item->GetEntry())
-    {
-        case 5042:
-            item->SetEntry(5043);
-            break;
-        case 5048:
-            item->SetEntry(5044);
-            break;
-        case 17303:
-            item->SetEntry(17302);
-            break;
-        case 17304:
-            item->SetEntry(17305);
-            break;
-        case 17307:
-            item->SetEntry(17308);
-            break;
-        case 21830:
-            item->SetEntry(21831);
-            break;
-    }
+    
+    item->SetEntry(gift->GetProto()->WrappedGift);
     item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, _player->GetObjectGuid());
     item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
