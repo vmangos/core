@@ -292,6 +292,22 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (243525, 0, 60, 2, 0, 1560000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
 (243526, 0, 60, 2, 0, 1680000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints');
 
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(243513, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243514, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243515, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243516, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243517, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243518, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243519, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243520, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243521, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243522, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243523, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243524, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243525, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
+(243526, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type');
+
 
 -- End of migration.
 END IF;
