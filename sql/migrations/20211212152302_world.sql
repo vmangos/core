@@ -106,12 +106,15 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 DELETE FROM `generic_scripts` WHERE `id`=243502;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (243502, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 243502, 0, 0, 0, 0, 0, 0, 0, 'Southshore Guard - Start Waypoints');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(238601, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 611, 612, 0, 0, 0, 0, 0, 0, 0, 'Southshore Guard - Speak');
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (243502, 1, -852.268, -560.181, 11.6908, 100, 0, 0, 11),
-(243502, 2, -849.097, -544.966, 11.1183, 100, 0, 0, 0),
-(243502, 3, -870.534, -538.675, 8.21938, 100, 0, 0, 0),
-(243502, 4, -902.927, -544.349, 6.87962, 100, 0, 0, 0),
-(243502, 5, -900.795, -545.331, 6.87962, 100, 2100000, 3, 0);
+(243502, 2, -852.268, -560.181, 11.6908, 100, 0, 0, 238601),
+(243502, 3, -849.097, -544.966, 11.1183, 100, 0, 0, 0),
+(243502, 4, -870.534, -538.675, 8.21938, 100, 0, 0, 0),
+(243502, 5, -902.927, -544.349, 6.87962, 100, 0, 0, 0),
+(243502, 6, -900.795, -545.331, 6.87962, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243503;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
