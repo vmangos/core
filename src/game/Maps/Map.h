@@ -376,7 +376,6 @@ class Map : public GridRefManager<NGridType>
         // Used at extrapolation.
         void DoPlayerGridRelocation(Player*, float x, float y, float z, float angl);
         void CreatureRelocation(Creature* creature, float x, float y, float z, float orientation);
-        void GameObjectRelocation(GameObject* go, float x, float y, float z, float orientation, bool respawnRelocationOnFail = true);
 
         template<class T, class CONTAINER> void Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
 

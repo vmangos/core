@@ -1414,41 +1414,6 @@ void Map::DoPlayerGridRelocation(Player* player, float x, float y, float z, floa
     }
 }
 
-void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float orientation, bool respawnRelocationOnFail)
-{
-    Cell new_cell(MaNGOS::ComputeCellPair(x, y));
-    Cell old_cell = go->GetCurrentCell();
-
-    if (!respawnRelocationOnFail && !getNGrid(new_cell.GridX(), new_cell.GridY()))
-        return;
-
-    if (old_cell.DiffGrid(new_cell))
-    {
-        if ((!go->isActiveObject() || IsUnloading()) && !loaded(new_cell.gridPair()))
-        {
-            DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "GameObject (GUID: %u Entry: %u) attempt move from grid[%u,%u]cell[%u,%u] to unloaded grid[%u,%u]cell[%u,%u].", go->GetGUIDLow(), go->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
-            return;
-        }
-        EnsureGridLoadedAtEnter(new_cell);
-    }
-
-    // delay creature move for grid/cell to grid/cell moves
-    if (old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell))
-    {
-        NGridType* oldGrid = getNGrid(old_cell.GridX(), old_cell.GridY());
-        NGridType* newGrid = getNGrid(new_cell.GridX(), new_cell.GridY());
-        RemoveFromGrid(go, oldGrid, old_cell);
-        AddToGrid(go, newGrid, new_cell);
-        go->GetViewPoint().Event_GridChanged(&(*newGrid)(new_cell.CellX(), new_cell.CellY()));
-    }
-    else
-    {
-        go->Relocate(x, y, z, orientation);
-        go->UpdateModelPosition();
-        go->UpdateObjectVisibility();
-    }
-}
-
 void Map::CreatureRelocation(Creature* creature, float x, float y, float z, float ang)
 {
     MANGOS_ASSERT(CheckGridIntegrity(creature, false));

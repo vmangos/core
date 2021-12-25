@@ -38,9 +38,6 @@ class SpellEntry;
 class ChatHandler;
 struct Loot;
 
-#define TIME_INTERVAL_LOOK   5000
-#define VISIBILITY_RANGE    10000
-
 enum CanCastResult
 {
     CAST_OK                     = 0,
