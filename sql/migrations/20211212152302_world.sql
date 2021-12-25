@@ -208,9 +208,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (243509, 5, -809.075, -517.918, 16.528, 100, 0, 0, 0),
 (243509, 6, -796.521, -471.88, 16.6262, 100, 0, 0, 0),
 (243509, 7, -785.893, -449.136, 22.1255, 100, 0, 0, 0),
-(243509, 8, -819.587, -438.019, 13.9894, 100, 0, 0, 0),
-(243509, 9, -781.496, -437.445, 21.333, 100, 0, 0, 0),
-(243509, 10, -796.634, -433.713, 18.7880, 100, 2100000, 3, 0);
+(243509, 8, -796.634, -433.713, 18.7880, 100, 2100000, 3, 0);
 
 DELETE FROM `generic_scripts` WHERE `id`=243510;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
