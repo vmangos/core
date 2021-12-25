@@ -40,18 +40,19 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 DELETE FROM `creature_movement` WHERE `id` = 301755;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (2435, 1, -576.589, -555.617, 33.4733, 100, 0, 0, 11),
-(2435, 2, -584.442, -565.827, 32.8548, 100, 0, 0, 0),
-(2435, 3, -590.498, -573.355, 32.4334, 100, 0, 0, 0),
-(2435, 4, -627.736, -566.756, 27.9208, 100, 0, 0, 0),
-(2435, 5, -652.486, -561.351, 26.2017, 100, 0, 0, 0),
-(2435, 6, -668.636, -562.703, 25.3622, 100, 0, 0, 0),
-(2435, 7, -680.996, -566.52, 25.2009, 100, 0, 0, 0),
-(2435, 8, -693.22, -569.418, 24.4536, 100, 0, 0, 0),
-(2435, 9, -723.958, -551.954, 20.5542, 100, 0, 0, 0),
-(2435, 10, -764.897, -546.37, 17.9831, 100, 0, 0, 0),
-(2435, 11, -809.579, -528.999, 15.3876, 100, 0, 0, 0),
-(2435, 12, -821.22, -524.994, 13.8281, 100, 0, 0, 0),
-(2435, 13, -856.326, -532.717, 9.74993, 100, 30000, 5, 243501);
+(2435, 2, -576.589, -555.617, 33.4733, 100, 0, 0, 11),
+(2435, 3, -584.442, -565.827, 32.8548, 100, 0, 0, 0),
+(2435, 4, -590.498, -573.355, 32.4334, 100, 0, 0, 0),
+(2435, 5, -627.736, -566.756, 27.9208, 100, 0, 0, 0),
+(2435, 6, -652.486, -561.351, 26.2017, 100, 0, 0, 0),
+(2435, 7, -668.636, -562.703, 25.3622, 100, 0, 0, 0),
+(2435, 8, -680.996, -566.52, 25.2009, 100, 0, 0, 0),
+(2435, 9, -693.22, -569.418, 24.4536, 100, 0, 0, 0),
+(2435, 10, -723.958, -551.954, 20.5542, 100, 0, 0, 0),
+(2435, 11, -764.897, -546.37, 17.9831, 100, 0, 0, 0),
+(2435, 12, -809.579, -528.999, 15.3876, 100, 0, 0, 0),
+(2435, 13, -821.22, -524.994, 13.8281, 100, 0, 0, 0),
+(2435, 14, -856.326, -532.717, 9.74993, 100, 30000, 5, 243501);
 
 DELETE FROM `creature_movement_scripts` WHERE `id`=243501;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -276,22 +277,20 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 DELETE FROM `generic_scripts` WHERE `id` BETWEEN 243513 AND 243526;
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(243513, 0, 60, 2, 0, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243514, 0, 60, 2, 0, 240000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243515, 0, 60, 2, 0, 360000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243516, 0, 60, 2, 0, 480000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243517, 0, 60, 2, 0, 600000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243518, 0, 60, 2, 0, 720000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243519, 0, 60, 2, 0, 840000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243520, 0, 60, 2, 0, 960000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243521, 0, 60, 2, 0, 1080000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243522, 0, 60, 2, 0, 1200000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243523, 0, 60, 2, 0, 1320000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243524, 0, 60, 2, 0, 1440000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243525, 0, 60, 2, 0, 1560000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
-(243526, 0, 60, 2, 0, 1680000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints');
-/*
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(243513, 120, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243514, 240, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243515, 360, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243516, 480, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243517, 600, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243518, 720, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243519, 840, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243520, 960, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243521, 1080, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243522, 1200, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243523, 1320, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243524, 1440, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243525, 1560, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
+(243526, 1680, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowy Assassin - Start Waypoints'),
 (243513, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
 (243514, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
 (243515, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
@@ -306,7 +305,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (243524, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
 (243525, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type'),
 (243526, 0, 20, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Set Movement Type');
-*/
+
 
 -- End of migration.
 END IF;
