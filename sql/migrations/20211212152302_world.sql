@@ -315,20 +315,20 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 -- Magistrate Henry Maleb Dead
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (2435, 20, 2276, 300, 1, 0, 0);
 INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(243513, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243514, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243515, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243516, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243517, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
 (243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
-(243518, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk');
+(243519, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243520, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243521, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243522, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243523, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243524, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243525, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
+(243526, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk');
 */
 
 
