@@ -14,7 +14,6 @@ INSERT INTO `migrations` VALUES ('20211121202813');
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 9;
 UPDATE `creature_template` SET `gossip_menu_id` = 1841 WHERE `entry` = 9459;
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(1841,2493),
 (1842,2494);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
 (1841, 0, 0, 'I present you with proof of my deeds, Cyrus.', 4754, 1, 1, -1, 0, 4022, 0, 0, '', 0, 214),
