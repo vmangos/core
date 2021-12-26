@@ -39,35 +39,35 @@ UPDATE `creature_template` SET `gossip_menu_id` =  6981 WHERE `entry` = 16002;
 
 -- NOTE: MOST OF THESE TEXT_ID's ARE PLACEHOLDERS
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
-(7081, 8244, 0, 461),
-(7081, 8283, 0, 459),
+(7081, 8245, 0, 461),
+(7081, 8282, 0, 459),
 (7081, 8285, 0, 454),
-(7081, 8291, 0, 458),
+(7081, 8286, 0, 458),
 (7081, 8296, 0, 460),
 (7081, 8298, 0, 455);
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
-(6959, 8244, 0, 461),
-(6959, 8283, 0, 459),
+(6959, 8235, 0, 461),
+(6959, 8293, 0, 459),
 (6959, 8285, 0, 454),
-(6959, 8291, 0, 458),
+(6959, 8295, 0, 458),
 (6959, 8296, 0, 460),
-(6959, 8298, 0, 455);
+(6959, 8294, 0, 455);
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
-(6976, 8244, 0, 461),
-(6976, 8283, 0, 459),
+(6976, 8235, 0, 461),
+(6976, 8284, 0, 459),
 (6976, 8285, 0, 454),
 (6976, 8291, 0, 458),
-(6976, 8296, 0, 460),
-(6976, 8298, 0, 455);
+(6976, 8242, 0, 460),
+(6976, 8290, 0, 455);
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
-(6981, 8244, 0, 461),
-(6981, 8283, 0, 459),
+(6981, 8245, 0, 461),
+(6981, 8282, 0, 459),
 (6981, 8285, 0, 454),
-(6981, 8291, 0, 458),
-(6981, 8296, 0, 460),
+(6981, 8286, 0, 458),
+(6981, 8243, 0, 460),
 (6981, 8298, 0, 455);
 
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
