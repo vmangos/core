@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20211115170041');
 
 -- Update Warlock Quest Chains
 -- Quest 4964 Requires 4976 AND 4962
-UPDATE `mangos`.`quest_template` SET `RequiredCondition`='537' WHERE  `entry`=4964 AND `patch`=0;
+UPDATE `quest_template` SET `RequiredCondition`='537' WHERE  `entry`=4964 AND `patch`=0;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (535, 8, 4976, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (536, 8, 4962, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (537, -1, 535, 536, 0, 0, 0);
