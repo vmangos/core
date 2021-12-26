@@ -203,7 +203,6 @@ class ChatHandler
         bool HandleCheatWallclimbCommand(char* args);
 
         //Custom
-        bool HandleListAddonsCommand(char *);
         bool HandleSendSpellVisualCommand(char *);
         bool HandleSendSpellImpactCommand(char *);
         bool HandleDebugUnitCommand(char *);
@@ -227,18 +226,10 @@ class ChatHandler
         bool HandleAntiSpamReplace(char* args);
         bool HandleAntiSpamRemoveReplace(char* args);
 
-        // Packet dump
-        bool HandleReplayPlayCommand(char *);
-        bool HandleReplayRecordCommand(char *);
-        bool HandleReplayForwardCommand(char*);
-        bool HandleReplayStopCommand(char*);
-        bool HandleReplaySpeedCommand(char*);
-        bool HandleDebugRecvPacketDumpWrite(char *);
         // Mmaps
         bool HandleMmap(char* args);
         bool HandleMmapConnection(char* args);
         bool HandleMmapTestArea(char* args);
-        bool HandleMmapDebug(char* args);
         bool HandleMmapUnload(char *args);
         bool HandleMmapLoad(char* args);
         bool HandleMmapPathCommand(char* args);
@@ -708,6 +699,7 @@ class ChatHandler
         bool HandleNpcSetWanderDistCommand(char* args);
         bool HandleNpcSetSpawnTimeCommand(char* args);
         bool HandleNpcSpawnSpawnTimeCommand(char* args);
+        bool HandleNpcSetReactStateCommand(char* args);
         bool HandleNpcTameCommand(char* args);
         bool HandleNpcTextEmoteCommand(char* args);
         bool HandleNpcUnFollowCommand(char* args);

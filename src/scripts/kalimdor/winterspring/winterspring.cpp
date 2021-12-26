@@ -257,7 +257,7 @@ struct npc_artoriusAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
     
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 13555 || pSpell->Id == 25295)             // Serpent Sting (Rank 8 or Rank 9)
         {
@@ -377,7 +377,7 @@ struct npc_umi_yetiAI : public ScriptedAI
     {
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_UNSUMMON_YETI)
         {

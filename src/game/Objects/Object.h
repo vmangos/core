@@ -52,6 +52,7 @@ class InstanceData;
 class TerrainInfo;
 class ZoneScript;
 class GenericTransport;
+struct FactionEntry;
 struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
@@ -295,7 +296,7 @@ class Object
         void ExecuteDelayedActions();
 
         void BuildValuesUpdateBlockForPlayer(UpdateData& data, Player* target) const;
-        void BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* target, UpdateFieldFlags flags) const;
+        void BuildValuesUpdateBlockForPlayerWithFlags(UpdateData& data, Player* target, UpdateFieldFlags flags, bool includingEmpty = false) const;
         void BuildValuesUpdateBlockForPlayer(UpdateData& data, UpdateMask& updateMask, Player* target) const;
         void BuildOutOfRangeUpdateBlock(UpdateData& data) const;
         void BuildMovementUpdateBlock(UpdateData& data, uint8 flags = 0) const;
@@ -365,7 +366,7 @@ class Object
         void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
-        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag) const;
+        void MarkUpdateFieldsWithFlagForUpdate(UpdateMask& updateMask, uint16 flag, bool includingEmpty = false) const;
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
@@ -823,8 +824,11 @@ class WorldObject : public Object
         virtual bool IsCharmerOrOwnerPlayerOrPlayerItself() const { return IsPlayer(); }
         virtual bool IsHostileTo(WorldObject const* target) const = 0;
         virtual bool IsFriendlyTo(WorldObject const* target) const = 0;
-        FactionTemplateEntry const* getFactionTemplateEntry() const;
+        FactionTemplateEntry const* GetFactionTemplateEntry() const;
         virtual uint32 GetFactionTemplateId() const = 0;
+        bool HasFactionTemplateFlag(uint32 flag) const;
+        FactionEntry const* GetFactionEntry() const;
+        uint32 GetFactionId() const;
         virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         bool IsValidAttackTarget(Unit const* target, bool checkAlive = true) const;

@@ -796,7 +796,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 
         if (damagetype != DOT)
         {
-            if (!GetVictim())
+            if (!GetVictim() && IsPlayer())
             {
                 // if not have main target then attack state with target (including AI call)
                 //start melee attacks only after melee hit
@@ -1229,10 +1229,8 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             if (BattleGround* bg = pPlayerTap->GetBattleGround())
                 bg->HandleKillUnit(pCreatureVictim, pPlayerTap);
     }
-    // Nostalrius: interrupt non melee spell casted
+
     pVictim->InterruptSpellsCastedOnMe(false, true);
-    if (pPlayerTap)
-        ALL_SESSION_SCRIPTS(pPlayerTap->GetSession(), OnUnitKilled(pVictim->GetObjectGuid()));
 }
 
 struct PetOwnerKilledUnitHelper
@@ -1269,7 +1267,8 @@ uint32 Unit::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
-    CalculateSpellDamage(&damageInfo, damage, spellInfo, EFFECT_INDEX_0);
+    bool isCrit = IsSpellCrit(damageInfo.target, spellInfo, GetSchoolMask(damageInfo.school), BASE_ATTACK);
+    CalculateSpellDamage(&damageInfo, damage, spellInfo, EFFECT_INDEX_0, BASE_ATTACK, nullptr, isCrit);
     damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
     DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
     SendSpellNonMeleeDamageLog(&damageInfo);
@@ -4515,7 +4514,7 @@ bool Unit::IsFriendlyTo(WorldObject const* target) const
 
 bool Unit::IsHostileToPlayers() const
 {
-    FactionTemplateEntry const* my_faction = getFactionTemplateEntry();
+    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
     if (!my_faction || !my_faction->faction)
         return false;
 
@@ -4528,7 +4527,7 @@ bool Unit::IsHostileToPlayers() const
 
 bool Unit::IsNeutralToAll() const
 {
-    FactionTemplateEntry const* my_faction = getFactionTemplateEntry();
+    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
     if (!my_faction || !my_faction->faction)
         return true;
 
@@ -4541,7 +4540,7 @@ bool Unit::IsNeutralToAll() const
 
 bool Unit::IsContestedGuard() const
 {
-    if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
+    if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
         return entry->IsContestedGuardFaction();
 
     return false;
@@ -4562,9 +4561,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     // player cannot attack in mount state
     if (IsPlayer() && IsMounted())
-        return false;
-
-    if (IsCreature() && !((Creature*)this)->CanHaveTarget())
         return false;
 
     // nobody can attack GM in GM-mode
@@ -4941,6 +4937,22 @@ void Unit::RestoreFaction()
     }
 }
 
+Team Unit::GetTeam() const
+{
+    if (FactionEntry const* pFaction = GetFactionEntry())
+    {
+        switch (pFaction->team)
+        {
+            case HORDE:
+                return HORDE;
+            case ALLIANCE:
+                return ALLIANCE;
+        }
+    }
+    
+    return TEAM_NONE;
+}
+
 bool Unit::CanAttack(Unit const* target, bool force) const
 {
     ASSERT(target);
@@ -4965,7 +4977,7 @@ bool Unit::CanAttack(Unit const* target, bool force) const
     else if (!IsHostileTo(target))
         return false;
 
-    if (!target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()) || target->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (!target->IsTargetableBy(this))
         return false;
 
     // shaman totem quests: spell 8898, shaman can detect elementals but elementals cannot see shaman
@@ -5831,7 +5843,7 @@ void Unit::ClearInCombat()
         static_cast<Player*>(this)->pvpInfo.inPvPCombat = false;
 }
 
-bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool checkAlive) const
+bool Unit::IsTargetableBy(WorldObject const* pAttacker, bool forAoE, bool checkAlive) const
 {
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
         return false;
@@ -5845,26 +5857,45 @@ bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool
             return false;
     }
 
-    if (forAttack)
+    if (pAttacker)
     {
-        if (!forAoE && !CanBeDetected())
-            return false;
-
-        if (!isAttackerPlayer && !forAoE && HasUnitState(UNIT_STAT_FEIGN_DEATH))
-            return false;
-
-        // check flags
-        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
-            return false;
-
-        if (isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
-            return false;
-
-        if (!isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
             return false;
 
         if (IsTaxiFlying())
             return false;
+
+        if (!forAoE && !CanBeDetected())
+            return false;
+
+        if (pAttacker->IsCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+                return false;
+        }
+        else // non player attacker
+        {
+            if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                return false;
+
+            if (!forAoE && HasUnitState(UNIT_STAT_FEIGN_DEATH))
+                return false;
+        }
+
+        // attacker flags prevent attacking victim too
+        if (pAttacker->IsUnit())
+        {
+            if (IsCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+                    return false;
+            }
+            else // non player victim
+            {
+                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                    return false;
+            }
+        }
     }
 
     return IsInWorld();
@@ -7108,6 +7139,7 @@ void Unit::TauntApply(Unit* taunter)
 
     if (target && target == taunter)
         return;
+
     // Nostalrius : Correction bug sheep/fear
     if (!HasAuraType(SPELL_AURA_MOD_FEAR) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
     {
@@ -7243,7 +7275,7 @@ bool Unit::SelectHostileTarget()
     {
         for (const auto& itr : m_attackers)
         {
-            if (itr->IsInMap(this) && itr->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()))
+            if (itr->IsInMap(this) && itr->IsTargetableBy(this))
                 return false;
         }
     }
@@ -8228,7 +8260,140 @@ bool CharmInfo::IsReturning()
     return m_isReturning;
 }
 
-uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
+void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
+{
+    Creature* pCharmedCreature = ToCreature();
+
+    CharmInfo* charmInfo = GetCharmInfo();
+    if (!charmInfo)
+    {
+        sLog.outError("Unit::HandlePetCommand - %s doesn't have a charminfo!", GetGuidStr().c_str());
+        return;
+    }
+
+    Unit* pCharmer = GetCharmerOrOwner();
+    if (!pCharmer)
+    {
+        sLog.outError("Unit::HandlePetCommand - %s doesn't have a charmer or owner!", GetGuidStr().c_str());
+        return;
+    }
+
+    switch (command)
+    {
+        case COMMAND_STAY:
+            if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                StopMoving();
+                GetMotionMaster()->Clear(false);
+                GetMotionMaster()->MoveIdle();
+                charmInfo->SetIsAtStay(true);
+            }
+            charmInfo->SetCommandState(COMMAND_STAY);
+
+            charmInfo->SetIsCommandAttack(false);
+            charmInfo->SetIsCommandFollow(false);
+            charmInfo->SetIsFollowing(false);
+            charmInfo->SetIsReturning(false);
+            charmInfo->SaveStayPosition();
+            break;
+        case COMMAND_FOLLOW:
+            if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                AttackStop();
+                InterruptNonMeleeSpells(false);
+                GetMotionMaster()->MoveFollow(pCharmer, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            }
+            charmInfo->SetCommandState(COMMAND_FOLLOW);
+
+            charmInfo->SetIsCommandAttack(false);
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsReturning(true);
+            charmInfo->SetIsCommandFollow(true);
+            charmInfo->SetIsFollowing(false);
+            break;
+        case COMMAND_ATTACK:
+        {
+            if (!pTarget)
+            {
+                SendPetActionFeedback(FEEDBACK_NOTHING_TO_ATT);
+                return;
+            }
+
+            if (!pCharmer->IsValidAttackTarget(pTarget) || pCharmer->HasAuraType(SPELL_AURA_MOD_PACIFY))
+            {
+                SendPetActionFeedback(FEEDBACK_CANT_ATT_TARGET);
+                return;
+            }
+
+            if (GetTransport() != pTarget->GetTransport())
+            {
+                SendPetActionFeedback(FEEDBACK_NO_PATH_TO);
+                return;
+            }
+
+            ClearUnitState(UNIT_STAT_FOLLOW);
+            // This is true if pet has no target or has target but targets differs.
+            if (GetVictim() != pTarget || (GetVictim() == pTarget && !GetCharmInfo()->IsCommandAttack()) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                if (GetVictim())
+                    AttackStop();
+
+                if (pCharmedCreature)
+                {
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    pCharmedCreature->AI()->AttackStart(pTarget);
+
+                    //10% chance to play special pet attack talk, else growl
+                    if (pCharmedCreature->IsPet() && ((Pet*)this)->getPetType() == SUMMON_PET && this != pTarget && urand(0, 100) < 10)
+                        SendPetTalk((uint32)PET_TALK_ATTACK);
+                    else
+                    {
+                        // 90% chance for pet and 100% chance for charmed creature
+                        SendPetAIReaction();
+                    }
+                }
+                else                                // charmed player
+                {
+                    if (GetVictim() && GetVictim() != pTarget)
+                        AttackStop();
+
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    Attack(pTarget, true);
+                    SendPetAIReaction();
+                    GetMotionMaster()->MoveChase(pTarget);
+                }
+            }
+            break;
+        }
+        case COMMAND_DISMISS:                       // pet dismiss (summoned pet)
+        {
+            if (Pet* pPet = ToPet())
+            {
+                // Hunter pets are dismissed with a spell with a cast time
+                if (pPet->getPetType() != HUNTER_PET)
+                    // dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
+                    pPet->Unsummon(PET_SAVE_NOT_IN_SLOT);
+            }
+            else                                    // charmed
+                pCharmer->Uncharm();
+            break;
+        }  
+        default:
+            sLog.outError("Unit::HandlePetCommand - Unknown command state %u.", uint32(command));
+    }
+}
+
+uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
 {
     uint32 procEx = PROC_EX_NONE;
     switch (missCondition)
@@ -8267,17 +8432,20 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
             procEx |= PROC_EX_REFLECT;
         // no break
         case SPELL_MISS_NONE:
-            // On block
-            if (damageInfo->blocked)
-                procEx |= PROC_EX_BLOCK;
-            // On absorb
-            if (damageInfo->absorb)
-                procEx |= PROC_EX_ABSORB;
-            // On crit
-            if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
-                procEx |= PROC_EX_CRITICAL_HIT;
-            else
-                procEx |= PROC_EX_NORMAL_HIT;
+            if (damageInfo)
+            {
+                // On block
+                if (damageInfo->blocked)
+                    procEx |= PROC_EX_BLOCK;
+                // On absorb
+                if (damageInfo->absorb)
+                    procEx |= PROC_EX_ABSORB;
+                // On crit
+                if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
+                    procEx |= PROC_EX_CRITICAL_HIT;
+                else
+                    procEx |= PROC_EX_NORMAL_HIT;
+            }
             break;
     }
     return procEx;
@@ -9372,7 +9540,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
 {
     if (Unit* pVictim = GetVictim())
     {
-        if (pVictim->getFactionTemplateEntry()->faction == faction_id)
+        if (pVictim->GetFactionId() == faction_id)
         {
             AttackStop();
             if (IsNonMeleeSpellCasted(false))
@@ -9387,7 +9555,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
     AttackerSet const& attackers = GetAttackers();
     for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
     {
-        if ((*itr)->getFactionTemplateEntry()->faction == faction_id)
+        if ((*itr)->GetFactionId() == faction_id)
         {
             (*itr)->AttackStop();
             itr = attackers.begin();

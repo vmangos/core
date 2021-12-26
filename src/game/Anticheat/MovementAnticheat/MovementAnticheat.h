@@ -65,8 +65,8 @@ class MovementAnticheat
         uint32 ComputeCheatAction(std::stringstream& reason);
 
         void HandleCommand(ChatHandler* handler) const;
-        uint32 Update(uint32 diff, std::stringstream& reason);
-        uint32 Finalize(std::stringstream& reason);
+        uint32 Update(Player* pPlayer, uint32 diff, std::stringstream& reason);
+        uint32 Finalize(Player* pPlayer, std::stringstream& reason);
 
         // Public methods called from the movement handler upon received a packet.
         bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);

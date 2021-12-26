@@ -4,7 +4,7 @@
 #include "ObjectGuid.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
-#include <list>
+#include <mutex>
 #include <vector>
 #include <cstddef>
 

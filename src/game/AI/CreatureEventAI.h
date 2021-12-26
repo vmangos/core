@@ -23,7 +23,7 @@
 #define MANGOS_CREATURE_EAI_H
 
 #include "Common.h"
-#include "CreatureAI.h"
+#include "BasicAI.h"
 #include "ScriptMgr.h"
 
 class Unit;
@@ -289,7 +289,7 @@ struct CreatureEventAIHolder
     bool UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax);
 };
 
-class CreatureEventAI : public CreatureAI
+class CreatureEventAI : public BasicAI
 {
     public:
         explicit CreatureEventAI(Creature* c);
@@ -309,9 +309,8 @@ class CreatureEventAI : public CreatureAI
         void JustDied(Unit* killer) override;
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
-        void AttackStart(Unit* who) override;
         void MoveInLineOfSight(Unit* who) override;
-        void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override;
+        void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override;
         void MovementInform(uint32 type, uint32 id) override;
         void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(uint32 const diff) override;
@@ -323,8 +322,8 @@ class CreatureEventAI : public CreatureAI
 
         static int Permissible(Creature const*);
 
-        bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = nullptr);
-        void ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker);
+        bool ProcessEvent(CreatureEventAIHolder& pHolder, SpellCaster* pActionInvoker = nullptr);
+        void ProcessAction(ScriptMap* action, uint32 EventId, SpellCaster* pActionInvoker);
         void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases
@@ -337,10 +336,7 @@ class CreatureEventAI : public CreatureAI
         //Variables used by Events themselves
         typedef std::vector<CreatureEventAIHolder> CreatureEventAIList;
         CreatureEventAIList m_CreatureEventAIList;          //Holder for events (stores enabled, time, and eventid)
-        float  m_AttackDistance;                            // Distance to attack from
-        float  m_AttackAngle;                               // Angle of attack
         uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
-        bool m_bCanSummonGuards;
 
         void UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);

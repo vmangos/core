@@ -58,7 +58,7 @@ struct CharacterPetCache
     uint32 createdBySpell = 0;
     uint32 petType = 0;
     int32 trainingPoints = 0;
-    int32 loyaltyPoints = 0;;
+    int32 loyaltyPoints = 0;
     uint32 ownerGuid = 0;
     uint64 saveTime = 0;
     uint8 reactState = 0;

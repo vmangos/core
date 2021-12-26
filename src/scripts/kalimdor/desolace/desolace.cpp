@@ -297,78 +297,7 @@ bool QuestAccept_npc_dalinda_malem(Player* pPlayer, Creature* pCreature, Quest c
     }
     return true;
 }
-enum
-{
-//guid 12609 entry 177673 Serpant statue
-    NPC_LORD_KRAGARU            = 12369,
-    QUEST_BOOK_OF_THE_ANCIENTS  = 6027
 
-};
-struct go_serpent_statueAI: public GameObjectAI
-{
-    go_serpent_statueAI(GameObject* pGo) : GameObjectAI(pGo)
-    {
-        timer = 0;
-        state = 0;
-        guid_kragaru = 0;
-    }
-    uint64 guid_kragaru;
-    uint32 timer;
-    bool state;//0 = usual, can launch. //1 = in use, cannot launch
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (state)
-        {
-            if (timer < uiDiff)
-            {
-                state = 0;
-                me->SetGoState(GO_STATE_READY);
-                me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-            }
-            else
-                timer -= uiDiff;
-        }
-    }
-    bool CheckCanStartEvent()
-    {
-        return !state && !me->GetMap()->GetCreature(guid_kragaru);
-    }
-
-    void SetInUse(Creature* kragaru)
-    {
-        guid_kragaru = kragaru->GetGUID();
-        me->SetGoState(GO_STATE_ACTIVE);
-        me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-        state = 1;
-        timer = 120000;
-    }
-};
-GameObjectAI* GetAIgo_serpent_statue(GameObject *pGo)
-{
-    return new go_serpent_statueAI(pGo);
-}
-bool GOHello_go_serpent_statue(Player* pPlayer, GameObject* pGo)
-{
-    if (go_serpent_statueAI* pMarkAI = dynamic_cast<go_serpent_statueAI*>(pGo->AI()))
-    {
-        if (pMarkAI->CheckCanStartEvent())
-        {
-            if (pGo->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
-            {
-                if (pPlayer->GetQuestStatus(QUEST_BOOK_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-                {
-                    if (Creature* kragaru = pGo->SummonCreature(NPC_LORD_KRAGARU, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    {
-                        kragaru->SetRespawnDelay(350000);
-                        pMarkAI->SetInUse(kragaru);
-                    }
-                }
-            }
-        }
-    }
-    return true;
-}
 enum
 {
     NPC_MAGRAMI_SPECTRE                 = 11560,
@@ -1137,12 +1066,6 @@ void AddSC_desolace()
     newscript->Name = "npc_dalinda_malem";
     newscript->GetAI = &GetAI_npc_dalinda_malem;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_dalinda_malem;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_serpent_statue";
-    newscript->GOGetAI = &GetAIgo_serpent_statue;
-    newscript->pGOHello = &GOHello_go_serpent_statue;
     newscript->RegisterSelf();
 
     newscript = new Script;

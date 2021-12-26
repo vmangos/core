@@ -119,7 +119,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
         Razor_Phase_2 = 300000;
         Razor_Remove_Auras = 300000;
 
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
 
     }
@@ -148,7 +148,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
 
 
 
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
             m_creature->GetMap()->CreatureRelocation(m_creature, -7595, -1053, 408, 0.0f);
             DoCastSpellIfCan(m_creature, 31366);
@@ -165,7 +165,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
             m_creature->AI()->AttackStart(target);
 
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
             m_creature->RemoveAurasDueToSpell(31366);
 

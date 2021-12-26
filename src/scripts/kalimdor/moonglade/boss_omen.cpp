@@ -53,7 +53,7 @@ void boss_omenAI::UpdateAI(uint32 const uiDiff)
     DoMeleeAttackIfReady();
 }
 
-void boss_omenAI::SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry)
+void boss_omenAI::SpellHit(SpellCaster* /*pCaster*/, SpellEntry const* pSpellEntry)
 {
     if (pSpellEntry->Id == SPELL_ELUNES_CANDLE)
     {

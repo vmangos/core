@@ -2157,16 +2157,6 @@ bool ChatHandler::HandleDebugMoveCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugRecvPacketDumpWrite(char* c)
-{
-    WorldSession* sess = m_session;
-    if (Player* player = GetSelectedPlayer())
-        sess = player->GetSession();
-    PSendSysMessage("Starting replay recording for %s", playerLink(sess->GetPlayerName()).c_str());
-    sess->SetDumpRecvPackets(c);
-    return true;
-}
-
 bool ChatHandler::HandleDebugControlCommand(char *args)
 {
     Player* pTarget = GetSelectedPlayer();

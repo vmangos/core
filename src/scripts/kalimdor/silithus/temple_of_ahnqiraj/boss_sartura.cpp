@@ -81,7 +81,7 @@ struct boss_sarturaAI : public ScriptedAI
     void Reset() override
     {
         m_uiCleaveTimer = 4000;
-        m_uiWhirlWindTimer = urand(8000, 12000);;
+        m_uiWhirlWindTimer = urand(8000, 12000);
         m_uiWhirlWindEndTimer = 0;
         m_uiAggroResetTimer = urand(5000, 7500);
         

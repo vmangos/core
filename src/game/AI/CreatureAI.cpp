@@ -53,6 +53,22 @@ void CreatureAI::AttackedBy(Unit* attacker)
         AttackStart(attacker);
 }
 
+void CreatureAI::AttackStart(Unit* pVictim)
+{
+    if (!pVictim || m_creature->HasReactState(REACT_PASSIVE))
+        return;
+
+    if (m_creature->Attack(pVictim, m_bMeleeAttack))
+    {
+        m_creature->AddThreat(pVictim);
+        m_creature->SetInCombatWith(pVictim);
+        pVictim->SetInCombatWith(m_creature);
+
+        if (m_bCombatMovement)
+            m_creature->GetMotionMaster()->MoveChase(pVictim);
+    }
+}
+
 CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered)
 {
     if (!pTarget)
@@ -310,56 +326,6 @@ void CreatureAI::ClearTargetIcon()
     }
 }
 
-void CreatureAI::SetGazeOn(Unit* target)
-{
-    if (m_creature->CanAttack(target))
-    {
-        AttackStart(target);
-        m_creature->SetReactState(REACT_PASSIVE);
-    }
-}
-
-bool CreatureAI::UpdateVictimWithGaze()
-{
-    if (!m_creature->IsInCombat())
-        return false;
-
-    if (m_creature->HasReactState(REACT_PASSIVE))
-    {
-        if (m_creature->GetVictim())
-            return true;
-        m_creature->SetReactState(REACT_AGGRESSIVE);
-    }
-
-    if (m_creature->SelectHostileTarget())
-        if (Unit* victim = m_creature->GetVictim())
-            AttackStart(victim);
-    return m_creature->GetVictim();
-}
-
-bool CreatureAI::UpdateVictim()
-{
-    if (!m_creature->IsInCombat())
-        return false;
-
-    if (!m_creature->HasReactState(REACT_PASSIVE))
-    {
-        if (m_creature->SelectHostileTarget())
-            if (Unit* victim = m_creature->GetVictim())
-                AttackStart(victim);
-        return m_creature->GetVictim();
-    }
-
-    if (m_creature->GetThreatManager().isThreatListEmpty())
-    {
-        EnterEvadeMode();
-        return false;
-    }
-
-    return true;
-}
-
-
 void CreatureAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
 {
     if (!victim || (m_creature->IsNonMeleeSpellCasted(false) && !triggered))
@@ -380,25 +346,6 @@ bool CreatureAI::DoMeleeAttackIfReady()
 {
     return m_bMeleeAttack ? m_creature->UpdateMeleeAttackingState() : false;
 }
-
-struct EnterEvadeModeHelper
-{
-    explicit EnterEvadeModeHelper(Unit* _source) : source(_source) {}
-    void operator()(Unit* unit) const
-    {
-        if (unit->IsCreature() && unit->ToCreature()->IsTotem())
-            ((Totem*)unit)->UnSummon();
-        else
-        {
-            unit->GetMotionMaster()->Clear(false);
-            // for a controlled unit this will result in a follow move
-            unit->GetMotionMaster()->MoveTargetedHome();
-            unit->DeleteThreatList();
-            unit->CombatStop(true);
-        }
-    }
-    Unit* source;
-};
 
 void CreatureAI::SetMeleeAttack(bool enabled)
 {
@@ -443,6 +390,25 @@ void CreatureAI::SetCombatMovement(bool enabled)
         }  
     }
 }
+
+struct EnterEvadeModeHelper
+{
+    explicit EnterEvadeModeHelper(Unit* _source) : source(_source) {}
+    void operator()(Unit* unit) const
+    {
+        if (unit->IsCreature() && unit->ToCreature()->IsTotem())
+            ((Totem*)unit)->UnSummon();
+        else
+        {
+            unit->GetMotionMaster()->Clear(false);
+            // for a controlled unit this will result in a follow move
+            unit->GetMotionMaster()->MoveTargetedHome();
+            unit->DeleteThreatList();
+            unit->CombatStop(true);
+        }
+    }
+    Unit* source;
+};
 
 void CreatureAI::OnCombatStop()
 {

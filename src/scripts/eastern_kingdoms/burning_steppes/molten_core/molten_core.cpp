@@ -194,7 +194,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
     {        
         if (!m_creature->IsInCombat())
         {
-            if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 20.0f) && pWho->IsTargetable(true, false))
+            if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 20.0f) && pWho->IsTargetableBy(m_creature))
             {
                 // allow Soothe Animal to lower aggro range
                 if (m_creature->HasAuraType(SPELL_AURA_MOD_DETECT_RANGE) && !m_creature->IsWithinDistInMap(pWho, 10.0f))
@@ -222,7 +222,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
         if (m_uiRandomDebuffTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, RandDebuff) == CAST_OK)
-                m_uiRandomDebuffTimer = urand(14000, 24000);;
+                m_uiRandomDebuffTimer = urand(14000, 24000);
         }
         else m_uiRandomDebuffTimer -= uiDiff;
 

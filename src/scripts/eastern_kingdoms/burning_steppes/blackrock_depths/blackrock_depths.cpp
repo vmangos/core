@@ -121,7 +121,7 @@ struct npc_grimstoneAI : public npc_escortAI
 
     void Reset() override
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
         EventPhase = 0;
         Event_Timer = 1000;
@@ -1300,7 +1300,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
                 if (pGolem->IsAlive())
                 {
                     pGolem->RemoveAurasDueToSpell(10255);
-                    pGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                    pGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
                     if (pWho)
                         pGolem->AI()->AttackStart(pWho);
                 }
@@ -1555,7 +1555,7 @@ struct boss_plugger_spazzringAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override
     {
         if (pCaster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -2103,7 +2103,7 @@ struct npc_marshal_windsorAI : npc_escortAI
             case 19:
                 m_creature->SetVisibility(VISIBILITY_OFF);
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 if (Creature* pTemp = m_creature->SummonCreature(NPC_REGINALD_WINDSOR, 
                     m_creature->GetPositionX(), 
                     m_creature->GetPositionY(), 

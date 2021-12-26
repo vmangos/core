@@ -1438,10 +1438,14 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
         m_creature->DisappearAndDie();
     }
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
+        Unit* pCasterUnit = pCaster->ToUnit();
+        if (!pCasterUnit)
+            return;
+
         if (spell->Id == SPELL_COLLAR_USING_ALLIANCE || spell->Id == SPELL_COLLAR_USING_HORDE)
-            AttackStart(caster);
+            AttackStart(pCasterUnit);
         else if (spell->Id == SPELL_TAME_BEAST_PLAYER_ALLIANCE || spell->Id == SPELL_TAME_BEAST_PLAYER_HORDE)
         {
 
@@ -1450,7 +1454,7 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
 
             /** Link the tamed creature to the player it shall follow */
             m_creature->CastSpell(m_creature, SPELL_TAME_OWNED_BY_PLAYER, true);
-            m_creature->CastSpell(caster, SPELL_PLAYER_OWNED_BY_TAMED, true);
+            m_creature->CastSpell(pCasterUnit, SPELL_PLAYER_OWNED_BY_TAMED, true);
 
             /** Update creature for tamed one */
             if (m_creature->GetEntry() == NPC_RAM)
@@ -1463,13 +1467,13 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
                 m_creature->GetMotionMaster()->MoveIdle();
 
             /** Set owner information, specific to Alterac Valley Tamed Beast */
-            playerGuid = caster->GetObjectGuid();
+            playerGuid = pCasterUnit->GetObjectGuid();
 
 
-            m_creature->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            m_creature->GetMotionMaster()->MoveFollow(pCasterUnit, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             /** Set owner information, specific to Alterac Valley Tamed Beast */
-            //            playerGuid = caster->GetObjectGuid();
+            //            playerGuid = pCasterUnit->GetObjectGuid();
         }
     }
 
@@ -2910,7 +2914,7 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                 if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pQuestGiver->AI()))
                 {
                     pEscortAI->Start(true, 0, nullptr, false);
-                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 }
@@ -3124,7 +3128,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             {
                 pCreature->SetFactionTemplateId(1194);
                 pEscortAI->Start(true, 0, nullptr, false);
-                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 pCreature->SetWalk(false);
@@ -3151,7 +3155,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
                 pCreature->SetFactionTemplateId(1194);
                 pEscortAI->Start(true, 0, nullptr, false);
-                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 pCreature->SetWalk(false);
@@ -3692,7 +3696,7 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
                 if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>(pQuestGiver->AI()))
                 {
                     pEscortAI->Start(true, 0, nullptr, false);
-                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                     pQuestGiver->SetWalk(true);
@@ -3918,7 +3922,7 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
                         {
                             pEscortAI->Start(true, 0, nullptr, false);
                             //pCreature->SetFactionTemplateId(pPlayer->GetFactionTemplateId());
-                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                             pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                         }

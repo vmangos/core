@@ -130,7 +130,7 @@ MasterPlayer* ObjectAccessor::FindMasterPlayer(ObjectGuid guid)
     if (!guid)
         return nullptr;
 
-    return HashMapHolder<MasterPlayer>::Find(guid);;
+    return HashMapHolder<MasterPlayer>::Find(guid);
 }
 
 

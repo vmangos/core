@@ -40,15 +40,10 @@ enum MiranData
     SAY_MIRAN_2           = 511,
     SAY_MIRAN_3           = 498,
 
-    NPC_DARK_IRON_DWARF   = 2149
+    NPC_DARK_IRON_RAIDER  = 2149
 };
 
-struct Location
-{
-    float m_fX, m_fY, m_fZ, m_fO;
-};
-
-static const Location m_afAmbushSpawn[] =
+static const Position m_afAmbushSpawn[] =
 {
     { -5691.93f, -3745.91f, 319.159f, 2.21f},
     { -5706.98f, -3745.39f, 318.728f, 1.04f}
@@ -75,8 +70,8 @@ struct npc_miranAI: public npc_escortAI
         {
             case 19:
                 DoScriptText(SAY_MIRAN_1, m_creature);
-                m_creature->SummonCreature(NPC_DARK_IRON_DWARF, m_afAmbushSpawn[0].m_fX, m_afAmbushSpawn[0].m_fY, m_afAmbushSpawn[0].m_fZ, m_afAmbushSpawn[0].m_fO, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000);
-                m_creature->SummonCreature(NPC_DARK_IRON_DWARF, m_afAmbushSpawn[1].m_fX, m_afAmbushSpawn[1].m_fY, m_afAmbushSpawn[1].m_fZ, m_afAmbushSpawn[1].m_fO, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_DARK_IRON_RAIDER, m_afAmbushSpawn[0].x, m_afAmbushSpawn[0].y, m_afAmbushSpawn[0].z, m_afAmbushSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_DARK_IRON_RAIDER, m_afAmbushSpawn[1].x, m_afAmbushSpawn[1].y, m_afAmbushSpawn[1].z, m_afAmbushSpawn[1].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
                 break;
             case 23:
                 DoScriptText(SAY_MIRAN_3, m_creature);
@@ -88,7 +83,7 @@ struct npc_miranAI: public npc_escortAI
 
     void SummonedCreatureJustDied(Creature* pSummoned) override
     {
-        if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
+        if (pSummoned->GetEntry() == NPC_DARK_IRON_RAIDER)
         {
             --m_uiDwarves;
             if (!m_uiDwarves)
@@ -98,7 +93,7 @@ struct npc_miranAI: public npc_escortAI
 
     void JustSummoned(Creature* pSummoned) override
     {
-        if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
+        if (pSummoned->GetEntry() == NPC_DARK_IRON_RAIDER)
         {
             if (!m_uiDwarves)
                 DoScriptText(SAY_DARK_IRON_DWARF, pSummoned);
@@ -140,9 +135,7 @@ enum SaeanData
     FACTION_HOSTILE        = 54
 };
 
-struct point3o { float x, y, z, o; };
-
-static const point3o darkIronAmbusherSpawns[] =
+static const Position darkIronAmbusherSpawns[] =
 {
     { -5759.852051f, -3441.279053f, 305.573212f, 2.174024f },
     { -5757.629883f, -3437.680908f, 304.265106f, 2.610265f }

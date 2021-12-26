@@ -49,6 +49,9 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
     recv_data >> lootSlot;
 
+    if (lguid.IsEmpty())
+        return;
+
     switch (lguid.GetHigh())
     {
         case HIGHGUID_GAMEOBJECT:

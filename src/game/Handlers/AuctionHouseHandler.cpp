@@ -776,7 +776,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     AuctionHouseClientQueryTask task(AUCTION_QUERY_LIST_OWNER);
-    task.auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);;
+    task.auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
     task.accountId = GetAccountId();
     task.listfrom = listfrom;
     SetReceivedAHListRequest(true);

@@ -731,7 +731,7 @@ struct npc_kernobeeAI : public FollowerAI
                 {
                     m_creature->SetWalk(true);//speed influences speed of follower
                     SetFollowPaused(false);
-                    m_nextStepTimer = 5 * MINUTE * IN_MILLISECONDS;;
+                    m_nextStepTimer = 5 * MINUTE * IN_MILLISECONDS;
                     nextStep = 2;
                 }
                 else

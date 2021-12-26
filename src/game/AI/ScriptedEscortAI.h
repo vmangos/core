@@ -49,7 +49,6 @@ struct npc_escortAI : ScriptedAI
         void ResetCreature() override {}
 
         // CreatureAI functions
-        void AttackStart(Unit*) override;
 
         void EnterCombat(Unit*) override;
 

@@ -162,6 +162,7 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
                     strAI.empty() ? " - " : strAI.c_str(),
                     cstrAIClass ? cstrAIClass : " - ",
                     strScript.empty() ? " - " : strScript.c_str());
+    PSendSysMessage("React State: %s", ReactStateToString(pTarget->GetReactState()));
     PSendSysMessage(LANG_NPC_AI_MOVE, GetOnOffStr(pTarget->AI()->IsCombatMovementEnabled()));
     PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
     MovementGeneratorType moveType = pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType();
@@ -374,7 +375,7 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
 
     if (!creatureTarget || creatureTarget->IsPet())
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
@@ -545,7 +546,7 @@ bool ChatHandler::HandleNpcSpawnSpawnTimeCommand(char* args)
     Creature* pCreature = GetSelectedCreature();
     if (!pCreature)
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
@@ -575,13 +576,40 @@ bool ChatHandler::HandleNpcSetSpawnTimeCommand(char* args)
     Creature* pCreature = GetSelectedCreature();
     if (!pCreature)
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
 
     pCreature->SetRespawnDelay(stime);
     PSendSysMessage(LANG_COMMAND_SPAWNTIME, stime);
+
+    return true;
+}
+
+bool ChatHandler::HandleNpcSetReactStateCommand(char* args)
+{
+    Creature* pCreature = GetSelectedCreature();
+    if (!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 reactState;
+    if (!ExtractUInt32(&args, reactState))
+        return false;
+
+    if (reactState > REACT_AGGRESSIVE)
+    {
+        SendSysMessage("Invalid react state.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pCreature->SetReactState((ReactStates)reactState);
+    PSendSysMessage("React state of %s updated to %u.", pCreature->GetName(), reactState);
 
     return true;
 }
@@ -1186,7 +1214,7 @@ bool ChatHandler::HandleNpcFollowCommand(char* /*args*/)
 
     if (!creature)
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
@@ -1205,7 +1233,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
 
     if (!pCreature)
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
@@ -1242,7 +1270,7 @@ bool ChatHandler::HandleNpcAllowMovementCommand(char* args)
 
     if (!pCreature)
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
@@ -1267,7 +1295,7 @@ bool ChatHandler::HandleNpcAllowAttackCommand(char* args)
 
     if (!pCreature)
     {
-        PSendSysMessage(LANG_SELECT_CREATURE);
+        SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }

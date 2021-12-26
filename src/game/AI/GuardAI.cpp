@@ -97,18 +97,3 @@ void GuardAI::UpdateAI(uint32 const uiDiff)
     DoMeleeAttackIfReady();
 }
 
-void GuardAI::AttackStart(Unit* pWho)
-{
-    if (!pWho)
-        return;
-
-    if (m_creature->Attack(pWho, m_bMeleeAttack))
-    {
-        m_creature->AddThreat(pWho);
-        m_creature->SetInCombatWith(pWho);
-        pWho->SetInCombatWith(m_creature);
-
-        if (m_bCombatMovement)
-            m_creature->GetMotionMaster()->MoveChase(pWho);
-    }
-}

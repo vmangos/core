@@ -24,14 +24,14 @@ struct npc_escort_genericAI : public npc_escortAI
         {
             if (pPlayer->GetQuestStatus(m_pEscortData->uiQuestEntry) == QUEST_STATUS_INCOMPLETE)
             {
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
             }
             else if (pPlayer->GetQuestStatus(m_pEscortData->uiQuestEntry) == QUEST_STATUS_FAILED)
             {
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
             }
         }
@@ -92,7 +92,7 @@ struct npc_escort_genericAI : public npc_escortAI
         if (!m_pEscortData)
             return;
 
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 

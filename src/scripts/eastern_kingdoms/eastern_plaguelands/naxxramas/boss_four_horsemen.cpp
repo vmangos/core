@@ -168,7 +168,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 return;
 
-            if (m_creature->CanInitiateAttack() && pPlayer->IsTargetable(true, false) && m_creature->IsHostileTo(pPlayer))
+            if (m_creature->CanInitiateAttack() && pPlayer->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pPlayer))
             {
                 if (pPlayer->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
                 {
@@ -197,7 +197,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 75.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false) && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
         {
             if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {

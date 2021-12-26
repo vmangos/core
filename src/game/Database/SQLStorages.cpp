@@ -24,16 +24,16 @@
 #include "Database/SQLStorageImpl.h"
 #include "Database/DatabaseEnv.h"
 
-char const CreatureInfosrcfmt[] = "iiiiiffffiiiiiissiiiiiiiiiifffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiisiisiiiliiiiiiis";
-char const CreatureInfodstfmt[] = "iiiiiffffiiiiiissiiiiiiiiiifffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiisiisiiiliiiiiiii";
+char const CreatureInfosrcfmt[] = "iiiiiffffiiiiiissiiiiiiiiiifffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiisiisiiiliiiiiiis";
+char const CreatureInfodstfmt[] = "iiiiiffffiiiiiissiiiiiiiiiifffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiisiisiiiliiiiiiii";
 char const CreatureDataAddonInfofmt[] = "iiiibbis";
 char const CreatureDisplayInfoAddonfmt[] = "iffbi";
 char const GameObjectDisplayInfoAddonfmt[] = "iffffff";
 char const EquipmentInfofmt[] = "iiii";
 char const GameObjectInfosrcfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiis";
 char const GameObjectInfodstfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiii";
-char const ItemPrototypesrcfmt[] = "iiissiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiififfiffiffiffiffiiiiiiiiiiiifiiiiiifiiiiiifiiiiiifiiiiiifiiiiiiiiiiiiiiiiiiiiiiii";
-char const ItemPrototypedstfmt[] = "iiissiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiififfiffiffiffiffiiiiiiiiiiiifiiiiiifiiiiiifiiiiiifiiiiiifiiiiiiiiiiiiiiiiiiiiiiiix";
+char const ItemPrototypesrcfmt[] = "iiissiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiififfiffiffiffiffiiiiiiiiiiiifiiiiiifiiiiiifiiiiiifiiiiiifiiiiiiiiiiiiiiiiiiiiiiiii";
+char const ItemPrototypedstfmt[] = "iiissiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiififfiffiffiffiffiiiiiiiiiiiifiiiiiifiiiiiifiiiiiifiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiix";
 char const PageTextfmt[] = "isi";
 char const MapEntrysrcfmt[] = "iiiiiiiffss";
 char const MapEntrydstfmt[] = "iiiiiiiffsi";

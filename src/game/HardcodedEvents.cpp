@@ -986,7 +986,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId,
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT));
 
         if (pMouth)
-            pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
+            pMouth->AI()->OnScriptEventHappened(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
         else
             sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found.", zone->mouthGuid);
     }
@@ -1197,7 +1197,7 @@ bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, Position p
 
     if (Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, position.x, position.y, position.z, position.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
-        pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+        pMouth->AI()->OnScriptEventHappened(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
         zone->mouthGuid = pMouth->GetObjectGuid();
     }
     else

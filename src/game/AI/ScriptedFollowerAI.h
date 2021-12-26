@@ -31,8 +31,6 @@ class FollowerAI : public ScriptedAI
 
         void MovementInform(uint32 uiMotionType, uint32 uiPointId) override;
 
-        void AttackStart(Unit*) override;
-
         void MoveInLineOfSight(Unit*) override;
 
         void EnterEvadeMode() override;

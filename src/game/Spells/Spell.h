@@ -467,7 +467,7 @@ class Spell
             m_IsCastByItem = item ? true : false;
             m_CastItem = item;
         }
-        bool ShouldRemoveStealthAuras();;
+        bool ShouldRemoveStealthAuras();
 
         void AddChanneledAuraHolder(SpellAuraHolder* holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
@@ -584,6 +584,7 @@ class Spell
             SpellMissInfo reflectResult:8;
             uint8  effectMask:8;
             bool   processed:1;
+            bool   isCrit:1;
             bool   deleted:1;
         };
         uint8 m_needAliveTargetMask = 0;                    // Mask req. alive targets

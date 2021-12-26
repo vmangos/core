@@ -59,14 +59,14 @@ void SniffFile::WritePacket(FILE* pFile, LoggedPacket const& packet)
     {
         uint32 packetSize = packet.data.size() + sizeof(uint32);
         fwrite(&packetSize, sizeof(uint32), 1, pFile);
-        uint32 opcode = packet.data.GetOpcode();;
+        uint32 opcode = packet.data.GetOpcode();
         fwrite(&opcode, sizeof(uint32), 1, pFile);
     }
     else
     {
         uint32 packetSize = packet.data.size() + sizeof(uint16);
         fwrite(&packetSize, sizeof(uint32), 1, pFile);
-        uint16 opcode = packet.data.GetOpcode();;
+        uint16 opcode = packet.data.GetOpcode();
         fwrite(&opcode, sizeof(uint16), 1, pFile);
     } 
 

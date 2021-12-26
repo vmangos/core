@@ -175,7 +175,7 @@ void SummonCultists(Unit* pShard)
             float z = pGameObject->GetPositionZ() + 5.0f;
             pShard->UpdateGroundPositionZ(x, y, z);
             if (Creature* pCultist = pShard->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR, true, 1000))
-                pCultist->AI()->DoAction(pShard, NPC_CULTIST_ENGINEER);
+                pCultist->AI()->OnScriptEventHappened(NPC_CULTIST_ENGINEER, 0, pShard);
         }
     }
 }
@@ -303,9 +303,9 @@ struct MouthAI : public ScriptedAI
 
     void Reset() override {}
 
-    void DoAction(uint32 const action) override
+    void OnScriptEventHappened(uint32 uiEvent, uint32 /*uiData*/, WorldObject* /*pInvoker*/) override
     {
-        switch (action)
+        switch (uiEvent)
         {
             case EVENT_MOUTH_OF_KELTHUZAD_ZONE_START:
             {
@@ -360,7 +360,7 @@ struct NecropolisAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster*, SpellEntry const* spell) override
     {
         if (m_creature->HasAura(SPELL_COMMUNIQUE_TIMER_NECROPOLIS))
             return;
@@ -391,7 +391,7 @@ struct NecropolisHealthAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             m_creature->CastSpell(m_creature, SPELL_ZAP_NECROPOLIS, true);
@@ -471,7 +471,7 @@ struct NecropolisProxyAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -517,7 +517,7 @@ struct NecropolisRelayAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -581,7 +581,7 @@ struct NecroticShard : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit* pCaster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -845,17 +845,6 @@ struct npc_cultist_engineer : public ScriptedAI
             pGameObject->Delete();
     }
 
-    void DoAction(Unit* pUnit, uint32 action) override
-    {
-        if (action == NPC_CULTIST_ENGINEER)
-        {
-            m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
-            m_creature->CastSpell(m_creature, SPELL_CREATE_SUMMONER_SHIELD, true);
-            m_creature->CastSpell(m_creature, SPELL_MINION_SPAWN_IN, true);
-            m_events.ScheduleEvent(EVENT_CULTIST_CHANNELING, 1000);
-        }
-    }
-
     void UpdateAI(uint32 const diff) override
     {
         m_events.Update(diff);
@@ -888,15 +877,21 @@ struct npc_cultist_engineer : public ScriptedAI
                 // Player summons a Shadow of Doom for 1 hour.
                 if (Creature* pShadow = pPlayer->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * IN_MILLISECONDS, true, 5000))
                 {
-                    pShadow->AI()->InformGuid(pPlayer->GetObjectGuid(), 0);
                     pShadow->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pShadow->SetFacingToObject(pPlayer);
-                    pShadow->AI()->DoAction(pPlayer, NPC_SHADOW_OF_DOOM);
+                    pShadow->AI()->OnScriptEventHappened(NPC_SHADOW_OF_DOOM, 0, pPlayer);
                     pPlayer->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
                 }
                 pPlayer->SendSpellGo(pPlayer, SPELL_SUMMON_BOSS);
                 m_creature->CastSpell(m_creature, SPELL_QUIET_SUICIDE, true);
             }
+        }
+        else if (uiEvent == NPC_CULTIST_ENGINEER)
+        {
+            m_creature->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
+            m_creature->CastSpell(m_creature, SPELL_CREATE_SUMMONER_SHIELD, true);
+            m_creature->CastSpell(m_creature, SPELL_MINION_SPAWN_IN, true);
+            m_events.ScheduleEvent(EVENT_CULTIST_CHANNELING, 1000);
         }
     }
 };
@@ -919,7 +914,6 @@ struct ScourgeMinion : public ScriptedAI
     }
 
     EventMap m_events;
-    ObjectGuid m_summonerGuid;
 
     void Reset()
     {
@@ -935,24 +929,19 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void InformGuid(ObjectGuid const guid, uint32 type) override
+    void OnScriptEventHappened(uint32 uiEvent, uint32 /*uiData*/, WorldObject* pInvoker) override
     {
-        m_summonerGuid = guid;
-    }
-
-    void DoAction(Unit* pUnit, uint32 action) override
-    {
-        if (!pUnit)
+        if (!pInvoker)
             return;
 
-        if (action == NPC_SHADOW_OF_DOOM)
+        if (uiEvent == NPC_SHADOW_OF_DOOM)
         {
             m_events.ScheduleEvent(EVENT_DOOM_START_ATTACK, 5000); // Remove Flag (immune to Players) after 5 seconds.
             // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
-            m_creature->MonsterSay(PickRandomValue(BCT_SHADOW_OF_DOOM_TEXT_0, BCT_SHADOW_OF_DOOM_TEXT_1, BCT_SHADOW_OF_DOOM_TEXT_2, BCT_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, pUnit);
+            m_creature->MonsterSay(PickRandomValue(BCT_SHADOW_OF_DOOM_TEXT_0, BCT_SHADOW_OF_DOOM_TEXT_1, BCT_SHADOW_OF_DOOM_TEXT_2, BCT_SHADOW_OF_DOOM_TEXT_3), LANG_UNIVERSAL, pInvoker->ToUnit());
             m_creature->CastSpell(m_creature, SPELL_SPAWN_SMOKE, true);
         }
-        if (action == NPC_FLAMESHOCKER)
+        if (uiEvent == NPC_FLAMESHOCKER)
             m_events.ScheduleEvent(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
     }
 
@@ -969,7 +958,7 @@ struct ScourgeMinion : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pUnit, SpellEntry const* spell) override
+    void SpellHit(SpellCaster*, SpellEntry const* spell) override
     {
         switch (spell->Id)
         {
@@ -1000,15 +989,20 @@ struct ScourgeMinion : public ScriptedAI
                 case EVENT_DOOM_START_ATTACK:
                 {
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                    // Shadow of Doom seems to attack the Summoner here.
-                    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_summonerGuid))
+
+                    if (TemporarySummon* pMe = dynamic_cast<TemporarySummon*>(m_creature))
                     {
-                        if (pPlayer->IsWithinLOSInMap(m_creature))
+                        // Shadow of Doom seems to attack the Summoner here.
+                        if (Player* pPlayer = ToPlayer(pMe->GetSummoner()))
                         {
-                            m_creature->SetInCombatWith(pPlayer);
-                            m_creature->SetDetectionDistance(2.0f);
+                            if (pPlayer->IsWithinLOSInMap(m_creature))
+                            {
+                                m_creature->SetInCombatWith(pPlayer);
+                                m_creature->SetDetectionDistance(2.0f);
+                            }
                         }
                     }
+                    
                     break;
                 }
                 case EVENT_DOOM_MINDFLAY:
@@ -1329,7 +1323,7 @@ struct PallidHorrorAI : public ScriptedAI
                             {
                                 m_flameshockers.insert(pFlameshocker->GetObjectGuid());
                                 pFlameshocker->CastSpell(pFlameshocker, SPELL_MINION_SPAWN_IN, true);
-                                pFlameshocker->AI()->DoAction(pFlameshocker, NPC_FLAMESHOCKER);
+                                pFlameshocker->AI()->OnScriptEventHappened(NPC_FLAMESHOCKER, 0, pFlameshocker);
                             }
                         }
                     }

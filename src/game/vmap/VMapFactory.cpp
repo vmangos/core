@@ -44,7 +44,6 @@ void chompAndTrim(std::string& str)
 }
 
 IVMapManager* gVMapManager = nullptr;
-Table<unsigned int, bool>* iIgnoreSpellIds = nullptr;
 
 //===============================================
 // result false, if no more id are found
@@ -70,33 +69,6 @@ bool getNextId(std::string const& pString, unsigned int& pStartPos, unsigned int
 }
 
 //===============================================
-/**
-parameter: String of map ids. Delimiter = ","
-*/
-
-void VMapFactory::preventSpellsFromBeingTestedForLoS(char const* pSpellIdString)
-{
-    if (!iIgnoreSpellIds)
-        iIgnoreSpellIds = new Table<unsigned int , bool>();
-    if (pSpellIdString != nullptr)
-    {
-        unsigned int pos = 0;
-        unsigned int id;
-        std::string confString(pSpellIdString);
-        chompAndTrim(confString);
-        while (getNextId(confString, pos, id))
-            iIgnoreSpellIds->set(id, true);
-    }
-}
-
-//===============================================
-
-bool VMapFactory::checkSpellForLoS(unsigned int pSpellId)
-{
-    return !iIgnoreSpellIds->containsKey(pSpellId);
-}
-
-//===============================================
 // just return the instance
 IVMapManager* VMapFactory::createOrGetVMapManager()
 {
@@ -109,10 +81,8 @@ IVMapManager* VMapFactory::createOrGetVMapManager()
 // delete all internal data structures
 void VMapFactory::clear()
 {
-    delete iIgnoreSpellIds;
     delete gVMapManager;
 
-    iIgnoreSpellIds = nullptr;
     gVMapManager = nullptr;
 }
 }
