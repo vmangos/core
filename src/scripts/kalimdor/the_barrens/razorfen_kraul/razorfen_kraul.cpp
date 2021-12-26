@@ -176,9 +176,9 @@ enum
     NPC_SNUFFLENOSE_GOPHER      = 4781,
     GO_BLUELEAF_TUBER           = 20920,
 
-    SAY_GOPHER_SPAWN            = 1638, // %s nervously crawls from the crate.
-    SAY_GOPHER_COMMAND          = 1591, // %s wiggles his whiskers at $n.
-    SAY_GOPHER_FOUND            = 1592  // %s sniffs at the ground...
+    SAY_GOPHER_SPAWN            = 1638,
+    SAY_GOPHER_COMMAND          = 1591,
+    SAY_GOPHER_FOUND            = 1592
 };
 
 struct npc_snufflenose_gopherAI : public FollowerAI
