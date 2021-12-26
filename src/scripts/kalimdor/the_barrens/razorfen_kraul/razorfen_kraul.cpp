@@ -35,20 +35,20 @@ enum
 {
     QUEST_WILLIX_THE_IMPORTER  = 1144,
 
-    SAY_WILLIX_READY           = 1482, // Woo hoo! Finally getting out of here. It's going to be rough though. Keep your eyes peeled for trouble.
-    SAY_WILLIX_1               = 1483, // Up there is where Charlga Razorflank resides. Blasted old crone.
-    SAY_WILLIX_2               = 1484, // There's blueleaf tuber in this trench! It's like gold waiting to be mined I tell you!
-    SAY_WILLIX_3               = 1485, // There could be danger around every corner here.
-    SAY_WILLIX_4               = 1486, // I don't see how these foul animals live in this place... sheesh it smells!
-    SAY_WILLIX_5               = 1487, // I think I see a way for us to get out of this big twisted mess of a bramble.
-    SAY_WILLIX_6               = 1488, // Glad to be out of that wretched trench. Not much nicer up here though!
-    SAY_WILLIX_7               = 1490, // Finally! I'll be glad to get out of this place.
-    SAY_WILLIX_END             = 1493, // I think I'll rest a moment and catch my breath before heading back to Ratchet. Thanks for all the help!
+    SAY_WILLIX_READY           = 1482,
+    SAY_WILLIX_1               = 1483,
+    SAY_WILLIX_2               = 1484,
+    SAY_WILLIX_3               = 1485,
+    SAY_WILLIX_4               = 1486,
+    SAY_WILLIX_5               = 1487,
+    SAY_WILLIX_6               = 1488,
+    SAY_WILLIX_7               = 1490,
+    SAY_WILLIX_END             = 1493,
 
-    SAY_WILLIX_AGGRO_1         = 1546, // $n heading this way fast! To arms!
-    SAY_WILLIX_AGGRO_2         = 1544, // Eek! $n coming right at us!
-    SAY_WILLIX_AGGRO_3         = 1545, // Egads! $n on me!
-    SAY_WILLIX_AGGRO_4         = 1547, // Help! Get this $n off of me!
+    SAY_WILLIX_AGGRO_1         = 1546,
+    SAY_WILLIX_AGGRO_2         = 1544,
+    SAY_WILLIX_AGGRO_3         = 1545,
+    SAY_WILLIX_AGGRO_4         = 1547,
 
     NPC_RAGING_AGAMAR          = 4514
 };
