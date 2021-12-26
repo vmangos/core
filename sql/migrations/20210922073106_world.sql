@@ -8,24 +8,13 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20210922073106');
 -- Add your query below.
 
--- Razorfren Kraul - Willix the Importer
-DELETE FROM `script_texts` WHERE `entry`= -1047000; 
-DELETE FROM `script_texts` WHERE `entry`= -1047001; 
-DELETE FROM `script_texts` WHERE `entry`= -1047002; 
-DELETE FROM `script_texts` WHERE `entry`= -1047003; 
-DELETE FROM `script_texts` WHERE `entry`= -1047004; 
-DELETE FROM `script_texts` WHERE `entry`= -1047005; 
-DELETE FROM `script_texts` WHERE `entry`= -1047006; 
-DELETE FROM `script_texts` WHERE `entry`= -1047007; 
-DELETE FROM `script_texts` WHERE `entry`= -1047008; 
 
-UPDATE `broadcast_text` SET `chat_type`=0 WHERE `entry`=1544;
-UPDATE `broadcast_text` SET `chat_type`=0 WHERE `entry`=1546;
+-- Delete texts from custom table.
+DELETE FROM `script_texts` WHERE `entry` IN (-1047000, -1047001, -1047002, -1047003, -1047004, -1047005, -1047006, -1047007, -1047008, -1047009, -1047010, -1047011, -1047012);
 
--- Razorfren Kraul - Snufflenose Gopher
-DELETE FROM `script_texts` WHERE `entry`= -1780223; 
-DELETE FROM `script_texts` WHERE `entry`= -1780224; 
-DELETE FROM `script_texts` WHERE `entry`= -1780225;
+-- Assign emote.
+UPDATE `broadcast_text` SET `emote_id`=25 WHERE `entry`=1483;
+
 
 -- End of migration.
 END IF;
