@@ -148,7 +148,7 @@ GameObjectModel* GameObjectModel::construct(GameObject const* const object)
     return mdl;
 }
 
-bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& MaxDist, bool StopAtFirstHit) const
+bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& MaxDist, bool StopAtFirstHit, bool ignoreM2Model) const
 {
     if (!collision_enabled)
         return false;
@@ -161,7 +161,7 @@ bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& MaxDist, bool Sto
     Vector3 p = iInvRot * (ray.origin() - iPos) * iInvScale;
     Ray modRay(p, iInvRot * ray.direction());
     float distance = MaxDist * iInvScale;
-    bool hit = iModel->IntersectRay(modRay, distance, StopAtFirstHit);
+    bool hit = iModel->IntersectRay(modRay, distance, StopAtFirstHit, ignoreM2Model);
     if (hit)
     {
         distance *= iScale;

@@ -32,7 +32,7 @@ ModelInstance::ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel
     iInvScale = 1.f / iScale;
 }
 
-bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit) const
+bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool ignoreM2Model) const
 {
     if (!iModel)
     {
@@ -53,7 +53,7 @@ bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pSt
     Vector3 p = iInvRot * (pRay.origin() - iPos) * iInvScale;
     Ray modRay(p, iInvRot * pRay.direction());
     float distance = pMaxDist * iInvScale;
-    bool hit = iModel->IntersectRay(modRay, distance, pStopAtFirstHit);
+    bool hit = iModel->IntersectRay(modRay, distance, pStopAtFirstHit, ignoreM2Model);
     if (hit)
     {
         distance *= iScale;

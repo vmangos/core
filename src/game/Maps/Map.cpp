@@ -3047,15 +3047,13 @@ void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId /*=0*/) const
             itr.getSource()->SendDirectMessage(&data);
 }
 
-
-// NOSTALRIUS: GameObjectCollision
-bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos) const
+bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos, bool ignoreM2Model) const
 {
     ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
     ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
 
-    return VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2)
-    && (!checkDynLos || CheckDynamicTreeLoS(x1, y1, z1, x2, y2, z2));
+    return VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreM2Model)
+    && (!checkDynLos || CheckDynamicTreeLoS(x1, y1, z1, x2, y2, z2, ignoreM2Model));
 }
 
 bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, float modifyDist) const
@@ -3309,10 +3307,10 @@ float Map::GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) 
     return _dynamicTree.getHeight(x, y, z, maxSearchDist);
 }
 
-bool Map::CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2) const
+bool Map::CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const
 {
     std::shared_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
-    return _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2);
+    return _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, ignoreM2Model);
 }
 
 

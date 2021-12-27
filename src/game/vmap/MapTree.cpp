@@ -20,6 +20,7 @@
 #include "ModelInstance.h"
 #include "VMapManager2.h"
 #include "VMapDefinitions.h"
+#include "WorldModel.h"
 
 #include <string>
 #include <sstream>
@@ -33,14 +34,10 @@ namespace VMAP
 class MapRayCallback
 {
 public:
-    MapRayCallback(ModelInstance* val, bool isLos): prims(val), hit(false), los(isLos) {}
-    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
+    MapRayCallback(ModelInstance* val): prims(val), hit(false) {}
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true, bool ignoreM2Model = false)
     {
-        // Nostalrius: pas de LoS pour certains models (arbres, ...)
-        if (los && prims[entry].flags & MOD_NO_BREAK_LOS)
-            return false;
-
-        bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
+        bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit, ignoreM2Model);
         if (result)
             hit = true;
         return result;
@@ -59,9 +56,9 @@ class MapIntersectionFinderCallback
 {
 public:
     MapIntersectionFinderCallback(ModelInstance* val): result(nullptr), prims(val) {}
-    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true, bool ignoreM2Model = false)
     {
-        bool hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
+        bool hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit, ignoreM2Model);
         if (hit && (!result || result->flags & MOD_NO_BREAK_LOS))
             result = &prims[entry];
         return hit;
@@ -197,18 +194,18 @@ If intersection is found within pMaxDist, sets pMaxDist to intersection distance
 Else, pMaxDist is not modified and returns false;
 */
 
-bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const
+bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool ignoreM2Model) const
 {
     float distance = pMaxDist;
-    MapRayCallback intersectionCallBack(iTreeValues, isLosCheck);
-    iTree.intersectRay(pRay, intersectionCallBack, distance, pStopAtFirstHit);
+    MapRayCallback intersectionCallBack(iTreeValues);
+    iTree.intersectRay(pRay, intersectionCallBack, distance, pStopAtFirstHit, ignoreM2Model);
     if (intersectionCallBack.didHit())
         pMaxDist = distance;
     return intersectionCallBack.didHit();
 }
 //=========================================================
 
-bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) const
+bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2, bool ignoreM2Model) const
 {
     float maxDist = (pos2 - pos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
@@ -218,7 +215,7 @@ bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) co
         return true;
     // direction with length of 1
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
-    return !getIntersectionTime(ray, maxDist, true, true);
+    return !getIntersectionTime(ray, maxDist, true, ignoreM2Model);
 }
 //=========================================================
 /**
@@ -374,6 +371,7 @@ bool StaticMapTree::InitMap(std::string const& fname, VMapManager2* vm)
                 // assume that global model always is the first and only tree value (could be improved...)
                 iTreeValues[0] = ModelInstance(spawn, model);
                 iLoadedSpawns[0] = 1;
+                model->setModelFlags(spawn.flags);
             }
             else
             {
@@ -432,7 +430,9 @@ bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
             {
                 // acquire model instance
                 std::shared_ptr<WorldModel> model = vm->acquireModelInstance(iBasePath, spawn.name);
-                if (model == nullptr)
+                if (model)
+                    model->setModelFlags(spawn.flags);
+                else
                     ERROR_LOG("StaticMapTree::LoadMapTile() could not acquire WorldModel pointer for '%s'!", spawn.name.c_str());
 
                 // update tree

@@ -69,7 +69,7 @@ namespace VMAP
             ModelInstance(): iInvScale(0), iModel(nullptr) {}
             ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel> model);
             void setUnloaded() { iModel = nullptr; }
-            bool intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit) const;
+            bool intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool ignoreM2Model = false) const;
             void intersectPoint(G3D::Vector3 const& p, AreaInfo& info) const;
             bool isUnderModel(G3D::Vector3 const& p, float* outDist = nullptr, float* inDist = nullptr) const;
             bool GetLocationInfo(G3D::Vector3 const& p, LocationInfo& info) const;

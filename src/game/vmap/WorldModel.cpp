@@ -19,6 +19,7 @@
 #include "WorldModel.h"
 #include "VMapDefinitions.h"
 #include "MapTree.h"
+#include "ModelInstance.h"
 #include <string.h>
 
 using G3D::Vector3;
@@ -359,7 +360,7 @@ struct GModelRayCallback
 {
     GModelRayCallback(std::vector<MeshTriangle> const& tris, std::vector<Vector3> const& vert):
         vertices(vert.begin()), triangles(tris.begin()), hit(0) {}
-    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*pStopAtFirstHit*/)
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*pStopAtFirstHit*/, bool /*ignoreM2Model*/)
     {
         bool result = IntersectTriangle(triangles[entry], vertices, ray, distance);
         if (result)  ++hit;
@@ -370,12 +371,12 @@ struct GModelRayCallback
     uint32 hit;
 };
 
-uint32 GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const
+uint32 GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, bool ignoreM2Model) const
 {
     if (triangles.empty())
         return false;
     GModelRayCallback callback(triangles, vertices);
-    meshTree.intersectRay(ray, callback, distance, stopAtFirstHit);
+    meshTree.intersectRay(ray, callback, distance, stopAtFirstHit, ignoreM2Model);
     return callback.hit;
 }
 
@@ -418,9 +419,9 @@ void WorldModel::setGroupModels(std::vector<GroupModel>& models)
 struct WModelRayCallBack
 {
     WModelRayCallBack(std::vector<GroupModel> const& mod): models(mod.begin()), hit(false) {}
-    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit)
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit, bool ignoreM2Model)
     {
-        bool result = models[entry].IntersectRay(ray, distance, pStopAtFirstHit);
+        bool result = models[entry].IntersectRay(ray, distance, pStopAtFirstHit, ignoreM2Model);
         if (result)  hit = true;
         return hit;
     }
@@ -428,15 +429,18 @@ struct WModelRayCallBack
     bool hit;
 };
 
-bool WorldModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const
+bool WorldModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, bool ignoreM2Model) const
 {
+    if (ignoreM2Model && (modelFlags & MOD_M2))
+        return false;
+
     // small M2 workaround, maybe better make separate class with virtual intersection funcs
     // in any case, there's no need to use a bound tree if we only have one submodel
     if (groupModels.size() == 1)
-        return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit);
+        return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit, ignoreM2Model);
 
     WModelRayCallBack isc(groupModels);
-    groupTree.intersectRay(ray, isc, distance, stopAtFirstHit);
+    groupTree.intersectRay(ray, isc, distance, stopAtFirstHit, ignoreM2Model);
     return isc.hit;
 }
 
@@ -634,7 +638,7 @@ struct GModelRayOrientedCallback
 {
     GModelRayOrientedCallback(std::vector<MeshTriangle> const& tris, std::vector<Vector3> const& vert, bool isM2):
         vertices(vert.begin()), triangles(tris.begin()), minOutDist(-1), minInDist(-1), m2(isM2) {}
-    bool operator()(G3D::Ray const& ray, uint32 entry, float& unusedD, bool /*pStopAtFirstHit*/)
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& unusedD, bool /*pStopAtFirstHit*/, bool /*ignoreM2Model*/)
     {
         // Dont modify unusedD. Keep it to infinity. We want to traverse every triangle.
         float distance = unusedD;
