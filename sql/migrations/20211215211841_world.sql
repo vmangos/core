@@ -868,6 +868,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+519, 2560, 0, -14503.6, -316.241, 0.920787, 5.60251, 0, 0, -0.333807, 0.942641, 300, 300, 100, 1, 10);
 DELETE FROM `creature_loot_template` WHERE `item` = 4102;
 
+-- Remove Duplicate Mailbox
+DELETE FROM `gameobject` WHERE `guid` = 73246;
+
 
 -- End of migration.
 END IF;
