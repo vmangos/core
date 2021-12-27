@@ -323,6 +323,22 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`
 (243525, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk'),
 (243526, 2040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 630, 631, 632, 0, 0, 0, 0, 0, 2435, 'Shadowy Assassin - Talk');
 
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(243513, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243514, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243515, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243516, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243517, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243518, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243519, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243520, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243521, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243522, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243523, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243524, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243525, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object'),
+(243526, 0, 21, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Shadowy Assassin - Make Active Object');
+
 
 -- End of migration.
 END IF;
