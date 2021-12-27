@@ -25,6 +25,7 @@
 #include "World.h"
 #include "GameObjectModel.h"
 #include "DBCStores.h"
+#include "ModelInstance.h"
 
 struct GameobjectModelData
 {
@@ -89,6 +90,9 @@ bool GameObjectModel::initialize(GameObject const* const pGo, GameObjectDisplayI
 
     if (!iModel)
         return false;
+
+    if (it->second.name.find(".m2") != std::string::npos)
+        iModel->setModelFlags(VMAP::MOD_M2);
 
     name = it->second.name;
     iPos = Vector3(pGo->GetPositionX(), pGo->GetPositionY(), pGo->GetPositionZ());
