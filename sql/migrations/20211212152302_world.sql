@@ -19,7 +19,7 @@ DELETE FROM `creature_movement` WHERE  `id` IN (301764, 301765, 301761, 301763, 
 
 -- Misc
 UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid` = 15322;
-UPDATE `game_event` SET `description` = 'Southshore Assassin Event', `occurence`='120', `length`='30' WHERE `entry`=152;
+UPDATE `game_event` SET `description` = 'Southshore Assassins', `occurence`='120', `length`='35' WHERE `entry`=152;
 UPDATE `creature_template` SET `movement_type` = 0, `faction` = 108, `npc_flags` = 0, `ai_name` = '', `auras`='1785 3616' WHERE `entry` = 2434;
 DELETE FROM `creature_ai_scripts` WHERE `id` = 243401;
 DELETE FROM `creature_ai_events` WHERE `creature_id` = 2434;
