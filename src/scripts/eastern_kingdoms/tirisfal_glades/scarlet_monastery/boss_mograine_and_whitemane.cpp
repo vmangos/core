@@ -86,7 +86,6 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //Incase wipe during phase that mograine fake death
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-        m_creature->ClearUnitState(UNIT_STAT_FEIGN_DEATH);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
 
         m_bDivineShield = false;
