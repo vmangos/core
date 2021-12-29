@@ -9,6 +9,8 @@ INSERT INTO `migrations` VALUES ('20211228210943');
 -- Add your query below.
 
 
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` = 177808;
+
 -- Add Orb of Command Gossip (credit cmangos)
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
 (6001, 7154, 0, 0),
