@@ -480,27 +480,28 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         if (MovementType == POINT_MOTION_TYPE) 
         {
             switch (id) {
-            case 1: // enter combat after intro waypoints
-            {
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                m_creature->SetInCombatWithZone();
-                break;
-            }
-            case 2: // face Mograine before casting SPELL_SCARLETRESURRECTION
-            {
-                if (m_pInstance)
+                case 1: // enter combat after intro waypoints
                 {
-                    if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
-                    {
-                        m_creature->SetFacingToObject(pMograine);
-                    }
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    m_creature->SetInCombatWithZone();
+                    break;
                 }
-                break;
-            }
-            default:
-            {
-                break; // nothing
+                case 2: // face Mograine before casting SPELL_SCARLETRESURRECTION
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
+                        {
+                            m_creature->SetFacingToObject(pMograine);
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    break; // nothing
+                }
             }
         }
     }
