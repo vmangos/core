@@ -57,7 +57,9 @@ enum
     ENTRY_SCARLET_CENTURION      = 4301,
     ENTRY_SCARLET_CHAMPION       = 4302,
     ENTRY_SCARLET_ABBOT          = 4303,
-    ENTRY_SCARLET_MONK           = 4540
+    ENTRY_SCARLET_MONK           = 4540,
+
+    SOUND_MOGRAINE_FAKE_DEATH    = 1326
 };
 
 struct boss_scarlet_commander_mograineAI : public ScriptedAI
@@ -152,6 +154,8 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_creature->ClearComboPointHolders();
         m_creature->RemoveAllAuras();
         m_creature->ClearAllReactives();
+
+        m_creature->PlayDistanceSound(SOUND_MOGRAINE_FAKE_DEATH);
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
