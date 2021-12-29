@@ -84,7 +84,8 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_uiHammerOfJustice_Timer = 15000;
 
         //Incase wipe during phase that mograine fake death
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+        m_creature->ClearUnitState(UNIT_STAT_FEIGN_DEATH);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
 
         m_bDivineShield = false;
@@ -149,7 +150,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_creature->ClearAllReactives();
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-
+        m_creature->AddUnitState(UNIT_STAT_FEIGN_DEATH); // prevent SetInFront(target); getting called by SelectHostileTarget()
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
 
         m_bDivineShield = false;
@@ -202,6 +203,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         if (pSpell->Id == SPELL_SCARLETRESURRECTION)
         {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+            m_creature->ClearUnitState(UNIT_STAT_FEIGN_DEATH);
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             m_creature->SetHealth(m_creature->GetMaxHealth());
 
@@ -299,6 +301,10 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         m_bCanResurrect = false;
         m_bStopAttack = false;
 
+        // Whitemane should not get in combat without triggered by Mograine.
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
         if (!m_pInstance)
             return;
 
@@ -318,11 +324,6 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
         ScriptedAI::JustReachedHome();
-    }
-
-    void MoveInLineOfSight(Unit*) override
-    {
-        //This needs to be empty because Whitemane should NOT aggro while fighting Mograine. Mograine will give us a target.
     }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
@@ -476,14 +477,30 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
 
     void MovementInform(uint32 MovementType, uint32 id) override
     {
-        if (MovementType == POINT_MOTION_TYPE && id == 1)
-            m_creature->SetInCombatWithZone();
-        else
+        if (MovementType == POINT_MOTION_TYPE) 
         {
-            if (m_pInstance)
+            switch (id) {
+            case 1: // enter combat after intro waypoints
             {
-                if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
-                    m_creature->SetFacingToObject(pMograine);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                m_creature->SetInCombatWithZone();
+                break;
+            }
+            case 2: // face Mograine before casting SPELL_SCARLETRESURRECTION
+            {
+                if (m_pInstance)
+                {
+                    if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
+                    {
+                        m_creature->SetFacingToObject(pMograine);
+                    }
+                }
+                break;
+            }
+            default:
+            {
+                break; // nothing
             }
         }
     }
