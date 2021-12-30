@@ -17,7 +17,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (537, -1, 535, 536, 0, 0, 0);
 
 -- Quest 4975 Requires 4976 AND 4963
-UPDATE `mangos`.`quest_template` SET `RequiredCondition`='539' WHERE  `entry`=4975 AND `patch`=0;
+UPDATE `quest_template` SET `RequiredCondition`='539' WHERE  `entry`=4975 AND `patch`=0;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (538, 8, 4963, 0, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (539, -1, 535, 538, 0, 0, 0);
 
