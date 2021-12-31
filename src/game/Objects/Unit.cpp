@@ -2890,9 +2890,9 @@ bool Unit::IsInAccessablePlaceFor(Creature const* c) const
         return c->CanWalk() || c->CanFly();
 }
 
-bool Unit::IsReachableBySwmming() const
+bool Unit::CanSwimAtPosition(float x, float y, float z) const
 {
-    return GetTerrain()->IsSwimmable(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetTerrain()->IsSwimmable(x, y, z, GetMinSwimDepth());
 }
 
 bool Unit::IsInWater() const
@@ -8936,6 +8936,8 @@ void Unit::UpdateModelData()
                 m_modelCollisionHeight = modelData->collisionHeight / modelData->modelScale;
             else
                 m_modelCollisionHeight = 2.f;
+
+            m_modelCollisionHeight *= (GetObjectScale() / nativeScale);
         }
     }
     else
@@ -9784,7 +9786,7 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
         sizeFactor = DEFAULT_COMBAT_REACH;
 
     bool const canOnlySwim = attacker->CanSwim() && !attacker->CanWalk() && !attacker->CanFly();
-    bool const reachableBySwiming = IsReachableBySwmming();
+    bool const reachableBySwiming = attacker->CanSwimAtPosition(GetPosition());
 
     uint32 attacker_number = GetAttackers().size();
     if (attacker_number > 0)
@@ -9847,7 +9849,7 @@ bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
                 GetNearPoint2DAroundPosition(GetPositionX(), GetPositionY(), x, y, dist, angle + (M_PI_F / 6.0f) * float(i));
 
                 float ground = 0.0f;
-                z = GetTerrain()->GetWaterLevel(x, y, z, &ground) - 1.5f;
+                z = GetTerrain()->GetWaterLevel(x, y, z, &ground) - attacker->GetMinSwimDepth();
                 if (ground < z &&
                     attacker->CanReachWithMeleeAutoAttackAtPosition(this, x, y, z) &&
                     IsWithinLOS(x, y, z, false))
