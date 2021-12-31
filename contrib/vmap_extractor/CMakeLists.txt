@@ -48,5 +48,4 @@ add_subdirectory(vmapextract)
 
 target_link_libraries(g3dlite
                       shared
-                      framework
 )
