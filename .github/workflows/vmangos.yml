@@ -9,11 +9,28 @@ name: vmangos CI build
 on:
   push:
     paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
       - 'sql/**'
+      - '.drone.yml'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+
   pull_request:
     paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
       - 'sql/**'
-      
+      - '.drone.yml'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
