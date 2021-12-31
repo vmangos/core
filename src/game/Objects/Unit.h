@@ -545,6 +545,7 @@ class Unit : public SpellCaster
         float GetNativeScale() const;
         void SetNativeScale(float scale);
         float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
+        float GetMinSwimDepth() const { return GetCollisionHeight() * 0.75f; } // client switches to swim animation at this depth
         void UpdateModelData(); // at any changes to scale and/or displayId
         void InitPlayerDisplayIds();
         void DeMorph();
@@ -1031,7 +1032,7 @@ class Unit : public SpellCaster
         float GetMeleeZLimit() const { return m_meleeZLimit; }
         void SetMeleeZReach(float newZReach) { m_meleeZReach = newZReach; }
         float GetMeleeZReach() const { return m_meleeZReach; }
-        void GetRandomAttackPoint(Unit const* target, float &x, float &y, float &z) const;
+        bool GetRandomAttackPoint(Unit const* target, float &x, float &y, float &z) const;
 
         /**
          * Tries to attack a Unit/Player, also makes sure to stop attacking the current target
@@ -1360,7 +1361,12 @@ class Unit : public SpellCaster
         // Terrain checks
         virtual bool IsInWater() const;
         virtual bool IsUnderwater() const;
-        bool IsReachableBySwmming() const;
+        template<class T>
+        bool CanSwimAtPosition(T const& pos) const
+        {
+            return CanSwimAtPosition(pos.x, pos.y, pos.z);
+        }
+        bool CanSwimAtPosition(float x, float y, float z) const;
         bool IsInAccessablePlaceFor(Creature const* c) const;
 
         // Inhabit type checks

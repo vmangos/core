@@ -547,7 +547,7 @@ class Map : public GridRefManager<NGridType>
 
         // GameObjectCollision
         float GetHeight(float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos = true) const;
+        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos = true, bool ignoreM2Model = true) const;
         // First collision with object
         bool GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, float modifyDist) const;
         // Use navemesh to walk
@@ -562,7 +562,7 @@ class Map : public GridRefManager<NGridType>
         bool ContainsGameObjectModel(const GameObjectModel& model) const;
         bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const;
         float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const;
-        bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2) const;
+        bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const;
         bool IsUnloading() const { return m_unloading; }
         void MarkAsCrashed() { m_crashed = true; }
         bool IsCrashed() const { return m_crashed; }

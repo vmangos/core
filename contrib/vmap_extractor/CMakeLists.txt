@@ -45,3 +45,7 @@ SET_TARGET_PROPERTIES (bz2 PROPERTIES FOLDER "3rd Party")
 include_directories(../../dep/libmpq)
 
 add_subdirectory(vmapextract)
+
+target_link_libraries(g3dlite
+                      shared
+)
