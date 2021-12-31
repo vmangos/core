@@ -129,8 +129,17 @@ namespace VMAP
             // global map spawns (WDT), if any (most instances)
             if (success && fwrite("GOBJ", 4, 1, mapfile) != 1) success = false;
 
-            for (TileMap::iterator glob = globalRange.first; glob != globalRange.second && success; ++glob)
+            uint32 i = 0;
+            for (TileMap::iterator glob = globalRange.first; glob != globalRange.second && success; ++glob, ++i)
+            {
+                ModelSpawn& globSpawn = map_iter->second->UniqueEntries[glob->second];
                 success = ModelSpawn::writeToFile(mapfile, map_iter->second->UniqueEntries[glob->second]);
+                // MapTree nodes to update when loading tile:
+                std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(globSpawn.ID);
+                if (success && fwrite(&nIdx->second, sizeof(uint32), 1, mapfile) != 1) success = false;
+            }
+
+            printf("Map %u global objects %u", map_iter->first, i);
 
             fclose(mapfile);
 
