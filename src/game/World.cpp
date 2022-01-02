@@ -2872,14 +2872,12 @@ void World::LogCharacter(Player* character, char const* action)
         return;
     ASSERT(character);
     static SqlStatementID insLogChar;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO `logs_characters` SET `type`=?, `guid`=?, `account`=?, `name`=?, `ip`=?, `clientHash`=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO `logs_characters` SET `type`=?, `guid`=?, `account`=?, `name`=?, `ip`=?");
     logStmt.addString(action);
     logStmt.addUInt32(character->GetGUIDLow());
     logStmt.addUInt32(character->GetSession()->GetAccountId());
     logStmt.addString(character->GetName());
     logStmt.addString(character->GetSession()->GetRemoteAddress());
-    character->GetSession()->ComputeClientHash();
-    logStmt.addString(character->GetSession()->GetClientHash());
     logStmt.Execute();
 }
 
@@ -2889,14 +2887,12 @@ void World::LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& 
         return;
     ASSERT(sess);
     static SqlStatementID insLogChar;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO `logs_characters` SET `type`=?, `guid`=?, `account`=?, `name`=?, `ip`=?, `clientHash`=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO `logs_characters` SET `type`=?, `guid`=?, `account`=?, `name`=?, `ip`=?");
     logStmt.addString(action);
     logStmt.addUInt32(lowGuid);
     logStmt.addUInt32(sess->GetAccountId());
     logStmt.addString(charName);
     logStmt.addString(sess->GetRemoteAddress());
-    sess->ComputeClientHash();
-    logStmt.addString(sess->GetClientHash());
     logStmt.Execute();
 }
 

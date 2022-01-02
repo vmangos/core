@@ -1019,43 +1019,6 @@ bool WorldSession::AllowPacket(uint16 opcode)
     return true;
 }
 
-/**
- * Add the i-th client unique identifier.
- */
-void WorldSession::AddClientIdentifier(uint32 i, std::string str)
-{
-    m_clientIdentifiers[i] = str;
-    sLog.out(LOG_CLIENT_IDS, "%s:%s Player:%s #%u \"%s\"", GetUsername().c_str(), GetRemoteAddress().c_str(), GetPlayerName(), i, str.c_str());
-    bool all_identifiers_added = false; // To be implemented
-    if (all_identifiers_added)
-    {
-        ComputeClientHash();
-        sLog.out(LOG_CLIENT_IDS, "%s:%s Player:%s hash computed: %s", GetUsername().c_str(), GetRemoteAddress().c_str(), GetPlayerName(), m_clientHash.c_str());
-    }
-}
-
-/**
- * Given a number of client identifiers, computes a unique hash.
- */
-void WorldSession::ComputeClientHash()
-{
-    std::stringstream oss;
-    for (const auto& itr : m_clientIdentifiers)
-    {
-        Sha1Hash sha;
-        sha.UpdateData(itr.second);
-        sha.Finalize();
-        uint8* digest = sha.GetDigest();
-        char c = itr.first + '0';
-        if (c > '9')
-            c = c - '9' + 'A' - 1;
-        oss << c;
-        for (int i = 0; i < 3; ++i)
-            oss << char(digest[i] % (0x24 - 0x7A + 1) + 0x20);
-    }
-    m_clientHash = oss.str();
-}
-
 bool WorldSession::CharacterScreenIdleKick(uint32 currTime)
 {
     if (GetPlayer() || m_inQueue || PlayerLoading()) // not on the character screen
