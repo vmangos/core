@@ -44,6 +44,12 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=-53 WHERE `item`=5842 
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=-48 WHERE `item`=5842 AND `entry`=4113;
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=-18 WHERE `item`=5842 AND `entry`=14427;
 
+-- Correct drop chance: [Flayed Demon Skin] https://classic.wowhead.com/item=20310/flayed-demon-skin
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=5 WHERE `item`=20310 AND `entry` IN (4664,4663);
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=3 WHERE `item`=20310 AND `entry` IN (4666,4665,4705);
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.8 WHERE `item`=20310 AND `entry` IN (4668,4667);
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=1.4 WHERE `item`=20310 AND `entry`=13019;
+
 -- End of migration.
 END IF;
 END??
