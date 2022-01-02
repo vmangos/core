@@ -1446,6 +1446,20 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
+            if (GetFactionTemplateId())
+            {
+                std::list<Unit*> targets;
+                MaNGOS::AnyFriendlyUnitInObjectRangeCheck check(this, 10.0f);
+                MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(targets, check);
+                Cell::VisitAllObjects(this, searcher, 10.0f);
+                for (Unit* attacker : targets)
+                {
+                    if (!attacker->IsInCombat() && attacker->IsValidAttackTarget(user) &&
+                        attacker->IsWithinLOSInMap(user) && attacker->AI())
+                        attacker->AI()->AttackStart(user);
+                }
+            }
+
             GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user->GetObjectGuid(), GetObjectGuid());
             TriggerLinkedGameObject(user);
             return;
