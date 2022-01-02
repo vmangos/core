@@ -811,7 +811,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                 {
                     if (CharmInfo const* charm = static_cast<Unit const*>(victim)->GetCharmInfo())
                         if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                            return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                            return ft->IsFriendlyTo(*caster->GetFactionTemplateEntry());
                 }
                 
                 return caster->IsFriendlyTo(victim);

@@ -28,6 +28,7 @@
 
 class WMOInstance;
 class MPQFile;
+namespace ADT { struct MDDF; struct MODF; }
 
 Vec3D fixCoordSystem(Vec3D v);
 
@@ -35,7 +36,7 @@ class Model
 {
     public:
         ModelHeader header;
-        // nVertices = header.nBoundingVertices;
+        ModelBoundingVertex* boundingVertices;
         Vec3D* vertices;
         uint16* indices;
         size_t nIndices;
@@ -44,8 +45,6 @@ class Model
         bool ConvertToVMAPModel(const char* outfilename);
 
         bool ok;
-
-        void ScaleRotateTranslate(float scale, Vec3D rot, float w, Vec3D pos);
 
         Model(std::string& filename);
         ~Model() {_unload();}
@@ -74,5 +73,10 @@ class ModelInstance
         ModelInstance(MPQFile& f, const char* ModelInstName, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile);
 
 };
+
+namespace Doodad
+{
+    void ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile);
+}
 
 #endif

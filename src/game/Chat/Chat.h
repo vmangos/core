@@ -179,8 +179,6 @@ class ChatHandler
         ChatCommand* getCommandTable();
         
         bool HandleAnticheatCommand(char*);
-        bool HandleClientInfosCommand(char*);
-        bool HandleClientSearchCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
         bool HandleViewLogCommand(char*);
 

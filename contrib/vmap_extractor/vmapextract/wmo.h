@@ -23,9 +23,11 @@
 
 #include <string>
 #include <set>
-#include <vector>
+#include <memory>
 #include "vec3d.h"
 #include "loadlib/loadlib.h"
+#include <unordered_set>
+#include "adtfile.h"
 
 // MOPY flags
 enum MopyFlags
@@ -40,53 +42,50 @@ enum MopyFlags
     WMO_MATERIAL_COLLIDE_HIT    = 0x80
 };
 
-class WMOInstance;
 class WMOManager;
 class MPQFile;
-class Model;
+
+namespace WMO
+{
+    struct MODS
+    {
+        char Name[20];
+        uint32 StartIndex;     // index of first doodad instance in this set
+        uint32 Count;          // number of doodad instances in this set
+        char _pad[4];
+    };
+
+    struct MODD
+    {
+        uint32 NameIndex : 24;
+        Vec3D Position;
+        Quaternion Rotation;
+        float Scale;
+        uint32 Color;
+    };
+}
 
 /* for whatever reason a certain company just can't stick to one coordinate system... */
 static inline Vec3D fixCoords(const Vec3D& v) { return Vec3D(v.z, v.x, v.y); }
 
-class WMOModelInstance
+struct WMODoodadData
 {
-public:
-    // header
-    Vec3D pos;              // Position
-    float w;                // W for Quat Rotation
-    Vec3D dir;              // Direction for Quat Rotation
-    float sc;               // Scale Factor
-    unsigned int d1;
-
-    std::string filename;
-    int id;
-    unsigned int scale;
-    int light;
-    Vec3D ldir;
-    Vec3D lcol;
-    Model* model;
-
-    WMOModelInstance() {}
-    void init(std::string fname, MPQFile &f);
-};
-
-struct WMODoodadSet
-{
-    char name[0x14]; // set name
-    int start; // index of first doodad instance in this set
-    uint32 size; // number of doodad instances in this set
-    int unused; // unused? (always 0)
+    std::vector<WMO::MODS> Sets;
+    std::unique_ptr<char[]> Paths;
+    std::vector<WMO::MODD> Spawns;
+    std::unordered_set<uint16> References;
 };
 
 class WMORoot
 {
     public:
-        uint32 nTextures, nGroups, nP, nLights, nModels, nDoodads, nDoodadSets, RootWMOID, liquidType;
-        unsigned int col;
+        unsigned int color;
+        uint32 nTextures, nGroups, nPortals, nLights, nDoodadNames, nDoodadDefs, nDoodadSets, RootWMOID, flags;
         float bbcorn1[3];
         float bbcorn2[3];
 
-        std::vector<WMODoodadSet> doodadsets;
+        WMODoodadData DoodadData;
+        std::unordered_set<uint32> ValidDoodadNames;
         std::vector<char> GroupNames;
 
         WMORoot(std::string& filename);
@@ -94,17 +93,9 @@ class WMORoot
 
         bool open();
         bool ConvertToVMAPRootWmo(FILE* output);
-        Model* GetDoodadModel(unsigned int i)
-        {
-            if (i >= nModels)
-                return NULL;
-            return modelis[i]->model;
-        }
     private:
         std::string filename;
         char outfilename;
-        std::vector<std::string> doodadModels;
-        WMOModelInstance** modelis;
 };
 
 struct WMOLiquidHeader
@@ -151,38 +142,26 @@ class WMOGroup
         char* LiquBytes;
         uint32 liquflags;
 
-        int doodadset; //used for converting a wmo model with a specific doodadset
-        int nDoodads;
-        short* doodads;
+        std::vector<uint16> DoodadReferences;
 
-        WMOGroup(std::string& filename, WMORoot* root);
+        WMOGroup(std::string& filename);
         ~WMOGroup();
 
         bool open();
         int ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool pPreciseVectorData);
-        void WriteDoodadsTriangles(FILE* output, int indexShift);
-        void WriteDoodadsVertices(FILE* output);
-        void WriteDoodadsTriangles(FILE* output, int indexShift, WMORoot* rootWMO);
-        void WriteDoodadsVertices(FILE* output, WMORoot* rootWMO);
+
         bool ShouldSkip(WMORoot const& root) const;
+
     private:
         std::string filename;
         char outfilename;
-        WMORoot* root;
 };
 
 class WMOInstance
 {
         static std::set<int> ids;
     public:
-        std::string MapName;
-        int currx;
-        int curry;
-        WMOGroup* wmo;
-        Vec3D pos;
-        Vec3D pos2, pos3, rot;
-        uint32 indx, id, d2, d3;
-        int16 doodadset;
+        ADT::MODF m_wmo;
 
         WMOInstance(MPQFile& f, const char* WmoInstName, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile);
 

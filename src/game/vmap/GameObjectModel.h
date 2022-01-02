@@ -61,7 +61,7 @@ class GameObjectModel
         void disable() { collision_enabled = false;}
         void enable(bool enabled) { collision_enabled = enabled;}
 
-        bool intersectRay(G3D::Ray const& ray, float& MaxDist, bool StopAtFirstHit) const;
+        bool intersectRay(G3D::Ray const& ray, float& MaxDist, bool StopAtFirstHit, bool ignoreM2Model) const;
 
         static GameObjectModel* construct(GameObject const* const pGo);
 

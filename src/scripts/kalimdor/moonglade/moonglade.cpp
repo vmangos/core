@@ -371,6 +371,9 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 pPlayer->FailQuest(QUEST_WAKING_LEGENDS);
             m_idQuestActive = 0;
         }
+
+        // Remulos is only targetable for friendly player spells during Eranikus event so reset on death
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -382,6 +385,8 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 case 0:
                     if (Player* pPlayer = GetPlayerForEscort())
                         DoScriptText(SAY_REMULOS_INTRO_1, m_creature, pPlayer);
+                    // Remulos is only targetable for friendly player spells during Eranikus event
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                     m_creature->SetSpeedRate(MOVE_WALK, 2.2f); //du cout faudrait ptetre aussi revoir la vitesse de course.
                     m_creature->SetWalk(true);
                     break;
@@ -470,6 +475,9 @@ struct npc_keeper_remulosAI : public npc_escortAI
     {
         if (Player* pPlayer = GetPlayerForEscort())
             pPlayer->GroupEventHappens(QUEST_NIGHTMARE_MANIFESTS, pTarget);
+
+        // Remulos is only targetable for friendly player spells during Eranikus event: remove flag on quest completion
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 
         m_uiOutroTimer = 3000;
     }

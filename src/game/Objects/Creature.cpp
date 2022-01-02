@@ -1211,7 +1211,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
             if (GetCreatureInfo()->trainer_race && pPlayer->GetRace() != GetCreatureInfo()->trainer_race)
             {
                 // Allowed to train if exalted
-                if (FactionTemplateEntry const* faction_template = getFactionTemplateEntry())
+                if (FactionTemplateEntry const* faction_template = GetFactionTemplateEntry())
                 {
                     if (pPlayer->GetReputationRank(faction_template->faction) == REP_EXALTED)
                         return true;
@@ -2170,7 +2170,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if (!HasCreatureState(CSTATE_ALREADY_CALL_ASSIST) && GetVictim() && !IsPet() && !IsCharmed())
+    if (!HasCreatureState(CSTATE_ALREADY_CALL_ASSIST) && GetVictim() && !IsPet() && !IsCharmed() && m_callForHelpDist > 0)
     {
         SetNoCallAssistance(true);
 
@@ -2195,60 +2195,97 @@ void Creature::CallAssistance()
     }
 }
 
-void Creature::CallForHelp(float fRadius)
+void Creature::CallForHelp(float radius)
 {
-    if (fRadius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
+    if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
-
-    MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), fRadius);
+    
+    MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
     MaNGOS::CreatureWorker<MaNGOS::CallOfHelpCreatureInRangeDo> worker(this, u_do);
-    Cell::VisitGridObjects(this, worker, fRadius);
+    Cell::VisitGridObjects(this, worker, radius);
 }
 
-bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /*= true*/) const
+bool Creature::CanAssistTo(Unit const* pFriend, Unit const* pEnemy, bool checkfaction /*= true*/) const
 {
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_ASSIST))
+    return CanBeTargetedByCallForHelp(pFriend, pEnemy, checkfaction) && CanRespondToCallForHelpAgainst(pEnemy);
+}
+
+bool Creature::CanBeTargetedByCallForHelp(Unit const* pFriend, Unit const* pEnemy, bool checkfaction /*= true*/) const
+{
+    if (!HasFactionTemplateFlag(FACTION_TEMPLATE_RESPOND_TO_CALL_FOR_HELP | FACTION_TEMPLATE_FLEE_FROM_CALL_FOR_HELP))
         return false;
 
-    if (!CanInitiateAttack())
+    if (!IsAlive())
         return false;
 
-    // skip fighting creature
     if (IsInCombat())
         return false;
 
-    // only free creature
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
+        return false;
+
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE))
+        return false;
+
     if (GetCharmerOrOwnerGuid())
         return false;
 
-    // Invisible
     if (m_invisibilityMask)
+        return false;
+
+    if (GetFactionTemplateId() != pFriend->GetFactionTemplateId())
+    {
+        // only from same creature faction
+        if (checkfaction || !IsFriendlyTo(pFriend))
+            return false;
+    }
+
+    // neutral mobs can respond too, for example kodos in mulgore
+    if (IsFriendlyTo(pEnemy))
+        return false;
+
+    if (!pEnemy->IsTargetableBy(this))
+        return false;
+
+    return true;
+}
+
+bool Creature::CanRespondToCallForHelpAgainst(Unit const* pEnemy) const
+{
+    if (!HasFactionTemplateFlag(FACTION_TEMPLATE_RESPOND_TO_CALL_FOR_HELP))
+        return false;
+
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_ASSIST))
+        return false;
+
+    if (HasReactState(REACT_PASSIVE))
+        return false;
+
+    if (IsTempPacified())
         return false;
 
     if (IsInEvadeMode())
         return false;
 
-    // only from same creature faction
-    if (checkfaction)
-    {
-        if (GetFactionTemplateId() != u->GetFactionTemplateId())
-            return false;
-    }
-    else
-    {
-        if (!IsFriendlyTo(u))
-            return false;
-    }
-
-    if (!enemy->IsTargetableBy(this))
-        return false;
-
-    // skip non hostile to caster enemy creatures
-    if (!IsHostileTo(enemy))
-        return false;
-
     // prevent player from being stuck in combat with creature out of visibility radius
-    if (enemy->IsCharmerOrOwnerPlayerOrPlayerItself() && !isWithinVisibilityDistanceOf(enemy, enemy) && !GetMap()->IsDungeon())
+    if (pEnemy->IsCharmerOrOwnerPlayerOrPlayerItself() && !isWithinVisibilityDistanceOf(pEnemy, pEnemy) && !GetMap()->IsDungeon())
+        return false;
+
+    return true;
+}
+
+bool Creature::CanFleeFromCallForHelpAgainst(Unit const* pEnemy) const
+{
+    if (!HasFactionTemplateFlag(FACTION_TEMPLATE_FLEE_FROM_CALL_FOR_HELP))
+        return false;
+
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() != RANDOM_MOTION_TYPE)
+        return false;
+
+    if (IsRooted())
+        return false;
+
+    if (GetDistance(pEnemy) >= 10.0f)
         return false;
 
     return true;

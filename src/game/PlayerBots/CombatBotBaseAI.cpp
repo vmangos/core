@@ -2324,7 +2324,7 @@ bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const*
                     if (!friendly_dispel && !positive && holder->GetSpellProto()->IsCharmSpell())
                         if (CharmInfo *charm = pTarget->GetCharmInfo())
                             if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*me->getFactionTemplateEntry()))
+                                if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*me->GetFactionTemplateEntry()))
                                     bFoundOneDispell = true;
                     if (positive == friendly_dispel)
                         continue;
