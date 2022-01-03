@@ -3592,12 +3592,6 @@ void Spell::cancel()
     // channeled spells don't display interrupted message even if they are interrupted, possible other cases with no "Interrupted" message
     bool sendInterrupt = !(m_channeled && m_spellState != SPELL_STATE_PREPARING);
 
-    // Hack: cannibalize should not send interrupt message
-    if (m_spellInfo->Id == 20577)
-    {
-        sendInterrupt = false;
-    }
-
     m_autoRepeat = false;
     switch (m_spellState)
     {
