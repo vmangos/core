@@ -55,6 +55,7 @@ UPDATE `gossip_menu` SET `text_id` = 5993 WHERE `entry` = 521 AND `text_id` = 59
 UPDATE `gossip_menu_option` SET `option_broadcast_text` = 3143, `option_text` = 'I require training, sir!' WHERE `menu_id` = 521 AND `id` = 0;
 
 -- Creature 3594
+UPDATE `gossip_menu` SET `text_id`=4794 WHERE `entry`=4690 && `text_id`=4796;
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 4690 AND `id` = 1;
 
 -- Creature 3599
