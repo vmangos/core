@@ -58,7 +58,8 @@ UPDATE `gossip_menu_option` SET `option_broadcast_text` = 3143, `option_text` = 
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 4690 AND `id` = 1;
 
 -- Creature 3599
-UPDATE `gossip_menu` SET `text_id` = 934 WHERE `entry` = 436 AND `text_id` = 4794;
+UPDATE `gossip_menu` SET `text_id`=934 WHERE `entry`=436 && `text_id`=4794;
+UPDATE `gossip_menu` SET `text_id`=4794 WHERE `entry`=436 && `text_id`=4793;
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 436 AND `id` = 1;
 
 -- Creature 4163
