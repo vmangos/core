@@ -108,10 +108,10 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 
 -- Creature 4582
 UPDATE `gossip_menu` SET `text_id` = 5993 WHERE `entry` = 4542 AND `text_id` = 5996;
-UPDATE `gossip_menu_option` SET `option_broadcast_text` = 7563, `option_text` = 'I would like to train.' WHERE `menu_id` = 4542 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `option_broadcast_text` = 2548, `option_text` = 'I would like to train.' WHERE `menu_id` = 4542 AND `id` = 0;
 
 -- Creature 4584
-UPDATE `gossip_menu_option` SET `option_broadcast_text` = 7563, `option_text` = 'I would like to train.' WHERE `menu_id` = 4541 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `option_broadcast_text` = 2548, `option_text` = 'I would like to train.' WHERE `menu_id` = 4541 AND `id` = 0;
 
 -- Creature 5165
 UPDATE `gossip_menu` SET `text_id` = 5993 WHERE `entry` = 411 AND `text_id` = 5996;
