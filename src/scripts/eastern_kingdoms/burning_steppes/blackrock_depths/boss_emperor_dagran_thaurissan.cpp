@@ -29,6 +29,7 @@ enum eEmperor
     FACTION_FRIENDLY            = 35,
     SAY_AGGRO                   = -1230001,
     SAY_SLAY                    = -1230002,
+    EMOTE_SHAKEN                = 5429,
 
     SPELL_HANDOFTHAURISSAN      = 17492,
     SPELL_AVATAROFFLAME         = 15636,
@@ -75,6 +76,7 @@ struct boss_emperor_dagran_thaurissanAI : public ScriptedAI
             {
                 pPrincess->SetFactionTemplateId(FACTION_FRIENDLY);
                 pPrincess->AI()->EnterEvadeMode();
+                DoScriptText(EMOTE_SHAKEN, pPrincess);
             }
         }
     }
@@ -148,8 +150,7 @@ enum ePrincess
     SPELL_MINDBLAST             = 15587,
     SPELL_SHADOWWORDPAIN        = 15654,
     SPELL_SMITE                 = 10934,
-    SPELL_SHADOW_BOLT           = 15537,
-    SPELL_OPEN_PORTAL           = 13912
+    SPELL_SHADOW_BOLT           = 15537
 };
 
 struct boss_moira_bronzebeardAI : public ScriptedAI
@@ -173,19 +174,6 @@ struct boss_moira_bronzebeardAI : public ScriptedAI
         m_uiMindBlast_Timer = 16000;
         m_uiShadowWordPain_Timer = 2000;
         m_uiSmite_Timer = 8000;
-    }
-
-    void JustReachedHome() override
-    {
-        if (m_pInstance)
-        {
-            if (Creature* pEmperor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_EMPEROR)))
-            {
-                // if evade, then check if he is alive. If not, start make portal
-                if (!pEmperor->IsAlive())
-                    m_creature->CastSpell(m_creature, SPELL_OPEN_PORTAL, false);
-            }
-        }
     }
 
     void UpdateAI(uint32 const uiDiff) override
