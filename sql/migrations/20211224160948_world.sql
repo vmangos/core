@@ -26,21 +26,27 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (6909, 9, 11072.569336, 1907.023438, 1338.900757, 100.000000, 0, 0.000000, 0),
 (6909, 10, 11074.375977, 1903.905518, 1340.737061, 100.000000, 0, 0.000000, 0),
 (6909, 11, 11078.463867, 1899.173828, 1344.631348, 100.000000, 70000, 0.000000, 690911),
-(6909, 12, 11087.393555, 1900.319214, 1343.685547, 100.000000, 0, 0.000000, 0),
-(6909, 13, 11098.364258, 1906.453735, 1345.930664, 100.000000, 0, 0.000000, 0),
-(6909, 14, 11111.196289, 1909.802368, 1353.085327, 100.000000, 0, 0.000000, 0),
-(6909, 15, 11116.672852, 1910.986450, 1353.131226, 100.000000, 20000, 0.000000, 690915),
-(6909, 16, 11116.672852, 1910.986450, 1353.131226, 100.000000, 1000, 0.000000, 690916);
+(6909, 12, 11078.463867, 1899.173828, 1344.631348, 100.000000, 0, 0.000000, 690912),
+(6909, 13, 11087.393555, 1900.319214, 1343.685547, 100.000000, 0, 0.000000, 0),
+(6909, 14, 11098.364258, 1906.453735, 1345.930664, 100.000000, 0, 0.000000, 0),
+(6909, 15, 11111.196289, 1909.802368, 1353.085327, 100.000000, 0, 0.000000, 0),
+(6909, 16, 11116.672852, 1910.986450, 1353.131226, 100.000000, 20000, 0.000000, 0),
+(6909, 17, 11116.672852, 1910.986450, 1353.131226, 100.000000, 1000, 0.000000, 690917);
 
 -- Waypoint scripts for Sethir the Ancient.
 DELETE FROM `creature_movement_scripts` WHERE `id`=690904;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (690904, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3001, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Say Text');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(690904, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3001, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Say Text');
 DELETE FROM `creature_movement_scripts` WHERE `id`=690911;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (690911, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3002, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Say Text');
-DELETE FROM `creature_movement_scripts` WHERE `id`=690915;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (690915, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2982, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Say Text');
-DELETE FROM `creature_movement_scripts` WHERE `id`=690916;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (690916, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Despawn');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(690911, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Set Run'),
+(690911, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3002, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Say Text');
+DELETE FROM `creature_movement_scripts` WHERE `id`=690912;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(690912, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2982, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Say Text');
+DELETE FROM `creature_movement_scripts` WHERE `id`=690917;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(690917, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sethir the Ancient - Despawn');
 
 -- Events list for Sethir the Ancient
 DELETE FROM `creature_ai_events` WHERE `creature_id`=6909;
