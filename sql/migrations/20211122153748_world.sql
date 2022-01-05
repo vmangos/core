@@ -62,9 +62,8 @@ UPDATE `gossip_menu` SET `text_id` = 934 WHERE `entry` = 436 AND `text_id` = 479
 DELETE FROM `gossip_menu_option` WHERE `menu_id` = 436 AND `id` = 1;
 
 -- Creature 4163
-UPDATE `gossip_menu` SET `text_id` = 4795 WHERE `entry` = 4576 AND `text_id` = 4794;
-INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(4576, 4794);
+UPDATE `gossip_menu` SET `text_id`=4795 WHERE `entry`=4576 && `text_id`=4794;
+UPDATE `gossip_menu` SET `text_id`=4794 WHERE `entry`=4576 && `text_id`=4793;
 
 -- Creature 4214
 UPDATE `creature_template` SET `gossip_menu_id` = 4577 WHERE `entry` = 4214;
