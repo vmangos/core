@@ -20,10 +20,10 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 UPDATE `quest_template` SET `CompleteScript` = 651 WHERE `entry` = 651;
 
 INSERT INTO `gameobject` (`guid`, `id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`) VALUES 
-(443, 2870, -846.38556, -3268.444, 78.038246, 2.8099754, -62, -62),
-(444, 2870, -1351.0742,-2740.2263, 59.40781, 4.520403, -62, -62),
-(445, 2870, -855.4827, -1783.2532, 39.629177, 4.3109655, -62, -62),
-(446, 2870, -1510.17, -2171.2039, 17.2624, 4.34587, -62, -62);
+(30236, 2870, -846.38556, -3268.444, 78.038246, 2.8099754, -62, -62),
+(30237, 2870, -1351.0742,-2740.2263, 59.40781, 4.520403, -62, -62),
+(30238, 2870, -855.4827, -1783.2532, 39.629177, 4.3109655, -62, -62),
+(30239, 2870, -1510.17, -2171.2039, 17.2624, 4.34587, -62, -62);
 
 -- Add Scripts to Quest The Lost Fragments (credit cmangos)
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
