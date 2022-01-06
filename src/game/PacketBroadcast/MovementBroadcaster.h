@@ -7,6 +7,7 @@
 #include <thread>
 #include <vector>
 #include <cstddef>
+#include <memory>
 
 class PlayerBroadcaster;
 
