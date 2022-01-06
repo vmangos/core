@@ -510,7 +510,8 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
     {
         if (MovementType == POINT_MOTION_TYPE) 
         {
-            switch (id) {
+            switch (id)
+            {
                 case 1: // enter combat after intro waypoints
                 {
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
