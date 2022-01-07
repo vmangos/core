@@ -22,12 +22,12 @@ UPDATE `creature_template` SET `speed_run`=2.79286 WHERE `entry` IN (4252, 4251)
 -- Events list for Gnome Racer
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4252;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(425201, 4252, 0, 1, 0, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race: Gnome Racer - Apply Random Speed Aura');
+(425201, 4252, 0, 1, 1, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race: Gnome Racer - Apply Random Speed Aura');
 
 -- Events list for Goblin Racer
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4251;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(425101, 4251, 0, 1, 0, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race: Goblin Racer - Apply Random Speed Aura');
+(425101, 4251, 0, 1, 1, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race: Goblin Racer - Apply Random Speed Aura');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=425201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -93,7 +93,8 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 -- Cast Salt Flats Racer Speed
 DELETE FROM `creature_movement_scripts` WHERE `id`=425201;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(425201, 0, 0, 15, 6602, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Cast Salt Flats Racer Normal');
+(425201, 0, 0, 15, 6602, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Cast Salt Flats Racer Normal'),
+(425201, 5, 0, 44, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Set Phase to 1');
 
 -- Fobeed yells after 1 round
 DELETE FROM `creature_movement_scripts` WHERE `id`=425202;
@@ -111,6 +112,11 @@ DELETE FROM `creature_movement_scripts` WHERE `id`=425206;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (425206, 0, 0, 61, 4419, 300, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Gnome Finished:  Start Ending Game Event'),
 (425206, 0, 1, 0, 0, 0, 0, 0, 21549, 0, 9, 2, 1518, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Gnome Finished:  Race Master Kronkrider - Yell Text');
+
+-- Prevent racers from applying speed auras once the event is over.
+DELETE FROM `creature_movement_scripts` WHERE `id`=425207;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425207, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Set Phase to 0');
 
 -- Daisy runs to the start Position
 DELETE FROM `creature_movement_special` WHERE `id`=4507;
@@ -278,7 +284,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (4251, 120, -6266.67, -3898.97, -61.7393, 100, 0, 0.000000, 0),
 (4251, 121, -6233.27, -3904.18, -60.4698, 100, 0, 0.000000, 13), -- Turn on walking
 (4251, 122, -6195.02, -3906.6, -60.157, 100, 0, 0.000000, 425205), -- Goblin win
-(4251, 123, -6166.91, -3905.76, -59.907, 100, 31000, 0.000000, 0), -- Waiting position
+(4251, 123, -6166.91, -3905.76, -59.907, 100, 31000, 0.000000, 425207), -- Waiting position
 (4251, 124, -6135.35, -3905.65, -59.805, 100, 0, 0.000000, 0), -- Return to camp
 (4251, 125, -6123.58, -3901.43, -59.842, 100, 0, 0.000000, 0),
 (4251, 126, -6116.44, -3888.03, -59.7954, 100, 0, 0.000000, 0),
@@ -422,7 +428,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (4252, 121, -6266.62, -3902.6, -61.7296, 100, 0, 0.000000, 0),
 (4252, 122, -6233.63, -3898.84, -60.4796, 100, 0, 0.000000, 13), -- Turn on walking
 (4252, 123, -6193.93, -3899.92, -60.157, 100, 0, 0.000000, 425206), -- Gnome wins
-(4252, 124, -6166.57, -3896.82, -59.805, 100, 30000, 0.000000, 0), -- Waiting position
+(4252, 124, -6166.57, -3896.82, -59.805, 100, 30000, 0.000000, 425207), -- Waiting position
 (4252, 125, -6133.96, -3895.67, -59.805, 100, 0, 0.000000, 0), -- Return to camp
 (4252, 126, -6124.58, -3890.32, -59.4468, 100, 0, 0.000000, 0),
 (4252, 127, -6120.73, -3863.32, -58.6251, 100, 0, 0.000000, 0),
