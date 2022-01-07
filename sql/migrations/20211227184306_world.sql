@@ -9,6 +9,10 @@ INSERT INTO `migrations` VALUES ('20211227184306');
 -- Add your query below.
 
 
+-- Update chat type for texts.
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry` IN (1452, 1517, 1518, 1522, 2124, 8240);
+
+-- Correct creature data.
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry` IN (4419, 4252, 4251);
 UPDATE `creature_template` SET `flags_extra`=33554434 WHERE `entry` IN (4507); 
 UPDATE `creature` SET `spawn_flags`=1 WHERE `guid` IN (21680, 21682, 21681, 21549, 21145); -- Make them active or the script fails like on Classic ERA.
@@ -18,109 +22,106 @@ REPLACE INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`
 
 -- Events list for Gnome Racer
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4252;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (425201, 4252, 0, 1, 0, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race - Gnome Racer random speed aura');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(425201, 4252, 0, 1, 0, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race: Gnome Racer - Apply Random Speed Aura');
 
 -- Events list for Goblin Racer
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4251;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (425101, 4251, 0, 1, 0, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race - Goblin Racer random speed aura');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(425101, 4251, 0, 1, 0, 100, 3, 5000, 5000, 5000, 5000, 425201, 425202, 425203, 'Mirage Race: Goblin Racer - Apply Random Speed Aura');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=425201;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425201, 0, 15, 6601, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Random aura: Salt Flats Racer Slow');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425201, 0, 15, 6601, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Random Aura: Cast Spell Salt Flats Racer Slow');
 DELETE FROM `creature_ai_scripts` WHERE `id`=425202;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425202, 0, 15, 6602, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Random aura: Salt Flats Racer Normal');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425202, 0, 15, 6602, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Random Aura: Cast Spell Salt Flats Racer Normal');
 DELETE FROM `creature_ai_scripts` WHERE `id`=425203;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425203, 0, 15, 6600, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Random aura: Salt Flats Racer Speed');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425203, 0, 15, 6600, 34, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Random Aura: Cast Spell Salt Flats Racer Speed');
 
 -- Events list for Race Master Kronkrider
 DELETE FROM `creature_ai_events` WHERE `creature_id`=4419;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (441901, 4419, 0, 1, 0, 100, 1, 1080000, 1080000, 1080000, 1080000, 441901, 0, 0, 'Mirage Race - Race Master Kronkrider Yelling 2 minutes');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (441902, 4419, 0, 1, 0, 100, 1, 1200000, 1200000, 1080000, 1080000, 441902, 0, 0, 'Mirage Race - Race Master Kronkrider Yelling 1 minute');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (441903, 4419, 0, 1, 0, 100, 1, 1260000, 1260000, 1080000, 1080000, 441903, 0, 0, 'Mirage Race - Fobeed starting race');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (441904, 4419, 0, 1, 0, 100, 1, 1258000, 1258000, 1080000, 1080000, 441904, 0, 0, 'Mirage Race - Daisy starting emotes');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(441901, 4419, 0, 1, 0, 100, 1, 1080000, 1080000, 1080000, 1080000, 441901, 0, 0, 'Mirage Race: Race Master Kronkrider - Yelling 2 minutes'),
+(441902, 4419, 0, 1, 0, 100, 1, 1200000, 1200000, 1080000, 1080000, 441902, 0, 0, 'Mirage Race: Race Master Kronkrider - Yelling 1 minute'),
+(441903, 4419, 0, 1, 0, 100, 1, 1260000, 1260000, 1080000, 1080000, 441903, 0, 0, 'Mirage Race: Race Master Kronkrider - Start Script on Fobeed to Start Race'),
+(441904, 4419, 0, 1, 0, 100, 1, 1258000, 1258000, 1080000, 1080000, 441904, 0, 0, 'Mirage Race: Race Master Kronkrider - Start Script on Daisy to Emote');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=441901;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441901, 0, 0, 0, 0, 0, 0, 21585, 0, 9, 2, 1655, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Gnome Pit Boss say');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441901, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 8240, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Race Master Kronkrider Yelling 2 minutes');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(441901, 0, 0, 0, 0, 0, 0, 0, 21585, 0, 9, 2, 1655, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Gnome Pit Boss  - Say Text'),
+(441901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8240, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Race Master Kronkrider - Say Text');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=441902;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441902, 0, 60, 3, 0, 0, 0, 21680, 0, 9, 2, 0, 2168001, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Goblin Racer moves to start position');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441902, 0, 60, 3, 0, 0, 0, 21682, 0, 9, 2, 0, 2168201, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Gnome Racer moves to start position');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441902, 0, 60, 3, 0, 0, 0, 21681, 0, 9, 2, 0, 2168101, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy moves to start position');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441902, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1452, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Race Master Kronkrider Yelling 1 minute');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(441902, 0, 0, 60, 3, 0, 0, 0, 21680, 0, 9, 2, 0, 2168001, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin Racer - Move to start position'),
+(441902, 0, 0, 60, 3, 0, 0, 0, 21682, 0, 9, 2, 0, 2168201, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Gnome Racer  - Move to start position'),
+(441902, 0, 0, 60, 3, 0, 0, 0, 21681, 0, 9, 2, 0, 2168101, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Move to start position'),
+(441902, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1452, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Race Master Kronkrider - Say Text');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=441903;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441903, 0, 60, 3, 0, 0, 0, 21682, 0, 9, 2, 0, 2168202, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Start Gnome Racer');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441903, 0, 0, 1, 0, 0, 0, 21145, 0, 9, 2, 2124, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Fobeed Yelling start');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441903, 0, 1, 36, 0, 0, 0, 21681, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy OneShotAttack1H');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441903, 0, 60, 3, 0, 0, 0, 21680, 0, 9, 2, 0, 2168002, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Start Goblin Racer');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441903, 0, 61, 2168001, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Start Goblin Racer event');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441903, 0, 61, 2168201, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Start Gnome Racer event');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(441903, 0, 0, 60, 3, 0, 0, 0, 21682, 0, 9, 2, 0, 2168202, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Gnome Racer - Start Waypoints'),
+(441903, 0, 0, 60, 3, 0, 0, 0, 21680, 0, 9, 2, 0, 2168002, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin Racer - Start Waypoints'),
+(441903, 0, 0, 0, 0, 0, 0, 0, 21145, 0, 9, 2, 2124, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Fobeed - Say Text'),
+(441903, 0, 0, 1, 36, 0, 0, 0, 21681, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Emote OneShotAttack1H');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=441904;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (441904, 0, 39, 2168101, 0, 0, 0, 21681, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy emotes');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(441904, 0, 39, 2168101, 0, 0, 0, 21681, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Start Script to Play Emotes');
 
 -- Daisy emotes
 DELETE FROM `generic_scripts` WHERE `id`=2168101;
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 0, 1, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy: OneShotWaveNoSheathe (70)');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 5, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6.24828, 0, 'Mirage Race - Daisy: Change Orientation');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 7, 1, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy: OneShotCheerNoSheathe (71)');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 7, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy: Change sheath unarmed');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 9, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2168102, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy: run back to camp');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 10, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy: OneShotCheer (4)');
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(2168101, 0, 0, 1, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Emote OneShotWaveNoSheathe (70)'),
+(2168101, 5, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6.24828, 0, 'Mirage Race: Daisy - Change Orientation'),
+(2168101, 7, 0, 1, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Emote OneShotCheerNoSheathe (71)'),
+(2168101, 7, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Set Sheath State to Unarmed'),
+(2168101, 9, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2168102, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Run Back to Camp'),
+(2168101, 10, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Emote OneShotCheer (4)');
 
 -- Daisy Change sheath
 DELETE FROM `creature_movement_scripts` WHERE `id`=2168102;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168102, 0, 51, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Daisy: Change sheath melee');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(2168102, 0, 51, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Daisy - Set Sheath State to Melee');
 
 -- Daisy orientation after waypoints
 DELETE FROM `creature_movement_scripts` WHERE `id`=2168101;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2168101, 1, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.14159, 0, 'Mirage Race - Daisy: Change Orientation');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(2168101, 1, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.14159, 0, 'Mirage Race: Daisy - Set Orientation');
 
 -- Cast Salt Flats Racer Speed
 DELETE FROM `creature_movement_scripts` WHERE `id`=425201;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425201, 0, 15, 6602, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - cast Salt Flats Racer Normal');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425201, 0, 0, 15, 6602, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Cast Salt Flats Racer Normal');
 
 -- Fobeed yells after 1 round
 DELETE FROM `creature_movement_scripts` WHERE `id`=425202;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425202, 0, 0, 1, 0, 0, 0, 21145, 0, 9, 3, 1517, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - Fobeed to Gnome Racer yell after 1 turn');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425202, 0, 0, 0, 0, 0, 0, 0, 21145, 0, 9, 3, 1517, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Fobeed - Yell After First Lap');
 
 -- Turn on running
 DELETE FROM `creature_movement_scripts` WHERE `id`=425203;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425203, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - turn on running');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425203, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Set Run');
 
 -- Turn on walking
 DELETE FROM `creature_movement_scripts` WHERE `id`=425204;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425204, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race - turn on walking');
-
--- Goblin event active
-DELETE FROM `conditions` WHERE `condition_entry`=441901;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (441901, 36, 2168201, 0, 0, 0, 0);
--- Gnome event active
-DELETE FROM `conditions` WHERE `condition_entry`=441902;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (441902, 36, 2168001, 0, 0, 0, 0);
--- Gnome OR Goblin event active
-DELETE FROM `conditions` WHERE `condition_entry`=441903;
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (441903, -1, 441901, 441902, 0, 0, 0);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425204, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race: Goblin or Gnomish Racer - Set Walk');
 
 -- Race Master Kronkrider Goblin win!
 DELETE FROM `creature_movement_scripts` WHERE `id`=425205;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425205, 0, 39, 425205, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 441903, 'Mirage Race -  Ending Goblin Racer event');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425205, 0, 0, 61, 4419, 300, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Goblin Finished:  Start Ending Game Event'),
+(425205, 0, 1, 0, 0, 0, 0, 0, 21549, 0, 9, 2, 1522, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Goblin Finished:  Race Master Kronkrider - Yell Text');
 
 -- Race Master Kronkrider Goblin win!
 DELETE FROM `creature_movement_scripts` WHERE `id`=425206;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425206, 0, 39, 425206, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 441903, 'Mirage Race -  Ending Gnome Racer event');
-
--- Race Master Kronkrider Goblin win!
-DELETE FROM `generic_scripts` WHERE `id`=425205;
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425205, 0, 62, 2168001, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Ending Goblin Racer event');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425205, 0, 62, 2168201, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Ending Gnome Racer event');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425205, 0, 0, 1, 0, 0, 0, 21549, 0, 9, 2, 1522, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Race Master Kronkrider Yelling goblins win');
-
--- Race Master Kronkrider Gnome win!
-DELETE FROM `generic_scripts` WHERE `id`=425206;
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425206, 0, 62, 2168001, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Ending Goblin Racer event');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425206, 0, 62, 2168201, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Ending Gnome Racer event');
-INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (425206, 0, 0, 1, 0, 0, 0, 21549, 0, 9, 2, 1518, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race -  Race Master Kronkrider Yelling gnome win');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(425206, 0, 0, 61, 4419, 300, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Gnome Finished:  Start Ending Game Event'),
+(425206, 0, 1, 0, 0, 0, 0, 0, 21549, 0, 9, 2, 1518, 0, 0, 0, 0, 0, 0, 0, 0, 'Mirage Race Gnome Finished:  Race Master Kronkrider - Yell Text');
 
 -- Daisy runs to the start Position
 DELETE FROM `creature_movement_special` WHERE `id`=2168101;
