@@ -136,9 +136,15 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
         if (!CheckScriptTargets(tmp.target_type, tmp.target_param1, tmp.target_param2, tablename, tmp.id))
             DisableScriptAction(tmp);
 
+        if (tmp.raw.data[4] != (tmp.raw.data[4] & ALL_DB_SCRIPT_FLAGS))
+        {
+            sLog.outErrorDb("Table `%s` has unknown script flags (data_flags = %u) for script id %u", tablename, tmp.raw.data[4], tmp.id);
+            continue;
+        }
+
         if (!tmp.target_type && (tmp.raw.data[4] & SF_GENERAL_SWAP_INITIAL_TARGETS) && (tmp.raw.data[4] & SF_GENERAL_SWAP_FINAL_TARGETS))
         {
-            sLog.outErrorDb("Table `%s` has nonsensical flag combination (data_flags = %u) without a buddy for script id %u", tablename, tmp.moveTo.flags, tmp.id);
+            sLog.outErrorDb("Table `%s` has nonsensical flag combination (data_flags = %u) without a buddy for script id %u", tablename, tmp.raw.data[4], tmp.id);
             continue;
         }
 
