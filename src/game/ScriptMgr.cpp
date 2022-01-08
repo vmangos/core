@@ -148,6 +148,12 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             continue;
         }
 
+        if (tmp.target_type && (tmp.raw.data[4] & SF_GENERAL_TARGET_SELF) && !(tmp.raw.data[4] & (SF_GENERAL_SWAP_INITIAL_TARGETS | SF_GENERAL_SWAP_FINAL_TARGETS)))
+        {
+            sLog.outErrorDb("Table `%s` has nonsensical flag and target combination (data_flags = %u) (target_type = %u) for script id %u", tablename, tmp.raw.data[4], tmp.target_type, tmp.id);
+            continue;
+        }
+
         // generic command args check
         switch (tmp.command)
         {
