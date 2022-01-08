@@ -48,6 +48,8 @@ enum
     GO_SORCERER_DOOR        = 18972,                        //door to open when Fenrus the Devourer dies
     GO_ARUGAL_DOOR          = 18971,                        //door to open when Wolf Master Nandos dies
     GO_ARUGAL_FOCUS         = 18973,                        //this generates the lightning visual in the Fenrus event
+
+    SOUND_FENRUS_AGGRO      = 6017,                         //Fenrus howls on aggro A_FenrusAggro in sound entries
 };
 
 struct instance_shadowfang_keep : public ScriptedInstance
@@ -155,6 +157,17 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 break;
             case NPC_CMD_SPRINGVALE:
                 showSpringvalePatrol = true;
+                break;
+        }
+    }
+
+    void OnCreatureEnterCombat(Creature* pCreature) override
+    {
+        switch (pCreature->GetEntry())
+        {
+            case NPC_FENRUS:
+                // play Fenrus howl
+                pCreature->PlayDirectSound(SOUND_FENRUS_AGGRO);
                 break;
         }
     }
