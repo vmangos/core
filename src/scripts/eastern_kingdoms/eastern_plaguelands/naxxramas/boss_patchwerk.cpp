@@ -116,10 +116,9 @@ struct boss_patchwerkAI : public ScriptedAI
 
     void DoHatefulStrike()
     {
-        // Hateful Strike: https://classic.wowhead.com/guides/patchwerk-naxxramas-raid-strategy
-        // 1) target players between second, third, and fourth on threat
-        // 2) only players within melee range
-        // 3) target player with the most health
+        // Hateful Strike sources:
+        // https://classic.wowhead.com/guides/patchwerk-naxxramas-raid-strategy
+        // https://old.reddit.com/r/classicwow/comments/jw3vlt/patchwerk_hateful_strike_clarification/
 
         Unit* pTarget            = nullptr;
         uint32 uiHighestHP       = 0;
@@ -128,22 +127,22 @@ struct boss_patchwerkAI : public ScriptedAI
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (const auto iter : tList)
         {
-            // Only second, third, and fourth form threat list can be targeted
+            // Do not check further than fourth form threat list
             if (threatListPosition > 4)
                 break;
 
-            // Skip first from thread list
+            // Skip current main tank for inital target search
             if (threatListPosition > 0)
             {
-                // Only target players
+                // Only players
                 if (iter->getUnitGuid().IsPlayer())
                 {
                     if (Player* pTempTarget = m_creature->GetMap()->GetPlayer(iter->getUnitGuid()))
                     {
-                        // Check if selected player is within melee range
+                        // Check if player is within melee range
                         if (m_creature->IsInMap(pTempTarget) && m_creature->CanReachWithMeleeSpellAttack(pTempTarget))
                         {
-                            // Check if target has higher hp than anyone checked so far
+                            // Check if player has higher hp than anyone checked so far
                             if (pTempTarget->GetHealth() > uiHighestHP)
                             {
                                 pTarget = pTempTarget;
@@ -156,21 +155,16 @@ struct boss_patchwerkAI : public ScriptedAI
             threatListPosition++;
         }
 
-        if (pTarget)
+        if (pTarget) // player found -> face him and cast Hateful Strike
         {
-            // Face new target
             m_creature->SetInFront(pTarget);
             m_creature->SetTargetGuid(pTarget->GetObjectGuid());
-
-            // Update previousTarget for CustomGetTarget() -> makes Patchwerk face the main tank again after Hateful Strike
+            // Update previousTarget used in CustomGetTarget() -> makes Patchwerk face the main tank again
             previousTarget = pTarget->GetObjectGuid();
-
-            // Cast Hateful Strike
             DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
         }
-        else
+        else // no player found -> cast Hateful Strike on main tank
         {
-            // Hateful Strike will target main tank if second, third, and fourth players form threat list are not within meele range.
             if (Unit* mainTank = m_creature->GetVictim())
             {
                 if (m_creature->CanReachWithMeleeSpellAttack(mainTank))
