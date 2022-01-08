@@ -5535,12 +5535,8 @@ void Aura::HandleShapeshiftBoosts(bool apply)
 void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
-    if (target->GetTypeId() != TYPEID_UNIT)
-        return;
 
-    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(target->GetEntry());
-    if (ci && ci->type == CREATURE_TYPE_BEAST)
-        target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
+    target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
 
     if (apply)
     {
