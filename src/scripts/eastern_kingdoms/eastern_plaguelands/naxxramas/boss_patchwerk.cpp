@@ -128,7 +128,7 @@ struct boss_patchwerkAI : public ScriptedAI
         for (const auto iter : tList)
         {
             // Do not check further than fourth form threat list
-            if (threatListPosition > 4)
+            if (threatListPosition > 3)
                 break;
 
             // Skip current main tank for inital target search
