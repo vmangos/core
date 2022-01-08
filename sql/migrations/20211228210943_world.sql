@@ -25,6 +25,8 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
 (300, 8, 7761, 0, 0, 0, 0);
 
+UPDATE `spell_target_position` SET `target_position_x`=-7666.46, `target_position_y`=-1103.08, `target_position_z`=399.679, `target_orientation`=1 WHERE `id`=23460;
+
 
 -- End of migration.
 END IF;
