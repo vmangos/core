@@ -49,7 +49,7 @@ enum
     GO_ARUGAL_DOOR          = 18971,                        //door to open when Wolf Master Nandos dies
     GO_ARUGAL_FOCUS         = 18973,                        //this generates the lightning visual in the Fenrus event
 
-	SOUND_FENRUS_AGGRO      = 6017,                         //Fenrus howls on aggro A_FenrusAggro in sound entries
+    SOUND_FENRUS_AGGRO      = 6017,                         //Fenrus howls on aggro A_FenrusAggro in sound entries
 };
 
 struct instance_shadowfang_keep : public ScriptedInstance
@@ -161,16 +161,16 @@ struct instance_shadowfang_keep : public ScriptedInstance
         }
     }
 
-	void OnCreatureEnterCombat(Creature* pCreature) override
-	{
-		switch (pCreature->GetEntry())
-		{
-		    case NPC_FENRUS:
-			    // play Fenrus howl
-			    pCreature->PlayDirectSound(SOUND_FENRUS_AGGRO);
-			    break;
-		}
-	}
+    void OnCreatureEnterCombat(Creature* pCreature) override
+    {
+        switch (pCreature->GetEntry())
+        {
+            case NPC_FENRUS:
+                // play Fenrus howl
+                pCreature->PlayDirectSound(SOUND_FENRUS_AGGRO);
+                break;
+        }
+    }
 
 
     void OnObjectCreate(GameObject* pGo) override
