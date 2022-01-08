@@ -25,7 +25,18 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`,
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
 (300, 8, 7761, 0, 0, 0, 0);
 
-UPDATE `spell_target_position` SET `target_position_x`=-7666.46, `target_position_y`=-1103.08, `target_position_z`=399.679, `target_orientation`=1 WHERE `id`=23460;
+-- Correct targets for spell Teleport to Blackwing Lair DND.
+UPDATE `spell_target_position` SET `target_position_x`=-7666.46, `target_position_y`=-1103.08, `target_position_z`=399.679, `target_orientation`=1, `build_min`=4449 WHERE `id`=23460;
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `Comment`) VALUES (23460, 0, 25, 17, 'Teleport to Blackwing Lair: Fix Targets');
+
+-- Correct targets for spell Teleport to Molten Core DND.
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `build_min`, `build_max`) VALUES (25139, 409, 1080, -483, -108, 1, 4878, 5875);
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `Comment`) VALUES (25139, 0, 25, 17, 'Teleport to Molten Core: Fix Targets');
+
+-- Update Lothos Riftwaker's gossip script to use correct teleport spell.
+DELETE FROM `gossip_scripts` WHERE `id`=5750;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5750, 0, 0, 15, 25139, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lothos Riftwaker - Teleport Target to Molten Core');
 
 
 -- End of migration.

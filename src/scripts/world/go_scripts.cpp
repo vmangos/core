@@ -25,7 +25,6 @@ EndScriptData */
 go_cat_figurine (the "trap" version of GO, two different exist)
 go_barov_journal
 go_field_repair_bot_74A
-go_orb_of_command
 go_resonite_cask
 go_tablet_of_madness
 go_silithyste
@@ -99,18 +98,6 @@ bool GOHello_go_field_repair_bot_74A(Player* pPlayer, GameObject* pGo)
 {
     if (pPlayer->HasSkill(SKILL_ENGINEERING) && pPlayer->GetSkillValueBase(SKILL_ENGINEERING) >= 300 && !pPlayer->HasSpell(22704))
         pPlayer->CastSpell(pPlayer, 22864, false);
-    return true;
-}
-
-/*######
-## go_orb_of_command
-######*/
-
-bool GOHello_go_orb_of_command(Player* pPlayer, GameObject* pGo)
-{
-    if (pPlayer->GetQuestRewardStatus(7761))
-        pPlayer->TeleportTo(469, -7664.76f, -1100.87f, 399.679f, 0.561981f);
-
     return true;
 }
 
@@ -551,11 +538,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_field_repair_bot_74A";
     newscript->pGOHello = &GOHello_go_field_repair_bot_74A;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_orb_of_command";
-    newscript->pGOHello = &GOHello_go_orb_of_command;
     newscript->RegisterSelf();
 
     newscript = new Script;
