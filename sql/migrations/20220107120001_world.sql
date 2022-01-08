@@ -62,7 +62,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (@PYREWOOD_DAY_CGUID+36, 1895, 0, 0, 0, 0, -379.518, 1624.61, 17.0644, 2.95271, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_DAY_CGUID+37, 1895, 0, 0, 0, 0, -344.082, 1504.01, 18.9795, 4.18879, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_DAY_CGUID+38, 1895, 0, 0, 0, 0, -324.423, 1550.48, 25.4598, 4.91264, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
--- (@PYREWOOD_DAY_CGUID+39, 2106, 0, 0, 0, 0, -387.331, 1648.79, 24.3721, 1.03501, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10), -- does not change
+(@PYREWOOD_DAY_CGUID+39, 2106, 0, 0, 0, 0, -387.331, 1648.79, 24.3721, 1.03501, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_DAY_CGUID+40, 1891, 0, 0, 0, 0, -385.642, 1573.14, 17.1813, 5.10274, 300, 500, 5, 100, 100, 2, 0, 0, 0, 10),
 (@PYREWOOD_DAY_CGUID+41, 1891, 0, 0, 0, 0, -343.315, 1553.08, 24.5102, 3.56684, 300, 500, 5, 100, 100, 2, 0, 0, 0, 10),
 (@PYREWOOD_DAY_CGUID+42, 1894, 0, 0, 0, 0, -398.426, 1568.85, 18.2377, 1.09189, 300, 500, 5, 100, 100, 2, 0, 0, 0, 10),
@@ -75,7 +75,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (@PYREWOOD_DAY_CGUID+49, 1895, 0, 0, 0, 0, -329.456, 1545.74, 30.1367, 2.26893, 300, 500, 0, 100, 100, 0, 0, 0, 0, 10);
 
 -- Moonrage Spawns
-DELETE FROM `creature` WHERE `id` IN (1896, 1893, 1892, 3533, 3529, 2106, 3531);
+DELETE FROM `creature` WHERE `id` IN (1896, 1893, 1892, 3533, 3529, 3531);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (@PYREWOOD_NIGHT_CGUID+1, 1896, 0, 0, 0, 0, -424.202, 1543.84, 18.672, 6.17847, 300, 500, 0, 100, 100, 0, 0, 0, 0, 10),
 (@PYREWOOD_NIGHT_CGUID+2, 1896, 0, 0, 0, 0, -414.124, 1581.03, 19.7275, 6.10865, 300, 500, 0, 100, 100, 0, 0, 0, 0, 10),
@@ -104,7 +104,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 (@PYREWOOD_NIGHT_CGUID+25, 1893, 0, 0, 0, 0, -411.187, 1452.8, 31.8624, 2.12556, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_NIGHT_CGUID+26, 1896, 0, 0, 0, 0, -410.145, 1580.45, 24.4956, 0.210933, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_NIGHT_CGUID+27, 1893, 0, 0, 0, 0, -391.615, 1601.72, 17.1706, 4.86947, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
--- (@PYREWOOD_NIGHT_CGUID+28, 2106, 0, 0, 0, 0, -387.331, 1648.79, 24.3721, 0.615309, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10), -- does not change
+-- (@PYREWOOD_NIGHT_CGUID+28, 2106, 0, 0, 0, 0, -387.331, 1648.79, 24.3721, 0.615309, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10), -- already spawned above
 (@PYREWOOD_NIGHT_CGUID+29, 1893, 0, 0, 0, 0, -385.389, 1633.27, 24.3721, 0.629366, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_NIGHT_CGUID+30, 1893, 0, 0, 0, 0, -384.993, 1619, 24.3721, 5.70723, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
 (@PYREWOOD_NIGHT_CGUID+31, 1896, 0, 0, 0, 0, -379.518, 1624.61, 17.0644, 2.95271, 300, 500, 5, 100, 100, 1, 0, 0, 0, 10),
@@ -167,7 +167,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (@PYREWOOD_DAY_CGUID+36, -49),
 (@PYREWOOD_DAY_CGUID+37, -49),
 (@PYREWOOD_DAY_CGUID+38, -49),
-(@PYREWOOD_DAY_CGUID+39, -49),
+-- (@PYREWOOD_DAY_CGUID+39, -49), -- he seems not to change
 (@PYREWOOD_DAY_CGUID+40, -49),
 (@PYREWOOD_DAY_CGUID+41, -49),
 (@PYREWOOD_DAY_CGUID+42, -49),
@@ -205,7 +205,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (@PYREWOOD_NIGHT_CGUID+25, 49),
 (@PYREWOOD_NIGHT_CGUID+26, 49),
 (@PYREWOOD_NIGHT_CGUID+27, 49),
-(@PYREWOOD_NIGHT_CGUID+28, 49),
+-- (@PYREWOOD_NIGHT_CGUID+28, 49), -- he seems not to change
 (@PYREWOOD_NIGHT_CGUID+29, 49),
 (@PYREWOOD_NIGHT_CGUID+30, 49),
 (@PYREWOOD_NIGHT_CGUID+31, 49),
