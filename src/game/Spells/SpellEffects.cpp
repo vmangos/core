@@ -862,15 +862,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, spell_id, true);
                     return;
                 }
-                case 7671:                                  // Transformation (human<->worgen)
-                {
-                    if (!unitTarget)
-                        return;
-
-                    // Transform Visual
-                    unitTarget->CastSpell(unitTarget, 24085, true);
-                    return;
-                }
                 case 8063:                                  // Deviate Fish
                 {
                     Player* pPlayer = m_caster->ToPlayer();
