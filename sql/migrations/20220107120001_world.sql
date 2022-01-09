@@ -12,8 +12,8 @@ INSERT INTO `migrations` VALUES ('20220107120001');
 SET @PYREWOOD_EVENT = 49;
 SET @PYREWOOD_VILLAGE_CGUID = 57441;
 
--- New Event for Pyrewood.
-INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES (@PYREWOOD_EVENT, '2020-01-02 21:00:00', '2030-12-31 08:00:00', 1440, 720, 0, 'Pyrewood Village Night', 0, 0, 0, 10);
+-- New Event for Pyrewood starts 21:00, ends 05:30 (confirmed by ptr).
+INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES (@PYREWOOD_EVENT, '2020-01-02 21:00:00', '2030-12-31 05:30:00', 1440, 720, 0, 'Pyrewood Village Night', 0, 0, 0, 10);
 
 UPDATE `creature_template` SET `script_name`='' WHERE `entry` IN (1891, 1894, 1895, 3528, 3532, 3530);
 
@@ -288,57 +288,88 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (@PYREWOOD_VILLAGE_CGUID+48, 14, -328.988, 1531.25, 18.0225, 4.03171, 10000, 0, 0),
 (@PYREWOOD_VILLAGE_CGUID+48, 15, -333.592, 1524.62, 18.0225, 0, 0, 0, 0);
 
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1895;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1894;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1891;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=3528;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=3530;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=3532;
-UPDATE `creature_template` SET `npc_flags`=4224 WHERE `entry`=3528;
-UPDATE `creature_template` SET `npc_flags`=4224 WHERE `entry`=3530;
-UPDATE `creature_template` SET `npc_flags`=4224 WHERE `entry`=3532;
-UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=3532;
-UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=2106;
-UPDATE `creature_template` SET `base_attack_time`=2000 WHERE `entry`=3532;
-UPDATE `creature_template` SET `base_attack_time`=2000 WHERE `entry`=2106;
-UPDATE `creature_template` SET `dmg_min`=31.3535 WHERE `entry`=1891;
-UPDATE `creature_template` SET `dmg_max`=45.7493 WHERE `entry`=1891;
-UPDATE `creature_template` SET `attack_power`=50 WHERE `entry`=1891;
-UPDATE `creature_template` SET `dmg_min`=34.5471, `dmg_max`=45.7493, `attack_power`=54 WHERE `entry`=1894;
-UPDATE `creature_template` SET `armor`=650 WHERE `entry`=1891;
-UPDATE `creature_template` SET `armor`=685 WHERE `entry`=1894;
-UPDATE `creature_template` SET `armor`=566 WHERE `entry`=1895;
-UPDATE `creature_template` SET `armor`=721, `dmg_min`=39.6769, `dmg_max`=52.7154 WHERE `entry`=2106;
-UPDATE `creature_template` SET `dmg_min`=34.8489, `dmg_max`=46.4448 WHERE `entry`=1895;
-UPDATE `creature_template` SET `armor`=959, `dmg_min`=34.5471, `dmg_max`=45.7493 WHERE `entry`=3528;
-UPDATE `creature_template` SET `armor`=685, `dmg_min`=37.5879, `dmg_max`=49.8247 WHERE `entry`=3530;
-UPDATE `creature_template` SET `armor`=959, `dmg_min`=34.5471, `dmg_max`=45.7493 WHERE `entry`=3532;
-UPDATE `creature_template` SET `faction`=123 WHERE `entry`=3532;
-UPDATE `creature_template` SET `attack_power`=50 WHERE `entry`=3532;
-UPDATE `creature_template` SET `attack_power`=54 WHERE `entry`=3530;
-UPDATE `creature_template` SET `attack_power`=50 WHERE `entry`=3528;
-UPDATE `creature_template` SET `attack_power`=56 WHERE `entry`=2106;
-UPDATE `creature_template` SET `attack_power`=48 WHERE `entry`=1895;
-UPDATE `creature_template` SET `ranged_dmg_min`=19.179, `ranged_dmg_max`=25.7685 WHERE `entry`=3532;
-UPDATE `creature_template` SET `ranged_dmg_min`=20.682, `ranged_dmg_max`=27.8801 WHERE `entry`=3530;
-UPDATE `creature_template` SET `ranged_dmg_min`=19.179, `ranged_dmg_max`=25.7685 WHERE `entry`=3528;
-UPDATE `creature_template` SET `ranged_dmg_min`=26.3577 WHERE `entry`=2106;
-UPDATE `creature_template` SET `ranged_dmg_min`=21.9108, `ranged_dmg_max`=29.5805 WHERE `entry`=2106;
-UPDATE `creature_template` SET `ranged_dmg_min`=19.3565, `ranged_dmg_max`=26.1776 WHERE `entry`=1895;
-UPDATE `creature_template` SET `ranged_dmg_min`=17.4565, `ranged_dmg_max`=23.6133 WHERE `entry`=1894;
-UPDATE `creature_template` SET `ranged_dmg_min`=19.179, `ranged_dmg_max`=25.7685 WHERE `entry`=1891;
-UPDATE `creature_template` SET `spell_id2`=15657 WHERE `entry`=3530;
-UPDATE `creature_template` SET `display_scale1`=0 WHERE `entry`=1895;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=3533;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=3531;
+UPDATE `creature_template` SET `display_scale1`=0, `unit_flags`=64, `armor`=566, `dmg_min`=34.8489, `dmg_max`=46.4448, `attack_power`=48, `ranged_dmg_min`=19.3565, `ranged_dmg_max`=26.1776, `spell_id1`=2053, `ai_name`='EventAI' WHERE `entry`=1895;
+UPDATE `creature_template` SET `unit_flags`=64, `dmg_min`=34.5471, `dmg_max`=45.7493, `attack_power`=54, `armor`=685, `ranged_dmg_min`=17.4565, `ranged_dmg_max`=23.6133, `spell_id1`=7164, `spell_id2`=12169, `spell_id3`=11972 WHERE `entry`=1894;
+UPDATE `creature_template` SET `unit_flags`=64, `dmg_min`=31.3535, `dmg_max`=45.7493, `attack_power`=50, `armor`=650, `ranged_dmg_min`=19.179, `ranged_dmg_max`=25.7685, `spell_id1`=6660, `spell_list_id`=18910 WHERE `entry`=1891;
+UPDATE `creature_template` SET `unit_flags`=64, `npc_flags`=4, `armor`=959, `dmg_min`=34.5471, `dmg_max`=45.7493, `attack_power`=50, `ranged_dmg_min`=19.179, `ranged_dmg_max`=25.7685 WHERE `entry`=3528;
+UPDATE `creature_template` SET `unit_flags`=64, `npc_flags`=4, `armor`=685, `dmg_min`=37.5879, `dmg_max`=49.8247, `attack_power`=54, `ranged_dmg_min`=20.682, `ranged_dmg_max`=27.8801, `spell_id2`=15657, `spell_id1`=6713, `ai_name`='' WHERE `entry`=3530;
+UPDATE `creature_template` SET `unit_flags`=64, `npc_flags`=4, `speed_walk`=1, `base_attack_time`=2000, `armor`=959, `dmg_min`=34.5471, `dmg_max`=45.7493, `faction`=123, `attack_power`=50, `ranged_dmg_min`=19.179, `ranged_dmg_max`=25.7685 WHERE `entry`=3532;
+UPDATE `creature_template` SET `speed_walk`=1, `base_attack_time`=2000,  `armor`=721, `dmg_min`=39.6769, `dmg_max`=52.7154, `attack_power`=56, `ranged_dmg_min`=21.9108, `ranged_dmg_max`=29.5805 WHERE `entry`=2106;
+UPDATE `creature_template` SET `unit_flags`=64, `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000 WHERE `entry`=3533;
+UPDATE `creature_template` SET `unit_flags`=64, `npc_flags`=0 WHERE `entry`=3531;
 UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=3529;
-UPDATE `creature_template` SET `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000 WHERE `entry`=3533;
-UPDATE `creature_template` SET `npc_flags`=0 WHERE `entry`=3531;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1892;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1893;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1896;
-UPDATE `creature_template` SET `unit_flags`=64 WHERE `entry`=1924;
-UPDATE `creature_template` SET `base_attack_time`=2000, `ranged_attack_time`=2000 WHERE `entry`=1892;
+UPDATE `creature_template` SET `unit_flags`=64, `base_attack_time`=2000, `ranged_attack_time`=2000, `ai_name`='' WHERE `entry`=1892;
+UPDATE `creature_template` SET `unit_flags`=64, `spell_id1`=13730, `spell_id2`=6507, `spell_id3`=0 WHERE `entry`=1893;
+UPDATE `creature_template` SET `unit_flags`=64, `spell_id1`=594 WHERE `entry`=1896;
+
+-- Worgen do not have any weapons on respawn.
+DELETE FROM `creature_equip_template` WHERE `entry`=1896;
+
+-- 3528: Pyrewood Armorer - no spells
+-- 3532: Pyrewood Leatherworker - no spells
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (353001);
+
+-- Events list for Pyrewood Tailor
+DELETE FROM `creature_ai_events` WHERE `creature_id`=3530;
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (189101, 189102, 189103, 189104, 189105, 189106);
+
+-- Events list for Pyrewood Watcher
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1891;
+
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
+(35300, 'Silverpine Forest - Pyrewood Tailor', 15657, 100, 1, 0, 0, 2, 16, 16, 6, 82, 0, 6713, 100, 1, 0, 0, 0, 38, 38, 2, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18940, 'Silverpine Forest - Pyrewood Sentry', 7164, 100, 0, 0, 0, 2, 1, 20, 180, 190, 0, 12169, 100, 0, 0, 0, 2, 2, 20, 12, 30, 0, 11972, 100, 1, 0, 0, 258, 4, 35, 20, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18910, 'Silverpine Forest - Pyrewood Watcher', 6660, 100, 1, 0, 0, 10, 2, 13, 2, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18960, 'Silverpine Forest - Moonrage Elder', 594, 100, 1, 0, 0, 2, 1, 4, 1, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18930, 'Silverpine Forest - Moonrage Sentry', 6507, 100, 0, 0, 0, 2, 1, 24, 11, 35, 0, 13730, 100, 1, 0, 0, 2, 1, 8, 33, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(35310, 'Silverpine Forest - Moonrage Tailor', 7140, 100, 1, 0, 0, 2, 1, 24, 24, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+-- Events list for Moonrage Elder
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1896;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189601, 1896, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189601, 0, 0, 'Moonrage Elder - Flee at 15% HP');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=189601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(189601, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonrage Elder - Flee');
+
+-- Events list for Pyrewood Elder
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1895;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189501, 1895, 0, 14, 0, 100, 1, 15, 40, 17000, 90000, 189501, 0, 0, 'Pyrewood Elder - Friendly HP');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189502, 1895, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189502, 0, 0, 'Pyrewood Elder - Flee');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=189501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(189501, 0, 0, 15, 2053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Elder - Cast Lesser Heal');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=189502;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(189502, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Elder - Flee at 15% HP');
+
+-- Events list for Pyrewood Watcher
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1891;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189101, 1891, 0, 9, 0, 100, 0, 0, 5, 0, 0, 189101, 0, 0, 'Pyrewood Watcher - Target in Melee Range');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189102, 1891, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189102, 0, 0, 'Pyrewood Watcher - Flee');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=189101;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(189101, 0, 1, 42, 1, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Melee Attack target'),
+(189101, 0, 2, 20, 5, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Chase target');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=189102;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(189102, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Flee at 15% HP');
+
+-- Events list for Moonrage Sentry
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1893;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189301, 1893, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189301, 0, 0, 'Moonrage Sentry - Flee at 15% HP');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=189301;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(189301, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonrage Sentry - Flee');
 
 
 -- End of migration.
