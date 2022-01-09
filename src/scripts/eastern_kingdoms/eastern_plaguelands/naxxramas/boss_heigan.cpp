@@ -335,7 +335,7 @@ struct boss_heiganAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_MANABURN,  Seconds(10));
         m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(18));
         m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(48));
-        m_creature->CastStop();
+        m_creature->InterruptNonMeleeSpells(false);
         m_creature->SetReactState(REACT_AGGRESSIVE);
         eruptionPhase = 0;
 

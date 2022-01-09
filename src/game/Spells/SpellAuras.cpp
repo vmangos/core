@@ -3283,7 +3283,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->SetCharmerGuid(GetCasterGuid());
         target->SetFactionTemplateId(caster->GetFactionTemplateId());
-        target->CastStop(target == caster ? GetId() : 0);
+        if (target != caster)
+            target->InterruptNonMeleeSpells(false);
         caster->SetCharm(target);
 
         target->CombatStop(true);
@@ -3581,7 +3582,11 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         target->AddUnitState(inCharge ? UNIT_STAT_PENDING_STUNNED : UNIT_STAT_STUNNED);
         target->SetTargetGuid(ObjectGuid());
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
+
+        // it appears that spell casts get interrupted even if they don't have the flag
+        //target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
+        if (target->GetObjectGuid() != GetCasterGuid())
+            target->InterruptNonMeleeSpells(false);
 
         // Player specific
         if (Player* targetPlayer = target->ToPlayer())

@@ -589,7 +589,6 @@ struct boss_kelthuzadAI : public ScriptedAI
                     events.ScheduleEvent(EVENT_CHAINS,           Seconds(60));
                     m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE);
-                    //m_creature->CastStop();
                     m_creature->InterruptNonMeleeSpells(true);
 
                     DoResetThreat();

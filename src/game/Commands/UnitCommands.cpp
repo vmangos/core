@@ -1980,36 +1980,23 @@ bool ChatHandler::HandleDamageCommand(char* args)
         damage = ditheru(player->CalcArmorReducedDamage(target, damage));
 
     // melee damage by specific school
-    if (!*args)
-    {
-        uint32 absorb = 0;
-        int32 resist = 0;
+    uint32 absorb = 0;
+    int32 resist = 0;
 
-        target->CalculateDamageAbsorbAndResist(player, schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, nullptr);
+    target->CalculateDamageAbsorbAndResist(player, schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, nullptr);
 
-        uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
-        damage += bonus;
-        uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
+    uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
+    damage += bonus;
+    uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
 
-        if (damage <= malus)
-            return true;
-
-        damage -= malus;
-
-        player->DealDamageMods(target, damage, &absorb);
-        player->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, schoolmask, nullptr, false);
-        player->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, schoolmask, damage, absorb, resist, VICTIMSTATE_NORMAL, 0);
+    if (damage <= malus)
         return true;
-    }
 
-    // non-melee damage
+    damage -= malus;
 
-    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-    uint32 spellid = ExtractSpellIdFromLink(&args);
-    if (!spellid || !sSpellMgr.GetSpellEntry(spellid))
-        return false;
-
-    player->SpellNonMeleeDamageLog(target, spellid, damage);
+    player->DealDamageMods(target, damage, &absorb);
+    player->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, schoolmask, nullptr, false);
+    player->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, schoolmask, damage, absorb, resist, VICTIMSTATE_NORMAL, 0);
     return true;
 }
 
