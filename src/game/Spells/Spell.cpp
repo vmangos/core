@@ -1239,15 +1239,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     }
     else                                                    // in 1.12.1 we need explicit miss info
     {
-        if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
+        if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST || missInfo == SPELL_MISS_IMMUNE)
         {
             if (pRealUnitCaster && pRealUnitCaster != unit)
             {
                 if (!m_spellInfo->IsPositiveSpell() && (m_caster->IsVisibleForOrDetect(unit, unit, false) || m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET)))
                 {
-                    bool combat = !IsTriggeredByAura() &&
-                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
-                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT);
+                    bool combat = !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
+                                  (m_immediateHandled || !IsTriggeredByAura() &&
+                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT));
 
                     // Pickpocket can cause back attack if failed
                     if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET))
