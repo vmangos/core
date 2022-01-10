@@ -33,7 +33,7 @@ jobs:
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
         export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
         #wget
-        choco install -y wget
+        choco install -y wget --version 1.20
         #ACE package download
         wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
         unzip ACE-$ACE_VERSION.zip
@@ -44,12 +44,8 @@ jobs:
         wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
         unzip tbb-$TBB_VERSION-win.zip
         rm tbb-$TBB_VERSION-win.zip
-        #make
-        choco install -y make
-        #cmake
-        choco install -y cmake
         #openssl
-        choco install -y openssl
+        choco install -y openssl --version=1.1.1.500
       #git bash shell
       shell: bash
 
