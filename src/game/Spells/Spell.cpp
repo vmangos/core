@@ -1237,43 +1237,43 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             unitTarget = m_casterUnit;
         }
     }
-    else                                                    // in 1.12.1 we need explicit miss info
+    else if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST || missInfo == SPELL_MISS_IMMUNE)
     {
-        if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
+        // in 1.12.1 we need explicit miss info
+        if (pRealUnitCaster && pRealUnitCaster != unit)
         {
-            if (pRealUnitCaster && pRealUnitCaster != unit)
+            if (!m_spellInfo->IsPositiveSpell() && (m_caster->IsVisibleForOrDetect(unit, unit, false) || m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET)))
             {
-                if (!m_spellInfo->IsPositiveSpell() && (m_caster->IsVisibleForOrDetect(unit, unit, false) || m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET)))
+                // SPELL_ATTR_EX2_NO_INITIAL_THREAT is only checked on hit
+                // test case: cast Starshards on target immune to Arcane (Manaclaw in Winterspring)
+                // target will aggro instantly, while not immune target will not until damage is dealt
+                bool combat = (!IsTriggeredByAura() || m_spellInfo->speed) &&
+                                !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT);
+
+                // Pickpocket can cause back attack if failed
+                if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET))
                 {
-                    bool combat = !IsTriggeredByAura() &&
-                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
-                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT);
+                    pRealUnitCaster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                    combat = true;
+                }
 
-                    // Pickpocket can cause back attack if failed
-                    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET))
+                if (combat)
+                {
+                    if (!m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS))
                     {
-                        pRealUnitCaster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                        combat = true;
+                        if (!unit->IsInCombat())
+                            unit->AttackedBy(pRealUnitCaster);
+
+                        unit->AddThreat(pRealUnitCaster);
+                        unit->SetInCombatWithAggressor(pRealUnitCaster);
                     }
-
-                    if (combat)
-                    {
-                        if (!m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS))
-                        {
-                            if (!unit->IsInCombat())
-                                unit->AttackedBy(pRealUnitCaster);
-
-                            unit->AddThreat(pRealUnitCaster);
-                            unit->SetInCombatWithAggressor(pRealUnitCaster);
-                        }
                         
-                        pRealUnitCaster->SetInCombatWithVictim(unit);
-                    }
-                    else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_OUT_OF_COMBAT_ATTACK))
-                    {
-                        unit->SetOutOfCombatWithAggressor(pRealUnitCaster);
-                        pRealUnitCaster->SetOutOfCombatWithVictim(unit);
-                    }
+                    pRealUnitCaster->SetInCombatWithVictim(unit);
+                }
+                else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_OUT_OF_COMBAT_ATTACK))
+                {
+                    unit->SetOutOfCombatWithAggressor(pRealUnitCaster);
+                    pRealUnitCaster->SetOutOfCombatWithVictim(unit);
                 }
             }
         }
@@ -1673,7 +1673,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                     (m_spellInfo->Id == 6358 || // Exception to fix succubus seduction.
                      m_caster->IsVisibleForOrDetect(unit, unit, false)))
             {
-                if (!IsTriggeredByAura() &&
+                if ((!IsTriggeredByAura() || m_spellInfo->speed) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_THREAT_ONLY_ON_MISS) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT))
