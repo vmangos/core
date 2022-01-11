@@ -560,14 +560,6 @@ void Creature::InitializeReactState()
         SetReactState(REACT_AGGRESSIVE);
 }
 
-float Creature::GetScaleForDisplayId(uint32 displayId)
-{
-    if (CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId))
-        return displayEntry->scale;
-    
-    return DEFAULT_OBJECT_SCALE;
-}
-
 uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, CreatureDataAddon const* addon /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/, float* scale /*=nullptr*/)
 {
     // Use creature event display id explicit, override any other static models
