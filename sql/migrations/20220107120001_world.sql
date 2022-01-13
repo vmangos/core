@@ -466,8 +466,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206102;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(206102, 5, 0, 10, 2062, 0, 1, 100, 0, 0, 0, 8, 4, 45205, -1, 7, -396.638, 1511.03, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hendricks'),
-(206102, 0, 3, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206101, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Start Waypoints');
+(206102, 0, 2, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206101, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Start Waypoints'),
+(206102, 0, 1, 10, 2062, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -396.638, 1511.03, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hendricks');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206103;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -511,8 +511,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206402;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(206402, 0, 1, 10, 2066, 0, 1, 100, 0, 0, 0, 8, 4, 45205, -1, 7, -398.346, 1511.81, 18.952, 4.7822, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Higarth'),
-(206402, 0, 2, 10, 2063, 0, 1, 100, 0, 0, 0, 8, 4, 45205, -1, 7, -396.381, 1511.8, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Wilhelm'),
+(206402, 0, 1, 10, 2066, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -398.346, 1511.81, 18.952, 4.7822, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Higarth'),
+(206402, 0, 2, 10, 2063, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -396.381, 1511.8, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Wilhelm'),
 (206402, 0, 3, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206401, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Start Waypoints');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206403;
@@ -594,8 +594,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206802;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(206802, 0, 1, 10, 2067, 0, 1, 100, 0, 0, 0, 8, 4, 45205, -1, 7, -398.522, 1512.69, 18.952, 4.79966, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Brunswick'),
-(206802, 0, 2, 10, 2065, 0, 1, 100, 0, 0, 0, 8, 4, 45205, -1, 7, -396.286, 1512.55, 18.952, 4.69494, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Cooper'),
+(206802, 0, 1, 10, 2067, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -398.522, 1512.69, 18.952, 4.79966, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Brunswick'),
+(206802, 0, 2, 10, 2065, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -396.286, 1512.55, 18.952, 4.69494, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Cooper'),
 (206802, 0, 3, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206801, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Start Waypoints');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206803;
