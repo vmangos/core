@@ -108,7 +108,7 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
         }
         else if (pTarget->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmInfo() && (m_creature->GetCharmInfo()->GetReactState() != REACT_AGGRESSIVE))
         {
-            m_creature->CastStop();
+            m_creature->InterruptNonMeleeSpells(false);
             m_creature->AttackStop(true);
             return;
         }
