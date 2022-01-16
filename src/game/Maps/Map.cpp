@@ -2952,7 +2952,7 @@ void Map::SendMonsterTextToMap(int32 textId, Language language, ChatMsg chatMsg,
             return;
         }
 
-        MaNGOS::StaticMonsterChatBuilder say_build(cInfo, chatMsg, textId, language, pTarget, 0);
+        MaNGOS::StaticMonsterChatBuilder say_build(cInfo, chatMsg, textId, language, pTarget);
         MaNGOS::LocalizedPacketDo<MaNGOS::StaticMonsterChatBuilder> say_do(say_build);
 
         Map::PlayerList const& pList = GetPlayers();

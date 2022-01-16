@@ -2630,21 +2630,17 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
     }
 }
 
-
-/**
- * Function that either simulates or does script text for a map
- *
- * @param textId Entry of the text, stored in SD2-database, only type CHAT_TYPE_ZONE_YELL supported
- * @param creatureId Id of the creature of whom saying will be simulated
- * @param pMap Given Map on which the map-wide text is displayed
- * @param pSource Can be nullptr. If pointer to Creature is given, then the creature does the map-wide text
- * @param pTarget Can be nullptr. Possible target for the text
- */
 void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Creature* pSource /*= nullptr*/, Unit* pTarget /*= nullptr*/)
 {
     if (!pMap)
     {
-        sLog.outError("DoOrSimulateScriptTextForMap entry %i, invalid Map pointer.", textId);
+        sLog.outError("DoOrSimulateScriptTextForMap call for text %i without a valid map!", textId);
+        return;
+    }
+
+    if (!creatureId && !pSource)
+    {
+        sLog.outError("DoOrSimulateScriptTextForMap call for text %i without a valid source!", textId);
         return;
     }
 
@@ -2684,7 +2680,7 @@ void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Cr
         }
     }
 
-    sLog.outDebug("SD2: DoOrSimulateScriptTextForMap: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u",
+    sLog.outDebug("SD2: DoOrSimulateScriptTextForMap: textId=%i, soundId=%u, chatType=%u, languageId=%u, emoteId=%u",
           textId, soundId, chatType, languageId, emoteId);
 
     uint8 chatMsg;
