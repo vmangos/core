@@ -285,6 +285,7 @@ set (game_SRCS
     Chat/AsyncCommandHandlers.h
     Chat/AbstractPlayer.h
     Chat/MasterPlayer.h
+    Chat/MonsterChatBuilder.h
     Database/CharacterDatabaseCache.h
     Database/CharacterDatabaseCleaner.h
     Database/DBCEnums.h

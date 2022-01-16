@@ -48,6 +48,7 @@
 #include "ZoneScriptMgr.h"
 #include "InstanceData.h"
 #include "Chat.h"
+#include "MonsterChatBuilder.h"
 #include "Anticheat.h"
 
 #include "packet_builder.h"
@@ -3070,59 +3071,6 @@ void WorldObject::SetActiveObjectState(bool on)
             map->Add((GameObject*)this);
     }
 }
-
-namespace MaNGOS
-{
-    class MonsterChatBuilderFormat
-    {
-    public:
-        MonsterChatBuilderFormat(WorldObject const& obj, ChatMsg msgtype, int32 textId, Language language, Unit const* target, va_list* vaList = nullptr)
-            : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target), i_vaList(vaList) {}
-        void operator()(WorldPacket& data, int32 loc_idx)
-        {
-            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.GetGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
-            char textFinal[2048];
-            va_list argsCpy;
-            va_copy(argsCpy, *i_vaList);
-            vsnprintf(textFinal, 2048, text, argsCpy);
-            va_end(argsCpy);
-            ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_source.GetObjectGuid(), i_source.GetNameForLocaleIdx(loc_idx),
-                i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
-        }
-
-    private:
-        WorldObject const& i_source;
-        ChatMsg i_msgtype;
-        int32 i_textId;
-        Language i_language;
-        Unit const* i_target;
-        va_list* i_vaList;
-    };
-}
-
-namespace MaNGOS
-{
-    class MonsterChatBuilder
-    {
-    public:
-        MonsterChatBuilder(WorldObject const& obj, ChatMsg msgtype, int32 textId, Language language, Unit const* target)
-            : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target) {}
-        void operator()(WorldPacket& data, int32 loc_idx) const
-        {
-            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.GetGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
-
-            ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_source.GetObjectGuid(), i_source.GetNameForLocaleIdx(loc_idx),
-                i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
-        }
-
-    private:
-        WorldObject const& i_source;
-        ChatMsg i_msgtype;
-        int32 i_textId;
-        Language i_language;
-        Unit const* i_target;
-    };
-}                                                           // namespace MaNGOS
 
 void WorldObject::PMonsterSay(int32 textId, ...) const
 {
