@@ -97,7 +97,6 @@ enum Events
 
 // the shiny thing in center that despawns after pull
 static constexpr float pullPortal[3] = { 3716.379883f, -5106.779785f, 132.9f };
-static constexpr float pullPortalCenter[3] = { 3716.380f, -5106.788f, 141.290f };
 
 // Center position of each alcove
 static constexpr uint32 NUM_ALCOVES = 7;
