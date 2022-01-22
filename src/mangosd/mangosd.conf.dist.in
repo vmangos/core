@@ -966,6 +966,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default:  1
 #                  0 (instant in liquid damage start)
 #
+#    EnvironmentalDamage.Min
+#    EnvironmentalDamage.Max
+#        Generic environmental (lava/slime/etc) damage taken on tick
+#        Default:  605-610
+#
 #    MaxPrimaryTradeSkill
 #        Max number of primary professions players can have at the same time.
 #        Default: 2
@@ -1090,6 +1095,8 @@ Guild.EventLogRecordsCount = 100
 MirrorTimer.Fatigue.Max = 60
 MirrorTimer.Breath.Max = 60
 MirrorTimer.Environmental.Max = 1
+EnvironmentalDamage.Min = 605
+EnvironmentalDamage.Max = 610
 MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
