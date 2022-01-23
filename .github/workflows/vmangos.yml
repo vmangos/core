@@ -40,7 +40,7 @@ jobs:
         os: [ubuntu-latest]
         compiler: [gcc, clang]
         include:
-          - os: windows-latest
+          - os: windows-2019
 
     steps:
 
@@ -56,7 +56,7 @@ jobs:
         sudo apt-get -qq install cmake build-essential cppcheck git make libiberty-dev openssl libssl-dev
       #windows dependencies
     - name: windows dependencies
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       #Sets versions for ACE/TBB
       env:
         ACE_VERSION: 6.5.11
@@ -97,7 +97,7 @@ jobs:
         make install
     #windows
     - name: windows build & install
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       run: |
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
