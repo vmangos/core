@@ -527,10 +527,19 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
         default:
             return;
     }
-    // Calcul de la prochaine position
-    uint32 leaderTimeBeforeNextWP = leader->movespline->timeElapsed(); // Temps restant pour le leader.
+
+    // Teleport when distance is too far away instead of running through terrain.
+    if (creature.GetDistance3dToCenter(leader) >= DEFAULT_VISIBILITY_DISTANCE)
+    {
+        creature.NearTeleportTo(leader->GetPosition());
+        return;
+    }
+
+    // Calculation of the next position.
+    uint32 leaderTimeBeforeNextWP = leader->movespline->timeElapsed(); // Time remaining for the leader.
     if (!leaderTimeBeforeNextWP)
         return;
+
     uint32 totalLeaderPoints = leader->movespline->CountSplinePoints();
     Vector3 last = leader->movespline->GetPoint(totalLeaderPoints);
     Vector3 direction = last - leader->movespline->GetPoint(totalLeaderPoints - 1);
@@ -542,7 +551,6 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     z = last.z;
     creature.UpdateGroundPositionZ(x, y, z);
     creature.GetMap()->GetWalkHitPosition(creature.GetTransport(), last.x, last.y, last.z, x, y, z);
-
     creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
 
     PathInfo p(&creature);
@@ -554,6 +562,7 @@ void PatrolMovementGenerator::StartMove(Creature& creature)
     float speed = p.Length() / float(leaderTimeBeforeNextWP) * 1000.0f;
     if (speed > creature.GetSpeed(MOVE_RUN) * 1.3f)
         speed = creature.GetSpeed(MOVE_RUN) * 1.3f;
+
     Movement::MoveSplineInit init(creature, "PatrolMovementGenerator::StartMove");
     init.Move(&p);
     init.SetWalk(creature.IsWalking() && !creature.IsLevitating());

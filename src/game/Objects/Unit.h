@@ -545,6 +545,8 @@ class Unit : public SpellCaster
         float GetNativeScale() const;
         void SetNativeScale(float scale);
         float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
+        float GetMinSwimDepth() const { return GetCollisionHeight() * 0.75f; } // client switches to swim animation at this depth
+        static float GetScaleForDisplayId(uint32 displayId);
         void UpdateModelData(); // at any changes to scale and/or displayId
         void InitPlayerDisplayIds();
         void DeMorph();
@@ -648,12 +650,6 @@ class Unit : public SpellCaster
 
     public:
         /**
-         * Stop all spells from casting except the one give by except_spellid
-         * @param except_spellid This spell id will not be stopped from casting, defaults to 0
-         * \see Unit::InterruptSpell
-         */
-        void CastStop(uint32 except_spellid = 0);
-        /**
          * Gets the current DiminishingLevels for the given group
          * @param group The group that you would like to know the current diminishing return level for
          * @return The current diminishing level, up to DIMINISHING_LEVEL_IMMUNE
@@ -694,7 +690,6 @@ class Unit : public SpellCaster
         void SendPlaySpellVisual(uint32 id) const;
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE) const;
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
-        uint32 SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage);
         void WritePetSpellsCooldown(WorldPacket& data) const;
 
         SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
@@ -992,7 +987,7 @@ class Unit : public SpellCaster
 
         void AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType = BASE_ATTACK, bool checkLoS = true, bool extra = false);
         void SendAttackStateUpdate(CalcDamageInfo* damageInfo) const;
-        void SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const;
+        void SendAttackStateUpdate(uint32 HitInfo, Unit* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const;
         void SendMeleeAttackStop(Unit* victim) const;
         void SendMeleeAttackStart(Unit* pVictim) const;
 
@@ -1031,7 +1026,7 @@ class Unit : public SpellCaster
         float GetMeleeZLimit() const { return m_meleeZLimit; }
         void SetMeleeZReach(float newZReach) { m_meleeZReach = newZReach; }
         float GetMeleeZReach() const { return m_meleeZReach; }
-        void GetRandomAttackPoint(Unit const* target, float &x, float &y, float &z) const;
+        bool GetRandomAttackPoint(Unit const* target, float &x, float &y, float &z) const;
 
         /**
          * Tries to attack a Unit/Player, also makes sure to stop attacking the current target
@@ -1360,7 +1355,12 @@ class Unit : public SpellCaster
         // Terrain checks
         virtual bool IsInWater() const;
         virtual bool IsUnderwater() const;
-        bool IsReachableBySwmming() const;
+        template<class T>
+        bool CanSwimAtPosition(T const& pos) const
+        {
+            return CanSwimAtPosition(pos.x, pos.y, pos.z);
+        }
+        bool CanSwimAtPosition(float x, float y, float z) const;
         bool IsInAccessablePlaceFor(Creature const* c) const;
 
         // Inhabit type checks

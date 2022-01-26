@@ -239,8 +239,6 @@ class WorldSessionFilter : public PacketFilter
         ~WorldSessionFilter() override {}
 };
 
-typedef std::map<uint8, std::string> ClientIdentifiersMap;
-
 // Player session in the World
 class WorldSession
 {
@@ -267,7 +265,6 @@ class WorldSession
         char const* GetPlayerName() const;
         void SetSecurity(AccountTypes security) { m_security = security; }
         std::string const& GetRemoteAddress() const { return m_address; }
-        std::string const& GetClientHash() const { return m_clientHash; }
         void SetPlayer(Player* plr) { _player = plr; }
         void SetMasterPlayer(MasterPlayer* plr) { m_masterPlayer = plr; }
         void LoginPlayer(ObjectGuid playerGuid);
@@ -337,9 +334,8 @@ class WorldSession
         void InitCheatData(Player* pPlayer);
         MovementAnticheat* GetCheatData();
         void ProcessAnticheatAction(char const* detector, char const* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
-        void AddClientIdentifier(uint32 i, std::string str);
-        ClientIdentifiersMap const& GetClientIdentifiers() const { return m_clientIdentifiers; }
-        void ComputeClientHash();
+        uint32 GetFingerprint() const { return 0; } // TODO
+        void CleanupFingerprintHistory() {} // TODO
         
         void SetReceivedWhoRequest(bool v) { m_who_recvd = v; }
         bool ReceivedWhoRequest() const { return m_who_recvd; }
@@ -818,8 +814,6 @@ class WorldSession
         uint32 m_accountFlags;
         LocaleConstant m_sessionDbcLocale;
         int m_sessionDbLocaleIndex;
-        ClientIdentifiersMap m_clientIdentifiers;
-        std::string     m_clientHash;
         ClientOSType    m_clientOS;
         uint32          m_gameBuild;
         PlayerBotEntry* m_bot;

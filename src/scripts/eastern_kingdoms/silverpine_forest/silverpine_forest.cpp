@@ -29,6 +29,16 @@ EndContentData */
 #include "scriptPCH.h"
 #include "Group.h"
 
+namespace SilverpineUtils
+{
+    bool IsWorgenTime()
+    {
+        time_t rawtime;
+        time(&rawtime);
+        struct tm * timeinfo = localtime(&rawtime);
+        return ((timeinfo->tm_hour >= 21) || (timeinfo->tm_hour >= 0 && timeinfo->tm_hour < 9));
+    }
+}
 /*#####
 ## npc_deathstalker_erland
 #####*/
@@ -186,7 +196,7 @@ enum DeathstalkerFaerleiaData
     // 1st wave
     NPC_COUNCILMAN_SMITHERS  = 2060,
     // 2nd wave
-    NPC_COUNCILMAN_THATHER   = 2061,
+    NPC_COUNCILMAN_THATCHER  = 2061,
     NPC_COUNCILMAN_HENDRICKS = 2062,
     // 3rd wave
     NPC_COUNCILMAN_WILHELM   = 2063,
@@ -225,7 +235,10 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
 
     void Reset() override 
     {
-        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        if (!m_bEventStarted && m_creature->IsAlive())
+        {
+            m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        }
     }
 
     uint64 m_uiPlayerGUID;
@@ -301,10 +314,27 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
             }
         }
         
-        if (found)
-            pSummoned->GetMotionMaster()->MovePoint(99, fX, fY, fZ, MOVE_PATHFINDING);
-        else
-            pSummoned->GetMotionMaster()->MovePoint(99, m_afMoveCoords[0], m_afMoveCoords[1], m_afMoveCoords[2], MOVE_PATHFINDING);
+        // while GetRandomPoint should set these to defaults if it returns false we do not want to rely on an implementation detail
+        if (!found)
+        {
+            fX = m_afMoveCoords[0];
+            fY = m_afMoveCoords[1];
+        }
+        // do not randomize Z to prevent standing in air
+        fZ = m_afMoveCoords[2];
+        pSummoned->GetMotionMaster()->MovePoint(99, fX, fY, fZ, MOVE_PATHFINDING | MOVE_WALK_MODE);
+        // set home to endpoint to run there if evade
+        pSummoned->SetHomePosition(fX, fY, fZ, pSummoned->GetHomePositionO());
+    }
+
+    // if a summoned creature despawns while alive we need to fail and finish
+    void SummonedCreatureDespawn(Creature* pDespawned) override
+    {
+        if (!m_bEventStarted || !pDespawned->IsAlive()) return;
+
+        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        FailQuestForPlayerOrGroup();
+        FinishEvent();
     }
 
     void SummonedCreatureJustDied(Creature* /*pKilled*/) override
@@ -344,7 +374,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
                         m_uiWaveTimer = 10000;
                         break;
                     case 1:
-                        m_creature->SummonCreature(NPC_COUNCILMAN_THATHER,   SpawnPoints[2].fX, SpawnPoints[2].fY, SpawnPoints[2].fZ, SpawnPoints[2].fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 90000);
+                        m_creature->SummonCreature(NPC_COUNCILMAN_THATCHER,   SpawnPoints[2].fX, SpawnPoints[2].fY, SpawnPoints[2].fZ, SpawnPoints[2].fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 90000);
                         m_creature->SummonCreature(NPC_COUNCILMAN_HENDRICKS, SpawnPoints[1].fX, SpawnPoints[1].fY, SpawnPoints[1].fZ, SpawnPoints[1].fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 90000);
                         m_uiWaveTimer = 10000;
                         break;
@@ -391,23 +421,127 @@ CreatureAI* GetAI_npc_deathstalker_faerleia(Creature* pCreature)
     return new npc_deathstalker_faerleiaAI(pCreature);
 }
 
+//#define DEBUG_WORGEN_TRANSFO
+
 /*
  * Pyrewood Council support
  */
 
 enum CouncilmanData
 {
-    NPC_FAERLEIA        = 2058
+    NPC_FAERLEIA            = 2058,
+
+    DISPLAY_MOONRAGE_LARGE  = 564,
+    DISPLAY_MOONRAGE_MEDIUM = 574,
+    DISPLAY_MOONRAGE_SMALL  = 729,
 };
 
 struct npc_councilmanAI : ScriptedAI
 {
+    uint32 m_uiCouncilorDisplayId;
+    uint32 m_uiWorgenDisplayId;
+    uint32 m_uiTransformAnimTimer;
+#ifdef DEBUG_WORGEN_TRANSFO
+    uint32 m_uiDebugTransfoTimer;
+#endif
+
     explicit npc_councilmanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_uiCouncilorDisplayId = pCreature->GetDisplayId();
+        switch (pCreature->GetEntry())
+        {
+            case NPC_COUNCILMAN_SMITHERS:
+            case NPC_COUNCILMAN_HENDRICKS:
+            case NPC_LORD_MAYOR_MORRISON:
+                m_uiWorgenDisplayId = DISPLAY_MOONRAGE_SMALL;
+                break;
+            case NPC_COUNCILMAN_THATCHER:
+            case NPC_COUNCILMAN_WILHELM:
+                m_uiWorgenDisplayId = DISPLAY_MOONRAGE_MEDIUM;
+                break;
+            case NPC_COUNCILMAN_HARTIN:
+            case NPC_COUNCILMAN_HIGARTH:
+            case NPC_COUNCILMAN_COOPER:
+            case NPC_COUNCILMAN_BRUNSWICK:
+                m_uiWorgenDisplayId = DISPLAY_MOONRAGE_LARGE;
+                break;
+            default:
+                m_uiWorgenDisplayId = 0;
+                break;
+        }
+        // set worgen display id on spawn if required
+        if (SilverpineUtils::IsWorgenTime())
+            SetDisplayId(pCreature, m_uiWorgenDisplayId);
+
         npc_councilmanAI::Reset();
     }
 
-    void Reset() override { }
+    void Reset() override 
+    {
+#ifdef DEBUG_WORGEN_TRANSFO
+        m_uiDebugTransfoTimer = 20000;
+#endif
+    }
+
+    void SetDisplayId(Creature* const creature, uint32 const displayId)
+    {
+        if (creature)
+        {
+            float scale = creature->GetScaleForDisplayId(displayId);
+            creature->SetObjectScale(scale);
+            creature->SetDisplayId(displayId);
+        }
+    }
+
+    bool IsWorgen()
+    {
+        return m_uiWorgenDisplayId && m_creature->GetDisplayId() == m_uiWorgenDisplayId;
+    }
+
+    void UpdateAI(uint32 const uiDiff) override
+    {
+        bool worgenTime = SilverpineUtils::IsWorgenTime();
+#ifdef DEBUG_WORGEN_TRANSFO
+        worgenTime = IsWorgen();
+        if (m_uiDebugTransfoTimer < uiDiff)
+        {
+            worgenTime = !IsWorgen();
+            m_uiDebugTransfoTimer = 15000;
+        }
+        else
+            m_uiDebugTransfoTimer -= uiDiff;
+#endif
+        if (m_uiTransformAnimTimer)
+        {
+            if (m_uiTransformAnimTimer <= uiDiff)
+            {
+                m_uiTransformAnimTimer = 0;
+                m_creature->CastSpell(m_creature, 24085, true);
+            }
+            else
+                m_uiTransformAnimTimer -= uiDiff;
+        }
+        if (worgenTime && !IsWorgen())
+        {
+            SetDisplayId(m_creature, m_uiWorgenDisplayId);
+            m_creature->SetTempPacified(1000);
+            m_uiTransformAnimTimer = 100;
+            Reset();
+        }
+        else if (!worgenTime && IsWorgen())
+        {
+            SetDisplayId(m_creature, m_uiCouncilorDisplayId);
+            m_creature->SetTempPacified(1000);
+            m_uiTransformAnimTimer = 100;
+            Reset();
+        }
+
+        ScriptedAI::UpdateAI(uiDiff);
+
+        // if we find a target before our way point its time to move to attack
+        if (m_creature->GetVictim() && m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+            m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
+    }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
@@ -418,13 +552,6 @@ struct npc_councilmanAI : ScriptedAI
             if (auto pFaerleia = m_creature->FindNearestCreature(NPC_FAERLEIA, 30.0f))
                 m_creature->AddThreat(pFaerleia);
         }
-    }
-
-    void EnterEvadeMode() override
-    {
-        // should happen only if all players and questgiver are dead
-        // thus nothing to do in world any longer
-        m_creature->ForcedDespawn();
     }
 };
 
@@ -456,8 +583,6 @@ enum HumanWorgenData
     SPELL_SHOOT_PYREWOOD   = 6660,
     SPELL_LESSER_HEAL      = 2053
 };
-
-//#define DEBUG_WORGEN_TRANSFO
 
 struct npc_human_worgenAI : public ScriptedAI
 {
@@ -499,7 +624,6 @@ struct npc_human_worgenAI : public ScriptedAI
     uint32 m_uiDisarm_Timer;
     uint32 m_uiExposeWeakness_Timer;
     uint32 m_uiShoot_Timer;
-    uint32 m_uiWolfSound_Timer;
     uint32 m_uiHeal_Timer;
     uint32 m_uiTransformAnimTimer;
 #ifdef DEBUG_WORGEN_TRANSFO
@@ -519,7 +643,6 @@ struct npc_human_worgenAI : public ScriptedAI
         m_uiDisarm_Timer         = 9200;
         m_uiBackstab_Timer       = 7000;
         m_uiHeal_Timer           = 8800;
-        m_uiWolfSound_Timer      = urand(60000, 600000);
 #ifdef DEBUG_WORGEN_TRANSFO
         m_uiDebugTransfoTimer    = 20000;
 #endif
@@ -527,10 +650,7 @@ struct npc_human_worgenAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        time_t rawtime;
-        time(&rawtime);
-        struct tm * timeinfo = localtime(&rawtime);
-        bool worgenTime = ((timeinfo->tm_hour >= 21) || (timeinfo->tm_hour >= 0 && timeinfo->tm_hour < 9));
+       bool worgenTime = SilverpineUtils::IsWorgenTime();
 #ifdef DEBUG_WORGEN_TRANSFO
         worgenTime = IsWorgen();
         if (m_uiDebugTransfoTimer < uiDiff)
@@ -554,7 +674,6 @@ struct npc_human_worgenAI : public ScriptedAI
         if (worgenTime && !IsWorgen())
         {
             m_creature->UpdateEntry(m_uiWorgenEntry);
-            m_creature->PlayDirectSound(6017);
             m_creature->SetTempPacified(1000);
             m_uiTransformAnimTimer = 100;
             Reset();
@@ -562,21 +681,9 @@ struct npc_human_worgenAI : public ScriptedAI
         else if (!worgenTime && IsWorgen())
         {
             m_creature->UpdateEntry(m_uiOriginalEntry);
-            m_creature->PlayDirectSound(6017);
             m_creature->SetTempPacified(1000);
             m_uiTransformAnimTimer = 100;
             Reset();
-        }
-
-        if (IsWorgen())
-        {
-            if (m_uiWolfSound_Timer < uiDiff)
-            {
-                m_creature->PlayDirectSound(6017);
-                m_uiWolfSound_Timer = urand(60000, 600000);
-            }
-            else
-                m_uiWolfSound_Timer -= uiDiff;
         }
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

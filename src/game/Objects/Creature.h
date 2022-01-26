@@ -249,7 +249,6 @@ class Creature : public Unit
         CreatureData const* GetCreatureData() const;
 
         static uint32 ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, CreatureDataAddon const* addon = nullptr, GameEventCreatureData const* eventData = nullptr, float* scale = nullptr);
-        static float GetScaleForDisplayId(uint32 displayId);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;
@@ -298,7 +297,7 @@ class Creature : public Unit
         void DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
         void MoveAwayFromTarget(Unit* pTarget, float distance);
-        void CallForHelp(float fRadius);
+        void CallForHelp(float radius);
         void CallAssistance();
         void SetNoCallAssistance(bool val)
         { 
@@ -315,7 +314,10 @@ class Creature : public Unit
                 ClearCreatureState(CSTATE_ALREADY_SEARCH_ASSIST);
         }
         bool HasSearchedAssistance() const { return HasCreatureState(CSTATE_ALREADY_SEARCH_ASSIST); }
-        bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
+        bool CanBeTargetedByCallForHelp(Unit const* pFriend, Unit const* pEnemy, bool checkfaction = true) const;
+        bool CanRespondToCallForHelpAgainst(Unit const* pEnemy) const;
+        bool CanFleeFromCallForHelpAgainst(Unit const* pEnemy) const;
+        bool CanAssistTo(Unit const* pFriend, Unit const* pEnemy, bool checkfaction = true) const;
         bool CanInitiateAttack() const;
         bool CanHaveTarget() const { return !HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET); }
 
@@ -553,7 +555,7 @@ class Creature : public Unit
                 ClearCreatureState(CSTATE_ESCORTABLE); 
         }
         bool IsEscortable() const { return HasCreatureState(CSTATE_ESCORTABLE); }
-        bool CanAssistPlayers() { return HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
+        bool CanAssistPlayers() { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
         bool CanSummonGuards() { return HasExtraFlag(CREATURE_FLAG_EXTRA_SUMMON_GUARD); }
         uint32 GetOriginalEntry() const { return m_originalEntry; }
 

@@ -3132,7 +3132,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
                     {
                         if (CharmInfo *charm = unitTarget->GetCharmInfo())
                             if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                if (ft->IsFriendlyTo(*m_caster->getFactionTemplateEntry()))
+                                if (ft->IsFriendlyTo(*m_caster->GetFactionTemplateEntry()))
                                     priority_dispel = dispel_list.size();
                     }
                     else if (positive == friendly)
@@ -5838,7 +5838,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
         return;
 
     // Nostalrius (INTERFACTION) : Totem furie-des-vents ecrase les benes de puissance et des rois Paladin.
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
+    /*if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
     {
         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_MOD_ATTACK_POWER);
         for (const auto aura : auras)
@@ -5863,7 +5863,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
             }
         }
     }
-
+    */
     if (m_spellInfo->EffectMiscValue[eff_idx])
     {
         uint32 enchant_id = m_spellInfo->EffectMiscValue[eff_idx];

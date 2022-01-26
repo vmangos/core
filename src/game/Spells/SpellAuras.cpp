@@ -2657,6 +2657,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                                 display_id = gender == GENDER_MALE ?
                                             10136 :
                                             10147 ;
+                                mod_x = DEFAULT_GNOME_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
                                 break;
                             case RACE_HUMAN:
                                 display_id = gender == GENDER_MALE ?
@@ -2687,12 +2688,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                                 if (gender == GENDER_MALE)
                                 {
                                     display_id = 10148;
-                                    mod_x = DEFAULT_TAUREN_MALE_SCALE;
+                                    mod_x = DEFAULT_TAUREN_MALE_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
                                 }
                                 else
                                 {
                                     display_id = 10149;
-                                    mod_x = DEFAULT_TAUREN_FEMALE_SCALE;
+                                    mod_x = DEFAULT_TAUREN_FEMALE_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
                                 }
                                 break;
                             default:
@@ -2741,6 +2742,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             target->SetTransForm(0);
             target->SetDisplayId(target->GetNativeDisplayId());
             target->ResetTransformScale();
+            target->UpdateModelData();
 
             // apply default equipment for creature case
             if (target->GetTypeId() == TYPEID_UNIT)
@@ -3056,7 +3058,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pTarget->RemoveAurasDueToSpell(6272);
         pTarget->RemoveAurasDueToSpell(11403);
 
-        FactionTemplateEntry const* origFactionTemplate = pTarget->getFactionTemplateEntry();
+        FactionTemplateEntry const* origFactionTemplate = pTarget->GetFactionTemplateEntry();
 
         pTarget->AddUnitState(UNIT_STAT_POSSESSED);
         pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
@@ -3269,7 +3271,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (!caster)
             return;
 
-        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
+        FactionTemplateEntry const* origFactionTemplate = target->GetFactionTemplateEntry();
 
         // Remove dummy auras from spells with EffectSummonPossessed
         target->RemoveAurasDueToSpell(126);
@@ -3283,7 +3285,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->SetCharmerGuid(GetCasterGuid());
         target->SetFactionTemplateId(caster->GetFactionTemplateId());
-        target->CastStop(target == caster ? GetId() : 0);
+        if (target != caster)
+            target->InterruptNonMeleeSpells(false);
         caster->SetCharm(target);
 
         target->CombatStop(true);
@@ -3581,7 +3584,11 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         target->AddUnitState(inCharge ? UNIT_STAT_PENDING_STUNNED : UNIT_STAT_STUNNED);
         target->SetTargetGuid(ObjectGuid());
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
+
+        // it appears that spell casts get interrupted even if they don't have the flag
+        //target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
+        if (target->GetObjectGuid() != GetCasterGuid())
+            target->InterruptNonMeleeSpells(false);
 
         // Player specific
         if (Player* targetPlayer = target->ToPlayer())
@@ -5535,12 +5542,8 @@ void Aura::HandleShapeshiftBoosts(bool apply)
 void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
-    if (target->GetTypeId() != TYPEID_UNIT)
-        return;
 
-    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(target->GetEntry());
-    if (ci && ci->type == CREATURE_TYPE_BEAST)
-        target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
+    target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
 
     if (apply)
     {

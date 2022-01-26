@@ -71,8 +71,8 @@ extern ScriptMapMap sCreatureAIScripts;
 #define TEXT_SOURCE_CUSTOM_END      TEXT_SOURCE_RANGE*3 + 1
 
 //Generic scripting functions
-void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, int32 chatTypeOverride = -1);
-void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
+void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget = nullptr, int32 chatTypeOverride = -1);
+void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Creature* pSource = nullptr, Unit* pTarget = nullptr);
 
 // Returns a target based on the type specified.
 WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, Map* pMap, uint8 targetType, uint32 param1 = 0u, uint32 param2 = 0u, SpellEntry const* pSpellEntry = nullptr);

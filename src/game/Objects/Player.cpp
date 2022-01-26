@@ -10469,7 +10469,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         }
         else if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
         {
-            pBag->StoreItem(slot, pItem, update);
+            pBag->StoreItem(slot, pItem);
             if (IsInWorld() && update)
             {
                 pItem->AddToWorld();
@@ -10751,7 +10751,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
         {
             Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
             if (pBag)
-                pBag->RemoveItem(slot, update);
+                pBag->RemoveItem(slot);
         }
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
         // pItem->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid()); not clear owner at remove (it will be set at store). This used in mail and auction code
@@ -10862,7 +10862,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             m_items[slot] = nullptr;
         }
         else if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
-            pBag->RemoveItem(slot, update);
+            pBag->RemoveItem(slot);
 
         if (IsInWorld() && update)
         {
@@ -11560,8 +11560,8 @@ void Player::SwapItem(uint16 src, uint16 dst)
                 if (!bagItem)
                     continue;
 
-                fullBag->RemoveItem(i, true);
-                emptyBag->StoreItem(count, bagItem, true);
+                fullBag->RemoveItem(i);
+                emptyBag->StoreItem(count, bagItem);
                 bagItem->SetState(ITEM_CHANGED, this);
 
                 ++count;
@@ -13338,7 +13338,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
         q_status.uState = QUEST_CHANGED;
 
     if (announce)
-        SendQuestReward(pQuest, xp, questEnder);
+        SendQuestReward(pQuest, xp);
 
     bool handled = false;
 
@@ -14454,7 +14454,7 @@ void Player::SendQuestCompleteEvent(uint32 quest_id) const
     }
 }
 
-void Player::SendQuestReward(Quest const* pQuest, uint32 XP, Object* questGiver) const
+void Player::SendQuestReward(Quest const* pQuest, uint32 XP) const
 {
     uint32 questid = pQuest->GetQuestId();
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questid);
@@ -18343,7 +18343,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
     uint32 reqFaction = pProto->RequiredReputationFaction;
     if (!reqFaction && pProto->RequiredReputationRank > 0)
-        reqFaction = pCreature->getFactionTemplateEntry()->faction;
+        reqFaction = pCreature->GetFactionId();
 
     if (uint32(GetReputationRank(reqFaction)) < pProto->RequiredReputationRank)
     {
@@ -19299,16 +19299,16 @@ BattleGroundBracketId Player::GetBattleGroundBracketIdFromLevel(BattleGroundType
 
 float Player::GetReputationPriceDiscount(Creature const* pCreature) const
 {
-    FactionTemplateEntry const* vendor_faction = pCreature->getFactionTemplateEntry();
-    if (!vendor_faction || !vendor_faction->faction)
+    uint32 factionId = pCreature->GetFactionId();
+    if (!factionId)
         return 1.0f;
 
     float mod = 1.0f;
-    ReputationRank rank = GetReputationRank(vendor_faction->faction);
+    ReputationRank rank = GetReputationRank(factionId);
     if (rank >= REP_HONORED)
         mod -= 0.1f;
 
-    switch (vendor_faction->faction)
+    switch (factionId)
     {
         // Alliance
         case 72:  // Stormwind
@@ -20182,7 +20182,7 @@ void Player::UpdateTerainEnvironmentFlags()
 
     // All liquid types: check under surface level
     if (liquid_status.type_flags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME))
-        SetEnvironmentFlags(ENVIRONMENT_FLAG_UNDERWATER, (res & LIQUID_MAP_UNDER_WATER));
+        SetEnvironmentFlags(ENVIRONMENT_FLAG_UNDERWATER, ((res & LIQUID_MAP_UNDER_WATER) && liquid_status.level > (z + GetCollisionHeight())));
 
     // In water: on or under surface level
     if (liquid_status.type_flags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN))
@@ -20200,7 +20200,7 @@ void Player::UpdateTerainEnvironmentFlags()
     SetEnvironmentFlags(ENVIRONMENT_FLAG_HIGH_SEA, (liquid_status.type_flags & MAP_LIQUID_TYPE_DEEP_WATER));
 
     // All liquid types: check if deep enough level for swimming
-    SetEnvironmentFlags(ENVIRONMENT_FLAG_HIGH_LIQUID, ((res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER)) && liquid_status.level > (liquid_status.depth_level + 1.5f)));
+    SetEnvironmentFlags(ENVIRONMENT_FLAG_HIGH_LIQUID, ((res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER)) && liquid_status.level > (z + GetMinSwimDepth())));
 }
 
 void Player::SetCanParry(bool value)

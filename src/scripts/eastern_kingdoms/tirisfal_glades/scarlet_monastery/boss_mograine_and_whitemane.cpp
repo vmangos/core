@@ -57,7 +57,9 @@ enum
     ENTRY_SCARLET_CENTURION      = 4301,
     ENTRY_SCARLET_CHAMPION       = 4302,
     ENTRY_SCARLET_ABBOT          = 4303,
-    ENTRY_SCARLET_MONK           = 4540
+    ENTRY_SCARLET_MONK           = 4540,
+
+    SOUND_MOGRAINE_FAKE_DEATH    = 1326
 };
 
 struct boss_scarlet_commander_mograineAI : public ScriptedAI
@@ -76,7 +78,6 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
     bool m_bDivineShield;
     bool m_bHasDied;
     bool m_bHeal;
-    bool m_bFakeDeath;
 
     void Reset() override
     {
@@ -84,13 +85,13 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_uiHammerOfJustice_Timer = 15000;
 
         //Incase wipe during phase that mograine fake death
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
 
         m_bDivineShield = false;
         m_bHasDied = false;
         m_bHeal = false;
-        m_bFakeDeath = false;
 
         if (!m_pInstance)
             return;
@@ -148,14 +149,20 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_creature->RemoveAllAuras();
         m_creature->ClearAllReactives();
 
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+        m_creature->PlayDistanceSound(SOUND_MOGRAINE_FAKE_DEATH);
 
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
 
         m_bDivineShield = false;
         m_bHasDied = true;
-        m_bFakeDeath = true;
    }
+
+    bool IsFakeDeathActive()
+    {
+        return (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER) || m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC));
+    }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
@@ -174,7 +181,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
                     FakeDeath();
             }
 
-            if (m_bFakeDeath)
+            if (IsFakeDeathActive())
                 uiDamage = 0;
 
             return;
@@ -201,12 +208,13 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //When hit with ressurection stop fake death and say text
         if (pSpell->Id == SPELL_SCARLETRESURRECTION)
         {
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+
             m_creature->SetHealth(m_creature->GetMaxHealth());
 
             DoScriptText(SAY_MO_RESSURECTED, m_creature);
-            m_bFakeDeath = false;
 
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
@@ -215,8 +223,14 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
+        // FakeDeath()
+        // Mograine will keep in combat with players.
+        // Skip further checks, otherwiese SelectHostileTarget() will make Mograine attack
+        if (!IsFakeDeathActive())
+        {
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
+                return;
+        }
 
         if (m_bHasDied && !m_bHeal && m_pInstance && m_pInstance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) == SPECIAL)
         {
@@ -228,15 +242,18 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
                 m_uiCrusaderStrike_Timer = 10000;
                 m_uiHammerOfJustice_Timer = 15000;
 
-                if (m_creature->GetVictim())
+                // check after fake death
+                if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
+                {
                     m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
+                }
 
                 m_bHeal = true;
             }
         }
 
         //This if-check to make sure mograine does not attack while fake death
-        if (m_bFakeDeath)
+        if (IsFakeDeathActive())
             return;
 
         //m_uiCrusaderStrike_Timer
@@ -299,13 +316,29 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         m_bCanResurrect = false;
         m_bStopAttack = false;
 
+        // Whitemane should not get in combat without triggered by Mograine.
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+
         if (!m_pInstance)
             return;
 
         if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
         {
-            if (m_creature->IsAlive() && !pMograine->IsAlive())
-                pMograine->Respawn();
+            // If Whitemane resets while she is alive:
+            if (m_creature->IsAlive())
+            {
+                // Respwan Mograine, in case he was dead (He does not give loot while Whitemane is alive, so no abuse)
+                if (!pMograine->IsAlive())
+                {
+                    pMograine->Respawn();
+                }
+                // Reset Mograine, in case he was in fake death sate
+                else if (pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER) || pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                {
+                    pMograine->OnLeaveCombat();
+                }
+            }
         }
     }
 
@@ -318,11 +351,6 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
         ScriptedAI::JustReachedHome();
-    }
-
-    void MoveInLineOfSight(Unit*) override
-    {
-        //This needs to be empty because Whitemane should NOT aggro while fighting Mograine. Mograine will give us a target.
     }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
@@ -365,8 +393,12 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         {
             if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
             {
-                if (pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING))
-                    pKiller->DealDamage(pMograine, 1, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                if (pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER) || pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                {
+                    pMograine->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                    pMograine->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    pKiller->DealDamage(pMograine, (pMograine->GetHealth() + 1), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                }
             }
         }
     }
@@ -476,14 +508,32 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
 
     void MovementInform(uint32 MovementType, uint32 id) override
     {
-        if (MovementType == POINT_MOTION_TYPE && id == 1)
-            m_creature->SetInCombatWithZone();
-        else
+        if (MovementType == POINT_MOTION_TYPE) 
         {
-            if (m_pInstance)
+            switch (id)
             {
-                if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
-                    m_creature->SetFacingToObject(pMograine);
+                case 1: // enter combat after intro waypoints
+                {
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                    m_creature->SetInCombatWithZone();
+                    break;
+                }
+                case 2: // face Mograine before casting SPELL_SCARLETRESURRECTION
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
+                        {
+                            m_creature->SetFacingToObject(pMograine);
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    break; // nothing
+                }
             }
         }
     }

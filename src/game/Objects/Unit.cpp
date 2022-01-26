@@ -1254,29 +1254,6 @@ void Unit::PetOwnerKilledUnit(Unit* pVictim)
     CallForAllControlledUnits(PetOwnerKilledUnitHelper(pVictim), CONTROLLED_MINIPET | CONTROLLED_GUARDIANS);
 }
 
-void Unit::CastStop(uint32 except_spellid)
-{
-    for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
-        if (Spell* spell = GetCurrentSpell(CurrentSpellTypes(i)))
-            if (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime())
-                InterruptSpell(CurrentSpellTypes(i), false);
-}
-
-// Obsolete func need remove, here only for comotability vs another patches
-uint32 Unit::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage)
-{
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
-    SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
-    bool isCrit = IsSpellCrit(damageInfo.target, spellInfo, GetSchoolMask(damageInfo.school), BASE_ATTACK);
-    CalculateSpellDamage(&damageInfo, damage, spellInfo, EFFECT_INDEX_0, BASE_ATTACK, nullptr, isCrit);
-    damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
-    DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
-    SendSpellNonMeleeDamageLog(&damageInfo);
-    DealSpellDamage(&damageInfo, true);
-    return damageInfo.damage;
-}
-
-//TODO for melee need create structure as in
 void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType)
 {
     damageInfo->attacker = this;
@@ -2890,9 +2867,9 @@ bool Unit::IsInAccessablePlaceFor(Creature const* c) const
         return c->CanWalk() || c->CanFly();
 }
 
-bool Unit::IsReachableBySwmming() const
+bool Unit::CanSwimAtPosition(float x, float y, float z) const
 {
-    return GetTerrain()->IsSwimmable(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetTerrain()->IsSwimmable(x, y, z, GetMinSwimDepth());
 }
 
 bool Unit::IsInWater() const
@@ -4406,7 +4383,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 /*SwingType*/, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
+void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
 {
     CalcDamageInfo dmgInfo;
     dmgInfo.HitInfo = HitInfo;
@@ -4514,7 +4491,7 @@ bool Unit::IsFriendlyTo(WorldObject const* target) const
 
 bool Unit::IsHostileToPlayers() const
 {
-    FactionTemplateEntry const* my_faction = getFactionTemplateEntry();
+    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
     if (!my_faction || !my_faction->faction)
         return false;
 
@@ -4527,7 +4504,7 @@ bool Unit::IsHostileToPlayers() const
 
 bool Unit::IsNeutralToAll() const
 {
-    FactionTemplateEntry const* my_faction = getFactionTemplateEntry();
+    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
     if (!my_faction || !my_faction->faction)
         return true;
 
@@ -4540,7 +4517,7 @@ bool Unit::IsNeutralToAll() const
 
 bool Unit::IsContestedGuard() const
 {
-    if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
+    if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
         return entry->IsContestedGuardFaction();
 
     return false;
@@ -4939,19 +4916,17 @@ void Unit::RestoreFaction()
 
 Team Unit::GetTeam() const
 {
-    if (FactionTemplateEntry const* pFactionTemplate = getFactionTemplateEntry())
+    if (FactionEntry const* pFaction = GetFactionEntry())
     {
-        if (FactionEntry const* pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
+        switch (pFaction->team)
         {
-            switch (pFaction->team)
-            {
-                case HORDE:
-                    return HORDE;
-                case ALLIANCE:
-                    return ALLIANCE;
-            }
+            case HORDE:
+                return HORDE;
+            case ALLIANCE:
+                return ALLIANCE;
         }
     }
+    
     return TEAM_NONE;
 }
 
@@ -8717,7 +8692,8 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
 
     if (apply)
     {
-        CastStop(GetObjectGuid() == casterGuid ? spellId : 0);
+        if (casterGuid != GetObjectGuid())
+            InterruptNonMeleeSpells(false);
 
         switch (modType)
         {
@@ -8737,9 +8713,6 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
                 GetMotionMaster()->MoveConfused();
                 break;
         }
-
-        if (casterGuid != GetObjectGuid())
-            InterruptNonMeleeSpells(false);
 
         if (IsCreature())
             SetTargetGuid(ObjectGuid());
@@ -8903,41 +8876,50 @@ void Unit::SetDisplayId(uint32 displayId)
                     pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
 }
 
+inline float CheckValidScale(float scale)
+{
+    if (scale <= 0.0f)
+        return DEFAULT_OBJECT_SCALE;
+
+    return scale;
+}
+
+float Unit::GetScaleForDisplayId(uint32 displayId)
+{
+    if (CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId))
+    {
+        if (CreatureModelDataEntry const* modelEntry = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
+            return CheckValidScale(modelEntry->modelScale * displayEntry->scale);
+
+        return CheckValidScale(displayEntry->scale);
+    }
+
+    return DEFAULT_OBJECT_SCALE;
+}
+
 void Unit::UpdateModelData()
 {
     CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(GetDisplayId());
     CreatureDisplayInfoAddon const* displayAddon = sObjectMgr.GetCreatureDisplayInfoAddon(GetDisplayId());
-    if (displayAddon && displayEntry && displayAddon->bounding_radius && displayEntry->scale)
+    if (displayAddon && displayEntry && displayAddon->bounding_radius)
     {
+        CreatureModelDataEntry const* modelEntry = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId);
+
         // Tauren and gnome players have scale != 1.0
-        float nativeScale = displayEntry->scale;
-        if (IsPlayer())
-        {
-            switch (GetDisplayId())
-            {
-                case 59: // Tauren Male
-                    nativeScale = DEFAULT_TAUREN_MALE_SCALE;
-                    break;
-                case 60: // Tauren Female
-                    nativeScale = DEFAULT_TAUREN_FEMALE_SCALE;
-                    break;
-                case 1563: // Gnome Male
-                case 1564: // Gnome Female
-                    nativeScale = DEFAULT_GNOME_SCALE;
-                    break;
-            }
-        }
+        float const nativeScale = CheckValidScale(modelEntry ? (modelEntry->modelScale * displayEntry->scale) : displayEntry->scale);
 
         // we expect values in database to be relative to scale = 1.0
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / nativeScale) * displayAddon->bounding_radius);
         SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / nativeScale) * displayAddon->combat_reach);
 
-        if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
+        if (modelEntry)
         {
-            if (modelData->collisionHeight > 0.f && modelData->modelScale > 0.f)
-                m_modelCollisionHeight = modelData->collisionHeight / modelData->modelScale;
+            if (modelEntry->collisionHeight > 0.f && modelEntry->modelScale > 0.f)
+                m_modelCollisionHeight = modelEntry->collisionHeight / modelEntry->modelScale;
             else
                 m_modelCollisionHeight = 2.f;
+
+            m_modelCollisionHeight *= (GetObjectScale() / nativeScale);
         }
     }
     else
@@ -8946,6 +8928,19 @@ void Unit::UpdateModelData()
         SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.5f);
     }
+}
+
+void Unit::InitPlayerDisplayIds()
+{
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass());
+    if (!info)
+        return;
+
+    uint32 const displayId = GetGender() == GENDER_FEMALE ? info->displayId_f : info->displayId_m;
+
+    SetObjectScale(GetScaleForDisplayId(displayId));
+    SetNativeDisplayId(displayId);
+    SetDisplayId(displayId);
 }
 
 void Unit::ClearComboPointHolders()
@@ -9542,7 +9537,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
 {
     if (Unit* pVictim = GetVictim())
     {
-        if (pVictim->getFactionTemplateEntry()->faction == faction_id)
+        if (pVictim->GetFactionId() == faction_id)
         {
             AttackStop();
             if (IsNonMeleeSpellCasted(false))
@@ -9557,7 +9552,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
     AttackerSet const& attackers = GetAttackers();
     for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
     {
-        if ((*itr)->getFactionTemplateEntry()->faction == faction_id)
+        if ((*itr)->GetFactionId() == faction_id)
         {
             (*itr)->AttackStop();
             itr = attackers.begin();
@@ -9777,7 +9772,7 @@ void Unit::CombatStopInRange(float dist)
 }
 
 // TriniyCore
-void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float &z) const
+bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float &z) const
 {
     // Compute random angle
     float angle = GetAngle(attacker);
@@ -9785,12 +9780,17 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
     if (sizeFactor < 0.1f)
         sizeFactor = DEFAULT_COMBAT_REACH;
 
+    bool const canOnlySwim = attacker->CanSwim() && !attacker->CanWalk() && !attacker->CanFly();
+    bool const reachableBySwiming = attacker->CanSwimAtPosition(GetPosition());
+
     uint32 attacker_number = GetAttackers().size();
     if (attacker_number > 0)
         --attacker_number;
-    // Don't compute a random position for a moving player
-    if (IsPlayer() && IsMoving())
+
+    // Don't compute a random position for a moving player or when swimming to player near shore
+    if (IsPlayer() && IsMoving() || canOnlySwim && !reachableBySwiming)
         attacker_number = 0;
+
     angle += (attacker_number ? ((float(M_PI / 2) - float(M_PI) * rand_norm_f()) * attacker_number / sizeFactor) * 0.3f : 0);
 
     float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + rand_norm_f() * (attacker->GetMeleeReach() - attacker->GetObjectBoundingRadius());
@@ -9803,25 +9803,26 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
             GetPosition(initialPosX, initialPosY, initialPosZ);
 
     float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +
-                                        pow(initialPosY - attacker->GetPositionY(), 2) +
-                                        pow(initialPosZ - attacker->GetPositionZ(), 2));
+        pow(initialPosY - attacker->GetPositionY(), 2) +
+        pow(initialPosZ - attacker->GetPositionZ(), 2));
     if (dist > attackerTargetDistance)
     {
-        // On ne bouge pas, on est deja a portee.
+        // We're not moving, we're already within range. 
         attacker->GetPosition(x, y, z);
-        return;
+        return true;
     }
+
     float normalizedVectZ = (attacker->GetPositionZ() - initialPosZ) / attackerTargetDistance;
     float normalizedVectXY = sqrt(1 - normalizedVectZ * normalizedVectZ);
     x = initialPosX + dist * cos(angle) * normalizedVectXY;
     y = initialPosY + dist * sin(angle) * normalizedVectXY;
     z = initialPosZ + dist * normalizedVectZ;
 
-    if ((attacker->CanFly() || (attacker->CanSwim() && IsReachableBySwmming())))
+    if ((attacker->CanFly() || (attacker->CanSwim() && reachableBySwiming)))
     {
         GetMap()->GetLosHitPosition(initialPosX, initialPosY, initialPosZ, x, y, z, -0.2f);
         if (attacker->CanFly())
-            return;
+            return true;
         float ground = 0.0f;
         float waterSurface = GetTerrain()->GetWaterLevel(x, y, z, &ground);
         if (waterSurface == VMAP_INVALID_HEIGHT_VALUE)
@@ -9830,16 +9831,44 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
             z = waterSurface;
         if (z < ground)
             z = ground;
+        return true;
+    }
+    else if (canOnlySwim && !reachableBySwiming)
+    {
+        z = GetTerrain()->GetWaterLevel(attacker->GetPositionX(), attacker->GetPositionY(), attacker->GetPositionZ());
+        if (z != VMAP_INVALID_HEIGHT_VALUE)
+        {
+            dist = std::max(GetCombatReach(true) + attacker->GetCombatReach(true), ATTACK_DISTANCE) - GetObjectBoundingRadius() - std::fabs(z - GetPositionZ());
+            for (int i = 0; i < 12; i++)
+            {
+                GetNearPoint2DAroundPosition(GetPositionX(), GetPositionY(), x, y, dist, angle + (M_PI_F / 6.0f) * float(i));
+
+                float ground = 0.0f;
+                z = GetTerrain()->GetWaterLevel(x, y, z, &ground) - attacker->GetMinSwimDepth();
+                if (ground < z &&
+                    attacker->CanReachWithMeleeAutoAttackAtPosition(this, x, y, z) &&
+                    IsWithinLOS(x, y, z, false))
+                    return true;
+            }
+        }
     }
     else
     {
-        uint32 nav = NAV_GROUND | NAV_WATER;
+        uint32 nav = 0;
+        if (attacker->CanWalk())
+            nav |= NAV_GROUND;
+        if (attacker->CanSwim())
+            nav |= NAV_WATER;
         if (!attacker->IsPlayer())
             nav |= NAV_MAGMA | NAV_SLIME;
+
         // Try mmaps. On fail, use target position (but should not fail)
-        if (!GetMap()->GetWalkHitPosition(GetTransport(), initialPosX, initialPosY, initialPosZ, x, y, z, nav))
-            GetPosition(x, y, z);
+        if (GetMap()->GetWalkHitPosition(GetTransport(), initialPosX, initialPosY, initialPosZ, x, y, z, nav))
+            return true;
     }
+
+    GetPosition(x, y, z);
+    return false;
 }
 
 float Unit::GetMeleeReach() const
@@ -10481,35 +10510,4 @@ void Unit::WritePetSpellsCooldown(WorldPacket& data) const
         ++cdCount;
     }
     data.put<uint16>(cdCountPos, cdCount);
-}
-
-inline float GetDefaultPlayerScale(uint8 race, uint8 gender)
-{
-    if (race == RACE_TAUREN)
-        return (gender == GENDER_FEMALE ? DEFAULT_TAUREN_FEMALE_SCALE : DEFAULT_TAUREN_MALE_SCALE);
-    if (race == RACE_GNOME)
-        return DEFAULT_GNOME_SCALE;
-    return DEFAULT_OBJECT_SCALE;
-}
-
-void Unit::InitPlayerDisplayIds()
-{
-    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass());
-    if (!info)
-        return;
-
-    uint8 gender = GetGender();
-
-    SetObjectScale(GetDefaultPlayerScale(GetRace(), gender));
-    switch (gender)
-    {
-        case GENDER_FEMALE:
-            SetNativeDisplayId(info->displayId_f);
-            SetDisplayId(info->displayId_f);
-            break;
-        case GENDER_MALE:
-            SetNativeDisplayId(info->displayId_m);
-            SetDisplayId(info->displayId_m);
-            break;
-    }
 }

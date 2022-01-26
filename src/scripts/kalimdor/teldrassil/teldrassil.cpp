@@ -98,40 +98,6 @@ CreatureAI* GetAI_npc_mist(Creature* pCreature)
     return new npc_mistAI(pCreature);
 }
 
-struct npc_sethirAI : public ScriptedAI
-{
-    npc_sethirAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override { }
-
-    void Aggro(Unit* pUnit) override
-    {
-        m_creature->MonsterSay("Filfh! Filfh everywhere! The forests must be cleansed!");
-        for (uint32 counter = 0; counter < 6; counter++)
-        {
-            if (Creature* summoned = DoSpawnCreature(6911, 8.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 1000))
-                if (summoned->AI())
-                    summoned->AI()->AttackStart(pUnit);
-        }
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_sethir(Creature* pCreature)
-{
-    return new npc_sethirAI(pCreature);
-}
-
 bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MIST)
@@ -172,11 +138,6 @@ void AddSC_teldrassil()
     newscript->Name = "npc_mist";
     newscript->GetAI = &GetAI_npc_mist;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_mist;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_sethir";
-    newscript->GetAI = &GetAI_npc_sethir;
     newscript->RegisterSelf();
 
     newscript = new Script;

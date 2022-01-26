@@ -1360,7 +1360,7 @@ class Player final: public Unit
         QuestStatusMap& getQuestStatusMap() { return mQuestStatus; };
 
         void SendQuestCompleteEvent(uint32 quest_id) const;
-        void SendQuestReward(Quest const* pQuest, uint32 XP, Object* questGiver) const;
+        void SendQuestReward(Quest const* pQuest, uint32 XP) const;
         void SendQuestFailed(uint32 quest_id) const;
         void SendQuestFailedAtTaker(uint32 quest_id, uint32 reason = INVALIDREASON_DONT_HAVE_REQ) const;
         void SendQuestTimerFailed(uint32 quest_id) const;

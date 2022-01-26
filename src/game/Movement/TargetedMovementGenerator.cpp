@@ -87,7 +87,11 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 
         // NOSTALRIUS: Eviter les collisions entre mobs.
         // Cette fonction prend un angle aleatoire.
-        i_target->GetRandomAttackPoint(&owner, x, y, z);
+        if (!i_target->GetRandomAttackPoint(&owner, x, y, z))
+        {
+            m_bReachable = false;
+            return;
+        }
     }
     // prevent redundant micro-movement for pets, other followers.
     else if (!i_target->IsMoving() && owner.movespline->Finalized() && i_target->IsWithinDistInMap(&owner, 1.4f * m_fOffset))

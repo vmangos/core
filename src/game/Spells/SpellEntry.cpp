@@ -628,21 +628,21 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
             // Seal of Righteousness
             if (IsFitToFamilyMask(UI64LIT(0x0000000008000000)) && SpellIconID == 25)
             {
-                coeff = 0.092f;
+                coeff = 0.10f;
                 float speed = BASE_ATTACK_TIME;
 
                 if (caster->IsPlayer())
                 {
                     if (Item *item = ((Player*)caster)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
                     {
-                        coeff = item->isOneHandedWeapon() ? 0.092f : 0.108f;
-                        speed = item->GetProto()->Delay;
+                        coeff = item->isOneHandedWeapon() ? 0.10f : 0.125f;
+                        
                     }
                 }
 
-                speed /= 1000.0f;
+                
 
-                return speed * coeff;
+                return coeff;
             }
             // Seal of Command
             if (Id == 20424)
@@ -811,7 +811,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                 {
                     if (CharmInfo const* charm = static_cast<Unit const*>(victim)->GetCharmInfo())
                         if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                            return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                            return ft->IsFriendlyTo(*caster->GetFactionTemplateEntry());
                 }
                 
                 return caster->IsFriendlyTo(victim);

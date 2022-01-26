@@ -523,7 +523,10 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
     void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_PILOT_WIZZ)
+        {
             m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
+            m_creature->RestoreFaction();
+        }
 
         if (pSummoned->GetEntry() == NPC_MERCENARY)
             pSummoned->AI()->AttackStart(m_creature);

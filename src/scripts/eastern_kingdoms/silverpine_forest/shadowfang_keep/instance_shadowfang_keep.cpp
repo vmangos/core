@@ -42,11 +42,14 @@ enum
     NPC_FENRUS              = 4274,                         //used to summon Arugal in Fenrus event
     NPC_VINCENT             = 4444,                         //Vincent should be "dead" is Arugal is done the intro already
     NPC_NANDOS              = 3927,
+    NPC_WOLF_GUARD          = 3854,                         //Baron Silverlaine and Commander Springvale patrol
 
     GO_COURTYARD_DOOR       = 18895,                        //door to open when talking to NPC's
     GO_SORCERER_DOOR        = 18972,                        //door to open when Fenrus the Devourer dies
     GO_ARUGAL_DOOR          = 18971,                        //door to open when Wolf Master Nandos dies
     GO_ARUGAL_FOCUS         = 18973,                        //this generates the lightning visual in the Fenrus event
+
+    SOUND_FENRUS_AGGRO      = 6017,                         //Fenrus howls on aggro A_FenrusAggro in sound entries
 };
 
 struct instance_shadowfang_keep : public ScriptedInstance
@@ -77,8 +80,8 @@ struct instance_shadowfang_keep : public ScriptedInstance
     uint32 m_uiSpawnPatrolOnBaronDeath;
     uint32 m_uiSpawnPatrolOnCmdDeath;
 
-    bool isBaronDead;
-    bool isCmdDead;
+    bool showSilverlainePatrol;
+    bool showSpringvalePatrol;
 
     void Initialize() override
     {
@@ -95,8 +98,8 @@ struct instance_shadowfang_keep : public ScriptedInstance
         m_uiVincentGUID       = 0;
         m_uiCmdSpringvaleGUID = 0;
 
-        isBaronDead = false;
-        isCmdDead   = false;
+        showSilverlainePatrol  = false;
+        showSpringvalePatrol   = false;
         m_uiSpawnPatrolOnBaronDeath = 6000;
         m_uiSpawnPatrolOnCmdDeath   = 6000;
 
@@ -138,19 +141,10 @@ struct instance_shadowfang_keep : public ScriptedInstance
             case NPC_CMD_SPRINGVALE:
                 m_uiCmdSpringvaleGUID = pCreature->GetGUID();
                 break;
-        }
-        /** Initialize NPC_BARON_SILVERLAINE boss Patrol */
-        if (pCreature->GetRespawnDelay() == 7201)
-        {
-            pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->SetFactionTemplateId(35);
-        }
-
-        /** Initialize 4278 Patrol */
-        if (pCreature->GetRespawnDelay() == 7202)
-        {
-            pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->SetFactionTemplateId(35);
+            case NPC_WOLF_GUARD:
+                pCreature->SetVisibility(VISIBILITY_OFF);
+                pCreature->SetFactionTemplateId(35);
+                break;
         }
     }
 
@@ -159,10 +153,21 @@ struct instance_shadowfang_keep : public ScriptedInstance
         switch (pCreature->GetEntry())
         {
             case NPC_BARON_SILVERLAINE:
-                isBaronDead = true;
+                showSilverlainePatrol = true;
                 break;
             case NPC_CMD_SPRINGVALE:
-                isCmdDead = true;
+                showSpringvalePatrol = true;
+                break;
+        }
+    }
+
+    void OnCreatureEnterCombat(Creature* pCreature) override
+    {
+        switch (pCreature->GetEntry())
+        {
+            case NPC_FENRUS:
+                // play Fenrus howl
+                pCreature->PlayDirectSound(SOUND_FENRUS_AGGRO);
                 break;
         }
     }
@@ -194,7 +199,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
 
     void Update(uint32 uiDiff) override
     {
-        if (isBaronDead)
+        if (showSilverlainePatrol)
         {
             std::list<Creature*> m_EscortList;
 
@@ -205,10 +210,11 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pBaron, 3854, 400.0f);
                     for (const auto& it : m_EscortList)
-                        if (it->GetRespawnDelay() == 7201)
+                        if (it->GetRespawnDelay() == 7201 && it->GetEntry() == NPC_WOLF_GUARD)
                         {
                             it->SetVisibility(VISIBILITY_ON);
                             it->SetFactionTemplateId(17);
+                            showSilverlainePatrol = false; // do it only once
                         }
                     m_EscortList.clear();
                 }
@@ -216,7 +222,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
                     m_uiSpawnPatrolOnBaronDeath -= uiDiff;
             }
         }
-        if (isCmdDead)
+        if (showSpringvalePatrol)
         {
             std::list<Creature*> m_EscortList;
 
@@ -227,10 +233,11 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pCmd, 3854, 400.0f);
                     for (const auto& it : m_EscortList)
-                        if (it->GetRespawnDelay() == 7202)
+                        if (it->GetRespawnDelay() == 7202 && it->GetEntry() == NPC_WOLF_GUARD)
                         {
                             it->SetVisibility(VISIBILITY_ON);
                             it->SetFactionTemplateId(17);
+                            showSpringvalePatrol = false; // do it only once
                         }
                     m_EscortList.clear();
                 }

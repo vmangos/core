@@ -154,15 +154,12 @@ struct DynamicTreeIntersectionCallback
 {
     bool did_hit;
     DynamicTreeIntersectionCallback() : did_hit(false) {}
-    bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance)
+    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
-        did_hit = obj.intersectRay(r, distance, true);
+        did_hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
         return did_hit;
     }
-    bool didHit() const
-    {
-        return did_hit;
-    }
+    bool didHit() const { return did_hit; }
 };
 
 struct DynamicTreeIntersectionCallback_WithLogger
@@ -172,10 +169,10 @@ struct DynamicTreeIntersectionCallback_WithLogger
     {
         DEBUG_LOG("Dynamic Intersection log");
     }
-    bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance)
+    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
         DEBUG_LOG("testing intersection with %s", obj.name.c_str());
-        bool hit = obj.intersectRay(r, distance, true);
+        bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
         if (hit)
         {
             did_hit = true;
@@ -183,10 +180,7 @@ struct DynamicTreeIntersectionCallback_WithLogger
         }
         return hit;
     }
-    bool didHit() const
-    {
-        return did_hit;
-    }
+    bool didHit() const { return did_hit; }
 };
 
 //=========================================================
@@ -199,7 +193,7 @@ bool DynamicMapTree::getIntersectionTime(G3D::Ray const& ray, Vector3 const& end
 {
     float distance = pMaxDist;
     DynamicTreeIntersectionCallback callback;
-    impl.intersectRay(ray, callback, distance, endPos);
+    impl.intersectRay(ray, callback, distance, endPos, false);
     if (callback.didHit())
         pMaxDist = distance;
     return callback.didHit();
@@ -260,7 +254,7 @@ bool DynamicMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2,
     return result;
 }
 
-bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2) const
+bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const
 {
     Vector3 v1(x1, y1, z1), v2(x2, y2, z2);
 
@@ -272,7 +266,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 
     G3D::Ray r(v1, (v2 - v1) / maxDist);
     DynamicTreeIntersectionCallback callback;
-    impl.intersectRay(r, callback, maxDist, v2);
+    impl.intersectRay(r, callback, maxDist, v2, ignoreM2Model);
 
     return !callback.did_hit;
 }

@@ -48,6 +48,7 @@
 #include "ZoneScriptMgr.h"
 #include "InstanceData.h"
 #include "Chat.h"
+#include "MonsterChatBuilder.h"
 #include "Anticheat.h"
 
 #include "packet_builder.h"
@@ -726,8 +727,8 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     if (owner)
                     {
                         FactionTemplateEntry const* ft1,* ft2;
-                        ft1 = owner->getFactionTemplateEntry();
-                        ft2 = target->getFactionTemplateEntry();
+                        ft1 = owner->GetFactionTemplateEntry();
+                        ft2 = target->GetFactionTemplateEntry();
                         if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsInSameRaidWith(target))
                             if (owner->IsInInterFactionMode() && target->IsInInterFactionMode())
                                 forceFriendly = true;
@@ -3071,59 +3072,6 @@ void WorldObject::SetActiveObjectState(bool on)
     }
 }
 
-namespace MaNGOS
-{
-    class MonsterChatBuilderFormat
-    {
-    public:
-        MonsterChatBuilderFormat(WorldObject const& obj, ChatMsg msgtype, int32 textId, Language language, Unit const* target, va_list* vaList = nullptr)
-            : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target), i_vaList(vaList) {}
-        void operator()(WorldPacket& data, int32 loc_idx)
-        {
-            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.GetGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
-            char textFinal[2048];
-            va_list argsCpy;
-            va_copy(argsCpy, *i_vaList);
-            vsnprintf(textFinal, 2048, text, argsCpy);
-            va_end(argsCpy);
-            ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_source.GetObjectGuid(), i_source.GetNameForLocaleIdx(loc_idx),
-                i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
-        }
-
-    private:
-        WorldObject const& i_source;
-        ChatMsg i_msgtype;
-        int32 i_textId;
-        Language i_language;
-        Unit const* i_target;
-        va_list* i_vaList;
-    };
-}
-
-namespace MaNGOS
-{
-    class MonsterChatBuilder
-    {
-    public:
-        MonsterChatBuilder(WorldObject const& obj, ChatMsg msgtype, int32 textId, Language language, Unit const* target)
-            : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target) {}
-        void operator()(WorldPacket& data, int32 loc_idx) const
-        {
-            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.GetGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
-
-            ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_source.GetObjectGuid(), i_source.GetNameForLocaleIdx(loc_idx),
-                i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
-        }
-
-    private:
-        WorldObject const& i_source;
-        ChatMsg i_msgtype;
-        int32 i_textId;
-        Language i_language;
-        Unit const* i_target;
-    };
-}                                                           // namespace MaNGOS
-
 void WorldObject::PMonsterSay(int32 textId, ...) const
 {
     va_list ap;
@@ -3329,7 +3277,7 @@ bool WorldObject::isVisibleFor(Player const* u, WorldObject const* viewPoint) co
     return IsVisibleForInState(u, viewPoint, false);
 }
 
-FactionTemplateEntry const* WorldObject::getFactionTemplateEntry() const
+FactionTemplateEntry const* WorldObject::GetFactionTemplateEntry() const
 {
     FactionTemplateEntry const* entry = sObjectMgr.GetFactionTemplateEntry(GetFactionTemplateId());
     if (!entry)
@@ -3343,6 +3291,30 @@ FactionTemplateEntry const* WorldObject::getFactionTemplateEntry() const
         }
     }
     return entry;
+}
+
+bool WorldObject::HasFactionTemplateFlag(uint32 flag) const
+{
+    if (FactionTemplateEntry const* pTemplate = GetFactionTemplateEntry())
+        return (pTemplate->factionFlags & flag) != 0;
+
+    return false;
+}
+
+FactionEntry const* WorldObject::GetFactionEntry() const
+{
+    if (FactionTemplateEntry const* pTemplate = GetFactionTemplateEntry())
+        return sObjectMgr.GetFactionEntry(pTemplate->faction);
+
+    return nullptr;
+}
+
+uint32 WorldObject::GetFactionId() const
+{
+    if (FactionTemplateEntry const* pTemplate = GetFactionTemplateEntry())
+        return pTemplate->faction;
+
+    return 0;
 }
 
 // function based on function Unit::UnitReaction from 13850 client
@@ -3365,7 +3337,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
     {
         if (selfPlayerOwner->IsGameMaster())
             return REP_NEUTRAL;
-        if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
+        if (FactionTemplateEntry const* targetFactionTemplateEntry = target->GetFactionTemplateEntry())
             if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
                 return *repRank;
     }
@@ -3373,7 +3345,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
     {
         if (targetPlayerOwner->IsGameMaster())
             return REP_NEUTRAL;
-        if (FactionTemplateEntry const* selfFactionTemplateEntry = getFactionTemplateEntry())
+        if (FactionTemplateEntry const* selfFactionTemplateEntry = GetFactionTemplateEntry())
             if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
                 return *repRank;
     }
@@ -3396,7 +3368,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                 if (selfPlayerOwner->IsInRaidWith(targetPlayerOwner))
                     return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
                                          // however client seems to allow mixed group parties, because in 13850 client it works like:
-                                         // return GetFactionReactionTo(getFactionTemplateEntry(), target);
+                                         // return GetFactionReactionTo(GetFactionTemplateEntry(), target);
 
                                          // Sanctuary
                 if (selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY) && targetPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY))
@@ -3416,7 +3388,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
         }
         if (selfPlayerOwner)
         {
-            if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
+            if (FactionTemplateEntry const* targetFactionTemplateEntry = target->GetFactionTemplateEntry())
             {
                 if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
                     return *repRank;
@@ -3425,7 +3397,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                     if (targetFactionEntry->CanHaveReputation())
                     {
                         // check contested flags
-                        if (targetFactionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD
+                        if (targetFactionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS
                             && selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
                             return REP_HOSTILE;
 
@@ -3440,7 +3412,7 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
         }
     }
     // do checks dependant only on our faction
-    return GetFactionReactionTo(getFactionTemplateEntry(), target);
+    return GetFactionReactionTo(GetFactionTemplateEntry(), target);
 }
 
 ReputationRank WorldObject::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target)
@@ -3449,7 +3421,7 @@ ReputationRank WorldObject::GetFactionReactionTo(FactionTemplateEntry const* fac
     if (!factionTemplateEntry)
         return REP_NEUTRAL;
 
-    FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry();
+    FactionTemplateEntry const* targetFactionTemplateEntry = target->GetFactionTemplateEntry();
     if (!targetFactionTemplateEntry)
         return REP_NEUTRAL;
 
@@ -3482,8 +3454,6 @@ ReputationRank WorldObject::GetFactionReactionTo(FactionTemplateEntry const* fac
         return REP_FRIENDLY;
     if (targetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry))
         return REP_FRIENDLY;
-    if (factionTemplateEntry->factionFlags & FACTION_TEMPLATE_HOSTILE_BY_DEFAULT)
-        return REP_HOSTILE;
     // neutral by default
     return REP_NEUTRAL;
 }
@@ -3528,7 +3498,7 @@ bool WorldObject::IsValidAttackTarget(Unit const* target, bool checkAlive) const
             Player const* player = playerAffectingTarget ? playerAffectingTarget : playerAffectingAttacker;
             WorldObject const* object = playerAffectingTarget ? this : target;
 
-            if (FactionTemplateEntry const* factionTemplate = object->getFactionTemplateEntry())
+            if (FactionTemplateEntry const* factionTemplate = object->GetFactionTemplateEntry())
             {
                 if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
                     if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionTemplate->faction))
