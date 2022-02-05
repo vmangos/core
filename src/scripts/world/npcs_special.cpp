@@ -1241,7 +1241,7 @@ std::array<FireworkStruct, 25> const Fireworks =
     { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
 }};
 
-static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
+static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874 } };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1290,45 +1290,102 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
-        for (uint32 goEntry : Launcher)
-        {
-            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
-            {
-                pGo->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
-                break;
-            }
-        }
-
         float x, y, z;
         m_creature->GetPosition(x, y, z);
 
         if (Fireworks[m_uiIndex].m_bIsCluster)
         {
-            for (int i = 0; i < 5; ++i)
+            for (uint32 goEntry : Launcher)
             {
-                switch (i)
+                if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
                 {
-                case 0:
-                    m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
-                    break;
-                case 1:
-                    m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
-                    break;
-                case 2:
-                    m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
-                    break;
-                case 3:
-                    m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
-                    break;
-                case 4:
-                    m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
+                    switch (pGo->GetEntry())
+                    {
+                    case 180859: // Still needs to be sniffed (Schematic: Cluster Launcher).
+                    case 180869:
+                        for (int i = 0; i < 5; ++i)
+                        {
+                            switch (i)
+                            {
+                            case 0:
+                                m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
+                                break;
+                            case 1:
+                                m_creature->NearTeleportTo(x, y + 3.0f, z + 7.5f, 0.0f);
+                                break;
+                            case 2:
+                                m_creature->NearTeleportTo(x + 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                                break;
+                            case 3:
+                                m_creature->NearTeleportTo(x - 5.25f, y + 1.5, z + 7.5f, 0.0f);
+                                break;
+                            case 4:
+                                m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
+                                break;
+                            }
+                            m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                        }
+                        break;
+                    case 180772:
+                        for (int i = 0; i < 5; ++i)
+                        {
+                            switch (i)
+                            {
+                            case 0:
+                                m_creature->NearTeleportTo(x, y, z + 8.0f, 0.0f);
+                                break;
+                            case 1:
+                                m_creature->NearTeleportTo(x - 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                                break;
+                            case 2:
+                                m_creature->NearTeleportTo(x, y, z + 2.0f, 0.0f);
+                                break;
+                            case 3:
+                                m_creature->NearTeleportTo(x, y - 2.0f, z + 5.0f, 0.0f);
+                                break;
+                            case 4:
+                                m_creature->NearTeleportTo(x + 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                                break;
+                            }
+                            m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                        }
+                        break;
+                    case 180874:
+                        for (int i = 0; i < 5; ++i)
+                        {
+                            switch (i)
+                            {
+                            case 0:
+                                m_creature->NearTeleportTo(x + 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                                break;
+                            case 1:
+                                m_creature->NearTeleportTo(x, y + 2.0f, z + 5.0f, 0.0f);
+                                break;
+                            case 2:
+                                m_creature->NearTeleportTo(x, y, z + 2.0f, 0.0f);
+                                break;
+                            case 3:
+                                m_creature->NearTeleportTo(x - 3.5f, y + 1.0f, z + 5.0f, 0.0f);
+                                break;
+                            case 4:
+                                m_creature->NearTeleportTo(x, y, z + 8.0f, 0.0f);
+                                break;
+                            }
+                            m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                        }
+                        break;
+                    }
                     break;
                 }
-                m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
             }
+
+
         }
         else
+        {
+            m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
             m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
+        }
 
         // Lunar Fortune is casted 3 seconds later.
         if (m_bisLucky)

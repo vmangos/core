@@ -697,15 +697,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
-                case 26471: // Lunar Festival Port Error
-                {
-                    if (!m_caster->IsPlayer())
-                        return;
-
-                    m_caster->RemoveSpellCooldown(26373); // Remove cooldown from Lunar Invititation
-                    SendCastResult(SPELL_FAILED_NOT_HERE);
-                    return;
-                }
                 case 24531: // Refocus : "Instantly clears the cooldowns of Aimed Shot, Multishot, Volley, and Arcane Shot."
                 {
                     if (!m_caster->IsPlayer())
@@ -5638,13 +5629,10 @@ void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
             break;
         case GameObjectActions::AnimateCustom0:
             gameObjTarget->SendGameObjectCustomAnim(0);
-            break;
         case GameObjectActions::AnimateCustom1:
             gameObjTarget->SendGameObjectCustomAnim(1);
-            break;
         case GameObjectActions::AnimateCustom2:
             gameObjTarget->SendGameObjectCustomAnim(2);
-            break;
         case GameObjectActions::AnimateCustom3:
             gameObjTarget->SendGameObjectCustomAnim(3);
             break;
