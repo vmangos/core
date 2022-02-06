@@ -5629,10 +5629,13 @@ void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
             break;
         case GameObjectActions::AnimateCustom0:
             gameObjTarget->SendGameObjectCustomAnim(0);
+            break;
         case GameObjectActions::AnimateCustom1:
             gameObjTarget->SendGameObjectCustomAnim(1);
+            break;
         case GameObjectActions::AnimateCustom2:
             gameObjTarget->SendGameObjectCustomAnim(2);
+            break;
         case GameObjectActions::AnimateCustom3:
             gameObjTarget->SendGameObjectCustomAnim(3);
             break;
