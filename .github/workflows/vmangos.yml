@@ -40,7 +40,7 @@ jobs:
         os: [ubuntu-latest]
         compiler: [gcc, clang]
         include:
-          - os: windows-2019
+          - os: windows-latest
 
     steps:
 
@@ -56,11 +56,11 @@ jobs:
         sudo apt-get -qq install cmake build-essential cppcheck git make libiberty-dev openssl libssl-dev
       #windows dependencies
     - name: windows dependencies
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-latest'
       #Sets versions for ACE/TBB
       env:
-        ACE_VERSION: 6.5.11
-        ACE_VERSION2: 6_5_11
+        ACE_VERSION: 6.5.16
+        ACE_VERSION2: 6_5_16
         TBB_VERSION: 2020.3
 
       run: |
@@ -97,16 +97,16 @@ jobs:
         make install
     #windows
     - name: windows build & install
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-latest'
       run: |
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
         cd $GITHUB_WORKSPACE/ACE_wrappers
-        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
         cd $GITHUB_WORKSPACE
         mkdir build
         cd build
-        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
-        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 17 2022" -A x64 ..
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash
