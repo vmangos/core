@@ -24,8 +24,8 @@ jobs:
     - name: windows dependencies
       #Sets versions for ACE/TBB
       env:
-        ACE_VERSION: 6.5.16
-        ACE_VERSION2: 6_5_16
+        ACE_VERSION: 7.0.6
+        ACE_VERSION2: 7_0_6
         TBB_VERSION: 2020.3
         
       run: |
