@@ -128,7 +128,7 @@ void WorldSession::SendUpdateTrade(bool trader_state /*= true*/)
 //==============================================================
 // transfer the items to the players
 
-void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
+void WorldSession::MoveItems(Item* myItems[], Item* hisItems[])
 {
     Player* trader = _player->GetTrader();
     if (!trader)
@@ -470,7 +470,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         }
 
         // execute trade: 2. store
-        moveItems(myItems, hisItems);
+        MoveItems(myItems, hisItems);
 
         // logging money
         if (sWorld.getConfig(CONFIG_BOOL_GM_LOG_TRADE))
@@ -575,7 +575,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (isLogingOut())
+    if (IsLogingOut())
     {
         SendTradeStatus(TRADE_STATUS_YOU_LOGOUT);
         return;
@@ -619,7 +619,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetSession()->isLogingOut())
+    if (pOther->GetSession()->IsLogingOut())
     {
         SendTradeStatus(TRADE_STATUS_TARGET_LOGOUT);
         return;

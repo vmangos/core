@@ -464,26 +464,21 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
             {
                 switch (eventType)
                 {
-                case LINKING_EVENT_AGGRO:
-                    if (pMaster->IsControlledByPlayer())
-                        return;
-
-                    if (pMaster->IsInCombat())
-                        pMaster->SetInCombatWith(pEnemy);
-                    else
-                        pMaster->AI()->AttackStart(pEnemy);
-                    break;
-                case LINKING_EVENT_EVADE:
-                    if (!pMaster->IsAlive())
-                        pMaster->Respawn();
-                    break;
-                case LINKING_EVENT_RESPAWN:
-                    if (pMaster->IsAlive())
-                        SetFollowing(pSource, pMaster);
-                    break;
-                case LINKING_EVENT_DIE:                 // Nothing linked for this case
-                case LINKING_EVENT_DESPAWN:             // Nothing linked for this case
-                    break;
+                    case LINKING_EVENT_AGGRO:
+                        if (pMaster->IsControlledByPlayer())
+                            return;
+                        pMaster->EnterCombatWithTarget(pEnemy);
+                    case LINKING_EVENT_EVADE:
+                        if (!pMaster->IsAlive())
+                            pMaster->Respawn();
+                        break;
+                    case LINKING_EVENT_RESPAWN:
+                        if (pMaster->IsAlive())
+                            SetFollowing(pSource, pMaster);
+                        break;
+                    case LINKING_EVENT_DIE:                 // Nothing linked for this case
+                    case LINKING_EVENT_DESPAWN:             // Nothing linked for this case
+                        break;
                 }
             }
         }

@@ -179,8 +179,6 @@ class ChatHandler
         ChatCommand* getCommandTable();
         
         bool HandleAnticheatCommand(char*);
-        bool HandleClientInfosCommand(char*);
-        bool HandleClientSearchCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
         bool HandleViewLogCommand(char*);
 
@@ -196,11 +194,13 @@ class ChatHandler
         bool HandleCheatAlwaysProcCommand(char *);
         bool HandleCheatTriggerPassCommand(char *);
         bool HandleCheatIgnoreTriggersCommand(char *);
+        bool HandleCheatImmuneToPlayersCommand(char *);
+        bool HandleCheatImmuneToCreaturesCommand(char *);
+        bool HandleCheatUntargetableCommand(char *);
         bool HandleCheatWaterwalkCommand(char* args);
         bool HandleCheatWallclimbCommand(char* args);
 
         //Custom
-        bool HandleListAddonsCommand(char *);
         bool HandleSendSpellVisualCommand(char *);
         bool HandleSendSpellImpactCommand(char *);
         bool HandleDebugUnitCommand(char *);
@@ -224,18 +224,10 @@ class ChatHandler
         bool HandleAntiSpamReplace(char* args);
         bool HandleAntiSpamRemoveReplace(char* args);
 
-        // Packet dump
-        bool HandleReplayPlayCommand(char *);
-        bool HandleReplayRecordCommand(char *);
-        bool HandleReplayForwardCommand(char*);
-        bool HandleReplayStopCommand(char*);
-        bool HandleReplaySpeedCommand(char*);
-        bool HandleDebugRecvPacketDumpWrite(char *);
         // Mmaps
         bool HandleMmap(char* args);
         bool HandleMmapConnection(char* args);
         bool HandleMmapTestArea(char* args);
-        bool HandleMmapDebug(char* args);
         bool HandleMmapUnload(char *args);
         bool HandleMmapLoad(char* args);
         bool HandleMmapPathCommand(char* args);
@@ -705,6 +697,7 @@ class ChatHandler
         bool HandleNpcSetWanderDistCommand(char* args);
         bool HandleNpcSetSpawnTimeCommand(char* args);
         bool HandleNpcSpawnSpawnTimeCommand(char* args);
+        bool HandleNpcSetReactStateCommand(char* args);
         bool HandleNpcTameCommand(char* args);
         bool HandleNpcTextEmoteCommand(char* args);
         bool HandleNpcUnFollowCommand(char* args);
@@ -972,6 +965,7 @@ class ChatHandler
         bool HandleMaxSkillCommand(char* args);
         bool HandleSetSkillCommand(char* args);
         bool HandleRespawnCommand(char* args);
+        bool HandleChargeCommand(char* args);
         bool HandleComeToMeCommand(char* args);
         bool HandleCombatStopCommand(char* args);
         bool HandleRepairitemsCommand(char* args);

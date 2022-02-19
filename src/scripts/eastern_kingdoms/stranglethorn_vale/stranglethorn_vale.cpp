@@ -48,7 +48,7 @@ struct mob_yennikuAI : public ScriptedAI
         m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
     }
 
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
+    void SpellHit(SpellCaster* caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -202,7 +202,7 @@ struct npc_molthorAI : public npc_escortAI
         m_uiPhase = 0;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(SpellCaster* pCaster, const SpellEntry* pSpell)
     {
         if (pSpell->Id == SPELL_MOLTHOR_HEART_THROW)
         {

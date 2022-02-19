@@ -444,13 +444,9 @@ void GameEventMgr::LoadFromDB()
     }
 
     mGameEventCreatureData.resize(mGameEvent.size());
-    //                                   0              1                             2
-    result = WorldDatabase.Query("SELECT creature.guid, game_event_creature_data.event, game_event_creature_data.display_id,"
-                                 //   3                                      4
-                                 "game_event_creature_data.equipment_id, game_event_creature_data.entry_id, "
-                                 //   5                                     6
-                                 "game_event_creature_data.spell_start, game_event_creature_data.spell_end "
-                                 "FROM creature JOIN game_event_creature_data ON creature.guid=game_event_creature_data.guid");
+    //                                     0       1        2             3               4           5              6
+    result = WorldDatabase.PQuery("SELECT `guid`, `event`, `display_id`, `equipment_id`, `entry_id`, `spell_start`, `spell_end` "
+                                  "FROM `game_event_creature_data` t1 WHERE `patch`=(SELECT max(`patch`) FROM `game_event_creature_data` t2 WHERE t1.`guid`=t2.`guid` && t1.`event`=t2.`event` && `patch` <= %u)", sWorld.GetWowPatch());
 
     count = 0;
     if (!result)

@@ -697,6 +697,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 26471: // Lunar Festival Port Error
+                {
+                    if (!m_caster->IsPlayer())
+                        return;
+
+                    m_caster->RemoveSpellCooldown(26373); // Remove cooldown from Lunar Invititation
+                    SendCastResult(SPELL_FAILED_NOT_HERE);
+                    return;
+                }
                 case 24531: // Refocus : "Instantly clears the cooldowns of Aimed Shot, Multishot, Volley, and Arcane Shot."
                 {
                     if (!m_caster->IsPlayer())
@@ -1413,7 +1422,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Fake death
                     //m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEING_DEATH);
-                    m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_casterUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     m_casterUnit->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     m_casterUnit->AddUnitState(UNIT_STAT_FEIGN_DEATH);
 
@@ -1568,7 +1577,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 14813: // Dark Iron Drunk Mug
                 {
-                    if (unitTarget->HasAura(14823) || unitTarget->GetEntry() == 14871)
+                    if (unitTarget->HasAura(14823))
                         return;
 
                     if (m_originalCasterGUID && m_originalCasterGUID.IsGameObject())
@@ -2083,10 +2092,6 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
 
             return;
         }
-        // just skip
-        case 23770:                                         // Sayge's Dark Fortune of *
-            // not exist, common cooldown can be implemented in scripts if need.
-            return;
         // Brittle Armor - (need add max stack of 24575 Brittle Armor)
         case 29284:
             m_caster->CastSpell(unitTarget, 24575, true, m_CastItem, nullptr, m_originalCasterGUID);
@@ -3127,7 +3132,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
                     {
                         if (CharmInfo *charm = unitTarget->GetCharmInfo())
                             if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                if (ft->IsFriendlyTo(*m_caster->getFactionTemplateEntry()))
+                                if (ft->IsFriendlyTo(*m_caster->GetFactionTemplateEntry()))
                                     priority_dispel = dispel_list.size();
                     }
                     else if (positive == friendly)
@@ -3712,7 +3717,9 @@ void Spell::EffectSpawn(SpellEffectIndex /*eff_idx*/)
     if (!unitTarget || (unitTarget->GetTypeId() != TYPEID_UNIT))
         return;
 
-    unitTarget->SetVisibility(VISIBILITY_ON);
+    if (unitTarget->GetVisibility() != VISIBILITY_ON)
+        unitTarget->SetVisibility(VISIBILITY_ON);
+    unitTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 }
 
 void Spell::EffectTradeSkill(SpellEffectIndex /*eff_idx*/)
@@ -4436,7 +4443,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 2765: // SHOWLABEL Only ON
                 {
                     if (Player* pPlayer = ToPlayer(m_caster))
-                        pPlayer->SetGMChat(true, true);;
+                        pPlayer->SetGMChat(true, true);
                     return;
                 }
                 case 1509: // GM Only OFF
@@ -4734,6 +4741,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, spellId, true);
                     return;
                 }
+                case 24731:                                    // Cannon Fire
+                {
+                    if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    unitTarget->CastSpell(m_caster, 24742, true);
+                    return;
+                }
                 case 24737:                                 // Ghost Costume
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
@@ -4745,6 +4760,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // Ghost Costume (male or female)
                     m_caster->CastSpell(unitTarget, unitTarget->GetGender() == GENDER_MALE ? 24735 : 24736, true);
+                    return;
+                }
+                case 24742:                                 // Magic Wings
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->RemoveAurasDueToSpell(24754);   // Darkmoon Faire Cannon root aura
                     return;
                 }
                 case 24751:                                 // Trick or Treat
@@ -5815,7 +5838,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
         return;
 
     // Nostalrius (INTERFACTION) : Totem furie-des-vents ecrase les benes de puissance et des rois Paladin.
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
+    /*if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
     {
         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_MOD_ATTACK_POWER);
         for (const auto aura : auras)
@@ -5840,7 +5863,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
             }
         }
     }
-
+    */
     if (m_spellInfo->EffectMiscValue[eff_idx])
     {
         uint32 enchant_id = m_spellInfo->EffectMiscValue[eff_idx];
@@ -6559,31 +6582,39 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         float max_dis = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
         float dis = rand_norm_f() * (max_dis - min_dis) + min_dis;
 
+        float max_angle = (max_dis - min_dis) / (max_dis + m_caster->GetObjectBoundingRadius());
+        float angle_offset = max_angle * (rand_norm_f() - 0.5f);
+
         float x, y, z;
         m_casterUnit->GetPosition(x, y, z);
-        fx = x + dis * cos(m_casterUnit->GetOrientation());
-        fy = y + dis * sin(m_casterUnit->GetOrientation());
+        fx = x + dis * cos(m_casterUnit->GetOrientation()+ angle_offset);
+        fy = y + dis * sin(m_casterUnit->GetOrientation()+ angle_offset);
         fz = z;
-        m_casterUnit->GetMap()->GetLosHitPosition(x, y, z + 0.5f, fx, fy, fz, -1.5f);
+        m_casterUnit->GetMap()->GetLosHitPosition(x, y, z + 2.0f, fx, fy, fz, -1.5f);
     }
 
     Map* cMap = m_casterUnit->GetMap();
 
     if (goinfo->type == GAMEOBJECT_TYPE_FISHINGNODE)
     {
-        float waterLevel = m_casterUnit->GetTerrain()->GetWaterLevel(fx, fy, fz);
-        if (waterLevel == VMAP_INVALID_HEIGHT_VALUE)             // Hack to prevent fishing bobber from failing to land on fishing hole
+        GridMapLiquidData liqData;
+
+        if (!m_caster->GetTerrain()->IsSwimmable(fx, fy, m_caster->GetPositionZ() + 1.0f, 1.5f, &liqData))
+            m_caster->GetTerrain()->IsSwimmable(fx, fy, liqData.level, 1.5f, &liqData);
+
+        float x, y, z;
+        m_casterUnit->GetPosition(x, y, z);
+        if ((abs(liqData.depth_level) < 1) || !(m_caster->GetMap()->isInLineOfSight(x, y, z + 2.0f, fx, fy, liqData.level))) // Hack to prevent fishing bobber from failing to land on fishing hole
         {
-            // but this is not proper, we really need to ignore not materialized objects
+            // But this is not proper, we really need to ignore not materialized objects
             SendCastResult(SPELL_FAILED_NOT_FISHABLE);
             SendChannelUpdate(0);
             finish();
             return;
         }
 
-        // replace by water level in this case
-        //fz = cMap->GetWaterLevel(fx, fy);
-        fz = waterLevel;
+        // Replace by water level in this case
+        fz = liqData.level;
     }
 
     GameObject* pGameObj = new GameObject;

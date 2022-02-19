@@ -45,7 +45,7 @@ enum
     SPELL_STORM =               26546,
 
     SPELL_ENRAGE =              24318,
-    EMOTE_ENRAGE =              -1000003,
+    EMOTE_ENRAGE =              2384,
 
     SPELL_TRANSFER =            2400,
     EMOTE_TRANSFER =            -1388101,

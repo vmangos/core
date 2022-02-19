@@ -956,11 +956,16 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
     targetInfo.HitInfo = 0x0;
     targetInfo.damage = 0;
 
-    // Calculate hit result
-    targetInfo.missCondition = m_caster->SpellHitResult(pTarget, m_spellInfo, effIndex, m_canReflect, this);
-
     // spell fly from visual cast object
     SpellCaster* affectiveObject = GetAffectiveCasterObject();
+
+    if (affectiveObject && m_spellInfo->CanCrit())
+        targetInfo.isCrit = affectiveObject->IsSpellCrit(pTarget, m_spellInfo, m_spellSchoolMask, m_attackType, this);
+    else
+        targetInfo.isCrit = false;
+
+    // Calculate hit result
+    targetInfo.missCondition = m_caster->SpellHitResult(pTarget, m_spellInfo, effIndex, m_canReflect, this);
 
     // Spell have speed - need calculate incoming time
     if (m_spellInfo->speed > 0.0f && affectiveObject && pTarget != affectiveObject)
@@ -1126,7 +1131,19 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     target->processed = true;                               // Target checked in apply effects procedure
 
     // Get mask of effects for target
-    uint32 mask = target->effectMask;
+    uint32 effectMask = target->effectMask;
+    if (effectMask)
+    {
+        // Some persistent area aura spells target units in SMSG_SPELL_GO,
+        // but we do not want to execute the effect again for each unit.
+        for (int effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
+        {
+            if ((effectMask & (1 << effectNumber)) && m_spellInfo->Effect[effectNumber] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+                effectMask &= ~(1 << effectNumber);
+        }
+        if (!effectMask)
+            return;
+    }
 
     Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_casterUnit : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
     if (!unit)
@@ -1158,25 +1175,29 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     
     // Drop some attacker proc flags if this is a secondary target. Do not need to change
     // the victim proc flags.
-    if (m_targetNum > 1) {
+    if (m_targetNum > 1)
+    {
         // If this is a melee spell hit, strip the flag and apply a spell hit flag instead.
         // This is required to proc things like Deep Wounds on the victim when hitting 
         // multiple targets, but not proc additional melee-only beneficial auras on the 
         // attacker like Sweeping Strikes. Leave the victim proc flags responding to a melee
         // spell.
-        if (procAttacker & PROC_FLAG_DEAL_MELEE_ABILITY) {
+        if (procAttacker & PROC_FLAG_DEAL_MELEE_ABILITY)
+        {
             procAttacker &= ~(PROC_FLAG_DEAL_MELEE_ABILITY);
             procAttacker |= PROC_FLAG_DEAL_HARMFUL_SPELL;
         }
-        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST)) {
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST))
+        {
             // Secondary target on a successful spell cast. Remove these flags so we're not
             // proccing beneficial auras multiple times. Also remove negative spell hit for
             // chain lightning + clearcasting. Leave positive effects
             // eg. Chain heal/lightning & Zandalarian Hero Charm
-            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | 
-                              PROC_FLAG_DEAL_HARMFUL_SPELL);
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST |
+                PROC_FLAG_DEAL_HARMFUL_SPELL);
         }
-        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_DEAL_HARMFUL_SPELL)) {
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_DEAL_HARMFUL_SPELL))
+        {
             // Do not allow secondary hits for negative aoe spells (such as Arcane Explosion) 
             // to proc beneficial abilities such as Clearcasting. Positive aoe spells can
             // still trigger, as in the case of prayer of healing and inspiration...
@@ -1199,60 +1220,60 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // mark effects that were already handled in Spell::HandleDelayedSpellLaunch on spell launch as processed
         for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             if (m_spellInfo->IsEffectHandledOnDelayedSpellLaunch(SpellEffectIndex(i)))
-                mask &= ~(1 << i);
+                effectMask &= ~(1 << i);
 
         // maybe used in effects that are handled on hit
         m_damage += target->damage;
     }
 
     if (missInfo == SPELL_MISS_NONE)                        // In case spell hit target, do all effect on that target
-        DoSpellHitOnUnit(unit, mask);
+        DoSpellHitOnUnit(unit, effectMask);
     if (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE)
     {
         if (m_casterUnit)
         {
             isReflected = true;
-            DoSpellHitOnUnit(m_casterUnit, mask);
+            DoSpellHitOnUnit(m_casterUnit, effectMask);
             unitTarget = m_casterUnit;
         }
     }
-    else                                                    // in 1.12.1 we need explicit miss info
+    else if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST || missInfo == SPELL_MISS_IMMUNE)
     {
-        if (missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
+        // in 1.12.1 we need explicit miss info
+        if (pRealUnitCaster && pRealUnitCaster != unit)
         {
-            if (pRealUnitCaster && pRealUnitCaster != unit)
+            if (!m_spellInfo->IsPositiveSpell() && (m_caster->IsVisibleForOrDetect(unit, unit, false) || m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET)))
             {
-                if (!m_spellInfo->IsPositiveSpell() && (m_caster->IsVisibleForOrDetect(unit, unit, false) || m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET)))
+                // SPELL_ATTR_EX2_NO_INITIAL_THREAT is only checked on hit
+                // test case: cast Starshards on target immune to Arcane (Manaclaw in Winterspring)
+                // target will aggro instantly, while not immune target will not until damage is dealt
+                bool combat = (!IsTriggeredByAura() || m_spellInfo->speed) &&
+                                !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT);
+
+                // Pickpocket can cause back attack if failed
+                if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET))
                 {
-                    bool combat = !IsTriggeredByAura() &&
-                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
-                                  !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT);
+                    pRealUnitCaster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                    combat = true;
+                }
 
-                    // Pickpocket can cause back attack if failed
-                    if (m_spellInfo->HasAttribute(SPELL_ATTR_EX_IS_PICKPOCKET))
+                if (combat)
+                {
+                    if (!m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS))
                     {
-                        pRealUnitCaster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                        combat = true;
+                        if (!unit->IsInCombat())
+                            unit->AttackedBy(pRealUnitCaster);
+
+                        unit->AddThreat(pRealUnitCaster);
+                        unit->SetInCombatWithAggressor(pRealUnitCaster);
                     }
-
-                    if (combat)
-                    {
-                        if (!m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS))
-                        {
-                            if (!unit->IsInCombat())
-                                unit->AttackedBy(pRealUnitCaster);
-
-                            unit->AddThreat(pRealUnitCaster);
-                            unit->SetInCombatWithAggressor(pRealUnitCaster);
-                        }
                         
-                        pRealUnitCaster->SetInCombatWithVictim(unit);
-                    }
-                    else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_OUT_OF_COMBAT_ATTACK))
-                    {
-                        unit->SetOutOfCombatWithAggressor(pRealUnitCaster);
-                        pRealUnitCaster->SetOutOfCombatWithVictim(unit);
-                    }
+                    pRealUnitCaster->SetInCombatWithVictim(unit);
+                }
+                else if (m_spellInfo->HasAttribute(SPELL_ATTR_EX3_OUT_OF_COMBAT_ATTACK))
+                {
+                    unit->SetOutOfCombatWithAggressor(pRealUnitCaster);
+                    pRealUnitCaster->SetOutOfCombatWithVictim(unit);
                 }
             }
         }
@@ -1290,7 +1311,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // Do healing and triggers
     if (m_healing)
     {
-        bool crit = pRealCaster && pRealCaster->IsSpellCrit(unitTarget, m_spellInfo, m_spellSchoolMask, BASE_ATTACK, this);
+        bool crit = target->isCrit;
         uint32 addhealth = ditheru(m_healing);
         if (crit)
         {
@@ -1381,7 +1402,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
             for (uint8 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
             {
-                if ((mask & (1 << effectNumber)) &&
+                if ((effectMask & (1 << effectNumber)) &&
                     IsDirectDamageWithBonusEffect(m_spellInfo->Effect[effectNumber]))
                 {
                     damageEffectIndex = SpellEffectIndex(effectNumber);
@@ -1389,7 +1410,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 }
             }
 
-            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this);
+            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this, target->isCrit);
         }
 
         unitTarget->CalculateAbsorbResistBlock(pCaster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
@@ -1408,7 +1429,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Send log damage message to client
         pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
 
-        procEx = createProcExtendMask(&damageInfo, missInfo);
+        procEx = CreateProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 
         // (HACK) trigger Vengeance on weapon crits for Paladins
@@ -1502,7 +1523,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(pCaster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
-        procEx = createProcExtendMask(&damageInfo, missInfo);
+        procEx = CreateProcExtendMask(&damageInfo, missInfo);
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         uint32 dmg = 0;
         // Sometime we need to manually set dmg != 0 (arcane projectile triggers a spell that deals damage)
@@ -1547,14 +1568,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             if (Player* p = pRealUnitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
                 p->RewardPlayerAndGroupAtCast(unit, m_spellInfo->Id);
 
-        if (m_casterUnit)
-        {
-            if (((Creature*)unit)->AI())
-                ((Creature*)unit)->AI()->SpellHit(m_casterUnit, m_spellInfo);
+        if (((Creature*)unit)->AI())
+            ((Creature*)unit)->AI()->SpellHit(m_caster, m_spellInfo);
 
-            if (ZoneScript* pZoneScript = unit->GetZoneScript())
-                pZoneScript->OnCreatureSpellHit(m_casterUnit, unit->ToCreature(), m_spellInfo);
-        }
+        if (ZoneScript* pZoneScript = unit->GetZoneScript())
+            pZoneScript->OnCreatureSpellHit(m_caster, unit->ToCreature(), m_spellInfo);
     }
 
     
@@ -1619,8 +1637,8 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
     if (pRealCaster && pRealCaster != unit)
     {
-        // Recheck  UNIT_FLAG_NON_ATTACKABLE for delayed spells
-        if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
+        // Recheck  UNIT_FLAG_SPAWNING for delayed spells
+        if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
             unit->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid())
         {
             pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
@@ -1655,7 +1673,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                     (m_spellInfo->Id == 6358 || // Exception to fix succubus seduction.
                      m_caster->IsVisibleForOrDetect(unit, unit, false)))
             {
-                if (!IsTriggeredByAura() &&
+                if ((!IsTriggeredByAura() || m_spellInfo->speed) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_THREAT_ONLY_ON_MISS) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT))
@@ -1926,7 +1944,7 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
         }
 
         if (m_damage > 0)
-            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this);
+            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this, target->isCrit);
     }
 
     target->damage = damageInfo.damage;
@@ -2541,7 +2559,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 // remove not targetable units if spell has no script targets
                 for (UnitList::iterator itr = targetUnitMap.begin(); itr != targetUnitMap.end();)
                 {
-                    if (!(*itr)->IsTargetable(true, m_caster->IsCharmerOrOwnerPlayerOrPlayerItself(), true, false) || !m_spellInfo->CanTargetAliveState((*itr)->IsAlive()))
+                    if (!(*itr)->IsTargetableBy(m_caster, true, false) || !m_spellInfo->CanTargetAliveState((*itr)->IsAlive()))
                         targetUnitMap.erase(itr++);
                     else
                         ++itr;
@@ -2595,11 +2613,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
         {
-            // targets the ground, not the units in the area
             switch (m_spellInfo->Effect[effIndex])
             {
-                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                    break;
                 case SPELL_EFFECT_SUMMON:
                     if (m_casterUnit)
                         targetUnitMap.push_back(m_casterUnit);
@@ -3878,30 +3893,32 @@ void Spell::cast(bool skipCheck)
     SendCastResult(castResult);
     InitializeDamageMultipliers();
 
-    // AoE case. Trigger spells for caster now.
-    if (m_procAttacker & PROC_FLAG_SUCCESSFUL_AOE && m_canTrigger)
+    // Trigger procs on cast end for caster.
+    if (m_canTrigger && m_casterUnit)
     {
-        uint32 procAttacker = 0;
-        // Blizzard case. Should trigger at launch for clearcast.
-        if (m_spellInfo->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_BLIZZARD>())
-            procAttacker = m_procAttacker;
-        else
-            procAttacker = (m_procAttacker & PROC_FLAG_ON_TRAP_ACTIVATION);
-        uint32 procAttackerFlags = procAttacker;
-        if (!IsTriggered())
+        uint32 procEx = PROC_EX_CAST_END;
+        Unit* pTarget = m_targets.getUnitTarget() ? m_targets.getUnitTarget() : m_casterUnit;
+        for (const auto& target : m_UniqueTargetInfo)
         {
-            procAttackerFlags |= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_AOE);
-            if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
-                procAttackerFlags |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+            if (target.targetGUID == pTarget->GetObjectGuid())
+            {
+                if (target.missCondition == SPELL_MISS_NONE)
+                    procEx |= (target.isCrit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT);
+                else
+                    procEx |= CreateProcExtendMask(nullptr, target.missCondition);
+                break;
+            }
         }
-        m_caster->ProcDamageAndSpell(ProcSystemArguments(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this));
-    }
 
-    // Shaman totems. Trigger spell cast procs, but not others
-    if (m_spellInfo->IsTotemSummonSpell() && m_canTrigger && m_casterUnit)
-    {
-        uint32 procAttackerFlags = PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
-        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(m_casterUnit, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this));
+        // This will trigger only auras with PROC_EX_CAST_END.
+        m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(pTarget, m_procAttacker, PROC_FLAG_NONE, procEx, 1, m_attackType, m_spellInfo, this));
+
+        // Trigger procs for spells with no unit targets at cast time.
+        if (m_UniqueTargetInfo.empty())
+        {
+            if (uint32 procAttacker = m_procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST))
+                m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(nullptr, procAttacker, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this));
+        }
     }
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
@@ -6763,7 +6780,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!friendly_dispel && !positive && holder->GetSpellProto()->IsCharmSpell())
                             if (CharmInfo *charm = unit_target->GetCharmInfo())
                                 if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                    if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*m_caster->getFactionTemplateEntry()))
+                                    if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*m_caster->GetFactionTemplateEntry()))
                                         bFoundOneDispell = true;
                         if (positive == friendly_dispel)
                             continue;
@@ -6976,7 +6993,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!m_caster->IsPlayer() || m_CastItem)
                     break;
 
-                if (m_targets.getUnitTarget()->GetPowerType() != POWER_MANA)
+                if (m_targets.getUnitTarget() && m_targets.getUnitTarget()->GetPowerType() != POWER_MANA)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;
@@ -7076,7 +7093,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
         if (_target)                                         //for target dead/target not valid
         {
-            if (!_target->IsTargetable(true, m_casterUnit->IsCharmerOrOwnerPlayerOrPlayerItself()))
+            if (!_target->IsTargetableBy(m_spellInfo->IsPositiveSpell() ? nullptr : m_casterUnit))
                 return SPELL_FAILED_BAD_TARGETS;            // guessed error
 
             // SPELL_EFFECT_DISPEL -> Positive or negative depending on the target
@@ -8091,7 +8108,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
     if (target != m_caster && target->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid())
     {
         // any unattackable target skipped
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING))
             return false;
 
         // unselectable targets skipped in all cases except TARGET_UNIT_SCRIPT_NEAR_CASTER targeting
@@ -8393,7 +8410,6 @@ public:
     SpellTargets i_TargetType;
     SpellCaster* i_originalCaster;
     SpellCaster* i_castingObject;
-    bool i_playerControlled;
     float i_centerX;
     float i_centerY;
 
@@ -8413,7 +8429,6 @@ public:
     {
         if (!i_originalCaster)
             i_originalCaster = i_spell.GetAffectiveCasterObject();
-        i_playerControlled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
 
         switch (i_push_type)
         {
@@ -8471,7 +8486,7 @@ public:
             if (i_TargetType != SPELL_TARGETS_ALL)
             {
                 bool const forAttack = i_TargetType == SPELL_TARGETS_HOSTILE || i_TargetType == SPELL_TARGETS_NOT_FRIENDLY || i_TargetType == SPELL_TARGETS_AOE_DAMAGE;
-                if (!unit->IsTargetable(forAttack, i_playerControlled, true, false) || !i_spell.m_spellInfo->CanTargetAliveState(unit->IsAlive()))
+                if (!unit->IsTargetableBy(forAttack ? i_originalCaster : nullptr, true, false) || !i_spell.m_spellInfo->CanTargetAliveState(unit->IsAlive()))
                     continue;
             }
 

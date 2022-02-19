@@ -179,7 +179,7 @@ void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y
     mover->GetSession()->SendPacket(&data);
 }
 
-void MovementPacketSender::SendTeleportToObservers(Unit* unit)
+void MovementPacketSender::SendTeleportToObservers(Unit* unit, float x, float y, float z, float ang)
 {
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
@@ -194,8 +194,14 @@ void MovementPacketSender::SendTeleportToObservers(Unit* unit)
 #else
     data << unit->GetGUID();
 #endif
-    data << unit->m_movementInfo;
-    unit->SendMovementMessageToSet(std::move(data), true, mover);
+
+    // copy moveinfo to change position to where player is teleporting
+    MovementInfo moveInfo = unit->m_movementInfo;
+    moveInfo.ChangePosition(x, y, z, ang);
+    data << moveInfo;
+
+    // not using SendMovementMessageToSet because we want the packet sent now
+    unit->SendObjectMessageToSet(&data, true, mover);
 }
 
 void MovementPacketSender::SendKnockBackToController(Unit* unit, float vcos, float vsin, float speedXY, float speedZ)

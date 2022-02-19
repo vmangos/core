@@ -1,3 +1,4 @@
+#include <World.h>
 #include "CombatBotBaseAI.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -2323,7 +2324,7 @@ bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const*
                     if (!friendly_dispel && !positive && holder->GetSpellProto()->IsCharmSpell())
                         if (CharmInfo *charm = pTarget->GetCharmInfo())
                             if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*me->getFactionTemplateEntry()))
+                                if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*me->GetFactionTemplateEntry()))
                                     bFoundOneDispell = true;
                     if (positive == friendly_dispel)
                         continue;
@@ -2636,7 +2637,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
                 continue;
 
             // Avoid low level items
-            if ((pProto->ItemLevel + 10) < me->GetLevel())
+            if ((pProto->ItemLevel + sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_RANDOM_GEAR_LEVEL_DIFFERENCE)) < me->GetLevel())
                 continue;
         }
 

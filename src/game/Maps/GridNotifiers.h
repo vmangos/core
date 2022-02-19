@@ -1009,19 +1009,21 @@ namespace MaNGOS
                 if (u == i_funit)
                     return;
 
-                if (!u->CanAssistTo(i_funit, i_enemy, false))
-                    return;
-
                 // too far
                 if (!i_funit->IsWithinDistInMap(u, i_range))
+                    return;
+
+                if (!u->CanBeTargetedByCallForHelp(i_funit, i_enemy, false))
                     return;
 
                 // only if see assisted creature
                 if (!i_funit->IsWithinLOSInMap(u))
                     return;
 
-                if (u->AI())
+                if (u->CanRespondToCallForHelpAgainst(i_enemy) && u->AI())
                     u->AI()->AttackStart(i_enemy);
+                else if (u->CanFleeFromCallForHelpAgainst(i_enemy))
+                    u->MoveAwayFromTarget(i_enemy, 10.0f);
             }
 
         private:
@@ -1532,7 +1534,7 @@ namespace MaNGOS
                 if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist), true, false))
                     return false;
 
-                if (!u->IsTargetable(true, m_me->IsCharmerOrOwnerPlayerOrPlayerItself()))
+                if (!u->IsTargetableBy(m_me))
                     return false;
 
                 if (m_ignoreCivilians && u->IsCreature() && static_cast<Creature*>(u)->IsCivilian())

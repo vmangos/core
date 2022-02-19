@@ -26,221 +26,221 @@ using G3D::Ray;
 
 namespace VMAP
 {
-ModelInstance::ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel> model): ModelSpawn(spawn), iModel(model)
-{
-    iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
-    iInvScale = 1.f / iScale;
-}
-
-bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit) const
-{
-    if (!iModel)
+    ModelInstance::ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel> model): ModelSpawn(spawn), iModel(model)
     {
-#ifdef VMAP_DEBUG
-        DEBUG_LOG("<object not loaded>");
-#endif
-        return false;
-    }
-    float time = pRay.intersectionTime(iBound);
-    if (time == G3D::inf())
-    {
-#ifdef VMAP_DEBUG
-        DEBUG_LOG("Ray does not hit '%s'", name.c_str());
-#endif
-        return false;
-    }
-    // child bounds are defined in object space:
-    Vector3 p = iInvRot * (pRay.origin() - iPos) * iInvScale;
-    Ray modRay(p, iInvRot * pRay.direction());
-    float distance = pMaxDist * iInvScale;
-    bool hit = iModel->IntersectRay(modRay, distance, pStopAtFirstHit);
-    if (hit)
-    {
-        distance *= iScale;
-        pMaxDist = distance;
-        //sLog.outString("LoS HIT ! Flags 0x%x (%s)", flags, name.c_str());
-    }
-    return hit;
-}
-
-void ModelInstance::intersectPoint(G3D::Vector3 const& p, AreaInfo& info) const
-{
-    if (!iModel)
-    {
-#ifdef VMAP_DEBUG
-        DEBUG_LOG("<object not loaded>");
-#endif
-        return;
+        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
+        iInvScale = 1.f / iScale;
     }
 
-    // M2 files don't contain area info, only WMO files
-    if (flags & MOD_M2)
-        return;
-    if (!iBound.contains(p))
-        return;
-    // child bounds are defined in object space:
-    Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-    Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
-    float zDist;
-    if (iModel->IntersectPoint(pModel, zDirModel, zDist, info))
+    bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool ignoreM2Model) const
     {
-        Vector3 modelGround = pModel + zDist * zDirModel;
-        // Transform back to world space. Note that:
-        // Mat * vec == vec * Mat.transpose()
-        // and for rotation matrices: Mat.inverse() == Mat.transpose()
-        float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
-        if (info.ground_Z < world_Z)
+        if (!iModel)
         {
-            info.ground_Z = world_Z;
-            info.adtId = adtId;
+    #ifdef VMAP_DEBUG
+            DEBUG_LOG("<object not loaded>");
+    #endif
+            return false;
+        }
+        float time = pRay.intersectionTime(iBound);
+        if (time == G3D::inf())
+        {
+    #ifdef VMAP_DEBUG
+            DEBUG_LOG("Ray does not hit '%s'", name.c_str());
+    #endif
+            return false;
+        }
+        // child bounds are defined in object space:
+        Vector3 p = iInvRot * (pRay.origin() - iPos) * iInvScale;
+        Ray modRay(p, iInvRot * pRay.direction());
+        float distance = pMaxDist * iInvScale;
+        bool hit = iModel->IntersectRay(modRay, distance, pStopAtFirstHit, ignoreM2Model);
+        if (hit)
+        {
+            distance *= iScale;
+            pMaxDist = distance;
+            //sLog.outString("LoS HIT ! Flags 0x%x (%s)", flags, name.c_str());
+        }
+        return hit;
+    }
+
+    void ModelInstance::intersectPoint(G3D::Vector3 const& p, AreaInfo& info) const
+    {
+        if (!iModel)
+        {
+    #ifdef VMAP_DEBUG
+            DEBUG_LOG("<object not loaded>");
+    #endif
+            return;
+        }
+
+        // M2 files don't contain area info, only WMO files
+        if (flags & MOD_M2)
+            return;
+        if (!iBound.contains(p))
+            return;
+        // child bounds are defined in object space:
+        Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
+        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        float zDist;
+        if (iModel->IntersectPoint(pModel, zDirModel, zDist, info))
+        {
+            Vector3 modelGround = pModel + zDist * zDirModel;
+            // Transform back to world space. Note that:
+            // Mat * vec == vec * Mat.transpose()
+            // and for rotation matrices: Mat.inverse() == Mat.transpose()
+            float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
+            if (info.ground_Z < world_Z)
+            {
+                info.ground_Z = world_Z;
+                info.adtId = adtId;
+            }
         }
     }
-}
 
-bool ModelInstance::isUnderModel(G3D::Vector3 const& p, float* outDist, float* inDist) const
-{
-    if (!iModel)
+    bool ModelInstance::isUnderModel(G3D::Vector3 const& p, float* outDist, float* inDist) const
     {
-#ifdef VMAP_DEBUG
-        DEBUG_LOG("<object not loaded>");
-#endif
-        return false;
-    }
-
-    // M2 files don't have bounds
-    if (flags & MOD_M2)
-    {
-        //if (p.
-    }
-    else if (!iBound.contains(p))
-        return false;
-    // child bounds are defined in object space:
-    Vector3 up(0, 0, 1);
-    Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-    up = iInvRot * up * iInvScale;
-
-    return iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist);
-}
-
-bool ModelInstance::GetLocationInfo(G3D::Vector3 const& p, LocationInfo& info) const
-{
-    if (!iModel)
-    {
-#ifdef VMAP_DEBUG
-        DEBUG_LOG("<object not loaded>");
-#endif
-        return false;
-    }
-
-    // M2 files don't contain area info, only WMO files
-    if (flags & MOD_M2)
-        return false;
-    if (!iBound.contains(p))
-        return false;
-    // child bounds are defined in object space:
-    Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-    Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
-    float zDist;
-    if (iModel->GetLocationInfo(pModel, zDirModel, zDist, info))
-    {
-        Vector3 modelGround = pModel + zDist * zDirModel;
-        // Transform back to world space. Note that:
-        // Mat * vec == vec * Mat.transpose()
-        // and for rotation matrices: Mat.inverse() == Mat.transpose()
-        float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
-        if (info.ground_Z < world_Z) // hm...could it be handled automatically with zDist at intersection?
+        if (!iModel)
         {
-            info.ground_Z = world_Z;
-            info.hitInstance = this;
+    #ifdef VMAP_DEBUG
+            DEBUG_LOG("<object not loaded>");
+    #endif
+            return false;
+        }
+
+        // M2 files don't have bounds
+        if (flags & MOD_M2)
+        {
+            //if (p.
+        }
+        else if (!iBound.contains(p))
+            return false;
+        // child bounds are defined in object space:
+        Vector3 up(0, 0, 1);
+        Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
+        up = iInvRot * up * iInvScale;
+
+        return iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist);
+    }
+
+    bool ModelInstance::GetLocationInfo(G3D::Vector3 const& p, LocationInfo& info) const
+    {
+        if (!iModel)
+        {
+    #ifdef VMAP_DEBUG
+            DEBUG_LOG("<object not loaded>");
+    #endif
+            return false;
+        }
+
+        // M2 files don't contain area info, only WMO files
+        if (flags & MOD_M2)
+            return false;
+        if (!iBound.contains(p))
+            return false;
+        // child bounds are defined in object space:
+        Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
+        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        float zDist;
+        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, info))
+        {
+            Vector3 modelGround = pModel + zDist * zDirModel;
+            // Transform back to world space. Note that:
+            // Mat * vec == vec * Mat.transpose()
+            // and for rotation matrices: Mat.inverse() == Mat.transpose()
+            float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
+            if (info.ground_Z < world_Z) // hm...could it be handled automatically with zDist at intersection?
+            {
+                info.ground_Z = world_Z;
+                info.hitInstance = this;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool ModelInstance::GetLiquidLevel(G3D::Vector3 const& p, LocationInfo& info, float& liqHeight) const
+    {
+        // child bounds are defined in object space:
+        Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
+        // Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
+        float zLevel;
+        if (info.hitModel->GetLiquidLevel(pModel, zLevel))
+        {
+            // calculate world height (zDist in model coords):
+            // despite making little sense, there ARE some (slightly) tilted WMOs...
+            // we can only determine liquid height in LOCAL z-direction (heightmap data),
+            // so with increasing tilt, liquid calculation gets increasingly wrong...not my fault, really :p
+            liqHeight = (zLevel - pModel.z) * iScale + p.z;
             return true;
         }
+        return false;
     }
-    return false;
-}
 
-bool ModelInstance::GetLiquidLevel(G3D::Vector3 const& p, LocationInfo& info, float& liqHeight) const
-{
-    // child bounds are defined in object space:
-    Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-    // Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
-    float zLevel;
-    if (info.hitModel->GetLiquidLevel(pModel, zLevel))
+    bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
     {
-        // calculate world height (zDist in model coords):
-        // despite making little sense, there ARE some (slightly) tilted WMOs...
-        // we can only determine liquid height in LOCAL z-direction (heightmap data),
-        // so with increasing tilt, liquid calculation gets increasingly wrong...not my fault, really :p
-        liqHeight = (zLevel - pModel.z) * iScale + p.z;
+        uint32 check = 0, nameLen;
+        check += fread(&spawn.flags, sizeof(uint32), 1, rf);
+        // EoF?
+        if (!check)
+        {
+            if (ferror(rf))
+                ERROR_LOG("Error reading ModelSpawn!");
+            return false;
+        }
+        check += fread(&spawn.adtId, sizeof(uint16), 1, rf);
+        check += fread(&spawn.ID, sizeof(uint32), 1, rf);
+        check += fread(&spawn.iPos, sizeof(float), 3, rf);
+        check += fread(&spawn.iRot, sizeof(float), 3, rf);
+        check += fread(&spawn.iScale, sizeof(float), 1, rf);
+        bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
+        if (has_bound) // only WMOs have bound in MPQ, only available after computation
+        {
+            Vector3 bLow, bHigh;
+            check += fread(&bLow, sizeof(float), 3, rf);
+            check += fread(&bHigh, sizeof(float), 3, rf);
+            spawn.iBound = G3D::AABox(bLow, bHigh);
+        }
+        check += fread(&nameLen, sizeof(uint32), 1, rf);
+        if (check != uint32(has_bound ? 17 : 11))
+        {
+            ERROR_LOG("Error reading ModelSpawn!");
+            return false;
+        }
+        char nameBuff[500];
+        if (nameLen > 500) // file names should never be that long, must be file error
+        {
+            ERROR_LOG("Error reading ModelSpawn, file name too long!");
+            return false;
+        }
+        check = fread(nameBuff, sizeof(char), nameLen, rf);
+        if (check != nameLen)
+        {
+            ERROR_LOG("Error reading name string of ModelSpawn!");
+            return false;
+        }
+        spawn.name = std::string(nameBuff, nameLen);
         return true;
     }
-    return false;
-}
 
-bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
-{
-    uint32 check = 0, nameLen;
-    check += fread(&spawn.flags, sizeof(uint32), 1, rf);
-    // EoF?
-    if (!check)
+    bool ModelSpawn::writeToFile(FILE* wf, ModelSpawn const& spawn)
     {
-        if (ferror(rf))
-            ERROR_LOG("Error reading ModelSpawn!");
-        return false;
+        uint32 check = 0;
+        check += fwrite(&spawn.flags, sizeof(uint32), 1, wf);
+        check += fwrite(&spawn.adtId, sizeof(uint16), 1, wf);
+        check += fwrite(&spawn.ID, sizeof(uint32), 1, wf);
+        check += fwrite(&spawn.iPos, sizeof(float), 3, wf);
+        check += fwrite(&spawn.iRot, sizeof(float), 3, wf);
+        check += fwrite(&spawn.iScale, sizeof(float), 1, wf);
+        bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
+        if (has_bound) // only WMOs have bound in MPQ, only available after computation
+        {
+            check += fwrite(&spawn.iBound.low(), sizeof(float), 3, wf);
+            check += fwrite(&spawn.iBound.high(), sizeof(float), 3, wf);
+        }
+        uint32 nameLen = spawn.name.length();
+        check += fwrite(&nameLen, sizeof(uint32), 1, wf);
+        if (check != uint32(has_bound ? 17 : 11)) return false;
+        check = fwrite(spawn.name.c_str(), sizeof(char), nameLen, wf);
+        return check == nameLen;
     }
-    check += fread(&spawn.adtId, sizeof(uint16), 1, rf);
-    check += fread(&spawn.ID, sizeof(uint32), 1, rf);
-    check += fread(&spawn.iPos, sizeof(float), 3, rf);
-    check += fread(&spawn.iRot, sizeof(float), 3, rf);
-    check += fread(&spawn.iScale, sizeof(float), 1, rf);
-    bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
-    if (has_bound) // only WMOs have bound in MPQ, only available after computation
-    {
-        Vector3 bLow, bHigh;
-        check += fread(&bLow, sizeof(float), 3, rf);
-        check += fread(&bHigh, sizeof(float), 3, rf);
-        spawn.iBound = G3D::AABox(bLow, bHigh);
-    }
-    check += fread(&nameLen, sizeof(uint32), 1, rf);
-    if (check != uint32(has_bound ? 17 : 11))
-    {
-        ERROR_LOG("Error reading ModelSpawn!");
-        return false;
-    }
-    char nameBuff[500];
-    if (nameLen > 500) // file names should never be that long, must be file error
-    {
-        ERROR_LOG("Error reading ModelSpawn, file name too long!");
-        return false;
-    }
-    check = fread(nameBuff, sizeof(char), nameLen, rf);
-    if (check != nameLen)
-    {
-        ERROR_LOG("Error reading name string of ModelSpawn!");
-        return false;
-    }
-    spawn.name = std::string(nameBuff, nameLen);
-    return true;
-}
-
-bool ModelSpawn::writeToFile(FILE* wf, ModelSpawn const& spawn)
-{
-    uint32 check = 0;
-    check += fwrite(&spawn.flags, sizeof(uint32), 1, wf);
-    check += fwrite(&spawn.adtId, sizeof(uint16), 1, wf);
-    check += fwrite(&spawn.ID, sizeof(uint32), 1, wf);
-    check += fwrite(&spawn.iPos, sizeof(float), 3, wf);
-    check += fwrite(&spawn.iRot, sizeof(float), 3, wf);
-    check += fwrite(&spawn.iScale, sizeof(float), 1, wf);
-    bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
-    if (has_bound) // only WMOs have bound in MPQ, only available after computation
-    {
-        check += fwrite(&spawn.iBound.low(), sizeof(float), 3, wf);
-        check += fwrite(&spawn.iBound.high(), sizeof(float), 3, wf);
-    }
-    uint32 nameLen = spawn.name.length();
-    check += fwrite(&nameLen, sizeof(uint32), 1, wf);
-    if (check != uint32(has_bound ? 17 : 11)) return false;
-    check = fwrite(spawn.name.c_str(), sizeof(char), nameLen, wf);
-    return check == nameLen;
-}
 }

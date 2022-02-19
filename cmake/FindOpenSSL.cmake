@@ -47,6 +47,7 @@ else( OPENSSL_INCLUDE_DIR AND OPENSSL_LIBRARIES )
       /usr/local/include
       /usr/local/include/openssl
       /usr/local/openssl/include
+      /usr/local/opt/openssl
       ${TMP_OPENSSL_INCLUDE_DIR}
     DOC
       "Specify the directory containing openssl.h."
@@ -62,6 +63,7 @@ else( OPENSSL_INCLUDE_DIR AND OPENSSL_LIBRARIES )
       /usr/local/lib
       /usr/local/lib/ssl
       /usr/local/ssl/lib
+      /usr/local/opt/openssl/lib
       ${TMP_OPENSSL_LIBRARIES}
     DOC "Specify the OpenSSL library here."
   )

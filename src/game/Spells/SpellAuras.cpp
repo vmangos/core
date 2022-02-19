@@ -1074,7 +1074,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
 void Aura::TriggerSpell()
 {
-    ObjectGuid casterGUID = GetCasterGuid();
+    ObjectGuid casterGUID = GetSpellProto()->HasAttribute(SPELL_ATTR_WEARER_CASTS_PROC_TRIGGER) ? GetTarget()->GetObjectGuid() : GetCasterGuid();
     Unit* triggerTarget = GetTriggerTarget();
 
     if (!casterGUID || !triggerTarget)
@@ -1202,8 +1202,10 @@ void Aura::TriggerSpell()
 //                    case 24716: break;
 //                    // Dream Fog
 //                    case 24780: break;
-//                    // Cannon Prep
-//                    case 24832: break;
+                    case 24743:                             // Cannon Prep
+                    case 24832:                             // Cannon Prep
+                        trigger_spell_id = 24731;
+                        break;
                     case 24834:                             // Shadow Bolt Whirl
                     {
                         uint32 spellForTick[8] = { 24820, 24821, 24822, 24823, 24835, 24836, 24837, 24838 };
@@ -1696,7 +1698,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 8067:                              // Party Time!
                     {
                         m_isPeriodic = true;
-                        m_modifier.periodictime = 10 * IN_MILLISECONDS;;
+                        m_modifier.periodictime = 10 * IN_MILLISECONDS;
                         return;
                     }
                     case 10255:                             // Stoned
@@ -1719,10 +1721,22 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         GetHolder()->SetAuraDuration(0); // Remove aura (else stays for ever, and casts at login)
                         return;
                     }
+                    case 13910: // Force Create Elemental Totem
+                    {
+                        if (Player* pPlayer = ToPlayer(target))
+                        {
+                            if (Unit* caster = GetCaster())
+                                DoScriptText(5428, caster, pPlayer);
+
+                            // Create Elemental Totem
+                            pPlayer->CastSpell(pPlayer, 13909, false);
+                        }
+                        return;
+                    }
                     case 16336: // Haunting Phantoms
                     {
                         m_isPeriodic = true;
-                        m_modifier.periodictime = urand(30, 90) * IN_MILLISECONDS;;
+                        m_modifier.periodictime = urand(30, 90) * IN_MILLISECONDS;
                         return;
                     }
                     case 26234:                             // Ragnaros Submerge Visual
@@ -2643,6 +2657,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                                 display_id = gender == GENDER_MALE ?
                                             10136 :
                                             10147 ;
+                                mod_x = DEFAULT_GNOME_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
                                 break;
                             case RACE_HUMAN:
                                 display_id = gender == GENDER_MALE ?
@@ -2673,12 +2688,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                                 if (gender == GENDER_MALE)
                                 {
                                     display_id = 10148;
-                                    mod_x = DEFAULT_TAUREN_MALE_SCALE;
+                                    mod_x = DEFAULT_TAUREN_MALE_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
                                 }
                                 else
                                 {
                                     display_id = 10149;
-                                    mod_x = DEFAULT_TAUREN_FEMALE_SCALE;
+                                    mod_x = DEFAULT_TAUREN_FEMALE_SCALE / target->GetScaleForDisplayId(target->GetNativeDisplayId());
                                 }
                                 break;
                             default:
@@ -2727,6 +2742,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             target->SetTransForm(0);
             target->SetDisplayId(target->GetNativeDisplayId());
             target->ResetTransformScale();
+            target->UpdateModelData();
 
             // apply default equipment for creature case
             if (target->GetTypeId() == TYPEID_UNIT)
@@ -2953,7 +2969,7 @@ void Aura::HandleAuraTrackStealthed(bool apply, bool /*Real*/)
     if (apply)
         GetTarget()->RemoveNoStackAurasDueToAuraHolder(GetHolder());
 
-    GetTarget()->ApplyModByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_TRACK_STEALTHED, apply);
+    GetTarget()->ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_TRACK_STEALTHED, apply);
 }
 
 void Aura::HandleAuraModScale(bool apply, bool /*Real*/)
@@ -2995,20 +3011,14 @@ void Aura::HandleModPossess(bool apply, bool Real)
         if (apply && pCaster->IsPlayer())
         {
             Player* pPlayerCaster = static_cast<Player*>(pCaster);
-            UpdateMask updateMask;
-            updateMask.SetCount(pTarget->GetValuesCount());
-            pTarget->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
-            if (updateMask.HasData())
-            {
-                UpdateData newData;
-                pTarget->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
 
-                if (newData.HasData())
-                {
-                    WorldPacket newDataPacket;
-                    newData.BuildPacket(&newDataPacket);
-                    pPlayerCaster->SendDirectMessage(&newDataPacket);
-                }
+            UpdateData newData;
+            pTarget->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UF_FLAG_OWNER_ONLY);
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                pPlayerCaster->SendDirectMessage(&newDataPacket);
             }
         }
         pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
@@ -3048,7 +3058,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pTarget->RemoveAurasDueToSpell(6272);
         pTarget->RemoveAurasDueToSpell(11403);
 
-        FactionTemplateEntry const* origFactionTemplate = pTarget->getFactionTemplateEntry();
+        FactionTemplateEntry const* origFactionTemplate = pTarget->GetFactionTemplateEntry();
 
         pTarget->AddUnitState(UNIT_STAT_POSSESSED);
         pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
@@ -3261,7 +3271,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (!caster)
             return;
 
-        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
+        FactionTemplateEntry const* origFactionTemplate = target->GetFactionTemplateEntry();
 
         // Remove dummy auras from spells with EffectSummonPossessed
         target->RemoveAurasDueToSpell(126);
@@ -3275,7 +3285,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->SetCharmerGuid(GetCasterGuid());
         target->SetFactionTemplateId(caster->GetFactionTemplateId());
-        target->CastStop(target == caster ? GetId() : 0);
+        if (target != caster)
+            target->InterruptNonMeleeSpells(false);
         caster->SetCharm(target);
 
         target->CombatStop(true);
@@ -3343,21 +3354,14 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (Player* pPlayerCaster = caster->ToPlayer())
         {
             pPlayerCaster->CharmSpellInitialize();
-            
-            UpdateMask updateMask;
-            updateMask.SetCount(target->GetValuesCount());
-            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_OWNER_ONLY);
-            if (updateMask.HasData())
-            {
-                UpdateData newData;
-                target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
 
-                if (newData.HasData())
-                {
-                    WorldPacket newDataPacket;
-                    newData.BuildPacket(&newDataPacket);
-                    pPlayerCaster->SendDirectMessage(&newDataPacket);
-                }
+            UpdateData newData;
+            target->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UF_FLAG_OWNER_ONLY);
+            if (newData.HasData())
+            {
+                WorldPacket newDataPacket;
+                newData.BuildPacket(&newDataPacket);
+                pPlayerCaster->SendDirectMessage(&newDataPacket);
             }
         }
     }
@@ -3580,7 +3584,11 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         target->AddUnitState(inCharge ? UNIT_STAT_PENDING_STUNNED : UNIT_STAT_STUNNED);
         target->SetTargetGuid(ObjectGuid());
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
+
+        // it appears that spell casts get interrupted even if they don't have the flag
+        //target->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_STUN, target->GetObjectGuid() == GetCasterGuid() ? GetId() : 0);
+        if (target->GetObjectGuid() != GetCasterGuid())
+            target->InterruptNonMeleeSpells(false);
 
         // Player specific
         if (Player* targetPlayer = target->ToPlayer())
@@ -3701,7 +3709,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
         {
             target->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG, UNIT_VIS_FLAGS_CREEP);
             if (target->GetTypeId() == TYPEID_PLAYER)
-                target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH);
+                target->SetByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_STEALTH);
             // apply only if not in GM invisibility (and overwrite invisibility state)
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -3740,7 +3748,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
             {
                 target->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_VIS_FLAG, UNIT_VIS_FLAGS_CREEP);
                 if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->RemoveByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH);
+                    target->RemoveByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_STEALTH);
                 // restore invisibility if any
                 if (target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
                 {
@@ -3766,7 +3774,7 @@ void Aura::HandleInvisibility(bool apply, bool Real)
         if (Real && target->GetTypeId() == TYPEID_PLAYER)
         {
             // apply glow vision
-            target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
+            target->SetByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
         }
 
         // apply only if not in GM invisibility and not stealth
@@ -3790,7 +3798,7 @@ void Aura::HandleInvisibility(bool apply, bool Real)
         {
             // remove glow vision
             if (target->GetTypeId() == TYPEID_PLAYER)
-                target->RemoveByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
+                target->RemoveByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
             // apply only if not in GM invisibility & not stealthed while invisible
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -3825,7 +3833,7 @@ void Aura::HandleDetectAmore(bool apply, bool /*real*/)
     if (!GetTarget()->IsPlayer())
         return;
 
-    GetTarget()->ApplyModByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_DETECT_AMORE, apply);
+    GetTarget()->ApplyModByteFlag(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_FLAGS, PLAYER_FIELD_BYTE2_DETECT_AMORE, apply);
 }
 
 void Aura::HandleAuraModRoot(bool apply, bool Real)
@@ -5534,26 +5542,15 @@ void Aura::HandleShapeshiftBoosts(bool apply)
 void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
-    if (target->GetTypeId() != TYPEID_UNIT)
-        return;
 
-    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(target->GetEntry());
-    if (ci && ci->type == CREATURE_TYPE_BEAST)
-        target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
+    target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
 
     if (apply)
     {
         if (Player* pPlayerCaster = ToPlayer(GetCaster()))
         {
-            UpdateMask updateMask;
-            updateMask.SetCount(target->GetValuesCount());
-            updateMask.SetBit(UNIT_FIELD_HEALTH);
-            updateMask.SetBit(UNIT_FIELD_MAXHEALTH);
-            target->MarkUpdateFieldsWithFlagForUpdate(updateMask, UF_FLAG_SPECIAL_INFO);
-
             UpdateData newData;
-            target->BuildValuesUpdateBlockForPlayer(newData, updateMask, pPlayerCaster);
-
+            target->BuildValuesUpdateBlockForPlayerWithFlags(newData, pPlayerCaster, UpdateFieldFlags(UF_FLAG_SPECIAL_INFO | UF_FLAG_DYNAMIC));
             if (newData.HasData())
             {
                 WorldPacket newDataPacket;
@@ -6259,7 +6256,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             SpellNonMeleeDamage damageInfo(pCaster, target, spellProto->Id, SpellSchools(spellProto->School));
             damageInfo.periodicLog = true;
 
-            pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex());
+            bool isCrit = pCaster->IsSpellCrit(damageInfo.target, spellProto, GetSchoolMask(damageInfo.school), BASE_ATTACK);
+            pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex(), BASE_ATTACK, nullptr, isCrit);
 
             damageInfo.target->CalculateAbsorbResistBlock(pCaster, &damageInfo, spellProto);
 
@@ -6270,7 +6268,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // Set trigger flag
             uint32 procAttacker = PROC_FLAG_DEAL_HARMFUL_PERIODIC;
             uint32 procVictim   = PROC_FLAG_TAKE_HARMFUL_PERIODIC;
-            uint32 procEx       = createProcExtendMask(&damageInfo, SPELL_MISS_NONE);
+            uint32 procEx       = CreateProcExtendMask(&damageInfo, SPELL_MISS_NONE);
             if (damageInfo.damage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
 

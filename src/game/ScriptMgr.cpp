@@ -82,7 +82,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
     scripts.clear();                                        // need for reload support
 
     //                                                  0     1        2          3           4            5            6            7                8                9              10            11         12          13          14         15   16   17   18       19
-    QueryResult* result = WorldDatabase.PQuery("SELECT `id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id` FROM %s", tablename);
+    QueryResult* result = WorldDatabase.PQuery("SELECT `id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id` FROM %s ORDER BY `id`, `delay`, `priority`", tablename);
 
     uint32 count = 0;
 
@@ -136,9 +136,21 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
         if (!CheckScriptTargets(tmp.target_type, tmp.target_param1, tmp.target_param2, tablename, tmp.id))
             DisableScriptAction(tmp);
 
+        if (tmp.raw.data[4] != (tmp.raw.data[4] & ALL_DB_SCRIPT_FLAGS))
+        {
+            sLog.outErrorDb("Table `%s` has unknown script flags (data_flags = %u) for script id %u", tablename, tmp.raw.data[4], tmp.id);
+            continue;
+        }
+
         if (!tmp.target_type && (tmp.raw.data[4] & SF_GENERAL_SWAP_INITIAL_TARGETS) && (tmp.raw.data[4] & SF_GENERAL_SWAP_FINAL_TARGETS))
         {
-            sLog.outErrorDb("Table `%s` has nonsensical flag combination (data_flags = %u) without a buddy for script id %u", tablename, tmp.moveTo.flags, tmp.id);
+            sLog.outErrorDb("Table `%s` has nonsensical flag combination (data_flags = %u) without a buddy for script id %u", tablename, tmp.raw.data[4], tmp.id);
+            continue;
+        }
+
+        if (tmp.target_type && (tmp.raw.data[4] & SF_GENERAL_TARGET_SELF) && !(tmp.raw.data[4] & (SF_GENERAL_SWAP_INITIAL_TARGETS | SF_GENERAL_SWAP_FINAL_TARGETS)))
+        {
+            sLog.outErrorDb("Table `%s` has nonsensical flag and target combination (data_flags = %u) (target_type = %u) for script id %u", tablename, tmp.raw.data[4], tmp.target_type, tmp.id);
             continue;
         }
 
@@ -2508,193 +2520,206 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
     }
 }
 
-void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 chatTypeOverride)
+void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatTypeOverride)
 {
     if (!pSource)
     {
-        sLog.outError("DoScriptText entry %i, invalid Source pointer.", iTextEntry);
+        sLog.outError("DoScriptText entry %i, invalid Source pointer.", textId);
         return;
     }
 
-    uint8 Type;
-    uint32 Emote;
-    uint32 Language;
-    uint32 SoundId;
+    uint8 chatType;
+    uint32 emoteId;
+    uint32 languageId;
+    uint32 soundId;
 
-    if (iTextEntry >= 0)
+    if (textId >= 0)
     {
-        if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
+        if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(textId))
         {
-            Type = bct->chatType;
-            Emote = bct->emoteId1;
-            Language = bct->languageId;
-            SoundId = bct->soundId;
+            chatType = bct->chatType;
+            emoteId = bct->emoteId1;
+            languageId = bct->languageId;
+            soundId = bct->soundId;
         }
         else
         {
-            sLog.outError("DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process broadcast text id %i, but text id does not exist.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
+            sLog.outError("DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process broadcast text id %i, but text id does not exist.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textId);
             return;
         }
     }
     else
     {
-        if (StringTextData const* pData = sScriptMgr.GetTextData(iTextEntry))
+        if (StringTextData const* pData = sScriptMgr.GetTextData(textId))
         {
-            Type = pData->Type;
-            Emote = pData->Emote;
-            Language = pData->Language;
-            SoundId = pData->SoundId;
+            chatType = pData->Type;
+            emoteId = pData->Emote;
+            languageId = pData->Language;
+            soundId = pData->SoundId;
         }
         else
         {
-            sLog.outError("DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), iTextEntry);
+            sLog.outError("DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textId);
             return;
         }
     }
 
     if (chatTypeOverride >= 0)
-        Type = chatTypeOverride;
+        chatType = chatTypeOverride;
 
-    DEBUG_LOG("DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u",
-        iTextEntry, SoundId, Type, Language, Emote);
+    DEBUG_LOG("DoScriptText: textId=%i, soundId=%u, chatType=%u, languageId=%u, emoteId=%u",
+        textId, soundId, chatType, languageId, emoteId);
 
-    if (SoundId)
+    if (soundId)
     {
-        if (sObjectMgr.GetSoundEntry(SoundId))
+        if (sObjectMgr.GetSoundEntry(soundId))
         {
-            if (Type == CHAT_TYPE_ZONE_YELL)
+            if (chatType == CHAT_TYPE_ZONE_YELL)
             {
                 if (Map* pZone = pSource->GetMap())
-                    pZone->PlayDirectSoundToMap(SoundId);
+                    pZone->PlayDirectSoundToMap(soundId);
             }
             else
-                pSource->PlayDirectSound(SoundId);
+                pSource->PlayDirectSound(soundId);
         }
         else
-            sLog.outError("DoScriptText entry %i tried to process invalid sound id %u.", iTextEntry, SoundId);
+            sLog.outError("DoScriptText entry %i tried to process invalid sound id %u.", textId, soundId);
     }
 
-    if (Emote)
+    if (emoteId)
     {
         if (pSource->GetTypeId() == TYPEID_UNIT || pSource->GetTypeId() == TYPEID_PLAYER)
-            ((Unit*)pSource)->HandleEmoteCommand(Emote);
+            ((Unit*)pSource)->HandleEmoteCommand(emoteId);
         else
-            sLog.outError("DoScriptText entry %i tried to process emote for invalid TypeId (%u).", iTextEntry, pSource->GetTypeId());
+            sLog.outError("DoScriptText entry %i tried to process emote for invalid TypeId (%u).", textId, pSource->GetTypeId());
     }
 
-    switch (Type)
+    switch (chatType)
     {
         case CHAT_TYPE_SAY:
-            pSource->MonsterSay(iTextEntry, Language, pTarget);
+            pSource->MonsterSay(textId, languageId, pTarget);
             break;
         case CHAT_TYPE_YELL:
-            pSource->MonsterYell(iTextEntry, Language, pTarget);
+            pSource->MonsterYell(textId, languageId, pTarget);
             break;
         case CHAT_TYPE_TEXT_EMOTE:
-            pSource->MonsterTextEmote(iTextEntry, pTarget);
+            pSource->MonsterTextEmote(textId, pTarget);
             break;
         case CHAT_TYPE_BOSS_EMOTE:
-            pSource->MonsterTextEmote(iTextEntry, pTarget, true);
+            pSource->MonsterTextEmote(textId, pTarget, true);
             break;
         case CHAT_TYPE_WHISPER:
             if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
-                pSource->MonsterWhisper(iTextEntry, pTarget);
+                pSource->MonsterWhisper(textId, pTarget);
             else
-                sLog.outError("DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
+                sLog.outError("DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textId);
 
             break;
         case CHAT_TYPE_BOSS_WHISPER:
         {
             if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
-                pSource->MonsterWhisper(iTextEntry, pTarget, true);
+                pSource->MonsterWhisper(textId, pTarget, true);
             else
-                sLog.outError("DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
+                sLog.outError("DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textId);
 
             break;
         }
         case CHAT_TYPE_ZONE_YELL:
-            pSource->MonsterYellToZone(iTextEntry, Language, pTarget);
+            pSource->MonsterYellToZone(textId, languageId, pTarget);
             break;
     }
 }
 
-
-/**
- * Function that either simulates or does script text for a map
- *
- * @param iTextEntry Entry of the text, stored in SD2-database, only type CHAT_TYPE_ZONE_YELL supported
- * @param uiCreatureEntry Id of the creature of whom saying will be simulated
- * @param pMap Given Map on which the map-wide text is displayed
- * @param pCreatureSource Can be nullptr. If pointer to Creature is given, then the creature does the map-wide text
- * @param pTarget Can be nullptr. Possible target for the text
- */
-void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource /*=nullptr*/, Unit* pTarget /*=nullptr*/)
+void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Creature* pSource /*= nullptr*/, Unit* pTarget /*= nullptr*/)
 {
     if (!pMap)
     {
-    sLog.outError("DoOrSimulateScriptTextForMap entry %i, invalid Map pointer.", iTextEntry);
-    return;
-    }
-
-    CreatureInfo const* pInfo = sObjectMgr.GetCreatureTemplate(uiCreatureEntry);
-    if (!pInfo)
-    {
-        sLog.outError("DoOrSimulateScriptTextForMap has invalid source entry %u for map %u.", uiCreatureEntry, pMap->GetId());
+        sLog.outError("DoOrSimulateScriptTextForMap call for text %i without a valid map!", textId);
         return;
     }
 
-    uint8 Type;
-    uint32 Emote;
-    uint32 LanguageId;
-    uint32 SoundId;
-
-    if (iTextEntry >= 0)
+    if (!creatureId && !pSource)
     {
-        if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
+        sLog.outError("DoOrSimulateScriptTextForMap call for text %i without a valid source!", textId);
+        return;
+    }
+
+    uint8 chatType;
+    uint32 emoteId;
+    uint32 languageId;
+    uint32 soundId;
+
+    if (textId >= 0)
+    {
+        if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(textId))
         {
-            Type = bct->chatType;
-            Emote = bct->emoteId1;
-            LanguageId = bct->languageId;
-            SoundId = bct->soundId;
+            chatType = bct->chatType;
+            emoteId = bct->emoteId1;
+            languageId = bct->languageId;
+            soundId = bct->soundId;
         }
         else
         {
-            sLog.outError("DoOrSimulateScriptTextForMap with source entry %u for map %u could not find broadcast text id %i.", uiCreatureEntry, pMap->GetId(), iTextEntry);
+            sLog.outError("DoOrSimulateScriptTextForMap with source entry %u for map %u could not find broadcast text id %i.", creatureId, pMap->GetId(), textId);
             return;
         }
     }
     else
     {
-        if (MangosStringLocale const* pData = sObjectMgr.GetMangosStringLocale(iTextEntry))
+        if (MangosStringLocale const* pData = sObjectMgr.GetMangosStringLocale(textId))
         {
-            Type = pData->Type;
-            Emote = pData->Emote;
-            LanguageId = pData->LanguageId;
-            SoundId = pData->SoundId;
+            chatType = pData->Type;
+            emoteId = pData->Emote;
+            languageId = pData->LanguageId;
+            soundId = pData->SoundId;
         }
         else
         {
-            sLog.outError("DoOrSimulateScriptTextForMap with source entry %u for map %u could not find script text entry %i.", uiCreatureEntry, pMap->GetId(), iTextEntry);
+            sLog.outError("DoOrSimulateScriptTextForMap with source entry %u for map %u could not find script text entry %i.", creatureId, pMap->GetId(), textId);
             return;
         }
     }
 
-    sLog.outDebug("SD2: DoOrSimulateScriptTextForMap: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u",
-          iTextEntry, SoundId, Type, LanguageId, Emote);
+    sLog.outDebug("SD2: DoOrSimulateScriptTextForMap: textId=%i, soundId=%u, chatType=%u, languageId=%u, emoteId=%u",
+          textId, soundId, chatType, languageId, emoteId);
 
-    if (Type != CHAT_TYPE_ZONE_YELL)
+    uint8 chatMsg;
+    switch (chatType)
     {
-        sLog.outError("DoSimulateScriptTextForMap entry %i has not supported chat type %u.", iTextEntry, Type);
-        return;
+        case CHAT_TYPE_SAY:
+            chatMsg = CHAT_MSG_MONSTER_SAY;
+            break;
+        case CHAT_TYPE_YELL:
+        case CHAT_TYPE_ZONE_YELL:
+            chatMsg = CHAT_MSG_MONSTER_YELL;
+            break;
+        case CHAT_TYPE_TEXT_EMOTE:
+            chatMsg = CHAT_MSG_MONSTER_EMOTE;
+            break;
+        case CHAT_TYPE_BOSS_EMOTE:
+            chatMsg = CHAT_MSG_RAID_BOSS_EMOTE;
+            break;
+        case CHAT_TYPE_WHISPER:
+            chatMsg = CHAT_MSG_MONSTER_WHISPER;
+            break;
+        case CHAT_TYPE_BOSS_WHISPER:
+        {
+            chatMsg = CHAT_MSG_RAID_BOSS_WHISPER;
+            break;
+        }
+        default:
+        {
+            sLog.outError("DoSimulateScriptTextForMap entry %i has not supported chat type %u.", textId, chatType);
+            return;
+        }
     }
 
-    if (SoundId)
-        pMap->PlayDirectSoundToMap(SoundId);
+    if (soundId)
+        pMap->PlayDirectSoundToMap(soundId);
+    if (emoteId && pSource)
+        pSource->HandleEmote(emoteId);
 
-    if (pCreatureSource)                                // If provided pointer for sayer, use direct version
-        pMap->MonsterYellToMap(pCreatureSource->GetObjectGuid(), iTextEntry, Language(LanguageId), pTarget);
-    else                                                // Simulate yell
-        pMap->MonsterYellToMap(pInfo, iTextEntry, Language(LanguageId), pTarget);
+    pMap->SendMonsterTextToMap(textId, Language(languageId), ChatMsg(chatMsg), creatureId, pSource, pTarget);
 }
 
 void Script::RegisterSelf(bool bReportError)

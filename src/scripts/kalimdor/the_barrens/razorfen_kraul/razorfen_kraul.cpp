@@ -35,20 +35,20 @@ enum
 {
     QUEST_WILLIX_THE_IMPORTER  = 1144,
 
-    SAY_WILLIX_READY           = -1047000,
-    SAY_WILLIX_1               = -1047001,
-    SAY_WILLIX_2               = -1047002,
-    SAY_WILLIX_3               = -1047003,
-    SAY_WILLIX_4               = -1047004,
-    SAY_WILLIX_5               = -1047005,
-    SAY_WILLIX_6               = -1047006,
-    SAY_WILLIX_7               = -1047007,
-    SAY_WILLIX_END             = -1047008,
+    SAY_WILLIX_READY           = 1482,
+    SAY_WILLIX_1               = 1483,
+    SAY_WILLIX_2               = 1484,
+    SAY_WILLIX_3               = 1485,
+    SAY_WILLIX_4               = 1486,
+    SAY_WILLIX_5               = 1487,
+    SAY_WILLIX_6               = 1488,
+    SAY_WILLIX_7               = 1490,
+    SAY_WILLIX_END             = 1493,
 
-    SAY_WILLIX_AGGRO_1         = -1047009,
-    SAY_WILLIX_AGGRO_2         = -1047010,
-    SAY_WILLIX_AGGRO_3         = -1047011,
-    SAY_WILLIX_AGGRO_4         = -1047012,
+    SAY_WILLIX_AGGRO_1         = 1546,
+    SAY_WILLIX_AGGRO_2         = 1544,
+    SAY_WILLIX_AGGRO_3         = 1545,
+    SAY_WILLIX_AGGRO_4         = 1547,
 
     NPC_RAGING_AGAMAR          = 4514
 };
@@ -176,9 +176,9 @@ enum
     NPC_SNUFFLENOSE_GOPHER      = 4781,
     GO_BLUELEAF_TUBER           = 20920,
 
-    SAY_GOPHER_SPAWN            = -1780223,
-    SAY_GOPHER_COMMAND          = -1780224,
-    SAY_GOPHER_FOUND            = -1780225
+    SAY_GOPHER_SPAWN            = 1638,
+    SAY_GOPHER_COMMAND          = 1591,
+    SAY_GOPHER_FOUND            = 1592
 };
 
 struct npc_snufflenose_gopherAI : public FollowerAI

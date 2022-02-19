@@ -298,7 +298,7 @@ void npc_shade_hakkarAI::Reset()
         m_creature->ForcedDespawn(1000);
     }
     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+    //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 
     for (uint32 & eventSpawn : eventSpawns)
         eventSpawn = 0;

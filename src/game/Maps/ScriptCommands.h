@@ -322,6 +322,8 @@ enum eScriptCommand
     SCRIPT_COMMAND_SET_PVP                  = 86,           // source = Player
                                                             // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON     = 87,           // source = GameObject
+    SCRIPT_COMMAND_SET_COMMAND_STATE        = 88,           // source = Creature
+                                                            // datalong = command_state (see enum CommandStates)
 
     SCRIPT_COMMAND_MAX,
 
@@ -498,11 +500,14 @@ enum eStartScriptForAllOptions
 
 enum eDataFlags
 {
-    SF_GENERAL_SWAP_INITIAL_TARGETS = 0x1,                  // Swaps the provided source and target, before buddy is checked.
-    SF_GENERAL_SWAP_FINAL_TARGETS   = 0x2,                  // Swaps the local source and target, after buddy is assigned.
-    SF_GENERAL_TARGET_SELF          = 0x4,                  // Replaces the provided target with the provided source.
-    SF_GENERAL_ABORT_ON_FAILURE     = 0x8                   // Terminates the script if the command fails.
+    SF_GENERAL_SWAP_INITIAL_TARGETS = 0x01,                 // Swaps the original source and target, before buddy is checked.
+    SF_GENERAL_SWAP_FINAL_TARGETS   = 0x02,                 // Swaps the final source and target, after buddy is assigned.
+    SF_GENERAL_TARGET_SELF          = 0x04,                 // Replaces the final target with the final source.
+    SF_GENERAL_ABORT_ON_FAILURE     = 0x08,                 // Terminates the whole script if the command fails.
+    SF_GENERAL_SKIP_MISSING_TARGETS = 0x10,                 // Command is skipped if source or target is not found, without printing an error.
 };
+
+#define ALL_DB_SCRIPT_FLAGS (SF_GENERAL_SWAP_INITIAL_TARGETS | SF_GENERAL_SWAP_FINAL_TARGETS | SF_GENERAL_TARGET_SELF | SF_GENERAL_ABORT_ON_FAILURE | SF_GENERAL_SKIP_MISSING_TARGETS)
 
 struct ScriptInfo
 {
@@ -1033,6 +1038,11 @@ struct ScriptInfo
         } setPvP;
 
                                                             // SCRIPT_COMMAND_RESET_DOOR_OR_BUTTON (87)
+
+        struct                                              // SCRIPT_COMMAND_SET_COMMAND_STATE (88)
+        {
+            uint32 commandState;                            // datalong
+        } setCommandState;
 
         struct
         {

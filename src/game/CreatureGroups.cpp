@@ -220,7 +220,7 @@ void CreatureGroup::MemberAssist(Creature* member, Unit* target, Creature* allie
         member->AI()->AttackedBy(target);
         if (member->GetVictim())
             member->SetLastLeashExtensionTimePtr(alliedAttacker->GetLastLeashExtensionTimePtr());
-        m_assistGuard = false;;
+        m_assistGuard = false;
     }
 }
 

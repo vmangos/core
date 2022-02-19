@@ -285,25 +285,21 @@ struct boss_majordomoAI : public ScriptedAI
                 // World of Warcraft Client Patch 1.4.0 (2005-04-19)
                 // - Ragnaros now stays up 2 hours rather than 1 after being summoned. 
                 uint32 const despawnTime = (sWorld.GetWowPatch() >= WOW_PATCH_104) ? (2 * HOUR * IN_MILLISECONDS) : (1 * HOUR * IN_MILLISECONDS);
-                if (Creature* Ragnaros = m_creature->SummonCreature(NPC_RAGNAROS, 842.237488f, -833.683105f, -231.916498f, M_PI + m_creature->GetAngle(842.237488f, -833.683105f), TEMPSUMMON_MANUAL_DESPAWN, despawnTime))
-                {
-                    Ragnaros->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                if (Creature* Ragnaros = m_creature->SummonCreature(NPC_RAGNAROS, 838.308f, -831.466f, -232.185f, 2.19911f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, despawnTime))
                     m_creature->SetFacingToObject(Ragnaros);
-                    Ragnaros->CastSpell(Ragnaros, SPELL_RAGNAROS_EMERGE, false);
-                }
                 break;
             }
-            case 34:
+            case 36:
                 if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
                 {
                     DoScriptText(SAY_ARRIVAL1_RAG, Ragnaros);
                     Ragnaros->HandleEmote(EMOTE_ONESHOT_ROAR);
                 }
                 break;
-            case 47:
+            case 50:
                 DoScriptText(SAY_ARRIVAL2_MAJ, m_creature);
                 break;
-            case 55:
+            case 60:
                 if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
                 {
                     Ragnaros->SetTargetGuid(m_creature->GetGUID());
@@ -311,7 +307,7 @@ struct boss_majordomoAI : public ScriptedAI
                     Ragnaros->HandleEmote(EMOTE_ONESHOT_ROAR);
                 }
                 break;
-            case 70:
+            case 76:
                 if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
                     Ragnaros->CastSpell(m_creature, SPELL_ELEMENTAL_FIRE, false);  // 20565
                 // Handle rest in Ragnaros script

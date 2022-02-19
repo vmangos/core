@@ -119,7 +119,7 @@ enum UpdateFieldValueTypes
     UF_TYPE_BYTES2    = 6
 };
 
-enum UpdateFieldFlags
+enum UpdateFieldFlags : uint16
 {
     UF_FLAG_NONE         = 0x000,
     UF_FLAG_PUBLIC       = 0x001,

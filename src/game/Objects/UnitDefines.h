@@ -389,7 +389,7 @@ enum UnitFlags
 {
     UNIT_FLAG_NONE                  = 0x00000000,
     UNIT_FLAG_UNK_0                 = 0x00000001,           // Movement checks disabled, likely paired with loss of client control packet.
-    UNIT_FLAG_NON_ATTACKABLE        = 0x00000002,           // not attackable
+    UNIT_FLAG_SPAWNING              = 0x00000002,           // not attackable
     UNIT_FLAG_DISABLE_MOVE          = 0x00000004,
     UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // players, pets, totems, guardians, companions, charms, any units associated with players
     UNIT_FLAG_PET_RENAME            = 0x00000010,           // Old pet rename: moved to UNIT_FIELD_BYTES_2,2 in TBC+
@@ -473,6 +473,20 @@ enum ReactStates
     REACT_DEFENSIVE  = 1,
     REACT_AGGRESSIVE = 2
 };
+
+inline char const* ReactStateToString(uint32 reactState)
+{
+    switch (reactState)
+    {
+        case REACT_PASSIVE:
+            return "Passive";
+        case REACT_DEFENSIVE:
+            return "Defensive";
+        case REACT_AGGRESSIVE:
+            return "Aggressive";
+    }
+    return "UNKNOWN";
+}
 
 enum CommandStates
 {

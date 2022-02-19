@@ -38,12 +38,13 @@ void CritterAI::DamageTaken(Unit* pWho, uint32& uiDamage)
     }
 }
 
-void CritterAI::SpellHit(Unit* pWho, SpellEntry const* pSpell)
+void CritterAI::SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell)
 {
     if (!pSpell->IsPositiveSpell() && !pSpell->IsDirectDamageSpell() && m_creature->IsAlive())
     {
         if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != TIMED_FLEEING_MOTION_TYPE)
-            m_creature->GetMotionMaster()->MoveFleeing(pWho, ESCAPE_TIMER);
+            if (Unit* pUnit = pCaster->ToUnit())
+                m_creature->GetMotionMaster()->MoveFleeing(pUnit, ESCAPE_TIMER);
         m_uiCombatTimer = ESCAPE_TIMER;
     }
 }

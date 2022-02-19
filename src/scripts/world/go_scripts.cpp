@@ -17,18 +17,14 @@
 /* ScriptData
 SDName: GO_Scripts
 SD%Complete: 100
-SDComment: Quest support: 4285,4287,4288(crystal pylons), 4296, 5088, 6481, 10990, 10991, 10992. Field_Repair_Bot->Teaches spell 22704. Barov_journal->Teaches spell 26089
+SDComment: Quest support: 4296, 5088, 6481, 10990, 10991, 10992. Field_Repair_Bot->Teaches spell 22704. Barov_journal->Teaches spell 26089
 SDCategory: Game Objects
 EndScriptData */
 
 /* ContentData
 go_cat_figurine (the "trap" version of GO, two different exist)
-go_northern_crystal_pylon
-go_eastern_crystal_pylon
-go_western_crystal_pylon
 go_barov_journal
 go_field_repair_bot_74A
-go_orb_of_command
 go_resonite_cask
 go_tablet_of_madness
 go_silithyste
@@ -57,54 +53,6 @@ bool GOHello_go_cat_figurine(Player* pPlayer, GameObject* pGo)
     pPlayer->CastSpell(pPlayer, SPELL_SUMMON_GHOST_SABER, true);
     return false;
 }
-
-/*######
-## go_crystal_pylons (3x)
-######*/
-
-
-bool GOHello_go_eastern_crystal_pylon(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-    {
-        pPlayer->PrepareQuestMenu(pGo->GetGUID());
-        pPlayer->SendPreparedQuest(pGo->GetGUID());
-    }
-
-    if (pPlayer->GetQuestStatus(4287) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4287);
-
-    return true;
-}
-
-bool GOHello_go_western_crystal_pylon(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-    {
-        pPlayer->PrepareQuestMenu(pGo->GetGUID());
-        pPlayer->SendPreparedQuest(pGo->GetGUID());
-    }
-
-    if (pPlayer->GetQuestStatus(4288) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4288);
-
-    return true;
-}
-
-bool GOHello_go_northern_crystal_pylon(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-    {
-        pPlayer->PrepareQuestMenu(pGo->GetGUID());
-        pPlayer->SendPreparedQuest(pGo->GetGUID());
-    }
-
-    if (pPlayer->GetQuestStatus(4285) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->AreaExploredOrEventHappens(4285);
-
-    return true;
-}
-
 
 /*######
 ## go_barov_journal
@@ -143,58 +91,6 @@ bool GossipSelect_go_barov_journal(Player* pPlayer, GameObject* pGo, uint32 uiSe
 }
 
 /*######
-## go_greater_moonlight
-######*/
-
-bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
-    auto zone = pPlayer->GetZoneId();
-
-    if (zone == 493) // Moonglade
-    {
-        sLog.outError("Zone %d Team %d GO %d", zone, pPlayer->GetTeamId(), pGo->GetGUIDLow());
-        if (pPlayer->GetTeamId() == TEAM_ALLIANCE)
-        {
-            switch (pGo->GetGUIDLow())
-            {
-                case 3998422: // Darnassus
-                    pPlayer->TeleportTo(WorldLocation(1, 10150.45f, 2602.12f, 1330.82f, 5.03f));
-                    break;
-                case 3998424: // Stormwind
-                    pPlayer->TeleportTo(WorldLocation(0, -8748.27f, 1074.27f, 90.52f, 4.17f));
-                    break;
-                case 3998425: // Ironforge
-                    pPlayer->TeleportTo(WorldLocation(0, -4663.39f, -956.23f, 500.37f, 5.73f));
-                    break;
-                default:
-                    return false;
-            }
-        }
-        else
-        {
-            switch(pGo->GetGUID())
-            {
-                case 3998423: // Thunderbluff
-                    pPlayer->TeleportTo(WorldLocation(1, -1031.73f, -230.42f, 160.18f, 3.12f));
-                    break;
-                case 3998426: // Undercity
-                    pPlayer->TeleportTo(WorldLocation(0, 1642.41f, 239.9f, 62.59f, 3.01f));
-                    break;
-                case 3998427: // Orgrimmar
-                    pPlayer->TeleportTo(WorldLocation(1, 1971.18f, -4259.45f, 32.21f, 4.0f));
-                    break;
-                default:
-                    return false;
-            }
-        }
-    
-    } else {
-        pPlayer->TeleportTo(WorldLocation(1, 7577.0f, -2188.9f, 475.3f, 5.03f));
-    }
-
-    return true;
-}
-
-/*######
 ## go_field_repair_bot_74A
 ######*/
 
@@ -202,18 +98,6 @@ bool GOHello_go_field_repair_bot_74A(Player* pPlayer, GameObject* pGo)
 {
     if (pPlayer->HasSkill(SKILL_ENGINEERING) && pPlayer->GetSkillValueBase(SKILL_ENGINEERING) >= 300 && !pPlayer->HasSpell(22704))
         pPlayer->CastSpell(pPlayer, 22864, false);
-    return true;
-}
-
-/*######
-## go_orb_of_command
-######*/
-
-bool GOHello_go_orb_of_command(Player* pPlayer, GameObject* pGo)
-{
-    if (pPlayer->GetQuestRewardStatus(7761))
-        pPlayer->TeleportTo(469, -7664.76f, -1100.87f, 399.679f, 0.561981f);
-
     return true;
 }
 
@@ -532,6 +416,53 @@ GameObjectAI* GetAI_go_darkmoon_faire_music(GameObject* gameobject)
 }
 
 /*####
+## go_firework_rocket
+####*/
+
+enum
+{
+    EVENT_ROCKET_DESPAWN = 1,
+};
+
+struct go_firework_rocket : public GameObjectAI
+{
+    // In videos and sniffs, rockets are triggered immediately .
+    // Without this code it takes forever (like 5 seconds) in vmangos for some reason.
+    go_firework_rocket(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        m_events.ScheduleEvent(EVENT_ROCKET_DESPAWN, Seconds(0));
+    }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        if (!me->isSpawned())
+            return;
+
+        m_events.Update(diff);
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_ROCKET_DESPAWN:
+                {
+                    me->Despawn();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+private:
+    EventMap m_events;
+};
+
+GameObjectAI* GetAI_go_firework_rocket(GameObject* gameobject)
+{
+    return new go_firework_rocket(gameobject);
+}
+
+/*####
 ## go_lunar_festival_firecracker
 ####*/
 
@@ -544,7 +475,14 @@ struct go_lunar_festival_firecracker : public GameObjectAI
 {
     go_lunar_festival_firecracker(GameObject* gobj) : GameObjectAI(gobj)
     {
-        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(30,60)));
+        if (me->GetEntry() == 180763 || me->GetEntry() == 180764)
+            m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(30,60)));
+    }
+
+    bool OnUse(Unit* /*user*/) override
+    {
+        m_events.ScheduleEvent(EVENT_FIRECRACKER_DESPAWN, Seconds(urand(0, 2)));
+        return true;
     }
 
     void UpdateAI(uint32 const diff) override
@@ -587,82 +525,57 @@ void AddSC_go_scripts()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "go_greater_moonlight";
-    newscript->pGOHello = &GOHello_go_greater_moonlight;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "go_cat_figurine";
-    newscript->pGOHello =           &GOHello_go_cat_figurine;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_eastern_crystal_pylon";
-    newscript->pGOHello =           &GOHello_go_eastern_crystal_pylon;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_northern_crystal_pylon";
-    newscript->pGOHello =           &GOHello_go_northern_crystal_pylon;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_western_crystal_pylon";
-    newscript->pGOHello =           &GOHello_go_western_crystal_pylon;
+    newscript->pGOHello = &GOHello_go_cat_figurine;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_barov_journal";
-    newscript->pGOHello =           &GOHello_go_barov_journal;
-    newscript->pGOGossipSelect =    &GossipSelect_go_barov_journal;
+    newscript->pGOHello = &GOHello_go_barov_journal;
+    newscript->pGOGossipSelect = &GossipSelect_go_barov_journal;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_field_repair_bot_74A";
-    newscript->pGOHello =           &GOHello_go_field_repair_bot_74A;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_orb_of_command";
-    newscript->pGOHello =           &GOHello_go_orb_of_command;
+    newscript->pGOHello = &GOHello_go_field_repair_bot_74A;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_resonite_cask";
-    newscript->pGOHello =           &GOHello_go_resonite_cask;
+    newscript->pGOHello = &GOHello_go_resonite_cask;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_tablet_of_madness";
-    newscript->pGOHello =           &GOHello_go_tablet_of_madness;
+    newscript->pGOHello = &GOHello_go_tablet_of_madness;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_silithyste";
-    newscript->pGOHello =           &GOHello_go_silithyste;
+    newscript->pGOHello = &GOHello_go_silithyste;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_restes_sha_ni";
-    newscript->pGOHello =           &GOHello_go_restes_sha_ni;
+    newscript->pGOHello = &GOHello_go_restes_sha_ni;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_Hive_Regal_Glyphed_Crystal";
-    newscript->pGOHello =           &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
-    newscript->pGOGossipSelect =    &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
+    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
+    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_REGAL_RUBBING>);
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_Hive_Ashi_Glyphed_Crystal";
-    newscript->pGOHello =           &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
-    newscript->pGOGossipSelect =    &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
+    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
+    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ASHI_RUBBING>);
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_Hive_Zora_Glyphed_Crystal";
-    newscript->pGOHello =           &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
-    newscript->pGOGossipSelect =    &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
+    newscript->pGOHello = &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
+    newscript->pGOGossipSelect = &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -678,5 +591,10 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_lunar_festival_firecracker";
     newscript->GOGetAI = &GetAI_go_lunar_festival_firecracker;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_firework_rocket";
+    newscript->GOGetAI = &GetAI_go_firework_rocket;
     newscript->RegisterSelf();
 }

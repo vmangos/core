@@ -63,14 +63,14 @@ struct npc_ruul_snowhoofAI : public npc_escortAI
         switch (uiPointId)
         {
             case 13:
-                m_creature->SummonCreature(NPC_T_TOTEMIC, 3449.218018f, -587.825073f, 174.978867f, 4.714445f, TEMPSUMMON_DEAD_DESPAWN, 60000);
-                m_creature->SummonCreature(NPC_T_URSA, 3446.384521f, -587.830872f, 175.186279f, 4.714445f, TEMPSUMMON_DEAD_DESPAWN, 60000);
-                m_creature->SummonCreature(NPC_T_PATHFINDER, 3444.218994f, -587.835327f, 175.380600f, 4.714445f, TEMPSUMMON_DEAD_DESPAWN, 60000);
+                m_creature->SummonCreature(NPC_T_TOTEMIC, 3449.218018f, -587.825073f, 174.978867f, 4.714445f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_T_URSA, 3446.384521f, -587.830872f, 175.186279f, 4.714445f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_T_PATHFINDER, 3444.218994f, -587.835327f, 175.380600f, 4.714445f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
                 break;
             case 19:
-                m_creature->SummonCreature(NPC_T_TOTEMIC, 3508.344482f, -492.024261f, 186.929031f, 4.145029f, TEMPSUMMON_DEAD_DESPAWN, 60000);
-                m_creature->SummonCreature(NPC_T_URSA, 3506.265625f, -490.531006f, 186.740128f, 4.239277f, TEMPSUMMON_DEAD_DESPAWN, 60000);
-                m_creature->SummonCreature(NPC_T_PATHFINDER, 3503.682373f, -489.393799f, 186.629684f, 4.349232f, TEMPSUMMON_DEAD_DESPAWN, 60000);
+                m_creature->SummonCreature(NPC_T_TOTEMIC, 3508.344482f, -492.024261f, 186.929031f, 4.145029f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_T_URSA, 3506.265625f, -490.531006f, 186.740128f, 4.239277f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
+                m_creature->SummonCreature(NPC_T_PATHFINDER, 3503.682373f, -489.393799f, 186.629684f, 4.349232f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
                 break;
             case 25:
                 m_creature->RemoveAurasDueToSpell(BEAR_AURA);
@@ -657,7 +657,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_DESTROY_KARANG_S_BANNER_2)
         {

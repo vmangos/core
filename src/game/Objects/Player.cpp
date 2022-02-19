@@ -871,16 +871,18 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, -1);  // -1 is default value
 #endif
 
-    SetByteValue(PLAYER_BYTES, 0, skin);
-    SetByteValue(PLAYER_BYTES, 1, face);
-    SetByteValue(PLAYER_BYTES, 2, hairStyle);
-    SetByteValue(PLAYER_BYTES, 3, hairColor);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, skin);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID, face);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, hairStyle);
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, hairColor);
 
-    SetByteValue(PLAYER_BYTES_2, 0, facialHair);
-    SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, facialHair);
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_UNK1, 0xEE);
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_NORMAL);
 
-    SetUInt16Value(PLAYER_BYTES_3, 0, gender);              // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
-    SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
+    // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
+    SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, gender);
+    SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, 0);
 
     SetUInt32Value(PLAYER_GUILDID, 0);
     SetUInt32Value(PLAYER_GUILDRANK, 0);
@@ -1166,7 +1168,7 @@ DrunkenState Player::GetDrunkenstateByValue(uint16 value)
 void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
 {
     m_drunk = newDrunkenValue;
-    SetUInt16Value(PLAYER_BYTES_3, 0, uint16(GetGender()) | (m_drunk & 0xFFFE));
+    SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, uint16(GetGender()) | (m_drunk & 0xFFFE));
 
     uint32 newDrunkenState = Player::GetDrunkenstateByValue(m_drunk);
 
@@ -1402,12 +1404,11 @@ void Player::OnMirrorTimerExpirationPulse(MirrorTimer::Type timer)
             EnvironmentalDamage(DAMAGE_DROWNING, ((GetMaxHealth() / 5) + urand(0, (GetLevel() - 1))));
             break;
         case MirrorTimer::ENVIRONMENTAL:
-            // TODO: Check these formulas
             if (IsInMagma())
-                EnvironmentalDamage(DAMAGE_LAVA, urand(600, 700));
+                EnvironmentalDamage(DAMAGE_LAVA, urand(sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MIN), sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MAX)));
             // FIXME: Need to skip slime damage in Undercity, maybe someone can find better way to handle environmental damage
             //if (IsInSlime() && m_zoneUpdateId != 1497)
-            //    EnvironmentalDamage(DAMAGE_SLIME, urand(600, 700));
+            //    EnvironmentalDamage(DAMAGE_SLIME, urand(sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MIN), sWorld.getConfig(CONFIG_UINT32_ENVIRONMENTAL_DAMAGE_MAX)));
             break;
         case MirrorTimer::FEIGNDEATH:
             // Vanilla: kill player on feigning death for too long
@@ -1462,13 +1463,13 @@ bool Player::IsCityProtector() { return m_ExtraFlags & PLAYER_EXTRA_CITY_PROTECT
 
 void Player::SetCityTitle()
 {
-    SetByteValue(PLAYER_BYTES_3, 2, GetRace());
+    SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_CITY_PROTECTOR_TITLE, GetRace());
     m_ExtraFlags |= PLAYER_EXTRA_CITY_PROTECTOR;
 }
 
 void Player::RemoveCityTitle()
 {
-    SetByteValue(PLAYER_BYTES_3, 2, 0);
+    SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_CITY_PROTECTOR_TITLE, 0);
     m_ExtraFlags &= ~PLAYER_EXTRA_CITY_PROTECTOR;
 }
 
@@ -1675,6 +1676,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     if (IsHasDelayedTeleport())
         TeleportTo(m_teleport_dest, m_teleport_options, m_teleportRecoverDelayed);
+
     // Movement extrapolation & cheat computation - only if not already kicked!
     if (!GetSession()->IsConnected())
         return;
@@ -1687,6 +1689,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             if (!transition || !IsInCombat())
                 sMapMgr.ScheduleInstanceSwitch(this, newInstanceId);
     }
+
     if (IsInWorld())
     {
         if (m_repopAtGraveyardPending && !HasPendingMovementChange())
@@ -1710,7 +1713,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
         // Anticheat sanction
         std::stringstream reason;
-        uint32 cheatAction = GetCheatData()->Update(p_time, reason);
+        uint32 cheatAction = GetCheatData()->Update(this, p_time, reason);
         if (cheatAction)
             GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
     }
@@ -1720,7 +1723,7 @@ void Player::OnDisconnected()
 {
     // Anticheat sanction
     std::stringstream reason;
-    uint32 cheatAction = GetCheatData()->Finalize(reason);
+    uint32 cheatAction = GetCheatData()->Finalize(this, reason);
     if (cheatAction)
         GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
 
@@ -2766,6 +2769,24 @@ void Player::RegenerateHealth()
     ModifyHealth(int32(addvalue));
 }
 
+bool Player::CanUseBank(ObjectGuid bankerGUID) const
+{
+    // bankerGUID parameter is optional, set to 0 by default.
+    if (!bankerGUID)
+        bankerGUID = m_currentBankerGuid;
+
+    bool isUsingBankCommand = (bankerGUID == GetObjectGuid() && bankerGUID == m_currentBankerGuid);
+
+    if (!isUsingBankCommand)
+    {
+        Creature* creature = GetNPCIfCanInteractWith(bankerGUID, UNIT_NPC_FLAG_BANKER);
+        if (!creature)
+            return false;
+    }
+
+    return true;
+}
+
 bool Player::CanInteractWithQuestGiver(Object* questGiver) const
 {
     switch (questGiver->GetTypeId())
@@ -3443,9 +3464,6 @@ void Player::GiveLevel(uint32 level)
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
-
-    if (m_session->ShouldBeBanned(GetLevel()))
-        sWorld.BanAccount(BAN_ACCOUNT, m_session->GetUsername(), 0, m_session->GetScheduleBanReason(), "");
 }
 
 void Player::UpdateFreeTalentPoints(bool resetIfNeed)
@@ -3606,7 +3624,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // cleanup unit flags (will be re-applied if need at aura load).
     RemoveFlag(UNIT_FIELD_FLAGS,
-               UNIT_FLAG_NON_ATTACKABLE   | UNIT_FLAG_DISABLE_MOVE  | UNIT_FLAG_NOT_ATTACKABLE_1 |
+               UNIT_FLAG_SPAWNING   | UNIT_FLAG_DISABLE_MOVE  | UNIT_FLAG_NOT_ATTACKABLE_1 |
                UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_LOOTING          |
                UNIT_FLAG_PET_IN_COMBAT    | UNIT_FLAG_SILENCED      | UNIT_FLAG_PACIFIED         |
                UNIT_FLAG_STUNNED          | UNIT_FLAG_IN_COMBAT     | UNIT_FLAG_DISARMED         |
@@ -4839,7 +4857,7 @@ void Player::BuildPlayerRepop()
     SetHealth(1);
 
     SetWaterWalking(true);
-    if (!GetSession()->isLogingOut())
+    if (!GetSession()->IsLogingOut())
         SetRooted(false);
 
     // BG - remove insignia related
@@ -4929,7 +4947,7 @@ void Player::KillPlayer()
     //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_IN_PVP);
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-    ApplyModByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStorage.LookupEntry<MapEntry>(GetMapId())->Instanceable());
+    ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStorage.LookupEntry<MapEntry>(GetMapId())->Instanceable());
 
     // 6 minutes until repop at graveyard
     m_deathTimer = CORPSE_REPOP_TIME;
@@ -4956,11 +4974,11 @@ Corpse* Player::CreateCorpse()
         return nullptr;
     }
 
-    uint8 skin       = GetByteValue(PLAYER_BYTES, 0);
-    uint8 face       = GetByteValue(PLAYER_BYTES, 1);
-    uint8 hairstyle  = GetByteValue(PLAYER_BYTES, 2);
-    uint8 haircolor  = GetByteValue(PLAYER_BYTES, 3);
-    uint8 facialhair = GetByteValue(PLAYER_BYTES_2, 0);
+    uint8 skin       = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID);
+    uint8 face       = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID);
+    uint8 hairstyle  = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID);
+    uint8 haircolor  = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID);
+    uint8 facialhair = GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE);
 
     corpse->SetByteValue(CORPSE_FIELD_BYTES_1, 1, GetRace());
     corpse->SetByteValue(CORPSE_FIELD_BYTES_1, 2, GetGender());
@@ -7072,7 +7090,7 @@ void Player::DuelComplete(DuelCompleteType type)
     duel->opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 0);
 
     if (duel->opponent->duel)
-        duel->opponent->duel->finished = true;;
+        duel->opponent->duel->finished = true;
     duel->finished = true;
 }
 
@@ -8208,7 +8226,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
     }
 
     SetLootGuid(guid);
-    ALL_SESSION_SCRIPTS(GetSession(), OnLoot(guid, loot_type));
 
     // need know for proper finish item loots (internal pre-switch loot type set in different from 3.x code version)
     // in fact this meaning that it send same loot types for interesting cases like 3.x version code (skip pre-3.x client loot type limitaitons)
@@ -9908,7 +9925,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
                 }
 
                 // prevent equip item in process logout
-                if (GetSession()->isLogingOut())
+                if (GetSession()->IsLogingOut())
                     return EQUIP_ERR_YOU_ARE_STUNNED;
 
                 if (IsInCombat() && pProto->Class == ITEM_CLASS_WEAPON && m_weaponChangeTimer != 0)
@@ -10023,7 +10040,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
     }
 
     // prevent unequip item in process logout
-    if (GetSession()->isLogingOut())
+    if (GetSession()->IsLogingOut())
         return EQUIP_ERR_YOU_ARE_STUNNED;
 
     if (!swap && pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
@@ -10451,7 +10468,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         }
         else if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
         {
-            pBag->StoreItem(slot, pItem, update);
+            pBag->StoreItem(slot, pItem);
             if (IsInWorld() && update)
             {
                 pItem->AddToWorld();
@@ -10733,7 +10750,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
         {
             Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
             if (pBag)
-                pBag->RemoveItem(slot, update);
+                pBag->RemoveItem(slot);
         }
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
         // pItem->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid()); not clear owner at remove (it will be set at store). This used in mail and auction code
@@ -10844,7 +10861,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             m_items[slot] = nullptr;
         }
         else if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
-            pBag->RemoveItem(slot, update);
+            pBag->RemoveItem(slot);
 
         if (IsInWorld() && update)
         {
@@ -11542,8 +11559,8 @@ void Player::SwapItem(uint16 src, uint16 dst)
                 if (!bagItem)
                     continue;
 
-                fullBag->RemoveItem(i, true);
-                emptyBag->StoreItem(count, bagItem, true);
+                fullBag->RemoveItem(i);
+                emptyBag->StoreItem(count, bagItem);
                 bagItem->SetState(ITEM_CHANGED, this);
 
                 ++count;
@@ -13320,7 +13337,7 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
         q_status.uState = QUEST_CHANGED;
 
     if (announce)
-        SendQuestReward(pQuest, xp, questEnder);
+        SendQuestReward(pQuest, xp);
 
     bool handled = false;
 
@@ -14436,7 +14453,7 @@ void Player::SendQuestCompleteEvent(uint32 quest_id) const
     }
 }
 
-void Player::SendQuestReward(Quest const* pQuest, uint32 XP, Object* questGiver) const
+void Player::SendQuestReward(Quest const* pQuest, uint32 XP) const
 {
     uint32 questid = pQuest->GetQuestId();
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questid);
@@ -14590,7 +14607,6 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid
     uint16 slot = FindQuestSlot(pQuest->GetQuestId());
     if (slot < MAX_QUEST_LOG_SIZE)
         SetQuestSlotCounter(slot, uint8(creatureOrGO_idx), uint8(count));
-    ALL_SESSION_SCRIPTS(GetSession(), OnQuestKillUpdated(guid));
 }
 
 /*********************************************************/
@@ -14746,16 +14762,18 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         money = MAX_MONEY_AMOUNT;
     SetMoney(money);
 
-    SetByteValue(PLAYER_BYTES, 0, fields[9].GetUInt8());  // skin
-    SetByteValue(PLAYER_BYTES, 1, fields[10].GetUInt8()); // face
-    SetByteValue(PLAYER_BYTES, 2, fields[11].GetUInt8()); // hair style
-    SetByteValue(PLAYER_BYTES, 3, fields[12].GetUInt8()); // hair color
-    SetByteValue(PLAYER_BYTES_2, 0, fields[13].GetUInt8()); // facial hair
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID, fields[9].GetUInt8());
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID, fields[10].GetUInt8());
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID, fields[11].GetUInt8());
+    SetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID, fields[12].GetUInt8());
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE, fields[13].GetUInt8());
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_UNK1, 0xEE);
     SetBankBagSlotCount(fields[14].GetUInt8());
+    SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_NORMAL);
 
     m_drunk = fields[49].GetUInt16();
 
-    SetUInt16Value(PLAYER_BYTES_3, 0, (m_drunk & 0xFFFE) | gender);
+    SetUInt16Value(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER_AND_INEBRIATION, (m_drunk & 0xFFFE) | gender);
 
     SetUInt32Value(PLAYER_FLAGS, fields[15].GetUInt32());
 
@@ -14772,7 +14790,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetUInt32Value(PLAYER_AMMO_ID, fields[58].GetUInt32());
 
     // Action bars state
-    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[59].GetUInt8());
+    SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS, fields[59].GetUInt8());
 
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -15504,7 +15522,7 @@ void Player::LoadCorpse()
     else
     {
         if (Corpse* corpse = GetCorpse())
-            ApplyModByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStorage.LookupEntry<MapEntry>(corpse->GetMapId())->Instanceable());
+            ApplyModByteFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_FLAGS, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStorage.LookupEntry<MapEntry>(corpse->GetMapId())->Instanceable());
         else
         {
             //Prevent Dead Player login without corpse
@@ -16465,12 +16483,12 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(GetLevel());
     uberInsert.addUInt32(GetUInt32Value(PLAYER_XP));
     uberInsert.addUInt32(GetMoney());
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 0));     // skin
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 1));     // face
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 2));     // hair style
-    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, 3));     // hair color
-    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, 0));  // facial hair
-    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, 2));  // bank bag slots
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID));
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_FACE_ID));
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_STYLE_ID));
+    uberInsert.addUInt8(GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_HAIR_COLOR_ID));
+    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_FACIAL_STYLE));
+    uberInsert.addUInt32(GetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_BANK_BAG_SLOTS));
 
     // Nostalrius: Fix toggled PvP flag after relog.
     uint32 playerFlags = GetUInt32Value(PLAYER_FLAGS) & ~(PLAYER_FLAGS_PVP_DESIRED);
@@ -16579,7 +16597,7 @@ void Player::SaveToDB(bool online, bool force)
 
     uberInsert.addUInt32(GetUInt32Value(PLAYER_AMMO_ID));
 
-    uberInsert.addUInt32(uint32(GetByteValue(PLAYER_FIELD_BYTES, 2)));
+    uberInsert.addUInt32(uint32(GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_ACTION_BARS)));
     uberInsert.addUInt32(GetWorldMask());
     uberInsert.addUInt64(uint64(m_createTime));
     uberInsert.Execute();
@@ -16602,7 +16620,7 @@ void Player::SaveToDB(bool online, bool force)
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
-    if (m_session->isLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
+    if (m_session->IsLogingOut() || !sWorld.getConfig(CONFIG_BOOL_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats();
 
     // save pet (hunter pet level and experience and all type pets health/mana).
@@ -17772,9 +17790,9 @@ void Player::SetRestBonus(float rest_bonus_new)
 
     // update data for client
     if (m_restBonus > 10)
-        SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);
+        SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_RESTED);
     else if (m_restBonus <= 1)
-        SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);
+        SetByteValue(PLAYER_BYTES_2, PLAYER_BYTES_2_OFFSET_REST_STATE, REST_STATE_NORMAL);
 
     // RestTickUpdate
     SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, uint32(m_restBonus));
@@ -17786,7 +17804,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
 
     // not let cheating with start flight in time of logout process || if casting not finished || while in combat || if not use Spell's with EffectSendTaxi
-    if (GetSession()->isLogingOut() || IsInCombat())
+    if (GetSession()->IsLogingOut() || IsInCombat())
     {
         WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
         data << uint32(ERR_TAXIPLAYERBUSY);
@@ -18324,7 +18342,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
     uint32 reqFaction = pProto->RequiredReputationFaction;
     if (!reqFaction && pProto->RequiredReputationRank > 0)
-        reqFaction = pCreature->getFactionTemplateEntry()->faction;
+        reqFaction = pCreature->GetFactionId();
 
     if (uint32(GetReputationRank(reqFaction)) < pProto->RequiredReputationRank)
     {
@@ -18859,7 +18877,7 @@ void Player::SetComboPoints()
     if (combotarget)
     {
         SetGuidValue(PLAYER_FIELD_COMBO_TARGET, combotarget->GetObjectGuid());
-        SetByteValue(PLAYER_FIELD_BYTES, 1, m_comboPoints);
+        SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_COMBO_POINTS, m_comboPoints);
     }
     /*else
     {
@@ -19280,16 +19298,16 @@ BattleGroundBracketId Player::GetBattleGroundBracketIdFromLevel(BattleGroundType
 
 float Player::GetReputationPriceDiscount(Creature const* pCreature) const
 {
-    FactionTemplateEntry const* vendor_faction = pCreature->getFactionTemplateEntry();
-    if (!vendor_faction || !vendor_faction->faction)
+    uint32 factionId = pCreature->GetFactionId();
+    if (!factionId)
         return 1.0f;
 
     float mod = 1.0f;
-    ReputationRank rank = GetReputationRank(vendor_faction->faction);
+    ReputationRank rank = GetReputationRank(factionId);
     if (rank >= REP_HONORED)
         mod -= 0.1f;
 
-    switch (vendor_faction->faction)
+    switch (factionId)
     {
         // Alliance
         case 72:  // Stormwind
@@ -19416,25 +19434,25 @@ void Player::UpdateForQuestWorldObjects()
     if (!IsInWorld() || !FindMap())
         return;
 
-    uint32 count = 0;
-    UpdateData upd;
+    UpdateData updateData;
     std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
     for (const auto& guid : m_visibleGUIDs)
     {
         if (guid.IsGameObject())
         {
             if (GameObject* obj = GetMap()->GetGameObject(guid))
+            { 
                 if (!obj->IsTransport())
+                {
                     if (m_visibleGobjQuestActivated[obj->GetObjectGuid()] != obj->ActivateToQuest(this))
-                    {
-                        ++count;
-                        obj->BuildCreateUpdateBlockForPlayer(upd, this); //[-ZERO] we must send create packet because of GAMEOBJECT_FLAGS change (not dynamic) - probably incorrect
-                    }
+                        obj->BuildValuesUpdateBlockForPlayerWithFlags(updateData, this, UF_FLAG_DYNAMIC, true);
+                }
+            }
         }
     }
     lock.unlock();
-    if (count)
-        upd.Send(GetSession());
+    if (updateData.HasData())
+        updateData.Send(GetSession());
 }
 
 void Player::SendSummonRequest(ObjectGuid summonerGuid, uint32 mapId, uint32 zoneId, float x, float y, float z)
@@ -20163,7 +20181,7 @@ void Player::UpdateTerainEnvironmentFlags()
 
     // All liquid types: check under surface level
     if (liquid_status.type_flags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME))
-        SetEnvironmentFlags(ENVIRONMENT_FLAG_UNDERWATER, (res & LIQUID_MAP_UNDER_WATER));
+        SetEnvironmentFlags(ENVIRONMENT_FLAG_UNDERWATER, ((res & LIQUID_MAP_UNDER_WATER) && liquid_status.level > (z + GetCollisionHeight())));
 
     // In water: on or under surface level
     if (liquid_status.type_flags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN))
@@ -20181,7 +20199,7 @@ void Player::UpdateTerainEnvironmentFlags()
     SetEnvironmentFlags(ENVIRONMENT_FLAG_HIGH_SEA, (liquid_status.type_flags & MAP_LIQUID_TYPE_DEEP_WATER));
 
     // All liquid types: check if deep enough level for swimming
-    SetEnvironmentFlags(ENVIRONMENT_FLAG_HIGH_LIQUID, ((res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER)) && liquid_status.level > (liquid_status.depth_level + 1.5f)));
+    SetEnvironmentFlags(ENVIRONMENT_FLAG_HIGH_LIQUID, ((res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER)) && liquid_status.level > (z + GetMinSwimDepth())));
 }
 
 void Player::SetCanParry(bool value)

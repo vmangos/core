@@ -102,7 +102,7 @@ struct boss_faerlinaAI : public ScriptedAI
         m_uiEnrageTimer             = 60000;
     }
 
-    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override 
+    void SpellHit(SpellCaster* pCaster, SpellEntry const* pSpell) override 
     {
         /*
         note from wowhead:
@@ -117,7 +117,9 @@ struct boss_faerlinaAI : public ScriptedAI
         {
             m_uiEnrageTimer = std::max(m_uiEnrageTimer, (uint32)30000);
             m_creature->RemoveAurasDueToSpell(SPELL_ENRAGE);
-            pWho->Kill(pWho, nullptr);
+
+            if (Unit* pUnit = pCaster->ToUnit())
+                pUnit->Kill(pUnit, nullptr);
         }
     }
 

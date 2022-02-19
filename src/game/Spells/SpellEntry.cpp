@@ -265,86 +265,6 @@ bool Spells::IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const
     return false;
 }
 
-void SpellEntry::InitCachedValues()
-{
-    ComputeBinary();
-    ComputeDispel();
-    ComputeNonPeriodicDispel();
-}
-
-void SpellEntry::ComputeBinary()
-{
-    _isBinary = false;
-    // Les sorts non magiques ne sont pas concernes.
-    if (DmgClass != SPELL_DAMAGE_CLASS_MAGIC)
-        return;
-
-    // Pareil pour les sorts physiques (charges)
-    if (School == SPELL_SCHOOL_NORMAL)
-        return;
-
-    bool foundNoDamageAura   = false;
-    for (int eff = 0; eff < 3; ++eff)
-    {
-        // Micro opt - don't iterate anymore if we already have an aura
-        if (foundNoDamageAura)
-            break;
-        
-        switch (Effect[eff])
-        {
-            case SPELL_EFFECT_INTERRUPT_CAST:
-                foundNoDamageAura = true;
-                break;
-            case SPELL_EFFECT_APPLY_AURA:
-                switch (EffectApplyAuraName[eff])
-                {
-                    case SPELL_AURA_MOD_DECREASE_SPEED:
-                    case SPELL_AURA_MOD_FEAR:
-                    case SPELL_AURA_MOD_STUN:
-                    case SPELL_AURA_MOD_PACIFY:
-                    case SPELL_AURA_MOD_ROOT:
-                    case SPELL_AURA_MOD_SILENCE:
-                    case SPELL_AURA_MOD_DISARM:
-                    case SPELL_AURA_MOD_RESISTANCE:
-                    case SPELL_AURA_MOD_DAMAGE_TAKEN:
-                        foundNoDamageAura = true;
-                        break;
-                }
-                break;
-            case SPELL_EFFECT_KNOCK_BACK:
-                foundNoDamageAura = true;
-                break;
-        }
-    }
-    _isBinary = foundNoDamageAura;
-    if (Id == 26143) {              // SPELL_MIND_FLAY (C'Thuns Eye Tentacles)
-        _isBinary = true;
-    }
-    else if (Id == 26478) {
-        _isBinary = true;           // SPELL_GROUND_RUPTURE_NATURE (C'thuns Giant tentacles ground rupture)
-    }
-}
-
-void SpellEntry::ComputeNonPeriodicDispel()
-{
-    _isNonPeriodicDispel = true;
-    for (int i = 0; i < 3; ++i)
-        if (_isNonPeriodicDispel && Effect[i] != 0 && (Effect[i] != SPELL_EFFECT_DISPEL || EffectRadiusIndex[i] != 0))
-            _isNonPeriodicDispel = false;
-}
-
-void SpellEntry::ComputeDispel()
-{
-    _isDispel = false;
-    for (uint32 i : Effect)
-    {
-        if (i == SPELL_EFFECT_DISPEL)
-        {
-            _isDispel = true;
-            break;
-        }
-    }
-}
 DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
 {
     // Explicit Diminishing Groups
@@ -496,42 +416,6 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
         return DIMINISHING_DEATHCOIL;
 
     return DIMINISHING_NONE;
-}
-
-bool SpellEntry::IsPvEHeartBeat() const
-{
-    if (!(Attributes & SPELL_ATTR_DIMINISHING_RETURNS))
-        return false;
-
-    for (uint32 i : EffectApplyAuraName)
-    {
-        switch (i)
-        {
-            case SPELL_AURA_MOD_FEAR:
-            case SPELL_AURA_MOD_ROOT:
-            case SPELL_AURA_MOD_PACIFY_SILENCE:
-            case SPELL_AURA_MOD_CONFUSE:
-                return false;
-        }
-    }
-
-    return true;
-}
-
-bool SpellEntry::IsCCSpell() const
-{
-    if (IsChanneledSpell())
-        return false;
-    if (HasEffect(SPELL_EFFECT_INTERRUPT_CAST))
-        return false;
-
-    switch (GetDiminishingReturnsGroup(false))
-    {
-        case DIMINISHING_NONE:
-        case DIMINISHING_LIMITONLY:
-            return false;
-    }
-    return true;
 }
 
 WeaponAttackType SpellEntry::GetWeaponAttackType() const
@@ -744,21 +628,21 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
             // Seal of Righteousness
             if (IsFitToFamilyMask(UI64LIT(0x0000000008000000)) && SpellIconID == 25)
             {
-                coeff = 0.092f;
+                coeff = 0.10f;
                 float speed = BASE_ATTACK_TIME;
 
                 if (caster->IsPlayer())
                 {
                     if (Item *item = ((Player*)caster)->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
                     {
-                        coeff = item->isOneHandedWeapon() ? 0.092f : 0.108f;
-                        speed = item->GetProto()->Delay;
+                        coeff = item->isOneHandedWeapon() ? 0.10f : 0.125f;
+                        
                     }
                 }
 
-                speed /= 1000.0f;
+                
 
-                return speed * coeff;
+                return coeff;
             }
             // Seal of Command
             if (Id == 20424)
@@ -927,7 +811,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                 {
                     if (CharmInfo const* charm = static_cast<Unit const*>(victim)->GetCharmInfo())
                         if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                            return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                            return ft->IsFriendlyTo(*caster->GetFactionTemplateEntry());
                 }
                 
                 return caster->IsFriendlyTo(victim);

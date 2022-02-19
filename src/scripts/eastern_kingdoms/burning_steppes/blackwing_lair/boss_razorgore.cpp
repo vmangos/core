@@ -397,7 +397,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
             if (it->IsAlive())
             {
                 it->SetHomePosition(-7555.55f, -1025.16f, 408.4914f, 0.65f);
-                it->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
+                it->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
                 it->AI()->EnterEvadeMode();
             }
         }

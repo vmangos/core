@@ -283,7 +283,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
             }
 
             pCreature->SetFactionTemplateId(FACTION_FRIENDLY);
-            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
             pCreature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
             AffrayChallenger[i] = pCreature->GetGUID();
         }
@@ -292,7 +292,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
     void SetChallengerReady(Unit *pUnit)
     {
         pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         pUnit->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
         pUnit->SetFactionTemplateId(FACTION_MONSTER);
     }
@@ -523,7 +523,10 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
     void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_PILOT_WIZZ)
+        {
             m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
+            m_creature->RestoreFaction();
+        }
 
         if (pSummoned->GetEntry() == NPC_MERCENARY)
             pSummoned->AI()->AttackStart(m_creature);
@@ -621,30 +624,30 @@ struct npc_mission_possible_but_not_probableAI : ScriptedAI
 
     }
 
-    void SpellHit(Unit* /*caster*/, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* /*caster*/, SpellEntry const* pSpell) override
     {
         uint32 spellId = 0;
 
         switch (m_creature->GetEntry())
         {
-        case NPC_MUTATED_VENTURE_CO_DRONE:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_GARROTE, CF_ROGUE_AMBUSH>())
-                spellId = SPELL_JUGGLER_VEIN_RUPTURE;
-            break;
-        case NPC_VENTURE_CO_PATROLLER:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_RUPTURE>())
-                spellId = SPELL_LUNG_PUNCTURE;
-            break;
-        case NPC_VENTURE_CO_LOOKOUT:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_EVISCERATE>())
-                spellId = SPELL_SLUSH;
-            break;
-        case NPC_GRAND_FOREMAN_PUZIK_GALLYWIX:
-            if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_AMBUSH>())
-                spellId = SPELL_DECIMATE;
-            break;
-        default:
-            return;
+            case NPC_MUTATED_VENTURE_CO_DRONE:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_GARROTE, CF_ROGUE_AMBUSH>())
+                    spellId = SPELL_JUGGLER_VEIN_RUPTURE;
+                break;
+            case NPC_VENTURE_CO_PATROLLER:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_RUPTURE>())
+                    spellId = SPELL_LUNG_PUNCTURE;
+                break;
+            case NPC_VENTURE_CO_LOOKOUT:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_EVISCERATE>())
+                    spellId = SPELL_SLUSH;
+                break;
+            case NPC_GRAND_FOREMAN_PUZIK_GALLYWIX:
+                if (pSpell->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_AMBUSH>())
+                    spellId = SPELL_DECIMATE;
+                break;
+            default:
+                return;
         }
 
         DoCastSpellIfCan(m_creature, spellId);

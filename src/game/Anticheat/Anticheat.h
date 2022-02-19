@@ -99,8 +99,8 @@ public:
 
     bool IsInKnockBack() const { return false; }
 
-    uint32 Update(uint32 diff, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
-    uint32 Finalize(std::stringstream& reason) { return CHEAT_ACTION_NONE; }
+    uint32 Update(Player* pPlayer, uint32 diff, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
+    uint32 Finalize(Player* pPlayer, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
     void AddCheats(uint32 cheats, uint32 count = 1) {}
     void HandleCommand(ChatHandler* handler) const {}
     void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) {}

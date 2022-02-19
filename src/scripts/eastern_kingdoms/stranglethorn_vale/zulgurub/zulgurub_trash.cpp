@@ -268,7 +268,7 @@ struct npc_esprit_vaudou : public ScriptedAI
     npc_esprit_vaudou(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // Intuables !
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_NOT_SELECTABLE);
         Reset();
     }
 
@@ -380,7 +380,7 @@ struct go_pile_dechetsAI: public GameObjectAI
                 {
                     Guru->CastSpell(pUser, 24178, true);
                     Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
                     if (Unit* pTarget = Guru->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -426,7 +426,7 @@ struct go_pile_dechetsAI: public GameObjectAI
                                 Guru->CastSpell(pUser, 24178, true);
                                 Guru->AddUnitState(UNIT_STAT_ROOT);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                                 Guru->SetFactionTemplateId(14); // Troll Bloodscalp
                                 break;
                             }

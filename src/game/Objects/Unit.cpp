@@ -796,7 +796,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
 
         if (damagetype != DOT)
         {
-            if (!GetVictim())
+            if (!GetVictim() && IsPlayer())
             {
                 // if not have main target then attack state with target (including AI call)
                 //start melee attacks only after melee hit
@@ -1229,10 +1229,8 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             if (BattleGround* bg = pPlayerTap->GetBattleGround())
                 bg->HandleKillUnit(pCreatureVictim, pPlayerTap);
     }
-    // Nostalrius: interrupt non melee spell casted
+
     pVictim->InterruptSpellsCastedOnMe(false, true);
-    if (pPlayerTap)
-        ALL_SESSION_SCRIPTS(pPlayerTap->GetSession(), OnUnitKilled(pVictim->GetObjectGuid()));
 }
 
 struct PetOwnerKilledUnitHelper
@@ -1256,28 +1254,6 @@ void Unit::PetOwnerKilledUnit(Unit* pVictim)
     CallForAllControlledUnits(PetOwnerKilledUnitHelper(pVictim), CONTROLLED_MINIPET | CONTROLLED_GUARDIANS);
 }
 
-void Unit::CastStop(uint32 except_spellid)
-{
-    for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
-        if (Spell* spell = GetCurrentSpell(CurrentSpellTypes(i)))
-            if (spell->getState() == SPELL_STATE_PREPARING && spell->GetCastedTime())
-                InterruptSpell(CurrentSpellTypes(i), false);
-}
-
-// Obsolete func need remove, here only for comotability vs another patches
-uint32 Unit::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage)
-{
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
-    SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
-    CalculateSpellDamage(&damageInfo, damage, spellInfo, EFFECT_INDEX_0);
-    damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
-    DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
-    SendSpellNonMeleeDamageLog(&damageInfo);
-    DealSpellDamage(&damageInfo, true);
-    return damageInfo.damage;
-}
-
-//TODO for melee need create structure as in
 void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType)
 {
     damageInfo->attacker = this;
@@ -2891,9 +2867,9 @@ bool Unit::IsInAccessablePlaceFor(Creature const* c) const
         return c->CanWalk() || c->CanFly();
 }
 
-bool Unit::IsReachableBySwmming() const
+bool Unit::CanSwimAtPosition(float x, float y, float z) const
 {
-    return GetTerrain()->IsSwimmable(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetTerrain()->IsSwimmable(x, y, z, GetMinSwimDepth());
 }
 
 bool Unit::IsInWater() const
@@ -4407,7 +4383,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo) const
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit* target, uint8 /*SwingType*/, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
+void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit* target, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount) const
 {
     CalcDamageInfo dmgInfo;
     dmgInfo.HitInfo = HitInfo;
@@ -4515,7 +4491,7 @@ bool Unit::IsFriendlyTo(WorldObject const* target) const
 
 bool Unit::IsHostileToPlayers() const
 {
-    FactionTemplateEntry const* my_faction = getFactionTemplateEntry();
+    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
     if (!my_faction || !my_faction->faction)
         return false;
 
@@ -4528,7 +4504,7 @@ bool Unit::IsHostileToPlayers() const
 
 bool Unit::IsNeutralToAll() const
 {
-    FactionTemplateEntry const* my_faction = getFactionTemplateEntry();
+    FactionTemplateEntry const* my_faction = GetFactionTemplateEntry();
     if (!my_faction || !my_faction->faction)
         return true;
 
@@ -4541,7 +4517,7 @@ bool Unit::IsNeutralToAll() const
 
 bool Unit::IsContestedGuard() const
 {
-    if (FactionTemplateEntry const* entry = getFactionTemplateEntry())
+    if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
         return entry->IsContestedGuardFaction();
 
     return false;
@@ -4562,9 +4538,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     // player cannot attack in mount state
     if (IsPlayer() && IsMounted())
-        return false;
-
-    if (IsCreature() && !((Creature*)this)->CanHaveTarget())
         return false;
 
     // nobody can attack GM in GM-mode
@@ -4941,6 +4914,22 @@ void Unit::RestoreFaction()
     }
 }
 
+Team Unit::GetTeam() const
+{
+    if (FactionEntry const* pFaction = GetFactionEntry())
+    {
+        switch (pFaction->team)
+        {
+            case HORDE:
+                return HORDE;
+            case ALLIANCE:
+                return ALLIANCE;
+        }
+    }
+    
+    return TEAM_NONE;
+}
+
 bool Unit::CanAttack(Unit const* target, bool force) const
 {
     ASSERT(target);
@@ -4965,7 +4954,7 @@ bool Unit::CanAttack(Unit const* target, bool force) const
     else if (!IsHostileTo(target))
         return false;
 
-    if (!target->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()) || target->HasUnitState(UNIT_STAT_FEIGN_DEATH))
+    if (!target->IsTargetableBy(this))
         return false;
 
     // shaman totem quests: spell 8898, shaman can detect elementals but elementals cannot see shaman
@@ -5831,7 +5820,7 @@ void Unit::ClearInCombat()
         static_cast<Player*>(this)->pvpInfo.inPvPCombat = false;
 }
 
-bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool checkAlive) const
+bool Unit::IsTargetableBy(WorldObject const* pAttacker, bool forAoE, bool checkAlive) const
 {
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
         return false;
@@ -5845,26 +5834,45 @@ bool Unit::IsTargetable(bool forAttack, bool isAttackerPlayer, bool forAoE, bool
             return false;
     }
 
-    if (forAttack)
+    if (pAttacker)
     {
-        if (!forAoE && !CanBeDetected())
-            return false;
-
-        if (!isAttackerPlayer && !forAoE && HasUnitState(UNIT_STAT_FEIGN_DEATH))
-            return false;
-
-        // check flags
-        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
-            return false;
-
-        if (isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
-            return false;
-
-        if (!isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
             return false;
 
         if (IsTaxiFlying())
             return false;
+
+        if (!forAoE && !CanBeDetected())
+            return false;
+
+        if (pAttacker->IsCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+                return false;
+        }
+        else // non player attacker
+        {
+            if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                return false;
+
+            if (!forAoE && HasUnitState(UNIT_STAT_FEIGN_DEATH))
+                return false;
+        }
+
+        // attacker flags prevent attacking victim too
+        if (pAttacker->IsUnit())
+        {
+            if (IsCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
+                    return false;
+            }
+            else // non player victim
+            {
+                if (pAttacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+                    return false;
+            }
+        }
     }
 
     return IsInWorld();
@@ -7108,6 +7116,7 @@ void Unit::TauntApply(Unit* taunter)
 
     if (target && target == taunter)
         return;
+
     // Nostalrius : Correction bug sheep/fear
     if (!HasAuraType(SPELL_AURA_MOD_FEAR) && !HasAuraType(SPELL_AURA_MOD_CONFUSE))
     {
@@ -7243,7 +7252,7 @@ bool Unit::SelectHostileTarget()
     {
         for (const auto& itr : m_attackers)
         {
-            if (itr->IsInMap(this) && itr->IsTargetable(true, IsCharmerOrOwnerPlayerOrPlayerItself()))
+            if (itr->IsInMap(this) && itr->IsTargetableBy(this))
                 return false;
         }
     }
@@ -8228,7 +8237,140 @@ bool CharmInfo::IsReturning()
     return m_isReturning;
 }
 
-uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
+void Unit::HandlePetCommand(CommandStates command, Unit* pTarget)
+{
+    Creature* pCharmedCreature = ToCreature();
+
+    CharmInfo* charmInfo = GetCharmInfo();
+    if (!charmInfo)
+    {
+        sLog.outError("Unit::HandlePetCommand - %s doesn't have a charminfo!", GetGuidStr().c_str());
+        return;
+    }
+
+    Unit* pCharmer = GetCharmerOrOwner();
+    if (!pCharmer)
+    {
+        sLog.outError("Unit::HandlePetCommand - %s doesn't have a charmer or owner!", GetGuidStr().c_str());
+        return;
+    }
+
+    switch (command)
+    {
+        case COMMAND_STAY:
+            if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                StopMoving();
+                GetMotionMaster()->Clear(false);
+                GetMotionMaster()->MoveIdle();
+                charmInfo->SetIsAtStay(true);
+            }
+            charmInfo->SetCommandState(COMMAND_STAY);
+
+            charmInfo->SetIsCommandAttack(false);
+            charmInfo->SetIsCommandFollow(false);
+            charmInfo->SetIsFollowing(false);
+            charmInfo->SetIsReturning(false);
+            charmInfo->SaveStayPosition();
+            break;
+        case COMMAND_FOLLOW:
+            if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                AttackStop();
+                InterruptNonMeleeSpells(false);
+                GetMotionMaster()->MoveFollow(pCharmer, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            }
+            charmInfo->SetCommandState(COMMAND_FOLLOW);
+
+            charmInfo->SetIsCommandAttack(false);
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsReturning(true);
+            charmInfo->SetIsCommandFollow(true);
+            charmInfo->SetIsFollowing(false);
+            break;
+        case COMMAND_ATTACK:
+        {
+            if (!pTarget)
+            {
+                SendPetActionFeedback(FEEDBACK_NOTHING_TO_ATT);
+                return;
+            }
+
+            if (!pCharmer->IsValidAttackTarget(pTarget) || pCharmer->HasAuraType(SPELL_AURA_MOD_PACIFY))
+            {
+                SendPetActionFeedback(FEEDBACK_CANT_ATT_TARGET);
+                return;
+            }
+
+            if (GetTransport() != pTarget->GetTransport())
+            {
+                SendPetActionFeedback(FEEDBACK_NO_PATH_TO);
+                return;
+            }
+
+            ClearUnitState(UNIT_STAT_FOLLOW);
+            // This is true if pet has no target or has target but targets differs.
+            if (GetVictim() != pTarget || (GetVictim() == pTarget && !GetCharmInfo()->IsCommandAttack()) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+            {
+                if (GetVictim())
+                    AttackStop();
+
+                if (pCharmedCreature)
+                {
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    pCharmedCreature->AI()->AttackStart(pTarget);
+
+                    //10% chance to play special pet attack talk, else growl
+                    if (pCharmedCreature->IsPet() && ((Pet*)this)->getPetType() == SUMMON_PET && this != pTarget && urand(0, 100) < 10)
+                        SendPetTalk((uint32)PET_TALK_ATTACK);
+                    else
+                    {
+                        // 90% chance for pet and 100% chance for charmed creature
+                        SendPetAIReaction();
+                    }
+                }
+                else                                // charmed player
+                {
+                    if (GetVictim() && GetVictim() != pTarget)
+                        AttackStop();
+
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    Attack(pTarget, true);
+                    SendPetAIReaction();
+                    GetMotionMaster()->MoveChase(pTarget);
+                }
+            }
+            break;
+        }
+        case COMMAND_DISMISS:                       // pet dismiss (summoned pet)
+        {
+            if (Pet* pPet = ToPet())
+            {
+                // Hunter pets are dismissed with a spell with a cast time
+                if (pPet->getPetType() != HUNTER_PET)
+                    // dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
+                    pPet->Unsummon(PET_SAVE_NOT_IN_SLOT);
+            }
+            else                                    // charmed
+                pCharmer->Uncharm();
+            break;
+        }  
+        default:
+            sLog.outError("Unit::HandlePetCommand - Unknown command state %u.", uint32(command));
+    }
+}
+
+uint32 CreateProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)
 {
     uint32 procEx = PROC_EX_NONE;
     switch (missCondition)
@@ -8267,17 +8409,20 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
             procEx |= PROC_EX_REFLECT;
         // no break
         case SPELL_MISS_NONE:
-            // On block
-            if (damageInfo->blocked)
-                procEx |= PROC_EX_BLOCK;
-            // On absorb
-            if (damageInfo->absorb)
-                procEx |= PROC_EX_ABSORB;
-            // On crit
-            if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
-                procEx |= PROC_EX_CRITICAL_HIT;
-            else
-                procEx |= PROC_EX_NORMAL_HIT;
+            if (damageInfo)
+            {
+                // On block
+                if (damageInfo->blocked)
+                    procEx |= PROC_EX_BLOCK;
+                // On absorb
+                if (damageInfo->absorb)
+                    procEx |= PROC_EX_ABSORB;
+                // On crit
+                if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
+                    procEx |= PROC_EX_CRITICAL_HIT;
+                else
+                    procEx |= PROC_EX_NORMAL_HIT;
+            }
             break;
     }
     return procEx;
@@ -8547,7 +8692,8 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
 
     if (apply)
     {
-        CastStop(GetObjectGuid() == casterGuid ? spellId : 0);
+        if (casterGuid != GetObjectGuid())
+            InterruptNonMeleeSpells(false);
 
         switch (modType)
         {
@@ -8567,9 +8713,6 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, Mo
                 GetMotionMaster()->MoveConfused();
                 break;
         }
-
-        if (casterGuid != GetObjectGuid())
-            InterruptNonMeleeSpells(false);
 
         if (IsCreature())
             SetTargetGuid(ObjectGuid());
@@ -8733,41 +8876,50 @@ void Unit::SetDisplayId(uint32 displayId)
                     pOwner->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
 }
 
+inline float CheckValidScale(float scale)
+{
+    if (scale <= 0.0f)
+        return DEFAULT_OBJECT_SCALE;
+
+    return scale;
+}
+
+float Unit::GetScaleForDisplayId(uint32 displayId)
+{
+    if (CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId))
+    {
+        if (CreatureModelDataEntry const* modelEntry = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
+            return CheckValidScale(modelEntry->modelScale * displayEntry->scale);
+
+        return CheckValidScale(displayEntry->scale);
+    }
+
+    return DEFAULT_OBJECT_SCALE;
+}
+
 void Unit::UpdateModelData()
 {
     CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(GetDisplayId());
     CreatureDisplayInfoAddon const* displayAddon = sObjectMgr.GetCreatureDisplayInfoAddon(GetDisplayId());
-    if (displayAddon && displayEntry && displayAddon->bounding_radius && displayEntry->scale)
+    if (displayAddon && displayEntry && displayAddon->bounding_radius)
     {
+        CreatureModelDataEntry const* modelEntry = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId);
+
         // Tauren and gnome players have scale != 1.0
-        float nativeScale = displayEntry->scale;
-        if (IsPlayer())
-        {
-            switch (GetDisplayId())
-            {
-                case 59: // Tauren Male
-                    nativeScale = DEFAULT_TAUREN_MALE_SCALE;
-                    break;
-                case 60: // Tauren Female
-                    nativeScale = DEFAULT_TAUREN_FEMALE_SCALE;
-                    break;
-                case 1563: // Gnome Male
-                case 1564: // Gnome Female
-                    nativeScale = DEFAULT_GNOME_SCALE;
-                    break;
-            }
-        }
+        float const nativeScale = CheckValidScale(modelEntry ? (modelEntry->modelScale * displayEntry->scale) : displayEntry->scale);
 
         // we expect values in database to be relative to scale = 1.0
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / nativeScale) * displayAddon->bounding_radius);
         SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / nativeScale) * displayAddon->combat_reach);
 
-        if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
+        if (modelEntry)
         {
-            if (modelData->collisionHeight > 0.f && modelData->modelScale > 0.f)
-                m_modelCollisionHeight = modelData->collisionHeight / modelData->modelScale;
+            if (modelEntry->collisionHeight > 0.f && modelEntry->modelScale > 0.f)
+                m_modelCollisionHeight = modelEntry->collisionHeight / modelEntry->modelScale;
             else
                 m_modelCollisionHeight = 2.f;
+
+            m_modelCollisionHeight *= (GetObjectScale() / nativeScale);
         }
     }
     else
@@ -8776,6 +8928,19 @@ void Unit::UpdateModelData()
         SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.5f);
     }
+}
+
+void Unit::InitPlayerDisplayIds()
+{
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass());
+    if (!info)
+        return;
+
+    uint32 const displayId = GetGender() == GENDER_FEMALE ? info->displayId_f : info->displayId_m;
+
+    SetObjectScale(GetScaleForDisplayId(displayId));
+    SetNativeDisplayId(displayId);
+    SetDisplayId(displayId);
 }
 
 void Unit::ClearComboPointHolders()
@@ -9304,7 +9469,7 @@ void Unit::SetPvP(bool state)
 
 void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed)
 {
-    if (IsRooted())
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
         return;
 
     float angle = this == target ? GetOrientation() + M_PI_F : target->GetAngle(this);
@@ -9321,7 +9486,7 @@ void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verti
 
 void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
 {
-    if (IsRooted() || !movespline->Finalized())
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT) || !movespline->Finalized())
         return;
 
     InterruptNonMeleeSpells(false);
@@ -9372,7 +9537,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
 {
     if (Unit* pVictim = GetVictim())
     {
-        if (pVictim->getFactionTemplateEntry()->faction == faction_id)
+        if (pVictim->GetFactionId() == faction_id)
         {
             AttackStop();
             if (IsNonMeleeSpellCasted(false))
@@ -9387,7 +9552,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
     AttackerSet const& attackers = GetAttackers();
     for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
     {
-        if ((*itr)->getFactionTemplateEntry()->faction == faction_id)
+        if ((*itr)->GetFactionId() == faction_id)
         {
             (*itr)->AttackStop();
             itr = attackers.begin();
@@ -9607,7 +9772,7 @@ void Unit::CombatStopInRange(float dist)
 }
 
 // TriniyCore
-void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float &z) const
+bool Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float &z) const
 {
     // Compute random angle
     float angle = GetAngle(attacker);
@@ -9615,12 +9780,17 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
     if (sizeFactor < 0.1f)
         sizeFactor = DEFAULT_COMBAT_REACH;
 
+    bool const canOnlySwim = attacker->CanSwim() && !attacker->CanWalk() && !attacker->CanFly();
+    bool const reachableBySwiming = attacker->CanSwimAtPosition(GetPosition());
+
     uint32 attacker_number = GetAttackers().size();
     if (attacker_number > 0)
         --attacker_number;
-    // Don't compute a random position for a moving player
-    if (IsPlayer() && IsMoving())
+
+    // Don't compute a random position for a moving player or when swimming to player near shore
+    if (IsPlayer() && IsMoving() || canOnlySwim && !reachableBySwiming)
         attacker_number = 0;
+
     angle += (attacker_number ? ((float(M_PI / 2) - float(M_PI) * rand_norm_f()) * attacker_number / sizeFactor) * 0.3f : 0);
 
     float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + rand_norm_f() * (attacker->GetMeleeReach() - attacker->GetObjectBoundingRadius());
@@ -9633,25 +9803,26 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
             GetPosition(initialPosX, initialPosY, initialPosZ);
 
     float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +
-                                        pow(initialPosY - attacker->GetPositionY(), 2) +
-                                        pow(initialPosZ - attacker->GetPositionZ(), 2));
+        pow(initialPosY - attacker->GetPositionY(), 2) +
+        pow(initialPosZ - attacker->GetPositionZ(), 2));
     if (dist > attackerTargetDistance)
     {
-        // On ne bouge pas, on est deja a portee.
+        // We're not moving, we're already within range. 
         attacker->GetPosition(x, y, z);
-        return;
+        return true;
     }
+
     float normalizedVectZ = (attacker->GetPositionZ() - initialPosZ) / attackerTargetDistance;
     float normalizedVectXY = sqrt(1 - normalizedVectZ * normalizedVectZ);
     x = initialPosX + dist * cos(angle) * normalizedVectXY;
     y = initialPosY + dist * sin(angle) * normalizedVectXY;
     z = initialPosZ + dist * normalizedVectZ;
 
-    if ((attacker->CanFly() || (attacker->CanSwim() && IsReachableBySwmming())))
+    if ((attacker->CanFly() || (attacker->CanSwim() && reachableBySwiming)))
     {
         GetMap()->GetLosHitPosition(initialPosX, initialPosY, initialPosZ, x, y, z, -0.2f);
         if (attacker->CanFly())
-            return;
+            return true;
         float ground = 0.0f;
         float waterSurface = GetTerrain()->GetWaterLevel(x, y, z, &ground);
         if (waterSurface == VMAP_INVALID_HEIGHT_VALUE)
@@ -9660,16 +9831,44 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
             z = waterSurface;
         if (z < ground)
             z = ground;
+        return true;
+    }
+    else if (canOnlySwim && !reachableBySwiming)
+    {
+        z = GetTerrain()->GetWaterLevel(attacker->GetPositionX(), attacker->GetPositionY(), attacker->GetPositionZ());
+        if (z != VMAP_INVALID_HEIGHT_VALUE)
+        {
+            dist = std::max(GetCombatReach(true) + attacker->GetCombatReach(true), ATTACK_DISTANCE) - GetObjectBoundingRadius() - std::fabs(z - GetPositionZ());
+            for (int i = 0; i < 12; i++)
+            {
+                GetNearPoint2DAroundPosition(GetPositionX(), GetPositionY(), x, y, dist, angle + (M_PI_F / 6.0f) * float(i));
+
+                float ground = 0.0f;
+                z = GetTerrain()->GetWaterLevel(x, y, z, &ground) - attacker->GetMinSwimDepth();
+                if (ground < z &&
+                    attacker->CanReachWithMeleeAutoAttackAtPosition(this, x, y, z) &&
+                    IsWithinLOS(x, y, z, false))
+                    return true;
+            }
+        }
     }
     else
     {
-        uint32 nav = NAV_GROUND | NAV_WATER;
+        uint32 nav = 0;
+        if (attacker->CanWalk())
+            nav |= NAV_GROUND;
+        if (attacker->CanSwim())
+            nav |= NAV_WATER;
         if (!attacker->IsPlayer())
             nav |= NAV_MAGMA | NAV_SLIME;
+
         // Try mmaps. On fail, use target position (but should not fail)
-        if (!GetMap()->GetWalkHitPosition(GetTransport(), initialPosX, initialPosY, initialPosZ, x, y, z, nav))
-            GetPosition(x, y, z);
+        if (GetMap()->GetWalkHitPosition(GetTransport(), initialPosX, initialPosY, initialPosZ, x, y, z, nav))
+            return true;
     }
+
+    GetPosition(x, y, z);
+    return false;
 }
 
 float Unit::GetMeleeReach() const
@@ -10311,35 +10510,4 @@ void Unit::WritePetSpellsCooldown(WorldPacket& data) const
         ++cdCount;
     }
     data.put<uint16>(cdCountPos, cdCount);
-}
-
-inline float GetDefaultPlayerScale(uint8 race, uint8 gender)
-{
-    if (race == RACE_TAUREN)
-        return (gender == GENDER_FEMALE ? DEFAULT_TAUREN_FEMALE_SCALE : DEFAULT_TAUREN_MALE_SCALE);
-    if (race == RACE_GNOME)
-        return DEFAULT_GNOME_SCALE;
-    return DEFAULT_OBJECT_SCALE;
-}
-
-void Unit::InitPlayerDisplayIds()
-{
-    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(GetRace(), GetClass());
-    if (!info)
-        return;
-
-    uint8 gender = GetGender();
-
-    SetObjectScale(GetDefaultPlayerScale(GetRace(), gender));
-    switch (gender)
-    {
-        case GENDER_FEMALE:
-            SetNativeDisplayId(info->displayId_f);
-            SetDisplayId(info->displayId_f);
-            break;
-        case GENDER_MALE:
-            SetNativeDisplayId(info->displayId_m);
-            SetDisplayId(info->displayId_m);
-            break;
-    }
 }

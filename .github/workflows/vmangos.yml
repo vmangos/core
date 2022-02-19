@@ -1,4 +1,4 @@
-#3 build types 
+#3 build types
 # - gcc under Ubuntu
 # - clang under Ubuntu
 # - visual studio under Windows
@@ -8,9 +8,28 @@ name: vmangos CI build
 
 on:
   push:
-    branches: [ development ]
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - 'sql/**'
+      - '.drone.yml'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+
   pull_request:
-    branches: [ development ]
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - 'sql/**'
+      - '.drone.yml'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
 
 jobs:
   build:
@@ -21,7 +40,7 @@ jobs:
         os: [ubuntu-latest]
         compiler: [gcc, clang]
         include:
-          - os: windows-latest
+          - os: windows-2019
 
     steps:
 
@@ -34,22 +53,22 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get -qq install libmysql++-dev libace-dev libtbb-dev
-        sudo apt-get -qq install cmake build-essential cppcheck git make binutils-dev libiberty-dev openssl libssl-dev
+        sudo apt-get -qq install cmake build-essential cppcheck git make libiberty-dev openssl libssl-dev
       #windows dependencies
     - name: windows dependencies
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       #Sets versions for ACE/TBB
       env:
         ACE_VERSION: 6.5.11
         ACE_VERSION2: 6_5_11
         TBB_VERSION: 2020.3
-      
+
       run: |
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
         export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
         #wget
-        choco install -y wget
+        choco install -y wget --version 1.20
         #ACE package download
         wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
         unzip ACE-$ACE_VERSION.zip
@@ -60,12 +79,8 @@ jobs:
         wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
         unzip tbb-$TBB_VERSION-win.zip
         rm tbb-$TBB_VERSION-win.zip
-        #make
-        choco install -y make
-        #cmake
-        choco install -y cmake
         #openssl
-        choco install -y openssl
+        choco install -y openssl --version=1.1.1.500
       #git bash shell
       shell: bash
 
@@ -77,12 +92,12 @@ jobs:
         mkdir build
         mkdir _install
         cd build
-        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DSERVERS=1 -DTOOLS=1 -DSCRIPTS=1 -DWITH_DOCS=1 -DWITH_WARNINGS=0 -DELUNA=0 -DWITH_COREDEBUG=0 -DUSE_EXTRACTORS=1
+        cmake ../ -DCMAKE_INSTALL_PREFIX=../_install -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1
         make -j2
         make install
-    #windows 
+    #windows
     - name: windows build & install
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       run: |
         #directory variables
         export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
@@ -91,7 +106,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         mkdir build
         cd build
-        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DSERVERS=1 -DTOOLS=1 -DSCRIPTS=1 -DWITH_DOCS=1 -DWITH_WARNINGS=0 -DELUNA=0 -DWITH_COREDEBUG=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
         /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
       #git bash shell
       shell: bash

@@ -88,7 +88,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if ((_player->IsBankPos(INVENTORY_SLOT_BAG_0, srcslot) || _player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot)) && !CanUseBank())
+    if ((_player->IsBankPos(INVENTORY_SLOT_BAG_0, srcslot) || _player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot)) && !_player->CanUseBank())
     {
         ProcessAnticheatAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
         return;
@@ -146,7 +146,7 @@ void WorldSession::HandleSwapItem(WorldPacket& recv_data)
         return;
     }
 
-    if ((_player->IsBankPos(srcbag, srcslot) || _player->IsBankPos(dstbag, dstslot)) && !CanUseBank())
+    if ((_player->IsBankPos(srcbag, srcslot) || _player->IsBankPos(dstbag, dstslot)) && !_player->CanUseBank())
     {
         ProcessAnticheatAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
         return;
@@ -445,7 +445,13 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
     }
     else
     {
-        DEBUG_LOG("WORLD: CMSG_ITEM_QUERY_SINGLE - NO item INFO! (ENTRY: %u)", item);
+        if (pProto && !pProto->m_bDiscovered)
+        {
+            std::stringstream oss;
+            oss << "Requested info for undiscovered item " << pProto->ItemId;
+            ProcessAnticheatAction("PassiveAnticheat", oss.str().c_str(), CHEAT_ACTION_LOG);
+        }
+        
         WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
         data << uint32(item | 0x80000000);
         SendPacket(&data);
@@ -824,7 +830,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
                     // when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
                     if (!pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
-                            ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->getFactionTemplateEntry()->faction))
+                            ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->GetFactionId()))
                         continue;
 
                     if (crItem->conditionId && !IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
@@ -879,7 +885,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recv_data)
     // cheating: check if source bag / item or destination bag is in bank and player can't use bank
     if (_player->IsBankPos(srcbag, srcslot) || (dstbag >= BANK_SLOT_BAG_START && dstbag < BANK_SLOT_BAG_END))
     {
-        if (!CanUseBank())
+        if (!_player->CanUseBank())
             return;
     }
 
@@ -999,7 +1005,7 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
     if (!pItem)
         return;
 
-    if (!CanUseBank())
+    if (!_player->CanUseBank())
         return;
 
     ItemPosCountVec dest;
@@ -1034,7 +1040,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
     if (!pItem)
         return;
 
-    if (!CanUseBank())
+    if (!_player->CanUseBank())
         return;
 
     if (_player->IsBankPos(srcbag, srcslot))                // moving from bank to inventory
@@ -1168,8 +1174,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    // cheating: non-wrapper wrapper (all empty wrappers is stackable)
-    if (!(gift->GetProto()->Flags & ITEM_FLAG_WRAPPER) || gift->GetMaxStackCount() == 1)
+    if (!(gift->GetProto()->Flags & ITEM_FLAG_WRAPPER) || !gift->GetProto()->WrappedGift)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
         return;
@@ -1236,29 +1241,8 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 
     CharacterDatabase.BeginTransaction(_player->GetGUIDLow());
     CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", item->GetOwnerGuid().GetCounter(), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
-    item->SetEntry(gift->GetEntry());
-
-    switch (item->GetEntry())
-    {
-        case 5042:
-            item->SetEntry(5043);
-            break;
-        case 5048:
-            item->SetEntry(5044);
-            break;
-        case 17303:
-            item->SetEntry(17302);
-            break;
-        case 17304:
-            item->SetEntry(17305);
-            break;
-        case 17307:
-            item->SetEntry(17308);
-            break;
-        case 21830:
-            item->SetEntry(21831);
-            break;
-    }
+    
+    item->SetEntry(gift->GetProto()->WrappedGift);
     item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, _player->GetObjectGuid());
     item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
@@ -1271,22 +1255,4 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 
     uint32 count = 1;
     _player->DestroyItemCount(gift, count, true);
-}
-
-bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
-{
-    // bankerGUID parameter is optional, set to 0 by default.
-    if (!bankerGUID)
-        bankerGUID = m_currentBankerGUID;
-
-    bool isUsingBankCommand = (bankerGUID == GetPlayer()->GetObjectGuid() && bankerGUID == m_currentBankerGUID);
-
-    if (!isUsingBankCommand)
-    {
-        Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(bankerGUID, UNIT_NPC_FLAG_BANKER);
-        if (!creature)
-            return false;
-    }
-
-    return true;
 }

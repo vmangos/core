@@ -393,7 +393,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
                 slimsFriend->CombatStop(true);
                 slimsFriend->RemoveAllAuras();
                 slimsFriend->DeleteThreatList();
-                slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
+                slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_IMMUNE_TO_NPC);
 
                 DoScriptText(SAY_PROGRESS_2_FRI, slimsFriend);
             }

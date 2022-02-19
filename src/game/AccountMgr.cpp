@@ -68,8 +68,8 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
 
     if (!update_sv)
         return AOR_DB_INTERNAL_ERROR;                       // unexpected error
-    LoginDatabase.Execute(
-        "INSERT INTO `realmcharacters` (`realmid`, `acctid`, `numchars`) SELECT `realmlist`.`id`, `account`.`id`, 0 FROM `realmlist`, `account` LEFT JOIN `realmcharacters` ON `acctid`=`account`.`id` WHERE `acctid` IS NULL");
+
+    LoginDatabase.Execute("REPLACE INTO `realmcharacters` (`realmid`, `acctid`, `numchars`) SELECT `realmlist`.`id`, `account`.`id`, 0 FROM `realmlist`,`account` LEFT JOIN `realmcharacters` ON `acctid`=`account`.`id` WHERE `acctid` IS NULL");
 
     return AOR_OK;                                          // everything's fine
 }

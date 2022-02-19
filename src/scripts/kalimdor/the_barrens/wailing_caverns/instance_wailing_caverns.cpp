@@ -79,7 +79,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                     m_uiVerdanGUID = pCreature->GetGUID();
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                     break;*/
         }

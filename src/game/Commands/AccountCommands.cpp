@@ -1047,63 +1047,6 @@ bool ChatHandler::HandleAnticheatCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleListAddonsCommand(char* args)
-{
-    Player* player = GetSelectedPlayer();
-    if (!player)
-        return false;
-
-    std::set<std::string> const& addons = player->GetSession()->GetAddons();
-    PSendSysMessage("%u addons on target.", addons.size());
-    for (const auto& addon : addons)
-        PSendSysMessage(">> %s", addon.c_str());
-    return true;
-}
-
-bool ChatHandler::HandleClientInfosCommand(char* args)
-{
-    Player* player = nullptr;
-    if (!ExtractPlayerTarget(&args, &player) && m_session)
-        player = m_session->GetPlayer();
-    if (!player)
-        return false;
-
-    PSendSysMessage("Account %s has %u client identifiers.", player->GetSession()->GetUsername().c_str(), player->GetSession()->GetClientIdentifiers().size());
-    for (const auto& it : player->GetSession()->GetClientIdentifiers())
-        PSendSysMessage("%u: %s", it.first, it.second.c_str());
-    player->GetSession()->ComputeClientHash();
-    PSendSysMessage("Hash is %s", playerLink(player->GetSession()->GetClientHash()).c_str());
-    return true;
-}
-
-bool ChatHandler::HandleClientSearchCommand(char* args)
-{
-    ASSERT(args);
-    std::string searchedHash = args;
-    uint32 i = 0;
-    World::SessionMap const& sessMap = sWorld.GetAllSessions();
-    for (const auto& itr : sessMap)
-    {
-        if (!itr.second)
-            continue;
-
-        std::string currentHash = itr.second->GetClientHash();
-        if (currentHash.find(searchedHash) != std::string::npos)
-        {
-            PSendSysMessage("%s on account %s, %s",
-                            playerLink(itr.second->GetPlayerName()).c_str(),
-                            playerLink(itr.second->GetUsername()).c_str(),
-                            playerLink(itr.second->GetRemoteAddress()).c_str());
-            ++i;
-        }
-    }
-    if (i == 0)
-        PSendSysMessage("Not result for hash %s", playerLink(searchedHash).c_str());
-    else
-        PSendSysMessage("%u result(s) for %s", i, playerLink(searchedHash).c_str());
-    return true;
-}
-
 bool ChatHandler::HandleSpamerMute(char* args)
 {
     if (!*args)

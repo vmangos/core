@@ -558,7 +558,7 @@ struct npc_klinfranAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
     
-    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
+    void SpellHit(SpellCaster* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell && pSpell->Id == 14277)   // Scorpid Sting (Rank 4)
         {

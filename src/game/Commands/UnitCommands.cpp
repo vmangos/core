@@ -278,7 +278,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Channel object: %s", pTarget->GetChannelObjectGuid().GetString().c_str());
     PSendSysMessage("Scale: %g", pTarget->GetFloatValue(OBJECT_FIELD_SCALE_X));
     PSendSysMessage("Level: %u", pTarget->GetLevel());
-    if (auto pFactionTemplate = pTarget->getFactionTemplateEntry())
+    if (auto pFactionTemplate = pTarget->GetFactionTemplateEntry())
     {
         if (auto pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
             PSendSysMessage("Faction template: %u - %s", pTarget->GetFactionTemplateId(), pFaction->name[0].c_str());
@@ -756,6 +756,23 @@ bool ChatHandler::HandleListThreatCommand(char* /*args*/)
     {
         PSendSysMessage("%g - %s", itr->getThreat(), itr->getUnitGuid().GetString().c_str());
     }
+
+    return true;
+}
+
+
+bool ChatHandler::HandleChargeCommand(char* /*args*/)
+{
+    Unit* pUnit = GetSelectedUnit();
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pUnit || pUnit == pPlayer)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pPlayer->GetMotionMaster()->MoveCharge(pUnit);
 
     return true;
 }
@@ -1946,7 +1963,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
     {
         player->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
         if (target != player)
-            player->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_NORMAL, 0);
+            player->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_NORMAL, 0);
         return true;
     }
 
@@ -1963,36 +1980,23 @@ bool ChatHandler::HandleDamageCommand(char* args)
         damage = ditheru(player->CalcArmorReducedDamage(target, damage));
 
     // melee damage by specific school
-    if (!*args)
-    {
-        uint32 absorb = 0;
-        int32 resist = 0;
+    uint32 absorb = 0;
+    int32 resist = 0;
 
-        target->CalculateDamageAbsorbAndResist(player, schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, nullptr);
+    target->CalculateDamageAbsorbAndResist(player, schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, nullptr);
 
-        uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
-        damage += bonus;
-        uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
+    uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
+    damage += bonus;
+    uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
 
-        if (damage <= malus)
-            return true;
-
-        damage -= malus;
-
-        player->DealDamageMods(target, damage, &absorb);
-        player->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, schoolmask, nullptr, false);
-        player->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, 1, schoolmask, damage, absorb, resist, VICTIMSTATE_NORMAL, 0);
+    if (damage <= malus)
         return true;
-    }
 
-    // non-melee damage
+    damage -= malus;
 
-    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-    uint32 spellid = ExtractSpellIdFromLink(&args);
-    if (!spellid || !sSpellMgr.GetSpellEntry(spellid))
-        return false;
-
-    player->SpellNonMeleeDamageLog(target, spellid, damage);
+    player->DealDamageMods(target, damage, &absorb);
+    player->DealDamage(target, damage, nullptr, DIRECT_DAMAGE, schoolmask, nullptr, false);
+    player->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, schoolmask, damage, absorb, resist, VICTIMSTATE_NORMAL, 0);
     return true;
 }
 
@@ -2022,7 +2026,7 @@ bool ChatHandler::HandleAoEDamageCommand(char* args)
     for (Unit* pTarget : targetsList)
     {
         pPlayer->DealDamage(pTarget, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-        pPlayer->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, pTarget, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_NORMAL, 0);
+        pPlayer->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, pTarget, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_NORMAL, 0);
     }
 
     return true;

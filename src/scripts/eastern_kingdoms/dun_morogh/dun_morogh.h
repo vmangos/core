@@ -261,7 +261,7 @@ struct npc_mortar_team_target_dummyAI : ScriptedAI
     explicit npc_mortar_team_target_dummyAI(Creature* pCreature);
 
     void Reset() override;
-    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override;
+    void SpellHit(SpellCaster* /*pCaster*/, SpellEntry const* pSpell) override;
     void UpdateAI(uint32 const uiDiff) override;
 };
 

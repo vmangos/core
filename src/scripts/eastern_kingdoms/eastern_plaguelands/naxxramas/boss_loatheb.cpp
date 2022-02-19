@@ -84,7 +84,7 @@ struct mob_rottingMaggotAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 1.5f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false) && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
         {
             if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
@@ -160,7 +160,7 @@ struct mob_eyeStalkAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 19.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->IsTargetable(true, false) && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableBy(m_creature) && m_creature->IsHostileTo(pWho))
         {
             if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
@@ -387,13 +387,21 @@ struct boss_loathebAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit*, SpellEntry const* pSpell) override 
+    /* Loatheb does not automatically remove Vampiric Embrace before TBC, source: https://wowpedia.fandom.com/wiki/Loatheb_(Classic)
+    Shadow priests are excellent for healing groups with current talents (as of 4 January 2007) as shown by Death and Taxes, 
+    who successfully managed to kill him with five people (http://www.dtguilds.com/forums/showthread.php?t=5534). 
+    Movie: http://www.youtube.com/watch?v=raaLqFelbCk. 
+    This was hotfixed later, and Loatheb dispels the Vampiric Embrace off of himself shortly after applied. 
+    Vampiric Embrace triggers the Corrupted Mind debuff.
+
+    void SpellHit(SpellCaster*, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 15286) // vamperic embrace
         {
             DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE);
         }
     }
+    */
 
     void UpdateAI(uint32 const uiDiff) override
     {

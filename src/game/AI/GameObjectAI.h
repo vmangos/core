@@ -17,7 +17,6 @@ class GameObjectAI
 
         virtual void UpdateAI(uint32 const /*uiDiff*/) {}
         virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
-        virtual void InformGuid(ObjectGuid guid) {}
         virtual bool OnUse(Unit* /*user*/) { return false; }
 
         // Called when the gameobject summon successfully a creature

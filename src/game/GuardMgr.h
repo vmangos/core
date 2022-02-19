@@ -25,8 +25,8 @@
 
 #define GUARD_POST_MAX_CHARGES 10
 
+class Unit;
 class Creature;
-class Player;
 
 struct AreaGuardInfo
 {
@@ -35,6 +35,18 @@ struct AreaGuardInfo
     uint32 const creatureIdHorde;
     uint32 cooldown;
     uint32 charges;
+
+    uint32 GetCreatureIdForTeam(Team team) const
+    {
+        switch (team)
+        {
+            case HORDE:
+                return creatureIdHorde;
+            case ALLIANCE:
+                return creatureIdAlliance;
+        }
+        return 0;
+    }
 };
 
 class GuardMgr
@@ -44,7 +56,8 @@ class GuardMgr
         ~GuardMgr() {}
         void Update(uint32 diff);
         uint32 GetTextId(uint32 factionTemplateId, uint32 areaId, uint32 displayId) const;
-        bool SummonGuard(Creature* pCivilian, Player* pEnemy);
+        Team GetTeam(Creature* pCivilian, Unit* pEnemy);
+        bool SummonGuard(Creature* pCivilian, Unit* pEnemy);
     private:
         std::unordered_map<uint32, AreaGuardInfo> m_mAreaGuardInfo;
         uint32 m_uiRechargeTimer;
