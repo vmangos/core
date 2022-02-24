@@ -1457,6 +1457,26 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3065, 0, 0, 'Horrifying.', 6279, 1, 1, 3066, 0, 0, 0, 0, '', 0, 0),
 (3066, 0, 0, 'Absolutely.', 0, 1, 1, -1, 0, 0, 0, 0, '', 0, 0);
 
+-- ----------------------------------------------------------------------
+
+-- Unstuck Creature 34982
+UPDATE `creature` SET `position_x` = 2738.18, `position_y` = 675.899 WHERE `guid` = 34982;
+
+-- ----------------------------------------------------------------------
+ 
+-- Add Missing Gossip Option
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3801, 0, 0, 'Myranda, do you have enough eyeballs to make another amulet? I have lost the old one.', 8324, 1, 1, -1, 0, 380101, 0, 0, '', 0, 3782);
+
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (380101, 0, 15, 20693, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Myranda the Hag - Cast Spell');
+
+*****
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (3780, 9, 6570, 1, 0, 0, 0); -- This condition type may be bugged, doesnt seem to return true if a player has an incomplete quest
+*****
+
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (3781, 23, 16787, 1, 0, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (3782, -1, 3780, 3781, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
