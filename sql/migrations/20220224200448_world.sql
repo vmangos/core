@@ -1383,6 +1383,151 @@ UPDATE `creature` SET `id2` = 6005, `id3` = 6006 WHERE `id` = 6004;
 UPDATE `creature` SET `id2` = 6004, `id3` = 6006 WHERE `id` = 6005;
 UPDATE `creature` SET `id2` = 6004, `id3` = 6005 WHERE `id` = 6006;
 
+-- ----------------------------------------------------------------------
+
+-- WESTFALL
+-- Murloc Raider Can Be Murloc Coastrunner
+-- https://classic.wowhead.com/npc=515/murloc-raider
+UPDATE `creature` SET `id` = 515 WHERE `guid` IN (
+89938,
+90088,
+90077,
+89459,
+89934,
+90076,
+89940,
+90405,
+89464,
+89461,
+89466,
+90090,
+89936,
+90385,
+90081,
+90078,
+90075,
+89458
+);
+UPDATE `creature` SET `id2` = 126 WHERE `id` = 515;
+
+-- Murloc Minor Oracle Can Be Murloc Coastrunner
+-- https://classic.wowhead.com/npc=456/murloc-minor-oracle
+UPDATE `creature` SET `id` = 456 WHERE `guid` IN (
+90080,
+90079,
+89939,
+90089,
+90083,
+90086,
+90084
+);
+UPDATE `creature` SET `id2` = 126 WHERE `id` = 456;
+
+-- Murloc Netter Can Be Murloc Minor Oracle
+-- https://classic.wowhead.com/npc=513/murloc-netter
+UPDATE `creature` SET `id` = 513 WHERE `guid` IN (
+89922,
+68756,
+89921,
+90064,
+69492,
+89923,
+81709,
+89919,
+90067,
+89917,
+89918,
+68754,
+90060,
+89470,
+89473
+);
+UPDATE `creature` SET `id2` = 456 WHERE `id` = 513;
+
+-- Murloc Warrior Can Be Murloc Netter
+-- https://classic.wowhead.com/npc=171/murloc-warrior
+UPDATE `creature` SET `id` = 171 WHERE `guid` IN (
+89943,
+89944,
+90099,
+89488,
+89479,
+90093,
+90094,
+89947
+);
+UPDATE `creature` SET `id2` = 513 WHERE `id` = 171;
+
+-- Murloc Hunter Can Be Murloc Warrior
+-- https://classic.wowhead.com/npc=458/murloc-hunter
+UPDATE `creature` SET `id` = 458 WHERE `guid` IN (
+89948,
+89949,
+89485,
+89487,
+89486,
+89476,
+89954,
+89494,
+89952,
+89497,
+90024,
+90027,
+90022,
+89832,
+89833,
+90026,
+89836,
+89478,
+89480,
+89946,
+89483,
+89484,
+90098,
+89834,
+89835
+);
+UPDATE `creature` SET `id2` = 171 WHERE `id` = 458;
+
+-- Murloc Oracle Can Be Murloc Hunter
+-- https://classic.wowhead.com/npc=517/murloc-oracle
+UPDATE `creature` SET `id` = 517 WHERE `guid` IN (
+89506,
+89956,
+89957,
+89962,
+89970,
+90111,
+90110,
+90109
+);
+UPDATE `creature` SET `id2` = 458 WHERE `id` = 517;
+
+-- Murloc Tidehunter Can Be Murloc Oracle
+-- https://classic.wowhead.com/npc=127/murloc-tidehunter
+UPDATE `creature` SET `id` = 127 WHERE `guid` IN (
+89975,
+89513,
+89519,
+89508,
+89507,
+89960,
+89501,
+89972,
+89512,
+89974,
+90148,
+90112,
+90106,
+90105
+);
+UPDATE `creature` SET `id2` = 517 WHERE `id` = 127;
+
+-- https://classic.wowhead.com/npc=589/defias-pillager
+-- https://classic.wowhead.com/npc=590/defias-looter
+UPDATE `creature` SET `id2` = 590 WHERE `id` = 589;
+UPDATE `creature` SET `id2` = 589 WHERE `id` = 590;
+
 
 -- End of migration.
 END IF;
