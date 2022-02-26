@@ -1631,6 +1631,14 @@ UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 3483;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (3483, 8, 3461, 0, 0, 0, 1);
 UPDATE `quest_template` SET `RequiredCondition` = 3483 WHERE `entry` = 3483;
 
+-- ----------------------------------------------------------------------
+
+-- Blackwood Stores Should Summon Creature
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(48605, 0, 0, 10, 2168, 300000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Blackwood Grain Store - Summon Creature'),
+(48616, 0, 0, 10, 2168, 300000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Blackwood Nut Store - Summon Creature'),
+(48671, 0, 0, 10, 2168, 300000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Blackwood Fruit Store - Summon Creature');
+
 
 -- End of migration.
 END IF;
