@@ -1354,8 +1354,9 @@ DELETE FROM `gameobject` WHERE `guid` = 73246;
 
 -- ----------------------------------------------------------------------
 
--- Correct Flags
-UPDATE `gameobject_template` SET `flags` = 0 WHERE `entry` = 19535;
+-- Correct Serpentbloom Flags
+UPDATE `gameobject_template` SET `flags` = 0,  `size` = 0.1 WHERE `entry` = 19535;
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE  `id` IN (19535, 13891);
 
 -- ----------------------------------------------------------------------
 
