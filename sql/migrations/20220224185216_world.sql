@@ -1608,6 +1608,29 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1067603, 0, 0, 16, 6495, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raider Jhash - Play Sound');
 
+-- ----------------------------------------------------------------------
+
+-- Arch Druid Fandral Staghelm Should Not Offer Quest 3803
+DELETE FROM `creature_questrelation` WHERE `id` = 3516 AND `quest` = 3803;
+
+-- ----------------------------------------------------------------------
+
+-- Add Missing Items To Bernard Gump
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`, `condition_id`) VALUES
+(1302, 3357, 1, 7200, 0, 0),
+(1302, 3356, 1, 7200, 0, 0),
+(1302, 3355, 1, 7200, 0, 0),
+(1302, 2453, 2, 7200, 0, 0),
+(1302, 785, 2, 7200, 0, 0),
+(1302, 2449, 3, 7200, 0, 0);
+
+-- ----------------------------------------------------------------------
+
+-- Quest 3483 Should Be Repeatable And Disable Once Chain is Complete
+UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `entry` = 3483;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (3483, 8, 3461, 0, 0, 0, 1);
+UPDATE `quest_template` SET `RequiredCondition` = 3483 WHERE `entry` = 3483;
+
 
 -- End of migration.
 END IF;
