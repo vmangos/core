@@ -1523,6 +1523,183 @@ UPDATE `creature` SET `id` = 127 WHERE `guid` IN (
 );
 UPDATE `creature` SET `id2` = 517 WHERE `id` = 127;
 
+-- Riverpaw Gnoll Can Be Riverpaw Scout
+-- https://classic.wowhead.com/npc=117/riverpaw-gnoll
+UPDATE `creature` SET `id` = 117 WHERE `guid` IN (
+86616,
+86620,
+90332,
+86783,
+90335,
+86662,
+86785,
+86661,
+86786,
+87025,
+86793
+);
+UPDATE `creature` SET `id2` = 500 WHERE `id` = 117;
+
+-- Riverpaw Gnoll Or Riverpaw Shaman
+UPDATE `creature` SET `id` = 500, `id2` = 1065 WHERE `guid` IN (
+86791,
+86790,
+87024,
+86792
+);
+
+-- Riverpaw Mongrel Can Be Riverpaw Scout
+-- https://classic.wowhead.com/npc=123/riverpaw-mongrel
+UPDATE `creature` SET `id` = 123 WHERE `guid` IN (
+87037,
+87036,
+90328,
+90326,
+87085,
+88751
+);
+UPDATE `creature` SET `id2` = 500 WHERE `id` = 123;
+
+-- Riverpaw Herbalist Can Be Riverpaw Mongrel
+-- https://classic.wowhead.com/npc=501/riverpaw-herbalist
+UPDATE `creature` SET `id` = 501 WHERE `guid` IN (
+89609,
+89610,
+89611,
+89602,
+90309,
+89601,
+89600,
+89597,
+89598,
+89604,
+89605,
+87027,
+89632,
+90304,
+89623,
+89620,
+89624,
+89619,
+89658,
+89659,
+89621,
+89626,
+89627,
+89630,
+89629,
+89628,
+89633
+);
+UPDATE `creature` SET `id2` = 123 WHERE `id` = 501;
+
+-- Riverpaw Brute Can Be Riverpaw Herbalist
+-- https://classic.wowhead.com/npc=124/riverpaw-brute
+UPDATE `creature` SET `id` = 124 WHERE `guid` IN (
+89649,
+89656,
+90295,
+89654,
+89642,
+89646,
+90298,
+89636,
+89651,
+89653,
+89652
+);
+UPDATE `creature` SET `id2` = 501 WHERE `id` = 124;
+
+-- Riverpaw Bandit Can Be Riverpaw Brute
+-- https://classic.wowhead.com/npc=452/riverpaw-bandit
+UPDATE `creature` SET `id` = 452 WHERE `guid` IN (
+89682,
+89683,
+89686,
+90367,
+89687,
+89688,
+89693,
+89690,
+90370,
+90272
+);
+UPDATE `creature` SET `id2` = 124 WHERE `id` = 452;
+
+-- Riverpaw Taskmaster Can Be Riverpaw Bandit
+-- https://classic.wowhead.com/npc=98/riverpaw-taskmaster
+UPDATE `creature` SET `id` = 98 WHERE `guid` IN (
+90268,
+89707,
+89710,
+89705,
+89704,
+89703,
+89702,
+89700,
+89701,
+89718,
+98717,
+89719,
+89720,
+90265,
+90256,
+90252,
+90261,
+89714,
+89713,
+89715,
+90242,
+89752,
+89749,
+89751,
+89750,
+90251,
+89717
+);
+UPDATE `creature` SET `id2` = 452 WHERE `id` = 98;
+
+-- Riverpaw Mystic Can Be Riverpaw Taskmaster
+-- https://classic.wowhead.com/npc=453/riverpaw-mystic
+UPDATE `creature` SET `id` = 453 WHERE `guid` IN (
+90258,
+90262,
+89724,
+89723,
+89721,
+89725,
+89753,
+89755,
+89754,
+90260,
+90240,
+90247,
+89741,
+89764,
+89762,
+89763,
+89761,
+89759,
+89738,
+89734,
+89739,
+89737,
+89727,
+89733,
+89747,
+89744,
+89746,
+89745,
+89732,
+89731,
+89730,
+90266,
+89758
+);
+UPDATE `creature` SET `id2` = 98 WHERE `id` = 453;
+
+
+
 -- https://classic.wowhead.com/npc=589/defias-pillager
 -- https://classic.wowhead.com/npc=590/defias-looter
 UPDATE `creature` SET `id2` = 590 WHERE `id` = 589;
