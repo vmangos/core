@@ -21,7 +21,7 @@ UPDATE `game_event` SET `description`='Lunar Festival: Minions of Omen' WHERE `e
 UPDATE `spell_scripts` SET `datalong`=26451 WHERE `datalong`=26471;
 
 UPDATE `creature_template` SET `speed_walk`=1, `base_attack_time`=2000, `ranged_attack_time`=2000, `unit_flags`=256 WHERE entry IN (15549,15556,15557,15558,15559,15560,15561,15562,15563,15564,15565,15566,15567,15568,15569,15570,15572,15573,15574,15575,15576,15577,15578,15579,15580,15581,15582,15583,15584,15585,15586,15587,15588,15592,15593,15594,15595,15596,15597,15598,15599,15600,15601,15602,15603,15604,15605,15606,15607,15871);
-UPDATE `creature_template` SET `display_scale1`=0, `display_scale2`=0, `display_scale4`=0, `display_scale3`=0, `gossip_menu_id`=6935, `level_min`=55, `level_max`=55, `health_min`=2614, `health_max`=2614, `npc_flags`=1, `speed_walk`=1, `unit_flags`=512, `ai_name`='EventAI' WHERE `entry`=15917;
+UPDATE `creature_template` SET `display_scale1`=1.35, `display_scale2`=1.25, `display_scale4`=1.35, `display_scale3`=1.25, `gossip_menu_id`=6935, `level_min`=55, `level_max`=55, `health_min`=2614, `health_max`=2614, `npc_flags`=1, `speed_walk`=1, `unit_flags`=512, `ai_name`='EventAI' WHERE `entry`=15917;
 
 -- Delete old Elders from Event.
 DELETE FROM `game_event_creature` WHERE `guid` IN (SELECT `guid` FROM `creature` WHERE id IN (15549,15556,15557,15558,15559,15560,15561,15562,15563,15564,15565,15566,15567,15568,15569,15570,15572,15573,15574,15575,15576,15577,15578,15579,15580,15581,15582,15583,15584,15585,15586,15587,15588,15592,15593,15594,15595,15596,15597,15598,15599,15600,15601,15602,15603,15604,15605,15606,15607,15871));
@@ -211,12 +211,12 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     (@LUNAR_FESTIVAL_ELDERS_CGUID+42, 15602, 0, 0, 0, 0, 1995.88, -2420.17, 59.3823, 2.72271, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_ELDERS_CGUID+43, 15568, 0, 0, 0, 0, 2215.43, 237.536, 34.7272, 1.69297, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_ELDERS_CGUID+44, 15566, 0, 0, 0, 0, 2237.86, -5340.41, 84.7113, 1.13446, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
-	(@LUNAR_FESTIVAL_ELDERS_CGUID+45, 15560, 0, 0, 0, 229, 67.8133, -537.544, 32.1637, 2.63545, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
-	(@LUNAR_FESTIVAL_ELDERS_CGUID+46, 15607, 0, 0, 0, 329, 3705.22, -3466.81, 130.794, 0, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
-	(@LUNAR_FESTIVAL_ELDERS_CGUID+47, 15593, 0, 0, 0, 109, -414.836, 5.38781, -90.772, 2.11185, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
-	(@LUNAR_FESTIVAL_ELDERS_CGUID+48, 15549, 0, 0, 0, 230, 596.586, -188.771, -54.0721, 0.10472, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
-	(@LUNAR_FESTIVAL_ELDERS_CGUID+49, 15578, 0, 0, 0, 209, 1689.04, 1147.57, 8.96011, 2.37365, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
-	(@LUNAR_FESTIVAL_ELDERS_CGUID+50, 15556, 0, 0, 0, 349, -139.935, -363.996, -170.336, 6.16101, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10);
+    (@LUNAR_FESTIVAL_ELDERS_CGUID+45, 15560, 0, 0, 0, 229, 67.8133, -537.544, 32.1637, 2.63545, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_ELDERS_CGUID+46, 15607, 0, 0, 0, 329, 3705.22, -3466.81, 130.794, 0, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_ELDERS_CGUID+47, 15593, 0, 0, 0, 109, -414.836, 5.38781, -90.772, 2.11185, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_ELDERS_CGUID+48, 15549, 0, 0, 0, 230, 596.586, -188.771, -54.0721, 0.10472, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_ELDERS_CGUID+49, 15578, 0, 0, 0, 209, 1689.04, 1147.57, 8.96011, 2.37365, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_ELDERS_CGUID+50, 15556, 0, 0, 0, 349, -139.935, -363.996, -170.336, 6.16101, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10);
 
     
 INSERT INTO `game_event_creature` SELECT creature.guid, @LUNAR_FESTIVAL_EVENT FROM `creature` WHERE creature.guid BETWEEN @LUNAR_FESTIVAL_ELDERS_CGUID+1 AND @LUNAR_FESTIVAL_ELDERS_CGUID+44;
@@ -247,6 +247,43 @@ INSERT INTO `spell_effect_mod` (`Id`, `EffectMiscValue`, `Comment`) VALUES
     (26518, 4, 'Fix Launcher animation for Large White Firework Cluster'),
     (26519, 4, 'Fix Launcher animation for Large Yellow Firework Cluster'),
     (26521, 4, 'Fix Launcher animation for Lucky Lunar Rocket');
+
+-- Thanks to TC brutforced Gameobjects, we have now the real names for the traps (The missing space must be a typo by Blizzard).
+UPDATE `gameobject_template` SET `name`='Port to Moonglade TRAP' WHERE `entry`=180891;
+UPDATE `gameobject_template` SET `name`='Port to StormwindTRAP' WHERE `entry`=180892;
+UPDATE `gameobject_template` SET `name`='Port to Ironforge TRAP' WHERE `entry`=180893;
+UPDATE `gameobject_template` SET `name`='Port to Darnassus TRAP' WHERE `entry`=180894;
+UPDATE `gameobject_template` SET `name`='Port to OrgrimmarTRAP' WHERE `entry`=180895;
+UPDATE `gameobject_template` SET `name`='Port to Undercity TRAP' WHERE `entry`=180896;
+UPDATE `gameobject_template` SET `name`='Port to Thunder Bluff TRAP' WHERE `entry`=180897;
+UPDATE `gameobject_template` SET `faction`='0', `data6`='-1' WHERE `entry` IN (180897,180896,180895,180894,180893,180892,180891);
+
+UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Orgrimmar - Port Alliance Player to Moonglade' WHERE `id`=26414 AND `comments`='Lunar Teleport Cap: Orgrimmar - Send Error to Alliance Player';
+UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Thunderbluff - Port Alliance Player to Moonglade' WHERE `id`=26412 AND `comments`='Lunar Teleport Cap: Thunderbluff - Send Error to Alliance Player';
+UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Undercity - Port Alliance Player to Moonglade' WHERE `id`=26410 AND `comments`='Lunar Teleport Cap: Undercity - Send Error to Alliance Player';
+UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Darnassus - Port Horde Player to Moonglade' WHERE `id`=26409 AND `comments`='Lunar Teleport Cap: Darnassus - Send Error to Horde Player';
+UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Ironforge - Port Horde Player to Moonglade' WHERE `id`=26408 AND `comments`='Lunar Teleport Cap: Ironforge - Send Error to Horde Player';
+UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Stormwind - Port Horde Player to Moonglade' WHERE `id`=26406 AND `comments`='Lunar Teleport Cap: Stormwind - Send Error to Horde Player';
+
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `EffectImplicitTargetA`, `Comment`) VALUES
+    (26406, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Stormwind'),
+    (26408, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Ironforge'),
+    (26409, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Darnassus'),
+    (26410, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Undercity'),
+    (26412, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Thunderbluff'),
+    (26414, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Orgrimmar');
+
+DELETE FROM `creature_ai_events` WHERE `id`=1589202;
+DELETE FROM `creature_ai_scripts` WHERE `id`=1589202;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589202, 15892, 260, 1, 0, 100, 0, 0, 0, 0, 0, 1589202, 0, 0, 'Lunar Festival Emissary - Modify Flags on Spawn');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589102, 15891, 261, 1, 0, 100, 0, 0, 0, 0, 0, 1589102, 0, 0, 'Lunar Festival Herald - Modify Flags on Spawn');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589202, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Emissary - Modify Flags');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1589102, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lunar Festival Herald - Modify Flags');
+DELETE FROM `conditions` WHERE `condition_entry`=260;
+DELETE FROM `conditions` WHERE `condition_entry`=261;
+DELETE FROM `conditions` WHERE `condition_entry`=262;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (260, 52, 12469, 12460, 12526, 0, 1);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (261, 52, 12478, 12496, 12487, 0, 1);
 
 
 -- End of migration.
