@@ -1640,6 +1640,11 @@ INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalon
 (48616, 0, 0, 10, 2168, 300000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Blackwood Nut Store - Summon Creature'),
 (48671, 0, 0, 10, 2168, 300000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Blackwood Fruit Store - Summon Creature');
 
+-- ----------------------------------------------------------------------
+
+-- Quests Required Wrong Pre Quest 
+UPDATE `quest_template` SET `PrevQuestId` = 1653 WHERE `entry` IN (1442, 1655);
+
 
 -- End of migration.
 END IF;
