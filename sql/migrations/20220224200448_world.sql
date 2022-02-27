@@ -1698,12 +1698,23 @@ UPDATE `creature` SET `id` = 453 WHERE `guid` IN (
 );
 UPDATE `creature` SET `id2` = 98 WHERE `id` = 453;
 
-
-
 -- https://classic.wowhead.com/npc=589/defias-pillager
 -- https://classic.wowhead.com/npc=590/defias-looter
 UPDATE `creature` SET `id2` = 590 WHERE `id` = 589;
 UPDATE `creature` SET `id2` = 589 WHERE `id` = 590;
+
+-- https://classic.wowhead.com/npc=95/defias-smuggler
+-- https://classic.wowhead.com/npc=504/defias-trapper
+UPDATE `creature` SET `id2` = 504 WHERE `id` = 95;
+UPDATE `creature` SET `id2` = 95 WHERE `id` = 504;
+
+-- https://classic.wowhead.com/npc=121/defias-pathstalker
+-- https://classic.wowhead.com/npc=122/defias-highwayman
+-- https://classic.wowhead.com/npc=449/defias-knuckleduster
+UPDATE `creature` SET `id2` = 122, `id3` = 449 WHERE `id` = 121;
+UPDATE `creature` SET `id2` = 121, `id3` = 449 WHERE `id` = 122;
+UPDATE `creature` SET `id2` = 121, `id3` = 122 WHERE `id` = 449;
+-- ** NEEDS MORE ATTENTION HAS RANDOM SPAWNS JUST TO BE ANNOYING
 
 
 -- End of migration.
