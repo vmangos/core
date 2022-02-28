@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220228181818');
 -- Add your query below.
 
--- Makes Curing Shrine usable again after 0.5 seconds (from TC brutforced GameObjects)
+-- Makes Curing Shrine usable again after 0.5 seconds (from TC bruteforced GameObjects)
 UPDATE `gameobject_template` SET `data3`=500 WHERE `entry`=181955;
 UPDATE `gameobject_template` SET `data3`=500 WHERE `entry`=181682;
 
