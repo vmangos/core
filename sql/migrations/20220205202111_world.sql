@@ -248,7 +248,7 @@ INSERT INTO `spell_effect_mod` (`Id`, `EffectMiscValue`, `Comment`) VALUES
     (26519, 4, 'Fix Launcher animation for Large Yellow Firework Cluster'),
     (26521, 4, 'Fix Launcher animation for Lucky Lunar Rocket');
 
--- Thanks to TC brutforced Gameobjects, we have now the real names for the traps (The missing space must be a typo by Blizzard).
+-- Thanks to TC bruteforced Gameobjects, we have now the real names for the traps (The missing space must be a typo by Blizzard).
 UPDATE `gameobject_template` SET `name`='Port to Moonglade TRAP' WHERE `entry`=180891;
 UPDATE `gameobject_template` SET `name`='Port to StormwindTRAP' WHERE `entry`=180892;
 UPDATE `gameobject_template` SET `name`='Port to Ironforge TRAP' WHERE `entry`=180893;
@@ -273,6 +273,7 @@ INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `EffectImplicitTargetA`, `C
     (26412, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Thunderbluff'),
     (26414, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Orgrimmar');
 
+-- Remove Questgiver flag from some Horde npcs too.
 DELETE FROM `creature_ai_events` WHERE `id`=1589202;
 DELETE FROM `creature_ai_scripts` WHERE `id`=1589202;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589202, 15892, 260, 1, 0, 100, 0, 0, 0, 0, 0, 1589202, 0, 0, 'Lunar Festival Emissary - Modify Flags on Spawn');
