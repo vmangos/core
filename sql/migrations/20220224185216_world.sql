@@ -1643,7 +1643,7 @@ INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalon
 -- ----------------------------------------------------------------------
 
 -- Quests Required Wrong Pre Quest 
-UPDATE `quest_template` SET `PrevQuestId` = 1653 WHERE `entry` IN (1442, 1655);
+UPDATE `quest_template` SET `PrevQuestId` = -1654 WHERE `entry` IN (1442, 1655);
 
 
 -- End of migration.
