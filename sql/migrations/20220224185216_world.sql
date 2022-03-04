@@ -1687,6 +1687,12 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (11789, 30, 1907.0086669921875, -4283.04980468750, 30.18111801147460937, 100, 0, 0),
 (11789, 31, 1921.8472900390625, -4283.99609375000, 29.73994255065917968, 100, 0, 0);
 
+-- ----------------------------------------------------------------------
+
+-- Fix Quest Typo
+UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon allows one to see a corrupted soul shard on those tainted beasts that are put down for the greater good. I grind shards into a usable reagent that goes into making Cenarion plant salve. We will use that salve to turn corrupted plants into healthy ones again.$b$bIn exchange for these shards, I will give you some Cenarion plant salves I have already prepared.' WHERE `entry`=4108;
+UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon allows one to see a corrupted soul shard on those tainted beasts that are put down for the greater good. I grind shards into a usable reagent that goes into making Cenarion plant salve. We will use that salve to turn corrupted plants into healthy ones again.$b$bIn exchange for these shards, I will give you some Cenarion plant salves I have already prepared.' WHERE `entry`=5887;
+
 
 -- End of migration.
 END IF;
