@@ -1693,6 +1693,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon allows one to see a corrupted soul shard on those tainted beasts that are put down for the greater good. I grind shards into a usable reagent that goes into making Cenarion plant salve. We will use that salve to turn corrupted plants into healthy ones again.$b$bIn exchange for these shards, I will give you some Cenarion plant salves I have already prepared.' WHERE `entry`=4108;
 UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon allows one to see a corrupted soul shard on those tainted beasts that are put down for the greater good. I grind shards into a usable reagent that goes into making Cenarion plant salve. We will use that salve to turn corrupted plants into healthy ones again.$b$bIn exchange for these shards, I will give you some Cenarion plant salves I have already prepared.' WHERE `entry`=5887;
 
+-- ----------------------------------------------------------------------
+
+-- Remove Loot From Ward of Laze
+UPDATE `creature_template` SET `gold_min`='0', `gold_max`='0' WHERE `entry`=2667;
+
 
 -- End of migration.
 END IF;
