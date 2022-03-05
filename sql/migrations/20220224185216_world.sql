@@ -1697,6 +1697,38 @@ UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon al
 -- Remove Loot From Ward of Laze
 UPDATE `creature_template` SET `gold_min`='0', `gold_max`='0' WHERE `entry`=2667;
 
+-- ----------------------------------------------------------------------
+
+-- Update Some More Breadcrumb Quests
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=5082 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=9052 AND `patch`=8;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=8414 AND `patch`=6;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=4126 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=4136 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=2865 AND `patch`=1;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=2865 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=639 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=1938 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=1824 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=1085 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=429 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=11 AND `patch`=0;
+
+UPDATE `quest_template` SET `NextQuestInChain`= 6607 WHERE `entry`=6609 AND `patch`=0;
+UPDATE `quest_template` SET `NextQuestInChain`= 6607 WHERE `entry`=6608 AND `patch`=0;
+UPDATE `quest_template` SET `NextQuestInChain`= 95 WHERE `entry`=164 AND `patch`=0;
+
+UPDATE `quest_template` SET `NextQuestId`= 0 , `NextQuestInChain`= 1420 WHERE `entry`=1418 AND `patch`=0;
+
+UPDATE `quest_template` SET `NextQuestInChain`= 1011 WHERE `entry`=4581 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=1011 AND `patch`=0;
+
+UPDATE `quest_template` SET `NextQuestInChain`= 5 WHERE `entry`=163 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=5 AND `patch`=0;
+
+UPDATE `quest_template` SET `NextQuestInChain`= 148 WHERE `entry`=165 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=148 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
