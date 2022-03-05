@@ -347,7 +347,6 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 (930, 19, 10, 3569, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 9503.99, 721.516, 1256.47, 2.85157, 0, 'The Glowing Fruit: Summon Creature Bogling'),
 (930, 19, 10, 3569, 60000, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 9504.07, 720.209, 1256.47, 4.18116, 0, 'The Glowing Fruit: Summon Creature Bogling');
 
-
 -- ----------------------------------------------------------------------
 
 -- Quest Does Not Have Pre Quest
@@ -1025,7 +1024,7 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 UPDATE `creature` SET  `position_x` = 152.458, `position_y` = 1745.22, `position_z` = 92.4667, spawntimesecsmin = 180, spawntimesecsmax = 180 WHERE `guid` IN (28278, 28279, 28280, 28298);
 UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (28279, 28280, 28298);
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 28278;
-DELETE FROM creature_movement where id = 28278;
+DELETE FROM `creature_movement` WHERE `id` = 28278;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES
 (28278, 1, 152.458, 1745.22, 92.4667, 100),
 (28278, 2, 124.412, 1722.02, 91.1262, 100),
