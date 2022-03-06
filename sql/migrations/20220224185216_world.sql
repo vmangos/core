@@ -1729,12 +1729,16 @@ UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=5 AND `patch`=0;
 UPDATE `quest_template` SET `NextQuestInChain`= 148 WHERE `entry`=165 AND `patch`=0;
 UPDATE `quest_template` SET `PrevQuestId`= 0 WHERE `entry`=148 AND `patch`=0;
 
+-- ----------------------------------------------------------------------
+
 -- Add Script to Quest Skirmish at Echo Ridge (credit cmangos)
 DELETE FROM `quest_end_scripts` WHERE `id`=21;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (21, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1242, 0, 0, 0, 0, 0, 0, 0, 0, 'Marshal McBride - Talk');
 UPDATE `quest_template` SET `CompleteScript` = 21 WHERE `entry` = 21;
 UPDATE `broadcast_text` SET `emote_id1` = 113 WHERE `entry` = 1242;
+
+-- ----------------------------------------------------------------------
 
 -- Add Script to Deeprun Rat Roundup (credit cmangos) (NOTE: There Seems To Be Some CPP That Despawns The Rats When Spell 21052 Should)
 UPDATE `quest_template` SET `CompleteScript` = 6661 WHERE `entry` = 6661;
