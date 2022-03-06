@@ -1752,6 +1752,25 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (6661, 5, 0, 3, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19.6312, 40.0752, -4.21403, 4.79965, 0, 'Monty - Move'),
 (6661, 7, 0, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Monty - Modify Flags');
 
+-- ----------------------------------------------------------------------
+
+-- Improve End Event For Quest The Defias Brotherhood (credit cmangos)
+DELETE FROM `quest_end_scripts` WHERE `id`=166;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(166, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 198, 199, 0, 0, 0, 0, 0, 0, 'Gryan Stoutmantle - Talk');
+UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `id` IN (197, 198, 199);
+
+-- ----------------------------------------------------------------------
+
+-- Script end event for quest Avast Ye, Admiral! (credit cmangos)
+DELETE FROM `quest_end_scripts` WHERE `id`=4621;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(4621, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5522, 0, 0, 0, 0, 0, 0, 0, 0, 'Fleet Master Firallon - Talk'),
+(4621, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5523, 0, 0, 0, 0, 0, 0, 0, 0, 'Fleet Master Firallon - Talk'),
+(4621, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5523, 0, 0, 0, 0, 0, 0, 0, 0, 'Fleet Master Firallon - Talk'),
+(4621, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5523, 0, 0, 0, 0, 0, 0, 0, 0, 'Fleet Master Firallon - Talk');
+UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `id` IN (5522, 5523);
+
 
 -- End of migration.
 END IF;
