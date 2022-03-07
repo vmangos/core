@@ -1763,6 +1763,7 @@ UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN (197, 198, 199);
 -- ----------------------------------------------------------------------
 
 -- Script end event for quest Avast Ye, Admiral! (credit cmangos)
+UPDATE `quest_template` SET `CompleteScript` = 4621 WHERE `entry` = 4621;
 DELETE FROM `quest_end_scripts` WHERE `id`=4621;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4621, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5522, 0, 0, 0, 0, 0, 0, 0, 0, 'Fleet Master Firallon - Talk'),
