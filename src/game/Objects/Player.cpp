@@ -5333,8 +5333,6 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
         return;
     }
 
-    float val = 1.0f;
-
     switch (modType)
     {
         case FLAT_MOD:

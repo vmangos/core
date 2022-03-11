@@ -7403,8 +7403,6 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         return false;
     }
 
-    float val = 1.0f;
-
     switch (modifierType)
     {
         case BASE_VALUE:
