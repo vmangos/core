@@ -5294,13 +5294,9 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "AURA MOD DAMAGE type:%u negative:%u", m_modifier.m_miscvalue, m_positive ? 0 : 1);
 
     Unit* target = GetTarget();
-    if (!target)
-    {
-        return;
-    }
 
     // apply item specific bonuses for already equipped weapon
-    if (Real && target->IsPlayer())
+    if (Real)
     {
         if (Player* player = target->ToPlayer())
         {
@@ -5310,7 +5306,6 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
                 {
                     player->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
                 }
-
             }
         }
     }
@@ -5347,9 +5342,7 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
 
     // Skip non magic case for speedup
     if ((m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_MAGIC) == 0)
-    {
         return;
-    }
 
     if (GetSpellProto()->EquippedItemClass != -1 || GetSpellProto()->EquippedItemInventoryTypeMask != 0)
     {
