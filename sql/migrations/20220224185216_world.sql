@@ -2205,6 +2205,11 @@ UPDATE `creature_template` SET `faction`= 35, `unit_flags` = 0, `call_for_help_r
 -- Stop Yeh'kinya Being Kited Away From Spawn
 UPDATE `creature_template` SET `flags_extra` = 65536 WHERE `entry` = 8579;
 
+-- ----------------------------------------------------------------------
+
+-- Attempt To Stop Overlord MokMorokk Script Breaking
+UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid`=31442;
+
 
 -- End of migration.
 END IF;
