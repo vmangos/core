@@ -2215,6 +2215,12 @@ UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid` = 31442;
 -- Codex: Prayer of Shadow Protection Should be Patch 1.9
 UPDATE `item_template` SET `patch` = 7 WHERE `entry` = 22393;
 
+-- ----------------------------------------------------------------------
+
+-- Fix Vizzklick's gossip text for players without Tailoring (credit cmangos)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (174, 7, 197, 230, 0, 0, 0);
+UPDATE `gossip_menu` SET `condition_id` = 174 WHERE `entry` = 1301 AND`text_id` = 1934;
+
 
 -- End of migration.
 END IF;
