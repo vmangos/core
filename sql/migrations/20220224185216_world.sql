@@ -2208,7 +2208,12 @@ UPDATE `creature_template` SET `flags_extra` = 65536 WHERE `entry` = 8579;
 -- ----------------------------------------------------------------------
 
 -- Attempt To Stop Overlord MokMorokk Script Breaking
-UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid`=31442;
+UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid` = 31442;
+
+-- ----------------------------------------------------------------------
+
+-- Codex: Prayer of Shadow Protection Should be Patch 1.9
+UPDATE `item_template` SET `patch` = 7 WHERE `entry` = 22393;
 
 
 -- End of migration.
