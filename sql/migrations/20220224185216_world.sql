@@ -2172,6 +2172,36 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 
 -- ----------------------------------------------------------------------
 
+-- Correct Stats For Anvilrage Creatures (credit velite12)
+UPDATE `creature_template` SET `dmg_min` = 88, `dmg_max` = 119 WHERE `name` = 'Anvilrage Reservist';
+UPDATE `creature_template` SET `dmg_min` = 187, `dmg_max` = 254 WHERE `name` = 'Anvilrage Overseer';
+UPDATE `creature_template` SET `dmg_min` = 248, `dmg_max` = 337 WHERE `name` = 'Anvilrage Warden';
+UPDATE `creature_template` SET `dmg_min` = 262, `dmg_max` = 355 WHERE `name` = 'Anvilrage Guardsman';
+UPDATE `creature_template` SET `dmg_min` = 338, `dmg_max` = 449 WHERE `name` = 'Anvilrage Captain';
+UPDATE `creature_template` SET `dmg_min` = 305, `dmg_max` = 412 WHERE `name` = 'Anvilrage Footman';
+UPDATE `creature_template` SET `dmg_min` = 241, `dmg_max` = 324 WHERE `name` = 'Anvilrage Medic';
+UPDATE `creature_template` SET `dmg_min` = 273, `dmg_max` = 361 WHERE `name` = 'Anvilrage Officer';
+UPDATE `creature_template` SET `dmg_min` = 293, `dmg_max` = 397 WHERE `name` = 'Anvilrage Marshal';
+UPDATE `creature_template` SET `dmg_min` = 279, `dmg_max` = 370 WHERE `name` = 'Anvilrage Soldier';
+
+-- ----------------------------------------------------------------------
+
+-- Update Muigin Script
+DELETE FROM `creature_ai_scripts` WHERE `id`=911901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(911901, 0, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 1, 915701, -1, 10, -6210.62, -1059.14, -197.906, 0, 0, 'Muigin - Summon Creature'),
+(911901, 0, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 1, 915701, -1, 10, -6213.33, -1059.19, -197.906, 0, 0, 'Muigin - Summon Creature'),
+(911901, 0, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 1, 915701, -1, 10, -6210.81, -1053.88, -197.906, 0, 0, 'Muigin - Summon Creature'),
+(911901, 0, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 1, 915701, -1, 10, -6211.25, -1057.72, -197.9, 0, 0, 'Muigin - Summon Creature'),
+(911901, 0, 0, 10, 9157, 660000, 0, 0, 0, 0, 0, 0, 1, 915701, -1, 10, -6213.66, -1056.38, -197.906, 0, 0, 'Muigin - Summon Creature');
+
+-- ----------------------------------------------------------------------
+
+-- Update Explosive Sheep (NOTE: The sheep are still bugged, they do not despawn and have an infinite cooldown, also their cpp can be removed I think)
+UPDATE `creature_template` SET `faction`= 35, `unit_flags` = 0, `call_for_help_range` = 0, `detection_range` = 20, `script_name` = '' WHERE `entry`=2675;
+
+-- ----------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
