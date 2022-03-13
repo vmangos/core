@@ -218,12 +218,12 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     (@LUNAR_FESTIVAL_ELDERS_CGUID+49, 15578, 0, 0, 0, 209, 1689.04, 1147.57, 8.96011, 2.37365, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_ELDERS_CGUID+50, 15556, 0, 0, 0, 349, -139.935, -363.996, -170.336, 6.16101, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10);
 
-    
 INSERT INTO `game_event_creature` SELECT creature.guid, @LUNAR_FESTIVAL_EVENT FROM `creature` WHERE creature.guid BETWEEN @LUNAR_FESTIVAL_ELDERS_CGUID+1 AND @LUNAR_FESTIVAL_ELDERS_CGUID+44;
 
--- Fix all Launcher animations.
+-- Fix all Launcher animations "(`requiresSpellFocus`=1351 OR `requiresSpellFocus`=1352) AND (`effect1`=86 OR `effect2`=86) GROUP BY entry".
 INSERT INTO `spell_effect_mod` (`Id`, `EffectMiscValue`, `Comment`) VALUES
     (26286, 4, 'Fix Launcher animation for Small Red Rocket'),
+    (26291, 4, 'Fix Launcher animation for Small Blue Rocket'),
     (26292, 4, 'Fix Launcher animation for Small Green Rocket'),
     (26293, 4, 'Fix Launcher animation for Small Purple Rocket'),
     (26294, 4, 'Fix Launcher animation for Small White Rocket'),
@@ -256,7 +256,6 @@ UPDATE `gameobject_template` SET `name`='Port to Darnassus TRAP' WHERE `entry`=1
 UPDATE `gameobject_template` SET `name`='Port to OrgrimmarTRAP' WHERE `entry`=180895;
 UPDATE `gameobject_template` SET `name`='Port to Undercity TRAP' WHERE `entry`=180896;
 UPDATE `gameobject_template` SET `name`='Port to Thunder Bluff TRAP' WHERE `entry`=180897;
-UPDATE `gameobject_template` SET `faction`='0', `data6`='-1' WHERE `entry` IN (180897,180896,180895,180894,180893,180892,180891);
 
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Orgrimmar - Port Alliance Player to Moonglade' WHERE `id`=26414 AND `comments`='Lunar Teleport Cap: Orgrimmar - Send Error to Alliance Player';
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Thunderbluff - Port Alliance Player to Moonglade' WHERE `id`=26412 AND `comments`='Lunar Teleport Cap: Thunderbluff - Send Error to Alliance Player';
@@ -264,14 +263,6 @@ UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Undercity - Port Alli
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Darnassus - Port Horde Player to Moonglade' WHERE `id`=26409 AND `comments`='Lunar Teleport Cap: Darnassus - Send Error to Horde Player';
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Ironforge - Port Horde Player to Moonglade' WHERE `id`=26408 AND `comments`='Lunar Teleport Cap: Ironforge - Send Error to Horde Player';
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Stormwind - Port Horde Player to Moonglade' WHERE `id`=26406 AND `comments`='Lunar Teleport Cap: Stormwind - Send Error to Horde Player';
-
-INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `EffectImplicitTargetA`, `Comment`) VALUES
-    (26406, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Stormwind'),
-    (26408, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Ironforge'),
-    (26409, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Darnassus'),
-    (26410, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Undercity'),
-    (26412, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Thunderbluff'),
-    (26414, 0, 25, 'Fix for Holiday - Lunar Teleport Cap: Orgrimmar');
 
 -- Remove Questgiver flag from some Horde npcs too.
 DELETE FROM `creature_ai_events` WHERE `id`=1589202;
