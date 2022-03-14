@@ -2221,6 +2221,21 @@ UPDATE `item_template` SET `patch` = 7 WHERE `entry` = 22393;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (174, 7, 197, 230, 0, 0, 0);
 UPDATE `gossip_menu` SET `condition_id` = 174 WHERE `entry` = 1301 AND`text_id` = 1934;
 
+-- ----------------------------------------------------------------------
+
+-- Add requirements to the March of the Silithid quests (credit cmangos)
+UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 4493;
+UPDATE `quest_template` SET `PrevQuestId` = 0, `ExclusiveGroup` = 0 WHERE `entry` = 4494;
+UPDATE `quest_template` SET `RequiredCondition`=1612 WHERE `entry`=4493;
+UPDATE `quest_template` SET `RequiredCondition`=1615 WHERE `entry`=4494;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(1610, 8, 162, 0, 0, 0, 0),
+(1611, 8, 4267, 0, 0, 0, 0),
+(1612, -2, 1610, 1611, 0, 0, 0),
+(1613, 8, 32, 0, 0, 0, 0),
+(1614, 8, 7732, 0, 0, 0, 0),
+(1615, -2, 1613, 1614, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
