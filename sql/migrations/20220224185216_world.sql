@@ -1756,7 +1756,7 @@ UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon al
 -- ----------------------------------------------------------------------
 
 -- Remove Loot From Ward of Laze
-UPDATE `creature_template` SET `gold_min`='0', `gold_max`='0' WHERE `entry`=2667;
+UPDATE `creature_template` SET `gold_min`=0, `gold_max`=0 WHERE `entry`=2667;
 
 -- ----------------------------------------------------------------------
 
@@ -2235,6 +2235,19 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 (1613, 8, 32, 0, 0, 0, 0),
 (1614, 8, 7732, 0, 0, 0, 0),
 (1615, -2, 1613, 1614, 0, 0, 0);
+
+-- ----------------------------------------------------------------------
+
+-- Kayla Smithe Should Summon Imp
+-- Events list for Kayla Smithe
+DELETE FROM `creature_ai_events` WHERE `creature_id`=5749;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (574901, 5749, 0, 11, 0, 100, 0, 0, 0, 0, 0, 574901, 0, 0, 'Kayla Smithe - Summon Imp on Spawn');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=574901;
+DELETE FROM `creature_ai_scripts` WHERE `id`=574901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(574901, 0, 0, 15, 11939, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kayla Smithe - Summon Imp on Spawn');
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 5749;
 
 
 -- End of migration.
