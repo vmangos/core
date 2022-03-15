@@ -49,6 +49,14 @@ DELETE FROM `script_texts` WHERE `entry`= -1780206;
 DELETE FROM `script_texts` WHERE `entry`= -1780207;
 DELETE FROM `script_texts` WHERE `entry`= -1780208;
 
+-- 10 seconds to blast! Stand back!!!
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4326;
+-- 5 seconds until detonation!!!!!
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4327;
+-- FIRE IN THE HOLE!
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4137;
+
+
 -- End of migration.
 END IF;
 END??
