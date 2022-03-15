@@ -187,10 +187,6 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                 }
                 break;
             }
-            case NPC_GRUBBIS:
-                // Movement of Grubbis and Add to be handled by DB waypoints
-                DoScriptText(SAY_GRUBBIS_SPAWN, pSummoned); // TODO: this text is never broadcasted! -> Move to waypoints?
-                break;
             case NPC_CHOMPER: //chomper must be invoqued after grubbis
                 pSummoned->JoinCreatureGroup(pSummoned->FindNearestCreature(NPC_GRUBBIS, 10, true), 3, ((pSummoned->GetAngle(m_creature) - m_creature->GetOrientation()) + 2 * M_PI_F), (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER));
                 break;
@@ -545,10 +541,19 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                         break;
                     case 33:
                         DoSummonPack(7);                    // Summon Grubbis and add
+                        m_uiPhaseTimer = 1000;
+                        break;
+                    case 34:
+                        if (m_pInstance)
+                        {
+                            if (Creature* grubbis = m_creature->FindNearestCreature(NPC_GRUBBIS, 100.0f))
+                            {
+                                DoScriptText(SAY_GRUBBIS_SPAWN, grubbis);
+                            }
+                        }
                         m_uiPhaseTimer = 0;
                         break;
-
-                    case 34:                                // 1 sek after Death of Grubbis
+                    case 35:                                // 1 sek after Death of Grubbis
                         if (m_pInstance)
                         {
                             if (GameObject* pDoor = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(GO_CAVE_IN_NORTH)))
@@ -557,23 +562,23 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                         m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
                         m_uiPhaseTimer = 5000;
                         break;
-                    case 35:
+                    case 36:
                         DoScriptText(SAY_BLOW_SOON, m_creature);
                         m_uiPhaseTimer = 5000;
                         break;
-                    case 36:
+                    case 37:
                         DoScriptText(SAY_BLOW_2, m_creature);
                         m_uiPhaseTimer = 2000;
                         break;
-                    case 37:
+                    case 38:
                         m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
                         m_uiPhaseTimer = 1000;
                         break;
-                    case 38:
+                    case 39:
                         DoCastSpellIfCan(m_creature, SPELL_EXPLOSION_NORTH);
                         m_uiPhaseTimer = 500;
                         break;
-                    case 39:
+                    case 40:
                         // Close northern cave-in and let charges explode
                         if (m_pInstance)
                         {
@@ -583,7 +588,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                         }
                         m_uiPhaseTimer = 8000;
                         break;
-                    case 40:
+                    case 41:
                         DoCastSpellIfCan(m_creature, SPELL_FIREWORKS_RED);
                         DoScriptText(SAY_FINISH_2, m_creature);
                         m_uiPhaseTimer = 0;

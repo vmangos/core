@@ -49,6 +49,13 @@ DELETE FROM `script_texts` WHERE `entry`= -1780206;
 DELETE FROM `script_texts` WHERE `entry`= -1780207;
 DELETE FROM `script_texts` WHERE `entry`= -1780208;
 
+-- Some texts should be yell:
+-- We come from below! You can never stop us!
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4328;
+-- Incoming blast in 10 seconds!
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4135;
+-- Incoming blast in 5 seconds. Clear the tunnel! Stay back!!
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4136;
 -- 10 seconds to blast! Stand back!!!
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4326;
 -- 5 seconds until detonation!!!!!
