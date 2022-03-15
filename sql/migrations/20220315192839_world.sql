@@ -8,11 +8,13 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20220315192839');
 -- Add your query below.
 
+-- Boss_Mekgineer_Thermaplugg
 DELETE FROM `script_texts` WHERE `entry`= -1090024; 
 DELETE FROM `script_texts` WHERE `entry`= -1090025; 
 DELETE FROM `script_texts` WHERE `entry`= -1090026; 
 DELETE FROM `script_texts` WHERE `entry`= -1090027; 
 
+-- npc_blastmaster_emi_shortfuse
 DELETE FROM `script_texts` WHERE `entry`= -1090000;
 DELETE FROM `script_texts` WHERE `entry`= -1090001;
 DELETE FROM `script_texts` WHERE `entry`= -1090002;
@@ -40,6 +42,12 @@ DELETE FROM `script_texts` WHERE `entry`= -1090022;
 DELETE FROM `script_texts` WHERE `entry`= -1090028;
 DELETE FROM `script_texts` WHERE `entry`= -1090023;
 
+-- npc_kernobee
+DELETE FROM `script_texts` WHERE `entry`= -1780204;
+DELETE FROM `script_texts` WHERE `entry`= -1780205;
+DELETE FROM `script_texts` WHERE `entry`= -1780206;
+DELETE FROM `script_texts` WHERE `entry`= -1780207;
+DELETE FROM `script_texts` WHERE `entry`= -1780208;
 
 -- End of migration.
 END IF;

@@ -189,7 +189,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
             }
             case NPC_GRUBBIS:
                 // Movement of Grubbis and Add to be handled by DB waypoints
-                DoScriptText(SAY_GRUBBIS_SPAWN, pSummoned);
+                DoScriptText(SAY_GRUBBIS_SPAWN, pSummoned); // TODO: this text is never broadcasted! -> Move to waypoints?
                 break;
             case NPC_CHOMPER: //chomper must be invoqued after grubbis
                 pSummoned->JoinCreatureGroup(pSummoned->FindNearestCreature(NPC_GRUBBIS, 10, true), 3, ((pSummoned->GetAngle(m_creature) - m_creature->GetOrientation()) + 2 * M_PI_F), (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER));
@@ -649,11 +649,11 @@ enum
 
     SPELL_EXPLOSION             = 27745, //spell de Clank.
 
-    SAY_KERNOBEE_START          = -1780204,
-    SAY_BOMB_START              = -1780205,
-    SAY_BOMB_SEE_END            = -1780206,
-    SAY_KERNOBEE_SEE_END        = -1780207,
-    SAY_KERNOBEE_END            = -1780208,
+    SAY_KERNOBEE_START          = 3881,
+    SAY_BOMB_START              = 3927,
+    SAY_BOMB_SEE_END            = 3949,
+    SAY_KERNOBEE_SEE_END        = 3948,
+    SAY_KERNOBEE_END            = 3929,
 };
 
 static float const aKernobeePositions[3][3] =
