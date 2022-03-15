@@ -1,0 +1,49 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20220315192839');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20220315192839');
+-- Add your query below.
+
+DELETE FROM `script_texts` WHERE `entry`= -1090024; 
+DELETE FROM `script_texts` WHERE `entry`= -1090025; 
+DELETE FROM `script_texts` WHERE `entry`= -1090026; 
+DELETE FROM `script_texts` WHERE `entry`= -1090027; 
+
+DELETE FROM `script_texts` WHERE `entry`= -1090000;
+DELETE FROM `script_texts` WHERE `entry`= -1090001;
+DELETE FROM `script_texts` WHERE `entry`= -1090002;
+DELETE FROM `script_texts` WHERE `entry`= -1090003;
+DELETE FROM `script_texts` WHERE `entry`= -1090004;
+DELETE FROM `script_texts` WHERE `entry`= -1090005;
+DELETE FROM `script_texts` WHERE `entry`= -1090006;
+DELETE FROM `script_texts` WHERE `entry`= -1090007;
+DELETE FROM `script_texts` WHERE `entry`= -1090008;
+DELETE FROM `script_texts` WHERE `entry`= -1090009;
+DELETE FROM `script_texts` WHERE `entry`= -1090010;
+DELETE FROM `script_texts` WHERE `entry`= -1090011;
+DELETE FROM `script_texts` WHERE `entry`= -1090012;
+DELETE FROM `script_texts` WHERE `entry`= -1090013;
+DELETE FROM `script_texts` WHERE `entry`= -1090014;
+DELETE FROM `script_texts` WHERE `entry`= -1090015;
+DELETE FROM `script_texts` WHERE `entry`= -1090016;
+DELETE FROM `script_texts` WHERE `entry`= -1090017;
+DELETE FROM `script_texts` WHERE `entry`= -1090018;
+DELETE FROM `script_texts` WHERE `entry`= -1090019;
+DELETE FROM `script_texts` WHERE `entry`= -1090020;
+DELETE FROM `script_texts` WHERE `entry`= -1090021;
+DELETE FROM `script_texts` WHERE `entry`= -1090022;
+
+DELETE FROM `script_texts` WHERE `entry`= -1090028;
+DELETE FROM `script_texts` WHERE `entry`= -1090023;
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
