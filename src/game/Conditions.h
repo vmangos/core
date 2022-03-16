@@ -80,10 +80,11 @@ enum ConditionType
                                                             // Value2: 0,1,2 for condition true while quest active (0 any state, 1 if quest incomplete, 2 if quest completed).
     CONDITION_AD_COMMISSION_AURA    = 10,                   // Returns true if the player has an argent dawn commission aura.
                                                             // Requirement: Player Target
-    CONDITION_WAR_EFFORT_STAGE      = 11,                   // Checks the current state of the War Effect event.
+    CONDITION_SAVED_VARIABLE        = 11,                   // Checks a global saved variable.
                                                             // Requirement: None
-                                                            // Value1: stage
-                                                            // Value2: 0 : ==, 1: >= 2 <=
+                                                            // Value1: index
+                                                            // Value2: data
+                                                            // Value3: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_ACTIVE_GAME_EVENT     = 12,                   // Checks if a given game event is currently active.
                                                             // Requirement: None
                                                             // Value1: event_id
