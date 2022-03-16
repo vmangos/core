@@ -109,13 +109,20 @@ uint32 MovementAnticheat::Update(Player* pPlayer, uint32 diff, std::stringstream
 
 uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
 {
-    if (m_maxOverspeedDistance < fabs(m_overspeedDistance))
-        m_maxOverspeedDistance = fabs(m_overspeedDistance);
-    if (m_maxClientDesync < static_cast<uint32>(abs(m_clientDesync)))
-        m_maxClientDesync = abs(m_clientDesync);
+    if (m_overspeedDistance > 0)
+    {
+        if (m_maxOverspeedDistance < m_overspeedDistance)
+            m_maxOverspeedDistance = m_overspeedDistance;
 
-    m_cheatOccuranceTick[CHEAT_TYPE_OVERSPEED_DIST] = uint32(fabs(m_overspeedDistance));
-    m_cheatOccuranceTick[CHEAT_TYPE_TIME_DESYNC] = abs(m_clientDesync);
+        m_cheatOccuranceTick[CHEAT_TYPE_OVERSPEED_DIST] = uint32(m_overspeedDistance);
+    }
+    if (m_clientDesync > 0)
+    {
+        if (m_maxClientDesync < static_cast<uint32>(m_clientDesync))
+            m_maxClientDesync = m_clientDesync;
+
+        m_cheatOccuranceTick[CHEAT_TYPE_TIME_DESYNC] = m_clientDesync;
+    }
 
     m_updateCheckTimer = CHEATS_UPDATE_INTERVAL;
 
@@ -366,20 +373,6 @@ void MovementAnticheat::OnExplore(AreaEntry const* pArea)
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
 
-void MovementAnticheat::OnTransport(Player* pPlayer, ObjectGuid transportGuid)
-{
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED) ||
-        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return;
-
-    // Do not allow bypassing anticheat by pretending to be on a transport.
-    GameObject* pTransport = pPlayer->GetMap()->GetGameObject(transportGuid);
-
-    if (!pTransport || !pTransport->IsTransport() || !pTransport->IsWithinDist(pPlayer, 70.0f, false))
-        AddCheats(1 << CHEAT_TYPE_FAKE_TRANSPORT);
-}
-
 void MovementAnticheat::OnWrongAckData()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
@@ -489,6 +482,10 @@ bool ShouldRejectMovement(uint32 cheatFlags)
         sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_REJECT))
         return true;
 
+    if ((cheatFlags & (1 << CHEAT_TYPE_FAKE_TRANSPORT)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
+        return true;
+
     if ((cheatFlags & (1 << CHEAT_TYPE_WATER_WALK)) &&
         sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_REJECT))
         return true;
@@ -545,7 +542,8 @@ bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uin
 bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)) ||
+        !pPlayer->movespline->Finalized())
         return true;
     
     if (pPlayer != me)
@@ -575,71 +573,57 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     
     uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
+#define HAS_CHEAT(t) (cheatFlags & (1 << t))
 
     if (movementInfo.ctime == 0)
         APPEND_CHEAT(CHEAT_TYPE_NULL_CLIENT_TIME);
 
-    bool failedSplineCheck = false;
-    
-    // Server controlled movement.
-    if (!me->movespline->Finalized())
-    {
-        auto const previousPoint = me->movespline->PreviousDestination();
-        auto const nextPoint = me->movespline->CurrentDestination();
-        float const distanceServer = GetDistance3D(previousPoint, nextPoint);
-        float const distanceClient = GetDistance3D(GetLastMovementInfo().pos, movementInfo.pos);
-
-        // Player is moving a greater distance than it takes to reach next point?
-        if (distanceClient > distanceServer)
-            failedSplineCheck = true;
-    }
-    // Client controlled movement.
-    else
-    {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        // Not allowed to change jump speed while jumping
-        if ((movementInfo.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)) &&
-           (GetLastMovementInfo().moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)) &&
-           (movementInfo.jump.xyspeed > GetLastMovementInfo().jump.xyspeed + 0.0001f) &&
-           (GetLastMovementInfo().jump.xyspeed > 0.0001f) &&
-           (!IsInKnockBack()))
-            APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
+    // Not allowed to change jump speed while jumping
+    if ((movementInfo.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)) &&
+        (GetLastMovementInfo().moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)) &&
+        (movementInfo.jump.xyspeed > GetLastMovementInfo().jump.xyspeed + 0.0001f) &&
+        (GetLastMovementInfo().jump.xyspeed > 0.0001f) &&
+        (!IsInKnockBack()))
+        APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
 #endif
 
-        if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
-            APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
+    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (me->GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
+        APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
 
-        if (CheckMultiJump(opcode))
-            APPEND_CHEAT(CHEAT_TYPE_MULTI_JUMP);
+    if (CheckMultiJump(opcode))
+        APPEND_CHEAT(CHEAT_TYPE_MULTI_JUMP);
 
-        if (opcode == MSG_MOVE_STOP_SWIM && (movementInfo.moveFlags & MOVEFLAG_SWIMMING))
-            APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
+    if (opcode == MSG_MOVE_STOP_SWIM && (movementInfo.moveFlags & MOVEFLAG_SWIMMING))
+        APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
 
-        if (uint32 flags = CheckTimeDesync(movementInfo))
+    if (uint32 flags = CheckTimeDesync(movementInfo))
+        cheatFlags |= flags;
+
+    bool teleportDetected;
+    if (teleportDetected = CheckTeleport(movementInfo))
+        APPEND_CHEAT(CHEAT_TYPE_TELEPORT);
+
+    if (CheckForbiddenArea(movementInfo))
+        APPEND_CHEAT(CHEAT_TYPE_FORBIDDEN_AREA);
+
+    if (CheckFakeTransport(movementInfo))
+        APPEND_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT);
+
+    if (CheckTeleportToTransport(movementInfo))
+        APPEND_CHEAT(CHEAT_TYPE_TELEPORT_TRANSPORT);
+
+    if (CheckWallClimb(movementInfo, opcode))
+        APPEND_CHEAT(CHEAT_TYPE_WALL_CLIMB);
+
+    if (CheckNoFallTime(movementInfo, opcode))
+        APPEND_CHEAT(CHEAT_TYPE_NO_FALL_TIME);
+
+    // Distance computation related. No need to do it if teleport detected.
+    if (!teleportDetected)
+    {
+        if (uint32 flags = CheckSpeedHack(movementInfo, opcode))
             cheatFlags |= flags;
-
-        bool teleportDetected;
-        if (teleportDetected = CheckTeleport(movementInfo))
-            APPEND_CHEAT(CHEAT_TYPE_TELEPORT);
-
-        if (CheckForbiddenArea(movementInfo))
-            APPEND_CHEAT(CHEAT_TYPE_FORBIDDEN_AREA);
-
-        if (CheckTeleportToTransport(movementInfo))
-            APPEND_CHEAT(CHEAT_TYPE_TELEPORT_TRANSPORT);
-
-        if (CheckWallClimb(movementInfo, opcode))
-            APPEND_CHEAT(CHEAT_TYPE_WALL_CLIMB);
-
-        if (CheckNoFallTime(movementInfo, opcode))
-            APPEND_CHEAT(CHEAT_TYPE_NO_FALL_TIME);
-        
-        // Distance computation related. No need to do it if teleport detected.
-        if (!teleportDetected)
-        {
-            if (uint32 flags = CheckSpeedHack(movementInfo, opcode))
-                cheatFlags |= flags;
-        }
     }
 
     if (IsFallEndOpcode(opcode) || 
@@ -650,7 +634,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
     bool const sendHeartbeat = ShouldRejectMovement(cheatFlags);
 
-    if (sendHeartbeat || failedSplineCheck)
+    if (sendHeartbeat)
     {
         // Movement flags get verified first. Don't undo them if they passed.
         if (IsFlagAckOpcode(opcode))
@@ -661,7 +645,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
         
         if (sendHeartbeat)
         {
-            if ((cheatFlags & (1 << CHEAT_TYPE_OVERSPEED_JUMP)) &&
+            if (HAS_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
             {
                 UnitMoveType moveType = GetMoveTypeForMovementInfo(GetLastMovementInfo());
@@ -669,14 +653,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 MovementPacketSender::SendSpeedChangeToAll(me, moveType, speedRate);
             }
 
-            if ((cheatFlags & (1 << CHEAT_TYPE_WALL_CLIMB)) &&
-                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_REJECT))
-            {
-                // Prevent false positive detection loop on auto run against wall while afk.
-                me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
-            }
-
-            if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
+            if (HAS_CHEAT(CHEAT_TYPE_NO_FALL_TIME) &&
                 sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
             {
                 // Teleport to ground height in this case.
@@ -687,7 +664,16 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
                 GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses extrapolation.
                 me->TeleportPositionRelocation(x, y, z, 0);
             }
+
+            me->RemoveUnitMovementFlag(MOVEFLAG_MASK_XZ);
             me->SendHeartBeat(true);
+
+            if (HAS_CHEAT(CHEAT_TYPE_FAKE_TRANSPORT) &&
+                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_REJECT))
+            {
+                // Force logout player to sync transport positions.
+                m_session->LogoutRequest(time(nullptr) - 20);
+            }
         } 
 
         return false;
@@ -695,6 +681,7 @@ bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
     return true;
 #undef APPEND_CHEAT
+#undef HAS_CHEAT
 }
 
 bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
@@ -801,6 +788,40 @@ bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     else if (removeMoveFlags)
         movementInfo.RemoveMovementFlag(removeMoveFlags);
 
+    return true;
+}
+
+bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId)
+{
+    if (me != pPlayer)
+        InitNewPlayer(pPlayer);
+
+    if (splineId == m_lastSplineId)
+    {
+        AddMessageToPacketLog("HandleSplineDone: spline id == last spline id == " + std::to_string(splineId));
+        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode for spline id %u twice",
+            me->GetName(), m_session->GetAccountId(), splineId);
+        return false;
+    }
+
+    if (splineId != me->movespline->GetId())
+    {
+        AddMessageToPacketLog("HandleSplineDone: spline id " + std::to_string(splineId) + " != " + std::to_string(me->movespline->GetId()));
+        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode for wrong spline id %u (expected %u)",
+            me->GetName(), m_session->GetAccountId(), splineId, me->movespline->GetId());
+        return false;
+    }
+
+    float distance = Geometry::GetDistance3D(movementInfo.GetPos(), me->movespline->FinalDestination());
+    if (distance > 10.0f)
+    {
+        AddMessageToPacketLog("HandleSplineDone: distance to spline destination is " + std::to_string(distance));
+        sLog.outInfo("HandleSplineDone: Player %s from account id %u sent spline done opcode with position that is %g yards away from destination",
+            me->GetName(), m_session->GetAccountId(), distance);
+        return false;
+    }
+
+    m_lastSplineId = splineId;
     return true;
 }
 
@@ -993,6 +1014,7 @@ bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) con
 uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode)
 {
     if ((opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
+        (opcode == CMSG_MOVE_SPLINE_DONE) ||
         me->IsTaxiFlying() || 
         me->IsBeingTeleported())
         return 0;
@@ -1055,22 +1077,36 @@ uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 #undef APPEND_CHEAT
 }
 
+bool MovementAnticheat::CheckFakeTransport(MovementInfo const& movementInfo)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED))
+        return false;
+
+    // Do not allow bypassing anticheat by pretending to be on a transport.
+    if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
+        GetLastMovementInfo().ctime && !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    {
+        GameObject* pTransport = me->GetMap()->GetGameObject(movementInfo.t_guid);
+
+        if (!pTransport || !pTransport->IsTransport() || !pTransport->IsWithinDist(me, 70.0f, false))
+            return true;
+    }
+    return false;
+}
+
 bool MovementAnticheat::CheckTeleportToTransport(MovementInfo const& movementInfo) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED))
         return false;
 
-    // Minimal checks on transports
-    if (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT)
+    // To transport tele hack detection
+    if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
+        GetLastMovementInfo().ctime && !GetLastMovementInfo().HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
-        // To transport tele hack detection
-        if (GetLastMovementInfo().ctime && !(GetLastMovementInfo().moveFlags & MOVEFLAG_ONTRANSPORT))
-        {
-            float dist2d = (movementInfo.pos.x - GetLastMovementInfo().pos.x) * (movementInfo.pos.x - GetLastMovementInfo().pos.x);
-            dist2d += (movementInfo.pos.y - GetLastMovementInfo().pos.y) * (movementInfo.pos.y - GetLastMovementInfo().pos.y);
-            if (dist2d > 100 * 100)
-                return true;
-        }
+        float dist2d = (movementInfo.pos.x - GetLastMovementInfo().pos.x) * (movementInfo.pos.x - GetLastMovementInfo().pos.x);
+        dist2d += (movementInfo.pos.y - GetLastMovementInfo().pos.y) * (movementInfo.pos.y - GetLastMovementInfo().pos.y);
+        if (dist2d > 100 * 100)
+            return true;
     }
     return false;
 }
