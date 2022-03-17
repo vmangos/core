@@ -2351,6 +2351,11 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (21325, 09, -6467.70166015625, -3297.321777343750, -104.019233703613281, 100, 0, 0),
 (21325, 10, -6477.99951171875, -3289.034667968750, -107.632736206054687, 100, 0, 0);
 
+-- ----------------------------------------------------------------------
+
+-- Remove Gossip From Creatures
+UPDATE `creature_template` SET `npc_flags` = 0 WHERE `entry` IN (3210, 3211, 3213, 3214);
+
 
 -- End of migration.
 END IF;
