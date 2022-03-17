@@ -1415,7 +1415,12 @@ struct npc_riggle_bassbaitAI : ScriptedAI
     explicit npc_riggle_bassbaitAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_uiTimer = 0;
-        sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 0, true); // reset on spawn
+
+        auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
+        if (time(nullptr) - prevWinTime > DAY)
+        {
+            sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 0, true);
+        }
         npc_riggle_bassbaitAI::Reset();
     }
 
