@@ -267,8 +267,8 @@ UPDATE `game_event` SET `start_time` = '2022-01-01 00:19:48' WHERE `entry`=152;
 -- Add Remorseful Highborne Gossips (From Sniffs)
 -- Taken From Here: https://github.com/Haeniken/FairyCore/commit/25260b92a6c5163643248deeae7247a3bac6cbb7
 UPDATE `creature_template` SET `gossip_menu_id` = 3803 WHERE `entry` = 10684;
-INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(3803, 4635),
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(3803, 4635, 0),
 (3803, 4636, 221);
 
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES
