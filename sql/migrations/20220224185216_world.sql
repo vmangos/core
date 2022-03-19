@@ -2363,6 +2363,30 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- Remove Gossip From Creatures
 UPDATE `creature_template` SET `npc_flags` = 0 WHERE `entry` IN (3210, 3211, 3213, 3214);
 
+-- ----------------------------------------------------------------------
+
+-- Add Quest End Script For Raene's Cleansing 1028
+UPDATE `quest_template` SET `CompleteScript` = 1028 WHERE `entry` = 1028;
+
+-- GameObjects spawned during script.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`) VALUES
+(9749, 19538, 1, 2779.46, -1552.08, 265.367, 5.20108, 0, 0, -0.515038, 0.857168, -1, -1, 1, 100),
+(9750, 19538, 1, 2780.11, -1552.79, 266.25, 0.663223, 0, 0, 0.325567, 0.945519, -1, -1, 1, 100),
+(9751, 19539, 1, 2779.82, -1552.47, 263.936, 4.85202, 0, 0, -0.656058, 0.75471, -1, -1, 1, 100),
+(9752, 19539, 1, 2781.14, -1553.91, 267.74, 4.53786, 0, 0, -0.766044, 0.642789, -1, -1, 1, 100),
+(9753, 19540, 1, 2780.24, -1552.93, 264.417, 4.83456, 0, 0, -0.66262, 0.748956, -1, -1, 1, 100),
+(9754, 19540, 1, 2782.03, -1554.47, 266.996, 5.37562, 0, 0, -0.438371, 0.898794, -1, -1, 1, 100);
+
+-- Main script
+DELETE FROM `quest_end_scripts` WHERE `id`=1028;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1028, 1, 9, 9749, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Small Wisp'),
+(1028, 1, 9, 9750, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Small Wisp'),
+(1028, 1, 9, 9751, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Medium Wisp'),
+(1028, 1, 9, 9752, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Medium Wisp'),
+(1028, 1, 9, 9753, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Large Wisp'),
+(1028, 1, 9, 9754, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Large Wisp');
+
 
 -- End of migration.
 END IF;
