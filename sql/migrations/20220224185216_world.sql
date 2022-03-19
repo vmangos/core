@@ -2387,6 +2387,11 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 (1028, 1, 9, 9753, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Large Wisp'),
 (1028, 1, 9, 9754, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Large Wisp');
 
+-- ----------------------------------------------------------------------
+
+-- Update Engineer Card Templates (credit cmangos)
+UPDATE `item_template` SET `flags` = 65536, `allowable_class` = -1, `allowable_race` = -1 `material` = -1, `bag_family` = 128, `extra_flags` = 1 WHERE `entry` IN (10790, 10791);
+
 
 -- End of migration.
 END IF;
