@@ -2392,6 +2392,22 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 -- Update Engineer Card Templates (credit cmangos)
 UPDATE `item_template` SET `flags` = 65536, `allowable_class` = -1, `allowable_race` = -1, `material` = -1, `bag_family` = 128, `extra_flags` = 1 WHERE `entry` IN (10790, 10791);
 
+-- ----------------------------------------------------------------------
+
+-- Grimclaw Should Change Orientation When Emoted
+DELETE FROM `creature_ai_scripts` WHERE `id`=369501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(369501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1225, 0, 0, 0, 0, 0, 0, 0, 0, 'Grimclaw - Say Text'),
+(369501, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Grimclaw - Set Movement Type'),
+(369501, 2, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.12791, 0, 'Grimclaw - Orientation');
+
+
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(369504, 3695, 0, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 369504, 0, 0, 'Grimclaw - Set Movement Type OOC');
+
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(369504, 0, 0, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Grimclaw - Set Movement Type OOC');
+
 
 -- End of migration.
 END IF;
