@@ -19,16 +19,16 @@ UPDATE `conditions` SET `value1`=1046 WHERE `condition_entry`=400;
 
 -- Add Missing Gossip Menu Option
 INSERT INTO `gossip_menu_option` (`menu_id`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_script_id`, `condition_id`) VALUES
-(5502, 'Raene, I lost Dartol\'s Rod of Transformation.', 9025, 1, 1, 10000, 5502, 389);
+(5502, 'Raene, I lost Dartol\'s Rod of Transformation.', 9025, 1, 1, 5501, 5502, 389);
 
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (5502, 0, 0, 15, 22227, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene Wolfrunner - Cast Spell');
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
-(10000, 9026);
+(5501, 6554);
 
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES
-(9026, 9026, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(6554, 9026, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Add Conditions
 -- 387: Target Can Accept Quest 1045
