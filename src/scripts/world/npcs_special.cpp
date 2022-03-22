@@ -1506,6 +1506,63 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, Que
 }
 
 /*
+ * Jang (Stranglethorn Vale Fishing Extravaganza)
+ */
+
+struct npc_jangAI : ScriptedAI
+{
+    explicit npc_jangAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_uiTimer = 0;
+        npc_jangAI::Reset();
+    }
+
+    uint32 m_uiTimer;
+
+    void Reset() override
+    {
+
+    }
+
+    void CheckTournamentState() const
+    {
+
+        if (sObjectMgr.GetSavedVariable(VAR_TOURN_WINNER))
+        {
+            if (!m_creature->IsQuestGiver())
+            {
+                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            }
+        }
+        else
+        {
+            if (m_creature->IsQuestGiver())
+            {
+                m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 const uiDiff) override
+    {
+        if (m_uiTimer < uiDiff)
+        {
+            CheckTournamentState();
+            m_uiTimer = 1000;
+        }
+        else
+            m_uiTimer -= uiDiff;
+
+        ScriptedAI::UpdateAI(uiDiff);
+    }
+};
+
+CreatureAI* GetAI_npc_jang(Creature* pCreature)
+{
+    return new npc_jangAI(pCreature);
+}
+
+/*
  * Target Dummy
  */
 
@@ -2494,6 +2551,11 @@ void AddSC_npcs_special()
     newscript->Name = "npc_riggle_bassbait";
     newscript->GetAI = &GetAI_npc_riggle_bassbait;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_riggle_bassbait;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_jang";
+    newscript->GetAI = &GetAI_npc_jang;
     newscript->RegisterSelf();
 
     newscript = new Script;
