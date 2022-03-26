@@ -2408,6 +2408,20 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (369504, 0, 0, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'Grimclaw - Set Movement Type OOC');
 
+-- ----------------------------------------------------------------------
+
+-- Searing Gorge - Dark Iron Sentry (credit cmangos)
+UPDATE `creature` SET `position_x` = -7023.14746093750, `position_y` = -1283.5075683593750, `position_z` = 258.440917968750000, `orientation` = 4.764749050140380859, `wander_distance` = 0, `movement_type` = 0 WHERE `guid` = 300644;
+UPDATE `creature` SET `position_x` = -6906.52539062500, `position_y` = -1093.6492919921875, `position_z` = 256.740142822265625, `orientation` = 0.942477762699127197, `wander_distance` = 0, `movement_type` = 0 WHERE `guid` = 300651;
+UPDATE `creature` SET `position_x` = -6995.07080078125, `position_y` = -1144.6099853515625, `position_z` = 257.579864501953125, `orientation` = 1.413716673851013183, `wander_distance` = 0, `movement_type` = 0 WHERE `guid` = 300646;
+UPDATE `creature` SET `position_x` = -6931.85400390625, `position_y` = -1419.8157958984375, `position_z` = 256.156494140625000, `orientation` = 4.852015495300292968, `wander_distance` = 0, `movement_type` = 0 WHERE `guid` = 300640;
+
+UPDATE `creature` SET `position_x` = -7030.37, `position_y` = -1319.45, `position_z` = 242.490 WHERE `guid` = 300643;
+UPDATE `creature` SET `position_x` = -7000.79, `position_y` = -1320.59, `position_z` = 241.677 WHERE `guid` = 300645;
+
+-- Dark Iron Sentry Should Be Dark Iron Lookout
+UPDATE `creature` SET `id` = 8566, `mana_percent` = 0 WHERE `guid` IN (300649, 300650, 300648, 300643, 300645);
+
 
 -- End of migration.
 END IF;
