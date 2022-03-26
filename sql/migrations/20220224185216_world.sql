@@ -2422,6 +2422,15 @@ UPDATE `creature` SET `position_x` = -7000.79, `position_y` = -1320.59, `positio
 -- Dark Iron Sentry Should Be Dark Iron Lookout
 UPDATE `creature` SET `id` = 8566, `mana_percent` = 0 WHERE `guid` IN (300649, 300650, 300648, 300643, 300645);
 
+-- ----------------------------------------------------------------------
+
+-- Add Missing Gameobjects Used In Quest Decoy! (credit cmangos)
+INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`) VALUES
+(180659, 8, 0, 'Drop-Off Point', 0, 0, 1, 1348, 10, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(151771, 180659, 1, 5086.19, -5116.32, 931.162, 4.78877, 0, 0, 0.679593, -0.733589, 150, 150, 100, 1, 0, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
