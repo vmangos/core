@@ -21,6 +21,9 @@ UPDATE `locales_quest` SET `RequestItemsText_loc3`='Wir haben zwar schon einen G
 -- Arena Grandmaster
 UPDATE `locales_quest` SET `RequestItemsText_loc3`='Aye, Landratte! Bringt mir 12 Schmuckstücke des hiesigen Meisters der Arena und Ihr seid der neue Großmeister der Arena der Gurabashi! Arrrr!' WHERE `entry`=7838;
 
+-- Quest [Could I get a Fishing Flier?] requires fishing skill of 150
+UPDATE `quest_template` SET `RequiredSkillValue`=150 WHERE `entry` IN (8228, 8229);
+
 -- End of migration.
 END IF;
 END??
