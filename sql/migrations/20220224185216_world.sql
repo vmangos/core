@@ -2431,6 +2431,11 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `factio
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (151771, 180659, 1, 5086.19, -5116.32, 931.162, 4.78877, 0, 0, 0.679593, -0.733589, 150, 150, 100, 1, 0, 0, 0, 10);
 
+-- ----------------------------------------------------------------------
+
+-- Attempt To Fix Dire Maul Doors Sometimes Not Opening
+UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid`=56943;
+
 
 -- End of migration.
 END IF;
