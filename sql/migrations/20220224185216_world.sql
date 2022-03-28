@@ -2554,6 +2554,7 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE
 2656,
 2712,
 2866,
+3724,
 13360,
 13872,
 142140,
