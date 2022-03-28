@@ -2564,7 +2564,8 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE
 176583,
 176584,
 176586,
-176587
+176587,
+142143
 );
 
 UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 900 WHERE `id` IN (
