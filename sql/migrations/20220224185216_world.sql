@@ -2436,6 +2436,223 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 -- Attempt To Fix Dire Maul Doors Sometimes Not Opening
 UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid`=56943;
 
+-- ----------------------------------------------------------------------
+
+-- Sync Some Gobject Respawn Times With Cmangos
+UPDATE `gameobject` SET `spawntimesecsmin` = 10, `spawntimesecsmax` = 10 WHERE `id` IN (
+52,
+54,
+57,
+58,
+759,
+2716,
+2717,
+2718,
+2739,
+2740,
+2741,
+2742,
+3237,
+3238,
+3239,
+13949,
+20447,
+104564,
+104569,
+104574,
+126158,
+148499,
+169294,
+176484,
+176485,
+176486,
+176487,
+176785,
+177287,
+177805,
+177806,
+177964,
+178084,
+178085,
+179488,
+179498,
+180665,
+180667
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 30, `spawntimesecsmax` = 30 WHERE `id` IN (
+1721,
+1722,
+177927
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 45, `spawntimesecsmax` = 90 WHERE `id` IN (
+142144,
+142145
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 50, `spawntimesecsmax` = 50 WHERE `id` IN (
+19284
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 60, `spawntimesecsmax` = 60 WHERE `id` IN (
+3644
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 120, `spawntimesecsmax` = 120 WHERE `id` IN (
+2124,
+164729
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` IN (
+3658,
+3694,
+3719,
+12654,
+19541,
+19542,
+19868,
+176325,
+176327,
+180582,
+180656,
+180657,
+180662,
+180663,
+180664,
+181598
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE `id` IN (
+324,
+1610,
+1617,
+1618,
+1619,
+1620,
+1621,
+1622,
+1623,
+1624,
+1628,
+1731,
+1732,
+1733,
+1734,
+1735,
+1736,
+2040,
+2041,
+2042,
+2043,
+2044,
+2045,
+2046,
+2047,
+2055,
+2656,
+2712,
+2866,
+13360,
+13872,
+142140,
+142141,
+142142,
+142143,
+160445,
+175566,
+176583,
+176584,
+176586,
+176587
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 900, `spawntimesecsmax` = 900 WHERE `id` IN (
+2855,
+3236,
+3706,
+3724,
+3725,
+3726,
+3727,
+3729,
+3799,
+3800,
+4087,
+4088,
+4089,
+4090
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 1800, `spawntimesecsmax` = 1800 WHERE `id` IN (
+180753
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 3595, `spawntimesecsmax` = 3595 WHERE `id` IN (
+173284,
+173324,
+173327,
+174594,
+174595,
+174596,
+174598,
+174599,
+174600,
+174601,
+174602,
+174603,
+174604,
+174605,
+174606,
+174607,
+174608,
+174684,
+174686,
+174708,
+174709,
+174712,
+174713
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 3600, `spawntimesecsmax` = 3600 WHERE `id` IN (
+2850,
+3695,
+3715,
+74448,
+111095
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 5200, `spawntimesecsmax` = 5200 WHERE `id` IN (
+75293
+);
+
+UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800 WHERE `id` IN (
+3703,
+3704,
+34025,
+34026,
+34027,
+34028,
+34029,
+34030,
+75296,
+75299,
+153464,
+153469,
+164819,
+164911,
+175245,
+179516,
+179528,
+179548,
+180691,
+181356
+);
+
+UPDATE gameobject SET animprogress = 100;
+
+UPDATE gameobject SET spawntimesecsmin = 10, spawntimesecsmax = 10 WHERE spawntimesecsmin < 21 AND spawntimesecsmin > 0;
+
 
 -- End of migration.
 END IF;
