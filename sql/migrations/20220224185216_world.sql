@@ -2435,6 +2435,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 -- Attempt To Fix Dire Maul Doors Sometimes Not Opening
 UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid`=56943;
+UPDATE `gameobject` SET `spawn_flags` = 1 WHERE `guid`=363231;
 
 -- ----------------------------------------------------------------------
 
