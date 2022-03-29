@@ -2693,10 +2693,6 @@ UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176588 AND `map` = 30;
 
 
-
-What is map 30?
-
-
 -- End of migration.
 END IF;
 END??
