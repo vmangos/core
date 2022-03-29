@@ -2662,10 +2662,7 @@ UPDATE gameobject SET spawntimesecsmin = 10, spawntimesecsmax = 10 WHERE spawnti
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` IN (1618, 1617, 1619, 1620, 1621, 1622, 1623, 1624, 2041, 2866, 142140, 142141, 142142, 142143, 142144, 142145, 176583, 176584, 176586, 176587, 176588, 176589);
 
 UPDATE `gameobject` SET `spawntimesecsmin`= 2700, `spawntimesecsmax` = 4500 WHERE `id` = 176589;
-UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 142145;
-UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 142144;
-UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 176588;
-UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 176642;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` IN (142145, 142144, 176588, 176642);
 
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1619 AND `map` = 43;
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1621 AND `map` = 47;
