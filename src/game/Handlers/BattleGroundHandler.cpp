@@ -300,55 +300,53 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
     {
         case BATTLEGROUND_WS:
         {
-            uint32 count1 = 0;                                  //always constant zero?
-            uint32 count2 = 0;                                  //count of next fields
-
-            Player* ali_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());
-            if (ali_plr)
-                ++count2;
-
-            Player* horde_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
-            if (horde_plr)
-                ++count2;
-
-            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4 + 4 + 16 * count1 + 16 * count2));
-            data << count1;                             // alliance flag holders count - obsolete, now always 0
-            /*for(uint8 i = 0; i < count1; ++i)
+            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS);
+            size_t countPos = data.wpos();
+            uint32 count = 0;
+            data << uint32(0);
+            for (auto const& itr : bg->GetPlayers())
             {
-                data << ObjectGuid(0);                  // guid
-                data << (float)0;                       // x
-                data << (float)0;                       // y
-            }*/
-            data << count2;                             // horde flag holders count - obsolete, now count of next fields
-            if (ali_plr)
-            {
-                data << ObjectGuid(ali_plr->GetObjectGuid());
-                data << float(ali_plr->GetPositionX());
-                data << float(ali_plr->GetPositionY());
+                if (_player->GetTeam() == itr.second.PlayerTeam)
+                {
+                    if (Player const* pPlayer = sObjectMgr.GetPlayer(itr.first))
+                    {
+                        data << ObjectGuid(pPlayer->GetObjectGuid());
+                        data << float(pPlayer->GetPositionX());
+                        data << float(pPlayer->GetPositionY());
+                        count++;
+                    }
+                }
             }
-            if (horde_plr)
+            data.put<uint32>(countPos, count);
+            
+            Player* pFlagCarrier;
+            if (_player->GetTeam() == ALLIANCE)
+                pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
+            else
+                pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());;
+
+            data << bool(pFlagCarrier != nullptr);
+
+            if (pFlagCarrier)
             {
-                data << ObjectGuid(horde_plr->GetObjectGuid());
-                data << float(horde_plr->GetPositionX());
-                data << float(horde_plr->GetPositionY());
+                data << ObjectGuid(pFlagCarrier->GetObjectGuid());
+                data << float(pFlagCarrier->GetPositionX());
+                data << float(pFlagCarrier->GetPositionY());
             }
 
             SendPacket(&data);
+            break;
         }
-        break;
         case BATTLEGROUND_AB:
         case BATTLEGROUND_AV:
         {
             //for other BG types - send default
-            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4 + 4));
+            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4 + 1));
             data << uint32(0);
-            data << uint32(0);
+            data << uint8(0);
             SendPacket(&data);
-        }
-        break;
-        default:
-            //maybe it is sent also in arena - do nothing
             break;
+        }
     }
 }
 
@@ -542,9 +540,10 @@ void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
     DEBUG_LOG("WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    recv_data.read_skip<uint8>();                           // unk1
-    recv_data.read_skip<uint8>();                           // BattleGroundTypeId-1 ?
-    recv_data.read_skip<uint16>();                          // unk2 0
+    uint32 mapId;
+    recv_data >> mapId;
+    if (_player->GetMapId() != mapId)
+        return;
 #endif
 
     // not allow leave battleground in combat

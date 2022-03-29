@@ -1346,31 +1346,23 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid 
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    *data << guid;                                          // battlemaster guid
+    *data << guid; // battlemaster guid
 #endif
-    *data << uint32(mapId);                                 // battleground id
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
-    *data << uint8(0x00);                                   // unk
-    *data << uint32(0);                                     // number of bg instances
-#endif
+    *data << uint32(mapId);
+    *data << uint8(0x00); // unk
 
-    // battleground
+    size_t countPos = data->wpos();
+    uint32 count = 0;
+    *data << uint32(0); // number of bg instances
+
+    uint32 bracket_id = plr->GetBattleGroundBracketIdFromLevel(bgTypeId);
+    ClientBattleGroundIdSet const& ids = m_ClientBattleGroundIds[bgTypeId][bracket_id];
+    for (const auto id : ids)
     {
-        *data << uint8(0x00);                               // unk
-
-        size_t count_pos = data->wpos();
-        uint32 count = 0;
-        *data << uint32(0);                                 // number of bg instances
-
-        uint32 bracket_id = plr->GetBattleGroundBracketIdFromLevel(bgTypeId);
-        ClientBattleGroundIdSet const& ids = m_ClientBattleGroundIds[bgTypeId][bracket_id];
-        for (const auto id : ids)
-        {
-            *data << uint32(id);
-            ++count;
-        }
-        data->put<uint32>(count_pos , count);
+        *data << uint32(id);
+        ++count;
     }
+    data->put<uint32>(countPos, count);
 }
 
 void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGroundTypeId bgTypeId)
