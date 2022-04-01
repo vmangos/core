@@ -8321,7 +8321,7 @@ ObjectGuid ObjectMgr::GetFullTransportGuidFromLowGuid(uint32 lowGuid)
     {
         if (GameObjectInfo const* pInfo = GetGameObjectInfo(data->id))
             if (pInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
-                guid = ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, lowGuid);
+                guid = ObjectGuid(HIGHGUID_TRANSPORT, data->id, lowGuid);
     }
 
     return guid;
