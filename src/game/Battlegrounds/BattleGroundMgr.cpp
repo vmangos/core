@@ -123,10 +123,12 @@ bool BattleGroundQueue::SelectionPool::KickGroup(uint32 size)
 // used when building selection pools
 // returns true if we can invite more players, or when we added group to selection pool
 // returns false when selection pool is full
-bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 desiredCount)
+bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 desiredCount, uint32 bgInstanceId)
 {
     //if group is larger than desired count - don't allow to add it to pool
-    if (!ginfo->IsInvitedToBGInstanceGUID && desiredCount >= PlayerCount + ginfo->Players.size())
+    if (!ginfo->IsInvitedToBGInstanceGUID &&
+       (!ginfo->DesiredInstanceId || ginfo->DesiredInstanceId == bgInstanceId) &&
+       (desiredCount >= PlayerCount + ginfo->Players.size()))
     {
         SelectedGroups.push_back(ginfo);
         // increase selected players count
@@ -141,7 +143,7 @@ bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 de
 /*********************************************************/
 
 // add group or player (grp == nullptr) to bg queue with the given leader and bg specifications
-GroupQueueInfo * BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGroundTypeId BgTypeId, BattleGroundBracketId bracketId, bool isPremade, std::vector<uint32>* excludedMembers)
+GroupQueueInfo * BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGroundTypeId BgTypeId, BattleGroundBracketId bracketId, bool isPremade, uint32 instanceId, std::vector<uint32>* excludedMembers)
 {
     // create new ginfo
     GroupQueueInfo* ginfo = new GroupQueueInfo;
@@ -151,6 +153,7 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleG
     ginfo->RemoveInviteTime          = 0;
     ginfo->GroupTeam                 = leader->GetTeam();
     ginfo->BracketId                 = bracketId;
+    ginfo->DesiredInstanceId         = instanceId;
     ginfo->Players.clear();
 
     //compute index (if group is premade or joined a rated match) to queues
@@ -180,7 +183,7 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleG
 
                 if (grp->GetMembersCount() > group_limit) // queue players solo if group size is above limit set in config
                 {
-                    AddGroup(member, nullptr, BgTypeId, bracketId, false);
+                    AddGroup(member, nullptr, BgTypeId, bracketId, false, instanceId, nullptr);
                     ChatHandler(member).PSendSysMessage("Group queue limit is set to %u. You have been queued solo.", group_limit);
                 }
                 else
@@ -472,13 +475,13 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BattleGroundBracketId 
     uint32 aliCount = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].size();
     //index to queue which group is current
     uint32 aliIndex = 0;
-    for (; aliIndex < aliCount && m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree); aliIndex++)
+    for (; aliIndex < aliCount && m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree, bg->GetClientInstanceID()); aliIndex++)
         ++Ali_itr;
     //the same thing for horde
     GroupsQueueType::const_iterator Horde_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin();
     uint32 hordeCount = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].size();
     uint32 hordeIndex = 0;
-    for (; hordeIndex < hordeCount && m_SelectionPools[BG_TEAM_HORDE].AddGroup((*Horde_itr), hordeFree); hordeIndex++)
+    for (; hordeIndex < hordeCount && m_SelectionPools[BG_TEAM_HORDE].AddGroup((*Horde_itr), hordeFree, bg->GetClientInstanceID()); hordeIndex++)
         ++Horde_itr;
 
     //if ofc like BG queue invitation is set in config, then we are happy
@@ -504,7 +507,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BattleGroundBracketId 
             //kick alliance group, add to pool new group if needed
             if (m_SelectionPools[BG_TEAM_ALLIANCE].KickGroup(diffHorde - diffAli))
             {
-                for (; aliIndex < aliCount && m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*Ali_itr), (aliFree >= diffHorde) ? aliFree - diffHorde : 0); aliIndex++)
+                for (; aliIndex < aliCount && m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*Ali_itr), (aliFree >= diffHorde) ? aliFree - diffHorde : 0, bg->GetClientInstanceID()); aliIndex++)
                     ++Ali_itr;
             }
             //if ali selection is already empty, then kick horde group, but if there are less horde than ali in bg - break;
@@ -520,7 +523,7 @@ void BattleGroundQueue::FillPlayersToBG(BattleGround* bg, BattleGroundBracketId 
             //kick horde group, add to pool new group if needed
             if (m_SelectionPools[BG_TEAM_HORDE].KickGroup(diffAli - diffHorde))
             {
-                for (; hordeIndex < hordeCount && m_SelectionPools[BG_TEAM_HORDE].AddGroup((*Horde_itr), (hordeFree >= diffAli) ? hordeFree - diffAli : 0); hordeIndex++)
+                for (; hordeIndex < hordeCount && m_SelectionPools[BG_TEAM_HORDE].AddGroup((*Horde_itr), (hordeFree >= diffAli) ? hordeFree - diffAli : 0, bg->GetClientInstanceID()); hordeIndex++)
                     ++Horde_itr;
             }
             if (!m_SelectionPools[BG_TEAM_HORDE].GetPlayerCount())
@@ -550,7 +553,7 @@ bool BattleGroundQueue::CheckPremadeMatch(BattleGroundBracketId bracket_id, uint
             {
                 if (!(*(itr_team[i]))->IsInvitedToBGInstanceGUID && (*(itr_team[i]))->Players.size() >= sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_PREMADE_QUEUE_GROUP_MIN_SIZE))
                 {
-                    m_SelectionPools[i].AddGroup(*(itr_team[i]), MaxPlayersPerTeam);
+                    m_SelectionPools[i].AddGroup(*(itr_team[i]), MaxPlayersPerTeam, 0);
                     if (m_SelectionPools[i].GetPlayerCount() >= MinPlayersPerTeam)
                         break;
                 }
@@ -602,7 +605,7 @@ bool BattleGroundQueue::CheckNormalMatch(BattleGroundBracketId bracket_id, uint3
         {
             if (!(*(itr_team[i]))->IsInvitedToBGInstanceGUID)
             {
-                m_SelectionPools[i].AddGroup(*(itr_team[i]), maxPlayers);
+                m_SelectionPools[i].AddGroup(*(itr_team[i]), maxPlayers, 0);
                 if (m_SelectionPools[i].GetPlayerCount() >= minPlayers)
                     break;
             }
@@ -620,7 +623,7 @@ bool BattleGroundQueue::CheckNormalMatch(BattleGroundBracketId bracket_id, uint3
         for (; itr_team[j] != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + j].end(); ++(itr_team[j]))
         {
             if (!(*(itr_team[j]))->IsInvitedToBGInstanceGUID)
-                if (!m_SelectionPools[j].AddGroup(*(itr_team[j]), m_SelectionPools[(j + 1) % BG_TEAMS_COUNT].GetPlayerCount()))
+                if (!m_SelectionPools[j].AddGroup(*(itr_team[j]), m_SelectionPools[(j + 1) % BG_TEAMS_COUNT].GetPlayerCount(), 0))
                     break;
         }
         // do not allow to start bg with more than 2 players more on 1 faction
