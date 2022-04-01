@@ -1148,10 +1148,12 @@ uint32 BattleGroundMgr::CreateClientVisibleInstanceId(BattleGroundTypeId bgTypeI
     // the optimization would be to use as bitmask std::vector<uint32> - but that would only make code unreadable
     uint32 lastId = 1;
     ClientBattleGroundIdSet& ids = m_ClientBattleGroundIds[bgTypeId][bracket_id];
-    for (auto id : ids) {
+    for (auto id : ids)
+    {
         if (lastId == id)
             lastId++;
-        break;
+        else
+            break;
     }
     ids.insert(lastId);
     return lastId;
