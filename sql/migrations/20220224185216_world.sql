@@ -2715,6 +2715,16 @@ UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176643 AND `map` = 30;
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 175404 AND `map` IN (429, 30);
 
+-- ----------------------------------------------------------------------
+
+-- Add Spell Target To Healing Circle Used By Blackwing Taskmaster
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
+(22458, 1, 12468, 0, 0, 0, 5875),
+(22458, 1, 12458, 0, 0, 0, 5875),
+(22458, 1, 14022, 0, 0, 0, 5875),
+(22458, 1, 14024, 0, 0, 0, 5875),
+(22458, 1, 14023, 0, 0, 0, 5875);
+
 
 -- End of migration.
 END IF;
