@@ -86,7 +86,7 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
     recv_data >> mapId;
     DEBUG_LOG("WorldSession::HandleBattlefieldJoinOpcode : mapId=%u", mapId);
 
-    WorldPacket data(CMSG_BOOTME);
+    WorldPacket data(CMSG_BATTLEMASTER_JOIN);
     data << uint64(0);
     data << uint32(mapId);
     data << uint32(0);
@@ -296,36 +296,39 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
     if (!bg)                                                // can't be received if player not in battleground
         return;
 
+    WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS);
+    size_t countPos = data.wpos();
+    uint32 count = 0;
+    data << uint32(0);
+    if (_player->GetGroup() != bg->GetBgRaid(_player->GetTeam()))
+    {
+        for (auto const& itr : bg->GetPlayers())
+        {
+            if (_player->GetTeam() == itr.second.PlayerTeam)
+            {
+                if (Player const* pPlayer = sObjectMgr.GetPlayer(itr.first))
+                {
+                    data << ObjectGuid(pPlayer->GetObjectGuid());
+                    data << float(pPlayer->GetPositionX());
+                    data << float(pPlayer->GetPositionY());
+                    count++;
+                }
+            }
+        }
+    }
+    data.put<uint32>(countPos, count);
+    
     switch (bg->GetTypeID())
     {
         case BATTLEGROUND_WS:
         {
-            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS);
-            size_t countPos = data.wpos();
-            uint32 count = 0;
-            data << uint32(0);
-            for (auto const& itr : bg->GetPlayers())
-            {
-                if (_player->GetTeam() == itr.second.PlayerTeam)
-                {
-                    if (Player const* pPlayer = sObjectMgr.GetPlayer(itr.first))
-                    {
-                        data << ObjectGuid(pPlayer->GetObjectGuid());
-                        data << float(pPlayer->GetPositionX());
-                        data << float(pPlayer->GetPositionY());
-                        count++;
-                    }
-                }
-            }
-            data.put<uint32>(countPos, count);
-            
             Player* pFlagCarrier;
             if (_player->GetTeam() == ALLIANCE)
                 pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
             else
                 pFlagCarrier = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());;
 
-            data << bool(pFlagCarrier != nullptr);
+            data << uint8(pFlagCarrier ? 1 : 0);
 
             if (pFlagCarrier)
             {
@@ -333,21 +336,17 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
                 data << float(pFlagCarrier->GetPositionX());
                 data << float(pFlagCarrier->GetPositionY());
             }
-
-            SendPacket(&data);
             break;
         }
-        case BATTLEGROUND_AB:
-        case BATTLEGROUND_AV:
+        default:
         {
-            //for other BG types - send default
-            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4 + 1));
-            data << uint32(0);
+            // other battlegrounds don't have flag carriers
             data << uint8(0);
-            SendPacket(&data);
             break;
         }
     }
+
+    SendPacket(&data);
 }
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)

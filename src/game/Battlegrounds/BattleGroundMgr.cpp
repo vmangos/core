@@ -958,14 +958,14 @@ void BattleGroundMgr::Update(uint32 diff)
     }
 }
 
-void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGround *bg, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2)
+void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGround *bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2)
 {
     // we can be in 3 queues in same time...
-    if (StatusID == 0 || !bg)
+    if (statusId == 0 || !bg)
     {
         data->Initialize(SMSG_BATTLEFIELD_STATUS, 4 * 2);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        *data << uint32(QueueSlot);                         // queue id (0...2)
+        *data << uint32(queueSlot);                         // queue id (0...2)
 #endif
         *data << uint32(0);
         return;
@@ -973,25 +973,25 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
 
     data->Initialize(SMSG_BATTLEFIELD_STATUS, (4 + 1 + 1 + 4 + 2 + 4 + 1 + 4 + 4 + 4));
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    *data << uint32(QueueSlot);                             // queue id (0...2) - player can be in 3 queues in time
+    *data << uint32(queueSlot);                             // queue id (0...2) - player can be in 3 queues in time
 #endif
     // uint64 in client
-    *data << uint32(bg->GetMapId());                        // MapID
-    *data << uint8(0);                                      // Unknown
+    *data << uint32(bg->GetMapId());
+    *data << uint8(bg->GetBracketId());
     *data << uint32(bg->GetClientInstanceID());
-    *data << uint32(StatusID);                              // status
-    switch (StatusID)
+    *data << uint32(statusId);
+    switch (statusId)
     {
         case STATUS_WAIT_QUEUE:                             // status_in_queue
-            *data << uint32(Time1);                         // average wait time, milliseconds
-            *data << uint32(Time2);                         // time in queue, updated every minute!, milliseconds
+            *data << uint32(time1);                         // average wait time, milliseconds
+            *data << uint32(time2);                         // time in queue, updated every minute!, milliseconds
             break;
         case STATUS_WAIT_JOIN:                              // status_invite
-            *data << uint32(Time1);                         // time to remove from queue, milliseconds
+            *data << uint32(time1);                         // time to remove from queue, milliseconds
             break;
         case STATUS_IN_PROGRESS:                            // status_in_progress
-            *data << uint32(Time1);                         // time to bg auto leave, 0 at bg start, 120000 after bg end, milliseconds
-            *data << uint32(Time2);                         // time from bg start, milliseconds
+            *data << uint32(time1);                         // time to bg auto leave, 0 at bg start, 120000 after bg end, milliseconds
+            *data << uint32(time2);                         // time from bg start, milliseconds
             break;
         default:
             sLog.outError("Unknown BG status!");
@@ -1349,7 +1349,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid 
     *data << guid; // battlemaster guid
 #endif
     *data << uint32(mapId);
-    *data << uint8(0x00); // unk
+    *data << uint8(plr->GetBattleGroundBracketIdFromLevel(bgTypeId));
 
     size_t countPos = data->wpos();
     uint32 count = 0;
