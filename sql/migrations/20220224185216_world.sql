@@ -2725,6 +2725,17 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`
 (22458, 1, 14024, 0, 0, 0, 5875),
 (22458, 1, 14023, 0, 0, 0, 5875);
 
+-- ----------------------------------------------------------------------
+
+-- Wu Shen And Ilsa Corbin Should Emote OOC
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE  `entry`=5479 AND `patch`=0;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(547901, 5479, 0, 1, 0, 100, 3, 0, 0, 3000, 10000, 547901, 547902, 0, 'Wu Shen - Emote OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(547901, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wu Shen - Emote');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(547902, 0, 0, 1, 1, 0, 0, 0, 5480, 5, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ilsa Corbin - Emote');
+
 
 -- End of migration.
 END IF;
