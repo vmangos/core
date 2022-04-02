@@ -2736,6 +2736,13 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (547902, 0, 0, 1, 1, 0, 0, 0, 5480, 5, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ilsa Corbin - Emote');
 
+-- ----------------------------------------------------------------------
+
+-- Timmy Should Despawn at Night
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(45501, -27),
+(53705, -27);
+
 
 -- End of migration.
 END IF;
