@@ -2757,6 +2757,18 @@ INSERT INTO `creature_equip_template` (`entry`, `equipentry1`) VALUES
 INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
 (12799, 0, 0, 0, -1, 0, 0, 0, '');
 
+-- ----------------------------------------------------------------------
+
+-- Update Theresa Waypoint (position was incorrect due to creature positions update)
+UPDATE `creature_movement_special` SET `position_x`=1777.47, `position_y`=398.305, `position_z`=-57.214 WHERE  `id`=5697 AND `point`=11;
+
+-- ----------------------------------------------------------------------
+
+-- Add Missing Emote To Chloe Curthas
+DELETE FROM `creature_ai_scripts` WHERE `id`=565802;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(565802, 0, 0, 1, 4, 21, 22, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Chloe Curthas - Random Emote');
+
 
 -- End of migration.
 END IF;
