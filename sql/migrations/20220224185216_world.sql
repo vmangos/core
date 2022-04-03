@@ -2743,6 +2743,20 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (45501, -27),
 (53705, -27);
 
+-- ----------------------------------------------------------------------
+
+-- Update Some Creatures
+INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (31893, 0); -- Riley Walker 5660
+INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (42204, 0); -- Maethrya 11138
+INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (53177, 0); -- Khaelyn Steelwing 12617
+
+-- Sergeant Ba'sha
+UPDATE `creature_template` SET `equipment_id` = 12799 WHERE `entry` = 12799;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`) VALUES
+(12799, 10612);
+INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
+(12799, 0, 0, 0, -1, 0, 0, 0, '');
+
 
 -- End of migration.
 END IF;
