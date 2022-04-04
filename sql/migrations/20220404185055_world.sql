@@ -27,7 +27,7 @@ UPDATE `creature_template` SET `detection_range` = 5 WHERE `entry` = 5687;
 
 -- Events list for Brother Malach
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(566101, 5661, 0, 1, 0, 100, 1, 20000, 20000, 201000, 201000, 566101, 0, 0, 'Brother Malach - Start Event OOC');
+(566101, 5661, 0, 1, 0, 100, 1, 0, 0, 201000, 201000, 566101, 0, 0, 'Brother Malach - Start Event OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (566101, 0, 0, 39, 566101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Start Script');
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
