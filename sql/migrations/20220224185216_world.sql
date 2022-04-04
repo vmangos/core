@@ -2762,6 +2762,11 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`,
 -- Update Theresa Waypoint (position was incorrect due to creature positions update)
 UPDATE `creature_movement_special` SET `position_x`=1777.47, `position_y`=398.305, `position_z`=-57.214 WHERE  `id`=5697 AND `point`=11;
 
+-- ----------------------------------------------------------------------
+
+-- Unstuck Creature
+UPDATE `creature` SET `position_z` = 75.6233 WHERE `guid` = 51729;
+
 
 -- End of migration.
 END IF;
