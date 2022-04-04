@@ -2774,8 +2774,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 -- WIP
 DELETE FROM `creature` WHERE `guid` IN (45211, 45212, 45224, 45222, 45221, 45223);
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 5661;
-UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE  `entry` IN (1978, 1977, 1980, 8306);
-
+UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE  `entry` IN (1978, 1977, 1980, 8306, 1984);
+UPDATE `broadcast_text` SET `emote_id1` = 5 WHERE  `entry` IN (8307);
 
 
 -- Events list for Brother Malach
