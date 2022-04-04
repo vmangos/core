@@ -27,15 +27,15 @@ UPDATE `creature_template` SET `detection_range` = 5 WHERE `entry` = 5687;
 
 -- Events list for Brother Malach
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(566101, 5661, 0, 1, 0, 100, 1, 0, 0, 201000, 201000, 566101, 0, 0, 'Brother Malach - Start Event OOC');
+(566101, 5661, 0, 1, 0, 100, 1, 201000, 201000, 201000, 201000, 566101, 0, 0, 'Brother Malach - Start Event OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (566101, 0, 0, 39, 566101, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Start Script');
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (566101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1978, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Talk'),
 (566101, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1977, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Talk'),
-(566101, 8, 0, 10, 5681, 15000, 0, 0, 0, 0, 0, 0, 2, 568001, 0, 6, 1736.19, 379.807, -62.2078, 3.83972, 0, 'Brother Malach - Summon Creature'),
-(566101, 8, 0, 10, 5680, 15000, 0, 0, 0, 0, 0, 0, 2, 568001, 0, 6, 1735.93, 378.124, -62.2055, 3.71755, 0, 'Brother Malach - Summon Creature'),
-(566101, 8, 0, 10, 5680, 15000, 0, 0, 0, 0, 0, 0, 2, 568001, 0, 6, 1734.36, 379.952, -62.2058, 3.92699, 0, 'Brother Malach - Summon Creature'),
+(566101, 8, 0, 10, 5680, 0, 0, 0, 0, 0, 0, 0, 0, 568001, 0, 2, 1734.36, 379.952, -62.2058, 3.92699, 0, 'Brother Malach - Summon Creature'),
+(566101, 8, 0, 10, 5681, 0, 0, 0, 0, 0, 0, 0, 0, 568001, 0, 2, 1736.19, 379.807, -62.2078, 3.83972, 0, 'Brother Malach - Summon Creature'),
+(566101, 8, 0, 10, 5680, 0, 0, 0, 0, 0, 0, 0, 0, 568001, 0, 2, 1735.93, 378.124, -62.2055, 3.71755, 0, 'Brother Malach - Summon Creature'),
 (566101, 24, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.88974, 0, 'Brother Malach - Set Orientation'),
 (566101, 25, 0, 15, 7162, 0, 0, 0, 38130, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Cast Spell'),
 (566101, 29, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.26256, 0, 'Brother Malach - Set Orientation'),
@@ -43,8 +43,8 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 (566101, 33, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.9619, 0, 'Brother Malach - Set Orientation'),
 (566101, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1980, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Talk'),
 (566101, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8306, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Talk'),
-(566101, 39, 0, 10, 5686, 15000, 0, 0, 0, 0, 0, 0, 2, 568001, 0, 6, 1734.68, 378.533, -62.1315, 3.85718, 0, 'Brother Malach - Summon Creature'),
-(566101, 39, 0, 10, 5685, 15000, 0, 0, 0, 0, 0, 0, 2, 568001, 0, 6, 1735.24, 380.689, -62.2077, 3.85718, 0, 'Brother Malach - Summon Creature'),
+(566101, 39, 0, 10, 5685, 0, 0, 0, 0, 0, 0, 0, 0, 568001, 0, 2, 1735.24, 380.689, -62.2077, 3.85718, 0, 'Brother Malach - Summon Creature'),
+(566101, 39, 0, 10, 5686, 0, 0, 0, 0, 0, 0, 0, 0, 568001, 0, 2, 1734.68, 378.533, -62.1315, 3.85718, 0, 'Brother Malach - Summon Creature'),
 (566101, 56, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.88974, 0, 'Brother Malach - Set Orientation'),
 (566101, 57, 0, 15, 7162, 0, 0, 0, 38130, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Cast Spell'),
 (566101, 63, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.26256, 0, 'Brother Malach - Set Orientation'),
@@ -52,7 +52,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 (566101, 67, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.9619, 0, 'Brother Malach - Set Orientation'),
 (566101, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1984, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Talk'),
 (566101, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8307, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Talk'),
-(566101, 74, 0, 10, 5687, 15000, 0, 0, 0, 0, 0, 0, 2, 568001, 0, 6, 1735.33, 379.152, -62.206, 3.82227, 0, 'Brother Malach - Summon Creature'),
+(566101, 74, 0, 10, 5687, 0, 0, 0, 0, 0, 0, 0, 0, 568001, 0, 2, 1735.33, 379.152, -62.206, 3.82227, 0, 'Brother Malach - Summon Creature'),
 (566101, 129, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.88974, 0, 'Brother Malach - Set Orientation'),
 (566101, 130, 0, 15, 7162, 0, 0, 0, 38130, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Malach - Cast Spell'),
 (566101, 134, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.26256, 0, 'Brother Malach - Set Orientation'),
