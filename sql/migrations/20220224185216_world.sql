@@ -2767,6 +2767,19 @@ UPDATE `creature_movement_special` SET `position_x`=1777.47, `position_y`=398.30
 -- Unstuck Creature
 UPDATE `creature` SET `position_z` = 75.6233 WHERE `guid` = 51729;
 
+-- ----------------------------------------------------------------------
+
+--  Add random movement to Burning Blade NPCs, Burning Blade Apprentice Do Not Flee On Low Health, Fanatics and Apprentices are immune to fear (credit cmangos)
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (6417, 6418, 6419, 6420, 6421, 6422, 6423, 6424, 6425, 6426, 7333, 7334, 7335, 7336, 7337, 7338, 7339, 7340, 7341, 7342, 7880, 7882, 7883, 7884, 7885, 7897, 7898, 7899, 7900, 7901, 8428, 8429);
+UPDATE `creature_template` SET `mechanic_immune_mask`=16 WHERE `entry` IN (3197, 3198);
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (319801);
+
+-- Events list for Burning Blade Apprentice
+DELETE FROM `creature_ai_events` WHERE `creature_id`=3198;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (319802, 3198, 0, 1, 0, 100, 0, 1000, 1000, 0, 0, 319802, 0, 0, 'Burning Blade Apprentice - Summon Voidwalker on Spawn');
+
 
 -- End of migration.
 END IF;
