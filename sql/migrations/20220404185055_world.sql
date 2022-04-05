@@ -20,9 +20,9 @@ DELETE FROM `creature` WHERE `guid` IN (45211, 45212, 45224, 45222, 45221, 45223
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 5661;
 UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE  `entry` IN (1978, 1977, 1980, 1984, 8306, 1985);
 UPDATE `broadcast_text` SET `emote_id1` = 5 WHERE  `entry` IN (8307);
-UPDATE `creature_template` SET `unit_flags` = 32768 WHERE entry IN (5657, 5658, 5660, 5659, 5655, 5656, 5653, 5654);
-UPDATE `creature_template` SET `flags_extra` = 524290 WHERE entry IN (5657, 5658, 5660, 5659, 5655, 5656);
-UPDATE `creature_template` SET `detection_range` = 0 WHERE entry IN (5657, 5658, 5660, 5659, 5655, 5656);
+UPDATE `creature_template` SET `unit_flags` = 32768 WHERE `entry` IN (5657, 5658, 5660, 5659, 5655, 5656, 5653, 5654);
+UPDATE `creature_template` SET `flags_extra` = 524290 WHERE `entry` IN (5657, 5658, 5660, 5659, 5655, 5656);
+UPDATE `creature_template` SET `detection_range` = 0 WHERE `entry` IN (5657, 5658, 5660, 5659, 5655, 5656);
 UPDATE `creature_template` SET `detection_range` = 5 WHERE `entry` = 5687;
 
 -- Events list for Brother Malach
