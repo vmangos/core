@@ -805,7 +805,9 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
             botRole = ROLE_TANK;
         }
 
-        ExtractUInt32(&args, botLevel);
+        // Prevent setting a custom level for bots unless the account is a GM or skipping checks is enabled.
+        if (GetSession()->GetSecurity() > SEC_PLAYER || sWorld.getConfig(CONFIG_BOOL_PARTY_BOT_SKIP_CHECKS))
+            ExtractUInt32(&args, botLevel);
     }
 
     if (!botClass)
