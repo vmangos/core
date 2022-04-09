@@ -2780,6 +2780,38 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (319801);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3198;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (319802, 3198, 0, 1, 0, 100, 0, 1000, 1000, 0, 0, 319802, 0, 0, 'Burning Blade Apprentice - Summon Voidwalker on Spawn');
 
+-- ----------------------------------------------------------------------
+
+-- Add Gloom'rel Gossips (credit cmangos) (https://youtu.be/kvbHzgA-sxg?t=254)
+UPDATE `creature_template` SET `gossip_menu_id` = 1945, `script_name` = '' WHERE `entry` = 9037;
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 91022;
+UPDATE `quest_template` SET `RewSpellCast` = 0, `RequiredCondition` = 490 WHERE `entry` = 4083;
+UPDATE `gameobject` SET `spawntimesecsmin` = -25, `spawntimesecsmax` = -25 WHERE `guid` = 252540; -- NOTE: HAS WRONG POSITION
+
+DELETE FROM `gossip_menu` WHERE `entry` = 1945;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES 
+(1945, 2598, 0, 0),
+(1945, 2605, 0, 494),
+(20023, 2604, 0, 0), -- NOTE: CUSTOM ENTRY
+(20025, 2606, 0, 0);  -- NOTE: CUSTOM ENTRY
+
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(1945, 0, 0, 'Gloom\'rel, tell me your secrets!', 0, 1, 1, 20023, 0, 194502, 0, 0, NULL, 0, 496),
+(1945, 1, 0, 'I have paid your price, Gloom\'rel. Now teach me your secrets!', 0, 1, 1, 20025, 0, 194501, 0, 0, NULL, 0, 494);
+
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES
+(490, 7, 186, 230),
+(491, 8, 4083, 0),
+(492, 17, 14891, 1),
+(493, -1, 490, 492),
+(494, -1, 491, 493),
+(495, -3, 491, 0),
+(496, -1, 493, 495);
+
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(194501, 0, 0, 15, 14894, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gloom\'rel - Cast Spell'),
+(194502, 0, 0, 9, 252540, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gloom\'rel - Respawn GameObject');
+
 
 -- End of migration.
 END IF;
