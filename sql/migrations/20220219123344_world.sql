@@ -73,6 +73,7 @@ INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @POPULARITY_CONTEST_
 
 -- Orgrimmar Contest Winning Gameobjects (I did this already last year but some stuff is missing, thats why i delete the old objects).
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@POPULARITY_CONTEST_WINNER_ORGRIMMAR_EVENT);
+DELETE FROM `game_event_gameobject` WHERE `event`=@POPULARITY_CONTEST_WINNER_ORGRIMMAR_EVENT;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
     (@POPULARITY_CONTEST_WINNER_ORGRIMMAR_GGUID+1, 181016, 1, 1917.01, -4138.25, 40.3796, 4.41568, 0, 0, -0.803857, 0.594823, 120, 120, 100, 1, 0, 0, 7, 10),
     (@POPULARITY_CONTEST_WINNER_ORGRIMMAR_GGUID+2, 181016, 1, 1924.46, -4137.94, 40.3811, 4.99164, 0, 0, -0.601814, 0.798636, 120, 120, 100, 1, 0, 0, 7, 10),
@@ -174,6 +175,7 @@ INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @POPULARITY_CONTEST_
 
 -- Darnassus Contest Winning Gameobjects (I did this already last year but some stuff is missing, thats why i delete the old objects).
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@POPULARITY_CONTEST_WINNER_DARNASSUS_EVENT);
+DELETE FROM `game_event_gameobject` WHERE `event`=@POPULARITY_CONTEST_WINNER_DARNASSUS_EVENT;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
     (@POPULARITY_CONTEST_WINNER_DARNASSUS_GGUID+1, 181016, 1, 9667.78, 2529.11, 1360, 0.244346, 0, 0, 0.121869, 0.992546, 120, 120, 100, 1, 0, 0, 7, 10),
     (@POPULARITY_CONTEST_WINNER_DARNASSUS_GGUID+2, 181016, 1, 9668.83, 2521.06, 1360, 5.88176, 0, 0, -0.199368, 0.979925, 120, 120, 100, 1, 0, 0, 7, 10),
@@ -207,6 +209,7 @@ INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @POPULARITY_CONTEST_
 
 -- Love is in The Air Gameobjects (I did this already last year but some stuff is missing and wrong, that's why i respawn everything).
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `game_event_gameobject` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT);
+DELETE FROM `game_event_gameobject` WHERE `event`=@LOVE_IS_IN_THE_AIR_EVENT;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
     (@LOVE_IS_IN_THE_AIR_GGUID+1, 181014, 0, -9094.49, 429.216, 99.0901, 5.46288, 0, 0, -0.398748, 0.91706, 120, 120, 100, 1, 0, 0, 7, 10),
     (@LOVE_IS_IN_THE_AIR_GGUID+2, 181014, 0, -9075.37, 407.018, 98.6196, 2.25147, 0, 0, 0.902585, 0.430512, 120, 120, 100, 1, 0, 0, 7, 10),
