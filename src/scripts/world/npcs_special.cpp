@@ -1240,9 +1240,7 @@ std::array<FireworkStruct, 25> const Fireworks =
     { 15915, {26510, 26509, 26508, 26507, 26506}, true, true }, // Large White Firework Cluster
     { 15916, {26515, 26514, 26513, 26512, 26511}, true, true }, // Large Yellow Firework Cluster
     { 15918, {26487, 26509, 26508, 26484, 26483}, true, true }, // Lucky Rocket Cluster
-}};
-
-static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874 } };
+} };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1296,87 +1294,84 @@ struct npc_pats_firework_guyAI : ScriptedAI
 
         if (Fireworks[m_uiIndex].m_bIsCluster)
         {
-            for (uint32 goEntry : Launcher)
+            if (Fireworks[m_uiIndex].m_bIsLarge)
             {
-                if (Fireworks[m_uiIndex].m_bIsLarge)
+                /* BIG Rockets
+                ╔══════╤═════╤═════╗
+                ║ X    │ Y   │ Z   ║
+                ╠══════╪═════╪═════╣
+                ║ 0    │ 0   │ +3  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ +3  │ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ +5.25│ -1.5│ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ -5.25│ -1.5│ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ 0   │ +12 ║
+                ╚══════╧═════╧═════╝
+                */
+                for (int i = 0; i < 5; ++i)
                 {
-                    /* BIG Rockets
-                    ╔══════╤═════╤═════╗
-                    ║ X    │ Y   │ Z   ║
-                    ╠══════╪═════╪═════╣
-                    ║ 0    │ 0   │ +3  ║
-                    ╟──────┼─────┼─────╢
-                    ║ 0    │ +3  │ +7.5║
-                    ╟──────┼─────┼─────╢
-                    ║ +5.25│ -1.5│ +7.5║
-                    ╟──────┼─────┼─────╢
-                    ║ -5.25│ -1.5│ +7.5║
-                    ╟──────┼─────┼─────╢
-                    ║ 0    │ 0   │ +12 ║
-                    ╚══════╧═════╧═════╝
-                    */
-                    for (int i = 0; i < 5; ++i)
+                    switch (i)
                     {
-                        switch (i)
-                        {
-                        case 0:
-                            m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
-                            break;
-                        case 1:
-                            m_creature->NearTeleportTo(x, y + 3.0f, z + 7.5f, 0.0f);
-                            break;
-                        case 2:
-                            m_creature->NearTeleportTo(x + 5.25f, y - 1.5f, z + 7.5f, 0.0f);
-                            break;
-                        case 3:
-                            m_creature->NearTeleportTo(x - 5.25f, y - 1.5f, z + 7.5f, 0.0f);
-                            break;
-                        case 4:
-                            m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
-                            break;
-                        }
-                        m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                    case 0:
+                        m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
+                        break;
+                    case 1:
+                        m_creature->NearTeleportTo(x, y + 3.0f, z + 7.5f, 0.0f);
+                        break;
+                    case 2:
+                        m_creature->NearTeleportTo(x + 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                        break;
+                    case 3:
+                        m_creature->NearTeleportTo(x - 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                        break;
+                    case 4:
+                        m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
+                        break;
                     }
+                    m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
                 }
-                else
+            }
+            else
+            {
+                /* Normal / Small Rockets
+                ╔══════╤═════╤═════╗
+                ║ X    │ Y   │ Z   ║
+                ╠══════╪═════╪═════╣
+                ║ 0    │ 0   │ +8  ║
+                ╟──────┼─────┼─────╢
+                ║ +3.5 │ -1  │ +5  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ +2  │ +5  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ 0   │ +2  ║
+                ╟──────┼─────┼─────╢
+                ║ -3.5 │ -1  │ +5  ║
+                ╚══════╧═════╧═════╝
+                */
+                for (int i = 0; i < 5; ++i)
                 {
-                    /* Normal / Small Rockets
-                    ╔══════╤═════╤═════╗
-                    ║ X    │ Y   │ Z   ║
-                    ╠══════╪═════╪═════╣
-                    ║ 0    │ 0   │ +8  ║
-                    ╟──────┼─────┼─────╢
-                    ║ +3.5 │ -1  │ +5  ║
-                    ╟──────┼─────┼─────╢
-                    ║ 0    │ +2  │ +5  ║
-                    ╟──────┼─────┼─────╢
-                    ║ 0    │ 0   │ +2  ║
-                    ╟──────┼─────┼─────╢
-                    ║ -3.5 │ -1  │ +5  ║
-                    ╚══════╧═════╧═════╝
-                    */
-                    for (int i = 0; i < 5; ++i)
+                    switch (i)
                     {
-                        switch (i)
-                        {
-                        case 0:
-                            m_creature->NearTeleportTo(x, y, z + 8.0f, 0.0f);
-                            break;
-                        case 1:
-                            m_creature->NearTeleportTo(x + 3.5f, y - 1.0f, z + 5.0f, 0.0f);
-                            break;
-                        case 2:
-                            m_creature->NearTeleportTo(x, y + 2.0f, z + 5.0f, 0.0f);
-                            break;
-                        case 3:
-                            m_creature->NearTeleportTo(x, y, z + 2.0f, 0.0f);
-                            break;
-                        case 4:
-                            m_creature->NearTeleportTo(x - 3.5f, y - 1.0f, z + 5.0f, 0.0f);
-                            break;
-                        }
-                        m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                    case 0:
+                        m_creature->NearTeleportTo(x, y, z + 8.0f, 0.0f);
+                        break;
+                    case 1:
+                        m_creature->NearTeleportTo(x + 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                        break;
+                    case 2:
+                        m_creature->NearTeleportTo(x, y + 2.0f, z + 5.0f, 0.0f);
+                        break;
+                    case 3:
+                        m_creature->NearTeleportTo(x, y, z + 2.0f, 0.0f);
+                        break;
+                    case 4:
+                        m_creature->NearTeleportTo(x - 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                        break;
                     }
+                    m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
                 }
             }
         }
