@@ -218,17 +218,17 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                     return true;
             return false;
         }
-        case CONDITION_WAR_EFFORT_STAGE:
+        case CONDITION_SAVED_VARIABLE:
         {
-            uint32 stage = sObjectMgr.GetSavedVariable(VAR_WE_STAGE, 0);
-            switch (m_value2)
+            uint32 stage = sObjectMgr.GetSavedVariable(m_value1, 0);
+            switch (m_value3)
             {
                 case 0:
-                    return stage == m_value1;
+                    return stage == m_value2;
                 case 1:
-                    return stage >= m_value1;
+                    return stage >= m_value2;
                 case 2:
-                    return stage <= m_value1;
+                    return stage <= m_value2;
             }
             return false;
         }
@@ -1059,16 +1059,16 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
-        case CONDITION_WAR_EFFORT_STAGE:
+        case CONDITION_SAVED_VARIABLE:
         {
-            if (m_value1 < 0 || m_value1 > WAR_EFFORT_STAGE_COMPLETE)
+            if (m_value1 == VAR_WE_STAGE && (m_value2 < 0 || m_value2 > WAR_EFFORT_STAGE_COMPLETE))
             {
-                sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid stage %u", m_entry, m_condition, m_value1);
+                sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid stage %u", m_entry, m_condition, m_value2);
                 return false;
             }
-            if (m_value2 < 0 || m_value2 > 2)
+            if (m_value3 < 0 || m_value3 > 2)
             {
-                sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid equality %u", m_entry, m_condition, m_value2);
+                sLog.outErrorDb("Saved variable condition (entry %u, type %u) has invalid equality %u", m_entry, m_condition, m_value3);
                 return false;
             }
             break;

@@ -34,7 +34,8 @@
 #include "Anticheat.h"
 #include "packet_builder.h"
 #include "MovementPacketSender.h"
-
+#include "MoveSpline.h"
+#include "Geometry.h"
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
@@ -814,16 +815,57 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_MOVE_SPLINE_DONE");
 
-    MovementInfo movementInfo;                              // used only for proper packet read
+    MovementInfo movementInfo;
+    uint32 splineId;
 
     recvData >> movementInfo;
-    recvData >> Unused<uint32>();                          // unk
-    recvData >> Unused<uint32>();                          // unk2
+    movementInfo.UpdateTime(recvData.GetPacketTime());
 
-    // Forward packet to near players
-    recvData.SetOpcode(MSG_MOVE_STOP);
-    recvData.rpos(0);
-    HandleMovementOpcodes(recvData);
+    recvData >> splineId;
+    recvData >> Unused<float>();
+
+    Unit* pMover = _player->GetMover();
+
+    if (pMover->GetObjectGuid() != m_clientMoverGuid)
+        return;
+
+    Player* pPlayerMover = pMover->ToPlayer();
+
+    // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
+    if (pPlayerMover && pPlayerMover->IsBeingTeleported())
+    {
+        recvData.rpos(recvData.wpos());                   // prevent warnings spam
+        return;
+    }
+
+    if (!VerifyMovementInfo(movementInfo))
+        return;
+
+    if (pPlayerMover)
+    {
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_JUMPING))
+            _player->GetCheatData()->ResetJumpCounters();
+
+        if (!_player->GetCheatData()->HandleSplineDone(pPlayerMover, movementInfo, splineId) ||
+            !_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, CMSG_MOVE_SPLINE_DONE))
+        {
+            m_moveRejectTime = WorldTimer::getMSTime();
+            return;
+        }
+    }
+
+    HandleMoverRelocation(pMover, movementInfo);
+
+    WorldPacket data(movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING) ? MSG_MOVE_HEARTBEAT : MSG_MOVE_STOP, recvData.size());
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    data << m_clientMoverGuid.WriteAsPacked();
+#else
+    data << m_clientMoverGuid.GetRawValue();
+#endif
+    movementInfo.Write(data);
+
+    pMover->SendMovementMessageToSet(std::move(data), true, _player);
 }
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
@@ -953,8 +995,11 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     if (!pMover)
         return;
 
-    pMover->m_movementInfo.stime += lag;
-    pMover->m_movementInfo.ctime += lag;
+    if (pMover->m_movementInfo.ctime)
+    {
+        pMover->m_movementInfo.stime += lag;
+        pMover->m_movementInfo.ctime += lag;
+    }
 
     // fix an 1.12 client problem with transports
     if (_player->HasJustBoarded())
@@ -1033,9 +1078,6 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
     {
         if (!pMover->GetTransport())
         {
-            if (pPlayerMover)
-                GetPlayer()->GetCheatData()->OnTransport(pPlayerMover, pPlayerMover->m_movementInfo.GetTransportGuid());
-
             if (GenericTransport* transport = pMover->GetMap()->GetTransport(pMover->m_movementInfo.GetTransportGuid()))
             {
                 transport->AddPassenger(pMover);

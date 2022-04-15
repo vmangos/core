@@ -366,6 +366,27 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
         SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
     }
 
+    if (getPetType() == HUNTER_PET)
+    {
+        SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_LOYALTY, m_pTmpCache->loyalty);
+
+        SetUInt32Value(UNIT_FIELD_FLAGS, m_pTmpCache->renamed ? UNIT_FLAG_PET_ABANDON : UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
+
+        SetTP(m_pTmpCache->trainingPoints);
+
+        SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
+        SetPower(POWER_HAPPINESS, m_pTmpCache->currentHappiness);
+        SetPowerType(POWER_FOCUS);
+    }
+
+    if (getPetType() != MINI_PET)
+    {
+        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        else
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    }
+
     AIM_Initialize();
     map->Add((Creature*)this);
 
@@ -391,27 +412,6 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
 
     if ((getPetType() != SUMMON_PET || current) && !savedhealth)
         SetDeathState(JUST_DIED);
-
-    if (getPetType() == HUNTER_PET)
-    {
-        SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_LOYALTY, m_pTmpCache->loyalty);
-
-        SetUInt32Value(UNIT_FIELD_FLAGS, m_pTmpCache->renamed ? UNIT_FLAG_PET_ABANDON : UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
-
-        SetTP(m_pTmpCache->trainingPoints);
-
-        SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
-        SetPower(POWER_HAPPINESS, m_pTmpCache->currentHappiness);
-        SetPowerType(POWER_FOCUS);
-    }
-
-    if (getPetType() != MINI_PET)
-    {
-        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-        else
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-    }
 
     // Save pet for resurrection by spirit healer.
     if (IsPermanentPetFor(owner))
