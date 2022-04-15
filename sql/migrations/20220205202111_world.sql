@@ -12,6 +12,7 @@ INSERT INTO `migrations` VALUES ('20220205202111');
 SET @LUNAR_FESTIVAL_ELDERS_CGUID = 52364;
 SET @LUNAR_FESTIVAL_REVELER = 18581;
 SET @CHINESE_NEW_YEAR_EVENT_GGUID = 88093;
+SET @LUNAR_FESTIVAL_GGUID = 13642;
 SET @LUNAR_FESTIVAL_EVENT = 7;
 SET @CHINESE_NEW_YEAR_EVENT = 38;
 
@@ -70,7 +71,6 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     (@LUNAR_FESTIVAL_REVELER+25, 15917, 0, 0, 0, 1, 7757.48, -2776.26, 456.102, 5.39307, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_REVELER+26, 15917, 0, 0, 0, 1, 7759.67, -2779.19, 456.464, 2.11185, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_REVELER+27, 15917, 0, 0, 0, 1, 7762.35, -2781.49, 456.091, 0.925025, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10);
-    
 INSERT INTO `game_event_creature` SELECT creature.guid, @CHINESE_NEW_YEAR_EVENT FROM `creature` WHERE creature.guid BETWEEN @LUNAR_FESTIVAL_REVELER+1 AND @LUNAR_FESTIVAL_REVELER+27;
 
 INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
@@ -162,7 +162,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@CHINESE_NEW_YEAR_EVENT_GGUID+57, 180768, 1, 7877.13, -2755.78, 480.833, 4.86947, 0, 0, -0.649447, 0.760406, 120, 120, 100, 1, 0, 0, 7, 10),
     (@CHINESE_NEW_YEAR_EVENT_GGUID+58, 180768, 1, 7877.18, -2616.02, 453.095, 6.14356, 0, 0, -0.0697556, 0.997564, 120, 120, 100, 1, 0, 0, 7, 10),
     (@CHINESE_NEW_YEAR_EVENT_GGUID+59, 180768, 1, 7893.55, -2691.9, 454.543, 4.32842, 0, 0, -0.829037, 0.559194, 120, 120, 100, 1, 0, 0, 7, 10);
-
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @CHINESE_NEW_YEAR_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @CHINESE_NEW_YEAR_EVENT_GGUID+1 AND @CHINESE_NEW_YEAR_EVENT_GGUID+59;
 
 -- Respawn Elders.
@@ -217,7 +216,6 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
     (@LUNAR_FESTIVAL_ELDERS_CGUID+48, 15549, 0, 0, 0, 230, 596.586, -188.771, -54.0721, 0.10472, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_ELDERS_CGUID+49, 15578, 0, 0, 0, 209, 1689.04, 1147.57, 8.96011, 2.37365, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10),
     (@LUNAR_FESTIVAL_ELDERS_CGUID+50, 15556, 0, 0, 0, 349, -139.935, -363.996, -170.336, 6.16101, 120, 120, 0, 100, 100, 0, 0, 0, 7, 10);
-
 INSERT INTO `game_event_creature` SELECT creature.guid, @LUNAR_FESTIVAL_EVENT FROM `creature` WHERE creature.guid BETWEEN @LUNAR_FESTIVAL_ELDERS_CGUID+1 AND @LUNAR_FESTIVAL_ELDERS_CGUID+44;
 
 -- Fix all Launcher animations "(`requiresSpellFocus`=1351 OR `requiresSpellFocus`=1352) AND (`effect1`=86 OR `effect2`=86) GROUP BY entry".
@@ -276,7 +274,6 @@ DELETE FROM `conditions` WHERE `condition_entry`=261;
 DELETE FROM `conditions` WHERE `condition_entry`=262;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (260, 52, 12469, 12460, 12526, 0, 1);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (261, 52, 12478, 12496, 12487, 0, 1);
-
 
 -- 1111:  Not (Source's Entry Is 15882)
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1111, 16, 15882, 0, 0, 0, 1);
@@ -488,6 +485,25 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=1590810;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1590810, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
 (1590810, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Reset Phase to 0 (Moonglade Only)');
+
+-- Delete wrongly added Mailbox.
+DELETE FROM `gameobject` WHERE `guid`=64628;
+
+-- Missing Lunar Gameobjects.
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+    (@LUNAR_FESTIVAL_GGUID+1, 180755, 0, -8483.79, 526.233, 105.781, 2.21656, 0, 0, 0.894934, 0.446199, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+2, 180755, 0, -8439.11, 625.298, 97.3484, 5.72468, 0, 0, -0.275637, 0.961262, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+3, 180755, 0, -5001.95, -1242, 511.28, 0.680677, 0, 0, 0.333806, 0.942642, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+4, 180755, 0, -4896.44, -980.974, 506.799, 2.26892, 0, 0, 0.906307, 0.422619, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+5, 180755, 0, -4866.29, -1148.22, 504.77, 0.471238, 0, 0, 0.233445, 0.97237, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+6, 180755, 0, -4834.15, -861.966, 505.343, 3.24635, 0, 0, -0.998629, 0.0523532, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+7, 180755, 0, -4633.95, -932.176, 507.625, 3.83973, 0, 0, -0.939692, 0.342021, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+8, 180756, 0, -5007.57, -1235.2, 511.254, 0.680677, 0, 0, 0.333806, 0.942642, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+9, 180756, 0, -4900.82, -984.625, 506.779, 2.25147, 0, 0, 0.902585, 0.430512, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+10, 180756, 0, -4825.68, -1289.34, 504.257, 1.48353, 0, 0, 0.67559, 0.737278, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+11, 180756, 0, -4802.89, -1180.28, 504.932, 1.5708, 0, 0, 0.707107, 0.707107, 120, 120, 100, 1, 0, 0, 7, 10),
+    (@LUNAR_FESTIVAL_GGUID+12, 180756, 0, -4633.86, -932.095, 506.451, 3.83973, 0, 0, -0.939692, 0.342021, 120, 120, 100, 1, 0, 0, 7, 10);
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LUNAR_FESTIVAL_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LUNAR_FESTIVAL_GGUID+1 AND @LUNAR_FESTIVAL_GGUID+12;
 
 
 -- End of migration.
