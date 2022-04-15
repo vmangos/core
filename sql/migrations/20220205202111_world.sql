@@ -264,7 +264,7 @@ UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Darnassus - Port Hord
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Ironforge - Port Horde Player to Moonglade' WHERE `id`=26408 AND `comments`='Lunar Teleport Cap: Ironforge - Send Error to Horde Player';
 UPDATE `spell_scripts` SET `comments`='Lunar Teleport Cap: Stormwind - Port Horde Player to Moonglade' WHERE `id`=26406 AND `comments`='Lunar Teleport Cap: Stormwind - Send Error to Horde Player';
 
--- Remove Questgiver flag from some Horde npcs too.
+-- Fix Questgiver flag for some Horde npcs.
 DELETE FROM `creature_ai_events` WHERE `id`=1589202;
 DELETE FROM `creature_ai_scripts` WHERE `id`=1589202;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1589202, 15892, 260, 1, 0, 100, 0, 0, 0, 0, 0, 1589202, 0, 0, 'Lunar Festival Emissary - Modify Flags on Spawn');
@@ -276,6 +276,218 @@ DELETE FROM `conditions` WHERE `condition_entry`=261;
 DELETE FROM `conditions` WHERE `condition_entry`=262;
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (260, 52, 12469, 12460, 12526, 0, 1);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (261, 52, 12478, 12496, 12487, 0, 1);
+
+
+-- 1111:  Not (Source's Entry Is 15882)
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1111, 16, 15882, 0, 0, 0, 1);
+
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (26347, 0, 180771, 1111, 0, 5086, 5875);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (26347, 0, 180868, 1111, 0, 5086, 5875);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES (26347, 0, 180850, 1111, 0, 5086, 5875);
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1590505, 1590507);
+
+-- Events list for Darnassus Reveler
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15905;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590501, 15905, 70, 22, 0, 100, 1, 34, 0, 0, 0, 1590501, 0, 0, 'Darnassus Reveler - Buff and Dance on received Dance emote (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590502, 15905, 113, 22, 0, 100, 1, 58, 0, 0, 0, 1590502, 0, 0, 'Darnassus Reveler - Emote Shy on received Kiss emote.');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590503, 15905, 69, 1, 6, 100, 1, 1000, 1000, 1000, 1000, 1590503, 0, 0, 'Darnassus Reveler - Cast Rocket Red OOC (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590504, 15905, 70, 1, 0, 100, 1, 0, 20000, 35000, 40000, 1590504, 0, 0, 'Darnassus Reveler - Emote Cheer OOC (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590506, 15905, 15905, 1, 0, 100, 1, 0, 20000, 60000, 180000, 1590506, 0, 0, 'Darnassus Reveler - Emote Talk (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590508, 15905, 69, 11, 0, 100, 1, 0, 0, 0, 0, 1590508, 0, 0, 'Darnassus Reveler - Set Gossip Menu Id (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590509, 15905, 0, 1, 1, 100, 1, 5000, 45000, 5000, 45000, 1590509, 0, 0, 'Darnassus Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590510, 15905, 0, 1, 3, 100, 1, 15000, 30000, 15000, 30000, 1590510, 0, 0, 'Darnassus Reveler - Emote ONESHOT_NONE (0) (Moonglade Only) - Copy');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590503;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590503, 0, 0, 39, 1590501, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Cast Spell Rocket, RED'),
+(1590503, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Change to Phase 1');
+
+DELETE FROM `generic_scripts` WHERE `id`=1590501;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590501, 1, 0, 15, 26347, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Cast Rocket, RED (Moonglade Only)'),
+(1590501, 4, 0, 1, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Emote: OneShotLaughNoSheathe (153)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590509;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590509, 0, 0, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Set Phase to 2 (Moonglade Only)'),
+(1590509, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590510;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590510, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
+(1590510, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassus Reveler - Reset Phase to 0 (Moonglade Only)');
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1571905, 1571907);
+
+-- Events list for Thunder Bluff Reveler
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15719;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571901, 15719, 70, 22, 0, 100, 1, 34, 0, 0, 0, 1571901, 0, 0, 'Thunder Bluff Reveler - Buff and Dance on received Dance emote (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571902, 15719, 113, 22, 0, 100, 1, 58, 0, 0, 0, 1571902, 0, 0, 'Thunder Bluff Reveler - Emote Shy on received Kiss emote.');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571903, 15719, 69, 1, 6, 100, 1, 1000, 1000, 1000, 1000, 1571903, 0, 0, 'Thunder Bluff Reveler - Cast Rocket Red OOC (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571904, 15719, 70, 1, 0, 100, 1, 0, 20000, 35000, 40000, 1571904, 0, 0, 'Thunder Bluff Reveler - Emote Cheer OOC (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571906, 15719, 15719, 1, 0, 100, 1, 0, 20000, 60000, 180000, 1571906, 0, 0, 'Thunder Bluff Reveler - Emote Talk (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571908, 15719, 69, 11, 0, 100, 1, 0, 0, 0, 0, 1571908, 0, 0, 'Thunder Bluff Reveler - Set Gossip Menu Id (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571909, 15719, 0, 1, 1, 100, 1, 5000, 45000, 5000, 45000, 1571909, 0, 0, 'Thunder Bluff Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1571910, 15719, 0, 1, 3, 100, 1, 15000, 30000, 15000, 30000, 1571910, 0, 0, 'Thunder Bluff Reveler - Emote ONESHOT_NONE (0) (Moonglade Only) - Copy');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1571903;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1571903, 0, 0, 39, 1571901, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Cast Spell Rocket, RED'),
+(1571903, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Change to Phase 1');
+
+DELETE FROM `generic_scripts` WHERE `id`=1571901;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1571901, 1, 0, 15, 26347, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Cast Rocket, RED (Moonglade Only)'),
+(1571901, 4, 0, 1, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Emote: OneShotLaughNoSheathe (153)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1571909;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1571909, 0, 0, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Set Phase to 2 (Moonglade Only)'),
+(1571909, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1571910;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1571910, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
+(1571910, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunder Bluff Reveler - Reset Phase to 0 (Moonglade Only)');
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1569405, 1569407);
+
+-- Events list for Stormwind Reveler
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15694;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569401, 15694, 70, 22, 0, 100, 1, 34, 0, 0, 0, 1569401, 0, 0, 'Stormwind Reveler - Buff and Dance on received Dance emote (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569402, 15694, 113, 22, 0, 100, 1, 58, 0, 0, 0, 1569402, 0, 0, 'Stormwind Reveler - Emote Shy on received Kiss emote.');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569403, 15694, 69, 1, 6, 100, 1, 1000, 1000, 1000, 1000, 1569403, 0, 0, 'Stormwind Reveler - Cast Rocket Red OOC (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569404, 15694, 70, 1, 0, 100, 1, 0, 20000, 35000, 40000, 1569404, 0, 0, 'Stormwind Reveler - Emote Cheer OOC (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569406, 15694, 15694, 1, 0, 100, 1, 0, 20000, 60000, 180000, 1569406, 0, 0, 'Stormwind Reveler - Emote Talk (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569408, 15694, 69, 11, 0, 100, 1, 0, 0, 0, 0, 1569408, 0, 0, 'Stormwind Reveler - Set Gossip Menu Id (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569409, 15694, 0, 1, 1, 100, 1, 5000, 45000, 5000, 45000, 1569409, 0, 0, 'Stormwind Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1569410, 15694, 0, 1, 3, 100, 1, 15000, 30000, 15000, 30000, 1569410, 0, 0, 'Stormwind Reveler - Emote ONESHOT_NONE (0) (Moonglade Only) - Copy');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1569403;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1569403, 0, 0, 39, 1569401, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Cast Spell Rocket, RED'),
+(1569403, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Change to Phase 1');
+
+DELETE FROM `generic_scripts` WHERE `id`=1569401;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1569401, 1, 0, 15, 26347, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Cast Rocket, RED (Moonglade Only)'),
+(1569401, 4, 0, 1, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Emote: OneShotLaughNoSheathe (153)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1569409;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1569409, 0, 0, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Set Phase to 2 (Moonglade Only)'),
+(1569409, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1569410;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1569410, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
+(1569410, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Reveler - Reset Phase to 0 (Moonglade Only)');
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1590605, 1590607);
+
+-- Events list for Ironforge Reveler
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15906;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590601, 15906, 70, 22, 0, 100, 1, 34, 0, 0, 0, 1590601, 0, 0, 'Ironforge Reveler - Buff and Dance on received Dance emote (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590602, 15906, 113, 22, 0, 100, 1, 58, 0, 0, 0, 1590602, 0, 0, 'Ironforge Reveler - Emote Shy on received Kiss emote.');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590603, 15906, 69, 1, 6, 100, 1, 1000, 1000, 1000, 1000, 1590603, 0, 0, 'Ironforge Reveler - Cast Rocket Red OOC (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590604, 15906, 70, 1, 0, 100, 1, 0, 20000, 35000, 40000, 1590604, 0, 0, 'Ironforge Reveler - Emote Cheer OOC (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590606, 15906, 15906, 1, 0, 100, 1, 0, 20000, 60000, 180000, 1590606, 0, 0, 'Ironforge Reveler - Emote Talk (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590608, 15906, 69, 11, 0, 100, 1, 0, 0, 0, 0, 1590608, 0, 0, 'Ironforge Reveler - Set Gossip Menu Id (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590609, 15906, 0, 1, 1, 100, 1, 5000, 45000, 5000, 45000, 1590609, 0, 0, 'Ironforge Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590610, 15906, 0, 1, 3, 100, 1, 15000, 30000, 15000, 30000, 1590610, 0, 0, 'Ironforge Reveler - Emote ONESHOT_NONE (0) (Moonglade Only) - Copy');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590603;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590603, 0, 0, 39, 1590601, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Cast Spell Rocket, RED'),
+(1590603, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Change to Phase 1');
+
+DELETE FROM `generic_scripts` WHERE `id`=1590601;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590601, 1, 0, 15, 26347, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Cast Rocket, RED (Moonglade Only)'),
+(1590601, 4, 0, 1, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Emote: OneShotLaughNoSheathe (153)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590609;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590609, 0, 0, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Set Phase to 2 (Moonglade Only)'),
+(1590609, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590610;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590610, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
+(1590610, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Reveler - Reset Phase to 0 (Moonglade Only)');
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1590705, 1590707);
+
+-- Events list for Undercity Reveler
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15907;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590701, 15907, 70, 22, 0, 100, 1, 34, 0, 0, 0, 1590701, 0, 0, 'Undercity Reveler - Buff and Dance on received Dance emote (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590702, 15907, 113, 22, 0, 100, 1, 58, 0, 0, 0, 1590702, 0, 0, 'Undercity Reveler - Emote Shy on received Kiss emote.');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590703, 15907, 69, 1, 6, 100, 1, 1000, 1000, 1000, 1000, 1590703, 0, 0, 'Undercity Reveler - Cast Rocket Red OOC (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590704, 15907, 70, 1, 0, 100, 1, 0, 20000, 35000, 40000, 1590704, 0, 0, 'Undercity Reveler - Emote Cheer OOC (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590706, 15907, 15907, 1, 0, 100, 1, 0, 20000, 60000, 180000, 1590706, 0, 0, 'Undercity Reveler - Emote Talk (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590708, 15907, 69, 11, 0, 100, 1, 0, 0, 0, 0, 1590708, 0, 0, 'Undercity Reveler - Set Gossip Menu Id (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590709, 15907, 0, 1, 1, 100, 1, 5000, 45000, 5000, 45000, 1590709, 0, 0, 'Undercity Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590710, 15907, 0, 1, 3, 100, 1, 15000, 30000, 15000, 30000, 1590710, 0, 0, 'Undercity Reveler - Emote ONESHOT_NONE (0) (Moonglade Only) - Copy');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590703;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590703, 0, 0, 39, 1590701, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Cast Spell Rocket, RED'),
+(1590703, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Change to Phase 1');
+
+DELETE FROM `generic_scripts` WHERE `id`=1590701;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590701, 1, 0, 15, 26347, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Cast Rocket, RED (Moonglade Only)'),
+(1590701, 4, 0, 1, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Emote: OneShotLaughNoSheathe (153)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590709;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590709, 0, 0, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Set Phase to 2 (Moonglade Only)'),
+(1590709, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590710;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590710, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
+(1590710, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Reveler - Reset Phase to 0 (Moonglade Only)');
+
+-- Removing unused script actions.
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (1590805, 1590807);
+
+-- Events list for Orgrimmar Reveler
+DELETE FROM `creature_ai_events` WHERE `creature_id`=15908;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590801, 15908, 70, 22, 0, 100, 1, 34, 0, 0, 0, 1590801, 0, 0, 'Orgrimmar Reveler - Buff and Dance on received Dance emote (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590802, 15908, 113, 22, 0, 100, 1, 58, 0, 0, 0, 1590802, 0, 0, 'Orgrimmar Reveler - Emote Shy on received Kiss emote.');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590803, 15908, 69, 1, 6, 100, 1, 1000, 1000, 1000, 1000, 1590803, 0, 0, 'Orgrimmar Reveler - Cast Rocket Red OOC (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590804, 15908, 70, 1, 0, 100, 1, 0, 20000, 35000, 40000, 1590804, 0, 0, 'Orgrimmar Reveler - Emote Cheer OOC (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590806, 15908, 15908, 1, 0, 100, 1, 0, 20000, 60000, 180000, 1590806, 0, 0, 'Orgrimmar Reveler - Emote Talk (Not in Moonglade)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590808, 15908, 69, 11, 0, 100, 1, 0, 0, 0, 0, 1590808, 0, 0, 'Orgrimmar Reveler - Set Gossip Menu Id (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590809, 15908, 0, 1, 1, 100, 1, 5000, 45000, 5000, 45000, 1590809, 0, 0, 'Orgrimmar Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1590810, 15908, 0, 1, 3, 100, 1, 15000, 30000, 15000, 30000, 1590810, 0, 0, 'Orgrimmar Reveler - Emote ONESHOT_NONE (0) (Moonglade Only) - Copy');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590803;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590803, 0, 0, 39, 1590801, 0, 0, 0, 0, 0, 0, 4, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Cast Spell Rocket, RED'),
+(1590803, 0, 0, 44, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Change to Phase 1');
+
+DELETE FROM `generic_scripts` WHERE `id`=1590801;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590801, 1, 0, 15, 26347, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Cast Rocket, RED (Moonglade Only)'),
+(1590801, 4, 0, 1, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Emote: OneShotLaughNoSheathe (153)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590809;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590809, 0, 0, 44, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Set Phase to 2 (Moonglade Only)'),
+(1590809, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Emote STATE_DANCE (10) (Moonglade Only)');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=1590810;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1590810, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Emote ONESHOT_NONE (0) (Moonglade Only)'),
+(1590810, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Reveler - Reset Phase to 0 (Moonglade Only)');
 
 
 -- End of migration.
