@@ -757,7 +757,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 Spell req target not to be in combat state
     SPELL_ATTR_EX_MELEE_COMBAT_START          = 0x00000200,            // 9 player starts melee combat after this spell is cast
     SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 no generates threat on cast 100%
-    SPELL_ATTR_EX_UNK11                       = 0x00000800,            // 11
+    SPELL_ATTR_EX_DONT_REFRESH_DURATION_ON_RECAST = 0x00000800,        // 11 TODO not implemented - Aura will not refresh its duration when recast
     SPELL_ATTR_EX_IS_PICKPOCKET               = 0x00001000,            // 12
     SPELL_ATTR_EX_FARSIGHT                    = 0x00002000,            // 13
     SPELL_ATTR_EX_CHANNEL_TRACK_TARGET        = 0x00004000,            // 14 Client automatically forces player to face target when channeling
@@ -772,7 +772,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_UNK23                       = 0x00800000,            // 23
     SPELL_ATTR_EX_IS_FISHING                  = 0x01000000,            // 24 only fishing spells
     SPELL_ATTR_EX_UNK25                       = 0x02000000,            // 25 not set in 2.4.2
-    SPELL_ATTR_EX_UNK26                       = 0x04000000,            // 26
+    SPELL_ATTR_EX_REQUIRE_ALL_TARGETS         = 0x04000000,            // 26 TODO not implemented
     SPELL_ATTR_EX_REFUND_POWER                = 0x08000000,            // 27 All these spells refund power on parry or deflect
     SPELL_ATTR_EX_DONT_DISPLAY_IN_AURA_BAR    = 0x10000000,            // 28 client doesn't display these spells in aura bar
     SPELL_ATTR_EX_CHANNEL_DISPLAY_SPELL_NAME  = 0x20000000,            // 29 spell name is displayed in cast bar instead of 'channeling' text
@@ -808,7 +808,7 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_IS_ARCANE_CONCENTRATION    = 0x00800000,            // 23 Only mage Arcane Concentration have this flag
     SPELL_ATTR_EX2_UNK24                      = 0x01000000,            // 24
     SPELL_ATTR_EX2_UNK25                      = 0x02000000,            // 25
-    SPELL_ATTR_EX2_UNK26                      = 0x04000000,            // 26 unaffected by school immunity
+    SPELL_ATTR_EX2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE = 0x04000000,      // 26 TODO not implemented - unaffected by school immunity
     SPELL_ATTR_EX2_UNK27                      = 0x08000000,            // 27
     SPELL_ATTR_EX2_NOT_AN_ACTION              = 0x10000000,            // 28 no breaks stealth if it fails??
     SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
@@ -847,7 +847,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_CAN_PROC_FROM_TRIGGERED_SPECIAL = 0x04000000,       // 26 Auras with this attribute can proc off SPELL_ATTR_EX3_TRIGGERED_CAN_TRIGGER_SPECIAL
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
-    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
+    SPELL_ATTR_EX3_IGNORE_CASTER_MODIFIERS    = 0x20000000,            // 29 TODO not implemented - Resistances should still affect damage
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_UNK31                      = 0x80000000             // 31
 };
@@ -855,7 +855,7 @@ enum SpellAttributesEx3
 enum SpellAttributesEx4
 {
     SPELL_ATTR_EX4_IGNORE_RESISTANCES         = 0x00000001,            // 0 From TC 3.3.5, but not present in 1.12 native DBCs. Add it with spell_mod to prevent a spell from being resisted.
-    SPELL_ATTR_EX4_UNK1                       = 0x00000002,            // 1 proc on finishing move?
+    SPELL_ATTR_EX4_PROC_ONLY_ON_CASTER        = 0x00000002,            // 1 TODO not implemented - Only proc on self-cast
     SPELL_ATTR_EX4_REAL_TIME_DURATION         = 0x00000004,            // 2 aura continues to expire while player is offline
     SPELL_ATTR_EX4_UNK3                       = 0x00000008,            // 3
     SPELL_ATTR_EX4_UNK4                       = 0x00000010,            // 4 This will no longer cause guards to attack on use??
@@ -878,7 +878,7 @@ enum SpellAttributesEx4
     SPELL_ATTR_EX4_UNK21                      = 0x00200000,            // 21
     SPELL_ATTR_EX4_UNK22                      = 0x00400000,            // 22
     SPELL_ATTR_EX4_UNK23                      = 0x00800000,            // 23
-    SPELL_ATTR_EX4_UNK24                      = 0x01000000,            // 24
+    SPELL_ATTR_EX4_AUTO_RANGED_COMBAT_SPELL   = 0x01000000,            // 24 TODO not implemented
     SPELL_ATTR_EX4_IS_PET_SCALING             = 0x02000000,            // 25 pet scaling auras
     SPELL_ATTR_EX4_CAST_ONLY_IN_OUTLAND       = 0x04000000,            // 26 Can only be used in Outland.
     SPELL_ATTR_EX4_UNK27                      = 0x08000000,            // 27
