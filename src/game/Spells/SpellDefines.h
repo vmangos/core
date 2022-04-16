@@ -757,7 +757,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        = 0x00000100,            // 8 Spell req target not to be in combat state
     SPELL_ATTR_EX_MELEE_COMBAT_START          = 0x00000200,            // 9 player starts melee combat after this spell is cast
     SPELL_ATTR_EX_NO_THREAT                   = 0x00000400,            // 10 no generates threat on cast 100%
-    SPELL_ATTR_EX_DONT_REFRESH_DURATION_ON_RECAST = 0x00000800,        // 11 TODO not implemented - Aura will not refresh its duration when recast
+    SPELL_ATTR_EX_DONT_REFRESH_DURATION_ON_RECAST = 0x00000800,        // 11 Aura will not refresh its duration when recast
     SPELL_ATTR_EX_IS_PICKPOCKET               = 0x00001000,            // 12
     SPELL_ATTR_EX_FARSIGHT                    = 0x00002000,            // 13
     SPELL_ATTR_EX_CHANNEL_TRACK_TARGET        = 0x00004000,            // 14 Client automatically forces player to face target when channeling
