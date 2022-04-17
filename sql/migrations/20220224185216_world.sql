@@ -3364,6 +3364,13 @@ REPLACE INTO `npc_trainer_greeting` (`entry`, `content_default`) VALUES
 (13417, 'Hello, shaman!  Ready for some training?'),
 (14740, 'I can teach you how to use a fishing pole to catch fish.');
 
+-- ----------------------------------------------------------------------
+
+-- Slagg Should Only Teach Barbecued Buzzard Wing
+DELETE FROM `npc_trainer` WHERE `entry` = 2818;
+INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
+(2818, 4095, 450, 185, 175, 25, 0, 5875);
+
 
 -- End of migration.
 END IF;
