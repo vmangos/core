@@ -341,6 +341,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // Fix bug after 1.11 where client doesn't send stand state update while casting.
         // Test case: Begin eating or drinking, then start casting Hearthstone and run.
         pMover->SetStandState(UNIT_STAND_STATE_STAND);
+        pMover->HandleEmoteState(0);
     }
 
     HandleMoverRelocation(pMover, movementInfo);
