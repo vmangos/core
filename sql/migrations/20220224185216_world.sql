@@ -2818,11 +2818,11 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` IN (5142, 5601);
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(580, 176247, 0, 1455, -3594.62, 86.9498, 2.63544, 0, 0, 0.968147, 0.250381, -20, -20, 100, 1, 0, 0, 0, 10);
+(5348, 176247, 0, 1455, -3594.62, 86.9498, 2.63544, 0, 0, 0.968147, 0.250381, -20, -20, 100, 1, 0, 0, 0, 10);
 
 DELETE FROM `quest_end_scripts` WHERE `id`=5149;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(5149, 0, 0, 9, 580, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Respawn Gameobject'),
+(5149, 0, 0, 9, 5348, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Respawn Gameobject'),
 (5149, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6416, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Say text 1'),
 (5149, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6417, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Say text 2'),
 (5149, 4, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Emote talk');
