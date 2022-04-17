@@ -2827,6 +2827,11 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (5149, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6417, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Say text 2'),
 (5149, 4, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pamela\'s Doll - Pamela Redpath: Emote talk');
 
+-- ----------------------------------------------------------------------
+
+-- Remove High Level Loot From Gruff Swiftbite
+DELETE FROM `creature_loot_template` WHERE `entry` = 100 AND `item` IN (30039, 30040);
+
 
 -- End of migration.
 END IF;
