@@ -3374,7 +3374,18 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 -- ----------------------------------------------------------------------
 
 -- The Text for Laird's Response is Missing Linebreaks (credit TrinityCore)
-UPDATE `page_text` SET `text` = 'Nessa,$B$BIt is good to hear from you.$B$BThe collection of bones and scales  you sent me was incredible.  Never have I seen fish of that size off the mainland.  the fishers of Rut'theran must pull in easily a ton of fish each day!$B$BI envy the size of their bounty, but I am a small bit troubled as well.  Could our new world tree make the fish grow to such a size?  If that is so, what other effects might it have?$B$BQuestions to ponder,$B-Laird' WHERE `entry` = 2513;
+UPDATE `page_text` SET `text` = 'Nessa,$B$BIt is good to hear from you.$B$BThe collection of bones and scales  you sent me was incredible.  Never have I seen fish of that size off the mainland.  the fishers of Rut\'theran must pull in easily a ton of fish each day!$B$BI envy the size of their bounty, but I am a small bit troubled as well.  Could our new world tree make the fish grow to such a size?  If that is so, what other effects might it have?$B$BQuestions to ponder,$B-Laird' WHERE `entry` = 2513;
+
+-- ----------------------------------------------------------------------
+
+-- Correct Sian'dur Gossip (Credit Trinity Core)
+UPDATE `creature_template` SET `gossip_menu_id` = 4013 WHERE `entry` = 3407;
+UPDATE `gossip_menu` SET `text_id` = 4870 WHERE `entry` = 4013 AND `text_id` = 5004;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(4013, 0, 3, 'I\'d like to train.', 7149, 5, 16, 0, 0, 0, 0, 0, '', 0, 0),
+(4013, 1, 0, 'I wish to unlearn my talents.', 8271, 1, 1, 4461, 0, 0, 0, 0, '', 0, 135),
+(4013, 2, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 414, 0, 0, NULL, 0, 462),
+(4013, 3, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, -1, 0, 415, 0, 0, NULL, 0, 461);
 
 
 -- End of migration.
