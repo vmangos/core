@@ -36,6 +36,9 @@ UPDATE `locales_quest` SET `RequestItemsText_loc3`='Aye, Landratte! Bringt mir 1
 
 -- Quest [Could I get a Fishing Flier?] requires fishing skill of 150
 UPDATE `quest_template` SET `RequiredSkillValue`=150 WHERE `entry` IN (8228, 8229);
+-- Quest [Could I get a Fishing Flier?] german locales
+UPDATE `locales_quest` SET `OfferRewardText_loc3`='Es wird diesen Sonntag einen Angelwettbewerb in Booty Bay geben! Hier sind die Regeln für den Wettbewerb, falls Ihr daran teilnehmen möchtet!' WHERE `entry`=8228;
+UPDATE `locales_quest` SET `OfferRewardText_loc3`='Es wird einen Angelwettbewerb in Booty Bay geben, diesen Sonntag! Hier sind die Regeln für Euch!' WHERE `entry`=8229;
 
 -- End of migration.
 END IF;
