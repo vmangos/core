@@ -3446,6 +3446,7 @@ echo "($105, $1, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Re
 
 -- ----------------------------------------------------------------------
 
+-- Update Some Emote Events
 -- Events list for Elly Langston
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (132828, 132829);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1328;
@@ -3481,6 +3482,17 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 (132808, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
 (132808, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1533, 1534, 1535, 1536, 0, 0, 0, 0, 0, 'Generic - Talk');
 
+-- Events list for Jenn Langston
+DELETE FROM `creature_ai_events` WHERE `creature_id`=3626;
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (362602, 362603, 362604, 362605, 362606, 362607, 362628, 362629);
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(362601, 3626, 0, 22, 0, 100, 0, 41, 0, 0, 0, 132801, 0, 0, 'Jenn Langston - Talk - Received Emote'),
+(362602, 3626, 0, 22, 0, 100, 0, 34, 0, 0, 0, 132802, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362603, 3626, 0, 22, 0, 100, 0, 84, 0, 0, 0, 132803, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362604, 3626, 0, 22, 0, 100, 0, 17, 0, 0, 0, 132804, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362605, 3626, 0, 22, 0, 100, 0, 58, 0, 0, 0, 132805, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362606, 3626, 0, 22, 0, 100, 0, 77, 0, 0, 0, 132806, 0, 0, 'Jenn Langston - Talk - Received Emote'),
+(362607, 3626, 0, 22, 0, 100, 0, 101, 0, 0, 0, 132807, 0, 0, 'Jenn Langston - Talk - Received Emote');
 
 
 -- End of migration.
