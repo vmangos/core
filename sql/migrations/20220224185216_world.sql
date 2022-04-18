@@ -3395,11 +3395,11 @@ UPDATE `broadcast_text` SET `emote_id1` = 11 WHERE `entry`=1401;
 -- Events list for Master Wood (needs cpp removing)
 UPDATE `creature_template` SET `ai_name` = 'EventAI', `script_name` = '' WHERE `entry` = 8383;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(838301, 8383, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Master Wood - Talk - Recieved Emote'),
-(838302, 8383, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Master Wood - Talk - Recieved Emote'),
-(838303, 8383, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, 'Master Wood - Emote - Recieved Emote'),
-(838304, 8383, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Master Wood - Emote - Recieved Emote'),
-(838305, 8383, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Master Wood - Emote - Recieved Emote');
+(838301, 8383, 3, 22, 0, 100, 1, 77, 0, 0, 0, 838301, 0, 0, 'Master Wood - Talk - Recieved Emote'),
+(838302, 8383, 3, 22, 0, 100, 1, 41, 0, 0, 0, 838302, 0, 0, 'Master Wood - Talk - Recieved Emote'),
+(838303, 8383, 3, 22, 0, 100, 1, 101, 0, 0, 0, 838303, 0, 0, 'Master Wood - Emote - Recieved Emote'),
+(838304, 8383, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, 'Master Wood - Emote - Recieved Emote'),
+(838305, 8383, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, 'Master Wood - Emote - Recieved Emote');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (838301, 0, 0, 39, 838301, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
 (838302, 0, 0, 39, 838302, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
@@ -3416,20 +3416,20 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 -- Events list for Mountaineer Pebblebitty
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3836;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(383601, 3836, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
-(383602, 3836, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
-(383603, 3836, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
-(383604, 3836, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
-(383605, 3836, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote');
+(383601, 3836, 3, 22, 0, 100, 1, 77, 0, 0, 0, 838301, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
+(383602, 3836, 3, 22, 0, 100, 1, 41, 0, 0, 0, 838302, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
+(383603, 3836, 3, 22, 0, 100, 1, 101, 0, 0, 0, 838303, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
+(383604, 3836, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
+(383605, 3836, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote');
 
 -- Events list for Master Mathias Shaw
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 332;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(33201, 332, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Master Mathias Shaw - Talk - Recieved Emote'),
-(33202, 332, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Master Mathias Shaw - Talk - Recieved Emote'),
-(33203, 332, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
-(33204, 332, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
-(33205, 332, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote');
+(33201, 332, 3, 22, 0, 100, 1, 77, 0, 0, 0, 838301, 0, 0, 'Master Mathias Shaw - Talk - Recieved Emote'),
+(33202, 332, 3, 22, 0, 100, 1, 41, 0, 0, 0, 838302, 0, 0, 'Master Mathias Shaw - Talk - Recieved Emote'),
+(33203, 332, 3, 22, 0, 100, 1, 101, 0, 0, 0, 838303, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
+(33204, 332, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
+(33205, 332, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote');
 
 -- Script to use if any more are found
 /*NAME=$(curl -Ls https://classic.wowhead.com/npc=$1 | grep '<title>' | sed -n 's:.*<title>\(.*\)</title>.*:\1:p' | cut -d - -f 1)
@@ -3438,11 +3438,11 @@ echo -- Events list for $NAME
 echo "UPDATE \`creature_template\` SET \`ai_name\` = 'EventAI' WHERE \`entry\` = $1;"
 
 echo "INSERT INTO \`creature_ai_events\` (\`id\`, \`creature_id\`, \`condition_id\`, \`event_type\`, \`event_inverse_phase_mask\`, \`event_chance\`, \`even$
-echo "($101, $1, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, '$NAME- Talk - Recieved Emote'),"
-echo "($102, $1, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, '$NAME- Talk - Recieved Emote'),"
-echo "($103, $1, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, '$NAME- Emote - Recieved Emote'),"
-echo "($104, $1, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, '$NAME- Emote - Recieved Emote'),"
-echo "($105, $1, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Recieved Emote');"*/
+echo "($101, $1, 3, 22, 0, 100, 1, 77, 0, 0, 0, 838301, 0, 0, '$NAME- Talk - Recieved Emote'),"
+echo "($102, $1, 3, 22, 0, 100, 1, 41, 0, 0, 0, 838302, 0, 0, '$NAME- Talk - Recieved Emote'),"
+echo "($103, $1, 3, 22, 0, 100, 1, 101, 0, 0, 0, 838303, 0, 0, '$NAME- Emote - Recieved Emote'),"
+echo "($104, $1, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, '$NAME- Emote - Recieved Emote'),"
+echo "($105, $1, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Recieved Emote');"*/
 
 -- ----------------------------------------------------------------------
 
@@ -3451,13 +3451,13 @@ echo "($105, $1, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Re
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (132828, 132829);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1328;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(132801, 1328, 0, 22, 0, 100, 0, 41, 0, 0, 0, 132801, 0, 0, 'Elly Langston - Talk - Received Emote'),
-(132802, 1328, 0, 22, 0, 100, 0, 34, 0, 0, 0, 132802, 0, 0, 'Elly Langston - Emote - Received Emote'),
-(132803, 1328, 0, 22, 0, 100, 0, 84, 0, 0, 0, 132803, 0, 0, 'Elly Langston - Emote - Received Emote'),
-(132804, 1328, 0, 22, 0, 100, 0, 17, 0, 0, 0, 132804, 0, 0, 'Elly Langston - Emote - Received Emote'),
-(132805, 1328, 0, 22, 0, 100, 0, 58, 0, 0, 0, 132805, 0, 0, 'Elly Langston - Emote - Received Emote'),
-(132806, 1328, 0, 22, 0, 100, 0, 77, 0, 0, 0, 132806, 0, 0, 'Elly Langston - Talk - Received Emote'),
-(132807, 1328, 0, 22, 0, 100, 0, 101, 0, 0, 0, 132807, 0, 0, 'Elly Langston - Talk - Received Emote');
+(132801, 1328, 3, 22, 0, 100, 1, 41, 0, 0, 0, 132801, 0, 0, 'Elly Langston - Talk - Received Emote'),
+(132802, 1328, 3, 22, 0, 100, 1, 34, 0, 0, 0, 132802, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132803, 1328, 3, 22, 0, 100, 1, 84, 0, 0, 0, 132803, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132804, 1328, 3, 22, 0, 100, 1, 17, 0, 0, 0, 132804, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132805, 1328, 3, 22, 0, 100, 1, 58, 0, 0, 0, 132805, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132806, 1328, 3, 22, 0, 100, 1, 77, 0, 0, 0, 132806, 0, 0, 'Elly Langston - Talk - Received Emote'),
+(132807, 1328, 3, 22, 0, 100, 1, 101, 0, 0, 0, 132807, 0, 0, 'Elly Langston - Talk - Received Emote');
 
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (132801, 132802, 132803, 132804, 132805, 132806, 132807, 132808);
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -3486,13 +3486,13 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3626;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (362602, 362603, 362604, 362605, 362606, 362607, 362628, 362629);
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(362601, 3626, 0, 22, 0, 100, 0, 41, 0, 0, 0, 132801, 0, 0, 'Jenn Langston - Talk - Received Emote'),
-(362602, 3626, 0, 22, 0, 100, 0, 34, 0, 0, 0, 132802, 0, 0, 'Jenn Langston - Emote - Received Emote'),
-(362603, 3626, 0, 22, 0, 100, 0, 84, 0, 0, 0, 132803, 0, 0, 'Jenn Langston - Emote - Received Emote'),
-(362604, 3626, 0, 22, 0, 100, 0, 17, 0, 0, 0, 132804, 0, 0, 'Jenn Langston - Emote - Received Emote'),
-(362605, 3626, 0, 22, 0, 100, 0, 58, 0, 0, 0, 132805, 0, 0, 'Jenn Langston - Emote - Received Emote'),
-(362606, 3626, 0, 22, 0, 100, 0, 77, 0, 0, 0, 132806, 0, 0, 'Jenn Langston - Talk - Received Emote'),
-(362607, 3626, 0, 22, 0, 100, 0, 101, 0, 0, 0, 132807, 0, 0, 'Jenn Langston - Talk - Received Emote');
+(362601, 3626, 3, 22, 0, 100, 1, 41, 0, 0, 0, 132801, 0, 0, 'Jenn Langston - Talk - Received Emote'),
+(362602, 3626, 3, 22, 0, 100, 1, 34, 0, 0, 0, 132802, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362603, 3626, 3, 22, 0, 100, 1, 84, 0, 0, 0, 132803, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362604, 3626, 3, 22, 0, 100, 1, 17, 0, 0, 0, 132804, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362605, 3626, 3, 22, 0, 100, 1, 58, 0, 0, 0, 132805, 0, 0, 'Jenn Langston - Emote - Received Emote'),
+(362606, 3626, 3, 22, 0, 100, 1, 77, 0, 0, 0, 132806, 0, 0, 'Jenn Langston - Talk - Received Emote'),
+(362607, 3626, 3, 22, 0, 100, 1, 101, 0, 0, 0, 132807, 0, 0, 'Jenn Langston - Talk - Received Emote');
 
 
 -- End of migration.
