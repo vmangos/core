@@ -3389,42 +3389,66 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 
 -- ----------------------------------------------------------------------
 
--- Events list for Mountaineer Pebblebitty (NOTE: after testing a few random npc's in stormwind, this ai seems to be shared by many npc's) (FURTHER NOTE: horde npc's also share this ai, even speaking the text in the wrong language)
+-- Update Some Emote Events (NOTE: after testing a few random npc's in stormwind, this ai seems to be shared by many npc's) (FURTHER NOTE: horde npc's also share this ai, even speaking the text in the wrong language)
 UPDATE `broadcast_text` SET `emote_id1` = 11 WHERE `entry`=1401;
-UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3836;
-
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(383601, 3836, 0, 22, 0, 100, 0, 77, 0, 0, 0, 383601, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
-(383602, 3836, 0, 22, 0, 100, 0, 41, 0, 0, 0, 383602, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
-(383603, 3836, 0, 22, 0, 100, 0, 101, 0, 0, 0, 383603, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
-(383604, 3836, 0, 22, 0, 100, 0, 17, 0, 0, 0, 383604, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
-(383605, 3836, 0, 22, 0, 100, 0, 78, 0, 0, 0, 383605, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote');
-
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(383601, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Talk'),
-(383602, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Talk'),
-(383603, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Emote'),
-(383604, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Emote'),
-(383605, 2, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Emote');
-
--- ----------------------------------------------------------------------
 
 -- Events list for Master Wood (needs cpp removing)
 UPDATE `creature_template` SET `ai_name` = 'EventAI', `script_name` = '' WHERE `entry` = 8383;
-
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(838301, 8383, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
-(838302, 8383, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
-(838303, 8383, 0, 22, 0, 100, 0, 101, 0, 0, 0,8383603, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
-(838304, 8383, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
-(838305, 8383, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote');
-
+(838301, 8383, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Master Wood - Talk - Recieved Emote'),
+(838302, 8383, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Master Wood - Talk - Recieved Emote'),
+(838303, 8383, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, 'Master Wood - Emote - Recieved Emote'),
+(838304, 8383, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Master Wood - Emote - Recieved Emote'),
+(838305, 8383, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Master Wood - Emote - Recieved Emote');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(838301, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Talk'),
-(838302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Talk'),
-(838303, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Emote'),
-(838304, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Emote'),
-(838305, 2, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mountaineer Pebblebitty - Emote');
+(838301, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(838302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(838303, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(838304, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(838305, 2, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote');
+
+-- Events list for Mountaineer Pebblebitty
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3836;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(383601, 3836, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
+(383602, 3836, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Mountaineer Pebblebitty - Talk - Recieved Emote'),
+(383603, 3836, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
+(383604, 3836, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote'),
+(383605, 3836, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Mountaineer Pebblebitty - Emote - Recieved Emote');
+
+-- Events list for Master Mathias Shaw
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 332;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(33201, 332, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, 'Master Mathias Shaw - Talk - Recieved Emote'),
+(33202, 332, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, 'Master Mathias Shaw - Talk - Recieved Emote'),
+(33203, 332, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
+(33204, 332, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
+(33205, 332, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote');
+
+
+
+
+
+
+
+-- Script to use if any more are found
+/*NAME=$(curl -Ls https://classic.wowhead.com/npc=$1 | grep '<title>' | sed -n 's:.*<title>\(.*\)</title>.*:\1:p' | cut -d - -f 1)
+
+echo -- Events list for $NAME
+echo "UPDATE \`creature_template\` SET \`ai_name\` = 'EventAI' WHERE \`entry\` = $1;"
+
+echo "INSERT INTO \`creature_ai_events\` (\`id\`, \`creature_id\`, \`condition_id\`, \`event_type\`, \`event_inverse_phase_mask\`, \`event_chance\`, \`even$
+echo "($101, $1, 0, 22, 0, 100, 0, 77, 0, 0, 0, 838301, 0, 0, '$NAME- Talk - Recieved Emote'),"
+echo "($102, $1, 0, 22, 0, 100, 0, 41, 0, 0, 0, 838302, 0, 0, '$NAME- Talk - Recieved Emote'),"
+echo "($103, $1, 0, 22, 0, 100, 0, 101, 0, 0, 0, 838303, 0, 0, '$NAME- Emote - Recieved Emote'),"
+echo "($104, $1, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, '$NAME- Emote - Recieved Emote'),"
+echo "($105, $1, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Recieved Emote');"*/
+
+
+
+-- ----------------------------------------------------------------------
+
+
 
 
 -- End of migration.
