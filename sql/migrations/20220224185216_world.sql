@@ -3389,7 +3389,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 
 -- ----------------------------------------------------------------------
 
--- Events list for Mountaineer Pebblebitty
+-- Events list for Mountaineer Pebblebitty (NOTE: after testing a few random npc's in stormwind, this ai seems to be shared by many npc's)
 UPDATE `broadcast_text` SET `emote_id1` = 11 WHERE `entry`=1401;
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3836;
 
