@@ -3451,7 +3451,7 @@ echo "($105, $1, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Re
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (132828, 132829);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1328;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(132801, 1328, 3, 22, 0, 100, 1, 41, 0, 0, 0, 132801, 0, 0, 'Elly Langston - Talk - Received Emote'),
+(132801, 1328, 3, 22, 0, 100, 1, 41, 0, 0, 0, 132801, 0, 0, 'Elly Langston - Emote - Received Emote'),
 (132802, 1328, 3, 22, 0, 100, 1, 34, 0, 0, 0, 132802, 0, 0, 'Elly Langston - Emote - Received Emote'),
 (132803, 1328, 3, 22, 0, 100, 1, 84, 0, 0, 0, 132803, 0, 0, 'Elly Langston - Emote - Received Emote'),
 (132804, 1328, 3, 22, 0, 100, 1, 17, 0, 0, 0, 132804, 0, 0, 'Elly Langston - Emote - Received Emote'),
@@ -3486,7 +3486,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3626;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (362602, 362603, 362604, 362605, 362606, 362607, 362628, 362629);
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(362601, 3626, 3, 22, 0, 100, 1, 41, 0, 0, 0, 132801, 0, 0, 'Jenn Langston - Talk - Received Emote'),
+(362601, 3626, 3, 22, 0, 100, 1, 41, 0, 0, 0, 132801, 0, 0, 'Jenn Langston - Emote - Received Emote'),
 (362602, 3626, 3, 22, 0, 100, 1, 34, 0, 0, 0, 132802, 0, 0, 'Jenn Langston - Emote - Received Emote'),
 (362603, 3626, 3, 22, 0, 100, 1, 84, 0, 0, 0, 132803, 0, 0, 'Jenn Langston - Emote - Received Emote'),
 (362604, 3626, 3, 22, 0, 100, 1, 17, 0, 0, 0, 132804, 0, 0, 'Jenn Langston - Emote - Received Emote'),
