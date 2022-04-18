@@ -3448,6 +3448,7 @@ echo "($105, $1, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Re
 
 -- Update Some Emote Events
 -- Events list for Elly Langston
+UPDATE `broadcast_text` SET `emote_id1` = 0 WHERE `entry` = 1521;
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (132828, 132829);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1328;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
@@ -3475,12 +3476,12 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 (132803, 2, 0, 1, 17, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
 (132804, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
 (132805, 2, 0, 1, 24, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132806, 0, 0, 1, 14, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132806, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1521, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(132806, 2, 0, 1, 14, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132806, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1521, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
 (132807, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132807, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1529, 1530, 1531, 1532, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(132807, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1529, 1530, 1531, 1532, 0, 0, 0, 0, 0, 'Generic - Talk'),
 (132808, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132808, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1533, 1534, 1535, 1536, 0, 0, 0, 0, 0, 'Generic - Talk');
+(132808, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1533, 1534, 1535, 1536, 0, 0, 0, 0, 0, 'Generic - Talk');
 
 -- Events list for Jenn Langston
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3626;
