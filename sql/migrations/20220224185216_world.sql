@@ -3446,6 +3446,40 @@ echo "($105, $1, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Re
 
 -- ----------------------------------------------------------------------
 
+-- Events list for Elly Langston
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (132828, 132829);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=1328;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(132801, 1328, 0, 22, 0, 100, 0, 41, 0, 0, 0, 132801, 0, 0, 'Elly Langston - Talk - Received Emote'),
+(132802, 1328, 0, 22, 0, 100, 0, 34, 0, 0, 0, 132802, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132803, 1328, 0, 22, 0, 100, 0, 84, 0, 0, 0, 132803, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132804, 1328, 0, 22, 0, 100, 0, 17, 0, 0, 0, 132804, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132805, 1328, 0, 22, 0, 100, 0, 58, 0, 0, 0, 132805, 0, 0, 'Elly Langston - Emote - Received Emote'),
+(132806, 1328, 0, 22, 0, 100, 0, 77, 0, 0, 0, 132806, 0, 0, 'Elly Langston - Talk - Received Emote'),
+(132807, 1328, 0, 22, 0, 100, 0, 101, 0, 0, 0, 132807, 0, 0, 'Elly Langston - Talk - Received Emote');
+
+DELETE FROM `creature_ai_scripts` WHERE `id` IN (132801, 132802, 132803, 132804, 132805, 132806, 132807, 132808);
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(132801, 0, 0, 39, 132801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
+(132802, 0, 0, 39, 132802, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
+(132803, 0, 0, 39, 132803, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
+(132804, 0, 0, 39, 132804, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
+(132805, 0, 0, 39, 132805, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
+(132806, 0, 0, 39, 132806, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
+(132807, 0, 0, 39, 132807, 132808, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script');
+
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(132801, 2, 0, 1, 11, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132802, 2, 0, 1, 94, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132803, 2, 0, 1, 17, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132804, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132805, 2, 0, 1, 24, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132806, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132806, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1521, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(132807, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132807, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1529, 1530, 1531, 1532, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(132808, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(132808, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1533, 1534, 1535, 1536, 0, 0, 0, 0, 0, 'Generic - Talk');
 
 
 
