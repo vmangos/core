@@ -3401,11 +3401,11 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (838304, 8383, 0, 22, 0, 100, 0, 17, 0, 0, 0, 838304, 0, 0, 'Master Wood - Emote - Recieved Emote'),
 (838305, 8383, 0, 22, 0, 100, 0, 78, 0, 0, 0, 838305, 0, 0, 'Master Wood - Emote - Recieved Emote');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(838301, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
-(838302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
-(838303, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(838304, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(838305, 2, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote');
+(838301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(838302, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
+(838303, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(838304, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
+(838305, 0, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote');
 
 -- Events list for Mountaineer Pebblebitty
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3836;
