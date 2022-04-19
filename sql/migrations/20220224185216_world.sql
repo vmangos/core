@@ -3431,19 +3431,6 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (33204, 332, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote'),
 (33205, 332, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, 'Master Mathias Shaw - Emote - Recieved Emote');
 
--- Script to use if any more are found
-/*NAME=$(curl -Ls https://classic.wowhead.com/npc=$1 | grep '<title>' | sed -n 's:.*<title>\(.*\)</title>.*:\1:p' | cut -d - -f 1)
-
-echo -- Events list for $NAME
-echo "UPDATE \`creature_template\` SET \`ai_name\` = 'EventAI' WHERE \`entry\` = $1;"
-
-echo "INSERT INTO \`creature_ai_events\` (\`id\`, \`creature_id\`, \`condition_id\`, \`event_type\`, \`event_inverse_phase_mask\`, \`event_chance\`, \`even$
-echo "($101, $1, 3, 22, 0, 100, 1, 77, 0, 0, 0, 838301, 0, 0, '$NAME- Talk - Recieved Emote'),"
-echo "($102, $1, 3, 22, 0, 100, 1, 41, 0, 0, 0, 838302, 0, 0, '$NAME- Talk - Recieved Emote'),"
-echo "($103, $1, 3, 22, 0, 100, 1, 101, 0, 0, 0, 838303, 0, 0, '$NAME- Emote - Recieved Emote'),"
-echo "($104, $1, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, '$NAME- Emote - Recieved Emote'),"
-echo "($105, $1, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, '$NAME- Emote - Recieved Emote');"*/
-
 -- ----------------------------------------------------------------------
 
 -- Update Some Emote Events
