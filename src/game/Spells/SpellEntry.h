@@ -440,6 +440,19 @@ namespace Spells
 
         return false;
     }
+
+    inline bool IsThreatEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_THREAT:
+            case SPELL_EFFECT_THREAT_ALL:
+            case SPELL_EFFECT_ATTACK_ME:
+                return true;
+        }
+
+        return false;
+    }
 }
 
 class SpellEntry
@@ -940,6 +953,16 @@ class SpellEntry
             for (uint32 i : Effect)
             {
                 if (Spells::IsEffectThatCanCrit(i))
+                    return true;
+            }
+            return false;
+        }
+
+        bool HasDirectThreatIncreaseEffect() const
+        {
+            for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (Spells::IsThreatEffect(Effect[i]) && EffectBasePoints[i] > 0)
                     return true;
             }
             return false;
