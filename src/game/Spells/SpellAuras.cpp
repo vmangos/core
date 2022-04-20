@@ -2603,8 +2603,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     HandleShapeshiftBoosts(apply);
     target->UpdateModelData();
 
-    if (target->GetTypeId() == TYPEID_PLAYER)
+    if (target->IsPlayer())
         ((Player*)target)->InitDataForForm();
+    else
+    {
+        target->UpdateSpeed(MOVE_WALK, false);
+        target->UpdateSpeed(MOVE_RUN, false);
+    }
 }
 
 void Aura::HandleAuraTransform(bool apply, bool Real)
@@ -2776,6 +2781,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 }
             }
         }
+    }
+
+    if (target->IsCreature())
+    {
+        target->UpdateSpeed(MOVE_WALK, false);
+        target->UpdateSpeed(MOVE_RUN, false);
     }
 }
 

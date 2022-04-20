@@ -176,6 +176,9 @@ typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 #define SPEED_REDUCTION_HP_10  0.6f
 #define SPEED_REDUCTION_HP_5   0.5f
 
+#define DEFAULT_NPC_WALK_SPEED_RATE 1.0f
+#define DEFAULT_NPC_RUN_SPEED_RATE 1.14286f
+
 // from `creature_template` table
 struct CreatureInfo
 {
@@ -336,6 +339,8 @@ struct CreatureDisplayInfoAddon
     uint32 display_id;
     float bounding_radius;
     float combat_reach;
+    float speed_walk;
+    float speed_run;
     uint8 gender;
     uint32 display_id_other_gender;                         // The oposite gender for this display id (male/female)
 };

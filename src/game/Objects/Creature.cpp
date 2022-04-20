@@ -1048,6 +1048,52 @@ float Creature::GetFleeingSpeed() const
     return GetSpeed(MOVE_RUN);
 }
 
+float Creature::GetBaseWalkSpeedRate() const
+{
+    if (GetMountID())
+    {
+        if (CreatureDisplayInfoAddon const* displayAddon = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(GetMountID()))
+            return displayAddon->speed_walk;
+    }
+
+    if (GetDisplayId() != GetNativeDisplayId())
+    {
+        if (CreatureDisplayInfoAddon const* displayAddon = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(GetDisplayId()))
+            return displayAddon->speed_walk;
+    }
+
+    if (GetCreatureInfo()->speed_walk)
+        return GetCreatureInfo()->speed_walk;
+
+    if (CreatureDisplayInfoAddon const* displayAddon = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(GetNativeDisplayId()))
+        return displayAddon->speed_walk;
+
+    return DEFAULT_NPC_WALK_SPEED_RATE;
+}
+
+float Creature::GetBaseRunSpeedRate() const
+{
+    if (GetMountID())
+    {
+        if (CreatureDisplayInfoAddon const* displayAddon = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(GetMountID()))
+            return displayAddon->speed_run;
+    }
+
+    if (GetDisplayId() != GetNativeDisplayId())
+    {
+        if (CreatureDisplayInfoAddon const* displayAddon = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(GetDisplayId()))
+            return displayAddon->speed_run;
+    }
+
+    if (GetCreatureInfo()->speed_run)
+        return GetCreatureInfo()->speed_run;
+
+    if (CreatureDisplayInfoAddon const* displayAddon = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(GetNativeDisplayId()))
+        return displayAddon->speed_run;
+
+    return DEFAULT_NPC_RUN_SPEED_RATE;
+}
+
 void Creature::MoveAwayFromTarget(Unit* pTarget, float distance)
 {
     if (HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
