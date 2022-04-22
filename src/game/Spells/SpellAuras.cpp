@@ -7411,14 +7411,15 @@ void SpellAuraHolder::SetAuraFlag(uint32 slot, bool add)
     {
         uint32 flags = AFLAG_NONE;
 
-        if (IsPositive())
-        {
-            if (!m_spellProto->HasAttribute(SPELL_ATTR_CANT_CANCEL))
-                flags |= AFLAG_CANCELABLE;
-            flags |= AFLAG_UNK3;
-        }
-        else
-            flags |= AFLAG_UNK4;
+        if (IsPositive() && !m_spellProto->HasAttribute(SPELL_ATTR_CANT_CANCEL))
+            flags |= AFLAG_CANCELABLE;
+
+        if (GetAuraByEffectIndex(EFFECT_INDEX_0))
+            flags |= AFLAG_EFF_INDEX_0;
+        if (GetAuraByEffectIndex(EFFECT_INDEX_1))
+            flags |= AFLAG_EFF_INDEX_1;
+        if (GetAuraByEffectIndex(EFFECT_INDEX_2))
+            flags |= AFLAG_EFF_INDEX_2;
 
         val |= (flags << byte);
     }
