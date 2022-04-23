@@ -3498,7 +3498,7 @@ UPDATE `creature_template` SET `dmg_min`=133, `dmg_max`=176, `attack_power`=234,
 UPDATE `creature_template` SET `school_immune_mask`= 4 WHERE `entry` IN (89,2091,2108,2447,2726,2760,4036,4037,4038,4676,5850,5852,7137,9016,9017,9026,9816,9878,9879,11502,11666,11667,11668,12056,12143,15438);
 UPDATE `creature_template` SET `school_immune_mask`= 8 WHERE `entry` IN (92,2258,2592,2735,2736,2752,2762,2791,4499,11321,11744,11777,11778,11783,11784,12201,12237,14435,14455,15352,17085,17154,17156,17157,17158,17159,17160);
 UPDATE `creature_template` SET `school_immune_mask`= 16 WHERE `entry` IN (510,691,2761,3917,5461,5462,7079,7132,7428,7429,9453,10198,10642,10756,10757,13280,17153,17155,17167,17358,19204,21428,21728,22009,22309,17207);
-UPDATE `creature_template` SET `school_immune_mask`= 32 WHERE `entry` IN (703,1043,1364,);
+UPDATE `creature_template` SET `school_immune_mask`= 32 WHERE `entry` IN (703,1043,1364);
 UPDATE `creature_template` SET `school_immune_mask`= 64 WHERE `entry` IN (10202,10662,10663,10664,11480,11483,16488,16530,16854);
 UPDATE `creature_template` SET `school_immune_mask`= 126 WHERE `entry` IN (12457,16491);
 UPDATE `creature_template` SET `school_immune_mask`= 116 WHERE `entry` IN (7734,7735);
