@@ -3482,6 +3482,18 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (362606, 3626, 3, 22, 0, 100, 1, 77, 0, 0, 0, 132806, 0, 0, 'Jenn Langston - Talk - Received Emote'),
 (362607, 3626, 3, 22, 0, 100, 1, 101, 0, 0, 0, 132807, 0, 0, 'Jenn Langston - Talk - Received Emote');
 
+-- ----------------------------------------------------------------------
+
+-- Update Some Creatures
+-- Update Creatures Movement Type
+UPDATE `creature` SET `wander_distance` = 5, `movement_type` = 1 WHERE `guid` = 38336;
+
+-- Update Winterfall Ursa (credit cmangos)
+UPDATE `creature_template` SET `dmg_min`=135, `dmg_max`=182, `attack_power`=242, `dmg_multiplier`=1.22, `base_attack_time`=2750, `ranged_attack_time`=2750, `ranged_dmg_min`=95, `ranged_dmg_max`=139, `ranged_attack_power`=25 WHERE  `entry`=7438 AND `patch`=0;
+
+-- Update High Chief Winterfall (credit cmangos)
+UPDATE `creature_template` SET `dmg_min`=133, `dmg_max`=176, `attack_power`=234, `ranged_attack_time`=2800, `ranged_dmg_min`=91, `ranged_dmg_max`=133, `ranged_attack_power`=23 WHERE  `entry`=10738 AND `patch`=0;
+
 
 -- End of migration.
 END IF;
