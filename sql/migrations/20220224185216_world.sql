@@ -3505,6 +3505,31 @@ UPDATE `creature_template` SET `school_immune_mask`= 116 WHERE `entry` IN (7734,
 UPDATE `creature_template` SET `school_immune_mask`= 124 WHERE `entry` IN (8317,10485);
 UPDATE `creature_template` SET `school_immune_mask`= 36 WHERE `entry` IN (16491);
 
+-- ----------------------------------------------------------------------
+
+-- Update Northwatch Hold Creatures (credit cmangos)
+UPDATE `creature` SET `position_x`=-2107.94, `position_y`=-3619.42, `position_z`=61.1805, `orientation`=0.0865079, `wander_distance`=2, `movement_type`=1 WHERE `guid`=13892;
+UPDATE `creature` SET `position_x`=-2203.74, `position_y`=-3736.61, `position_z`=92.8459, `orientation`=0.817897, `wander_distance`=2, `movement_type`=1 WHERE `guid`=13882;
+UPDATE `creature` SET `position_x`=-2174.67, `position_y`=-3621.19, `position_z`=91.9533, `orientation`=5.26205, `wander_distance`=2, `movement_type`=1 WHERE `guid`=13900;
+UPDATE `creature` SET `position_x`=-2150.03, `position_y`=-3586, `position_z`=91.7744, `orientation`=3.16465, `wander_distance`=2, `movement_type`=1 WHERE `guid`=13866;
+UPDATE `creature` SET `position_x`=-2092.82, `position_y`=-3639.43, `position_z`=61.7993, `orientation`=1.89214 WHERE `guid`=13897;
+UPDATE `creature` SET `position_x`=-2098.38, `position_y`=-3639.79, `position_z`=61.7993, `orientation`=0.739975, `wander_distance`=1, `movement_type`=1 WHERE `guid`=13945;
+
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `wander_distance`, `movement_type`) VALUES
+(14343, 3385, 1, -2106.7, -3660.36, 96.2727, 0.117951, 2, 1),
+(14342, 3385, 1, -2092.82, -3639.43, 61.7993, 1.89214, 1, 1),
+(14341, 3385, 1, -2092.82, -3639.43, 61.7993, 1.89214, 1, 1),
+(14340, 3386, 1, -2221.81, -3769.8, 130.862, 4.22589, 2, 1),
+(14339, 3385, 1, -2092.31, -3615.21, 61.856, 3.85196, 2, 1);
+
+UPDATE `creature` SET `wander_distance`=2, `movement_type`=1 WHERE `guid` IN (13930,13934,13885,13932,13874,13947,13887,13943,13891,13904,13944,13937,13899,13902,13866,13878,13896,13938,13907,13864,13884,13873,13869);
+UPDATE `creature` SET `wander_distance`=1, `movement_type`=1 WHERE `guid` IN (13889,13939,13948,13906,13876,13894,13935,13871,13870,13905,13942,13886,13903,13890,13946,13872,13936,13898,13901,13865,13893,13941);
+
+UPDATE `creature` SET spawntimesecsmin=300, spawntimesecsmax=300 WHERE `id` IN (3385,3386);
+
+-- ----------------------------------------------------------------------
+
+
 
 -- End of migration.
 END IF;
