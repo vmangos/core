@@ -3532,9 +3532,10 @@ UPDATE `creature` SET spawntimesecsmin=300, spawntimesecsmax=300 WHERE `id` IN (
 DELETE FROM `generic_scripts` WHERE `id`=1248101;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1248101, 0, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Justine Demalier - Emote'),
-(1248101, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7900, 0, 0, 0, 0, 0, 0, 0, 0, 'Justine Demalier - Talk'),
-(1248101, 8, 0, 0, 0, 0, 0, 0, 300993, 0, 9, 3, 7901, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Talk'),
+(1248101, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7900, 0, 0, 0, 0, 0, 0, 0, 0, 'Justine Demalier - Talk'),
+(1248101, 4, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Justine Demalier - Emote'),
 (1248101, 8, 0, 1, 5, 0, 0, 0, 300993, 0, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Emote'),
+(1248101, 8, 0, 0, 0, 0, 0, 0, 300993, 0, 9, 3, 7901, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Talk'),
 (1248101, 10, 0, 1, 1, 0, 0, 0, 300993, 0, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Emote'),
 (1248101, 13, 0, 1, 25, 0, 0, 0, 300993, 0, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Emote');
 
