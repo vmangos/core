@@ -3524,7 +3524,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 UPDATE `creature` SET `wander_distance`=2, `movement_type`=1 WHERE `guid` IN (13930,13934,13885,13932,13874,13947,13887,13943,13891,13904,13944,13937,13899,13902,13866,13878,13896,13938,13907,13864,13884,13873,13869);
 UPDATE `creature` SET `wander_distance`=1, `movement_type`=1 WHERE `guid` IN (13889,13939,13948,13906,13876,13894,13935,13871,13870,13905,13942,13886,13903,13890,13946,13872,13936,13898,13901,13865,13893,13941);
 
-UPDATE `creature` SET spawntimesecsmin=300, spawntimesecsmax=300 WHERE `id` IN (3385,3386);
+UPDATE `creature` SET `spawntimesecsmin`=300, `spawntimesecsmax`=300 WHERE `id` IN (3385,3386);
 
 -- ----------------------------------------------------------------------
 
