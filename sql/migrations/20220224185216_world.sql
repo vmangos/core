@@ -3539,6 +3539,22 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 (1248101, 10, 0, 1, 1, 0, 0, 0, 300993, 0, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Emote'),
 (1248101, 13, 0, 1, 25, 0, 0, 0, 300993, 0, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Melris Malagan - Emote');
 
+-- ----------------------------------------------------------------------
+
+-- Update Some Vendor Restock Timers
+UPDATE `npc_vendor` SET `incrtime` = 7200 WHERE `item` IN (765, 785, 929, 1711, 2289, 2447, 3355, 3356, 3357, 3358, 4234, 4304, 4424, 4357, 3918);
+
+-- ----------------------------------------------------------------------
+
+-- Update Marshal Gryan Stoutmantle and Captain Danuvin Scripts (credit cmangos)
+DELETE FROM `creature_ai_scripts` WHERE `id`=23401;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(23401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 39, 40, 0, 0, 0, 0, 0, 0, 0, 'Marshal Gryan Stoutmantle - Say Text');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=82101;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(82101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 44, 0, 0, 0, 0, 0, 0, 0, 'Captain Danuvin - Say Text');
+
 
 -- End of migration.
 END IF;
