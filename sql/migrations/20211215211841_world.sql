@@ -36,6 +36,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+21, 1673, 1, 9939.07, 312.243, 1318.16, 5.28835, 0, 0, -0.477158, 0.878817, 300, 300, 100, 1, 8, 10),
 (@GUID+22, 1673, 1, 10005.3, 539.605, 1315.9, 1.41372, 0, 0, 0.649447, 0.760406, 300, 300, 100, 1, 8, 10);
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 1673;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1613, 30, 'Teldrassil - Fel Cone', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (1673, 1613, 0, 'Teldrassil - Fel Cone', 0, 0, 10);
 
 -- Add Missing Timberling Sprout Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `patch_max`) VALUES
@@ -58,6 +60,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+39, 4608, 1, 9592.43, 756.992, 1259.55, 3.59538, 0, 0, -0.97437, 0.224951, 300, 300, 100, 1, 8, 10),
 (@GUID+40, 4608, 1, 9609.39, 930.985, 1268.38, 3.15906, 0, 0, -0.999962, 0.00873464, 300, 300, 100, 1, 8, 10);
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 4608;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1614, 30, 'Teldrassil - Timberling Sprout', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (4608, 1614, 0, 'Teldrassil - Timberling Sprout', 0, 0, 10);
 
 -- Add Missing Laden Mushroom Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -86,6 +90,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+63, 3640, 1, -1258.58, -3054.3, 88.2827, 4.24115, 0, 0, -0.85264, 0.522499, 10, 10, 100, 1, 10),
 (@GUID+64, 3640, 1, -1118.96, -2983.2, 92.764, 0.59341, 0, 0, 0.292371, 0.956305, 10, 10, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `spawn_flags` = 0 WHERE `id` = 3640;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1615, 10, 'The Barrens - Laden Mushroom', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (3640, 1615, 0, 'The Barrens - Laden Mushroom', 0, 0, 10);
 
 -- Add Missing Silithid Mound Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -123,6 +129,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+96, 3685, 1, -3111.51, -2283.34, 95.0335, 5.86431, 0, 0, -0.207912, 0.978148, 300, 300, 100, 1, 10),
 (@GUID+97, 3685, 1, -3085.05, -1943, 95.9858, 2.44346, 0, 0, 0.939692, 0.342021, 300, 300, 100, 1, 10);
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 3685;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1616, 10, 'The Barrens - Silithid Mound', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (3685, 1616, 0, 'The Barrens - Silithid Mound', 0, 0, 10);
 
 -- Add Missing Mudsnout Blossom Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -143,6 +151,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+112, 1723, 0, -879.271, -1003.03, 30.3479, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 100, 1, 10),
 (@GUID+113, 1723, 0, -874.061, -979.79, 30.3477, 0.890117, 0, 0, 0.430511, 0.902586, 300, 300, 100, 1, 10);
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 1723;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1617, 5, 'Hillsbrad Foothills - Mudsnout Blossom', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (1723, 1617, 0, 'Hillsbrad Foothills - Mudsnout Blossom', 0, 0, 10);
 
 -- Add Missing Incendia Agarve Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -161,6 +171,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+126, 175928, 1, -4977, -2026, -49, 3.142, 0, 0, 1, -0.000203653, 120, 120, 100, 1, 10),
 (@GUID+127, 175928, 1, -5100, -2066, -47, 3.142, 0, 0, 1, -0.000203653, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 30, `spawntimesecsmax` = 30 WHERE `id` = 175928;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1618, 9, 'Thousand Needles - Incendia Agarve', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (175928, 1618, 0, 'Thousand Needles - Incendia Agarve', 0, 0, 10);
 
 -- Add Missing Sack of Oats Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -212,10 +224,11 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+173, 2724, 0, -10193.5, 1916.24, 37.3986, 1.88495, 0, 0, 0.809016, 0.587786, 120, 120, 100, 1, 10),
 (@GUID+174, 2724, 0, -9718.86, 1039.67, 35.8731, 6.05629, 0, 0, -0.113203, 0.993572, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` = 2724;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1619, 40, 'Westfall - Sack of Oats', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (2724, 1619, 0, 'Westfall - Sack of Oats', 0, 0, 10);
 
 -- Add Missing Mathystra Relic Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
-(@GUID+175, 13360, 1, 7240.45, -887.029, 34.7443, 4.90438, 0, 0, -0.636078, 0.771625, 120, 120, 100, 1, 10),
 (@GUID+176, 13360, 1, 7438.97, -1085.67, 37.9898, 2.35619, 0, 0, 0.92388, 0.382683, 120, 120, 100, 1, 10),
 (@GUID+177, 12654, 1, 7650.69, -945.462, 26.58, 5.20108, 0, 0, -0.515037, 0.857168, 120, 120, 100, 1, 10),
 (@GUID+178, 12654, 1, 7685.36, -941.541, 25.9426, 4.64258, 0, 0, -0.731354, 0.681998, 120, 120, 100, 1, 10),
@@ -224,6 +237,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+181, 13872, 1, 7525.01, -1073.17, 36.7286, 5.96903, 0, 0, -0.156434, 0.987688, 120, 120, 100, 1, 10),
 (@GUID+182, 13872, 1, 7586.5, -920.016, 19.5537, 4.43314, 0, 0, -0.798635, 0.601815, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` IN (13360, 12654, 13872);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1636, 10, 'Stranglethorn Vale - Mathystra Relic', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (13360, 1636, 0, 'Darkshore - Mathystra Relic (Entry: 13360)', 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (12654, 1636, 0, 'Darkshore - Mathystra Relic (Entry: 12654)', 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (13872, 1636, 0, 'Darkshore - Mathystra Relic (Entry: 13872)', 0, 0, 10);
 
 -- Add Missing Plant Bundle Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -241,6 +258,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+190, 24798, 0, -9764.88, -4070.3, 1.08228, 0.401425, 0, 0, 0.199367, 0.979925, 120, 120, 100, 1, 10),
 (@GUID+191, 24798, 0, -9742.82, -4054.58, -1.19661, 4.18879, 0, 0, -0.866025, 0.500001, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 600, `spawn_flags` = 0 WHERE `id` = 24798;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1620, 20, 'Swamp of Sorrows - Sundried Driftwood', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (24798, 1620, 0, 'Swamp of Sorrows - Sundried Driftwood', 0, 0, 10);
 
 -- Add Missing Scattered Crate Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -255,6 +274,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+200, 28604, 0, -10088.6, -3470.51, 18.838, 2.67035, 0, 0, 0.972369, 0.233448, 120, 120, 100, 1, 10),
 (@GUID+201, 28604, 0, -10077.2, -2446.37, 26.8379, 2.11185, 0, 0, 0.870356, 0.492424, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 600, `spawntimesecsmax` = 600 WHERE `id` = 28604;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1621, 5, 'Swamp of Sorrows - Scattered Crate', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (28604, 1621, 0, 'Swamp of Sorrows - Scattered Crate', 0, 0, 10);
 
 -- Add Missing Crate of Elunite Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -276,6 +297,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+217, 86492, 1, 6468.53, 811.573, -36.8584, 3.4383, 0, 0, -0.989016, 0.147811, 120, 120, 100, 1, 10),
 (@GUID+218, 86492, 1, 6483.66, 824.695, -36.3243, 4.31097, 0, 0, -0.833885, 0.551938, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `spawn_flags` = 0, `animprogress` = 100 WHERE `id` = 86492;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1622, 7, 'Darkshore - Crate of Elunite', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (86492, 1622, 0, 'Darkshore - Crate of Elunite', 0, 0, 10);
 
 -- Add Missing Iron Coral Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -284,6 +307,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+221, 89634, 0, -4057.32, -795.446, -11.0738, 1.43117, 0, 0, 0.656058, 0.75471, 120, 120, 100, 1, 10),
 (@GUID+222, 89634, 0, -3997.55, -796.361, -15.4056, 5.89921, 0, 0, -0.190808, 0.981627, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180, `spawn_flags` = 0 WHERE `id` = 89634;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1623, 6, 'Wetlands - Iron Coral', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (89634, 1623, 0, 'Wetlands - Iron Coral', 0, 0, 10);
 
 -- Add Missing Sunscorched Shell Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -296,11 +321,15 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+229, 89635, 1, -4936.51, -960.148, -5.37081, 4.62512, 0, 0, -0.737277, 0.675591, 120, 120, 100, 1, 10),
 (@GUID+230, 89635, 1, -4970.95, -867.053, -5.87075, 0.994837, 0, 0, 0.477158, 0.878817, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 89635;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1624, 5, 'Thousand Needles - Sunscorched Shell', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (89635, 1624, 0, 'Thousand Needles - Sunscorched Shell', 0, 0, 10);
 
 -- Add Missing Hippogryph Egg Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (@GUID+231, 141931, 1, -5953.47, 1525.22, 143.954, 0.506145, 0, 0, 0.25038, 0.968148, 180, 180, 100, 1, 10),
 (@GUID+232, 141931, 1, -5921.69, 1500.45, 135.398, 4.13643, 0, 0, -0.878817, 0.47716, 180, 180, 100, 1, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1625, 3, 'Feralas - Hippogryph Egg', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (141931, 1625, 0, 'Feralas - Hippogryph Egg', 0, 0, 10);
 
 -- Add Missing Gordunni Scroll Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -328,6 +357,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+251, 148516, 1, 3798.55, -5304.15, 85.3893, 4.2237, 0, 0, -0.857167, 0.515038, 120, 120, 100, 1, 10),
 (@GUID+252, 148516, 1, 3870.53, -5224.82, 103.247, 2.05949, 0, 0, 0.857167, 0.515038, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 148516;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1626, 3, 'Azshara - Tablet of Beth\'Amara', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (148516, 1626, 0, 'Azshara - Tablet of Beth\'Amara', 0, 0, 10);
 
 -- Add Missing Tablet of Jinyael Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -347,6 +378,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+266, 148513, 1, 3610.32, -5095.59, 86.1216, 4.43314, 0, 0, -0.798635, 0.601815, 120, 120, 100, 1, 10),
 (@GUID+267, 148513, 1, 3666.07, -5078.38, 95.3026, 3.71755, 0, 0, -0.958819, 0.284016, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 148513;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1627, 3, 'Azshara - Tablet of Jinyael', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (148513, 1627, 0, 'Azshara - Tablet of Jinyael', 0, 0, 10);
 
 -- Add Missing Tablet of Markri Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -367,6 +400,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+282, 148514, 1, 3809.1, -5268.6, 93.8907, 1.90241, 0, 0, 0.814116, 0.580703, 120, 120, 100, 1, 10),
 (@GUID+283, 148514, 1, 3824.21, -5315.97, 86.1585, 5.044, 0, 0, -0.580703, 0.814116, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 148514;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1628, 3, 'Azshara - Tablet of Markri', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (148514, 1628, 0, 'Azshara - Tablet of Markri', 0, 0, 10);
 
 -- Add Missing Tablet of Saelhai Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -389,6 +424,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+300, 148515, 1, 3669.6, -5236.3, 84.7367, 3.47321, 0, 0, -0.986285, 0.16505, 120, 120, 100, 1, 10),
 (@GUID+301, 148515, 1, 3733.22, -5236.1, 84.6708, 2.47837, 0, 0, 0.945518, 0.325568, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` = 148515;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1629, 3, 'Azshara - Tablet of Saelhai', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (148515, 1629, 0, 'Azshara - Tablet of Saelhai', 0, 0, 10);
 
 -- Add Missing Hyacinth Mushroom Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -415,6 +452,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+322, 152094, 1, 10700.8, 894.121, 1323.48, 5.81195, 0, 0, -0.233445, 0.97237, 120, 120, 100, 1, 10),
 (@GUID+323, 152094, 1, 10393.3, 901.13, 1324.77, 2.42601, 0, 0, 0.936672, 0.350207, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300, `spawn_flags` = 0 WHERE `id` = 152094;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1630, 30, 'Teldrassil - Hyacinth Mushroom', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (152094, 1630, 0, 'Teldrassil - Hyacinth Mushroom', 0, 0, 10);
 
 -- Add Missing Azsharite Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -443,6 +482,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+346, 152631, 1, 2361.14, -5715.47, 107.984, 4.39823, 0, 0, -0.809016, 0.587786, 120, 120, 100, 1, 10),
 (@GUID+347, 152622, 1, 2340.54, -6138.33, 118.632, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 10);
 UPDATE `gameobject` SET `spawntimesecsmin` = 180, `spawntimesecsmax` = 180 WHERE `id` IN (152631, 152622, 152620);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1631, 10, 'Azshara - Azsharite (Entry: 152622)', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (152622, 1631, 0, 'Azshara - Azsharite (Entry: 152622)', 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1632, 4, 'Azshara - Azsharite (Entry: 152621)', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (152621, 1632, 0, 'Azshara - Azsharite (Entry: 152621)', 0, 0, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1633, 4, 'Azshara - Azsharite (Entry: 152620)', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (152620, 1633, 0, 'Azshara - Azsharite (Entry: 152620)', 0, 0, 10);
 
 -- Add Missing Blood of Heroes Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `patch_max`) VALUES
@@ -526,12 +571,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+425, 176213, 0, 2494.31, -5134.04, 75.2775, 3.9619, 0, 0, -0.91706, 0.39875, 7200, 7200, 100, 1, 12, 10),
 (@GUID+426, 176213, 0, 3112.6, -3688.04, 134.408, 3.194, 0, 0, -0.999657, 0.0262017, 7200, 7200, 100, 1, 12, 10),
 (@GUID+427, 176213, 0, 3131.49, -3521.91, 154.185, 5.21854, 0, 0, -0.507538, 0.861629, 7200, 7200, 100, 1, 12, 10);
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1634, 15, 'Plaguelands - Blood of Heroes', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (176213, 1634, 0, 'Plaguelands - Blood of Heroes', 0, 0, 10);
 
 -- Add Cmangos Data
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (@GUID+428, 176249, 329, 4070.43, -3660.61, 132.66, 3.38217, 0, 0, 0.927894, 0.372845, 180, 180, 100, 1, 10),
-(@GUID+429, 176249, 329, 3858.25, -3757.06, 145.091, -2.58309, 0, 0, 0.961262, -0.275637, 180, 180, 100, 1, 10),
-(@GUID+430, 175966, 329, 3457.5, -3111.17, 137.482, 2.023, 0, 0, 0.847629, 0.53059, 180, 180, 100, 1, 10),
 (@GUID+431, 175966, 329, 3585.85, -3061.59, 136.515, 5.31, 0, 0, 0.467617, -0.883931, 180, 180, 100, 1, 10),
 (@GUID+432, 2087, 0, -14680.9, 500.437, 2.18742, -2.35619, 0, 0, 0, 0, 120, 120, 100, 1, 10),
 (@GUID+433, 2653, 0, -986, -3874, 149.125, 5.489, 0, 0, 0.386739, -0.922189, 300, 300, 100, 1, 10),
@@ -545,7 +590,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+441, 2653, 0, -798, -3897, 144.968, 0.587, 0, 0, 0.289304, 0.957237, 300, 300, 100, 1, 10),
 (@GUID+442, 2653, 0, -931, -3953, 148.85, 3.308, 0, 0, 0.996541, -0.0831077, 300, 300, 100, 1, 10),
 (@GUID+443, 2653, 0, -911, -3946, 151.794, 5.935, 0, 0, 0.173215, -0.984884, 300, 300, 100, 1, 10),
-(@GUID+444, 2653, 0, -897, -3949, 138.035, 5.191, 0, 0, 0.519352, -0.85456, 300, 300, 100, 1, 10),
 (@GUID+445, 2653, 0, -819.6, -3912.4, 145.84, 0.56, 0, 0, 0.276356, 0.961055, 300, 300, 100, 1, 10),
 (@GUID+446, 2653, 0, -896, -4000, 144.195, 1.695, 0, 0, 0.749628, 0.661859, 300, 300, 100, 1, 10),
 (@GUID+447, 2653, 0, -858, -3999, 146.267, 5.997, 0, 0, 0.142605, -0.98978, 300, 300, 100, 1, 10),
@@ -553,14 +597,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+449, 2653, 0, -938, -3848, 148.087, 1.133, 0, 0, 0.536682, 0.843785, 300, 300, 100, 1, 10),
 (@GUID+450, 2653, 0, -836, -3929, 148.626, 0.973, 0, 0, 0.467535, 0.883975, 300, 300, 100, 1, 10),
 (@GUID+451, 2653, 0, -946.57, -3893, 154.072, 5.351, 0, 0, 0.449399, -0.893331, 300, 300, 100, 1, 10),
-(@GUID+452, 2653, 0, -883, -3885, 135.184, 5.9, 0, 0, 0.190423, -0.981702, 300, 300, 100, 1, 10),
 (@GUID+453, 2653, 0, -854, -3930, 148.799, 0.317, 0, 0, 0.157837, 0.987465, 300, 300, 100, 1, 10),
-(@GUID+454, 2653, 0, -852.465, -3889.12, 140.951, 2.4, 0, 0, 0.932039, 0.362358, 300, 300, 100, 1, 10),
 (@GUID+455, 2653, 0, -857.528, -3931.43, 149.044, -0.20944, 0, 0, -0.104529, 0.994522, 300, 300, 100, 1, 10),
-(@GUID+456, 2653, 0, -882.01, -3885.88, 135.174, 2.98451, 0, 0, 0.996917, 0.0784606, 300, 300, 100, 1, 10),
 (@GUID+457, 2653, 0, -842.014, -3939.07, 150.111, 1.309, 0, 0, 0.608763, 0.793352, 300, 300, 100, 1, 10),
 (@GUID+458, 2653, 0, -830.497, -3885.8, 147.603, 0.087266, 0, 0, 0.0436192, 0.999048, 300, 300, 100, 1, 10),
-(@GUID+459, 2653, 0, -947.561, -3927.05, 145.284, -2.23402, 0, 0, -0.898794, 0.438372, 300, 300, 100, 1, 10),
 (@GUID+460, 2653, 0, -793.146, -3898.25, 145.014, 0.10472, 0, 0, 0.0523361, 0.99863, 300, 300, 100, 1, 10),
 (@GUID+461, 2653, 0, -874.558, -3911.16, 134.068, -0.977384, 0, 0, -0.469471, 0.882948, 300, 300, 100, 1, 10),
 (@GUID+462, 2653, 0, -911.687, -3877.76, 141.116, 2.51327, 0, 0, 0.951056, 0.309019, 300, 300, 100, 1, 10),
@@ -619,8 +659,7 @@ INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `descripti
 (176143, 3014, 0, 'Eastern Plaguelands - Pamela\'s Doll\'s Right Side', 10);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
 (@GUID+481, 176143, 0, 1408.95, -3657.77, 82.0193, 5.74214, 0, 0, -0.267238, 0.963631, 2, 2, 100, 1, 10),
-(@GUID+482, 176143, 0, 1411.24, -3712.94, 78.1772, 1.62316, 0, 0, 0.725374, 0.688355, 2, 2, 100, 1, 10),
-(@GUID+483, 176143, 0, 1477.12, -3716.01, 80.5158, 2.46091, 0, 0, 0.942641, 0.333808, 2, 2, 100, 1, 10);
+(@GUID+482, 176143, 0, 1411.24, -3712.94, 78.1772, 1.62316, 0, 0, 0.725374, 0.688355, 2, 2, 100, 1, 10);
 
 -- Add Missing Supply Crate Spawns
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_max`) VALUES
@@ -748,16 +787,16 @@ UPDATE `gameobject` SET `animprogress` = 100 WHERE `id` IN (1610, 1667);
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
 (3662, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3661, 1, 'Wetlands - Incendicite Mineral Vein', 10),
-(3659, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3660, 1, 'Wetlands - Incendicite Mineral Vein', 10),
+(3659, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3658, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3657, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3656, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3655, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3654, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3653, 1, 'Wetlands - Incendicite Mineral Vein', 10),
-(3651, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3652, 1, 'Wetlands - Incendicite Mineral Vein', 10),
+(3651, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3650, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3649, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3648, 1, 'Wetlands - Incendicite Mineral Vein', 10),
@@ -766,8 +805,8 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) V
 (3644, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3634, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3633, 1, 'Wetlands - Incendicite Mineral Vein', 10),
-(3631, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3632, 1, 'Wetlands - Incendicite Mineral Vein', 10),
+(3631, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3630, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3629, 1, 'Wetlands - Incendicite Mineral Vein', 10),
 (3628, 1, 'Wetlands - Incendicite Mineral Vein', 10),
@@ -836,6 +875,39 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (21058, 3620, 20, 'Wetlands - Incendicite Mineral Vein', 10),
 (21059, 3620, 0, 'Wetlands - Incendicite Mineral Vein', 10);
 
+-- Pool of pools for Incendicite Mineral Vein.
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (3663, 5, 'Wetlands - Incendicite Mineral Vein (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(3620, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3625, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3626, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3627, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3628, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3629, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3630, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3631, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3632, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3633, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3634, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3644, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3646, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3647, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3648, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3649, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3650, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3651, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3652, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3653, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3654, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3655, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3656, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3657, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3658, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3659, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3660, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3661, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0),
+(3662, 3663, 0, 'Wetlands - Incendicite Mineral Vein', 0);
+
 -- Add Missing Syndicate Documents
 UPDATE `gameobject_template` SET `faction` = 84 WHERE `entry` = 1740;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -867,9 +939,25 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@GUID+518, 2560, 0, -13704.9, -327.592, -0.079004, 3.21142, 0, 0, -0.999391, 0.0349061, 300, 300, 100, 1, 10),
 (@GUID+519, 2560, 0, -14503.6, -316.241, 0.920787, 5.60251, 0, 0, -0.333807, 0.942641, 300, 300, 100, 1, 10);
 DELETE FROM `creature_loot_template` WHERE `item` = 4102;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES (1635, 15, 'Stranglethorn Vale - Half Buried Bottle', 0, 0, 0, 10);
+INSERT INTO `pool_gameobject_template` (`id`, `pool_entry`, `chance`, `description`, `flags`, `patch_min`, `patch_max`) VALUES (2560, 1635, 0, 'Stranglethorn Vale - Half Buried Bottle', 0, 0, 10);
 
 -- Remove Duplicate Mailbox
 DELETE FROM `gameobject` WHERE `guid` = 73246;
+
+-- Fix wrong guids being referenced in scripts.
+DELETE FROM `quest_end_scripts` WHERE `id`=651;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(651, 0, 0, 9, 30239, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stones of Binding : Stone of Inner Binding - Respawn Gameobject');
+DELETE FROM `gameobject_scripts` WHERE `id`=15216;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(15216, 0, 0, 9, 30236, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stones of Binding : Stone of East Binding - Respawn Gameobject');
+DELETE FROM `gameobject_scripts` WHERE `id`=15398;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(15398, 0, 0, 9, 30238, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stones of Binding : Stone of West Binding - Respawn Gameobject');
+DELETE FROM `gameobject_scripts` WHERE `id`=16598;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(16598, 0, 0, 9, 30237, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stones of Binding : Stone of Outer Binding - Respawn Gameobject');
 
 
 -- End of migration.
@@ -878,3 +966,4 @@ END??
 delimiter ; 
 CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;
+
