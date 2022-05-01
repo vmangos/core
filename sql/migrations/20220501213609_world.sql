@@ -9,8 +9,6 @@ INSERT INTO `migrations` VALUES ('20220501213609');
 -- Add your query below.
 
 
-
-
 -- TIN ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct position of Tin Vein in Hillsbrad Foothills (position is off by 1.02559 yards).
 UPDATE `gameobject` SET `position_x`=86.8319, `position_y`=-1064.58, `position_z`=58.904, `orientation`=5.65487, `rotation0`=0, `rotation1`=0, `rotation2`=-0.309016, `rotation3`=0.951057 WHERE `guid`=5671;
