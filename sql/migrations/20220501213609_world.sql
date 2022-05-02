@@ -4625,8 +4625,6 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 604800, `spawntimesecsmax` = 604800
 181356
 );
 
-UPDATE gameobject SET animprogress = 100;
-
 UPDATE gameobject SET spawntimesecsmin = 10, spawntimesecsmax = 10 WHERE spawntimesecsmin < 21 AND spawntimesecsmin > 0;
 
 -- Update Mining Gameobjects
