@@ -6021,10 +6021,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (20522, 1265, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Eastern Plaguelands 144 objects total
 (20523, 1265, 0, 'Plaguebloom', 0, 10); -- Plagueblooms in Eastern Plaguelands 144 objects total
 
--- Create new pool to hold Plaguebloom spawns in Felwood.
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(423, 1, 'Plagueblooms in Felwood', 0, 10);
-
 -- Missing Plaguebloom spawns in Felwood.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (20533, 176641, 1, 4204.94, -1031.77, 293.272, 4.81711, 0, 0, -0.66913, 0.743145, 1800, 1800, 1, 100, 0, 10),
@@ -6047,25 +6043,25 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (20552, 176641, 1, 5644.48, -674.997, 343.131, 4.11898, 0, 0, -0.882947, 0.469473, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 20533 at 1483.930054 yards.
 (20554, 176641, 1, 4886.47, -781, 296.668, 1.48353, 0, 0, 0.67559, 0.737278, 1800, 1800, 1, 100, 0, 10); -- Closest existing guid is 20533 at 726.209839 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(20534, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20535, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20536, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20537, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20538, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20540, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20542, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20543, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20544, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20545, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20546, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20547, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20548, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20549, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20550, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20551, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20552, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20554, 423, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
-(20533, 423, 0, 'Plaguebloom', 0, 10);
+(20534, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20535, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20536, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20537, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20538, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20540, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20542, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20543, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20544, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20545, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20546, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20547, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20548, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20549, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20550, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20551, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20552, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20554, 1227, 0, 'Plaguebloom', 0, 10), -- Plagueblooms in Felwood
+(20533, 1227, 0, 'Plaguebloom', 0, 10);
 
 -- Missing Plaguebloom spawns in Eastern Plaguelands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
