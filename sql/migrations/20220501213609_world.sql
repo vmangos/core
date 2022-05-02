@@ -1231,6 +1231,10 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (9853, 1033, 0, 'Copper Vein', 0, 10), -- Copper Veins in Barrens 147 objects total
 (9855, 1033, 0, 'Copper Vein', 0, 10); -- Copper Veins in Barrens 147 objects total
 
+-- Remove Undergroud Objects Not Present In Sniffs
+DELETE FROM `gameobject` WHERE `guid` IN (4788, 5027, 5149);
+DELETE FROM `pool_gameobject` WHERE `guid` IN (4788, 5027, 5149);
+
 -- DARK IRON ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Correct position of Dark Iron Deposit in Burning Steppes (position is off by 4.72449 yards).
 UPDATE `gameobject` SET `position_x`=-7616.39, `position_y`=-705.041, `position_z`=181.31, `orientation`=0.977383, `rotation0`=0, `rotation1`=0, `rotation2`=0.469471, `rotation3`=0.882948 WHERE `guid`=3998521;
