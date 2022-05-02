@@ -4595,6 +4595,30 @@ UPDATE gameobject SET animprogress = 100;
 
 UPDATE gameobject SET spawntimesecsmin = 10, spawntimesecsmax = 10 WHERE spawntimesecsmin < 21 AND spawntimesecsmin > 0;
 
+-- Update Mining Gameobjects
+UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` IN (1731, 1732, 165658, 2047, 324, 175404);
+
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 103713;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 3763;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 73941;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 123310;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 123309;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 165658;
+UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` = 175404;
+
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1733 AND `map` = 48;
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1731 AND `map` IN (43, 36);
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1732 AND `map` IN (43, 36);
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1735 AND `map` IN (409, 230, 47, 70);
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 181109 AND `map` = 30;
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1734 AND `map` IN (349, 47);
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2040 AND `map` IN (349, 70);
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176645 AND `map` = 30;
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2047 AND `map` = 349;
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 165658 AND `map` IN (409, 230);
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176643 AND `map` = 30;
+UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 175404 AND `map` IN (429, 30);
+
 -- Create new pool to hold Ooze Covered Gold Vein spawns in Durotar.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
 (409, 1, 'Ooze Covered Gold Veins in Durotar', 0, 10);
