@@ -4373,11 +4373,32 @@ DELETE FROM `gameobject` WHERE  `guid` IN (
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 123848;
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (
-15470,
-17754,
-17751,
-15462,
-50167
+15460,
+15461,
+15463,
+15464,
+15465,
+15466,
+15468,
+15469,
+15471,
+15472,
+15473,
+20542,
+20543,
+20544,
+20545,
+20546,
+20547,
+20548,
+20549,
+20550,
+20551,
+20552,
+20554,
+20555,
+15467,
+15459
 ) AND `pool_entry` = 37000;
 
 UPDATE `pool_template` SET `description`='Ooze Covered Rich Thorium Veins in Silithus' WHERE  `entry`=37000;
