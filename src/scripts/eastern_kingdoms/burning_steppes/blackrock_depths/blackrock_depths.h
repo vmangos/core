@@ -63,6 +63,7 @@ enum
     EVENT_BAR_PATRONS          = 100,
 
     FACTION_DARK_IRON          = 54,
+    FACTION_ARENA_NEUTRAL      = 15,
 
     NPC_EMPEROR                = 9019,
     NPC_PRINCESS               = 8929,
@@ -128,8 +129,12 @@ enum
 
     NPC_FIREGUARD_DESTROYER    = 8911,
     NPC_ANVILRAGE_OFFICER      = 8895,
+    NPC_ANVILRAGE_SOLDIER      = 8893,
+    NPC_ANVILRAGE_MEDIC        = 8894,
 
     NPC_SHADOWFORGE_SENATOR    = 8904,
+    NPC_SHADOWFORGE_PEASANT    = 8896,
+    NPC_SHADOWFORGE_CITIZEN    = 8902,
     NPC_GRIMSTONE              = 10096,
     NPC_THELDREN               = 16059,
 
@@ -182,5 +187,16 @@ static float const aBarPatrolPositions[2][4] = {
 };
 
 static uint32 const aBarPatrolId[3] = {NPC_FIREGUARD_DESTROYER, NPC_ANVILRAGE_OFFICER, NPC_ANVILRAGE_OFFICER};
+
+struct ArenaCylinder
+{
+    float m_fCenterX;
+    float m_fCenterY;
+    float m_fCenterZ;
+    uint32 m_uiRadius;
+    uint32 m_uiHeight;
+};
+
+static const ArenaCylinder aArenaCrowdVolume = { 595.78f, -188.65f, -38.63f, 69, 10 };
 
 #endif
