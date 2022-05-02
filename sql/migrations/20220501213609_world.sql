@@ -4343,6 +4343,7 @@ UPDATE `pool_template` SET `description`='Truesilver Deposits in Swamp of Sorrow
 -- MISC ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 DELETE FROM `gameobject` WHERE  `guid` IN (
+15467,
 15460,
 15461,
 15463,
@@ -4354,7 +4355,12 @@ DELETE FROM `gameobject` WHERE  `guid` IN (
 15471,
 15472,
 15473,
-20542,
+15459,
+15470,
+17754,
+17751,
+50167,
+15462,
 20543,
 20544,
 20545,
@@ -4366,13 +4372,12 @@ DELETE FROM `gameobject` WHERE  `guid` IN (
 20551,
 20552,
 20554,
-20555,
-15467,
-15459);
+20555);
 
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 123848;
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (
+15467,
 15460,
 15461,
 15463,
@@ -4384,7 +4389,12 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (
 15471,
 15472,
 15473,
-20542,
+15459,
+15470,
+17754,
+17751,
+50167,
+15462,
 20543,
 20544,
 20545,
@@ -4396,10 +4406,7 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (
 20551,
 20552,
 20554,
-20555,
-15467,
-15459
-) AND `pool_entry` = 37000;
+20555) AND `pool_entry` = 37000;
 
 UPDATE `pool_template` SET `description`='Ooze Covered Rich Thorium Veins in Silithus' WHERE  `entry`=37000;
 
