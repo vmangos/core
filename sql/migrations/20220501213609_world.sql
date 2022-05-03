@@ -4676,7 +4676,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (17751, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
 (15459, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
 (15467, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
-(50167, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
 (17754, 412, 0, 'Ooze Covered Thorium Vein', 0, 10);
 
 -- Create new pool to hold Ooze Covered Truesilver Deposit spawns in Feralas.
