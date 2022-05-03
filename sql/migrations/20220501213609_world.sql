@@ -4926,7 +4926,7 @@ UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=332;
 UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=398;
 UPDATE `pool_template` SET `max_limit`=7 WHERE  `entry`=322;
 UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=325;
-UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=324
+UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=324;
 UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=323;
 UPDATE `pool_template` SET `max_limit`=16 WHERE  `entry`=298;
 UPDATE `pool_template` SET `max_limit`=10 WHERE  `entry`=279;
