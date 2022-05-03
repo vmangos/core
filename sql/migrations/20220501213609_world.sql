@@ -4341,9 +4341,7 @@ UPDATE `pool_template` SET `description`='Truesilver Deposits in Stranglethorn 1
 UPDATE `pool_template` SET `description`='Truesilver Deposits in Swamp of Sorrows' WHERE  `entry`=1316;
 
 -- MISC ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Misc
 DELETE FROM `gameobject` WHERE  `guid` IN (
-15467,
 15460,
 15461,
 15463,
@@ -4355,12 +4353,7 @@ DELETE FROM `gameobject` WHERE  `guid` IN (
 15471,
 15472,
 15473,
-15459,
-15470,
-17754,
-17751,
-50167,
-15462,
+20542,
 20543,
 20544,
 20545,
@@ -4372,13 +4365,9 @@ DELETE FROM `gameobject` WHERE  `guid` IN (
 20551,
 20552,
 20554,
-20555,
-20542);
+20555);
 
-UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` = 123848;
-
-DELETE FROM `pool_gameobject` WHERE `guid` IN (
-15467,
+DELETE FROM `pool_gameobject` WHERE  `guid` IN (
 15460,
 15461,
 15463,
@@ -4390,12 +4379,7 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (
 15471,
 15472,
 15473,
-15459,
-15470,
-17754,
-17751,
-50167,
-15462,
+20542,
 20543,
 20544,
 20545,
@@ -4407,8 +4391,17 @@ DELETE FROM `pool_gameobject` WHERE `guid` IN (
 20551,
 20552,
 20554,
-20555,
-20542) AND `pool_entry` = 37000;
+20555);
+
+DELETE FROM `pool_gameobject` WHERE  `guid` IN (
+15467,
+15459,
+15470,
+17754,
+17751,
+50167,
+16680,
+15462);
 
 UPDATE `pool_template` SET `description`='Ooze Covered Rich Thorium Veins in Silithus' WHERE  `entry`=37000;
 
@@ -4681,6 +4674,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (15470, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
 (16680, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
 (17751, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
+(15459, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
+(15467, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
+(50167, 412, 0, 'Ooze Covered Thorium Vein', 0, 10),
 (17754, 412, 0, 'Ooze Covered Thorium Vein', 0, 10);
 
 -- Create new pool to hold Ooze Covered Truesilver Deposit spawns in Feralas.
