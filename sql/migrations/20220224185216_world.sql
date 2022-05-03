@@ -2439,39 +2439,6 @@ UPDATE `gameobject` SET `spawn_flags` = 1 WHERE `guid`=363231;
 
 -- ----------------------------------------------------------------------
 
--- Update Herbalism Gameobjects
-UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` IN (1618, 1617, 1619, 1620, 1621, 1622, 1623, 1624, 2041, 2866, 142140, 142141, 142142, 142143, 142144, 142145, 176583, 176584, 176586, 176587, 176588, 176589);
-
-UPDATE `gameobject` SET `spawntimesecsmin`= 2700, `spawntimesecsmax` = 4500 WHERE `id` = 176589;
-UPDATE `gameobject` SET `spawntimesecsmin`= 300, `spawntimesecsmax` = 300 WHERE `id` IN (142145, 142144, 176588, 176642);
-
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1619 AND `map` = 43;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1621 AND `map` = 47;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2045 AND `map` IN (48, 349);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1622 AND `map` IN (48, 43);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1628 AND `map` IN (189, 129);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 1624 AND `map` IN (189, 43);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2041 AND `map` IN (189, 43);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2042 AND `map` IN (189, 47);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2046 AND `map` IN (189, 129);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 2044 AND `map` = 30;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 180165 AND `map` = 309;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 142141 AND `map` = 129;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 180164 AND `map` = 309;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 142143 AND `map` = 349;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 142144 AND `map` IN (429, 349);
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 142145 AND `map` = 429;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 180167 AND `map` = 309;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176638 AND `map` = 30;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176584 AND `map` = 429;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 180168 AND `map` = 309;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176639 AND `map` = 30;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 180166 AND `map` = 309;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176640 AND `map` = 30;
-UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176588 AND `map` = 30;
-
--- ----------------------------------------------------------------------
-
 -- Add Spell Target To Healing Circle Used By Blackwing Taskmaster
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
 (22458, 1, 12468, 0, 0, 0, 5875),
