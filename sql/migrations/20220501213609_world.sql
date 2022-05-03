@@ -4846,7 +4846,6 @@ UPDATE `pool_template` SET `description`='Iron Deposits in Badlands' WHERE  `ent
 UPDATE `pool_template` SET `description`='Iron Deposits in Desolace' WHERE  `entry`=1141;
 UPDATE `pool_template` SET `description`='Iron Deposits in Thousand Needles' WHERE  `entry`=1132;
 
-
 UPDATE `pool_template` SET `max_limit`='2' WHERE  `entry`=412;
 UPDATE `pool_template` SET `max_limit`='2' WHERE  `entry`=397;
 UPDATE `pool_template` SET `max_limit`='4' WHERE  `entry`=335;
@@ -5011,7 +5010,11 @@ UPDATE `pool_gameobject` SET `description`='Ooze Covered Rich Thorium Vein' WHER
 DELETE FROM `pool_template` WHERE  `entry`=3663;
 UPDATE `pool_gameobject` SET `pool_entry` = 1274 WHERE `guid` IN (397176, 397177, 397178, 397179);
 DELETE FROM `pool_template` WHERE  `entry`=1319;
-DELETE FROM `mangos`.`pool_template` WHERE  `entry`=1245;
+DELETE FROM `pool_template` WHERE  `entry`=1245;
+
+-- LOOK AT ALL THE CUSTOM ORE OBJECTS
+-- SELECT * FROM gameobject WHERE id IN (SELECT entry FROM gameobject_template WHERE NAME LIKE "%Vein%") AND rotation2 = 0
+
 
 -- End of migration.
 END IF;
