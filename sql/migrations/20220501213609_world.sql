@@ -5012,9 +5012,27 @@ UPDATE `pool_gameobject` SET `pool_entry` = 1274 WHERE `guid` IN (397176, 397177
 DELETE FROM `pool_template` WHERE  `entry`=1319;
 DELETE FROM `pool_template` WHERE  `entry`=1245;
 
--- LOOK AT ALL THE CUSTOM ORE OBJECTS
--- SELECT * FROM gameobject WHERE id IN (SELECT entry FROM gameobject_template WHERE NAME LIKE "%Vein%") AND rotation2 = 0
--- SELECT * FROM gameobject WHERE id IN (SELECT entry FROM gameobject_template WHERE NAME LIKE "%Deposit%") AND rotation2 = 0
+/*
+LOOK AT ALL THE CUSTOM ORE OBJECTS
+SELECT * FROM gameobject WHERE id IN (SELECT entry FROM gameobject_template WHERE NAME LIKE "%Vein%") AND rotation2 = 0
+SELECT * FROM gameobject WHERE id IN (SELECT entry FROM gameobject_template WHERE NAME LIKE "%Deposit%") AND rotation2 = 0
+*/
+
+/*
+NOTE: CMANGOS HAS LOTS MORE ORES HERE (COMMITED DIRECTLY TO CLASSIC SO NOT BACK-PORTED)
+https://github.com/cmangos/classic-db/commit/376196d1511ccac1c0577a3ca7d1b9754816e94c
+https://github.com/cmangos/classic-db/commit/11457c85f740f4c66d42774acda48367332ede00
+https://github.com/cmangos/classic-db/commit/913aaea4a8319c1993574262573bef3bab8a93ea
+https://github.com/cmangos/classic-db/commit/f0db9c779464c135a2e78f9cf6fafdf9a22223c4
+https://github.com/cmangos/classic-db/commit/3ca651deddea4de75a3a4521b3d4fe32ce9f1cac
+https://github.com/cmangos/classic-db/commit/1800127db2e11c73d47a2ee001ea1424d3e1dc54
+https://github.com/cmangos/classic-db/commit/50546173410e40ba86c2dc567852c8aba9c4a1a3
+https://github.com/cmangos/classic-db/commit/a62b11f6ed77142daf9bbc3dc43f8f81aefc87cf
+https://github.com/cmangos/classic-db/commit/f2ba1bb5714fb2daa1e1d4f6e2796ab172e276d2
+https://github.com/cmangos/classic-db/commit/4cb145a368edc973a74fa5a5d77b7075720acd04
+https://github.com/cmangos/classic-db/commit/76aac8083054451a9b8c56964868d0022d9f861d
+*/
+
 
 -- End of migration.
 END IF;
