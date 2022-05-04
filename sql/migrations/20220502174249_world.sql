@@ -1367,39 +1367,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (999372, 1036, 0, 'Bruiseweed', 0, 10), -- Bruiseweeds in The Barrens
 (999373, 1036, 0, 'Bruiseweed', 0, 10); -- Bruiseweeds in The Barrens
 
--- Create new pool to hold Doom Weed spawns in Tirisfal Glades.
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(415, 40, 'Doom Weeds in Tirisfal Glades', 0, 10);
--- Add existing spawns to pool.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(45031, 409, 0, 'Doom Weed', 0, 10),
-(45032, 409, 0, 'Doom Weed', 0, 10),
-(45070, 409, 0, 'Doom Weed', 0, 10),
-(45071, 409, 0, 'Doom Weed', 0, 10),
-(45072, 409, 0, 'Doom Weed', 0, 10),
-(45112, 409, 0, 'Doom Weed', 0, 10),
-(45169, 409, 0, 'Doom Weed', 0, 10),
-(45178, 409, 0, 'Doom Weed', 0, 10),
-(45179, 409, 0, 'Doom Weed', 0, 10),
-(45181, 409, 0, 'Doom Weed', 0, 10),
-(45182, 409, 0, 'Doom Weed', 0, 10),
-(45183, 409, 0, 'Doom Weed', 0, 10),
-(45184, 409, 0, 'Doom Weed', 0, 10),
-(45185, 409, 0, 'Doom Weed', 0, 10),
-(45186, 409, 0, 'Doom Weed', 0, 10),
-(45187, 409, 0, 'Doom Weed', 0, 10),
-(45188, 409, 0, 'Doom Weed', 0, 10),
-(45210, 409, 0, 'Doom Weed', 0, 10),
-(45211, 409, 0, 'Doom Weed', 0, 10),
-(45212, 409, 0, 'Doom Weed', 0, 10),
-(45214, 409, 0, 'Doom Weed', 0, 10),
-(45215, 409, 0, 'Doom Weed', 0, 10),
-(45216, 409, 0, 'Doom Weed', 0, 10),
-(45217, 409, 0, 'Doom Weed', 0, 10),
-(45218, 409, 0, 'Doom Weed', 0, 10),
-(45286, 409, 0, 'Doom Weed', 0, 10),
-(45291, 409, 0, 'Doom Weed', 0, 10);
-
 -- Missing Doom Weed spawns in Tirisfal Glades.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (45224, 176753, 0, 2574.08, 398.103, 33.1812, 3.12412, 0, 0, 0.999962, 0.00873464, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 45211 at 22.711180 yards.
@@ -1412,17 +1379,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (45737, 176753, 0, 2549.78, 523.822, 15.3514, 3.7001, 0, 0, -0.961261, 0.27564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 45291 at 12.030589 yards.
 (45752, 176753, 0, 2566.46, 539.654, 15.6006, 5.68977, 0, 0, -0.292372, 0.956305, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 45291 at 16.780058 yards.
 (45783, 176753, 0, 2661.83, 553.988, 15.7135, 4.85202, 0, 0, -0.656058, 0.75471, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 45188 at 6.289917 yards.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(45224, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45282, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45285, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45292, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45196, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45476, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45631, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45737, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45752, 409, 0, 'Doom Weed', 0, 10), -- Doom Weeds in Tirisfal Glades
-(45783, 409, 0, 'Doom Weed', 0, 10); -- Doom Weeds in Tirisfal Glades
 
 -- Correct position of Dreamfoil in Un'Goro Crater (position is off by 1.17064 yards).
 UPDATE `gameobject` SET `position_x`=-6751.08, `position_y`=-2048.45, `position_z`=-271.963, `orientation`=4.64258, `rotation0`=0, `rotation1`=0, `rotation2`=-0.731354, `rotation3`=0.681998 WHERE `guid`=19269;
@@ -2409,87 +2365,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (17457, 1208, 0, 'Firebloom', 0, 10), -- Fireblooms in Tanaris 62 objects total
 (17499, 1208, 0, 'Firebloom', 0, 10); -- Fireblooms in Tanaris 62 objects total
 
--- Create new pool to hold Gloom Weed spawns in Tirisfal Glades.
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(417, 40, 'Gloom Weeds in Tirisfal Glades', 0, 10);
--- Add existing spawns to pool.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(25508, 417, 0, 'Gloom Weed', 0, 10),
-(25513, 417, 0, 'Gloom Weed', 0, 10),
-(25518, 417, 0, 'Gloom Weed', 0, 10),
-(25531, 417, 0, 'Gloom Weed', 0, 10),
-(25549, 417, 0, 'Gloom Weed', 0, 10),
-(25550, 417, 0, 'Gloom Weed', 0, 10),
-(25552, 417, 0, 'Gloom Weed', 0, 10),
-(25556, 417, 0, 'Gloom Weed', 0, 10),
-(25558, 417, 0, 'Gloom Weed', 0, 10),
-(25560, 417, 0, 'Gloom Weed', 0, 10),
-(25562, 417, 0, 'Gloom Weed', 0, 10),
-(25565, 417, 0, 'Gloom Weed', 0, 10),
-(25569, 417, 0, 'Gloom Weed', 0, 10),
-(45063, 417, 0, 'Gloom Weed', 0, 10),
-(45064, 417, 0, 'Gloom Weed', 0, 10),
-(45111, 417, 0, 'Gloom Weed', 0, 10),
-(45131, 417, 0, 'Gloom Weed', 0, 10),
-(45145, 417, 0, 'Gloom Weed', 0, 10),
-(45146, 417, 0, 'Gloom Weed', 0, 10),
-(45147, 417, 0, 'Gloom Weed', 0, 10),
-(45148, 417, 0, 'Gloom Weed', 0, 10),
-(45149, 417, 0, 'Gloom Weed', 0, 10),
-(45150, 417, 0, 'Gloom Weed', 0, 10),
-(45151, 417, 0, 'Gloom Weed', 0, 10),
-(45152, 417, 0, 'Gloom Weed', 0, 10),
-(45153, 417, 0, 'Gloom Weed', 0, 10),
-(45154, 417, 0, 'Gloom Weed', 0, 10),
-(45155, 417, 0, 'Gloom Weed', 0, 10),
-(45156, 417, 0, 'Gloom Weed', 0, 10),
-(45173, 417, 0, 'Gloom Weed', 0, 10),
-(45174, 417, 0, 'Gloom Weed', 0, 10),
-(45189, 417, 0, 'Gloom Weed', 0, 10),
-(45190, 417, 0, 'Gloom Weed', 0, 10),
-(45191, 417, 0, 'Gloom Weed', 0, 10),
-(45192, 417, 0, 'Gloom Weed', 0, 10),
-(45193, 417, 0, 'Gloom Weed', 0, 10),
-(45199, 417, 0, 'Gloom Weed', 0, 10),
-(45206, 417, 0, 'Gloom Weed', 0, 10),
-(45207, 417, 0, 'Gloom Weed', 0, 10),
-(45226, 417, 0, 'Gloom Weed', 0, 10),
-(45235, 417, 0, 'Gloom Weed', 0, 10),
-(45236, 417, 0, 'Gloom Weed', 0, 10),
-(45237, 417, 0, 'Gloom Weed', 0, 10),
-(45241, 417, 0, 'Gloom Weed', 0, 10),
-(45243, 417, 0, 'Gloom Weed', 0, 10),
-(45247, 417, 0, 'Gloom Weed', 0, 10),
-(45248, 417, 0, 'Gloom Weed', 0, 10),
-(45249, 417, 0, 'Gloom Weed', 0, 10),
-(45250, 417, 0, 'Gloom Weed', 0, 10),
-(45252, 417, 0, 'Gloom Weed', 0, 10),
-(45253, 417, 0, 'Gloom Weed', 0, 10),
-(45255, 417, 0, 'Gloom Weed', 0, 10),
-(45258, 417, 0, 'Gloom Weed', 0, 10),
-(45262, 417, 0, 'Gloom Weed', 0, 10),
-(45263, 417, 0, 'Gloom Weed', 0, 10),
-(45264, 417, 0, 'Gloom Weed', 0, 10),
-(45265, 417, 0, 'Gloom Weed', 0, 10),
-(45266, 417, 0, 'Gloom Weed', 0, 10),
-(45268, 417, 0, 'Gloom Weed', 0, 10),
-(45269, 417, 0, 'Gloom Weed', 0, 10),
-(45270, 417, 0, 'Gloom Weed', 0, 10),
-(45273, 417, 0, 'Gloom Weed', 0, 10),
-(45274, 417, 0, 'Gloom Weed', 0, 10),
-(45275, 417, 0, 'Gloom Weed', 0, 10),
-(45277, 417, 0, 'Gloom Weed', 0, 10),
-(45279, 417, 0, 'Gloom Weed', 0, 10),
-(45280, 417, 0, 'Gloom Weed', 0, 10),
-(45281, 417, 0, 'Gloom Weed', 0, 10),
-(45283, 417, 0, 'Gloom Weed', 0, 10),
-(45284, 417, 0, 'Gloom Weed', 0, 10),
-(45287, 417, 0, 'Gloom Weed', 0, 10),
-(45289, 417, 0, 'Gloom Weed', 0, 10),
-(45290, 417, 0, 'Gloom Weed', 0, 10),
-(45293, 417, 0, 'Gloom Weed', 0, 10),
-(45294, 417, 0, 'Gloom Weed', 0, 10);
-
 -- Correct position of Gloom Weed in Tirisfal Glades (position is off by 0.0100098 yards).
 UPDATE `gameobject` SET `position_x`=2204.13, `position_y`=1120.06, `position_z`=34.8163, `orientation`=4.01426, `rotation0`=0, `rotation1`=0, `rotation2`=-0.906307, `rotation3`=0.422619 WHERE `guid`=25562;
 
@@ -2522,34 +2397,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (46291, 175566, 0, 2306.28, 494.127, 35.7492, 5.49779, 0, 0, -0.382683, 0.92388, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 45262 at 30.822075 yards.
 (25514, 175566, 0, 2193.01, 652.462, 32.8342, 0.471238, 0, 0, 0.233445, 0.97237, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 25513 at 38.092777 yards.
 (46299, 175566, 0, 2170.57, 480.299, 66.2506, 1.67551, 0, 0, 0.743144, 0.669131, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 45237 at 52.409267 yards.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(45864, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(25563, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(45882, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(45883, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(45884, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(45885, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(25564, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46200, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(25566, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46201, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(25551, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46205, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46244, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46247, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46252, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(25570, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46257, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46267, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46276, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46278, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46279, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46282, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46285, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46290, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46291, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(25514, 417, 0, 'Gloom Weed', 0, 10), -- Gloom Weeds in Tirisfal Glades
-(46299, 417, 0, 'Gloom Weed', 0, 10); -- Gloom Weeds in Tirisfal Glades
 
 -- Correct position of Golden Sansam in Un'Goro Crater (position is off by 1.04446 yards).
 UPDATE `gameobject` SET `position_x`=-6394.04, `position_y`=-1380.74, `position_z`=-271.681, `orientation`=5.25344, `rotation0`=0, `rotation1`=0, `rotation2`=-0.492423, `rotation3`=0.870356 WHERE `guid`=19203;
@@ -3313,31 +3160,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (49240, 1236, 0, 'Icecap', 0, 10), -- Icecaps in Winterspring 153 objects total
 (20276, 1236, 0, 'Icecap', 0, 10), -- Icecaps in Winterspring 153 objects total
 (20277, 1236, 0, 'Icecap', 0, 10); -- Icecaps in Winterspring 153 objects total
-
--- Create new pool to hold Incendia Agave spawns in Thousand Needles.
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `patch_max`) VALUES
-(421, 10, 'Incendia Agaves in Thousand Needles', 0, 10);
--- Add existing spawns to pool.
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(16749, 421, 0, 'Incendia Agave', 0, 10),
-(16750, 421, 0, 'Incendia Agave', 0, 10),
-(16755, 421, 0, 'Incendia Agave', 0, 10),
-(16756, 421, 0, 'Incendia Agave', 0, 10),
-(16757, 421, 0, 'Incendia Agave', 0, 10),
-(25684, 421, 0, 'Incendia Agave', 0, 10),
-(25685, 421, 0, 'Incendia Agave', 0, 10),
-(25686, 421, 0, 'Incendia Agave', 0, 10),
-(25687, 421, 0, 'Incendia Agave', 0, 10),
-(25688, 421, 0, 'Incendia Agave', 0, 10),
-(25689, 421, 0, 'Incendia Agave', 0, 10),
-(25690, 421, 0, 'Incendia Agave', 0, 10),
-(25691, 421, 0, 'Incendia Agave', 0, 10),
-(25692, 421, 0, 'Incendia Agave', 0, 10),
-(25693, 421, 0, 'Incendia Agave', 0, 10),
-(25694, 421, 0, 'Incendia Agave', 0, 10),
-(25695, 421, 0, 'Incendia Agave', 0, 10),
-(25696, 421, 0, 'Incendia Agave', 0, 10),
-(25697, 421, 0, 'Incendia Agave', 0, 10);
 
 -- Correct position of Incendia Agave in Thousand Needles (position is off by 0.0100098 yards).
 UPDATE `gameobject` SET `position_x`=-4966.54, `position_y`=-1914.79, `position_z`=-41.1326, `orientation`=3.78737, `rotation0`=0, `rotation1`=0, `rotation2`=-0.948323, `rotation3`=0.317306 WHERE `guid`=25687;
