@@ -1924,7 +1924,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (15092, 1619, 1, -1759.17, -910.335, 79.1745, 2.04204, 0, 0, 0.85264, 0.522499, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 1835 at 5.977466 yards.
 (15131, 1619, 1, -2037.5, 298.458, 126.762, 2.3911, 0, 0, 0.930417, 0.366502, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 1867 at 117.432587 yards.
 (18672, 1619, 1, -1281.1, -1042.77, 48.7105, 2.14675, 0, 0, 0.878817, 0.47716, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 18603 at 156.562637 yards.
-(15459, 1619, 1, -1664.08, 368.102, 111.681, 4.88692, 0, 0, -0.642787, 0.766045, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 1951 at 206.932434 yards.
+(4788, 1619, 1, -1664.08, 368.102, 111.681, 4.88692, 0, 0, -0.642787, 0.766045, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 1951 at 206.932434 yards.
 (15463, 1619, 1, -2735.74, -321.652, 13.0835, 1.27409, 0, 0, 0.594822, 0.803857, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 1954 at 300.506104 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (18669, 1025, 0, 'Earthroot', 0, 10), -- Earthroots in Mulgore 31 objects total
@@ -1933,7 +1933,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (15092, 1025, 0, 'Earthroot', 0, 10), -- Earthroots in Mulgore 31 objects total
 (15131, 1025, 0, 'Earthroot', 0, 10), -- Earthroots in Mulgore 31 objects total
 (18672, 1025, 0, 'Earthroot', 0, 10), -- Earthroots in Mulgore 31 objects total
-(15459, 1025, 0, 'Earthroot', 0, 10), -- Earthroots in Mulgore 31 objects total
+(4788, 1025, 0, 'Earthroot', 0, 10), -- Earthroots in Mulgore 31 objects total
 (15463, 1025, 0, 'Earthroot', 0, 10); -- Earthroots in Mulgore 31 objects total
 
 -- Correct position of Earthroot in The Barrens (position is off by 0.747622 yards).
@@ -1957,7 +1957,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (56087, 3726, 1, -463.693, -1340.92, 110.516, 4.97419, 0, 0, -0.608761, 0.793354, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 55892 at 2551.070801 yards.
 (56088, 3726, 1, -396.659, -1586.49, 103.695, 0.244346, 0, 0, 0.121869, 0.992546, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 55892 at 2313.863281 yards.
 (15466, 3726, 1, -2475.08, -1594.51, 111.186, 3.52557, 0, 0, -0.981627, 0.190812, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 1798 at 2540.807373 yards.
-(15467, 3726, 1, -1367.89, -3949.43, 42.8773, 2.07694, 0, 0, 0.861629, 0.507539, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 1798 at 180.747818 yards.
+(5027, 3726, 1, -1367.89, -3949.43, 42.8773, 2.07694, 0, 0, 0.861629, 0.507539, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 1798 at 180.747818 yards.
 (15468, 3726, 1, -4152.02, -2279.53, 95.8744, 5.02655, 0, 0, -0.587785, 0.809017, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 1798 at 3099.858643 yards.
 (15469, 3726, 1, -1815.75, -1971.06, 104.918, 4.59022, 0, 0, -0.748956, 0.66262, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 1798 at 2006.823364 yards.
 (15471, 3726, 1, -1721.55, -3900.48, 16.4119, 0.104719, 0, 0, 0.0523357, 0.99863, 900, 900, 1, 100, 0, 10), -- Closest existing guid is 1798 at 183.821503 yards.
@@ -2001,7 +2001,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (56087, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
 (56088, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
 (15466, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
-(15467, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(5027, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
 (15468, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
 (15469, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
 (15471, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
@@ -3126,44 +3126,25 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Missing Grave Moss spawns in Desolace.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(17698, 1628, 1, -1299.83, 1942.04, 51.1616, 5.88176, 0, 0, -0.199368, 0.979925, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4487 at 5.888136 yards.
-(17699, 1628, 1, -1599.25, 1376.42, 61.2987, 2.19911, 0, 0, 0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4481 at 433.997955 yards.
-(18877, 1628, 1, -1342.52, 963.65, 91.5162, 2.16421, 0, 0, 0.882947, 0.469473, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 18676 at 331.919250 yards.
-(17700, 1628, 1, -1158.39, 2254.16, 92.2791, 2.56563, 0, 0, 0.958819, 0.284016, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4499 at 257.957367 yards.
-(17701, 1628, 1, -1307.94, 2046.85, 50.1442, 4.01426, 0, 0, -0.906307, 0.422619, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4499 at 20.791868 yards.
-(17703, 1628, 1, -1402.27, 1831.51, 50.1442, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4477 at 7.134086 yards.
-(18878, 1628, 1, -631.91, 1516.65, 89.813, 4.83456, 0, 0, -0.66262, 0.748956, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 18676 at 653.399292 yards.
-(17707, 1628, 1, -647.017, 1758.21, 89.8061, 4.76475, 0, 0, -0.688354, 0.725374, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4437 at 606.480042 yards.
-(18879, 1628, 1, -982.668, 2446.35, 94.8709, 5.21854, 0, 0, -0.507538, 0.861629, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 18680 at 208.852051 yards.
+(5149, 1628, 1, -1299.83, 1942.04, 51.1616, 5.88176, 0, 0, -0.199368, 0.979925, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4487 at 5.888136 yards.
+(18877, 1628, 1, -1599.25, 1376.42, 61.2987, 2.19911, 0, 0, 0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4481 at 433.997955 yards.
+(17698, 1628, 1, -1342.52, 963.65, 91.5162, 2.16421, 0, 0, 0.882947, 0.469473, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 18676 at 331.919250 yards.
+(17699, 1628, 1, -1158.39, 2254.16, 92.2791, 2.56563, 0, 0, 0.958819, 0.284016, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4499 at 257.957367 yards.
+(18878, 1628, 1, -1307.94, 2046.85, 50.1442, 4.01426, 0, 0, -0.906307, 0.422619, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4499 at 20.791868 yards.
+(18879, 1628, 1, -1402.27, 1831.51, 50.1442, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4477 at 7.134086 yards.
+(21930, 1628, 1, -631.91, 1516.65, 89.813, 4.83456, 0, 0, -0.66262, 0.748956, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 18676 at 653.399292 yards.
+(21931, 1628, 1, -647.017, 1758.21, 89.8061, 4.76475, 0, 0, -0.688354, 0.725374, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 4437 at 606.480042 yards.
+(21932, 1628, 1, -982.668, 2446.35, 94.8709, 5.21854, 0, 0, -0.507538, 0.861629, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 18680 at 208.852051 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(5149, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
+(18877, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
 (17698, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
 (17699, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
-(17700, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
-(17701, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
-(17703, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
-(17707, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
-(18879, 107, 0, 'Grave Moss', 0, 10); -- Grave Moss (x13) - Kodo Graveyard
-
--- Guid 17698 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (17698, 107, 0, 'Grave Moss', 0, 10);
-
--- Guid 17699 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (17699, 107, 0, 'Grave Moss', 0, 10);
-
--- Guid 17700 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (17700, 107, 0, 'Grave Moss', 0, 10);
-
--- Guid 17701 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (17701, 107, 0, 'Grave Moss', 0, 10);
-
--- Guid 17703 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (17703, 107, 0, 'Grave Moss', 0, 10);
-
--- Guid 18877 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (18877, 107, 0, 'Grave Moss', 0, 10);
-
--- Guid 18878 should be part of pool Grave Moss (x13) - Kodo Graveyard (107).
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES (18878, 107, 0, 'Grave Moss', 0, 10);
+(18878, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
+(18879, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
+(21930, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
+(21931, 107, 0, 'Grave Moss', 0, 10), -- Grave Moss (x13) - Kodo Graveyard
+(21932, 107, 0, 'Grave Moss', 0, 10); -- Grave Moss (x13) - Kodo Graveyard
 
 
 -- Correct position of Gromsblood in Desolace (position is off by 0.349976 yards).
@@ -4466,10 +4447,10 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Missing Liferoot spawns in Arathi Highlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(21849, 2041, 0, -1455.35, -1925.88, 50.5102, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7340 at 12.771090 yards.
+(21933, 2041, 0, -1455.35, -1925.88, 50.5102, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7340 at 12.771090 yards.
 (21851, 2041, 0, -1400.24, -1704.12, 48.3906, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7505 at 14.763986 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(21849, 1184, 0, 'Liferoot', 0, 10), -- Liferoots in Arathi 47 objects total
+(21933, 1184, 0, 'Liferoot', 0, 10), -- Liferoots in Arathi 47 objects total
 (21851, 1184, 0, 'Liferoot', 0, 10); -- Liferoots in Arathi 47 objects total
 
 -- Missing Liferoot spawns in The Hinterlands.
@@ -5321,18 +5302,18 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_min`, `
 -- Missing Mountain Silversage spawns in Western Plaguelands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (21849, 176586, 0, 1690.23, -2477.8, 99.8174, 3.21142, 0, 0, -0.999391, 0.0349061, 1800, 1800, 1, 100, 0, 10),
-(21850, 176586, 0, 2907.65, -1319.5, 167.159, 5.42797, 0, 0, -0.414693, 0.909961, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 1681.756592 yards.
-(21851, 176586, 0, 1861.67, -1889.43, 99.0528, 3.3685, 0, 0, -0.993571, 0.113208, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 612.838928 yards.
-(21852, 176586, 0, 1862.28, -1242.78, 73.6229, 1.01229, 0, 0, 0.484809, 0.87462, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 1247.221680 yards.
-(21853, 176586, 0, 1963.57, -2147.67, 83.2375, 3.59538, 0, 0, -0.97437, 0.224951, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 428.923676 yards.
-(21854, 176586, 0, 2201.24, -1801.18, 72.0393, 1.25664, 0, 0, 0.587785, 0.809017, 1800, 1800, 1, 100, 0, 10); -- Closest existing guid is 21849 at 848.361633 yards.
+(21934, 176586, 0, 2907.65, -1319.5, 167.159, 5.42797, 0, 0, -0.414693, 0.909961, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 1681.756592 yards.
+(21935, 176586, 0, 1861.67, -1889.43, 99.0528, 3.3685, 0, 0, -0.993571, 0.113208, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 612.838928 yards.
+(21936, 176586, 0, 1862.28, -1242.78, 73.6229, 1.01229, 0, 0, 0.484809, 0.87462, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 1247.221680 yards.
+(21937, 176586, 0, 1963.57, -2147.67, 83.2375, 3.59538, 0, 0, -0.97437, 0.224951, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 21849 at 428.923676 yards.
+(21938, 176586, 0, 2201.24, -1801.18, 72.0393, 1.25664, 0, 0, 0.587785, 0.809017, 1800, 1800, 1, 100, 0, 10); -- Closest existing guid is 21849 at 848.361633 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(21850, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(21851, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(21852, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(21853, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(21854, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
-(21849, 427, 0, 'Mountain Silversage', 0, 10);
+(21849, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(21934, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(21935, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(21936, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(21937, 427, 0, 'Mountain Silversage', 0, 10), -- Mountain Silversages in Western Plaguelands
+(21938, 427, 0, 'Mountain Silversage', 0, 10);
 
 -- Correct position of Peacebloom in Durotar (position is off by 0.000100136 yards).
 UPDATE `gameobject` SET `position_x`=809.231, `position_y`=-5008.37, `position_z`=10.3424, `orientation`=0.436332, `rotation0`=0, `rotation1`=0, `rotation2`=0.216439, `rotation3`=0.976296 WHERE `guid`=1314;
@@ -6065,9 +6046,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Missing Plaguebloom spawns in Eastern Plaguelands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(21855, 176587, 0, 2019.04, -4695.94, 91.3082, 2.9496, 0, 0, 0.995396, 0.0958512, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 19955 at 2.992112 yards.
+(21939, 176587, 0, 2019.04, -4695.94, 91.3082, 2.9496, 0, 0, 0.995396, 0.0958512, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 19955 at 2.992112 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(21855, 1265, 0, 'Plaguebloom', 0, 10); -- Plagueblooms in Eastern Plaguelands 144 objects total
+(21939, 1265, 0, 'Plaguebloom', 0, 10); -- Plagueblooms in Eastern Plaguelands 144 objects total
 
 -- Correct position of Purple Lotus in Tanaris (position is off by 2.2099 yards).
 UPDATE `gameobject` SET `position_x`=-7986.6, `position_y`=-3850.93, `position_z`=18.7965, `orientation`=0.872664, `rotation0`=0, `rotation1`=0, `rotation2`=0.422618, `rotation3`=0.906308 WHERE `guid`=15894;
@@ -7864,15 +7845,15 @@ UPDATE `gameobject` SET `position_x`=313.651, `position_y`=-349.851, `position_z
 
 -- Missing Wintersbite spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(21855, 2044, 0, 544.052, -207.92, 146.243, 1.48353, 0, 0, 0.67559, 0.737278, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 8209 at 8.258742 yards.
-(21856, 2044, 0, 250.224, -412.048, 153.166, 3.75246, 0, 0, -0.953716, 0.300708, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 8196 at 10.912564 yards.
-(21857, 2044, 0, 319.122, -386.163, 170.845, 3.85718, 0, 0, -0.936671, 0.35021, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 8212 at 36.625572 yards.
-(21858, 2044, 0, 783.456, -247.429, 135.859, 3.01941, 0, 0, 0.998135, 0.0610518, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 8207 at 182.269623 yards.
+(21940, 2044, 0, 544.052, -207.92, 146.243, 1.48353, 0, 0, 0.67559, 0.737278, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 8209 at 8.258742 yards.
+(21941, 2044, 0, 250.224, -412.048, 153.166, 3.75246, 0, 0, -0.953716, 0.300708, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 8196 at 10.912564 yards.
+(21942, 2044, 0, 319.122, -386.163, 170.845, 3.85718, 0, 0, -0.936671, 0.35021, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 8212 at 36.625572 yards.
+(21943, 2044, 0, 783.456, -247.429, 135.859, 3.01941, 0, 0, 0.998135, 0.0610518, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 8207 at 182.269623 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(21855, 1062, 0, 'Wintersbite', 0, 10), -- Wintersbite in Alterac 34 objects total
-(21856, 1062, 0, 'Wintersbite', 0, 10), -- Wintersbite in Alterac 34 objects total
-(21857, 1062, 0, 'Wintersbite', 0, 10), -- Wintersbite in Alterac 34 objects total
-(21858, 1062, 0, 'Wintersbite', 0, 10); -- Wintersbite in Alterac 34 objects total
+(21940, 1062, 0, 'Wintersbite', 0, 10), -- Wintersbite in Alterac 34 objects total
+(21941, 1062, 0, 'Wintersbite', 0, 10), -- Wintersbite in Alterac 34 objects total
+(21942, 1062, 0, 'Wintersbite', 0, 10), -- Wintersbite in Alterac 34 objects total
+(21943, 1062, 0, 'Wintersbite', 0, 10); -- Wintersbite in Alterac 34 objects total
 
 -- Update Herbalism Gameobjects
 UPDATE `gameobject` SET `spawn_flags` = 0 WHERE `id` IN (1618, 1617, 1619, 1620, 1621, 1622, 1623, 1624, 2041, 2866, 142140, 142141, 142142, 142143, 142144, 142145, 176583, 176584, 176586, 176587, 176588, 176589);
