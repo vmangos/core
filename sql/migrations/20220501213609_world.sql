@@ -5006,6 +5006,7 @@ DELETE FROM `pool_template` WHERE  `entry`=3663;
 UPDATE `pool_gameobject` SET `pool_entry` = 1274 WHERE `guid` IN (397176, 397177, 397178, 397179);
 DELETE FROM `pool_template` WHERE  `entry`=1319;
 DELETE FROM `pool_template` WHERE  `entry`=1245;
+DELETE FROM `game_event_gameobject` WHERE  `guid`=16586 AND `event`=11;
 
 /*
 LOOK AT ALL THE CUSTOM ORE OBJECTS
