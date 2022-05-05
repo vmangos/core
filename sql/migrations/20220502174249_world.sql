@@ -7706,6 +7706,361 @@ UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176640 AND `map` = 30;
 UPDATE `gameobject` SET `spawntimesecsmin`= 604800, `spawntimesecsmax` = 604800 WHERE `id` = 176588 AND `map` = 30;
 
+-- Misc
+UPDATE `pool_gameobject` SET `description`='Black Lotus' WHERE  `guid` IN (
+3998092,
+3998091,
+3998090,
+3998089,
+3998088,
+3998087,
+3998085,
+3998084,
+3998081,
+3998078,
+3998143,
+3998144,
+3998148,
+3998149,
+3998152,
+3998153,
+3998156,
+3998157,
+3998176,
+3998187,
+3998193,
+3998194,
+3998197,
+3998202,
+3998203,
+3998204,
+3998205,
+3998206,
+3998221,
+3998224,
+3998244,
+3998245,
+3998246,
+3998248,
+3998249,
+3998250,
+3998251,
+3998252,
+3998253,
+3998254
+);
+
+DELETE FROM `pool_gameobject` WHERE `guid` IN (
+488,
+489,
+689,
+918,
+1082,
+1085,
+1086,
+1917,
+1918,
+1919,
+1920,
+1921,
+1950,
+1988,
+1989,
+1991,
+1999,
+2064,
+2067,
+2068,
+2131,
+2178,
+2180,
+2181,
+2377,
+18251,
+18260,
+18273,
+40719,
+40720,
+40721,
+40722,
+40723,
+40724,
+40725,
+40726,
+40727,
+40728,
+40729
+);
+
+DELETE FROM `pool_template` WHERE  `entry`=1082;
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(40721, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon
+(18251, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40723, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40724, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(18260, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40725, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40726, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(18273, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40727, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40728, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40729, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40719, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40720, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon 
+(40722, 1082, 0, 'Mageroyal', 0, 10), -- Mageroyals in Stonetalon
+(2131, 1082, 0, 'Mageroyal', 0, 10); -- Mageroyals in The Stonetalon 
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(2377, 422, 0, 'Mageroyal', 0, 10), -- Mageroyals in The Barrens 
+(2181, 422, 0, 'Mageroyal', 0, 10), -- Mageroyals in The Barrens 
+(2180, 422, 0, 'Mageroyal', 0, 10), -- Mageroyals in The Barrens 
+(2178, 422, 0, 'Mageroyal', 0, 10); -- Mageroyals in The Barrens 
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(2068, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(2067, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(2064, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1999, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1991, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1989, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1988, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1950, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1921, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1920, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1919, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1918, 1029, 0, 'Earthroot', 0, 10), -- Earthroots in Barrens 127 objects total
+(1917, 1029, 0, 'Earthroot', 0, 10); -- Earthroots in Barrens 127 objects total
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
+(1086, 425, 0, 'Silverleaf', 0, 10), -- Silverleafs in The Barrens
+(1085, 425, 0, 'Silverleaf', 0, 10), -- Silverleafs in The Barrens
+(1082, 425, 0, 'Silverleaf', 0, 10), -- Silverleafs in The Barrens
+(918, 425, 0, 'Silverleaf', 0, 10), -- Silverleafs in The Barrens
+(689, 425, 0, 'Silverleaf', 0, 10), -- Silverleafs in The Barrens
+(489, 425, 0, 'Silverleaf', 0, 10), -- Silverleafs in The Barrens
+(488, 425, 0, 'Silverleaf', 0, 10); -- Silverleafs in The Barrens
+
+UPDATE `pool_template` SET `description`='Black Lotus in Burning Steppes' WHERE  `entry`=303;
+UPDATE `pool_template` SET `description`='Black Lotus in Eastern Plaguelands' WHERE  `entry`=301;
+UPDATE `pool_template` SET `description`='Black Lotus in Silithus' WHERE  `entry`=300;
+UPDATE `pool_template` SET `description`='Black Lotus in Winterspring' WHERE  `entry`=302;
+UPDATE `pool_template` SET `description`='Dreamfoil in Dire Maul East' WHERE  `entry`=4291;
+UPDATE `pool_template` SET `description`='Ghost Mushroom in Dire Maul East' WHERE  `entry`=4293;
+UPDATE `pool_template` SET `description`='Gromsblood in Dire Maul East' WHERE  `entry`=4292;
+UPDATE `pool_template` SET `description`='Stranglekelp in Dustwallow Marsh' WHERE  `entry`=43522;
+UPDATE `pool_template` SET `description`='Grave Moss in Desolace' WHERE  `entry`=107;
+UPDATE `pool_template` SET `description`='Grave Moss in Raven Hill' WHERE  `entry`=105;
+UPDATE `pool_template` SET `description`='Grave Moss in Tranquil Gardens' WHERE  `entry`=106;
+UPDATE `pool_template` SET `description`='Grave Moss in Stromgarde' WHERE  `entry`=104;
+UPDATE `pool_template` SET `description`='Grave Moss in Barrens 5 objects total' WHERE  `entry`=1083;
+UPDATE `pool_template` SET `description`='Liferoots in Hillsbrad Foothills' WHERE  `entry`=998;
+UPDATE `pool_template` SET `description`='Arthas Tears in Eastern Plaguelands' WHERE  `entry`=1266;
+UPDATE `pool_template` SET `description`='Arthas Tears in Felwood' WHERE  `entry`=1226;
+UPDATE `pool_template` SET `description`='Arthas Tears in Western Plaguelands' WHERE  `entry`=1259;
+UPDATE `pool_template` SET `description`='Blindweed in Swamp of Sorrows (1)' WHERE  `entry`=1307;
+UPDATE `pool_template` SET `description`='Blindweed in Swamp of Sorrows (2) ' WHERE  `entry`=1312;
+UPDATE `pool_template` SET `description`='Blindweed in Ungoro Crater' WHERE  `entry`=1216;
+UPDATE `pool_template` SET `description`='Briarthorn in Ashenvale' WHERE  `entry`=1073;
+UPDATE `pool_template` SET `description`='Briarthorn in Barrens' WHERE  `entry`=1037;
+UPDATE `pool_template` SET `description`='Briarthorn in Darkshore' WHERE  `entry`=1100;
+UPDATE `pool_template` SET `description`='Briarthorn in Duskwood' WHERE  `entry`=1113;
+UPDATE `pool_template` SET `description`='Briarthorn in Loch Modan' WHERE  `entry`=1165;
+UPDATE `pool_template` SET `description`='Briarthorn in Redridge' WHERE  `entry`=1127;
+UPDATE `pool_template` SET `description`='Briarthorn in Silverpine Forest' WHERE  `entry`=1046;
+UPDATE `pool_template` SET `description`='Briarthorn in Stonetalon' WHERE  `entry`=1087;
+UPDATE `pool_template` SET `description`='Briarthorn in Westfall' WHERE  `entry`=1109;
+UPDATE `pool_template` SET `description`='Briarthorn in Wetlands' WHERE  `entry`=1151;
+UPDATE `pool_template` SET `description`='Bruiseweed in Ashenvale' WHERE  `entry`=1072;
+UPDATE `pool_template` SET `description`='Bruiseweed in Barrens' WHERE  `entry`=1036;
+UPDATE `pool_template` SET `description`='Bruiseweed in Darkshore' WHERE  `entry`=1101;
+UPDATE `pool_template` SET `description`='Bruiseweed in Desolace' WHERE  `entry`=1137;
+UPDATE `pool_template` SET `description`='Bruiseweed in Duskwood' WHERE  `entry`=1115;
+UPDATE `pool_template` SET `description`='Bruiseweed in Loch Modan' WHERE  `entry`=1164;
+UPDATE `pool_template` SET `description`='Bruiseweed in Redridge' WHERE  `entry`=1126;
+UPDATE `pool_template` SET `description`='Bruiseweed in Silverpine Forest' WHERE  `entry`=1047;
+UPDATE `pool_template` SET `description`='Bruiseweed in Stonetalon' WHERE  `entry`=1086;
+UPDATE `pool_template` SET `description`='Bruiseweed in Thousand Needles' WHERE  `entry`=1133;
+UPDATE `pool_template` SET `description`='Bruiseweed in Westfall' WHERE  `entry`=1110;
+UPDATE `pool_template` SET `description`='Bruiseweed in Wetlands' WHERE  `entry`=1150;
+UPDATE `pool_template` SET `description`='Dream Foil in Burning Steppes' WHERE  `entry`=1301;
+UPDATE `pool_template` SET `description`='Dreamfoil in Azshara' WHERE  `entry`=1242;
+UPDATE `pool_template` SET `description`='Dreamfoil in Eastern Plaguelands' WHERE  `entry`=1267;
+UPDATE `pool_template` SET `description`='Dreamfoil in Felwood' WHERE  `entry`=1228;
+UPDATE `pool_template` SET `description`='Dreamfoil in Silithus' WHERE  `entry`=1221;
+UPDATE `pool_template` SET `description`='Dreamfoil in Ungoro Crater' WHERE  `entry`=1212;
+UPDATE `pool_template` SET `description`='Dreamfoil in Western Plaguelands' WHERE  `entry`=1260;
+UPDATE `pool_template` SET `description`='Earthroots in Barrens' WHERE  `entry`=1029;
+UPDATE `pool_template` SET `description`='Dreamfoil in Felwood' WHERE  `entry`=416;
+UPDATE `pool_template` SET `description`='Earthroots in Darkshore' WHERE  `entry`=1094;
+UPDATE `pool_template` SET `description`='Earthroots in Dun Morogh' WHERE  `entry`=1016;
+UPDATE `pool_template` SET `description`='Earthroots in Durotar' WHERE  `entry`=1021;
+UPDATE `pool_template` SET `description`='Earthroot in Barrens' WHERE  `entry`=1029;
+UPDATE `pool_template` SET `description`='Earthroot in Darkshore' WHERE  `entry`=1094;
+UPDATE `pool_template` SET `description`='Earthroot in Dun Morogh' WHERE  `entry`=1016;
+UPDATE `pool_template` SET `description`='Earthroot in Durotar' WHERE  `entry`=1021;
+UPDATE `pool_template` SET `description`='Earthroot in Elwynn Forest' WHERE  `entry`=1011;
+UPDATE `pool_template` SET `description`='Earthroot in Loch Modan' WHERE  `entry`=1160;
+UPDATE `pool_template` SET `description`='Earthroot in Mulgore' WHERE  `entry`=1025;
+UPDATE `pool_template` SET `description`='Earthroot in Redridge' WHERE  `entry`=1124;
+UPDATE `pool_template` SET `description`='Earthroot in Silverpine Forest' WHERE  `entry`=1040;
+UPDATE `pool_template` SET `description`='Earthroot in Teldrassil' WHERE  `entry`=1001;
+UPDATE `pool_template` SET `description`='Earthroot in Tirisfal' WHERE  `entry`=1005;
+UPDATE `pool_template` SET `description`='Earthroot in Westfall' WHERE  `entry`=1105;
+UPDATE `pool_template` SET `description`='Fadeleaf in Dustwallow Marsh' WHERE  `entry`=1328;
+UPDATE `pool_template` SET `description`='Fadeleaf in Stranglethorn' WHERE  `entry`=1172;
+UPDATE `pool_template` SET `description`='Fadeleaf in Arathi Highlands' WHERE  `entry`=1183;
+UPDATE `pool_template` SET `description`='Fadeleaf in Badlands' WHERE  `entry`=1285;
+UPDATE `pool_template` SET `description`='Fadeleaf in Hinterlands' WHERE  `entry`=1252;
+UPDATE `pool_template` SET `description`='Fadeleaf in Swamp of Sorrows (2)' WHERE  `entry`=1311;
+UPDATE `pool_template` SET `description`='Firebloom in Badlands' WHERE  `entry`=1281;
+UPDATE `pool_template` SET `description`='Firebloom in Blasted Lands' WHERE  `entry`=1276;
+UPDATE `pool_template` SET `description`='Firebloom in Searing Gorge' WHERE  `entry`=1291;
+UPDATE `pool_template` SET `description`='Firebloom in Tanaris' WHERE  `entry`=1208;
+UPDATE `pool_template` SET `description`='Ghost Mushroom in Hinterlands' WHERE  `entry`=1247;
+UPDATE `pool_template` SET `description`='Golden Sansam in Azshara' WHERE  `entry`=1241;
+UPDATE `pool_template` SET `description`='Golden Sansam in Burning Steppes' WHERE  `entry`=1300;
+UPDATE `pool_template` SET `description`='Golden Sansam in Eastern Plaguelands' WHERE  `entry`=1268;
+UPDATE `pool_template` SET `description`='Golden Sansam in Felwood' WHERE  `entry`=1230;
+UPDATE `pool_template` SET `description`='Golden Sansam in Feralas' WHERE  `entry`=1194;
+UPDATE `pool_template` SET `description`='Golden Sansam in Hinterlands' WHERE  `entry`=1253;
+UPDATE `pool_template` SET `description`='Golden Sansam in Silithus' WHERE  `entry`=1224;
+UPDATE `pool_template` SET `description`='Golden Sansam in Ungoro' WHERE  `entry`=1214;
+UPDATE `pool_template` SET `description`='Golden Sansam in Felwood' WHERE  `entry`=418;
+UPDATE `pool_template` SET `description`='Goldthorn in Badlands' WHERE  `entry`=1283;
+UPDATE `pool_template` SET `description`='Goldthorn in Dustwallow Marsh' WHERE  `entry`=1103;
+UPDATE `pool_template` SET `description`='Goldthorn in Feralas' WHERE  `entry`=1191;
+UPDATE `pool_template` SET `description`='Goldthorn in Stranglethorn' WHERE  `entry`=1174;
+UPDATE `pool_template` SET `description`='Goldthorn in Swamp of Sorrows (1)' WHERE  `entry`=1308;
+UPDATE `pool_template` SET `description`='Goldthorn in Swamp of Sorrows (2)' WHERE  `entry`=1313;
+UPDATE `pool_template` SET `description`='Goldthron in Hinterlands' WHERE  `entry`=1249;
+UPDATE `pool_template` SET `description`='Grave Moss in Barrens' WHERE  `entry`=1083;
+UPDATE `pool_template` SET `description`='Grave Moss in Wetlands' WHERE  `entry`=1148;
+UPDATE `pool_template` SET `description`='Gromsblood in Ashenvale' WHERE  `entry`=1327;
+UPDATE `pool_template` SET `description`='Grave Moss in Eastern Plaguelands' WHERE  `entry`=419;
+UPDATE `pool_template` SET `description`='Gromsblood in Blasted Lands' WHERE  `entry`=1275;
+UPDATE `pool_template` SET `description`='Gromsblood in Desolace' WHERE  `entry`=1143;
+UPDATE `pool_template` SET `description`='Gromsblood in Felwood' WHERE  `entry`=1225;
+UPDATE `pool_template` SET `description`='Gromsblood in Felwood' WHERE  `entry`=420;
+UPDATE `pool_template` SET `description`='Icecap in Winterspring' WHERE  `entry`=1236;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Badlands' WHERE  `entry`=1282;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Dustwallow Marsh' WHERE  `entry`=1102;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Feralas' WHERE  `entry`=1189;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Hinterlands' WHERE  `entry`=1248;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Stranglethorn' WHERE  `entry`=1173;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Swamp of Sorrows (1)' WHERE  `entry`=1309;
+UPDATE `pool_template` SET `description`='Khadgars Whisker in Swamp of Sorrows (2)' WHERE  `entry`=1310;
+UPDATE `pool_template` SET `description`='Kingsblood in Ashenvale' WHERE  `entry`=1078;
+UPDATE `pool_template` SET `description`='Kingsblood in Badlands' WHERE  `entry`=1284;
+UPDATE `pool_template` SET `description`='Kingsblood in Barrens' WHERE  `entry`=1038;
+UPDATE `pool_template` SET `description`='Kingsblood in Desolace' WHERE  `entry`=1138;
+UPDATE `pool_template` SET `description`='Kingsblood in Duskwood' WHERE  `entry`=1117;
+UPDATE `pool_template` SET `description`='Kingsblood in Dustwallow Marsh' WHERE  `entry`=1039;
+UPDATE `pool_template` SET `description`='Kingsblood in Stonetalon' WHERE  `entry`=1088;
+UPDATE `pool_template` SET `description`='Kingsblood in Stranglethorn' WHERE  `entry`=1170;
+UPDATE `pool_template` SET `description`='Kingsblood in Swamp of Sorrows' WHERE  `entry`=1326;
+UPDATE `pool_template` SET `description`='Kingsblood in Thousand Needles' WHERE  `entry`=1136;
+UPDATE `pool_template` SET `description`='Kingsblood in Wetlands' WHERE  `entry`=1155;
+UPDATE `pool_template` SET `description`='Liferoot in Ashenvale' WHERE  `entry`=1325;
+UPDATE `pool_template` SET `description`='Liferoot in Alterac Mountains' WHERE  `entry`=1063;
+UPDATE `pool_template` SET `description`='Liferoot in Arathi Highlands' WHERE  `entry`=1184;
+UPDATE `pool_template` SET `description`='Liferoot in Desolace' WHERE  `entry`=1144;
+UPDATE `pool_template` SET `description`='Liferoot in Dustwallow Marsh' WHERE  `entry`=1104;
+UPDATE `pool_template` SET `description`='Liferoot in Feralas' WHERE  `entry`=1193;
+UPDATE `pool_template` SET `description`='Liferoot in Hillsbrad Foothills' WHERE  `entry`=998;
+UPDATE `pool_template` SET `description`='Liferoot in Hinterlands' WHERE  `entry`=1251;
+UPDATE `pool_template` SET `description`='Liferoot in Stranglethorn' WHERE  `entry`=1179;
+UPDATE `pool_template` SET `description`='Liferoot in Swamp of Sorrows (1)' WHERE  `entry`=1317;
+UPDATE `pool_template` SET `description`='Liferoot in Wetlands' WHERE  `entry`=1153;
+UPDATE `pool_template` SET `description`='Mageroyal in Ashenvale' WHERE  `entry`=1077;
+UPDATE `pool_template` SET `description`='Mageroyal in Barrens' WHERE  `entry`=1032;
+UPDATE `pool_template` SET `description`='Mageroyal in Darkshore' WHERE  `entry`=1097;
+UPDATE `pool_template` SET `description`='Mageroyal in Durotar' WHERE  `entry`=1023;
+UPDATE `pool_template` SET `description`='Mageroyal in Duskwood' WHERE  `entry`=1116;
+UPDATE `pool_template` SET `description`='Mageroyal in Hillsbrad Foothills' WHERE  `entry`=1049;
+UPDATE `pool_template` SET `description`='Mageroyal in Loch Modan' WHERE  `entry`=1163;
+UPDATE `pool_template` SET `description`='Mageroyal in Redridge' WHERE  `entry`=1306;
+UPDATE `pool_template` SET `description`='Mageroyal in Silverpine Forest' WHERE  `entry`=1043;
+UPDATE `pool_template` SET `description`='Mageroyal in Teldrassil' WHERE  `entry`=1004;
+UPDATE `pool_template` SET `description`='Mageroyal in Barrens' WHERE  `entry`=422;
+UPDATE `pool_template` SET `description`='Mageroyal in Westfall' WHERE  `entry`=1108;
+UPDATE `pool_template` SET `description`='Mageroyal in Wetlands' WHERE  `entry`=1154;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Azshara' WHERE  `entry`=1243;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Burning Steppes' WHERE  `entry`=1302;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Eastern Plaguelands' WHERE  `entry`=1269;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Silithus' WHERE  `entry`=1222;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Ungoro Crater' WHERE  `entry`=1218;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Winterspring' WHERE  `entry`=1237;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Felwood' WHERE  `entry`=424;
+UPDATE `pool_template` SET `description`='Mountain Silversage in Western Plaguelands' WHERE  `entry`=427;
+UPDATE `pool_template` SET `description`='Peaceblooms in Barrens' WHERE  `entry`=1030;
+UPDATE `pool_template` SET `description`='Peacebloom in Darkshore' WHERE  `entry`=1096;
+UPDATE `pool_template` SET `description`='Peacebloom in Barrens' WHERE  `entry`=1030;
+UPDATE `pool_template` SET `description`='Peacebloom in Dun Morogh' WHERE  `entry`=1017;
+UPDATE `pool_template` SET `description`='Peacebloom in Durotar' WHERE  `entry`=1020;
+UPDATE `pool_template` SET `description`='Peacebloom in Elwynn Forest' WHERE  `entry`=1012;
+UPDATE `pool_template` SET `description`='Peacebloom in Loch Modan' WHERE  `entry`=1161;
+UPDATE `pool_template` SET `description`='Peacebloom in Mulgore' WHERE  `entry`=1026;
+UPDATE `pool_template` SET `description`='Peacebloom in Redridge' WHERE  `entry`=1125;
+UPDATE `pool_template` SET `description`='Peacebloom in Silverpine Forest' WHERE  `entry`=1041;
+UPDATE `pool_template` SET `description`='Peacebloom in Teldrassil' WHERE  `entry`=1002;
+UPDATE `pool_template` SET `description`='Peacebloom in Tirisfal' WHERE  `entry`=1006;
+UPDATE `pool_template` SET `description`='Peacebloom in Westfall' WHERE  `entry`=1107;
+UPDATE `pool_template` SET `description`='Plaguebloom in Eastern Plaguelands' WHERE  `entry`=1265;
+UPDATE `pool_template` SET `description`='Plaguebloom in Felwood' WHERE  `entry`=1227;
+UPDATE `pool_template` SET `description`='Plaguebloom in Western Plaguelands' WHERE  `entry`=1258;
+UPDATE `pool_template` SET `description`='Purple Lotus in Ashenvale' WHERE  `entry`=1305;
+UPDATE `pool_template` SET `description`='Purple Lotus in Azshara' WHERE  `entry`=1239;
+UPDATE `pool_template` SET `description`='Purple Lotus in Badlands' WHERE  `entry`=1286;
+UPDATE `pool_template` SET `description`='Purple Lotus in Feralas' WHERE  `entry`=1324;
+UPDATE `pool_template` SET `description`='Purple Lotus in Hinterlands' WHERE  `entry`=1254;
+UPDATE `pool_template` SET `description`='Purple Lotus in Stranglethorn' WHERE  `entry`=1199;
+UPDATE `pool_template` SET `description`='Purple Lotus in Tanaris' WHERE  `entry`=1205;
+UPDATE `pool_template` SET `description`='Silverleaf in Darkshore' WHERE  `entry`=1095;
+UPDATE `pool_template` SET `description`='Silverleaf in Dun Morogh' WHERE  `entry`=1018;
+UPDATE `pool_template` SET `description`='Silverleaf in Durotar' WHERE  `entry`=1022;
+UPDATE `pool_template` SET `description`='Silverleaf in Elwynn Forest' WHERE  `entry`=1013;
+UPDATE `pool_template` SET `description`='Silverleaf in Loch Modan' WHERE  `entry`=1162;
+UPDATE `pool_template` SET `description`='Silverleaf in Mulgore' WHERE  `entry`=1027;
+UPDATE `pool_template` SET `description`='Silverleaf in Silverpine Forest' WHERE  `entry`=1042;
+UPDATE `pool_template` SET `description`='Silverleaf in Teldrassil' WHERE  `entry`=1003;
+UPDATE `pool_template` SET `description`='Silverleaf in Barrens' WHERE  `entry`=425;
+UPDATE `pool_template` SET `description`='Silverleafs in Tirisfal' WHERE  `entry`=1007;
+UPDATE `pool_template` SET `description`='Silverleaf in Westfall' WHERE  `entry`=1106;
+UPDATE `pool_template` SET `description`='Silverleaf in Tirisfal' WHERE  `entry`=1007;
+UPDATE `pool_template` SET `description`='Stranglekelp in Ashenvale' WHERE  `entry`=1076;
+UPDATE `pool_template` SET `description`='Stranglekelp in Azshara' WHERE  `entry`=1321;
+UPDATE `pool_template` SET `description`='Stranglekelp in Barrens' WHERE  `entry`=1064;
+UPDATE `pool_template` SET `description`='Stranglekelp in Darkshore' WHERE  `entry`=1322;
+UPDATE `pool_template` SET `description`='Stranglekelp in Desolace' WHERE  `entry`=1145;
+UPDATE `pool_template` SET `description`='Stranglekelp in Durotar' WHERE  `entry`=1323;
+UPDATE `pool_template` SET `description`='Stranglekelp in Feralas' WHERE  `entry`=1190;
+UPDATE `pool_template` SET `description`='Stranglekelp in Silverpine Forest' WHERE  `entry`=1065;
+UPDATE `pool_template` SET `description`='Stranglekelp in Stranglethorn' WHERE  `entry`=1171;
+UPDATE `pool_template` SET `description`='Stranglekelp in Hinterlands' WHERE  `entry`=1000;
+UPDATE `pool_template` SET `description`='Stranglekelp in Westfall' WHERE  `entry`=1122;
+UPDATE `pool_template` SET `description`='Stranglekelp in Wetlands' WHERE  `entry`=1149;
+UPDATE `pool_template` SET `description`='Sungrass in Azshara' WHERE  `entry`=1240;
+UPDATE `pool_template` SET `description`='Sungrass in Blasted Lands' WHERE  `entry`=1277;
+UPDATE `pool_template` SET `description`='Sungrass in Burning Steppes' WHERE  `entry`=1303;
+UPDATE `pool_template` SET `description`='Sungrass in Eastern Plaguelands' WHERE  `entry`=1320;
+UPDATE `pool_template` SET `description`='Sungrass in Felwood' WHERE  `entry`=1229;
+UPDATE `pool_template` SET `description`='Sungrass in Feralas' WHERE  `entry`=1192;
+UPDATE `pool_template` SET `description`='Sungrass in Hinterlands' WHERE  `entry`=1250;
+UPDATE `pool_template` SET `description`='Sungrass in Ungoro Crater' WHERE  `entry`=1215;
+UPDATE `pool_template` SET `description`='Sungrass in Western Plaguelands' WHERE  `entry`=1261;
+UPDATE `pool_template` SET `description`='Sungrass in Felwood' WHERE  `entry`=426;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Alterac Mountains' WHERE  `entry`=1061;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Arathi Highlands' WHERE  `entry`=1185;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Ashenvale' WHERE  `entry`=1081;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Barrens' WHERE  `entry`=1168;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Desolace' WHERE  `entry`=1142;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Stonetalon' WHERE  `entry`=1085;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Stranglethorn' WHERE  `entry`=1169;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Thousand Needles' WHERE  `entry`=1134;
+UPDATE `pool_template` SET `description`='Wild Steelbloom in Wetlands' WHERE  `entry`=1152;
+UPDATE `pool_template` SET `description`='Wildsteel Bloom in Duskwood' WHERE  `entry`=1114;
+
 
 -- End of migration.
 END IF;
