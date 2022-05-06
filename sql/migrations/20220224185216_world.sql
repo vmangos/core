@@ -3287,7 +3287,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `creature` WHERE (`guid` IN (33142, 33143, 33144, 33145, 108863, 108864, 108865, 108868));
 DELETE FROM `creature_movement` WHERE (`id` = 108865);
 
-INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wnader_distance`, `health_percent`, `mana_percent`, `patch_max`, `movement_type`) VALUES
+INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `patch_max`, `movement_type`) VALUES
 (33142, 11697, 1, 1583.8886718750, -2851.2922363281, 184.6023712158, 6.230825424194340, 300, 300, 0, 100, 100, 10, 0),
 (33143, 11697, 1, 1545.3580322266, -2848.5144042969, 182.5300903320, 4.607669353485110, 300, 300, 0, 100, 100, 10, 0),
 (33144, 11697, 1, 1538.9871826172, -2877.8420410156, 183.4159088135, 5.742133140563960, 300, 300, 0, 100, 100, 10, 0),
