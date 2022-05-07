@@ -8061,6 +8061,14 @@ UPDATE `pool_template` SET `description`='Wild Steelbloom in Thousand Needles' W
 UPDATE `pool_template` SET `description`='Wild Steelbloom in Wetlands' WHERE  `entry`=1152;
 UPDATE `pool_template` SET `description`='Wildsteel Bloom in Duskwood' WHERE  `entry`=1114;
 
+UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=418;
+UPDATE `pool_template` SET `max_limit`=6 WHERE  `entry`=416;
+UPDATE `pool_template` SET `max_limit`=5 WHERE  `entry`=420;
+UPDATE `pool_template` SET `max_limit`=20 WHERE  `entry`=422;
+UPDATE `pool_template` SET `max_limit`=2 WHERE  `entry`=427;
+UPDATE `pool_template` SET `max_limit`=20 WHERE  `entry`=425;
+UPDATE `pool_template` SET `max_limit`=3 WHERE  `entry`=426;
+
 
 -- End of migration.
 END IF;
