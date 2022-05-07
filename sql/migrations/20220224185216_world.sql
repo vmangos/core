@@ -3594,6 +3594,23 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (8066, 25, 1720.9526367188, -3470.0847167969, 144.3831329346, 100),
 (8066, 26, 1724.1323242188, -3484.9157714844, 143.7532501221, 100);
 
+-- ----------------------------------------------------------------------
+
+-- Update Script For Forsaken Diseases (credit cmangos)
+DELETE FROM `quest_end_scripts` WHERE `id`=1011;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1342, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind: Talk'),
+(1011, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind: Modify Flags'),
+(1011, 0, 0, 15, 6354, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Cast Spell'),
+(1011, 5, 0, 15, 6355, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Cast Spell'),
+(1011, 5, 0, 1, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Emote'),
+(1011, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1316, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Talk'),
+(1011, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1318, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Talk'),
+(1011, 16, 0, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Emote'),
+(1011, 20, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Modify Flags'),
+(1011, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1319, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Talk'),
+(1011, 20, 0, 1, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Emote');
+
 
 -- End of migration.
 END IF;
