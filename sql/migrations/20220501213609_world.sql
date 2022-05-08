@@ -5029,6 +5029,55 @@ https://github.com/cmangos/classic-db/commit/4cb145a368edc973a74fa5a5d77b7075720
 https://github.com/cmangos/classic-db/commit/76aac8083054451a9b8c56964868d0022d9f861d
 */
 
+/*
+POOLS
+SELECT guid, id, position_x, COUNT(position_x)
+FROM gameobject
+WHERE id IN (
+142141,
+176642,
+176589,
+142143,
+1621,
+3729,
+1622,
+3730,
+176584,
+176639,
+1619,
+3726,
+2042,
+2866,
+142144,
+176583,
+176638,
+2046,
+1628,
+142145,
+176637,
+176588,
+2043,
+1624,
+2041,
+1620,
+3727,
+176586,
+176640,
+1618,
+3724,
+176587,
+176641,
+142140,
+1617,
+3725,
+2045,
+142142,
+176636,
+1623,
+2044)
+GROUP BY position_x
+HAVING COUNT(position_x) > 1
+*/
 
 -- End of migration.
 END IF;
