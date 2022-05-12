@@ -25,6 +25,24 @@ SET @POPULARITY_CONTEST_WINNER_THUNDERBLUFF_GGUID = 31660;
 SET @POPULARITY_CONTEST_WINNER_UNDERCITY_GGUID = 13787;
 SET @POPULARITY_CONTEST_PEDDLE_CGUID = 2354;
 
+-- Missing Templates (TC Bruteforce).
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES 
+    (181088, 7, 6, 327, 'Event Trap, Thrall', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+    (181089, 7, 6, 327, 'Event Trap, Bolvar', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+    (181090, 7, 6, 327, 'Event Trap, Magni', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+    (181091, 7, 6, 327, 'Event Trap, Tyrande', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+    (181092, 7, 6, 327, 'Event Trap, Cairne', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+    (181093, 7, 6, 327, 'Event Trap, Sylvanas', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+-- Spell 27663 targets those GameObjects (not used rn in vmangos, its hardcoded)
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
+    (27663, 0, 181088, 0, 0, 5059, 5875),
+    (27663, 0, 181089, 0, 0, 5059, 5875),
+    (27663, 0, 181090, 0, 0, 5059, 5875),
+    (27663, 0, 181091, 0, 0, 5059, 5875),
+    (27663, 0, 181092, 0, 0, 5059, 5875),
+    (27663, 0, 181093, 0, 0, 5059, 5875);
+
 -- Peddle.
 UPDATE `creature_template` SET `unit_flags`=32768 WHERE `entry`=16075;
 
