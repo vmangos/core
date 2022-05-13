@@ -3645,7 +3645,22 @@ DELETE FROM `game_event` WHERE `entry` = 160;
 DELETE FROM `game_event_creature` WHERE `guid` = 2026 AND `event` = 160;
 DELETE FROM `game_event_creature` WHERE `guid` = 6491 AND `event` = 160;
 
--- NOTE: EVENT 150 IS NOT NEEDED AS LEPRITHUS SPAWN COULD BE ADDED TO THE NIGHT EVENT (WE ARE ALSO MISSING AN ALTERNATE SPAWNPOINT NEAR THE DUSTPLAINS THAT IS A PATROL)
+-- NOTE: EVENT 150 (SAME WITH EVENT 151) IS NOT NEEDED AS LEPRITHUS SPAWN COULD BE ADDED TO THE NIGHT EVENT (WE ARE ALSO MISSING AN ALTERNATE SPAWNPOINT NEAR THE DUSTPLAINS THAT IS A PATROL)
+
+-- ----------------------------------------------------------------------
+
+-- Add Missing Aggro Text To Defias Messenger
+DELETE FROM `creature_ai_scripts` WHERE `id`=55001;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(55001, 0, 0, 39, 55001, 55002, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Defias Messenger - Start Script');
+
+DELETE FROM `generic_scripts` WHERE `id`=55001;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(55001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 473, 474, 475, 476, 0, 0, 0, 0, 0, 'Defias Messenger - Talk');
+
+DELETE FROM `generic_scripts` WHERE `id`=55002;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(55002, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 477, 478, 479, 480, 0, 0, 0, 0, 0, 'Defias Messenger - Talk');
 
 
 -- End of migration.
