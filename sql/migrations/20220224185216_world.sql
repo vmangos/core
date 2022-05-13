@@ -3662,6 +3662,11 @@ DELETE FROM `generic_scripts` WHERE `id`=55002;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (55002, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 477, 478, 479, 480, 0, 0, 0, 0, 0, 'Defias Messenger - Talk');
 
+-- ----------------------------------------------------------------------
+
+-- Make Tanaris Pirates Swim (credit cmangos) 
+UPDATE creature_template SET inhabit_type = 3 WHERE entry IN (7858,7855,7857,7856);
+
 
 -- End of migration.
 END IF;
