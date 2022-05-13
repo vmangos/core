@@ -3611,6 +3611,40 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (1011, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1319, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Talk'),
 (1011, 20, 0, 1, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Forsaken Diseases: Kayneth Stillwind - Emote');
 
+-- ----------------------------------------------------------------------
+
+-- Update and Remove Some Events
+UPDATE `game_event` SET `description` = 'Call to Arms: Alterac Valley' WHERE `entry` = 18;
+UPDATE `game_event` SET `description` = 'Call to Arms' WHERE `entry` = 25;
+
+-- Remove Unneeded Event 159
+DELETE FROM `game_event` WHERE  `entry`=159;
+DELETE FROM `game_event_creature` WHERE `event` = 159;
+UPDATE `creature` SET `patch_min` = 3 WHERE `guid` = 3421;
+
+-- Remove Unneeded Event 156
+DELETE FROM `game_event` WHERE `entry` = 156;
+DELETE FROM `conditions` WHERE `condition_entry` IN (72, 76, 77);
+UPDATE `creature_loot_template` SET `condition_id`= 0, `patch_min` = 1 WHERE `entry` = 10184 AND `item` = 18705;
+UPDATE `creature_loot_template` SET `condition_id`= 0, `patch_min` = 1 WHERE `entry` = 11988 AND `item` = 17203;
+UPDATE `creature_loot_template` SET `condition_id`= 0, `patch_min` = 1 WHERE `entry` = 11502 AND `item` = 17204;
+UPDATE `reference_loot_template` SET `condition_id` = 0 WHERE `entry`=30001;
+UPDATE `gameobject_loot_template` SET `condition_id` = 0, `patch_min` = 1 WHERE `entry` = 16719 AND `item`=18646;
+UPDATE `gameobject_loot_template` SET `condition_id` = 0, `patch_min` = 1 WHERE `entry` = 16719 AND `item`=18703;
+UPDATE `skinning_loot_template` SET `condition_id` = 0, `patch_min` = 1 WHERE `entry` = 10184 AND`item` = 15410;
+
+-- Remove Unneeded Event 158
+DELETE FROM `game_event` WHERE  `entry`=158;
+DELETE FROM `conditions` WHERE  `condition_entry`=78;
+UPDATE `reference_loot_template` SET `patch_min` = 8, `condition_id` = 0 WHERE `entry` = 30171 AND `item` = 22388;
+UPDATE `reference_loot_template` SET `patch_min` = 8, `condition_id` = 0 WHERE `entry` = 30171 AND `item` = 22389;
+UPDATE `reference_loot_template` SET `patch_min` = 8, `condition_id` = 0 WHERE `entry` = 30171 AND `item` = 22390;
+
+-- Remove Unneeded Event 160
+DELETE FROM `game_event` WHERE `entry` = 160;
+DELETE FROM `game_event_creature` WHERE `guid` = 2026 AND `event` = 160;
+DELETE FROM `game_event_creature` WHERE `guid` = 6491 AND `event` = 160;
+
 
 -- End of migration.
 END IF;
