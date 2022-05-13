@@ -26,15 +26,15 @@ SET @POPULARITY_CONTEST_WINNER_UNDERCITY_GGUID = 13787;
 SET @POPULARITY_CONTEST_PEDDLE_CGUID = 2354;
 
 -- Missing Templates (TC Bruteforce).
-INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES 
-    (181088, 7, 6, 327, 'Event Trap, Thrall', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-    (181089, 7, 6, 327, 'Event Trap, Bolvar', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-    (181090, 7, 6, 327, 'Event Trap, Magni', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-    (181091, 7, 6, 327, 'Event Trap, Tyrande', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-    (181092, 7, 6, 327, 'Event Trap, Cairne', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-    (181093, 7, 6, 327, 'Event Trap, Sylvanas', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES
+    (181088, 7, 6, 327, 'Event Trap, Thrall', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_love_is_in_the_air_event_trap'),
+    (181089, 7, 6, 327, 'Event Trap, Bolvar', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_love_is_in_the_air_event_trap'),
+    (181090, 7, 6, 327, 'Event Trap, Magni', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_love_is_in_the_air_event_trap'),
+    (181091, 7, 6, 327, 'Event Trap, Tyrande', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_love_is_in_the_air_event_trap'),
+    (181092, 7, 6, 327, 'Event Trap, Cairne', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_love_is_in_the_air_event_trap'),
+    (181093, 7, 6, 327, 'Event Trap, Sylvanas', 0, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_love_is_in_the_air_event_trap');
 
--- Spell 27663 targets those GameObjects (not used rn in vmangos, its hardcoded)
+-- Spell 27663 targets those GameObjects (not used rn in vmangos, its hardcoded in peddles script)
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `conditionId`, `inverseEffectMask`, `build_min`, `build_max`) VALUES
     (27663, 0, 181088, 0, 0, 5059, 5875),
     (27663, 0, 181089, 0, 0, 5059, 5875),
@@ -849,8 +849,14 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
     (@LOVE_IS_IN_THE_AIR_GGUID+618, 181060, 1, 10127.5, 2219.46, 1330.95, 4.55531, 0, 0, -0.760406, 0.649449, 120, 120, 100, 1, 0, 0, 7, 10),
     (@LOVE_IS_IN_THE_AIR_GGUID+619, 181060, 1, 10135.9, 2225.01, 1330.94, 0.855211, 0, 0, 0.414693, 0.909961, 120, 120, 100, 1, 0, 0, 7, 10),
     (@LOVE_IS_IN_THE_AIR_GGUID+620, 181060, 1, 10139.1, 2227.24, 1330.96, 4.50295, 0, 0, -0.777145, 0.629321, 120, 120, 100, 1, 0, 0, 7, 10),
-    (@LOVE_IS_IN_THE_AIR_GGUID+621, 181073, 0, 98.9861, -1720.18, 220.223, 4.95674, 0, 0, -0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 7, 10);
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LOVE_IS_IN_THE_AIR_GGUID+1 AND @LOVE_IS_IN_THE_AIR_GGUID+621;
+    (@LOVE_IS_IN_THE_AIR_GGUID+621, 181073, 0, 98.9861, -1720.18, 220.223, 4.95674, 0, 0, -0.615661, 0.788011, 120, 120, 100, 1, 0, 0, 7, 10),
+	(@LOVE_IS_IN_THE_AIR_GGUID+622, 181088, 1, 1929.58, -4137.4, 40.4708, 4.17134, 0, 0, 0, 0, 300, 300, 100, 1, 0, 0, 7, 10),
+	(@LOVE_IS_IN_THE_AIR_GGUID+623, 181089, 0, -8435.29, 323.431, 121.829, 1.76278, 0, 0, 0, 0, 300, 300, 100, 1, 0, 0, 7, 10),
+	(@LOVE_IS_IN_THE_AIR_GGUID+624, 181090, 0, -4867.87, -1032.22, 502.273, 5.49779, 0, 0, 0, 0, 300, 300, 100, 1, 0, 0, 7, 10),
+	(@LOVE_IS_IN_THE_AIR_GGUID+625, 181091, 1, 9670.28, 2534.94, 1360.08, 5.34071, 0, 0, 0, 0, 300, 300, 100, 1, 0, 0, 7, 10),
+	(@LOVE_IS_IN_THE_AIR_GGUID+626, 181092, 1, -1199.99, -118.787, 163.882, 3.10669, 0, 0, 0, 0, 300, 300, 100, 1, 0, 0, 7, 10),
+	(@LOVE_IS_IN_THE_AIR_GGUID+627, 181093, 0, 1302.19, 343.649, -64.944, 1.55334, 0, 0, 0, 0, 300, 300, 100, 1, 0, 0, 7, 10);
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @LOVE_IS_IN_THE_AIR_EVENT FROM `gameobject` WHERE gameobject.guid BETWEEN @LOVE_IS_IN_THE_AIR_GGUID+1 AND @LOVE_IS_IN_THE_AIR_GGUID+627;
 
 
 -- End of migration.
