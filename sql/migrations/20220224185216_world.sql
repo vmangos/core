@@ -3645,7 +3645,31 @@ DELETE FROM `game_event` WHERE `entry` = 160;
 DELETE FROM `game_event_creature` WHERE `guid` = 2026 AND `event` = 160;
 DELETE FROM `game_event_creature` WHERE `guid` = 6491 AND `event` = 160;
 
+/*
 -- NOTE: EVENT 150 (SAME WITH EVENT 151) IS NOT NEEDED AS LEPRITHUS SPAWN COULD BE ADDED TO THE NIGHT EVENT (WE ARE ALSO MISSING AN ALTERNATE SPAWNPOINT NEAR THE DUSTPLAINS THAT IS A PATROL)
+Leprithus Spawns At Night
+DELETE FROM `game_event` WHERE `entry`=150; -- (Hardcoded cpp Needs Removing?)
+DELETE FROM `game_event_creature` WHERE `event`=150;
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(28458, 27),
+(301720, 27),
+(301721, 27),
+(301722, 27),
+(301723, 27),
+(301724, 27),
+(301725, 27),
+(301726, 27);
+
+Fleshrippers Despawn At Night
+DELETE FROM `game_event` WHERE `entry`=151; -- (Hardcoded cpp Needs Removing?)
+DELETE FROM `game_event_creature` WHERE `event`=151;
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(52594, -27),
+(52595, -27),
+(52596, -27),
+(90279, -27),
+(90280, -27);
+*/
 
 -- ----------------------------------------------------------------------
 
@@ -3665,7 +3689,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 -- ----------------------------------------------------------------------
 
 -- Make Tanaris Pirates Swim (credit cmangos) 
-UPDATE creature_template SET inhabit_type = 3 WHERE entry IN (7858,7855,7857,7856);
+UPDATE `creature_template` SET `inhabit_type` = 3 WHERE `entry` IN (7858,7855,7857,7856);
 
 -- ----------------------------------------------------------------------
 
