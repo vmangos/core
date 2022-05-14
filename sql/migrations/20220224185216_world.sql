@@ -3703,6 +3703,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (66715, 176117, 0, 1408.95, -3657.77, 82.0193, 5.74214, 0, 0, -0.267238, 0.963631, 120, 120, 100, 1, 0, 0, 0, 10),
 (66716, 176117, 0, 1411.24, -3712.94, 78.1772, 1.62316, 0, 0, 0.725374, 0.688355, 120, 120, 100, 1, 0, 0, 0, 10);
 
+-- ----------------------------------------------------------------------
+
+-- Jalane Ayrole And Josephine Lister Should Not Teach Shadoweave Mask
+DELETE FROM `npc_trainer` WHERE  `entry` = 9584 AND `spell` = 12128;
+DELETE FROM `npc_trainer` WHERE  `entry` = 4578 AND `spell` = 12128;
+
 
 -- End of migration.
 END IF;
