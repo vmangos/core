@@ -3645,9 +3645,24 @@ DELETE FROM `game_event` WHERE `entry` = 160;
 DELETE FROM `game_event_creature` WHERE `guid` = 2026 AND `event` = 160;
 DELETE FROM `game_event_creature` WHERE `guid` = 6491 AND `event` = 160;
 
-/*
--- NOTE: EVENT 150 (SAME WITH EVENT 151) IS NOT NEEDED AS LEPRITHUS SPAWN COULD BE ADDED TO THE NIGHT EVENT (WE ARE ALSO MISSING AN ALTERNATE SPAWNPOINT NEAR THE DUSTPLAINS THAT IS A PATROL)
-Leprithus Spawns At Night
+-- NOTE: EVENT 150 (SAME WITH EVENT 151) IS NOT NEEDED AS LEPRITHUS SPAWN CAN BE ADDED TO THE NIGHT EVENT
+-- Add Missing Leprithus Spawn (They are not pooled two spawns are active in classic)
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1392, 572, 0, 0, 0, 0, -10956.3, 751.845, 43.5525, 3.86293, 7200, 10800, 50, 100, 100, 1, 0, 0, 0, 10),
+(1395, 846, 0, 0, 0, 0, -10956.3, 751.845, 43.5525, 3.86293, 300, 300, 0, 100, 0, 0, 0, 0, 0, 10),
+(1528, 846, 0, 0, 0, 0, -10956.3, 751.845, 43.5525, 3.86293, 300, 300, 0, 100, 0, 0, 0, 0, 0, 10);
+
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(1392, 1392, 0, 6.25244, 11),
+(1392, 1395, 3, 3.92699, 11),
+(1392, 1528, 3, 2.35619, 11);
+
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(1392, 27),
+(1395, 27),
+(1528, 27);
+
+-- Leprithus Spawns At Night
 DELETE FROM `game_event` WHERE `entry`=150; -- (Hardcoded cpp Needs Removing?)
 DELETE FROM `game_event_creature` WHERE `event`=150;
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
@@ -3660,7 +3675,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (301725, 27),
 (301726, 27);
 
-Fleshrippers Despawn At Night
+-- Fleshrippers Despawn At Night
 DELETE FROM `game_event` WHERE `entry`=151; -- (Hardcoded cpp Needs Removing?)
 DELETE FROM `game_event_creature` WHERE `event`=151;
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
@@ -3669,7 +3684,6 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (52596, -27),
 (90279, -27),
 (90280, -27);
-*/
 
 -- ----------------------------------------------------------------------
 
