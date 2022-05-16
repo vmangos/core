@@ -44,6 +44,7 @@
 #include "Geometry.h"
 #include "ObjectPosSelector.h"
 #include "MoveMapSharedDefines.h"
+#include "PathFinder.h"
 #include "TemporarySummon.h"
 #include "ZoneScriptMgr.h"
 #include "InstanceData.h"
@@ -1974,6 +1975,87 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             break;
         }
     }
+}
+
+void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+{
+    float destX = pos.x + dist * cos(angle);
+    float destY = pos.y + dist * sin(angle);
+    float destZ = pos.z;
+
+    GenericTransport* transport = GetTransport();
+
+    float halfHeight = IsUnit() ? static_cast<Unit*>(this)->GetCollisionHeight() : 0.0f;
+    if (IsUnit())
+    {
+        PathFinder path(static_cast<Unit*>(this));
+        Vector3 src(pos.x, pos.y, pos.z);
+        Vector3 dest(destX, destY, destZ + halfHeight);
+        if (transport) // need to use offsets for PF check
+        {
+            transport->CalculatePassengerOffset(src.x, src.y, src.z);
+            transport->CalculatePassengerOffset(dest.x, dest.y, dest.z);
+        }
+        path.calculate(src, dest, false, true);
+        if (path.getPathType())
+        {
+            G3D::Vector3 result = path.getPath().back();
+            destX = result.x;
+            destY = result.y;
+            destZ = result.z;
+            if (transport) // transport produces offset, but we need global pos
+                transport->CalculatePassengerPosition(destX, destY, destZ);
+        }
+    }
+
+    UpdateAllowedPositionZ(destX, destY, destZ);
+    destZ += halfHeight;
+    bool colPoint = GetMap()->GetLosHitPosition(pos.x, pos.y, pos.z + halfHeight, destX, destY, destZ, -0.5f);
+    destZ -= halfHeight;
+
+    if (colPoint)
+    {
+        destX -= CONTACT_DISTANCE * cos(angle);
+        destY -= CONTACT_DISTANCE * sin(angle);
+        dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
+    }
+
+    colPoint = GetMap()->GetLosHitPosition(destX, destY, destZ + halfHeight, destX, destY, destZ, -0.5f);
+    if (colPoint)
+        dist = sqrt((pos.x - destX) * (pos.x - destX) + (pos.y - destY) * (pos.y - destY));
+
+    float step = dist / 10.0f;
+    Position tempPos(destX, destY, destZ, 0.f);
+    bool distanceZSafe = true;
+    float previousZ = destZ;
+
+    for (int i = 0; i < 10; i++)
+    {
+        if (fabs(pos.z - destZ) > ATTACK_DISTANCE)
+        {
+            previousZ = destZ;
+            destX -= step * cos(angle);
+            destY -= step * sin(angle);
+            UpdateAllowedPositionZ(destX, destY, destZ);
+            if (fabs(previousZ - destZ) > (ATTACK_DISTANCE / 2))
+                distanceZSafe = false;
+        }
+        else
+        {
+            pos.x = destX;
+            pos.y = destY;
+            pos.z = destZ;
+            break;
+        }
+    }
+
+    if (distanceZSafe)
+        pos = tempPos;
+
+    MaNGOS::NormalizeMapCoord(pos.x);
+    MaNGOS::NormalizeMapCoord(pos.y);
+    UpdateAllowedPositionZ(pos.x, pos.y, pos.z);
+    pos.o = m_position.o;
 }
 
 bool WorldObject::IsPositionValid() const

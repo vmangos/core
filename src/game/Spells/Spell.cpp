@@ -3112,25 +3112,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     case TARGET_LOCATION_CASTER_RIGHT:       angle -= M_PI_F / 2;     break;
                 }
 
-                float x, y, z;
-                m_caster->GetNearPoint(m_caster, x, y, z, 0.0f, radius, angle);
-
-                // Hacky fix in case we are inside a cave, because GetNearPoint will update Z to above the cave.
-                // Example case: trap for gobject 178325, spell 21078
-                if ((m_caster->GetDistance(x, y, z) > radius * 2) &&
-                    !m_caster->IsWithinLOS(x, y, z, false))
-                {
-                    m_caster->GetPosition(x, y, z);
-                    m_caster->GetNearPoint2D(x, y, radius, angle);
-                }
-
-                // For some reason all the creature Blink spells use this target type instead of the player one.
-                // Prevent them from teleporting to places that they can't normally walk to like under the map.
-                if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_LEAP)
-                    if (!m_caster->GetMap()->GetWalkHitPosition(m_caster->GetTransport(), x, y, z, x, y, z, NAV_GROUND | NAV_WATER, 1.0f, false) || (abs(m_caster->GetPositionZ() - z) > 5.0f))
-                        m_caster->GetPosition(x, y, z);
-
-                m_targets.setDestination(x, y, z);
+                Position pos;
+                m_caster->GetFirstCollisionPosition(pos, radius, angle);
+                m_targets.setDestination(pos.x, pos.y, pos.z);
             }                
 
             if (m_casterUnit && targetUnitMap.empty())
