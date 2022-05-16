@@ -3723,6 +3723,21 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `npc_trainer` WHERE  `entry` = 9584 AND `spell` = 12128;
 DELETE FROM `npc_trainer` WHERE  `entry` = 4578 AND `spell` = 12128;
 
+-- ----------------------------------------------------------------------
+
+-- Add Missing Repair Option To Vendors
+UPDATE `creature_template` SET `npc_flags` = 16388 WHERE `entry` IN (
+3612,
+4171,
+4175,
+4177,
+4180,
+4232,
+4233,
+4234,
+4236
+);
+
 
 -- End of migration.
 END IF;
