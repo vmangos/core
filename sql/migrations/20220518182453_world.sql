@@ -22,7 +22,7 @@ UPDATE `creature_template` set `faction` = 21, `script_name` = '' WHERE `entry` 
 14511
 );
 
-UPDATE `creature_template` SET `detection_range` = 75 WHERE `entry` IN (
+UPDATE `creature_template` SET `detection_range` = 45 WHERE `entry` IN (
 14521,
 14520,
 14519,
