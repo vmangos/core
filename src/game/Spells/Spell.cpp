@@ -1673,7 +1673,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                     (m_spellInfo->Id == 6358 || // Exception to fix succubus seduction.
                      m_caster->IsVisibleForOrDetect(unit, unit, false)))
             {
-                if ((!IsTriggeredByAura() || m_spellInfo->speed) &&
+                if ((!IsTriggeredByAura() || m_spellInfo->speed || m_spellInfo->HasDirectThreatIncreaseEffect()) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NO_THREAT) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_THREAT_ONLY_ON_MISS) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT))
@@ -3112,25 +3112,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     case TARGET_LOCATION_CASTER_RIGHT:       angle -= M_PI_F / 2;     break;
                 }
 
-                float x, y, z;
-                m_caster->GetNearPoint(m_caster, x, y, z, 0.0f, radius, angle);
-
-                // Hacky fix in case we are inside a cave, because GetNearPoint will update Z to above the cave.
-                // Example case: trap for gobject 178325, spell 21078
-                if ((m_caster->GetDistance(x, y, z) > radius * 2) &&
-                    !m_caster->IsWithinLOS(x, y, z, false))
-                {
-                    m_caster->GetPosition(x, y, z);
-                    m_caster->GetNearPoint2D(x, y, radius, angle);
-                }
-
-                // For some reason all the creature Blink spells use this target type instead of the player one.
-                // Prevent them from teleporting to places that they can't normally walk to like under the map.
-                if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_LEAP)
-                    if (!m_caster->GetMap()->GetWalkHitPosition(m_caster->GetTransport(), x, y, z, x, y, z, NAV_GROUND | NAV_WATER, 1.0f, false) || (abs(m_caster->GetPositionZ() - z) > 5.0f))
-                        m_caster->GetPosition(x, y, z);
-
-                m_targets.setDestination(x, y, z);
+                Position pos;
+                m_caster->GetFirstCollisionPosition(pos, radius, angle);
+                m_targets.setDestination(pos.x, pos.y, pos.z);
             }                
 
             if (m_casterUnit && targetUnitMap.empty())
@@ -3546,20 +3530,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         ReSetTimer();
 
         if (!m_IsTriggeredSpell && m_casterUnit)
-        {
             m_casterUnit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_ACTION_CANCELS, m_spellInfo->Id, false, !ShouldRemoveStealthAuras());
-
-            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
-            // - Stealth and Invisibility effects will now be canceled at the
-            //   beginning of an action(spellcast, ability use etc...), rather than
-            //   at the completion of the action.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            // If timer = 0, it's an instant cast spell and will be casted on the next tick.
-            // Cast completion will remove all any stealth/invis auras
-            if (m_timer)
-                m_casterUnit->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
-#endif
-        }
 
         OnSpellLaunch();
 
@@ -6780,8 +6751,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!friendly_dispel && !positive && holder->GetSpellProto()->IsCharmSpell())
                             if (CharmInfo *charm = unit_target->GetCharmInfo())
                                 if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                    if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*m_caster->GetFactionTemplateEntry()))
-                                        bFoundOneDispell = true;
+                                    if (FactionTemplateEntry const* ft2 = m_caster->GetFactionTemplateEntry())
+                                        if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*ft2))
+                                            bFoundOneDispell = true;
                         if (positive == friendly_dispel)
                             continue;
                     }

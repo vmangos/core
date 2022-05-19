@@ -7611,7 +7611,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
             continue;
 
         // wrong triggering type
-        if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+        if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
             continue;
 
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellData.SpellId);
@@ -7804,7 +7804,8 @@ void Player::RemovedInsignia(Player* looterPlr, Corpse* corpse)
     if (!corpse)
         return;
 
-    WorldPacket data(SMSG_PLAYER_SKINNED,0);
+    WorldPacket data(SMSG_PLAYER_SKINNED,1);
+    data << uint8(0);
     GetSession()->SendPacket(&data);
 
     sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), looterPlr);
@@ -12487,7 +12488,7 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId)
 
 uint32 Player::GetGossipTextId(WorldObject* pSource)
 {
-    if (!pSource || pSource->GetTypeId() != TYPEID_UNIT)
+    if (!pSource || !pSource->IsCreature() || pSource->IsPet())
         return DEFAULT_GOSSIP_MESSAGE;
 
     if (uint32 pos = sObjectMgr.GetNpcGossip(((Creature*)pSource)->GetGUIDLow()))
@@ -12643,19 +12644,27 @@ void Player::SendPreparedQuest(ObjectGuid guid)
         // need pet case for some quests
         if (Creature* pCreature = GetMap()->GetAnyTypeCreature(guid))
         {
-            uint32 textid = sObjectMgr.GetNpcGossip(pCreature->GetGUIDLow());
+            uint32 textId;
+            if (pCreature->GetDefaultGossipMenuId())
+                textId = GetGossipTextId(pCreature->GetDefaultGossipMenuId(), pCreature);
+            else
+                textId = GetGossipTextId(pCreature);
 
-            NpcText const* gossiptext = sObjectMgr.GetNpcText(textid);
-            if (gossiptext && gossiptext->Options[0].BroadcastTextID)
+            // do not show placeholder text as quest greeting
+            if (textId != DEFAULT_GOSSIP_MESSAGE)
             {
-                if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(gossiptext->Options[0].BroadcastTextID))
+                NpcText const* gossiptext = sObjectMgr.GetNpcText(textId);
+                if (gossiptext && gossiptext->Options[0].BroadcastTextID)
                 {
-                    qe._Emote = bct->emoteId1;
-                    qe._Delay = bct->emoteDelay1;
-                    int loc_idx = GetSession()->GetSessionDbLocaleIndex();
-                    title = bct->GetText(loc_idx, pCreature->GetGender(), false);
+                    if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(gossiptext->Options[0].BroadcastTextID))
+                    {
+                        qe._Emote = bct->emoteId1;
+                        qe._Delay = bct->emoteDelay1;
+                        int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                        title = bct->GetText(loc_idx, pCreature->GetGender(), false);
+                    }
+
                 }
-                
             }
         }
         PlayerTalkClass->SendQuestGiverQuestList(qe, title, guid);
@@ -12726,8 +12735,8 @@ bool Player::CanSeeStartQuest(Quest const* pQuest) const
 {
     if (SatisfyQuestClass(pQuest, false) && SatisfyQuestRace(pQuest, false) && SatisfyQuestSkill(pQuest, false) && SatisfyQuestCondition(pQuest, false) &&
             SatisfyQuestExclusiveGroup(pQuest, false) && SatisfyQuestReputation(pQuest, false) &&
-            SatisfyQuestPreviousQuest(pQuest, false) && SatisfyQuestNextChain(pQuest, false) &&
-            SatisfyQuestPrevChain(pQuest, false) &&
+            SatisfyQuestPreviousQuest(pQuest, false) && SatisfyQuestBreadcrumbQuest(pQuest, false) && SatisfyQuestDependentBreadcrumbQuests(pQuest, false) && 
+            SatisfyQuestNextChain(pQuest, false) && SatisfyQuestPrevChain(pQuest, false) &&
             pQuest->IsActive())
     {
         int32 highLevelDiff = sWorld.getConfig(CONFIG_INT32_QUEST_HIGH_LEVEL_HIDE_DIFF);
@@ -12749,6 +12758,7 @@ bool Player::CanTakeQuest(Quest const* pQuest, bool msg, bool skipStatusCheck /*
            SatisfyQuestSkill(pQuest, msg) && SatisfyQuestCondition(pQuest, msg) && SatisfyQuestReputation(pQuest, msg) &&
            SatisfyQuestPreviousQuest(pQuest, msg) && SatisfyQuestTimed(pQuest, msg) &&
            SatisfyQuestNextChain(pQuest, msg) && SatisfyQuestPrevChain(pQuest, msg) &&
+           SatisfyQuestBreadcrumbQuest(pQuest, msg) && SatisfyQuestDependentBreadcrumbQuests(pQuest, msg) &&
            pQuest->IsActive();
 }
 
@@ -13596,6 +13606,42 @@ bool Player::SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const
         SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
 
     return false;
+}
+
+bool Player::SatisfyQuestBreadcrumbQuest(Quest const* qInfo, bool msg) const
+{
+    // If the target quest is not available, then we cannot accept the breadcrumb
+    uint32 breadcrumbTargetQuestId = qInfo->GetBreadcrumbForQuestId();
+    if (!breadcrumbTargetQuestId)
+        return true;
+
+    if (!CanTakeQuest(sObjectMgr.GetQuestTemplate(breadcrumbTargetQuestId), false))
+    {
+        if (msg)
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
+        return false;
+    }
+
+    return true;
+}
+
+bool Player::SatisfyQuestDependentBreadcrumbQuests(Quest const* qInfo, bool msg) const
+{
+    // If we have one of the breadcrumb quests, then we can't accept the target quest
+    for (uint32 breadcrumbQuestId : qInfo->DependentBreadcrumbQuests)
+    {
+        QuestStatus status = GetQuestStatus(breadcrumbQuestId);
+        if ((status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_FAILED) && !GetQuestRewardStatus(breadcrumbQuestId))
+        {
+            if (msg)
+                SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
@@ -19073,7 +19119,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
         if (!spellData.SpellId)
             continue;
 
-        // wrong triggering type (note: ITEM_SPELLTRIGGER_ON_NO_DELAY_USE not have cooldown)
+        // wrong triggering type
         if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
             continue;
 

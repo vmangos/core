@@ -1416,6 +1416,11 @@ struct npc_riggle_bassbaitAI : ScriptedAI
     {
         m_uiTimer = 0;
 
+        auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
+        if (time(nullptr) - prevWinTime > DAY)
+        {
+            sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 0, true);
+        }
         npc_riggle_bassbaitAI::Reset();
     }
 
@@ -1492,6 +1497,7 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, Que
     {
         sObjectMgr.SetSavedVariable(VAR_TOURNAMENT, time(nullptr), true);
         sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
+        sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 1, true);
         pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         pCreature->MonsterYellToZone(YELL_WINNER, 0, pPlayer);
     }

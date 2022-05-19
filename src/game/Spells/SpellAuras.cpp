@@ -2603,8 +2603,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     HandleShapeshiftBoosts(apply);
     target->UpdateModelData();
 
-    if (target->GetTypeId() == TYPEID_PLAYER)
+    if (target->IsPlayer())
         ((Player*)target)->InitDataForForm();
+    else
+    {
+        target->UpdateSpeed(MOVE_WALK, false);
+        target->UpdateSpeed(MOVE_RUN, false);
+    }
 }
 
 void Aura::HandleAuraTransform(bool apply, bool Real)
@@ -2776,6 +2781,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 }
             }
         }
+    }
+
+    if (target->IsCreature())
+    {
+        target->UpdateSpeed(MOVE_WALK, false);
+        target->UpdateSpeed(MOVE_RUN, false);
     }
 }
 
@@ -5292,14 +5303,22 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
 void Aura::HandleModDamagePercentDone(bool apply, bool Real)
 {
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "AURA MOD DAMAGE type:%u negative:%u", m_modifier.m_miscvalue, m_positive ? 0 : 1);
+
     Unit* target = GetTarget();
 
     // apply item specific bonuses for already equipped weapon
-    if (Real && target->GetTypeId() == TYPEID_PLAYER)
+    if (Real)
     {
-        for (int i = 0; i < MAX_ATTACK; ++i)
-            if (Item* pItem = ((Player*)target)->GetWeaponForAttack(WeaponAttackType(i), true, false))
-                ((Player*)target)->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
+        if (Player* player = target->ToPlayer())
+        {
+            for (int i = 0; i < MAX_ATTACK; ++i)
+            {
+                if (Item* pItem = player->GetWeaponForAttack(WeaponAttackType(i), true, false))
+                {
+                    player->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
+                }
+            }
+        }
     }
 
     // m_modifier.m_miscvalue is bitmask of spell schools
@@ -5314,15 +5333,17 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
     if ((m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL) != 0)
     {
         // apply generic physical damage bonuses including wand case
-        if (GetSpellProto()->EquippedItemClass == -1 || target->GetTypeId() != TYPEID_PLAYER)
+        if (GetSpellProto()->EquippedItemClass == -1 || !target->IsPlayer())
         {
             target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, m_modifier.m_amount, apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_PCT, m_modifier.m_amount, apply);
 
             // For show in client
-            if (target->GetTypeId() == TYPEID_PLAYER)
+            if (target->IsPlayer())
+            {
                 target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT, m_modifier.m_amount / 100.0f, apply);
+            }
         }
         else
         {
@@ -5345,9 +5366,16 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
 
     // Magic damage percent modifiers implemented in Unit::SpellDamageBonusDone
     // Send info to client
-    if (target->GetTypeId() == TYPEID_PLAYER)
+    if (target->IsPlayer())
+    {
         for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-            target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, m_modifier.m_amount / 100.0f, apply);
+        {
+            if (m_modifier.m_miscvalue & (1 << i)) // make sure current spell school is actually included
+            {
+                target->ApplyModSignedFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, m_modifier.m_amount / 100.0f, apply);
+            }
+        }
+    }
 }
 
 void Aura::HandleModOffhandDamagePercent(bool apply, bool Real)
@@ -7400,14 +7428,15 @@ void SpellAuraHolder::SetAuraFlag(uint32 slot, bool add)
     {
         uint32 flags = AFLAG_NONE;
 
-        if (IsPositive())
-        {
-            if (!m_spellProto->HasAttribute(SPELL_ATTR_CANT_CANCEL))
-                flags |= AFLAG_CANCELABLE;
-            flags |= AFLAG_UNK3;
-        }
-        else
-            flags |= AFLAG_UNK4;
+        if (IsPositive() && !m_spellProto->HasAttribute(SPELL_ATTR_CANT_CANCEL))
+            flags |= AFLAG_CANCELABLE;
+
+        if (GetAuraByEffectIndex(EFFECT_INDEX_0))
+            flags |= AFLAG_EFF_INDEX_0;
+        if (GetAuraByEffectIndex(EFFECT_INDEX_1))
+            flags |= AFLAG_EFF_INDEX_1;
+        if (GetAuraByEffectIndex(EFFECT_INDEX_2))
+            flags |= AFLAG_EFF_INDEX_2;
 
         val |= (flags << byte);
     }

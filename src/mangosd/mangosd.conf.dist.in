@@ -1598,7 +1598,7 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.TimeDesync.Threshold
 #        Description: Milliseconds of time difference tolerated.
-#        Default:     10000
+#        Default:     5000
 #
 #    Anticheat.TimeDesync.Penalty
 #        Description: Action to take upon failing this check.
@@ -1814,13 +1814,18 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
+#    Anticheat.FakeTransport.Reject
+#        Description: Do not accept movement info and logout player to sync transports.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
 #    Anticheat.FakeTransport.Threshold
 #        Description: Detections needed to trigger a penalty.
 #        Default:     1
 #
 #    Anticheat.FakeTransport.Penalty
 #        Description: Action to take upon failing this check.
-#        Default:     11 - Log, Report to GM, Kick
+#        Default:     3 - Log, Report to GM
 #
 #    Anticheat.WaterWalk.Enable
 #        Description: Check for players walking on water without a water walking buff.
@@ -2020,7 +2025,7 @@ Anticheat.SkippedHeartbeats.Threshold.Tick = 2
 Anticheat.SkippedHeartbeats.Threshold.Total = 10
 Anticheat.SkippedHeartbeats.Penalty = 11
 Anticheat.TimeDesync.Enable = 1
-Anticheat.TimeDesync.Threshold = 10000
+Anticheat.TimeDesync.Threshold = 5000
 Anticheat.TimeDesync.Penalty = 11
 Anticheat.NumDesyncs.Enable = 1
 Anticheat.NumDesyncs.Threshold = 5
@@ -2069,8 +2074,9 @@ Anticheat.TeleportToTransport.Reject = 1
 Anticheat.TeleportToTransport.Threshold = 2
 Anticheat.TeleportToTransport.Penalty = 11
 Anticheat.FakeTransport.Enable = 1
+Anticheat.FakeTransport.Reject = 1
 Anticheat.FakeTransport.Threshold = 1
-Anticheat.FakeTransport.Penalty = 11
+Anticheat.FakeTransport.Penalty = 3
 Anticheat.WaterWalk.Enable = 1
 Anticheat.WaterWalk.Reject = 1
 Anticheat.WaterWalk.Threshold = 5

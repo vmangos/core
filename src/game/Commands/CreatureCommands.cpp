@@ -1286,6 +1286,7 @@ bool ChatHandler::HandleNpcAllowMovementCommand(char* args)
     if (pCreature->AI())
         pCreature->AI()->SetCombatMovement(value);
 
+    PSendSysMessage("Combat movement %s for %s.", value ? "enabled" : "disabled", pCreature->GetName());
     return true;
 }
 
@@ -1311,6 +1312,7 @@ bool ChatHandler::HandleNpcAllowAttackCommand(char* args)
     if (pCreature->AI())
         pCreature->AI()->SetMeleeAttack(value);
 
+    PSendSysMessage("Melee attacking %s for %s.", value ? "enabled" : "disabled", pCreature->GetName());
     return true;
 }
 

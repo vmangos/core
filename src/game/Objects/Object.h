@@ -661,6 +661,13 @@ class WorldObject : public Object
         void UpdateGroundPositionZ(float x, float y, float &z) const;
         void UpdateAllowedPositionZ(float x, float y, float &z) const;
 
+        void MovePositionToFirstCollision(Position &pos, float dist, float angle);
+        void GetFirstCollisionPosition(Position&pos, float dist, float angle)
+        {
+            pos = GetPosition();
+            MovePositionToFirstCollision(pos, dist, angle);
+        }
+
         // Valeur de retour : false si aucun point correct trouve.
         bool GetRandomPoint(float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z) const;
 

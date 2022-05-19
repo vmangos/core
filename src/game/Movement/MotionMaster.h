@@ -147,6 +147,7 @@ class MotionMaster : std::stack<MovementGenerator *>
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
         static char const* GetMovementGeneratorTypeName(MovementGeneratorType generator);
         void GetUsedMovementGeneratorsList(std::vector<MovementGeneratorType>& list) const;
+        bool IsUsingIdleOrDefaultMovement() const;
 
         void PropagateSpeedChange();
         bool SetNextWaypoint(uint32 pointId);

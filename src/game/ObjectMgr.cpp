@@ -1642,6 +1642,18 @@ void ObjectMgr::LoadCreatureDisplayInfoAddon()
                 const_cast<CreatureDisplayInfoAddon*>(minfo)->display_id_other_gender = 0;
             }
         }
+
+        if (minfo->speed_walk <= 0.0f)
+        {
+            sLog.outErrorDb("Table `creature_display_info_addon` has invalid walk speed (%g) defined for display id %u.", minfo->speed_walk, minfo->display_id);
+            const_cast<CreatureDisplayInfoAddon*>(minfo)->speed_walk = DEFAULT_NPC_WALK_SPEED_RATE;
+        }
+
+        if (minfo->speed_run <= 0.0f)
+        {
+            sLog.outErrorDb("Table `creature_display_info_addon` has invalid run speed (%g) defined for display id %u.", minfo->speed_run, minfo->display_id);
+            const_cast<CreatureDisplayInfoAddon*>(minfo)->speed_run = DEFAULT_NPC_RUN_SPEED_RATE;
+        }
     }
 
     // character races expected have display info data in table
@@ -3765,8 +3777,7 @@ void ObjectMgr::LoadItemRequiredTarget()
         {
             if (SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
-                if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE ||
-                    itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+                if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
                 {
                     SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(pSpellInfo->Id);
                     if (bounds.first != bounds.second)
@@ -4794,8 +4805,8 @@ void ObjectMgr::LoadQuests()
                           "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
     //                      119                       120                       121                       122
                           "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
-    //                      123            124               125         126             127      128
-                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney`, `RewXP`, `RequiredCondition` "
+    //                      123            124               125         126             127      128                  129
+                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney`, `RewXP`, `RequiredCondition`, `BreadcrumbForQuestId` "
                           " FROM `quest_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
     {
@@ -5343,8 +5354,11 @@ void ObjectMgr::LoadQuests()
         // fill additional data stores
         if (qinfo->PrevQuestId)
         {
-            if (m_QuestTemplatesMap.find(abs(qinfo->GetPrevQuestId())) == m_QuestTemplatesMap.end())
+            QuestMap::iterator qPrevItr = m_QuestTemplatesMap.find(abs(qinfo->GetPrevQuestId()));
+            if (qPrevItr == m_QuestTemplatesMap.end())
                 sLog.outErrorDb("Quest %d has PrevQuestId %i, but no such quest", qinfo->GetQuestId(), qinfo->GetPrevQuestId());
+            else if (qPrevItr->second->BreadcrumbForQuestId)
+                sLog.outErrorDb("Quest %d should not be unlocked by breadcrumb quest %u", qinfo->GetQuestId(), qinfo->GetPrevQuestId());
             else
                 qinfo->prevQuests.push_back(qinfo->PrevQuestId);
         }
@@ -5366,6 +5380,50 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->LimitTime)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAG_TIMED);
+
+        if (uint32 breadcrumbQuestId = qinfo->BreadcrumbForQuestId)
+        {
+            QuestMap::iterator qBreadcrumbQuestItr = m_QuestTemplatesMap.find(breadcrumbQuestId);
+            if (qBreadcrumbQuestItr == m_QuestTemplatesMap.end())
+            {
+                sLog.outErrorDb("Quest %u has BreadcrumbForQuestId %u, but there is no such quest", qinfo->GetQuestId(), breadcrumbQuestId);
+                qinfo->BreadcrumbForQuestId = 0;
+            }
+            else
+            {
+                if (qinfo->NextQuestId)
+                    sLog.outErrorDb("Quest %u is a breadcrumb, it should not unlock quest %d", qinfo->GetQuestId(), qinfo->NextQuestId);
+                if (qinfo->ExclusiveGroup)
+                    sLog.outErrorDb("Quest %u is a breadcrumb, it should not be in exclusive group %d", qinfo->GetQuestId(), qinfo->ExclusiveGroup);
+            }
+        }
+    }
+
+    // Prevent any breadcrumb loops, and inform target quests of their breadcrumbs
+    for (auto const& itr : m_QuestTemplatesMap)
+    {
+        Quest* qinfo = itr.second.get();
+        uint32   qid = qinfo->GetQuestId();
+        uint32 breadcrumbForQuestId = qinfo->BreadcrumbForQuestId;
+        std::set<uint32> questSet;
+
+        while (breadcrumbForQuestId)
+        {
+            // If the insertion fails, then we already processed this breadcrumb quest in this iteration. This means that two breadcrumb quests have each other set as targets
+            if (!questSet.insert(qinfo->QuestId).second)
+            {
+                sLog.outErrorDb("Breadcrumb quests %u and %u are in a loop!", qid, breadcrumbForQuestId);
+                qinfo->BreadcrumbForQuestId = 0;
+                break;
+            }
+
+            qinfo = const_cast<Quest*>(sObjectMgr.GetQuestTemplate(breadcrumbForQuestId));
+
+            // Every quest has a list of breadcrumb quests that point toward it
+            qinfo->DependentBreadcrumbQuests.push_back(qid);
+
+            breadcrumbForQuestId = qinfo->GetBreadcrumbForQuestId();
+        }
     }
 
     // check QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT for spell with SPELL_EFFECT_QUEST_COMPLETE
@@ -8274,7 +8332,7 @@ ObjectGuid ObjectMgr::GetFullTransportGuidFromLowGuid(uint32 lowGuid)
     {
         if (GameObjectInfo const* pInfo = GetGameObjectInfo(data->id))
             if (pInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
-                guid = ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, lowGuid);
+                guid = ObjectGuid(HIGHGUID_TRANSPORT, data->id, lowGuid);
     }
 
     return guid;

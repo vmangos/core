@@ -861,6 +861,12 @@ bool Map::ScriptCommand_Morph(ScriptInfo const& script, WorldObject* source, Wor
         pSource->SetDisplayId(display_id);
     }
 
+    if (pSource->IsCreature())
+    {
+        pSource->UpdateSpeed(MOVE_WALK, false);
+        pSource->UpdateSpeed(MOVE_RUN, false);
+    }
+
     return false;
 }
 
