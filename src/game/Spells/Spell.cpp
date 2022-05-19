@@ -1652,7 +1652,8 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                 unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_HOSTILE_ACTION_RECEIVED_CANCELS);
 
             // not break stealth by cast targeting
-            if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH))
+            // skip gobject caster because of buffs in wsg
+            if (!m_casterGo && !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH))
             {
                 unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
                 unit->RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);

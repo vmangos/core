@@ -22107,6 +22107,10 @@ void Player::CastHighestStealthRank()
     if (!stealthSpellEntry)
         return;
 
+    // not if prevented by faerie fire
+    if (IsImmuneToSpell(stealthSpellEntry, true))
+        return;
+
     // reset cooldown on it if needed
     if (!IsSpellReady(*stealthSpellEntry))
         RemoveSpellCooldown(*stealthSpellEntry);

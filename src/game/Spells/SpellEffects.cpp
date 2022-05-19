@@ -2074,7 +2074,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             if (urand(0, 10))
                 return;
             break;
-        // Vanish (not exist)
+        // Vanish
         case 18461:
         {
             unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
