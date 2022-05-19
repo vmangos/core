@@ -220,7 +220,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_SAVED_VARIABLE:
         {
-            const auto stage = static_cast<int32>(sObjectMgr.GetSavedVariable(m_value1, 0));
+            auto const stage = static_cast<int64>(sObjectMgr.GetSavedVariable(m_value1, 0));
             switch (m_value3)
             {
                 case 0:
@@ -243,7 +243,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_LEVEL:
         {
-            const auto level = static_cast<int32>(target->ToUnit()->GetLevel());
+            auto const level = static_cast<int64>(target->ToUnit()->GetLevel());
             switch (m_value2)
             {
                 case 0:
@@ -370,7 +370,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_LAST_WAYPOINT:
         {
-            const auto lastReachedWp = static_cast<int32>(((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint());
+            auto const lastReachedWp = static_cast<int64>(((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint());
             switch (m_value2)
             {
                 case 0:
@@ -394,7 +394,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             if (InstanceData const* data = pMap->GetInstanceData())
             {
-                const auto value = static_cast<int32>(const_cast<InstanceData*>(data)->GetData(m_value1));
+                auto const value = static_cast<int64>(const_cast<InstanceData*>(data)->GetData(m_value1));
 
                 switch (m_value3)
                 {
@@ -415,7 +415,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
-                const auto value = static_cast<int32>(pEvent->GetData(m_value2));
+                auto const value = static_cast<int64>(pEvent->GetData(m_value2));
 
                 switch (m_value4)
                 {
@@ -440,7 +440,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_DISTANCE_TO_TARGET:
         {
-            const auto distance = static_cast<int32>(source->GetDistance(target));
+            auto const distance = static_cast<int64>(source->GetDistance(target));
 
             switch (m_value2)
             {
@@ -463,7 +463,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_HEALTH_PERCENT:
         {
-            const auto hp_percent = static_cast<int32>(target->ToUnit()->GetHealthPercent());
+            auto const hp_percent = static_cast<int64>(target->ToUnit()->GetHealthPercent());
             
             switch (m_value2)
             {
@@ -478,7 +478,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_MANA_PERCENT:
         {
-            const auto mana_percent = static_cast<int32>(target->ToUnit()->GetPowerPercent(POWER_MANA));
+            auto const mana_percent = static_cast<int64>(target->ToUnit()->GetPowerPercent(POWER_MANA));
 
             switch (m_value2)
             {
@@ -683,7 +683,7 @@ bool ConditionEntry::IsValid()
     {
         case CONDITION_NOT:
         {
-            if (m_value1 >= static_cast<int32>(m_entry))
+            if (m_value1 >= static_cast<int64>(m_entry))
             {
                 sLog.outErrorDb("CONDITION_NOT (entry %u, type %d) has invalid value1 %u, must be lower than entry, skipped", m_entry, m_condition, m_value1);
                 return false;
@@ -699,12 +699,12 @@ bool ConditionEntry::IsValid()
         case CONDITION_OR:
         case CONDITION_AND:
         {
-            if (m_value1 >= static_cast<int32>(m_entry))
+            if (m_value1 >= static_cast<int64>(m_entry))
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value1 %u, must be lower than entry, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-            if (m_value2 >= static_cast<int32>(m_entry))
+            if (m_value2 >= static_cast<int64>(m_entry))
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value2 %u, must be lower than entry, skipped", m_entry, m_condition, m_value2);
                 return false;
@@ -723,7 +723,7 @@ bool ConditionEntry::IsValid()
             }
             if (m_value3)
             {
-                if (m_value3 >= static_cast<int32>(m_entry))
+                if (m_value3 >= static_cast<int64>(m_entry))
                 {
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value3 %u, must be lower than entry, skipped", m_entry, m_condition, m_value3);
                     return false;
@@ -737,7 +737,7 @@ bool ConditionEntry::IsValid()
             }
             if (m_value4)
             {
-                if (m_value4 >= static_cast<int32>(m_entry))
+                if (m_value4 >= static_cast<int64>(m_entry))
                 {
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value4 %u, must be lower than entry, skipped", m_entry, m_condition, m_value4);
                     return false;
@@ -932,7 +932,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_LEVEL:
         {
-            if (!m_value1 || m_value1 > static_cast<int32>(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)))
+            if (!m_value1 || m_value1 > static_cast<int64>(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)))
             {
                 sLog.outErrorDb("Level condition (entry %u, type %u)has invalid level %u, skipped", m_entry, m_condition, m_value1);
                 return false;
