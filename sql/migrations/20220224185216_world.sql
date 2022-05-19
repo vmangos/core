@@ -3744,6 +3744,13 @@ UPDATE `creature_template` SET `npc_flags` = 16388 WHERE `entry` IN (
 UPDATE `quest_template` SET `PrevQuestId` = 0, `SpecialFlags` = 0 WHERE  `entry` = 8579 AND `patch`=7;
 UPDATE `quest_template` SET `PrevQuestId` = 8579 WHERE `entry` = 8595 AND `patch`=7;
 
+-- ----------------------------------------------------------------------
+
+-- Add Missing Action Menu ID's
+UPDATE `gossip_menu_option` SET `action_menu_id` = 6587 WHERE `menu_id` = 6588 AND `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id` = 6586 WHERE `menu_id` = 6587 AND `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id` = 6585 WHERE `menu_id` = 6586 AND `id`=0;
+
 
 -- End of migration.
 END IF;
