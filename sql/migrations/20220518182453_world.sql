@@ -95,6 +95,39 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1451603, 0, 0, 15, 12980, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Darkreaver - Cast Spell');
 
+-- Add AI For Paladin Stuns
+-- Banal Spirit / Aspect of Banality
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14514 AND `patch`=2;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1451802, 14518, 0, 8, 0, 100, 1, 20355, 2, 0, 0, 1451401, 0, 0, 'Aspect of Banality - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1451401, 14514, 0, 8, 0, 100, 1, 20355, 2, 0, 0, 1451401, 0, 0, 'Banal Spirit - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1451401, 0, 0, 15, 23269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Banal Spirit - Cast Spell'),
+(1451401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9732, 0, 0, 0, 0, 0, 0, 0, 0, 'Banal Spirit - Talk');
+
+-- Malicious Spirit / Aspect of Malice
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14513 AND `patch`=2;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1452002, 14520, 0, 8, 0, 100, 1, 20184, 2, 0, 0, 1451301, 0, 0, 'Aspect of Malice - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1451301, 14513, 0, 8, 0, 100, 1, 20184, 2, 0, 0, 1451301, 0, 0, 'Malicious Spirit - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1451301, 0, 0, 15, 23269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Malicious Spirit - Cast Spell'),
+(1451301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9774, 0, 0, 0, 0, 0, 0, 0, 0, 'Malicious Spirit - Talk');
+
+-- Corrupted Spirit / Aspect of Corruption
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14512 AND `patch`=2;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1451902, 14519, 0, 8, 0, 100, 1, 20286, 2, 0, 0, 1451201, 0, 0, 'Aspect of Corruption - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (14512, 14512, 0, 8, 0, 100, 1, 20286, 2, 0, 0, 1451201, 0, 0, 'Corrupted Spirit - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1451201, 0, 0, 15, 23269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Corrupted Spirit - Cast Spell'),
+(1451201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9775, 0, 0, 0, 0, 0, 0, 0, 0, 'Corrupted Spirit - Talk');
+
+-- Shadowed Spirit / Aspect of Shadow
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14511 AND `patch`=2;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1452102, 14521, 0, 8, 0, 100, 1, 20346, 2, 0, 0, 1451101, 0, 0, 'Aspect of Shadow - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1451101, 14511, 0, 8, 0, 100, 1, 20346, 2, 0, 0, 1451101, 0, 0, 'Shadowed Spirit - Cast Spell On Hit By Spell');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1451101, 0, 0, 15, 23269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowed Spirit - Cast Spell'),
+(1451101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9773, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowed Spirit - Talk');
+
 /*
 Missing Mana Values In Creature Template:
 14512
