@@ -3751,6 +3751,10 @@ UPDATE `gossip_menu_option` SET `action_menu_id` = 6587 WHERE `menu_id` = 6588 A
 UPDATE `gossip_menu_option` SET `action_menu_id` = 6586 WHERE `menu_id` = 6587 AND `id`=0;
 UPDATE `gossip_menu_option` SET `action_menu_id` = 6585 WHERE `menu_id` = 6586 AND `id`=0;
 
+-- ----------------------------------------------------------------------
+
+UPDATE `creature` SET `wander_distance` = 4, `movement_type` = 1 WHERE `guid` = 47347;
+
 
 -- End of migration.
 END IF;
