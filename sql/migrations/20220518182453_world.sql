@@ -278,9 +278,10 @@ DELETE FROM `generic_scripts` WHERE `id`=1451108;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1451108, 0, 0, 63, 843608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1356, 0, 0, 0, 0, 0, 'Wave 8 Creature - Add Map Event Target');
 
+-- Wave 9
 DELETE FROM `generic_scripts` WHERE `id`=843609;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(843609, 0, 0, 61, 843609, 300, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Divination Scryer - Start Map Event - Wave 9'),
+(843609, 0, 0, 61, 843609, 400, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Divination Scryer - Start Map Event - Wave 9'),
 (843609, 1, 0, 10, 14511, 0, 0, 0, 0, 0, 0, 0, 0, 1451109, 0, 5, 104.977, 170.914, 93.1266, 0.10472, 0, 'Divination Scryer - Summon Creature - Wave 9'),
 (843609, 1, 0, 10, 14511, 0, 0, 0, 0, 0, 0, 0, 0, 1451109, 0, 5, 157.179, 143.024, 93.7753, 2.14675, 0, 'Divination Scryer - Summon Creature - Wave 9'),
 (843609, 1, 0, 0, 0, 0, 0, 0, 14511, 50, 8, 2, 9781, 0, 0, 0, 0, 0, 0, 0, 0, 'Divination Scryer - Talk'),
