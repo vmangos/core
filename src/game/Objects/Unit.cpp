@@ -5784,7 +5784,7 @@ void Unit::SetInCombatWithAssisted(Unit* pAssisted)
         }
     }
 
-    SetInCombatState(pAssisted->GetCombatTimer() > 0 ? UNIT_PVP_COMBAT_TIMER : 0);
+    SetInCombatState((pAssisted->GetCombatTimer() > 0 || pAssisted->HasAuraType(SPELL_AURA_INTERRUPT_REGEN)) ? UNIT_PVP_COMBAT_TIMER : 0);
 }
 
 void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly/* = false*/)
