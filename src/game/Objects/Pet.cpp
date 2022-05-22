@@ -726,7 +726,7 @@ void Pet::Update(uint32 update_diff, uint32 diff)
 
 void Pet::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 {
-    if (m_regenTimer <= update_diff)
+    if (m_regenTimer <= static_cast<int64>(update_diff))
     {
         if (!IsInCombat() || IsPolymorphed())
             RegenerateHealth();
