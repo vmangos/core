@@ -2623,7 +2623,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
             continue;
 
         // Skip unobtainable items
-        if (pProto->ExtraFlags & ITEM_EXTRA_NOT_OBTAINABLE)
+        if (pProto->HasExtraFlag(ITEM_EXTRA_NOT_OBTAINABLE))
             continue;
 
         // Only gear and weapons
