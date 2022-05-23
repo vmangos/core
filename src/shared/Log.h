@@ -89,19 +89,25 @@ enum Color
 
 enum LogFile
 {
-    LOG_CHAT            = 0,
+    LOG_BASIC,
+    LOG_WORLDPACKET,
+    LOG_CHAT,
     LOG_BG,
     LOG_CHAR,
+    LOG_HONOR,
     LOG_RA,
+    LOG_DBERROR,
     LOG_DBERRFIX,
     LOG_CLIENT_IDS,
     LOG_LOOTS,
     LOG_LEVELUP,
     LOG_PERFORMANCE,
     LOG_MONEY_TRADES,
+    LOG_GM,
     LOG_GM_CRITICAL,
     LOG_CHAT_SPAM,
-    LOG_EXPLOITS,
+    LOG_ANTICHEAT,
+    LOG_NOSTALRIUS,
     LOG_MAX_FILES
 };
 
@@ -111,7 +117,7 @@ enum LogType
     LogDetails,
     LogDebug,
     LogError,
-    LogWarden,
+    LogAnticheat,
     LOG_TYPE_MAX // add new entries *before* this value!
 };
 
@@ -124,30 +130,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
     ~Log()
     {
-        if(logfile != nullptr)
-            fclose(logfile);
-        logfile = nullptr;
-
-        if(gmLogfile != nullptr)
-            fclose(gmLogfile);
-        gmLogfile = nullptr;
-
-        if(dberLogfile != nullptr)
-            fclose(dberLogfile);
-        dberLogfile = nullptr;
-
-        if (worldLogfile != nullptr)
-            fclose(worldLogfile);
-        worldLogfile = nullptr;
-
-        if (nostalriusLogFile != nullptr)
-            fclose(nostalriusLogFile);
-        nostalriusLogFile = nullptr;
-
-        if (honorLogfile != nullptr)
-            fclose(honorLogfile);
-        honorLogfile = nullptr;
-
         for (auto& logFile : logFiles)
         {
             if (logFile != nullptr)
@@ -191,7 +173,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
                                 char const* opcodeName,
                                 ByteBuffer const* packet, bool incoming);
         // any log level
-        uint32 GetLogLevel() const { return m_logLevel; }
+        uint32 GetLogLevel() const { return m_consoleLevel; }
         void SetLogLevel(char* Level);
         void SetLogFileLevel(char* Level);
         void SetColor(bool stdout_stream, Color color);
@@ -201,7 +183,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         static std::string GetTimestampStr();
         bool HasLogFilter(uint32 filter) const { return m_logFilter & filter; }
         void SetLogFilter(LogFilters filter, bool on) { if (on) m_logFilter |= filter; else m_logFilter &= ~filter; }
-        bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
+        bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_consoleLevel >= loglvl || (m_fileLevel >= loglvl && logFiles[LOG_BASIC]); }
         bool IsIncludeTime() const { return m_includeTime; }
 
         static void WaitBeforeContinueIfNeed();
@@ -210,26 +192,22 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         std::list<uint32> m_smartlogExtraGuids;
 
     private:
+        void out(LogFile t, LogLevel l, bool error, char const* str, va_list args);
+
         FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
 
-        FILE* logfile;
-        FILE* gmLogfile;
-        FILE* dberLogfile;
-        FILE* wardenLogfile;
-        FILE* anticheatLogfile;
-        FILE* worldLogfile;
-        FILE* nostalriusLogFile;
-        FILE* honorLogfile;
         FILE* logFiles[LOG_MAX_FILES];
         bool  timestampPrefix[LOG_MAX_FILES];
 
-        bool m_bIsChatLogFileActivated;
+        const bool m_bIsChatLogFileActivated;
 
         // log/console control
-        LogLevel m_logLevel;
-        LogLevel m_logFileLevel;
+        LogLevel m_consoleLevel;
+        LogLevel m_fileLevel;
         bool m_colored;
+
+        // include timestamp in console output
         bool m_includeTime;
         bool m_wardenDebug;
         Color m_colors[LOG_TYPE_MAX];
@@ -237,13 +215,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;
-        std::string m_logsTimestamp;
+        const std::string m_logsTimestamp;
 
         // char log control
         bool m_charLog_Dump;
 
         // gm log control
-        bool m_gmlog_per_account;
+        const bool m_gmlog_per_account;
         std::string m_gmlog_filename_format;
 };
 

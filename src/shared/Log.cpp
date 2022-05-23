@@ -56,8 +56,9 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
 };
 
 Log::Log() :
-    logfile(nullptr), gmLogfile(nullptr), dberLogfile(nullptr),
-    wardenLogfile(nullptr), anticheatLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_includeTime(false), m_wardenDebug(false), m_gmlog_per_account(false)
+    m_colored(false), m_includeTime(false), m_wardenDebug(false), m_logsTimestamp(GetTimestampStr()),
+    m_gmlog_per_account(sConfig.GetBoolDefault("GmLogPerAccount", false)),
+    m_bIsChatLogFileActivated(sConfig.GetBoolDefault("ChatLogEnable", false))
 {
     for (int i = 0; i < LOG_MAX_FILES; ++i)
     {
@@ -225,9 +226,9 @@ void Log::SetLogLevel(char* level)
     else if (newLevel > LOG_LVL_DEBUG)
         newLevel = LOG_LVL_DEBUG;
 
-    m_logLevel = LogLevel(newLevel);
+    m_consoleLevel = LogLevel(newLevel);
 
-    printf("LogLevel is %d\n", m_logLevel);
+    printf("LogLevel is %d\n", m_consoleLevel);
 }
 
 void Log::SetLogFileLevel(char* level)
@@ -239,9 +240,9 @@ void Log::SetLogFileLevel(char* level)
     else if (newLevel > LOG_LVL_DEBUG)
         newLevel = LOG_LVL_DEBUG;
 
-    m_logFileLevel = LogLevel(newLevel);
+    m_fileLevel = LogLevel(newLevel);
 
-    printf("LogFileLevel is %d\n", m_logFileLevel);
+    printf("LogFileLevel is %d\n", m_fileLevel);
 }
 
 void Log::Initialize()
@@ -254,71 +255,61 @@ void Log::Initialize()
             m_logsDir.append("/");
     }
 
-    m_bIsChatLogFileActivated = sConfig.GetBoolDefault("ChatLogEnable", false);
-
-    m_logsTimestamp = "_" + GetTimestampStr();
-
     /// Open specific log files
-    logfile = openLogFile("LogFile","LogTimestamp","w");
 
-    m_gmlog_per_account = sConfig.GetBoolDefault("GmLogPerAccount",false);
-    if (!m_gmlog_per_account)
-        gmLogfile = openLogFile("GMLogFile","GmLogTimestamp","a");
-    else
+    // GM log settings for per account case
+    m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");
+    if (!m_gmlog_filename_format.empty())
     {
-        // GM log settings for per account case
-        m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");
-        if (!m_gmlog_filename_format.empty())
+        bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp",false);
+
+        size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
+        if (dot_pos!=m_gmlog_filename_format.npos)
         {
-            bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp",false);
+            if (m_gmlog_timestamp)
+                m_gmlog_filename_format.insert(dot_pos,m_logsTimestamp);
 
-            size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
-            if (dot_pos!=m_gmlog_filename_format.npos)
-            {
-                if (m_gmlog_timestamp)
-                    m_gmlog_filename_format.insert(dot_pos,m_logsTimestamp);
-
-                m_gmlog_filename_format.insert(dot_pos,"_#%u");
-            }
-            else
-            {
-                m_gmlog_filename_format += "_#%u";
-
-                if (m_gmlog_timestamp)
-                    m_gmlog_filename_format += m_logsTimestamp;
-            }
-
-            m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
+            m_gmlog_filename_format.insert(dot_pos,"_#%u");
         }
+        else
+        {
+            m_gmlog_filename_format += "_#%u";
+
+            if (m_gmlog_timestamp)
+                m_gmlog_filename_format += m_logsTimestamp;
+        }
+
+        m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
     }
 
-    dberLogfile             = openLogFile("DBErrorLogFile", nullptr, "a");
-    worldLogfile            = openLogFile("WorldLogFile", "WorldLogTimestamp", "a");
-    nostalriusLogFile       = openLogFile("NostalriusLogFile", "NostalriusLogTimestamp", "a");
-    honorLogfile            = openLogFile("HonorLogFile", "HonorLogTimestamp", "a");
-    wardenLogfile           = openLogFile("WardenLogFile", "WardenLogTimestamp", "a");
-    anticheatLogfile         = openLogFile("AnticheatLogFile", "AnticheatLogTimestamp", "a");
-    logFiles[LOG_CHAT]      = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
-    logFiles[LOG_BG]        = openLogFile("BgLogFile", "BgLogTimestamp", "a");
-    logFiles[LOG_CHAR]      = openLogFile("CharLogFile", "CharLogTimestamp", "a");
-    logFiles[LOG_RA]        = openLogFile("RaLogFile", nullptr, "a");
-    logFiles[LOG_DBERRFIX]  = openLogFile("DBErrorFixFile", nullptr, "w+");
-    logFiles[LOG_CLIENT_IDS]= openLogFile("ClientIdsLogFile", nullptr, "a");
-    logFiles[LOG_LOOTS]     = openLogFile("LootsLogFile", nullptr, "a");
-    logFiles[LOG_LEVELUP]   = openLogFile("LevelupLogFile", nullptr, "a");
+    logFiles[LOG_BASIC]         = openLogFile("LogFile", "LogTimestamp", "w");
+    logFiles[LOG_WORLDPACKET]   = openLogFile("WorldLogFile", "WorldLogTimestamp", "a");
+    logFiles[LOG_CHAT]          = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
+    logFiles[LOG_BG]            = openLogFile("BgLogFile", "BgLogTimestamp", "a");
+    logFiles[LOG_CHAR]          = openLogFile("CharLogFile", "CharLogTimestamp", "a");
+    logFiles[LOG_HONOR]         = openLogFile("HonorLogFile", "HonorLogTimestamp", "a");
+    logFiles[LOG_RA]            = openLogFile("RaLogFile", nullptr, "a");
+    logFiles[LOG_DBERROR]       = openLogFile("DBErrorLogFile", nullptr, "a");
+    logFiles[LOG_DBERRFIX]      = openLogFile("DBErrorFixFile", nullptr, "w+");
+    logFiles[LOG_CLIENT_IDS]    = openLogFile("ClientIdsLogFile", nullptr, "a");
+    logFiles[LOG_LOOTS]         = openLogFile("LootsLogFile", nullptr, "a");
+    logFiles[LOG_LEVELUP]       = openLogFile("LevelupLogFile", nullptr, "a");
     logFiles[LOG_PERFORMANCE]   = openLogFile("PerformanceLog.File", nullptr, "a");
+    logFiles[LOG_GM]            = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
+                                  openLogFile("GMLogFile", "GmLogTimestamp", "a") : nullptr;
     logFiles[LOG_MONEY_TRADES]  = openLogFile("LogMoneyTrades", nullptr, "a");
     logFiles[LOG_GM_CRITICAL]   = openLogFile("CriticalCommandsLogFile", nullptr, "a");
     logFiles[LOG_CHAT_SPAM]     = openLogFile("ChatSpamLogFile", nullptr, "a");
-    logFiles[LOG_EXPLOITS]      = openLogFile("ExploitsLogFile", nullptr, "a");
+    logFiles[LOG_ANTICHEAT]     = openLogFile("AnticheatLogFile", "AnticheatLogTimestamp", "a");
+    logFiles[LOG_NOSTALRIUS]    = openLogFile("NostalriusLogFile", "NostalriusLogTimestamp", "a");
 
     timestampPrefix[LOG_DBERRFIX] = false;
 
     // Main log file settings
     m_wardenDebug  = sConfig.GetBoolDefault("Warden.DebugLog", false);
     m_includeTime  = sConfig.GetBoolDefault("LogTime", false);
-    m_logLevel     = LogLevel(sConfig.GetIntDefault("LogLevel", 0));
-    m_logFileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 0));
+    m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel", 0));
+    m_fileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 0));
     InitColors(sConfig.GetStringDefault("LogColors", ""));
 
     // Smartlog data
@@ -400,85 +391,110 @@ std::string Log::GetTimestampStr()
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
     char buf[20];
-    snprintf(buf,20,"%04d-%02d-%02d_%02d-%02d-%02d",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
+    snprintf(buf,20,"_%04d-%02d-%02d_%02d-%02d-%02d",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
     return std::string(buf);
+}
+
+// the actual logging function.  nothing else should write log messages, except this
+void Log::out(LogFile type, LogLevel l, bool error, char const* str, va_list ap)
+{
+    ASSERT(type >= 0 && type < LOG_MAX_FILES);
+
+    if (!str)
+        return;
+
+    // neither gets logged? we're done
+    if (m_consoleLevel < l && !(logFiles[type] && m_fileLevel >= l))
+        return;
+
+    // make buffer
+    char buff[4096];
+    vsnprintf(buff, sizeof(buff), str, ap);
+
+    // LOG_PERFORMANCE and LOG_DBERRFIX should never be logged to the console
+    if (type != LOG_PERFORMANCE && type != LOG_DBERRFIX && m_consoleLevel >= l)
+    {
+        if (m_colored)
+        {
+            LogType logType;
+            if (error)
+                logType = LogError;
+            else if (l == LOG_LVL_DETAIL)
+                logType = LogDetails;
+            else if (l == LOG_LVL_DEBUG)
+                logType = LogDebug;
+            else if (type == LOG_ANTICHEAT)
+                logType = LogAnticheat;
+            else
+                logType = LogNormal;
+
+            SetColor(true, m_colors[logType]);
+        }
+
+        if (m_includeTime)
+            outTime(stdout);
+
+        if (error && buff[0] != '\0')
+            printf("ERROR: ");
+
+        utf8printf(stdout, buff);
+
+        if (m_colored)
+            ResetColor(true);
+
+        printf("\n");
+        fflush(stdout);
+    }
+
+    if (logFiles[type] && m_fileLevel >= l)
+    {
+        if (timestampPrefix[type])
+            outTimestamp(logFiles[type]);
+
+        if (error && buff[0] != '\0')
+            fputs("ERROR: ", logFiles[type]);
+
+        fputs(buff, logFiles[type]);
+        fputs("\n", logFiles[type]);
+        fflush(logFiles[type]);
+    }
+}
+
+void Log::out(LogFile type, char const* str, ...)
+{
+    va_list ap;
+    va_start(ap, str);
+    out(type, LOG_LVL_MINIMAL, false, str, ap);
+    va_end(ap);
 }
 
 void Log::outString()
 {
-    if (m_includeTime)
-        outTime(stdout);
-    printf("\n");
-    if (logfile)
-    {
-        outTimestamp(logfile);
-        fprintf(logfile, "\n");
-        fflush(logfile);
-    }
-
-    fflush(stdout);
+    outString("");
 }
 
 void Log::outString(char const* str, ...)
 {
-    if (!str)
-        return;
-
-    if (m_colored)
-        SetColor(true,m_colors[LogNormal]);
-
-    if (m_includeTime)
-        outTime(stdout);
-
     va_list ap;
-
     va_start(ap, str);
-    vutf8printf(stdout, str, &ap);
+    out(LOG_BASIC, LOG_LVL_MINIMAL, false, str, ap);
     va_end(ap);
+}
 
-    if (m_colored)
-        ResetColor(true);
-
-    printf("\n");
-
-    if (logfile)
-    {
-        outTimestamp(logfile);
-
-        va_start(ap, str);
-        vfprintf(logfile, str, ap);
-        fprintf(logfile, "\n");
-        va_end(ap);
-
-        fflush(logfile);
-    }
-
-    fflush(stdout);
+void Log::outBasic(char const* str, ...)
+{
+    va_list ap;
+    va_start(ap, str);
+    out(LOG_BASIC, LOG_LVL_MINIMAL, false, str, ap);
+    va_end(ap);
 }
 
 void Log::outInfo(char const* str, ...)
 {
-    if (!str)
-        return;
     va_list ap;
     va_start(ap, str);
-    vutf8printf(stdout, str, &ap);
+    out(LOG_NOSTALRIUS, LOG_LVL_MINIMAL, false, str, ap);
     va_end(ap);
-
-    printf ("\n");
-    if (nostalriusLogFile)
-    {
-        outTimestamp(nostalriusLogFile);
-
-        va_start(ap, str);
-        vfprintf(nostalriusLogFile, str, ap);
-        fprintf(nostalriusLogFile, "\n");
-        fflush(nostalriusLogFile);
-        va_end(ap);
-
-        fflush(nostalriusLogFile);
-    }
-    fflush(stdout);
 }
 
 void Log::outHonor(char const* str, ...)
@@ -488,378 +504,64 @@ void Log::outHonor(char const* str, ...)
 
     if (!HasLogFilter(LOG_FILTER_HONOR))
     {
-        if (m_colored)
-            SetColor(false, m_colors[LogNormal]);
-
-        if (m_includeTime)
-            outTime(stdout);
-
-        va_list ap;
-
-        va_start(ap, str);
-        vutf8printf(stderr, str, &ap);
-        va_end(ap);
-
-        if (m_colored)
-            ResetColor(false);
-
-        fprintf(stderr, "\n");
-        fflush(stderr);
-    }
-
-    if (honorLogfile)
-    {
-        outTimestamp(honorLogfile);
-        fprintf(honorLogfile, "%s", "");
-
-        va_list ap;
-
-        va_start(ap, str);
-        vfprintf(honorLogfile, str, ap);
-        va_end(ap);
-
-        fprintf(honorLogfile, "\n");
-        fflush(honorLogfile);
-    }
-}
-
-void Log::out(LogFile type, char const* str, ...)
-{
-    ASSERT(type < LOG_MAX_FILES)
-    if (!str)
-        return;
-
-    if (logFiles[type])
-    {
-        if (timestampPrefix[type])
-            outTimestamp(logFiles[type]);
-
         va_list ap;
         va_start(ap, str);
-        vfprintf(logFiles[type], str, ap);
-        fprintf(logFiles[type], "\n");
-        fflush(logFiles[type]);
+        out(LOG_HONOR, LOG_LVL_MINIMAL, false, str, ap);
         va_end(ap);
-
-        fflush(logFiles[type]);
     }
-    fflush(stdout);
 }
 
 void Log::outError(char const* err, ...)
 {
-    if (!err)
-        return;
-
-    if (m_colored)
-        SetColor(false,m_colors[LogError]);
-
-    if (m_includeTime)
-        outTime(stderr);
-
     va_list ap;
-
     va_start(ap, err);
-    vutf8printf(stderr, err, &ap);
+    out(LOG_BASIC, LOG_LVL_MINIMAL, true, err, ap);
     va_end(ap);
-
-    if (m_colored)
-        ResetColor(false);
-
-    fprintf(stderr, "\n");
-    if (logfile)
-    {
-        outTimestamp(logfile);
-        fprintf(logfile, "ERROR:");
-
-        va_start(ap, err);
-        vfprintf(logfile, err, ap);
-        va_end(ap);
-
-        fprintf(logfile, "\n");
-        fflush(logfile);
-    }
-
-    fflush(stderr);
 }
 
 void Log::outErrorDb()
 {
-    if (m_includeTime)
-        outTime(stderr);
-
-    fprintf(stderr, "\n");
-
-    if (logfile)
-    {
-        outTimestamp(logfile);
-        fprintf(logfile, "ERROR:\n");
-        fflush(logfile);
-    }
-
-    if (dberLogfile)
-    {
-        outTimestamp(dberLogfile);
-        fprintf(dberLogfile, "\n");
-        fflush(dberLogfile);
-    }
-
-    fflush(stderr);
+    outErrorDb("");
 }
 
 void Log::outErrorDb(char const* err, ...)
 {
-    if (!err)
-        return;
-
-    if (m_colored)
-        SetColor(false,m_colors[LogError]);
-
-    if (m_includeTime)
-        outTime(stderr);
-
     va_list ap;
-
     va_start(ap, err);
-    vutf8printf(stderr, err, &ap);
+    out(LOG_DBERROR, LOG_LVL_MINIMAL, true, err, ap);
     va_end(ap);
-
-    if (m_colored)
-        ResetColor(false);
-
-    fprintf(stderr, "\n");
-
-    if (logfile)
-    {
-        outTimestamp(logfile);
-        fprintf(logfile, "ERROR:");
-
-        va_start(ap, err);
-        vfprintf(logfile, err, ap);
-        va_end(ap);
-
-        fprintf(logfile, "\n");
-        fflush(logfile);
-    }
-
-    if (dberLogfile)
-    {
-        outTimestamp(dberLogfile);
-
-        va_list ap;
-        va_start(ap, err);
-        vfprintf(dberLogfile, err, ap);
-        va_end(ap);
-
-        fprintf(dberLogfile, "\n");
-        fflush(dberLogfile);
-    }
-
-    fflush(stderr);
-}
-
-void Log::outBasic(char const* str, ...)
-{
-    if (!str)
-        return;
-
-    if (m_logLevel >= LOG_LVL_BASIC)
-    {
-        if (m_colored)
-            SetColor(true,m_colors[LogDetails]);
-
-        if (m_includeTime)
-            outTime(stdout);
-
-        va_list ap;
-        va_start(ap, str);
-        vutf8printf(stdout, str, &ap);
-        va_end(ap);
-
-        if (m_colored)
-            ResetColor(true);
-
-        printf("\n");
-    }
-
-    if (logfile && m_logFileLevel >= LOG_LVL_BASIC)
-    {
-        va_list ap;
-        outTimestamp(logfile);
-        va_start(ap, str);
-        vfprintf(logfile, str, ap);
-        fprintf(logfile, "\n");
-        va_end(ap);
-        fflush(logfile);
-    }
-
-    fflush(stdout);
 }
 
 void Log::outDetail(char const* str, ...)
 {
-    if (!str)
-        return;
-
-    if (m_logLevel >= LOG_LVL_DETAIL)
-    {
-
-        if (m_colored)
-            SetColor(true,m_colors[LogDetails]);
-
-        if (m_includeTime)
-            outTime(stdout);
-
-        va_list ap;
-        va_start(ap, str);
-        vutf8printf(stdout, str, &ap);
-        va_end(ap);
-
-        if (m_colored)
-            ResetColor(true);
-
-        printf("\n");
-    }
-
-    if (logfile && m_logFileLevel >= LOG_LVL_DETAIL)
-    {
-        outTimestamp(logfile);
-
-        va_list ap;
-        va_start(ap, str);
-        vfprintf(logfile, str, ap);
-        va_end(ap);
-
-        fprintf(logfile, "\n");
-        fflush(logfile);
-    }
-
-    fflush(stdout);
+    va_list ap;
+    va_start(ap, str);
+    out(LOG_BASIC, LOG_LVL_DETAIL, false, str, ap);
+    va_end(ap);
 }
 
 void Log::outDebug(char const* str, ...)
 {
-    if (!str)
-        return;
-
-    if (m_logLevel >= LOG_LVL_DEBUG)
-    {
-        if (m_colored)
-            SetColor(true,m_colors[LogDebug]);
-
-        if (m_includeTime)
-            outTime(stdout);
-
-        va_list ap;
-        va_start(ap, str);
-        vutf8printf(stdout, str, &ap);
-        va_end(ap);
-
-        if (m_colored)
-            ResetColor(true);
-
-        printf("\n");
-    }
-
-    if (logfile && m_logFileLevel >= LOG_LVL_DEBUG)
-    {
-        outTimestamp(logfile);
-
-        va_list ap;
-        va_start(ap, str);
-        vfprintf(logfile, str, ap);
-        va_end(ap);
-
-        fprintf(logfile, "\n");
-        fflush(logfile);
-    }
-
-    fflush(stdout);
+    va_list ap;
+    va_start(ap, str);
+    out(LOG_BASIC, LOG_LVL_DEBUG, false, str, ap);
+    va_end(ap);
 }
 
 void Log::outWarden(char const* wrd, ...)
 {
-    if (!wrd)
-        return;
-
-    if (m_colored)
-        SetColor(true, m_colors[LogWarden]);
-
-    if (m_includeTime)
-        outTime(stdout);
-
-    // Append tag to console warden messages.
-    printf("[Warden] ");
-
     va_list ap;
     va_start(ap, wrd);
-    vutf8printf(stdout, wrd, &ap);
+    out(LOG_ANTICHEAT, LOG_LVL_BASIC, false, wrd, ap);
     va_end(ap);
-
-    if (m_colored)
-        ResetColor(true);
-
-    printf("\n");
-
-    if (wardenLogfile)
-    {
-        outTimestamp(wardenLogfile);
-        fprintf(wardenLogfile, "[Warden] ");
-
-        va_list ap;
-        va_start(ap, wrd);
-        vfprintf(wardenLogfile, wrd, ap);
-        va_end(ap);
-
-        fprintf(wardenLogfile, "\n");
-        fflush(wardenLogfile);
-    }
-
-    fflush(stdout);
 }
 
 void Log::outWardenDebug(char const* wrd, ...)
 {
-    if (!m_wardenDebug)
-        return;
-
-    if (!wrd)
-        return;
-
-    if (m_colored)
-        SetColor(true, m_colors[LogWarden]);
-
-    if (m_includeTime)
-        outTime(stdout);
-
-    // Append tag to console warden messages.
-    printf("[Warden] ");
-
     va_list ap;
     va_start(ap, wrd);
-    vutf8printf(stdout, wrd, &ap);
+    out(LOG_ANTICHEAT, LOG_LVL_DEBUG, false, wrd, ap);
     va_end(ap);
-
-    if (m_colored)
-        ResetColor(true);
-
-    printf("\n");
-
-    if (wardenLogfile)
-    {
-        outTimestamp(wardenLogfile);
-        fprintf(wardenLogfile, "[Warden] ");
-
-        va_list ap;
-        va_start(ap, wrd);
-        vfprintf(wardenLogfile, wrd, ap);
-        va_end(ap);
-
-        fprintf(wardenLogfile, "\n");
-        fflush(wardenLogfile);
-    }
-
-    fflush(stdout);
 }
 
 void Log::outAnticheat(char const* detector, char const* player, char const* reason, char const* penalty)
@@ -867,102 +569,27 @@ void Log::outAnticheat(char const* detector, char const* player, char const* rea
     if (!detector || !player || !reason || !penalty)
         return;
 
-    if (m_colored)
-        SetColor(true, m_colors[LogWarden]);
-
-    if (m_includeTime)
-        outTime(stdout);
-
-    printf("[%s] Player %s, Cheat: %s, Penalty: %s", detector, player, reason, penalty);
-
-    if (m_colored)
-        ResetColor(true);
-
-    printf("\n");
-
-    if (anticheatLogfile)
-    {
-        outTimestamp(anticheatLogfile);
-        fprintf(anticheatLogfile, "[%s] Player %s, Cheat: %s, Penalty: %s", detector, player, reason, penalty);
-        fprintf(anticheatLogfile, "\n");
-        fflush(anticheatLogfile);
-    }
-
-    fflush(stdout);
+    out(LOG_ANTICHEAT, false, "[%s] Player %s, Cheat: %s, Penalty: %s", detector, player, reason, penalty);
 }
 
-void Log::outCommand(uint32 account, char const* str, ...)
+void Log::outCommand(uint32, char const* str, ...)
 {
-    if (!str)
-        return;
-
-    if (m_logLevel >= LOG_LVL_DETAIL)
-    {
-        if (m_colored)
-            SetColor(true,m_colors[LogDetails]);
-
-        if (m_includeTime)
-            outTime(stdout);
-
-        va_list ap;
-        va_start(ap, str);
-        vutf8printf(stdout, str, &ap);
-        va_end(ap);
-
-        if (m_colored)
-            ResetColor(true);
-
-        printf("\n");
-    }
-
-    if (logfile && m_logFileLevel >= LOG_LVL_DETAIL)
-    {
-        va_list ap;
-        outTimestamp(logfile);
-        va_start(ap, str);
-        vfprintf(logfile, str, ap);
-        fprintf(logfile, "\n");
-        va_end(ap);
-        fflush(logfile);
-    }
-
-    if (m_gmlog_per_account)
-    {
-        if (FILE* per_file = openGmlogPerAccount (account))
-        {
-            va_list ap;
-            outTimestamp(per_file);
-            va_start(ap, str);
-            vfprintf(per_file, str, ap);
-            fprintf(per_file, "\n");
-            va_end(ap);
-            fclose(per_file);
-        }
-    }
-    else if (gmLogfile)
-    {
-        va_list ap;
-        outTimestamp(gmLogfile);
-        va_start(ap, str);
-        vfprintf(gmLogfile, str, ap);
-        fprintf(gmLogfile, "\n");
-        va_end(ap);
-        fflush(gmLogfile);
-    }
-
-    fflush(stdout);
+    va_list ap;
+    va_start(ap, str);
+    out(LOG_GM, LOG_LVL_DETAIL, false, str, ap);
+    va_end(ap);
 }
 
 void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
                              char const* opcodeName, ByteBuffer const* packet,
                              bool incoming)
 {
-    if (!worldLogfile)
+    if (!logFiles[LOG_WORLDPACKET])
         return;
 
-    outTimestamp(worldLogfile);
+    outTimestamp(logFiles[LOG_WORLDPACKET]);
 
-    fprintf(worldLogfile,
+    fprintf(logFiles[LOG_WORLDPACKET],
             "\n%s:\nSOCKET: %p\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
             incoming ? "CLIENT" : "SERVER", socketHandle, packet->size(),
             opcodeName, opcode);
@@ -971,13 +598,13 @@ void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
     while (p < packet->size())
     {
         for (size_t j = 0; j < 16 && p < packet->size(); ++j)
-            fprintf(worldLogfile, "%.2X ", (*packet)[p++]);
+            fprintf(logFiles[LOG_WORLDPACKET], "%.2X ", (*packet)[p++]);
 
-        fprintf(worldLogfile, "\n");
+        fprintf(logFiles[LOG_WORLDPACKET], "\n");
     }
 
-    fprintf(worldLogfile, "\n\n");
-    fflush(worldLogfile);
+    fprintf(logFiles[LOG_WORLDPACKET], "\n\n");
+    fflush(logFiles[LOG_WORLDPACKET]);
 }
 
 void Log::WaitBeforeContinueIfNeed()

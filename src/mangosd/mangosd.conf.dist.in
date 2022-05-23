@@ -490,6 +490,7 @@ DebuffLimit = 0
 #    LogFilter_VisibilityChanges
 #    LogFilter_Weather
 #    LogFilter_DbStrictedCheck
+#    LogFilter_Honor
 #        Log filters (active by default)
 #        Default: 1 - not include with any log level
 #                 0 - include in log if log level permit
@@ -511,15 +512,6 @@ DebuffLimit = 0
 #        Default: "anticheat.log"
 #
 #    AnticheatLogTimestamp
-#        Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
-#    WardenLogFile
-#        Log file for warden check results
-#        Default: "warden.log"
-#
-#    WardenLogTimestamp
 #        Logfile with timestamp of server start in name
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
@@ -599,10 +591,6 @@ DebuffLimit = 0
 #        Default: "gm_critical.log"
 #                 "" - Empty name for disable
 #
-#    ExploitsLogFile
-#        Log file for possible exploits for abuse detection
-#        Default: "" - Empty name for disable
-#
 #    RaLogFile
 #        Log file of RA commands
 #        Default: "Ra.log"
@@ -660,9 +648,7 @@ LogFilter_DbStrictedCheck = 1
 LogFilter_Pathfinding = 0
 LogFilter_Honor = 1
 AnticheatLogFile = "anticheat.log"
-AnticheatLogTimestamp = 0
-WardenLogFile = "warden.log"
-WardenLogTimestamp = 0
+AnticheatLogTimestamp = 1
 WorldLogFile = ""
 WorldLogTimestamp = 0
 HonorLogFile = ""
@@ -686,7 +672,6 @@ GmLogFile = ""
 GmLogTimestamp = 0
 GmLogPerAccount = 0
 CriticalCommandsLogFile = "gm_critical.log"
-ExploitsLogFile = ""
 RaLogFile = ""
 NostalriusLogFile = "Info.log"
 NostalriusLogTimestamp = 0
