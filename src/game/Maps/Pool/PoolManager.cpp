@@ -467,7 +467,7 @@ void PoolGroup<Creature>::Spawn1Object(MapPersistentState& mapState, PoolObject*
         if (dataMap && dataMap->IsLoaded(data->position.x, data->position.y))
         {
             Creature* pCreature = new Creature;
-            //DEBUG_LOG("Spawning creature %u",obj->guid);
+            //sLog.outDebug("Spawning creature %u",obj->guid);
             if (!pCreature->LoadFromDB(obj->guid, dataMap))
             {
                 delete pCreature;
@@ -510,7 +510,7 @@ void PoolGroup<GameObject>::Spawn1Object(MapPersistentState& mapState, PoolObjec
             GameObjectData const* data = sObjectMgr.GetGOData(obj->guid);
             MANGOS_ASSERT(data);
             GameObject* pGameobject = GameObject::CreateGameObject(data->id);
-            //DEBUG_LOG("Spawning gameobject %u", obj->guid);
+            //sLog.outDebug("Spawning gameobject %u", obj->guid);
             if (!pGameobject->LoadFromDB(obj->guid, dataMap))
             {
                 delete pGameobject;

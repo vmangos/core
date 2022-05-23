@@ -249,34 +249,10 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
 #define sLog MaNGOS::Singleton<Log>::Instance()
 
-#define BASIC_LOG(...)                                  \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC))    \
-            sLog.outBasic(__VA_ARGS__);                 \
-    } while(0)
-
-#define BASIC_FILTER_LOG(F,...)                         \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && !sLog.HasLogFilter(F)) \
-            sLog.outBasic(__VA_ARGS__);                 \
-    } while(0)
-
-#define DETAIL_LOG(...)                                 \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL))   \
-            sLog.outDetail(__VA_ARGS__);                \
-    } while(0)
-
 #define DETAIL_FILTER_LOG(F,...)                        \
     do {                                                \
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && !sLog.HasLogFilter(F)) \
             sLog.outDetail(__VA_ARGS__);                \
-    } while(0)
-
-#define DEBUG_LOG(...)                                  \
-    do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))    \
-            sLog.outDebug(__VA_ARGS__);                 \
     } while(0)
 
 #define DEBUG_FILTER_LOG(F,...)                         \

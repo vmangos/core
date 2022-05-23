@@ -45,7 +45,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recv_data)
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(auctioneerGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!unit)
     {
-        DEBUG_LOG("WORLD: HandleAuctionHelloOpcode - %s not found or you can't interact with him.", auctioneerGuid.GetString().c_str());
+        sLog.outDebug("WORLD: HandleAuctionHelloOpcode - %s not found or you can't interact with him.", auctioneerGuid.GetString().c_str());
         return;
     }
 
@@ -217,7 +217,7 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
         // using special access modes (1,-1) done at mode set in command, so not need recheck
         if (GetPlayer()->GetAuctionAccessMode() == 0 && !ChatHandler(GetPlayer()).FindCommand("auction"))
         {
-            DEBUG_LOG("%s attempt open auction in cheating way.", guid.GetString().c_str());
+            sLog.outDebug("%s attempt open auction in cheating way.", guid.GetString().c_str());
             return nullptr;
         }
 
@@ -229,7 +229,7 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
         auctioneer = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
         if (!auctioneer)
         {
-            DEBUG_LOG("Auctioneeer %s accessed in cheating way.", guid.GetString().c_str());
+            sLog.outDebug("Auctioneeer %s accessed in cheating way.", guid.GetString().c_str());
             return nullptr;
         }
     }
@@ -241,7 +241,7 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
 // this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: HandleAuctionSellItem");
+    sLog.outDebug("WORLD: HandleAuctionSellItem");
 
     ObjectGuid auctioneerGuid;
     ObjectGuid itemGuid;
@@ -416,7 +416,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 // this function is called when client bids or buys out auction
 void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: HandleAuctionPlaceBid");
+    sLog.outDebug("WORLD: HandleAuctionPlaceBid");
 
     ObjectGuid auctioneerGuid;
     uint32 auctionId;
@@ -564,13 +564,13 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
 // this void is called when auction_owner cancels his auction
 void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: HandleAuctionRemoveItem");
+    sLog.outDebug("WORLD: HandleAuctionRemoveItem");
 
     ObjectGuid auctioneerGuid;
     uint32 auctionId;
     recv_data >> auctioneerGuid;
     recv_data >> auctionId;
-    //DEBUG_LOG("Cancel AUCTION AuctionID: %u", auctionId);
+    //sLog.outDebug("Cancel AUCTION AuctionID: %u", auctionId);
 
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(auctioneerGuid);
     if (!auctionHouseEntry)
@@ -713,7 +713,7 @@ public:
 // called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: HandleAuctionListBidderItems");
+    sLog.outDebug("WORLD: HandleAuctionListBidderItems");
     if (ReceivedAHListRequest())
         return;
 
@@ -757,7 +757,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
 // this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: HandleAuctionListOwnerItems");
+    sLog.outDebug("WORLD: HandleAuctionListOwnerItems");
     if (ReceivedAHListRequest())
         return;
 
@@ -785,7 +785,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
 
 void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: HandleAuctionListItems");
+    sLog.outDebug("WORLD: HandleAuctionListItems");
     if (ReceivedAHListRequest())
         return;
 
@@ -813,7 +813,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
     if (GetPlayer()->HasUnitState(UNIT_STAT_FEIGN_DEATH))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    //DEBUG_LOG("Auctionhouse search %s list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
+    //sLog.outDebug("Auctionhouse search %s list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
     //  auctioneerGuid.GetString().c_str(), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
 
     // converting string that we try to find to lower case

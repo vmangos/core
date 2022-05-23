@@ -101,13 +101,13 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                       opcode, GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : -1);
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         {
-            DEBUG_LOG("Dumping error-causing packet:");
+            sLog.outDebug("Dumping error-causing packet:");
             new_pct->hexlike();
         }
 
         if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
         {
-            DETAIL_LOG("Disconnecting session [account id %i / address %s] for badly formatted packet.",
+            sLog.outDetail("Disconnecting session [account id %i / address %s] for badly formatted packet.",
                        m_Session ? m_Session->GetAccountId() : -1, GetRemoteAddress().c_str());
 
             return -1;
@@ -140,7 +140,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> clientSeed;
     recvPacket.read(digest, 20);
 
-    DEBUG_LOG("WorldSocket::HandleAuthSession: client %u, serverId %u, account %s, clientseed %u",
+    sLog.outDebug("WorldSocket::HandleAuthSession: client %u, serverId %u, account %s, clientseed %u",
               BuiltNumberClient,
               serverId,
               account.c_str(),
@@ -190,7 +190,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     char const* sStr = s.AsHexStr();                        //Must be freed by OPENSSL_free()
     char const* vStr = v.AsHexStr();                        //Must be freed by OPENSSL_free()
 
-    DEBUG_LOG("WorldSocket::HandleAuthSession: (s,v) check s: %s v: %s",
+    sLog.outDebug("WorldSocket::HandleAuthSession: (s,v) check s: %s v: %s",
               sStr,
               vStr);
 
@@ -207,7 +207,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
             SendPacket(packet);
 
             delete result;
-            BASIC_LOG("WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs).");
+            sLog.outBasic("WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs).");
             return -1;
         }
     }
@@ -256,7 +256,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        BASIC_LOG("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
+        sLog.outBasic("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
         return -1;
     }
 
@@ -286,7 +286,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     std::string address = GetRemoteAddress();
 
-    DEBUG_LOG("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
+    sLog.outDebug("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
               account.c_str(),
               address.c_str());
 

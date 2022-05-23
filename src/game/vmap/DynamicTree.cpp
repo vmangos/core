@@ -167,16 +167,16 @@ struct DynamicTreeIntersectionCallback_WithLogger
     bool did_hit;
     DynamicTreeIntersectionCallback_WithLogger() : did_hit(false)
     {
-        DEBUG_LOG("Dynamic Intersection log");
+        sLog.outDebug("Dynamic Intersection log");
     }
     bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirst, bool ignoreM2Model)
     {
-        DEBUG_LOG("testing intersection with %s", obj.name.c_str());
+        sLog.outDebug("testing intersection with %s", obj.name.c_str());
         bool hit = obj.intersectRay(r, distance, stopAtFirst, ignoreM2Model);
         if (hit)
         {
             did_hit = true;
-            DEBUG_LOG("result: intersects");
+            sLog.outDebug("result: intersects");
         }
         return hit;
     }

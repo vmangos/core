@@ -698,7 +698,7 @@ uint32 GameEventMgr::Initialize()                           // return the next e
     }
 
     uint32 delay = Update(&activeAtShutdown);
-    BASIC_LOG("Game Event system initialized.");
+    sLog.outBasic("Game Event system initialized.");
     m_IsGameEventsInit = true;
     return delay;
 }
@@ -738,7 +738,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= nullptr*/)
         //sLog.outErrorDb("Checking event %u",itr);
         if (CheckOneGameEvent(itr, currenttime))
         {
-            //DEBUG_LOG("GameEvent %u is active",itr->first);
+            //sLog.outDebug("GameEvent %u is active",itr->first);
             if (!IsActiveEvent(itr))
             {
                 bool resume = activeAtShutdown && activeAtShutdown->find(itr) != activeAtShutdown->end();
@@ -747,7 +747,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= nullptr*/)
         }
         else
         {
-            //DEBUG_LOG("GameEvent %u is not active",itr->first);
+            //sLog.outDebug("GameEvent %u is not active",itr->first);
             if (IsActiveEvent(itr))
                 StopEvent(itr);
             else
@@ -765,7 +765,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= nullptr*/)
             nextEventDelay = calcDelay;
     }
 
-    BASIC_LOG("Next game event check in %u seconds.", nextEventDelay + 1);
+    sLog.outBasic("Next game event check in %u seconds.", nextEventDelay + 1);
 
     return (nextEventDelay + 1) * IN_MILLISECONDS;           // Add 1 second to be sure event has started/stopped at next call
 }
@@ -775,7 +775,7 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
     m_ActiveEvents.erase(event_id);
     CharacterDatabase.PExecute("DELETE FROM game_event_status WHERE event = %u", event_id);
 
-    BASIC_LOG("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
+    sLog.outBasic("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
     // un-spawn positive event tagged objects
     GameEventUnspawn(event_id);
     // spawn negative event tagget objects
@@ -796,7 +796,7 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id, bool resume)
     if (sWorld.getConfig(CONFIG_BOOL_EVENT_ANNOUNCE))
         sWorld.SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
 
-    BASIC_LOG("GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());
+    sLog.outBasic("GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());
     // spawn positive event tagget objects
     GameEventSpawn(event_id);
     // un-spawn negative event tagged objects

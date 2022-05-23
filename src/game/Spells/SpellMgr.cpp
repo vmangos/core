@@ -906,7 +906,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
     SpellGroup unused;
     if (CheckSpellGroupStackRules(spellId_1, spellId_2, unused) != SPELL_GROUP_STACK_RULE_DEFAULT)
     {
-        DETAIL_LOG("[STACK][%u/%u] Pas de stack (DB/spell_group)", spellId_1, spellId_2);
+        sLog.outDetail("[STACK][%u/%u] Pas de stack (DB/spell_group)", spellId_1, spellId_2);
         return false;
     }
 
@@ -1242,14 +1242,14 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
         if (!isModifier)
         {
-            DETAIL_LOG("[STACK][%u/%u] Meme icone et non modifier.", spellId_1, spellId_2);
+            sLog.outDetail("[STACK][%u/%u] Meme icone et non modifier.", spellId_1, spellId_2);
             return true;
         }
     }
 
     if (IsRankSpellDueToSpell(spellInfo_1, spellId_2))
     {
-        DETAIL_LOG("[STACK][%u/%u] IsRankSpellDueToSpell", spellId_1, spellId_2);
+        sLog.outDetail("[STACK][%u/%u] IsRankSpellDueToSpell", spellId_1, spellId_2);
         return true;
     }
 
@@ -1279,7 +1279,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
     if (dummy_only)
         return false;
 
-    DETAIL_LOG("[STACK][%u/%u] not dummy only.", spellId_1, spellId_2);
+    sLog.outDetail("[STACK][%u/%u] not dummy only.", spellId_1, spellId_2);
     return true;
 }
 

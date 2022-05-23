@@ -100,10 +100,10 @@ bool MySQLConnection::OpenConnection(bool reconnect)
 
     if (mMysql)
     {
-        DETAIL_LOG("Connected to MySQL database at %s",
+        sLog.outDetail("Connected to MySQL database at %s",
             m_host.c_str());
-        DETAIL_LOG("MySQL client library: %s", mysql_get_client_info());
-        DETAIL_LOG("MySQL server ver: %s ", mysql_get_server_info(mMysql));
+        sLog.outDetail("MySQL client library: %s", mysql_get_client_info());
+        sLog.outDetail("MySQL server ver: %s ", mysql_get_server_info(mMysql));
 
         /*----------SET AUTOCOMMIT ON---------*/
         // It seems mysql 5.0.x have enabled this feature
@@ -117,9 +117,9 @@ bool MySQLConnection::OpenConnection(bool reconnect)
         // LEAVE 'AUTOCOMMIT' MODE ALWAYS ENABLED!!!
         // W/O IT EVEN 'SELECT' QUERIES WOULD REQUIRE TO BE WRAPPED INTO 'START TRANSACTION'<>'COMMIT' CLAUSES!!!
         if (!mysql_autocommit(mMysql, 1))
-            DETAIL_LOG("AUTOCOMMIT SUCCESSFULLY SET TO 1");
+            sLog.outDetail("AUTOCOMMIT SUCCESSFULLY SET TO 1");
         else
-            DETAIL_LOG("AUTOCOMMIT NOT SET TO 1");
+            sLog.outDetail("AUTOCOMMIT NOT SET TO 1");
         /*-------------------------------------*/
 
         // set connection properties to UTF8 to properly handle locales for different

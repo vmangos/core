@@ -130,7 +130,7 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 team, uint3
 
 bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 mapId, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    DEBUG_LOG("Creating capture point %u", entry);
+    sLog.outDebug("Creating capture point %u", entry);
 
     // check info existence
     GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
@@ -177,7 +177,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
 {
     if (!m_Creatures[type])
     {
-        DEBUG_LOG("opvp creature type %u was already deleted", type);
+        sLog.outDebug("opvp creature type %u was already deleted", type);
         return false;
     }
 
@@ -189,7 +189,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         return false;
     }
 
-    DEBUG_LOG("deleting opvp creature type %u", type);
+    sLog.outDebug("deleting opvp creature type %u", type);
     MANGOS_ASSERT(cr->IsTemporarySummon());
     static_cast<TemporarySummon*>(cr)->UnSummon();
 
@@ -576,7 +576,7 @@ void ZoneScript::OnPlayerLeave(Player* plr)
     if (!plr->GetSession()->PlayerLogout())
         SendRemoveWorldStates(plr);
     m_players[plr->GetTeamId()].erase(plr);
-    DEBUG_LOG("Player %s left a ZoneScript zone", plr->GetName());
+    sLog.outDebug("Player %s left a ZoneScript zone", plr->GetName());
 }
 
 void ZoneScript::SendUpdateWorldState(uint32 field, uint32 value)

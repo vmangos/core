@@ -194,8 +194,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     {
         uint64 minTime = uint64(cur_time - lastTime);
         uint64 fullTime = uint64(lastTime - firstTime);
-        DETAIL_LOG("Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
-        DETAIL_LOG("Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
+        sLog.outDetail("Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
+        sLog.outDetail("Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
 
         lastTime = cur_time;
         sendLastPacketCount = 1;
@@ -237,7 +237,7 @@ void WorldSession::QueuePacket(WorldPacket* newPacket)
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, char const* reason)
 {
-    DEBUG_LOG("SESSION: received unexpected opcode %s (0x%.4X) %s",
+    sLog.outDebug("SESSION: received unexpected opcode %s (0x%.4X) %s",
                   LookupOpcodeName(packet->GetOpcode()),
                   packet->GetOpcode(),
                   reason);
@@ -409,7 +409,7 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                                   packet->GetOpcode());
                     break;
                 case STATUS_UNHANDLED:
-                    DEBUG_LOG("SESSION: received not handled opcode %s (0x%.4X)",
+                    sLog.outDebug("SESSION: received not handled opcode %s (0x%.4X)",
                               opHandle.name,
                               packet->GetOpcode());
                     break;
@@ -429,13 +429,13 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
                           packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
             if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
             {
-                DEBUG_LOG("Dumping error causing packet:");
+                sLog.outDebug("Dumping error causing packet:");
                 packet->hexlike();
             }
 
             if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
             {
-                DETAIL_LOG("Disconnecting session [account id %u / address %s] for badly formatted packet.",
+                sLog.outDetail("Disconnecting session [account id %u / address %s] for badly formatted packet.",
                            GetAccountId(), GetRemoteAddress().c_str());
                 ProcessAnticheatAction("Anticrash", "ByteBufferException", CHEAT_ACTION_KICK);
             }
@@ -638,7 +638,7 @@ void WorldSession::LogoutPlayer(bool Save)
         WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
         SendPacket(&data);
 
-        DEBUG_LOG("SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
+        sLog.outDebug("SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
     }
 
     if (m_masterPlayer)
@@ -1161,7 +1161,7 @@ bool WorldSession::CharacterScreenIdleKick(uint32 currTime)
 
     if ((currTime - m_idleTime) >= (maxIdle * 1000))
     {
-        DEBUG_LOG("SESSION: Kicking session [%s] from character selection", GetRemoteAddress().c_str());
+        sLog.outDebug("SESSION: Kicking session [%s] from character selection", GetRemoteAddress().c_str());
         return true;
     }
 

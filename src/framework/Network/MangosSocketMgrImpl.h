@@ -167,7 +167,7 @@ protected:
 
     virtual int svc()
     {
-        DEBUG_LOG("Network Thread Starting");
+        sLog.outDebug("Network Thread Starting");
 
         WorldDatabase.ThreadStart();
 
@@ -204,7 +204,7 @@ protected:
 
         WorldDatabase.ThreadEnd();
 
-        DEBUG_LOG("Network Thread Exitting");
+        sLog.outDebug("Network Thread Exitting");
 
         return 0;
     }
@@ -261,7 +261,7 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
     if (StartThreadsIfNeeded() == -1)
         return -1;
 
-    BASIC_LOG("Max allowed socket connections %d", ACE::max_handles());
+    sLog.outBasic("Max allowed socket connections %d", ACE::max_handles());
 
     if (m_SockOutUBuff <= 0)
     {

@@ -1001,7 +1001,7 @@ void GameObject::DeleteFromDB() const
 {
     if (!HasStaticDBSpawnData())
     {
-        DEBUG_LOG("Trying to delete not saved gameobject!");
+        sLog.outDebug("Trying to delete not saved gameobject!");
         return;
     }
 
@@ -1696,7 +1696,7 @@ void GameObject::Use(Unit* user)
                     int32 chance = skill - zone_skill + 5;
                     int32 roll = irand(1, 100);
 
-                    DEBUG_LOG("Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
+                    sLog.outDebug("Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
 
                     // normal chance
                     bool success = skill >= zone_skill && chance >= roll;
@@ -2334,7 +2334,7 @@ struct SpawnGameObjectInMapsWorker
             GameObjectData const* data = sObjectMgr.GetGOData(i_guid);
             MANGOS_ASSERT(data);
             GameObject* pGameobject = GameObject::CreateGameObject(data->id);
-            //DEBUG_LOG("Spawning gameobject %u", *itr);
+            //sLog.outDebug("Spawning gameobject %u", *itr);
             if (!pGameobject->LoadFromDB(i_guid, map))
                 delete pGameobject;
             else

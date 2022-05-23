@@ -783,7 +783,7 @@ void AreaAura::Update(uint32 diff)
                 else if (!target->AddSpellAuraHolder(holder))
                     holder = nullptr;
 
-                DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
+                sLog.outDetail("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
 
                 // Add holder to spell if it's channeled so the updates are synced
                 if (holder && IsChanneled() && !addedToExisting)

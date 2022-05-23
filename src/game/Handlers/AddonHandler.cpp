@@ -101,7 +101,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
             AddOnPacked >> crc >> unk7 >> unk6;
 
-            //DEBUG_LOG("ADDON: Name:%s CRC:%x Unknown1 :%x Unknown2 :%x", AddonNames.c_str(), crc, unk7, unk6);
+            //sLog.outDebug("ADDON: Name:%s CRC:%x Unknown1 :%x Unknown2 :%x", AddonNames.c_str(), crc, unk7, unk6);
 
             *Target << (uint8)2;
 
@@ -140,7 +140,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
             AddOnPacked >> crc >> unk6;
 
-            //DEBUG_LOG("ADDON: Name:%s CRC:%llx Unknown1 :%x", AddonNames.c_str(), crc, unk6);
+            //sLog.outDebug("ADDON: Name:%s CRC:%llx Unknown1 :%x", AddonNames.c_str(), crc, unk6);
 
             if (crc == 0x4C1C776D01LL)  // standard addon CRC
             {

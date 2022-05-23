@@ -768,7 +768,7 @@ struct instance_stratholme : public ScriptedInstance
                 m_uiGateTrapTimers[i][0] -= uiDiff;
                 if (m_uiGateTrapTimers[i][0] <= uiDiff)
                 {
-                    DEBUG_LOG("SD2: Instance Stratholme - Rat Trap reseted %u.", i);
+                    sLog.outDebug("SD2: Instance Stratholme - Rat Trap reseted %u.", i);
                     m_uiGateTrapTimers[i][0] = 0;
                 }
             }
@@ -988,7 +988,7 @@ struct instance_stratholme : public ScriptedInstance
         if (m_uiGateTrapTimers[uiGate][0])
             return;
 
-        DEBUG_LOG("SD2: Instance Stratholme - Rat Trap activated %i.", uiGate);
+        sLog.outDebug("SD2: Instance Stratholme - Rat Trap activated %i.", uiGate);
         // close the gates
         DoUseDoorOrButton(m_ratTrapGateGUID[2 * uiGate]);
         DoUseDoorOrButton(m_ratTrapGateGUID[2 * uiGate + 1]);

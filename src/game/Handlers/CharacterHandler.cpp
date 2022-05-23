@@ -153,7 +153,7 @@ void WorldSession::HandleCharEnum(QueryResult* result)
             if (m_characterMaxLevel < level)
                 m_characterMaxLevel = level;
 
-            DETAIL_LOG("Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
+            sLog.outDetail("Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
             if (Player::BuildEnumData(result, &data))
                 ++num;
         }
@@ -337,7 +337,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         SendPacket(&data);
 
         std::string IP_str = GetRemoteAddress();
-        BASIC_LOG("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
+        sLog.outBasic("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
         sLog.out(LOG_CHAR, "Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), guidLow);
     }
     else
@@ -382,7 +382,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
         return;
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    sLog.outBasic("Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
     sLog.out(LOG_CHAR, "Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
 
     // If the character is online (ALT-F4 logout for example)
@@ -412,7 +412,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
         return;
     }
 
-    DEBUG_LOG("WORLD: Recvd Player Logon Message");
+    sLog.outDebug("WORLD: Recvd Player Logon Message");
 
     LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())
@@ -578,7 +578,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             ++linecount;
         }
 
-        DEBUG_LOG("WORLD: Sent motd (SMSG_MOTD)");
+        sLog.outDebug("WORLD: Sent motd (SMSG_MOTD)");
     }
 
     if (Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId()))
@@ -588,7 +588,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         data << uint8(1);
         data << guild->GetMOTD();
         SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
+        sLog.outDebug("WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
 
         guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
     }
@@ -625,7 +625,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     else
         sObjectAccessor.AddObject(pCurrChar);
 
-    //DEBUG_LOG("Player %s added to Map.",pCurrChar->GetName());
+    //sLog.outDebug("Player %s added to Map.",pCurrChar->GetName());
     pCurrChar->GetSocial()->SendFriendList();
     pCurrChar->GetSocial()->SendIgnoreList();
 
@@ -752,7 +752,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
 void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_ATWAR");
+    sLog.outDebug("WORLD: Received CMSG_SET_FACTION_ATWAR");
 
     uint32 repListId;
     uint8  flag;
@@ -785,7 +785,7 @@ void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)
     tutflag |= (1 << rInt);
     SetTutorialInt(wInt, tutflag);
 
-    //DEBUG_LOG("Received Tutorial Flag Set {%u}.", iFlag);
+    //sLog.outDebug("Received Tutorial Flag Set {%u}.", iFlag);
 }
 
 void WorldSession::HandleTutorialClearOpcode(WorldPacket& /*recv_data*/)
@@ -803,7 +803,7 @@ void WorldSession::HandleTutorialResetOpcode(WorldPacket& /*recv_data*/)
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    DEBUG_LOG("WORLD: Received CMSG_SET_WATCHED_FACTION");
+    sLog.outDebug("WORLD: Received CMSG_SET_WATCHED_FACTION");
     int32 repId;
     recv_data >> repId;
     GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
@@ -812,7 +812,7 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_INACTIVE");
+    sLog.outDebug("WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recv_data >> replistid >> inactive;
@@ -822,13 +822,13 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleShowingHelmOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("CMSG_SHOWING_HELM for %s", _player->GetName());
+    sLog.outDebug("CMSG_SHOWING_HELM for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("CMSG_SHOWING_CLOAK for %s", _player->GetName());
+    sLog.outDebug("CMSG_SHOWING_CLOAK for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
 }
 

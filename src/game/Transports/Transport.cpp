@@ -206,7 +206,7 @@ void GenericTransport::AddPassenger(Unit* passenger, bool adjustCoords)
 {
     if (m_passengers.insert(passenger).second)
     {
-        DETAIL_LOG("Unit %s boarded transport %s.", passenger->GetName(), GetName());
+        sLog.outDetail("Unit %s boarded transport %s.", passenger->GetName(), GetName());
         passenger->SetTransport(this);
         passenger->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
         bool changedTransports = passenger->m_movementInfo.t_guid != GetObjectGuid();
@@ -243,7 +243,7 @@ void GenericTransport::RemovePassenger(Unit* passenger)
 
     if (erased)
     {
-        DETAIL_LOG("Unit %s removed from transport %s.", passenger->GetName(), GetName());
+        sLog.outDetail("Unit %s removed from transport %s.", passenger->GetName(), GetName());
         passenger->SetTransport(nullptr);
         passenger->m_movementInfo.ClearTransportData();
     }

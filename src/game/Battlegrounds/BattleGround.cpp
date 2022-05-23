@@ -911,7 +911,7 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool transport, bool sen
         if (transport && pPlayer->FindMap() == GetBgMap())
             pPlayer->TeleportToBGEntryPoint();
 
-        DETAIL_LOG("BATTLEGROUND: Removed player %s from BattleGround.", pPlayer->GetName());
+        sLog.outDetail("BATTLEGROUND: Removed player %s from BattleGround.", pPlayer->GetName());
     }
 
     //battleground object will be deleted next BattleGround::Update() call
@@ -981,7 +981,7 @@ void BattleGround::AddPlayer(Player* pPlayer)
     AddOrSetPlayerToCorrectBgGroup(pPlayer, guid, team);
 
     // Log
-    DETAIL_LOG("BATTLEGROUND: Player %s joined the battle.", pPlayer->GetName());
+    sLog.outDetail("BATTLEGROUND: Player %s joined the battle.", pPlayer->GetName());
 }
 
 /* this method adds player to his team's bg group, or sets his correct group if player is already in bg group */

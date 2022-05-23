@@ -158,7 +158,7 @@ std::string TrimLeft(const std::string& s)
 
 int OfflineChatSocket::handle_input(ACE_HANDLE)
 {
-    DEBUG_LOG("OfflineChatSocket::handle_input");
+    sLog.outDebug("OfflineChatSocket::handle_input");
     if (closing_)
     {
         sLog.outError("Called OfflineChatSocket::handle_input with closing_ = true");
@@ -169,7 +169,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
 
     if (readBytes <= 0)
     {
-        DEBUG_LOG("read %i bytes in OfflineChatSocket::handle_input", readBytes);
+        sLog.outDebug("read %i bytes in OfflineChatSocket::handle_input", readBytes);
         return -1;
     }
     DEBUG_OUT_CHAT("OfflineChatSocket::handle_input %i bytes read", readBytes);

@@ -303,7 +303,7 @@ bool ChatHandler::HandleDebugSendPoiCommand(char* args)
     if (!ExtractUInt32(&args, flags))
         return false;
 
-    DETAIL_LOG("Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon, flags);
+    sLog.outDetail("Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon, flags);
     pPlayer->PlayerTalkClass->SendPointOfInterest(target->GetPositionX(), target->GetPositionY(), Poi_Icon(icon), flags, 30, "Test POI");
     return true;
 }
@@ -437,12 +437,12 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
             data << unit->GetPackGUID();
         else
         {
-            DEBUG_LOG("Sending opcode: unknown type '%s'", type.c_str());
+            sLog.outDebug("Sending opcode: unknown type '%s'", type.c_str());
             break;
         }
     }
     ifs.close();
-    DEBUG_LOG("Sending opcode %u", data.GetOpcode());
+    sLog.outDebug("Sending opcode %u", data.GetOpcode());
     data.hexlike();
     m_session->SendPacket(&data);
     PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName());
@@ -1058,7 +1058,7 @@ bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeS
         if (!ExtractUInt32Base(&valStr, iValue, base))
             return false;
 
-        DEBUG_LOG(GetMangosString(LANG_SET_UINT), guid.GetString().c_str(), field, iValue);
+        sLog.outDebug(GetMangosString(LANG_SET_UINT), guid.GetString().c_str(), field, iValue);
         target->SetUInt32Value(field , iValue);
         PSendSysMessage(LANG_SET_UINT_FIELD, guid.GetString().c_str(), field, iValue);
     }
@@ -1068,7 +1068,7 @@ bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeS
         if (!ExtractFloat(&valStr, fValue))
             return false;
 
-        DEBUG_LOG(GetMangosString(LANG_SET_FLOAT), guid.GetString().c_str(), field, fValue);
+        sLog.outDebug(GetMangosString(LANG_SET_FLOAT), guid.GetString().c_str(), field, fValue);
         target->SetFloatValue(field , fValue);
         PSendSysMessage(LANG_SET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
     }
@@ -1263,24 +1263,24 @@ bool ChatHandler::HandleGetValueHelper(Object* target, uint32 field, char* typeS
                 res = iValue & (1 << (32 - 1)) ? "0" : " ";
                 for (int i = 32; i > 0; --i)
                     res += iValue & (1 << (i - 1)) ? "1" : "0";
-                DEBUG_LOG(GetMangosString(LANG_GET_BITSTR), guid.GetString().c_str(), field, res.c_str());
+                sLog.outDebug(GetMangosString(LANG_GET_BITSTR), guid.GetString().c_str(), field, res.c_str());
                 PSendSysMessage(LANG_GET_BITSTR_FIELD, guid.GetString().c_str(), field, res.c_str());
                 break;
             }
             case 16:
-                DEBUG_LOG(GetMangosString(LANG_GET_HEX), guid.GetString().c_str(), field, iValue);
+                sLog.outDebug(GetMangosString(LANG_GET_HEX), guid.GetString().c_str(), field, iValue);
                 PSendSysMessage(LANG_GET_HEX_FIELD, guid.GetString().c_str(), field, iValue);
                 break;
             case 10:
             default:
-                DEBUG_LOG(GetMangosString(LANG_GET_UINT), guid.GetString().c_str(), field, iValue);
+                sLog.outDebug(GetMangosString(LANG_GET_UINT), guid.GetString().c_str(), field, iValue);
                 PSendSysMessage(LANG_GET_UINT_FIELD, guid.GetString().c_str(), field, iValue);
         }
     }
     else
     {
         float fValue = target->GetFloatValue(field);
-        DEBUG_LOG(GetMangosString(LANG_GET_FLOAT), guid.GetString().c_str(), field, fValue);
+        sLog.outDebug(GetMangosString(LANG_GET_FLOAT), guid.GetString().c_str(), field, fValue);
         PSendSysMessage(LANG_GET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
     }
 
@@ -1446,22 +1446,22 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
             default:
             case 1:                                         // int +
                 value = uint32(int32(value) + int32(iValue));
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_INT32), guidString, field, iValue, value, value);
+                sLog.outDebug(GetMangosString(LANG_CHANGE_INT32), guidString, field, iValue, value, value);
                 PSendSysMessage(LANG_CHANGE_INT32_FIELD, guidString, field, iValue, value, value);
                 break;
             case 2:                                         // |= bit or
                 value |= iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                sLog.outDebug(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
                 PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
             case 3:                                         // &= bit and
                 value &= iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                sLog.outDebug(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
                 PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
             case 4:                                         // &=~ bit and not
                 value &= ~iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                sLog.outDebug(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
                 PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
         }
@@ -1478,7 +1478,7 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
 
         value += fValue;
 
-        DEBUG_LOG(GetMangosString(LANG_CHANGE_FLOAT), guidString, field, fValue, value);
+        sLog.outDebug(GetMangosString(LANG_CHANGE_FLOAT), guidString, field, fValue, value);
         PSendSysMessage(LANG_CHANGE_FLOAT_FIELD, guidString, field, fValue, value);
 
         target->SetFloatValue(field, value);

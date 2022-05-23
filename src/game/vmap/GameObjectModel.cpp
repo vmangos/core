@@ -54,7 +54,7 @@ void LoadGameObjectModelList()
 
         if (name_length >= sizeof(buff))
         {
-            DEBUG_LOG("File %s seems to be corrupted", VMAP::GAMEOBJECT_MODELS);
+            sLog.outDebug("File %s seems to be corrupted", VMAP::GAMEOBJECT_MODELS);
             break;
         }
 
@@ -82,7 +82,7 @@ bool GameObjectModel::initialize(GameObject const* const pGo, GameObjectDisplayI
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        DEBUG_LOG("Model %s has zero bounds, loading skipped", it->second.name.c_str());
+        sLog.outDebug("Model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 
@@ -188,7 +188,7 @@ bool GameObjectModel::Relocate(GameObject const& go)
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        DEBUG_LOG("GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        sLog.outDebug("GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 

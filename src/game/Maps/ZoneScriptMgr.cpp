@@ -84,7 +84,7 @@ void ZoneScriptMgr::HandlePlayerEnterZone(Player* plr, uint32 zoneid)
         return;
 
     itr->second->OnPlayerEnter(plr);
-    //DEBUG_LOG("Player %u entered ZoneScript", plr->GetGUIDLow());
+    //sLog.outDebug("Player %u entered ZoneScript", plr->GetGUIDLow());
 }
 
 void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
@@ -98,7 +98,7 @@ void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
         return;
 
     itr->second->OnPlayerLeave(plr);
-    //DEBUG_LOG("Player %u left ZoneScript", plr->GetGUIDLow());
+    //sLog.outDebug("Player %u left ZoneScript", plr->GetGUIDLow());
 }
 
 ZoneScript * ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)
@@ -107,7 +107,7 @@ ZoneScript * ZoneScriptMgr::GetZoneScriptToZoneId(uint32 zoneid)
     if (itr == m_ZoneScriptsMap.end())
     {
         // no handle for this zone, return
-        //DETAIL_LOG("Pas de script pour la zone %u", zoneid);
+        //sLog.outDetail("Pas de script pour la zone %u", zoneid);
         return nullptr;
     }
     return itr->second;

@@ -75,7 +75,7 @@ namespace VMAP
         void operator()(Vector3 const& point, uint32 entry)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("trying to intersect '%s'", prims[entry].name.c_str());
+            sLog.outDebug("trying to intersect '%s'", prims[entry].name.c_str());
     #endif
             prims[entry].intersectPoint(point, aInfo);
         }
@@ -91,7 +91,7 @@ namespace VMAP
         void operator()(Vector3 const& point, uint32 entry)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("trying to intersect '%s'", prims[entry].name.c_str());
+            sLog.outDebug("trying to intersect '%s'", prims[entry].name.c_str());
     #endif
             if (prims[entry].GetLocationInfo(point, locInfo))
                 result = true;
@@ -359,7 +359,7 @@ namespace VMAP
             // global model spawns
             // only non-tiled maps have them, and if so exactly one (so far at least...)
 #ifdef VMAP_DEBUG
-            DEBUG_LOG("Map isTiled: %u", static_cast<uint32>(iIsTiled));
+            sLog.outDebug("Map isTiled: %u", static_cast<uint32>(iIsTiled));
 #endif
 
             if (!iIsTiled)
@@ -395,9 +395,9 @@ namespace VMAP
                         ++iLoadedSpawns[referencedVal];
 #ifdef VMAP_DEBUG
                         if (iTreeValues[referencedVal].ID != spawn.ID)
-                            DEBUG_LOG("Error: trying to load wrong spawn in node!");
+                            sLog.outDebug("Error: trying to load wrong spawn in node!");
                         else if (iTreeValues[referencedVal].name != spawn.name)
-                            DEBUG_LOG("Error: name mismatch on GUID=%u", spawn.ID);
+                            sLog.outDebug("Error: name mismatch on GUID=%u", spawn.ID);
 #endif
                     }
                 }
@@ -477,9 +477,9 @@ namespace VMAP
                         ++iLoadedSpawns[referencedVal];
     #ifdef VMAP_DEBUG
                         if (iTreeValues[referencedVal].ID != spawn.ID)
-                            DEBUG_LOG("Error: trying to load wrong spawn in node!");
+                            sLog.outDebug("Error: trying to load wrong spawn in node!");
                         else if (iTreeValues[referencedVal].name != spawn.name)
-                            DEBUG_LOG("Error: name mismatch on GUID=%u", spawn.ID);
+                            sLog.outDebug("Error: name mismatch on GUID=%u", spawn.ID);
     #endif
                     }
                 }

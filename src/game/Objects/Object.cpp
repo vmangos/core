@@ -211,10 +211,10 @@ Object::~Object()
 
     if (m_uint32Values)
     {
-        //DEBUG_LOG("Object desctr 1 check (%p)",(void*)this);
+        //sLog.outDebug("Object desctr 1 check (%p)",(void*)this);
         delete [] m_uint32Values;
         delete [] m_uint32Values_mirror;
-        //DEBUG_LOG("Object desctr 2 check (%p)",(void*)this);
+        //sLog.outDebug("Object desctr 2 check (%p)",(void*)this);
     }
 }
 
@@ -293,7 +293,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData& data, Player* target) c
         updateFlags |= UPDATEFLAG_SELF;
 #endif
 
-    //DEBUG_LOG("BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
+    //sLog.outDebug("BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
 
     ByteBuffer buf(500);
     buf << (uint8)updatetype;

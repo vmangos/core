@@ -55,7 +55,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-    //DEBUG_LOG("WORLD: received CMSG_DUEL_CANCELLED");
+    //sLog.outDebug("WORLD: received CMSG_DUEL_CANCELLED");
 
     auto pPlayer = GetPlayer();
     // no duel requested

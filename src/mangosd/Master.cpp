@@ -76,7 +76,7 @@ void freezeDetector(uint32 _delaytime)
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         uint32 curtime = WorldTimer::getMSTime();
-        //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
+        //sLog.outDebug("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
 
         // normal work
         if (loops != World::m_worldLoopCounter)

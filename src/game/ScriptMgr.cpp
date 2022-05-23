@@ -2579,7 +2579,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
     if (chatTypeOverride >= 0)
         chatType = chatTypeOverride;
 
-    DEBUG_LOG("DoScriptText: textId=%i, soundId=%u, chatType=%u, languageId=%u, emoteId=%u",
+    sLog.outDebug("DoScriptText: textId=%i, soundId=%u, chatType=%u, languageId=%u, emoteId=%u",
         textId, soundId, chatType, languageId, emoteId);
 
     if (soundId)

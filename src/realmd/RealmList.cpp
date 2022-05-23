@@ -175,7 +175,7 @@ void RealmList::UpdateIfNeed()
 
 void RealmList::UpdateRealms(bool init)
 {
-    DETAIL_LOG("Updating Realm List...");
+    sLog.outDetail("Updating Realm List...");
 
     QueryResult *result = LoginDatabase.Query(
         //       0     1       2          3       4       5             6

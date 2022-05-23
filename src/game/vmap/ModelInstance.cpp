@@ -37,7 +37,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            sLog.outDebug("<object not loaded>");
     #endif
             return false;
         }
@@ -45,7 +45,7 @@ namespace VMAP
         if (time == G3D::inf())
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("Ray does not hit '%s'", name.c_str());
+            sLog.outDebug("Ray does not hit '%s'", name.c_str());
     #endif
             return false;
         }
@@ -68,7 +68,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            sLog.outDebug("<object not loaded>");
     #endif
             return;
         }
@@ -102,7 +102,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            sLog.outDebug("<object not loaded>");
     #endif
             return false;
         }
@@ -127,7 +127,7 @@ namespace VMAP
         if (!iModel)
         {
     #ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
+            sLog.outDebug("<object not loaded>");
     #endif
             return false;
         }

@@ -40,7 +40,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
 
     recv_data >> guid;
 
-    DEBUG_LOG("WORLD: Recvd CMSG_MEETINGSTONE_JOIN Message guid: %s", guid.GetString().c_str());
+    sLog.outDebug("WORLD: Recvd CMSG_MEETINGSTONE_JOIN Message guid: %s", guid.GetString().c_str());
 
     // ignore for remote control state
     if (!_player->IsSelfMover())
@@ -88,7 +88,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("WORLD: Recvd CMSG_MEETINGSTONE_LEAVE");
+    sLog.outDebug("WORLD: Recvd CMSG_MEETINGSTONE_LEAVE");
     if (Group* grp = _player->GetGroup())
     {
         if (grp->IsLeader(_player->GetObjectGuid()) && grp->isInLFG())
@@ -108,7 +108,7 @@ void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket& /*recv_data*/)
 {
-    DEBUG_LOG("WORLD: Received CMSG_MEETING_STONE_INFO");
+    sLog.outDebug("WORLD: Received CMSG_MEETING_STONE_INFO");
 
     if (Group* grp = _player->GetGroup())
     {

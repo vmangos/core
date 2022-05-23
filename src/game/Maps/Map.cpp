@@ -483,7 +483,7 @@ Map::Add(T* obj)
     if (obj->isActiveObject() && !IsUnloading())
         AddToActive(obj);
 
-    DEBUG_LOG("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
+    sLog.outDebug("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
 
     obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     obj->SetIsNewObject(true);
@@ -512,7 +512,7 @@ void Map::Add(GenericTransport* obj)
     obj->SetMap(this);
     obj->AddToWorld();
 
-    //DEBUG_LOG("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
+    //sLog.outDebug("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
 
     //obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     m_transports.insert(obj);
@@ -1257,7 +1257,7 @@ Map::Remove(T* obj, bool remove)
     if (!loaded(GridPair(cell.data.Part.grid_x, cell.data.Part.grid_y)))
         return;
 
-    DEBUG_LOG("Remove object (GUID: %u TypeId:%u) from grid[%u,%u]", obj->GetGUIDLow(), obj->GetTypeId(), cell.data.Part.grid_x, cell.data.Part.grid_y);
+    sLog.outDebug("Remove object (GUID: %u TypeId:%u) from grid[%u,%u]", obj->GetGUIDLow(), obj->GetTypeId(), cell.data.Part.grid_x, cell.data.Part.grid_y);
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     MANGOS_ASSERT(grid != nullptr);
 
@@ -1505,7 +1505,7 @@ bool Map::UnloadGrid(uint32 const& x, uint32 const& y, bool pForce)
         if (!pForce && ActiveObjectsNearGrid(x, y))
             return false;
 
-        DEBUG_LOG("Unloading grid[%u,%u] for map %u", x, y, i_id);
+        sLog.outDebug("Unloading grid[%u,%u] for map %u", x, y, i_id);
         ObjectGridUnloader unloader(*grid);
 
         // Finish remove and delete all creatures with delayed remove before moving to respawn grids
@@ -1534,7 +1534,7 @@ bool Map::UnloadGrid(uint32 const& x, uint32 const& y, bool pForce)
         m_TerrainData->Unload(gx, gy);
     }
 
-    DEBUG_LOG("Unloading grid[%u,%u] for map %u finished", x, y, i_id);
+    sLog.outDebug("Unloading grid[%u,%u] for map %u finished", x, y, i_id);
     return true;
 }
 
@@ -1645,7 +1645,7 @@ void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGui
 
 void Map::SendInitSelf(Player* player)
 {
-    DETAIL_LOG("Creating player data for himself %u", player->GetGUIDLow());
+    sLog.outDetail("Creating player data for himself %u", player->GetGUIDLow());
 
     UpdateData data;
 
@@ -1954,7 +1954,7 @@ void Map::CreateInstanceData(bool load)
             char const* data = fields[0].GetString();
             if (data)
             {
-                DEBUG_LOG("Loading instance data for `%s` (Map: %u Instance: %u)", sScriptMgr.GetScriptName(i_script_id), GetId(), i_InstanceId);
+                sLog.outDebug("Loading instance data for `%s` (Map: %u Instance: %u)", sScriptMgr.GetScriptName(i_script_id), GetId(), i_InstanceId);
                 i_data->Load(data);
             }
             else
@@ -1972,7 +1972,7 @@ void Map::CreateInstanceData(bool load)
     }
     else
     {
-        DEBUG_LOG("New instance data, \"%s\" ,initialized!", sScriptMgr.GetScriptName(i_script_id));
+        sLog.outDebug("New instance data, \"%s\" ,initialized!", sScriptMgr.GetScriptName(i_script_id));
         i_data->Initialize();
         i_data->Create();
     }
@@ -2075,7 +2075,7 @@ bool DungeonMap::CanEnter(Player* player)
     uint32 maxPlayers = GetMaxPlayers();
     if (!player->IsGameMaster() && GetPlayersCountExceptGMs() >= maxPlayers)
     {
-        DETAIL_LOG("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
+        sLog.outDetail("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
         player->SendTransferAborted(TRANSFER_ABORT_MAX_PLAYERS);
         return false;
     }
@@ -2215,7 +2215,7 @@ bool DungeonMap::Add(Player* player)
     SetResetSchedule(false);
     player->AddInstanceEnterTime(GetInstanceId(), time(nullptr));
 
-    DETAIL_LOG("MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
+    sLog.outDetail("MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
     // initialize unload state
     m_unloadTimer = 0;
     m_resetAfterUnload = false;
@@ -2234,7 +2234,7 @@ void DungeonMap::Update(uint32 t_diff)
 
 void DungeonMap::Remove(Player* player, bool remove)
 {
-    DETAIL_LOG("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
+    sLog.outDetail("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
 
     //if last player set unload timer
     if (!m_unloadTimer && m_mapRefManager.getSize() == 1)
@@ -2415,7 +2415,7 @@ bool BattleGroundMap::Add(Player* player)
 
 void BattleGroundMap::Remove(Player* player, bool remove)
 {
-    DETAIL_LOG("MAP: Removing player '%s' from bg '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
+    sLog.outDetail("MAP: Removing player '%s' from bg '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
     Map::Remove(player, remove);
 }
 
@@ -3002,7 +3002,7 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
     bool result0 = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetId(), srcX, srcY, srcZ, destX, destY, destZ, tempX, tempY, tempZ, modifyDist);
     if (result0)
     {
-        DEBUG_LOG("Map::GetHitPosition vmaps corrects gained with static objects! new dest coords are X:%f Y:%f Z:%f", destX, destY, destZ);
+        sLog.outDebug("Map::GetHitPosition vmaps corrects gained with static objects! new dest coords are X:%f Y:%f Z:%f", destX, destY, destZ);
         destX = tempX;
         destY = tempY;
         destZ = tempZ;
@@ -3014,7 +3014,7 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
     bool result1 = GetDynamicObjectHitPos(startPos, dstPos, resultPos, modifyDist);
     if (result1)
     {
-        DEBUG_LOG("Map::GetHitPosition vmaps corrects gained with dynamic objects! new dest coords are X:%f Y:%f Z:%f", destX, destY, destZ);
+        sLog.outDebug("Map::GetHitPosition vmaps corrects gained with dynamic objects! new dest coords are X:%f Y:%f Z:%f", destX, destY, destZ);
         destX = resultPos.x;
         destY = resultPos.y;
         destZ = resultPos.z;
@@ -3045,7 +3045,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     dtNavMeshQuery const* m_navMeshQuery = transport ? mmap->GetModelNavMeshQuery(transport->GetDisplayId()) : mmap->GetNavMeshQuery(GetId());
     if (!m_navMeshQuery)
     {
-        DETAIL_LOG("WalkHitPos: No nav mesh loaded !");
+        sLog.outDetail("WalkHitPos: No nav mesh loaded !");
         return false;
     }
 
@@ -3068,7 +3068,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     dtPolyRef startRef = PathInfo::FindWalkPoly(m_navMeshQuery, point, filter, closestPoint, zSearchDist);
     if (!startRef)
     {
-        DETAIL_LOG("WalkHitPos: Start poly not found");
+        sLog.outDetail("WalkHitPos: Start poly not found");
         return false;
     }
     filter.setExcludeFlags(NAV_STEEP_SLOPES);
@@ -3081,7 +3081,7 @@ bool Map::GetWalkHitPosition(GenericTransport* transport, float srcX, float srcY
     dtStatus result = m_navMeshQuery->raycast(startRef, closestPoint, endPosition, &filter, &t, hitNormal, visited, &visitedCount, 50);
     if (dtStatusFailed(result) || !visitedCount)
     {
-        DETAIL_LOG("WalkHitPos: Navmesh raycast failed");
+        sLog.outDetail("WalkHitPos: Navmesh raycast failed");
         return false;
     }
     for (int i = 0; i < 3; ++i)

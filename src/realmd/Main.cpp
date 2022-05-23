@@ -208,17 +208,17 @@ extern int main(int argc, char **argv)
         Log::WaitBeforeContinueIfNeed();
     }
 
-    DETAIL_LOG("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    sLog.outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     if (SSLeay() < 0x009080bfL )
     {
-        DETAIL_LOG("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
-        DETAIL_LOG("WARNING: Minimal required version [OpenSSL 0.9.8k]");
+        sLog.outDetail("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
+        sLog.outDetail("WARNING: Minimal required version [OpenSSL 0.9.8k]");
     }
 
-    DETAIL_LOG("Using ACE: %s", ACE_VERSION);
+    sLog.outDetail("Using ACE: %s", ACE_VERSION);
 
 #ifdef USE_SENDGRID
-    DETAIL_LOG("Using CURL version %s", curl_version());
+    sLog.outDetail("Using CURL version %s", curl_version());
 
     // not checking the SendMail config option here to make sure config reloads will work (in the future?)
     MailerService mailer;
@@ -366,7 +366,7 @@ extern int main(int argc, char **argv)
         if( (++loopCounter) == numLoops )
         {
             loopCounter = 0;
-            DETAIL_LOG("Ping MySQL to keep connection alive");
+            sLog.outDetail("Ping MySQL to keep connection alive");
             LoginDatabase.Ping();
         }
 #ifdef WIN32

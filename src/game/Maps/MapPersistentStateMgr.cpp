@@ -643,7 +643,7 @@ MapPersistentState* MapPersistentStateManager::AddPersistentState(MapEntry const
         return old_save;
     }
 
-    DEBUG_LOG("MapPersistentStateManager::AddPersistentState: mapId = %d, instanceId = %d, reset time = %u, canRset = %u", mapEntry->id, instanceId, resetTime, canReset ? 1 : 0);
+    sLog.outDebug("MapPersistentStateManager::AddPersistentState: mapId = %d, instanceId = %d, reset time = %u, canRset = %u", mapEntry->id, instanceId, resetTime, canReset ? 1 : 0);
 
     MapPersistentState *state;
     if (mapEntry->IsDungeon())
@@ -876,7 +876,7 @@ void MapPersistentStateManager::_ResetSave(PersistentStateMap& holder, Persisten
 
 void MapPersistentStateManager::_ResetInstance(uint32 mapId, uint32 instanceId)
 {
-    DEBUG_LOG("MapPersistentStateManager::_ResetInstance %u, %u", mapId, instanceId);
+    sLog.outDebug("MapPersistentStateManager::_ResetInstance %u, %u", mapId, instanceId);
 
     PersistentStateMap::iterator itr = m_instanceSaveByInstanceId.find(instanceId);
     if (itr != m_instanceSaveByInstanceId.end())

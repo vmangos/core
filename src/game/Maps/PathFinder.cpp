@@ -794,7 +794,7 @@ dtStatus PathInfo::findSmoothPath(float const* startPos, float const* endPos,
         npolys = fixupShortcuts(polys, npolys, m_navMeshQuery);
 
         if (dtStatusFailed(m_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
-            DEBUG_LOG("Cannot find height at position X: %f Y: %f Z: %f for %s", result[2], result[0], result[1], m_sourceUnit->GetName());
+            sLog.outDebug("Cannot find height at position X: %f Y: %f Z: %f for %s", result[2], result[0], result[1], m_sourceUnit->GetName());
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
 

@@ -364,7 +364,7 @@ bool Petition::Rename(std::string& newname)
     CharacterDatabase.PExecute("UPDATE `petition` SET `name` = '%s' WHERE `petition_guid` = '%u'",
         db_newname.c_str(), m_id);
 
-    DEBUG_LOG("Petition %u renamed to '%s'", m_id, newname.c_str());
+    sLog.outDebug("Petition %u renamed to '%s'", m_id, newname.c_str());
 
     m_name = newname;
 

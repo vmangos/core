@@ -75,7 +75,7 @@ bool PostgreSQLConnection::OpenConnection(bool reconnect)
         return false;
     }
 
-    DETAIL_LOG("Connected to Postgre database at %s", m_host.c_str());
+    sLog.outDetail("Connected to Postgre database at %s", m_host.c_str());
     sLog.outString("PostgreSQL server ver: %d", PQserverVersion(mPGconn));
     return true;
 }
@@ -193,7 +193,7 @@ bool PostgreSQLConnection::_TransactionCmd(char const* sql)
     }
     else
     {
-        DEBUG_LOG("SQL: %s", sql);
+        sLog.outDebug("SQL: %s", sql);
     }
     return true;
 }
