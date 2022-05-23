@@ -396,14 +396,14 @@ std::string Log::GetTimestampStr()
 }
 
 // the actual logging function.  nothing else should write log messages, except this
-void Log::out(LogFile type, LogLevel l, bool error, char const* str, va_list ap)
+void Log::out(LogFile type, LogLevel l, char const* str, va_list ap)
 {
     ASSERT(type >= 0 && type < LOG_MAX_FILES);
 
     if (!str)
         return;
 
-    // neither gets logged? we're done
+    // neither console nor file gets this?  we're done
     if (m_consoleLevel < l && !(logFiles[type] && m_fileLevel >= l))
         return;
 
@@ -417,9 +417,7 @@ void Log::out(LogFile type, LogLevel l, bool error, char const* str, va_list ap)
         if (m_colored)
         {
             LogType logType;
-            if (error)
-                logType = LogError;
-            else if (l == LOG_LVL_DETAIL)
+            if (l == LOG_LVL_DETAIL)
                 logType = LogDetails;
             else if (l == LOG_LVL_DEBUG)
                 logType = LogDebug;
@@ -433,9 +431,6 @@ void Log::out(LogFile type, LogLevel l, bool error, char const* str, va_list ap)
 
         if (m_includeTime)
             outTime(stdout);
-
-        if (error && buff[0] != '\0')
-            printf("ERROR: ");
 
         utf8printf(stdout, buff);
 
@@ -451,9 +446,6 @@ void Log::out(LogFile type, LogLevel l, bool error, char const* str, va_list ap)
         if (timestampPrefix[type])
             outTimestamp(logFiles[type]);
 
-        if (error && buff[0] != '\0')
-            fputs("ERROR: ", logFiles[type]);
-
         fputs(buff, logFiles[type]);
         fputs("\n", logFiles[type]);
         fflush(logFiles[type]);
@@ -464,8 +456,18 @@ void Log::out(LogFile type, char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(type, LOG_LVL_MINIMAL, false, str, ap);
+    out(type, LOG_LVL_MINIMAL, str, ap);
     va_end(ap);
+}
+
+void Log::error(LogFile type, LogLevel l, char const* str, va_list ap)
+{
+    if (!str || !str[0])
+        return;
+
+    char format[4096];
+    snprintf(format, sizeof(format), "ERROR: %s", str);
+    out(type, l, format, ap);
 }
 
 void Log::outString()
@@ -477,7 +479,7 @@ void Log::outString(char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(LOG_BASIC, LOG_LVL_MINIMAL, false, str, ap);
+    out(LOG_BASIC, LOG_LVL_MINIMAL, str, ap);
     va_end(ap);
 }
 
@@ -485,7 +487,7 @@ void Log::outBasic(char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(LOG_BASIC, LOG_LVL_MINIMAL, false, str, ap);
+    out(LOG_BASIC, LOG_LVL_MINIMAL, str, ap);
     va_end(ap);
 }
 
@@ -493,7 +495,7 @@ void Log::outInfo(char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(LOG_NOSTALRIUS, LOG_LVL_MINIMAL, false, str, ap);
+    out(LOG_NOSTALRIUS, LOG_LVL_MINIMAL, str, ap);
     va_end(ap);
 }
 
@@ -506,7 +508,7 @@ void Log::outHonor(char const* str, ...)
     {
         va_list ap;
         va_start(ap, str);
-        out(LOG_HONOR, LOG_LVL_MINIMAL, false, str, ap);
+        out(LOG_HONOR, LOG_LVL_MINIMAL, str, ap);
         va_end(ap);
     }
 }
@@ -515,7 +517,7 @@ void Log::outError(char const* err, ...)
 {
     va_list ap;
     va_start(ap, err);
-    out(LOG_BASIC, LOG_LVL_MINIMAL, true, err, ap);
+    error(LOG_BASIC, LOG_LVL_MINIMAL, err, ap);
     va_end(ap);
 }
 
@@ -528,7 +530,7 @@ void Log::outErrorDb(char const* err, ...)
 {
     va_list ap;
     va_start(ap, err);
-    out(LOG_DBERROR, LOG_LVL_MINIMAL, true, err, ap);
+    error(LOG_DBERROR, LOG_LVL_MINIMAL, err, ap);
     va_end(ap);
 }
 
@@ -536,7 +538,7 @@ void Log::outDetail(char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(LOG_BASIC, LOG_LVL_DETAIL, false, str, ap);
+    out(LOG_BASIC, LOG_LVL_DETAIL, str, ap);
     va_end(ap);
 }
 
@@ -544,7 +546,7 @@ void Log::outDebug(char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(LOG_BASIC, LOG_LVL_DEBUG, false, str, ap);
+    out(LOG_BASIC, LOG_LVL_DEBUG, str, ap);
     va_end(ap);
 }
 
@@ -552,7 +554,7 @@ void Log::outWarden(char const* wrd, ...)
 {
     va_list ap;
     va_start(ap, wrd);
-    out(LOG_ANTICHEAT, LOG_LVL_BASIC, false, wrd, ap);
+    out(LOG_ANTICHEAT, LOG_LVL_BASIC, wrd, ap);
     va_end(ap);
 }
 
@@ -560,7 +562,7 @@ void Log::outWardenDebug(char const* wrd, ...)
 {
     va_list ap;
     va_start(ap, wrd);
-    out(LOG_ANTICHEAT, LOG_LVL_DEBUG, false, wrd, ap);
+    out(LOG_ANTICHEAT, LOG_LVL_DEBUG, wrd, ap);
     va_end(ap);
 }
 
@@ -576,7 +578,7 @@ void Log::outCommand(uint32, char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
-    out(LOG_GM, LOG_LVL_DETAIL, false, str, ap);
+    out(LOG_GM, LOG_LVL_DETAIL, str, ap);
     va_end(ap);
 }
 

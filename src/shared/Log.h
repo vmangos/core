@@ -192,7 +192,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         std::list<uint32> m_smartlogExtraGuids;
 
     private:
-        void out(LogFile t, LogLevel l, bool error, char const* str, va_list args);
+        void out(LogFile t, LogLevel l, char const* str, va_list args);
+        void error(LogFile t, LogLevel l, char const* str, va_list args);
 
         FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
