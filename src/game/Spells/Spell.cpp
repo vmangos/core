@@ -1667,7 +1667,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
             // for delayed spells ignore not visible explicit target
             if (m_delayed && unit == m_targets.getUnitTarget() &&
-                    !unit->IsVisibleForOrDetect(m_caster, m_caster, false))
+               !unit->IsVisibleForOrDetect(m_caster, m_caster, false))
             {
                 pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 ResetEffectDamageAndHeal();
@@ -1676,6 +1676,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
             // can cause back attack (if detected), stealth removed at Spell::cast if spell break it
             if ((!m_spellInfo->IsPositiveSpell() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) &&
+                    !(pRealCaster->IsGameObject() && unit->IsPlayer()) && // hunter traps should not put you in combat
                     !m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_SAP>() && // Sap handled somewhere else. Without this, sap will remove stealth if the rogue is visible.
                     (m_spellInfo->Id == 6358 || // Exception to fix succubus seduction.
                      m_caster->IsVisibleForOrDetect(unit, unit, false)))
@@ -1685,13 +1686,6 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX_THREAT_ONLY_ON_MISS) &&
                     !m_spellInfo->HasAttribute(SPELL_ATTR_EX2_NO_INITIAL_THREAT))
                 {
-                    // use speedup check to avoid re-remove after above lines
-                    if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH)
-                    {
-                        unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                        unit->RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
-                    }
-
                     // caster can be detected but have stealth aura
                     if (m_casterUnit)
                     {
