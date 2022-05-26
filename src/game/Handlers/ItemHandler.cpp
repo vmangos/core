@@ -1100,17 +1100,6 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recv_data)
         GetPlayer()->RemoveAmmo();
 }
 
-void WorldSession::SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId, bool apply)
-{
-    WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1)); // last check 1.12.1
-    data << ObjectGuid(targetGuid);
-    data << ObjectGuid(casterGuid);
-    data << uint32(itemId);
-    data << uint32(spellId);
-    data << uint8(apply); // changes message color in combat log (white or yellow)
-    SendPacket(&data);
-}
-
 void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration)
 {
     // last check 2.0.10

@@ -12113,6 +12113,31 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
     }
 }
 
+void Player::BuildEnchantmentLog(WorldPacket& data, ObjectGuid casterGuid, uint32 itemId, uint32 spellId, bool showAffiliation) const
+{
+    data << GetObjectGuid();
+    data << ObjectGuid(casterGuid); // message says enchant has faded if empty
+    data << uint32(itemId);
+    data << uint32(spellId);
+    data << uint8(showAffiliation); // only used if casterGuid is not empty
+}
+
+void Player::SendEnchantmentLog(ObjectGuid casterGuid, uint32 itemId, uint32 spellId) const
+{
+    WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1));
+    BuildEnchantmentLog(data, casterGuid, itemId, spellId, false);
+    GetSession()->SendPacket(&data); // only to self
+
+    // unapply message should probably be sent only to self
+    // given that affiliation is not used in this case
+    if (!casterGuid.IsEmpty())
+    {
+        WorldPacket data2(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1));
+        BuildEnchantmentLog(data2, casterGuid, itemId, spellId, true);
+        SendMessageToSet(&data2, false); // exclude self
+    }
+}
+
 void Player::SendEnchantmentDurations() const
 {
     for (const auto& itr : m_enchantDuration)

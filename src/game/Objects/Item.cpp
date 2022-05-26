@@ -1057,10 +1057,10 @@ void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint
         if (Player* owner = GetOwner())
         {
             if (uint32 oldEnchant = GetEnchantmentId(slot))
-                owner->GetSession()->SendEnchantmentLog(owner->GetObjectGuid(), ObjectGuid(), GetEntry(), oldEnchant, false);
+                owner->SendEnchantmentLog(ObjectGuid(), GetEntry(), oldEnchant);
 
             if (id)
-                owner->GetSession()->SendEnchantmentLog(owner->GetObjectGuid(), casterGuid, GetEntry(), id, true);
+                owner->SendEnchantmentLog(casterGuid, GetEntry(), id);
         }
     }
 
@@ -1096,7 +1096,7 @@ void Item::ClearEnchantment(EnchantmentSlot slot, bool sendToClient)
     if (slot < MAX_INSPECTED_ENCHANTMENT_SLOT && sendToClient)
     {
         if (Player* owner = GetOwner())
-            owner->GetSession()->SendEnchantmentLog(owner->GetObjectGuid(), ObjectGuid(), GetEntry(), GetEnchantmentId(slot), false);
+            owner->SendEnchantmentLog(ObjectGuid(), GetEntry(), GetEnchantmentId(slot));
     }
 
     for (uint8 x = 0; x < 3; ++x)

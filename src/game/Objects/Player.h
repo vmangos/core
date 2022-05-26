@@ -1075,6 +1075,7 @@ class Player final: public Unit
         void RemoveAllEnchantments(EnchantmentSlot slot);
         void AddEnchantmentDuration(Item* item, EnchantmentSlot slot, uint32 duration);
         void SendEnchantmentDurations() const;
+        void BuildEnchantmentLog(WorldPacket& data, ObjectGuid casterGuid, uint32 itemId, uint32 spellId, bool showAffiliation) const;
         void AddItemDurations(Item* item);
         void RemoveItemDurations(Item* item);
         void SendItemDurations() const;
@@ -1227,6 +1228,7 @@ class Player final: public Unit
         void SendNotifyLootMoneyRemoved() const;
         bool IsAllowedToLoot(Creature const* creature);
 
+        void SendEnchantmentLog(ObjectGuid casterGuid, uint32 itemId, uint32 spellId) const;
         void ApplyEnchantment(Item* item,EnchantmentSlot slot,bool apply, bool apply_dur = true, bool ignore_condition = false);
         void ApplyEnchantment(Item* item,bool apply);
 
