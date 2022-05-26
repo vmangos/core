@@ -34,9 +34,6 @@ enum
     SPELL_FLAMEBUFFET           = 23341,
     SPELL_PYROBLAST             = 20228, // guesswork, but best fitting in spells-area, was 17274 (has mana cost)
 
-    AURA_PLAYER_CANALISATION    = 16532, // cast on player by altar
-    REQUIRED_SUMMONERS          = 3,
-
     CANALISEURS_ENTRY           = 10316,
 
     SPELL_SELF_CAGE             = 15282,
@@ -47,7 +44,6 @@ enum
 
     DOOR_OPEN_ID                = 175705,
 
-    EMOTE_NEARLY_FULL           = 5566, // TODO: %s is nearly at full strength!
     EMOTE_FULL                  = 5567,
     YELL_BOSS_FREE              = 5268
 };
