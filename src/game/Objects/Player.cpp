@@ -20970,7 +20970,7 @@ bool Player::ChangeRace(uint8 newRace)
     m_DbSaveDisabled = true;
     if (!ChangeSpellsForRace(oldRace, newRace))
     {
-        CHANGERACE_ERR("Impossible de changer les spells.");
+        CHANGERACE_ERR("Cannot change spells.");
         return false;
     }
 
@@ -20982,17 +20982,17 @@ bool Player::ChangeRace(uint8 newRace)
 
     if (!ChangeReputationsForRace(oldRace, newRace))
     {
-        CHANGERACE_ERR("Impossible de changer les reputations.");
+        CHANGERACE_ERR("Cannot change reputations.");
         return false;
     }
     if (!ChangeQuestsForRace(oldRace, newRace))
     {
-        CHANGERACE_ERR("Impossible de changer les quetes.");
+        CHANGERACE_ERR("Cannot change quests.");
         return false;
     }
     if (!ChangeItemsForRace(oldRace, newRace))
     {
-        CHANGERACE_ERR("Impossible de changer les items.");
+        CHANGERACE_ERR("Cannot change items.");
         return false;
     }
     /*
@@ -21017,11 +21017,12 @@ bool Player::ChangeRace(uint8 newRace)
             SetHomebindToLocation(WorldLocation(1, 1633.33f, -4439.11f, 15.7588f, 0.0f), 1637);
         }
     }
-    // Sauvegarde dans ObjectMgr aussi (sinon mauvaise faction prise en compte dans la distrib PvP)
-    if (PlayerCacheData* data = sObjectMgr.GetPlayerDataByGUID(GetGUIDLow()))
-        data->uiRace = newRace;
+
+    ObjectGuid guid = GetObjectGuid();
 
     m_session->LogoutPlayer(false);
+    sWorld.InvalidatePlayerDataToAllClient(guid);
+
     return true;
 }
 
