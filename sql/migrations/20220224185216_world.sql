@@ -3755,6 +3755,19 @@ UPDATE `gossip_menu_option` SET `action_menu_id` = 6585 WHERE `menu_id` = 6586 A
 
 UPDATE `creature` SET `wander_distance` = 4, `movement_type` = 1 WHERE `guid` IN (47347, 53838);
 
+-- ----------------------------------------------------------------------
+
+-- Update Quest Script 1680 (credit cmangos)
+DELETE FROM `quest_start_scripts` WHERE `id`=1680;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1680, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2302, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge - Muren Stormpike: Talk'),
+(1680, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge - Muren Stormpike: Emote'),
+(1680, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge - Muren Stormpike: Orientation'),
+(1680, 4, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8377, 0, 'Tormus Deepforge - Muren Stormpike: Orientation');
+
+UPDATE `quest_template` SET `OfferRewardEmote1` = 66 WHERE `entry` = 1678;
+UPDATE `quest_template` SET `CompleteEmote` = 6 WHERE `entry` = 1678;
+
 
 -- End of migration.
 END IF;
