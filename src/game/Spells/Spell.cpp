@@ -993,14 +993,29 @@ void Spell::AddUnitTarget(Unit* pTarget, SpellEffectIndex effIndex)
     // If target reflect spell back to caster
     if (targetInfo.missCondition == SPELL_MISS_REFLECT)
     {
-        // Calculate reflected spell result on caster
-        targetInfo.reflectResult = m_casterUnit ? m_casterUnit->SpellHitResult(m_casterUnit, m_spellInfo, effIndex, m_canReflect, this) : SPELL_MISS_IMMUNE;
+        // After patch 1.10, hunter trap effects are no longer reflected back.
+        // https://classic.wowhead.com/item=18634/gyrofreeze-ice-reflector#comments
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        if (!m_casterUnit || m_originalCasterGUID.IsGameObject())
+#else
+        if (!m_casterUnit)
+#endif
+        {
+            if (m_casterUnit && !m_spellInfo->HasAttribute(SPELL_ATTR_EX3_SUPPRESS_TARGET_PROCS))
+                m_casterUnit->ProcDamageAndSpell(ProcSystemArguments(pTarget, PROC_FLAG_NONE, PROC_FLAG_TAKE_HARMFUL_SPELL, PROC_EX_REFLECT, 1, BASE_ATTACK, m_spellInfo, this));
+            targetInfo.reflectResult = SPELL_MISS_IMMUNE;
+        }
+        else
+        {
+            // Calculate reflected spell result on caster
+            targetInfo.reflectResult = m_casterUnit->SpellHitResult(m_casterUnit, m_spellInfo, effIndex, m_canReflect, this);
 
-        if (targetInfo.reflectResult == SPELL_MISS_REFLECT)     // Impossible reflect again, so simply deflect spell
-            targetInfo.reflectResult = SPELL_MISS_PARRY;
+            if (targetInfo.reflectResult == SPELL_MISS_REFLECT)     // Impossible reflect again, so simply deflect spell
+                targetInfo.reflectResult = SPELL_MISS_PARRY;
 
-        // Increase time interval for reflected spells by 1.5
-        targetInfo.timeDelay += targetInfo.timeDelay >> 1;
+            // Increase time interval for reflected spells by 1.5
+            targetInfo.timeDelay += targetInfo.timeDelay >> 1;
+        } 
     }
     else
         targetInfo.reflectResult = SPELL_MISS_NONE;
