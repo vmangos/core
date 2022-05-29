@@ -3770,7 +3770,7 @@ UPDATE `quest_template` SET `CompleteEmote` = 6 WHERE `entry` = 1678;
 
 -- ----------------------------------------------------------------------
 
--- Update First Aid Gossip Conditions
+-- Update First Aid Gossip Conditions (NOTE: not sure if this is 100% correct, its just what I coulg glean from watching videos)
 -- 66: Target Has 226 Points In Skill 129
 UPDATE `conditions` SET `value2`=226 WHERE `condition_entry`=66;
 
