@@ -3777,6 +3777,11 @@ UPDATE `conditions` SET `value2`=226 WHERE `condition_entry`=66;
 -- 396: Target Has 300 Points In Skill 129
 UPDATE `conditions` SET `value2`=300 WHERE `condition_entry`=396;
 
+-- ----------------------------------------------------------------------
+
+-- Remove Low Level Loot From Thunderhead Creatures
+DELETE FROM `creature_loot_template` WHERE `entry` IN (6380, 6375, 6379, 6378, 6377) AND item = 30017;
+
 
 -- End of migration.
 END IF;
