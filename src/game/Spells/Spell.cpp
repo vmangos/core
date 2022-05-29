@@ -3491,12 +3491,6 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
                 if (!IsAutoRepeat() || !IsAcceptableAutorepeatError(result))
                 {
                     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell %u failed for reason 0x%x (target %u)", m_spellInfo->Id, result, pTarget ? pTarget->GetGUIDLow() : 0);
-                    if (triggeredByAura && !triggeredByAura->GetHolder()->IsPassive())
-                    {
-                        SendChannelUpdate(0, true);
-                        triggeredByAura->GetHolder()->SetAuraDuration(0);
-                    }
-
                     SendCastResult(result);
                     //SendInterrupted(0);
                     finish(false);
