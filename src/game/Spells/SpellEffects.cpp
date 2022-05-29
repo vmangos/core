@@ -862,14 +862,52 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, spell_id, true);
                     return;
                 }
-                case 7671:                                  // Transformation (human<->worgen)
+                case 7671:                                  // Pyrewood Transformation (Human <-> Worgen)
                 {
                     if (!unitTarget)
                         return;
-
-                    // Transform Visual
-                    unitTarget->CastSpell(unitTarget, 24085, true);
-                    return;
+                    
+                    switch (unitTarget->GetEntry())
+                    {
+                        case 1891: // Pyrewood Watcher
+                            unitTarget->ToCreature()->UpdateEntry(1892);
+                            break;
+                        case 1892: // Moonrage Watcher
+                            unitTarget->ToCreature()->UpdateEntry(1891);
+                            break;
+                        case 1893: // Moonrage Sentry
+                            unitTarget->ToCreature()->UpdateEntry(1894);
+                            break;
+                        case 1894: // Pyrewood Sentry
+                            unitTarget->ToCreature()->UpdateEntry(1893);
+                            break;
+                        case 1895: // Pyrewood Elder
+                            unitTarget->ToCreature()->UpdateEntry(1896);
+                            break;
+                        case 1896: // Moonrage Elder
+                            unitTarget->ToCreature()->UpdateEntry(1895);
+                            break;
+                        case 3528: // Pyrewood Armorer
+                            unitTarget->ToCreature()->UpdateEntry(3529);
+                            break;
+                        case 3529: // Moonrage Armorer
+                            unitTarget->ToCreature()->UpdateEntry(3528);
+                            break;
+                        case 3530: // Pyrewood Tailor
+                            unitTarget->ToCreature()->UpdateEntry(3531);
+                            break;
+                        case 3531: // Moonrage Tailor
+                            unitTarget->ToCreature()->UpdateEntry(3530);
+                            break;
+                        case 3532: // Pyrewood Leatherworker
+                            unitTarget->ToCreature()->UpdateEntry(3533);
+                            break;
+                        case 3533: // Moonrage Leatherworker
+                            unitTarget->ToCreature()->UpdateEntry(3532);
+                            break;
+                        default:
+                            return;
+                    };
                 }
                 case 8063:                                  // Deviate Fish
                 {

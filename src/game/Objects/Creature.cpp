@@ -543,6 +543,9 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
             SetActiveObjectState(true);
     }
 
+    if (AI() && GetCreatureInfo()->spell_list_id)
+            AI()->SetSpellsList(GetCreatureInfo()->spell_list_id);
+
     // if eventData set then event active and need apply spell_start
     if (eventData)
         ApplyGameEventSpells(eventData, true);
