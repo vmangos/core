@@ -530,20 +530,22 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     }
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_GIGANTIC_AOI))
+    else if (HasExtraFlag(CREATURE_FLAG_EXTRA_GIGANTIC_AOI))
     {
         SetVisibilityModifier(VISIBILITY_DISTANCE_GIGANTIC);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     } 
-    if (HasExtraFlag(CREATURE_FLAG_EXTRA_INFINITE_AOI))
+    else if (HasExtraFlag(CREATURE_FLAG_EXTRA_INFINITE_AOI))
     {
         SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     }
 
-    if (AI() && GetCreatureInfo()->spell_list_id)
+    // No need to set spell list if creature is not yet spawned,
+    // as it will be done in the CreatureAI contstructor.
+    if (IsInWorld() && AI() && GetCreatureInfo()->spell_list_id)
             AI()->SetSpellsList(GetCreatureInfo()->spell_list_id);
 
     // if eventData set then event active and need apply spell_start
