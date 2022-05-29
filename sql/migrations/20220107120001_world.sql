@@ -13,12 +13,13 @@ SET @PYREWOOD_EVENT = 49;
 SET @PYREWOOD_VILLAGE_CGUID = 57441;
 
 -- New Event for Pyrewood starts 21:00, ends 05:30 (confirmed by ptr).
-INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES (@PYREWOOD_EVENT, '2020-01-02 21:00:00', '2030-12-31 05:30:00', 1440, 480, 0, 'Pyrewood Village Night', 0, 0, 0, 10);
+INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES 
+(@PYREWOOD_EVENT, '2020-01-02 21:00:00', '2030-12-31 05:30:00', 1440, 480, 0, 'Pyrewood Village Night', 0, 0, 0, 10);
 
 UPDATE `creature_template` SET `script_name`='' WHERE `entry` IN (1891, 1894, 1895, 3528, 3532, 3530);
 
 -- Remove old Waypoints.
-DELETE FROM `creature_movement` WHERE `id` IN (18408, 18408, 18408, 18408, 18408, 18408, 18408, 18408, 18408, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 19220, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18235, 18405, 18405, 18405, 18405, 18405, 18405, 18405, 18405);
+DELETE FROM `creature_movement` WHERE `id` IN (18408, 19220, 18235, 18405);
 
 -- Pyrewood Spawns.
 DELETE FROM `creature` WHERE `id` IN (1891, 1894, 1895, 3528, 3532, 2106, 3530);
@@ -321,52 +322,38 @@ DELETE FROM `creature_ai_scripts` WHERE `id` IN (189101, 189102, 189103, 189104,
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1891;
 
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
-(35300, 'Silverpine Forest - Pyrewood Tailor', 15657, 100, 1, 0, 0, 2, 16, 16, 6, 82, 0, 6713, 100, 1, 0, 0, 0, 38, 38, 2, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(18940, 'Silverpine Forest - Pyrewood Sentry', 7164, 100, 0, 0, 0, 2, 1, 20, 180, 190, 0, 12169, 100, 0, 0, 0, 2, 2, 20, 12, 30, 0, 11972, 100, 1, 0, 0, 258, 4, 35, 20, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(18910, 'Silverpine Forest - Pyrewood Watcher', 6660, 100, 1, 0, 0, 10, 2, 13, 2, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(18960, 'Silverpine Forest - Moonrage Elder', 594, 100, 1, 0, 0, 2, 1, 4, 1, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(18930, 'Silverpine Forest - Moonrage Sentry', 6507, 100, 0, 0, 0, 2, 1, 24, 11, 35, 0, 13730, 100, 1, 0, 0, 2, 1, 8, 33, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(35310, 'Silverpine Forest - Moonrage Tailor', 7140, 100, 1, 0, 0, 2, 1, 24, 24, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(35300, 'Silverpine Forest - Pyrewood Tailor', 15657, 100, 1, 0, 0, 0, 16, 16, 6, 82, 0, 6713, 100, 1, 0, 0, 32, 10, 15, 8, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18940, 'Silverpine Forest - Pyrewood Sentry', 7164, 100, 0, 0, 0, 0, 1, 20, 180, 190, 0, 12169, 100, 0, 0, 0, 0, 2, 20, 12, 30, 0, 11972, 100, 1, 0, 0, 256, 4, 35, 20, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18910, 'Silverpine Forest - Pyrewood Watcher', 6660, 100, 1, 0, 0, 8, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18960, 'Silverpine Forest - Moonrage Elder', 594, 100, 1, 0, 0, 32, 2, 6, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18930, 'Silverpine Forest - Moonrage Sentry', 6507, 100, 0, 0, 0, 0, 1, 6, 12, 25, 0, 13730, 100, 1, 0, 0, 0, 2, 20, 33, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(35310, 'Silverpine Forest - Moonrage Tailor', 7140, 100, 1, 0, 0, 0, 1, 12, 24, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(18950, 'Silverpine Forest - Pyrewood Elder', 2053, 100, 15, 0, 0, 0, 3, 15, 10, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Events list for Moonrage Elder
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1896;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189601, 1896, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189601, 0, 0, 'Moonrage Elder - Flee at 15% HP');
-
 DELETE FROM `creature_ai_scripts` WHERE `id`=189601;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (189601, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonrage Elder - Flee');
 
 -- Events list for Pyrewood Elder
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1895;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189501, 1895, 0, 14, 0, 100, 1, 15, 40, 17000, 90000, 189501, 0, 0, 'Pyrewood Elder - Friendly HP');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189502, 1895, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189502, 0, 0, 'Pyrewood Elder - Flee');
-
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189501, 1895, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189501, 0, 0, 'Pyrewood Elder - Flee at 15% HP');
 DELETE FROM `creature_ai_scripts` WHERE `id`=189501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(189501, 0, 0, 15, 2053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Elder - Cast Lesser Heal');
-
-DELETE FROM `creature_ai_scripts` WHERE `id`=189502;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(189502, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Elder - Flee at 15% HP');
+(189501, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Elder - Flee');
 
 -- Events list for Pyrewood Watcher
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1891;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189101, 1891, 0, 9, 0, 100, 0, 0, 5, 0, 0, 189101, 0, 0, 'Pyrewood Watcher - Target in Melee Range');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189102, 1891, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189102, 0, 0, 'Pyrewood Watcher - Flee');
-
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189101, 1891, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189101, 0, 0, 'Pyrewood Watcher - Flee at 15% HP');
 DELETE FROM `creature_ai_scripts` WHERE `id`=189101;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(189101, 0, 1, 42, 1, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Melee Attack target'),
-(189101, 0, 2, 20, 5, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Chase target');
-
-DELETE FROM `creature_ai_scripts` WHERE `id`=189102;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(189102, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Flee at 15% HP');
+(189101, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Watcher - Flee');
 
 -- Events list for Moonrage Sentry
 DELETE FROM `creature_ai_events` WHERE `creature_id`=1893;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (189301, 1893, 0, 2, 0, 100, 0, 15, 0, 0, 0, 189301, 0, 0, 'Moonrage Sentry - Flee at 15% HP');
-
 DELETE FROM `creature_ai_scripts` WHERE `id`=189301;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (189301, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonrage Sentry - Flee');
@@ -377,34 +364,22 @@ UPDATE `creature_template` SET `armor`=615, `dmg_min`=31.3535, `dmg_max`=41.4931
 UPDATE `creature_template` SET `speed_walk`=1, `dmg_min`=26.2333, `dmg_max`=34.7785, `attack_power`=64, `ranged_dmg_min`=24.519, `ranged_dmg_max`=33.0643, `ranged_attack_power`=52, `armor`=791, `spell_id1`=2589, `spell_list_id`=20580, `faction`=68, `unit_flags`=32768, `script_name`='', `ai_name`='EventAI' WHERE `entry`=2058;
 UPDATE `creature_template` SET `ai_name`='EventAI', `script_name`='' WHERE `entry` IN (2060, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2068);
 
-REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (20580, 'Deathstalker Faerleia', 2589, 100, 1, 0, 0, 130, 1, 43, 1, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
+(20580, 'Deathstalker Faerleia', 2589, 100, 1, 0, 0, 0, 6, 20, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Events list for Deathstalker Faerleia
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2058;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (205802, 2058, 0, 30, 0, 100, 0, 0, 0, 0, 0, 205802, 0, 0, 'Deathstalker Faerleia - Leave Combat');
-
-DELETE FROM `creature_ai_scripts` WHERE `id`=205801;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(205801, 0, 0, 22, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Set Faction to Undercity'),
-(205801, 0, 0, 7, 452, 0, 1, 0, 452, 0, 21, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Quest Complete'),
-(205801, 0, 0, 39, 205801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Start Script');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(205802, 2058, 0, 30, 0, 100, 0, 0, 0, 0, 0, 205802, 0, 0, 'Deathstalker Faerleia - Drink Potion on Leaving Combat');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=205802;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (205802, 0, 0, 15, 3359, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathstalker Faerleia: Cast Spell - Drink Potion (3359)');
 
-DELETE FROM `generic_scripts` WHERE `id`=205801;
-INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(205801, 1, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Add QuestGiver Flag'),
-(205801, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 545, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Say Text');
-
 UPDATE `quest_template` SET `StartScript`=452 WHERE `entry`=452;
 
 -- 45201: Extra Targets Of Scripted Map Event 452 Satisfy Condition (121:  Not (Target Is Alive))
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (45201, 47, 452, 121, 0, 0, 0);
-
--- 45202: (45201: Extra Targets Of Scripted Map Event 452 Satisfy Condition (121:  Not (Target Is Alive))) And (116: Target Is Alive)
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (45202, -1, 45201, 116, 0, 0, 0);
 
 -- 45203: Scripted Map Event 452 Is Active
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (45203, 36, 452, 0, 0, 0, 0);
@@ -416,7 +391,7 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (452, 0, 3, 22, 232, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Set Faction Escortee'),
 (452, 0, 4, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Remove NPC flags'),
 (452, 1, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 542, 0, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Deathstalker Faerleia - SayText'),
-(452, 9, 6, 10, 2060, 240000, 0, 0, 0, 0, 0, 0, 0, 45205, -1, 7, -397.503, 1511, 18.952, 4.7473, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Summon Councilman Smithers');
+(452, 9, 6, 10, 2060, 240000, 0, 0, 0, 0, 0, 0, 0, 45205, -1, 1, -397.503, 1511, 18.952, 4.7473, 0, 'Pyrewood Ambush: Deathstalker Faerleia - Summon Councilman Smithers');
 
 -- Add Councilman to Map Event Target
 DELETE FROM `generic_scripts` WHERE `id`=45205;
@@ -426,14 +401,13 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 -- 2. wave
 DELETE FROM `generic_scripts` WHERE `id`=45201;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(45201, 5, 0, 10, 2061, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -398.219, 1511.08, 18.952, 4.86947, 45201, 'Pyrewood Ambush: Councilman Smithers - Summon Councilman Thatcher');
+(45201, 5, 0, 10, 2061, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -398.219, 1511.08, 18.952, 4.86947, 45201, 'Pyrewood Ambush: Councilman Smithers - Summon Councilman Thatcher');
 
 -- Events list for Councilman Smithers
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2060;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(206001, 2060, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206001, 0, 0, 'Pyrewood Ambush: Councilman Smithers - Death'),
-(206002, 2060, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206002, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Just Spawned'),
-(206003, 2060, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206003, 0, 0, 'Pyrewood Ambush: Councilman Smithers - 15 % Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206001, 2060, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206001, 0, 0, 'Pyrewood Ambush: Councilman Smithers - Summon Councilman Thatcher on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206002, 2060, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206002, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Start Waypoints on Spawn');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206003, 2060, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206003, 0, 0, 'Pyrewood Ambush: Councilman Smithers - Flee at 15% Health');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206001;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -450,15 +424,14 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 -- 3. wave
 DELETE FROM `generic_scripts` WHERE `id`=45202;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(45202, 5, 0, 10, 2064, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -397.428, 1511.84, 18.952, 4.69494, 45201, 'Pyrewood Ambush: Summon Councilman Hartin');
+(45202, 5, 0, 10, 2064, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -397.428, 1511.84, 18.952, 4.69494, 45201, 'Pyrewood Ambush: Summon Councilman Hartin');
 
 -- Events list for Councilman Thatcher
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2061;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(206101, 2061, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206101, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Death'),
-(206102, 2061, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206102, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Just Spawned'),
-(206103, 2061, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206103, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - 15 % Health'),
-(206104, 2061, 0, 17, 0, 100, 0, 2062, 0, 0, 0, 206104, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hendricks');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206101, 2061, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206101, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hartin on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206102, 2061, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206102, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hendricks and Start Waypoints on Spawn');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206103, 2061, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206103, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Flee at 15% Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206104, 2061, 0, 17, 0, 100, 0, 2062, 0, 0, 0, 206104, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Join Creature Group on Summon Councilman Hendricks');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206101;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -466,8 +439,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206102;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(206102, 0, 2, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206101, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Start Waypoints'),
-(206102, 0, 1, 10, 2062, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -396.638, 1511.03, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hendricks');
+(206102, 0, 1, 10, 2062, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -396.638, 1511.03, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Thatcher - Summon Councilman Hendricks'),
+(206102, 0, 2, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206101, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Councilman Thatcher - Start Waypoints');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206103;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -479,9 +452,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- Events list for Councilman Hendricks
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2062;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(206201, 2062, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206201, 0, 0, 'Pyrewood Ambush: Councilman Hendricks - Death'),
-(206202, 2062, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206202, 0, 0, 'Pyrewood Ambush: Councilman Hendricks - 15 % Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206201, 2062, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206201, 0, 0, 'Pyrewood Ambush: Councilman Hendricks - Summon  Councilman Hartin on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206202, 2062, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206202, 0, 0, 'Pyrewood Ambush: Councilman Hendricks - Flee at 15% Health');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206201;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -494,16 +466,15 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 -- 4. wave
 DELETE FROM `generic_scripts` WHERE `id`=45203;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(45203, 5, 0, 10, 2068, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -397.366, 1512.61, 18.952, 4.7473, 45201, 'Pyrewood Ambush: Summon Lord Mayor Morrison');
+(45203, 5, 0, 10, 2068, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -397.366, 1512.61, 18.952, 4.7473, 45201, 'Pyrewood Ambush: Summon Lord Mayor Morrison');
 
 -- Events list for Councilman Hartin
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2064;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(206401, 2064, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206401, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Death'),
-(206402, 2064, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206402, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Just Spawned'),
-(206403, 2064, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206403, 0, 0, 'Pyrewood Ambush: Councilman Hartin - 15 % Health'),
-(206404, 2064, 0, 17, 0, 100, 0, 2066, 0, 0, 0, 206404, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Higarth'),
-(206405, 2064, 0, 17, 0, 100, 0, 2063, 0, 0, 0, 206405, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Wilhelm');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206401, 2064, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206401, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Lord Mayor Morrison on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206402, 2064, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206402, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Higarth and Wilhelm and Start Waypoints on Spawn');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206403, 2064, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206403, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Flee at 15% Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206404, 2064, 0, 17, 0, 100, 0, 2066, 0, 0, 0, 206404, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Join Creature Group on Summon Councilman Higarth');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206405, 2064, 0, 17, 0, 100, 0, 2063, 0, 0, 0, 206405, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Join Creature Group on Summon Councilman Wilhelm');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206401;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -511,8 +482,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206402;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(206402, 0, 1, 10, 2066, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -398.346, 1511.81, 18.952, 4.7822, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Higarth'),
-(206402, 0, 2, 10, 2063, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -396.381, 1511.8, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Wilhelm'),
+(206402, 0, 1, 10, 2066, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -398.346, 1511.81, 18.952, 4.7822, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Higarth'),
+(206402, 0, 2, 10, 2063, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -396.381, 1511.8, 18.952, 4.66003, 0, 'Pyrewood Ambush: Councilman Hartin - Summon Councilman Wilhelm'),
 (206402, 0, 3, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206401, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Councilman Hartin - Start Waypoints');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206403;
@@ -529,8 +500,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- Events list for Councilman Wilhelm
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2063;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206301, 2063, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206301, 0, 0, 'Pyrewood Ambush: Councilman Wilhelm - Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206302, 2063, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206302, 0, 0, 'Pyrewood Ambush: Councilman Wilhelm - 15 % Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206301, 2063, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206301, 0, 0, 'Pyrewood Ambush: Councilman Wilhelm - Summon Lord Mayor Morrison on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206302, 2063, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206302, 0, 0, 'Pyrewood Ambush: Councilman Wilhelm - Flee at 15% Health');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206301;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -542,8 +513,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- Events list for Councilman Higarth
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2066;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206601, 2066, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206601, 0, 0, 'Pyrewood Ambush: Councilman Higarth - Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206602, 2066, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206602, 0, 0, 'Pyrewood Ambush: Councilman Higarth - 15 % Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206601, 2066, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206601, 0, 0, 'Pyrewood Ambush: Councilman Higarth - Summon Lord Mayor Morrison on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206602, 2066, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206602, 0, 0, 'Pyrewood Ambush: Councilman Higarth - Flee at 15% Health');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206601;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -555,8 +526,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- Events list for Councilman Brunswick
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2067;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206701, 2067, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206701, 0, 0, 'Pyrewood Ambush: Councilman Brunswick - Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206702, 2067, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206702, 0, 0, 'Pyrewood Ambush: Councilman Brunswick - 15 % Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206701, 2067, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206701, 0, 0, 'Pyrewood Ambush: Councilman Brunswick - Complete Quest Pyrewood Ambush on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206702, 2067, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206702, 0, 0, 'Pyrewood Ambush: Councilman Brunswick - Flee at 15% Health');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206701;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -568,8 +539,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- Events list for Councilman Cooper
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2065;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206501, 2065, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206501, 0, 0, 'Pyrewood Ambush: Councilman Cooper - Death');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206502, 2065, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206502, 0, 0, 'Pyrewood Ambush: Councilman Cooper - 15 % Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206501, 2065, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206501, 0, 0, 'Pyrewood Ambush: Councilman Cooper - Complete Quest Pyrewood Ambush on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206502, 2065, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206502, 0, 0, 'Pyrewood Ambush: Councilman Cooper - Flee at 15% Health');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -581,12 +552,11 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- Events list for Lord Mayor Morrison
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2068;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(206801, 2068, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206801, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Death'),
-(206802, 2068, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206802, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Just Spawned'),
-(206803, 2068, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206803, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - 15 % Health'),
-(206804, 2068, 0, 17, 0, 100, 0, 2065, 0, 0, 0, 206804, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summoned Councilman Cooper'),
-(206805, 2068, 0, 17, 0, 100, 0, 2067, 0, 0, 0, 206805, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summoned Councilman Brunswick');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206801, 2068, 0, 6, 0, 100, 0, 0, 0, 0, 0, 206801, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Complete Quest Pyrewood Ambush on Death');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206802, 2068, 0, 11, 0, 100, 0, 0, 0, 0, 0, 206802, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Brunswick and Cooper and Start Waypoints on Spawn');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206803, 2068, 0, 2, 0, 100, 0, 15, 0, 0, 0, 206803, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Flee at 15% Health');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206804, 2068, 0, 17, 0, 100, 0, 2065, 0, 0, 0, 206804, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Join Creature Group on Summoned Councilman Cooper');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (206805, 2068, 0, 17, 0, 100, 0, 2067, 0, 0, 0, 206805, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Join Creature Group on Summoned Councilman Brunswick');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206801;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -594,8 +564,8 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206802;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(206802, 0, 1, 10, 2067, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -398.522, 1512.69, 18.952, 4.79966, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Brunswick'),
-(206802, 0, 2, 10, 2065, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 7, -396.286, 1512.55, 18.952, 4.69494, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Cooper'),
+(206802, 0, 1, 10, 2067, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -398.522, 1512.69, 18.952, 4.79966, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Brunswick'),
+(206802, 0, 2, 10, 2065, 240000, 0, 0, 0, 0, 0, 8, 0, 45205, -1, 1, -396.286, 1512.55, 18.952, 4.69494, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Summon Councilman Cooper'),
 (206802, 0, 3, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 206801, 0, 0, 0, 0, 0, 0, 0, 'Pyrewood Ambush: Lord Mayor Morrison - Start Waypoints');
 
 DELETE FROM `creature_ai_scripts` WHERE `id`=206803;
@@ -620,8 +590,7 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 
 DELETE FROM `generic_scripts` WHERE `id`=45207;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(45207, 0, 0, 70, 452, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45203, 'Pyrewood Ambush: Fail Quest'),
-(45207, 0, 0, 62, 452, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45203, 'Pyrewood Ambush: End Map Event');
+(45207, 0, 0, 70, 452, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45203, 'Pyrewood Ambush: Fail Quest');
 
 -- Waypoints for Councilman Smithers
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -645,6 +614,9 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (206801, 1, -397.155, 1505.2, 19.8225, 100, 0, 0, 0),
 (206801, 2, -400.12, 1499.09, 19.8225, 100, 0, 0, 0),
 (206801, 3, -405.49, 1497.04, 19.8225, 100, 0, 0, 0);
+
+-- These npcs are not trainers.
+DELETE FROM `npc_trainer` WHERE `entry` IN (3531, 3530);
 
 
 -- End of migration.
