@@ -3768,6 +3768,15 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 UPDATE `quest_template` SET `OfferRewardEmote1` = 66 WHERE `entry` = 1678;
 UPDATE `quest_template` SET `CompleteEmote` = 6 WHERE `entry` = 1678;
 
+-- ----------------------------------------------------------------------
+
+-- Update First Aid Gossip Conditions
+-- 66: Target Has 226 Points In Skill 129
+UPDATE `conditions` SET `value2`=226 WHERE `condition_entry`=66;
+
+-- 396: Target Has 300 Points In Skill 129
+UPDATE `conditions` SET `value2`=300 WHERE `condition_entry`=396;
+
 
 -- End of migration.
 END IF;
