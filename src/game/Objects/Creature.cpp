@@ -504,8 +504,6 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
     UpdateAllStats();
 
     m_reputationId = -1;
-
-    // checked and error show at loading templates
     if (FactionTemplateEntry const* pFactionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction))
         if (FactionEntry const* pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
             m_reputationId = pFaction->reputationListID;
@@ -544,7 +542,7 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
     }
 
     // No need to set spell list if creature is not yet spawned,
-    // as it will be done in the CreatureAI contstructor.
+    // as it will be done in the CreatureAI constructor.
     if (IsInWorld() && AI() && GetCreatureInfo()->spell_list_id)
             AI()->SetSpellsList(GetCreatureInfo()->spell_list_id);
 
