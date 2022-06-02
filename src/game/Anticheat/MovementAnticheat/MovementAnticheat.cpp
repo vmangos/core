@@ -821,6 +821,9 @@ bool MovementAnticheat::HandleSplineDone(Player* pPlayer, MovementInfo const& mo
         return false;
     }
 
+    if (!movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_JUMPING))
+        ResetJumpCounters();
+
     m_lastSplineId = splineId;
     return true;
 }
