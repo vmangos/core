@@ -580,7 +580,7 @@ void SetByteValue(uint32& variable, uint8 offset, uint8 value)
 {
     if (offset > 4)
     {
-        sLog.outError("Utility::SetByteValue: wrong offset %u", offset);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Utility::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -595,7 +595,7 @@ void SetUInt16Value(uint32& variable, uint8 offset, uint16 value)
 {
     if (offset > 2)
     {
-        sLog.outError("Utility::SetUInt16Value: wrong offset %u", offset);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Utility::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 

@@ -1551,7 +1551,7 @@ void SpellCaster::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabili
     SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
     if (spellProto == nullptr)
     {
-        sLog.outError("SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->SpellID);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SpellCaster::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->SpellID);
         return;
     }
 
@@ -1875,9 +1875,9 @@ SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, uint32 spellId, boo
     if (!spellInfo)
     {
         if (triggeredByAura)
-            sLog.outError("CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
-            sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -1889,9 +1889,9 @@ SpellCastResult SpellCaster::CastSpell(SpellCaster* pTarget, SpellEntry const* s
     if (!spellInfo)
     {
         if (triggeredByAura)
-            sLog.outError("CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
-            sLog.outError("CastSpell: unknown spell by caster: %s", GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell: unknown spell by caster: %s", GetGuidStr().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -1946,9 +1946,9 @@ void SpellCaster::CastCustomSpell(Unit* pTarget, uint32 spellId, optional<int32>
     if (!spellInfo)
     {
         if (triggeredByAura)
-            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastCustomSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
-            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
         return;
     }
 
@@ -1960,9 +1960,9 @@ void SpellCaster::CastCustomSpell(Unit* pTarget, SpellEntry const* spellInfo, op
     if (!spellInfo)
     {
         if (triggeredByAura)
-            sLog.outError("CastCustomSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastCustomSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
-            sLog.outError("CastCustomSpell: unknown spell by caster: %s", GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastCustomSpell: unknown spell by caster: %s", GetGuidStr().c_str());
         return;
     }
 
@@ -2009,9 +2009,9 @@ SpellCastResult SpellCaster::CastSpell(float x, float y, float z, uint32 spellId
     if (!spellInfo)
     {
         if (triggeredByAura)
-            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell(x,y,z): unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
-            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -2024,9 +2024,9 @@ SpellCastResult SpellCaster::CastSpell(float x, float y, float z, SpellEntry con
     if (!spellInfo)
     {
         if (triggeredByAura)
-            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell(x,y,z): unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
-            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetGuidStr().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CastSpell(x,y,z): unknown spell by caster: %s", GetGuidStr().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 

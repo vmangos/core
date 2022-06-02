@@ -26,6 +26,8 @@
 #include "Policies/Singleton.h"
 
 class Config;
+class Player;
+class WorldSession;
 class ByteBuffer;
 
 enum LogLevel
@@ -84,10 +86,11 @@ enum Color
     LBLUE,
     LMAGENTA,
     LCYAN,
-    WHITE
+    WHITE,
+    COLOR_COUNT
 };
 
-enum LogFile
+enum LogType
 {
     LOG_BASIC,
     LOG_WORLDPACKET,
@@ -107,21 +110,8 @@ enum LogFile
     LOG_GM_CRITICAL,
     LOG_CHAT_SPAM,
     LOG_ANTICHEAT,
-    LOG_NOSTALRIUS,
-    LOG_MAX_FILES
+    LOG_TYPE_MAX
 };
-
-enum LogType
-{
-    LogNormal = 0,
-    LogDetails,
-    LogDebug,
-    LogError,
-    LogAnticheat,
-    LOG_TYPE_MAX // add new entries *before* this value!
-};
-
-int const Color_count = int(WHITE)+1;
 
 class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::mutex> >
 {
@@ -146,29 +136,15 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         void InitSmartlogEntries(std::string const& str);
         void InitSmartlogGuids(std::string const& str);
 
-        void out(LogFile t, char const* format, ...) ATTR_PRINTF(3,4);
-        void outCommand(uint32 account, char const* str, ...) ATTR_PRINTF(3,4);
-        void outString();                                   // any log level
-                                                            // any log level
-        void outString(char const* str, ...)      ATTR_PRINTF(2,3);
-        void outInfo(char const* str, ...)      ATTR_PRINTF(2,3);
-        void outHonor(char const* str, ...)       ATTR_PRINTF(2, 3);
-                                                            // any log level
-        void outError(char const* err, ...)       ATTR_PRINTF(2,3);
-                                                            // log level >= 1
-        void outBasic(char const* str, ...)       ATTR_PRINTF(2,3);
-                                                            // log level >= 2
-        void outDetail(char const* str, ...)      ATTR_PRINTF(2,3);
-                                                            // log level >= 3
-        void outDebug(char const* str, ...)       ATTR_PRINTF(2,3);
-        void outWarden(char const* wrd, ...)        ATTR_PRINTF(2,3);
-        void outWardenDebug(char const* wrd, ...)   ATTR_PRINTF(2,3);
-        void outAnticheat(char const* detector, char const* player, char const* reason, char const* penalty);
+        // for general server messages
+        void Out(LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(3,4);
 
-        void outErrorDb();                                  // any log level
-                                                            // any log level
-        void outErrorDb(char const* str, ...)     ATTR_PRINTF(2,3);
-                                                            // any log level
+        // for player-specific messages
+        void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
+        void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
+        void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+
         void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
                                 char const* opcodeName,
                                 ByteBuffer const* packet, bool incoming);
@@ -192,14 +168,11 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         std::list<uint32> m_smartlogExtraGuids;
 
     private:
-        void out(LogFile t, LogLevel l, char const* str, va_list args);
-        void error(LogFile t, LogLevel l, char const* str, va_list args);
-
         FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
 
-        FILE* logFiles[LOG_MAX_FILES];
-        bool  timestampPrefix[LOG_MAX_FILES];
+        FILE* logFiles[LOG_TYPE_MAX];
+        bool  timestampPrefix[LOG_TYPE_MAX];
 
         const bool m_bIsChatLogFileActivated;
 
@@ -231,13 +204,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 #define DETAIL_FILTER_LOG(F,...)                        \
     do {                                                \
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && !sLog.HasLogFilter(F)) \
-            sLog.outDetail(__VA_ARGS__);                \
+            sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, __VA_ARGS__);                \
     } while(0)
 
 #define DEBUG_FILTER_LOG(F,...)                         \
     do {                                                \
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && !sLog.HasLogFilter(F)) \
-            sLog.outDebug(__VA_ARGS__);                 \
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, __VA_ARGS__);                  \
     } while(0)
 
 #define ERROR_DB_FILTER_LOG(F,...)                      \

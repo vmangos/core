@@ -722,7 +722,7 @@ void instance_ruins_of_ahnqiraj::SpawnNewCrystals(ObjectGuid usedCrystal)
 
             if (!pCrystal)
             {
-                sLog.outError("[OSSIRIAN] Unable to spawn crystal %u at position #%u", GO_OSSIRIAN_CRYSTAL, newIndex);
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [OSSIRIAN] Unable to spawn crystal %u at position #%u", GO_OSSIRIAN_CRYSTAL, newIndex);
                 return;
             }
 

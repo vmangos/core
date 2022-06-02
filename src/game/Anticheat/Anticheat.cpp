@@ -41,13 +41,13 @@ AnticheatManager* GetAnticheatLib()
 
 void AnticheatManager::LoadAnticheatData()
 {
-    sLog.outString();
-    sLog.outString("Loading warden checks...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading warden checks...");
     sWardenScanMgr.loadFromDB();
     Warden::LoadScriptedScans();
     
-    sLog.outString();
-    sLog.outString("Loading warden modules...");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Loading warden modules...");
     sWardenModuleMgr;
 }
 

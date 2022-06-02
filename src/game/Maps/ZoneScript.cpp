@@ -79,14 +79,14 @@ bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 mapId, float 
     GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectInfo(entry);
     if (!goInfo)
     {
-        sLog.outError("Invalid GameObject entry %u in OPvPCapturePoint::AddObject!", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid GameObject entry %u in OPvPCapturePoint::AddObject!", entry);
         return false;
     }
 
     Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
     if (!map)
     {
-        sLog.outError("Invalid Map id %u in OPvPCapturePoint::AddObject!", mapId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid Map id %u in OPvPCapturePoint::AddObject!", mapId);
         return false;
     }
 
@@ -97,7 +97,7 @@ bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 mapId, float 
         return true;
     }
 
-    sLog.outError("Failed to create GameObject with entry %u in OPvPCapturePoint::AddObject!", entry);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Failed to create GameObject with entry %u in OPvPCapturePoint::AddObject!", entry);
     return false;
 }
 
@@ -106,14 +106,14 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 team, uint3
     CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(entry);
     if (!cInfo)
     {
-        sLog.outError("Invalid Creature entry %u in OPvPCapturePoint::AddCreature!", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid Creature entry %u in OPvPCapturePoint::AddCreature!", entry);
         return false;
     }
 
     Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
     if (!map)
     {
-        sLog.outError("Invalid Map id %u in OPvPCapturePoint::AddCreature!", mapId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid Map id %u in OPvPCapturePoint::AddCreature!", mapId);
         return false;
     }
 
@@ -124,40 +124,40 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 team, uint3
         return true;
     }
 
-    sLog.outError("Failed to create Creature with entry %u in OPvPCapturePoint::AddCreature!", entry);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Failed to create Creature with entry %u in OPvPCapturePoint::AddCreature!", entry);
     return false;
 }
 
 bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 mapId, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    sLog.outDebug("Creating capture point %u", entry);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Creating capture point %u", entry);
 
     // check info existence
     GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
     if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        sLog.outError("OutdoorPvP: GO %u is not capture point!", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: OutdoorPvP: GO %u is not capture point!", entry);
         return false;
     }
 
     GameObjectInfo const* goInfo = sObjectMgr.GetGameObjectInfo(entry);
     if (!goInfo)
     {
-        sLog.outError("Invalid GameObject entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid GameObject entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
         return false;
     }
 
     Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
     if (!map)
     {
-        sLog.outError("Invalid Map id %u in OPvPCapturePoint::SetCapturePointData!", mapId);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid Map id %u in OPvPCapturePoint::SetCapturePointData!", mapId);
         return false;
     }
 
     GameObject* pGo = map->SummonGameObject(entry, x, y, z, o, rotation0, rotation1, rotation2, rotation3, 0, WORLD_DEFAULT_OBJECT);
     if (!pGo)
     {
-        sLog.outError("Failed to create GameObject with entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Failed to create GameObject with entry %u in OPvPCapturePoint::SetCapturePointData!", entry);
         return false;
     }
 
@@ -177,7 +177,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
 {
     if (!m_Creatures[type])
     {
-        sLog.outDebug("opvp creature type %u was already deleted", type);
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "opvp creature type %u was already deleted", type);
         return false;
     }
 
@@ -189,7 +189,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         return false;
     }
 
-    sLog.outDebug("deleting opvp creature type %u", type);
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "deleting opvp creature type %u", type);
     MANGOS_ASSERT(cr->IsTemporarySummon());
     static_cast<TemporarySummon*>(cr)->UnSummon();
 
@@ -576,7 +576,7 @@ void ZoneScript::OnPlayerLeave(Player* plr)
     if (!plr->GetSession()->PlayerLogout())
         SendRemoveWorldStates(plr);
     m_players[plr->GetTeamId()].erase(plr);
-    sLog.outDebug("Player %s left a ZoneScript zone", plr->GetName());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Player %s left a ZoneScript zone", plr->GetName());
 }
 
 void ZoneScript::SendUpdateWorldState(uint32 field, uint32 value)

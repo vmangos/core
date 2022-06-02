@@ -526,7 +526,7 @@ void npc_doctorAI::UpdateAI(uint32 const diff)
                 patientEntry = HordeSoldierId[urand(0, 2)];
                 break;
             default:
-                sLog.outError("Invalid entry for Triage doctor. Please check your database");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Invalid entry for Triage doctor. Please check your database");
                 return;
         }
 

@@ -327,7 +327,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
             // this is probably an error state, but we'll leave it
             // and hopefully recover on the next Update
             // we still need to copy our preffix
-            sLog.outError("%u's Path Build failed: 0 length path r=0x%x", m_sourceUnit->GetGUIDLow(), dtResult);
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %u's Path Build failed: 0 length path r=0x%x", m_sourceUnit->GetGUIDLow(), dtResult);
         }
 
         //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++  m_polyLength=%u prefixPolyLength=%u suffixPolyLength=%u \n",m_polyLength, prefixPolyLength, suffixPolyLength);
@@ -349,7 +349,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
         // std::thread::id const threadId = std::this_thread::get_id();
 
         //if (threadId != m_navMeshQuery->m_owningThread)
-            //sLog.outError("CRASH: We are using a dtNavMeshQuery from thread %u which belongs to thread %u!", threadId, m_navMeshQuery->m_owningThread);
+            //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CRASH: We are using a dtNavMeshQuery from thread %u which belongs to thread %u!", threadId, m_navMeshQuery->m_owningThread);
 
         dtStatus dtResult = m_navMeshQuery->findPath(
                                 startPoly,          // start polygon
@@ -364,7 +364,7 @@ void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
         if (!m_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
-            sLog.outError("%u's Path Build failed: 0 length path. Result=0x%x", m_sourceUnit->GetGUIDLow(), dtResult);
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %u's Path Build failed: 0 length path. Result=0x%x", m_sourceUnit->GetGUIDLow(), dtResult);
             BuildShortcut();
             m_type = PATHFIND_NOPATH;
             return;
@@ -794,7 +794,7 @@ dtStatus PathInfo::findSmoothPath(float const* startPos, float const* endPos,
         npolys = fixupShortcuts(polys, npolys, m_navMeshQuery);
 
         if (dtStatusFailed(m_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
-            sLog.outDebug("Cannot find height at position X: %f Y: %f Z: %f for %s", result[2], result[0], result[1], m_sourceUnit->GetName());
+            sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Cannot find height at position X: %f Y: %f Z: %f for %s", result[2], result[0], result[1], m_sourceUnit->GetName());
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
 

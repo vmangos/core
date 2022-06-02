@@ -40,7 +40,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
 
     recv_data >> guid;
 
-    sLog.outDebug("WORLD: Recvd CMSG_MEETINGSTONE_JOIN Message guid: %s", guid.GetString().c_str());
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MEETINGSTONE_JOIN Message guid: %s", guid.GetString().c_str());
 
     // ignore for remote control state
     if (!_player->IsSelfMover())
@@ -54,7 +54,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
     // Never expect this opcode for some type GO's
     if (obj->GetGoType() != GAMEOBJECT_TYPE_MEETINGSTONE)
     {
-        sLog.outError("HandleMeetingStoneJoinOpcode: CMSG_MEETINGSTONE_JOIN for not allowed GameObject type %u (Entry %u), didn't expect this to happen.", obj->GetGoType(), obj->GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandleMeetingStoneJoinOpcode: CMSG_MEETINGSTONE_JOIN for not allowed GameObject type %u (Entry %u), didn't expect this to happen.", obj->GetGoType(), obj->GetEntry());
         return;
     }
 
@@ -88,7 +88,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
 {
-    sLog.outDebug("WORLD: Recvd CMSG_MEETINGSTONE_LEAVE");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MEETINGSTONE_LEAVE");
     if (Group* grp = _player->GetGroup())
     {
         if (grp->IsLeader(_player->GetObjectGuid()) && grp->isInLFG())
@@ -108,7 +108,7 @@ void WorldSession::HandleMeetingStoneLeaveOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket& /*recv_data*/)
 {
-    sLog.outDebug("WORLD: Received CMSG_MEETING_STONE_INFO");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_MEETING_STONE_INFO");
 
     if (Group* grp = _player->GetGroup())
     {

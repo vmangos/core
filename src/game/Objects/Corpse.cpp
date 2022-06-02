@@ -90,7 +90,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
 
     if (!IsPositionValid())
     {
-        sLog.outError("Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
                       guidlow, owner->GetName(), owner->GetPositionX(), owner->GetPositionY());
         return false;
     }
@@ -134,7 +134,7 @@ void Corpse::DeleteBonesFromWorld()
 
     if (!corpse)
     {
-        sLog.outError("Bones %u not found in world.", GetGUIDLow());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Bones %u not found in world.", GetGUIDLow());
         return;
     }
 
@@ -173,7 +173,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 
     if (m_type >= MAX_CORPSE_TYPE)
     {
-        sLog.outError("%s Owner %s have wrong corpse type (%i), not load.", GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), m_type);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s Owner %s have wrong corpse type (%i), not load.", GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), m_type);
         return false;
     }
 
@@ -203,7 +203,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     PlayerInfo const* info = sObjectMgr.GetPlayerInfo(race, _class);
     if (!info)
     {
-        sLog.outError("Player %u has incorrect race/class pair.", GetGUIDLow());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Player %u has incorrect race/class pair.", GetGUIDLow());
         return false;
     }
     SetUInt32Value(CORPSE_FIELD_DISPLAY_ID, gender == GENDER_FEMALE ? info->displayId_f : info->displayId_m);
@@ -246,7 +246,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 
     if (!IsPositionValid())
     {
-        sLog.outError("%s Owner %s not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s Owner %s not created. Suggested coordinates isn't valid (X: %f Y: %f)",
                       GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), GetPositionX(), GetPositionY());
         return false;
     }

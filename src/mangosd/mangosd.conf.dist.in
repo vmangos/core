@@ -673,8 +673,6 @@ GmLogTimestamp = 0
 GmLogPerAccount = 0
 CriticalCommandsLogFile = "gm_critical.log"
 RaLogFile = ""
-NostalriusLogFile = "Info.log"
-NostalriusLogTimestamp = 0
 LogColors = ""
 
 LogsDB.Chat                 = 0

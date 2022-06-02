@@ -147,7 +147,7 @@ struct npc_grimstoneAI : public npc_escortAI
         if (GameObject* pGo = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(id)))
             pGo->SetGoState(GOState(state));
 
-        sLog.outDebug("npc_grimstone, arena gate update state.");
+        sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "npc_grimstone, arena gate update state.");
     }
 
     //TODO: move them to center
@@ -190,7 +190,7 @@ struct npc_grimstoneAI : public npc_escortAI
             Player *challenger = m_creature->GetMap()->GetPlayer(m_pInstance->GetData64(DATA_ARENA_CHALLENGER));
             if (!challenger)
             {
-                sLog.outError("[Blackrock Depths] Ring of Law challenger player not found!");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [Blackrock Depths] Ring of Law challenger player not found!");
                 return;
             }
 
@@ -297,7 +297,7 @@ struct npc_grimstoneAI : public npc_escortAI
 
                     if (m_pInstance->GetData(DATA_THELDREN) == IN_PROGRESS)
                         m_pInstance->SetData(DATA_THELDREN, DONE);
-                    sLog.outDebug("npc_grimstone: event reached end and set complete.");
+                    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "npc_grimstone: event reached end and set complete.");
                 }
                 break;
         }

@@ -175,7 +175,7 @@ void RealmList::UpdateIfNeed()
 
 void RealmList::UpdateRealms(bool init)
 {
-    sLog.outDetail("Updating Realm List...");
+    sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Updating Realm List...");
 
     QueryResult *result = LoginDatabase.Query(
         //       0     1       2          3       4       5             6
@@ -197,7 +197,7 @@ void RealmList::UpdateRealms(bool init)
 
             if (realmflags & ~(REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD))
             {
-                sLog.outError("Realm allowed have only OFFLINE Mask 0x2), or NEWPLAYERS (mask 0x20), or RECOMENDED (mask 0x40), or SPECIFICBUILD (mask 0x04) flags in DB");
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Realm allowed have only OFFLINE Mask 0x2), or NEWPLAYERS (mask 0x20), or RECOMENDED (mask 0x40), or SPECIFICBUILD (mask 0x04) flags in DB");
                 realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
             }
 
@@ -208,7 +208,7 @@ void RealmList::UpdateRealms(bool init)
                 fields[8].GetFloat(), fields[9].GetCppString());
 
             if(init)
-                sLog.outString("Added realm \"%s\"", fields[1].GetString());
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Added realm \"%s\"", fields[1].GetString());
         } while( result->NextRow() );
         delete result;
     }

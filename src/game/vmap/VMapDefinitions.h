@@ -38,18 +38,18 @@ namespace VMAP
 #elif defined MMAP_GENERATOR
 #include <assert.h>
 #define MANGOS_ASSERT(x) assert(x)
-#define sLog.outDebug(...) 0
-#define sLog.outDetail(...) 0
+#define sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ...) 0
+#define sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, ...) 0
 #define LOG_FILTER_MAP_LOADING true
-#define DEBUG_FILTER_LOG(F,...) do{ if (F) sLog.outDebug(__VA_ARGS__); } while(0)
+#define DEBUG_FILTER_LOG(F,...) do{ if (F) sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, __VA_ARGS__); } while(0)
 #define ERROR_LOG(...) do{ printf("ERROR:"); printf(__VA_ARGS__); printf("\n"); } while(0)
 #else
 #include <assert.h>
 #define MANGOS_ASSERT(x) assert(x)
-#define sLog.outDebug(...) do{ printf(__VA_ARGS__); printf("\n"); } while(0)
-#define sLog.outDetail(...) do{ printf(__VA_ARGS__); printf("\n"); } while(0)
+#define sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, ...) do{ printf(__VA_ARGS__); printf("\n"); } while(0)
+#define sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, ...) do{ printf(__VA_ARGS__); printf("\n"); } while(0)
 #define LOG_FILTER_MAP_LOADING true
-#define DEBUG_FILTER_LOG(F,...) do{ if (F) sLog.outDebug(__VA_ARGS__); } while(0)
+#define DEBUG_FILTER_LOG(F,...) do{ if (F) sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, __VA_ARGS__); } while(0)
 #define ERROR_LOG(...) do{ printf("ERROR:"); printf(__VA_ARGS__); printf("\n"); } while(0)
 #endif
 

@@ -163,7 +163,7 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& /*recv_data*/)
 
     if (group->GetLeaderGuid() == GetPlayer()->GetObjectGuid())
     {
-        sLog.outError("HandleGroupAcceptOpcode: %s tried to accept an invite to his own group",
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandleGroupAcceptOpcode: %s tried to accept an invite to his own group",
                       GetPlayer()->GetGuidStr().c_str());
         return;
     }
@@ -229,7 +229,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recv_data)
     // can't uninvite yourself
     if (guid == GetPlayer()->GetObjectGuid())
     {
-        sLog.outError("WorldSession::HandleGroupUninviteGuidOpcode: leader %s tried to uninvite himself from the group.", GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandleGroupUninviteGuidOpcode: leader %s tried to uninvite himself from the group.", GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -271,7 +271,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recv_data)
     // can't uninvite yourself
     if (GetPlayer()->GetName() == membername)
     {
-        sLog.outError("WorldSession::HandleGroupUninviteOpcode: leader %s tried to uninvite himself from the group.", GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandleGroupUninviteOpcode: leader %s tried to uninvite himself from the group.", GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -383,7 +383,7 @@ void WorldSession::HandleLootRoll(WorldPacket& recv_data)
     recv_data >> itemSlot;
     recv_data >> rollType;
 
-    //sLog.outDebug("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -405,7 +405,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recv_data)
     if (!GetPlayer()->GetGroup())
         return;
 
-    //sLog.outDebug("Received opcode MSG_MINIMAP_PING X: %f, Y: %f", x, y);
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Received opcode MSG_MINIMAP_PING X: %f, Y: %f", x, y);
 
     /** error handling **/
     /********************/
@@ -432,7 +432,7 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
     // everything is fine, do it
     roll = urand(minimum, maximum);
 
-    //sLog.outDebug("ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
 
     WorldPacket data(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8);
     data << uint32(minimum);
@@ -530,7 +530,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
 {
-    //sLog.outDebug("WORLD: Recvd CMSG_GROUP_CHANGE_SUB_GROUP Message");
+    //sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_GROUP_CHANGE_SUB_GROUP Message");
     std::string name;
     std::string nameSwapWith;
 
@@ -798,7 +798,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
 void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
 {
-    sLog.outDebug("WORLD: Received CMSG_REQUEST_PARTY_MEMBER_STATS");
+    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Received CMSG_REQUEST_PARTY_MEMBER_STATS");
     ObjectGuid guid;
     recv_data >> guid;
 

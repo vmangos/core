@@ -58,7 +58,7 @@ void Warden::LoadScriptedScans()
 
     WardenWin::LoadScriptedScans();
 
-    sLog.outBasic(">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
+    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, ">> %u scripted Warden scans loaded from anticheat module", sWardenScanMgr.Count() - start);
 }
 
 Warden::Warden(WorldSession *session, const WardenModule *module, const BigNumber &K) :
@@ -561,31 +561,5 @@ void Warden::LogPositiveToDB(std::shared_ptr<const Scan> scan)
     if (!scan || !_session)
         return;
 
-    if (uint32(scan->penalty) < sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL))
-        return;
-
-    static SqlStatementID insWardenPositive;
-
-    SqlStatement stmt = LogsDatabase.CreateStatement(insWardenPositive, "INSERT INTO `logs_warden` (`check`, `action`, `account`, `guid`, `map`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-
-    stmt.addUInt16(scan->checkId);
-    stmt.addInt8(scan->penalty);
-    stmt.addUInt32(_session->GetAccountId());
-    if (Player* pl = _session->GetPlayer())
-    {
-        stmt.addUInt64(pl->GetObjectGuid().GetRawValue());
-        stmt.addUInt32(pl->GetMapId());
-        stmt.addFloat(pl->GetPositionX());
-        stmt.addFloat(pl->GetPositionY());
-        stmt.addFloat(pl->GetPositionZ());
-    }
-    else
-    {
-        stmt.addUInt64(0);
-        stmt.addUInt32(0xFFFFFFFF);
-        stmt.addFloat(0.0f);
-        stmt.addFloat(0.0f);
-        stmt.addFloat(0.0f);
-    }
-    stmt.Execute();
+    sLog.Player(_session, LOG_ANTICHEAT, "Warden", LOG_LVL_MINIMAL, "Check %u penalty %u", scan->checkId, scan->penalty);
 }

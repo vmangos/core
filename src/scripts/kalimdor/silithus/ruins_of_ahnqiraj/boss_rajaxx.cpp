@@ -270,7 +270,7 @@ struct boss_rajaxxAI : public ScriptedAI
     {
         FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(609); // Cenarion Circle
         if (!factionEntry) {
-            sLog.outError("Rajaxx justDied, unable to find Cenarion Circle faction");
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Rajaxx justDied, unable to find Cenarion Circle faction");
             return;
         }
         std::list<Creature*> helpers;
