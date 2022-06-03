@@ -40,6 +40,9 @@ UPDATE `quest_template` SET `RequiredSkillValue`=150 WHERE `entry` IN (8228, 822
 UPDATE `locales_quest` SET `OfferRewardText_loc3`='Es wird diesen Sonntag einen Angelwettbewerb in Booty Bay geben! Hier sind die Regeln für den Wettbewerb, falls Ihr daran teilnehmen möchtet!' WHERE `entry`=8228;
 UPDATE `locales_quest` SET `OfferRewardText_loc3`='Es wird einen Angelwettbewerb in Booty Bay geben, diesen Sonntag! Hier sind die Regeln für Euch!' WHERE `entry`=8229;
 
+-- School of Tastyfish: rare fish drop rate https://classic.wowhead.com/item=19803/brownells-blue-striped-racer#comments
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`=0.2 WHERE `entry`=17280  AND `item` IN (19803, 19805, 19806, 19808);
+
 -- End of migration.
 END IF;
 END??
