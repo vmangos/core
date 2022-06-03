@@ -3792,6 +3792,16 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (1951, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4031.221, -3394.153, 39.01234, 5.033, 0, 'Rituals of Power: Tabetha - Move'),
 (1951, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4031.56, -3392.96, 39.01, 2.129, 0, 'Rituals of Power: Tabetha - Move');
 
+-- ----------------------------------------------------------------------
+
+-- Remove Hardcoded Darkmoon Faire Event Times
+DELETE FROM `game_event` WHERE `entry` IN (4, 5, 23, 24);
+INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES
+(4, '2020-06-04 00:00:01', '2030-12-31 23:59:59', 20160, 2880, 0, 'Darkmoon Faire - Elwynn', 0, 0, 4, 10),
+(5, '2020-06-11 00:00:01', '2030-12-31 23:59:59', 20160, 2880, 0, 'Darkmoon Faire - Mulgore', 0, 0, 4, 10),
+(23, '2020-06-03 00:00:01', '2030-12-31 23:59:59', 20160, 1440, 0, 'Darkmoon Faire - Building Elwynn', 0, 0, 4, 10),
+(24, '2020-06-10 00:00:01', '2030-12-31 23:59:59', 20160, 1440, 0, 'Darkmoon Faire - Building Mulgore', 0, 0, 4, 10);
+
 
 -- End of migration.
 END IF;
