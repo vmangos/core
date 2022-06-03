@@ -137,13 +137,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         void InitSmartlogGuids(std::string const& str);
 
         // for general server messages
-        void Out(LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(3,4);
+        void Out(LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4,5);
 
         // for player-specific messages
-        void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
-        void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
-        void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(4, 5);
-        void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void Player(WorldSession const* session, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void Player(WorldSession const* session, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
+        void Player(uint32 accountId, LogType logType, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(5, 6);
+        void Player(uint32 accountId, LogType logType, char const* subTytpe, LogLevel logLevel, char const* format, ...) ATTR_PRINTF(6, 7);
 
         void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
                                 char const* opcodeName,
