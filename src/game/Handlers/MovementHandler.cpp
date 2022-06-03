@@ -924,7 +924,6 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
 {
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
-    recvData.hexlike();
 
     ObjectGuid oldMoverGuid;
     MovementInfo movementInfo;
