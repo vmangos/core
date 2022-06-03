@@ -184,7 +184,7 @@ FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
 		BG_MAGENTA, BG_CYAN, BG_WHITE
 	};
 
-	static uint8 UnixColorFG[Color_count] =
+	static uint8 UnixColorFG[COLOR_COUNT] =
 	{
 		FG_BLACK,                                           // BLACK
 		FG_RED,                                             // RED
@@ -203,7 +203,7 @@ FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
 		FG_WHITE                                            // LWHITE
 	};
 
-	fprintf((stdout_stream ? stdout : stderr), "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < Color_count ? ";1" : ""));
+	fprintf((stdout_stream ? stdout : stderr), "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < COLOR_COUNT ? ";1" : ""));
 #endif
 }
 
