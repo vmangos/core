@@ -3782,6 +3782,16 @@ UPDATE `conditions` SET `value2`=300 WHERE `condition_entry`=396;
 -- Remove Low Level Loot From Thunderhead Creatures
 DELETE FROM `creature_loot_template` WHERE `entry` IN (6380, 6375, 6379, 6378, 6377) AND item = 30017;
 
+-- ----------------------------------------------------------------------
+
+-- Add Quest Script 1951 (credit cmangos)
+UPDATE `quest_template` SET `CompleteScript` = 1951 WHERE `entry` = 1951;
+DELETE FROM `quest_end_scripts` WHERE `id`=1951;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1951, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2659, 0, 0, 0, 0, 0, 0, 0, 0, 'Rituals of Power: Tabetha - Talk'),
+(1951, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4031.221, -3394.153, 39.01234, 5.033, 0, 'Rituals of Power: Tabetha - Move'),
+(1951, 6, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4031.56, -3392.96, 39.01, 2.129, 0, 'Rituals of Power: Tabetha - Move');
+
 
 -- End of migration.
 END IF;
