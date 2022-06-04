@@ -4962,6 +4962,45 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (1080, 1693, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
 (1080, 0, 0, 'I am ready to begin.', 4084, 1, 1, 0, 0, 0, 0, NULL, 0);
+
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
+-- Rivern Frostwind
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
+UPDATE `creature_template` SET `gossip_menu_id` = 3130 WHERE `entry` = 10618;
+
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
+-- Simone the Inconspicuous
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 24439;
+UPDATE `creature_template` SET `gossip_menu_id` = 5868 WHERE `entry` = 14527;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5868, 7041, 0);
+
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
+-- Franklin the Friendly
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 4602;
+UPDATE `creature_template` SET `gossip_menu_id` = 5870 WHERE `entry` = 14529;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5870, 7043, 0);
+
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
+-- Artorius the Amiable
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 42301;
+UPDATE `creature_template` SET `gossip_menu_id` = 5872 WHERE `entry` = 14531;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5872, 7045, 0);
+
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
+-- Krug Skullsplit
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 46167;
+UPDATE `mangos`.`creature_template` SET `gossip_menu_id`='6687' WHERE  `entry`=15612 AND `patch`=7;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (6687, 8059, 0);
+
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
+-- Annora
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 52882;
+UPDATE `creature_template` SET `gossip_menu_id` = 4171 WHERE `entry` = 11073;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(4171, 5253, 0);
 */
 
 -- Thorkaf Dragoneye
@@ -4984,42 +5023,9 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
 (3073, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, NULL, 0);
 
--- Rivern Frostwind
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
-UPDATE `creature_template` SET `gossip_menu_id` = 3130 WHERE `entry` = 10618;
-
--- Annora
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 52882;
-UPDATE `creature_template` SET `gossip_menu_id` = 4171 WHERE `entry` = 11073;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(4171, 5253, 0);
-
 -- Gnome Engineer
 DELETE FROM `npc_gossip` WHERE `npc_guid` IN (86175, 86178, 190236, 190237, 190238, 190239, 190240, 190241);
 UPDATE `creature_template` SET `gossip_menu_id` = 284 WHERE `entry` = 13000;
-
--- Simone the Inconspicuous
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 24439;
-UPDATE `creature_template` SET `gossip_menu_id` = 5868 WHERE `entry` = 14527;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(5868, 7041, 0);
-
--- Franklin the Friendly
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 4602;
-UPDATE `creature_template` SET `gossip_menu_id` = 5870 WHERE `entry` = 14529;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(5870, 7043, 0);
-
--- Artorius the Amiable
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 42301;
-UPDATE `creature_template` SET `gossip_menu_id` = 5872 WHERE `entry` = 14531;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(5872, 7045, 0);
-
--- Krug Skullsplit
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 46167;
-UPDATE `mangos`.`creature_template` SET `gossip_menu_id`='6687' WHERE  `entry`=15612 AND `patch`=7;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (6687, 8059, 0);
 
 
 -- End of migration.
