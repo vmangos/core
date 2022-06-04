@@ -5032,7 +5032,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 
 -- Loramus (NOTE: Needs CPP Removing)
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 35865;
-UPDATE `creature_template` SET `gossip_menu_id` = 1163 WHERE `entry` = 7783;
+UPDATE `creature_template` SET `gossip_menu_id` = 1163, `script_name`='' WHERE `entry` = 7783;
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (1163, 1796, 0),
 (1164, 1813, 0),
