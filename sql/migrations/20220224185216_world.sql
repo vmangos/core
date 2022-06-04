@@ -4942,11 +4942,6 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (1080, 0, 0, 'I am ready to begin.', 4084, 1, 1, 0, 0, 0, 0, NULL, 0);
 
 -- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
--- Rivern Frostwind
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
-UPDATE `creature_template` SET `gossip_menu_id` = 3130, `script_name`='' WHERE `entry` = 10618;
-
--- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
 -- Simone the Inconspicuous
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 24439;
 UPDATE `creature_template` SET `gossip_menu_id` = 5868 WHERE `entry` = 14527;
@@ -5062,6 +5057,12 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (3142, 0, 0, 7, 3141, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Loramus: Loramus Thalipedes - Complete Quest');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
 (179, 9, 3141, 0, 0, 0, 0);
+
+-- Rivern Frostwind (NOTE: Needs CPP Removing)
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
+UPDATE `creature_template` SET `gossip_menu_id` = 3130, `script_name`='' WHERE `entry` = 10618;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(3130, 1, 1, 'I want to browse your goods.', 3370, 3, 4, 0, 0, 0, 0, 0, NULL, 0, 71);
 
 
 -- End of migration.
