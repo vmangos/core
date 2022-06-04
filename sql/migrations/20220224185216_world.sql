@@ -4918,7 +4918,6 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` IN (
 -- ----------------------------------------------------------------------
 
 -- Add Some Missing Gossips [WIP]
-
 /*
 -- QUEST ID 2078 SCRIPT WILL HAVE TO BE CONVERTED TO DB FOR THIS GOSSIP TO BE USED
 -- The Threshwackonator 4100
@@ -4954,8 +4953,8 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (1183, 0, 0, 'Indeed.\n', 4251, 1, 1, 1184, 0, 0, 0, NULL, 0),
 (1184, 0, 0, 'I will do this with or without your help, Loramus.\n', 4254, 1, 1, 1185, 0, 0, 0, NULL, 0),
 (1185, 0, 0, 'Yes.\n', 4256, 1, 1, 0, 0, 0, 0, NULL, 0);
-*/
 
+-- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
 -- Blastmaster Emi Shortfuse
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 30136;
 UPDATE `creature_template` SET `gossip_menu_id` = 1080 WHERE `entry` = 7998;
@@ -4963,6 +4962,7 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (1080, 1693, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
 (1080, 0, 0, 'I am ready to begin.', 4084, 1, 1, 0, 0, 0, 0, NULL, 0);
+*/
 
 -- Thorkaf Dragoneye
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 6931;
