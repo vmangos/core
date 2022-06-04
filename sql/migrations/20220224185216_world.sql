@@ -5027,6 +5027,12 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 DELETE FROM `npc_gossip` WHERE `npc_guid` IN (86175, 86178, 190236, 190237, 190238, 190239, 190240, 190241);
 UPDATE `creature_template` SET `gossip_menu_id` = 284 WHERE `entry` = 13000;
 
+-- Mor'zul Bloodbringer
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 3329;
+UPDATE `creature_template` SET `gossip_menu_id` = 5817 WHERE `entry` = 14436;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5817, 6990, 0);
+
 
 -- End of migration.
 END IF;
