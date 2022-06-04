@@ -4944,7 +4944,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 -- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
 -- Rivern Frostwind
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
-UPDATE `creature_template` SET `gossip_menu_id` = 3130 WHERE `entry` = 10618;
+UPDATE `creature_template` SET `gossip_menu_id` = 3130, `script_name`='' WHERE `entry` = 10618;
 
 -- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
 -- Simone the Inconspicuous
