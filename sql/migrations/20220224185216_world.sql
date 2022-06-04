@@ -4917,7 +4917,7 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` IN (
 
 -- ----------------------------------------------------------------------
 
--- Add Some Missing Gossips
+-- Add Some Missing Gossips [WIP]
 -- The Threshwackonator 4100
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 36626;
 UPDATE `creature_template` SET `gossip_menu_id` = 221 WHERE `entry` = 6669;
