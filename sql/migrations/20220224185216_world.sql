@@ -4933,28 +4933,6 @@ REPLACE INTO `npc_text` (`ID`, `BroadcastTextID0`) VALUES
 (758, 2741);
 
 -- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
--- Loramus
-DELETE FROM `npc_gossip` WHERE `npc_guid` = 35865;
-UPDATE `creature_template` SET `gossip_menu_id` = 1163 WHERE `entry` = 7783;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(1163, 1796, 0),
-(1164, 1813, 0),
-(1181, 1813, 0),
-(1182, 1814, 0),
-(1183, 1815, 0),
-(1184, 1816, 0),
-(1185, 1817, 0);
-INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
-(1163, 0, 0, 'Hail, Loramus. I bring word from the Blasted Lands.', 4230, 1, 1, 1164, 0, 0, 0, NULL, 0),
-(1164, 0, 0, 'Will you help?', 4245, 1, 1, 0, 0, 0, 0, NULL, 0),
-(1163, 1, 0, 'I wish to hear your story.', 4257, 1, 1, 1181, 0, 0, 0, NULL, 0),
-(1181, 0, 0, 'Please continue.', 4247, 1, 1, 1182, 0, 0, 0, NULL, 0),
-(1182, 0, 0, 'I do not understand.', 4249, 1, 1, 1183, 0, 0, 0, NULL, 0),
-(1183, 0, 0, 'Indeed.\n', 4251, 1, 1, 1184, 0, 0, 0, NULL, 0),
-(1184, 0, 0, 'I will do this with or without your help, Loramus.\n', 4254, 1, 1, 1185, 0, 0, 0, NULL, 0),
-(1185, 0, 0, 'Yes.\n', 4256, 1, 1, 0, 0, 0, 0, NULL, 0);
-
--- CREATURES CPP SCRIPTS WILL NEED TO BE CONVERTED FOR THIS GOSSIP TO BE USED
 -- Blastmaster Emi Shortfuse
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 30136;
 UPDATE `creature_template` SET `gossip_menu_id` = 1080 WHERE `entry` = 7998;
@@ -5051,6 +5029,39 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` = 3329;
 UPDATE `creature_template` SET `gossip_menu_id` = 5817 WHERE `entry` = 14436;
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (5817, 6990, 0);
+
+-- Loramus (NOTE: Needs CPP Removing)
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 35865;
+UPDATE `creature_template` SET `gossip_menu_id` = 1163 WHERE `entry` = 7783;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(1163, 1796, 0),
+(1164, 1813, 0),
+(1181, 1813, 0),
+(1182, 1814, 0),
+(1183, 1815, 0),
+(1184, 1816, 0),
+(1185, 1817, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
+(1163, 0, 0, 'Hail, Loramus. I bring word from the Blasted Lands.', 4230, 1, 1, 1164, 0, 0, 0, NULL, 0),
+(1164, 0, 0, 'Will you help?', 4245, 1, 1, -1, 0, 0, 0, NULL, 0),
+(1163, 1, 0, 'I wish to hear your story.', 4257, 1, 1, 1181, 0, 0, 0, NULL, 0),
+(1181, 0, 0, 'Please continue.', 4247, 1, 1, 1182, 0, 0, 0, NULL, 0),
+(1182, 0, 0, 'I do not understand.', 4249, 1, 1, 1183, 0, 0, 0, NULL, 0),
+(1183, 0, 0, 'Indeed.\n', 4251, 1, 1, 1184, 0, 0, 0, NULL, 0),
+(1184, 0, 0, 'I will do this with or without your help, Loramus.\n', 4254, 1, 1, 1185, 0, 0, 0, NULL, 0),
+(1185, 0, 0, 'Yes.\n', 4256, 1, 1, -1, 0, 0, 0, NULL, 0);
+UPDATE `gossip_menu_option` SET `condition_id` = 174 WHERE `menu_id` = 1163 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `action_script_id` = 2744 WHERE `menu_id` = 1164;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(2744, 0, 0, 7, 2744, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Demon Hunter: Loramus Thalipedes - Complete Quest');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(174, 9, 2744, 0, 0, 0, 0);
+UPDATE `gossip_menu_option` SET `condition_id` = 179 WHERE `menu_id` = 1163 AND `id` = 1;
+UPDATE `gossip_menu_option` SET `action_script_id` = 3142 WHERE `menu_id` = 1185;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(3142, 0, 0, 7, 3141, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Loramus: Loramus Thalipedes - Complete Quest');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(179, 9, 3141, 0, 0, 0, 0);
 
 
 -- End of migration.
