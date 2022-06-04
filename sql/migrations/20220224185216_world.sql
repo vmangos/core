@@ -4918,6 +4918,9 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` IN (
 -- ----------------------------------------------------------------------
 
 -- Add Some Missing Gossips [WIP]
+
+/*
+QUEST ID 2078 SCRIPT WILL HAVE TO BE CONVERTED TO DB FOR THIS GOSSIP TO BE USED
 -- The Threshwackonator 4100
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 36626;
 UPDATE `creature_template` SET `gossip_menu_id` = 221 WHERE `entry` = 6669;
@@ -4926,6 +4929,10 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (221, 758, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
 (221, 0, 0, 'Turn the key to start the machine.', 2703, 1, 1, 0, 0, 0, 0, NULL, 0);
+REPLACE INTO `npc_text` (`ID`, `BroadcastTextID0`) VALUES
+(718, 2702),
+(758, 2741);
+*/
 
 -- Loramus
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 35865;
