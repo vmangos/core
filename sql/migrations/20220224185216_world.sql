@@ -4910,7 +4910,108 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` IN (
 755,
 757,
 4383,
-6862);
+6862,
+53943,
+53953,
+53954);
+
+-- ----------------------------------------------------------------------
+
+-- Add Some Missing Gossips
+-- The Threshwackonator 4100
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 36626;
+UPDATE `creature_template` SET `gossip_menu_id` = 221 WHERE `entry` = 6669;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(221, 718, 0),
+(221, 758, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
+(221, 0, 0, 'Turn the key to start the machine.', 2703, 1, 1, 0, 0, 0, 0, NULL, 0);
+
+-- Loramus
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 35865;
+UPDATE `creature_template` SET `gossip_menu_id` = 1163 WHERE `entry` = 7783;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(1163, 1796, 0),
+(1164, 1813, 0),
+(1181, 1813, 0),
+(1182, 1814, 0),
+(1183, 1815, 0),
+(1184, 1816, 0),
+(1185, 1817, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
+(1163, 0, 0, 'Hail, Loramus. I bring word from the Blasted Lands.', 4230, 1, 1, 1164, 0, 0, 0, NULL, 0),
+(1164, 0, 0, 'Will you help?', 4245, 1, 1, 0, 0, 0, 0, NULL, 0),
+(1163, 1, 0, 'I wish to hear your story.', 4257, 1, 1, 1181, 0, 0, 0, NULL, 0),
+(1181, 0, 0, 'Please continue.', 4247, 1, 1, 1182, 0, 0, 0, NULL, 0),
+(1182, 0, 0, 'I do not understand.', 4249, 1, 1, 1183, 0, 0, 0, NULL, 0),
+(1183, 0, 0, 'Indeed.\n', 4251, 1, 1, 1184, 0, 0, 0, NULL, 0),
+(1184, 0, 0, 'I will do this with or without your help, Loramus.\n', 4254, 1, 1, 1185, 0, 0, 0, NULL, 0),
+(1185, 0, 0, 'Yes.\n', 4256, 1, 1, 0, 0, 0, 0, NULL, 0);
+
+-- Blastmaster Emi Shortfuse
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 30136;
+UPDATE `creature_template` SET `gossip_menu_id` = 1080 WHERE `entry` = 7998;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(1080, 1693, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
+(1080, 0, 0, 'I am ready to begin.', 4084, 1, 1, 0, 0, 0, 0, NULL, 0);
+
+-- Thorkaf Dragoneye
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 6931;
+UPDATE `creature_template` SET `gossip_menu_id` = 3068 WHERE `entry` = 7867;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(3068, 3802, 0);
+
+-- Brumn Winterhoof
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 11315;
+UPDATE `creature_template` SET `gossip_menu_id` = 3069 WHERE `entry` = 7869;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(3069, 3803, 0);
+
+-- Se'Jib
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 540;
+UPDATE `creature_template` SET `gossip_menu_id` = 3073 WHERE `entry` = 7871;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(3073, 3806, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`) VALUES
+(3073, 0, 3, 'I would like to train.', 2548, 5, 16, 0, 0, 0, 0, NULL, 0);
+
+-- Rivern Frostwind
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
+UPDATE `creature_template` SET `gossip_menu_id` = 3130 WHERE `entry` = 10618;
+
+-- Annora
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 52882;
+UPDATE `creature_template` SET `gossip_menu_id` = 4171 WHERE `entry` = 11073;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(4171, 5253, 0);
+
+-- Gnome Engineer
+DELETE FROM `npc_gossip` WHERE `npc_guid` IN (86175, 86178, 190236, 190237, 190238, 190239, 190240, 190241);
+UPDATE `creature_template` SET `gossip_menu_id` = 284 WHERE `entry` = 13000;
+
+-- Simone the Inconspicuous
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 24439;
+UPDATE `creature_template` SET `gossip_menu_id` = 5868 WHERE `entry` = 14527;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5868, 7041, 0);
+
+-- Franklin the Friendly
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 4602;
+UPDATE `creature_template` SET `gossip_menu_id` = 5870 WHERE `entry` = 14529;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5870, 7043, 0);
+
+-- Artorius the Amiable
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 42301;
+UPDATE `creature_template` SET `gossip_menu_id` = 5872 WHERE `entry` = 14531;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
+(5872, 7045, 0);
+
+-- Krug Skullsplit
+DELETE FROM `npc_gossip` WHERE `npc_guid` = 46167;
+UPDATE `mangos`.`creature_template` SET `gossip_menu_id`='6687' WHERE  `entry`=15612 AND `patch`=7;
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (6687, 8059, 0);
 
 
 -- End of migration.
