@@ -4917,7 +4917,7 @@ DELETE FROM `npc_gossip` WHERE `npc_guid` IN (
 
 -- ----------------------------------------------------------------------
 
--- Add Some Missing Gossips [WIP]
+-- Add Some Missing Gossips
 /*
 -- QUEST ID 2078 SCRIPT WILL HAVE TO BE CONVERTED TO DB FOR THIS GOSSIP TO BE USED
 -- The Threshwackonator 4100
