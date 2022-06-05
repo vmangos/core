@@ -1014,7 +1014,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
         SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells

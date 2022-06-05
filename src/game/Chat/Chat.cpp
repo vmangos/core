@@ -1487,36 +1487,36 @@ void ChatHandler::CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand)
         ChatCommand* command = &table[i];
 
         if (parentCommand && command->SecurityLevel < parentCommand->SecurityLevel)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Subcommand '%s' of command '%s' have less access level (%hhu) that parent (%hhu)",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '%s' of command '%s' have less access level (%hhu) that parent (%hhu)",
                           command->Name, parentCommand->Name, command->SecurityLevel, parentCommand->SecurityLevel);
 
         if (!parentCommand && strlen(command->Name) == 0)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Subcommand '' at top level");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '' at top level");
 
         if (command->ChildCommands)
         {
             if (command->Handler)
             {
                 if (parentCommand)
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Subcommand '%s' of command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '%s' of command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
                                   command->Name, parentCommand->Name);
                 else
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: First level command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "First level command '%s' have handler and subcommands in same time, must be used '' subcommand for handler instead.",
                                   command->Name);
             }
 
             if (parentCommand && strlen(command->Name) == 0)
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Subcommand '' of command '%s' have subcommands", parentCommand->Name);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '' of command '%s' have subcommands", parentCommand->Name);
 
             CheckIntegrity(command->ChildCommands, command);
         }
         else if (!command->Handler)
         {
             if (parentCommand)
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Subcommand '%s' of command '%s' not have handler and subcommands in same time. Must have some from its!",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Subcommand '%s' of command '%s' not have handler and subcommands in same time. Must have some from its!",
                               command->Name, parentCommand->Name);
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: First level command '%s' not have handler and subcommands in same time. Must have some from its!",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "First level command '%s' not have handler and subcommands in same time. Must have some from its!",
                               command->Name);
         }
     }

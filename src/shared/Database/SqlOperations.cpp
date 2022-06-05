@@ -185,13 +185,13 @@ bool SqlQueryHolder::SetQuery(size_t index, char const* sql)
 {
     if(m_queries.size() <= index)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Query index (" SIZEFMTD ") out of range (size: " SIZEFMTD ") for query: %s", index, m_queries.size(), sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Query index (" SIZEFMTD ") out of range (size: " SIZEFMTD ") for query: %s", index, m_queries.size(), sql);
         return false;
     }
 
     if(m_queries[index].first != nullptr)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt assign query to holder index (" SIZEFMTD ") where other query stored (Old: [%s] New: [%s])",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt assign query to holder index (" SIZEFMTD ") where other query stored (Old: [%s] New: [%s])",
             index,m_queries[index].first,sql);
         return false;
     }
@@ -205,7 +205,7 @@ bool SqlQueryHolder::SetPQuery(size_t index, char const* format, ...)
 {
     if(!format)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Query (index: " SIZEFMTD ") is empty.",index);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Query (index: " SIZEFMTD ") is empty.",index);
         return false;
     }
 
@@ -217,7 +217,7 @@ bool SqlQueryHolder::SetPQuery(size_t index, char const* format, ...)
 
     if(res==-1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL Query truncated (and not execute) for format: %s",format);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format);
         return false;
     }
 

@@ -74,7 +74,7 @@ void PlayerBotMgr::Load()
                               " FROM `account`");
     if (!result)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Playerbot: unable to load max account id.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Playerbot: unable to load max account id.");
         return;
     }
     Field* fields = result->Fetch();
@@ -288,7 +288,7 @@ void PlayerBotMgr::Update(uint32 diff)
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: PLAYERBOT: Unable to load session id %u", iter->second->accountId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "PLAYERBOT: Unable to load session id %u", iter->second->accountId);
             DeleteBot(iter);
 
             if (iter->second->customBot)

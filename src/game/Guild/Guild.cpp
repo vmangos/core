@@ -241,7 +241,7 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
         if (newmember.Level < 1 || newmember.Level > PLAYER_STRONG_MAX_LEVEL ||
                 !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
             return GuildAddStatus::PLAYER_DATA_ERROR;
         }
     }
@@ -351,7 +351,7 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
 {
     if (!guildRanksResult)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Guild %u has broken `guild_rank` data, creating new...", m_Id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Guild %u has broken `guild_rank` data, creating new...", m_Id);
         CreateDefaultGuildRanks(0);
         return true;
     }
@@ -401,14 +401,14 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
     if (m_Ranks.size() < GUILD_RANKS_MIN_COUNT)             // if too few ranks, renew them
     {
         m_Ranks.clear();
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Guild %u has broken `guild_rank` data, creating new...", m_Id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Guild %u has broken `guild_rank` data, creating new...", m_Id);
         CreateDefaultGuildRanks(0);                         // 0 is default locale_idx
         broken_ranks = false;
     }
     // guild_rank have wrong numbered ranks, repair
     if (broken_ranks)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Guild %u has broken `guild_rank` data, repairing...", m_Id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Guild %u has broken `guild_rank` data, repairing...", m_Id);
         CharacterDatabase.BeginTransaction();
         CharacterDatabase.PExecute("DELETE FROM `guild_rank` WHERE `guild_id`='%u'", m_Id);
         for (size_t i = 0; i < m_Ranks.size(); ++i)
@@ -469,20 +469,20 @@ bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
         // this code will remove not existing character guids from guild
         if (newmember.Level < 1 || newmember.Level > PLAYER_STRONG_MAX_LEVEL) // can be at broken `data` field
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s has a broken data in field `characters`.`data`, deleting him from guild!", newmember.guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters`.`data`, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
             continue;
         }
         if (!newmember.ZoneId)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s has broken zone-data", newmember.guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has broken zone-data", newmember.guid.GetString().c_str());
             // here it will also try the same, to get the zone from characters-table, but additional it tries to find
             // the zone through xy coords .. this is a bit redundant, but shouldn't be called often
             newmember.ZoneId = Player::GetZoneIdFromDB(newmember.guid);
         }
         if (!((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE)) // can be at broken `class` field
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM `guild_member` WHERE `guid` = '%u'", lowguid);
             continue;
         }

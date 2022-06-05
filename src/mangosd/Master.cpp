@@ -88,7 +88,7 @@ void freezeDetector(uint32 _delaytime)
 #ifdef NDEBUG
         else if (WorldTimer::getMSTimeDiff(lastchange, curtime) > _delaytime)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: World Thread hangs, kicking out server!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World Thread hangs, kicking out server!");
             std::terminate();              // bang crash
         }
 #endif
@@ -124,7 +124,7 @@ void remoteAccess()
 
     if (acceptor.open (listen_addr, &reactor, ACE_NONBLOCK) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
@@ -173,7 +173,7 @@ void offlineChat()
 
     if (m_Acceptor.open (listen_addr, &m_Reactor, ACE_NONBLOCK) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "Starting offline-chat listener on port %d on %s", raport, stringip.c_str ());
@@ -213,7 +213,7 @@ int Master::Run()
         uint32 pid = CreatePIDFile(pidfile);
         if( !pid )
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Cannot create PID file %s.\n", pidfile.c_str() );
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidfile.c_str() );
             Log::WaitBeforeContinueIfNeed();
             return 1;
         }
@@ -292,14 +292,14 @@ int Master::Run()
 
                 if(!curAff )
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x",Aff,appAff);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
                     if(SetProcessAffinityMask(hProcess,curAff))
                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using processors (bitmask, hex): %x", curAff);
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can't set used processors (hex): %x",curAff);
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set used processors (hex): %x",curAff);
                 }
             }
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -313,7 +313,7 @@ int Master::Run()
             if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "mangosd process priority class set to HIGH");
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can't set mangosd process priority class.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set mangosd process priority class.");
         }
     }
     #endif
@@ -352,7 +352,7 @@ int Master::Run()
 
     if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Failed to start WorldSocket network");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to start WorldSocket network");
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
         // go down and shutdown the server
@@ -471,7 +471,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
     int nAsyncConnections = sConfig.GetIntDefault((name + "Database.WorkerThreads").c_str(), 1);
     if (dbstring.empty())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s database not specified in configuration file", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s database not specified in configuration file", name.c_str());
         return false;
     }
 
@@ -504,7 +504,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Incorrectly formatted database connection string for database %s", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Incorrectly formatted database connection string for database %s", name.c_str());
         return false;
     }
 
@@ -513,7 +513,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
     ///- Initialise the world database
     if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Cannot connect to world database %s", name.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to world database %s", name.c_str());
         return false;
     }
 
@@ -526,7 +526,7 @@ bool Master::_StartDB()
     realmID = sConfig.GetIntDefault("RealmID", 0);
     if(!realmID)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Realm ID not defined in configuration file");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Realm ID not defined in configuration file");
         return false;
     }
 

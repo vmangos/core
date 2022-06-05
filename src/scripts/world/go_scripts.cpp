@@ -262,7 +262,7 @@ struct go_bells : public GameObjectAI
             break;
             }
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: go_bells() called with invalid object, ID: %u", me->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
     }
 

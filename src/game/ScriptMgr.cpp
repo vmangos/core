@@ -1362,7 +1362,7 @@ bool ScriptMgr::CheckScriptTargets(uint32 targetType, uint32 targetParam1, uint3
         default:
         {
             if (targetType >= TARGET_T_END)
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table `%s` has an unknown target_type = %u used for id %u.", tableName, targetType, tableEntry);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `%s` has an unknown target_type = %u used for id %u.", tableName, targetType, tableEntry);
             break;
         }
     }
@@ -2068,7 +2068,7 @@ void ScriptMgr::Initialize()
     for (uint32 i = 1; i < GetScriptIdsCount(); ++i)
     {
         if (!m_scripts[i])
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: No script found for script_name '%s'.", GetScriptName(i));
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "No script found for script_name '%s'.", GetScriptName(i));
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %i C++ Scripts.", num_sc_scripts);
@@ -2536,7 +2536,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
 {
     if (!pSource)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText entry %i, invalid Source pointer.", textId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText entry %i, invalid Source pointer.", textId);
         return;
     }
 
@@ -2556,7 +2556,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process broadcast text id %i, but text id does not exist.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process broadcast text id %i, but text id does not exist.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textId);
             return;
         }
     }
@@ -2571,7 +2571,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textId);
             return;
         }
     }
@@ -2595,7 +2595,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
                 pSource->PlayDirectSound(soundId);
         }
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText entry %i tried to process invalid sound id %u.", textId, soundId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText entry %i tried to process invalid sound id %u.", textId, soundId);
     }
 
     if (emoteId)
@@ -2603,7 +2603,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
         if (pSource->GetTypeId() == TYPEID_UNIT || pSource->GetTypeId() == TYPEID_PLAYER)
             ((Unit*)pSource)->HandleEmoteCommand(emoteId);
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText entry %i tried to process emote for invalid TypeId (%u).", textId, pSource->GetTypeId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText entry %i tried to process emote for invalid TypeId (%u).", textId, pSource->GetTypeId());
     }
 
     switch (chatType)
@@ -2624,7 +2624,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
             if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
                 pSource->MonsterWhisper(textId, pTarget);
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textId);
 
             break;
         case CHAT_TYPE_BOSS_WHISPER:
@@ -2632,7 +2632,7 @@ void DoScriptText(int32 textId, WorldObject* pSource, Unit* pTarget, int32 chatT
             if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
                 pSource->MonsterWhisper(textId, pTarget, true);
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textId);
 
             break;
         }
@@ -2646,13 +2646,13 @@ void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Cr
 {
     if (!pMap)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoOrSimulateScriptTextForMap call for text %i without a valid map!", textId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoOrSimulateScriptTextForMap call for text %i without a valid map!", textId);
         return;
     }
 
     if (!creatureId && !pSource)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoOrSimulateScriptTextForMap call for text %i without a valid source!", textId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoOrSimulateScriptTextForMap call for text %i without a valid source!", textId);
         return;
     }
 
@@ -2672,7 +2672,7 @@ void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Cr
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoOrSimulateScriptTextForMap with source entry %u for map %u could not find broadcast text id %i.", creatureId, pMap->GetId(), textId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoOrSimulateScriptTextForMap with source entry %u for map %u could not find broadcast text id %i.", creatureId, pMap->GetId(), textId);
             return;
         }
     }
@@ -2687,7 +2687,7 @@ void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Cr
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoOrSimulateScriptTextForMap with source entry %u for map %u could not find script text entry %i.", creatureId, pMap->GetId(), textId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoOrSimulateScriptTextForMap with source entry %u for map %u could not find script text entry %i.", creatureId, pMap->GetId(), textId);
             return;
         }
     }
@@ -2721,7 +2721,7 @@ void DoOrSimulateScriptTextForMap(int32 textId, uint32 creatureId, Map* pMap, Cr
         }
         default:
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DoSimulateScriptTextForMap entry %i has not supported chat type %u.", textId, chatType);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DoSimulateScriptTextForMap entry %i has not supported chat type %u.", textId, chatType);
             return;
         }
     }
@@ -2745,7 +2745,7 @@ void Script::RegisterSelf(bool bReportError)
     {
         // Don't report unused generic scripts
         if (bReportError)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script registering but script_name %s is not assigned in database. Script will not be used.", Name.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script registering but script_name %s is not assigned in database. Script will not be used.", Name.c_str());
 
         delete this;
     }

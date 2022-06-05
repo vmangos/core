@@ -306,7 +306,7 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                     }
                 }
                 else
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Immol'Thar introuvable !! GUID %u", m_uiImmolTharGUID);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Immol'Thar introuvable !! GUID %u", m_uiImmolTharGUID);
             }
             m_auiEncounter[TYPE_CRISTAL_EVENT] = uiData;
             break;
@@ -322,7 +322,7 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Tortheldrin (%u) made attackable.", tortheldrin->GetGUIDLow());
                 }
                 else
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Tortheldrin not found!");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Tortheldrin not found!");
             }
             m_auiEncounter[TYPE_IMMOL_THAR] = uiData;
             break;

@@ -472,7 +472,7 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
                     data << uint32(529);
                     break;
                 default:
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleBot: Invalid BG queue type!");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
             }
@@ -745,7 +745,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
                     canQueue = ChatHandler(me).HandleGoArathiCommand(args);
                     break;
                 default:
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleBot: Invalid BG queue type!");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
             }

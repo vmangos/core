@@ -157,7 +157,7 @@ void BattleGroundWS::RespawnFlagAfterDrop(Team team)
     if (obj)
         obj->Delete();
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
 
     ClearDroppedFlagGuid(team);
     ForceFlagAreaTrigger(team);
@@ -438,7 +438,7 @@ void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
     {
         if (!player)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundWS: Removing offline player who has the FLAG!!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundWS: Removing offline player who has the FLAG!!");
             ClearAllianceFlagPicker();
             RespawnFlag(ALLIANCE, false);
         }
@@ -449,7 +449,7 @@ void BattleGroundWS::RemovePlayer(Player* player, ObjectGuid guid)
     {
         if (!player)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundWS: Removing offline player who has the FLAG!!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundWS: Removing offline player who has the FLAG!!");
             ClearHordeFlagPicker();
             RespawnFlag(HORDE, false);
         }
@@ -519,7 +519,7 @@ void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
           case 4629:                                          // unk4
               break; */
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
             source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }

@@ -80,7 +80,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
         }
         //EventMap had events but they were not added because they must be for instance
         if (events_count == 0)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CreatureEventAI: Creature %u has events but no events added to list because of instance flags.", m_creature->GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreatureEventAI: Creature %u has events but no events added to list because of instance flags.", m_creature->GetEntry());
         else
         {
             m_CreatureEventAIList.reserve(events_count);
@@ -97,7 +97,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : BasicAI(c)
         }
     }
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CreatureEventAI: EventMap for Creature %u is empty but creature is using CreatureEventAI.", m_creature->GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreatureEventAI: EventMap for Creature %u is empty but creature is using CreatureEventAI.", m_creature->GetEntry());
 
     m_bEmptyList = m_CreatureEventAIList.empty();
     m_Phase = 0;

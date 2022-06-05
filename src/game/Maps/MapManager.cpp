@@ -109,7 +109,7 @@ void MapManager::InitializeVisibilityDistanceInfo()
 Map* MapManager::CreateMap(uint32 id, WorldObject const* obj)
 {
     MANGOS_ASSERT(obj);
-    //if (!obj->IsInWorld()) sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
+    //if (!obj->IsInWorld()) sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
     Guard _guard(*this);
 
     Map* m = nullptr;
@@ -497,7 +497,7 @@ Map* MapManager::CreateTestMap(uint32 mapid, bool instanced, float posX, float p
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(mapid);
     if (!entry)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CreateTestMap: no entry for map %d", mapid);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreateTestMap: no entry for map %d", mapid);
         MANGOS_ASSERT(false);
     }
     uint32 instanceId = GenerateInstanceId();
@@ -528,7 +528,7 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
     MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(id);
     if (!entry)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CreateDungeonMap: no entry for map %d", id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreateDungeonMap: no entry for map %d", id);
         MANGOS_ASSERT(false);
     }
 

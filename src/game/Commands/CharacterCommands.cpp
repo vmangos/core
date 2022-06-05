@@ -3581,7 +3581,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(player->GetClass());
     if (!cEntry)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
         return false;
     }
 

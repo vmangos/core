@@ -178,7 +178,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 
     if (!petition)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [PetitionHandler] No petition exists for petition ID %u, yet charter exists with guid %u for owner %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for petition ID %u, yet charter exists with guid %u for owner %s",
             petitionGuid, itemguid.GetCounter(), _player->GetGuidStr().c_str());
 
         return;
@@ -291,7 +291,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 
     if (!petition)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [PetitionHandler] No petition exists for charter with guid %u for signer %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for charter with guid %u for signer %s",
             itemGuid.GetCounter(), _player->GetGuidStr().c_str());
         return;
     }
@@ -442,7 +442,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
     Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [PetitionHandler] No petition exists for charter with guid %u for signer %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for charter with guid %u for signer %s",
             itemGuid.GetCounter(), _player->GetGuidStr().c_str());
         return;
     }
@@ -481,7 +481,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
     Petition* petition = sGuildMgr.GetPetitionById(petitionGuid);
     if (!petition)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [PetitionHandler] No petition exists for charter with guid %u for guild master %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PetitionHandler] No petition exists for charter with guid %u for guild master %s",
             itemGuid.GetCounter(), _player->GetGuidStr().c_str());
         return;
     }

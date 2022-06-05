@@ -304,7 +304,7 @@ void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, Quest
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: FollowerAI attempt to StartFollow while already following.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FollowerAI attempt to StartFollow while already following.");
         return;
     }
 

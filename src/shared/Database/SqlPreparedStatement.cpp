@@ -60,8 +60,8 @@ bool SqlStatement::Execute()
     //verify amount of bound parameters
     if(args->boundParams() != arguments())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: statement: %s", m_pDB->GetStmtString(ID()).c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: statement: %s", m_pDB->GetStmtString(ID()).c_str());
         MANGOS_ASSERT(false);
         return false;
     }
@@ -75,8 +75,8 @@ bool SqlStatement::DirectExecute()
     //verify amount of bound parameters
     if(args->boundParams() != arguments())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: statement: %s", m_pDB->GetStmtString(ID()).c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: statement: %s", m_pDB->GetStmtString(ID()).c_str());
         MANGOS_ASSERT(false);
         return false;
     }

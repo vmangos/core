@@ -365,7 +365,7 @@ void npc_escortAI::MovementInform(uint32 uiMoveType, uint32 uiPointId)
         //Make sure that we are still on the right waypoint
         if (wp.id != uiPointId)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [ScriptedEscortAI] Waypoint out of order for <#%u - %s>: <%u> instead of <%u>.", 
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ScriptedEscortAI] Waypoint out of order for <#%u - %s>: <%u> instead of <%u>.", 
                 m_creature->GetEntry(), m_creature->GetName(), uiPointId, wp.id);
             return;
         }
@@ -425,13 +425,13 @@ void npc_escortAI::Start(bool bRun, uint64 uiPlayerGUID, Quest const* pQuest, bo
 {
     if (m_creature->IsInCombat())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: EscortAI attempt to Start while in combat.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "EscortAI attempt to Start while in combat.");
         return;
     }
 
     if (HasEscortState(STATE_ESCORT_ESCORTING))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: EscortAI attempt to Start while already escorting.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "EscortAI attempt to Start while already escorting.");
         return;
     }
 
@@ -525,7 +525,7 @@ void npc_escortAI::ReturnToCombatStartPosition()
 
             if (m_creature->GetDistance2d(fPosX, fPosY) > 1000.0f)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [ScriptedEscortAI.GetCombatStartPosition] Creature with entry <%u> is in <%f> distance from {%f,%f,%f}.", 
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ScriptedEscortAI.GetCombatStartPosition] Creature with entry <%u> is in <%f> distance from {%f,%f,%f}.", 
                     m_creature->GetEntry(), m_creature->GetDistance2d(fPosX, fPosY), fPosX, fPosY, fPosZ);
                 m_creature->GetPosition(fPosX, fPosY, fPosY);
                 SetCombatStartPosition(fPosX, fPosY, fPosZ);

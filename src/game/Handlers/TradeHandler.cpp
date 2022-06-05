@@ -186,21 +186,21 @@ void WorldSession::MoveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: trader can't store item: %s", myItems[i]->GetGuidStr().c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "trader can't store item: %s", myItems[i]->GetGuidStr().c_str());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: player can't take item back: %s", myItems[i]->GetGuidStr().c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "player can't take item back: %s", myItems[i]->GetGuidStr().c_str());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: player can't store item: %s", hisItems[i]->GetGuidStr().c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "player can't store item: %s", hisItems[i]->GetGuidStr().c_str());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: trader can't take item back: %s", hisItems[i]->GetGuidStr().c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "trader can't take item back: %s", hisItems[i]->GetGuidStr().c_str());
             }
         }
     }

@@ -460,7 +460,7 @@ struct npc_attack_masterAI : public ScriptedAI
                                      );
                 if (!cityBoss)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Impossible d'invoquer le maitre de la ville !");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Impossible d'invoquer le maitre de la ville !");
                     uiCD = CD_INFINY;
                     return;
                 }
@@ -641,7 +641,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
                                0.0f, 0.0f, 0.0f, 0.0f, timeSpawned
                            );
         if (!gobj)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Impossible de spawner le gobj [Entry:%u]", uiGobjEntry);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Impossible de spawner le gobj [Entry:%u]", uiGobjEntry);
     }
     void DoSayRandom()
     {
@@ -774,7 +774,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
                 AttackStart(newTarget);
             else
             {
-                //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Impossible de trouver une cible.");
+                //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Impossible de trouver une cible.");
                 return;
             }
         }

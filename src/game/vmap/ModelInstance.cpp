@@ -184,7 +184,7 @@ namespace VMAP
         if (!check)
         {
             if (ferror(rf))
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Error reading ModelSpawn!");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading ModelSpawn!");
             return false;
         }
         check += fread(&spawn.adtId, sizeof(uint16), 1, rf);
@@ -203,19 +203,19 @@ namespace VMAP
         check += fread(&nameLen, sizeof(uint32), 1, rf);
         if (check != uint32(has_bound ? 17 : 11))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Error reading ModelSpawn!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading ModelSpawn!");
             return false;
         }
         char nameBuff[500];
         if (nameLen > 500) // file names should never be that long, must be file error
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Error reading ModelSpawn, file name too long!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading ModelSpawn, file name too long!");
             return false;
         }
         check = fread(nameBuff, sizeof(char), nameLen, rf);
         if (check != nameLen)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Error reading name string of ModelSpawn!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error reading name string of ModelSpawn!");
             return false;
         }
         spawn.name = std::string(nameBuff, nameLen);

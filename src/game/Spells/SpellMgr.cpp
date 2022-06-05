@@ -2230,7 +2230,7 @@ void SpellMgr::LoadSpellPetAuras()
 
             if (i == MAX_EFFECT_INDEX)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u listed in `spell_pet_auras` does not have dummy aura or dummy effect", spell);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u listed in `spell_pet_auras` does not have dummy aura or dummy effect", spell);
                 continue;
             }
 
@@ -2753,46 +2753,46 @@ void SpellMgr::CheckUsedSpells(char const* table)
 
         if (family < -1 || family > SPELLFAMILY_UNK3)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong SpellFamily value(%u), skipped.", table, spell, family);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong SpellFamily value(%u), skipped.", table, spell, family);
             continue;
         }
 
         // TODO: spellIcon check need dbc loading
         if (spellIcon < -1)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong SpellIcon value(%u), skipped.", table, spell, spellIcon);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong SpellIcon value(%u), skipped.", table, spell, spellIcon);
             continue;
         }
 
         // TODO: spellVisual check need dbc loading
         if (spellVisual < -1)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong SpellVisual value(%u), skipped.", table, spell, spellVisual);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong SpellVisual value(%u), skipped.", table, spell, spellVisual);
             continue;
         }
 
         // TODO: for spellCategory better check need dbc loading
         if (category < -1 || (category >= 0 && sSpellCategoriesStore.find(category) == sSpellCategoriesStore.end()))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong SpellCategory value(%u), skipped.", table, spell, category);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong SpellCategory value(%u), skipped.", table, spell, category);
             continue;
         }
 
         if (effectType < -1 || effectType >= TOTAL_SPELL_EFFECTS)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong SpellEffect type value(%u), skipped.", table, spell, effectType);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong SpellEffect type value(%u), skipped.", table, spell, effectType);
             continue;
         }
 
         if (auraType < -1 || auraType >= TOTAL_AURAS)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong SpellAura type value(%u), skipped.", table, spell, auraType);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong SpellAura type value(%u), skipped.", table, spell, auraType);
             continue;
         }
 
         if (effectIdx < -1 || effectIdx >= 3)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table '%s' for spell %u have wrong EffectIdx value(%u), skipped.", table, spell, effectIdx);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table '%s' for spell %u have wrong EffectIdx value(%u), skipped.", table, spell, effectIdx);
             continue;
         }
 
@@ -2805,13 +2805,13 @@ void SpellMgr::CheckUsedSpells(char const* table)
             SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spell);
             if (!spellEntry)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' not exist but used in %s.", spell, name.c_str(), code.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' not exist but used in %s.", spell, name.c_str(), code.c_str());
                 continue;
             }
 
             if (family >= 0 && spellEntry->SpellFamilyName != uint32(family))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' family(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->SpellFamilyName, family, code.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' family(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->SpellFamilyName, family, code.c_str());
                 continue;
             }
 
@@ -2821,7 +2821,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 {
                     if (spellEntry->SpellFamilyFlags)
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' not fit to (" UI64FMTD ") but used in %s.",
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' not fit to (" UI64FMTD ") but used in %s.",
                                       spell, name.c_str(), familyMask, code.c_str());
                         continue;
                     }
@@ -2831,7 +2831,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 {
                     if (!spellEntry->IsFitToFamilyMask(familyMask))
                     {
-                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' not fit to (" I64FMT ") but used in %s.", spell, name.c_str(), familyMask, code.c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' not fit to (" I64FMT ") but used in %s.", spell, name.c_str(), familyMask, code.c_str());
                         continue;
                     }
 
@@ -2840,19 +2840,19 @@ void SpellMgr::CheckUsedSpells(char const* table)
 
             if (spellIcon >= 0 && spellEntry->SpellIconID != uint32(spellIcon))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' icon(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->SpellIconID, spellIcon, code.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' icon(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->SpellIconID, spellIcon, code.c_str());
                 continue;
             }
 
             if (spellVisual >= 0 && spellEntry->SpellVisual != uint32(spellVisual))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' visual(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->SpellVisual, spellVisual, code.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' visual(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->SpellVisual, spellVisual, code.c_str());
                 continue;
             }
 
             if (category >= 0 && spellEntry->Category != uint32(category))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' category(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->Category, category, code.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' category(%u) <> %u but used in %s.", spell, name.c_str(), spellEntry->Category, category, code.c_str());
                 continue;
             }
 
@@ -2860,13 +2860,13 @@ void SpellMgr::CheckUsedSpells(char const* table)
             {
                 if (effectType >= 0 && spellEntry->Effect[effectIdx] != uint32(effectType))
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' effect%d <> %u but used in %s.", spell, name.c_str(), effectIdx + 1, effectType, code.c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' effect%d <> %u but used in %s.", spell, name.c_str(), effectIdx + 1, effectType, code.c_str());
                     continue;
                 }
 
                 if (auraType >= 0 && spellEntry->EffectApplyAuraName[effectIdx] != uint32(auraType))
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' aura%d <> %u but used in %s.", spell, name.c_str(), effectIdx + 1, auraType, code.c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' aura%d <> %u but used in %s.", spell, name.c_str(), effectIdx + 1, auraType, code.c_str());
                     continue;
                 }
 
@@ -2875,13 +2875,13 @@ void SpellMgr::CheckUsedSpells(char const* table)
             {
                 if (effectType >= 0 && !spellEntry->HasEffect(SpellEffects(effectType)))
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' not have effect %u but used in %s.", spell, name.c_str(), effectType, code.c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' not have effect %u but used in %s.", spell, name.c_str(), effectType, code.c_str());
                     continue;
                 }
 
                 if (auraType >= 0 && !spellEntry->HasAura(AuraType(auraType)))
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u '%s' not have aura %u but used in %s.", spell, name.c_str(), auraType, code.c_str());
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u '%s' not have aura %u but used in %s.", spell, name.c_str(), auraType, code.c_str());
                     continue;
                 }
             }
@@ -2947,10 +2947,10 @@ void SpellMgr::CheckUsedSpells(char const* table)
             if (!found)
             {
                 if (effectIdx >= 0)
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spells '%s' not found for family %i (" I64FMT ") icon(%i) visual(%i) category(%i) effect%d(%i) aura%d(%i) but used in %s",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spells '%s' not found for family %i (" I64FMT ") icon(%i) visual(%i) category(%i) effect%d(%i) aura%d(%i) but used in %s",
                                   name.c_str(), family, familyMask, spellIcon, spellVisual, category, effectIdx + 1, effectType, effectIdx + 1, auraType, code.c_str());
                 else
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spells '%s' not found for family %i (" I64FMT ") icon(%i) visual(%i) category(%i) effect(%i) aura(%i) but used in %s",
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spells '%s' not found for family %i (" I64FMT ") icon(%i) visual(%i) category(%i) effect(%i) aura(%i) but used in %s",
                                   name.c_str(), family, familyMask, spellIcon, spellVisual, category, effectType, auraType, code.c_str());
                 continue;
             }

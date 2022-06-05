@@ -165,7 +165,7 @@ void GameObject::RemoveFromWorld()
                 owner->RemoveGameObject(this, false);
             else
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Delete %s with SpellId %u LinkedGO %u that lost references to owner %s GO list. Crash possible later.",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Delete %s with SpellId %u LinkedGO %u that lost references to owner %s GO list. Crash possible later.",
                               GetGuidStr().c_str(), m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), owner_guid.GetString().c_str());
             }
         }
@@ -189,7 +189,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
 
     if (!IsPositionValid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Gameobject (GUID: %u Entry: %u ) not created. Suggested coordinates are invalid (X: %f Y: %f)", guidlow, name_id, x, y);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Gameobject (GUID: %u Entry: %u ) not created. Suggested coordinates are invalid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
 
@@ -717,7 +717,7 @@ void GameObject::AddUniqueUse(Player* player)
             SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(info->summoningRitual.animSpell);
             if (!spellInfo)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: unknown spell id %u at play anim for gameobject (Entry: %u GoType: %u )", info->summoningRitual.animSpell, GetEntry(), GetGoType());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown spell id %u at play anim for gameobject (Entry: %u GoType: %u )", info->summoningRitual.animSpell, GetEntry(), GetGoType());
                 return;
             }
             Spell* spell = new Spell(player, spellInfo, true, GetObjectGuid());
@@ -850,7 +850,7 @@ void GameObject::SaveToDB()
     GameObjectData const* data = sObjectMgr.GetGOData(GetGUIDLow());
     if (!data)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameObject::SaveToDB failed, cannot get gameobject data!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameObject::SaveToDB failed, cannot get gameobject data!");
         return;
     }
 
@@ -2010,7 +2010,7 @@ void GameObject::Use(Unit* user)
         }
 #endif
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameObject::Use unhandled GameObject type %u (entry %u).", GetGoType(), GetEntry());
             break;
     }
 
@@ -2020,7 +2020,7 @@ void GameObject::Use(Unit* user)
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u )", spellId, GetEntry(), GetGoType());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u )", spellId, GetEntry(), GetGoType());
         return;
     }
 

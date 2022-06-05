@@ -50,13 +50,13 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
     Unit* pCharmedUnit = _player->GetMap()->GetUnit(petGuid);
     if (!pCharmedUnit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetAction: %s not exist.", petGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetAction: %s not exist.", petGuid.GetString().c_str());
         return;
     }
 
     if (GetPlayer()->GetObjectGuid() != pCharmedUnit->GetCharmerOrOwnerGuid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetAction: %s isn't controlled by %s.", petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetAction: %s isn't controlled by %s.", petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -81,7 +81,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
     CharmInfo* charmInfo = pCharmedUnit->GetCharmInfo();
     if (!charmInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandlePetAction: object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pCharmedUnit->GetGUIDLow(), pCharmedUnit->GetTypeId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandlePetAction: object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pCharmedUnit->GetGUIDLow(), pCharmedUnit->GetTypeId());
         return;
     }
 
@@ -117,7 +117,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid);
             if (!spellInfo)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: unknown PET spell id %i", spellid);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown PET spell id %i", spellid);
                 return;
             }
 
@@ -175,7 +175,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             break;
         }
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: unknown PET flag Action %i and spellid %i.", uint32(flag), spellid);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown PET flag Action %i and spellid %i.", uint32(flag), spellid);
     }
 }
 
@@ -189,13 +189,13 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
     Unit* pet = GetPlayer()->GetMap()->GetUnit(petGuid);    // pet or controlled creature/player
     if (!pet)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s doesn't exist.", petGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s doesn't exist.", petGuid.GetString().c_str());
         return;
     }
 
     if (GetPlayer()->GetObjectGuid() != pet->GetCharmerOrOwnerGuid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetStopAttack: %s isn't charm/pet of %s.", petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetStopAttack: %s isn't charm/pet of %s.", petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -247,7 +247,7 @@ void WorldSession::HandlePetSetAction(WorldPacket& recv_data)
 
     if (!pet || (pet != _player->GetPet() && pet != _player->GetCharm()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetSetAction: Unknown pet or pet owner.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetSetAction: Unknown pet or pet owner.");
         return;
     }
 
@@ -258,7 +258,7 @@ void WorldSession::HandlePetSetAction(WorldPacket& recv_data)
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandlePetSetAction: object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pet->GetGUIDLow(), pet->GetTypeId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandlePetSetAction: object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pet->GetGUIDLow(), pet->GetTypeId());
         return;
     }
 
@@ -438,7 +438,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 
     if (!pet || guid != pet->GetObjectGuid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetUnlearnOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetUnlearnOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -448,7 +448,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandlePetUnlearnOpcode: %s is considered pet-like but doesn't have a charminfo!", pet->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandlePetUnlearnOpcode: %s is considered pet-like but doesn't have a charminfo!", pet->GetGuidStr().c_str());
         return;
     }
 
@@ -496,7 +496,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
     if (!pet || (guid != _player->GetPetGuid() && guid != _player->GetCharmGuid()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetSpellAutocastOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetSpellAutocastOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -507,7 +507,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandlePetSpellAutocastOpcod: %s is considered pet-like but doesn't have a charminfo!", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandlePetSpellAutocastOpcod: %s is considered pet-like but doesn't have a charminfo!", guid.GetString().c_str());
         return;
     }
 
@@ -535,14 +535,14 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
     if (!pet || (guid != _player->GetPetGuid() && guid != _player->GetCharmGuid()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandlePetCastSpellOpcode: %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandlePetCastSpellOpcode: %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid);
     if (!spellInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: unknown PET spell id %i", spellid);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown PET spell id %i", spellid);
         return;
     }
 

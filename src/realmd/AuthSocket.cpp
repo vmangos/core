@@ -690,7 +690,7 @@ bool AuthSocket::_HandleLogonProof()
         else
         {
             pinResult = false;
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [ERROR] Invalid PIN flags set for user %s - user cannot log-in until fixed", _login.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] Invalid PIN flags set for user %s - user cannot log-in until fixed", _login.c_str());
         }
     }
 
@@ -713,7 +713,7 @@ bool AuthSocket::_HandleLogonProof()
 
             if (!result)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unable to remove geolock PIN for %s - account has not been unlocked", _safelogin.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to remove geolock PIN for %s - account has not been unlocked", _safelogin.c_str());
             }
         }
         else if (GeographicalLockCheck())
@@ -726,7 +726,7 @@ bool AuthSocket::_HandleLogonProof()
 
             if (!result)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unable to write geolock PIN for %s - account has not been locked", _safelogin.c_str());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to write geolock PIN for %s - account has not been locked", _safelogin.c_str());
 
                 char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_DB_BUSY };
                 send(data, sizeof(data));
@@ -885,7 +885,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     // Stop if the account is not found
     if (!result)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [ERROR] user %s tried to login and we cannot find his session key in the database.", _login.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login and we cannot find his session key in the database.", _login.c_str());
         close_connection();
         return false;
     }
@@ -958,7 +958,7 @@ bool AuthSocket::_HandleReconnectProof()
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [ERROR] user %s tried to login, but session invalid.", _login.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s tried to login, but session invalid.", _login.c_str());
         close_connection();
         return false;
     }
@@ -986,7 +986,7 @@ bool AuthSocket::_HandleRealmList()
 
     if (delay < minDelay)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", _login.c_str(), get_remote_address().c_str(), delay);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[ERROR] user %s IP %s is sending CMD_REALM_LIST too frequently.  Delay = %d seconds", _login.c_str(), get_remote_address().c_str(), delay);
         return false;
     }
 

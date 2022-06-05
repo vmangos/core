@@ -134,7 +134,7 @@ extern int main(int argc, char **argv)
 #endif
                 else
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
                     usage(argv[0]);
                     Log::WaitBeforeContinueIfNeed();
                     return 1;
@@ -142,12 +142,12 @@ extern int main(int argc, char **argv)
                 break;
             }
             case ':':
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Runtime-Error: bad format of commandline arguments");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: bad format of commandline arguments");
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
@@ -173,7 +173,7 @@ extern int main(int argc, char **argv)
 
     if (!sConfig.SetSource(cfg_file))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not find configuration file %s.", cfg_file);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find configuration file %s.", cfg_file);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
@@ -200,11 +200,11 @@ extern int main(int argc, char **argv)
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
     if (confVersion < _REALMDCONFVERSION)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: *****************************************************************************");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:  WARNING: Your realmd.conf version indicates your conf file is out of date!");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:           Please check for updates, as your current default values may cause");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:           strange behavior.");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: *****************************************************************************");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, " WARNING: Your realmd.conf version indicates your conf file is out of date!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          Please check for updates, as your current default values may cause");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          strange behavior.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
         Log::WaitBeforeContinueIfNeed();
     }
 
@@ -240,7 +240,7 @@ extern int main(int argc, char **argv)
         uint32 pid = CreatePIDFile(pidfile);
         if( !pid )
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Cannot create PID file %s.\n", pidfile.c_str() );
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create PID file %s.\n", pidfile.c_str() );
             Log::WaitBeforeContinueIfNeed();
             return 1;
         }
@@ -262,7 +262,7 @@ extern int main(int argc, char **argv)
 
         if (!result)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: The geoip table cannot be empty when geolocking is enabled.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "The geoip table cannot be empty when geolocking is enabled.");
             return 1;
         }
     }
@@ -271,7 +271,7 @@ extern int main(int argc, char **argv)
     sRealmList.Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
     if (sRealmList.size() == 0)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: No valid realms specified.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "No valid realms specified.");
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
@@ -293,7 +293,7 @@ extern int main(int argc, char **argv)
 
     if(acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MaNGOS realmd can not bind to %s:%d", bind_ip.c_str(), rmport);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaNGOS realmd can not bind to %s:%d", bind_ip.c_str(), rmport);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }
@@ -318,14 +318,14 @@ extern int main(int argc, char **argv)
 
                 if(!curAff )
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Processors marked in UseProcessors bitmask (hex) %x not accessible for realmd. Accessible processors bitmask (hex): %x",Aff,appAff);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Processors marked in UseProcessors bitmask (hex) %x not accessible for realmd. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
                     if(SetProcessAffinityMask(hProcess,curAff))
                         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using processors (bitmask, hex): %x", curAff);
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can't set used processors (hex): %x", curAff);
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set used processors (hex): %x", curAff);
                 }
             }
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
@@ -338,7 +338,7 @@ extern int main(int argc, char **argv)
             if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
                 sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "realmd process priority class set to HIGH");
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can't set realmd process priority class.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't set realmd process priority class.");
             sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
         }
     }
@@ -411,7 +411,7 @@ bool StartDB()
     std::string dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
     if(dbstring.empty())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Database not specified");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Database not specified");
         return false;
     }
 
@@ -444,14 +444,14 @@ bool StartDB()
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Incorrectly formatted database connection string for logon database");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Incorrectly formatted database connection string for logon database");
         return false;
     }
 
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Database: %s", dbStringLog.c_str() );
     if(!LoginDatabase.Initialize(dbstring.c_str()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Cannot connect to database");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot connect to database");
         return false;
     }
 

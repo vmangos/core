@@ -37,7 +37,7 @@ class ByteBufferException
 
         void PrintPosError() const
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: " SIZEFMTD ") value with size: " SIZEFMTD,
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: " SIZEFMTD ") value with size: " SIZEFMTD,
                 (add ? "put" : "get"), pos, size, esize);
         }
     private:

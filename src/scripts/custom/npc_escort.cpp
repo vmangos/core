@@ -12,7 +12,7 @@ struct npc_escort_genericAI : public npc_escortAI
         Reset();
         m_pEscortData = data;
         if (!m_pEscortData)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: npc_escort : La creature %u n'a pas de donnees dans la table `script_escort_data` ! Le PNJ sera inactif.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "npc_escort : La creature %u n'a pas de donnees dans la table `script_escort_data` ! Le PNJ sera inactif.");
     }
 
     // ATTENTION : Peut etre nullptr

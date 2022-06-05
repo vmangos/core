@@ -73,7 +73,7 @@ void GameEventMgr::StartEvent(uint16 event_id, bool overwrite /*=false*/, bool r
 {
     if (!IsValidEvent(event_id))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::StartEvent game event id (%u) not exist in `game_event`.", event_id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::StartEvent game event id (%u) not exist in `game_event`.", event_id);
         return;
     }
     ApplyNewEvent(event_id, resume);
@@ -100,7 +100,7 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
 {
     if (!IsValidEvent(event_id))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::StopEvent game event id (%u) not exist in `game_event`.", event_id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::StopEvent game event id (%u) not exist in `game_event`.", event_id);
         return;
     }
     UnApplyEvent(event_id);
@@ -117,7 +117,7 @@ void GameEventMgr::EnableEvent(uint16 event_id, bool enable)
     // skip if event not exists or length <= 0
     if (!IsValidEvent(event_id))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::EnableEvent game event id (%u) not exist in `game_event`.", event_id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::EnableEvent game event id (%u) not exist in `game_event`.", event_id);
         return;
     }
 
@@ -155,7 +155,7 @@ bool GameEventMgr::IsEnabled(uint16 event_id)
 {
     if (!IsValidEvent(event_id))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::IsEnabled game event id (%u) not exist in `game_event`.", event_id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::IsEnabled game event id (%u) not exist in `game_event`.", event_id);
         return false;
     }
 
@@ -818,7 +818,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventCreatureGuids.size())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::GameEventSpawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventCreatureGuids.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::GameEventSpawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventCreatureGuids.size());
         return;
     }
 
@@ -848,7 +848,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventGameobjectGuids.size())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventGameobjectGuids.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventGameobjectGuids.size());
         return;
     }
 
@@ -880,7 +880,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
     {
         if ((size_t)event_id >= mGameEventSpawnPoolIds.size())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::GameEventSpawn attempt access to out of range mGameEventSpawnPoolIds element %i (size: " SIZEFMTD ")", event_id, mGameEventSpawnPoolIds.size());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::GameEventSpawn attempt access to out of range mGameEventSpawnPoolIds element %i (size: " SIZEFMTD ")", event_id, mGameEventSpawnPoolIds.size());
             return;
         }
 
@@ -895,7 +895,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventCreatureGuids.size())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventCreatureGuids.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventCreatureGuids.size());
         return;
     }
 
@@ -925,7 +925,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventGameobjectGuids.size())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventGameobjectGuids.size());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventGameobjectGuids.size());
         return;
     }
 
@@ -957,7 +957,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
     {
         if ((size_t)event_id >= mGameEventSpawnPoolIds.size())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventSpawnPoolIds element %i (size: " SIZEFMTD ")", event_id, mGameEventSpawnPoolIds.size());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventSpawnPoolIds element %i (size: " SIZEFMTD ")", event_id, mGameEventSpawnPoolIds.size());
             return;
         }
 

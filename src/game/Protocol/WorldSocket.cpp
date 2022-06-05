@@ -46,7 +46,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 
     if (opcode >= NUM_MSG_TYPES)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SESSION: received nonexistent opcode 0x%.4X", opcode);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SESSION: received nonexistent opcode 0x%.4X", opcode);
         return -1;
     }
 
@@ -69,7 +69,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             case CMSG_AUTH_SESSION:
                 if (m_Session)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::ProcessIncoming: Player send CMSG_AUTH_SESSION again");
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming: Player send CMSG_AUTH_SESSION again");
                     return -1;
                 }
 
@@ -89,7 +89,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 }
                 else
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
                     return -1;
                 }
             }
@@ -97,7 +97,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     }
     catch (ByteBufferException &)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.",
                       opcode, GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : -1);
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         {
@@ -154,7 +154,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandleAuthSession: Sent Auth Response (version mismatch).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (version mismatch).");
         return -1;
     }
 
@@ -175,7 +175,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
         return -1;
     }
 
@@ -242,7 +242,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8(AUTH_BANNED);
         SendPacket(packet);
 
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandleAuthSession: Sent Auth Response (Account banned).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (Account banned).");
         return -1;
     }
 
@@ -280,7 +280,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandleAuthSession: Sent Auth Response (authentification failed).");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Sent Auth Response (authentification failed).");
         return -1;
     }
 
@@ -304,7 +304,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         clientOs = CLIENT_OS_MAC;
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandleAuthSession: Unrecognized OS '%s' for account '%s' from %s", os.c_str(), account.c_str(), address.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandleAuthSession: Unrecognized OS '%s' for account '%s' from %s", os.c_str(), account.c_str(), address.c_str());
         return -1;
     }
 
@@ -368,7 +368,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
 
                 if (m_Session && m_Session->GetSecurity() == SEC_PLAYER)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandlePing: Player kicked for "
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandlePing: Player kicked for "
                                   "overspeeded pings address = %s",
                                   GetRemoteAddress().c_str());
 
@@ -392,7 +392,7 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
         if (!m_Session)
 #endif
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSocket::HandlePing: peer sent CMSG_PING, "
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSocket::HandlePing: peer sent CMSG_PING, "
                           "but is not authenticated or got recently kicked,"
                           " address = %s",
                           GetRemoteAddress().c_str());

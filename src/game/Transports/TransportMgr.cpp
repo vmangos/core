@@ -368,7 +368,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, Map* map /*= nullptr*/)
     {
         if (mapEntry->Instanceable() != tInfo->inInstance)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName(), mapId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport %u (name: %s) attempted creation in instance map (id: %u) but it is not an instanced transport!", entry, trans->GetName(), mapId);
             delete trans;
             return nullptr;
         }

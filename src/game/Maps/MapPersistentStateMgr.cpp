@@ -393,7 +393,7 @@ void DungeonResetScheduler::LoadResetTimes()
 
             if (!mapEntry || !mapEntry->IsDungeon())
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MapPersistentStateManager::LoadResetTimes: invalid map Id %u in instance_reset!", mapId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapPersistentStateManager::LoadResetTimes: invalid map Id %u in instance_reset!", mapId);
                 CharacterDatabase.DirectPExecute("DELETE FROM `instance_reset` WHERE `map` = '%u'", mapId);
                 continue;
             }
@@ -529,7 +529,7 @@ void DungeonResetScheduler::ScheduleReset(bool add, time_t time, DungeonResetEve
             }
 
             if (itr == m_resetTimeQueue.end())
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DungeonResetScheduler::ScheduleReset: cannot cancel the reset, the event(%d,%d,%d) was not found!", event.type, event.mapId, event.instanceId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DungeonResetScheduler::ScheduleReset: cannot cancel the reset, the event(%d,%d,%d) was not found!", event.type, event.mapId, event.instanceId);
         }
     }
 }
@@ -637,7 +637,7 @@ MapPersistentState* MapPersistentStateManager::AddPersistentState(MapEntry const
     if (MapPersistentState *old_save = GetPersistentState(mapEntry->id, instanceId))
     {
         if (instanceId && old_save->GetMapId() != mapEntry->id)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MapPersistentStateManager::AddPersistentState: instance %u has existing map ID '%u', but map to add for is '%u'. Mismatched states are loaded",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapPersistentStateManager::AddPersistentState: instance %u has existing map ID '%u', but map to add for is '%u'. Mismatched states are loaded",
                 instanceId, old_save->GetMapId(), mapEntry->id);
 
         return old_save;
@@ -884,7 +884,7 @@ void MapPersistentStateManager::_ResetInstance(uint32 mapId, uint32 instanceId)
         // delay reset until map unload for loaded map
         if (mapId != itr->second->GetMapId())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [CRASH] Instance %u is linked to two different maps, '%u' (scheduler) and '%u' (instance bind)",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[CRASH] Instance %u is linked to two different maps, '%u' (scheduler) and '%u' (instance bind)",
                 instanceId, mapId, itr->second->GetMapId());
             return;
         }
@@ -946,7 +946,7 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapId, bool warn, uint32 
         // this is called one minute before the reset time
         if (!mapEntry->resetDelay)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MapPersistentStateManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MapPersistentStateManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapId);
             return;
         }
 

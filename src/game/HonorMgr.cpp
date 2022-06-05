@@ -301,7 +301,7 @@ void HonorMaintenancer::CreateCalculationReport()
     ofs.open(path.c_str());
     if (!ofs.is_open())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can't create HCR file!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't create HCR file!");
         return;
     }
 

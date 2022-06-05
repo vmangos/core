@@ -1307,7 +1307,7 @@ void BattleGroundAV::EventPlayerDefendsPoint(Player* player, BG_AV_Nodes node)
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundAV: player defends node: %i", node);
     if (m_nodes[node].prevOwner != BattleGroundAVTeamIndex(teamIdx))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundAV: player defends point which doesn't belong to his team %i", node);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundAV: player defends point which doesn't belong to his team %i", node);
         return;
     }
 

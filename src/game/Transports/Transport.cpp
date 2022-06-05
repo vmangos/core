@@ -50,7 +50,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     if (!IsPositionValid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
                       guidlow, x, y);
         return false;
     }
@@ -455,7 +455,7 @@ void GenericTransport::UpdatePassengerPosition(Unit* passenger)
     CalculatePassengerPosition(x, y, z, &o);
     if (!MaNGOS::IsValidMapCoord(x, y, z))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [TRANSPORTS] Object %s [guid %u] has invalid position on transport.", passenger->GetName(), passenger->GetGUIDLow());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[TRANSPORTS] Object %s [guid %u] has invalid position on transport.", passenger->GetName(), passenger->GetGUIDLow());
         return;
     }
 

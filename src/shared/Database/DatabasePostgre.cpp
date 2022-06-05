@@ -37,7 +37,7 @@ DatabasePostgre::DatabasePostgre()
     {
         if (!PQisthreadsafe())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: FATAL ERROR: PostgreSQL libpq isn't thread-safe.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FATAL ERROR: PostgreSQL libpq isn't thread-safe.");
             exit(1);
         }
     }
@@ -68,7 +68,7 @@ bool PostgreSQLConnection::OpenConnection(bool reconnect)
     /* check to see that the backend connection was successfully made */
     if (PQstatus(mPGconn) != CONNECTION_OK)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not connect to Postgre database at %s: %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not connect to Postgre database at %s: %s",
             m_host.c_str(), PQerrorMessage(mPGconn));
         PQfinish(mPGconn);
         mPGconn = nullptr;
@@ -187,8 +187,8 @@ bool PostgreSQLConnection::_TransactionCmd(char const* sql)
     PGresult* res = PQexec(mPGconn, sql);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL: %s", sql);
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: %s", PQerrorMessage(mPGconn));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", PQerrorMessage(mPGconn));
         return false;
     }
     else

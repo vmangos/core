@@ -344,7 +344,7 @@ void LFGQueue::Update(uint32 diff)
 
             if (!pLeader || !pMember)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: LFGQueue::Update - null leader or member when forming group from queued players");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "LFGQueue::Update - null leader or member when forming group from queued players");
                 return;
             }
 

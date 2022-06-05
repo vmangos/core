@@ -431,7 +431,7 @@ void BattleGround::SendPacketToAll(WorldPacket* packet)
         if (Player* pPlayer = sObjectMgr.GetPlayer(itr.first))
             pPlayer->GetSession()->SendPacket(packet);
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:SendPacketToAll: %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:SendPacketToAll: %s not found!", itr.first.GetString().c_str());
     }
 }
 
@@ -442,7 +442,7 @@ void BattleGround::SendPacketToTeam(Team teamId, WorldPacket* packet, Player* se
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
         if (!pPlayer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:SendPacketToTeam: %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:SendPacketToTeam: %s not found!", itr.first.GetString().c_str());
             continue;
         }
 
@@ -473,7 +473,7 @@ void BattleGround::PlaySoundToTeam(uint32 soundId, Team teamId)
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
         if (!pPlayer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:PlaySoundToTeam: %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:PlaySoundToTeam: %s not found!", itr.first.GetString().c_str());
             continue;
         }
 
@@ -496,7 +496,7 @@ void BattleGround::CastSpellOnTeam(uint32 spellId, Team teamId)
 
         if (!pPlayer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:CastSpellOnTeam: %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:CastSpellOnTeam: %s not found!", itr.first.GetString().c_str());
             continue;
         }
 
@@ -516,7 +516,7 @@ void BattleGround::RewardHonorToTeam(uint32 honor, Team teamId)
 
         if (!pPlayer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:RewardHonorToTeam: %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:RewardHonorToTeam: %s not found!", itr.first.GetString().c_str());
             continue;
         }
 
@@ -541,7 +541,7 @@ void BattleGround::RewardReputationToTeam(uint32 factionId, uint32 reputation, T
 
         if (!pPlayer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:RewardReputationToTeam: %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:RewardReputationToTeam: %s not found!", itr.first.GetString().c_str());
             continue;
         }
 
@@ -613,7 +613,7 @@ void BattleGround::EndBattleGround(Team winner)
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
         if (!pPlayer)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:EndBattleGround %s not found!", itr.first.GetString().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:EndBattleGround %s not found!", itr.first.GetString().c_str());
             continue;
         }
 
@@ -735,7 +735,7 @@ void BattleGround::RewardSpellCast(Player* pPlayer, uint32 spellId)
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground reward spell %u does not exist.", spellId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground reward spell %u does not exist.", spellId);
         return;
     }
 
@@ -934,7 +934,7 @@ void BattleGround::Reset()
     m_activeEvents[BG_EVENT_DOOR] = 0;
 
     if (m_invitedAlliance > 0 || m_invitedHorde > 0)
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround system: bad counter, m_invitedAlliance: %d, m_invitedHorde: %d", m_invitedAlliance, m_invitedHorde);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround system: bad counter, m_invitedAlliance: %d, m_invitedHorde: %d", m_invitedAlliance, m_invitedHorde);
 
     m_invitedAlliance = 0;
     m_invitedHorde = 0;
@@ -1136,7 +1136,7 @@ void BattleGround::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
                 itr->second->bonusHonor += value;
             break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround: Unknown player score type %u", type);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: Unknown player score type %u", type);
             break;
     }
 }
@@ -1151,7 +1151,7 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
                     x, y, z, o, rotation0, rotation1, rotation2, rotation3, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
     {
         sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject template %u not found in database! BattleGround not created!", entry);
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Cannot create gameobject template %u! BattleGround not created!", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot create gameobject template %u! BattleGround not created!", entry);
         delete go;
         return false;
     }
@@ -1199,7 +1199,7 @@ void BattleGround::DoorClose(ObjectGuid guid)
         }
     }
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround: Door %s not found (cannot close doors)", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: Door %s not found (cannot close doors)", guid.GetString().c_str());
 }
 
 void BattleGround::DoorOpen(ObjectGuid guid)
@@ -1212,7 +1212,7 @@ void BattleGround::DoorOpen(ObjectGuid guid)
         obj->UseDoorOrButton(RESPAWN_ONE_DAY);
     }
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround: Door %s not found! - doors will be closed.", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: Door %s not found! - doors will be closed.", guid.GetString().c_str());
 }
 
 void BattleGround::OnObjectDBLoad(Creature* creature)
@@ -1271,7 +1271,7 @@ bool BattleGround::IsDoor(uint8 event1, uint8 event2)
     {
         if (event2 > 0)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround too high event2 for event1:%i", event1);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround too high event2 for event1:%i", event1);
             return false;
         }
         return true;
@@ -1283,12 +1283,12 @@ void BattleGround::OpenDoorEvent(uint8 event1, uint8 event2 /*=0*/)
 {
     if (!IsDoor(event1, event2))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:OpenDoorEvent this is no door event1:%u event2:%u", event1, event2);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:OpenDoorEvent this is no door event1:%u event2:%u", event1, event2);
         return;
     }
     if (!IsActiveEvent(event1, event2))                 // maybe already despawned (eye)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround:OpenDoorEvent this event isn't active event1:%u event2:%u", event1, event2);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround:OpenDoorEvent this event isn't active event1:%u event2:%u", event1, event2);
         return;
     }
     BGObjects::const_iterator itr = m_eventObjects[MAKE_PAIR32(event1, event2)].gameobjects.begin();
@@ -1482,7 +1482,7 @@ bool BattleGround::DelObject(uint32 type)
     GameObject* obj = GetBgMap()->GetGameObject(m_bgObjects[type]);
     if (!obj)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can't find gobject: %s", m_bgObjects[type].GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can't find gobject: %s", m_bgObjects[type].GetString().c_str());
         return false;
     }
 
@@ -1576,7 +1576,7 @@ void BattleGround::HandleTriggerBuff(ObjectGuid goGuid)
         index--;
     if (index < 0)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround (Type: %u) has buff trigger %s GOType: %u but it hasn't that object in its internal data",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround (Type: %u) has buff trigger %s GOType: %u but it hasn't that object in its internal data",
                       GetTypeID(), goGuid.GetString().c_str(), obj->GetGoType());
         return;
     }

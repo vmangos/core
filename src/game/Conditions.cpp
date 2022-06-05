@@ -363,7 +363,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             if (m_value1 <= OBJECT_FIELD_ENTRY || m_value1 >= source->GetValuesCount())
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CONDITION_HAS_FLAG call for wrong field %u (max count: %u) in object (TypeId: %u).",
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CONDITION_HAS_FLAG call for wrong field %u (max count: %u) in object (TypeId: %u).",
                     m_value1, source->GetValuesCount(), source->GetTypeId());
                 return false;
             }

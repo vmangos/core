@@ -55,7 +55,7 @@ bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32
         if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_SEVERITY) && GetSecurity() < SEC_MODERATOR
                 && !ChatHandler(this).isValidChatMessage(msg.c_str()))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
                           GetPlayer()->GetGUIDLow(), msg.c_str());
             if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_KICK))
                 KickPlayer();
@@ -142,7 +142,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CHAT: Wrong message type received: %u", type);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: Wrong message type received: %u", type);
         return;
     }
 
@@ -272,7 +272,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         break;
 
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CHAT: unknown message type %u, lang: %u", type, lang);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHAT: unknown message type %u, lang: %u", type, lang);
             return;
     }
 

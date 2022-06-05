@@ -66,7 +66,7 @@ bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, 
 
     if (!IsPositionValid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DynamicObject (spell %u eff %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", spellId, effIndex, GetPositionX(), GetPositionY());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DynamicObject (spell %u eff %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", spellId, effIndex, GetPositionX(), GetPositionY());
         return false;
     }
 
@@ -107,7 +107,7 @@ bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, 
     SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellProto)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DynamicObject (spell %u) not created. Spell not exist!", spellId, GetPositionX(), GetPositionY());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DynamicObject (spell %u) not created. Spell not exist!", spellId, GetPositionX(), GetPositionY());
         return false;
     }
 

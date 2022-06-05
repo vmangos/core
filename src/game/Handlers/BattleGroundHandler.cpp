@@ -178,7 +178,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
 
     if (!bg && !(bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId)))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground: no available bg / template found");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: no available bg / template found");
         return;
     }
 
@@ -379,7 +379,7 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recv_data)
 
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground: invalid bgtype received.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: invalid bgtype received.");
         return;
     }
 
@@ -460,7 +460,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
         //if player don't match battleground max level, then do not allow him to enter! (this might happen when player leveled up during his waiting in queue
         if (_player->GetLevel() > bg->GetMaxLevel())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground: Player %s (%u) has level (%u) higher than maxlevel (%u) of battleground (%u)! Do not port him to battleground!",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: Player %s (%u) has level (%u) higher than maxlevel (%u) of battleground (%u)! Do not port him to battleground!",
                           _player->GetName(), _player->GetGUIDLow(), _player->GetLevel(), bg->GetMaxLevel(), bg->GetTypeID());
             action = 0;
         }
@@ -472,7 +472,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
         case 1:                                         // port to battleground
             if (!_player->IsInvitedForBattleGroundQueueType(bgQueueTypeId))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground: Player %s (%u) is not invited in queue type %u !", _player->GetName(), _player->GetGUIDLow(), bgQueueTypeId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: Player %s (%u) is not invited in queue type %u !", _player->GetName(), _player->GetGUIDLow(), bgQueueTypeId);
                 return;                                 // cheating?
             }
 
@@ -529,7 +529,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
                      bgTypeId);
             break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground port: unknown action %u", action);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground port: unknown action %u", action);
             break;
     }
 }

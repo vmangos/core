@@ -174,7 +174,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                 m_auiEncounter[uiType] = uiData;
                 break;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Instance Wiling Caverns: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Instance Wiling Caverns: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
                 break;
         }
         if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && m_auiEncounter[2] == DONE && m_auiEncounter[3] == DONE && m_auiEncounter[4] == NOT_STARTED)

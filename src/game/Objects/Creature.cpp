@@ -184,7 +184,7 @@ bool CreatureCreatePos::Relocate(Creature* cr) const
 
     if (!cr->IsPositionValid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s not created. Suggested coordinates isn't valid (X: %f Y: %f)", cr->GetGuidStr().c_str(), cr->GetPositionX(), cr->GetPositionY());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s not created. Suggested coordinates isn't valid (X: %f Y: %f)", cr->GetGuidStr().c_str(), cr->GetPositionX(), cr->GetPositionY());
         return false;
     }
 
@@ -636,11 +636,11 @@ void Creature::Update(uint32 update_diff, uint32 diff)
     {
         case JUST_ALIVED:
             // Don't must be called, see Creature::SetDeathState JUST_ALIVED -> ALIVE promoting.
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_ALIVED (4)", GetGUIDLow(), GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_ALIVED (4)", GetGUIDLow(), GetEntry());
             break;
         case JUST_DIED:
             // Don't must be called, see Creature::SetDeathState JUST_DIED -> CORPSE promoting.
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_DEAD (1)", GetGUIDLow(), GetEntry());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUIDLow: %u Entry: %u ) in wrong state: JUST_DEAD (1)", GetGUIDLow(), GetEntry());
             break;
         case DEAD:
         {
@@ -1457,7 +1457,7 @@ void Creature::SaveToDB()
     CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow());
     if (!data)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Creature::SaveToDB failed, cannot get creature data!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature::SaveToDB failed, cannot get creature data!");
         return;
     }
 
@@ -2078,7 +2078,7 @@ void Creature::CastSpawnSpell()
         if (result != SPELL_CAST_OK)
         {
             RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s failed to cast spawn spell %u due to reason %u.", GetGuidStr().c_str(), GetCreatureInfo()->spawn_spell_id, result);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s failed to cast spawn spell %u due to reason %u.", GetGuidStr().c_str(), GetCreatureInfo()->spawn_spell_id, result);
         }
     }
 }
@@ -2665,7 +2665,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
 {
     if (!CanHaveThreatList())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Creature entry %u call SetInCombatWithZone but creature cannot have threat list.", GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature entry %u call SetInCombatWithZone but creature cannot have threat list.", GetEntry());
         return;
     }
 
@@ -2673,7 +2673,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
 
     if (!pMap->IsDungeon())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Creature entry %u call SetInCombatWithZone for map (id: %u) that isn't an instance.", GetEntry(), pMap->GetId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature entry %u call SetInCombatWithZone for map (id: %u) that isn't an instance.", GetEntry(), pMap->GetId());
         return;
     }
 
@@ -3648,7 +3648,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Unit* target = nullptr;
 
     if (dist > ATTACK_DISTANCE)
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > ATTACK_DISTANCE. Extra distance ignored.", GetGUIDLow(), GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Creature (GUID: %u Entry: %u) SelectNearestTargetInAttackDistance called with dist > ATTACK_DISTANCE. Extra distance ignored.", GetGUIDLow(), GetEntry());
 
     MaNGOS::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
     MaNGOS::UnitLastSearcher<MaNGOS::NearestHostileUnitInAttackDistanceCheck> searcher(target, u_check);
@@ -3712,7 +3712,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCast
 
     if (!pSpellInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: TryToCast: attempt to cast unknown spell %u by creature with entry: %u", uiSpell, GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "TryToCast: attempt to cast unknown spell %u by creature with entry: %u", uiSpell, GetEntry());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -4018,7 +4018,7 @@ void Creature::SetVirtualItem(VirtualItemSlot slot, uint32 item_id)
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_id);
     if (!proto)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Not listed in 'item_template' item (ID:%u) used as virtual item for %s", item_id, GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Not listed in 'item_template' item (ID:%u) used as virtual item for %s", item_id, GetGuidStr().c_str());
         return;
     }
 
@@ -4035,7 +4035,7 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
 {
     if (CreatureGroup* myGroup = GetCreatureGroup())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s attempts to join group, but is already in one.", GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s attempts to join group, but is already in one.", GetGuidStr().c_str());
         return;
     }
 

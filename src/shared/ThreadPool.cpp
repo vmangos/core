@@ -156,15 +156,15 @@ void ThreadPool::worker::loop_wrapper()
         }
         catch (const std::exception &e)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: A ThreadPool task generated an exception: %s",e.what());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "A ThreadPool task generated an exception: %s",e.what());
         }
         catch (const std::string &e)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: A ThreadPool task generated an exception: %s", e.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "A ThreadPool task generated an exception: %s", e.c_str());
         }
         catch (...)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: A ThreadPool task generated an exception");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "A ThreadPool task generated an exception");
         }
         if (pool->m_errorHandling == ErrorHandling::TERMINATE)
             pool->m_status = Status::TERMINATING;

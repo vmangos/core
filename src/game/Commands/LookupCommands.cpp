@@ -779,7 +779,7 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
         FILE* f = fopen("creature_export.sql", "w");
         if (!f)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: File creation failed.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "File creation failed.");
             return false;
         }
         std::string exportStr = toExport.str();

@@ -392,7 +392,7 @@ void World::LoadConfigSettings(bool reload)
     {
         if (!sConfig.Reload())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: World settings reload fail: can't read settings from %s.", sConfig.GetFilename().c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "World settings reload fail: can't read settings from %s.", sConfig.GetFilename().c_str());
             return;
         }
     }
@@ -401,21 +401,21 @@ void World::LoadConfigSettings(bool reload)
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
     if (!confVersion)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: *****************************************************************************");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:  WARNING: mangosd.conf does not include a ConfVersion variable.");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:           Your configuration file may be out of date!");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: *****************************************************************************");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, " WARNING: mangosd.conf does not include a ConfVersion variable.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          Your configuration file may be out of date!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
         Log::WaitBeforeContinueIfNeed();
     }
     else
     {
         if (confVersion < _MANGOSDCONFVERSION)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: *****************************************************************************");
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:  WARNING: Your mangosd.conf version indicates your conf file is out of date!");
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:           Please check for updates, as your current default values may cause");
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR:           unexpected behavior.");
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: *****************************************************************************");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, " WARNING: Your mangosd.conf version indicates your conf file is out of date!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          Please check for updates, as your current default values may cause");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "          unexpected behavior.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "*****************************************************************************");
             Log::WaitBeforeContinueIfNeed();
         }
     }
@@ -646,7 +646,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS, "MaxOverspeedPings", 2);
     if (getConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS) != 0 && getConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS) < 2)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MaxOverspeedPings (%i) must be in range 2..infinity (or 0 to disable check). Set to 2.", getConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MaxOverspeedPings (%i) must be in range 2..infinity (or 0 to disable check). Set to 2.", getConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS));
         setConfig(CONFIG_UINT32_MAX_OVERSPEED_PINGS, 2);
     }
 
@@ -753,13 +753,13 @@ void World::LoadConfigSettings(bool reload)
     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
     if (m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.Grey.Unit can't be greater %f", MAX_VISIBILITY_DISTANCE);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.Grey.Unit can't be greater %f", MAX_VISIBILITY_DISTANCE);
         m_VisibleUnitGreyDistance = MAX_VISIBILITY_DISTANCE;
     }
     m_VisibleObjectGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Object", 10);
     if (m_VisibleObjectGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.Grey.Object can't be greater %f", MAX_VISIBILITY_DISTANCE);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.Grey.Object can't be greater %f", MAX_VISIBILITY_DISTANCE);
         m_VisibleObjectGreyDistance = MAX_VISIBILITY_DISTANCE;
     }
 
@@ -767,12 +767,12 @@ void World::LoadConfigSettings(bool reload)
     m_MaxVisibleDistanceOnContinents      = sConfig.GetFloatDefault("Visibility.Distance.Continents",     DEFAULT_VISIBILITY_DISTANCE);
     if (m_MaxVisibleDistanceOnContinents < 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.Continents can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.Continents can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
         m_MaxVisibleDistanceOnContinents = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     }
     else if (m_MaxVisibleDistanceOnContinents + m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.Continents can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.Continents can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
         m_MaxVisibleDistanceOnContinents = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
@@ -780,12 +780,12 @@ void World::LoadConfigSettings(bool reload)
     m_MaxVisibleDistanceInInstances        = sConfig.GetFloatDefault("Visibility.Distance.Instances",       DEFAULT_VISIBILITY_INSTANCE);
     if (m_MaxVisibleDistanceInInstances < 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.Instances can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.Instances can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
         m_MaxVisibleDistanceInInstances = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     }
     else if (m_MaxVisibleDistanceInInstances + m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.Instances can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.Instances can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
         m_MaxVisibleDistanceInInstances = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
@@ -793,19 +793,19 @@ void World::LoadConfigSettings(bool reload)
     m_MaxVisibleDistanceInBG        = sConfig.GetFloatDefault("Visibility.Distance.BG",       DEFAULT_VISIBILITY_BG);
     if (m_MaxVisibleDistanceInBG < 45 * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.BG can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.BG can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
         m_MaxVisibleDistanceInBG = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     }
     else if (m_MaxVisibleDistanceInBG + m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.BG can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.BG can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
         m_MaxVisibleDistanceInBG = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
     m_MaxVisibleDistanceInFlight    = sConfig.GetFloatDefault("Visibility.Distance.InFlight",      DEFAULT_VISIBILITY_DISTANCE);
     if (m_MaxVisibleDistanceInFlight + m_VisibleObjectGreyDistance > MAX_VISIBILITY_DISTANCE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Visibility.Distance.InFlight can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Visibility.Distance.InFlight can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance);
         m_MaxVisibleDistanceInFlight = MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance;
     }
 
@@ -832,7 +832,7 @@ void World::LoadConfigSettings(bool reload)
     if (reload)
     {
         if (honorPath != m_honorPath)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HonorDir option can't be changed at mangosd.conf reload, using current value (%s).", m_honorPath.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HonorDir option can't be changed at mangosd.conf reload, using current value (%s).", m_honorPath.c_str());
     }
     else
     {
@@ -853,7 +853,7 @@ void World::LoadConfigSettings(bool reload)
     if (reload)
     {
         if (dataPath != m_dataPath)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: DataDir option can't be changed at mangosd.conf reload, using current value (%s).", m_dataPath.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "DataDir option can't be changed at mangosd.conf reload, using current value (%s).", m_dataPath.c_str());
     }
     else
     {
@@ -867,7 +867,7 @@ void World::LoadConfigSettings(bool reload)
     bool disableModelUnload = sConfig.GetBoolDefault("Collision.Models.Unload", false);
 
     if (!enableHeight)
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: VMAP height use disabled! Creatures movements and other things will be in broken state.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "VMAP height use disabled! Creatures movements and other things will be in broken state.");
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
@@ -1223,7 +1223,7 @@ void World::SetInitialWorldSettings()
             !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f) ||
             !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map and vmap files in appropriate directories or correct the DataDir value in the mangosd.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map and vmap files in appropriate directories or correct the DataDir value in the mangosd.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
         Log::WaitBeforeContinueIfNeed();
         exit(1);
     }
@@ -1801,7 +1801,7 @@ void World::DetectDBCLang()
 
     if (m_lang_confid != 255 && m_lang_confid >= MAX_DBC_LOCALE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", MAX_DBC_LOCALE);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", MAX_DBC_LOCALE);
         m_lang_confid = LOCALE_enUS;
     }
 
@@ -1828,7 +1828,7 @@ void World::DetectDBCLang()
 
     if (default_locale >= MAX_DBC_LOCALE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unable to determine your DBC Locale! (corrupt DBC?)");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to determine your DBC Locale! (corrupt DBC?)");
         Log::WaitBeforeContinueIfNeed();
         exit(1);
     }
@@ -2707,7 +2707,7 @@ void World::setConfigPos(eConfigUInt32Values index, char const* fieldname, uint3
     setConfig(index, fieldname, defvalue);
     if (int32(getConfig(index)) < 0)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%i) can't be negative. Using %u instead.", fieldname, int32(getConfig(index)), defvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%i) can't be negative. Using %u instead.", fieldname, int32(getConfig(index)), defvalue);
         setConfig(index, defvalue);
     }
 }
@@ -2717,7 +2717,7 @@ void World::setConfigPos(eConfigFloatValues index, char const* fieldname, float 
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < 0.0f)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%f) can't be negative. Using %f instead.", fieldname, getConfig(index), defvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%f) can't be negative. Using %f instead.", fieldname, getConfig(index), defvalue);
         setConfig(index, defvalue);
     }
 }
@@ -2727,7 +2727,7 @@ void World::setConfigMin(eConfigUInt32Values index, char const* fieldname, uint3
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%u) must be >= %u. Using %u instead.", fieldname, getConfig(index), minvalue, minvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%u) must be >= %u. Using %u instead.", fieldname, getConfig(index), minvalue, minvalue);
         setConfig(index, minvalue);
     }
 }
@@ -2737,7 +2737,7 @@ void World::setConfigMin(eConfigInt32Values index, char const* fieldname, int32 
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%i) must be >= %i. Using %i instead.", fieldname, getConfig(index), minvalue, minvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%i) must be >= %i. Using %i instead.", fieldname, getConfig(index), minvalue, minvalue);
         setConfig(index, minvalue);
     }
 }
@@ -2747,7 +2747,7 @@ void World::setConfigMin(eConfigFloatValues index, char const* fieldname, float 
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%f) must be >= %f. Using %f instead.", fieldname, getConfig(index), minvalue, minvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%f) must be >= %f. Using %f instead.", fieldname, getConfig(index), minvalue, minvalue);
         setConfig(index, minvalue);
     }
 }
@@ -2757,12 +2757,12 @@ void World::setConfigMinMax(eConfigUInt32Values index, char const* fieldname, ui
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%u) must be in range %u...%u. Using %u instead.", fieldname, getConfig(index), minvalue, maxvalue, minvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%u) must be in range %u...%u. Using %u instead.", fieldname, getConfig(index), minvalue, maxvalue, minvalue);
         setConfig(index, minvalue);
     }
     else if (getConfig(index) > maxvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%u) must be in range %u...%u. Using %u instead.", fieldname, getConfig(index), minvalue, maxvalue, maxvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%u) must be in range %u...%u. Using %u instead.", fieldname, getConfig(index), minvalue, maxvalue, maxvalue);
         setConfig(index, maxvalue);
     }
 }
@@ -2772,12 +2772,12 @@ void World::setConfigMinMax(eConfigInt32Values index, char const* fieldname, int
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%i) must be in range %i...%i. Using %i instead.", fieldname, getConfig(index), minvalue, maxvalue, minvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%i) must be in range %i...%i. Using %i instead.", fieldname, getConfig(index), minvalue, maxvalue, minvalue);
         setConfig(index, minvalue);
     }
     else if (getConfig(index) > maxvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%i) must be in range %i...%i. Using %i instead.", fieldname, getConfig(index), minvalue, maxvalue, maxvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%i) must be in range %i...%i. Using %i instead.", fieldname, getConfig(index), minvalue, maxvalue, maxvalue);
         setConfig(index, maxvalue);
     }
 }
@@ -2787,12 +2787,12 @@ void World::setConfigMinMax(eConfigFloatValues index, char const* fieldname, flo
     setConfig(index, fieldname, defvalue);
     if (getConfig(index) < minvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%f) must be in range %f...%f. Using %f instead.", fieldname, getConfig(index), minvalue, maxvalue, minvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%f) must be in range %f...%f. Using %f instead.", fieldname, getConfig(index), minvalue, maxvalue, minvalue);
         setConfig(index, minvalue);
     }
     else if (getConfig(index) > maxvalue)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s (%f) must be in range %f...%f. Using %f instead.", fieldname, getConfig(index), minvalue, maxvalue, maxvalue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s (%f) must be in range %f...%f. Using %f instead.", fieldname, getConfig(index), minvalue, maxvalue, maxvalue);
         setConfig(index, maxvalue);
     }
 }
@@ -2804,7 +2804,7 @@ bool World::configNoReload(bool reload, eConfigUInt32Values index, char const* f
 
     uint32 val = sConfig.GetIntDefault(fieldname, defvalue);
     if (val != getConfig(index))
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s option can't be changed at mangosd.conf reload, using current value (%u).", fieldname, getConfig(index));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s option can't be changed at mangosd.conf reload, using current value (%u).", fieldname, getConfig(index));
 
     return false;
 }
@@ -2816,7 +2816,7 @@ bool World::configNoReload(bool reload, eConfigInt32Values index, char const* fi
 
     int32 val = sConfig.GetIntDefault(fieldname, defvalue);
     if (val != getConfig(index))
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s option can't be changed at mangosd.conf reload, using current value (%i).", fieldname, getConfig(index));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s option can't be changed at mangosd.conf reload, using current value (%i).", fieldname, getConfig(index));
 
     return false;
 }
@@ -2828,7 +2828,7 @@ bool World::configNoReload(bool reload, eConfigFloatValues index, char const* fi
 
     float val = sConfig.GetFloatDefault(fieldname, defvalue);
     if (val != getConfig(index))
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s option can't be changed at mangosd.conf reload, using current value (%f).", fieldname, getConfig(index));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s option can't be changed at mangosd.conf reload, using current value (%f).", fieldname, getConfig(index));
 
     return false;
 }
@@ -2840,7 +2840,7 @@ bool World::configNoReload(bool reload, eConfigBoolValues index, char const* fie
 
     bool val = sConfig.GetBoolDefault(fieldname, defvalue);
     if (val != getConfig(index))
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s option can't be changed at mangosd.conf reload, using current value (%s).", fieldname, getConfig(index) ? "'true'" : "'false'");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s option can't be changed at mangosd.conf reload, using current value (%s).", fieldname, getConfig(index) ? "'true'" : "'false'");
 
     return false;
 }

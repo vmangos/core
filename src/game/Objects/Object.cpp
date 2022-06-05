@@ -199,13 +199,13 @@ Object::~Object()
     if (IsInWorld())
     {
         ///- Do NOT call RemoveFromWorld here, if the object is a player it will crash
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Object::~Object (GUID: %u TypeId: %u) deleted but still in world!!", GetGUIDLow(), GetTypeId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::~Object (GUID: %u TypeId: %u) deleted but still in world!!", GetGUIDLow(), GetTypeId());
         MANGOS_ASSERT(false);
     }
 
     if (m_objectUpdated)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Object::~Object (GUID: %u TypeId: %u) deleted but still have updated status!!", GetGUIDLow(), GetTypeId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::~Object (GUID: %u TypeId: %u) deleted but still have updated status!!", GetGUIDLow(), GetTypeId());
         MANGOS_ASSERT(false);
     }
 
@@ -1118,7 +1118,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 4)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Object::SetByteValue: wrong offset %u", offset);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -1136,7 +1136,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 2)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Object::SetUInt16Value: wrong offset %u", offset);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 
@@ -1228,7 +1228,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 4)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Object::SetByteFlag: wrong offset %u", offset);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::SetByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -1245,7 +1245,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 4)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Object::RemoveByteFlag: wrong offset %u", offset);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Object::RemoveByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -1303,19 +1303,19 @@ void Object::BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_play
 
 void Object::AddToClientUpdateList()
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unexpected call of Object::AddToClientUpdateList for object (TypeId: %u Update fields: %u)", GetTypeId(), m_valuesCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unexpected call of Object::AddToClientUpdateList for object (TypeId: %u Update fields: %u)", GetTypeId(), m_valuesCount);
     MANGOS_ASSERT(false);
 }
 
 void Object::RemoveFromClientUpdateList()
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unexpected call of Object::RemoveFromClientUpdateList for object (TypeId: %u Update fields: %u)", GetTypeId(), m_valuesCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unexpected call of Object::RemoveFromClientUpdateList for object (TypeId: %u Update fields: %u)", GetTypeId(), m_valuesCount);
     MANGOS_ASSERT(false);
 }
 
 void Object::BuildUpdateData(UpdateDataMapType& /*update_players */)
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unexpected call of Object::BuildUpdateData for object (TypeId: %u Update fields: %u)", GetTypeId(), m_valuesCount);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unexpected call of Object::BuildUpdateData for object (TypeId: %u Update fields: %u)", GetTypeId(), m_valuesCount);
     MANGOS_ASSERT(false);
 }
 
@@ -2254,7 +2254,7 @@ void WorldObject::SetCreatureSummonLimit(uint32 limit)
     if (FindMap())
         return FindMap()->SetSummonLimitForObject(GetGUID(), limit);
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to set summon limit for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to set summon limit for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
 }
 
 uint32 Map::GetSummonCountForObject(uint64 guid) const
@@ -2293,7 +2293,7 @@ void WorldObject::DecrementSummonCounter()
             m_summonLimitAlert = 0;
     }
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to decrement summon count for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to decrement summon count for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
 }
 
 void Map::IncrementSummonCountForObject(uint64 guid)
@@ -2306,7 +2306,7 @@ void WorldObject::IncrementSummonCounter()
     if (FindMap())
         FindMap()->IncrementSummonCountForObject(GetGUID());
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to increment summon count for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to increment summon count for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
 }
 
 Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject)
@@ -3149,7 +3149,7 @@ bool WorldObject::IsLikePlayer() const
 
 bool WorldObject::PrintCoordinatesError(float x, float y, float z, char const* descr) const
 {
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s with invalid %s coordinates: mapid = %uu, x = %f, y = %f, z = %f", GetGuidStr().c_str(), descr, GetMapId(), x, y, z);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s with invalid %s coordinates: mapid = %uu, x = %f, y = %f, z = %f", GetGuidStr().c_str(), descr, GetMapId(), x, y, z);
     return false;                                           // always false for continue assert fail
 }
 
@@ -3397,7 +3397,7 @@ FactionTemplateEntry const* WorldObject::GetFactionTemplateEntry() const
 
         if (GetObjectGuid() != guid)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s have invalid faction (faction template id) #%u", GetGuidStr().c_str(), GetFactionTemplateId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s have invalid faction (faction template id) #%u", GetGuidStr().c_str(), GetFactionTemplateId());
             guid = GetObjectGuid();
         }
     }

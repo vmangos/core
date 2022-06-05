@@ -120,7 +120,7 @@ extern int main(int argc, char **argv)
 #endif
                 else
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
                     usage(argv[0]);
                     Log::WaitBeforeContinueIfNeed();
                     return 1;
@@ -128,12 +128,12 @@ extern int main(int argc, char **argv)
                 break;
             }
             case ':':
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
             default:
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Runtime-Error: bad format of commandline arguments");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Runtime-Error: bad format of commandline arguments");
                 usage(argv[0]);
                 Log::WaitBeforeContinueIfNeed();
                 return 1;
@@ -159,7 +159,7 @@ extern int main(int argc, char **argv)
 
     if (!sConfig.SetSource(cfg_file))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not find configuration file %s.", cfg_file);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not find configuration file %s.", cfg_file);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }

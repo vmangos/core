@@ -51,7 +51,7 @@ DatabaseMysql::DatabaseMysql()
 
         if (!mysql_thread_safe())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: FATAL ERROR: Used MySQL library isn't thread-safe.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "FATAL ERROR: Used MySQL library isn't thread-safe.");
             Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
@@ -83,7 +83,7 @@ bool MySQLConnection::OpenConnection(bool reconnect)
     MYSQL* mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not initialize Mysql connection");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not initialize Mysql connection");
         return false;
     }
 
@@ -131,7 +131,7 @@ bool MySQLConnection::OpenConnection(bool reconnect)
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not connect to MySQL database at %s: %s\n",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not connect to MySQL database at %s: %s\n",
             m_host.c_str(), mysql_error(mysqlInit));
         mysql_close(mysqlInit);
         return false;
@@ -302,8 +302,8 @@ bool MySQLConnection::_TransactionCmd(char const* sql)
 {
     if (mysql_query(mMysql, sql))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL: %s", sql);
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: %s", mysql_error(mMysql));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: %s", sql);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_error(mMysql));
         return false;
     }
     else
@@ -366,15 +366,15 @@ bool MySqlPreparedStatement::prepare()
     m_stmt = mysql_stmt_init(m_pMySQLConn);
     if (!m_stmt)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL: mysql_stmt_init()() failed ");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: mysql_stmt_init()() failed ");
         return false;
     }
 
     //prepare statement
     if (mysql_stmt_prepare(m_stmt, m_szFmt.c_str(), m_szFmt.length()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
         return false;
     }
 
@@ -386,8 +386,8 @@ bool MySqlPreparedStatement::prepare()
     //if we do not have result metadata
     if (!m_pResultMetadata && strnicmp(m_szFmt.c_str(), "select", 6) == 0)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL: no meta information for '%s'", m_szFmt.c_str());
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: no meta information for '%s'", m_szFmt.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
         return false;
     }
 
@@ -445,8 +445,8 @@ void MySqlPreparedStatement::bind(SqlStmtParameters const& holder)
     //bind input arguments
     if (mysql_stmt_bind_param(m_stmt, m_pInputArgs))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: mysql_stmt_bind_param() failed\n");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: mysql_stmt_bind_param() failed\n");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
     }
 }
 
@@ -494,8 +494,8 @@ bool MySqlPreparedStatement::execute()
 
     if(mysql_stmt_execute(m_stmt))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL: cannot execute '%s'", m_szFmt.c_str());
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL: cannot execute '%s'", m_szFmt.c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL ERROR: %s", mysql_stmt_error(m_stmt));
         return false;
     }
 

@@ -56,7 +56,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
     if (TempValue > 0xFFFFF)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::ReadAddonsInfo addon info too big, size %u", TempValue);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::ReadAddonsInfo addon info too big, size %u", TempValue);
         return false;
     }
 
@@ -159,7 +159,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Addon packet uncompress error :(");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Addon packet uncompress error :(");
         return false;
     }
     return true;

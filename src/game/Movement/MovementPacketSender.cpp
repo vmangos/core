@@ -48,7 +48,7 @@ void MovementPacketSender::AddSpeedChangeToController(Unit* unit, UnitMoveType m
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendSpeedChangeToController: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendSpeedChangeToController: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -120,7 +120,7 @@ void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType m
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendSpeedChangeToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendSpeedChangeToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -171,7 +171,7 @@ void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendTeleportToController: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendTeleportToController: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -206,7 +206,7 @@ void MovementPacketSender::SendTeleportToObservers(Unit* unit, float x, float y,
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendTeleportToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendTeleportToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -231,7 +231,7 @@ void MovementPacketSender::SendKnockBackToController(Unit* unit, float vcos, flo
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendKnockBackToController: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendKnockBackToController: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -271,7 +271,7 @@ void MovementPacketSender::SendKnockBackToObservers(Unit* unit, float vcos, floa
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendSpeedChangeToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendSpeedChangeToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -296,7 +296,7 @@ void MovementPacketSender::AddMovementFlagChangeToController(Unit* unit, Movemen
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::AddMovementFlagChangeToController: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::AddMovementFlagChangeToController: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -308,7 +308,7 @@ void MovementPacketSender::AddMovementFlagChangeToController(Unit* unit, Movemen
         case MOVEFLAG_HOVER:                movementChangeType = SET_HOVER; break;
         case MOVEFLAG_SAFE_FALL:            movementChangeType = FEATHER_FALL; break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::AddMovementFlagChangeToController: Unsupported MovementFlag (%d), data not sent to client.", mFlag);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::AddMovementFlagChangeToController: Unsupported MovementFlag (%d), data not sent to client.", mFlag);
             return;
     }
 
@@ -333,7 +333,7 @@ void MovementPacketSender::SendMovementFlagChangeToController(Unit* unit, Player
         case SET_HOVER: opcode = pendingChange.apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER; break;
         case FEATHER_FALL: opcode = pendingChange.apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL; break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendMovementFlagChangeToController: Unsupported movement change (%u), data not sent to client.", pendingChange.movementChangeType);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendMovementFlagChangeToController: Unsupported movement change (%u), data not sent to client.", pendingChange.movementChangeType);
             return;
     }
 
@@ -358,7 +358,7 @@ void MovementPacketSender::SendMovementFlagChangeToObservers(Unit* unit, Movemen
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::AddMovementFlagChangeToController: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::AddMovementFlagChangeToController: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -370,7 +370,7 @@ void MovementPacketSender::SendMovementFlagChangeToObservers(Unit* unit, Movemen
         case MOVEFLAG_HOVER:                opcode = MSG_MOVE_HOVER; break;
         case MOVEFLAG_SAFE_FALL:            opcode = MSG_MOVE_FEATHER_FALL; break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendMovementFlagChangeToObservers: Unsupported MovementFlag (%d), data not sent to client.", mFlag);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendMovementFlagChangeToObservers: Unsupported MovementFlag (%d), data not sent to client.", mFlag);
             return;
     }
 
@@ -401,7 +401,7 @@ void MovementPacketSender::SendMovementFlagChangeToAll(Unit* unit, MovementFlags
         case MOVEFLAG_HOVER:            opcode = apply ? MSG_MOVE_HOVER                     : MSG_MOVE_HOVER; break;
 #endif
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MovementPacketSender::SendMovementFlagChangeToAll: Unsupported MovementFlag (%d), data not sent to client.", mFlag);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MovementPacketSender::SendMovementFlagChangeToAll: Unsupported MovementFlag (%d), data not sent to client.", mFlag);
             return;
     }
 

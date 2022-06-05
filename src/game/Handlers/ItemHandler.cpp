@@ -619,7 +619,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recv_data)
         Item *pNewItem = pItem->CloneItem(count, _player);
         if (!pNewItem)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count);
             _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }

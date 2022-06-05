@@ -95,7 +95,7 @@ Group::~Group()
         else if (m_bgGroup->GetBgRaid(HORDE) == this)
             m_bgGroup->SetBgRaid(HORDE, nullptr);
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Group::~Group: battleground group is not linked to the correct battleground.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Group::~Group: battleground group is not linked to the correct battleground.");
     }
     RemoveAllInvites();
     Rolls::iterator itr;

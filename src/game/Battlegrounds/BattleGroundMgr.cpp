@@ -306,7 +306,7 @@ void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
     itr = m_queuedPlayers.find(guid);
     if (itr == m_queuedPlayers.end())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
         return;
     }
 
@@ -339,7 +339,7 @@ void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
     //player can't be in queue without group, but just in case
     if (bracketId == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundQueue: ERROR Cannot find groupinfo for %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue: ERROR Cannot find groupinfo for %s", guid.GetString().c_str());
         return;
     }
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "BattleGroundQueue: Removing %s, from bracketId %u", guid.GetString().c_str(), (uint32)bracketId);
@@ -709,7 +709,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
     BattleGround*  bgTemplate = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
     if (!bgTemplate)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Battleground: Update: bg template not found for %u", bgTypeId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Battleground: Update: bg template not found for %u", bgTypeId);
         return;
     }
     // get the min. players per team, properly for larger arenas as well.
@@ -770,7 +770,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             BattleGround* bg2 = sBattleGroundMgr.CreateNewBattleGround(bgTypeId, bracketId);
             if (!bg2)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
                 return;
             }
             //invite those selection pools
@@ -794,7 +794,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             BattleGround* bg2 = sBattleGroundMgr.CreateNewBattleGround(bgTypeId, bracketId);
             if (!bg2)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue::Update - Cannot create battleground: %u", bgTypeId);
                 return;
             }
 
@@ -990,7 +990,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
             *data << uint32(time2);                         // time from bg start, milliseconds
             break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unknown BG status!");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unknown BG status!");
             break;
     }
 }
@@ -1162,7 +1162,7 @@ BattleGround* BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeId
     BattleGround *bgTemplate = GetBattleGroundTemplate(bgTypeId);
     if (!bgTemplate)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGround: CreateNewBattleGround - bg template not found for %u", bgTypeId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGround: CreateNewBattleGround - bg template not found for %u", bgTypeId);
         return nullptr;
     }
 
@@ -1393,7 +1393,7 @@ void BattleGroundMgr::SendToBattleGround(Player* player, uint32 instanceId, Batt
         player->TeleportTo(mapid, x, y, z, o);
     }
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: player %u trying to port to nonexistent bg instance %u", player->GetGUIDLow(), instanceId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "player %u trying to port to nonexistent bg instance %u", player->GetGUIDLow(), instanceId);
 }
 
 BattleGroundQueueTypeId BattleGroundMgr::BgQueueTypeId(BattleGroundTypeId bgTypeId)
@@ -1696,7 +1696,7 @@ void BattleGroundQueue::PlayerLoggedOut(ObjectGuid guid)
     itr = m_queuedPlayers.find(guid);
     if (itr == m_queuedPlayers.end())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleGroundQueue: couldn't find for remove: %s", guid.GetString().c_str());
         return;
     }
     itr->second.lastOnlineTime  = WorldTimer::getMSTime();

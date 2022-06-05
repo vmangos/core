@@ -25,7 +25,7 @@ enum EncounterState
 #define OUT_SAVE_INST_DATA_COMPLETE    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Saving Instance Data for Instance %s (Map %d, Instance Id %d) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 #define OUT_LOAD_INST_DATA(a)          sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Loading Instance Data for Instance %s (Map %d, Instance Id %d). Input is '%s'", instance->GetMapName(), instance->GetId(), instance->GetInstanceId(), a)
 #define OUT_LOAD_INST_DATA_COMPLETE    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "Instance Data Load for Instance %s (Map %d, Instance Id: %d) is complete.",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
-#define OUT_LOAD_INST_DATA_FAIL        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unable to load Instance Data for Instance %s (Map %d, Instance Id: %d).",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
+#define OUT_LOAD_INST_DATA_FAIL        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to load Instance Data for Instance %s (Map %d, Instance Id: %d).",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 
 class ScriptedInstance : public InstanceData
 {

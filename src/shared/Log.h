@@ -32,10 +32,11 @@ class ByteBuffer;
 
 enum LogLevel
 {
-    LOG_LVL_MINIMAL = 0,                                    // unconditional and errors
-    LOG_LVL_BASIC   = 1,
-    LOG_LVL_DETAIL  = 2,
-    LOG_LVL_DEBUG   = 3
+    LOG_LVL_ERROR = 0,
+    LOG_LVL_MINIMAL,
+    LOG_LVL_BASIC,
+    LOG_LVL_DETAIL,
+    LOG_LVL_DEBUG,
 };
 
 // bitmask (not forgot update logFilterData content)

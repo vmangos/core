@@ -179,7 +179,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petEntry);
     if (!creatureInfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Pet entry %u does not exist but used at pet load (owner: %s).", petEntry, owner->GetGuidStr().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet entry %u does not exist but used at pet load (owner: %s).", petEntry, owner->GetGuidStr().c_str());
         m_pTmpCache = nullptr;
         m_loading = false;
         return false;
@@ -226,7 +226,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petNumber, bool c
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_PET);
     if (!Create(guid, pos, creatureInfo, pet_number))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
                       GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
         m_pTmpCache = nullptr;
         m_loading = false;
@@ -1264,7 +1264,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 {
     if (!creature)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CRITICAL: nullptr pointer passed into CreateBaseAtCreature()");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CRITICAL: nullptr pointer passed into CreateBaseAtCreature()");
         return false;
     }
 
@@ -1280,7 +1280,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     CreatureInfo const* cinfo = GetCreatureInfo();
     if (!cinfo)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CreateBaseAtCreature() failed, creatureInfo is missing!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreateBaseAtCreature() failed, creatureInfo is missing!");
         return false;
     }
 
@@ -1335,7 +1335,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         owner = GetOwner();
         if (!owner)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->entry);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->entry);
             return false;
         }
     }
@@ -1520,7 +1520,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             break;
         }
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Pet have incorrect type (%u) for levelup.", getPetType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet have incorrect type (%u) for levelup.", getPetType());
             break;
     }
 
@@ -1594,7 +1594,7 @@ void Pet::_LoadSpellCooldowns()
             SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
             if (!spellEntry)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s has unknown spell %u in `character_spell_cooldown`, skipping.", GetGuidStr().c_str(), spellId);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s has unknown spell %u in `character_spell_cooldown`, skipping.", GetGuidStr().c_str(), spellId);
                 continue;
             }
 
@@ -1773,7 +1773,7 @@ void Pet::_LoadAuras(uint32 timediff)
             SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellid);
             if (!spellproto)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Pet::_LoadAuras: Unknown spell (spellid %u), ignore.", spellid);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet::_LoadAuras: Unknown spell (spellid %u), ignore.", spellid);
                 continue;
             }
 
@@ -1943,11 +1943,11 @@ bool Pet::AddSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         // do pet spell book cleanup
         if (state == PETSPELL_UNCHANGED)                    // spell load case
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Pet::AddSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet::AddSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spellId);
             CharacterDatabase.PExecute("DELETE FROM `pet_spell` WHERE `spell` = '%u'", spellId);
         }
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Pet::AddSpell: nonexistent in SpellStore spell #%u request.", spellId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Pet::AddSpell: nonexistent in SpellStore spell #%u request.", spellId);
 
         return false;
     }

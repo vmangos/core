@@ -94,14 +94,14 @@ void AuctionHouseBotMgr::Update(bool force /* = false */)
 
     if (m_items.empty() ||  /*m_config->botguid==0 ||*/ m_config->botaccount == 0)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AHBot::Update() : Bad config or empty table.");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AHBot::Update() : Bad config or empty table.");
         return;
     }
 
     AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(m_auctionHouseEntry);
     if (!auctionHouse)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AHBot::Update() : No auction house for faction %u.", m_config->ahfid);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AHBot::Update() : No auction house for faction %u.", m_config->ahfid);
         return;
     }
 

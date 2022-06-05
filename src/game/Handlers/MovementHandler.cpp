@@ -60,7 +60,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check (only cheating case possible)
     if (!MapManager::IsValidMapCoord(loc))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far to a not valid location "
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far to a not valid location "
                       "(map:%u, x:%f, y:%f, z:%f) We port him to his homebind instead..",
                       GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
         // stop teleportation else we would try this again and again in LogoutPlayer...
@@ -469,7 +469,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
             move_type = MOVE_TURN_RATE;
             break;
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
             return;
     }
 
@@ -890,7 +890,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 
     if (serverMoverGuid != guid)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
                       _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
         m_clientMoverGuid = _player->GetMover()->GetObjectGuid();
         return;

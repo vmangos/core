@@ -316,7 +316,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
     // do not allow to sell already auctioned items
     if (sAuctionMgr.GetAItem(itemGuid.GetCounter()))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AuctionError, %s is sending %s, but item is already in another auction", pl->GetGuidStr().c_str(), itemGuid.GetString().c_str());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AuctionError, %s is sending %s, but item is already in another auction", pl->GetGuidStr().c_str(), itemGuid.GetString().c_str());
         SendAuctionCommandResult(nullptr, AUCTION_STARTED, AUCTION_ERR_INVENTORY, EQUIP_ERR_ITEM_NOT_FOUND);
         return;
     }
@@ -612,7 +612,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
         }
         else
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Auction id: %u has nonexistent item (item guid : %u)!!!", auction->Id, auction->itemGuidLow);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Auction id: %u has nonexistent item (item guid : %u)!!!", auction->Id, auction->itemGuidLow);
             SendAuctionCommandResult(nullptr, AUCTION_REMOVED, AUCTION_ERR_INVENTORY, EQUIP_ERR_ITEM_NOT_FOUND);
             return;
         }
@@ -621,7 +621,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
     {
         SendAuctionCommandResult(nullptr, AUCTION_REMOVED, AUCTION_ERR_DATABASE);
         // this code isn't possible ... maybe there should be ASSERT
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is nullptr", pl->GetGUIDLow(), auctionId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is nullptr", pl->GetGUIDLow(), auctionId);
         return;
     }
 
@@ -696,7 +696,7 @@ public:
                 }
                 default:
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [AsyncAuctionQuery] Invalid query type %u", _queryType);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[AsyncAuctionQuery] Invalid query type %u", _queryType);
                     return;
                 }
             }
@@ -727,7 +727,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
     recv_data >> outbiddedCount;
     if (recv_data.size() != (16 + outbiddedCount * 4))
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Client sent bad opcode!!! with count: %u and size : %u (must be: %u)", outbiddedCount, (uint32)recv_data.size(), (16 + outbiddedCount * 4));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Client sent bad opcode!!! with count: %u and size : %u (must be: %u)", outbiddedCount, (uint32)recv_data.size(), (16 + outbiddedCount * 4));
         outbiddedCount = 0;
     }
 

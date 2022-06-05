@@ -41,7 +41,7 @@
         \
         if(res==-1) \
         { \
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: SQL Query truncated (and not execute) for format: %s",format); \
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SQL Query truncated (and not execute) for format: %s",format); \
             return false; \
         } \
     }

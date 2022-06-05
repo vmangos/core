@@ -24,7 +24,7 @@ void ScriptedInstance::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime
                 pGo->ResetDoorOrButton();
         }
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script call DoUseDoorOrButton, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DoUseDoorOrButton, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
     }
 }
 
@@ -60,7 +60,7 @@ void ScriptedInstance::DoOpenDoor(uint64 uiGuid)
                 pGo->UseDoorOrButton(0, false);
         }
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script call DoOpenDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DoOpenDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
     }
 }
 
@@ -76,7 +76,7 @@ void ScriptedInstance::DoResetDoor(uint64 uiGuid)
         if (pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR || pGo->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
             pGo->ResetDoorOrButton();
         else
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script call DoResetDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DoResetDoor, but gameobject entry %u is type %u.",pGo->GetEntry(),pGo->GetGoType());
     }
 }
 
@@ -146,7 +146,7 @@ GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
         return instance->GetGameObject(find->second);
 
     // Output log, possible reason is not added GO to map, or not yet loaded;
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script requested gameobject with entry %u, but no gameobject of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script requested gameobject with entry %u, but no gameobject of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
 
     return nullptr;
 }
@@ -160,7 +160,7 @@ Creature* ScriptedInstance::GetSingleCreatureFromStorage(uint32 uiEntry, bool bS
 
     // Output log, possible reason is not added GO to map, or not yet loaded;
     if (!bSkipDebugLog)
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script requested creature with entry %u, but no npc of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script requested creature with entry %u, but no npc of this entry was created yet, or it was not stored by script for map %u.", uiEntry, instance->GetId());
 
     return nullptr;
 }
@@ -264,7 +264,7 @@ void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
 
     if (!bFound)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Script call DialogueHelper::StartNextDialogueText, but textEntry %i is not in provided dialogue (on map id %u)", iTextEntry, m_pInstance ? m_pInstance->instance->GetId() : 0);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Script call DialogueHelper::StartNextDialogueText, but textEntry %i is not in provided dialogue (on map id %u)", iTextEntry, m_pInstance ? m_pInstance->instance->GetId() : 0);
         return;
     }
 

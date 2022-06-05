@@ -62,7 +62,7 @@ int RASocket::open(void* )
 {
     if (reactor ()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: RASocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::open: unable to register client handler errno = %s", ACE_OS::strerror (errno));
         return -1;
     }
 
@@ -70,7 +70,7 @@ int RASocket::open(void* )
 
     if (peer ().get_remote_addr (remote_addr) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: RASocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::open: peer ().get_remote_addr errno = %s", ACE_OS::strerror (errno));
         return -1;
     }
 
@@ -124,7 +124,7 @@ int RASocket::handle_output (ACE_HANDLE)
     {
         if(reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK) == -1)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: RASocket::handle_output: error while cancel_wakeup");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::handle_output: error while cancel_wakeup");
             return -1;
         }
         outActive = false;
@@ -152,7 +152,7 @@ int RASocket::handle_input(ACE_HANDLE)
     sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "RASocket::handle_input");
     if(closing_)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Called RASocket::handle_input with closing_ = true");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Called RASocket::handle_input with closing_ = true");
         return -1;
     }
 
@@ -319,7 +319,7 @@ int RASocket::sendf(const char* msg)
         if (reactor ()->schedule_wakeup
             (this, ACE_Event_Handler::WRITE_MASK) == -1)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: RASocket::sendf error while schedule_wakeup");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "RASocket::sendf error while schedule_wakeup");
             return -1;
         }
         outActive = true;

@@ -72,7 +72,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
             break;
         }
         default:
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: QuestGiver called for unexpected type %u", questgiver->GetTypeId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "QuestGiver called for unexpected type %u", questgiver->GetTypeId());
             break;
     }
 
@@ -240,7 +240,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recv_data)
 
     if (reward >= QUEST_REWARD_CHOICES_COUNT)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
         return;
     }
 
@@ -531,7 +531,7 @@ uint32 WorldSession::GetDialogStatus(Player* pPlayer, Object* questgiver, uint32
         }
         default:
             //it's impossible, but check ^)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Warning: GetDialogStatus called for unexpected type %u", questgiver->GetTypeId());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Warning: GetDialogStatus called for unexpected type %u", questgiver->GetTypeId());
             return DIALOG_STATUS_NONE;
     }
 

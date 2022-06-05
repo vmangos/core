@@ -217,7 +217,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         instance_temple_of_ahnqiraj* tmpPTr = dynamic_cast<instance_temple_of_ahnqiraj*>(pCreature->GetInstanceData());
         if (!tmpPTr) {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
             m_pInstance = nullptr;
         }
         else {

@@ -190,7 +190,7 @@ struct npc_grimstoneAI : public npc_escortAI
             Player *challenger = m_creature->GetMap()->GetPlayer(m_pInstance->GetData64(DATA_ARENA_CHALLENGER));
             if (!challenger)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [Blackrock Depths] Ring of Law challenger player not found!");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[Blackrock Depths] Ring of Law challenger player not found!");
                 return;
             }
 

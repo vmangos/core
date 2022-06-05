@@ -244,7 +244,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction)
     Item *pItem = GetAItem(auction->itemGuidLow);
     if (!pItem)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Auction item (GUID: %u) not found, and lost.", auction->itemGuidLow);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Auction item (GUID: %u) not found, and lost.", auction->itemGuidLow);
         return;
     }
 
@@ -374,7 +374,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
         if (!proto)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", itemGuid, itemId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", itemGuid, itemId);
             continue;
         }
 
@@ -462,7 +462,7 @@ void AuctionHouseMgr::LoadAuctions()
         if (!pItem)
         {
             auction->DeleteFromDB();
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Auction %u has not a existing item : %u, deleted", auction->Id, auction->itemGuidLow);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Auction %u has not a existing item : %u, deleted", auction->Id, auction->itemGuidLow);
             delete auction;
             continue;
         }
@@ -837,7 +837,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     Item *pItem = sAuctionMgr.GetAItem(itemGuidLow);
     if (!pItem)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: auction to item, that doesn't exist !!!!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "auction to item, that doesn't exist !!!!");
         return false;
     }
     data << uint32(Id);

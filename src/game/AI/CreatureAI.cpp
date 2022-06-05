@@ -193,7 +193,7 @@ void CreatureAI::SetSpellsList(uint32 entry)
     else if (CreatureSpellsList const* pSpellsTemplate = sObjectMgr.GetCreatureSpellsList(entry))
         SetSpellsList(pSpellsTemplate);
     else
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
 }
 
 void CreatureAI::SetSpellsList(CreatureSpellsList const* pSpellsList)

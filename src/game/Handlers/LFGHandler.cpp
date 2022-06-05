@@ -54,7 +54,7 @@ void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket& recv_data)
     // Never expect this opcode for some type GO's
     if (obj->GetGoType() != GAMEOBJECT_TYPE_MEETINGSTONE)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: HandleMeetingStoneJoinOpcode: CMSG_MEETINGSTONE_JOIN for not allowed GameObject type %u (Entry %u), didn't expect this to happen.", obj->GetGoType(), obj->GetEntry());
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "HandleMeetingStoneJoinOpcode: CMSG_MEETINGSTONE_JOIN for not allowed GameObject type %u (Entry %u), didn't expect this to happen.", obj->GetGoType(), obj->GetEntry());
         return;
     }
 

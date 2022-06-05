@@ -91,7 +91,7 @@ bool MMapManager::loadMapData(uint32 mapId)
     if (dtStatusFailed(dtResult))
     {
         dtFreeNavMesh(mesh);
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s with %u tiles. Result 0x%x.", mapId, fileName, params.maxTiles, dtResult);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s with %u tiles. Result 0x%x.", mapId, fileName, params.maxTiles, dtResult);
         delete [] fileName;
         return false;
     }
@@ -160,14 +160,14 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
 
     if (fileHeader.mmapMagic != MMAP_MAGIC)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadMap: Bad header in mmap %03u%02i%02i.mmtile", mapId, x, y);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadMap: Bad header in mmap %03u%02i%02i.mmtile", mapId, x, y);
         fclose(file);
         return false;
     }
 
     if (fileHeader.mmapVersion != MMAP_VERSION)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadMap: %03u%02i%02i.mmtile was built with generator v%i, expected v%i",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadMap: %03u%02i%02i.mmtile was built with generator v%i, expected v%i",
                       mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
         fclose(file);
         return false;
@@ -179,7 +179,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     size_t result = fread(data, fileHeader.size, 1, file);
     if (!result)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadMap: Bad header or data in mmap %03u%02i%02i.mmtile", mapId, x, y);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadMap: Bad header or data in mmap %03u%02i%02i.mmtile", mapId, x, y);
         fclose(file);
         return false;
     }
@@ -199,7 +199,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     }
     else
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadMap: Could not load %03u%02i%02i.mmtile into navmesh [result 0x%x]", mapId, x, y, dResult);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadMap: Could not load %03u%02i%02i.mmtile into navmesh [result 0x%x]", mapId, x, y, dResult);
         dtFree(data);
         return false;
     }
@@ -237,7 +237,7 @@ bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
         // this is technically a memory leak
         // if the grid is later reloaded, dtNavMesh::addTile will return error but no extra memory is used
         // we cannot recover from this error - assert out
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
         MANGOS_ASSERT(false);
     }
     else
@@ -267,7 +267,7 @@ bool MMapManager::unloadMap(uint32 mapId)
         uint32 y = (i->first & 0x0000FFFF);
         dtStatus dtResult = mmap->navMesh->removeTile(i->second, nullptr, nullptr);
         if (dtStatusFailed(dtResult))
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
         else
             --loadedTiles;
     }
@@ -345,7 +345,7 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
         {
             ulock.unlock();
             dtFreeNavMeshQuery(navMeshQuery);
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
             return nullptr;
         }
 
@@ -388,14 +388,14 @@ bool MMapManager::loadGameObject(uint32 displayId)
 
     if (fileHeader.mmapMagic != MMAP_MAGIC)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadGameObject: Bad header in mmap %s", fileName);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadGameObject: Bad header in mmap %s", fileName);
         fclose(file);
         return false;
     }
 
     if (fileHeader.mmapVersion != MMAP_VERSION)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadGameObject: %s was built with generator v%i, expected v%i",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadGameObject: %s was built with generator v%i, expected v%i",
                       fileName, fileHeader.mmapVersion, MMAP_VERSION);
         fclose(file);
         return false;
@@ -406,7 +406,7 @@ bool MMapManager::loadGameObject(uint32 displayId)
     size_t result = fread(data, fileHeader.size, 1, file);
     if (!result)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadGameObject: Bad header or data in mmap %s", fileName);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadGameObject: Bad header or data in mmap %s", fileName);
         fclose(file);
         return false;
     }
@@ -419,7 +419,7 @@ bool MMapManager::loadGameObject(uint32 displayId)
     if (dtStatusFailed(r))
     {
         dtFreeNavMesh(mesh);
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:loadGameObject: Failed to initialize dtNavMesh from file %s. Result 0x%x.", fileName, r);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:loadGameObject: Failed to initialize dtNavMesh from file %s. Result 0x%x.", fileName, r);
         delete [] fileName;
         return false;
     }
@@ -449,7 +449,7 @@ dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
             if (dtStatusFailed(query->init(mmap->navMesh, 2048)))
             {
                 dtFreeNavMeshQuery(query);
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MMAP:GetModelNavMeshQuery: Failed to initialize dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MMAP:GetModelNavMeshQuery: Failed to initialize dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
                 return nullptr;
             }
 

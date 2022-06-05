@@ -52,13 +52,13 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
         pScript = itr->GetZoneScript();
         if (!pScript)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not initialize ZoneScript object. Got nullptr pointer from script.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not initialize ZoneScript object. Got nullptr pointer from script.");
             continue;
         }
         pScript->SetMap(pMap);
         if (!pScript->SetupZoneScript())
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Could not initialize ZoneScript object. SetupZoneScript failed.");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Could not initialize ZoneScript object. SetupZoneScript failed.");
             delete pScript;
             continue;
         }

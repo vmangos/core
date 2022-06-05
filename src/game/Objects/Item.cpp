@@ -78,7 +78,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(set->spells[x]);
                 if (!spellInfo)
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WORLD: unknown spell id %u in items set %u effects", set->spells[x], setid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WORLD: unknown spell id %u in items set %u effects", set->spells[x], setid);
                     break;
                 }
 
@@ -526,7 +526,7 @@ void Item::LoadLootFromDB(Field* fields)
     if (!proto)
     {
         CharacterDatabase.PExecute("DELETE FROM `item_loot` WHERE `guid` = '%u' AND `item_id` = '%u'", GetGUIDLow(), item_id);
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
         return;
     }
 
@@ -857,7 +857,7 @@ void Item::AddToUpdateQueueOf(Player* player)
         player = GetOwner();
         if (!player)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Item::AddToUpdateQueueOf - %s current owner (%s) not in world!",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::AddToUpdateQueueOf - %s current owner (%s) not in world!",
                           GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
@@ -865,7 +865,7 @@ void Item::AddToUpdateQueueOf(Player* player)
 
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Item::AddToUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::AddToUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
                       GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
@@ -887,7 +887,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
         player = GetOwner();
         if (!player)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Item::RemoveFromUpdateQueueOf - %s current owner (%s) not in world!",
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::RemoveFromUpdateQueueOf - %s current owner (%s) not in world!",
                           GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
@@ -895,7 +895,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
 
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Item::RemoveFromUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Item::RemoveFromUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
                       GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }

@@ -422,6 +422,9 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
 		if (m_includeTime)
 			outTime(stdout);
 
+		if (logLevel == LOG_LVL_ERROR)
+			printf("ERROR: ");
+
 		utf8printf(stdout, buff);
 
 		if (m_colored)
@@ -435,6 +438,9 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
 	{
 		if (timestampPrefix[logType])
 			outTimestamp(logFiles[logType]);
+
+		if (logLevel == LOG_LVL_ERROR)
+			fputs("ERROR: ", logFiles[logType]);
 
 		fputs(buff, logFiles[logType]);
 		fputs("\n", logFiles[logType]);

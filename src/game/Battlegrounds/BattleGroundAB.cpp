@@ -203,7 +203,7 @@ void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
         case 4021:                                          // Unk2
         //break;
         default:
-            //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
             //source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }

@@ -102,7 +102,7 @@ void SpellModMgr::LoadSpellMods()
             {
                 if (!sSpellMgr.OverwriteSpellEntry(spellid))
                 {
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Unable to create spell %u, skipping.", spellid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Unable to create spell %u, skipping.", spellid);
                     continue;
                 }
             }
@@ -111,7 +111,7 @@ void SpellModMgr::LoadSpellMods()
             if (!spell)
             {
                 if (!sSpellMgr.IsExistingSpellId(spellid))
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
 
@@ -219,12 +219,12 @@ void SpellModMgr::LoadSpellMods()
             if (!spell)
             {
                 if (!sSpellMgr.IsExistingSpellId(spellid))
-                    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
+                    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
             if (effect_idx >= MAX_EFFECT_INDEX)
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
                 continue;
             }
             // 0   1            2       3                    4               5                      6

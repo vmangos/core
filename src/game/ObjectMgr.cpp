@@ -115,7 +115,7 @@ T IdGenerator<T>::Generate()
 {
     if (m_nextGuid >= std::numeric_limits<T>::max() - 1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s guid overflow!! Can't continue, shutting down server. ", m_name);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s guid overflow!! Can't continue, shutting down server. ", m_name);
         World::StopNow(ERROR_EXIT_CODE);
     }
     return m_nextGuid++;
@@ -330,7 +330,7 @@ void ObjectMgr::LoadSpellDisabledEntrys()
         if (!sSpellMgr.GetSpellEntry(spellid))
         {
             if (!sSpellMgr.IsExistingSpellId(spellid))
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Spell entry %u from `spell_disabled` doesn't exist, ignoring.", spellid);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Spell entry %u from `spell_disabled` doesn't exist, ignoring.", spellid);
             continue;
         }
         m_DisabledSpells.insert(spellid);
@@ -457,7 +457,7 @@ Position const* ObjectMgr::GetCinematicInitialPosition(uint32 cinematicId)
         }
     }
     // Not found
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Can not find the starting point of cinematic %u", cinematicId);
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Can not find the starting point of cinematic %u", cinematicId);
     return nullptr;
 }
 
@@ -6790,7 +6790,7 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
 
         if (team != ALLIANCE && team != HORDE)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table `areatrigger_bg_entrance` has team (ID:%u) that is not Horde or Alliance for area trigger (ID:%u).", team, triggerId);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `areatrigger_bg_entrance` has team (ID:%u) that is not Horde or Alliance for area trigger (ID:%u).", team, triggerId);
             continue;
         }
         bget.team = Team(team);
@@ -8783,7 +8783,7 @@ void ObjectMgr::LoadReservedPlayersNames()
         std::wstring wstr;
         if (!Utf8toWStr(name, wstr))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Table `reserved_name` have invalid name: %s", name.c_str());
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Table `reserved_name` have invalid name: %s", name.c_str());
             continue;
         }
 
@@ -10799,7 +10799,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
         GameObject* go = GameObject::CreateGameObject(entry);
         if (!go->LoadFromDB(guid, map))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AddGOData: cannot add gameobject entry %u to map", entry);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AddGOData: cannot add gameobject entry %u to map", entry);
             delete go;
             return 0;
         }
@@ -10835,7 +10835,7 @@ bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, Position const& pos)
             Creature* creature = new Creature;
             if (!creature->LoadFromDB(guid, map))
             {
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AddCreature: cannot add creature entry %u to map", guid);
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AddCreature: cannot add creature entry %u to map", guid);
                 delete creature;
                 return false;
             }
@@ -10878,7 +10878,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
         Creature* creature = new Creature;
         if (!creature->LoadFromDB(guid, map))
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: AddCreature: cannot add creature entry %u to map", entry);
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "AddCreature: cannot add creature entry %u to map", entry);
             delete creature;
             return 0;
         }
@@ -11678,13 +11678,13 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
     auto itr = m_playerPremadeGearMap.find(entry);
     if (itr == m_playerPremadeGearMap.end())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to apply non-existent premade template to player (%u)", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to apply non-existent premade template to player (%u)", entry);
         return;
     }
 
     if (pPlayer->GetClass() != itr->second.requiredClass)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to apply premade template (%u) to a player with wrong class", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to apply premade template (%u) to a player with wrong class", entry);
         return;
     }
 
@@ -11721,13 +11721,13 @@ void ObjectMgr::ApplyPremadeSpecTemplateToPlayer(uint32 entry, Player* pPlayer) 
     auto itr = m_playerPremadeSpecMap.find(entry);
     if (itr == m_playerPremadeSpecMap.end())
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to apply non-existent premade template to player (%u)", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to apply non-existent premade template to player (%u)", entry);
         return;
     }
 
     if (pPlayer->GetClass() != itr->second.requiredClass)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Attempt to apply premade template (%u) to a player with wrong class", entry);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Attempt to apply premade template (%u) to a player with wrong class", entry);
         return;
     }
 

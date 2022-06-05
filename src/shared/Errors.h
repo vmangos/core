@@ -50,9 +50,9 @@ if (!(CONDITION)) \
 if (!(CONDITION)) \
 { \
     ACE_Stack_Trace st; \
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s:%i: Warning: Assertion in %s failed: %s",\
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s:%i: Warning: Assertion in %s failed: %s",\
         __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
-    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: %s", st.c_str()); \
+    sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "%s", st.c_str()); \
 }
 #else
 // Normal assert.

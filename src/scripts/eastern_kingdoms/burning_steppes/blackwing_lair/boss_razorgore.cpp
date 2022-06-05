@@ -587,7 +587,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                 }
             }
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
         }
 
         if (m_uiRazorgorePhase && m_uiCombatStarted)
@@ -664,11 +664,11 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         m_uiPossesseurGuid.Clear();
                     }
                     else
-                        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [MC/Razor] Unable to find the controller (%s)", m_uiPossesseurGuid.GetString().c_str());
+                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MC/Razor] Unable to find the controller (%s)", m_uiPossesseurGuid.GetString().c_str());
                 }
             }
             else
-                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: [MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
             if (m_uiPopTimer < uiDiff)
             {
                 for (uint8 i = 0; i < 4; ++i)

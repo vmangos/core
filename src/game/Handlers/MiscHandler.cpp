@@ -1040,7 +1040,7 @@ void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket& recv_data)
     if (!GetPlayer())                                       // ignore until not logged (check needed because STATUS_AUTHED)
     {
         if (actionBar != 0)
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(actionBar));
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(actionBar));
         return;
     }
 

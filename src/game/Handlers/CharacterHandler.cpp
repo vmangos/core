@@ -777,7 +777,7 @@ void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)
     uint32 wInt = (iFlag / 32);
     if (wInt >= 8)
     {
-        //sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: CHEATER? Account:[%d] Guid[%u] tried to send wrong CMSG_TUTORIAL_FLAG", GetAccountId(),GetGUID());
+        //sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "CHEATER? Account:[%d] Guid[%u] tried to send wrong CMSG_TUTORIAL_FLAG", GetAccountId(),GetGUID());
         return;
     }
     uint32 rInt = (iFlag % 32);

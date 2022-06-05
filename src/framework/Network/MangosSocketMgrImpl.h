@@ -48,7 +48,7 @@ protected:
 #if defined(ENFILE) && defined(EMFILE)
         if (errno == ENFILE || errno == EMFILE)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Out of file descriptors, suspending incoming connections for 10 seconds");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Out of file descriptors, suspending incoming connections for 10 seconds");
             this->reactor()->remove_handler(this, ACE_Event_Handler::ACCEPT_MASK | ACE_Event_Handler::DONT_CALL);
             this->reactor()->schedule_timer(this, NULL, ACE_Time_Value(10));
         }
@@ -265,7 +265,7 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
 
     if (m_SockOutUBuff <= 0)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Network.OutUBuff is wrong in your config file");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Network.OutUBuff is wrong in your config file");
         return -1;
     }
 
@@ -275,7 +275,7 @@ int MangosSocketMgr<SocketType>::StartReactiveIO(ACE_UINT16 port, const char* ad
 
     if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: Failed to open acceptor, check if the port is free");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Failed to open acceptor, check if the port is free");
         return -1;
     }
 
@@ -330,7 +330,7 @@ int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
     {
         if (sock->peer().set_option(SOL_SOCKET, SO_SNDBUF, (void*)&m_SockOutKBuff, sizeof(int)) == -1 && errno != ENOTSUP)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MangosSocketMgr<SocketType>::OnSocketOpen set_option SO_SNDBUF");
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocketMgr<SocketType>::OnSocketOpen set_option SO_SNDBUF");
             return -1;
         }
     }
@@ -342,7 +342,7 @@ int MangosSocketMgr<SocketType>::OnSocketOpen(SocketType* sock)
     {
         if (sock->peer().set_option(ACE_IPPROTO_TCP, TCP_NODELAY, (void*)&ndoption, sizeof(int)) == -1)
         {
-            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "ERROR: MangosSocketMgr<SocketType>::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror(errno));
+            sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "MangosSocketMgr<SocketType>::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror(errno));
             return -1;
         }
     }
