@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS `logs_warden`;
 DROP TABLE IF EXISTS `logs_player`;
 CREATE TABLE `logs_player` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `time` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   `type` ENUM(
     'Basic', 'WorldPacket', 'Chat', 'BG', 'Character', 'Honor', 'RA', 'DBError', 'DBErrorFix', 'ClientIds',
     'Loot', 'LevelUp', 'Performance', 'MoneyTrade', 'GM', 'GMCritical', 'ChatSpam', 'Anticheat'
