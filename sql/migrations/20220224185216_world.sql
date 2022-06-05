@@ -5067,6 +5067,15 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (5126, 0, 0, 7, 5126, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lorax\'s Tale: Lorax - Complete Quest');
 UPDATE `quest_template` SET `OfferRewardText` = '<Lorax laughs.>' WHERE `entry` = 5126;
 
+-- ----------------------------------------------------------------------
+
+-- 3 Creatures Should Spawn
+DELETE FROM `creature_ai_scripts` WHERE `id`=1128901;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1128901, 0, 0, 10, 11288, 40000, 0, 0, 11289, 20, 8, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Spectral Defender - Summon Creature'),
+(1128901, 0, 0, 10, 11288, 40000, 0, 0, 11289, 20, 8, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Spectral Defender - Summon Creature'),
+(1128901, 0, 0, 10, 11288, 40000, 0, 0, 11289, 20, 8, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Spectral Defender - Summon Creature');
+
 
 -- End of migration.
 END IF;
