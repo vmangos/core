@@ -5026,18 +5026,18 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (1183, 0, 0, 'Indeed.\n', 4251, 1, 1, 1184, 0, 0, 0, NULL, 0),
 (1184, 0, 0, 'I will do this with or without your help, Loramus.\n', 4254, 1, 1, 1185, 0, 0, 0, NULL, 0),
 (1185, 0, 0, 'Yes.\n', 4256, 1, 1, -1, 0, 0, 0, NULL, 0);
-UPDATE `gossip_menu_option` SET `condition_id` = 174 WHERE `menu_id` = 1163 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `condition_id` = 223 WHERE `menu_id` = 1163 AND `id` = 0;
 UPDATE `gossip_menu_option` SET `action_script_id` = 2744 WHERE `menu_id` = 1164;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (2744, 0, 0, 7, 2744, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Demon Hunter: Loramus Thalipedes - Complete Quest');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
-(174, 9, 2744, 0, 0, 0, 0);
-UPDATE `gossip_menu_option` SET `condition_id` = 179 WHERE `menu_id` = 1163 AND `id` = 1;
+(223, 9, 2744, 0, 0, 0, 0);
+UPDATE `gossip_menu_option` SET `condition_id` = 222 WHERE `menu_id` = 1163 AND `id` = 1;
 UPDATE `gossip_menu_option` SET `action_script_id` = 3142 WHERE `menu_id` = 1185;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (3142, 0, 0, 7, 3141, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Loramus: Loramus Thalipedes - Complete Quest');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
-(179, 9, 3141, 0, 0, 0, 0);
+(222, 9, 3141, 0, 0, 0, 0);
 
 -- Rivern Frostwind (NOTE: Needs CPP Removing)
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 42201;
@@ -5056,13 +5056,13 @@ INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
 (20018, 3762, 0),
 (20019, 3763, 0);
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(3049, 0, 0, 'You will have to excuse me, Lorax, I do not speak \'crazy\'.', 0, 1, 1, 20015, 0, 0, 0, 0, NULL, 0, 192),
+(3049, 0, 0, 'You will have to excuse me, Lorax, I do not speak \'crazy\'.', 0, 1, 1, 20015, 0, 0, 0, 0, NULL, 0, 221),
 (20015, 0, 0, 'My apologies, I did not realize that you could understand what I was saying. What is it you are doing out here?', 0, 1, 1, 20016, 0, 0, 0, 0, NULL, 0, 0),
 (20016, 0, 0, 'Do you? Perhaps you should tell me what it is that is bothering you.', 0, 1, 1, 20017, 0, 0, 0, 0, NULL, 0, 0),
 (20017, 0, 0, 'What deal?', 0, 1, 1, 20018, 0, 0, 0, 0, NULL, 0, 0),
 (20018, 0, 0, 'So how did he break the deal?', 0, 1, 1, 20019, 0, 0, 0, 0, NULL, 0, 0),
 (20019, 0, 0, 'Perhaps I can be of some assistance. I will make a deal with you, Satyr. I shall recover this unforged breastplate and slay the beast. In exchange for this task, you will teach me how to create the breastplate.', 0, 1, 1, -1, 0, 5126, 0, 0, NULL, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (192, 9, 5126, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (221, 9, 5126, 0, 0, 0, 0);
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (5126, 0, 0, 7, 5126, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lorax\'s Tale: Lorax - Complete Quest');
 UPDATE `quest_template` SET `OfferRewardText` = '<Lorax laughs.>' WHERE `entry` = 5126;
