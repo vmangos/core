@@ -413,8 +413,8 @@ void Warden::ApplyPenalty(std::string message, WardenActions penalty, std::share
 
 void Warden::HandlePacket(WorldPacket& recvData)
 {
-	// initialize decrypt packet
-	DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
+    // initialize decrypt packet
+    DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
 
     uint8 opcode;
     recvData >> opcode;
