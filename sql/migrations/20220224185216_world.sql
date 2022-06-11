@@ -5076,6 +5076,15 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (1128901, 0, 0, 10, 11288, 40000, 0, 0, 11289, 20, 8, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Spectral Defender - Summon Creature'),
 (1128901, 0, 0, 10, 11288, 40000, 0, 0, 11289, 20, 8, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 'Spectral Defender - Summon Creature');
 
+-- ----------------------------------------------------------------------
+
+-- Fathom Core Should Not Despawn After Use (note: needs CPP removing)
+UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `guid` = 32686;
+UPDATE `gameobject_template` SET `script_name` = '' WHERE `entry`= 177964;
+DELETE FROM `gameobject_scripts` WHERE `id` = 32686;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(32686, 0, 0, 10, 12876, 180000, 1, 50, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 0, 'Fathom Core - Summon Creature');
+
 
 -- End of migration.
 END IF;
