@@ -126,6 +126,7 @@ struct SoundEntriesEntry
 };
 
 typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
+typedef std::unordered_map<uint32, std::vector<CreatureClassLevelStats>> CreatureCLSMap;
 
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -629,6 +630,8 @@ class ObjectMgr
 
         static ItemPrototype const* GetItemPrototype(uint32 id) { return sItemStorage.LookupEntry<ItemPrototype>(id); }
 
+        CreatureClassLevelStats const* GetCreatureClassLevelStats(uint32 unitClass, uint32 level) const;
+
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;
 
         PlayerClassInfo const* GetPlayerClassInfo(uint32 class_) const
@@ -815,6 +818,7 @@ class ObjectMgr
         void LoadCreatureAddons();
         void LoadCreatureDisplayInfoAddon();
         void LoadCreatureSpells();
+        void LoadCreatureClassLevelStats();
         void LoadEquipmentTemplates();
         void LoadGameObjectLocales();
         void LoadGameobjects(bool reload = false);
@@ -1487,6 +1491,7 @@ class ObjectMgr
         CreatureDataMap m_CreatureDataMap;
         CreatureLocaleMap m_CreatureLocaleMap;
         CreatureSpellsMap m_CreatureSpellsMap;
+        CreatureCLSMap m_CreatureCLSMap;
         GameObjectDataMap m_GameObjectDataMap;
         GameObjectLocaleMap m_GameObjectLocaleMap;
         ItemLocaleMap m_ItemLocaleMap;

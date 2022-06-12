@@ -1359,10 +1359,11 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     }
 
     SetLevel(petlevel);
+    SetInitCreaturePowerType();
 
     // Before 1.9 pets retain their wild damage type
     if (sWorld.GetWowPatch() < WOW_PATCH_109 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS))
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmg_school));
+        SetMeleeDamageSchool(SpellSchools(cinfo->damage_school));
     else
         SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
 
@@ -1437,9 +1438,9 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 // donc pas de stats de pet.
                 DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->entry);
 
-                // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel * healthMod));
-                SetCreateMana(uint32(((float(cinfo->mana_max)   / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel * healthMod));
+                // disregard template multiplier
+                SetCreateHealth(GetClassLevelStats()->health * healthMod);
+                SetCreateMana(GetClassLevelStats()->mana);
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1471,8 +1472,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             {
                 sLog.outErrorDb("Hunter pet levelstats missing in DB");
 
-                // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel * healthMod));
+                // disregard template multiplier
+                SetCreateHealth(GetClassLevelStats()->health * healthMod);
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1489,15 +1490,18 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
             SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
 
-            SetCreateMana(cinfo->mana_max);
-            SetCreateHealth(cinfo->health_max * healthMod);
+            CreatureClassLevelStats const* pCLS = GetClassLevelStats();
+            SetCreateMana(pCLS->mana * cinfo->mana_multiplier);
+            SetCreateHealth(pCLS->health * cinfo->health_multiplier * healthMod);
 
             SetAttackTime(BASE_ATTACK, cinfo->base_attack_time);
             SetAttackTime(OFF_ATTACK, cinfo->base_attack_time);
             SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time);
 
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, damageMod * cinfo->dmg_min);
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, damageMod * cinfo->dmg_max);
+            float const meleeDamageAverage = pCLS->melee_damage * cinfo->damage_multiplier * damageMod;
+            float const meleeDamageVariance = meleeDamageAverage * cinfo->damage_variance;
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, meleeDamageAverage - meleeDamageVariance);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, meleeDamageAverage + meleeDamageVariance);
             break;
         }
         default:

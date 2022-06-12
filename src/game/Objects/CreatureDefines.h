@@ -135,6 +135,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_MOVEMENT_PAUSE            = 0x01000000, // 16777216 Creature will not pause movement when player talks to it
     CREATURE_FLAG_EXTRA_ALWAYS_RUN                   = 0x02000000, // 33554432 Creature will use run speed out of combat
     CREATURE_FLAG_EXTRA_NO_UNREACHABLE_EVADE         = 0x04000000, // 67108864 Creature will not evade due to target being unreachable
+    CREATURE_FLAG_EXTRA_APPEAR_DEAD                  = 0x08000000, // 134217728 Creature will have UNIT_DYNFLAG_DEAD applied
 };
 
 // Number of spells in one template
@@ -193,11 +194,6 @@ struct CreatureInfo
     uint32  gossip_menu_id;
     uint32  level_min;
     uint32  level_max;
-    uint32  health_min;
-    uint32  health_max;
-    uint32  mana_min;
-    uint32  mana_max;
-    uint32  armor;
     uint32  faction;
     uint32  npc_flags;
     float   speed_walk;
@@ -207,42 +203,39 @@ struct CreatureInfo
     float   leash_range;                                    // Hard limit on allowed chase distance
     uint32  rank;
     float   xp_multiplier;
-    float   dmg_min;
-    float   dmg_max;
-    uint32  dmg_school;
-    uint32  attack_power;
-    float   dmg_multiplier;
+    float   health_multiplier;
+    float   mana_multiplier;
+    float   armor_multiplier;
+    float   damage_multiplier;
+    float   damage_variance;
+    uint32  damage_school;
     uint32  base_attack_time;
     uint32  ranged_attack_time;
-    uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
-    uint32  unit_flags;                                     // enum UnitFlags mask values
-    uint32  dynamic_flags;
-    uint32  pet_family;                                     // enum CreatureFamily values (optional)
-    uint32  trainer_type;
-    uint32  trainer_spell;
-    uint32  trainer_class;
-    uint32  trainer_race;
-    float   ranged_dmg_min;
-    float   ranged_dmg_max;
-    uint32  ranged_attack_power;
-    uint32  type;                                           // enum CreatureType values
-    uint32  type_flags;                                     // enum CreatureTypeFlags mask values
-    uint32  loot_id;
-    uint32  pickpocket_loot_id;
-    uint32  skinning_loot_id;
     int32   holy_res;
     int32   fire_res;
     int32   nature_res;
     int32   frost_res;
     int32   shadow_res;
     int32   arcane_res;
+    uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
+    uint32  unit_flags;                                     // enum UnitFlags mask values
+    uint32  pet_family;                                     // enum CreatureFamily values (optional)
+    uint32  trainer_type;
+    uint32  trainer_spell;
+    uint32  trainer_class;
+    uint32  trainer_race;
+    uint32  type;                                           // enum CreatureType values
+    uint32  type_flags;                                     // enum CreatureTypeFlags mask values
+    uint32  loot_id;
+    uint32  pickpocket_loot_id;
+    uint32  skinning_loot_id;
+    uint32  gold_min;
+    uint32  gold_max;
     uint32  spells[CREATURE_MAX_SPELLS];
     uint32  spell_list_id;
     uint32  pet_spell_list_id;
     uint32  spawn_spell_id;
     uint32 const* auras;
-    uint32  gold_min;
-    uint32  gold_max;
     char const* ai_name;
     uint32  movement_type;
     uint32  inhabit_type;
@@ -343,6 +336,31 @@ struct CreatureDisplayInfoAddon
     float speed_run;
     uint8 gender;
     uint32 display_id_other_gender;                         // The oposite gender for this display id (male/female)
+};
+
+struct CreatureClassLevelStats
+{
+    CreatureClassLevelStats() = default;
+    CreatureClassLevelStats(float melee_damage_, float ranged_damage_, int32 attack_power_, int32 ranged_attack_power_,
+        int32 health_, int32 base_health_, int32 mana_, int32 base_mana_, int32 strength_, int32 agility_, int32 stamina_,
+        int32 intellect_, int32 spirit_, int32 armor_) : melee_damage(melee_damage_), ranged_damage(ranged_damage_), attack_power(attack_power_),
+        ranged_attack_power(ranged_attack_power_), health(health_), base_health(base_health_), mana(mana_), base_mana(base_mana_), strength(strength_),
+        agility(agility_), stamina(stamina_), intellect(intellect_), spirit(spirit_), armor(armor_) {};
+
+    float melee_damage = 0.0f;
+    float ranged_damage = 0.0f;
+    int32 attack_power = 0;
+    int32 ranged_attack_power = 0;
+    int32 health = 0;
+    int32 base_health = 0;
+    int32 mana = 0;
+    int32 base_mana = 0;
+    int32 strength = 0;
+    int32 agility = 0;
+    int32 stamina = 0;
+    int32 intellect = 0;
+    int32 spirit = 0;
+    int32 armor = 0;
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform

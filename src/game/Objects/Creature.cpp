@@ -321,8 +321,6 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, Cr
     // known valid are: CLASS_WARRIOR,CLASS_PALADIN,CLASS_ROGUE,CLASS_MAGE
     SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_CLASS, uint8(cinfo->unit_class));
 
-    SetInitCreaturePowerType();
-
     float scale;
     uint32 displayId = ChooseDisplayId(GetCreatureInfo(), data, addon, eventData, &scale);
     if (!displayId)                                         // Cancel load if no display id
@@ -461,16 +459,25 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
     SetSheath(SHEATH_STATE_MELEE);
     SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_MISC_FLAGS, UNIT_BYTE2_FLAG_AURAS);
 
-    SelectLevel(GetCreatureInfo(), preserveHPAndPower ? GetHealthPercent() : 100.0f, preserveHPAndPower ? GetPowerPercent(POWER_MANA) : 100.0f);
+    SelectLevel(preserveHPAndPower ? GetHealthPercent() : 100.0f, preserveHPAndPower ? GetPowerPercent(POWER_MANA) : 100.0f);
+    SetCreateResistance(SPELL_SCHOOL_HOLY, GetCreatureInfo()->holy_res);
+    SetCreateResistance(SPELL_SCHOOL_FIRE, GetCreatureInfo()->fire_res);
+    SetCreateResistance(SPELL_SCHOOL_NATURE, GetCreatureInfo()->nature_res);
+    SetCreateResistance(SPELL_SCHOOL_FROST, GetCreatureInfo()->frost_res);
+    SetCreateResistance(SPELL_SCHOOL_SHADOW, GetCreatureInfo()->shadow_res);
+    SetCreateResistance(SPELL_SCHOOL_ARCANE, GetCreatureInfo()->arcane_res);
+    uint32 attackTimer = GetCreatureInfo()->base_attack_time;
+    SetAttackTime(BASE_ATTACK, attackTimer);
+    SetAttackTime(OFF_ATTACK, attackTimer);
+    SetAttackTime(RANGED_ATTACK, GetCreatureInfo()->ranged_attack_time);
+    SetMeleeDamageSchool(SpellSchools(GetCreatureInfo()->damage_school));
+
+    SetCanModifyStats(true);
+    UpdateAllStats();
 
     SetFactionTemplateId(GetCreatureInfo()->faction);
     SetDefaultGossipMenuId(GetCreatureInfo()->gossip_menu_id);
     SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npc_flags);
-
-    uint32 attackTimer = GetCreatureInfo()->base_attack_time;
-    SetAttackTime(BASE_ATTACK,  attackTimer);
-    SetAttackTime(OFF_ATTACK,   attackTimer);
-    SetAttackTime(RANGED_ATTACK, GetCreatureInfo()->ranged_attack_time);
 
     uint32 unitFlags = GetCreatureInfo()->unit_flags;
     // we may need to append or remove additional flags
@@ -482,26 +489,13 @@ bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data /*=nullptr*/, 
         unitFlags |= UNIT_FLAG_USE_SWIM_ANIMATION;
     SetUInt32Value(UNIT_FIELD_FLAGS, unitFlags);
 
-    // preserve all current dynamic flags if exist
-    uint32 dynFlags = GetUInt32Value(UNIT_DYNAMIC_FLAGS);
-    SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynFlags ? dynFlags : GetCreatureInfo()->dynamic_flags);
-
-    SetCreateResistance(SPELL_SCHOOL_NORMAL, GetCreatureInfo()->armor);
-    SetCreateResistance(SPELL_SCHOOL_HOLY, GetCreatureInfo()->holy_res);
-    SetCreateResistance(SPELL_SCHOOL_FIRE, GetCreatureInfo()->fire_res);
-    SetCreateResistance(SPELL_SCHOOL_NATURE, GetCreatureInfo()->nature_res);
-    SetCreateResistance(SPELL_SCHOOL_FROST, GetCreatureInfo()->frost_res);
-    SetCreateResistance(SPELL_SCHOOL_SHADOW, GetCreatureInfo()->shadow_res);
-    SetCreateResistance(SPELL_SCHOOL_ARCANE, GetCreatureInfo()->arcane_res);
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_APPEAR_DEAD))
+        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
 
     if (HasExtraFlag(CREATURE_FLAG_EXTRA_FIXED_Z))
         AddUnitMovementFlag(MOVEFLAG_FIXED_Z);
 
     SetFly(CanFly());
-    SetMeleeDamageSchool(SpellSchools(GetCreatureInfo()->dmg_school));
-
-    SetCanModifyStats(true);
-    UpdateAllStats();
 
     m_reputationId = -1;
     if (FactionTemplateEntry const* pFactionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction))
@@ -676,10 +670,11 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                     UpdateEntry(newCreatureId, dbSpawnData, eventData);
                 }
 
-                CreatureInfo const* cinfo = GetCreatureInfo();
+                SelectLevel(dbSpawnData ? dbSpawnData->health_percent : 100.0f, dbSpawnData ? dbSpawnData->mana_percent : 100.0f);
+                UpdateAllStats();
 
-                SelectLevel(cinfo, dbSpawnData ? dbSpawnData->health_percent : 100.0f, dbSpawnData ? dbSpawnData->mana_percent : 100.0f);
                 SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
+
                 if (IsDeadByDefault())
                 {
                     SetDeathState(JUST_DIED);
@@ -1541,26 +1536,65 @@ void Creature::SaveToDB(uint32 mapid)
     WorldDatabase.CommitTransaction();
 }
 
-void Creature::SelectLevel(CreatureInfo const* cinfo, float percentHealth, float percentMana)
+CreatureClassLevelStats const* Creature::GetClassLevelStats() const
 {
-    uint32 rank = IsPet() ? 0 : cinfo->rank;
+    return sObjectMgr.GetCreatureClassLevelStats(GetClass(), GetLevel());
+}
+
+void Creature::SetInitCreaturePowerType()
+{
+    Pet* pPet = ToPet();
+
+    if (pPet && pPet->getPetType() == HUNTER_PET)
+        return;
+
+    if (GetClassLevelStats()->mana > 0)
+        SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, POWER_MANA);
+    else
+    {
+        switch (GetClass())
+        {
+            case CLASS_ROGUE:
+                SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, POWER_ENERGY);
+                SetMaxPower(POWER_ENERGY, GetCreatePowers(POWER_ENERGY));
+                SetPower(POWER_ENERGY, 0);
+                break;
+            default:
+                SetByteValue(UNIT_FIELD_BYTES_0, UNIT_BYTES_0_OFFSET_POWER_TYPE, POWER_RAGE);
+                SetMaxPower(POWER_RAGE, GetCreatePowers(POWER_RAGE));
+                SetPower(POWER_RAGE, 0);
+                break;
+        }
+    }
+}
+
+void Creature::SelectLevel(float percentHealth, float percentMana)
+{
+    CreatureInfo const* cinfo = GetCreatureInfo();
 
     // level
-    uint32 minlevel = std::min(cinfo->level_max, cinfo->level_min);
-    uint32 maxlevel = std::max(cinfo->level_max, cinfo->level_min);
-    uint32 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
-    SetLevel(level);
+    uint32 const minLevel = std::min(cinfo->level_max, cinfo->level_min);
+    uint32 const maxLevel = std::max(cinfo->level_max, cinfo->level_min);
+    uint32 const level = minLevel == maxLevel ? minLevel : urand(minLevel, maxLevel);
 
-    float rellevel = maxlevel == minlevel ? 0 : (float(level - minlevel)) / (maxlevel - minlevel);
+    SetLevel(level);
+    InitStatsForLevel();
+}
+
+void Creature::InitStatsForLevel(float percentHealth, float percentMana)
+{
+    CreatureInfo const* cinfo = GetCreatureInfo();
+    uint32 rank = IsPet() ? 0 : cinfo->rank;
+    SetInitCreaturePowerType();
+
+    CreatureClassLevelStats const* pCLS = GetClassLevelStats();
 
     // health
-    float healthmod = _GetHealthMod(rank);
+    float const healthMod = _GetHealthMod(rank);
+    uint32 const health = std::max(1u, uint32(roundf(healthMod * pCLS->health * cinfo->health_multiplier)));
+    uint32 const baseHealth = std::max(1u, uint32(roundf(healthMod * pCLS->base_health)));
 
-    uint32 minhealth = std::min(cinfo->health_max, cinfo->health_min);
-    uint32 maxhealth = std::max(cinfo->health_max, cinfo->health_min);
-    uint32 health = uint32(healthmod * (minhealth + uint32(rellevel * (maxhealth - minhealth))));
-
-    SetCreateHealth(health);
+    SetCreateHealth(baseHealth);
     SetMaxHealth(health);
 
     if (percentHealth == 100.0f)
@@ -1569,11 +1603,10 @@ void Creature::SelectLevel(CreatureInfo const* cinfo, float percentHealth, float
         SetHealthPercent(percentHealth);
 
     // mana
-    uint32 minmana = std::min(cinfo->mana_max, cinfo->mana_min);
-    uint32 maxmana = std::max(cinfo->mana_max, cinfo->mana_min);
-    uint32 mana = minmana + uint32(rellevel * (maxmana - minmana));
+    uint32 const mana = uint32(roundf(pCLS->mana * cinfo->mana_multiplier));
+    uint32 const baseMana = uint32(pCLS->base_mana);
 
-    SetCreateMana(mana);
+    SetCreateMana(baseMana);
     SetMaxPower(POWER_MANA, mana);
 
     if (percentMana == 100.0f)
@@ -1585,19 +1618,33 @@ void Creature::SelectLevel(CreatureInfo const* cinfo, float percentHealth, float
     SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, float(mana));
 
     // damage
-    float damagemod = _GetDamageMod(rank);
+    float const damageMod = _GetDamageMod(rank);
+    float const meleeDamageAverage = pCLS->melee_damage * cinfo->damage_multiplier * damageMod;
+    float const meleeDamageVariance = meleeDamageAverage * cinfo->damage_variance;
+    float const rangedDamageAverage = pCLS->ranged_damage * cinfo->damage_multiplier * damageMod;
+    float const rangedDamageVariance = rangedDamageAverage * cinfo->damage_variance;
 
-    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min * damagemod);
-    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max * damagemod);
+    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, meleeDamageAverage - meleeDamageVariance);
+    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, meleeDamageAverage + meleeDamageVariance);
 
-    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, cinfo->dmg_min * damagemod);
-    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, cinfo->dmg_max * damagemod);
+    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, (meleeDamageAverage - meleeDamageVariance) / 2.0f);
+    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, (meleeDamageAverage + meleeDamageVariance) / 2.0f);
 
-    SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, cinfo->ranged_dmg_min * damagemod);
-    SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, cinfo->ranged_dmg_max * damagemod);
+    SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, rangedDamageAverage - rangedDamageVariance);
+    SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, rangedDamageAverage + rangedDamageVariance);
 
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cinfo->attack_power * damagemod);
-    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, cinfo->ranged_attack_power * damagemod);
+    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, pCLS->attack_power);
+    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, pCLS->ranged_attack_power);
+
+    // armor
+    SetCreateResistance(SPELL_SCHOOL_NORMAL, pCLS->armor * cinfo->armor_multiplier);
+
+    // primary attributes
+    SetCreateStat(STAT_STRENGTH, pCLS->strength);
+    SetCreateStat(STAT_AGILITY, pCLS->agility);
+    SetCreateStat(STAT_STAMINA, pCLS->stamina);
+    SetCreateStat(STAT_INTELLECT, pCLS->intellect);
+    SetCreateStat(STAT_SPIRIT, pCLS->spirit);
 }
 
 float Creature::_GetHealthMod(int32 rank)
@@ -1702,7 +1749,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
     m_wanderDistance = data->wander_distance;
 
     m_respawnDelay = data->GetRandomRespawnTime();
-    m_deathState = data->spawn_flags & SPAWN_FLAG_DEAD ? DEAD : ALIVE;
+    m_deathState = ((data->spawn_flags & SPAWN_FLAG_DEAD) || !data->health_percent) ? DEAD : ALIVE;
 
     if (data->spawn_flags & SPAWN_FLAG_ACTIVE)
         m_isActiveObject = true;
@@ -1729,15 +1776,6 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
         GetMap()->GetPersistentState()->SaveCreatureRespawnTime(GetGUIDLow(), 0);
     }
 
-    uint32 curhealth = cinfo->health_max * data->health_percent / 100.0f;
-    if (curhealth)
-    {
-        curhealth = uint32(curhealth * _GetHealthMod(GetCreatureInfo()->rank));
-        if (curhealth < 1)
-            curhealth = 1;
-    }
-    uint32 curmana = cinfo->mana_max * data->mana_percent / 100.0f;
-
     if (sCreatureLinkingMgr.IsSpawnedByLinkedMob(this))
     {
         m_isSpawningLinked = true;
@@ -1755,8 +1793,18 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
         }
     }
 
-    SetHealth(m_deathState == ALIVE ? curhealth : 0);
-    SetPower(POWER_MANA, curmana);
+    if (m_deathState == ALIVE)
+    {
+        if (data->health_percent != 100.0f)
+            SetHealthPercent(data->health_percent);
+        if (data->mana_percent != 100.0f)
+            SetPowerPercent(POWER_MANA, data->mana_percent);
+    }
+    else
+    {
+        SetHealth(0);
+        SetPower(POWER_MANA, 0);
+    }
 
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movement_type);
@@ -1968,7 +2016,7 @@ void Creature::SetDeathState(DeathState s)
 
         Unit::SetDeathState(ALIVE);
 
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmg_school));
+        SetMeleeDamageSchool(SpellSchools(cinfo->damage_school));
 
         // Dynamic flags may be adjusted by spells. Clear them
         // first and let spell from *addon apply where needed.
@@ -3378,15 +3426,46 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
     }
 }
 
+// TODO: remove this
 void Creature::ResetStats()
 {
     if (m_creatureInfo)
     {
-        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, m_creatureInfo->dmg_min);
-        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, m_creatureInfo->dmg_max);
+        CreatureClassLevelStats const* pCLS = GetClassLevelStats();
+        float const damageMod = _GetDamageMod(m_creatureInfo->rank);
+        float const meleeDamageAverage = pCLS->melee_damage * m_creatureInfo->damage_multiplier * damageMod;
+        float const meleeDamageVariance = meleeDamageAverage * m_creatureInfo->damage_variance;
+        float const rangedDamageAverage = pCLS->ranged_damage * m_creatureInfo->damage_multiplier * damageMod;
+        float const rangedDamageVariance = rangedDamageAverage * m_creatureInfo->damage_variance;
+
+        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, meleeDamageAverage - meleeDamageVariance);
+        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, meleeDamageAverage + meleeDamageVariance);
+
+        SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, (meleeDamageAverage - meleeDamageVariance) / 2.0f);
+        SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, (meleeDamageAverage + meleeDamageVariance) / 2.0f);
+
+        SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, rangedDamageAverage - rangedDamageVariance);
+        SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, rangedDamageAverage + rangedDamageVariance);
         UpdateDamagePhysical(BASE_ATTACK);
     }
     RemoveAllAuras();
+}
+
+// TODO: remove this
+void Creature::GetDefaultDamageRange(float& dmgMin, float& dmgMax) const
+{
+    CreatureClassLevelStats const* pCLS = GetClassLevelStats();
+    float const damageMod = _GetDamageMod(m_creatureInfo->rank);
+    float const meleeDamageAverage = pCLS->melee_damage * m_creatureInfo->damage_multiplier * damageMod;
+    float const meleeDamageVariance = meleeDamageAverage * m_creatureInfo->damage_variance;
+    dmgMin = meleeDamageAverage - meleeDamageVariance;
+    dmgMax = meleeDamageAverage + meleeDamageVariance;
+}
+
+int32 Creature::GetDefaultArmor() const
+{
+    CreatureClassLevelStats const* pCLS = GetClassLevelStats();
+    return pCLS->agility + pCLS->armor * m_creatureInfo->armor_multiplier;
 }
 
 Unit* Creature::GetNearestVictimInRange(float min, float max)

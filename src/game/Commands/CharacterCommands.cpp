@@ -665,7 +665,11 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
         if (pCreature->IsPet())
             ((Pet*)pCreature)->GivePetLevel(newlevel);
         else
+        {
             pCreature->SetLevel(newlevel);
+            pCreature->InitStatsForLevel();
+            pCreature->UpdateAllStats();
+        }     
 
         PSendSysMessage(LANG_YOU_CHANGE_LVL, pCreature->GetName(), newlevel);
     }

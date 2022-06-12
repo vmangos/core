@@ -144,9 +144,11 @@ struct boss_majordomoAI : public ScriptedAI
             {
                 if (itr->IsAlive() && AddVivant > 0)
                 {
-                    CreatureInfo const *cinfo = itr->GetCreatureInfo();
-                    itr->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min + cinfo->dmg_min / AddVivant);
-                    itr->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max + cinfo->dmg_max / AddVivant);
+                    float dmgMin;
+                    float dmgMax;
+                    itr->GetDefaultDamageRange(dmgMin, dmgMax);
+                    itr->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, dmgMin + dmgMin / AddVivant);
+                    itr->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, dmgMax + dmgMax / AddVivant);
                 }
             }
         }

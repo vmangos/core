@@ -3076,7 +3076,6 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
     spawnCreature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
     spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
     spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    spawnCreature->SetInitCreaturePowerType();
     spawnCreature->InitStatsForLevel(m_casterUnit->GetLevel(), m_casterUnit);
     spawnCreature->GetCharmInfo()->SetPetNumber(petNumber, false);
 
@@ -3610,7 +3609,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
         spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
         spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, spawnCreature->GetCreatureInfo()->npc_flags);
-        spawnCreature->SetInitCreaturePowerType();
         spawnCreature->InitStatsForLevel(level, m_casterUnit);
         spawnCreature->GetCharmInfo()->SetPetNumber(petNumber, false);
 
@@ -6351,7 +6349,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
 
     critter->AIM_Initialize();
     critter->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as critter...
-    critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creatures have different from 1 DB data for level/hp
+    critter->SelectLevel();                                 // some summoned creatures have different from 1 DB data for level/hp
 
     map->Add((Creature*)critter);
     player->_SetMiniPet(critter);

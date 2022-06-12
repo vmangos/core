@@ -1315,11 +1315,11 @@ void ObjectMgr::CheckCreatureTemplates()
         else if (((1 << (cInfo->unit_class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
             sLog.outErrorDb("Creature (Entry: %u) has invalid unit_class(%u) for creature_template", cInfo->entry, cInfo->unit_class);
 
-        if (cInfo->dmg_school >= MAX_SPELL_SCHOOL)
+        if (cInfo->damage_school >= MAX_SPELL_SCHOOL)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has invalid spell school value (%u) in `dmg_school`", cInfo->entry, cInfo->dmg_school);
+            sLog.outErrorDb("Creature (Entry: %u) has invalid spell school value (%u) in `dmg_school`", cInfo->entry, cInfo->damage_school);
             sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `dmg_school`=%u WHERE entry=%u;", SPELL_SCHOOL_NORMAL, cInfo->entry);
-            const_cast<CreatureInfo*>(cInfo)->dmg_school = SPELL_SCHOOL_NORMAL;
+            const_cast<CreatureInfo*>(cInfo)->damage_school = SPELL_SCHOOL_NORMAL;
         }
 
         if (cInfo->base_attack_time == 0)
@@ -1856,6 +1856,227 @@ void ObjectMgr::LoadCreatureSpells()
     sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)m_CreatureSpellsMap.size());
 }
 
+void ObjectMgr::LoadCreatureClassLevelStats()
+{
+    m_CreatureCLSMap.clear();
+
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `unit_class` FROM `creature_template`"));
+
+    std::set<uint32> creatureClasses;
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 unitClass = fields[0].GetUInt32();
+            creatureClasses.insert(unitClass);
+        } while (result->NextRow());
+    }
+
+    // placeholder values
+    constexpr float phMeleeDamage = 1.5f;
+    constexpr float phRangedDamage = 1.3f;
+    constexpr float phDamageIncreasePerLevel = 1.2f;
+    constexpr int32 phStat = 20;
+    constexpr float phStatIncreasePerLevel = 0.1f;
+    constexpr int32 phArmorPerLevel = 30;
+
+    for (auto unitClass : creatureClasses)
+    {
+        result.reset(WorldDatabase.PQuery("SELECT MAX(`level_max`) FROM `creature_template` WHERE `unit_class`=%u", unitClass));
+
+        uint32 requiredMaxLevel = CREATURE_MAX_LEVEL;
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 maxLevel = fields[0].GetUInt32();
+                if (maxLevel > requiredMaxLevel)
+                    requiredMaxLevel = maxLevel;
+            } while (result->NextRow());
+        }
+
+        result.reset(WorldDatabase.PQuery("SELECT MAX(`level`) FROM `creature_classlevelstats` WHERE `class`=%u", unitClass));
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 maxLevel = fields[0].GetUInt32();
+
+                if (maxLevel > requiredMaxLevel)
+                    requiredMaxLevel = maxLevel;
+                else if (!maxLevel)
+                    sLog.outErrorDb("Missing creature CLS data for `class` = %u used in creature_template!", unitClass);
+
+                m_CreatureCLSMap[unitClass].resize(requiredMaxLevel);
+                
+            } while (result->NextRow());
+        }
+
+        //                                         0        1               2                3               4                      5         6              7       8            9           10         11         12           13        14
+        result.reset(WorldDatabase.PQuery("SELECT `level`, `melee_damage`, `ranged_damage`, `attack_power`, `ranged_attack_power`, `health`, `base_health`, `mana`, `base_mana`, `strength`, `agility`, `stamina`, `intellect`, `spirit`, `armor` FROM `creature_classlevelstats` WHERE `class`=%u ORDER BY `level`", unitClass));
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 level = fields[0].GetUInt32();
+
+                if (!level)
+                {
+                    sLog.outErrorDb("Table `creature_classlevelstats` contains data for invalid `level` = %u!", level);
+                    continue;
+                }
+
+                uint32 i = level - 1;
+                CreatureClassLevelStats& cls = m_CreatureCLSMap[unitClass][i];
+                cls.melee_damage = fields[1].GetFloat();
+                cls.ranged_damage = fields[2].GetFloat();
+                cls.attack_power = fields[3].GetInt32();
+                cls.ranged_attack_power = fields[4].GetInt32();
+                cls.health = fields[5].GetInt32();
+                cls.base_health = fields[6].GetInt32();
+                cls.mana = fields[7].GetInt32();
+                cls.base_mana = fields[8].GetInt32();
+                cls.strength = fields[9].GetInt32();
+                cls.agility = fields[10].GetInt32();
+                cls.stamina = fields[11].GetInt32();
+                cls.intellect = fields[12].GetInt32();
+                cls.spirit = fields[13].GetInt32();
+                cls.armor = fields[14].GetInt32();
+
+                if (cls.melee_damage <= 0.0f)
+                {
+                    sLog.outErrorDb("Invalid `melee_damage` = %g in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.melee_damage = phMeleeDamage + phMeleeDamage * phDamageIncreasePerLevel * i;
+                }
+
+                if (cls.ranged_damage <= 0.0f)
+                {
+                    sLog.outErrorDb("Invalid `ranged_damage` = %g in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.ranged_damage = phRangedDamage + phRangedDamage * phDamageIncreasePerLevel * i;
+                }
+
+                if (cls.attack_power <= 0)
+                {
+                    sLog.outErrorDb("Invalid `attack_power` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.attack_power = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.ranged_attack_power <= 0)
+                {
+                    sLog.outErrorDb("Invalid `ranged_attack_power` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.ranged_attack_power = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.health <= 0)
+                {
+                    sLog.outErrorDb("Invalid `health` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.health = phStat * 2 + phStat * 2 * i;
+                }
+
+                if (cls.base_health <= 0)
+                {
+                    sLog.outErrorDb("Invalid `base_health` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.base_health = phStat + phStat * i;
+                }
+
+                if (cls.mana < 0)
+                {
+                    sLog.outErrorDb("Invalid `mana` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.mana = abs(cls.mana);
+                }
+
+                if (cls.base_mana < 0)
+                {
+                    sLog.outErrorDb("Invalid `base_mana` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.base_mana = abs(cls.base_mana);
+                }
+
+                if (cls.strength <= 0)
+                {
+                    sLog.outErrorDb("Invalid `strength` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.strength = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.agility <= 0)
+                {
+                    sLog.outErrorDb("Invalid `agility` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.agility = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.stamina <= 0)
+                {
+                    sLog.outErrorDb("Invalid `stamina` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.stamina = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.intellect <= 0)
+                {
+                    sLog.outErrorDb("Invalid `intellect` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.intellect = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.spirit <= 0)
+                {
+                    sLog.outErrorDb("Invalid `spirit` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.spirit = phStat + phStat * phStatIncreasePerLevel * i;
+                }
+
+                if (cls.armor < 0)
+                {
+                    sLog.outErrorDb("Invalid `armor` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    cls.armor = abs(cls.armor);
+                }
+
+            } while (result->NextRow());
+        }
+
+        for (uint32 i = 0; i < requiredMaxLevel; i++)
+        {
+            CreatureClassLevelStats& cls = m_CreatureCLSMap[unitClass][i];
+            if (!cls.health)
+            {
+                sLog.outErrorDb("Missing creature CLS data for `class` = %u and `level` = %u!", unitClass, i+1);
+                cls.melee_damage = phMeleeDamage + phMeleeDamage * phDamageIncreasePerLevel * i;
+                cls.ranged_damage = phRangedDamage + phRangedDamage * phDamageIncreasePerLevel * i;
+                cls.attack_power = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.ranged_attack_power = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.health = phStat * 2 + phStat * 2 * i;
+                cls.base_health = phStat + phStat * i;
+                cls.mana = phStat * 2 + phStat * 2 * i;
+                cls.base_mana = phStat + phStat * i;
+                cls.strength = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.agility = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.stamina = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.intellect = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.spirit = phStat + phStat * phStatIncreasePerLevel * i;
+                cls.armor = phArmorPerLevel * i;
+            }
+        }
+    }
+}
+
+CreatureClassLevelStats const* ObjectMgr::GetCreatureClassLevelStats(uint32 unitClass, uint32 level) const
+{
+    auto itr = m_CreatureCLSMap.find(unitClass);
+    if (itr == m_CreatureCLSMap.end() || itr->second.empty())
+    {
+        sLog.outError("Missing creature CLS data for class = %u!", unitClass);
+        static CreatureClassLevelStats ph{ 1.5f, 1.3f, 20, 20, 40, 20, 40, 20, 20, 20, 20, 20, 20, 20 };
+        return &ph;
+    }
+
+    if (level > itr->second.size())
+        level = itr->second.size();
+
+    return &itr->second[level - 1];
+}
+
 void ObjectMgr::LoadCreatures(bool reload)
 {
     uint32 count = 0;
@@ -1933,14 +2154,14 @@ void ObjectMgr::LoadCreatures(bool reload)
                     break;
                 }
 
-                if ((cInfo->regeneration & REGEN_FLAG_HEALTH) && (cInfo->health_min > 0) && (curhealth < 100.0f) && !is_dead)
+                if ((cInfo->regeneration & REGEN_FLAG_HEALTH) && (curhealth < 100.0f) && !is_dead)
                 {
                     sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_HEALTH and low current health percent (%g%%).", guid, first_entry, curhealth);
                     sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `health_percent`=100 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
                     curhealth = 100.0f;
                 }
 
-                if ((cInfo->regeneration & REGEN_FLAG_POWER) && (cInfo->mana_min > 0) && (curmana < 100.0f))
+                if ((cInfo->regeneration & REGEN_FLAG_POWER) && (cInfo->unit_class != CLASS_WARRIOR) && (curmana < 100.0f))
                 {
                     sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_POWER and low current mana percent (%g%%).", guid, first_entry, curmana);
                     sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `mana_percent=100 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
