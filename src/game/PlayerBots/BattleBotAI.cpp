@@ -731,22 +731,30 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!me->InBattleGroundQueue())
         {
+            bool canQueue;
             char args[] = "";
             switch (m_battlegroundId)
             {
                 case BATTLEGROUND_QUEUE_AV:
-                    ChatHandler(me).HandleGoAlteracCommand(args);
+                    canQueue = ChatHandler(me).HandleGoAlteracCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_WS:
-                    ChatHandler(me).HandleGoWarsongCommand(args);
+                    canQueue = ChatHandler(me).HandleGoWarsongCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_AB:
-                    ChatHandler(me).HandleGoArathiCommand(args);
+                    canQueue = ChatHandler(me).HandleGoArathiCommand(args);
                     break;
                 default:
                     sLog.outError("BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
+            }
+
+            if (!canQueue)
+            {
+                sLog.outError("BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
+                botEntry->requestRemoval = true;
+                return;
             }
 
             SendFakePacket(CMSG_BATTLEMASTER_JOIN);
