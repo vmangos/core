@@ -5085,6 +5085,17 @@ DELETE FROM `gameobject_scripts` WHERE `id` = 32686;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (32686, 0, 0, 10, 12876, 180000, 1, 50, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 0, 'Fathom Core - Summon Creature');
 
+-- ----------------------------------------------------------------------
+
+-- Quest Text Requested Wrong Thorium Ammount
+UPDATE `quest_template` SET `RequestItemsText`='For the chest piece plans, I\'ll be needin\' 60 thorium bars.$B$B$BOh boy, there you go again. Are you gonna be runnin\' to yer blue Gods, askin\' why they have forsaken you?!? Toughen up, Nancy! Nobody ever said life\'s fair.' WHERE  `entry`=7656 AND `patch`=2;
+UPDATE `quest_template` SET `RequestItemsText`='For the belt plans, I\'ll be needin\' 20 thorium bars.' WHERE  `entry`=7653 AND `patch`=2;
+UPDATE `quest_template` SET `RequestItemsText`='For the boot plans, I\'ll be needin\' 40 thorium bars. Yep, 40. Are you gonna cry? Would you like a hanky?$B$B<Derotain laughs.>' WHERE  `entry`=7654 AND `patch`=2;
+UPDATE `quest_template` SET `RequestItemsText`='For the bracer plans, I\'ll be needin\' 20 thorium bars.$B$BAre you alright, sonny? Yer getting\' all red.' WHERE  `entry`=7655 AND `patch`=2;
+UPDATE `quest_template` SET `RequestItemsText`='Just hand over 50 thorium bars and the helm plans are yers.' WHERE  `entry`=7657 AND `patch`=2;
+UPDATE `quest_template` SET `RequestItemsText`='Just hand over 60 thorium bars and the leg plans are yers.$B$BI know, I\'m driving you into bankruptcy! I\'ve heard it all before so you can save your sob story, weakling.' WHERE  `entry`=7658 AND `patch`=2;
+UPDATE `quest_template` SET `RequestItemsText`='For the shoulder plans, I\'ll be needin\' 20 thorium bars.' WHERE  `entry`=7659 AND `patch`=2;
+
 
 -- End of migration.
 END IF;
