@@ -288,7 +288,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
         while (m_extraAttacks)
         {
-            AttackerStateUpdate(victim, BASE_ATTACK, true, true);
+            AttackerStateUpdate(victim, BASE_ATTACK, true);
             if (m_extraAttacks > 0)
                 --m_extraAttacks;
         }
@@ -343,7 +343,11 @@ AutoAttackCheckResult Unit::CanAutoAttackTarget(Unit const* pVictim) const
     if (!pVictim->IsAlive() || !IsAlive())
         return ATTACK_RESULT_DEAD;
 
-    if (!CanReachWithMeleeAutoAttack(pVictim) || (!IsWithinLOSInMap(pVictim) && !HasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK)))
+    if (!CanReachWithMeleeAutoAttack(pVictim))
+        return ATTACK_RESULT_NOT_IN_RANGE;
+
+    // Creature attacks should probably ignore LoS too, but it might open up exploits.
+    if (!(IsPlayer() && pVictim->IsPlayer()) && !HasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK) && !IsWithinLOSInMap(pVictim))
         return ATTACK_RESULT_NOT_IN_RANGE;
 
     if (GetDistance2dToCenter(pVictim) > NO_FACING_CHECKS_DISTANCE)
@@ -388,7 +392,7 @@ bool Unit::UpdateMeleeAttackingState()
                     if (GetAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                         SetAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
                 }
-                AttackerStateUpdate(pVictim, BASE_ATTACK, false);
+                AttackerStateUpdate(pVictim, BASE_ATTACK);
                 ResetAttackTimer(BASE_ATTACK);
             }
             if (HaveOffhandWeapon() && IsAttackReady(OFF_ATTACK))
@@ -398,7 +402,7 @@ bool Unit::UpdateMeleeAttackingState()
                 if (base_att < ATTACK_DISPLAY_DELAY)
                     SetAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
                 // do attack
-                AttackerStateUpdate(pVictim, OFF_ATTACK, false);
+                AttackerStateUpdate(pVictim, OFF_ATTACK);
                 ResetAttackTimer(OFF_ATTACK);
             }
             break;
@@ -2024,7 +2028,7 @@ void Unit::CalculateAbsorbResistBlock(SpellCaster* pCaster, SpellNonMeleeDamage*
     damageInfo->damage = (damageInfo->damage <= malus ? 0 : (damageInfo->damage - malus));
 }
 
-void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool checkLoS, bool extra)
+void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool extra)
 {
     if (!pVictim->IsAlive())
         return;
@@ -2039,10 +2043,6 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool che
         hitInfo = HITINFO_LEFTSWING + HITINFO_AFFECTS_VICTIM;
     else
         return;                                             // ignore ranged case
-
-    // Nostalrius: check ligne de vision
-    if (checkLoS && !HasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK) && !IsWithinLOSInMap(pVictim))
-        return;
 
     if (GetExtraAttacks() && !extra)
         AddExtraAttackOnUpdate();

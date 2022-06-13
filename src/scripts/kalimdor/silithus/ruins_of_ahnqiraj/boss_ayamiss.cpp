@@ -196,7 +196,7 @@ struct boss_ayamissAI : public ScriptedAI
         {
             SetCombatMovement(true);
             m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
-            m_creature->AttackerStateUpdate(m_creature->GetVictim(), BASE_ATTACK, true);
+            m_creature->AttackerStateUpdate(m_creature->GetVictim());
             m_creature->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING); //pathfinding desactivation
             m_bIsInPhaseTwo = true;
 
