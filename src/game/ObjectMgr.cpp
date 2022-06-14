@@ -1885,7 +1885,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
     {
         result.reset(WorldDatabase.PQuery("SELECT MAX(`level_max`) FROM `creature_template` WHERE `unit_class`=%u", unitClass));
 
-        uint32 requiredMaxLevel = CREATURE_MAX_LEVEL;
+        uint32 requiredMaxLevel = MAX_LEVEL;
         if (result)
         {
             do
@@ -1899,6 +1899,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
         result.reset(WorldDatabase.PQuery("SELECT MAX(`level`) FROM `creature_classlevelstats` WHERE `class`=%u", unitClass));
 
+        uint32 currentMaxLevel = CREATURE_MAX_LEVEL;
         if (result)
         {
             do
@@ -1906,12 +1907,12 @@ void ObjectMgr::LoadCreatureClassLevelStats()
                 Field* fields = result->Fetch();
                 uint32 maxLevel = fields[0].GetUInt32();
 
-                if (maxLevel > requiredMaxLevel)
-                    requiredMaxLevel = maxLevel;
+                if (maxLevel > currentMaxLevel)
+                    currentMaxLevel = maxLevel;
                 else if (!maxLevel)
                     sLog.outErrorDb("Missing creature CLS data for `class` = %u used in creature_template!", unitClass);
 
-                m_CreatureCLSMap[unitClass].resize(requiredMaxLevel);
+                m_CreatureCLSMap[unitClass].resize(std::max(requiredMaxLevel, currentMaxLevel));
                 
             } while (result->NextRow());
         }
@@ -2036,7 +2037,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
             } while (result->NextRow());
         }
 
-        for (uint32 i = 0; i < requiredMaxLevel; i++)
+        for (uint32 i = 0; i < currentMaxLevel; i++)
         {
             CreatureClassLevelStats& cls = m_CreatureCLSMap[unitClass][i];
             if (!cls.health)
@@ -2056,6 +2057,49 @@ void ObjectMgr::LoadCreatureClassLevelStats()
                 cls.intellect = phStat + phStat * phStatIncreasePerLevel * i;
                 cls.spirit = phStat + phStat * phStatIncreasePerLevel * i;
                 cls.armor = phArmorPerLevel * i;
+            }
+        }
+
+        if (currentMaxLevel < requiredMaxLevel)
+        {
+            CreatureClassLevelStats& penultimateLevelCls = m_CreatureCLSMap[unitClass][currentMaxLevel - 2];
+            CreatureClassLevelStats& maxLevelCls = m_CreatureCLSMap[unitClass][currentMaxLevel - 1];
+
+            float const meleeDamageIncreasePerLevel = std::max(1.03f, maxLevelCls.melee_damage / penultimateLevelCls.melee_damage);
+            float const rangedDamageIncreasePerLevel = std::max(1.03f, maxLevelCls.ranged_damage / penultimateLevelCls.ranged_damage);
+            float const attackPowerIncreasePerLevel = std::max(1.03f, float(maxLevelCls.attack_power) / float(penultimateLevelCls.attack_power));
+            float const rangedAttackPowerIncreasePerLevel = std::max(1.03f, float(maxLevelCls.ranged_attack_power) / float(penultimateLevelCls.ranged_attack_power));
+            float const healthIncreasePerLevel = std::max(1.03f, float(maxLevelCls.health) / float(penultimateLevelCls.health));
+            float const baseHealthIncreasePerLevel = std::max(1.03f, float(maxLevelCls.base_health) / float(penultimateLevelCls.base_health));
+            float const manaIncreasePerLevel = std::max(1.03f, float(maxLevelCls.mana) / float(penultimateLevelCls.mana));
+            float const baseManaIncreasePerLevel = std::max(1.03f, float(maxLevelCls.base_mana) / float(penultimateLevelCls.base_mana));
+            float const strengthIncreasePerLevel = std::max(1.03f, float(maxLevelCls.strength) / float(penultimateLevelCls.strength));
+            float const agilityIncreasePerLevel = std::max(1.03f, float(maxLevelCls.agility) / float(penultimateLevelCls.agility));
+            float const staminaIncreasePerLevel = std::max(1.03f, float(maxLevelCls.stamina) / float(penultimateLevelCls.stamina));
+            float const intellectIncreasePerLevel = std::max(1.03f, float(maxLevelCls.intellect) / float(penultimateLevelCls.intellect));
+            float const spiritIncreasePerLevel = std::max(1.03f, float(maxLevelCls.spirit) / float(penultimateLevelCls.spirit));
+            float const armorIncreasePerLevel = std::max(1.03f, float(maxLevelCls.armor) / float(penultimateLevelCls.armor));
+
+            for (uint32 i = currentMaxLevel; i < requiredMaxLevel; i++)
+            {
+                CreatureClassLevelStats& cls = m_CreatureCLSMap[unitClass][i];
+                if (!cls.health)
+                {
+                    cls.melee_damage = maxLevelCls.melee_damage * std::pow(meleeDamageIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.ranged_damage = maxLevelCls.ranged_damage * std::pow(rangedDamageIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.attack_power = maxLevelCls.attack_power * std::pow(attackPowerIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.ranged_attack_power = maxLevelCls.ranged_attack_power * std::pow(rangedAttackPowerIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.health = maxLevelCls.health * std::pow(healthIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.base_health = maxLevelCls.base_health * std::pow(baseHealthIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.mana = maxLevelCls.mana * std::pow(manaIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.base_mana = maxLevelCls.base_mana * std::pow(baseManaIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.strength = maxLevelCls.strength * std::pow(strengthIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.agility = maxLevelCls.agility * std::pow(agilityIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.stamina = maxLevelCls.stamina * std::pow(staminaIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.intellect = maxLevelCls.intellect * std::pow(intellectIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.spirit = maxLevelCls.spirit * std::pow(spiritIncreasePerLevel, 1 + (i - currentMaxLevel));
+                    cls.armor = maxLevelCls.armor * std::pow(armorIncreasePerLevel, 1 + (i - currentMaxLevel));
+                }
             }
         }
     }
