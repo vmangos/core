@@ -384,6 +384,9 @@ bool Unit::UpdateMeleeAttackingState()
     {
         case ATTACK_RESULT_OK:
         {
+            if (IsPlayer())
+                TogglePlayerPvPFlagOnAttackVictim(pVictim);
+
             if (IsAttackReady(BASE_ATTACK))
             {
                 // prevent base and off attack in same time, delay attack at 0.2 sec

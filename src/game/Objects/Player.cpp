@@ -1567,10 +1567,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     }
 
     if (HasUnitState(UNIT_STAT_MELEE_ATTACKING))
-    {
-        if (UpdateMeleeAttackingState())
-            TogglePlayerPvPFlagOnAttackVictim(GetVictim());
-    }
+        UpdateMeleeAttackingState();
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
