@@ -5096,6 +5096,54 @@ UPDATE `quest_template` SET `RequestItemsText`='Just hand over 50 thorium bars a
 UPDATE `quest_template` SET `RequestItemsText`='Just hand over 60 thorium bars and the leg plans are yers.$B$BI know, I\'m driving you into bankruptcy! I\'ve heard it all before so you can save your sob story, weakling.' WHERE  `entry`=7658 AND `patch`=2;
 UPDATE `quest_template` SET `RequestItemsText`='For the shoulder plans, I\'ll be needin\' 20 thorium bars.' WHERE  `entry`=7659 AND `patch`=2;
 
+-- ----------------------------------------------------------------------
+
+-- Add Event Script For Quest 29 (credit cmangos)
+DELETE FROM `event_scripts` WHERE `id`=6206;
+INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(6206, 0, 0, 1, 4, 0, 0, 0, 42333, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spell Use Bauble - Tajarri - Emote'),
+(6206, 1, 0, 0, 0, 0, 0, 0, 42333, 0, 9, 2, 7611, 0, 0, 0, 0, 0, 0, 0, 0, 'Spell Use Bauble - Tajarri - Talk');
+
+-- ----------------------------------------------------------------------
+
+-- Add Complete Script For Alien Egg (credit cmangos)
+UPDATE `quest_template` SET `CompleteScript` = 4821 WHERE `entry` = 4821;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`) VALUES 
+(5348, 175567, 1, -5444.2744, -2399.079, 89.24637, 5.8817606, -0.19936752, 0.9799248, -9, -9, 1);
+
+DELETE FROM `quest_end_scripts` WHERE `id`=4821;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(4821, 0, 0, 9, 5348, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Alien Egg - Respawn Gameobject'),
+(4821, 4, 0, 10, 10581, 180000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, -5443.845, -2399.18, 89.3327, 5.585, 0, 'Alien Egg - Summon Creature'),
+(4821, 4, 0, 13, 0, 0, 0, 0, 5348, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Alien Egg - Activate Gameobject');
+
+-- Events list for Young Arikara
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1058101, 10581, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1058101, 0, 0, 'Young Arikara - Cast Spell Just Spawned');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1058101, 0, 0, 15, 10389, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Young Arikara - Cast Spell On Spawn');
+
+UPDATE `creature_template` SET `unit_flags` = 768, `ai_name` = 'EventAI', `movement_type` = 2, `inhabit_type` = 3 WHERE `entry` = 10581;
+
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
+(10581,1,-5443.8447,-2399.1797,89.3327,100,3000,0),
+(10581,2,-5452.08,-2420.4788,89.55369,100,0,0),
+(10581,3,-5460.4624,-2437.259,89.66293,100,0,0),
+(10581,4,-5456.5273,-2444.5684,90.010345,100,0,0),
+(10581,5,-5446.4844,-2442.8086,89.906586,100,0,0),
+(10581,6,-5445.3784,-2422.4116,89.42869,100,0,0),
+(10581,7,-5444.078,-2404.7761,89.30369,100,0,0),
+(10581,8,-5447.545,-2394.3118,89.261826,100,0,0),
+(10581,9,-5447.846,-2393.177,90.7796,100,0,0),
+(10581,10,-5448.6235,-2390.6304,91.61294,100,0,0),
+(10581,11,-5449.413,-2388.0369,88.83508,100,0,0),
+(10581,12,-5450.5757,-2384.4739,75.862564,100,0,0),
+(10581,13,-5452.0205,-2380.3386,62.223392,100,0,0),
+(10581,14,-5453.1104,-2376.9172,46.72318,100,0,0),
+(10581,15,-5454.221,-2373.6519,27.222952,100,100,4);
+
+-- ----------------------------------------------------------------------
+
 
 -- End of migration.
 END IF;
