@@ -12,7 +12,7 @@ INSERT INTO `migrations` VALUES ('20220617125040');
 DELETE FROM `spell_effect_mod` WHERE `Id`=7057;
 
 -- Remove loot from Haunting Spirits
-UPDATE `creature_template` SET `gold_min`=0 AND `gold_max`=0 WHERE `entry`=4958;
+UPDATE `creature_template` SET `gold_min`=0,`gold_max`=0 WHERE `entry`=4958;
 
 -- End of migration.
 END IF;
