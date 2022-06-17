@@ -7072,7 +7072,8 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
         Unit* _target = m_targets.getUnitTarget();
 
-        if (_target)                                         //for target dead/target not valid
+        // for target dead/target not valid
+        if (_target && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]))
         {
             if (!_target->IsTargetableBy(m_spellInfo->IsPositiveSpell() ? nullptr : m_casterUnit))
                 return SPELL_FAILED_BAD_TARGETS;            // guessed error
