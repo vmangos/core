@@ -1733,6 +1733,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 7057: // Haunting Spirits
+                    {
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
+                        m_periodicTimer = m_modifier.periodictime;
+                        return;
+                    }
                     case 16336: // Haunting Phantoms
                     {
                         m_isPeriodic = true;
@@ -6400,9 +6407,13 @@ void Aura::PeriodicDummyTick()
                     return;
                 }
                 case 7057:                                  // Haunting Spirits
-                    if (roll_chance_i(33))
-                        target->CastSpell(target, m_modifier.m_amount, true, nullptr, this);
+                {
+                    if (roll_chance_i(5)) // 4 spawns over 5 minutes
+                    {
+                        target->CastSpell(target, 7067, true, nullptr, this); // Summon Haunting Spirit
+                    }
                     return;
+                }
                 case 16336:                                 // Haunting Phantoms
                 {
                     if (urand(0,1))
