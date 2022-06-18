@@ -1733,17 +1733,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
-                    case 7057: // Haunting Spirits
-                    {
-                        m_isPeriodic = true;
-                        m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
-                        m_periodicTimer = m_modifier.periodictime;
-                        return;
-                    }
+                    case 7057:  // Haunting Spirits
                     case 16336: // Haunting Phantoms
                     {
                         m_isPeriodic = true;
-                        m_modifier.periodictime = urand(30, 90) * IN_MILLISECONDS;
+                        m_modifier.periodictime = 5 * IN_MILLISECONDS; // expected to tick with 5 sec period
                         return;
                     }
                     case 26234:                             // Ragnaros Submerge Visual
@@ -6408,7 +6402,7 @@ void Aura::PeriodicDummyTick()
                 }
                 case 7057:                                  // Haunting Spirits
                 {
-                    if (roll_chance_i(5)) // 4 spawns over 5 minutes
+                    if (roll_chance_i(5))
                     {
                         target->CastSpell(target, 7067, true, nullptr, this); // Summon Haunting Spirit
                     }
@@ -6416,10 +6410,13 @@ void Aura::PeriodicDummyTick()
                 }
                 case 16336:                                 // Haunting Phantoms
                 {
-                    if (urand(0,1))
-                        target->CastSpell(target, 16334, true); // Summon Spiteful Phantom
-                    else
-                        target->CastSpell(target, 16335, true); // Summon Wrath Phantom
+                    if (roll_chance_i(5))
+                    {
+                        if (urand(0, 1))
+                            target->CastSpell(target, 16334, true); // Summon Spiteful Phantom
+                        else
+                            target->CastSpell(target, 16335, true); // Summon Wrath Phantom
+                    }
                     return;
                 }
                 case 24596:                                 // Intoxicating Venom
