@@ -1360,8 +1360,8 @@ DELETE FROM `gameobject` WHERE `guid` = 73246;
 
 -- ----------------------------------------------------------------------
 
--- Correct Serpentbloom Flags
-UPDATE `gameobject_template` SET `flags` = 0,  `size` = 0.1 WHERE `entry` = 19535;
+-- Correct Serpentbloom Flags And Make Clickable
+UPDATE `gameobject_template` SET `flags` = 0,  `displayId` = 0 WHERE `entry` = 19535;
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE  `id` IN (19535, 13891);
 
 -- ----------------------------------------------------------------------
@@ -5176,6 +5176,17 @@ DELETE FROM `gameobject` WHERE `id` IN (177790, 177844);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`, `patch_max`) VALUES
 (@GUID+20, 177790, 0, -10172.3, 2389.11, -138.894, 1.6057, 0, 0, 0.719339, 0.694659, 25, 25, 100, 1, 0, 10),
 (@GUID+21, 177844, 0, 848.998, 2208.29, -137.5, 1.50034, 0, 0, 0.681762, 0.731574, 25, 25, 100, 1, 0, 10); -- CUSTOM NO SNIFF DATA
+
+-- ----------------------------------------------------------------------
+
+-- Stop Creature Pathing Underground
+DELETE FROM `creature_movement` WHERE `id` = 38117;
+UPDATE `creature` SET `position_x` = -206.477, `position_y` = 58.4786, `position_z` = -50.4018 WHERE `guid` = 38117;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(38117, 1, -206.477, 58.4786, -49.4018, 0, 0, 0, 0),
+(38117, 2, -168.829, 53.9085, -40.5323, 0, 0, 0, 0),
+(38117, 3, -147.924, 32.2189, -29.7749, 0, 0, 0, 0),
+(38117, 4, -168.829, 53.9085, -40.5323, 0, 0, 0, 0);
 
 
 -- End of migration.
