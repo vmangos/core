@@ -5199,6 +5199,12 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (42250, 42251, 2, 2.09437, 11),
 (42250, 42252, 2, 4.18873, 11);
 
+-- ----------------------------------------------------------------------
+
+-- Fix Error In Blacksmith Quest Chains
+UPDATE `quest_template` SET `NextQuestId` = 2757, `NextQuestInChain` = 0 WHERE `entry` = 2756;
+UPDATE `quest_template` SET `NextQuestId` = 2759, `NextQuestInChain` = 0 WHERE `entry` = 2758;
+
 
 -- End of migration.
 END IF;
