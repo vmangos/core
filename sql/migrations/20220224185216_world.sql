@@ -2492,7 +2492,7 @@ UPDATE `creature` SET `position_z` = 75.6233 WHERE `guid` = 51729;
 -- ----------------------------------------------------------------------
 
 --  Add random movement to Burning Blade NPCs, Burning Blade Apprentice Do Not Flee On Low Health, Fanatics and Apprentices are immune to fear (credit cmangos)
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (6417, 6418, 6419, 6420, 6421, 6422, 6423, 6424, 6425, 6426, 7333, 7334, 7335, 7336, 7337, 7338, 7339, 7340, 7341, 7342, 7880, 7882, 7883, 7884, 7885, 7897, 7898, 7899, 7900, 7901, 8428, 8429);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` IN (6417, 6418, 6419, 6420, 6421, 6422, 6423, 6424, 6425, 6426, 7333, 7334, 7335, 7336, 7337, 7338, 7339, 7340, 7341, 7342, 7880, 7882, 7883, 7884, 7885, 7897, 7898, 7899, 7900, 7901, 8428, 8429, 6436, 6435, 12204, 12202, 12956, 12184, 12190, 12195, 12185, 12951, 12186, 12183, 12188);
 UPDATE `creature_template` SET `mechanic_immune_mask`=16 WHERE `entry` IN (3197, 3198);
 
 -- Removing unused script actions.
