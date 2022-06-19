@@ -5205,6 +5205,11 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 UPDATE `quest_template` SET `NextQuestId` = 2757, `NextQuestInChain` = 0 WHERE `entry` = 2756;
 UPDATE `quest_template` SET `NextQuestId` = 2759, `NextQuestInChain` = 0 WHERE `entry` = 2758;
 
+-- ----------------------------------------------------------------------
+
+-- Hakkari Shroud Should Not Drop From Creatures
+DELETE FROM `reference_loot_template` WHERE `entry` IN (2043, 1011) AND `item` = 10782;
+
 
 -- End of migration.
 END IF;
