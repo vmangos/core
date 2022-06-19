@@ -5188,6 +5188,17 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (38117, 3, -147.924, 32.2189, -29.7749, 0, 0, 0, 0),
 (38117, 4, -168.829, 53.9085, -40.5323, 0, 0, 0, 0);
 
+-- ----------------------------------------------------------------------
+
+-- Convert Winterfall Runners To Creature Groups
+DELETE FROM `creature_movement` WHERE `id` IN (42252, 42251);
+UPDATE `creature` SET `movement_type` = 0 WHERE `guid` IN (42252, 42251);
+
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(42250, 42250, 0, 0, 11),
+(42250, 42251, 2, 2.09437, 11),
+(42250, 42252, 2, 4.18873, 11);
+
 
 -- End of migration.
 END IF;
