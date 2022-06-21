@@ -25,6 +25,8 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 
+#include <unordered_set>
+
 class Config;
 class Player;
 class WorldSession;
@@ -131,9 +133,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         } 
     }
     public:
-        void Initialize();
-        void InitColors(std::string const& init_str);
-
         void InitSmartlogEntries(std::string const& str);
         void InitSmartlogGuids(std::string const& str);
 
@@ -149,14 +148,14 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
                                 char const* opcodeName,
                                 ByteBuffer const* packet, bool incoming);
-        // any log level
-        uint32 GetLogLevel() const { return m_consoleLevel; }
-        void SetLogLevel(char* Level);
-        void SetLogFileLevel(char* Level);
-        void SetColor(bool stdout_stream, Color color);
-        void ResetColor(bool stdout_stream);
-        void outTime(FILE* where);
-        static void outTimestamp(FILE* file);
+
+        bool IsSmartLog(uint32 entry, uint32 guid) const;
+
+        uint32 GetConsoleLevel() const { return m_consoleLevel; }
+        uint32 GetFileLevel() const { return m_fileLevel; }
+        void SetConsoleLevel(LogLevel level);
+        void SetFileLevel(LogLevel level);
+
         static std::string GetTimestampStr();
         bool HasLogFilter(uint32 filter) const { return m_logFilter & filter; }
         void SetLogFilter(LogFilters filter, bool on) { if (on) m_logFilter |= filter; else m_logFilter &= ~filter; }
@@ -165,17 +164,19 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
         static void WaitBeforeContinueIfNeed();
 
-        std::list<uint32> m_smartlogExtraEntries;
-        std::list<uint32> m_smartlogExtraGuids;
 
     private:
-        FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
+        void InitColors(std::string const& init_str);
+        void SetColor(bool stdout_stream, Color color);
+        void ResetColor(bool stdout_stream);
+
+        static void outTime(FILE* where);
+        static void outTimestamp(FILE* file);
+
+        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile);
         FILE* openGmlogPerAccount(uint32 account);
 
         FILE* logFiles[LOG_TYPE_MAX];
-        bool  timestampPrefix[LOG_TYPE_MAX];
-
-        const bool m_bIsChatLogFileActivated;
 
         // log/console control
         LogLevel m_consoleLevel;
@@ -198,6 +199,11 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         // gm log control
         const bool m_gmlog_per_account;
         std::string m_gmlog_filename_format;
+
+        // smart log for logging events (e.g. deaths) of certain entities
+        std::unordered_set<uint32> m_smartlogExtraEntries;
+        std::unordered_set<uint32> m_smartlogExtraGuids;
+
 };
 
 #define sLog MaNGOS::Singleton<Log>::Instance()
@@ -213,14 +219,5 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && !sLog.HasLogFilter(F)) \
             sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, __VA_ARGS__);                  \
     } while(0)
-
-#define ERROR_DB_FILTER_LOG(F,...)                      \
-    do {                                                \
-        if (!sLog.HasLogFilter(F))                      \
-            sLog.outErrorDb(__VA_ARGS__);               \
-    } while(0)
-
-#define ERROR_DB_STRICT_LOG(...) \
-    ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
 
 #endif

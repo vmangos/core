@@ -57,15 +57,89 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
 
 Log::Log() :
     m_colored(false), m_includeTime(false), m_wardenDebug(false), m_logsTimestamp(GetTimestampStr()),
-    m_gmlog_per_account(sConfig.GetBoolDefault("GmLogPerAccount", false)),
-    m_bIsChatLogFileActivated(sConfig.GetBoolDefault("ChatLogEnable", false))
+    m_gmlog_per_account(sConfig.GetBoolDefault("GmLogPerAccount", false))
 {
     for (int i = 0; i < LOG_TYPE_MAX; ++i)
     {
         logFiles[i] = nullptr;
-        timestampPrefix[i] = true;
     }
-    Initialize();
+
+    /// Common log files data
+    m_logsDir = sConfig.GetStringDefault("LogsDir", "");
+    if (!m_logsDir.empty())
+    {
+        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
+            m_logsDir.append("/");
+    }
+
+    auto const log_file_timestamp = sConfig.GetBoolDefault("LogFile.TimeStamp", false);
+
+    /// Open specific log files
+
+    // GM log settings for per account case
+    m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");
+    if (!m_gmlog_filename_format.empty())
+    {
+        bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp", false);
+
+        size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
+        if (dot_pos != m_gmlog_filename_format.npos)
+        {
+            if (m_gmlog_timestamp)
+                m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
+
+            m_gmlog_filename_format.insert(dot_pos, "_#%u");
+        }
+        else
+        {
+            m_gmlog_filename_format += "_#%u";
+
+            if (m_gmlog_timestamp)
+                m_gmlog_filename_format += m_logsTimestamp;
+        }
+
+        m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
+    }
+
+    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "server.log", log_file_timestamp);
+    logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp);
+    logFiles[LOG_CHAT] = openLogFile("ChatLogFile", log_file_timestamp);
+    logFiles[LOG_BG] = openLogFile("BgLogFile", log_file_timestamp);
+    logFiles[LOG_CHAR] = openLogFile("CharLogFile", log_file_timestamp);
+    logFiles[LOG_HONOR] = openLogFile("HonorLogFile", log_file_timestamp);
+    logFiles[LOG_RA] = openLogFile("RaLogFile", log_file_timestamp);
+    logFiles[LOG_DBERROR] = openLogFile("DBErrorLogFile", log_file_timestamp);
+    logFiles[LOG_DBERRFIX] = openLogFile("DBErrorFixFile", log_file_timestamp);
+    logFiles[LOG_CLIENT_IDS] = openLogFile("ClientIdsLogFile", log_file_timestamp);
+    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", log_file_timestamp);
+    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", log_file_timestamp);
+    logFiles[LOG_PERFORMANCE] = openLogFile("PerformanceLog.File", log_file_timestamp);
+    logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
+        openLogFile("GMLogFile", log_file_timestamp) : nullptr;
+    logFiles[LOG_MONEY_TRADES] = openLogFile("LogMoneyTrades", log_file_timestamp);
+    logFiles[LOG_GM_CRITICAL] = openLogFile("CriticalCommandsLogFile", log_file_timestamp);
+    logFiles[LOG_CHAT_SPAM] = openLogFile("ChatSpamLogFile", log_file_timestamp);
+    logFiles[LOG_ANTICHEAT] = openLogFile("LogFile.Anticheat", log_file_timestamp);
+
+    // Main log file settings
+    m_wardenDebug = sConfig.GetBoolDefault("Warden.DebugLog", false);
+    m_includeTime = sConfig.GetBoolDefault("LogTime", false);
+    m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel.Console", 2));
+    m_fileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 2));
+    InitColors(sConfig.GetStringDefault("LogColors", ""));
+
+    // Smartlog data
+    InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
+    InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
+
+    m_logFilter = 0;
+    for (int i = 0; i < LOG_FILTER_COUNT; ++i)
+        if (*logFilterData[i].name)
+            if (sConfig.GetBoolDefault(logFilterData[i].configName, logFilterData[i].defaultState))
+                m_logFilter |= (1 << i);
+
+    // Char log settings
+    m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
 }
 
 void Log::InitColors(std::string const& str)
@@ -110,7 +184,7 @@ void Log::InitSmartlogEntries(std::string const& str)
     while (ss)
     {
         ss >> entry;
-        m_smartlogExtraEntries.push_back(entry);
+        m_smartlogExtraEntries.insert(entry);
     }
 }
 
@@ -127,7 +201,7 @@ void Log::InitSmartlogGuids(std::string const& str)
     while (ss)
     {
         ss >> entry;
-        m_smartlogExtraGuids.push_back(entry);
+        m_smartlogExtraGuids.insert(entry);
     }
 }
 
@@ -217,128 +291,50 @@ void Log::ResetColor(bool stdout_stream)
 #endif
 }
 
-void Log::SetLogLevel(char* level)
+void Log::SetConsoleLevel(LogLevel level)
 {
-    int32 newLevel = atoi((char*)level);
+    if (level < LOG_LVL_ERROR)
+        level = LOG_LVL_ERROR;
+    else if (level > LOG_LVL_DEBUG)
+        level = LOG_LVL_DEBUG;
 
-    if (newLevel < LOG_LVL_MINIMAL)
-        newLevel = LOG_LVL_MINIMAL;
-    else if (newLevel > LOG_LVL_DEBUG)
-        newLevel = LOG_LVL_DEBUG;
+    m_consoleLevel = level;
 
-    m_consoleLevel = LogLevel(newLevel);
-
-    printf("LogLevel is %d\n", m_consoleLevel);
+    printf("Console log level set to %u\n", m_consoleLevel);
 }
 
-void Log::SetLogFileLevel(char* level)
+void Log::SetFileLevel(LogLevel level)
 {
     int32 newLevel = atoi((char*)level);
 
-    if (newLevel < LOG_LVL_MINIMAL)
-        newLevel = LOG_LVL_MINIMAL;
+    if (newLevel < LOG_LVL_ERROR)
+        newLevel = LOG_LVL_ERROR;
     else if (newLevel > LOG_LVL_DEBUG)
         newLevel = LOG_LVL_DEBUG;
 
     m_fileLevel = LogLevel(newLevel);
 
-    printf("LogFileLevel is %d\n", m_fileLevel);
+    printf("File log level set to %u\n", m_fileLevel);
 }
 
-void Log::Initialize()
+FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile)
 {
-    /// Common log files data
-    m_logsDir = sConfig.GetStringDefault("LogsDir", "");
-    if (!m_logsDir.empty())
-    {
-        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
-            m_logsDir.append("/");
-    }
-
-    /// Open specific log files
-
-    // GM log settings for per account case
-    m_gmlog_filename_format = sConfig.GetStringDefault("GMLogFile", "");
-    if (!m_gmlog_filename_format.empty())
-    {
-        bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp", false);
-
-        size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
-        if (dot_pos != m_gmlog_filename_format.npos)
-        {
-            if (m_gmlog_timestamp)
-                m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
-
-            m_gmlog_filename_format.insert(dot_pos, "_#%u");
-        }
-        else
-        {
-            m_gmlog_filename_format += "_#%u";
-
-            if (m_gmlog_timestamp)
-                m_gmlog_filename_format += m_logsTimestamp;
-        }
-
-        m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
-    }
-
-    logFiles[LOG_BASIC] = openLogFile("LogFile", "LogTimestamp", "w");
-    logFiles[LOG_WORLDPACKET] = openLogFile("WorldLogFile", "WorldLogTimestamp", "a");
-    logFiles[LOG_CHAT] = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
-    logFiles[LOG_BG] = openLogFile("BgLogFile", "BgLogTimestamp", "a");
-    logFiles[LOG_CHAR] = openLogFile("CharLogFile", "CharLogTimestamp", "a");
-    logFiles[LOG_HONOR] = openLogFile("HonorLogFile", "HonorLogTimestamp", "a");
-    logFiles[LOG_RA] = openLogFile("RaLogFile", nullptr, "a");
-    logFiles[LOG_DBERROR] = openLogFile("DBErrorLogFile", nullptr, "a");
-    logFiles[LOG_DBERRFIX] = openLogFile("DBErrorFixFile", nullptr, "w+");
-    logFiles[LOG_CLIENT_IDS] = openLogFile("ClientIdsLogFile", nullptr, "a");
-    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", nullptr, "a");
-    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", nullptr, "a");
-    logFiles[LOG_PERFORMANCE] = openLogFile("PerformanceLog.File", nullptr, "a");
-    logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
-        openLogFile("GMLogFile", "GmLogTimestamp", "a") : nullptr;
-    logFiles[LOG_MONEY_TRADES] = openLogFile("LogMoneyTrades", nullptr, "a");
-    logFiles[LOG_GM_CRITICAL] = openLogFile("CriticalCommandsLogFile", nullptr, "a");
-    logFiles[LOG_CHAT_SPAM] = openLogFile("ChatSpamLogFile", nullptr, "a");
-    logFiles[LOG_ANTICHEAT] = openLogFile("AnticheatLogFile", "AnticheatLogTimestamp", "a");
-
-    timestampPrefix[LOG_DBERRFIX] = false;
-
-    // Main log file settings
-    m_wardenDebug = sConfig.GetBoolDefault("Warden.DebugLog", false);
-    m_includeTime = sConfig.GetBoolDefault("LogTime", false);
-    m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel", 0));
-    m_fileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 0));
-    InitColors(sConfig.GetStringDefault("LogColors", ""));
-
-    // Smartlog data
-    InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
-    InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
-
-    m_logFilter = 0;
-    for (int i = 0; i < LOG_FILTER_COUNT; ++i)
-        if (*logFilterData[i].name)
-            if (sConfig.GetBoolDefault(logFilterData[i].configName, logFilterData[i].defaultState))
-                m_logFilter |= (1 << i);
-
-    // Char log settings
-    m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
-}
-
-FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode)
-{
-    std::string logfn = sConfig.GetStringDefault(configFileName, "");
+    std::string logfn = sConfig.GetStringDefault(configFileName, defaultFileName);
     if (logfn.empty())
         return nullptr;
 
-    if (configTimeStampFlag && sConfig.GetBoolDefault(configTimeStampFlag, false))
+    char const* mode;
+    if (timestampFile)
     {
+        mode = "w";
         size_t dot_pos = logfn.find_last_of('.');
         if (dot_pos != logfn.npos)
             logfn.insert(dot_pos, m_logsTimestamp);
         else
             logfn += m_logsTimestamp;
     }
+    else
+        mode = "a";
 
     return fopen((m_logsDir + logfn).c_str(), mode);
 }
@@ -417,7 +413,7 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
     if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= logLevel)
     {
         if (m_colored)
-            SetColor(true, m_colors[logLevel]);
+            SetColor(logLevel != LOG_LVL_ERROR, m_colors[logLevel]);
 
         if (m_includeTime)
             outTime(stdout);
@@ -428,7 +424,7 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
         utf8printf(stdout, buff);
 
         if (m_colored)
-            ResetColor(true);
+            ResetColor(logLevel != LOG_LVL_ERROR);
 
         printf("\n");
         fflush(stdout);
@@ -436,7 +432,8 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
 
     if (logFiles[logType] && m_fileLevel >= logLevel)
     {
-        if (timestampPrefix[logType])
+        // LOG_DBERRFIX should not get timestamp, but all others should
+        if (logType != LOG_DBERRFIX)
             outTimestamp(logFiles[logType]);
 
         if (logLevel == LOG_LVL_ERROR)
@@ -473,6 +470,12 @@ void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
 
     fprintf(logFiles[LOG_WORLDPACKET], "\n\n");
     fflush(logFiles[LOG_WORLDPACKET]);
+}
+
+bool Log::IsSmartLog(uint32 entry, uint32 guid) const
+{
+    return m_smartlogExtraEntries.find(entry) != m_smartlogExtraEntries.end() ||
+        m_smartlogExtraGuids.find(guid) != m_smartlogExtraEntries.end();
 }
 
 void Log::WaitBeforeContinueIfNeed()

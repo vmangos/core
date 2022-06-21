@@ -2753,18 +2753,8 @@ void Creature::LogDeath(Unit* pKiller) const
         return;
 
     // by default we log bosses only
-    if (!IsWorldBoss())
-    {
-        if (sLog.m_smartlogExtraEntries.empty() && sLog.m_smartlogExtraGuids.empty())
-            return;
-
-        // if entry or guid matches one of extra values from config we log too
-        bool extraEntry = std::find(sLog.m_smartlogExtraEntries.begin(), sLog.m_smartlogExtraEntries.end(), GetEntry()) != sLog.m_smartlogExtraEntries.end();
-        bool extraGuid = std::find(sLog.m_smartlogExtraGuids.begin(), sLog.m_smartlogExtraGuids.end(), GetGUIDLow()) != sLog.m_smartlogExtraGuids.end();
-
-        if (!extraEntry && !extraGuid)
-            return;
-    }
+    if (!IsWorldBoss() && !sLog.IsSmartLog(GetEntry(), GetGUIDLow()))
+        return;
 
     static SqlStatementID insLogDeath;
     SqlStatement logStmt = LogsDatabase.CreateStatement(insLogDeath, "INSERT INTO smartlog_creature SET type=?, entry=?, guid=?, specifier=?, combatTime=?, content=?");

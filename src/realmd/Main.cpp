@@ -190,8 +190,6 @@ extern int main(int argc, char **argv)
     }
 #endif
 
-    sLog.Initialize();
-
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Core revision: %s [realm-daemon]", _FULLVERSION);
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "<Ctrl-C> to stop.\n" );
     sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Using configuration file %s.", cfg_file);

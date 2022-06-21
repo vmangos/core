@@ -293,7 +293,7 @@ void HonorMaintenancer::DoMaintenance()
 
 void HonorMaintenancer::CreateCalculationReport()
 {
-    std::string timestamp = Log::GetTimestampStr();
+    std::string timestamp = sLog.GetTimestampStr();
     std::string filename = "HCR" + timestamp + ".txt";
     std::string path = sWorld.GetHonorPath() + filename;
 

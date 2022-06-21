@@ -460,30 +460,25 @@ DebuffLimit = 0
 #        Default: ""             - do not create PID file
 #                 "./worldd.pid" - create PID file (recommended name)
 #
-#    LogLevel
+#    LogLevel.Console
 #        Server console level of logging
-#        0 = Minimum; 1 = Basic&Error; 2 = Detail; 3 = Full/Debug
-#        Default: 3
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
+#
+#    LogLevel.File
+#        Server file level of logging
+#        0 = Error; 1 = Minimum; 2 = Basic; 3 = Detail; 4 = Full/Debug
+#        Default: 2
 #
 #    LogTime
 #        Include time in server console output [hh:mm:ss]
 #        Default: 0 (no time)
 #                 1 (print time)
 #
-#    LogFile
-#        Logfile name
-#        Default: "Server.log"
-#                 "" - Empty name disable creating log file
-#
-#    LogTimestamp
-#        Logfile with timestamp of server start in name
+#    LogFile.TimeStamp
+#        Include startup timestamp in log file names
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
-#    LogFileLevel
-#        Server file level of logging
-#        0 = Minimum; 1 = Error; 2 = Detail; 3 = Full/Debug
-#        Default: 0
 #
 #    LogFilter_TransportMoves
 #    LogFilter_CreatureMoves
@@ -507,23 +502,19 @@ DebuffLimit = 0
 #        Default: 0 - include in log if log level permit
 #                 1 - not include with any log level
 #
-#    AnticheatLogFile
+#    LogFile.Basic
+#        Basic log file name
+#        Default: "Server.log"
+#                 "" - Empty name disable creating log file
+#
+#    LogFile.World
+#        Packet logging file for the worldserver
+#        Default: "world_packets.log"
+#
+#    LogFile.Anticheat
 #        Log file for anticheat check results
 #        Default: "anticheat.log"
-#
-#    AnticheatLogTimestamp
-#        Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
-#    WorldLogFile
-#        Packet logging file for the worldserver
-#        Default: "world.log"
-#
-#    WorldLogTimestamp
-#        Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#                 "" - Empty name disable creating log file
 #
 #    DBErrorLogFile
 #        Log file of DB errors detected at server run
@@ -538,11 +529,6 @@ DebuffLimit = 0
 #        Default: "Char.log"
 #                 "" - Empty name disable creating log file
 #
-#    CharLogTimestamp
-#        Log file with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#
 #    CharLogDump
 #        Write character dump before deleting in Char.log
 #        For restoration, cut character data from log starting from
@@ -550,34 +536,17 @@ DebuffLimit = 0
 #        Default: 0 - don't include dumping chars to log
 #                 1 - include dumping chars to log
 #
-#    ChatLogEnable
-#        Enable or disable logging of player chat.
-#        Default: 1
-#
 #    ChatLogFile
 #        Log file for player chat.
 #        Default: "Chat.log"
-#
-#    ChatLogTimestamp
-#        Add time stamp to logged chat messages.
-#        Default: 0
 #
 #    BgLogFile
 #        Log file for battlegrounds system.
 #        Default: "bg.log"
 #
-#    BgLogTimestamp
-#        Add time stamp to battleground logs.
-#        Default: 0
-#
 #    GmLogFile
 #        GM Log file of gm commands
 #        Default: "" (Disable)
-#
-#    GmLogTimestamp
-#        GM Logfile with timestamp of server start in name
-#        Default: 0 - no timestamp in name
-#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
 #
 #    GmLogPerAccount
 #        GM Logfiles with GM account id (Note: logs not created if GmLogFile not set)
@@ -627,11 +596,9 @@ DebuffLimit = 0
 
 LogSQL = 1
 PidFile = ""
-LogLevel = 1
+LogLevel.Console = 2
+LogLevel.File = 2
 LogTime = 0
-LogFile = "Server.log"
-LogTimestamp = 0
-LogFileLevel = 1
 LogFilter_TransportMoves = 1
 LogFilter_CreatureMoves = 1
 LogFilter_VisibilityChanges = 1
@@ -647,7 +614,11 @@ LogFilter_SpellCast = 0
 LogFilter_DbStrictedCheck = 1
 LogFilter_Pathfinding = 0
 LogFilter_Honor = 1
-AnticheatLogFile = "anticheat.log"
+
+LogFile.Timestamp = 0
+LogFile.Basic = "Server.log"
+LogFile.Anticheat = "anticheat.log"
+
 AnticheatLogTimestamp = 1
 WorldLogFile = ""
 WorldLogTimestamp = 0
@@ -664,7 +635,6 @@ CharLogFile = "Char.log"
 CharLogTimestamp = 0
 CharLogDump = 0
 ChatLogFile = "Chat.log"
-ChatLogEnable = 1
 ChatLogTimestamp = 0
 BgLogFile = "bg.log"
 BgLogTimestamp = 0

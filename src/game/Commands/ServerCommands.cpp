@@ -574,11 +574,12 @@ bool ChatHandler::HandleServerLogLevelCommand(char *args)
 {
     if (!*args)
     {
-        PSendSysMessage("Log level: %u", sLog.GetLogLevel());
+        PSendSysMessage("Console log level: %u File log level: %u",
+            sLog.GetConsoleLevel(), sLog.GetFileLevel());
         return true;
     }
 
-    sLog.SetLogLevel(args);
+    sLog.SetConsoleLevel(LogLevel(atoi(args)));
     return true;
 }
 

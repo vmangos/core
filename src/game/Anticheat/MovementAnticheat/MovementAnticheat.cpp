@@ -132,7 +132,7 @@ uint32 MovementAnticheat::Finalize(Player* pPlayer, std::stringstream& reason)
     // Log data
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_LOG_DATA) && pPlayer && pPlayer->IsInWorld())
     {
-        sLog.Player(_session, LOG_ANTICHEAT, "Movement", LOG_LVL_BASIC, "DesyncMs %d DesyncDist %f Cheats %s",
+        sLog.Player(m_session, LOG_ANTICHEAT, "Movement", LOG_LVL_BASIC, "DesyncMs %d DesyncDist %f Cheats %s",
             m_clientDesync, m_overspeedDistance, reason.rdbuf()->in_avail() ? reason.str().c_str() : "");
     }
 
