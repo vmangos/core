@@ -752,7 +752,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
             if (!canQueue)
             {
-                sLog.outError("BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
+                sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
                 botEntry->requestRemoval = true;
                 return;
             }
