@@ -599,6 +599,10 @@ DebuffLimit = 0
 #        Default: "" - none colors
 #        Example: "13 7 11 9"
 #
+#    LogMoneyThreshold
+#        Log all trades where money exceeds the specified value in copper
+#        Default: 10000
+#
 #    LogsDB.Chat
 #        Enable or disable database chat logs.
 #        Default: 0
@@ -659,17 +663,9 @@ LogFile.Gm = ""
 LogFile.GmCriticalCommands = "gm_critical.log"
 LogFile.Trades = "Trades.log"
 
-AnticheatLogTimestamp = 1
-WorldLogFile = ""
-WorldLogTimestamp = 0
-HonorLogTimestamp = 0
 LogMoneyTreshold = 10000
-CharLogTimestamp = 0
 CharLogDump = 0
 
-ChatLogTimestamp = 0
-BgLogTimestamp = 0
-GmLogTimestamp = 0
 GmLogPerAccount = 0
 LogColors = ""
 

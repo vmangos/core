@@ -35,7 +35,7 @@
 
 INSTANTIATE_SINGLETON_1(Log);
 
-LogFilterData logFilterData[LOG_FILTER_COUNT] =
+constexpr LogFilterData logFilterData[] =
 {
     { "transport_moves",     "LogFilter_TransportMoves",     true  },
     { "creature_moves",      "LogFilter_CreatureMoves",      true  },
@@ -54,6 +54,9 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
     { "pathfinding",         "LogFilter_Pathfinding",        false },
     { "honor",               "LogFilter_Honor",              true  },
 };
+
+static_assert(sizeof(logFilterData) / sizeof(logFilterData[0]) == LOG_FILTER_COUNT,
+    "logFilterData size must match LOG_FILTER_COUNT");
 
 Log::Log() :
     m_colored(false), m_includeTime(false), m_logsTimestamp(GetTimestampStr())
