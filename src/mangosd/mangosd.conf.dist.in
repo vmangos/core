@@ -510,24 +510,73 @@ DebuffLimit = 0
 #    LogFile.World
 #        Packet logging file for the worldserver
 #        Default: "world_packets.log"
+#                 "" - Empty name disable creating log file
 #
 #    LogFile.Anticheat
 #        Log file for anticheat check results
-#        Default: "anticheat.log"
+#        Default: "Anticheat.log"
 #                 "" - Empty name disable creating log file
 #
-#    DBErrorLogFile
-#        Log file of DB errors detected at server run
-#        Default: "DBErrors.log"
+#    LogFile.Chat
+#        Log file for player chat.
+#        Default: "Chat.log"
+#                 "" - Empty name disable creating log file
 #
-#    DBErrorFixFile
-#        Log file of SQL requests to apply to fix detected database errors
-#        Default: ""
+#    LogFile.Bg
+#        Log file for battlegrounds system.
+#        Default: "Bg.log"
+#                 "" - Empty name disable creating log file
 #
-#    CharLogFile
+#    LogFile.Char
 #        Character operations logfile name
 #        Default: "Char.log"
 #                 "" - Empty name disable creating log file
+#
+#    LogFile.Honor
+#        Honor information logfile name
+#        Default: "" - Empty name disable creating log file
+#
+#    LogFile.Ra
+#        Log file of RA commands
+#        Default: "Ra.log"
+#                 "" - Empty name for disable
+#
+#    Logfile.DBError
+#        Log file of DB errors detected at server run
+#        Default: "DBErrors.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.DBErrorFix
+#        Log file of SQL requests to apply to fix detected database errors
+#        Default: ""
+#
+#    LogFile.Loot
+#        Log file of loot related messages
+#        Default: "Loot.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.LevelUp
+#        Log file of levelup related messages
+#        Default: "LevelUp.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Performance
+#        Log file of performance related messages
+#        Default: "Perf.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Gm
+#        GM Log file of gm commands
+#        Default: "" (Disable)
+#
+#    LogFile.CriticalCommands
+#        Log file for commands marked as critical, when used on own character (same IP for example)
+#        Default: "gm_critical.log"
+#                 "" - Empty name for disable
+#
+#    LogFile.Trades
+#        Log file of trade related messages
+#        Default: "" (Disable)
 #
 #    CharLogDump
 #        Write character dump before deleting in Char.log
@@ -536,34 +585,12 @@ DebuffLimit = 0
 #        Default: 0 - don't include dumping chars to log
 #                 1 - include dumping chars to log
 #
-#    ChatLogFile
-#        Log file for player chat.
-#        Default: "Chat.log"
-#
-#    BgLogFile
-#        Log file for battlegrounds system.
-#        Default: "bg.log"
-#
-#    GmLogFile
-#        GM Log file of gm commands
-#        Default: "" (Disable)
-#
 #    GmLogPerAccount
 #        GM Logfiles with GM account id (Note: logs not created if GmLogFile not set)
 #        Default: 0 - add gm log data to single log file
 #                 1 - add gm log data to account specific log files with name
 #                     in form Logname_#ID_YYYY-MM-DD_HH-MM-SS.Ext
 #                     or form Logname_#ID.Ext
-#
-#    CriticalCommandsLogFile
-#        Log file for commands marked as critical, when used on own character (same IP for example)
-#        Default: "gm_critical.log"
-#                 "" - Empty name for disable
-#
-#    RaLogFile
-#        Log file of RA commands
-#        Default: "Ra.log"
-#                 "" - Empty name for disable
 #
 #    LogColors
 #        Color for messages (format "normal_color details_color debug_color error_color")
@@ -617,32 +644,33 @@ LogFilter_Honor = 1
 
 LogFile.Timestamp = 0
 LogFile.Basic = "Server.log"
-LogFile.Anticheat = "anticheat.log"
+LogFile.Anticheat = "Anticheat.log"
+LogFile.Chat = "Chat.log"
+LogFile.Bg = "Bg.log"
+LogFile.Char = "Char.log"
+LogFile.Honor = ""
+LogFile.Ra = "Ra.log"
+LogFile.DBError = "DBErrors.log"
+LogFile.DBErrorFix = ""
+LogFile.Loot = "Loot.log"
+LogFile.LevelUp = "LevelUp.log"
+LogFile.Performance = "Perf.log"
+LogFile.Gm = ""
+LogFile.GmCriticalCommands = "gm_critical.log"
+LogFile.Trades = "Trades.log"
 
 AnticheatLogTimestamp = 1
 WorldLogFile = ""
 WorldLogTimestamp = 0
-HonorLogFile = ""
 HonorLogTimestamp = 0
-DBErrorLogFile = "DBErrors.log"
-DBErrorFixFile = ""
-ClientIdsLogFile = "client.log"
-LootsLogFile = "loot.log"
-LevelupLogFile = "levelup.log"
-LogMoneyTrades = "trades.log"
 LogMoneyTreshold = 10000
-CharLogFile = "Char.log"
 CharLogTimestamp = 0
 CharLogDump = 0
-ChatLogFile = "Chat.log"
+
 ChatLogTimestamp = 0
-BgLogFile = "bg.log"
 BgLogTimestamp = 0
-GmLogFile = ""
 GmLogTimestamp = 0
 GmLogPerAccount = 0
-CriticalCommandsLogFile = "gm_critical.log"
-RaLogFile = ""
 LogColors = ""
 
 LogsDB.Chat                 = 0
@@ -651,7 +679,6 @@ LogsDB.Trades               = 0
 LogsDB.Transactions         = 0
 LogsDB.Battlegrounds        = 0
 
-PerformanceLog.File                     = "perf.log"
 PerformanceLog.SlowWorldUpdate          = 100
 PerformanceLog.SlowMapSystemUpdate      = 100
 PerformanceLog.SlowSessionsUpdate       = 100
@@ -1433,18 +1460,6 @@ Antiflood.Sanction = 8
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 #
-#    Warden.DebugLog
-#        Description: Prints additional information about performed checks.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-#
-#    Warden.DBLogLevel
-#        Description: The minimal WardenActions value of Warden check to be logged into realmd.warden_log table.
-#                     WardenActions: 0 - log, 1 - kick, 2 - ban
-#
-#        Deafult:     0 - (Logging any failed check)
-#                     3 - (Disable DB logging)
-#
 #    Warden.ModuleDir
 #        Description: Directory where warden modules are stored.
 #        Default: "warden_modules"
@@ -1459,8 +1474,6 @@ Warden.ClientResponseDelay   = 30
 Warden.ScanFrequency         = 15
 Warden.DefaultPenalty        = 0
 Warden.BanDuration           = 86400
-Warden.DebugLog              = 0
-Warden.DBLogLevel            = 0
 Warden.ModuleDir             = "warden_modules"
 
 ###################################################################################################

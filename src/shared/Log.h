@@ -104,14 +104,12 @@ enum LogType
     LOG_RA,
     LOG_DBERROR,
     LOG_DBERRFIX,
-    LOG_CLIENT_IDS,
     LOG_LOOTS,
     LOG_LEVELUP,
     LOG_PERFORMANCE,
     LOG_MONEY_TRADES,
     LOG_GM,
     LOG_GM_CRITICAL,
-    LOG_CHAT_SPAM,
     LOG_ANTICHEAT,
     LOG_TYPE_MAX
 };
@@ -185,7 +183,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
         // include timestamp in console output
         bool m_includeTime;
-        bool m_wardenDebug;
         Color m_colors[LOG_TYPE_MAX];
         uint32 m_logFilter;
 
@@ -197,7 +194,6 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         bool m_charLog_Dump;
 
         // gm log control
-        const bool m_gmlog_per_account;
         std::string m_gmlog_filename_format;
 
         // smart log for logging events (e.g. deaths) of certain entities

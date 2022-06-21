@@ -1336,7 +1336,7 @@ void ObjectMgr::CheckCreatureTemplates()
 
         if (cInfo->damage_school >= MAX_SPELL_SCHOOL)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has invalid spell school value (%u) in `dmg_school`", cInfo->entry, cInfo->dmg_school);
+            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Creature (Entry: %u) has invalid spell school value (%u) in `damage_school`", cInfo->entry, cInfo->damage_school);
             sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "UPDATE creature_template SET `dmg_school`=%u WHERE entry=%u;", SPELL_SCHOOL_NORMAL, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->damage_school = SPELL_SCHOOL_NORMAL;
         }
@@ -1929,7 +1929,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
                 if (maxLevel > currentMaxLevel)
                     currentMaxLevel = maxLevel;
                 else if (!maxLevel)
-                    sLog.outErrorDb("Missing creature CLS data for `class` = %u used in creature_template!", unitClass);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing creature CLS data for `class` = %u used in creature_template!", unitClass);
 
                 m_CreatureCLSMap[unitClass].resize(std::max(requiredMaxLevel, currentMaxLevel));
                 
@@ -1948,7 +1948,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
                 if (!level)
                 {
-                    sLog.outErrorDb("Table `creature_classlevelstats` contains data for invalid `level` = %u!", level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `creature_classlevelstats` contains data for invalid `level` = %u!", level);
                     continue;
                 }
 
@@ -1971,85 +1971,85 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
                 if (cls.melee_damage <= 0.0f)
                 {
-                    sLog.outErrorDb("Invalid `melee_damage` = %g in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `melee_damage` = %g in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.melee_damage = phMeleeDamage + phMeleeDamage * phDamageIncreasePerLevel * i;
                 }
 
                 if (cls.ranged_damage <= 0.0f)
                 {
-                    sLog.outErrorDb("Invalid `ranged_damage` = %g in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `ranged_damage` = %g in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.ranged_damage = phRangedDamage + phRangedDamage * phDamageIncreasePerLevel * i;
                 }
 
                 if (cls.attack_power <= 0)
                 {
-                    sLog.outErrorDb("Invalid `attack_power` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `attack_power` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.attack_power = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.ranged_attack_power <= 0)
                 {
-                    sLog.outErrorDb("Invalid `ranged_attack_power` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `ranged_attack_power` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.ranged_attack_power = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.health <= 0)
                 {
-                    sLog.outErrorDb("Invalid `health` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `health` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.health = phStat * 2 + phStat * 2 * i;
                 }
 
                 if (cls.base_health <= 0)
                 {
-                    sLog.outErrorDb("Invalid `base_health` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `base_health` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.base_health = phStat + phStat * i;
                 }
 
                 if (cls.mana < 0)
                 {
-                    sLog.outErrorDb("Invalid `mana` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `mana` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.mana = abs(cls.mana);
                 }
 
                 if (cls.base_mana < 0)
                 {
-                    sLog.outErrorDb("Invalid `base_mana` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `base_mana` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.base_mana = abs(cls.base_mana);
                 }
 
                 if (cls.strength <= 0)
                 {
-                    sLog.outErrorDb("Invalid `strength` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `strength` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.strength = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.agility <= 0)
                 {
-                    sLog.outErrorDb("Invalid `agility` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `agility` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.agility = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.stamina <= 0)
                 {
-                    sLog.outErrorDb("Invalid `stamina` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `stamina` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.stamina = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.intellect <= 0)
                 {
-                    sLog.outErrorDb("Invalid `intellect` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `intellect` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.intellect = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.spirit <= 0)
                 {
-                    sLog.outErrorDb("Invalid `spirit` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `spirit` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.spirit = phStat + phStat * phStatIncreasePerLevel * i;
                 }
 
                 if (cls.armor < 0)
                 {
-                    sLog.outErrorDb("Invalid `armor` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Invalid `armor` = %i in `creature_classlevelstats` for `class`=%u and `level`=%u!", cls.melee_damage, unitClass, level);
                     cls.armor = abs(cls.armor);
                 }
 
@@ -2061,7 +2061,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
             CreatureClassLevelStats& cls = m_CreatureCLSMap[unitClass][i];
             if (!cls.health)
             {
-                sLog.outErrorDb("Missing creature CLS data for `class` = %u and `level` = %u!", unitClass, i+1);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Missing creature CLS data for `class` = %u and `level` = %u!", unitClass, i+1);
                 cls.melee_damage = phMeleeDamage + phMeleeDamage * phDamageIncreasePerLevel * i;
                 cls.ranged_damage = phRangedDamage + phRangedDamage * phDamageIncreasePerLevel * i;
                 cls.attack_power = phStat + phStat * phStatIncreasePerLevel * i;
@@ -2129,7 +2129,7 @@ CreatureClassLevelStats const* ObjectMgr::GetCreatureClassLevelStats(uint32 unit
     auto itr = m_CreatureCLSMap.find(unitClass);
     if (itr == m_CreatureCLSMap.end() || itr->second.empty())
     {
-        sLog.outError("Missing creature CLS data for class = %u!", unitClass);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Missing creature CLS data for class = %u!", unitClass);
         static CreatureClassLevelStats ph{ 1.5f, 1.3f, 20, 20, 40, 20, 40, 20, 20, 20, 20, 20, 20, 20 };
         return &ph;
     }

@@ -56,8 +56,7 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
 };
 
 Log::Log() :
-    m_colored(false), m_includeTime(false), m_wardenDebug(false), m_logsTimestamp(GetTimestampStr()),
-    m_gmlog_per_account(sConfig.GetBoolDefault("GmLogPerAccount", false))
+    m_colored(false), m_includeTime(false), m_logsTimestamp(GetTimestampStr())
 {
     for (int i = 0; i < LOG_TYPE_MAX; ++i)
     {
@@ -101,28 +100,25 @@ Log::Log() :
         m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
     }
 
-    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "server.log", log_file_timestamp);
+    logFiles[LOG_BASIC] = openLogFile("LogFile.Basic", "Server.log", log_file_timestamp);
     logFiles[LOG_WORLDPACKET] = openLogFile("LogFile.World", "world_packets.log", log_file_timestamp);
-    logFiles[LOG_CHAT] = openLogFile("ChatLogFile", log_file_timestamp);
-    logFiles[LOG_BG] = openLogFile("BgLogFile", log_file_timestamp);
-    logFiles[LOG_CHAR] = openLogFile("CharLogFile", log_file_timestamp);
-    logFiles[LOG_HONOR] = openLogFile("HonorLogFile", log_file_timestamp);
-    logFiles[LOG_RA] = openLogFile("RaLogFile", log_file_timestamp);
-    logFiles[LOG_DBERROR] = openLogFile("DBErrorLogFile", log_file_timestamp);
-    logFiles[LOG_DBERRFIX] = openLogFile("DBErrorFixFile", log_file_timestamp);
-    logFiles[LOG_CLIENT_IDS] = openLogFile("ClientIdsLogFile", log_file_timestamp);
-    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", log_file_timestamp);
-    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", log_file_timestamp);
-    logFiles[LOG_PERFORMANCE] = openLogFile("PerformanceLog.File", log_file_timestamp);
+    logFiles[LOG_CHAT] = openLogFile("LogFile.Chat", "Chat.log", log_file_timestamp);
+    logFiles[LOG_BG] = openLogFile("BgLogFile", "Bg.log", log_file_timestamp);
+    logFiles[LOG_CHAR] = openLogFile("LogFile.Char", "Char.log", log_file_timestamp);
+    logFiles[LOG_HONOR] = openLogFile("LogFile.Honor", "", log_file_timestamp);
+    logFiles[LOG_RA] = openLogFile("LogFile.Ra", "Ra.log", log_file_timestamp);
+    logFiles[LOG_DBERROR] = openLogFile("LogFile.DBError", "DBErrors.log", log_file_timestamp);
+    logFiles[LOG_DBERRFIX] = openLogFile("LogFile.DBErrorFix", "", log_file_timestamp);
+    logFiles[LOG_LOOTS] = openLogFile("LootsLogFile", "Loot.log", log_file_timestamp);
+    logFiles[LOG_LEVELUP] = openLogFile("LevelupLogFile", "LevelUp.log", log_file_timestamp);
+    logFiles[LOG_PERFORMANCE] = openLogFile("LogFile.Performance", "Perf.log", log_file_timestamp);
     logFiles[LOG_GM] = sConfig.GetBoolDefault("GmLogPerAccount", false) ?
-        openLogFile("GMLogFile", log_file_timestamp) : nullptr;
-    logFiles[LOG_MONEY_TRADES] = openLogFile("LogMoneyTrades", log_file_timestamp);
-    logFiles[LOG_GM_CRITICAL] = openLogFile("CriticalCommandsLogFile", log_file_timestamp);
-    logFiles[LOG_CHAT_SPAM] = openLogFile("ChatSpamLogFile", log_file_timestamp);
-    logFiles[LOG_ANTICHEAT] = openLogFile("LogFile.Anticheat", log_file_timestamp);
+        openLogFile("LogFile.Gm", "", log_file_timestamp) : nullptr;
+    logFiles[LOG_MONEY_TRADES] = openLogFile("LogFile.Trades", "", log_file_timestamp);
+    logFiles[LOG_GM_CRITICAL] = openLogFile("LogFile.CriticalCommands", "gm_critical.log", log_file_timestamp);
+    logFiles[LOG_ANTICHEAT] = openLogFile("LogFile.Anticheat", "Anticheat.log", log_file_timestamp);
 
     // Main log file settings
-    m_wardenDebug = sConfig.GetBoolDefault("Warden.DebugLog", false);
     m_includeTime = sConfig.GetBoolDefault("LogTime", false);
     m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel.Console", 2));
     m_fileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 2));
@@ -475,7 +471,7 @@ void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
 bool Log::IsSmartLog(uint32 entry, uint32 guid) const
 {
     return m_smartlogExtraEntries.find(entry) != m_smartlogExtraEntries.end() ||
-        m_smartlogExtraGuids.find(guid) != m_smartlogExtraEntries.end();
+        m_smartlogExtraGuids.find(guid) != m_smartlogExtraGuids.end();
 }
 
 void Log::WaitBeforeContinueIfNeed()
