@@ -35,31 +35,10 @@
 
 INSTANTIATE_SINGLETON_1(Log);
 
-constexpr LogFilterData logFilterData[] =
-{
-    { "transport_moves",     "LogFilter_TransportMoves",     true  },
-    { "creature_moves",      "LogFilter_CreatureMoves",      true  },
-    { "visibility_changes",  "LogFilter_VisibilityChanges",  true  },
-    { "",                    "",                             true  },
-    { "weather",             "LogFilter_Weather",            true  },
-    { "player_stats",        "LogFilter_PlayerStats",        false },
-    { "sql_text",            "LogFilter_SQLText",            false },
-    { "player_moves",        "LogFilter_PlayerMoves",        false },
-    { "periodic_effects",    "LogFilter_PeriodicAffects",    false },
-    { "ai_and_movegens",     "LogFilter_AIAndMovegens",      false },
-    { "damage",              "LogFilter_Damage",             false },
-    { "combat",              "LogFilter_Combat",             false },
-    { "spell_cast",          "LogFilter_SpellCast",          false },
-    { "db_stricted_check",   "LogFilter_DbStrictedCheck",    true  },
-    { "pathfinding",         "LogFilter_Pathfinding",        false },
-    { "honor",               "LogFilter_Honor",              true  },
-};
-
-static_assert(sizeof(logFilterData) / sizeof(logFilterData[0]) == LOG_FILTER_COUNT,
-    "logFilterData size must match LOG_FILTER_COUNT");
+static constexpr Color logColors[] = { RED, LRED, BLACK, YELLOW, BLUE };
 
 Log::Log() :
-    m_colored(false), m_includeTime(false), m_logsTimestamp(GetTimestampStr())
+    m_includeTime(false), m_logsTimestamp(GetTimestampStr())
 {
     for (int i = 0; i < LOG_TYPE_MAX; ++i)
     {
@@ -125,7 +104,6 @@ Log::Log() :
     m_includeTime = sConfig.GetBoolDefault("LogTime", false);
     m_consoleLevel = LogLevel(sConfig.GetIntDefault("LogLevel.Console", 2));
     m_fileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 2));
-    InitColors(sConfig.GetStringDefault("LogColors", ""));
 
     // Smartlog data
     InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
@@ -139,35 +117,6 @@ Log::Log() :
 
     // Char log settings
     m_charLog_Dump = sConfig.GetBoolDefault("CharLogDump", false);
-}
-
-void Log::InitColors(std::string const& str)
-{
-    if (str.empty())
-    {
-        m_colored = false;
-        return;
-    }
-
-    int color[LOG_TYPE_MAX];
-
-    std::istringstream ss(str);
-
-    for (int i = 0; i < LOG_TYPE_MAX; ++i)
-    {
-        ss >> color[i];
-
-        if (!ss)
-            return;
-
-        if (color[i] < 0 || color[i] >= COLOR_COUNT)
-            return;
-    }
-
-    for (int i = 0; i < LOG_TYPE_MAX; ++i)
-        m_colors[i] = Color(color[i]);
-
-    m_colored = true;
 }
 
 void Log::InitSmartlogEntries(std::string const& str)
@@ -204,11 +153,11 @@ void Log::InitSmartlogGuids(std::string const& str)
     }
 }
 
-void Log::SetColor(bool stdout_stream, Color color)
+void Log::SetColor(FILE* where, Color color) const
 {
 #if PLATFORM == PLATFORM_WINDOWS
 
-    static WORD WinColorFG[COLOR_COUNT] =
+    static constexpr WORD WinColorFG[] =
     {
         0,                                                  // BLACK
         FOREGROUND_RED,                                     // RED
@@ -221,19 +170,22 @@ void Log::SetColor(bool stdout_stream, Color color)
                                                             // YELLOW
         FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY,
         // RED_BOLD
-FOREGROUND_RED | FOREGROUND_INTENSITY,
-// GREEN_BOLD
-FOREGROUND_GREEN | FOREGROUND_INTENSITY,
-FOREGROUND_BLUE | FOREGROUND_INTENSITY,             // BLUE_BOLD
-                                                    // MAGENTA_BOLD
-FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-// CYAN_BOLD
-FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-// WHITE_BOLD
-FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
+        FOREGROUND_RED | FOREGROUND_INTENSITY,
+        // GREEN_BOLD
+        FOREGROUND_GREEN | FOREGROUND_INTENSITY,
+        FOREGROUND_BLUE | FOREGROUND_INTENSITY,             // BLUE_BOLD
+                                                            // MAGENTA_BOLD
+        FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+        // CYAN_BOLD
+        FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+        // WHITE_BOLD
+        FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
     };
 
-    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    static_assert(sizeof(WinColorFG) / sizeof(WinColorFG[0]) == COLOR_COUNT,
+        "WinColorFG size must match COLOR_COUNT");
+
+    HANDLE hConsole = GetStdHandle(where == stdout ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
     SetConsoleTextAttribute(hConsole, WinColorFG[color]);
 #else
 
@@ -276,17 +228,17 @@ FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
         FG_WHITE                                            // LWHITE
     };
 
-    fprintf((stdout_stream ? stdout : stderr), "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < COLOR_COUNT ? ";1" : ""));
+    fprintf(where, "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < COLOR_COUNT ? ";1" : ""));
 #endif
 }
 
-void Log::ResetColor(bool stdout_stream)
+void Log::ResetColor(FILE* where) const
 {
 #if PLATFORM == PLATFORM_WINDOWS
-    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    HANDLE hConsole = GetStdHandle(where == stdout ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
     SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 #else
-    fprintf((stdout_stream ? stdout : stderr), "\x1b[0m");
+    fprintf(where, "\x1b[0m");
 #endif
 }
 
@@ -316,7 +268,7 @@ void Log::SetFileLevel(LogLevel level)
     printf("File log level set to %u\n", m_fileLevel);
 }
 
-FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile)
+FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile) const
 {
     std::string logfn = sConfig.GetStringDefault(configFileName, defaultFileName);
     if (logfn.empty())
@@ -338,7 +290,7 @@ FILE* Log::openLogFile(char const* configFileName, char const* defaultFileName, 
     return fopen((m_logsDir + logfn).c_str(), mode);
 }
 
-FILE* Log::openGmlogPerAccount(uint32 account)
+FILE* Log::openGmlogPerAccount(uint32 account) const
 {
     if (m_gmlog_filename_format.empty())
         return nullptr;
@@ -392,7 +344,7 @@ std::string Log::GetTimestampStr()
 // the actual logging function.  nothing else should write log messages, except this
 void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
 {
-    ASSERT(logType >= 0 && logType < LOG_TYPE_MAX);
+    ASSERT(logType >= 0 && logType < LOG_TYPE_MAX&& logLevel >= 0 && logLevel <= LOG_LVL_DEBUG);
 
     if (!str)
         return;
@@ -411,22 +363,22 @@ void Log::Out(LogType logType, LogLevel logLevel, char const* str, ...)
     // LOG_PERFORMANCE and LOG_DBERRFIX should never be logged to the console
     if (logType != LOG_PERFORMANCE && logType != LOG_DBERRFIX && m_consoleLevel >= logLevel)
     {
-        if (m_colored)
-            SetColor(logLevel != LOG_LVL_ERROR, m_colors[logLevel]);
+        auto const where = logLevel == LOG_LVL_ERROR ? stderr : stdout;
+
+        SetColor(where, logColors[logLevel]);
 
         if (m_includeTime)
-            outTime(stdout);
+            outTime(where);
 
         if (logLevel == LOG_LVL_ERROR)
-            printf("ERROR: ");
+            fprintf(where, "ERROR: ");
 
         utf8printf(stdout, buff);
 
-        if (m_colored)
-            ResetColor(logLevel != LOG_LVL_ERROR);
+        ResetColor(where);
 
-        printf("\n");
-        fflush(stdout);
+        fprintf(where, "\n");
+        fflush(where);
     }
 
     if (logFiles[logType] && m_fileLevel >= logLevel)

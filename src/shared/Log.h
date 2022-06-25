@@ -71,7 +71,28 @@ struct LogFilterData
     bool defaultState;
 };
 
-LogFilterData logFilterData[];
+constexpr LogFilterData logFilterData[] =
+{
+    { "transport_moves",     "LogFilter_TransportMoves",     true  },
+    { "creature_moves",      "LogFilter_CreatureMoves",      true  },
+    { "visibility_changes",  "LogFilter_VisibilityChanges",  true  },
+    { "",                    "",                             true  },
+    { "weather",             "LogFilter_Weather",            true  },
+    { "player_stats",        "LogFilter_PlayerStats",        false },
+    { "sql_text",            "LogFilter_SQLText",            false },
+    { "player_moves",        "LogFilter_PlayerMoves",        false },
+    { "periodic_effects",    "LogFilter_PeriodicAffects",    false },
+    { "ai_and_movegens",     "LogFilter_AIAndMovegens",      false },
+    { "damage",              "LogFilter_Damage",             false },
+    { "combat",              "LogFilter_Combat",             false },
+    { "spell_cast",          "LogFilter_SpellCast",          false },
+    { "db_stricted_check",   "LogFilter_DbStrictedCheck",    true  },
+    { "pathfinding",         "LogFilter_Pathfinding",        false },
+    { "honor",               "LogFilter_Honor",              true  },
+};
+
+static_assert(sizeof(logFilterData) / sizeof(logFilterData[0]) == LOG_FILTER_COUNT,
+    "logFilterData size must match LOG_FILTER_COUNT");
 
 enum Color
 {
@@ -164,26 +185,23 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
 
 
     private:
-        void InitColors(std::string const& init_str);
-        void SetColor(bool stdout_stream, Color color);
-        void ResetColor(bool stdout_stream);
+        void SetColor(FILE* where, Color color) const;
+        void ResetColor(FILE* where) const;
 
         static void outTime(FILE* where);
         static void outTimestamp(FILE* file);
 
-        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile);
-        FILE* openGmlogPerAccount(uint32 account);
+        FILE* openLogFile(char const* configFileName, char const* defaultFileName, bool timestampFile) const;
+        FILE* openGmlogPerAccount(uint32 account) const;
 
         FILE* logFiles[LOG_TYPE_MAX];
 
         // log/console control
         LogLevel m_consoleLevel;
         LogLevel m_fileLevel;
-        bool m_colored;
 
         // include timestamp in console output
         bool m_includeTime;
-        Color m_colors[LOG_TYPE_MAX];
         uint32 m_logFilter;
 
         // cache values for after initilization use (like gm log per account case)
