@@ -5224,6 +5224,12 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (651601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5045, 5046, 0, 0, 0, 0, 0, 0, 0, 'Un\'Goro Thunderer - Talk');
 
+-- ----------------------------------------------------------------------
+
+-- Add Missing Creature Mor'vek 
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(1392, 11701, 0, 0, 0, 1, -7788.54, -2116.6, -265.37, 4.91707, 300, 300, 5, 100, 0, 1, 0, 0, 0, 10);
+
 
 -- End of migration.
 END IF;
