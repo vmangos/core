@@ -1716,6 +1716,23 @@ UPDATE `creature` SET `id2` = 121, `id3` = 449 WHERE `id` = 122;
 UPDATE `creature` SET `id2` = 121, `id3` = 122 WHERE `id` = 449;
 -- ** NEEDS MORE ATTENTION HAS RANDOM SPAWNS JUST TO BE ANNOYING
 
+-- ----------------------------------------------------------------------
+
+-- DESOLACE
+-- https://classic.wowhead.com/npc=4670/hatefury-rogue
+-- https://classic.wowhead.com/npc=4671/hatefury-trickster
+-- https://classic.wowhead.com/npc=4672/hatefury-felsworn
+UPDATE `creature` SET `id2` = 4671, `id3` = 4672 WHERE `id` = 4670;
+UPDATE `creature` SET `id2` = 4670, `id3` = 4672 WHERE `id` = 4671;
+UPDATE `creature` SET `id2` = 4670, `id3` = 4671 WHERE `id` = 4672;
+
+-- https://classic.wowhead.com/npc=4673/hatefury-betrayer
+-- https://classic.wowhead.com/npc=4674/hatefury-shadowstalker
+-- https://classic.wowhead.com/npc=4675/hatefury-hellcaller
+UPDATE `creature` SET `id2` = 4674, `id3` = 4675 WHERE `id` = 4673;
+UPDATE `creature` SET `id2` = 4673, `id3` = 4675 WHERE `id` = 4674;
+UPDATE `creature` SET `id2` = 4673, `id3` = 4674 WHERE `id` = 4675;
+
 
 -- End of migration.
 END IF;
