@@ -5230,6 +5230,28 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (1392, 11701, 0, 0, 0, 1, -7788.54, -2116.6, -265.37, 4.91707, 300, 300, 5, 100, 0, 1, 0, 0, 0, 10);
 
+-- ----------------------------------------------------------------------
+
+-- Convert Deathclasp To Creature Groups
+DELETE FROM `creature` WHERE `guid` IN (44365, 44366);
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (44396, 44397);
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 42921;
+
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(42921, 42921, 0, 0, 11),
+(42921, 44396, 5, 2.09437, 11),
+(42921, 44397, 5, 4.18873, 11);
+
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(15196, 1, -8102.7, 967.628, 59.6608, 100, 0, 0, 0),
+(15196, 2, -8114.65, 973.169, 61.9454, 100, 0, 0, 0),
+(15196, 3, -8091.66, 969.205, 54.2255, 100, 0, 0, 0),
+(15196, 4, -8074.71, 973.563, 46.2704, 100, 0, 0, 0),
+(15196, 5, -8063.58, 987.08, 42.0226, 100, 0, 0, 0),
+(15196, 6, -8058.13, 1001.68, 39.632, 100, 10000, 0, 0),
+(15196, 7, -8068.21, 980.402, 44.1115, 100, 0, 0, 0),
+(15196, 8, -8084.04, 970.468, 49.8062, 100, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
