@@ -5252,6 +5252,647 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (15196, 7, -8068.21, 980.402, 44.1115, 100, 0, 0, 0),
 (15196, 8, -8084.04, 970.468, 49.8062, 100, 0, 0, 0);
 
+-- ----------------------------------------------------------------------
+
+-- Add Start Script For A Plague Upon Thee
+UPDATE `quest_template` SET `StartScript` = 6389 WHERE `entry` IN (6389, 6390);
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1976)
+DELETE FROM `generic_scripts` WHERE `id`=12120;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12120, 1, 3, 0, 3123, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.24, -1677.35, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1977)
+DELETE FROM `generic_scripts` WHERE `id`=12121;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12121, 1, 3, 0, 3108, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.29, -1677.11, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1978)
+DELETE FROM `generic_scripts` WHERE `id`=12122;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12122, 1, 3, 0, 3115, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.17, -1676.99, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1979)
+DELETE FROM `generic_scripts` WHERE `id`=12123;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12123, 1, 3, 0, 3046, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.37, -1676.78, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1980)
+DELETE FROM `generic_scripts` WHERE `id`=12124;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12124, 1, 3, 0, 1733, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.26, -1668.15, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12124, 2, 3, 0, 2171, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.36, -1674.8, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12124, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.72, -1672.75, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1981)
+DELETE FROM `generic_scripts` WHERE `id`=12125;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12125, 1, 3, 0, 3141, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.99, -1677.16, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1982)
+DELETE FROM `generic_scripts` WHERE `id`=12126;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12126, 1, 3, 0, 1572, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.04, -1665.5, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12126, 2, 3, 0, 2171, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.93, -1672.43, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12126, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.23, -1670.53, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1983)
+DELETE FROM `generic_scripts` WHERE `id`=12127;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12127, 1, 3, 0, 3111, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.47, -1676.68, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1984)
+DELETE FROM `generic_scripts` WHERE `id`=12128;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12128, 1, 3, 0, 3159, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.24, -1677.17, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1985)
+DELETE FROM `generic_scripts` WHERE `id`=12129;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12129, 1, 3, 0, 3180, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.21, -1676.93, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1986)
+DELETE FROM `generic_scripts` WHERE `id`=12130;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12130, 1, 3, 0, 1786, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.36, -1663.64, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12130, 2, 3, 0, 2171, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.23, -1669.86, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12130, 4, 3, 0, 2288, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.36, -1670.38, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1987)
+DELETE FROM `generic_scripts` WHERE `id`=12131;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12131, 1, 3, 0, 3130, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.35, -1676.72, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1988)
+DELETE FROM `generic_scripts` WHERE `id`=12132;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12132, 1, 3, 0, 1058, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449, -1666.25, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12132, 2, 3, 0, 2171, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.34, -1672.2, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12132, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.49, -1670.68, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1989)
+DELETE FROM `generic_scripts` WHERE `id`=12133;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12133, 1, 3, 0, 635, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.7, -1663.94, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12133, 2, 3, 0, 2021, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.85, -1669.41, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12133, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.62, -1668.31, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1990)
+DELETE FROM `generic_scripts` WHERE `id`=12134;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12134, 1, 3, 0, 1361, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2447.54, -1666.55, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12134, 2, 3, 0, 2171, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451, -1671.9, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12134, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.18, -1670.45, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1991)
+DELETE FROM `generic_scripts` WHERE `id`=12135;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12135, 1, 3, 0, 449, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.79, -1664.59, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12135, 2, 3, 0, 1824, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.5, -1668.85, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12135, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.19, -1668.36, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1992)
+DELETE FROM `generic_scripts` WHERE `id`=12136;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12136, 1, 3, 0, 3150, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.31, -1677.19, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1993)
+DELETE FROM `generic_scripts` WHERE `id`=12137;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12137, 1, 3, 0, 1759, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2446.22, -1667.1, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12137, 2, 3, 0, 1979, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.26, -1671.07, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12137, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.9, -1670.14, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1994)
+DELETE FROM `generic_scripts` WHERE `id`=12138;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12138, 1, 3, 0, 1915, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.72, -1668.82, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12138, 2, 3, 0, 2131, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2456.62, -1665.56, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12138, 3, 3, 0, 2281, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2456, -1665.01, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1995)
+DELETE FROM `generic_scripts` WHERE `id`=12139;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12139, 0, 3, 0, 3180, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.07, -1676.99, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1996)
+DELETE FROM `generic_scripts` WHERE `id`=12140;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12140, 1, 3, 0, 1142, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.2, -1661.87, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12140, 2, 3, 0, 3257, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.96, -1671.85, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12140, 4, 3, 0, 2060, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.7, -1669.19, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1997)
+DELETE FROM `generic_scripts` WHERE `id`=12141;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12141, 1, 3, 0, 2131, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.04, -1666.88, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12141, 2, 3, 0, 1505, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2456.87, -1667.07, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12141, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2456.14, -1666.7, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1998)
+DELETE FROM `generic_scripts` WHERE `id`=12142;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12142, 1, 3, 0, 2131, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.36, -1667.53, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12142, 2, 3, 0, 1059, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.49, -1668.5, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1999)
+DELETE FROM `generic_scripts` WHERE `id`=12143;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12143, 1, 3, 0, 3161, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.04, -1677.06, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2000)
+DELETE FROM `generic_scripts` WHERE `id`=12144;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12144, 1, 3, 0, 2091, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.07, -1663.41, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2001)
+DELETE FROM `generic_scripts` WHERE `id`=12145;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12145, 1, 3, 0, 3100, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.18, -1676.79, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2002)
+DELETE FROM `generic_scripts` WHERE `id`=12146;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12146, 1, 3, 0, 2245, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.88, -1668.98, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12146, 2, 3, 0, 1570, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.26, -1668.28, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12146, 3, 3, 0, 2208, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.69, -1666.22, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2003)
+DELETE FROM `generic_scripts` WHERE `id`=12147;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12147, 1, 3, 0, 3160, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.34, -1677.08, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2004)
+DELETE FROM `generic_scripts` WHERE `id`=12148;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12148, 0, 3, 0, 3141, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.36, -1676.8, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2005)
+DELETE FROM `generic_scripts` WHERE `id`=12149;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12149, 1, 3, 0, 2082, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.02, -1663.39, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2006)
+DELETE FROM `generic_scripts` WHERE `id`=12150;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12150, 1, 3, 0, 1884, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.42, -1667.66, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12150, 2, 3, 0, 1294, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.3, -1667.74, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12150, 3, 3, 0, 2165, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.42, -1666.09, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2007)
+DELETE FROM `generic_scripts` WHERE `id`=12151;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12151, 1, 3, 0, 1669, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.79, -1666.91, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12151, 2, 3, 0, 1083, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.67, -1668.83, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2008)
+DELETE FROM `generic_scripts` WHERE `id`=12152;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12152, 1, 3, 0, 1637, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.02, -1667.69, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12152, 2, 3, 0, 2078, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.3, -1672.13, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12152, 4, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.39, -1670.9, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2009)
+DELETE FROM `generic_scripts` WHERE `id`=12153;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12153, 1, 3, 0, 2952, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2465.31, -1659.51, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2010)
+DELETE FROM `generic_scripts` WHERE `id`=12154;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12154, 1, 3, 0, 1119, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.69, -1666.32, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12154, 2, 3, 0, 1510, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.04, -1670.31, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2011)
+DELETE FROM `generic_scripts` WHERE `id`=12155;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12155, 1, 3, 0, 2110, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.16, -1663.56, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2012)
+DELETE FROM `generic_scripts` WHERE `id`=12156;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12156, 1, 3, 0, 1544, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.97, -1666.4, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12156, 2, 3, 0, 3916, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2460.56, -1664.18, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12156, 3, 3, 0, 2152, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.93, -1664.75, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2013)
+DELETE FROM `generic_scripts` WHERE `id`=12157;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12157, 0, 3, 0, 2087, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.03, -1663.47, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2014)
+DELETE FROM `generic_scripts` WHERE `id`=12158;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12158, 1, 3, 0, 3166, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.37, -1676.79, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2015)
+DELETE FROM `generic_scripts` WHERE `id`=12159;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12159, 1, 3, 0, 1095, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.97, -1664.8, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12159, 2, 3, 0, 1938, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.03, -1665.87, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12159, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.07, -1665.24, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2016)
+DELETE FROM `generic_scripts` WHERE `id`=12160;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12160, 1, 3, 0, 3147, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.29, -1676.57, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2017)
+DELETE FROM `generic_scripts` WHERE `id`=12161;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12161, 1, 3, 0, 2945, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2465.31, -1659.51, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2018)
+DELETE FROM `generic_scripts` WHERE `id`=12162;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12162, 1, 3, 0, 851, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.27, -1664.25, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12162, 2, 3, 0, 4190, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.04, -1663.24, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12162, 3, 3, 0, 2194, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.99, -1663.83, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2019)
+DELETE FROM `generic_scripts` WHERE `id`=12163;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12163, 1, 3, 0, 1938, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.75, -1663.97, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12163, 2, 3, 0, 1639, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.83, -1665.53, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12163, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2456.79, -1664.93, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2020)
+DELETE FROM `generic_scripts` WHERE `id`=12164;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12164, 1, 3, 0, 839, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2447.33, -1664.98, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12164, 2, 3, 0, 1938, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2446, -1670, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12164, 4, 3, 0, 2010, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2447.83, -1670.9, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2021)
+DELETE FROM `generic_scripts` WHERE `id`=12165;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12165, 1, 3, 0, 396, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.48, -1664.16, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12165, 2, 3, 0, 1452, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.92, -1668.02, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12165, 4, 3, 0, 2127, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.99, -1670.13, 103.132, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2022)
+DELETE FROM `generic_scripts` WHERE `id`=12166;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12166, 1, 3, 0, 228, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.9, -1662.43, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12166, 2, 3, 0, 1497, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.09, -1664.83, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12166, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.62, -1663.72, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2023)
+DELETE FROM `generic_scripts` WHERE `id`=12167;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12167, 1, 3, 0, 3186, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.3, -1676.65, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2024)
+DELETE FROM `generic_scripts` WHERE `id`=12168;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12168, 1, 3, 0, 788, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.59, -1661.44, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12168, 2, 3, 0, 2097, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.33, -1664.43, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12168, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.41, -1662.59, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2025)
+DELETE FROM `generic_scripts` WHERE `id`=12169;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12169, 1, 3, 0, 2157, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.18, -1663.4, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2026)
+DELETE FROM `generic_scripts` WHERE `id`=12170;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12170, 1, 3, 0, 246, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.41, -1662.35, 103.126, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12170, 2, 3, 0, 3357, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.76, -1671.6, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12170, 4, 3, 0, 1995, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.77, -1669.06, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2027)
+DELETE FROM `generic_scripts` WHERE `id`=12171;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12171, 1, 3, 0, 3238, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.2, -1676.73, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2028)
+DELETE FROM `generic_scripts` WHERE `id`=12172;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12172, 1, 3, 0, 1554, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.77, -1662.42, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12172, 2, 3, 0, 1635, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2458.15, -1663.78, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12172, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.02, -1663.39, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2029)
+DELETE FROM `generic_scripts` WHERE `id`=12173;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12173, 1, 3, 0, 2153, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.24, -1663.64, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2030)
+DELETE FROM `generic_scripts` WHERE `id`=12174;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12174, 1, 3, 0, 808, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2446.54, -1661.75, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12174, 2, 3, 0, 3357, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.76, -1671.6, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12174, 4, 3, 0, 1803, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.72, -1668.19, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2031)
+DELETE FROM `generic_scripts` WHERE `id`=12175;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12175, 1, 3, 0, 621, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.84, -1660.12, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12175, 2, 3, 0, 3368, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2458.64, -1662.74, 103.229, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12175, 3, 3, 0, 2216, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.27, -1661.34, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2032)
+DELETE FROM `generic_scripts` WHERE `id`=12176;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12176, 1, 3, 0, 2155, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.06, -1663.2, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2033)
+DELETE FROM `generic_scripts` WHERE `id`=12177;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12177, 1, 3, 0, 3265, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.23, -1676.69, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2034)
+DELETE FROM `generic_scripts` WHERE `id`=12178;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12178, 0, 3, 0, 3259, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.36, -1676.43, 104.909, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2035)
+DELETE FROM `generic_scripts` WHERE `id`=12179;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12179, 1, 3, 0, 2196, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.22, -1663.34, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2036)
+DELETE FROM `generic_scripts` WHERE `id`=12180;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12180, 1, 3, 0, 1096, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.74, -1659, 103.261, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12180, 2, 3, 0, 3378, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2458.64, -1662.74, 103.229, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12180, 3, 3, 0, 1846, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.54, -1660.3, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2037)
+DELETE FROM `generic_scripts` WHERE `id`=12181;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12181, 0, 3, 0, 2275, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.4, -1663.14, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2038)
+DELETE FROM `generic_scripts` WHERE `id`=12182;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12182, 1, 3, 0, 2222, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.28, -1663.34, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2039)
+DELETE FROM `generic_scripts` WHERE `id`=12183;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12183, 1, 3, 0, 1067, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2446.78, -1664.83, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12183, 2, 3, 0, 2724, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.56, -1661.81, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12183, 3, 3, 0, 1995, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.95, -1663.1, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2040)
+DELETE FROM `generic_scripts` WHERE `id`=12184;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12184, 1, 3, 0, 1291, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2445.85, -1660.29, 104.226, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12184, 2, 3, 0, 3417, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.76, -1671.6, 103.128, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12184, 4, 3, 0, 1719, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.51, -1667.64, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2041)
+DELETE FROM `generic_scripts` WHERE `id`=12185;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12185, 1, 3, 0, 592, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2447.79, -1663.6, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12185, 2, 3, 0, 2485, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.56, -1661.81, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12185, 3, 3, 0, 2214, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.95, -1662.48, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2042)
+DELETE FROM `generic_scripts` WHERE `id`=12186;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12186, 1, 3, 0, 2940, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.06, -1676.31, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2043)
+DELETE FROM `generic_scripts` WHERE `id`=12187;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12187, 1, 3, 0, 1231, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.39, -1660.39, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12187, 2, 3, 0, 1587, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.4, -1662.22, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12187, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2456.43, -1661.79, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2044)
+DELETE FROM `generic_scripts` WHERE `id`=12188;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12188, 1, 3, 0, 2342, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.64, -1663.23, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2045)
+DELETE FROM `generic_scripts` WHERE `id`=12189;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12189, 0, 3, 0, 2887, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.18, -1675.83, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2046)
+DELETE FROM `generic_scripts` WHERE `id`=12190;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12190, 1, 3, 0, 630, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.46, -1660.69, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12190, 2, 3, 0, 1780, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.34, -1663.86, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12190, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.11, -1662.85, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2047)
+DELETE FROM `generic_scripts` WHERE `id`=12191;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12191, 1, 3, 0, 1668, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.18, -1661.39, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12191, 2, 3, 0, 612, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.58, -1661.28, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2048)
+DELETE FROM `generic_scripts` WHERE `id`=12192;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12192, 0, 3, 0, 2751, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462.26, -1661.73, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2049)
+DELETE FROM `generic_scripts` WHERE `id`=12193;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12193, 0, 3, 0, 2879, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.25, -1675.98, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2050)
+DELETE FROM `generic_scripts` WHERE `id`=12194;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12194, 1, 3, 0, 2351, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.51, -1662.93, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2051)
+DELETE FROM `generic_scripts` WHERE `id`=12195;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12195, 1, 3, 0, 1018, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.23, -1661.77, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12195, 2, 3, 0, 251, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.39, -1662.43, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12195, 3, 3, 0, 2165, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.78, -1662.34, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2052)
+DELETE FROM `generic_scripts` WHERE `id`=12196;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12196, 0, 3, 0, 2962, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.66, -1676.14, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2053)
+DELETE FROM `generic_scripts` WHERE `id`=12197;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12197, 1, 3, 0, 799, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.71, -1659.15, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12197, 2, 3, 0, 1847, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455, -1662.09, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12197, 3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.53, -1661.08, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2054)
+DELETE FROM `generic_scripts` WHERE `id`=12198;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12198, 1, 3, 0, 1466, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2445.69, -1664.54, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12198, 2, 3, 0, 4791, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462.25, -1660, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12198, 3, 3, 0, 1781, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.66, -1662.83, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2055)
+DELETE FROM `generic_scripts` WHERE `id`=12199;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12199, 1, 3, 0, 636, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2450.97, -1660.51, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12199, 2, 3, 0, 998, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.53, -1659.65, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12199, 3, 3, 0, 2363, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.85, -1660.28, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2056)
+DELETE FROM `generic_scripts` WHERE `id`=12200;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12200, 1, 3, 0, 1545, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.96, -1658.72, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12200, 2, 3, 0, 765, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2453.42, -1657.58, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12200, 3, 3, 0, 2162, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2455.57, -1658.65, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2057)
+DELETE FROM `generic_scripts` WHERE `id`=12201;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12201, 1, 3, 0, 2403, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.54, -1662.63, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2058)
+DELETE FROM `generic_scripts` WHERE `id`=12202;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12202, 1, 3, 0, 496, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.38, -1659.92, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12202, 2, 3, 0, 994, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2451.73, -1658.6, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12202, 3, 3, 0, 1933, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2454.01, -1659.34, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2059)
+DELETE FROM `generic_scripts` WHERE `id`=12203;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12203, 1, 3, 0, 1181, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2445.61, -1662.77, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12203, 2, 3, 0, 4351, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2460.94, -1660.01, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12203, 3, 3, 0, 1733, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.29, -1662.01, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2060)
+DELETE FROM `generic_scripts` WHERE `id`=12204;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12204, 0, 3, 0, 2726, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462.36, -1662.04, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2061)
+DELETE FROM `generic_scripts` WHERE `id`=12205;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12205, 1, 3, 0, 406, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2448.14, -1660.8, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12205, 2, 3, 0, 5054, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2457.45, -1661.87, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12205, 3, 3, 0, 1676, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2449.03, -1661.29, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2062)
+DELETE FROM `generic_scripts` WHERE `id`=12206;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12206, 1, 3, 0, 1071, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2446.2, -1660.52, 104.023, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12206, 2, 3, 0, 4514, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2461.48, -1660.17, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move'),
+(12206, 3, 3, 0, 1740, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2452.42, -1660.74, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2063)
+DELETE FROM `generic_scripts` WHERE `id`=12207;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12207, 0, 3, 0, 2713, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462.22, -1661.9, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2064)
+DELETE FROM `generic_scripts` WHERE `id`=12208;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12208, 1, 3, 0, 2604, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462.1, -1662.39, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2065)
+DELETE FROM `generic_scripts` WHERE `id`=12209;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12209, 1, 3, 0, 2615, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462, -1662.12, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 2066)
+DELETE FROM `generic_scripts` WHERE `id`=12210;
+INSERT INTO `generic_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(12210, 1, 3, 0, 2753, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2462.16, -1661.59, 103.127, 0, 0, 'A Plague Upon Thee: Plagueland Termite - Move');
+
+-- Main script
+DELETE FROM `quest_start_scripts` WHERE `id`=6389;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12134, -1, 1, 2449.71, -1663.47, 103.211, 4.39823, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12135, -1, 1, 2449.88, -1663.36, 103.211, 1.72788, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12136, -1, 1, 2449.39, -1663.63, 103.211, 6.26573, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12137, -1, 1, 2449.53, -1663.54, 103.211, 2.35619, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12138, -1, 1, 2449.44, -1663.58, 103.211, 3.4383, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12139, -1, 1, 2450.08, -1663.17, 103.211, 0.785398, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12140, -1, 1, 2450.28, -1663.05, 103.211, 0.174533, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12141, -1, 1, 2450.6, -1662.84, 103.211, 4.62512, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12142, -1, 1, 2449.24, -1663.57, 103.211, 1.64061, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12143, -1, 1, 2449.16, -1663.61, 103.211, 3.50811, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12144, -1, 1, 2450.65, -1662.68, 103.211, 1.0821, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12133, -1, 1, 2450.09, -1663.25, 103.211, 4.88692, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12132, -1, 1, 2449.82, -1663.44, 103.211, 2.80998, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12131, -1, 1, 2450.52, -1663.04, 103.211, 4.2586, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12120, -1, 1, 2450.18, -1663.74, 103.211, 4.97419, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12121, -1, 1, 2450.4, -1663.54, 103.211, 2.84489, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12122, -1, 1, 2450.52, -1663.35, 103.211, 5.70723, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12123, -1, 1, 2449.96, -1663.64, 103.211, 0.0872665, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12124, -1, 1, 2449.97, -1663.54, 103.211, 6.10865, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12125, -1, 1, 2449.6, -1663.72, 103.211, 2.42601, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12126, -1, 1, 2450.29, -1663.31, 103.211, 5.02655, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3323, 0, 0, 0, 0, 0, 0, 0, 12127, -1, 1, 2450.67, -1663.08, 103.211, 2.79253, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12128, -1, 1, 2450.13, -1663.39, 103.211, 1.5708, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12129, -1, 1, 2450.9, -1662.91, 103.211, 1.16937, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4540, 0, 0, 0, 0, 0, 0, 0, 12130, -1, 1, 2450.45, -1663.16, 103.211, 5.67232, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12162, -1, 1, 2450.34, -1662.24, 103.211, 3.61283, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12161, -1, 1, 2450.8, -1661.99, 103.211, 4.2586, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12160, -1, 1, 2448.47, -1663.37, 103.211, 0.593412, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12159, -1, 1, 2450.48, -1662.28, 103.211, 5.21853, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12163, -1, 1, 2450.64, -1662.06, 103.211, 5.16617, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12164, -1, 1, 2448.59, -1663.12, 103.211, 3.76991, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12165, -1, 1, 2448.61, -1663.1, 103.211, 5.67232, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12166, -1, 1, 2450.44, -1662.03, 103.211, 3.89208, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12167, -1, 1, 2448.21, -1663.32, 103.211, 0.785398, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12168, -1, 1, 2450.54, -1661.94, 103.211, 4.39823, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12169, -1, 1, 2450.5, -1661.91, 103.211, 3.07178, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12158, -1, 1, 2448.65, -1663.41, 103.211, 4.97419, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 2777, 0, 0, 0, 0, 0, 0, 0, 12157, -1, 1, 2450.68, -1662.23, 103.211, 4.69494, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12156, -1, 1, 2450.3, -1662.49, 103.211, 1.65806, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12145, -1, 1, 2449.01, -1663.63, 103.211, 4.13643, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12146, -1, 1, 2450.42, -1662.78, 103.211, 5.13127, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3182, 0, 0, 0, 0, 0, 0, 0, 12147, -1, 1, 2449, -1663.59, 103.211, 4.32842, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12148, -1, 1, 2449.23, -1663.37, 103.211, 0.401426, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12149, -1, 1, 2450.65, -1662.53, 103.211, 6.21337, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12150, -1, 1, 2450.38, -1662.63, 103.211, 2.61799, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12151, -1, 1, 2448.95, -1663.45, 103.211, 1.16937, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12152, -1, 1, 2448.89, -1663.46, 103.211, 4.55531, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3182, 0, 0, 0, 0, 0, 0, 0, 12153, -1, 1, 2450.82, -1662.31, 103.211, 2.28638, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12154, -1, 1, 2448.88, -1663.43, 103.211, 5.06145, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4399, 0, 0, 0, 0, 0, 0, 0, 12155, -1, 1, 2450.69, -1662.31, 103.211, 0.767945, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12187, -1, 1, 2450.05, -1661.33, 103.211, 5.37561, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12186, -1, 1, 2448.14, -1662.47, 103.211, 3.01942, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12185, -1, 1, 2448.65, -1662.17, 103.211, 5.16617, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12184, -1, 1, 2448.19, -1662.47, 103.211, 1.62316, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12188, -1, 1, 2450.11, -1661.22, 103.211, 1.13446, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12189, -1, 1, 2448.26, -1662.26, 103.211, 2.79253, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12190, -1, 1, 2449.81, -1661.33, 103.211, 0.715585, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12191, -1, 1, 2449.65, -1661.33, 103.211, 0.541052, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12192, -1, 1, 2448.52, -1661.97, 103.211, 5.28835, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 2684, 0, 0, 0, 0, 0, 0, 0, 12193, -1, 1, 2448.13, -1662.2, 103.211, 5.07891, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12194, -1, 1, 2449.9, -1661.14, 103.211, 0.959931, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12183, -1, 1, 2448.47, -1662.35, 103.211, 1.22173, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12182, -1, 1, 2450.37, -1661.28, 103.211, 5.21853, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12181, -1, 1, 2450.15, -1661.51, 103.211, 0.628319, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12170, -1, 1, 2448.6, -1662.98, 103.211, 2.82743, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12171, -1, 1, 2448.45, -1663.02, 103.211, 2.04204, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12172, -1, 1, 2450.44, -1661.77, 103.211, 3.76991, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12173, -1, 1, 2450.67, -1661.64, 103.211, 2.32129, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12174, -1, 1, 2448.42, -1662.83, 103.211, 5.23599, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12175, -1, 1, 2450.33, -1661.71, 103.211, 3.4383, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3089, 0, 0, 0, 0, 0, 0, 0, 12176, -1, 1, 2450.4, -1661.66, 103.211, 1.64061, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3089, 0, 0, 0, 0, 0, 0, 0, 12177, -1, 1, 2448.23, -1662.92, 103.211, 4.5204, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12178, -1, 1, 2448.24, -1662.73, 103.211, 2.0944, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 3089, 0, 0, 0, 0, 0, 0, 0, 12179, -1, 1, 2450.41, -1661.42, 103.211, 3.22886, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4306, 0, 0, 0, 0, 0, 0, 0, 12180, -1, 1, 2450.2, -1661.51, 103.211, 6.23083, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12204, -1, 1, 2448.74, -1661.55, 103.211, 2.49582, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12205, -1, 1, 2449.11, -1661.32, 103.211, 5.39307, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12206, -1, 1, 2448.77, -1661.35, 103.211, 1.5708, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 2512, 0, 0, 0, 0, 0, 0, 0, 12207, -1, 1, 2448.67, -1661.4, 103.211, 5.13127, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12208, -1, 1, 2449.15, -1661.11, 103.211, 3.42085, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 2917, 0, 0, 0, 0, 0, 0, 0, 12209, -1, 1, 2448.96, -1661.19, 103.211, 6.03884, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 2917, 0, 0, 0, 0, 0, 0, 0, 12210, -1, 1, 2448.39, -1661.51, 103.211, 3.80482, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12203, -1, 1, 2448.61, -1661.63, 103.211, 2.32129, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12202, -1, 1, 2449.25, -1661.26, 103.211, 3.7001, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12195, -1, 1, 2449.5, -1661.34, 103.211, 3.735, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12196, -1, 1, 2448.32, -1661.99, 103.211, 3.05433, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12197, -1, 1, 2449.7, -1661.16, 103.211, 0.488692, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12198, -1, 1, 2448.58, -1661.8, 103.211, 3.38594, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12199, -1, 1, 2449.43, -1661.29, 103.211, 1.88496, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12200, -1, 1, 2449.57, -1661.19, 103.211, 5.49779, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
+(6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12201, -1, 1, 2449.64, -1661.05, 103.211, 5.8294, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite');
+
 
 -- End of migration.
 END IF;
