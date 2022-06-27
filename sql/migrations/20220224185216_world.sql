@@ -5945,6 +5945,61 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (5804, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7279, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: Say text 2'),
 (5804, 10, 0, 4, 147, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: npc\\_flag questgiver+gossip+vendor added');
 
+-- ----------------------------------------------------------------------
+
+-- Update Quest Script Headhunting (credit cmangos)
+SET @OGUID = 1081010;
+DELETE FROM `quest_end_scripts` WHERE `id`=582;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(582, 0, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Modify Flags'),
+(582, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 732, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Emote'),
+(582, 0, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.64577, 0, 'Headhunting: Nimboya - Orientation'),
+(582, 1, 0, 9, @OGUID, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 1, 0, 9, @OGUID+1, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 1, 0, 9, @OGUID+2, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 1, 0, 9, @OGUID+3, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 1, 0, 9, @OGUID+4, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 1, 0, 9, @OGUID+5, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 1, 0, 9, @OGUID+6, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 7, 0, 9, @OGUID+7, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 7, 0, 9, @OGUID+8, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 7, 0, 9, @OGUID+9, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 7, 0, 9, @OGUID+10, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 7, 0, 9, @OGUID+11, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 7, 0, 9, @OGUID+12, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 733, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Emote'),
+(582, 12, 0, 9, @OGUID+13, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 12, 0, 9, @OGUID+14, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 12, 0, 9, @OGUID+15, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 12, 0, 9, @OGUID+16, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 12, 0, 9, @OGUID+17, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 12, 0, 9, @OGUID+18, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Respawn Gameobject'),
+(582, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 734, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Talk'),
+(582, 19, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Orientation'),
+(582, 25, 0, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Headhunting: Nimboya - Modify Flags'),
+(582, 25, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.19395, 0, 'Headhunting: Nimboya - Orientation');
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`) VALUES 
+(@OGUID, 2371, 0, -12345.903, 170.5356, 3.004278, 4.4331365, -0.7986355, 0.60181504, -60, -60, 1),
+(@OGUID+1, 2371, 0, -12346.513, 171.06647, 3.004277, 3.1940022, -0.9996567, 0.026201647, -60, -60, 1),
+(@OGUID+2, 2371, 0, -12346.201, 171.26357, 3.00435, 3.0717661, 0.9993906, 0.034906134, -60, -60, 1),
+(@OGUID+3, 2371, 0, -12346.156, 170.5383, 3.004277, 1.780234, 0.7771454, 0.6293211, -60, -60, 1),
+(@OGUID+4, 2371, 0, -12346.156, 170.5383, 3.004277, 1.780234, 0.7771454, 0.6293211, -60, -60, 1),
+(@OGUID+5, 2371, 0, -12346.107, 170.72945, 3.00435, 0, 0, 1, -60, -60, 1),
+(@OGUID+6, 2371, 0, -12345.833, 169.7869, 2.978263, 0, 0, 1, -60, -60, 1),
+(@OGUID+7, 2371, 0, -12346.037, 170.97575, 3.00435, 5.585054, -0.34202003, 0.9396927, -60, -60, 1),
+(@OGUID+8, 2371, 0, -12346.091, 170.27995, 3.004277, 2.0769393, 0.86162853, 0.99904823, -60, -60, 1),
+(@OGUID+9, 2371, 0, -12346.354, 170.8782, 3.004349, 0.087266, 0.043619156, 0.99904823, -60, -60, 1),
+(@OGUID+10, 2371, 0, -12347.181, 170.73628, 3.022072, 5.811947, -0.23344517, 0.97236997, -60, -60, 1),
+(@OGUID+11, 2371, 0, -12345.812, 170.6614, 3.079033, 0.94247663, 0.45398998, 0.89100677, -60, -60, 1),
+(@OGUID+12, 2371, 0, -12346.648, 170.6251, 3.214931, 4.9741898, -0.60876083, 0.7933538, -60, -60, 1),
+(@OGUID+13, 2371, 0, -12346.784, 169.93674, 3.01733, 3.9095414, -0.92718315, 0.3746083, -60, -60, 1),
+(@OGUID+14, 2371, 0, -12346.142, 171.32802, 3.214792, 2.1642058, 0.88294697, 0.4694727, -60, -60, 1),
+(@OGUID+15, 2371, 0, -12346.013, 171.04683, 3.192957, 0.12217299, 0.061048508, 0.9981348, -60, -60, 1),
+(@OGUID+16, 2371, 0, -12345.653, 170.5593, 3.215016, 3.0194132, 0.9981346, 0.061051756, -60, -60, 1),
+(@OGUID+17, 2371, 0, -12346.173, 171.38135, 3.533223, 3.8397253, -0.9396925, 0.34202045, -60, -60, 1),
+(@OGUID+18, 2371, 0, -12346.501, 170.10889, 3.00499, 2.2514734, 0.902585, 0.43051165, -60, -60, 1);
+
 
 -- End of migration.
 END IF;
