@@ -5948,6 +5948,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 -- ----------------------------------------------------------------------
 
 -- Update Quest Script Headhunting (credit cmangos)
+UPDATE `creature` SET `orientation` = 3.19395 WHERE `guid` = 630;
 SET @OGUID = 1081010;
 DELETE FROM `quest_end_scripts` WHERE `id`=582;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
