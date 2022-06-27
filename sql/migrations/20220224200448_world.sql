@@ -1733,6 +1733,70 @@ UPDATE `creature` SET `id2` = 4674, `id3` = 4675 WHERE `id` = 4673;
 UPDATE `creature` SET `id2` = 4673, `id3` = 4675 WHERE `id` = 4674;
 UPDATE `creature` SET `id2` = 4673, `id3` = 4674 WHERE `id` = 4675;
 
+-- https://classic.wowhead.com/npc=4632/kolkar-centaur
+-- https://classic.wowhead.com/npc=4633/kolkar-scout
+-- https://classic.wowhead.com/npc=4634/kolkar-mauler
+UPDATE `creature` SET `id2` = 4633, `id3` = 4634 WHERE `id` = 4632;
+UPDATE `creature` SET `id2` = 4632, `id3` = 4634 WHERE `id` = 4633;
+UPDATE `creature` SET `id2` = 4632, `id3` = 4633 WHERE `id` = 4634;
+
+-- https://classic.wowhead.com/npc=4635/kolkar-windchaser
+-- https://classic.wowhead.com/npc=4636/kolkar-battle-lord
+-- https://classic.wowhead.com/npc=4637/kolkar-destroyer
+UPDATE `creature` SET `id2` = 4636, `id3` = 4637 WHERE `id` = 4635;
+UPDATE `creature` SET `id2` = 4635, `id3` = 4637 WHERE `id` = 4636;
+UPDATE `creature` SET `id2` = 4635, `id3` = 4636 WHERE `id` = 4637;
+
+-- https://classic.wowhead.com/npc=4638/magram-scout
+-- https://classic.wowhead.com/npc=4639/magram-outrunner
+UPDATE `creature` SET `id2` = 4639 WHERE `id` = 4638;
+UPDATE `creature` SET `id2` = 4638 WHERE `id` = 4639;
+
+-- https://classic.wowhead.com/npc=4640/magram-wrangler
+-- https://classic.wowhead.com/npc=4641/magram-windchaser
+UPDATE `creature` SET `id2` = 4641 WHERE `id` = 4640;
+UPDATE `creature` SET `id2` = 4640 WHERE `id` = 4641;
+
+-- https://classic.wowhead.com/npc=4642/magram-stormer
+-- https://classic.wowhead.com/npc=4643/magram-pack-runner
+UPDATE `creature` SET `id2` = 4643 WHERE `id` = 4642;
+UPDATE `creature` SET `id2` = 4642 WHERE `id` = 4643;
+
+-- https://classic.wowhead.com/npc=4644/magram-marauder
+-- https://classic.wowhead.com/npc=4645/magram-mauler
+UPDATE `creature` SET `id2` = 4645 WHERE `id` = 4644;
+UPDATE `creature` SET `id2` = 4644 WHERE `id` = 4645;
+
+-- https://classic.wowhead.com/npc=4646/gelkis-outrunner
+-- https://classic.wowhead.com/npc=4647/gelkis-scout
+UPDATE `creature` SET `id2` = 4647 WHERE `id` = 4646;
+UPDATE `creature` SET `id2` = 4646 WHERE `id` = 4647;
+
+-- https://classic.wowhead.com/npc=4648/gelkis-stamper
+-- https://classic.wowhead.com/npc=4649/gelkis-windchaser
+UPDATE `creature` SET `id2` = 4649 WHERE `id` = 4648;
+UPDATE `creature` SET `id2` = 4648 WHERE `id` = 4649;
+
+-- https://classic.wowhead.com/npc=4652/gelkis-mauler
+-- https://classic.wowhead.com/npc=4653/gelkis-marauder
+UPDATE `creature` SET `id2` = 4653 WHERE `id` = 4652;
+UPDATE `creature` SET `id2` = 4652 WHERE `id` = 4653;
+
+-- https://classic.wowhead.com/npc=4654/maraudine-scout
+-- https://classic.wowhead.com/npc=4655/maraudine-wrangler
+UPDATE `creature` SET `id2` = 4655 WHERE `id` = 4654;
+UPDATE `creature` SET `id2` = 4654 WHERE `id` = 4655;
+
+-- https://classic.wowhead.com/npc=4656/maraudine-mauler
+-- https://classic.wowhead.com/npc=4657/maraudine-windchaser
+UPDATE `creature` SET `id2` = 4657 WHERE `id` = 4656;
+UPDATE `creature` SET `id2` = 4656 WHERE `id` = 4657;
+
+-- https://classic.wowhead.com/npc=4658/maraudine-stormer
+-- https://classic.wowhead.com/npc=4659/maraudine-marauder
+UPDATE `creature` SET `id2` = 4659 WHERE `id` = 4658;
+UPDATE `creature` SET `id2` = 4658 WHERE `id` = 4659;
+
 
 -- End of migration.
 END IF;
