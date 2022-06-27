@@ -5926,6 +5926,25 @@ UPDATE `creature_template` SET `gossip_menu_id` = 6595, `npc_flags` = 3 WHERE `e
 INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
 (6595, 7814);
 
+-- ----------------------------------------------------------------------
+
+-- Update Quest Scripts For Arajs Scarab (credit cmangos)
+DELETE FROM `quest_end_scripts` WHERE `id`=5803;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5803, 0, 0, 4, 147, 7, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Alchemist Arbington: npc\\_flag questgiver+gossip+vendor removed'),
+(5803, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7278, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Alchemist Arbington: Say text 1'),
+(5803, 3, 0, 15, 9744, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Alchemist Arbington: Cast spell \"Psychometry\"'),
+(5803, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7279, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Alchemist Arbington: Say text 2'),
+(5803, 10, 0, 4, 147, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Alchemist Arbington: npc\\_flag questgiver+gossip+vendor added');
+
+DELETE FROM `quest_end_scripts` WHERE `id`=5804;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5804, 0, 0, 4, 147, 7, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: npc\\_flag questgiver+gossip+vendor removed'),
+(5804, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7278, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: Say text 1'),
+(5804, 3, 0, 15, 9744, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: Cast spell \"Psychometry\"'),
+(5804, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7279, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: Say text 2'),
+(5804, 10, 0, 4, 147, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Araj\'s Scarab - Apothecary Dithers: npc\\_flag questgiver+gossip+vendor added');
+
 
 -- End of migration.
 END IF;
