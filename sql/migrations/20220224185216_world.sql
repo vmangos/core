@@ -5893,6 +5893,39 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12200, -1, 1, 2449.57, -1661.19, 103.211, 5.49779, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite'),
 (6389, 0, 10, 12120, 4134, 0, 0, 0, 0, 0, 0, 0, 12201, -1, 1, 2449.64, -1661.05, 103.211, 5.8294, 0, 'A Plague Upon Thee: Summon Creature Plagueland Termite');
 
+-- ----------------------------------------------------------------------
+
+-- Add Niby the Almighty Gossip
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(5841, 7005),
+(5842, 7004),
+(5843, 7003),
+(5844, 7002);
+
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
+(5845, 0, 0, 'I am in search of a great and powerful Warlock.', 0, 1, 1),
+(5842, 0, 0, 'How do I do that?', 0, 1, 1),
+(5843, 0, 0, 'This is all very interesting but what is it that you want?', 0, 1, 1),
+(5844, 0, 0, 'What task?', 0, 1, 1);
+
+UPDATE `gossip_menu_option` SET `action_menu_id`=5841, `action_poi_id`=0 WHERE `menu_id`=5842 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=5842, `action_poi_id`=0 WHERE `menu_id`=5843 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=5843, `action_poi_id`=0 WHERE `menu_id`=5844 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=5844, `action_poi_id`=0 WHERE `menu_id`=5845 && `id`=0;
+
+-- 301: Target Has Not Accepted or Completed Quest 7601
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (301, 22, 7601, 0, 0, 0, 0);
+
+UPDATE `gossip_menu_option` SET `condition_id` = 301 WHERE `menu_id` = 5845 AND `id` = 0;
+
+-- ----------------------------------------------------------------------
+
+-- Add Impsy Gossip
+UPDATE `creature_template` SET `gossip_menu_id` = 6595, `npc_flags` = 3 WHERE `entry`=14470;
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(6595, 7814);
+
 
 -- End of migration.
 END IF;
