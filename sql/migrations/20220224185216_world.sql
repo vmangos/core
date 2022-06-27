@@ -5914,7 +5914,7 @@ UPDATE `gossip_menu_option` SET `action_menu_id`=5843, `action_poi_id`=0 WHERE `
 UPDATE `gossip_menu_option` SET `action_menu_id`=5844, `action_poi_id`=0 WHERE `menu_id`=5845 && `id`=0;
 
 -- 301: Target Has Not Accepted or Completed Quest 7601
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (301, 22, 7601, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (301, 19, 7601, 0, 0, 0, 0);
 
 UPDATE `gossip_menu_option` SET `condition_id` = 301 WHERE `menu_id` = 5845 AND `id` = 0;
 
