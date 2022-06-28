@@ -5107,6 +5107,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `
 -- ----------------------------------------------------------------------
 
 -- Add Complete Script For Alien Egg (credit cmangos)
+-- Add Complete Script For Alien Egg (credit cmangos)
 UPDATE `quest_template` SET `CompleteScript` = 4821 WHERE `entry` = 4821;
 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`) VALUES 
@@ -5115,15 +5116,14 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `quest_end_scripts` WHERE `id`=4821;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (4821, 0, 0, 9, 11427, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Alien Egg - Respawn Gameobject'),
-(4821, 4, 0, 10, 10581, 180000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, -5443.845, -2399.18, 89.3327, 5.585, 0, 'Alien Egg - Summon Creature'),
+(4821, 4, 0, 10, 10581, 180000, 0, 0, 0, 0, 0, 0, 1, 10581, 0, 1, -5443.85, -2399.18, 89.3327, 5.585, 0, 'Alien Egg - Summon Creature'),
 (4821, 4, 0, 13, 0, 0, 0, 0, 11427, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Alien Egg - Activate Gameobject');
 
--- Events list for Young Arikara
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1058101, 10581, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1058101, 0, 0, 'Young Arikara - Cast Spell Just Spawned');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1058101, 0, 0, 15, 10389, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Young Arikara - Cast Spell On Spawn');
+DELETE FROM `generic_scripts` WHERE `id`=10581;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(10581, 2, 0, 15, 10389, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Young Arikara - Cast Spell');
 
-UPDATE `creature_template` SET `unit_flags` = 768, `ai_name` = 'EventAI', `movement_type` = 2, `inhabit_type` = 3 WHERE `entry` = 10581;
+UPDATE `creature_template` SET `unit_flags` = 768, `movement_type` = 2 WHERE `entry` = 10581;
 
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `script_id`) VALUES
 (10581,1,-5443.8447,-2399.1797,89.3327,100,3000,0),
