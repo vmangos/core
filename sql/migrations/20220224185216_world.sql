@@ -6001,6 +6001,18 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+17, 2371, 0, -12346.173, 171.38135, 3.533223, 3.8397253, -0.9396925, 0.34202045, -60, -60, 1),
 (@OGUID+18, 2371, 0, -12346.501, 170.10889, 3.00499, 2.2514734, 0.902585, 0.43051165, -60, -60, 1);
 
+-- ----------------------------------------------------------------------
+
+-- Events list for Deepmoss Matriarch
+DELETE FROM `creature_ai_events` WHERE `creature_id`=4264;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (426401, 4264, 0, 11, 0, 100, 0, 0, 0, 0, 0, 426401, 0, 0, 'Deepmoss Matriarch - Talk - Just Spawned');
+
+DELETE FROM `creature_ai_scripts` WHERE `id`=426401;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(426401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1415, 0, 0, 0, 0, 0, 0, 0, 0, 'Deepmoss Matriarch - Talk');
+
+UPDATE `creature_template` SET `ai_name`='EventAI' WHERE  `entry`=4264;
+
 
 -- End of migration.
 END IF;
