@@ -6072,6 +6072,19 @@ UPDATE creature SET wander_distance = 3, movement_type = 1 WHERE id IN (11915,11
 -- Daggerspine Marauder Should Not Have Loot
 UPDATE `creature_template` SET `loot_id` = 0, `gold_min` = 0, `gold_max` = 0 WHERE `entry` = 2775;
 
+-- ----------------------------------------------------------------------
+
+-- Update Quest The Bait for Lar'korwi (note: there may be a map issue because the creature does not seem to path in a straight line)
+UPDATE `gameobject` SET `position_x` = -7197.88, `position_y` = -2423.8, `position_z` = -217.133, `orientation` = 3.7001 WHERE `guid` = 27142;
+
+DELETE FROM `event_scripts` WHERE `id`=3981;
+INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(3981, 0, 0, 10, 9684, 3000000, 0, 0, 0, 0, 0, 0, 0, 968401, -1, 1, -7201.95, -2354.85, -225.152, 4.84672, 0, 'The Bait for Lar\'korwi: Summon Creature');
+
+DELETE FROM `generic_scripts` WHERE `id`=968401;
+INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(968401, 0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7193.04, -2428.58, -217.548, 100, 0, 'Lar\'korwi - Move');
+
 
 -- End of migration.
 END IF;
