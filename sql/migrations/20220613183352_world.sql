@@ -12,6 +12,11 @@ INSERT INTO `migrations` VALUES ('20220613183352');
 -- Make default detection range blizzlike.
 ALTER TABLE `creature_template`
 	CHANGE COLUMN `detection_range` `detection_range` FLOAT NOT NULL DEFAULT '18' AFTER `speed_run`;
+  
+-- Add attack speed defaults.
+ALTER TABLE `creature_template`
+	CHANGE COLUMN `base_attack_time` `base_attack_time` INT(10) UNSIGNED NOT NULL DEFAULT '2000' AFTER `damage_school`,
+	CHANGE COLUMN `ranged_attack_time` `ranged_attack_time` INT(10) UNSIGNED NOT NULL DEFAULT '2000' AFTER `base_attack_time`;
 
 -- Add all missing creatures.
 INSERT INTO `creature_template` (`entry`, `patch`, `display_total_probability`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `name`, `subname`, `unit_class`, `rank`, `pet_family`, `type`, `type_flags`, `pet_spell_list_id`, `health_multiplier`, `mana_multiplier`, `civilian`, `racial_leader`, `speed_walk`, `speed_run`, `faction`, `inhabit_type`, `unit_flags`, `flags_extra`, `xp_multiplier`, `level_min`, `level_max`, `regeneration`, `mount_display_id`, `equipment_id`) VALUES
