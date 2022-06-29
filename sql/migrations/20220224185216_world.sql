@@ -6067,6 +6067,11 @@ INSERT INTO creature_movement (id,point,position_x,position_y,position_z,orienta
 -- update for static ones
 UPDATE creature SET wander_distance = 3, movement_type = 1 WHERE id IN (11915,11917,11918) AND movement_type = 0;
 
+-- ----------------------------------------------------------------------
+
+-- Daggerspine Marauder Should Not Have Loot
+UPDATE `creature_template` SET `loot_id` = 0, `gold_min` = 0, `gold_max` = 0 WHERE `entry` = 2775;
+
 
 -- End of migration.
 END IF;
