@@ -1205,6 +1205,8 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 (2701, 0, 76, 141980, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10632.1, -2988.86, 28.7832, 4.7473, 0, 'Heroes of Old: Summon GameObject Spectral Lockbox'),
 (2701, 0, 76, 141981, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10631.8, -2988.59, 28.3735, 3.97935, 0, 'Heroes of Old: Summon GameObject Spectral Lockbox Particles');
 
+DELETE FROM `gameobject` WHERE `id` IN (141980, 141981);
+
 -- ----------------------------------------------------------------------
 
 -- Correct Zandalar Patrol
@@ -1343,11 +1345,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 
 -- ----------------------------------------------------------------------
 
--- Remove Duplicate Mailbox
-DELETE FROM `gameobject` WHERE `guid` = 73246;
-
--- ----------------------------------------------------------------------
-
 -- Correct Serpentbloom Flags
 UPDATE `gameobject_template` SET `flags` = 0 WHERE `entry` = 19535;
 UPDATE `gameobject` SET `spawntimesecsmin` = 300, `spawntimesecsmax` = 300 WHERE  `id` IN (19535, 13891);
@@ -1462,10 +1459,7 @@ UPDATE `quest_template` SET `RewSpellCast` = 22925 WHERE `entry` = 7507;
 -- ----------------------------------------------------------------------
 
 -- Update Grol'dom Farm (credit cmangos)
-UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14894;
--- Events list for Swarm of bees
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1489401, 14894, 0, 1, 0, 100, 0, 1000, 1000, 0, 0, 1489401, 0, 0, 'Swarm of Bees - Cast Silithid Swarm Passive OOC');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1489401, 0, 15, 6590, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Swarm of Bees - Cast Silithid Swarm Passive');
+UPDATE `creature_template` SET `auras` = '6590' WHER  `entry` = 14894;
 
 -- ----------------------------------------------------------------------
 
@@ -1741,12 +1735,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (11789, 58, 1741.47, -4426.42, 36.8289, 100, 0, 0, 0),
 (11789, 59, 1735.99, -4411.18, 36.8947, 100, 0, 0, 0),
 (11789, 60, 1723.25, -4393.1, 32.8951, 100, 0, 0, 0);
-
--- ----------------------------------------------------------------------
-
--- Fix Quest Typo
-UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon allows one to see a corrupted soul shard on those tainted beasts that are put down for the greater good. I grind shards into a usable reagent that goes into making Cenarion plant salve. We will use that salve to turn corrupted plants into healthy ones again.$b$bIn exchange for these shards, I will give you some Cenarion plant salves I have already prepared.' WHERE `entry`=4108;
-UPDATE `quest_template` SET `RequestItemsText`= 'Possessing a Cenarion Beacon allows one to see a corrupted soul shard on those tainted beasts that are put down for the greater good. I grind shards into a usable reagent that goes into making Cenarion plant salve. We will use that salve to turn corrupted plants into healthy ones again.$b$bIn exchange for these shards, I will give you some Cenarion plant salves I have already prepared.' WHERE `entry`=5887;
 
 -- ----------------------------------------------------------------------
 
