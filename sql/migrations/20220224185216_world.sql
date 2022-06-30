@@ -2247,11 +2247,6 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 -- ----------------------------------------------------------------------
 
--- Update Explosive Sheep (NOTE: The sheep are still bugged, they do not despawn and have an infinite cooldown, also their cpp can be removed I think)
-UPDATE `creature_template` SET `faction`= 35, `unit_flags` = 0, `call_for_help_range` = 0, `detection_range` = 20 WHERE `entry`=2675;
-
--- ----------------------------------------------------------------------
-
 -- Stop Yeh'kinya Being Kited Away From Spawn
 UPDATE `creature_template` SET `flags_extra` = 65536 WHERE `entry` = 8579;
 
