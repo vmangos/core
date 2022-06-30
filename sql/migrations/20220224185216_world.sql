@@ -2222,20 +2222,6 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 
 -- ----------------------------------------------------------------------
 
--- Correct Stats For Anvilrage Creatures (credit velite12)
-UPDATE `creature_template` SET `dmg_min` = 88, `dmg_max` = 119 WHERE `name` = 'Anvilrage Reservist';
-UPDATE `creature_template` SET `dmg_min` = 187, `dmg_max` = 254 WHERE `name` = 'Anvilrage Overseer';
-UPDATE `creature_template` SET `dmg_min` = 248, `dmg_max` = 337 WHERE `name` = 'Anvilrage Warden';
-UPDATE `creature_template` SET `dmg_min` = 262, `dmg_max` = 355 WHERE `name` = 'Anvilrage Guardsman';
-UPDATE `creature_template` SET `dmg_min` = 338, `dmg_max` = 449 WHERE `name` = 'Anvilrage Captain';
-UPDATE `creature_template` SET `dmg_min` = 305, `dmg_max` = 412 WHERE `name` = 'Anvilrage Footman';
-UPDATE `creature_template` SET `dmg_min` = 241, `dmg_max` = 324 WHERE `name` = 'Anvilrage Medic';
-UPDATE `creature_template` SET `dmg_min` = 273, `dmg_max` = 361 WHERE `name` = 'Anvilrage Officer';
-UPDATE `creature_template` SET `dmg_min` = 293, `dmg_max` = 397 WHERE `name` = 'Anvilrage Marshal';
-UPDATE `creature_template` SET `dmg_min` = 279, `dmg_max` = 370 WHERE `name` = 'Anvilrage Soldier';
-
--- ----------------------------------------------------------------------
-
 -- Update Muigin Script
 DELETE FROM `creature_ai_scripts` WHERE `id`=911901;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
@@ -2248,7 +2234,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 -- ----------------------------------------------------------------------
 
 -- Update Explosive Sheep (NOTE: The sheep are still bugged, they do not despawn and have an infinite cooldown, also their cpp can be removed I think)
-UPDATE `creature_template` SET `faction`= 35, `unit_flags` = 0, `call_for_help_range` = 0, `detection_range` = 20, `script_name` = '' WHERE `entry`=2675;
+UPDATE `creature_template` SET `faction`= 35, `unit_flags` = 0, `call_for_help_range` = 0, `detection_range` = 20 WHERE `entry`=2675;
 
 -- ----------------------------------------------------------------------
 
@@ -2259,11 +2245,6 @@ UPDATE `creature_template` SET `flags_extra` = 65536 WHERE `entry` = 8579;
 
 -- Attempt To Stop Overlord MokMorokk Script Breaking
 UPDATE `creature` SET `spawn_flags` = 1 WHERE `guid` = 31442;
-
--- ----------------------------------------------------------------------
-
--- Codex: Prayer of Shadow Protection Should be Patch 1.9
-UPDATE `item_template` SET `patch` = 7 WHERE `entry` = 22393;
 
 -- ----------------------------------------------------------------------
 
@@ -2362,11 +2343,6 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 (1028, 1, 9, 9752, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Medium Wisp'),
 (1028, 1, 9, 9753, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Large Wisp'),
 (1028, 1, 9, 9754, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raene\'s Cleansing: Respawn GameObject Large Wisp');
-
--- ----------------------------------------------------------------------
-
--- Update Engineer Card Templates (credit cmangos)
-UPDATE `item_template` SET `flags` = 65536, `allowable_class` = -1, `allowable_race` = -1, `material` = -1, `bag_family` = 128, `extra_flags` = 1 WHERE `entry` IN (10790, 10791);
 
 -- ----------------------------------------------------------------------
 
