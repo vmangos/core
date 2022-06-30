@@ -954,6 +954,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (27964, 55, -1005.53, 1669.59, 61.2737, 100),
 (27964, 56, -977.827, 1691.4, 61.2361, 100);
 
+UPDATE `creature` SET `spawn_flags` = 2 WHERE `guid` IN (27948, 27947, 27946, 27945, 27944, 27949, 27950, 27951, 27952, 27953, 27939, 27940, 27941, 27942, 27943, 26335, 26336, 26337, 26338, 26339, 27954, 27955, 27956, 27957, 27958, 27959, 27960, 27961, 27962, 27963, 27964, 27965, 27966, 27967, 27973);
+
 -- ----------------------------------------------------------------------
 
 -- Add Desolace Kodo Herd Waypoints
@@ -1012,10 +1014,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (28275, 42, -1107.35, 2074.16, 61.4949, 100),
 (28275, 43, -1137.73, 2047.82, 61.3302, 100),
 (28275, 44, -1174.53, 2024.46, 59.9088, 100);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(470001, 0, 21, 1, 0, 0, 0, 4700, 5, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object'),
-(470001, 0, 21, 1, 0, 0, 0, 28297, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object');
-UPDATE `creature_movement` SET `script_id` = 470001 WHERE `id` = 28275 AND `point` = 1;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (470002, 0, 18, 0, 0, 0, 0, 28276, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470002, 0, 18, 0, 0, 0, 0, 28277, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
@@ -1088,10 +1086,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (28278, 53, -1113.92, 2071.24, 62.0882, 100),
 (28278, 54, -1144.86, 2040.23, 58.7336, 100);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(470003, 0, 21, 1, 0, 0, 0, 4700, 5, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object'),
-(470003, 0, 21, 1, 0, 0, 0, 28298, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object');
-UPDATE `creature_movement` SET `script_id` = 470003 WHERE `id` = 28278 AND `point` = 1;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (470004, 0, 18, 0, 0, 0, 0, 28279, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470004, 0, 18, 0, 0, 0, 0, 28280, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470004, 0, 18, 0, 0, 0, 0, 28298, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
@@ -1134,10 +1128,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (28282, 24, -1526.3, 1804.88, 60.9553, 100),
 (28282, 25, -1487.95, 1812.1, 63.5721, 100),
 (28282, 26, -1439.9, 1799.24, 50.1445, 100);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(470005, 0, 21, 1, 0, 0, 0, 4700, 5, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object'),
-(470005, 0, 21, 1, 0, 0, 0, 28299, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object');
-UPDATE `creature_movement` SET `script_id` = 470005 WHERE `id` = 28282 AND `point` = 1;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (470006, 0, 18, 0, 0, 0, 0, 28283, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470006, 0, 18, 0, 0, 0, 0, 28284, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
@@ -1189,15 +1179,13 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (28272, 32, -1445.51, 1708.06, 62.2747, 100),
 (28272, 33, -1458.01, 1748.56, 54.8912, 100);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(470007, 0, 21, 1, 0, 0, 0, 4700, 5, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object'),
-(470007, 0, 21, 1, 0, 0, 0, 28295, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Make Active Object');
-UPDATE `creature_movement` SET `script_id` = 470007 WHERE `id` = 28272 AND `point` = 1;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (470008, 0, 18, 0, 0, 0, 0, 28273, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470008, 0, 18, 0, 0, 0, 0, 28274, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470008, 0, 18, 0, 0, 0, 0, 28295, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature'),
 (470008, 2, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Aged Kodo - Despawn Creature');
 UPDATE `creature_movement` SET `script_id` = 470008 WHERE `id` = 28272 AND `point` = 33;
+
+UPDATE `creature` SET `spawn_flags` = 2 WHERE `guid` IN (28275, 28276, 28297, 28277, 28278, 28279, 28298, 28280, 28282, 28283, 28299, 28284, 28272, 28273, 28295, 28274);
 
 -- ----------------------------------------------------------------------
 
