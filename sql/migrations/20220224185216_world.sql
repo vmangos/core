@@ -1459,7 +1459,7 @@ UPDATE `quest_template` SET `RewSpellCast` = 22925 WHERE `entry` = 7507;
 -- ----------------------------------------------------------------------
 
 -- Update Grol'dom Farm (credit cmangos)
-UPDATE `creature_template` SET `auras` = '6590' WHER  `entry` = 14894;
+UPDATE `creature_template` SET `auras` = '6590' WHERE `entry` = 14894;
 
 -- ----------------------------------------------------------------------
 
