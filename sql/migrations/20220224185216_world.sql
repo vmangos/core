@@ -254,11 +254,6 @@ UPDATE `creature_template` SET `unit_flags` = 768 WHERE `entry` = 9623;
 
 -- ----------------------------------------------------------------------
 
--- Remove Creature Under Map
-DELETE FROM `creature` WHERE `guid` = 50190;
-
--- ----------------------------------------------------------------------
-
 -- Set Correct Start Date For Southshore Assassins
 UPDATE `game_event` SET `start_time` = '2022-01-01 00:19:48' WHERE `entry`=152;
 
