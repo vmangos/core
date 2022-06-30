@@ -1459,7 +1459,7 @@ UPDATE `creature_template` SET `auras` = '6590' WHERE `entry` = 14894;
 -- ----------------------------------------------------------------------
 
 -- Add Awbee Gossip (credit cmangos)
-UPDATE `creature_template` SET `gossip_menu_id` = 3063, `npc_flags` = 3 WHERE `entry` = 10740;
+UPDATE `creature_template` SET `gossip_menu_id` = 3063, `npc_flags` = 0 WHERE `entry` = 10740;
 
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
 (3063, 3797, 0, 0),
@@ -1472,6 +1472,25 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (3064, 0, 0, 'Continue please...', 0, 1, 1, 3065, 0, 0, 0, 0, '', 0, 0),
 (3065, 0, 0, 'Horrifying.', 6279, 1, 1, 3066, 0, 0, 0, 0, '', 0, 0),
 (3066, 0, 0, 'Absolutely.', 0, 1, 1, -1, 0, 0, 0, 0, '', 0, 0);
+
+-- ----------------------------------------------------------------------
+
+-- Add Blackhand Thug AI
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 10762;
+
+-- 346: Source's Guid Is 42154 Or 42153
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(346, 52, 42154, 42153, 0, 0, 0);
+
+-- 347: Creature 10762 Is Dead Within 10 Yards Of The Target
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(347, 20, 10762, 10, 0, 1, 1);
+
+-- Events list for Blackhand Thug
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
+(10762, 10762, 346, 6, 0, 100, 1, 0, 0, 0, 0, 1076201, 0, 0, 'Blackhand Thug - Modify Awbee Flags - Death');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1076201, 0, 0, 4, 147, 3, 1, 0, 41790, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 347, 'Blackhand Thug - Modify Awbee Flags');
 
 -- ----------------------------------------------------------------------
 
