@@ -5003,24 +5003,42 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 -- Lorax (NOTE: Needs CPP Removing)
 DELETE FROM `npc_gossip` WHERE `npc_guid` = 42264;
 UPDATE `creature_template` SET `gossip_menu_id` = 3049, `script_name`='' WHERE `entry` = 10918;
-INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES
-(3049, 3758, 0),
-(20015, 3759, 0),
-(20016, 3760, 0),
-(20017, 3761, 0),
-(20018, 3762, 0),
-(20019, 3763, 0);
-INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
-(3049, 0, 0, 'You will have to excuse me, Lorax, I do not speak \'crazy\'.', 0, 1, 1, 20015, 0, 0, 0, 0, NULL, 0, 224),
-(20015, 0, 0, 'My apologies, I did not realize that you could understand what I was saying. What is it you are doing out here?', 0, 1, 1, 20016, 0, 0, 0, 0, NULL, 0, 0),
-(20016, 0, 0, 'Do you? Perhaps you should tell me what it is that is bothering you.', 0, 1, 1, 20017, 0, 0, 0, 0, NULL, 0, 0),
-(20017, 0, 0, 'What deal?', 0, 1, 1, 20018, 0, 0, 0, 0, NULL, 0, 0),
-(20018, 0, 0, 'So how did he break the deal?', 0, 1, 1, 20019, 0, 0, 0, 0, NULL, 0, 0),
-(20019, 0, 0, 'Perhaps I can be of some assistance. I will make a deal with you, Satyr. I shall recover this unforged breastplate and slay the beast. In exchange for this task, you will teach me how to create the breastplate.', 0, 1, 1, -1, 0, 5126, 0, 0, NULL, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (224, 9, 5126, 0, 0, 0, 0);
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES
+(3049, 3758),
+(3044, 3763),
+(3045, 3762),
+(3046, 3761),
+(3047, 3760),
+(3048, 3759);
+
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`) VALUES
+(3049, 0, 0, 'You will have to excuse me, Lorax, I do not speak \'crazy.\'', 0, 1, 1),
+(3044, 0, 0, 'Perhaps I can be of some assistance. I will make a deal with you, Satyr. I shall recover this unforged breastplate and slay the beast, Goraluk Anvilcrack. In exchange for this task, you will teach me how to create the breastplate.', 0, 1, 1),
+(3045, 0, 0, 'So how did he break the deal?', 0, 1, 1),
+(3046, 0, 0, 'What deal?', 0, 1, 1),
+(3047, 0, 0, 'Do you? Perhaps you should tell me what it is that is bothering you.', 0, 1, 1),
+(3048, 0, 0, 'My apologies, I did not realize that you could understand what I was saying. What is it you are doing out here?', 0, 1, 1);
+
+UPDATE `gossip_menu_option` SET `action_menu_id`=3044, `action_poi_id`=0 WHERE `menu_id`=3045 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3045, `action_poi_id`=0 WHERE `menu_id`=3046 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3046, `action_poi_id`=0 WHERE `menu_id`=3047 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3047, `action_poi_id`=0 WHERE `menu_id`=3048 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3048, `action_poi_id`=0 WHERE `menu_id`=3049 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3044, `action_poi_id`=0 WHERE `menu_id`=3045 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3045, `action_poi_id`=0 WHERE `menu_id`=3046 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3046, `action_poi_id`=0 WHERE `menu_id`=3047 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3047, `action_poi_id`=0 WHERE `menu_id`=3048 && `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=3048, `action_poi_id`=0 WHERE `menu_id`=3049 && `id`=0;
+
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES
+(224, 9, 5126, 0, 0, 0, 0);
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (5126, 0, 0, 7, 5126, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lorax\'s Tale: Lorax - Complete Quest');
 UPDATE `quest_template` SET `OfferRewardText` = '<Lorax laughs.>' WHERE `entry` = 5126;
+
+UPDATE `gossip_menu_option` SET `condition_id` = 224 WHERE `menu_id` = 3049 AND `id` = 0;
+UPDATE `gossip_menu_option` SET `action_script_id` = 5126 WHERE `menu_id` = 3044 AND `id`=0;
 
 -- ----------------------------------------------------------------------
 
