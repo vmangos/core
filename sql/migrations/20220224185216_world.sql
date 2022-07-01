@@ -6057,6 +6057,18 @@ DELETE FROM `generic_scripts` WHERE `id`=968401;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (968401, 0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7193.04, -2428.58, -217.548, 100, 0, 'Lar\'korwi - Move');
 
+-- ----------------------------------------------------------------------
+
+-- Update Lady Jaina Proudmoore Gossip (credit cmangos)
+UPDATE `creature_template` SET `gossip_menu_id` = 2465 WHERE `entry` = 4968;
+
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(2465, 3157, 0, 0),
+(2465, 3158, 0, 501);
+
+-- 501: Target Has Done Quest 1324
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (501, 8, 1324, 0, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
