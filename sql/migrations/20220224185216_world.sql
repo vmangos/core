@@ -2311,7 +2311,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (21301, 15, -6495.17578125000, -3334.864501953125, -94.1529846191406250, 100, 0, 0),
 (21301, 16, -6496.85839843750, -3323.532958984375, -96.2880477905273437, 100, 0, 0);
 
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 21325;
+UPDATE `creature` SET `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 21325;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`) VALUES
 (21325, 01, -6483.77978515625, -3272.338867187500, -112.436500549316406, 100, 0, 0),
 (21325, 02, -6477.99951171875, -3289.034667968750, -107.632736206054687, 100, 0, 0),
@@ -2430,7 +2430,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 
 -- Update Some Creatures
 INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (31893, 0); -- Riley Walker 5660
-INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (42204, 0); -- Maethrya 11138
+INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (42204, 2); -- Maethrya 11138
 INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (53177, 0); -- Khaelyn Steelwing 12617
 
 -- Sergeant Ba'sha
@@ -3171,12 +3171,6 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 -- Update Creatures Movement Type
 UPDATE `creature` SET `wander_distance` = 5, `movement_type` = 1 WHERE `guid` = 38336;
 
--- Update Winterfall Ursa (credit cmangos)
-UPDATE `creature_template` SET `dmg_min`=135, `dmg_max`=182, `attack_power`=242, `dmg_multiplier`=1.22, `base_attack_time`=2750, `ranged_attack_time`=2750, `ranged_dmg_min`=95, `ranged_dmg_max`=139, `ranged_attack_power`=25 WHERE  `entry`=7438 AND `patch`=0;
-
--- Update High Chief Winterfall (credit cmangos)
-UPDATE `creature_template` SET `dmg_min`=133, `dmg_max`=176, `attack_power`=234, `ranged_attack_time`=2800, `ranged_dmg_min`=91, `ranged_dmg_max`=133, `ranged_attack_power`=23 WHERE  `entry`=10738 AND `patch`=0;
-
 -- Update Immunities (credit Trinity Core)
 UPDATE `creature_template` SET `school_immune_mask`= 4 WHERE `entry` IN (89,2091,2108,2447,2726,2760,4036,4037,4038,4676,5850,5852,7137,9016,9017,9026,9816,9878,9879,11502,11666,11667,11668,12056,12143,15438);
 UPDATE `creature_template` SET `school_immune_mask`= 8 WHERE `entry` IN (92,2258,2592,2735,2736,2752,2762,2791,4499,11321,11744,11777,11778,11783,11784,12201,12237,14435,14455,15352,17085,17154,17156,17157,17158,17159,17160);
@@ -3721,10 +3715,10 @@ UPDATE `creature` SET `wander_distance` = 4, `movement_type` = 1 WHERE `guid` IN
 -- Update Quest Script 1680 (credit cmangos)
 DELETE FROM `quest_start_scripts` WHERE `id`=1680;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1680, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2302, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge - Muren Stormpike: Talk'),
-(1680, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge - Muren Stormpike: Emote'),
-(1680, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge - Muren Stormpike: Orientation'),
-(1680, 4, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8377, 0, 'Tormus Deepforge - Muren Stormpike: Orientation');
+(1680, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2302, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge: Muren Stormpike - Talk'),
+(1680, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge: Muren Stormpike - Emote'),
+(1680, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tormus Deepforge: Muren Stormpike - Orientation'),
+(1680, 4, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8377, 0, 'Tormus Deepforge: Muren Stormpike - Orientation');
 
 UPDATE `quest_template` SET `OfferRewardEmote1` = 66 WHERE `entry` = 1678;
 UPDATE `quest_template` SET `CompleteEmote` = 6 WHERE `entry` = 1678;
@@ -5062,12 +5056,11 @@ UPDATE `quest_template` SET `RequestItemsText`='For the shoulder plans, I\'ll be
 -- Add Event Script For Quest 29 (credit cmangos)
 DELETE FROM `event_scripts` WHERE `id`=6206;
 INSERT INTO `event_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(6206, 0, 0, 1, 4, 0, 0, 0, 42333, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spell Use Bauble - Tajarri - Emote'),
-(6206, 1, 0, 0, 0, 0, 0, 0, 42333, 0, 9, 2, 7611, 0, 0, 0, 0, 0, 0, 0, 0, 'Spell Use Bauble - Tajarri - Talk');
+(6206, 0, 0, 1, 4, 0, 0, 0, 42333, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spell Use Bauble: Tajarri - Emote'),
+(6206, 1, 0, 0, 0, 0, 0, 0, 42333, 0, 9, 2, 7611, 0, 0, 0, 0, 0, 0, 0, 0, 'Spell Use Bauble: Tajarri - Talk');
 
 -- ----------------------------------------------------------------------
 
--- Add Complete Script For Alien Egg (credit cmangos)
 -- Add Complete Script For Alien Egg (credit cmangos)
 UPDATE `quest_template` SET `CompleteScript` = 4821 WHERE `entry` = 4821;
 
@@ -5136,7 +5129,7 @@ DELETE FROM `gameobject` WHERE `guid` = 3996085; -- Custom Entry
 DELETE FROM `gameobject` WHERE `id` IN (177790, 177844);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `patch_min`, `patch_max`) VALUES
 (@GUID+20, 177790, 0, -10172.3, 2389.11, -138.894, 1.6057, 0, 0, 0.719339, 0.694659, 25, 25, 100, 1, 0, 10),
-(@GUID+21, 177844, 0, 848.998, 2208.29, -137.5, 1.50034, 0, 0, 0.681762, 0.731574, 25, 25, 100, 1, 0, 10); -- CUSTOM NO SNIFF DATA
+(@GUID+21, 177844, 0, 846.182, 2207.69, -136.864, 1.71042, 0, 0, 0.754709, 0.656059, 25, 25, 100, 1, 0, 10);
 
 -- ----------------------------------------------------------------------
 
