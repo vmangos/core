@@ -205,9 +205,7 @@ struct urokUnderlingAI : public ScriptedAI
     void Reset() override
     {
         timer=0;
-        abilityReset();
     }
-    virtual void abilityReset(){}
     uint32 timer;
     uint64 guidMound;
     void JustDied(Unit* pKiller) override
@@ -289,13 +287,8 @@ struct urokEnforcerAI : public urokUnderlingAI
 {
     urokEnforcerAI(Creature* pCreature) : urokUnderlingAI(pCreature)
     {
-        abilityReset();
     }
-    void abilityReset() override
-    {
-        m_uiStrike_Timer = 1000;
-    }
-    uint32 m_uiStrike_Timer;
+
     void abilityCombatUpdate(uint32 uiDiff) override
     {
         if (!m_CreatureSpells.empty())
