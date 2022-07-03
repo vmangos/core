@@ -134,7 +134,7 @@ Unit* PetEventAI::FindTargetForAttack() const
 
     Unit const* pOwner = m_creature->GetCharmerOrOwner();
     if (!pOwner)
-        return false;
+        return nullptr;
 
     // Pet has no attackers, check for anyone attacking Owner.
     if (Unit* const pTarget = pOwner->GetAttackerForHelper())
