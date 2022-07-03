@@ -116,6 +116,13 @@ void PetAI::UpdateAI(uint32 const diff)
     Unit* tauntTarget = !playerControlled ? m_creature->GetTauntTarget() : nullptr;
     if (tauntTarget)
         DoAttack(tauntTarget, true);
+    else if (m_creature->GetVictim() && m_creature->GetOwnerGuid().IsCreature() && !m_creature->GetThreatManager().isThreatListEmpty())
+    {
+        // May need to change target based on threat if we are NPC pet.
+        if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
+            if (pTarget != m_creature->GetVictim() && !pTarget->HasAuraPetShouldAvoidBreaking())
+                DoAttack(pTarget, true);
+    }
 
     if (m_creature->GetVictim() && m_creature->GetVictim()->IsAlive())
     {
@@ -518,11 +525,19 @@ std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget(bool allowAutoS
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
         return std::make_pair(nullptr, PSTR_FAIL_NO_OWNER);
-
-    // Owner is creature and is evading. We must not re-aggro.
+    
     if (Creature const* pOwnerCreature = owner->ToCreature())
+    {
+        // Owner is creature and is evading. We must not re-aggro.
         if (pOwnerCreature->IsInEvadeMode())
             return std::make_pair(nullptr, PSTR_FAIL_NOT_ENABLED);
+
+        // Check for valid targets on threat list if we are NPC pet.
+        if (!m_creature->GetThreatManager().isThreatListEmpty())
+            if (Unit* pTarget = m_creature->GetThreatManager().getHostileTarget())
+                if (!pTarget->HasAuraPetShouldAvoidBreaking())
+                    return std::make_pair(pTarget, PSTR_SUCCESS_THREAT_LIST);
+    }
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->GetAttackerForHelper())
