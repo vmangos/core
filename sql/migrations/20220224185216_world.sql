@@ -2437,8 +2437,6 @@ INSERT INTO `creature_addon` (`guid`, `sheath_state`) VALUES (53177, 0); -- Khae
 UPDATE `creature_template` SET `equipment_id` = 12799 WHERE `entry` = 12799;
 INSERT INTO `creature_equip_template` (`entry`, `equipentry1`) VALUES
 (12799, 10612);
-INSERT INTO `creature_addon` (`guid`, `patch`, `display_id`, `mount_display_id`, `equipment_id`, `stand_state`, `sheath_state`, `emote_state`, `auras`) VALUES
-(12799, 0, 0, 0, -1, 0, 0, 0, '');
 
 -- ----------------------------------------------------------------------
 
