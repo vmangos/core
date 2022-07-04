@@ -2495,6 +2495,25 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 
 -- ----------------------------------------------------------------------
 
+-- Add Doom'rel Gossips (credit cmangos).
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(1947, 2601, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(1947, 0, 0, 'Your bondage is at an end, Doom\'rel.  I challenge you!', 4892, 1, 1, -1, 0, 1947, 0, 0, NULL, 0, 1947);
+DELETE FROM `gossip_scripts` WHERE `id`=1947;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1947, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4894, 0, 0, 0, 0, 0, 0, 0, 0, 'Doom\'rel - Say Text'),
+(1947, 0, 0, 37, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doom\'rel - Set Data Tomb of the Seven to In Progress');
+UPDATE `creature_template` SET `gossip_menu_id`=1947 WHERE `entry`=9039;
+
+-- 1947: Stored Value In Index 3 From Instance Script Is Equal To 0
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1947, 34, 3, 0, 0, 0, 0);
+
+-- Remove no longer needed text from custom table.
+DELETE FROM `script_texts` WHERE `entry`=-1230003;
+
+-- ----------------------------------------------------------------------
+
 -- Update Quest Pamelas Doll
 UPDATE `quest_template` SET `NextQuestId` = 0 WHERE `entry` IN (5142, 5601);
 
@@ -3082,17 +3101,17 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 (838304, 8383, 3, 22, 0, 100, 1, 17, 0, 0, 0, 838304, 0, 0, 'Master Wood - Emote - Recieved Emote'),
 (838305, 8383, 3, 22, 0, 100, 1, 78, 0, 0, 0, 838305, 0, 0, 'Master Wood - Emote - Recieved Emote');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(838301, 0, 0, 39, 838301, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(838302, 0, 0, 39, 838302, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(838303, 0, 0, 39, 838303, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(838304, 0, 0, 39, 838304, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(838305, 0, 0, 39, 838305, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script');
+(838301, 0, 0, 39, 838301, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(838302, 0, 0, 39, 838302, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(838303, 0, 0, 39, 838303, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(838304, 0, 0, 39, 838304, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(838305, 0, 0, 39, 838305, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script');
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(838301, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
-(838302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
-(838303, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(838304, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(838305, 2, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote');
+(838301, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1402, 1403, 1404, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Talk'),
+(838302, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1401, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Talk'),
+(838303, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(838304, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(838305, 2, 0, 1, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote');
 
 -- Events list for Mountaineer Pebblebitty
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3836;
@@ -3130,26 +3149,26 @@ INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_ty
 
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (132801, 132802, 132803, 132804, 132805, 132806, 132807, 132808);
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(132801, 0, 0, 39, 132801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(132802, 0, 0, 39, 132802, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(132803, 0, 0, 39, 132803, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(132804, 0, 0, 39, 132804, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(132805, 0, 0, 39, 132805, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(132806, 0, 0, 39, 132806, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script'),
-(132807, 0, 0, 39, 132807, 132808, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Generic - Start Script');
+(132801, 0, 0, 39, 132801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(132802, 0, 0, 39, 132802, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(132803, 0, 0, 39, 132803, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(132804, 0, 0, 39, 132804, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(132805, 0, 0, 39, 132805, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(132806, 0, 0, 39, 132806, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script'),
+(132807, 0, 0, 39, 132807, 132808, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Start Script');
 
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(132801, 2, 0, 1, 11, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132802, 2, 0, 1, 94, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132803, 2, 0, 1, 17, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132804, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132805, 2, 0, 1, 24, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132806, 2, 0, 1, 14, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132806, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1521, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Talk'),
-(132807, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132807, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1529, 1530, 1531, 1532, 0, 0, 0, 0, 0, 'Generic - Talk'),
-(132808, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Emote'),
-(132808, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1533, 1534, 1535, 1536, 0, 0, 0, 0, 0, 'Generic - Talk');
+(132801, 2, 0, 1, 11, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132802, 2, 0, 1, 94, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132803, 2, 0, 1, 17, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132804, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132805, 2, 0, 1, 24, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132806, 2, 0, 1, 14, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132806, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1521, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Talk'),
+(132807, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132807, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1529, 1530, 1531, 1532, 0, 0, 0, 0, 0, 'Generic Emote Response - Talk'),
+(132808, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic Emote Response - Emote'),
+(132808, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1533, 1534, 1535, 1536, 0, 0, 0, 0, 0, 'Generic Emote Response - Talk');
 
 -- Events list for Jenn Langston
 DELETE FROM `creature_ai_events` WHERE `creature_id`=3626;
@@ -5036,7 +5055,16 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 UPDATE `quest_template` SET `OfferRewardText` = '<Lorax laughs.>' WHERE `entry` = 5126;
 
 UPDATE `gossip_menu_option` SET `condition_id` = 224 WHERE `menu_id` = 3049 AND `id` = 0;
-UPDATE `gossip_menu_option` SET `action_script_id` = 5126 WHERE `menu_id` = 3044 AND `id`=0;
+UPDATE `gossip_menu_option` SET `action_menu_id`=-1, `action_script_id` = 5126 WHERE `menu_id` = 3044 AND `id`=0;
+
+-- ----------------------------------------------------------------------
+
+-- Add gossip menu for Artorius the Amiable.
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES
+(5872, 7045, 0, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_broadcast_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `box_broadcast_text`, `condition_id`) VALUES
+(5872, 0, 0, 'I know you as Artorius the Doombringer. Show yourself, demon! Face me!', 9751, 1, 1, -1, 0, 5871, 0, 0, NULL, 0, 5871);
+UPDATE `creature_template` SET `gossip_menu_id`=5872 WHERE `entry`=14531;
 
 -- ----------------------------------------------------------------------
 
@@ -5054,8 +5082,8 @@ UPDATE `gameobject` SET `spawntimesecsmin` = 0, `spawntimesecsmax` = 0 WHERE `gu
 UPDATE `gameobject_template` SET `script_name` = '' WHERE `entry`= 177964;
 DELETE FROM `gameobject_scripts` WHERE `id`=32686;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(32686, 0, 0, 10, 12876, 180000, 1, 50, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 502, 'Fathom Core - Summon Creature'),
-(32686, 0, 1, 37, 12, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Fathom Core - Set Data');
+(32686, 0, 0, 10, 12876, 180000, 1, 50, 0, 0, 0, 0, 8, 0, 0, 1, -780.439, -79.3731, -44.0216, 0.680678, 502, 'Fathom Core - Summon Creature Baron Aquanis'),
+(32686, 0, 1, 37, 12, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 'Fathom Core - Set Data Aquanis to In Progress');
 
 -- 502: Stored Value In Index 12 From Instance Script Is Equal To 0
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (502, 34, 12, 0, 0, 0, 0);
@@ -5230,6 +5258,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 -- Add Start Script For A Plague Upon Thee
 UPDATE `quest_template` SET `StartScript` = 6389 WHERE `entry` IN (6389, 6390);
+
+-- Fix size of termites.
+UPDATE `creature_template` SET `display_scale1`=0 WHERE `entry`=12120;
 
 -- Generic script for Creature Plagueland Termite (Entry: 12120 Guid: 1976)
 DELETE FROM `generic_scripts` WHERE `id`=12120;
