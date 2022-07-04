@@ -1488,7 +1488,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 
 -- Events list for Blackhand Thug
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
-(10762, 10762, 346, 6, 0, 100, 1, 0, 0, 0, 0, 1076201, 0, 0, 'Blackhand Thug - Modify Awbee Flags - Death');
+(1076201, 10762, 346, 6, 0, 100, 0, 0, 0, 0, 0, 1076201, 0, 0, 'Blackhand Thug - Modify Awbee Flags - Death');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (1076201, 0, 0, 4, 147, 3, 1, 0, 41790, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 347, 'Blackhand Thug - Modify Awbee Flags');
 
@@ -1923,7 +1923,7 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 -- Add Missing Dark Iron Patrol Group (credit cmangos)
 SET @CREATURE_0 := 6226;
 SET @CREATURE_1 := 6227;
-UPDATE `creature` SET `movement_type` = 0 WHERE (`guid` IN (@CREATURE_0, @CREATURE_1));
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE (`guid` IN (@CREATURE_0, @CREATURE_1));
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (6226, 1, -6832.78, -1364.04, 169.392, 100, 0, 0, 0),
 (6226, 2, -6838.95, -1373.04, 169.433, 100, 0, 0, 0),
@@ -2360,7 +2360,7 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=369501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (369501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1225, 0, 0, 0, 0, 0, 0, 0, 0, 'Grimclaw - Say Text'),
 (369501, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Grimclaw - Set Movement Type'),
-(369501, 2, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.12791, 0, 'Grimclaw - Orientation');
+(369501, 0, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.12791, 0, 'Grimclaw - Orientation');
 
 
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES
@@ -6047,6 +6047,7 @@ UPDATE creature SET wander_distance = 3, movement_type = 1 WHERE id IN (11915,11
 
 -- Daggerspine Marauder Should Not Have Loot
 UPDATE `creature_template` SET `loot_id` = 0, `gold_min` = 0, `gold_max` = 0 WHERE `entry` = 2775;
+DELETE FROM `creature_loot_template` WHERE `entry`=2775;
 
 -- ----------------------------------------------------------------------
 
