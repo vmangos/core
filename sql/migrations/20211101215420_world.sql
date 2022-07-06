@@ -39,6 +39,47 @@ UPDATE `creature` SET `position_x`=672.408, `position_y`=-286.799, `position_z`=
 -- Commander Randolph
 UPDATE `creature` SET `position_x`=-159.406, `position_y`=-458.363, `position_z`=40.4791 `orientation`=1.25664 WHERE `guid`=53088;
 
+-- Remove campfire from FW
+DELETE FROM `gameobject` WHERE `guid` = 90151;
+
+-- AV landmines should not be spawned past 1.8
+-- Stormpine Landmine, custom spawned atm
+UPDATE `gameobject` SET `patch_max` = 5 WHERE `id` = 179325;
+-- Frostwolf Landmine, custom spawned atm
+UPDATE `gameobject` SET `patch_max` = 5 WHERE `id` = 179324;
+-- Stormpike Mine Layer shouldn't be spawned past 1.8, custom spawned atm
+UPDATE `creature` SET `patch_max` = 5 WHERE `id` = 13356;
+-- Frostwolf Mine Layer shouldn't be spawned past 1.8, custom spawned atm
+UPDATE `creature` SET `patch_max`= 5 WHERE `id` = 13357;
+
+-- Stormpike Explosive Expert shouldn't be spawned past 1.10, custom spawned atm
+UPDATE `creature` SET `patch_max`= 7 WHERE `id` = 13598;
+-- Frostwolf Explosive Expert shouldn't be spawned past 1.10, custom spawned atm
+UPDATE `creature` SET `patch_max`= 7 WHERE `id` = 13597;
+
+-- Patch 1.8: There is now a portcullis at the end of each of the entrance tunnels inside Alterac Valley. They will rise two minutes into the battle. 
+UPDATE `gameobject` SET `patch_max` = 5 WHERE `id` = 180424;
+
+-- Nuke prelease AV NPCs (I haven't even seen those on original AV PTR)
+-- Stormpike Ranger
+DELETE FROM `creature` WHERE `id` IN (13520, 13521, 13522, 13523);
+-- Frostwolf Outrunner
+DELETE FROM `creature` WHERE `id` IN (13516, 13519, 13518, 13517);
+
+-- Alliance
+-- Set mountainer max patch
+UPDATE `creature` SET `patch_max`=8 WHERE `id` IN (12047,13325,13426,13335);
+UPDATE `creature` SET `patch_max`=0 where `guid` = 190243;
+-- Set sentinel max patch
+UPDATE `creature` SET `patch_max`=8 WHERE `id` IN (12048,13327,13336,13427);
+
+-- Horde
+-- Set warrior max patch
+UPDATE `creature` SET `patch_max`=8 WHERE `id` IN (12052,13330,13337,13428);
+
+-- Trolls shouldn't be spawned after patch 1.10
+UPDATE `creature` SET `patch_max`=8 WHERE `id` IN (10983,12157, 11679, 13956, 10983, 12156, 13958);
+
 
 -- End of migration.
 END IF;
