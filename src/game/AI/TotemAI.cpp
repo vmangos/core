@@ -32,7 +32,7 @@
 int TotemAI::Permissible(Creature const* creature)
 {
     if (creature->IsTotem())
-        return PERMIT_BASE_PROACTIVE;
+        return PERMIT_BASE_SPECIAL;
 
     return PERMIT_BASE_NO;
 }

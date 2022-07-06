@@ -35,9 +35,9 @@ using namespace Spells;
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
     uint8 bagIndex, slot;
-    uint8 spell_count;                                      // number of spells at item, not used
+    uint8 spellSlot; // the position of the spell id on the item template
 
-    recvPacket >> bagIndex >> slot >> spell_count;
+    recvPacket >> bagIndex >> slot >> spellSlot;
 
     // TODO: add targets.read() check
     Player* pUser = _player;
@@ -57,10 +57,19 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, spell_count: %u , Item: %u, data length = %i", bagIndex, slot, spell_count, pItem->GetEntry(), (uint32)recvPacket.size());
+    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, spellSlot: %u , Item: %u, data length = %i", bagIndex, slot, spellSlot, pItem->GetEntry(), (uint32)recvPacket.size());
 
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
+    {
+        recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
+        return;
+    }
+
+    if (spellSlot >= MAX_ITEM_PROTO_SPELLS ||
+        proto->Spells[spellSlot].SpellId == 0 ||
+        proto->Spells[spellSlot].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
@@ -141,18 +150,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         // free gray item after use fail
         pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
 
-        // search spell for spell error
-        uint32 spellid = 0;
-        for (const auto& itr : proto->Spells)
-        {
-            if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
-            {
-                spellid = itr.SpellId;
-                break;
-            }
-        }
-
         // send spell error
+        uint32 spellid = proto->Spells[spellSlot].SpellId;
         if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid))
             Spell::SendCastResult(_player, spellInfo, itemCastCheckResult);
         return;
@@ -381,7 +380,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     // Nostalrius : Ivina
     spell->SetClientStarted(true);
     spell->prepare(std::move(targets));
-    ALL_SESSION_SCRIPTS(this, OnSpellCasted(spellId));
 }
 
 void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)

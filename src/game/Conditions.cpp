@@ -218,17 +218,17 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                     return true;
             return false;
         }
-        case CONDITION_WAR_EFFORT_STAGE:
+        case CONDITION_SAVED_VARIABLE:
         {
-            uint32 stage = sObjectMgr.GetSavedVariable(VAR_WE_STAGE, 0);
-            switch (m_value2)
+            auto const stage = static_cast<int64>(sObjectMgr.GetSavedVariable(m_value1, 0));
+            switch (m_value3)
             {
                 case 0:
-                    return stage == m_value1;
+                    return stage == m_value2;
                 case 1:
-                    return stage >= m_value1;
+                    return stage >= m_value2;
                 case 2:
-                    return stage <= m_value1;
+                    return stage <= m_value2;
             }
             return false;
         }
@@ -243,15 +243,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_LEVEL:
         {
-            Unit const* pTarget = target->ToUnit();
+            auto const level = static_cast<int64>(target->ToUnit()->GetLevel());
             switch (m_value2)
             {
                 case 0:
-                    return pTarget->GetLevel() == m_value1;
+                    return level == m_value1;
                 case 1:
-                    return pTarget->GetLevel() >= m_value1;
+                    return level >= m_value1;
                 case 2:
-                    return pTarget->GetLevel() <= m_value1;
+                    return level <= m_value1;
             }
             return false;
         }
@@ -370,7 +370,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_LAST_WAYPOINT:
         {
-            uint32 const lastReachedWp = ((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint();
+            auto const lastReachedWp = static_cast<int64>(((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint());
             switch (m_value2)
             {
                 case 0:
@@ -394,14 +394,16 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             if (InstanceData const* data = pMap->GetInstanceData())
             {
+                auto const value = static_cast<int64>(const_cast<InstanceData*>(data)->GetData(m_value1));
+
                 switch (m_value3)
                 {
                     case 0:
-                        return const_cast<InstanceData*>(data)->GetData(m_value1) == m_value2;
+                        return value == m_value2;
                     case 1:
-                        return const_cast<InstanceData*>(data)->GetData(m_value1) >= m_value2;
+                        return value >= m_value2;
                     case 2:
-                        return const_cast<InstanceData*>(data)->GetData(m_value1) <= m_value2;
+                        return value <= m_value2;
                 }
             }
 
@@ -413,14 +415,16 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
+                auto const value = static_cast<int64>(pEvent->GetData(m_value2));
+
                 switch (m_value4)
                 {
                     case 0:
-                        return pEvent->GetData(m_value2) == m_value3;
+                        return value == m_value3;
                     case 1:
-                        return pEvent->GetData(m_value2) >= m_value3;
+                        return value >= m_value3;
                     case 2:
-                        return pEvent->GetData(m_value2) <= m_value3;
+                        return value <= m_value3;
                 }
             }
             return false;
@@ -436,7 +440,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_DISTANCE_TO_TARGET:
         {
-            uint32 distance = source->GetDistance(target);
+            auto const distance = static_cast<int64>(source->GetDistance(target));
 
             switch (m_value2)
             {
@@ -459,7 +463,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_HEALTH_PERCENT:
         {
-            uint32 hp_percent = target->ToUnit()->GetHealthPercent();
+            auto const hp_percent = static_cast<int64>(target->ToUnit()->GetHealthPercent());
             
             switch (m_value2)
             {
@@ -474,7 +478,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_MANA_PERCENT:
         {
-            uint32 mana_percent = target->ToUnit()->GetPowerPercent(POWER_MANA);
+            auto const mana_percent = static_cast<int64>(target->ToUnit()->GetPowerPercent(POWER_MANA));
 
             switch (m_value2)
             {
@@ -679,7 +683,7 @@ bool ConditionEntry::IsValid()
     {
         case CONDITION_NOT:
         {
-            if (m_value1 >= m_entry)
+            if (m_value1 >= static_cast<int64>(m_entry))
             {
                 sLog.outErrorDb("CONDITION_NOT (entry %u, type %d) has invalid value1 %u, must be lower than entry, skipped", m_entry, m_condition, m_value1);
                 return false;
@@ -695,12 +699,12 @@ bool ConditionEntry::IsValid()
         case CONDITION_OR:
         case CONDITION_AND:
         {
-            if (m_value1 >= m_entry)
+            if (m_value1 >= static_cast<int64>(m_entry))
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value1 %u, must be lower than entry, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-            if (m_value2 >= m_entry)
+            if (m_value2 >= static_cast<int64>(m_entry))
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value2 %u, must be lower than entry, skipped", m_entry, m_condition, m_value2);
                 return false;
@@ -719,7 +723,7 @@ bool ConditionEntry::IsValid()
             }
             if (m_value3)
             {
-                if (m_value3 >= m_entry)
+                if (m_value3 >= static_cast<int64>(m_entry))
                 {
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value3 %u, must be lower than entry, skipped", m_entry, m_condition, m_value3);
                     return false;
@@ -733,7 +737,7 @@ bool ConditionEntry::IsValid()
             }
             if (m_value4)
             {
-                if (m_value4 >= m_entry)
+                if (m_value4 >= static_cast<int64>(m_entry))
                 {
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value4 %u, must be lower than entry, skipped", m_entry, m_condition, m_value4);
                     return false;
@@ -928,7 +932,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_LEVEL:
         {
-            if (!m_value1 || m_value1 > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+            if (!m_value1 || m_value1 > static_cast<int64>(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)))
             {
                 sLog.outErrorDb("Level condition (entry %u, type %u)has invalid level %u, skipped", m_entry, m_condition, m_value1);
                 return false;
@@ -1059,16 +1063,16 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
-        case CONDITION_WAR_EFFORT_STAGE:
+        case CONDITION_SAVED_VARIABLE:
         {
-            if (m_value1 < 0 || m_value1 > WAR_EFFORT_STAGE_COMPLETE)
+            if (m_value1 == VAR_WE_STAGE && (m_value2 < 0 || m_value2 > WAR_EFFORT_STAGE_COMPLETE))
             {
-                sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid stage %u", m_entry, m_condition, m_value1);
+                sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid stage %u", m_entry, m_condition, m_value2);
                 return false;
             }
-            if (m_value2 < 0 || m_value2 > 2)
+            if (m_value3 < 0 || m_value3 > 2)
             {
-                sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid equality %u", m_entry, m_condition, m_value2);
+                sLog.outErrorDb("Saved variable condition (entry %u, type %u) has invalid equality %u", m_entry, m_condition, m_value3);
                 return false;
             }
             break;

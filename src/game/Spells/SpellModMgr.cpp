@@ -178,7 +178,6 @@ void SpellModMgr::LoadSpellMods()
             ModUInt32ValueIfExplicit(fields[35], spell->Mechanic);
             ModInt32ValueIfExplicit(fields[36], spell->EquippedItemClass);
 
-            spell->InitCachedValues();
             ++total_count;
         }
         while (result->NextRow());

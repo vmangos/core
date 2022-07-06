@@ -124,7 +124,7 @@ struct instance_blackrock_depths : ScriptedInstance
     void EnableCreature(Creature* pCreature)
     {
         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
@@ -260,8 +260,20 @@ struct instance_blackrock_depths : ScriptedInstance
             case 9938:
                 m_uiGoMagnusGUID = pCreature->GetGUID();
                 break;
+			// Arena Crowd
             case NPC_ARENA_SPECTATOR:
+            case NPC_SHADOWFORGE_PEASANT:
+            case NPC_SHADOWFORGE_CITIZEN:
+            case NPC_SHADOWFORGE_SENATOR:
+            case NPC_ANVILRAGE_SOLDIER:
+            case NPC_ANVILRAGE_MEDIC:
+            case NPC_ANVILRAGE_OFFICER:
+                if (pCreature->GetPositionZ() < aArenaCrowdVolume.m_fCenterZ || pCreature->GetPositionZ() > aArenaCrowdVolume.m_fCenterZ + aArenaCrowdVolume.m_uiHeight ||
+                    !pCreature->IsWithinDist2d(aArenaCrowdVolume.m_fCenterX, aArenaCrowdVolume.m_fCenterY, aArenaCrowdVolume.m_uiRadius))
+                    break;
                 m_lArenaSpectatorMobGUIDList.push_back(pCreature->GetGUID());
+                if (m_auiEncounter[TYPE_RING_OF_LAW] == DONE)
+                    pCreature->SetFactionTemporary(FACTION_ARENA_NEUTRAL, TEMPFACTION_RESTORE_RESPAWN);
                 break;
             /*case NPC_PANZOR: m_uiPanzorGUID = pCreature->GetGUID();
                 switch (urand (0,1))
@@ -728,7 +740,7 @@ struct instance_blackrock_depths : ScriptedInstance
                         if (Creature* pCreature = instance->GetCreature(guid))
                         {
                             if (pCreature->IsAlive())
-                                pCreature->SetFactionTemplateId(674);
+                                pCreature->SetFactionTemporary(FACTION_ARENA_NEUTRAL, TEMPFACTION_RESTORE_RESPAWN);
                         }
                     }
                 }

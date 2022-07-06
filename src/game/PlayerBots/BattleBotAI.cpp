@@ -331,6 +331,9 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
         if (!me->IsWithinDist(pTarget, aggroDistance))
             continue;
 
+        if (me->GetDistanceZ(pTarget) > 10.0f)
+            continue;
+
         if (me->IsWithinLOSInMap(pTarget))
             return pTarget;
     }
@@ -350,11 +353,14 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
                     continue;
 
                 if (Unit* pAttacker = pMember->GetAttackerForHelper())
-                    if (IsValidHostileTarget(pAttacker) &&
+                {
+                    if (pAttacker != pExcept &&
+                        IsValidHostileTarget(pAttacker) &&
                         me->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) &&
-                        me->IsWithinLOSInMap(pAttacker) && 
-                        pAttacker != pExcept)
+                        me->GetDistanceZ(pAttacker) < 10.0f &&
+                        me->IsWithinLOSInMap(pAttacker))
                         return pAttacker;
+                }
             }
         }
     }
@@ -512,7 +518,7 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 void BattleBotAI::OnPlayerLogin()
 {
     if (!m_initialized)
-        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
 }
 
 void BattleBotAI::UpdateWaypointMovement()
@@ -688,7 +694,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         PopulateSpellData();
         AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         SummonPetIfNeeded();
         me->SetHealthPercent(100.0f);
         me->SetPowerPercent(me->GetPowerType(), 100.0f);
@@ -725,22 +731,30 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!me->InBattleGroundQueue())
         {
+            bool canQueue;
             char args[] = "";
             switch (m_battlegroundId)
             {
                 case BATTLEGROUND_QUEUE_AV:
-                    ChatHandler(me).HandleGoAlteracCommand(args);
+                    canQueue = ChatHandler(me).HandleGoAlteracCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_WS:
-                    ChatHandler(me).HandleGoWarsongCommand(args);
+                    canQueue = ChatHandler(me).HandleGoWarsongCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_AB:
-                    ChatHandler(me).HandleGoArathiCommand(args);
+                    canQueue = ChatHandler(me).HandleGoArathiCommand(args);
                     break;
                 default:
                     sLog.outError("BattleBot: Invalid BG queue type!");
                     botEntry->requestRemoval = true;
                     return;
+            }
+
+            if (!canQueue)
+            {
+                sLog.outError("BattleBot: Attempt to queue for BG failed! Bot is too low level or BG is not available in this patch.");
+                botEntry->requestRemoval = true;
+                return;
             }
 
             SendFakePacket(CMSG_BATTLEMASTER_JOIN);
@@ -1910,7 +1924,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pPsychicScream &&
-            pVictim->CanReachWithMeleeAutoAttack(me) &&
+            GetAttackersInRangeCount(10.0f) &&
             CanTryToCastSpell(me, m_spells.priest.pPsychicScream))
         {
             if (DoCastSpell(me, m_spells.priest.pPsychicScream) == SPELL_CAST_OK)
@@ -1926,7 +1940,7 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pMindFlay &&
-           !pVictim->CanReachWithMeleeAutoAttack(me) &&
+           (!GetAttackersInRangeCount(10.0f) || me->HasAuraType(SPELL_AURA_SCHOOL_ABSORB)) &&
             CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
         {
             if (DoCastSpell(pVictim, m_spells.priest.pMindFlay) == SPELL_CAST_OK)

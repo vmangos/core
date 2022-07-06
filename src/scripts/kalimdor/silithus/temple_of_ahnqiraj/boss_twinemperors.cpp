@@ -247,7 +247,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!who || m_creature->GetVictim() || m_creature->IsInCombat())
             return;
 
-        if (who->IsTargetable(true, false) && who->IsInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+        if (who->IsTargetableBy(m_creature) && who->IsInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
         {
             float attackRadius = m_creature->GetAttackDistance(who);
             if (attackRadius < PULL_RANGE)

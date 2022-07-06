@@ -21,6 +21,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Anticheat.h"
+#include "MoveSpline.h"
 
 // Spline packets are for units controlled by the server. "Force speed change" (wrongly named opcodes) and "move set speed" packets are for units controlled by a player.
 OpcodesList const moveTypeToOpcode[MAX_MOVE_TYPE][3] =
@@ -123,23 +124,44 @@ void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType m
         return;
     }
 
-    WorldPacket data;
-    data.Initialize(moveTypeToOpcode[mtype][2], 8 + 30 + 4);
+    if (unit->movespline->Finalized())
+    {
+        WorldPacket data;
+        data.Initialize(moveTypeToOpcode[mtype][2], 8 + 30 + 4);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << unit->GetPackGUID();
+        data << unit->GetPackGUID();
 #else
-    data << unit->GetGUID();
+        data << unit->GetGUID();
 #endif
-    data << unit->m_movementInfo;
-    data << float(newSpeed);
-    unit->SendMovementMessageToSet(std::move(data), true, mover);
+        data << unit->m_movementInfo;
+        data << float(newSpeed);
+        unit->SendMovementMessageToSet(std::move(data), true, mover);
+    }
+    else
+    {
+        WorldPacket data;
+        data.Initialize(moveTypeToOpcode[mtype][0], 8 + 4);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        data << unit->GetPackGUID();
+#else
+        data << unit->GetGUID();
+        data << unit->m_movementInfo;
+#endif
+        data << float(newSpeed);
+        unit->SendMovementMessageToSet(std::move(data), true, mover);
+    }
 }
 
 void MovementPacketSender::SendSpeedChangeToAll(Unit* unit, UnitMoveType mtype, float newRate)
 {
     WorldPacket data;
     data.Initialize(moveTypeToOpcode[mtype][0], 8 + 4);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << unit->GetPackGUID();
+#else
+    data << unit->GetGUID();
+    data << unit->m_movementInfo;
+#endif
     data << float(newRate * baseMoveSpeed[mtype]);
     unit->SendMovementMessageToSet(std::move(data), true);
 }
@@ -179,7 +201,7 @@ void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y
     mover->GetSession()->SendPacket(&data);
 }
 
-void MovementPacketSender::SendTeleportToObservers(Unit* unit)
+void MovementPacketSender::SendTeleportToObservers(Unit* unit, float x, float y, float z, float ang)
 {
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
@@ -194,8 +216,14 @@ void MovementPacketSender::SendTeleportToObservers(Unit* unit)
 #else
     data << unit->GetGUID();
 #endif
-    data << unit->m_movementInfo;
-    unit->SendMovementMessageToSet(std::move(data), true, mover);
+
+    // copy moveinfo to change position to where player is teleporting
+    MovementInfo moveInfo = unit->m_movementInfo;
+    moveInfo.ChangePosition(x, y, z, ang);
+    data << moveInfo;
+
+    // not using SendMovementMessageToSet because we want the packet sent now
+    unit->SendObjectMessageToSet(&data, true, mover);
 }
 
 void MovementPacketSender::SendKnockBackToController(Unit* unit, float vcos, float vsin, float speedXY, float speedZ)

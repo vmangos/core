@@ -84,7 +84,7 @@ namespace VMAP
             //! pass mesh data to object and create BIH. Passed vectors get get swapped with old geometry!
             void setMeshData(std::vector<Vector3>& vert, std::vector<MeshTriangle>& tri);
             void setLiquidData(WmoLiquid*& liquid) { iLiquid = liquid; liquid = nullptr; }
-            uint32 IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const;
+            uint32 IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, bool ignoreM2Model = false) const;
             bool IsInsideObject(Vector3 const& pos, Vector3 const& up, float& z_dist) const;
             bool IsUnderObject(Vector3 const& pos, Vector3 const& up, bool isM2, float* outDist = nullptr, float* inDist = nullptr) const; // Use client triangles orientation. You can see bot->top through the floor.
             bool GetLiquidLevel(Vector3 const& pos, float& liqHeight) const;
@@ -112,21 +112,24 @@ namespace VMAP
     class WorldModel
     {
         public:
-            WorldModel(): RootWMOID(0) {}
+            WorldModel(): RootWMOID(0), modelFlags(0) {}
 
             //! pass group models to WorldModel and create BIH. Passed vector is swapped with old geometry!
             void setGroupModels(std::vector<GroupModel>& models);
             void setRootWmoID(uint32 id) { RootWMOID = id; }
-            bool IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const;
+            bool IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, bool ignoreM2Model) const;
             bool IntersectPoint(G3D::Vector3 const& p, G3D::Vector3 const& down, float& dist, AreaInfo& info) const;
             bool IsUnderObject(G3D::Vector3 const& p, G3D::Vector3 const& up, bool m2, float* outDist = nullptr, float* inDist = nullptr) const;
             bool GetLocationInfo(G3D::Vector3 const& p, G3D::Vector3 const& down, float& dist, LocationInfo& info) const;
             bool writeFile(std::string const& filename);
             bool readFile(std::string const& filename);
+            void setModelFlags(uint32 newFlags) { modelFlags = newFlags; }
+            uint32 getModelFlags() const { return modelFlags; }
         protected:
             uint32 RootWMOID;
             std::vector<GroupModel> groupModels;
             BIH groupTree;
+            uint32 modelFlags;
 
 #ifdef MMAP_GENERATOR
         public:

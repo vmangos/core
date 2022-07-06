@@ -950,7 +950,7 @@ struct SwarmguardNeedlerAI : public ScriptedAI
     {
         m_uiUpdateTarget_Timer = 2000;
         m_uiTuubidGuid = 0;
-        m_uiCleave_Timer = urand(6000, 12000);;
+        m_uiCleave_Timer = urand(6000, 12000);
         m_bisTuubidAlive = true;
     }
 

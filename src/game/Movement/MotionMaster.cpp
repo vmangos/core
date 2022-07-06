@@ -755,6 +755,19 @@ void MotionMaster::GetUsedMovementGeneratorsList(std::vector<MovementGeneratorTy
         list.push_back((*it)->GetMovementGeneratorType());
 }
 
+bool MotionMaster::IsUsingIdleOrDefaultMovement() const
+{
+    MovementGeneratorType currentType = GetCurrentMovementGeneratorType();
+
+    if (currentType == IDLE_MOTION_TYPE)
+        return true;
+
+    if ((currentType < MAX_DB_MOTION_TYPE || currentType == PATROL_MOTION_TYPE) && size() <= 1)
+        return true;
+
+    return false;
+}
+
 void MotionMaster::GetWaypointPathInformation(std::ostringstream& oss) const
 {
     for (Impl::container_type::const_reverse_iterator rItr = Impl::c.rbegin(); rItr != Impl::c.rend(); ++rItr)

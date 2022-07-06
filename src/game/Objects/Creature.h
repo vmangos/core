@@ -100,10 +100,15 @@ class Creature : public Unit
         void OnEnterCombat(Unit* pAttacker, bool notInCombat = false) override;
         void OnLeaveCombat() override;
         void RemoveAurasAtReset();
-        // En cas de modification "manuelle" des stats.
-        void ResetStats();
 
-        void SelectLevel(CreatureInfo const* cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
+        // Awful things used in awful scripts. TODO: remove
+        void ResetStats();
+        void GetDefaultDamageRange(float& dmgMin, float& dmgMax) const;
+        int32 GetDefaultArmor() const;
+
+        CreatureClassLevelStats const* GetClassLevelStats() const;
+        void SelectLevel(float percentHealth = 100.0f, float percentMana = 100.0f);
+        void InitStatsForLevel(float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
@@ -160,13 +165,7 @@ class Creature : public Unit
         void SetReactState(ReactStates st) { m_reactState = st; }
         ReactStates GetReactState() const { return m_reactState; }
         bool HasReactState(ReactStates state) const { return (m_reactState == state); }
-        void InitializeReactState()
-        {
-            if (IsTotem() || IsTrigger() || GetCreatureType() == CREATURE_TYPE_CRITTER)
-                SetReactState(REACT_PASSIVE);
-            else
-                SetReactState(REACT_AGGRESSIVE);
-        }
+        void InitializeReactState();
 
         bool IsTrainerOf(Player* player, bool msg) const;
         bool CanInteractWithBattleMaster(Player* player, bool msg) const;
@@ -255,7 +254,6 @@ class Creature : public Unit
         CreatureData const* GetCreatureData() const;
 
         static uint32 ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, CreatureDataAddon const* addon = nullptr, GameEventCreatureData const* eventData = nullptr, float* scale = nullptr);
-        static float GetScaleForDisplayId(uint32 displayId);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;
@@ -303,8 +301,10 @@ class Creature : public Unit
         void DoFlee();
         void DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
+        float GetBaseWalkSpeedRate() const;
+        float GetBaseRunSpeedRate() const;
         void MoveAwayFromTarget(Unit* pTarget, float distance);
-        void CallForHelp(float fRadius);
+        void CallForHelp(float radius);
         void CallAssistance();
         void SetNoCallAssistance(bool val)
         { 
@@ -321,8 +321,11 @@ class Creature : public Unit
                 ClearCreatureState(CSTATE_ALREADY_SEARCH_ASSIST);
         }
         bool HasSearchedAssistance() const { return HasCreatureState(CSTATE_ALREADY_SEARCH_ASSIST); }
-        bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
-        bool CanInitiateAttack();
+        bool CanBeTargetedByCallForHelp(Unit const* pFriend, Unit const* pEnemy, bool checkfaction = true) const;
+        bool CanRespondToCallForHelpAgainst(Unit const* pEnemy) const;
+        bool CanFleeFromCallForHelpAgainst(Unit const* pEnemy) const;
+        bool CanAssistTo(Unit const* pFriend, Unit const* pEnemy, bool checkfaction = true) const;
+        bool CanInitiateAttack() const;
         bool CanHaveTarget() const { return !HasExtraFlag(CREATURE_FLAG_EXTRA_NO_TARGET); }
 
         uint32 GetDefaultMount() { return m_mountId; }
@@ -348,6 +351,7 @@ class Creature : public Unit
         void Respawn();
         void SaveRespawnTime() override;
         void ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data);
+        void CastSpawnSpell();
 
         uint32 GetRespawnDelay() const { return m_respawnDelay; }
         void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
@@ -364,6 +368,7 @@ class Creature : public Unit
         void SendZoneUnderAttackMessage(Player* attacker);
 
         void SetInCombatWithZone(bool initialPulse = true);
+        void EnterCombatWithTarget(Unit* pTarget);
         bool canStartAttack(Unit const* who, bool force) const;
         bool _IsTargetAcceptable(Unit const* target) const;
         bool canCreatureAttack(Unit const* pVictim, bool force) const;
@@ -557,7 +562,7 @@ class Creature : public Unit
                 ClearCreatureState(CSTATE_ESCORTABLE); 
         }
         bool IsEscortable() const { return HasCreatureState(CSTATE_ESCORTABLE); }
-        bool CanAssistPlayers() { return HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
+        bool CanAssistPlayers() { return HasFactionTemplateFlag(FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS) || HasExtraFlag(CREATURE_FLAG_EXTRA_CAN_ASSIST); }
         bool CanSummonGuards() { return HasExtraFlag(CREATURE_FLAG_EXTRA_SUMMON_GUARD); }
         uint32 GetOriginalEntry() const { return m_originalEntry; }
 
@@ -566,6 +571,7 @@ class Creature : public Unit
 
         bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, uint32 firstCreatureId, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
         bool InitEntry(uint32 entry, CreatureData const* data = nullptr, CreatureDataAddon const* addon = nullptr, GameEventCreatureData const* eventData = nullptr);
+        void SetInitCreaturePowerType();
 
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 m_groupLootId;                               // used to find group which is looting corpse

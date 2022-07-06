@@ -42,17 +42,9 @@ enum ItemSpelltriggerType
     ITEM_SPELLTRIGGER_ON_USE          = 0,                  // use after equip cooldown
     ITEM_SPELLTRIGGER_ON_EQUIP        = 1,
     ITEM_SPELLTRIGGER_CHANCE_ON_HIT   = 2,
-    ITEM_SPELLTRIGGER_SOULSTONE       = 4,
-    /*
-     * ItemSpelltriggerType 5 might have changed on 2.4.3/3.0.3: Such auras
-     * will be applied on item pickup and removed on item loss - maybe on the
-     * other hand the item is destroyed if the aura is removed ("removed on
-     * death" of spell 57348 makes me think so)
-     */
-    ITEM_SPELLTRIGGER_ON_NO_DELAY_USE = 5,                  // no equip cooldown
 };
 
-#define MAX_ITEM_SPELLTRIGGER           6
+#define MAX_ITEM_SPELLTRIGGER           3
 
 enum ItemBondingType
 {
@@ -404,7 +396,8 @@ enum ItemExtraFlags
     ITEM_EXTRA_MAIL_STATIONERY     = 0x01,      // Used as icon or background for mails
     ITEM_EXTRA_IGNORE_QUEST_STATUS = 0x02,      // No quest status will be checked when this item drops
     ITEM_EXTRA_NOT_OBTAINABLE      = 0x04,      // Never obtainable by players in vanilla
-    ITEM_EXTRA_ALL                 = 0x07       // All used flags, used to check DB data (mask all above flags)
+    ITEM_EXTRA_CAST_AS_TRIGGERED   = 0x08,      // Spell assigned on item is cast as triggered (no cast time)
+    ITEM_EXTRA_ALL                 = 0x0F       // All used flags, used to check DB data (mask all above flags)
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -502,6 +495,7 @@ struct ItemPrototype
     uint32 FoodType;
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
+    uint32 WrappedGift;
     uint32 ExtraFlags;                                      // see ItemExtraFlags
     uint32 OtherTeamEntry;
 
@@ -536,6 +530,7 @@ struct ItemPrototype
     bool IsWeapon() const { return Class == ITEM_CLASS_WEAPON; }
     bool IsRangedWeapon() const { return IsWeapon() && (InventoryType == INVTYPE_RANGED || InventoryType == INVTYPE_THROWN || InventoryType == INVTYPE_RANGEDRIGHT); }
     bool HasSignature() const { return GetMaxStackSize() == 1 && Class != ITEM_CLASS_CONSUMABLE && Class != ITEM_CLASS_QUEST && (Flags & ITEM_FLAG_NO_CREATOR) == 0 && ItemId != 6948; /*Hearthstone*/ }
+    bool HasExtraFlag(uint32 flag) const { return ExtraFlags & flag; }
 
     uint32 GetProficiencySkill() const;
     uint32 GetProficiencySpell() const;

@@ -107,7 +107,6 @@ public:
 
     void OnUnreachable(Unit* attacker) {}
     void OnExplore(AreaEntry const* pArea) {}
-    void OnTransport(Player* plMover, ObjectGuid transportGuid) {}
     void OnWrongAckData() {};
     void OnFailedToAckChange() {};
 
@@ -118,6 +117,7 @@ public:
     */
     bool HandlePositionTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
     bool HandleFlagTests(Player* /*pPlayer*/, MovementInfo& /*movementInfo*/, uint16 /*opcode*/) { return true; }
+    bool HandleSplineDone(Player* /*pPlayer*/, MovementInfo const& /*movementInfo*/, uint32 /*splineId*/) { return true; }
     void LogMovementPacket(bool /*isClientPacket*/, WorldPacket& /*packet*/) {}
 };
 #endif

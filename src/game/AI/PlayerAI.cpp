@@ -202,7 +202,7 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
     if ((victim->IsCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid()) || me->IsFeared() || me->IsPolymorphed())
     {
         me->AttackStop();
-        me->CastStop();
+        me->InterruptNonMeleeSpells(false);
         return;
     }
 

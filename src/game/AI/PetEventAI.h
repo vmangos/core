@@ -47,7 +47,7 @@ public:
 
     static int Permissible(Creature const*);
 private:
-    bool FindTargetForAttack();
+    Unit* FindTargetForAttack() const;
 };
 
 #endif

@@ -401,21 +401,7 @@ GameObjectAI* GetAIgo_fire_of_akumai(GameObject *pGo)
 {
     return new go_fire_of_akumaiAI(pGo);
 }
-static float const afAquanisPos[4] = { -782.21f, -63.26f, -42.43f, 2.36f };
-bool GOUse_go_fathom_stone(Player* pPlayer, GameObject* pGo)
-{
-    instance_blackfathom_deeps* pInstance = (instance_blackfathom_deeps*)pGo->GetInstanceData();
-    if (!pInstance)
-        return true;
 
-    if (pInstance->GetData(TYPE_AQUANIS) == NOT_STARTED)
-    {
-        pPlayer->SummonCreature(NPC_BARON_AQUANIS, afAquanisPos[0], afAquanisPos[1], afAquanisPos[2], afAquanisPos[3], TEMPSUMMON_DEAD_DESPAWN, 0);
-        pInstance->SetData(TYPE_AQUANIS, IN_PROGRESS);
-    }
-
-    return false;
-}
 void AddSC_instance_blackfathom_deeps()
 {
     Script* newscript;
@@ -428,10 +414,5 @@ void AddSC_instance_blackfathom_deeps()
     newscript = new Script;
     newscript->Name = "go_fire_of_akumai";
     newscript->GOGetAI = &GetAIgo_fire_of_akumai;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_fathom_stone";
-    newscript->pGOHello = &GOUse_go_fathom_stone;
     newscript->RegisterSelf();
 }

@@ -126,6 +126,7 @@ struct SoundEntriesEntry
 };
 
 typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
+typedef std::unordered_map<uint32, std::vector<CreatureClassLevelStats>> CreatureCLSMap;
 
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -492,6 +493,7 @@ enum PermVariables
     VAR_TOURNAMENT  = 30021,    // last quest completion time
     VAR_TOURN_GOES  = 30022,    // tournament was started already
     VAR_TOURN_OVER  = 30023,    // tournament is over
+    VAR_TOURN_WINNER = 30056,   // for gosssip menu condition
 
     // War Effort shared contributions
     VAR_WE_ALLIANCE_COPPER          = 30024,
@@ -627,6 +629,8 @@ class ObjectMgr
         }
 
         static ItemPrototype const* GetItemPrototype(uint32 id) { return sItemStorage.LookupEntry<ItemPrototype>(id); }
+
+        CreatureClassLevelStats const* GetCreatureClassLevelStats(uint32 unitClass, uint32 level) const;
 
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;
 
@@ -814,6 +818,7 @@ class ObjectMgr
         void LoadCreatureAddons();
         void LoadCreatureDisplayInfoAddon();
         void LoadCreatureSpells();
+        void LoadCreatureClassLevelStats();
         void LoadEquipmentTemplates();
         void LoadGameObjectLocales();
         void LoadGameobjects(bool reload = false);
@@ -1486,6 +1491,7 @@ class ObjectMgr
         CreatureDataMap m_CreatureDataMap;
         CreatureLocaleMap m_CreatureLocaleMap;
         CreatureSpellsMap m_CreatureSpellsMap;
+        CreatureCLSMap m_CreatureCLSMap;
         GameObjectDataMap m_GameObjectDataMap;
         GameObjectLocaleMap m_GameObjectLocaleMap;
         ItemLocaleMap m_ItemLocaleMap;

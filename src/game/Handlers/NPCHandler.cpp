@@ -93,7 +93,7 @@ void WorldSession::SendShowBank(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_BANK, 8);
     data << ObjectGuid(guid);
-    m_currentBankerGUID = guid;
+    GetPlayer()->m_currentBankerGuid = guid;
     SendPacket(&data);
 }
 

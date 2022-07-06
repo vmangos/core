@@ -347,7 +347,7 @@ bool go_panther_cage(Player* pPlayer, GameObject* pGo)
     {
         if (Creature* panther = pGo->FindNearestCreature(ENRAGED_PANTHER, 5.0f, true))
         {
-            panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
             panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
             panther->AI()->AttackStart(pPlayer);
         }
@@ -388,7 +388,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
 {
     explicit npc_grenka_bloodscreechAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetVisibility(VISIBILITY_OFF);
 
         m_uiWave = 0;
@@ -449,7 +449,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
             case 2:
                 {
                     DoSummon(3);
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
                     m_creature->SetVisibility(VISIBILITY_ON);
                     if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_PlayerGuid))
                     {

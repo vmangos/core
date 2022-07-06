@@ -582,7 +582,7 @@ void HonorMaintenancer::CheckMaintenanceDay()
     {
         // Restart 15 minutes after honor weekend by server time
         if (sWorld.getConfig(CONFIG_BOOL_AUTO_HONOR_RESTART))
-            sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, SHUTDOWN_EXIT_CODE);
+            sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
         else
             sLog.outString("HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
 
@@ -858,15 +858,15 @@ void HonorMgr::Update()
         SetHighestRank(m_rank);
 
     // HIGHEST RANK
-    m_owner->SetByteValue(PLAYER_FIELD_BYTES, 3, m_highestRank.rank);
+    m_owner->SetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_HIGHEST_HONOR_RANK, m_highestRank.rank);
     // RANK (Patent)
-    m_owner->SetByteValue(PLAYER_BYTES_3, 3, m_rank.rank);
+    m_owner->SetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_HONOR_RANK, m_rank.rank);
 
     uint32 honorBar = uint32(m_rankPoints >= 0.0f ? m_rankPoints : -1 * m_rankPoints);
     honorBar = uint8(((honorBar - m_rank.minRP) / (m_rank.maxRP - m_rank.minRP)) * (m_rank.positive ? 255 : -255));
 
     // PLAYER_FIELD_HONOR_BAR
-    m_owner->SetByteValue(PLAYER_FIELD_BYTES2, 0, honorBar);
+    m_owner->SetByteValue(PLAYER_FIELD_BYTES2, PLAYER_FIELD_BYTES_2_OFFSET_HONOR_RANK_BAR, honorBar);
 
     // TODAY
     m_owner->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, todayHK);

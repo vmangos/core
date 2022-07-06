@@ -398,7 +398,7 @@ bool LootItem::AllowedForPlayer(Player const* player, WorldObject const* lootTar
         if (pProto->StartQuest)
         {
             Quest const* pQuest = sObjectMgr.GetQuestTemplate(pProto->StartQuest);
-            if (pQuest && !pQuest->IsRepeatable() && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE && !player->HasQuestForItem(itemid) && !(pProto->ExtraFlags & ITEM_EXTRA_IGNORE_QUEST_STATUS))
+            if (pQuest && !pQuest->IsRepeatable() && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE && !player->HasQuestForItem(itemid) && !pProto->HasExtraFlag(ITEM_EXTRA_IGNORE_QUEST_STATUS))
                 return false;
         }
     }

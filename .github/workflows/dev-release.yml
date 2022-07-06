@@ -1,0 +1,111 @@
+name: Windows Development Release
+
+on:
+  push:
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/ISSUE_TEMPLATE.md'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - 'sql/**'
+      - '.drone.yml'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+   
+jobs:
+  build:
+    runs-on: windows-2019
+    
+    steps:
+    #git checkout
+    - uses: actions/checkout@v2
+
+    - name: windows dependencies
+      #Sets versions for ACE/TBB
+      env:
+        ACE_VERSION: 6.5.11
+        ACE_VERSION2: 6_5_11
+        TBB_VERSION: 2020.3
+      
+      run: |
+        #directory variables
+        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        export TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb
+        #wget
+        choco install -y wget --version 1.20
+        #ACE package download
+        wget http://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-$ACE_VERSION2/ACE-$ACE_VERSION.zip
+        unzip ACE-$ACE_VERSION.zip
+        rm ACE-$ACE_VERSION.zip
+        #configuration of ACE header
+        echo "#include \"ace/config-win32.h\"" >> $ACE_ROOT/ace/config.h
+        #TBB package download
+        wget https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/tbb-$TBB_VERSION-win.zip
+        unzip tbb-$TBB_VERSION-win.zip
+        rm tbb-$TBB_VERSION-win.zip
+        #openssl
+        choco install -y openssl --version=1.1.1.500
+      #git bash shell
+      shell: bash
+
+    #build and install
+    - name: windows build & install
+      run: |
+        #directory variables
+        export ACE_ROOT=$GITHUB_WORKSPACE/ACE_wrappers
+        cd $GITHUB_WORKSPACE/ACE_wrappers
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "ACE_wrappers_vs2019.sln" //p:Configuration=Release //p:Platform=x64 //t:ACE //m:2
+        cd $GITHUB_WORKSPACE
+        mkdir build
+        cd build
+        cmake -D TBB_ROOT_DIR=$GITHUB_WORKSPACE/tbb -DWITH_WARNINGS=0 -DUSE_EXTRACTORS=1 -G "Visual Studio 16 2019" -A x64 ..
+        /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
+      #git bash shell
+      shell: bash
+    - name: Create Upload File Name
+      run: |
+          echo "ARCHIVE_FILENAME=${{ github.event.repository.name }}-$(git rev-parse --short HEAD).zip" >> $env:GITHUB_ENV
+    - name: Archive files
+      run: |
+          #data is in Release folder
+          cd ${{github.workspace}}/bin
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb.dll ${{github.workspace}}/bin/Release/tbb.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_debug.dll ${{github.workspace}}/bin/Release/tbb_debug.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview.dll ${{github.workspace}}/bin/Release/tbb_preview.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbb_preview_debug.dll ${{github.workspace}}/bin/Release/tbb_preview_debug.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc.dll ${{github.workspace}}/bin/Release/tbbmalloc.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_debug.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy.dll
+          copy ${{github.workspace}}/tbb/bin/intel64/vc14/tbbmalloc_proxy_debug.dll ${{github.workspace}}/bin/Release/tbbmalloc_proxy_debug.dll
+
+          copy ${{github.workspace}}/ACE_wrappers/lib/ACE.dll ${{github.workspace}}/bin/Release/ACE.dll
+          copy c:/mysql/lib/libmysql.dll ${{github.workspace}}/bin/Release/libmysql.dll
+          copy "c:/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" ${{github.workspace}}/bin/Release/libssl-1_1-x64.dll
+          copy "c:/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" ${{github.workspace}}/bin/Release/libcrypto-1_1-x64.dll
+
+          7z a -tzip ${{env.ARCHIVE_FILENAME}} Release
+    - name: Archive this artefact
+      uses: actions/upload-artifact@v2
+      with:
+          name: snapshot-devbuild
+          path: "${{github.workspace}}/bin/${{env.ARCHIVE_FILENAME}}"
+
+    - name: Download artifact snapshot-Release
+      uses: actions/download-artifact@v1
+      with:
+        name: snapshot-devbuild
+        path: all_snapshots
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: Upload snapshot
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build(${{ steps.date.outputs.date }})"
+        files: all_snapshots

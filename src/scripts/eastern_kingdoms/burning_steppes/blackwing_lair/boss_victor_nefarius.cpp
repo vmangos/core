@@ -26,21 +26,21 @@ EndScriptData */
 
 enum
 {
-    SAY_GAMESBEGIN_1                = -1469004,
-    SAY_GAMESBEGIN_2                = -1469005,
+    SAY_GAMESBEGIN_1                = 9907,
+    SAY_GAMESBEGIN_2                = 9845,
 
-    SAY_SCEPTER_RUN_START           = -1469031,
-    SAY_SCEPTER_TAUNT_0             = -1469038,
-    SAY_SCEPTER_TAUNT_1             = -1469040,
-    SAY_SCEPTER_TAUNT_2             = -1469041,
-    SAY_SCEPTER_TAUNT_3             = -1469042,
-    SAY_SCEPTER_TAUNT_4             = -1469043,
+    SAY_SCEPTER_RUN_START           = 11267,
+    SAY_SCEPTER_TAUNT_0             = 11214,
+    SAY_SCEPTER_TAUNT_1             = 11215,
+    SAY_SCEPTER_TAUNT_2             = 11216,
+    SAY_SCEPTER_TAUNT_3             = 11217,
+    SAY_SCEPTER_TAUNT_4             = 11218,
     MAX_SCEPTER_TAUNTS              = 6,
 
-    SAY_SCEPTER_RUN_LAUGHTER        = -1469039,
+    SAY_SCEPTER_RUN_LAUGHTER        = 11230,
 
-    SAY_SCEPTER_FAIL_LAUGHTER       = -1469044,
-    SAY_SCEPTER_FAIL                = -1469045,
+    SAY_SCEPTER_FAIL_LAUGHTER       = 11231,
+    SAY_SCEPTER_FAIL                = 11219,
 
     GOSSIP_TEXT_NEFARIUS_1          = 7134,
     GOSSIP_TEXT_NEFARIUS_2          = 7198,
@@ -66,7 +66,7 @@ enum
     SPELL_VISUAL_EFFECT             = 24180,
     SPELL_HOVER                     = 17131,
 
-    FACTION_BLACK_DRAGON            = 103,
+    FACTION_MONSTER                 = 14,
     FACTION_FRIENDLY                = 35,
 
     GO_DRAKONID_BONES               = 179804,
@@ -336,7 +336,8 @@ struct boss_victor_nefariusAI : ScriptedAI
                         break;
                     case 3:
                         DoCastSpellIfCan(m_creature, SPELL_NEFARIUS_BARRIER);
-                        m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                        m_creature->SetFactionTemplateId(FACTION_MONSTER);
 
                         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
                         for (const auto& i : liste)

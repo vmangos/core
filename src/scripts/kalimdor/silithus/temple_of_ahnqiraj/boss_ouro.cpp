@@ -205,7 +205,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                 DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CF_TRIGGERED);
             }
 
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
             ClearTargetIcon();
 
             m_bSubmerged      = true;
@@ -379,7 +379,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             if (m_uiSubmergeTimer < uiDiff)
             {
                 m_creature->SetVisibility(VISIBILITY_ON);
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
 
                 // Teleport to the trigger in order to get a new location
                 if (Creature* pTrigger = m_creature->GetMap()->GetCreature(m_ouroTriggerGuid))
@@ -502,7 +502,7 @@ struct npc_dirt_moundAI : public ScriptedAI
 
     void JustRespawned() override
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SPAWNING);
         ScriptedAI::JustRespawned();
     }
 

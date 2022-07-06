@@ -67,9 +67,9 @@ struct LazyPeonAI : public ScriptedAI
     uint8      state;
     ObjectGuid playerGuid;
 
-    void DoAction(uint32 const state) override
+    void OnScriptEventHappened(uint32 uiEvent, uint32 /*uiData*/, WorldObject* /*pInvoker*/) override
     {
-        this->state = state;
+        this->state = uiEvent;
     }
 
     void Reset() override {}

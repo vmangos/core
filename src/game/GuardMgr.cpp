@@ -401,7 +401,24 @@ uint32 GuardMgr::GetTextId(uint32 factionTemplateId, uint32 areaId, uint32 displ
     return TEXT_NONE;
 }
 
-bool GuardMgr::SummonGuard(Creature* pCivilian, Player* pEnemy)
+Team GuardMgr::GetTeam(Creature* pCivilian, Unit* pEnemy)
+{
+    if (Player* pPlayer = pEnemy->GetCharmerOrOwnerPlayerOrPlayerItself())
+    {
+        // Civilian must be opposite team of player.
+        switch (pPlayer->GetTeam())
+        {
+            case HORDE:
+                return ALLIANCE;
+            case ALLIANCE:
+                return HORDE;
+        }
+    }
+
+    return pCivilian->GetTeam();
+}
+
+bool GuardMgr::SummonGuard(Creature* pCivilian, Unit* pEnemy)
 {
     if (!pCivilian || !pEnemy)
         return false;
@@ -427,7 +444,7 @@ bool GuardMgr::SummonGuard(Creature* pCivilian, Player* pEnemy)
     if (uint32 textId = GetTextId(pCivilian->GetFactionTemplateId(), areaId, pCivilian->GetDisplayId()))
         DoScriptText(textId, pCivilian, pEnemy, CHAT_TYPE_SAY);
 
-    if (uint32 creatureId = pEnemy->GetTeamId() == TEAM_ALLIANCE ? guardInfo.creatureIdHorde : guardInfo.creatureIdAlliance)
+    if (uint32 creatureId = guardInfo.GetCreatureIdForTeam(GetTeam(pCivilian, pEnemy)))
     {
         float x, y, z;
         pCivilian->GetNearPoint(pCivilian, x, y, z, 0, 5, 0);

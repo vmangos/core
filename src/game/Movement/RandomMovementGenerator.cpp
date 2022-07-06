@@ -65,7 +65,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     {
         // Creature has made all its steps, time for a little break
         i_nextMoveTime.Reset(urand(4, 10) * IN_MILLISECONDS); // Retails seems to use rounded numbers so we do as well
-        i_wanderSteps = urand(0, 8);
+        i_wanderSteps = urand(0, ((i_wanderDistance <= 1.0f) ? 2 : 8));
     }
 }
 
@@ -75,7 +75,7 @@ void RandomMovementGenerator::Initialize(Creature &creature)
         return;
 
     creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    i_nextMoveTime.Reset(50);
+    i_nextMoveTime.Reset(1000);
 }
 
 void RandomMovementGenerator::Reset(Creature &creature)

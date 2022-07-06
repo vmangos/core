@@ -19,45 +19,35 @@
 #ifndef VMAPEXPORT_H
 #define VMAPEXPORT_H
 
+#define __STDC_LIMIT_MACROS
+
+#include <cstdint>
 #include <string>
 #include <set>
-#include <vector>
+#include <unordered_map>
+#include "loadlib/loadlib.h"
 
-typedef unsigned int uint32;
 typedef std::set<std::string> StringSet;
 
 enum ModelFlags
 {
     MOD_M2 = 1,
     MOD_WORLDSPAWN = 1 << 1,
-    MOD_HAS_BOUND = 1 << 2,
-    MOD_NO_BREAK_LOS = 1 << 3,
+    MOD_HAS_BOUND = 1 << 2
 };
 
-class ModelLOSMgr
-{
-    public:
-        class LosModificator
-        {
-            public:
-            bool operator<(LosModificator const& b) const { return id < b.id; }
-            bool enable;
-            uint32 id;
-            std::string filename;
-        };
-        static std::vector<LosModificator> modificators;
-        static bool IsLOSEnabled(uint32 spawnId, std::string model);
-        static bool Load();
-};
+struct WMODoodadData;
 
 extern const char* szWorkDirWmo;
 extern const char* szRawVMAPMagic;                          // vmap magic string for extracted raw vmap data
+extern std::unordered_map<std::string, WMODoodadData> WmoDoodads;
+
+uint32 GenerateUniqueObjectId(uint32 clientId, uint16 clientDoodadId);
 
 bool FileExists(const char* file);
 void strToLower(char* str);
 
-bool ExtractSingleWmoWithAllConfig(std::string& fname);     //iterates thru all config variants and extract ALL - even unused doodadset configurations 
-bool ExtractSingleWmo(std::string& fname, int DoodadConfig);//Extracts WMO with specified doodadset
+bool ExtractSingleWmo(std::string& fname);
 
 /* @param origPath = original path of the model, cleaned with fixnamen and fixname2
  * @param fixedName = will store the translated name (if changed)

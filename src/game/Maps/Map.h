@@ -376,7 +376,6 @@ class Map : public GridRefManager<NGridType>
         // Used at extrapolation.
         void DoPlayerGridRelocation(Player*, float x, float y, float z, float angl);
         void CreatureRelocation(Creature* creature, float x, float y, float z, float orientation);
-        void GameObjectRelocation(GameObject* go, float x, float y, float z, float orientation, bool respawnRelocationOnFail = true);
 
         template<class T, class CONTAINER> void Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
 
@@ -446,12 +445,15 @@ class Map : public GridRefManager<NGridType>
         uint32 GetPlayersCountExceptGMs() const;
         bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
 
-        // Send a Packet to all players on a map
+        // Send a Packet to all players in the map
         void SendToPlayers(WorldPacket const* data, Team team = TEAM_NONE) const;
-        // Send a Packet to all players in a zone. Return false if no player found
-        bool SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const;
         void SendDefenseMessage(int32 textId, uint32 zoneId) const;
+        void SendMonsterTextToMap(int32 textId, Language language, ChatMsg chatMsg, uint32 creatureId, WorldObject const* pSource = nullptr, Unit const* pTarget = nullptr);
 
+        // Send a Packet to all players in a zone
+        bool SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const; // return false if no player found
+        void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0) const;
+        
         typedef MapRefManager PlayerList;
         PlayerList const& GetPlayers() const { return m_mapRefManager; }
 
@@ -541,14 +543,10 @@ class Map : public GridRefManager<NGridType>
         InstanceData* GetInstanceData() { return i_data; }
         InstanceData const* GetInstanceData() const { return i_data; }
         uint32 GetScriptId() const { return i_script_id; }
-
-        void MonsterYellToMap(ObjectGuid guid, int32 textId, Language language, Unit const* target) const;
-        void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, Language language, Unit const* target, uint32 senderLowGuid = 0) const;
-        void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0) const;
-
+        
         // GameObjectCollision
         float GetHeight(float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos = true) const;
+        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, bool checkDynLos = true, bool ignoreM2Model = true) const;
         // First collision with object
         bool GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, float modifyDist) const;
         // Use navemesh to walk
@@ -563,7 +561,7 @@ class Map : public GridRefManager<NGridType>
         bool ContainsGameObjectModel(const GameObjectModel& model) const;
         bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const;
         float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const;
-        bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2) const;
+        bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2, bool ignoreM2Model) const;
         bool IsUnloading() const { return m_unloading; }
         void MarkAsCrashed() { m_crashed = true; }
         bool IsCrashed() const { return m_crashed; }
@@ -850,6 +848,7 @@ class Map : public GridRefManager<NGridType>
         bool ScriptCommand_SendScriptEvent(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetPvP(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_ResetDoorOrButton(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetCommandState(ScriptInfo const& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         ScriptCommandFunction const m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -942,6 +941,7 @@ class Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_SendScriptEvent,        // 85
             &Map::ScriptCommand_SetPvP,                 // 86
             &Map::ScriptCommand_ResetDoorOrButton,      // 87
+            &Map::ScriptCommand_SetCommandState,        // 88
         };
 
     public:

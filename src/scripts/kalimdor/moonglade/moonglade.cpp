@@ -312,7 +312,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 pSummoned->AddAura(17131); // hover
                 pSummoned->SetFly(true);
                 pSummoned->MonsterMove(aEranikusLocations[0].m_fX, aEranikusLocations[0].m_fY, aEranikusLocations[0].m_fZ);
-                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                 pSummoned->SetRespawnDelay(DAY);
                 break;
             case NPC_NIGHTMARE_PHANTASM:
@@ -371,6 +371,9 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 pPlayer->FailQuest(QUEST_WAKING_LEGENDS);
             m_idQuestActive = 0;
         }
+
+        // Remulos is only targetable for friendly player spells during Eranikus event so reset on death
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -382,6 +385,8 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 case 0:
                     if (Player* pPlayer = GetPlayerForEscort())
                         DoScriptText(SAY_REMULOS_INTRO_1, m_creature, pPlayer);
+                    // Remulos is only targetable for friendly player spells during Eranikus event
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                     m_creature->SetSpeedRate(MOVE_WALK, 2.2f); //du cout faudrait ptetre aussi revoir la vitesse de course.
                     m_creature->SetWalk(true);
                     break;
@@ -470,6 +475,9 @@ struct npc_keeper_remulosAI : public npc_escortAI
     {
         if (Player* pPlayer = GetPlayerForEscort())
             pPlayer->GroupEventHappens(QUEST_NIGHTMARE_MANIFESTS, pTarget);
+
+        // Remulos is only targetable for friendly player spells during Eranikus event: remove flag on quest completion
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 
         m_uiOutroTimer = 3000;
     }
@@ -593,7 +601,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                         m_uiTransitionTimer = 0;
 
                         pEranikus->SetWalk(true);
-                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        pEranikus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
                         pEranikus->AI()->AttackStart(m_creature);
                     }
                 }
@@ -1078,7 +1086,7 @@ struct boss_eranikusAI : public ScriptedAI
             // redeem eranikus
             m_uiEventTimer = 5000;
             m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING | UNIT_FLAG_PACIFIED);
         }
         else
         {

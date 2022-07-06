@@ -51,7 +51,7 @@ bool GOHello_go_entree_de_service(Player* pPlayer, GameObject* pGo)
             continue;
 
         pCreature->AI()->ReceiveEmote(pPlayer, 1000);
-        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
     }
     pGo->UseDoorOrButton(5);
 
@@ -828,7 +828,7 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;;
+    ScriptedInstance* m_pInstance;
     uint32 m_uiScourgeTimer;
     bool ScourgeStarted;
 

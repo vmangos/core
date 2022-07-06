@@ -27,6 +27,7 @@
 #include "Policies/Singleton.h"
 #include "Map.h"
 #include "GridStates.h"
+#include <condition_variable>
 
 class BattleGround;
 

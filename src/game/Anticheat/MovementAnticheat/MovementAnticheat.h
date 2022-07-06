@@ -9,6 +9,7 @@
 #include <array>
 #include <sstream>
 #include <deque>
+#include <mutex>
 
 enum CheatType
 {
@@ -71,6 +72,7 @@ class MovementAnticheat
         // Public methods called from the movement handler upon received a packet.
         bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
         bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        bool HandleSplineDone(Player* pPlayer, MovementInfo const& movementInfo, uint32 splineId);
         void LogMovementPacket(bool isClientPacket, WorldPacket& packet);
 
         bool IsInKnockBack() const { return m_knockBack; }
@@ -78,7 +80,6 @@ class MovementAnticheat
         void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin);
         void OnUnreachable(Unit* attacker);
         void OnExplore(AreaEntry const* pArea);
-        void OnTransport(Player* pPlayer, ObjectGuid transportGuid);
         void OnWrongAckData();
         void OnFailedToAckChange();
 
@@ -89,6 +90,7 @@ private:
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
         bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
+        bool CheckFakeTransport(MovementInfo const& movementInfo);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
         uint32 CheckTimeDesync(MovementInfo const& movementInfo);
@@ -100,6 +102,7 @@ private:
         UnitMoveType GetMoveTypeForMovementInfo(MovementInfo const& movementInfo) const;
 
         bool m_knockBack = false;
+        uint32 m_lastSplineId = 0;
 
         // Multi jump
         uint32 m_jumpCount = 0;
@@ -121,6 +124,7 @@ private:
         std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTick = {};    // gets reset every anticheat update tick
         std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTotal = {};   // gets reset when total treshold is reached
         std::deque<LoggedPacket> m_packetLog;
+        std::mutex m_packetLogMutex;
 };
 
 #endif

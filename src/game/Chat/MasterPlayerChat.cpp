@@ -55,8 +55,6 @@ void MasterPlayer::Whisper(std::string const& text, uint32 language, MasterPlaye
         GetSession()->SendPacket(&data);
     }
 
-    ALL_SESSION_SCRIPTS(receiver->GetSession(), OnWhispered(GetObjectGuid()));
-
     if (receiver->IsDND())
     {
         data.clear();

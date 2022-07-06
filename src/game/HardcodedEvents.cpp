@@ -156,90 +156,6 @@ void ElementalInvasion::ResetThings()
 }
 
 /*
-* Leprithus (rare) & Rotten Ghouls spawn at night
-*/
-
-void Leprithus::Update()
-{
-    auto event = GetLeprithusState();
-
-    if (event == LEPRITHUS_EVENT_ONGOING)
-    {
-        if (!sGameEventMgr.IsActiveEvent(LEPRITHUS_EVENT_ONGOING))
-            sGameEventMgr.StartEvent(LEPRITHUS_EVENT_ONGOING, true);
-    }
-    else if (sGameEventMgr.IsActiveEvent(LEPRITHUS_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(LEPRITHUS_EVENT_ONGOING, true);
-}
-
-void Leprithus::Enable()
-{
-    
-}
-
-void Leprithus::Disable()
-{
-    if (sGameEventMgr.IsActiveEvent(LEPRITHUS_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(LEPRITHUS_EVENT_ONGOING, true);
-}
-
-LeprithusEventState Leprithus::GetLeprithusState()
-{
-    time_t rawtime;
-    time(&rawtime);
-
-    struct tm* timeinfo;
-    timeinfo = localtime(&rawtime);
-
-    if (timeinfo->tm_hour >= 22 || timeinfo->tm_hour <= 9)
-        return LEPRITHUS_EVENT_ONGOING;
-
-    return LEPRITHUS_EVENT_NONE;    
-}
-
-/*
-* Moonbrook graveyard vultures(Fleshrippers) spawn at daylight
-*/
-
-void Moonbrook::Update()
-{
-    auto event = GetMoonbrookState();
-
-    if (event == MOONBROOK_EVENT_ONGOING)
-    {
-        if (!sGameEventMgr.IsActiveEvent(MOONBROOK_EVENT_ONGOING))
-            sGameEventMgr.StartEvent(MOONBROOK_EVENT_ONGOING, true);
-    }
-    else if (sGameEventMgr.IsActiveEvent(MOONBROOK_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(MOONBROOK_EVENT_ONGOING, true);
-}
-
-void Moonbrook::Enable()
-{
-    
-}
-
-void Moonbrook::Disable()
-{
-    if (sGameEventMgr.IsActiveEvent(MOONBROOK_EVENT_ONGOING))
-        sGameEventMgr.StopEvent(MOONBROOK_EVENT_ONGOING, true);
-}
-
-MoonbrookEventState Moonbrook::GetMoonbrookState()
-{
-    time_t rawtime;
-    time(&rawtime);
-
-    struct tm* timeinfo;
-    timeinfo = localtime(&rawtime);
-
-    if (timeinfo->tm_hour < 21 && timeinfo->tm_hour > 9)
-        return MOONBROOK_EVENT_ONGOING;
-
-    return MOONBROOK_EVENT_NONE;    
-}
-
-/*
 * Dragons of Nightmare
 */
 
@@ -986,7 +902,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId,
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_SI_ATTACK_COUNT));
 
         if (pMouth)
-            pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
+            pMouth->AI()->OnScriptEventHappened(EVENT_MOUTH_OF_KELTHUZAD_ZONE_STOP);
         else
             sLog.outError("ScourgeInvasionEvent::HandleActiveZone ObjectGuid %d not found.", zone->mouthGuid);
     }
@@ -1197,7 +1113,7 @@ bool ScourgeInvasionEvent::SummonMouth(Map* pMap, InvasionZone* zone, Position p
 
     if (Creature* pMouth = pMap->SummonCreature(NPC_MOUTH_OF_KELTHUZAD, position.x, position.y, position.z, position.o, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
-        pMouth->AI()->DoAction(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
+        pMouth->AI()->OnScriptEventHappened(EVENT_MOUTH_OF_KELTHUZAD_ZONE_START);
         zone->mouthGuid = pMouth->GetObjectGuid();
     }
     else
@@ -1760,13 +1676,11 @@ void WarEffortEvent::UpdateHiveColossusEvents()
 void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
 {
     auto invasion = new ElementalInvasion();
-    auto leprithus = new Leprithus();
-    auto moonbrook = new Moonbrook();
     auto nightmare = new DragonsOfNightmare();
     auto darkmoon = new DarkmoonFaire();
     auto fireworks = new FireworksShow();
     auto goblets = new ToastingGoblets();
     auto scourge_invasion = new ScourgeInvasionEvent();
     auto war_effort = new WarEffortEvent();
-    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
+    eventList = { invasion, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
 }

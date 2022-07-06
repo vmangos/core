@@ -151,7 +151,7 @@ public:
 private:
     struct worker {
         worker(ThreadPool *pool, int id, ErrorHandling mode);
-        ~worker();
+        virtual ~worker();
 
         void loop_wrapper();
         void loop();

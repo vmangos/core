@@ -2324,8 +2324,9 @@ bool CombatBotBaseAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const*
                     if (!friendly_dispel && !positive && holder->GetSpellProto()->IsCharmSpell())
                         if (CharmInfo *charm = pTarget->GetCharmInfo())
                             if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                                if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*me->getFactionTemplateEntry()))
-                                    bFoundOneDispell = true;
+                                if (FactionTemplateEntry const* ft2 = me->GetFactionTemplateEntry())
+                                    if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*ft2))
+                                        bFoundOneDispell = true;
                     if (positive == friendly_dispel)
                         continue;
                 }
@@ -2622,7 +2623,7 @@ void CombatBotBaseAI::EquipRandomGearInEmptySlots()
             continue;
 
         // Skip unobtainable items
-        if (pProto->ExtraFlags & ITEM_EXTRA_NOT_OBTAINABLE)
+        if (pProto->HasExtraFlag(ITEM_EXTRA_NOT_OBTAINABLE))
             continue;
 
         // Only gear and weapons

@@ -1045,11 +1045,24 @@ bool Item::IsTargetValidForItemUse(Unit* pUnitTarget)
     return false;
 }
 
-void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges)
+void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, ObjectGuid casterGuid /*= ObjectGuid()*/)
 {
     // Better lost small time at check in comparison lost time at item save to DB.
     if ((GetEnchantmentId(slot) == id) && (GetEnchantmentDuration(slot) == duration) && (GetEnchantmentCharges(slot) == charges))
         return;
+
+    
+    if (slot < MAX_INSPECTED_ENCHANTMENT_SLOT && !casterGuid.IsEmpty())
+    {
+        if (Player* owner = GetOwner())
+        {
+            if (uint32 oldEnchant = GetEnchantmentId(slot))
+                owner->SendEnchantmentLog(ObjectGuid(), GetEntry(), oldEnchant);
+
+            if (id)
+                owner->SendEnchantmentLog(casterGuid, GetEntry(), id);
+        }
+    }
 
     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET, id);
     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET, duration);
@@ -1075,10 +1088,16 @@ void Item::SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges)
     SetState(ITEM_CHANGED);
 }
 
-void Item::ClearEnchantment(EnchantmentSlot slot)
+void Item::ClearEnchantment(EnchantmentSlot slot, bool sendToClient)
 {
     if (!GetEnchantmentId(slot))
         return;
+
+    if (slot < MAX_INSPECTED_ENCHANTMENT_SLOT && sendToClient)
+    {
+        if (Player* owner = GetOwner())
+            owner->SendEnchantmentLog(ObjectGuid(), GetEntry(), GetEnchantmentId(slot));
+    }
 
     for (uint8 x = 0; x < 3; ++x)
         SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot * MAX_ENCHANTMENT_OFFSET + x, 0);
