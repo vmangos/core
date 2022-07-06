@@ -15320,7 +15320,17 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
                     SetAcceptWhispers(true);
                 break;
         }
-        SetCheatGod(true);
+
+        switch (sWorld.getConfig(CONFIG_UINT32_GM_CHEAT_GOD))
+        {
+        case 0:
+            SetCheatGod(false);
+            break;
+        default:
+        case 1:
+            SetCheatGod(true);
+            break;
+        }
     }
 
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
