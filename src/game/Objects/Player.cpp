@@ -15321,16 +15321,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
                 break;
         }
 
-        switch (sWorld.getConfig(CONFIG_UINT32_GM_CHEAT_GOD))
-        {
-        case 0:
-            SetCheatGod(false);
-            break;
-        default:
-        case 1:
-            SetCheatGod(true);
-            break;
-        }
+        SetCheatGod(sWorld.getConfig(CONFIG_BOOL_GM_CHEAT_GOD));
     }
 
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
