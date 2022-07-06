@@ -9,6 +9,12 @@ INSERT INTO `migrations` VALUES ('20220705212140');
 -- Add your query below.
 
 
+-- Correct position of Raven Hill Spirit Healer
+UPDATE `creature` SET  `position_x` = -10599.2, `position_y` = 294.208, `position_z` = 31.7003, `orientation` = 3.14159 WHERE `guid` = 12783;
+-- Correct position of Crown Guard Tower Spirit Healer
+UPDATE `creature` SET  `position_x` = 1978.22, `position_y` = -3666.04, `position_z` = 119.364, `orientation` = 1.36136 WHERE `guid` = 9386;
+-- Correct position of Scarab Wall Spirit Healer
+UPDATE `creature` SET  `position_x` = -7988.49, `position_y` = 1557.96, `position_z` = 4.73619, `orientation` = 3.10669 WHERE `guid` = 7716;
 -- Correct position of Booty Bay Spirit Healer
 UPDATE `creature` SET  `position_x` = -14280.6, `position_y` = 300.899, `position_z` = 31.2034, `orientation` = 4.50295 WHERE `guid` = 40519;
 -- Correct position of Flame Crest Spirit Healer
@@ -89,17 +95,17 @@ UPDATE `creature` SET  `position_x` = 7418.56, `position_y` = -2816.22, `positio
 UPDATE `creature` SET  `position_x` = -6298.81, `position_y` = -3497.08, `position_z` = 250.634, `orientation` = 0.418879 WHERE `guid` = 40593;
 -- Correct position of Kharanos Spirit Healer
 UPDATE `creature` SET  `position_x` = -5686.38, `position_y` = -514.7, `position_z` = 396.358, `orientation` = 5.71036 WHERE `guid` = 87045;
--- Correct position of Raven Hill Spirit Healer
-UPDATE `creature` SET  `position_x` = -10599.2, `position_y` = 294.208, `position_z` = 31.7003, `orientation` = 3.14159 WHERE `guid` = 12783;
--- Correct position of Crown Guard Tower Spirit Healer
-UPDATE `creature` SET  `position_x` = 1978.22, `position_y` = -3666.04, `position_z` = 119.364, `orientation` = 1.36136 WHERE `guid` = 9386;
--- Correct position of Scarab Wall Spirit Healer
-UPDATE `creature` SET  `position_x` = -7988.49, `position_y` = 1557.96, `position_z` = 4.73619, `orientation` = 3.10669 WHERE `guid` = 7716;
+-- Correct position of Dolanaar Spirit Healer
+UPDATE `creature` SET  `position_x` = 9683.94, `position_y` = 953.23, `position_z` = 1291.72, `orientation` = 5.67232 WHERE `guid` = 87048;
+-- Correct position of Darnassus Spirit Healer
+UPDATE `creature` SET  `position_x` = 10046.3, `position_y` = 2123.84, `position_z` = 1329.64, `orientation` = 5.60251 WHERE `guid` = 87049;
+-- TODO Deadwind Pass Spirit Healer 17649
 -- TODO Deathknell Spirit Healer 40547
 -- TODO Red Cloud Mesa Spirit Healer 40565
 -- TODO Coldridge Valley Spirit Healer 87046
 -- TODO Northshire Valley Spirit Healer 87047
--- TODO Deadwindpass Spirit Healer 17649
+-- TODO Ironforge Spirit Healer 87044
+-- TODO Shadowglen Spirit Healer 87050
 
 
 -- End of migration.
