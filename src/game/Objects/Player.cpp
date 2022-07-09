@@ -6423,28 +6423,35 @@ void Player::CheckAreaExploreAndOutdoor()
                 SetRestType(REST_TYPE_NO);
             }
         }
-        // On reapplique les sorts retires lorsque l'on entre une zone interieure
+        // Check if we need to reaply outdoor only passive spells
         if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK))
         {
-            // Celerite feline - Druide
-            if (GetShapeshiftForm() == FORM_CAT)
+            const PlayerSpellMap& spells = GetSpellMap();
+            for (const auto& itr : spells)
             {
-                PlayerSpellMap const& sp_list = GetSpellMap();
-                for (const auto& itr : sp_list)
+                if (itr.second.state == PLAYERSPELL_REMOVED)
+                    continue;
+                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
+                if (!spellInfo || !spellInfo->IsNeedCastSpellAtOutdoor() || HasAura(itr.first))
+                    continue;
+                if ((spellInfo->Stances || spellInfo->StancesNot) && !spellInfo->IsNeedCastSpellAtFormApply(GetShapeshiftForm()))
+                    continue;
+                CastSpell(this, spellInfo, true);
+            }
+            for (auto itemSet : m_ItemSetEff)
+            {
+                if (itemSet)
                 {
-                    if (itr.second.state == PLAYERSPELL_REMOVED)
-                        continue;
-                    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
-                    if (!spellInfo || !spellInfo->IsNeedCastSpellAtFormApply(GetShapeshiftForm()) ||
-                            !(spellInfo->Attributes & SPELL_ATTR_OUTDOORS_ONLY) ||
-                            HasAura(spellInfo->Id))
-                        continue;
-                    CastSpell(this, itr.first, true);
+                    for (auto spellInfo : itemSet->spells)
+                    {
+                        if (!spellInfo || !spellInfo->IsNeedCastSpellAtOutdoor() || HasAura(spellInfo->Id))
+                            continue;
+                        if ((spellInfo->Stances || spellInfo->StancesNot) && !spellInfo->IsNeedCastSpellAtFormApply(GetShapeshiftForm()))
+                            continue;
+                        CastSpell(this, spellInfo, true);
+                    }
                 }
             }
-            // Rapidite bestiale - Chasseur
-            if (HasSpell(19596) && !HasAura(19596))
-                CastSpell(this, 19596, true);
         }
     }
     else if (sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) && !IsGameMaster())

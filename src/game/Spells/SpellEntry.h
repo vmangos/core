@@ -984,6 +984,11 @@ class SpellEntry
                 !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
         }
 
+        inline bool IsNeedCastSpellAtOutdoor() const
+        {
+            return (HasAttribute(SPELL_ATTR_OUTDOORS_ONLY) && HasAttribute(SPELL_ATTR_PASSIVE));
+        }
+
         // Spell effects require a specific power type on the target
         bool IsTargetPowerTypeValid(Powers powerType) const
         {
