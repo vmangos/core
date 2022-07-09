@@ -2206,6 +2206,11 @@ Movement.PendingAckResponseTime = 2000
 #        Required security rank to assign ticket in escalation queue.
 #        Default: 7
 #
+#    GM.CheatGod
+#        Character will not die from damage.
+#                 0 (disable)
+#        Default: 1 (enable)
+#
 ###################################################################################################################
 
 GM.LoginState            = 2
@@ -2224,6 +2229,7 @@ GM.AllowPublicChannels   = 0
 GMTickets.Enable         = 1
 GMTickets.MinLevel       = 0
 GMTickets.Admin.Security = 7
+GM.CheatGod              = 1
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES
