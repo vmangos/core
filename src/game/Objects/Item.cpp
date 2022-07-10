@@ -47,33 +47,10 @@ void AddItemsSetItem(Player* player, Item* item)
         return;
 #endif
 
-    ItemSetEffect* eff = nullptr;
-
-    for (const auto& x : player->m_ItemSetEff)
-    {
-        if (x && x->setid == setid)
-        {
-            eff = x;
-            break;
-        }
-    }
+    ItemSetEffect* eff = player->GetItemSetEffect(setid);
 
     if (!eff)
-    {
-        eff = new ItemSetEffect;
-        memset(eff, 0, sizeof(ItemSetEffect));
-        eff->setid = setid;
-
-        size_t x = 0;
-        for (; x < player->m_ItemSetEff.size(); x++)
-            if (!player->m_ItemSetEff[x])
-                break;
-
-        if (x < player->m_ItemSetEff.size())
-            player->m_ItemSetEff[x] = eff;
-        else
-            player->m_ItemSetEff.push_back(eff);
-    }
+        eff = player->AddItemSetEffect(setid);
 
     ++eff->item_count;
 
@@ -126,16 +103,7 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
         return;
     }
 
-    ItemSetEffect* eff = nullptr;
-    size_t setindex = 0;
-    for (; setindex < player->m_ItemSetEff.size(); setindex++)
-    {
-        if (player->m_ItemSetEff[setindex] && player->m_ItemSetEff[setindex]->setid == setid)
-        {
-            eff = player->m_ItemSetEff[setindex];
-            break;
-        }
-    }
+    ItemSetEffect* eff = player->GetItemSetEffect(setid);
 
     // can be in case now enough skill requirement for set appling but set has been appliend when skill requirement not enough
     if (!eff)
@@ -165,11 +133,7 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
     }
 
     if (!eff->item_count)                                    // all items of a set were removed
-    {
-        MANGOS_ASSERT(eff == player->m_ItemSetEff[setindex]);
-        delete eff;
-        player->m_ItemSetEff[setindex] = nullptr;
-    }
+        player->RemoveItemSetEffect(setid);
 }
 
 bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProto)

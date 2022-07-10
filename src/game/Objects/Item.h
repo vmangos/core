@@ -36,7 +36,6 @@ struct ItemRandomPropertiesEntry;
 
 struct ItemSetEffect
 {
-    uint32 setid = 0;
     uint32 item_count = 0;
     SpellEntry const* spells[8] = {};
 };

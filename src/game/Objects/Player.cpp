@@ -739,9 +739,6 @@ Player::~Player()
 
     delete PlayerTalkClass;
 
-    for (const auto& x : m_ItemSetEff)
-         delete x;
-
     // clean up player-instance binds, may unload some instance saves
     for (const auto& itr : m_boundInstances)
         itr.second.state->RemovePlayer(this);
@@ -6438,18 +6435,15 @@ void Player::CheckAreaExploreAndOutdoor()
                     continue;
                 CastSpell(this, spellInfo, true);
             }
-            for (auto itemSet : m_ItemSetEff)
+            for (auto& setData : m_itemSetEffects)
             {
-                if (itemSet)
+                for (auto spellInfo : setData.second.spells)
                 {
-                    for (auto spellInfo : itemSet->spells)
-                    {
-                        if (!spellInfo || !spellInfo->IsNeedCastSpellAtOutdoor() || HasAura(spellInfo->Id))
-                            continue;
-                        if ((spellInfo->Stances || spellInfo->StancesNot) && !spellInfo->IsNeedCastSpellAtFormApply(GetShapeshiftForm()))
-                            continue;
-                        CastSpell(this, spellInfo, true);
-                    }
+                    if (!spellInfo || !spellInfo->IsNeedCastSpellAtOutdoor() || HasAura(spellInfo->Id))
+                        continue;
+                    if ((spellInfo->Stances || spellInfo->StancesNot) && !spellInfo->IsNeedCastSpellAtFormApply(GetShapeshiftForm()))
+                        continue;
+                    CastSpell(this, spellInfo, true);
                 }
             }
         }
@@ -7487,12 +7481,9 @@ void Player::UpdateEquipSpellsAtFormChange()
     }
 
     // item set bonuses not dependent from item broken state
-    for (const auto eff : m_ItemSetEff)
+    for (auto& setData : m_itemSetEffects)
     {
-        if (!eff)
-            continue;
-
-        for (const auto spellInfo : eff->spells)
+        for (const auto spellInfo : setData.second.spells)
         {
             if (!spellInfo)
                 continue;
@@ -7642,6 +7633,25 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
 
         ++count;
     }
+}
+
+ItemSetEffect* Player::GetItemSetEffect(uint32 setId)
+{
+    auto itr = m_itemSetEffects.find(setId);
+    if (itr == m_itemSetEffects.end())
+        return nullptr;
+
+    return &itr->second;
+}
+
+ItemSetEffect* Player::AddItemSetEffect(uint32 setId)
+{
+    return &m_itemSetEffects.emplace(setId, ItemSetEffect()).first->second;
+}
+
+void Player::RemoveItemSetEffect(uint32 setId)
+{
+    m_itemSetEffects.erase(setId);
 }
 
 void Player::_RemoveAllItemMods()
