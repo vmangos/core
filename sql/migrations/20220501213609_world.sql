@@ -1158,14 +1158,14 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (35616, 1731, 0, 1389.75, 1970.95, 15.3534, 5.44543, 0, 0, -0.406736, 0.913546, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 35535 at 9.417406 yards.
 (35617, 1731, 0, 1420.63, 1928.08, 10.2896, 0.296705, 0, 0, 0.147809, 0.989016, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 35443 at 13.453968 yards.
 (35618, 1731, 0, 1164.29, 390.215, 42.536, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 35455 at 173.413376 yards.
-(5637, 1731, 0, -744.473, 1409.05, 38.1738, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5131 at 214.048447 yards.
+(14489, 1731, 0, -744.473, 1409.05, 38.1738, 4.18879, 0, 0, -0.866025, 0.500001, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5131 at 214.048447 yards.
 (9793, 1731, 0, 360.693, 1067.62, 105.336, 0.872664, 0, 0, 0.422618, 0.906308, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 4979 at 25.908981 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (9767, 1044, 0, 'Copper Vein', 0, 10), -- Copper Veins in Silverpine Forest 92 objects total
 (35616, 1044, 0, 'Copper Vein', 0, 10), -- Copper Veins in Silverpine Forest 92 objects total
 (35617, 1044, 0, 'Copper Vein', 0, 10), -- Copper Veins in Silverpine Forest 92 objects total
 (35618, 1044, 0, 'Copper Vein', 0, 10), -- Copper Veins in Silverpine Forest 92 objects total
-(5637, 1044, 0, 'Copper Vein', 0, 10), -- Copper Veins in Silverpine Forest 92 objects total
+(14489, 1044, 0, 'Copper Vein', 0, 10), -- Copper Veins in Silverpine Forest 92 objects total
 (9793, 1044, 0, 'Copper Vein', 0, 10); -- Copper Veins in Silverpine Forest 92 objects total
 
 -- Missing Copper Vein spawns in Darkshore.
