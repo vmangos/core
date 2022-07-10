@@ -614,7 +614,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (14481, 1732, 1, -5210.62, -2515.15, -40.6858, 1.50098, 0, 0, 0.681998, 0.731354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5613 at 172.071518 yards.
 (17184, 1732, 1, -5107.07, -1449.59, -31.6964, 0.401425, 0, 0, 0.199368, 0.979925, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17159 at 293.151733 yards.
 (14486, 1732, 1, -5121.02, -2374.72, -51.7483, 0, 0, 0, 0, 1, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5613 at 19.589302 yards.
-(9752, 1732, 1, -5819.69, -3387.3, -47.8351, 1.51844, 0, 0, 0.688354, 0.725374, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5678 at 454.590118 yards.
+(14487, 1732, 1, -5819.69, -3387.3, -47.8351, 1.51844, 0, 0, 0.688354, 0.725374, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5678 at 454.590118 yards.
 (17185, 1732, 1, -5405.82, -1634.32, -50.4901, 0.90757, 0, 0, 0.438371, 0.898794, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17155 at 428.688538 yards.
 (17226, 1732, 1, -5572.41, -2240.99, -55.2881, 4.08407, 0, 0, -0.891006, 0.453991, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 17156 at 129.574493 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
@@ -643,7 +643,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (14481, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (17184, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (14486, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
-(9752, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
+(14487, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (17185, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (17226, 1131, 0, 'Tin Vein', 0, 10); -- Tin Veins in Thousand Needles 15 objects total
 
