@@ -572,7 +572,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (48125, 1732, 1, 3246.52, -340.965, 162.653, 2.91469, 0, 0, 0.993571, 0.113208, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48124 at 315.357025 yards.
 (32597, 1732, 1, 2909.78, 415.713, 103.499, 1.309, 0, 0, 0.608761, 0.793354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32587 at 199.615494 yards.
 (48133, 1732, 1, 1835.21, -3164.55, 93.6548, 5.49779, 0, 0, -0.382683, 0.92388, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48128 at 312.633484 yards.
-(9766, 1732, 1, 3305.86, 679.983, 18.0436, 1.65806, 0, 0, 0.737277, 0.675591, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 5676 at 190.596008 yards.
+(14488, 1732, 1, 3305.86, 679.983, 18.0436, 1.65806, 0, 0, 0.737277, 0.675591, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 5676 at 190.596008 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (9637, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (9640, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
@@ -585,7 +585,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (48125, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (32597, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (48133, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
-(9766, 1074, 0, 'Tin Vein', 0, 10); -- Tin Veins in Ashenvale 30 objects total
+(14488, 1074, 0, 'Tin Vein', 0, 10); -- Tin Veins in Ashenvale 30 objects total
 
 -- Missing Tin Vein spawns in Thousand Needles.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
