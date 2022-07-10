@@ -568,7 +568,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (48132, 1732, 1, 3104.31, 397.07, 14.2702, 3.21142, 0, 0, -0.999391, 0.0349061, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48127 at 135.799927 yards.
 (32583, 1732, 1, 2186.04, -2180.25, 117.121, 3.26377, 0, 0, -0.998135, 0.0610518, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32579 at 204.167557 yards.
 (33543, 1732, 1, 3278.94, 381.677, 10.9858, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33541 at 99.583359 yards.
-(4788, 1732, 1, 2331.05, -3524.71, 53.3985, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5499 at 438.042725 yards.
+(14480, 1732, 1, 2331.05, -3524.71, 53.3985, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5499 at 438.042725 yards.
 (48125, 1732, 1, 3246.52, -340.965, 162.653, 2.91469, 0, 0, 0.993571, 0.113208, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48124 at 315.357025 yards.
 (32597, 1732, 1, 2909.78, 415.713, 103.499, 1.309, 0, 0, 0.608761, 0.793354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32587 at 199.615494 yards.
 (48133, 1732, 1, 1835.21, -3164.55, 93.6548, 5.49779, 0, 0, -0.382683, 0.92388, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48128 at 312.633484 yards.
@@ -581,7 +581,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (48132, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (32583, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (33543, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
-(4788, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
+(14480, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (48125, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (32597, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (48133, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
@@ -611,7 +611,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (17180, 1732, 1, -5368.9, -2900.7, -56.4231, 5.28835, 0, 0, -0.477159, 0.878817, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17157 at 58.129078 yards.
 (17182, 1732, 1, -4948.66, -2009.09, -42.2582, 4.59022, 0, 0, -0.748956, 0.66262, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17162 at 343.989197 yards.
 (9700, 1732, 1, -5026.32, -2294.76, -49.7846, 2.84488, 0, 0, 0.989016, 0.147811, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5613 at 127.295036 yards.
-(5027, 1732, 1, -5210.62, -2515.15, -40.6858, 1.50098, 0, 0, 0.681998, 0.731354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5613 at 172.071518 yards.
+(14481, 1732, 1, -5210.62, -2515.15, -40.6858, 1.50098, 0, 0, 0.681998, 0.731354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5613 at 172.071518 yards.
 (17184, 1732, 1, -5107.07, -1449.59, -31.6964, 0.401425, 0, 0, 0.199368, 0.979925, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17159 at 293.151733 yards.
 (9751, 1732, 1, -5121.02, -2374.72, -51.7483, 0, 0, 0, 0, 1, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5613 at 19.589302 yards.
 (9752, 1732, 1, -5819.69, -3387.3, -47.8351, 1.51844, 0, 0, 0.688354, 0.725374, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5678 at 454.590118 yards.
@@ -640,7 +640,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (17180, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (17182, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (9700, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
-(5027, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
+(14481, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (17184, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (9751, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
 (9752, 1131, 0, 'Tin Vein', 0, 10), -- Tin Veins in Thousand Needles 15 objects total
@@ -686,7 +686,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (48053, 1732, 1, 2420.78, 1084.96, 339.115, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 47687 at 218.286896 yards.
 (48054, 1732, 1, 2471.98, 1237.88, 317.663, 2.67035, 0, 0, 0.972369, 0.233448, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 47687 at 142.562195 yards.
 (34193, 1732, 1, 792.672, 1546.45, -20.5975, 3.68265, 0, 0, -0.96363, 0.267241, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 34157 at 441.537170 yards.
-(5149, 1732, 1, 124.152, -217.584, 25.9676, 4.08407, 0, 0, -0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5669 at 92.438934 yards.
+(14482, 1732, 1, 124.152, -217.584, 25.9676, 4.08407, 0, 0, -0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5669 at 92.438934 yards.
 (48055, 1732, 1, 972.861, -6.39605, 30.3832, 2.35619, 0, 0, 0.92388, 0.382683, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 47677 at 288.344818 yards.
 (48056, 1732, 1, 971.631, -326.555, 24.0093, 0.418879, 0, 0, 0.207911, 0.978148, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 47676 at 32.633438 yards.
 (48057, 1732, 1, 1626.51, -62.4331, 78.6646, 5.68977, 0, 0, -0.292372, 0.956305, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 47686 at 456.825470 yards.
@@ -703,7 +703,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (48053, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
 (48054, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
 (34193, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
-(5149, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
+(14482, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
 (48055, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
 (48056, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
 (48057, 1090, 0, 'Tin Vein', 0, 10), -- Tin Veins in Stonetalon 25 objects total
@@ -2427,11 +2427,11 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 -- Missing Gold Vein spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (10622, 1734, 0, 243.813, -247.871, 147.019, 3.45576, 0, 0, -0.987688, 0.156436, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 6509 at 38.590897 yards.
-(9761, 1734, 0, 247.102, -286.261, 153.984, 1.23918, 0, 0, 0.580703, 0.814116, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 6509 at 22.633656 yards.
+(14483, 1734, 0, 247.102, -286.261, 153.984, 1.23918, 0, 0, 0.580703, 0.814116, 1800, 1800, 1, 100, 0, 10), -- Closest existing guid is 6509 at 22.633656 yards.
 (12261, 1734, 0, 595.001, -651.02, 153.667, 4.20625, 0, 0, -0.861629, 0.507539, 1800, 1800, 1, 100, 0, 10); -- Closest existing guid is 6420 at 22.153973 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (10622, 1353, 0, 'Gold Vein', 0, 10), -- Gold Veins in Alterac Mountains
-(9761, 1353, 0, 'Gold Vein', 0, 10), -- Gold Veins in Alterac Mountains
+(14483, 1353, 0, 'Gold Vein', 0, 10), -- Gold Veins in Alterac Mountains
 (12261, 1353, 0, 'Gold Vein', 0, 10); -- Gold Veins in Alterac Mountains
 
 -- Missing Gold Vein spawns in Burning Steppes.
@@ -3889,7 +3889,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (452, 324, 0, -8386.3, -2815.53, 211.551, 2.47837, 0, 0, 0.945518, 0.325568, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 233 at 212.163330 yards.
 (455, 324, 0, -7924, -2653.41, 159.456, 4.03171, 0, 0, -0.902585, 0.430512, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 159 at 29.111744 yards.
 (9766, 324, 0, -7744.56, -2400.38, 144.921, 3.61284, 0, 0, -0.972369, 0.233448, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 387 at 188.520218 yards.
-(968, 324, 0, -7885.49, -2977.03, 154.692, 0.628317, 0, 0, 0.309016, 0.951057, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 247 at 265.406464 yards.
+(14484, 324, 0, -7885.49, -2977.03, 154.692, 0.628317, 0, 0, 0.309016, 0.951057, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 247 at 265.406464 yards.
 (5637, 324, 0, -7771.45, -1950.79, 133.599, 4.03171, 0, 0, -0.902585, 0.430512, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 370 at 7.704159 yards.
 (13700, 324, 0, -7883.55, -1702.45, 137.553, 5.55015, 0, 0, -0.358368, 0.93358, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 242 at 42.828991 yards.
 (13791, 324, 0, -7867.83, -2616.99, 124.392, 5.44543, 0, 0, -0.406736, 0.913546, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 305 at 57.744373 yards.
@@ -3904,7 +3904,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (452, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
 (455, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
 (9766, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
-(968, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
+(14484, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
 (5637, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
 (13700, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
 (13791, 1298, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Burning Steppes 40 objects total
@@ -3913,14 +3913,14 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 -- Missing Small Thorium Vein spawns in The Hinterlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (444, 324, 0, 107.217, -4568.66, 132.759, 1.71042, 0, 0, 0.754709, 0.656059, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 296 at 97.710045 yards.
-(9793, 324, 0, -121.696, -4368.51, 153.591, 4.69494, 0, 0, -0.71325, 0.70091, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 354 at 121.626671 yards.
+(14485, 324, 0, -121.696, -4368.51, 153.591, 4.69494, 0, 0, -0.71325, 0.70091, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 354 at 121.626671 yards.
 (13699, 324, 0, -222.086, -3605.74, 231.848, 3.89209, 0, 0, -0.930417, 0.366502, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 360 at 144.790466 yards.
 (13701, 324, 0, 408.902, -4095.56, 113.969, 6.12611, 0, 0, -0.0784588, 0.996917, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 331 at 19.041668 yards.
 (13755, 324, 0, -155.38, -4073.34, 127.776, 1.71042, 0, 0, 0.754709, 0.656059, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 349 at 220.628830 yards.
 (13790, 324, 0, -261.942, -3704.23, 242.799, 2.72271, 0, 0, 0.978148, 0.207912, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 360 at 39.542103 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (444, 1257, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Hinterlands 9 objects total
-(9793, 1257, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Hinterlands 9 objects total
+(14485, 1257, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Hinterlands 9 objects total
 (13699, 1257, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Hinterlands 9 objects total
 (13701, 1257, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Hinterlands 9 objects total
 (13755, 1257, 0, 'Small Thorium Vein', 0, 10), -- Small Thorium Veins in Hinterlands 9 objects total
