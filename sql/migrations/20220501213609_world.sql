@@ -568,7 +568,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (48132, 1732, 1, 3104.31, 397.07, 14.2702, 3.21142, 0, 0, -0.999391, 0.0349061, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48127 at 135.799927 yards.
 (32583, 1732, 1, 2186.04, -2180.25, 117.121, 3.26377, 0, 0, -0.998135, 0.0610518, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32579 at 204.167557 yards.
 (33543, 1732, 1, 3278.94, 381.677, 10.9858, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 33541 at 99.583359 yards.
-(4788, 1732, 1, 2331.05, -3524.71, 53.3985, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5499 at 438.042725 yards.
+(12261, 1732, 1, 2331.05, -3524.71, 53.3985, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5499 at 438.042725 yards.
 (48125, 1732, 1, 3246.52, -340.965, 162.653, 2.91469, 0, 0, 0.993571, 0.113208, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48124 at 315.357025 yards.
 (32597, 1732, 1, 2909.78, 415.713, 103.499, 1.309, 0, 0, 0.608761, 0.793354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32587 at 199.615494 yards.
 (48133, 1732, 1, 1835.21, -3164.55, 93.6548, 5.49779, 0, 0, -0.382683, 0.92388, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 48128 at 312.633484 yards.
@@ -581,7 +581,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (48132, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (32583, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (33543, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
-(4788, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
+(12261, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (48125, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (32597, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
 (48133, 1074, 0, 'Tin Vein', 0, 10), -- Tin Veins in Ashenvale 30 objects total
