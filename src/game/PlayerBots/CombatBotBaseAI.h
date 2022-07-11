@@ -273,7 +273,7 @@ public:
     {
         struct
         {
-            SpellEntry const* spells[44];
+            SpellEntry const* spells[45];
         } raw;
         struct
         {
@@ -504,6 +504,7 @@ public:
             SpellEntry const* pMarkoftheWild;
             SpellEntry const* pGiftoftheWild;
             SpellEntry const* pThorns;
+            SpellEntry const* pRemoveCurse;
             SpellEntry const* pCurePoison;
             SpellEntry const* pAbolishPoison;
             SpellEntry const* pRebirth;

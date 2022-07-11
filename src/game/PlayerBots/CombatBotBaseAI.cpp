@@ -1660,6 +1660,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.druid.pThorns->Id < pSpellEntry->Id)
                         m_spells.druid.pThorns = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Remove Curse") != std::string::npos)
+                {
+                    if (!m_spells.druid.pRemoveCurse ||
+                        m_spells.druid.pRemoveCurse->Id < pSpellEntry->Id)
+                        m_spells.druid.pRemoveCurse = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Cure Poison") != std::string::npos)
                 {
                     if (!m_spells.druid.pCurePoison ||
