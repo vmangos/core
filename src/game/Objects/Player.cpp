@@ -2457,7 +2457,6 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData* data)
                     data << m_teleport_dest.o;
                 }
                 GetSession()->SendPacket(&data);
-                SendMovementMessageToSet(std::move(data), true);
                 SendSavedInstances();
             };
             if (data->recover)
