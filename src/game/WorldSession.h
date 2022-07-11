@@ -325,8 +325,8 @@ class WorldSession
 
         // Bot system
         std::stringstream m_chatBotHistory;
-        PlayerBotEntry* GetBot() { return m_bot; }
-        void SetBot(PlayerBotEntry* b) { m_bot = b; }
+        PlayerBotEntry* GetBot() { return m_bot.get(); }
+        void SetBot(std::shared_ptr<PlayerBotEntry> const& b) { m_bot = b; }
 
         // Warden / Anticheat
         void InitWarden(BigNumber* K);
@@ -816,7 +816,7 @@ class WorldSession
         int m_sessionDbLocaleIndex;
         ClientOSType    m_clientOS;
         uint32          m_gameBuild;
-        PlayerBotEntry* m_bot;
+        std::shared_ptr<PlayerBotEntry> m_bot;
 
         Warden* m_warden;
         MovementAnticheat* m_cheatData;

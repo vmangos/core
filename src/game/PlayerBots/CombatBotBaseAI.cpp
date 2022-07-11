@@ -8,6 +8,7 @@
 #include "WorldPacket.h"
 #include "Spell.h"
 #include "SpellAuras.h"
+#include "CharacterDatabaseCache.h"
 
 enum CombatBotSpells
 {
@@ -28,6 +29,8 @@ enum CombatBotSpells
     SPELL_SUMMON_FELHUNTER = 691,
     SPELL_SUMMON_SUCCUBUS = 712,
     SPELL_TAME_BEAST = 13481,
+    SPELL_REVIVE_PET = 982,
+    SPELL_CALL_PET = 883,
 
     PET_WOLF    = 565,
     PET_CAT     = 681,
@@ -2434,11 +2437,24 @@ void CombatBotBaseAI::SummonPetIfNeeded()
 {
     if (me->GetClass() == CLASS_HUNTER)
     {
-        if (me->GetPetGuid())
+        if (me->GetCharmGuid())
             return;
 
         if (me->GetLevel() < 10)
             return;
+
+        if (me->GetPetGuid() || sCharacterDatabaseCache.GetCharacterPetByOwner(me->GetGUIDLow()))
+        {
+            if (Pet* pPet = me->GetPet())
+            {
+                if (!pPet->IsAlive())
+                    me->CastSpell(pPet, SPELL_REVIVE_PET, true);
+            }
+            else
+                me->CastSpell(me, SPELL_CALL_PET, true);
+
+            return;
+        }
 
         uint32 petId = PickRandomValue( PET_WOLF, PET_CAT, PET_BEAR, PET_CRAB, PET_GORILLA, PET_BIRD,
                                         PET_BOAR, PET_BAT, PET_CROC, PET_SPIDER, PET_OWL, PET_STRIDER,
@@ -2453,7 +2469,7 @@ void CombatBotBaseAI::SummonPetIfNeeded()
     }
     else if (me->GetClass() == CLASS_WARLOCK)
     {
-        if (me->GetPetGuid())
+        if (me->GetPetGuid() || me->GetCharmGuid())
             return;
 
         std::vector<uint32> vSummons;

@@ -43,6 +43,17 @@ enum PartyBotSpells
 #define PB_MIN_FOLLOW_ANGLE 0.0f
 #define PB_MAX_FOLLOW_ANGLE 6.0f
 
+bool PartyBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
+{
+    if (!m_race && !m_class)
+    {
+        sess->LoginPlayer(entry->playerGUID);
+        return true;
+    }
+
+    return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o, sObjectAccessor.FindPlayer(m_cloneGuid));
+}
+
 void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
 {
     if (!pPlayer)
@@ -427,7 +438,13 @@ void PartyBotAI::AddToPlayerGroup()
         sObjectMgr.AddGroup(group);
     }
 
-    group->AddMember(me->GetObjectGuid(), me->GetName());
+    if (me->GetGroup() != group)
+    {
+        if (me->GetGroup())
+            me->RemoveFromGroup();
+
+        group->AddMember(me->GetObjectGuid(), me->GetName());
+    } 
 }
 
 void PartyBotAI::SendFakePacket(uint16 opcode)
@@ -500,40 +517,53 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         AddToPlayerGroup();
 
-        if (m_level && m_level != me->GetLevel())
+        if (m_race && m_class) // temporary character
         {
-            me->GiveLevel(m_level);
-            me->InitTalentForLevel();
-            me->SetUInt32Value(PLAYER_XP, 0);
-        }
+            if (m_level && m_level != me->GetLevel())
+            {
+                me->GiveLevel(m_level);
+                me->InitTalentForLevel();
+                me->SetUInt32Value(PLAYER_XP, 0);
+            }
 
-        if (!m_cloneGuid.IsEmpty())
-        {
-            CloneFromPlayer(sObjectAccessor.FindPlayer(m_cloneGuid));
-            AutoAssignRole();
-        }
-        else
-        {
-            LearnPremadeSpecForClass();
+            if (!m_cloneGuid.IsEmpty())
+            {
+                CloneFromPlayer(sObjectAccessor.FindPlayer(m_cloneGuid));
+                AutoAssignRole();
+            }
+            else
+            {
+                LearnPremadeSpecForClass();
 
+                if (m_role == ROLE_INVALID)
+                    AutoAssignRole();
+
+                AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP));
+
+                // fix client bug causing some item slots to not be visible
+                if (Player* pLeader = GetPartyLeader())
+                {
+                    me->SetVisibility(VISIBILITY_OFF);
+                    pLeader->UpdateVisibilityOf(pLeader, me);
+                    me->SetVisibility(VISIBILITY_ON);
+                }
+            }
+            me->UpdateSkillsToMaxSkillsForLevel();
+        }
+        else // loaded from db
+        {
             if (m_role == ROLE_INVALID)
                 AutoAssignRole();
 
-            AutoEquipGear(sWorld.getConfig(CONFIG_UINT32_PARTY_BOT_AUTO_EQUIP));
+            if (me->IsGameMaster())
+                me->SetGameMaster(false);
 
-            // fix client bug causing some item slots to not be visible
-            if (Player* pLeader = GetPartyLeader())
-            {
-                me->SetVisibility(VISIBILITY_OFF);
-                pLeader->UpdateVisibilityOf(pLeader, me);
-                me->SetVisibility(VISIBILITY_ON);
-            }
+            me->TeleportTo(m_mapId, m_x, m_y, m_z, m_o);
         }
 
         ResetSpellData();
         PopulateSpellData();
         AddAllSpellReagents();
-        me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING);
         SummonPetIfNeeded();
         me->SetHealthPercent(100.0f);

@@ -30,7 +30,10 @@ class PlayerBotAI: public PlayerAI
 {
     public:
         explicit PlayerBotAI(Player* pPlayer = nullptr) : PlayerAI(pPlayer), botEntry(nullptr) {}
-        ~PlayerBotAI() override {}
+        virtual ~PlayerBotAI() override
+        {
+            Remove();
+        }
         void Remove() override;
 
         virtual bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess);
@@ -52,7 +55,6 @@ class PlayerCreatorAI: public PlayerBotAI
             PlayerBotAI(pPlayer), m_race(_race_), m_class(_class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o)
         {
         }
-        ~PlayerCreatorAI() override {}
         bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override
         {
             return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o);
@@ -79,7 +81,6 @@ class MageOrgrimmarAttackerAI: public PlayerBotAI
 {
     public:
         explicit MageOrgrimmarAttackerAI(Player* pPlayer = nullptr) : PlayerBotAI(pPlayer) {}
-        ~MageOrgrimmarAttackerAI() override {}
         bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override;
         void UpdateAI(uint32 const /*diff*/) override;
 };
@@ -88,7 +89,6 @@ class PopulateAreaBotAI: public PlayerBotAI
 {
     public:
         explicit PopulateAreaBotAI(uint32 map, float x, float y, float z, uint32 team, float radius, Player* pPlayer = nullptr) : PlayerBotAI(pPlayer), _map(map), _x(x), _y(y), _z(z), _radius(radius), _team(team) {}
-        ~PopulateAreaBotAI() override {}
         void BeforeAddToMap(Player* player) override; // me=nullptr at call
         void OnPlayerLogin() override;
     protected:

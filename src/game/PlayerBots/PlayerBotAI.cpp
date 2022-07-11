@@ -50,8 +50,12 @@ void PlayerBotAI::UpdateAI(uint32 const diff)
 
 void PlayerBotAI::Remove()
 {
-    me->SetAI(nullptr);
-    me = nullptr;
+    if (me)
+    {
+        if (me->AI() == this)
+            me->SetAI(nullptr);
+        me = nullptr;
+    }
 }
 
 void PlayerBotFleeingAI::OnPlayerLogin()

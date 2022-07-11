@@ -43,7 +43,7 @@
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
-
+#include "PlayerBotMgr.h"
 
 class LoginQueryHolder : public SqlQueryHolder
 {
@@ -491,6 +491,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         }
         pCurrChar = new Player(this);
         pCurrChar->GetMotionMaster()->Initialize();
+
+        if (GetBot() && !sPlayerBotMgr.IsSavingAllowed())
+            pCurrChar->m_saveDisabled = true;
     }
 
     // "GetAccountId()==db stored account id" checked in LoadFromDB (prevent login not own character using cheating tools)
