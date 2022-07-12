@@ -81,6 +81,206 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, 
 -- Lunar Fungal Bloom Can Drop In Stacks Of 2
 UPDATE `gameobject_loot_template` SET `maxcount` = 2 WHERE `entry` = 14562 AND `item` = 15851;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Misc Text Fixes (credit cmangos)
+-- these quests have no RequestItemsText
+UPDATE quest_template SET
+RequestItemsText = NULL
+WHERE entry IN (5, 109, 163, 1361, 1464, 1489, 1679, 3570);
+
+-- text fix (Missing In Action)
+UPDATE quest_template SET
+RequestItemsText = 'Yes?'
+WHERE entry = 219;
+
+-- text fix (Protecting the Shipment)
+UPDATE quest_template SET
+RequestItemsText = 'Where is my powder, $N? My need grows more desperate every day.'
+WHERE entry = 309;
+
+-- text fix (Proving Your Worth)
+UPDATE quest_template SET
+RequestItemsText = 'Battle hard, $N. And do not despair, for despair is evil''s greatest weapon.'
+WHERE entry = 323;
+
+-- text fix (Escorting Erland)
+UPDATE quest_template SET
+RequestItemsText = 'Please be brief.  There is much danger about and we cannot stand idle in conversation.'
+WHERE entry = 435;
+
+-- text fix (Hints of a New Plague?)
+UPDATE quest_template SET
+RequestItemsText = 'The time for talk is done. Protect Kinelory if you care about the people of Hillsbrad at all.'
+WHERE entry = 660;
+
+-- text fix (Sunken Treasure)
+UPDATE quest_template SET
+RequestItemsText = 'This is no time to talk! The goggles need to be charged with the power of the stone!'
+WHERE entry = 665;
+
+-- text fix (Winterhoof Cleansing)
+UPDATE quest_template SET
+RequestItemsText = 'Do not delay, $N.  The Winterhoof Well''s taint must be removed!'
+WHERE entry = 754;
+
+-- text fix (Thunderhorn Cleansing)
+UPDATE quest_template SET
+RequestItemsText = 'The Thunderhorn Water Well is still tainted, $N.  Please, you must perform the ritual!'
+WHERE entry = 758;
+
+-- text fix (Wildmane Cleansing)
+UPDATE quest_template SET
+RequestItemsText = 'The last water well remains fetid and poisonous, $N.  You must not delay!'
+WHERE entry = 760;
+
+-- text fix (The Forgotten Pools)
+UPDATE quest_template SET
+RequestItemsText = 'Have you been to the Forgotten Pools, $N?  Did you find anything?'
+WHERE entry = 870;
+
+-- text fix (Galen's Escape)
+UPDATE quest_template SET
+RequestItemsText = 'The keyhole of this strongbox is filled with black resin.  It is impossible to open.'
+WHERE entry = 1393;
+
+-- text fix (The Missing Diplomat)
+UPDATE quest_template SET
+Details = 'Yeah, you''re obviously not the smartest $c to come into Stormwind, but you''re about to be one of the dumbest to never leave.$b$bHave you met me friends?'
+WHERE entry = 1447;
+
+-- text fix (To The Hinterlands)
+UPDATE quest_template SET
+OfferRewardText = 'What do you want, $gladdy:missy;? Can''t you see I''ve got problems to take care of here? Who has time to stand around yapping with some $R chatterbox?$b$bThere are trolls coming out of the woodwork! Make it snappy.'
+WHERE entry = 1449;
+
+-- text fix (Earth Sapta)
+UPDATE quest_template SET
+OfferRewardText = 'I give you one in good faith. You already proved yourself once, but me tinkin'' you should be more careful in the future.'
+WHERE entry = 1463;
+
+-- text fix (Devourer of Souls)
+UPDATE quest_template SET
+OfferRewardText = 'You were sent by Carendin? $N, then.$b$bDo not think light of me because my sight is gone. I see things that lie behind now, with clarity I had never known. What I once thought a curse, is now a boon.'
+WHERE entry = 1472;
+
+-- text fix (Tooga's Quest)
+UPDATE quest_template SET
+RequestItemsText = 'Where is Tooga?'
+WHERE entry = 1560;
+
+-- text fix (Beat Bartleby)
+UPDATE quest_template SET
+RequestItemsText = 'The only way you''ll get this mug is if you pry it from my cold, dead fingers...'
+WHERE entry = 1640;
+
+-- text fix (The Tome of Valor)
+UPDATE quest_template SET
+RequestItemsText = 'We''ll make our stand at the house!'
+WHERE entry = 1651;
+
+-- text fix (The Rethban Gauntlet)
+UPDATE quest_template SET
+RequestItemsText = 'Time is wasting, $N.  If I were you, I''d get going...'
+WHERE entry = 1699;
+
+-- text fix (The Affray)
+UPDATE quest_template SET
+RequestItemsText = 'Have you completed your challenge?'
+WHERE entry = 1719;
+
+-- text fix (Scarlet Diversions)
+UPDATE quest_template SET
+RequestItemsText = 'A surprise raid on the Scarlet Crusade''s tenuous forward position will give us a buffer of time to be able to march on Andorhal.  I trust you are here to report success!$b$bOnce this is successfully executed, we will need to work diligently and quickly.  We do not have the materiel and manpower to fight both the Scourge and the Scarlet Crusade at the same time if they do not buy our little ruse.'
+WHERE entry = 5096;
+
+-- text fix (Lorax's Tale)
+UPDATE quest_template SET
+RequestItemsText = '...'
+WHERE entry = 5126;
+
+-- text fix (The Key to Scholomance) Alliance
+UPDATE quest_template SET
+OfferRewardText = 'Well, here you are, $n - the completed Skeleton Key.  I am certain as I can be that this key will allow you within the confines of the Scholomance.  There''s only one way to be absolutely sure it works, though.  Waste no time in trying it out, I say.$b$bGood luck, mighty hero.  May you continue to bring light unto the darkness!',
+RequestItemsText = NULL
+WHERE entry = 5505;
+
+-- text fix (The Key to Scholomance) Horde
+UPDATE quest_template SET
+OfferRewardText = 'Well, here you are, $n - the completed Skeleton Key.  I am certain as I can be that this key will allow you within the confines of the Scholomance.  There''s only one way to be absolutely sure it works, though.  Waste no time in trying it out, I say.$b$bGood luck, mighty hero.  May your victories continue to bring you fame and power as you lay waste to Scholomance!',
+RequestItemsText = NULL
+WHERE entry = 5511;
+
+-- text fix (Mold Rhymes With...)
+UPDATE quest_template SET
+OfferRewardText = 'Arbington said you''d deliver the goods, and deliver you have! A deal is a deal; let me pack the fragments into the mold for you.$b$bDid Arbington imbue them already? Excellent... otherwise, it would have been a long trip back to the Chillwind Point for you.',
+RequestItemsText = 'Yeah, I know who you are, and I know why you''re here. Arbington sent word to me before you arrived. Let''s cut to deal at hand, now shall we?$b$bI''ve got a mold you can use for the skeleton key, but it will cost you - fifteen gold, up front, no negotiation. I''ll pack the skeletal fragments into the mold for you, and I''ll also teach you on how to forge the stem of the key without any knowledge of blacksmithing... all free of charge no less.$b$bWho says mercenaries don''t offer competitive deals!'
+WHERE entry = 5538;
+
+-- text fix (Rise and Be Recognized) Horde
+UPDATE quest_template SET
+OfferRewardText = 'This new insignia reflects your rank amongst the Frostwolf. Keep it on you at all times.$b$bAnd $c... Die with honor!',
+RequestItemsText = '<Warmaster Laggrond salutes you.>$b$bIt is your time, $N. You have done much for the Frostwolf Clan and in doing so, earned a place as not only a soldier of Frostwolf but also as a friend.$b$bWell done! Present your initiate''s insignia.'
+WHERE entry = 7163;
+
+-- text fix (Rise and Be Recognized) Alliance
+UPDATE quest_template SET
+RequestItemsText = 'Most do not live long enough to rise above their own mediocrity. You have proven yourself to be an exemplary soldier, $c. The time has come.$b$bPresent your insignia.'
+WHERE entry = 7168;
+
+-- text fix (Honored Amongst the Clan) Horde
+UPDATE quest_template SET
+RequestItemsText = 'It is good to see you again, $c. I had not expected you to return. Alas, you have proven yourself a brave and honorable soldier of the Frostwolf.$b$bYour time has come again, $N. You have earned a new ranking and as such, a new insignia denoting this rise in stature.$b$bPresent your insignia.'
+WHERE entry = 7164;
+
+-- text fix (Honored Amongst the Guard) Alliance
+UPDATE quest_template SET
+RequestItemsText = 'The base buzzes with news of your exploits in the Field of Strife! You have struck mighty blows against our enemy - crushing their morale! For this, you have earned a rank of honor among the Stormpike.$b$bPresent your insignia.'
+WHERE entry = 7169;
+
+-- text fix (Earned Reverence) Horde
+UPDATE quest_template SET
+OfferRewardText = '<Warmaster Laggrond roars.>$b$bThey have already begun telling tales of your deeds, soldier. The Stormpike shakes in fear when your name is uttered. Carry on!',
+RequestItemsText = 'So many slain. Blood drenches the fields. Yet... You live... You have persevered. You have led our armies to many victories. For this, then, soldier, you have earned a new rank.$b$bPresent your insignia.'
+WHERE entry = 7165;
+
+-- text fix (Earned Reverence) Alliance
+UPDATE quest_template SET
+RequestItemsText = 'I must know, $N. When you look directly into the eyes of the enemy, do you see fear? Do they now cower in your presence? They must realize that they are defeated!$b$bYou have earned reverence among the Guard. Present your insignia!'
+WHERE entry = 7170;
+
+-- text fix (Legendary Heroes) Horde
+UPDATE quest_template SET
+RequestItemsText = 'Your radiate command and power, $c. Exalted in the eyes of Frostwolf - the enemy cowers at the mention of your name.$b$bRise, Hero of Frostwolf. Rise and be honored!$b$bPresent your insignia.'
+WHERE entry = 7166;
+
+-- text fix (Legendary Heroes) Alliance
+UPDATE quest_template SET
+OfferRewardText = 'Surely it will be you who carries the Eye of Command!',
+RequestItemsText = 'Before me stands an exalted hero of the Alliance.$b$b<Lieutenant Haggerdin salutes.>$b$bFew have earned such a rank among the Stormpike. I have watched the enemy fall before you. I have seen their resolve crumble in your presence. When you enter the fray, you become the beacon of hope for our forces!$b$bPresent your insignia.'
+WHERE entry = 7171;
+
+-- text fix (The Eye of Command) Horde
+UPDATE quest_template SET
+RequestItemsText = 'Drek''Thar sings your praises. Kalimdor is abuzz with tales of your heroics. The Warchief glows - your stalwart defense of our clan has pleased him greatly.$b$bYou have earned the Eye of Command.$b$bPresent your insignia, Commander $N.'
+WHERE entry = 7167;
+
+-- text fix (The Eye of Command) Alliance
+UPDATE quest_template SET
+OfferRewardText = 'It is you who must lead our troops to victory, Commander! The soldiers are under your command. They will follow your direct orders. Lead them.... Crush the Frostwolf.',
+RequestItemsText = 'Let them hear your voice, Commander $N! Let them know fear. Show them what power the Stormpike holds in their rank!$b$bPresent your insignia.'
+WHERE entry = 7172;
+
+-- text fix (A Gallon of Blood)
+UPDATE quest_template SET
+RequestItemsText = 'You have the option of offering larger quantities of the blood taken from our enemies. I will be glad to accept gallon sized offerings, $N.'
+WHERE entry = 7385;
+
+-- text fix (Crystal Cluster)
+UPDATE quest_template SET
+RequestItemsText = 'There are times which you may be entrenched in battle for days or weeks on end. During those longer periods of activity you may end up collecting large clusters of the Frostwolf''s storm crystals.$b$bThe Circle accepts such offerings, $N.'
+WHERE entry = 7386;
+
 
 -- End of migration.
 END IF;
