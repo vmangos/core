@@ -1,0 +1,430 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20220713163845');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20220713163845');
+-- Add your query below.
+
+
+-- Western Plaguelands
+-- Mithril Deposits / Gold Veins / Truesilver Deposits
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1271, 1331));
+DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (1271, 1331);
+DELETE FROM `pool_template` WHERE `entry` IN (1271, 1331);
+
+SET @OGUID = 21842;
+SET @PTEMPLATE = 416;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 1734, 0, 1401.79, -1104, 71.263, 2.583, 0, 0, 0.961262, 0.275638, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 1734, 0, 1351.98, -1781.53, 76.1072, 4.97419, 0, 0, -0.608761, 0.793354, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 1734, 0, 1582.45, -1523, 61.443, -3, 0, 0, -0.953717, 0.300706, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 1734, 0, 1491.92, -1351.54, 63.0037, 3.4383, 0, 0, -0.989016, 0.147811, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 1734, 0, 1082.49, -1079.31, 100.575, 2.80998, 0, 0, 0.986285, 0.16505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 1734, 0, 1270.12, -1308, 68.229, 0.663, 0, 0, 0.325568, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 1734, 0, 1238.13, -1780.96, 68.3152, 5.34071, 0, 0, -0.45399, 0.891007, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 1734, 0, 1444.63, -1743, 68.881, -1, 0, 0, -0.48481, 0.87462, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 1734, 0, 1326.3, -1876.09, 75.9321, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 1734, 0, 1180.49, -1692.75, 73.1479, 2.74016, 0, 0, 0.979924, 0.19937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 1734, 0, 1440.1, -1000.29, 79.8371, 4.39823, 0, 0, -0.809016, 0.587786, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 1734, 0, 1102.24, -1480, 81.679, -1, 0, 0, -0.390731, 0.920505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+13, 1734, 0, 1402.24, -1103.01, 71.5185, 2.58308, 0, 0, 0.961261, 0.27564, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+14, 1734, 0, 1481.64, -867.292, 78.0325, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+15, 1734, 0, 1163.15, -1867.06, 73.9792, 0.837757, 0, 0, 0.406736, 0.913546, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+16, 1734, 0, 1429.4, -1221.99, 67.6879, 5.60251, 0, 0, -0.333807, 0.942641, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+17, 1734, 0, 1387.13, -1723.46, 71.8066, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+18, 1734, 0, 1264.27, -1297.43, 74.5188, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+19, 1734, 0, 1537.2, -1700.27, 78.4948, 6.00393, 0, 0, -0.139173, 0.990268, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+20, 1734, 0, 1682.83, -1010.24, 79.0426, -1.65806, 0, 0, 0.737277, -0.67559, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+21, 1734, 0, 1832.74, -1031.8, 83.7296, -0.890118, 0, 0, 0.430511, -0.902585, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+22, 1734, 0, 1227.64, -996.593, 99.4888, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+23, 1734, 0, 1420.81, -1972.1, 69.9208, -1.8326, 0, 0, 0.793353, -0.608761, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+24, 1734, 0, 1882.89, -1053.47, 78.6267, 2.65289, 0, 0, 0.970295, 0.241925, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+25, 1734, 0, 1059.28, -1954.39, 70.7691, 0.977384, 0, 0, 0.469472, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+26, 1734, 0, 1971.77, -1311.29, 76.34, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+27, 1734, 0, 1575.01, -1502.7, 69.3272, 3.75246, 0, 0, -0.953716, 0.300708, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+28, 2040, 0, 1401.79, -1104, 71.263, 2.583, 0, 0, 0.961262, 0.275638, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+29, 2040, 0, 1351.98, -1781.53, 76.1072, 4.97419, 0, 0, -0.608761, 0.793354, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+30, 2040, 0, 1582.45, -1523, 61.443, -3, 0, 0, -0.953717, 0.300706, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+31, 2040, 0, 1491.92, -1351.54, 63.0037, 3.4383, 0, 0, -0.989016, 0.147811, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+32, 2040, 0, 1082.49, -1079.31, 100.575, 2.80998, 0, 0, 0.986285, 0.16505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+33, 2040, 0, 1270.12, -1308, 68.229, 0.663, 0, 0, 0.325568, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+34, 2040, 0, 1238.13, -1780.96, 68.3152, 5.34071, 0, 0, -0.45399, 0.891007, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+35, 2040, 0, 1444.63, -1743, 68.881, -1, 0, 0, -0.48481, 0.87462, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+36, 2040, 0, 1326.3, -1876.09, 75.9321, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+37, 2040, 0, 1180.49, -1692.75, 73.1479, 2.74016, 0, 0, 0.979924, 0.19937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+38, 2040, 0, 1440.1, -1000.29, 79.8371, 4.39823, 0, 0, -0.809016, 0.587786, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+39, 2040, 0, 1102.24, -1480, 81.679, -1, 0, 0, -0.390731, 0.920505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+40, 2040, 0, 1402.24, -1103.01, 71.5185, 2.58308, 0, 0, 0.961261, 0.27564, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+41, 2040, 0, 1481.64, -867.292, 78.0325, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+42, 2040, 0, 1163.15, -1867.06, 73.9792, 0.837757, 0, 0, 0.406736, 0.913546, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+43, 2040, 0, 1429.4, -1221.99, 67.6879, 5.60251, 0, 0, -0.333807, 0.942641, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+44, 2040, 0, 1387.13, -1723.46, 71.8066, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+45, 2040, 0, 1264.27, -1297.43, 74.5188, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+46, 2040, 0, 1537.2, -1700.27, 78.4948, 6.00393, 0, 0, -0.139173, 0.990268, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+47, 2040, 0, 1682.83, -1010.24, 79.0426, -1.65806, 0, 0, 0.737277, -0.67559, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+48, 2040, 0, 1832.74, -1031.8, 83.7296, -0.890118, 0, 0, 0.430511, -0.902585, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+49, 2040, 0, 1227.64, -996.593, 99.4888, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+50, 2040, 0, 1420.81, -1972.1, 69.9208, -1.8326, 0, 0, 0.793353, -0.608761, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+51, 2040, 0, 1882.89, -1053.47, 78.6267, 2.65289, 0, 0, 0.970295, 0.241925, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+52, 2040, 0, 1059.28, -1954.39, 70.7691, 0.977384, 0, 0, 0.469472, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+53, 2040, 0, 1971.77, -1311.29, 76.34, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+54, 2040, 0, 1575.01, -1502.7, 69.3272, 3.75246, 0, 0, -0.953716, 0.300708, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+55, 2047, 0, 1401.79, -1104, 71.263, 2.583, 0, 0, 0.961262, 0.275638, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+56, 2047, 0, 1351.98, -1781.53, 76.1072, 4.97419, 0, 0, -0.608761, 0.793354, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+57, 2047, 0, 1582.45, -1523, 61.443, -3, 0, 0, -0.953717, 0.300706, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+58, 2047, 0, 1491.92, -1351.54, 63.0037, 3.4383, 0, 0, -0.989016, 0.147811, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+59, 2047, 0, 1082.49, -1079.31, 100.575, 2.80998, 0, 0, 0.986285, 0.16505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+60, 2047, 0, 1270.12, -1308, 68.229, 0.663, 0, 0, 0.325568, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+61, 2047, 0, 1238.13, -1780.96, 68.3152, 5.34071, 0, 0, -0.45399, 0.891007, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+62, 2047, 0, 1444.63, -1743, 68.881, -1, 0, 0, -0.48481, 0.87462, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+63, 2047, 0, 1326.3, -1876.09, 75.9321, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+64, 2047, 0, 1180.49, -1692.75, 73.1479, 2.74016, 0, 0, 0.979924, 0.19937, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+65, 2047, 0, 1440.1, -1000.29, 79.8371, 4.39823, 0, 0, -0.809016, 0.587786, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+66, 2047, 0, 1102.24, -1480, 81.679, -1, 0, 0, -0.390731, 0.920505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+67, 2047, 0, 1402.24, -1103.01, 71.5185, 2.58308, 0, 0, 0.961261, 0.27564, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+68, 2047, 0, 1481.64, -867.292, 78.0325, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+69, 2047, 0, 1163.15, -1867.06, 73.9792, 0.837757, 0, 0, 0.406736, 0.913546, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+70, 2047, 0, 1429.4, -1221.99, 67.6879, 5.60251, 0, 0, -0.333807, 0.942641, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+71, 2047, 0, 1387.13, -1723.46, 71.8066, 5.2709, 0, 0, -0.484809, 0.87462, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+72, 2047, 0, 1264.27, -1297.43, 74.5188, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+73, 2047, 0, 1537.2, -1700.27, 78.4948, 6.00393, 0, 0, -0.139173, 0.990268, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+74, 2047, 0, 1682.83, -1010.24, 79.0426, -1.65806, 0, 0, 0.737277, -0.67559, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+75, 2047, 0, 1832.74, -1031.8, 83.7296, -0.890118, 0, 0, 0.430511, -0.902585, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+76, 2047, 0, 1227.64, -996.593, 99.4888, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+77, 2047, 0, 1420.81, -1972.1, 69.9208, -1.8326, 0, 0, 0.793353, -0.608761, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+78, 2047, 0, 1882.89, -1053.47, 78.6267, 2.65289, 0, 0, 0.970295, 0.241925, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+79, 2047, 0, 1059.28, -1954.39, 70.7691, 0.977384, 0, 0, 0.469472, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+80, 2047, 0, 1971.77, -1311.29, 76.34, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+81, 2047, 0, 1575.01, -1502.7, 69.3272, 3.75246, 0, 0, -0.953716, 0.300708, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+2, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+3, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+4, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+5, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+6, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+7, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+8, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+9, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+10, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+11, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+12, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+13, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+14, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+15, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+16, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+17, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+18, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+19, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+20, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+21, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+22, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+23, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+24, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+25, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+26, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@PTEMPLATE+27, 1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+9, @PTEMPLATE+9, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+10, @PTEMPLATE+10, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+11, @PTEMPLATE+11, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+12, @PTEMPLATE+12, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+13, @PTEMPLATE+13, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+14, @PTEMPLATE+14, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+15, @PTEMPLATE+15, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+16, @PTEMPLATE+16, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+17, @PTEMPLATE+17, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+18, @PTEMPLATE+18, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+19, @PTEMPLATE+19, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+20, @PTEMPLATE+20, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+21, @PTEMPLATE+21, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+22, @PTEMPLATE+22, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+23, @PTEMPLATE+23, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+24, @PTEMPLATE+24, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+25, @PTEMPLATE+25, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+26, @PTEMPLATE+26, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+27, @PTEMPLATE+27, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+28, @PTEMPLATE+1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+29, @PTEMPLATE+2, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+30, @PTEMPLATE+3, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+31, @PTEMPLATE+4, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+32, @PTEMPLATE+5, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+33, @PTEMPLATE+6, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+34, @PTEMPLATE+7, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+35, @PTEMPLATE+8, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+36, @PTEMPLATE+9, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+37, @PTEMPLATE+10, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+38, @PTEMPLATE+11, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+39, @PTEMPLATE+12, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+40, @PTEMPLATE+13, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+41, @PTEMPLATE+14, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+42, @PTEMPLATE+15, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+43, @PTEMPLATE+16, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+44, @PTEMPLATE+17, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+45, @PTEMPLATE+18, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+46, @PTEMPLATE+19, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+47, @PTEMPLATE+20, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+48, @PTEMPLATE+21, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+49, @PTEMPLATE+22, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+50, @PTEMPLATE+23, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+51, @PTEMPLATE+24, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+52, @PTEMPLATE+25, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+53, @PTEMPLATE+26, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+54, @PTEMPLATE+27, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+55, @PTEMPLATE+1, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+56, @PTEMPLATE+2, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+57, @PTEMPLATE+3, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+58, @PTEMPLATE+4, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+59, @PTEMPLATE+5, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+60, @PTEMPLATE+6, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+61, @PTEMPLATE+7, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+62, @PTEMPLATE+8, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+63, @PTEMPLATE+9, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+64, @PTEMPLATE+10, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+65, @PTEMPLATE+11, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+66, @PTEMPLATE+12, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+67, @PTEMPLATE+13, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+68, @PTEMPLATE+14, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+69, @PTEMPLATE+15, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+70, @PTEMPLATE+16, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+71, @PTEMPLATE+17, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+72, @PTEMPLATE+18, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+73, @PTEMPLATE+19, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+74, @PTEMPLATE+20, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+75, @PTEMPLATE+21, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+76, @PTEMPLATE+22, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+77, @PTEMPLATE+23, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+78, @PTEMPLATE+24, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+79, @PTEMPLATE+25, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+80, @PTEMPLATE+26, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10),
+(@OGUID+81, @PTEMPLATE+27, 'Mithril Deposits / Gold Veins / Truesilver Deposits - Western Plaguelands', 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(1, 11, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+2,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+3,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+4,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+5,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+6,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+7,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+8,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+9,  1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+10, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+11, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+12, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+13, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+14, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+15, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+16, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+17, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+18, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+19, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+20, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+21, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+22, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+23, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+24, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+25, 1, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0);
+
+-- Truesilver Deposits / Small Thorium Veins
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1262, 1263));
+DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (1262, 1263);
+DELETE FROM `pool_template` WHERE `entry` IN (1262, 1263);
+
+SET @OGUID = 261399;
+SET @PTEMPLATE = 25468;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 324, 0, 2326.7, -1935.16, 115.164, 3.194, 0, 0, -0.999657, 0.0262016, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 324, 0, 1861.01, -1916.53, 95.6276, 3.9619, 0, 0, -0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 324, 0, 2570.69, -1621, 95.411, -1, 0, 0, -0.636078, 0.771625, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 324, 0, 2778.65, -1672.19, 134.91, 5.28835, 0, 0, -0.477159, 0.878817, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 324, 0, 2742.22, -1859.11, 75.9589, 5.3058, 0, 0, -0.469471, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 324, 0, 2266.57, -1614.03, 97.5257, 5.5676, 0, 0, -0.350207, 0.936672, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 324, 0, 1911.18, -2145.27, 75.1413, 6.21337, 0, 0, -0.0348988, 0.999391, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 324, 0, 1632.35, -2386, 73.885, 0.559, 0, 0, 0.275637, 0.961262, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 324, 0, 2009.89, -1503.28, 82.854, 0.715585, 0, 0, 0.350207, 0.936672, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 324, 0, 2149.09, -1501.81, 73.08, 0.785398, 0, 0, 0.382683, 0.92388, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+11, 324, 0, 1705.69, -1814.1, 80.3206, -1.25664, 0, 0, 0.587785, -0.809017, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+12, 324, 0, 2654.89, -1740.8, 115.441, 1.41372, 0, 0, 0.649448, 0.760406, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+13, 324, 0, 2208.09, -1719, 82.644, 1.501, 0, 0, 0.681998, 0.731354, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+14, 324, 0, 1813.05, -2458.89, 72.8594, 1.53589, 0, 0, 0.694658, 0.71934, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+15, 324, 0, 2408.59, -1759.78, 103.076, 1.81514, 0, 0, 0.788011, 0.615662, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+16, 324, 0, 1634.02, -1956.59, 73.183, 1.8675, 0, 0, 0.803857, 0.594823, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+17, 324, 0, 2258.52, -2379, 59.662, 2.566, 0, 0, 0.95882, 0.284015, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+18, 324, 0, 1593.42, -2215.51, 63.8084, -2.56563, 0, 0, 0.95882, -0.284015, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+19, 324, 0, 2089.01, -1983.69, 88.3662, 3.14159, 0, 0, -1, 0, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+20, 2047, 0, 2326.7, -1935.16, 115.164, 3.194, 0, 0, -0.999657, 0.0262016, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+21, 2047, 0, 1861.01, -1916.53, 95.6276, 3.9619, 0, 0, -0.91706, 0.39875, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+22, 2047, 0, 2570.69, -1621, 95.411, -1, 0, 0, -0.636078, 0.771625, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+23, 2047, 0, 2778.65, -1672.19, 134.91, 5.28835, 0, 0, -0.477159, 0.878817, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+24, 2047, 0, 2742.22, -1859.11, 75.9589, 5.3058, 0, 0, -0.469471, 0.882948, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+25, 2047, 0, 2266.57, -1614.03, 97.5257, 5.5676, 0, 0, -0.350207, 0.936672, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+26, 2047, 0, 1911.18, -2145.27, 75.1413, 6.21337, 0, 0, -0.0348988, 0.999391, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+27, 2047, 0, 1632.35, -2386, 73.885, 0.559, 0, 0, 0.275637, 0.961262, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+28, 2047, 0, 2009.89, -1503.28, 82.854, 0.715585, 0, 0, 0.350207, 0.936672, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+29, 2047, 0, 2149.09, -1501.81, 73.08, 0.785398, 0, 0, 0.382683, 0.92388, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+30, 2047, 0, 1705.69, -1814.1, 80.3206, -1.25664, 0, 0, 0.587785, -0.809017, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+31, 2047, 0, 2654.89, -1740.8, 115.441, 1.41372, 0, 0, 0.649448, 0.760406, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+32, 2047, 0, 2208.09, -1719, 82.644, 1.501, 0, 0, 0.681998, 0.731354, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+33, 2047, 0, 1813.05, -2458.89, 72.8594, 1.53589, 0, 0, 0.694658, 0.71934, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+34, 2047, 0, 2408.59, -1759.78, 103.076, 1.81514, 0, 0, 0.788011, 0.615662, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+35, 2047, 0, 1634.02, -1956.59, 73.183, 1.8675, 0, 0, 0.803857, 0.594823, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+36, 2047, 0, 2258.52, -2379, 59.662, 2.566, 0, 0, 0.95882, 0.284015, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+37, 2047, 0, 1593.42, -2215.51, 63.8084, -2.56563, 0, 0, 0.95882, -0.284015, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+38, 2047, 0, 2089.01, -1983.69, 88.3662, 3.14159, 0, 0, -1, 0, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+6, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+7, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+8, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+9, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+10, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+11, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+12, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+13, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+14, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+15, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+16, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+17, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+18, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+19, 1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+6, @PTEMPLATE+6, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+7, @PTEMPLATE+7, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+8, @PTEMPLATE+8, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+9, @PTEMPLATE+9, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+10, @PTEMPLATE+10, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+11, @PTEMPLATE+11, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+12, @PTEMPLATE+12, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+13, @PTEMPLATE+13, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+14, @PTEMPLATE+14, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+15, @PTEMPLATE+15, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+16, @PTEMPLATE+16, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+17, @PTEMPLATE+17, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+18, @PTEMPLATE+18, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+19, @PTEMPLATE+19, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+20, @PTEMPLATE+1, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+21, @PTEMPLATE+2, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+22, @PTEMPLATE+3, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+23, @PTEMPLATE+4, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+24, @PTEMPLATE+5, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+25, @PTEMPLATE+6, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+26, @PTEMPLATE+7, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+27, @PTEMPLATE+8, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+28, @PTEMPLATE+9, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+29, @PTEMPLATE+10, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+30, @PTEMPLATE+11, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+31, @PTEMPLATE+12, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+32, @PTEMPLATE+13, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+33, @PTEMPLATE+14, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+34, @PTEMPLATE+15, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+35, @PTEMPLATE+16, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+36, @PTEMPLATE+17, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+37, @PTEMPLATE+18, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10),
+(@OGUID+38, @PTEMPLATE+19, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(2, 8, 'Western Plaguelands - Truesilver Deposits / Small Thorium Veins (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+2,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+3,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+4,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+5,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+6,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+7,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+8,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+9,  2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+10, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+11, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+12, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+13, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+14, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+15, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+16, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+17, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+18, 2, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0);
+
+-- Truesilver Deposits / Rich Thorium Veins
+DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1264, 1262));
+DELETE FROM `pool_gameobject` WHERE `pool_entry` IN (1264, 1262);
+DELETE FROM `pool_template` WHERE `entry` IN (1264, 1262);
+
+SET @OGUID = 261637;
+SET @PTEMPLATE = 21657;
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(@OGUID+1, 175404, 0, 2955.94, -1341.01, 151.267, -1.23918, 0, 0, 0.580703, -0.814116, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+2, 175404, 0, 3025.7, -1567.14, 150.424, 0.558505, 0, 0, 0.275637, 0.961262, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+3, 175404, 0, 2285.39, -2334.25, 63.6795, 4.25861, 0, 0, -0.848047, 0.529921, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+4, 175404, 0, 2284.89, -2227.45, 56.8073, 4.95674, 0, 0, -0.615661, 0.788011, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+5, 175404, 0, 2318.85, -2372.06, 54.5187, 5.48033, 0, 0, -0.390731, 0.920505, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+6, 2047, 0, 2955.94, -1341.01, 151.267, -1.23918, 0, 0, 0.580703, -0.814116, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+7, 2047, 0, 3025.7, -1567.14, 150.424, 0.558505, 0, 0, 0.275637, 0.961262, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+8, 2047, 0, 2285.39, -2334.25, 63.6795, 4.25861, 0, 0, -0.848047, 0.529921, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+9, 2047, 0, 2284.89, -2227.45, 56.8073, 4.95674, 0, 0, -0.615661, 0.788011, 300, 300, 100, 1, 0, 0, 0, 10),
+(@OGUID+10, 2047, 0, 2318.85, -2372.06, 54.5187, 5.48033, 0, 0, -0.390731, 0.920505, 300, 300, 100, 1, 0, 0, 0, 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `patch_max`) VALUES
+(@PTEMPLATE+1, 1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+2, 1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+3, 1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+4, 1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@PTEMPLATE+5, 1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10);
+
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `description`, `patch_max`) VALUES 
+(@OGUID+1, @PTEMPLATE+1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+2, @PTEMPLATE+2, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+3, @PTEMPLATE+3, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+4, @PTEMPLATE+4, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+5, @PTEMPLATE+5, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+6, @PTEMPLATE+1, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+7, @PTEMPLATE+2, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+8, @PTEMPLATE+3, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+9, @PTEMPLATE+4, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10),
+(@OGUID+10, @PTEMPLATE+5, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 10);
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
+(3, 2, 'Western Plaguelands - Truesilver Deposits / Rich Thorium Veins (Master Pool)', 0, 0, 0, 10);
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `flags`) VALUES
+(@PTEMPLATE+1,  3, 0, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+2,  3, 0, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+3,  3, 0, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+4,  3, 0, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+5,  3, 0, 'Truesilver Deposits / Rich Thorium Veins - Western Plaguelands', 0);
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
