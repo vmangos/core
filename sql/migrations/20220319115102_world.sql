@@ -281,6 +281,16 @@ UPDATE quest_template SET
 RequestItemsText = 'There are times which you may be entrenched in battle for days or weeks on end. During those longer periods of activity you may end up collecting large clusters of the Frostwolf''s storm crystals.$b$bThe Circle accepts such offerings, $N.'
 WHERE entry = 7386;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Add Start Script For Remorseful Highborne (credit cmangos)
+DELETE FROM `quest_start_scripts` WHERE `id`=5252;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(5252, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6505, 6506, 6507, 0, 0, 0, 0, 0, 0, 'Remorseful Highborne - Talk');
+
+UPDATE `quest_template` SET `StartScript` = 5252 WHERE `entry` = 5252;
+UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN(6505, 6506, 6507);
+
 
 -- End of migration.
 END IF;
