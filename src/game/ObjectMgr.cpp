@@ -161,9 +161,6 @@ ObjectMgr::~ObjectMgr()
 
     for (auto& itr : m_CacheTrainerSpellMap)
         itr.second.Clear();
-
-    for (auto& itr : m_playerCacheData)
-        delete itr.second;
 }
 
 void ObjectMgr::LoadAllIdentifiers()
@@ -712,15 +709,23 @@ void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
     }
 }
 
-PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const
+PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow)
 {
     auto itr = m_playerCacheData.find(guidLow);
     if (itr != m_playerCacheData.end())
-        return itr->second;
+        return &itr->second;
     return nullptr;
 }
 
-PlayerCacheData* ObjectMgr::GetPlayerDataByName(std::string const& name) const
+PlayerCacheData const* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const
+{
+    auto itr = m_playerCacheData.find(guidLow);
+    if (itr != m_playerCacheData.end())
+        return &itr->second;
+    return nullptr;
+}
+
+PlayerCacheData const* ObjectMgr::GetPlayerDataByName(std::string const& name) const
 {
     if (ObjectGuid guid = GetPlayerGuidByName(name))
         return GetPlayerDataByGUID(guid.GetCounter());
@@ -766,7 +771,7 @@ uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
 
     uint32 lowguid = guid.GetCounter();
 
-    if (PlayerCacheData* data = GetPlayerDataByGUID(lowguid))
+    if (PlayerCacheData const* data = GetPlayerDataByGUID(lowguid))
     {
         return data->uiClass;
     }
@@ -818,7 +823,7 @@ void ObjectMgr::UpdatePlayerCachedPosition(Player* pPlayer)
     if (iter == m_playerCacheData.end())
         data = InsertPlayerInCache(pPlayer);
     else
-        data = iter->second;
+        data = &iter->second;
 
     if (!data)
         return;
@@ -833,7 +838,7 @@ void ObjectMgr::UpdatePlayerCachedPosition(uint32 lowGuid, uint32 mapId, float p
     if (iter == m_playerCacheData.end())
         return;
 
-    UpdatePlayerCachedPosition(iter->second, mapId, posX, posY, posZ, o, inFlight);
+    UpdatePlayerCachedPosition(&iter->second, mapId, posX, posY, posZ, o, inFlight);
 }
 
 void ObjectMgr::UpdatePlayerCachedPosition(PlayerCacheData* data, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight)
@@ -853,7 +858,7 @@ void ObjectMgr::UpdatePlayerCache(Player* pPlayer)
     if (iter == m_playerCacheData.end())
         data = InsertPlayerInCache(pPlayer);
     else
-        data = iter->second;
+        data = &iter->second;
 
     if (!data)
         return;
@@ -876,14 +881,11 @@ void ObjectMgr::UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _cl
 
 PlayerCacheData* ObjectMgr::InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId)
 {
-    auto data = new PlayerCacheData;
-    data->uiGuid = lowGuid;
-    UpdatePlayerCache(data, race, _class, gender, accountId, name, level, zoneId);
-
-    m_playerCacheData[lowGuid] = data;
+    PlayerCacheData& data = m_playerCacheData[lowGuid];
+    data.uiGuid = lowGuid;
+    UpdatePlayerCache(&data, race, _class, gender, accountId, name, level, zoneId);
     m_playerNameToGuid[name] = lowGuid;
-
-    return data;
+    return &data;
 }
 
 void ObjectMgr::DeletePlayerFromCache(uint32 lowGuid)
@@ -891,7 +893,7 @@ void ObjectMgr::DeletePlayerFromCache(uint32 lowGuid)
     auto itr = m_playerCacheData.find(lowGuid);
     if (itr != m_playerCacheData.end())
     {
-        auto itr2 = m_playerNameToGuid.find(itr->second->sName);
+        auto itr2 = m_playerNameToGuid.find(itr->second.sName);
         if (itr2 != m_playerNameToGuid.end())
             m_playerNameToGuid.erase(itr2);
         m_playerCacheData.erase(itr);
@@ -905,16 +907,16 @@ void ObjectMgr::ChangePlayerNameInCache(uint32 guidLow, std::string const& oldNa
     {
         m_playerNameToGuid.erase(oldName);
         m_playerNameToGuid[newName] = guidLow;
-        itr->second->sName = newName;
+        itr->second.sName = newName;
     }
 }
 
-void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData*>& data) const
+void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData const*>& data) const
 {
     for (const auto& iter : m_playerCacheData)
     {
-        if (iter.second->uiAccount == accountId)
-            data.push_back(iter.second);
+        if (iter.second.uiAccount == accountId)
+            data.push_back(&iter.second);
     }
 }
 

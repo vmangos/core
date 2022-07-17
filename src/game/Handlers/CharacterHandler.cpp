@@ -301,12 +301,12 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 
     if (!AllowTwoSideAccounts)
     {
-        std::list<PlayerCacheData*> characters;
+        std::list<PlayerCacheData const*> characters;
         sObjectMgr.GetPlayerDataForAccount(GetAccountId(), characters);
 
         if (!characters.empty())
         {
-            PlayerCacheData* cData = characters.front();
+            PlayerCacheData const* cData = characters.front();
             Team team_ = Player::TeamForRace(race_);
 
             uint8 acc_race = cData->uiRace;

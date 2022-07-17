@@ -542,7 +542,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
     DEBUG_LOG("WORLD: %s asked to add friend : '%s'",
               GetMasterPlayer()->GetName(), friendName.c_str());
 
-    PlayerCacheData *pData = sObjectMgr.GetPlayerDataByName(friendName);
+    PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(friendName);
     if (!pData)
         return;
 
@@ -614,7 +614,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
     DEBUG_LOG("WORLD: %s asked to Ignore: '%s'",
               GetMasterPlayer()->GetName(), ignoreName.c_str());
 
-    PlayerCacheData *pData = sObjectMgr.GetPlayerDataByName(ignoreName);
+    PlayerCacheData const* pData = sObjectMgr.GetPlayerDataByName(ignoreName);
     if (!pData)
         return;
 

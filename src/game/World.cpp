@@ -2341,7 +2341,7 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
     std::string safe_author = author;
     LoginDatabase.escape_string(safe_author);
 
-    PlayerCacheData* authorData = sObjectMgr.GetPlayerDataByName(author);
+    PlayerCacheData const* authorData = sObjectMgr.GetPlayerDataByName(author);
 
     BanQueryHolder* holder = new BanQueryHolder(mode, nameOrIP, duration_secs, reason, realmID, safe_author,
         authorData ? authorData->uiAccount : 0);
