@@ -240,7 +240,9 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+22, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
 (@PTEMPLATE+23, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
 (@PTEMPLATE+24, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
-(@PTEMPLATE+25, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0);
+(@PTEMPLATE+25, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+26, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0),
+(@PTEMPLATE+27, 1271, 0, 'Western Plaguelands - Mithril Deposits / Gold Veins / Truesilver Deposits', 0);
 
 -- Truesilver Deposits / Small Thorium Veins
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1262, 1263));
@@ -371,7 +373,8 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`, `fla
 (@PTEMPLATE+15, 1331, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
 (@PTEMPLATE+16, 1331, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
 (@PTEMPLATE+17, 1331, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
-(@PTEMPLATE+18, 1331, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0);
+(@PTEMPLATE+18, 1331, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0),
+(@PTEMPLATE+19, 1331, 0, 'Truesilver Deposits / Small Thorium Veins - Western Plaguelands', 0);
 
 -- Truesilver Deposits / Rich Thorium Veins
 DELETE FROM `gameobject` WHERE `guid` IN (SELECT `guid` FROM `pool_gameobject` WHERE `pool_entry` IN (1264, 1262));
