@@ -291,6 +291,11 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 UPDATE `quest_template` SET `StartScript` = 5252 WHERE `entry` = 5252;
 UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN(6505, 6506, 6507);
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove Empty Pool Template
+DELETE FROM `pool_template` WHERE `entry` = 1607;
+
 
 -- End of migration.
 END IF;
