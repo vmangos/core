@@ -648,24 +648,39 @@ void ObjectMgr::LoadSavedVariable()
 }
 
 // Caching player data
-void ObjectMgr::LoadPlayerCacheData()
+void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
 {
-    m_playerCacheData.clear();
-    m_playerNameToGuid.clear();
+    std::unique_ptr<QueryResult> result;
+    if (!lowGuid)
+    {
+        // load all characters (likely at startup)
+        m_playerCacheData.clear();
+        m_playerNameToGuid.clear();
 
-    std::unique_ptr<QueryResult> result(CharacterDatabase.Query(
-        //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
-        "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters`;"));
+        result.reset(CharacterDatabase.Query(
+            //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
+            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters`;"));
+    }
+    else
+    {
+        // load a single character (likely just restored)
+        result.reset(CharacterDatabase.PQuery(
+            //       0       1       2        3         4          5       6        7          8      9             10            11            12             13
+            "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `current_taxi_path` FROM `characters` WHERE `guid`=%u;", lowGuid));
+    }
 
-    uint32 total_count = 0;
+    uint32 totalCount = 0;
 
     if (!result)
     {
-        BarGoLink bar(1);
-        bar.step();
+        if (!lowGuid)
+        {
+            BarGoLink bar(1);
+            bar.step();
 
-        sLog.outString();
-        sLog.outString(">> Loaded 0 cached player data ...");
+            sLog.outString();
+            sLog.outString(">> Loaded 0 cached player data ...");
+        }
         return;
     }
 
@@ -686,12 +701,15 @@ void ObjectMgr::LoadPlayerCacheData()
             UpdatePlayerCachedPosition(data, fields[8].GetUInt32(), fields[9].GetFloat(), fields[10].GetFloat(),
                 fields[11].GetFloat(), fields[12].GetFloat(), !fields[13].GetCppString().empty());
         }
-        ++total_count;
+        ++totalCount;
     }
     while (result->NextRow());
 
-    sLog.outString();
-    sLog.outString(">> Loaded %u players in cache.", total_count);
+    if (!lowGuid)
+    {
+        sLog.outString();
+        sLog.outString(">> Loaded %u players in cache.", totalCount);
+    }
 }
 
 PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const

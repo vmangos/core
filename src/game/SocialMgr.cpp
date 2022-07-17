@@ -314,7 +314,7 @@ PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
     if (!result)
         return social;
 
-    uint32 friend_guid = 0;
+    uint32 friendLowGuid = 0;
     uint32 flags = 0;
 
     // used to speed up check below. Using GetNumberOfSocialsWithFlag will cause unneeded iteration
@@ -324,7 +324,7 @@ PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
     {
         Field* fields  = result->Fetch();
 
-        friend_guid = fields[0].GetUInt32();
+        friendLowGuid = fields[0].GetUInt32();
         flags = fields[1].GetUInt32();
 
         if ((flags & SOCIAL_FLAG_IGNORED) && ignoreCounter >= SOCIALMGR_IGNORE_LIMIT)
@@ -332,7 +332,11 @@ PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
         if ((flags & SOCIAL_FLAG_FRIEND) && friendCounter >= SOCIALMGR_FRIEND_LIMIT)
             continue;
 
-        social->m_playerSocialMap[friend_guid] = FriendInfo(flags);
+        // character deleted from account, don't load it until it's restored
+        if (!sObjectMgr.GetPlayerAccountIdByGUID(ObjectGuid(HIGHGUID_PLAYER, friendLowGuid)))
+            continue;
+
+        social->m_playerSocialMap[friendLowGuid] = FriendInfo(flags);
 
         if (flags & SOCIAL_FLAG_IGNORED)
             ignoreCounter++;
