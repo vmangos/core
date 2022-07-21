@@ -37,7 +37,6 @@ enum
     NPC_CMD_SPRINGVALE      = 4278,
     NPC_ASH                 = 3850,
     NPC_ADA                 = 3849,
-    NPC_ARUGAL              = 10000,                        //"Arugal" says intro text
     NPC_ARCHMAGE_ARUGAL     = 4275,                         //"Archmage Arugal" does Fenrus event
     NPC_FENRUS              = 4274,                         //used to summon Arugal in Fenrus event
     NPC_VINCENT             = 4444,                         //Vincent should be "dead" is Arugal is done the intro already
@@ -120,11 +119,6 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 break;
             case NPC_FENRUS:
                 m_uiFenrusGUID = pCreature->GetGUID();
-                break;
-            case NPC_ARUGAL:
-                //if Arugal has done the intro, make him invisible!
-                if (m_auiEncounter[4] == DONE)
-                    pCreature->SetVisibility(VISIBILITY_OFF);
                 break;
             case NPC_VINCENT:
                 m_uiVincentGUID = pCreature->GetGUID();
