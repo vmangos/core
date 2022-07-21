@@ -12,7 +12,6 @@ INSERT INTO `migrations` VALUES ('20220721212432');
 DELETE FROM `generic_scripts` WHERE `id`=10000;
 INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (10000, 0, 0, 4, 46, 134217728, 1, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Invisible'),
-(10000, 0, 0, 37, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Set Instance Data'),
 (10000, 5, 0, 4, 46, 134217728, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Visible'),
 (10000, 5, 0, 15, 10418, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Cast Teleport'),
 (10000, 9, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Emote Talk'),
@@ -25,7 +24,8 @@ INSERT INTO `generic_scripts` (`id`, `delay`, `priority`, `command`, `datalong`,
 (10000, 18, 0, 1, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Emote Laugh'),
 (10000, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5682, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Say Text 3'),
 (10000, 24, 0, 15, 7741, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Cast Teleport'),
-(10000, 25, 0, 18, 22, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Despawn');
+(10000, 25, 0, 18, 22, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Arugal Despawn'),
+(10000, 26, 0, 37, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SFK Intro - Set Instance Data');
 
 -- End of migration.
 END IF;
