@@ -1611,10 +1611,6 @@ bool ChatHandler::HandleBattleBotAddWarsongCommand(char* args)
 
 bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
 {
-    Player* pPlayer = m_session->GetPlayer();
-    if (!pPlayer)
-        return false;
-
     if (!*args)
     {
         SendSysMessage("Incorrect syntax. Expected faction");
