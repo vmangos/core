@@ -296,6 +296,11 @@ UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN(6505, 6506, 6507);
 -- Remove Empty Pool Template
 DELETE FROM `pool_template` WHERE `entry` = 1607;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Set Correct Creature ID
+UPDATE `creature` SET `id` = 8566 WHERE `guid` = 300647;
+
 
 -- End of migration.
 END IF;
