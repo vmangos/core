@@ -1713,6 +1713,22 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 12623:                             // Suppression
+                    {
+                        if (Creature* pCreature = target->ToCreature())
+                        {
+                            // Using script command to avoid including EventAI header.
+                            ScriptInfo si;
+                            si.command = SCRIPT_COMMAND_SET_PHASE;
+                            si.setPhase.phase = 1;
+                            if (apply)
+                                si.setPhase.mode = SO_SETPHASE_INCREMENT;
+                            else
+                                si.setPhase.mode = SO_SETPHASE_DECREMENT;
+                            pCreature->GetMap()->ScriptCommandStartDirect(si, pCreature, pCreature);
+                        }
+                        return;
+                    }
                     case 13139:                             // net-o-matic
                     {
                         // root to self part of (root_target->charge->root_self sequence

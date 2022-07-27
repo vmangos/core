@@ -2949,8 +2949,8 @@ GameObject* WorldObject::FindRandomGameObject(uint32 entry, float range) const
 Player* WorldObject::FindNearestPlayer(float range) const
 {
     Player* target = nullptr;
-    MaNGOS::NearestUnitCheck check(this, range);
-    MaNGOS::PlayerLastSearcher<MaNGOS::NearestUnitCheck> searcher(target, check);
+    MaNGOS::NearestAlivePlayerCheck check(this, range);
+    MaNGOS::PlayerLastSearcher<MaNGOS::NearestAlivePlayerCheck> searcher(target, check);
     Cell::VisitWorldObjects(this, searcher, range);
 
     return target;

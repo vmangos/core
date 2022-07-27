@@ -913,7 +913,7 @@ void GameObject::SaveToDB(uint32 mapid)
     WorldDatabase.CommitTransaction();
 }
 
-bool GameObject::LoadFromDB(uint32 guid, Map* map)
+bool GameObject::LoadFromDB(uint32 guid, Map* map, bool force)
 {
     GameObjectData const* data = sObjectMgr.GetGOData(guid);
 
@@ -922,9 +922,9 @@ bool GameObject::LoadFromDB(uint32 guid, Map* map)
         sLog.outErrorDb("Gameobject (GUID: %u) not found in table `gameobject`, can't load. ", guid);
         return false;
     }
-    if (data->spawn_flags & SPAWN_FLAG_DISABLED)
-        return false;
 
+    if (!force && (data->spawn_flags & SPAWN_FLAG_DISABLED))
+        return false;
 
     uint32 entry = data->id;
     //uint32 map_id = data->position.mapId;                          // already used before call
@@ -1629,7 +1629,7 @@ void GameObject::Use(Unit* user)
             uint32 time_to_restore = info->GetAutoCloseTime();
 
             // this appear to be ok, however others exist in addition to this that should have custom (ex: 190510, 188692, 187389)
-            if (time_to_restore && info->goober.customAnim)
+            if (HasCustomAnim() || time_to_restore && info->goober.customAnim)
                 SendGameObjectCustomAnim();
             else
                 SetGoState(GO_STATE_ACTIVE);
@@ -2406,6 +2406,7 @@ bool GameObject::HasCustomAnim() const
 {
     switch (GetDisplayId())
     {
+        case 2570: // eternal flame
         case 3071: // freezing trap
         case 3072: // explosive trap
         case 3073: // frost trap, fixed trap

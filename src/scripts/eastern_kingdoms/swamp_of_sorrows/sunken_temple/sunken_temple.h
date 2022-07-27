@@ -37,6 +37,7 @@ enum
     TYPE_MALFURION        = 7,
     TYPE_AVATAR           = 8,
     TYPE_ERANIKUS         = 9,
+    TYPE_ETERNAL_FLAME    = 10,
 
     NPC_ATALARION         = 8580,
     NPC_DREAMSCYTH        = 5721,
@@ -102,52 +103,11 @@ enum
     SPELL_AVATAR_SUMMONED = 12948,
 
     SAY_JAMMALAN_INTRO    = -1109005,
-    SAY_AVATAR_BRAZIER_1  = -1109006,
-    SAY_AVATAR_BRAZIER_2  = -1109007,
-    SAY_AVATAR_BRAZIER_3  = -1109008,
-    SAY_AVATAR_BRAZIER_4  = -1109009,
-    SAY_AVATAR_SPAWN      = -1109010,
 
     SAY_DREAMSCYTHE_INTRO = -1109011,
     SAY_DREAMSCYTHE_AGGRO = -1109012,
     SAY_ATALALARION_AGGRO = -1109013,
     SAY_ATALALARION_SPAWN = -1109014,
-};
-
-enum ShadeOfHakkar
-{
-    SHADE_SPAWN_TYPES   = 2,                             // The number of different event spawn types for the Shade of Hakkar
-    SHADE_HAKKARI_TYPE  = 0,
-    SHADE_KEEPER_TYPE   = 1,
-    MAX_HAKKARI_MINION  = 17,                            // Maximum number of Hakkari minions that can be alive at once 8 + 3 + 3 + 3 = 17 (4 waves w/ max spawn each time)
-    MAX_BLOODKEEPER     = 4,                             // Maximum number of blood keepers that can be alive at once
-    NUM_BRAZIERS        = 4,
-};
-
-struct npc_shade_hakkarAI : public ScriptedAI
-{
-    npc_shade_hakkarAI(Creature *m_creature);
-
-    ScriptedInstance* m_pInstance;
-
-    uint32 m_uiBraziersUsed;
-    uint32 m_uiHakkariTimer;
-    uint32 m_uiSuppressorTimer;
-    uint32 m_uiSuppressingTimer;
-    uint32 CheckTimer;
-    bool EngagedOnce;
-    bool FirstPop;
-    uint32 eventSpawns[SHADE_SPAWN_TYPES];
-
-    void Reset() override;
-    void Aggro(Unit *pWho) override;
-    void JustSummoned(Creature *m_creature) override;
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override;
-    void UpdateAI(uint32 const uiDiff) override;
-
-    void SummonJustDied(Creature *m_pcreature);
-    void UpdateBrazierState(GameObject *go, bool used);
-    void SummonTheAvatar();
 };
 
 #endif

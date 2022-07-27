@@ -63,7 +63,7 @@ class GameObject : public SpellCaster
 
         void SaveToDB();
         void SaveToDB(uint32 mapid);
-        bool LoadFromDB(uint32 guid, Map* map);
+        bool LoadFromDB(uint32 guid, Map* map, bool force = false);
         void DeleteFromDB() const;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_4_2

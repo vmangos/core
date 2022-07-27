@@ -246,6 +246,10 @@ enum ConditionType
     CONDITION_OBJECT_GO_STATE       = 55,                   // Checks the current go state of a GameObject.
                                                             // Requirement: GameObject Target
                                                             // Value1: go_state (see enum GOState)
+    CONDITION_NEARBY_PLAYER         = 56,                   // Checks if there is a player nearby.
+                                                            // Requirement: Unit Target
+                                                            // Value1: 0, 1, or 2 (0: any, 1: hostile, 2: friendly)
+                                                            // Value2: search_radius
 };
 
 enum ConditionFlags

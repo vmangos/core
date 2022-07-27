@@ -99,24 +99,6 @@ class AllCreaturesOfEntryInRangeCheck
         uint32 m_uiEntry;
         float m_fRange;
 };
-
-class PlayerAtMinimumRangeAway
-{
-    public:
-        PlayerAtMinimumRangeAway(Unit const* unit, float fMinRange) : pUnit(unit), fRange(fMinRange) {}
-        bool operator() (Player* pPlayer)
-        {
-            //No threat list check, must be done explicit if expected to be in combat with creature
-            if (!pPlayer->IsGameMaster() && pPlayer->IsAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false))
-                return true;
-
-            return false;
-        }
-
-    private:
-        Unit const* pUnit;
-        float fRange;
-};
 */
 
 #endif

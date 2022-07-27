@@ -265,7 +265,7 @@ class Creature : public Unit
         void SetDeathState(DeathState s) override;                   // overwrite virtual Unit::SetDeathState
         bool FallGround();
 
-        bool LoadFromDB(uint32 guid, Map* map);
+        bool LoadFromDB(uint32 guid, Map* map, bool force = false);
         void SaveToDB();
                                                             // overwrited in Pet
         virtual void SaveToDB(uint32 mapid);

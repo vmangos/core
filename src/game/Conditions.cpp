@@ -105,6 +105,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_NONE,               //  53
     CONDITION_REQ_TARGET_WORLDOBJECT, //  54
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  55
+    CONDITION_REQ_TARGET_UNIT,        //  56
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -595,6 +596,19 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_OBJECT_GO_STATE:
         {
             return target->ToGameObject()->GetGoState() == m_value1;
+        }
+        case CONDITION_NEARBY_PLAYER:
+        {
+            switch (m_value1)
+            {
+                case 0:
+                    return (bool)target->ToUnit()->FindNearestPlayer(m_value2);
+                case 1:
+                    return (bool)target->ToUnit()->FindNearestHostilePlayer(m_value2);
+                case 2:
+                    return (bool)target->ToUnit()->FindNearestFriendlyPlayer(m_value2);
+            }
+            return false;
         }
     }
     return false;
@@ -1216,6 +1230,20 @@ bool ConditionEntry::IsValid()
             if (m_value1 > GO_STATE_ACTIVE_ALTERNATIVE)
             {
                 sLog.outErrorDb("CONDITION_OBJECT_GO_STATE (entry %u, type %u) has invalid GO state %u, skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_NEARBY_PLAYER:
+        {
+            if (m_value1 < 0 || m_value1 > 2)
+            {
+                sLog.outErrorDb("CONDITION_NEARBY_PLAYER (entry %u, type %u) has invalid value1 %u, skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            if (m_value2 <= 0)
+            {
+                sLog.outErrorDb("CONDITION_NEARBY_PLAYER (entry %u, type %d) does not have max distance set in value2, skipped", m_entry, m_condition);
                 return false;
             }
             break;
