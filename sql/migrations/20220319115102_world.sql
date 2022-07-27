@@ -325,6 +325,20 @@ DELETE FROM `creature` WHERE `id` = 7732;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Add Some Immunities (credit cmangos)
+UPDATE `creature_template` SET `SchoolImmuneMask` = 4 WHERE `entry` IN (
+7044, -- Black Drake
+7045, -- Scalding Drake
+7046, -- Searscale Drake
+7846, -- Teremus the Devourer (https://classic.wowhead.com/npc=7846/teremus-the-devourer#comments:id=2838902)
+8976, -- Hematos
+14388, -- Rogue Black Drake
+14601, -- Ebonroc
+11981, -- Flamegor
+11983 -- Firemaw
+);
+
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- End of migration.
