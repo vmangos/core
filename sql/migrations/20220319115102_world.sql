@@ -326,7 +326,7 @@ DELETE FROM `creature` WHERE `id` = 7732;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Add Some Immunities (credit cmangos)
-UPDATE `creature_template` SET `SchoolImmuneMask` = 4 WHERE `entry` IN (
+UPDATE `creature_template` SET `school_immune_mask` = 4 WHERE `entry` IN (
 7044, -- Black Drake
 7045, -- Scalding Drake
 7046, -- Searscale Drake
