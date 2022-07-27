@@ -340,6 +340,21 @@ UPDATE `creature_template` SET `SchoolImmuneMask` = 4 WHERE `entry` IN (
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Update Quest Script For Pristine Spider Silk
+DELETE FROM `quest_end_scripts` WHERE `id`=1940;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1940, 0, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc\\_flag questgiver removed'),
+(1940, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2649, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 1'),
+(1940, 5, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Emote'),
+(1940, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2651, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 2'),
+(1940, 8, 0, 3, 0, 1800, 69, 1, 0, 0, 0, 0, 0, 0, 0, 0, -8964.6, 824.703, 109.447, 3.80513, 0, 'Pristine Spider Silk - Wynne Larson: Move point 1'),
+(1940, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2650, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 3'),
+(1940, 11, 0, 15, 9157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Cast spell \"Create Mage\'s Robe\"'),
+(1940, 16, 0, 1, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Emote'),
+(1940, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2648, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 4'),
+(1940, 19, 0, 3, 0, 1800, 69, 1, 0, 0, 0, 0, 0, 0, 0, 0, -8963, 822.517, 109.447, 3.846, 0, 'Pristine Spider Silk - Wynne Larson: Move point 1'),
+(1940, 19, 0, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc\\_flag questgiver added');
+
 
 -- End of migration.
 END IF;
