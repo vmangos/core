@@ -1107,7 +1107,7 @@ float SpellCaster::MeleeDamageBonusDone(Unit* pVictim, float pdamage, WeaponAtta
     if (!flat)
         DoneTotal = 0.0f;
 
-    float tmpDamage = pdamage + DoneTotal * int32(stack) * DonePercent;
+    float tmpDamage = (pdamage + DoneTotal * int32(stack)) * DonePercent;
 
     // apply spellmod to Done damage
     if (spellProto && pUnit)
