@@ -354,6 +354,11 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 (1940, 19, 0, 3, 0, 1800, 69, 1, 0, 0, 0, 0, 0, 0, 0, 0, -8963, 822.517, 109.447, 3.846, 0, 'Pristine Spider Silk - Wynne Larson: Move point 1'),
 (1940, 19, 0, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc\\_flag questgiver added');
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove Creature Under Map
+DELETE FROM `creature` WHERE `guid` = 89490;
+
 
 -- End of migration.
 END IF;
