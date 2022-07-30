@@ -2535,534 +2535,966 @@ DELETE FROM `creature_loot_template` WHERE `entry` = 100 AND `item` IN (30039, 3
 -- ----------------------------------------------------------------------
 
 -- Sync Trainer Greeting With Sniffs
-REPLACE INTO `npc_trainer_greeting` (`entry`, `content_default`) VALUES
-(198, 'Hello, mage!  Ready for some training?'),
-(223, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(328, 'Hello, mage!  Ready for some training?'),
-(331, 'Hello, mage!  Ready for some training?'),
-(375, 'Hello, priest!  Ready for some training?'),
-(376, 'Hello, priest!  Ready for some training?'),
-(377, 'Hello, priest!  Ready for some training?'),
-(459, 'Hello, warlock!  Ready for some training?'),
-(459, 'Hello, warlock!  Ready for some training?'),
-(460, 'Hello, warlock!  Ready for some training?'),
-(461, 'Hello, warlock!  Ready for some training?'),
-(461, 'Hello, warlock!  Ready for some training?'),
-(514, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(514, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(543, ''),
-(812, 'Searching for herbs requires both knowledge and instinct.'),
-(837, 'Hello, priest!  Ready for some training?'),
-(895, 'Hello, hunter!  Ready for some training?'),
-(906, 'Hello, warlock!  Ready for some training?'),
-(908, 'Searching for herbs requires both knowledge and instinct.'),
-(911, 'Hello, warrior!  Ready for some training?'),
-(912, 'Hello, warrior!  Ready for some training?'),
-(913, 'Hello, warrior!  Ready for some training?'),
-(914, 'Hello, warrior!  Ready for some training?'),
-(915, 'Hello, rogue!  Ready for some training?'),
-(916, 'Hello, rogue!  Ready for some training?'),
-(917, 'Hello, rogue!  Ready for some training?'),
-(918, 'Hello, rogue!  Ready for some training?'),
-(925, 'Hello, paladin!  Ready for some training?'),
-(925, 'Hello, paladin!  Ready for some training?'),
-(926, 'Hello, paladin!  Ready for some training?'),
-(927, 'Hello, paladin!  Ready for some training?'),
-(927, 'Hello, paladin!  Ready for some training?'),
-(928, 'Hello, paladin!  Ready for some training?'),
-(928, 'Hello, paladin!  Ready for some training?'),
-(944, 'Hello, mage!  Ready for some training?'),
-(957, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(957, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(985, 'Hello, warrior!  Ready for some training?'),
-(986, 'Hello, shaman!  Ready for some training?'),
-(987, 'Hello, hunter!  Ready for some training?'),
-(988, 'Hello, warlock!  Ready for some training?'),
-(1103, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(1215, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(1218, 'Searching for herbs requires both knowledge and instinct.'),
-(1226, 'Hello, priest!  Ready for some training?'),
-(1228, 'Hello, mage!  Ready for some training?'),
-(1229, 'Hello, warrior!  Ready for some training?'),
-(1231, 'Hello, hunter!  Ready for some training?'),
-(1232, 'Hello, paladin!  Ready for some training?'),
-(1232, 'Hello, paladin!  Ready for some training?'),
-(1234, 'Hello, rogue!  Ready for some training?'),
-(1241, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(1246, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(1246, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(1292, 'It requires a steady hand to remove the leather from a slain beast.'),
-(1300, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(1300, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(1346, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(1346, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(1355, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(1382, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(1383, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(1383, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(1385, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(1386, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(1404, 'Hello, hunter!  Ready for some training?'),
-(1411, 'Hello, rogue!  Ready for some training?'),
-(1430, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(1430, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(1458, 'Searching for herbs requires both knowledge and instinct.'),
-(1466, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(1632, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(1632, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(1651, 'I can teach you how to use a fishing pole to catch fish.'),
-(1680, 'I can teach you how to use a fishing pole to catch fish.'),
-(1699, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(1699, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(1901, 'Hello, warrior!  Ready for some training?'),
-(2114, 'Searching for herbs requires both knowledge and instinct.'),
-(2119, 'Hello, warrior!  Ready for some training?'),
-(2119, 'Hello, warrior!  Ready for some training?'),
-(2122, 'Hello, rogue!  Ready for some training?'),
-(2123, 'Hello, priest!  Ready for some training?'),
-(2124, 'Hello, mage!  Ready for some training?'),
-(2126, 'Hello, warlock!  Ready for some training?'),
-(2127, 'Hello, warlock!  Ready for some training?'),
-(2127, 'Hello, warlock!  Ready for some training?'),
-(2128, 'Hello, mage!  Ready for some training?'),
-(2129, 'Hello, priest!  Ready for some training?'),
-(2130, 'Hello, rogue!  Ready for some training?'),
-(2131, 'Hello, warrior!  Ready for some training?'),
-(2132, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(2132, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(2326, 'Here, let me show you how to bind those wounds....'),
-(2326, 'Here, let me show you how to bind those wounds....'),
-(2327, 'Here, let me show you how to bind those wounds....'),
-(2329, 'Here, let me show you how to bind those wounds....'),
-(2329, 'Here, let me show you how to bind those wounds....'),
-(2367, 'I can teach you how to use a fishing pole to catch fish.'),
-(2390, 'Searching for herbs requires both knowledge and instinct.'),
-(2391, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(2391, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(2485, 'Welcome!'),
-(2489, 'Welcome!'),
-(2492, 'Welcome!'),
-(2704, ''),
-(2704, ''),
-(2798, 'Here, let me show you how to bind those wounds....'),
-(2798, 'Here, let me show you how to bind those wounds....'),
-(2818, 'There is no treat finer than Barbecued Buzzard Wing.'),
-(2834, 'I can teach you how to use a fishing pole to catch fish.'),
-(2834, 'I can teach you how to use a fishing pole to catch fish.'),
-(2836, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(2837, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(2855, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(2856, 'Searching for herbs requires both knowledge and instinct.'),
-(2857, 'Engineering is very simple once you grasp the basics.'),
-(2878, ''),
-(2879, ''),
-(2998, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(2998, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(3001, 'You have not lived until you have dug deep into the earth.'),
-(3007, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3007, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3008, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3008, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3011, 'Enchanting is the art of improving existing items through magic. '),
-(3013, 'Searching for herbs requires both knowledge and instinct.'),
-(3026, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(3026, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(3028, 'I can teach you how to use a fishing pole to catch fish.'),
-(3030, 'Hello, shaman!  Ready for some training?'),
-(3031, 'Hello, shaman!  Ready for some training?'),
-(3032, 'Hello, shaman!  Ready for some training?'),
-(3033, 'Hello, druid!  Ready for some training?'),
-(3034, 'Hello, druid!  Ready for some training?'),
-(3036, 'Hello, druid!  Ready for some training?'),
-(3038, 'Hello, hunter!  Ready for some training?'),
-(3039, 'Hello, hunter!  Ready for some training?'),
-(3040, 'Hello, hunter!  Ready for some training?'),
-(3041, 'Hello, warrior!  Ready for some training?'),
-(3042, 'Hello, warrior!  Ready for some training?'),
-(3043, 'Hello, warrior!  Ready for some training?'),
-(3043, 'Hello, warrior!  Ready for some training?'),
-(3044, 'Hello, priest!  Ready for some training?'),
-(3045, 'Hello, priest!  Ready for some training?'),
-(3046, 'Hello, priest!  Ready for some training?'),
-(3047, 'Hello, mage!  Ready for some training?'),
-(3048, 'Hello, mage!  Ready for some training?'),
-(3049, 'Hello, mage!  Ready for some training?'),
-(3059, 'Hello, warrior!  Ready for some training?'),
-(3060, 'Hello, druid!  Ready for some training?'),
-(3060, 'Hello, druid!  Ready for some training?'),
-(3061, 'Hello, hunter!  Ready for some training?'),
-(3062, 'Hello, shaman!  Ready for some training?'),
-(3063, 'Hello, warrior!  Ready for some training?'),
-(3064, 'Hello, druid!  Ready for some training?'),
-(3065, 'Hello, hunter!  Ready for some training?'),
-(3066, 'Hello, shaman!  Ready for some training?'),
-(3067, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(3069, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3069, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3087, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(3137, 'You have not lived until you have dug deep into the earth.'),
-(3153, 'Hello, warrior!  Ready for some training?'),
-(3154, 'Hello, hunter!  Ready for some training?'),
-(3155, 'Hello, rogue!  Ready for some training?'),
-(3156, 'Hello, warlock!  Ready for some training?'),
-(3157, 'Hello, shaman!  Ready for some training?'),
-(3169, 'Hello, warrior!  Ready for some training?'),
-(3170, 'Hello, rogue!  Ready for some training?'),
-(3171, 'Hello, hunter!  Ready for some training?'),
-(3172, 'Hello, warlock!  Ready for some training?'),
-(3173, 'Hello, shaman!  Ready for some training?'),
-(3174, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(3175, 'You have not lived until you have dug deep into the earth.'),
-(3179, 'I can teach you how to use a fishing pole to catch fish.'),
-(3179, 'I can teach you how to use a fishing pole to catch fish.'),
-(3181, 'Here, let me show you how to bind those wounds....'),
-(3184, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(3185, 'Searching for herbs requires both knowledge and instinct.'),
-(3290, 'Engineering is very simple once you grasp the basics.'),
-(3306, ''),
-(3324, 'Hello, warlock!  Ready for some training?'),
-(3324, 'Hello, warlock!  Ready for some training?'),
-(3325, 'Hello, warlock!  Ready for some training?'),
-(3325, 'Hello, warlock!  Ready for some training?'),
-(3326, 'Hello, warlock!  Ready for some training?'),
-(3326, 'Hello, warlock!  Ready for some training?'),
-(3327, 'Hello, rogue!  Ready for some training?'),
-(3328, 'Hello, rogue!  Ready for some training?'),
-(3332, 'I can teach you how to use a fishing pole to catch fish.'),
-(3344, 'Hello, shaman!  Ready for some training?'),
-(3344, 'Hello, shaman!  Ready for some training?'),
-(3345, 'Enchanting is the art of improving existing items through magic. '),
-(3347, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(3352, 'Hello, hunter!  Ready for some training?'),
-(3353, 'Hello, warrior!  Ready for some training?'),
-(3354, 'Hello, warrior!  Ready for some training?'),
-(3355, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(3357, 'You have not lived until you have dug deep into the earth.'),
-(3363, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(3365, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3365, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3373, 'Here, let me show you how to bind those wounds....'),
-(3399, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(3399, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(3401, 'Hello, rogue!  Ready for some training?'),
-(3403, 'Hello, shaman!  Ready for some training?'),
-(3404, 'Searching for herbs requires both knowledge and instinct.'),
-(3406, 'Hello, hunter!  Ready for some training?'),
-(3407, 'Hello, hunter!  Ready for some training?'),
-(3408, 'Hello, warrior!  Ready for some training?'),
-(3408, 'Hello, warrior!  Ready for some training?'),
-(3478, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(3478, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(3484, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(3494, 'Engineering is very simple once you grasp the basics.'),
-(3494, 'Engineering is very simple once you grasp the basics.'),
-(3523, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(3523, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(3545, ''),
-(3549, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3549, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3555, 'You have not lived until you have dug deep into the earth.'),
-(3557, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(3593, 'Hello, warrior!  Ready for some training?'),
-(3594, 'Hello, rogue!  Ready for some training?'),
-(3595, 'Hello, priest!  Ready for some training?'),
-(3596, 'Hello, hunter!  Ready for some training?'),
-(3597, 'Hello, druid!  Ready for some training?'),
-(3597, 'Hello, druid!  Ready for some training?'),
-(3598, 'Hello, warrior!  Ready for some training?'),
-(3599, 'Hello, rogue!  Ready for some training?'),
-(3600, 'Hello, priest!  Ready for some training?'),
-(3601, 'Hello, hunter!  Ready for some training?'),
-(3601, 'Hello, hunter!  Ready for some training?'),
-(3602, 'Hello, druid!  Ready for some training?'),
-(3603, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(3603, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(3604, 'Searching for herbs requires both knowledge and instinct.'),
-(3605, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3607, 'I can teach you how to use a fishing pole to catch fish.'),
-(3620, ''),
-(3622, ''),
-(3624, ''),
-(3688, ''),
-(3690, 'Hello!  Can I teach you something?'),
-(3690, 'Hello!  Can I teach you something?'),
-(3698, ''),
-(3703, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3703, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(3706, 'Hello, priest!  Ready for some training?'),
-(3707, 'Hello, priest!  Ready for some training?'),
-(3963, 'Hello, hunter!  Ready for some training?'),
-(3964, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(3964, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(3965, 'Searching for herbs requires both knowledge and instinct.'),
-(3967, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(4087, 'Hello, warrior!  Ready for some training?'),
-(4089, 'Hello, warrior!  Ready for some training?'),
-(4090, 'Hello, priest!  Ready for some training?'),
-(4091, 'Hello, priest!  Ready for some training?'),
-(4092, 'Hello, priest!  Ready for some training?'),
-(4138, 'Hello, hunter!  Ready for some training?'),
-(4146, 'Hello, hunter!  Ready for some training?'),
-(4156, 'I can teach you how to use a fishing pole to catch fish.'),
-(4156, 'I can teach you how to use a fishing pole to catch fish.'),
-(4160, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(4163, 'Hello, rogue!  Ready for some training?'),
-(4165, 'Welcome!'),
-(4193, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(4204, 'Searching for herbs requires both knowledge and instinct.'),
-(4205, 'Hello, hunter!  Ready for some training?'),
-(4210, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(4211, 'Here, let me show you how to bind those wounds....'),
-(4211, 'Here, let me show you how to bind those wounds....'),
-(4212, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(4214, 'Hello, rogue!  Ready for some training?'),
-(4215, 'Hello, rogue!  Ready for some training?'),
-(4217, 'Hello, druid!  Ready for some training?'),
-(4218, 'Hello, druid!  Ready for some training?'),
-(4219, 'Hello, druid!  Ready for some training?'),
-(4254, 'You have not lived until you have dug deep into the earth.'),
-(4320, ''),
-(4552, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(4563, 'Hello, warlock!  Ready for some training?'),
-(4563, 'Hello, warlock!  Ready for some training?'),
-(4564, 'Hello, warlock!  Ready for some training?'),
-(4565, 'Hello, warlock!  Ready for some training?'),
-(4566, 'Hello, mage!  Ready for some training?'),
-(4567, 'Hello, mage!  Ready for some training?'),
-(4568, 'Hello, mage!  Ready for some training?'),
-(4573, 'I can teach you how to use a fishing pole to catch fish.'),
-(4573, 'I can teach you how to use a fishing pole to catch fish.'),
-(4582, 'Hello, rogue!  Ready for some training?'),
-(4583, 'Hello, rogue!  Ready for some training?'),
-(4584, 'Hello, rogue!  Ready for some training?'),
-(4586, 'Engineering is very simple once you grasp the basics.'),
-(4586, 'Engineering is very simple once you grasp the basics.'),
-(4588, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(4588, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(4591, 'Here, let me show you how to bind those wounds....'),
-(4591, 'Here, let me show you how to bind those wounds....'),
-(4593, 'Hello, warrior!  Ready for some training?'),
-(4593, 'Hello, warrior!  Ready for some training?'),
-(4594, 'Hello, warrior!  Ready for some training?'),
-(4595, 'Hello, warrior!  Ready for some training?'),
-(4596, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(4596, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(4598, 'You have not lived until you have dug deep into the earth.'),
-(4605, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(4606, 'Hello, priest!  Ready for some training?'),
-(4607, 'Hello, priest!  Ready for some training?'),
-(4608, 'Hello, priest!  Ready for some training?'),
-(4609, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(4609, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(4611, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(4614, 'Searching for herbs requires both knowledge and instinct.'),
-(4616, 'Enchanting is the art of improving existing items through magic. '),
-(4732, 'Hello!  Can I teach you something?'),
-(4732, 'Hello!  Can I teach you something?'),
-(4752, 'Hello!  Can I teach you something?'),
-(4752, 'Hello!  Can I teach you something?'),
-(4753, 'Hello!  Can I teach you something?'),
-(4753, 'Hello!  Can I teach you something?'),
-(4772, 'Hello!  Can I teach you something?'),
-(4773, ''),
-(4773, ''),
-(4898, 'Searching for herbs requires both knowledge and instinct.'),
-(4900, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(5113, 'Hello, warrior!  Ready for some training?'),
-(5113, 'Hello, warrior!  Ready for some training?'),
-(5114, 'Hello, warrior!  Ready for some training?'),
-(5115, 'Hello, hunter!  Ready for some training?'),
-(5116, 'Hello, hunter!  Ready for some training?'),
-(5117, 'Hello, hunter!  Ready for some training?'),
-(5127, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(5127, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(5137, 'Searching for herbs requires both knowledge and instinct.'),
-(5141, 'Hello, priest!  Ready for some training?'),
-(5142, 'Hello, priest!  Ready for some training?'),
-(5143, 'Hello, priest!  Ready for some training?'),
-(5143, 'Hello, priest!  Ready for some training?'),
-(5144, 'Hello, mage!  Ready for some training?'),
-(5145, 'Hello, mage!  Ready for some training?'),
-(5145, 'Hello, mage!  Ready for some training?'),
-(5146, 'Hello, mage!  Ready for some training?'),
-(5147, 'Hello, paladin!  Ready for some training?'),
-(5147, 'Hello, paladin!  Ready for some training?'),
-(5148, 'Hello, paladin!  Ready for some training?'),
-(5149, 'Hello, paladin!  Ready for some training?'),
-(5149, 'Hello, paladin!  Ready for some training?'),
-(5150, 'Here, let me show you how to bind those wounds....'),
-(5150, 'Here, let me show you how to bind those wounds....'),
-(5161, 'I can teach you how to use a fishing pole to catch fish.'),
-(5165, 'Hello, rogue!  Ready for some training?'),
-(5166, 'Hello, rogue!  Ready for some training?'),
-(5167, 'Hello, rogue!  Ready for some training?'),
-(5171, 'Hello, warlock!  Ready for some training?'),
-(5172, 'Hello, warlock!  Ready for some training?'),
-(5173, 'Hello, warlock!  Ready for some training?'),
-(5174, 'Engineering is very simple once you grasp the basics.'),
-(5174, 'Engineering is very simple once you grasp the basics.'),
-(5177, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(5479, 'Hello, warrior!  Ready for some training?'),
-(5480, 'Hello, warrior!  Ready for some training?'),
-(5482, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(5482, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(5484, 'Hello, priest!  Ready for some training?'),
-(5489, 'Hello, priest!  Ready for some training?'),
-(5491, 'Hello, paladin!  Ready for some training?'),
-(5491, 'Hello, paladin!  Ready for some training?'),
-(5492, 'Hello, paladin!  Ready for some training?'),
-(5493, 'I can teach you how to use a fishing pole to catch fish.'),
-(5495, 'Hello, warlock!  Ready for some training?'),
-(5495, 'Hello, warlock!  Ready for some training?'),
-(5496, 'Hello, warlock!  Ready for some training?'),
-(5497, 'Hello, mage!  Ready for some training?'),
-(5498, 'Hello, mage!  Ready for some training?'),
-(5499, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(5500, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(5500, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(5501, 'Hello, hunter!  Ready for some training?'),
-(5502, 'Searching for herbs requires both knowledge and instinct.'),
-(5502, 'Searching for herbs requires both knowledge and instinct.'),
-(5504, 'Hello, druid!  Ready for some training?'),
-(5505, 'Hello, druid!  Ready for some training?'),
-(5506, 'Hello, druid!  Ready for some training?'),
-(5513, 'You have not lived until you have dug deep into the earth.'),
-(5513, 'You have not lived until you have dug deep into the earth.'),
-(5515, 'Hello, hunter!  Ready for some training?'),
-(5516, 'Hello, hunter!  Ready for some training?'),
-(5517, 'Hello, hunter!  Ready for some training?'),
-(5566, 'Searching for herbs requires both knowledge and instinct.'),
-(5566, 'Searching for herbs requires both knowledge and instinct.'),
-(5567, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(5612, 'Hello, warlock!  Ready for some training?'),
-(5612, 'Hello, warlock!  Ready for some training?'),
-(5690, 'I can teach you how to use a fishing pole to catch fish.'),
-(5695, 'Enchanting is the art of improving existing items through magic. '),
-(5759, 'Here, let me show you how to bind those wounds....'),
-(5759, 'Here, let me show you how to bind those wounds....'),
-(5784, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(5811, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(5811, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(5880, 'Hello, mage!  Ready for some training?'),
-(5882, 'Hello, mage!  Ready for some training?'),
-(5883, 'Hello, mage!  Ready for some training?'),
-(5884, 'Hello, mage!  Ready for some training?'),
-(5885, 'Hello, mage!  Ready for some training?'),
-(5938, 'I can teach you how to use a fishing pole to catch fish.'),
-(5939, 'Here, let me show you how to bind those wounds....'),
-(5943, 'Here, let me show you how to bind those wounds....'),
-(5957, 'Welcome!'),
-(5958, 'Welcome!'),
-(5994, 'Hello, priest!  Ready for some training?'),
-(6014, 'Hello, priest!  Ready for some training?'),
-(6018, 'Hello, priest!  Ready for some training?'),
-(6094, 'Here, let me show you how to bind those wounds....'),
-(6094, 'Here, let me show you how to bind those wounds....'),
-(6286, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(6287, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6288, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6289, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6290, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6291, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6292, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6295, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6297, 'You have not lived until you have dug deep into the earth.'),
-(6299, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(6299, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(6306, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6387, 'It requires a steady hand to remove the leather from a slain beast.'),
-(6707, 'Hello, rogue!  Ready for some training?'),
-(7087, 'It requires a steady hand to remove the leather from a slain beast.'),
-(7088, 'It requires a steady hand to remove the leather from a slain beast.'),
-(7089, 'It requires a steady hand to remove the leather from a slain beast.'),
-(7311, 'Hello, mage!  Ready for some training?'),
-(7312, 'Hello, mage!  Ready for some training?'),
-(7312, 'Hello, mage!  Ready for some training?'),
-(7315, 'Hello, warrior!  Ready for some training?'),
-(7871, ''),
-(7944, ''),
-(7948, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(7953, ''),
-(7954, ''),
-(8128, 'You have not lived until you have dug deep into the earth.'),
-(8140, 'Hello, paladin!  Ready for some training?'),
-(8141, 'Hello, warrior!  Ready for some training?'),
-(8142, 'Hello, druid!  Ready for some training?'),
-(8144, 'It requires a steady hand to remove the leather from a slain beast.'),
-(8146, 'Searching for herbs requires both knowledge and instinct.'),
-(8153, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(8153, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(8306, 'Can I teach you how to turn the meat you find on beasts into a feast?'),
-(8308, 'Hello, hunter!  Ready for some training?'),
-(8736, 'Engineering is very simple once you grasp the basics.'),
-(8736, 'Engineering is very simple once you grasp the basics.'),
-(9465, 'Hello, druid!  Ready for some training?'),
-(10086, ''),
-(10088, ''),
-(10089, ''),
-(10090, ''),
-(10266, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(10266, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(10277, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(10278, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(10278, 'Care to learn how to turn the ore that you find into weapons and metal armor?'),
-(10930, 'Hello, hunter!  Ready for some training?'),
-(11025, 'Engineering is very simple once you grasp the basics.'),
-(11026, 'Engineering is very simple once you grasp the basics.'),
-(11026, 'Engineering is very simple once you grasp the basics.'),
-(11026, 'Engineering is very simple once you grasp the basics.'),
-(11028, 'Engineering is very simple once you grasp the basics.'),
-(11028, 'Engineering is very simple once you grasp the basics.'),
-(11037, 'Engineering is very simple once you grasp the basics.'),
-(11037, 'Engineering is very simple once you grasp the basics.'),
-(11041, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(11041, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(11042, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(11044, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(11046, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(11047, 'With alchemy you can turn found herbs into healing and other types of potions.'),
-(11050, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(11050, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(11051, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(11051, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?'),
-(11065, 'Enchanting is the art of improving existing items through magic. '),
-(11066, 'Enchanting is the art of improving existing items through magic. '),
-(11068, 'Enchanting is the art of improving existing items through magic. '),
-(11070, 'Enchanting is the art of improving existing items through magic. '),
-(11071, 'Enchanting is the art of improving existing items through magic. '),
-(11074, 'Enchanting is the art of improving existing items through magic. '),
-(11081, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11081, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11083, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11083, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11084, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11084, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11096, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11096, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11098, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11098, 'Greetings!  Can I teach you how to turn beast hides into armor?'),
-(11397, 'Hello, priest!  Ready for some training?'),
-(11401, 'Hello, priest!  Ready for some training?'),
-(11406, 'Hello, priest!  Ready for some training?'),
-(11406, 'Hello, priest!  Ready for some training?'),
-(11865, ''),
-(11865, ''),
-(11866, ''),
-(11867, ''),
-(11868, ''),
-(11868, ''),
-(11869, ''),
-(11869, ''),
-(11870, ''),
-(12025, 'Searching for herbs requires both knowledge and instinct.'),
-(12030, 'It requires a steady hand to remove the leather from a slain beast.'),
-(12032, 'I can teach you how to use a fishing pole to catch fish.'),
-(12042, 'Hello, druid!  Ready for some training?'),
-(12961, 'I can teach you how to use a fishing pole to catch fish.'),
-(13084, ''),
-(13283, 'Hello, rogue!  Ready for some training?'),
-(13417, 'Hello, shaman!  Ready for some training?'),
-(14740, 'I can teach you how to use a fishing pole to catch fish.');
+REPLACE INTO `npc_trainer_greeting` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES
+(198, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(223, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(328, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(331, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(375, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(376, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(377, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(459, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(459, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(460, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(461, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(461, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(514, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(514, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(543, '', "", "", "", "", "", "", "", ""),
+(812, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(837, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(895, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(906, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(908, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(911, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(912, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(913, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(914, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(915, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(916, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(917, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(918, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(925, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(925, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(926, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(927, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(927, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(928, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(928, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(944, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(957, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(957, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(985, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(986, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(987, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(988, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1103, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(1215, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(1218, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(1226, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1228, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1229, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1231, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1232, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1232, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1234, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1241, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(1246, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(1246, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(1292, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(1300, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(1300, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(1346, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(1346, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(1355, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(1382, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(1383, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(1383, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(1385, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(1386, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(1404, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1411, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(1430, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(1430, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(1458, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(1466, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(1632, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(1632, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(1651, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(1680, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(1699, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(1699, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(1901, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2114, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(2119, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2119, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2122, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2123, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2124, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2126, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2127, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2127, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2128, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2129, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2130, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2131, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(2132, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(2132, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(2326, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2326, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2327, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2329, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2329, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2367, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(2390, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(2391, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(2391, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(2485, 'Welcome!', "", "", "", "", "", "", "", ""),
+(2489, 'Welcome!', "", "", "", "", "", "", "", ""),
+(2492, 'Welcome!', "", "", "", "", "", "", "", ""),
+(2704, '', "", "", "", "", "", "", "", ""),
+(2704, '', "", "", "", "", "", "", "", ""),
+(2798, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2798, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(2818, 'There is no treat finer than Barbecued Buzzard Wing.', "", "", "", "", "", "", "", ""),
+(2834, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(2834, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(2836, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(2837, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(2855, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(2856, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(2857, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(2878, '', "", "", "", "", "", "", "", ""),
+(2879, '', "", "", "", "", "", "", "", ""),
+(2998, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(2998, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(3001, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(3007, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3007, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3008, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3008, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3011, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(3013, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(3026, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(3026, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(3028, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(3030, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3031, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3032, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3033, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3034, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3036, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3038, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3039, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3040, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3041, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3042, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3043, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3043, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3044, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3045, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3046, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3047, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3048, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3049, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3059, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3060, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3060, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3061, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3062, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3063, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3064, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3065, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3066, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3067, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(3069, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3069, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3087, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(3137, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(3153, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3154, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3155, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3156, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3157, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3169, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3170, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3171, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3172, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3173, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3174, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(3175, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(3179, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(3179, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(3181, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(3184, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(3185, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(3290, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(3306, '', "", "", "", "", "", "", "", ""),
+(3324, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3324, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3325, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3325, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3326, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3326, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3327, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3328, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3332, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(3344, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3344, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3345, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(3347, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(3352, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3353, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3354, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3355, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(3357, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(3363, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(3365, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3365, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3373, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(3399, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(3399, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(3401, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3403, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3404, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(3406, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3407, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3408, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3408, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3478, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(3478, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(3484, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(3494, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(3494, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(3523, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(3523, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(3545, '', "", "", "", "", "", "", "", ""),
+(3549, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3549, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3555, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(3557, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(3593, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3594, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3595, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3596, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3597, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3597, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3598, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3599, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3600, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3601, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3601, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3602, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3603, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(3603, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(3604, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(3605, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3607, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(3620, '', "", "", "", "", "", "", "", ""),
+(3622, '', "", "", "", "", "", "", "", ""),
+(3624, '', "", "", "", "", "", "", "", ""),
+(3688, '', "", "", "", "", "", "", "", ""),
+(3690, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(3690, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(3698, '', "", "", "", "", "", "", "", ""),
+(3703, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3703, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(3706, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3707, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3963, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(3964, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(3964, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(3965, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(3967, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(4087, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4089, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4090, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4091, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4092, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4138, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4146, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4156, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(4156, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(4160, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(4163, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4165, 'Welcome!', "", "", "", "", "", "", "", ""),
+(4193, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(4204, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(4205, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4210, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(4211, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(4211, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(4212, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(4214, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4215, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4217, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4218, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4219, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4254, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(4320, '', "", "", "", "", "", "", "", ""),
+(4552, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(4563, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4563, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4564, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4565, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4566, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4567, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4568, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4573, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(4573, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(4582, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4583, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4584, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4586, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(4586, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(4588, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(4588, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(4591, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(4591, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(4593, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4593, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4594, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4595, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4596, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(4596, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(4598, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(4605, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(4606, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4607, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4608, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(4609, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(4609, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(4611, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(4614, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(4616, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(4732, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4732, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4752, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4752, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4753, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4753, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4772, 'Hello!  Can I teach you something?', "", "", "", "", "", "", "", ""),
+(4773, '', "", "", "", "", "", "", "", ""),
+(4773, '', "", "", "", "", "", "", "", ""),
+(4898, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(4900, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(5113, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5113, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5114, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5115, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5116, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5117, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5127, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(5127, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(5137, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(5141, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5142, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5143, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5143, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5144, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5145, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5145, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5146, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5147, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5147, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5148, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5149, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5149, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5150, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(5150, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(5161, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(5165, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5166, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5167, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5171, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5172, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5173, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5174, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(5174, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(5177, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(5479, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5480, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5482, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(5482, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(5484, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5489, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5491, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5491, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5492, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5493, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(5495, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5495, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5496, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5497, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5498, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5499, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(5500, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(5500, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(5501, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5502, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(5502, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(5504, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5505, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5506, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5513, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(5513, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(5515, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5516, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5517, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5566, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(5566, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(5567, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(5612, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5612, 'Hello, warlock!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5690, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(5695, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(5759, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(5759, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(5784, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(5811, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(5811, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(5880, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5882, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5883, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5884, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5885, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(5938, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(5939, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(5943, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(5957, 'Welcome!', "", "", "", "", "", "", "", ""),
+(5958, 'Welcome!', "", "", "", "", "", "", "", ""),
+(5994, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(6014, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(6018, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(6094, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(6094, 'Here, let me show you how to bind those wounds....', "", "", "", "", "", "", "", ""),
+(6286, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(6287, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6288, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6289, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6290, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6291, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6292, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6295, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6297, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(6299, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(6299, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(6306, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6387, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(6707, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(7087, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(7088, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(7089, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(7311, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(7312, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(7312, 'Hello, mage!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(7315, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(7871, '', "", "", "", "", "", "", "", ""),
+(7944, '', "", "", "", "", "", "", "", ""),
+(7948, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(7953, '', "", "", "", "", "", "", "", ""),
+(7954, '', "", "", "", "", "", "", "", ""),
+(8128, 'You have not lived until you have dug deep into the earth.', "", "", "", "", "", "", "", ""),
+(8140, 'Hello, paladin!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(8141, 'Hello, warrior!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(8142, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(8144, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(8146, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(8153, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(8153, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(8306, 'Can I teach you how to turn the meat you find on beasts into a feast?', "", "", "", "", "", "", "", ""),
+(8308, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(8736, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(8736, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(9465, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(10086, '', "", "", "", "", "", "", "", ""),
+(10088, '', "", "", "", "", "", "", "", ""),
+(10089, '', "", "", "", "", "", "", "", ""),
+(10090, '', "", "", "", "", "", "", "", ""),
+(10266, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(10266, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(10277, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(10278, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(10278, 'Care to learn how to turn the ore that you find into weapons and metal armor?', "", "", "", "", "", "", "", ""),
+(10930, 'Hello, hunter!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(11025, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11026, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11026, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11026, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11028, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11028, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11037, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11037, 'Engineering is very simple once you grasp the basics.', "", "", "", "", "", "", "", ""),
+(11041, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(11041, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(11042, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(11044, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(11046, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(11047, 'With alchemy you can turn found herbs into healing and other types of potions.', "", "", "", "", "", "", "", ""),
+(11050, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(11050, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(11051, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(11051, 'Greetings!  Can I teach you how to turn found cloth into cloth armor?', "", "", "", "", "", "", "", ""),
+(11065, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(11066, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(11068, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(11070, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(11071, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(11074, 'Enchanting is the art of improving existing items through magic. ', "", "", "", "", "", "", "", ""),
+(11081, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11081, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11083, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11083, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11084, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11084, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11096, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11096, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11098, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11098, 'Greetings!  Can I teach you how to turn beast hides into armor?', "", "", "", "", "", "", "", ""),
+(11397, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(11401, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(11406, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(11406, 'Hello, priest!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(11865, '', "", "", "", "", "", "", "", ""),
+(11865, '', "", "", "", "", "", "", "", ""),
+(11866, '', "", "", "", "", "", "", "", ""),
+(11867, '', "", "", "", "", "", "", "", ""),
+(11868, '', "", "", "", "", "", "", "", ""),
+(11868, '', "", "", "", "", "", "", "", ""),
+(11869, '', "", "", "", "", "", "", "", ""),
+(11869, '', "", "", "", "", "", "", "", ""),
+(11870, '', "", "", "", "", "", "", "", ""),
+(12025, 'Searching for herbs requires both knowledge and instinct.', "", "", "", "", "", "", "", ""),
+(12030, 'It requires a steady hand to remove the leather from a slain beast.', "", "", "", "", "", "", "", ""),
+(12032, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(12042, 'Hello, druid!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(12961, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", ""),
+(13084, '', "", "", "", "", "", "", "", ""),
+(13283, 'Hello, rogue!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(13417, 'Hello, shaman!  Ready for some training?', "", "", "", "", "", "", "", ""),
+(14740, 'I can teach you how to use a fishing pole to catch fish.', "", "", "", "", "", "", "", "");
+
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 198;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 328;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 331;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 375;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 376;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 377;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 459;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 460;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 461;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 514;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 812;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 837;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 895;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 906;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 908;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 911;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 912;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 913;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 914;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 915;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 916;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 917;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 918;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 925;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 926;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 927;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 928;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 944;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 985;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 986;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 987;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 988;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 1103;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 1215;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 1218;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 1226;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 1228;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 1229;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 1231;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 1232;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 1234;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 1241;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 1292;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 1300;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 1317;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 1346;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 1355;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 1382;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 1385;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 1386;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 1404;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 1411;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 1430;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 1458;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 1470;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 1473;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 1632;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 1651;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 1676;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 1680;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 1681;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 1683;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 1699;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 1700;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 1701;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 1702;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 1703;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 1901;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 2114;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 2119;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 2122;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 2123;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 2124;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 2126;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 2127;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 2128;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 2129;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 2130;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 2131;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 2132;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 2326;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 2327;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 2329;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 2367;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 2390;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 2391;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 2399;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Добро пожаловать!" WHERE `entry` = 2485;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Добро пожаловать!" WHERE `entry` = 2489;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Добро пожаловать!" WHERE `entry` = 2492;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 2627;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 2798;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 2818;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 2834;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 2836;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 2837;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 2855;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 2856;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 2998;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 3001;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 3004;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3007;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 3009;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 3011;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 3013;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 3026;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 3028;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3030;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3031;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3032;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3033;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3034;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3036;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3038;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3039;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3040;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3041;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3042;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3043;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3044;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3045;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3046;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 3047;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 3048;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 3049;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3059;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3060;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3061;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3062;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3063;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3064;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3065;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3066;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 3067;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3069;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 3087;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 3136;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 3137;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3153;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3154;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3155;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 3156;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3157;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3169;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3170;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3171;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 3172;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3173;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 3174;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 3175;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 3179;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 3181;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 3184;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 3185;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 3290;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 3324;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 3325;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 3326;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3327;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3328;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 3332;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3344;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 3345;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 3347;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3352;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3353;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3354;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 3355;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 3357;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 3363;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3365;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 3373;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 3399;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3401;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 3403;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 3404;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3406;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3407;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3408;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 3478;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 3484;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 3494;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 3523;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3549;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 3555;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 3557;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3593;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3594;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3595;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3596;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3597;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 3598;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 3599;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3600;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3601;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 3602;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 3603;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 3604;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3605;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 3606;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 3607;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 3690;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3703;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 3704;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3706;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 3707;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 3963;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 3964;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 3965;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 3967;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 4087;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 4089;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 4090;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 4091;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 4092;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 4138;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 4146;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 4156;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 4159;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 4160;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 4163;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Добро пожаловать!" WHERE `entry` = 4165;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 4193;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 4204;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 4205;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 4210;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 4211;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 4212;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 4213;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 4214;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 4215;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 4217;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 4218;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 4219;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 4254;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 4258;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 4552;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 4563;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 4564;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 4565;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 4566;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 4567;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 4568;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 4573;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 4576;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 4578;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 4582;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 4583;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 4584;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 4588;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 4591;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 4593;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 4594;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 4595;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 4596;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 4598;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 4606;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 4607;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 4608;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 4611;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 4614;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 4616;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 4732;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 4752;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 4753;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 4772;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 4773;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 4898;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 4900;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 5032;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 5037;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 5038;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 5040;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 5041;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 5113;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 5114;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5115;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5116;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5117;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 5127;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 5137;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 5141;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 5142;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 5143;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5144;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5145;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5146;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 5147;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 5148;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 5149;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 5150;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 5153;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 5157;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 5159;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 5161;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 5164;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 5165;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 5166;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 5167;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 5171;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 5172;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 5173;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 5174;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 5177;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 5392;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 5479;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 5480;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 5482;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 5484;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 5489;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 5491;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 5492;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 5493;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 5495;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 5496;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5497;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5498;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 5499;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5501;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 5502;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 5504;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 5505;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 5506;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 5511;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 5513;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5515;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5516;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 5517;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 5518;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 5564;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 5566;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 5612;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 5690;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 5695;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 5759;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 5784;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5880;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5882;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5883;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5884;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 5885;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 5938;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 5939;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 5941;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 5943;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Добро пожаловать!" WHERE `entry` = 5957;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Добро пожаловать!" WHERE `entry` = 5958;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 5994;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 6014;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 6018;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Подойди, я покажу тебе, как перевязывать раны." WHERE `entry` = 6094;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gчернокнижник:чернокнижница;! Ты будешь учиться?" WHERE `entry` = 6251;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 6286;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6287;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6288;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6289;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6290;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6291;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6292;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6295;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 6297;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 6299;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6306;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 6387;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 6707;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 7087;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 7088;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 7089;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 7230;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 7231;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 7232;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 7311;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, маг! Ты $gготов:готова; учиться?" WHERE `entry` = 7312;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 7315;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 7406;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 7866;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 7867;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 7868;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 7869;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 7870;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 7871;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 7944;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 7946;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Освоив алхимию, ты сможешь варить зелья из найденных растений." WHERE `entry` = 7948;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 7949;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 7953;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуйте! Могу ли я вас чему-то обучить?" WHERE `entry` = 7954;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 8126;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Кто никогда не рылся в земле, тот, считай, и не жил!" WHERE `entry` = 8128;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, паладин! Ты $gпришел:пришла; за знаниями?" WHERE `entry` = 8140;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет тебе, воин! Ты хочешь учиться?" WHERE `entry` = 8141;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 8142;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 8144;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 8146;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 8153;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, научу, как устроить из добычи настоящее пиршество?" WHERE `entry` = 8306;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 8308;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 8736;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 8738;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 9465;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 9584;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gохотник:охотница;! Ну что, будешь учиться?" WHERE `entry` = 10930;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 10993;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 11017;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 11025;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 11031;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "В инженерном деле главное - понять основы. Остальное само придет." WHERE `entry` = 11037;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 11048;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 11050;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 11051;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 11052;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 11072;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 11073;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Наложение чар - это искусство улучшения материальных объектов с помощью магии." WHERE `entry` = 11074;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 11097;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь научиться делать доспехи из шкур животных?" WHERE `entry` = 11098;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 11146;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 11177;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Хочешь, я научу тебя, как из найденной руды делать оружие и доспехи?" WHERE `entry` = 11178;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 11397;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 11401;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gжрец:жрица;! Стремишься к новым знаниям?" WHERE `entry` = 11406;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй! Хочешь, я научу тебя шить доспехи из ткани?" WHERE `entry` = 11557;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы разбираться в травах, нужны и знания, и чутье." WHERE `entry` = 12025;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Чтобы снять шкуру с убитого зверя, нужна твердая рука." WHERE `entry` = 12030;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 12032;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Приветствую тебя, друид! Тебе нужны новые знания?" WHERE `entry` = 12042;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 12961;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Привет, $gразбойник:разбойница;! Ну что, будешь учиться?" WHERE `entry` = 13283;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Здравствуй, $gшаман:шаманка;! Хочешь поучиться?" WHERE `entry` = 13417;
+UPDATE `npc_trainer_greeting` SET `content_loc8` = "Я могу научить тебя ловить рыбу." WHERE `entry` = 14740;
 
 -- ----------------------------------------------------------------------
 
