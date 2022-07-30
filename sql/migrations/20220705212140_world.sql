@@ -99,14 +99,20 @@ UPDATE `creature` SET  `position_x` = -5686.38, `position_y` = -514.7, `position
 UPDATE `creature` SET  `position_x` = 9683.94, `position_y` = 953.23, `position_z` = 1291.72, `orientation` = 5.67232 WHERE `guid` = 87048;
 -- Correct position of Darnassus Spirit Healer
 UPDATE `creature` SET  `position_x` = 10046.3, `position_y` = 2123.84, `position_z` = 1329.64, `orientation` = 5.60251 WHERE `guid` = 87049;
--- TODO Deadwind Pass Spirit Healer 17649
--- TODO Deathknell Spirit Healer 40547
--- TODO Red Cloud Mesa Spirit Healer 40565
--- TODO Coldridge Valley Spirit Healer 87046
--- TODO Northshire Valley Spirit Healer 87047
--- TODO Ironforge Spirit Healer 87044
--- TODO Shadowglen Spirit Healer 87050
-
+-- Correct position of Deadwind Pass Spirit Healer
+UPDATE `creature` SET  `position_x` = -11119.0186, `position_y` = -1832.66321, `position_z` = 71.94753, `orientation` = 6.24827862 WHERE `guid` = 17649;
+-- Correct position of Deathknell Spirit Healer
+UPDATE `creature` SET  `position_x` = 1882.77588, `position_y` = 1622.23645, `position_z` = 94.28485, `orientation` = 1.47358 WHERE `guid` = 40547;
+-- Correct position of Red Cloud Mesa Spirit Healer
+UPDATE `creature` SET  `position_x` = -2947.77124, `position_y` = -142.5038, `position_z` = 66.97109, `orientation` = 5.113815 WHERE `guid` = 40565;
+-- Correct position of Coldridge Valley Spirit Healer
+UPDATE `creature` SET  `position_x` = -6169.81445, `position_y` = 346.84375, `position_z` = 400.1516, `orientation` = 5.323141 WHERE `guid` = 87046;
+-- Correct position of Northshire Valley Spirit Healer
+UPDATE `creature` SET  `position_x` = -8946.229, `position_y` = -183.477219, `position_z` = 79.99528, `orientation` = 5.825852 WHERE `guid` = 87047;
+-- Correct position of Ironforge Spirit Healer
+UPDATE `creature` SET  `position_x` = -5156.31348, `position_y` = -864.9803, `position_z` = 507.6792, `orientation` = 3.931262 WHERE `guid` = 87044;
+-- Correct postion of Shadowglen Spirit Healer
+UPDATE `creature` SET  `position_x` = 10391.8535, `position_y` = 826.4149, `position_z` = 1317.60156, `orientation` = 4.118977 WHERE `guid` = 87050;
 
 -- End of migration.
 END IF;
