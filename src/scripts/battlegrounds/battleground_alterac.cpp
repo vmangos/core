@@ -5270,6 +5270,11 @@ void AddSC_bg_alterac()
     newscript->RegisterSelf();
 
     newscript = new Script;
+    newscript->Name = "npc_ram_wolf_master";
+    newscript->pQuestRewardedNPC = &QuestComplete_npc_AVBlood_collector;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
     newscript->Name = "go_av_landmine";
     newscript->GOGetAI = &GetAI_go_av_landmine;
     newscript->RegisterSelf();

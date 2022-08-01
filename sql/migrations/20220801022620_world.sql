@@ -32,7 +32,7 @@ DELETE FROM `gossip_scripts` WHERE `id`=5283;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (5283, 0, 0, 7, 7027, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormpike Stable Master - Complete Quest Empty Stables'),
 (5283, 0, 0, 14, 21863, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormpike Stable Master - Remove Ram Aura from Player');
-UPDATE `creature_template` SET `gossip_menu_id`=5283, `npc_flags`=3, `script_name`='' WHERE `entry`=13617;
+UPDATE `creature_template` SET `gossip_menu_id`=5283, `npc_flags`=3 WHERE `entry`=13617;
 
 -- Events list for Alterac Ram
 DELETE FROM `creature_ai_events` WHERE `creature_id`=10990;
@@ -65,7 +65,7 @@ DELETE FROM `gossip_scripts` WHERE `id`=50002;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
 (50002, 0, 0, 7, 7001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwolf Stable Master - Complete Quest Empty Stables'),
 (50002, 0, 0, 14, 21827, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwolf Stable Master - Remove Frostwolf Aura from Player');
-UPDATE `creature_template` SET `gossip_menu_id`=50002, `npc_flags`=3, `script_name`='' WHERE `entry`=13616;
+UPDATE `creature_template` SET `gossip_menu_id`=50002, `npc_flags`=3 WHERE `entry`=13616;
 
 -- Events list for Frostwolf
 DELETE FROM `creature_ai_events` WHERE `creature_id`=10981;
