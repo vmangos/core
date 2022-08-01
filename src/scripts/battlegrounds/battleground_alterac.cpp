@@ -1334,259 +1334,6 @@ enum
     POINT_LAST_POINT    = 0xFFFFFF
 };
 
-enum
-{
-    QUEST_TAME_HORDE                = 7001,
-    QUEST_TAME_ALLIANCE             = 7027,
-
-    FROSTWOLF_MUZZLE                = 17626,
-    STORMPIKE_TRAINING_COLLAR       = 17689,
-
-    NPC_TAME_MASTER_HORDE           = 13616,
-    NPC_TAME_MASTER_ALLIANCE        = 13617,
-
-    NPC_RAM                         = 10990,
-    NPC_WOLF                        = 10981,
-    NPC_RAM_TAMED                   = 10989,
-    NPC_WOLF_TAMED                  = 10985,
-
-    SPELL_COLLAR_USING_ALLIANCE     = 21866,
-    SPELL_TAME_BEAST_PLAYER_ALLIANCE = 21867,
-    SPELL_COLLAR_USING_HORDE        = 21794,
-    SPELL_TAME_BEAST_PLAYER_HORDE   = 21795,
-
-    SPELL_TAME_OWNED_BY_PLAYER      = 21869,
-    SPELL_PLAYER_OWNED_BY_TAMED     = 21872,
-    SPELL_TAME_BEAST_GOSSIP         = 18362
-};
-
-/** Give a Muzzle / Collar to the player if he don't have one */
-bool GossipHello_AV_npc_ram_wolf(Player* pPlayer, Creature* pCreature)
-{
-    bool isAllowedToGetItem = true;
-    uint32 entryCreature;
-
-    /** Show quest menu */
-    pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-
-    /** Select corresponding item depending on NPC faction */
-    uint32 itemId = 0;
-    if (pCreature->GetEntry() == NPC_TAME_MASTER_HORDE)
-        itemId = FROSTWOLF_MUZZLE;
-    else if (pCreature->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
-        itemId = STORMPIKE_TRAINING_COLLAR;
-
-    /** Prepare Quest and Creature ID depending on the NPC faction */
-    if (pCreature->GetEntry() == NPC_TAME_MASTER_HORDE)
-        entryCreature = NPC_WOLF_TAMED;
-    else if (pCreature->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
-        entryCreature = NPC_RAM_TAMED;
-    else
-        return true;
-
-    /** Get a list of all tamed created on 100 meters radius around NPC */
-    std::list<Creature*> ramWolfTamedList;
-    GetCreatureListWithEntryInGrid(ramWolfTamedList, pCreature, entryCreature, 250.0f);
-
-    for (const auto& it : ramWolfTamedList)
-    {
-        /** Check if the Tamed beast has a player as owner */
-        ObjectGuid playerOwner(HIGHGUID_PLAYER, it->AI()->GetData(0));
-        if (Player* player = pCreature->GetMap()->GetPlayer(playerOwner))
-            if (player->GetGUID() == pPlayer->GetGUID())
-                isAllowedToGetItem = false;
-    }
-
-    /** Give the corresponding item to the player if he don't have one already */
-    if (!pPlayer->HasItemCount(itemId, 1, true) && isAllowedToGetItem)
-    {
-        uint32 noSpaceForCount = 0;
-        ItemPosCountVec dest;
-        uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, &noSpaceForCount);
-
-        if (msg == EQUIP_ERR_OK)
-        {
-            Item* pItem = pPlayer->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(5060));
-            pPlayer->SendNewItem(pItem, 1, true, false);
-        }
-    }
-    return true;
-}
-
-struct npc_ram_wolf_tamedAI : public ScriptedAI
-{
-    npc_ram_wolf_tamedAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    ObjectGuid playerGuid;
-
-    uint32 GetData(uint32) override
-    {
-        return playerGuid.GetCounter();
-    }
-
-    void Reset() override
-    {
-    }
-
-    void ResetEvent()
-    {
-        Reset();
-        m_creature->DisappearAndDie();
-    }
-
-    void SpellHit(SpellCaster* pCaster, SpellEntry const* spell) override
-    {
-        Unit* pCasterUnit = pCaster->ToUnit();
-        if (!pCasterUnit)
-            return;
-
-        if (spell->Id == SPELL_COLLAR_USING_ALLIANCE || spell->Id == SPELL_COLLAR_USING_HORDE)
-            AttackStart(pCasterUnit);
-        else if (spell->Id == SPELL_TAME_BEAST_PLAYER_ALLIANCE || spell->Id == SPELL_TAME_BEAST_PLAYER_HORDE)
-        {
-
-            EnterEvadeMode();
-            m_creature->SetFactionTemplateId(35);
-
-            /** Link the tamed creature to the player it shall follow */
-            m_creature->CastSpell(m_creature, SPELL_TAME_OWNED_BY_PLAYER, true);
-            m_creature->CastSpell(pCasterUnit, SPELL_PLAYER_OWNED_BY_TAMED, true);
-
-            /** Update creature for tamed one */
-            if (m_creature->GetEntry() == NPC_RAM)
-                m_creature->UpdateEntry(NPC_RAM_TAMED);
-            else if (m_creature->GetEntry() == NPC_WOLF)
-                m_creature->UpdateEntry(NPC_WOLF_TAMED);
-
-            /** Creature now need to follow the player everywhere */
-            if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
-                m_creature->GetMotionMaster()->MoveIdle();
-
-            /** Set owner information, specific to Alterac Valley Tamed Beast */
-            playerGuid = pCasterUnit->GetObjectGuid();
-
-
-            m_creature->GetMotionMaster()->MoveFollow(pCasterUnit, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-
-            /** Set owner information, specific to Alterac Valley Tamed Beast */
-            //            playerGuid = pCasterUnit->GetObjectGuid();
-        }
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        /** The tamed beast musn't attack */
-        if (m_creature->GetEntry() == NPC_RAM_TAMED || m_creature->GetEntry() == NPC_WOLF_TAMED)
-        {
-            /** If the player died, remove the tamed beast */
-            ObjectGuid playerOwner(HIGHGUID_PLAYER, m_creature->AI()->GetData(0));
-            if (Player* player = m_creature->GetMap()->GetPlayer(playerOwner))
-            {
-                if (player->IsDead())
-                {
-                    /** Make the tamed beast disappears, respawn in 2min30 */
-                    m_creature->SetRespawnDelay(180);
-                    m_creature->SetDeathState(JUST_DIED);
-
-                    /** Change back entry to standard beast */
-                    if (m_creature->GetEntry() == NPC_RAM_TAMED)
-                        m_creature->UpdateEntry(NPC_RAM);
-                    else if (m_creature->GetEntry() == NPC_WOLF_TAMED)
-                        m_creature->UpdateEntry(NPC_WOLF);
-
-                    m_creature->RemoveCorpse();
-                }
-            }
-            return;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-struct RamWolfMasterAI : public ScriptedAI
-{
-    RamWolfMasterAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        /** Prepare Quest and Creature ID depending on the NPC faction */
-        if (m_creature->GetEntry() == NPC_TAME_MASTER_HORDE)
-        {
-            m_uiEntryCreature = NPC_WOLF_TAMED;
-            m_uiEntryQuest    = QUEST_TAME_HORDE;
-        }
-        else if (m_creature->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
-        {
-            m_uiEntryCreature = NPC_RAM_TAMED;
-            m_uiEntryQuest    = QUEST_TAME_ALLIANCE;
-        }
-        Reset();
-    }
-
-    uint32 m_uiEntryCreature;
-    uint32 m_uiEntryQuest;
-    uint32 m_uiCheckTimer;
-
-    void Reset() override
-    {
-        m_uiCheckTimer = 200;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        /** Check if Tamed beast are in 10 meters radius */
-        if (m_uiCheckTimer < uiDiff)
-        {
-            if (m_uiEntryCreature != 0)
-            {
-                /** Get a list of all tamed created on 10 meters radius around NPC */
-                std::list<Creature*> ramWolfTamedList;
-                GetCreatureListWithEntryInGrid(ramWolfTamedList, m_creature, m_uiEntryCreature, 10.0f);
-
-                for (const auto& it : ramWolfTamedList)
-                {
-                    /** Check if the Tamed beast has a player as owner */
-                    ObjectGuid playerOwner(HIGHGUID_PLAYER, it->AI()->GetData(0));
-                    if (Player* player = m_creature->GetMap()->GetPlayer(playerOwner))
-                    {
-                        /** If the quest isn't completed, complete it */
-                        player->GroupEventHappens(m_uiEntryQuest, it);
-                        player->SendQuestCompleteEvent(m_uiEntryQuest); //Visual event doesn't validate the quest
-                        player->SetQuestStatus(m_uiEntryQuest, QUEST_STATUS_COMPLETE);
-
-                        /** Make the tamed beast disappears, respawn in 2min30 */
-                        it->SetRespawnDelay(180);
-                        it->SetDeathState(JUST_DIED);
-
-                        /** Change back entry to standard beast */
-                        if (it->GetEntry() == NPC_RAM_TAMED)
-                            it->UpdateEntry(NPC_RAM);
-                        else if (it->GetEntry() == NPC_WOLF_TAMED)
-                            it->UpdateEntry(NPC_WOLF);
-
-                        it->RemoveCorpse();
-                    }
-                }
-                ramWolfTamedList.clear();
-            }
-            m_uiCheckTimer = 200;
-        }
-        else
-            m_uiCheckTimer -= uiDiff;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
 /***************************************************************/
 /** CHALLENGE ALTERAC INVOCATION : AERIAL, CAVALRY, WORLD BOSS */
 /***************************************************************/
@@ -3657,13 +3404,6 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
     }
 };
 
-bool QuestComplete_AV_npc_ram_wolf(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
-{
-    if (pQuestGiver->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
-        pPlayer->SetQuestStatus(pQuest->GetQuestId(), QUEST_STATUS_NONE);
-    return false;
-}
-
 bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
     /** Check if NPC is linked to a quest */
@@ -5031,16 +4771,6 @@ struct DruidOfTheGroveAI : public ScriptedAI
     }
 };
 
-CreatureAI* GetAI_npc_ram_wolf_tamed(Creature* pCreature)
-{
-    return new npc_ram_wolf_tamedAI(pCreature);
-}
-
-CreatureAI* GetAI_RamWolfMasterAI(Creature* pCreature)
-{
-    return new RamWolfMasterAI(pCreature);
-}
-
 CreatureAI* GetAI_FrostwolfShamanAI(Creature* pCreature)
 {
     return new FrostwolfShamanAI(pCreature);
@@ -5510,10 +5240,6 @@ void AddSC_bg_alterac()
     newscript->GetAI = &GetAI_npc_AlteracDardosh;
     newscript->RegisterSelf();
     */
-    newscript = new Script;
-    newscript->Name = "npc_ram_wolf_tamed";
-    newscript->GetAI = &GetAI_npc_ram_wolf_tamed;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_worldboss_h_av";
@@ -5541,18 +5267,6 @@ void AddSC_bg_alterac()
     newscript->pQuestRewardedNPC = &QuestComplete_npc_AVBlood_collector;
     newscript->pGossipSelect = &GossipSelect_npc_AVBlood_collector;
     newscript->GetAI = &GetAI_npc_eventAV;
-    newscript->RegisterSelf();
-    /*
-    newscript = new Script;
-    newscript->Name = "npc_ram_wolf_quest";
-    newscript->pQuestRewardedNPC = &QuestComplete_AV_npc_ram_wolf;
-    newscript->RegisterSelf();
-    */
-    newscript = new Script;
-    newscript->Name = "npc_ram_wolf_master";
-    newscript->pGossipHello = &GossipHello_AV_npc_ram_wolf;
-    newscript->pQuestRewardedNPC = &QuestComplete_npc_AVBlood_collector;
-    newscript->GetAI = &GetAI_RamWolfMasterAI;
     newscript->RegisterSelf();
 
     newscript = new Script;
