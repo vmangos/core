@@ -67,7 +67,7 @@ INSERT INTO `gossip_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, 
 (50002, 0, 0, 14, 21827, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Frostwolf Stable Master - Remove Frostwolf Aura from Player');
 UPDATE `creature_template` SET `gossip_menu_id`=50002, `npc_flags`=3, `script_name`='' WHERE `entry`=13616;
 
--- Events list for Alterac Ram
+-- Events list for Frostwolf
 DELETE FROM `creature_ai_events` WHERE `creature_id`=10981;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1098101, 10981, 0, 8, 0, 100, 0, 21795, -1, 0, 0, 1098101, 0, 0, 'Frostwolf - Follow Player on Hit By Muzzle Effect Spell');
 DELETE FROM `creature_ai_scripts` WHERE `id`=1098101;
