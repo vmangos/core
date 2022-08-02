@@ -2522,6 +2522,9 @@ void Creature::SaveRespawnTime()
 
 bool Creature::IsOutOfThreatArea(Unit* pVictim) const
 {
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_LEASH_EVADE))
+        return false;
+
     // In dungeons, there is no threat area limit - only for active creatures (technical limitation, non actives are not updated without players around them)
     if (GetMap()->IsDungeon())
         return false;
