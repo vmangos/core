@@ -62,7 +62,7 @@ bool UnsummonPetDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Pet::Pet(PetType type) :
     Creature(CREATURE_SUBTYPE_PET),
-    m_TrainingPoints(0), m_resetTalentsCost(0), m_resetTalentsTime(0),
+    m_TrainingPoints(0), m_resetTalentsCost(0), m_resetTalentsTime(0), m_followAngle(PET_FOLLOW_ANGLE),
     m_removed(false), m_focusTimer(4000), m_happinessTimer(7500), m_loyaltyTimer(12000), m_petType(type), m_duration(0),
     m_loyaltyPoints(0), m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false), m_pTmpCache(nullptr), m_unSummoned(false), m_enabled(true)
 {
@@ -73,7 +73,10 @@ Pet::Pet(PetType type) :
     InitCharmInfo(this);
 
     if (type == MINI_PET)                                   // always passive
+    {
         SetReactState(REACT_PASSIVE);
+        SetFollowAngle(MINI_PET_FOLLOW_ANGLE);
+    }
     else if (type == GUARDIAN_PET)                          // always aggressive
         SetReactState(REACT_AGGRESSIVE);
 }

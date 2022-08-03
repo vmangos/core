@@ -3612,6 +3612,14 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         spawnCreature->InitStatsForLevel(level, m_casterUnit);
         spawnCreature->GetCharmInfo()->SetPetNumber(petNumber, false);
 
+        if (uint32 totalGuardians = m_casterUnit->GetGuardiansCount() + (m_casterUnit->GetPetGuid().IsEmpty() ? 0 : 1))
+        {
+            float followAngle = PET_FOLLOW_ANGLE + (M_PI_F / 6) * totalGuardians;
+            while (followAngle > M_PI_F * 2)
+                followAngle -= M_PI_F * 2;
+            spawnCreature->SetFollowAngle(followAngle);
+        }
+
         spawnCreature->AIM_Initialize();
         spawnCreature->LoadCreatureAddon();
 
