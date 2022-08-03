@@ -474,9 +474,11 @@ HonorScores HonorMaintenancer::GenerateScores(HonorStandingList& standingList)
         sc.BRK[0] = 1.000f;
     }
 
+    uint32 poolSize = sWorld.getConfig(CONFIG_UINT32_PVP_POOL_SIZE_PER_FACTION) == 0 ?
+            standingList.size() : sWorld.getConfig(CONFIG_UINT32_PVP_POOL_SIZE_PER_FACTION);
     // get the WS scores at the top of each break point
     for (float & group : sc.BRK)
-        group = floor((group * standingList.size()) + 0.5f);
+        group = floor((group * poolSize) + 0.5f);
 
     // initialize RP array
     // set the low point
