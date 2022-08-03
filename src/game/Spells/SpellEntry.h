@@ -1060,7 +1060,7 @@ class SpellEntry
         int32 GetDuration() const;
         int32 GetMaxDuration() const;
         int32 CalculateDuration(WorldObject const* caster = nullptr) const;
-        uint32 GetCastTime(Spell* spell = nullptr) const;
+        uint32 GetCastTime(SpellCaster const* caster, Spell* spell = nullptr) const;
         uint32 GetCastTimeForBonus(DamageEffectType damagetype) const;
         uint16 GetAuraMaxTicks() const;
         WeaponAttackType GetWeaponAttackType() const;

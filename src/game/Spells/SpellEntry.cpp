@@ -441,7 +441,7 @@ WeaponAttackType SpellEntry::GetWeaponAttackType() const
     }
 }
 
-uint32 SpellEntry::GetCastTime(Spell* spell) const
+uint32 SpellEntry::GetCastTime(SpellCaster const* caster, Spell* spell) const
 {
     if (spell)
     {
@@ -463,7 +463,9 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
     if (!spellCastTimeEntry)
         return 0;
 
-    int32 castTime = spellCastTimeEntry->CastTime;
+    int32 spellRank = caster && caster->GetTypeId() != TYPEID_GAMEOBJECT ? static_cast<Unit const*>(caster)->GetSpellRank(this) : 0;
+    int32 castTime = spellCastTimeEntry->CastTime + spellCastTimeEntry->CastTimePerLevel * (spellRank / 5 - baseLevel);
+    castTime = std::max(castTime, spellCastTimeEntry->MinCastTime);
 
     if (spell)
     {
@@ -497,7 +499,7 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
 
 uint32 SpellEntry::GetCastTimeForBonus(DamageEffectType damagetype) const
 {
-    uint32 CastingTime = !IsChanneledSpell() ? GetCastTime() : GetDuration();
+    uint32 CastingTime = !IsChanneledSpell() ? GetCastTime(nullptr) : GetDuration();
 
     if (CastingTime > 7000) CastingTime = 7000;
     if (CastingTime < 1500) CastingTime = 1500;
@@ -561,7 +563,7 @@ uint32 SpellEntry::GetCastTimeForBonus(DamageEffectType damagetype) const
     if (overTime > 0 && CastingTime > 0 && DirectDamage)
     {
         // mainly for DoTs which are 3500 here otherwise
-        uint32 OriginalCastTime = GetCastTime();
+        uint32 OriginalCastTime = GetCastTime(nullptr);
         if (OriginalCastTime > 7000) OriginalCastTime = 7000;
         if (OriginalCastTime < 1500) OriginalCastTime = 1500;
         // Portion to Over Time

@@ -3036,7 +3036,7 @@ void Creature::AddCooldown(SpellEntry const& spellEntry, ItemPrototype const* /*
 
         m_cooldownMap.AddCooldown(sWorld.GetCurrentClockTime(), spellEntry.Id, recTime, spellEntry.Category, categoryRecTime);
     }
-    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime())
+    else if (GetCharmerGuid().IsPlayer() && !IsPet() && !spellEntry.GetCastTime(this))
     {
         // Forced cooldown on using instant spells during mind control to prevent abuse.
         recTime = 10 * IN_MILLISECONDS;
