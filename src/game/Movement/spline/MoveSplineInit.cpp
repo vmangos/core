@@ -182,39 +182,29 @@ int32 MoveSplineInit::Launch()
 #endif
 
     MovementData mvtData(compress ? nullptr : &unit);
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // Nostalrius: client has a hardcoded limit to spline movement speed : 4*runSpeed.
     // We need to fix this, in case of charges for example (if character has movement slowing effects)
     if (args.velocity > 4 * realSpeedRun && !args.flags.done) // From client
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), args.velocity);
-    if (oldMoveFlags & MOVEFLAG_ROOT)
+    if ((oldMoveFlags & MOVEFLAG_ROOT) && !args.flags.done)
         mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_UNROOT, unit.GetObjectGuid());
     if (oldMoveFlags & MOVEFLAG_WALK_MODE && !(moveFlags & MOVEFLAG_WALK_MODE)) // Switch to run mode
         mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
     if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
         mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
-#else
-        mvtData.SetUnitSpeed(MSG_MOVE_SET_RUN_SPEED, unit.GetObjectGuid(), args.velocity);
-    if (oldMoveFlags & MOVEFLAG_ROOT)
-        mvtData.SetSplineOpcode(MSG_MOVE_UNROOT, unit.GetObjectGuid());
-    if (oldMoveFlags & MOVEFLAG_WALK_MODE && !(moveFlags & MOVEFLAG_WALK_MODE)) // Switch to run mode
-        mvtData.SetSplineOpcode(MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-    if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
-        mvtData.SetSplineOpcode(MSG_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
 #endif
         
     mvtData.AddPacket(data);
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // Do not forget to restore velocity after movement !
     if (args.velocity > 4 * realSpeedRun && !args.flags.done)
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
-#else
-        mvtData.SetUnitSpeed(MSG_MOVE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
-#endif
 
     // Restore correct walk mode for players
     if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
 
     if (compress)
@@ -227,8 +217,6 @@ int32 MoveSplineInit::Launch()
             sLog.outError("[MoveSplineInit] Unable to compress move packet, move spline not sent");
         }
     }
-#else
-        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
 #endif
     
     return move_spline.Duration();

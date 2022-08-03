@@ -183,7 +183,7 @@ void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y
     unit->PushPendingMovementChange(pendingChange);
 
     MovementInfo mi = unit->m_movementInfo;
-    mi.UpdateTime(WorldTimer::getMSTime());
+    mi.SetAsServerSide();
     mi.ChangePosition(x, y, z, ang);
 
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 41);
