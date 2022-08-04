@@ -5316,17 +5316,30 @@ bool Unit::IsImmuneToDamage(SpellSchoolMask shoolMask, SpellEntry const* spellIn
     // If m_immuneToDamage type contain magic, IMMUNE damage.
     SpellImmuneList const& damageList = m_spellImmune[IMMUNITY_DAMAGE];
     for (const auto& itr : damageList)
+    {
         if (itr.type & shoolMask)
-            return true;
+        {
+            if (!spellInfo || !spellInfo->IsPositiveSpell())
+                return true;
 
-    if (spellInfo && spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE)
-        return false;
+            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+            return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+        }
+    }
 
     // If m_immuneToSchool type contain this school type, IMMUNE damage.
     SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
     for (const auto& itr : schoolList)
+    {
         if (itr.type & shoolMask)
-            return true;
+        {
+            if (!spellInfo || !spellInfo->IsPositiveSpell())
+                return true;
+
+            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+            return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+        }
+    }
 
     return false;
 }
@@ -5341,18 +5354,32 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
 
     SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
     for (const auto& itr : dispelList)
+    {
         if (itr.type == spellInfo->Dispel)
-            return true;
+        {
+            if (!spellInfo->IsPositiveSpell())
+                return true;
+
+            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+            return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+        }
+    }
 
     if (!(spellInfo->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)            // ignore invulnerability
-     && !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE)         // unaffected by school immunity
      && !(spellInfo->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY))           // can remove immune (by dispell or immune it)
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (const auto& itr : schoolList)
-            if (!(Spells::IsPositiveSpell(itr.spellId) && spellInfo->IsPositiveSpell()) &&
-                    (itr.type & spellInfo->GetSpellSchoolMask()))
-                return true;
+        {
+            if (itr.type & spellInfo->GetSpellSchoolMask())
+            {
+                if (!spellInfo->IsPositiveSpell())
+                    return true;
+
+                SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+                return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
+        }
     }
 
     if (uint32 mechanic = spellInfo->Mechanic)
@@ -5361,7 +5388,13 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         for (const auto& itr : mechanicList)
         {
             if (itr.type == mechanic)
-                return true;
+            {
+                if (!spellInfo->IsPositiveSpell())
+                    return true;
+
+                SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+                return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
         }
 
         uint32 mask = 1 << (mechanic - 1);
@@ -5369,7 +5402,13 @@ bool Unit::IsImmuneToSpell(SpellEntry const* spellInfo, bool /*castOnSelf*/) con
         for (const auto& iter : immuneAuraApply)
         {
             if (iter->GetModifier()->m_miscvalue & mask)
-                return true;
+            {
+                if (!spellInfo->IsPositiveSpell())
+                    return true;
+
+                SpellEntry const* pImmunitySpell = iter->GetSpellProto();
+                return pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
         }
     }
 
@@ -5382,20 +5421,44 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
     uint32 effect = spellInfo->Effect[index];
     SpellImmuneList const& effectList = m_spellImmune[IMMUNITY_EFFECT];
     for (const auto& itr : effectList)
+    {
         if (itr.type == effect)
-            return true;
+        {
+            if (!spellInfo->IsPositiveEffect(index))
+                return true;
+
+            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+            return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+        }
+    }
 
     if (uint32 mechanic = spellInfo->EffectMechanic[index])
     {
         SpellImmuneList const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
         for (const auto& itr : mechanicList)
+        {
             if (itr.type == spellInfo->EffectMechanic[index])
-                return true;
+            {
+                if (!spellInfo->IsPositiveEffect(index))
+                    return true;
+
+                SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+                return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
+        }
 
         AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MECHANIC_IMMUNITY_MASK);
         for (const auto& iter : immuneAuraApply)
+        {
             if (iter->GetModifier()->m_miscvalue & (1 << (mechanic - 1)))
-                return true;
+            {
+                if (!spellInfo->IsPositiveEffect(index))
+                    return true;
+
+                SpellEntry const* pImmunitySpell = iter->GetSpellProto();
+                return pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
+        }
     }
 
     uint32 aura = spellInfo->EffectApplyAuraName[index];
@@ -5403,8 +5466,16 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
     {
         SpellImmuneList const& list = m_spellImmune[IMMUNITY_STATE];
         for (const auto& itr : list)
+        {
             if (itr.type == aura)
-                return true;
+            {
+                if (!spellInfo->IsPositiveEffect(index))
+                    return true;
+
+                SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+                return pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
+        }
     }
 
     // Mechanical units are immune to normal heal effects. There is a separate one for them.
@@ -5426,9 +5497,13 @@ bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
             if (pImmuneSpell && pImmuneSpell == spellInfo) // do not let itself immune out - fixes 39872 - Tidal Shield
                 continue;
 
-            if (!(pImmuneSpell && pImmuneSpell->IsPositiveSpell() && spellInfo->IsPositiveEffectMask(effectMask) && !pImmuneSpell->HasAttribute(SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE)) &&
-                (itr.type & spellInfo->GetSpellSchoolMask()))
-                return true;
+            if (itr.type & spellInfo->GetSpellSchoolMask())
+            {
+                if (!spellInfo->IsPositiveEffectMask(effectMask))
+                    return true;
+
+                return pImmuneSpell && !pImmuneSpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+            }
         }
     }
 
