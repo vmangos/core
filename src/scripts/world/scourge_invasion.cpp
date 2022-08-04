@@ -555,7 +555,6 @@ Necrotic Shard
 struct NecroticShard : public ScriptedAI
 {
     EventMap m_events;
-    uint32 m_camptype = 0;
     uint32 m_finders = 0;
 
     NecroticShard(Creature* pCreature) : ScriptedAI(pCreature)
@@ -597,8 +596,7 @@ struct NecroticShard : public ScriptedAI
             }
             case SPELL_CHOOSE_CAMP_TYPE:
             {
-                m_camptype = PickRandomValue(SPELL_CAMP_TYPE_GHOUL_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOST_SKELETON);
-                m_creature->CastSpell(m_creature, m_camptype, true);
+                m_creature->CastSpell(m_creature, PickRandomValue(SPELL_CAMP_TYPE_GHOUL_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOST_SKELETON), true);
                 break;
             }
             case SPELL_CAMP_RECEIVES_COMMUNIQUE:
@@ -658,12 +656,8 @@ struct NecroticShard : public ScriptedAI
             case NPC_NECROTIC_SHARD:
                 if (Creature* pShard = m_creature->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
                 {
-                    // Get the camp type from the Necrotic Shard.
-                    if (m_camptype)
-                        pShard->CastSpell(pShard, m_camptype, true);
-                    else
-                        pShard->CastSpell(pShard, SPELL_CHOOSE_CAMP_TYPE, true);
-
+                    // Get a new camp type.
+                    pShard->CastSpell(pShard, SPELL_CHOOSE_CAMP_TYPE, true);
                     m_creature->RemoveFromWorld();
                 }
                 break;
