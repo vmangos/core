@@ -359,6 +359,14 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong
 -- Remove Creature Under Map
 DELETE FROM `creature` WHERE `guid` = 89490;
 
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Add Missing Texts To Quest Script (credit cmangos)
+DELETE FROM `quest_start_scripts` WHERE `id`=1363;
+INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(1363, 1, 0, 1, 5, 0, 0, 0, 90459, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Acolyte Dellis - Emote'),
+(1363, 1, 0, 0, 0, 0, 0, 0, 90459, 0, 9, 2, 1828, 1829, 1830, 1831, 0, 0, 0, 0, 0, 'Acolyte Dellis - Talk');
+
 
 -- End of migration.
 END IF;
