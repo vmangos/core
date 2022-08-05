@@ -129,11 +129,15 @@ UPDATE `creature` SET `id` = 2204 WHERE `guid` IN (
 37967,
 37968
 );
-UPDATE `creature` SET `id2` = 2203 WHERE `id` = 2204;
+UPDATE `creature` SET `id2` = 2203 WHERE `guid` IN (
+37972,
+37973,
+37974
+);
 
 -- Greymist Coastrunner Can Be Greymist Seer
 -- https://classic.wowhead.com/npc=2202/greymist-coastrunner
-UPDATE `creature` SET `id` = 2202 WHERE `guid` IN (
+UPDATE `creature` SET `id2` = 2202 WHERE `guid` IN (
 37964,
 37965,
 37959,
@@ -153,13 +157,36 @@ UPDATE `creature` SET `id` = 2202 WHERE `guid` IN (
 37961,
 37962
 );
-UPDATE `creature` SET `id2` = 2203 WHERE `id` = 2202;
+UPDATE `creature` SET `id2` = 2203 WHERE `guid` IN (
+37855,
+37856,
+37857,
+37858,
+37859,
+37860,
+37861,
+37863,
+37864,
+37866,
+37867,
+37930,
+37931,
+37932,
+37933,
+37934,
+37935,
+37936,
+37941,
+37942,
+37943,
+37944
+);
 
 -- Greymist Raider Can Be Greymist Coastrunner
 -- https://classic.wowhead.com/npc=2201/greymist-raider
 UPDATE `creature` SET `id` = 2201 WHERE `guid` IN (
 37862,
-38937,
+37937,
 37938,
 37940,
 37939
@@ -180,7 +207,20 @@ UPDATE `creature` SET `id` = 2205, `id2` = 2204 WHERE `guid` IN (
 -- https://classic.wowhead.com/npc=2338/twilight-disciple
 -- https://classic.wowhead.com/npc=2339/twilight-thug
 UPDATE `creature` SET `id2` = 2339 WHERE `id` = 2338;
-UPDATE `creature` SET `id2` = 2338 WHERE `id` = 2339;
+UPDATE `creature` SET `id2` = 2338 WHERE `guid` IN (
+37016,
+37017,
+37020,
+37021,
+37024,
+37025,
+37026,
+37027,
+37028,
+37040,
+37044,
+37045
+);
 
 -- ----------------------------------------------------------------------
 
@@ -241,7 +281,6 @@ UPDATE `creature` SET `id` = 6194 WHERE `guid` IN (
 35464,
 35431,
 35482,
-35417,
 35449,
 35421,
 35420,
@@ -310,7 +349,6 @@ UPDATE `creature` SET `id` = 6196 WHERE `guid` IN (
 35485,
 35458,
 35450,
-35507,
 35442,
 35498,
 35495,
@@ -336,17 +374,17 @@ UPDATE `creature` SET `id2` = 7885 WHERE `id` = 7886;
 UPDATE `creature` SET `id` = 6186, `movement_type` = 1, `wander_distance` = 1  WHERE `guid` IN (
 35226,
 35214,
-25232
+35232
 );
 UPDATE `creature` SET `id2` = 6185 WHERE `id` = 6186;
 
 -- Add Missing Timbermaw Spawns
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(57449, 6186, 6185, 0, 0, 1, 3978.12, -5035.42, 136.33, 2.74885, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
-(57522, 6186, 6185, 0, 0, 1, 3948.55, -5018.79, 138.09, 0.722561, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
-(57529, 6186, 6185, 0, 0, 1, 3962.61, -5023.06, 137.442, 5.67093, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
-(57556, 6186, 6185, 0, 0, 1, 3967.71, -5029.17, 136.693, 3.59627, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
-(57567, 6186, 6185, 0, 0, 1, 3964.08, -5039.61, 137.109, 3.15164, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10);
+(35224, 6186, 6185, 0, 0, 1, 3978.12, -5035.42, 136.33, 2.74885, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
+(35229, 6186, 6185, 0, 0, 1, 3948.55, -5018.79, 138.09, 0.722561, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
+(35239, 6186, 6185, 0, 0, 1, 3962.61, -5023.06, 137.442, 5.67093, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
+(35240, 6186, 6185, 0, 0, 1, 3967.71, -5029.17, 136.693, 3.59627, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10),
+(35243, 6186, 6185, 0, 0, 1, 3964.08, -5039.61, 137.109, 3.15164, 333, 333, 1, 100, 100, 1, 0, 0, 0, 10);
 DELETE FROM `creature` WHERE `guid` = 35198;
 
 -- Timbermaw Pathfinder Can Be Timbermaw Warrior
@@ -365,11 +403,11 @@ UPDATE `creature` SET `id2` = 6185 WHERE `id` = 6184;
 
 -- Add Missing Timbermaw Spawns
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(57448, 6184, 6185, 0, 0, 1, 3947.23, -5049.63, 133.611, 3.15227, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
-(57469, 6184, 6185, 0, 0, 1, 4020.5, -5046.54, 132.482, 3.9683, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
-(57470, 6184, 6185, 0, 0, 1, 3983.16, -5049.67, 135.471, 0.0991868, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
-(57555, 6184, 6185, 0, 0, 1, 3917.41, -5016.51, 141.021, 0.559616, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
-(57560, 6184, 6185, 0, 0, 1, 3914.86, -4980.88, 142.913, 4.33968, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10);
+(35245, 6184, 6185, 0, 0, 1, 3947.23, -5049.63, 133.611, 3.15227, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
+(35246, 6184, 6185, 0, 0, 1, 4020.5, -5046.54, 132.482, 3.9683, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
+(35418, 6184, 6185, 0, 0, 1, 3983.16, -5049.67, 135.471, 0.0991868, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
+(35868, 6184, 6185, 0, 0, 1, 3917.41, -5016.51, 141.021, 0.559616, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10),
+(35869, 6184, 6185, 0, 0, 1, 3914.86, -4980.88, 142.913, 4.33968, 333, 333, 3, 100, 0, 1, 0, 0, 0, 10);
 
 -- https://classic.wowhead.com/npc=6198/blood-elf-surveyor
 -- https://classic.wowhead.com/npc=6199/blood-elf-reclaimer
@@ -422,14 +460,24 @@ UPDATE `creature` SET `id2` = 6188 WHERE `id` = 6187;
 -- https://classic.wowhead.com/npc=193/blue-dragonspawn
 -- https://classic.wowhead.com/npc=6131/draconic-mageweaver
 UPDATE `creature` SET `id2` = 6131 WHERE `id` = 193;
-UPDATE `creature` SET `id2` = 193 WHERE `id` = 6131;
+UPDATE `creature` SET `id2` = 193 WHERE `guid` IN (
+36413,
+36419,
+36420,
+36422,
+36423,
+36429,
+36430,
+36431,
+36432
+);
 
 -- ----------------------------------------------------------------------
 
 -- WINTERSPRING
 -- Winterfall Totemic Can Be Winterfall Den Watcher
 -- https://classic.wowhead.com/npc=7441/winterfall-totemic
-UPDATE `creature` SET `id` = 7441 WHERE `guid` IN (
+UPDATE `creature` SET `id2` = 7441 WHERE `guid` IN (
 41038,
 41040,
 41039
@@ -438,11 +486,23 @@ UPDATE `creature` SET `id2` = 7440 WHERE `id` = 7441;
 
 -- Winterfall Den Watcher Can Be Winterfall Shaman
 -- https://classic.wowhead.com/npc=7440/winterfall-den-watcher
-UPDATE `creature` SET `id` = 7440 WHERE `guid` IN (
+UPDATE `creature` SET `id2` = 7440 WHERE `guid` IN (
 41030,
 41034
 );
-UPDATE `creature` SET `id2` = 7439 WHERE `id` = 7440;
+UPDATE `creature` SET `id2` = 7439 WHERE `guid` IN (
+41035,
+41037,
+41041,
+41042,
+41043,
+41044,
+41045,
+41046,
+41047,
+41048,
+41049
+);
 
 -- Winterfall Ursa Can Be Winterfall Shaman
 -- https://classic.wowhead.com/npc=7438/winterfall-ursa
@@ -451,7 +511,18 @@ UPDATE `creature` SET `id` = 7438 WHERE `guid` IN (
 41032,
 41031
 );
-UPDATE `creature` SET `id2` = 7439 WHERE `id` = 7438;
+UPDATE `creature` SET `id2` = 7439 WHERE `guid` IN (
+41017,
+41019,
+41020,
+41022,
+41023,
+41024,
+41025,
+41026,
+41027,
+41028
+);
 
 -- Winterfall Den Watcher Just Outside Can Only Be Den Watcher
 UPDATE `creature` SET `id2` = 0 WHERE `guid` IN (
@@ -629,7 +700,19 @@ UPDATE `creature` SET `id2` = 3992 WHERE `id` = 4070;
 -- https://classic.wowhead.com/npc=4022/bloodfury-harpy
 -- https://classic.wowhead.com/npc=4025/bloodfury-ambusher
 -- https://classic.wowhead.com/npc=4026/bloodfury-windcaller
-UPDATE `creature` SET `id2` = 4025, `id3` = 4026 WHERE `id` = 4022;
+UPDATE `creature` SET `id2` = 4025, `id3` = 4026 WHERE `guid` IN (
+30419,
+30420,
+30421,
+30422,
+30423,
+30426,
+30427,
+30428,
+30429,
+30430,
+30431
+);
 UPDATE `creature` SET `id2` = 4022, `id3` = 4026 WHERE `id` = 4025;
 UPDATE `creature` SET `id2` = 4022, `id3` = 4025 WHERE `id` = 4026;
 
@@ -731,8 +814,8 @@ UPDATE `creature` SET `id` = 6552 WHERE `guid` IN (
 24304,
 24294
 );
-UPDATE `creature` SET `id2` = 6552, `id3` = 6553 WHERE `id` = 6551;
-UPDATE `creature` SET `id2` = 6551, `id3` = 6553 WHERE `id` = 6552;
+UPDATE `creature` SET `id2` = 6552 WHERE `id` = 6551;
+UPDATE `creature` SET `id2` = 6551 WHERE `id` = 6552;
 
 -- Gorishi Stinger And Gorishi Tunneler Can Be 6553, 6554 or 6555
 -- https://classic.wowhead.com/npc=6554/gorishi-stinger
@@ -808,8 +891,8 @@ UPDATE `creature` SET `id2` = 6513, `id3` = 6514 WHERE `id` = 6516;
 -- Wastewander Bandit And Wastewander Thief Can Be 5616, 5618 or 5617
 -- https://classic.wowhead.com/npc=5616/wastewander-thief
 -- https://classic.wowhead.com/npc=5618/wastewander-bandit
-UPDATE `creature` SET `id2` = 5617, `id3` = 5618 WHERE `id` = 5616;
-UPDATE `creature` SET `id2` = 5616, `id3` = 5617 WHERE `id` = 5618;
+UPDATE `creature` SET `id2` = 5618 WHERE `id` = 5616;
+UPDATE `creature` SET `id2` = 5616 WHERE `id` = 5618;
 
 -- Wastewander Rogue And Wastewander Assassin Can Be 5615, 5623 or 5617
 -- https://classic.wowhead.com/npc=5615/wastewander-rogue
@@ -874,9 +957,8 @@ UPDATE `creature` SET `id2` = 5455, `id3` = 5456 WHERE `id` = 5457;
 -- https://classic.wowhead.com/npc=5458/centipaar-worker
 -- https://classic.wowhead.com/npc=5459/centipaar-tunneler
 -- https://classic.wowhead.com/npc=5460/centipaar-sandreaver
-UPDATE `creature` SET `id2` = 5459, `id3` = 5460 WHERE `id` = 5458;
-UPDATE `creature` SET `id2` = 5458, `id3` = 5460 WHERE `id` = 5459;
-UPDATE `creature` SET `id2` = 5458, `id3` = 5459 WHERE `id` = 5460;
+UPDATE `creature` SET `id2` = 5460 WHERE `id` = 5458;
+UPDATE `creature` SET `id2` = 5458 WHERE `id` = 5460;
 
 -- https://classic.wowhead.com/npc=5441/hazzali-wasp
 -- https://classic.wowhead.com/npc=5450/hazzali-stinger
@@ -952,8 +1034,8 @@ UPDATE `creature` SET `id2` = 5254, `id3` = 5255 WHERE `id` = 5258;
 -- https://classic.wowhead.com/npc=5249/woodpaw-mongrel
 -- https://classic.wowhead.com/npc=5251/woodpaw-trapper
 -- https://classic.wowhead.com/npc=5253/woodpaw-brute
-UPDATE `creature` SET `id2` = 5251, `id3` = 5253 WHERE `id` = 5249;
-UPDATE `creature` SET `id2` = 5249, `id3` = 5253 WHERE `id` = 5251;
+UPDATE `creature` SET `id2` = 5251 WHERE `id` = 5249;
+UPDATE `creature` SET `id2` = 5249 WHERE `id` = 5251;
 UPDATE `creature` SET `id2` = 5249, `id3` = 5251 WHERE `id` = 5253;
 
 -- https://classic.wowhead.com/npc=7725/grimtotem-raider
@@ -1036,16 +1118,12 @@ UPDATE `creature` SET `id2` = 11443 WHERE `id` = 11442;
 -- Gordunni Mauler Can Be Gordunni Warlock
 -- https://classic.wowhead.com/npc=5234/gordunni-mauler
 UPDATE `creature` SET `id` = 5234 WHERE `guid` IN (
-50214,
-50197,
 50298,
-50244,
 50302,
 50300,
 50301,
 50295,
 50299,
-50213,
 50297
 );
 UPDATE `creature` SET `id2` = 5240 WHERE `id` = 5234;
@@ -1078,7 +1156,7 @@ UPDATE `creature` SET `id2` = 5357 WHERE `id` = 5358;
 
 -- Gordunni Ogre Can Be Gordunni Mage Or Gordunni Brute
 -- https://classic.wowhead.com/npc=5229/gordunni-ogre
-UPDATE `creature` SET `id` = 5229 WHERE `guid` IN (
+UPDATE `creature` SET `id2` = 5229, `id3` = 5237 WHERE `guid` IN (
 50186,
 50188,
 50187,
@@ -1096,7 +1174,7 @@ UPDATE `creature` SET `id` = 5229 WHERE `guid` IN (
 50202,
 50201
 );
-UPDATE `creature` SET `id` = 5229 WHERE `id` = 5237;
+UPDATE `creature` SET `id2` = 5229, `id3` = 5232 WHERE `id` = 5237;
 UPDATE `creature` SET `id2` = 5232, `id3` = 5237 WHERE `id` = 5229;
 
 -- https://classic.wowhead.com/npc=5331/hatecrest-warrior
@@ -1168,7 +1246,18 @@ UPDATE `creature` SET `id2` = 12477, `id3` = 12478 WHERE `id` = 12479;
 -- https://classic.wowhead.com/npc=7109/jadefire-felsworn
 -- https://classic.wowhead.com/npc=7110/jadefire-shadowstalker
 UPDATE `creature` SET `id2` = 7109, `id3` = 7110 WHERE `id` = 7106;
-UPDATE `creature` SET `id2` = 7106, `id3` = 7110 WHERE `id` = 7109;
+UPDATE `creature` SET `id2` = 7106, `id3` = 7110 WHERE `guid` IN (
+40695,
+40730,
+40735,
+40738,
+40747,
+40757,
+40764,
+40769,
+40829,
+40835
+);
 UPDATE `creature` SET `id2` = 7106, `id3` = 7109 WHERE `id` = 7110;
 
 -- https://classic.wowhead.com/npc=7112/jaedenar-cultist
@@ -1183,7 +1272,23 @@ UPDATE `creature` SET `id2` = 7118 WHERE `id` = 7120;
 
 -- https://classic.wowhead.com/npc=7107/jadefire-trickster
 -- https://classic.wowhead.com/npc=7108/jadefire-betrayer
-UPDATE `creature` SET `id2` = 7108 WHERE `id` = 7107;
+UPDATE `creature` SET `id2` = 7108 WHERE `guid` IN (
+40193,
+40194,
+40195,
+40240,
+40241,
+40242,
+40284,
+40288,
+40289,
+40291,
+40296,
+40677,
+40678,
+40713,
+40714
+);
 UPDATE `creature` SET `id2` = 7107 WHERE `id` = 7108;
 
 -- https://classic.wowhead.com/npc=7100/warpwood-moss-flayer
@@ -1234,7 +1339,13 @@ UPDATE `creature` SET `id2` = 9778 WHERE `id` = 9779;
 -- https://classic.wowhead.com/npc=765/swampwalker-elder
 -- https://classic.wowhead.com/npc=766/tangled-horror
 UPDATE `creature` SET `id2` = 766 WHERE `id` = 765;
-UPDATE `creature` SET `id2` = 765 WHERE `id` = 766;
+UPDATE `creature` SET `id2` = 765 WHERE `guid` IN (
+42823,
+42825,
+42828,
+42832,
+42834
+);
 
 -- https://classic.wowhead.com/npc=761/lost-one-seer
 -- https://classic.wowhead.com/npc=762/lost-one-riftseeker
@@ -1248,12 +1359,13 @@ UPDATE `creature` SET `id2` = 751 WHERE `id` = 752;
 
 -- ----------------------------------------------------------------------
 
--- TIRISFAL
+-- ALTERAC
 -- https://classic.wowhead.com/npc=2240/syndicate-footpad
 -- https://classic.wowhead.com/npc=2241/syndicate-thief
 UPDATE `creature` SET `id2` = 2241 WHERE `id` = 2240;
 UPDATE `creature` SET `id2` = 2240 WHERE `id` = 2241;
 
+-- TIRISFAL
 -- https://classic.wowhead.com/npc=1525/rotting-dead
 -- https://classic.wowhead.com/npc=1526/ravaged-corpse
 UPDATE `creature` SET `id2` = 1526 WHERE `id` = 1525;
@@ -1268,10 +1380,8 @@ UPDATE `creature` SET `id` = 1536 WHERE `guid` IN (
 44865,
 44574,
 44578,
-45047,
 44580,
 45059,
-44580,
 45067,
 44582,
 45057,
@@ -1548,18 +1658,6 @@ UPDATE `creature` SET `id` = 500, `id2` = 1065 WHERE `guid` IN (
 86792
 );
 
--- Riverpaw Mongrel Can Be Riverpaw Scout
--- https://classic.wowhead.com/npc=123/riverpaw-mongrel
-UPDATE `creature` SET `id` = 123 WHERE `guid` IN (
-87037,
-87036,
-90328,
-90326,
-87085,
-88751
-);
-UPDATE `creature` SET `id2` = 500 WHERE `id` = 123;
-
 -- Riverpaw Herbalist Can Be Riverpaw Mongrel
 -- https://classic.wowhead.com/npc=501/riverpaw-herbalist
 UPDATE `creature` SET `id` = 501 WHERE `guid` IN (
@@ -1592,72 +1690,6 @@ UPDATE `creature` SET `id` = 501 WHERE `guid` IN (
 89633
 );
 UPDATE `creature` SET `id2` = 123 WHERE `id` = 501;
-
--- Riverpaw Brute Can Be Riverpaw Herbalist
--- https://classic.wowhead.com/npc=124/riverpaw-brute
-UPDATE `creature` SET `id` = 124 WHERE `guid` IN (
-89649,
-89656,
-90295,
-89654,
-89642,
-89646,
-90298,
-89636,
-89651,
-89653,
-89652
-);
-UPDATE `creature` SET `id2` = 501 WHERE `id` = 124;
-
--- Riverpaw Bandit Can Be Riverpaw Brute
--- https://classic.wowhead.com/npc=452/riverpaw-bandit
-UPDATE `creature` SET `id` = 452 WHERE `guid` IN (
-89682,
-89683,
-89686,
-90367,
-89687,
-89688,
-89693,
-89690,
-90370,
-90272
-);
-UPDATE `creature` SET `id2` = 124 WHERE `id` = 452;
-
--- Riverpaw Taskmaster Can Be Riverpaw Bandit
--- https://classic.wowhead.com/npc=98/riverpaw-taskmaster
-UPDATE `creature` SET `id` = 98 WHERE `guid` IN (
-90268,
-89707,
-89710,
-89705,
-89704,
-89703,
-89702,
-89700,
-89701,
-89718,
-98717,
-89719,
-89720,
-90265,
-90256,
-90252,
-90261,
-89714,
-89713,
-89715,
-90242,
-89752,
-89749,
-89751,
-89750,
-90251,
-89717
-);
-UPDATE `creature` SET `id2` = 452 WHERE `id` = 98;
 
 -- Riverpaw Mystic Can Be Riverpaw Taskmaster
 -- https://classic.wowhead.com/npc=453/riverpaw-mystic
@@ -1706,15 +1738,7 @@ UPDATE `creature` SET `id2` = 589 WHERE `id` = 590;
 -- https://classic.wowhead.com/npc=95/defias-smuggler
 -- https://classic.wowhead.com/npc=504/defias-trapper
 UPDATE `creature` SET `id2` = 504 WHERE `id` = 95;
-UPDATE `creature` SET `id2` = 95 WHERE `id` = 504;
-
--- https://classic.wowhead.com/npc=121/defias-pathstalker
--- https://classic.wowhead.com/npc=122/defias-highwayman
--- https://classic.wowhead.com/npc=449/defias-knuckleduster
-UPDATE `creature` SET `id2` = 122, `id3` = 449 WHERE `id` = 121;
-UPDATE `creature` SET `id2` = 121, `id3` = 449 WHERE `id` = 122;
-UPDATE `creature` SET `id2` = 121, `id3` = 122 WHERE `id` = 449;
--- ** NEEDS MORE ATTENTION HAS RANDOM SPAWNS JUST TO BE ANNOYING
+UPDATE `creature` SET `id2` = 95 WHERE `id` = 504 && `guid` NOT IN (89451, 89452, 89453, 89454, 89455, 89456, 89457, 90317, 90320, 90322);
 
 -- ----------------------------------------------------------------------
 
@@ -1736,9 +1760,8 @@ UPDATE `creature` SET `id2` = 4673, `id3` = 4674 WHERE `id` = 4675;
 -- https://classic.wowhead.com/npc=4632/kolkar-centaur
 -- https://classic.wowhead.com/npc=4633/kolkar-scout
 -- https://classic.wowhead.com/npc=4634/kolkar-mauler
-UPDATE `creature` SET `id2` = 4633, `id3` = 4634 WHERE `id` = 4632;
-UPDATE `creature` SET `id2` = 4632, `id3` = 4634 WHERE `id` = 4633;
-UPDATE `creature` SET `id2` = 4632, `id3` = 4633 WHERE `id` = 4634;
+UPDATE `creature` SET `id2` = 4633 WHERE `id` = 4632;
+UPDATE `creature` SET `id2` = 4632 WHERE `id` = 4633;
 
 -- https://classic.wowhead.com/npc=4635/kolkar-windchaser
 -- https://classic.wowhead.com/npc=4636/kolkar-battle-lord
@@ -1756,11 +1779,6 @@ UPDATE `creature` SET `id2` = 4638 WHERE `id` = 4639;
 -- https://classic.wowhead.com/npc=4641/magram-windchaser
 UPDATE `creature` SET `id2` = 4641 WHERE `id` = 4640;
 UPDATE `creature` SET `id2` = 4640 WHERE `id` = 4641;
-
--- https://classic.wowhead.com/npc=4642/magram-stormer
--- https://classic.wowhead.com/npc=4643/magram-pack-runner
-UPDATE `creature` SET `id2` = 4643 WHERE `id` = 4642;
-UPDATE `creature` SET `id2` = 4642 WHERE `id` = 4643;
 
 -- https://classic.wowhead.com/npc=4644/magram-marauder
 -- https://classic.wowhead.com/npc=4645/magram-mauler
