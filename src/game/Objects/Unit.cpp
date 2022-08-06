@@ -5503,8 +5503,8 @@ bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (auto itr : schoolList)
         {
-            SpellEntry const* pImmuneSpell = sSpellMgr.GetSpellEntry(itr.spellId);
-            if (pImmuneSpell && pImmuneSpell == spellInfo) // do not let itself immune out - fixes 39872 - Tidal Shield
+            SpellEntry const* pImmunitySpell = sSpellMgr.GetSpellEntry(itr.spellId);
+            if (pImmunitySpell && pImmunitySpell == spellInfo) // do not let itself immune out - fixes 39872 - Tidal Shield
                 continue;
 
             if (itr.type & spellInfo->GetSpellSchoolMask())
@@ -5512,7 +5512,7 @@ bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
                 if (!spellInfo->IsPositiveEffectMask(effectMask))
                     return true;
 
-                if (pImmuneSpell && !pImmuneSpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+                if (pImmunitySpell && pImmunitySpell->HasAttribute(SPELL_ATTR_EX_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
                     return true;
             }
         }
