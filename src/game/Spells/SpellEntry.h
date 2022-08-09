@@ -32,6 +32,7 @@ class Spell;
 class Unit;
 class WorldObject;
 class SpellEntry;
+class SpellCaster;
 
 namespace Spells
 {
