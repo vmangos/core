@@ -1210,38 +1210,37 @@ struct FireworkStruct
     uint32 m_uiNpcEntry;
     uint32 m_uiSpellEntry[5];
     bool m_bIsCluster;
+    bool m_bIsLarge;
 };
 
 std::array<FireworkStruct, 25> const Fireworks =
 { {
-    { 15872, {26357, 26303, 26302, 26300, 26301}, true }, // Blue Firework Cluster
-    { 15873, {26360, 26308, 26307, 26306, 26305}, true }, // Red Firework Cluster
-    { 15874, {26358, 26312, 26311, 26310, 26309}, true }, // Green Firework Cluster
-    { 15875, {26359, 26316, 26315, 26314, 26313}, true }, // Purple Firework Cluster
-    { 15876, {26361, 26320, 26319, 26318, 26317}, true }, // White Firework Cluster
-    { 15877, {26362, 26324, 26323, 26322, 26321}, true }, // Yellow Firework Cluster
-    { 15879, {26344, 0,     0,     0,     0},     false}, // Small Blue Rocket
-    { 15880, {26345, 0,     0,     0,     0},     false}, // Small Green Rocket
-    { 15881, {26346, 0,     0,     0,     0},     false}, // Small Purple Rocket
-    { 15882, {26347, 0,     0,     0,     0},     false}, // Small Red Rocket
-    { 15883, {26349, 0,     0,     0,     0},     false}, // Small Yellow Rocket
-    { 15884, {26348, 0,     0,     0,     0},     false}, // Small White Rocket
-    { 15885, {26351, 0,     0,     0,     0},     false}, // Large Blue Rocket
-    { 15886, {26352, 0,     0,     0,     0},     false}, // Large Green Rocket
-    { 15887, {26353, 0,     0,     0,     0},     false}, // Large Purple Rocket
-    { 15888, {26354, 0,     0,     0,     0},     false}, // Large Red Rocket
-    { 15889, {26355, 0,     0,     0,     0},     false}, // Large White Rocket
-    { 15890, {26356, 0,     0,     0,     0},     false}, // Large Yellow Rocket
-    { 15911, {26487, 26486, 26485, 26484, 26483}, true }, // Large Blue Firework Cluster
-    { 15912, {26495, 26494, 26493, 26492, 26491}, true }, // Large Green Firework Cluster
-    { 15913, {26500, 26499, 26498, 26497, 26496}, true }, // Large Purple Firework Cluster
-    { 15914, {26505, 26504, 26503, 26502, 26501}, true }, // Large Red Firework Cluster
-    { 15915, {26510, 26509, 26508, 26507, 26506}, true }, // Large White Firework Cluster
-    { 15916, {26515, 26514, 26513, 26512, 26511}, true }, // Large Yellow Firework Cluster
-    { 15918, {26487, 26509, 26508, 26484, 26483}, true }, // Lucky Rocket Cluster
-}};
-
-static std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
+    { 15872, {26357, 26303, 26302, 26300, 26301}, true, false }, // Blue Firework Cluster
+    { 15873, {26360, 26308, 26307, 26306, 26305}, true, false }, // Red Firework Cluster
+    { 15874, {26358, 26312, 26311, 26310, 26309}, true, false }, // Green Firework Cluster
+    { 15875, {26359, 26316, 26315, 26314, 26313}, true, false }, // Purple Firework Cluster
+    { 15876, {26361, 26320, 26319, 26318, 26317}, true, false }, // White Firework Cluster
+    { 15877, {26362, 26324, 26323, 26322, 26321}, true, false }, // Yellow Firework Cluster
+    { 15879, {26344, 0,     0,     0,     0},     false, false }, // Small Blue Rocket
+    { 15880, {26345, 0,     0,     0,     0},     false, false }, // Small Green Rocket
+    { 15881, {26346, 0,     0,     0,     0},     false, false }, // Small Purple Rocket
+    { 15882, {26347, 0,     0,     0,     0},     false, false }, // Small Red Rocket
+    { 15883, {26349, 0,     0,     0,     0},     false, false }, // Small Yellow Rocket
+    { 15884, {26348, 0,     0,     0,     0},     false, false }, // Small White Rocket
+    { 15885, {26351, 0,     0,     0,     0},     false, true }, // Large Blue Rocket
+    { 15886, {26352, 0,     0,     0,     0},     false, true }, // Large Green Rocket
+    { 15887, {26353, 0,     0,     0,     0},     false, true }, // Large Purple Rocket
+    { 15888, {26354, 0,     0,     0,     0},     false, true }, // Large Red Rocket
+    { 15889, {26355, 0,     0,     0,     0},     false, true }, // Large White Rocket
+    { 15890, {26356, 0,     0,     0,     0},     false, true }, // Large Yellow Rocket
+    { 15911, {26487, 26486, 26485, 26484, 26483}, true, true }, // Large Blue Firework Cluster
+    { 15912, {26495, 26494, 26493, 26492, 26491}, true, true }, // Large Green Firework Cluster
+    { 15913, {26500, 26499, 26498, 26497, 26496}, true, true }, // Large Purple Firework Cluster
+    { 15914, {26505, 26504, 26503, 26502, 26501}, true, true }, // Large Red Firework Cluster
+    { 15915, {26510, 26509, 26508, 26507, 26506}, true, true }, // Large White Firework Cluster
+    { 15916, {26515, 26514, 26513, 26512, 26511}, true, true }, // Large Yellow Firework Cluster
+    { 15918, {26487, 26509, 26508, 26484, 26483}, true, true }, // Lucky Rocket Cluster
+} };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1290,45 +1289,98 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
-        for (uint32 goEntry : Launcher)
-        {
-            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
-            {
-                pGo->SendGameObjectCustomAnim(3); // SendGameObjectCustomAnim(2) is sniffed too, but it has no animation.
-                break;
-            }
-        }
-
         float x, y, z;
         m_creature->GetPosition(x, y, z);
 
         if (Fireworks[m_uiIndex].m_bIsCluster)
         {
-            for (int i = 0; i < 5; ++i)
+            if (Fireworks[m_uiIndex].m_bIsLarge)
             {
-                switch (i)
+                /* BIG Rockets
+                ╔══════╤═════╤═════╗
+                ║ X    │ Y   │ Z   ║
+                ╠══════╪═════╪═════╣
+                ║ 0    │ 0   │ +3  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ +3  │ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ +5.25│ -1.5│ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ -5.25│ -1.5│ +7.5║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ 0   │ +12 ║
+                ╚══════╧═════╧═════╝
+                */
+                for (int i = 0; i < 5; ++i)
                 {
-                case 0:
-                    m_creature->NearTeleportTo(x, y, z + 7.0f, 0.0f);
-                    break;
-                case 1:
-                    m_creature->NearTeleportTo(x - 1.5f, y + 1.5f, z + 5.0f, 0.0f);
-                    break;
-                case 2:
-                    m_creature->NearTeleportTo(x - 1.5f, y - 1.5f, z + 5.0f, 0.0f);
-                    break;
-                case 3:
-                    m_creature->NearTeleportTo(x + 1.5f, y, z + 5.0f, 0.0f);
-                    break;
-                case 4:
-                    m_creature->NearTeleportTo(x, y + 1.5f, z + 3.0f, 0.0f);
-                    break;
+                    switch (i)
+                    {
+                    case 0:
+                        m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
+                        break;
+                    case 1:
+                        m_creature->NearTeleportTo(x, y + 3.0f, z + 7.5f, 0.0f);
+                        break;
+                    case 2:
+                        m_creature->NearTeleportTo(x + 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                        break;
+                    case 3:
+                        m_creature->NearTeleportTo(x - 5.25f, y - 1.5f, z + 7.5f, 0.0f);
+                        break;
+                    case 4:
+                        m_creature->NearTeleportTo(x, y, z + 12.0f, 0.0f);
+                        break;
+                    }
+                    m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
                 }
-                m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+            }
+            else
+            {
+                /* Normal / Small Rockets
+                ╔══════╤═════╤═════╗
+                ║ X    │ Y   │ Z   ║
+                ╠══════╪═════╪═════╣
+                ║ 0    │ 0   │ +8  ║
+                ╟──────┼─────┼─────╢
+                ║ +3.5 │ -1  │ +5  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ +2  │ +5  ║
+                ╟──────┼─────┼─────╢
+                ║ 0    │ 0   │ +2  ║
+                ╟──────┼─────┼─────╢
+                ║ -3.5 │ -1  │ +5  ║
+                ╚══════╧═════╧═════╝
+                */
+                for (int i = 0; i < 5; ++i)
+                {
+                    switch (i)
+                    {
+                    case 0:
+                        m_creature->NearTeleportTo(x, y, z + 8.0f, 0.0f);
+                        break;
+                    case 1:
+                        m_creature->NearTeleportTo(x + 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                        break;
+                    case 2:
+                        m_creature->NearTeleportTo(x, y + 2.0f, z + 5.0f, 0.0f);
+                        break;
+                    case 3:
+                        m_creature->NearTeleportTo(x, y, z + 2.0f, 0.0f);
+                        break;
+                    case 4:
+                        m_creature->NearTeleportTo(x - 3.5f, y - 1.0f, z + 5.0f, 0.0f);
+                        break;
+                    }
+                    m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[i], true);
+                }
             }
         }
         else
+        {
+            // Non Cluster Rockets are always z + 3.0f!
+            m_creature->NearTeleportTo(x, y, z + 3.0f, 0.0f);
             m_creature->CastSpell(m_creature, Fireworks[m_uiIndex].m_uiSpellEntry[0], true);
+        }
 
         // Lunar Fortune is casted 3 seconds later.
         if (m_bisLucky)
