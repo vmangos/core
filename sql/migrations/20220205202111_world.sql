@@ -32,7 +32,7 @@ DELETE FROM `creature` WHERE id IN (15549,15556,15557,15558,15559,15560,15561,15
 
 -- Lunar Festival Reveler gossip.
 INSERT INTO `gossip_menu` (`entry`, `text_id`, `script_id`, `condition_id`) VALUES (6935, 8224, 0, 0);
-INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (8224, 11685, 1, 11686, 1, 11687, 1, 11688, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+-- INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`, `BroadcastTextID1`, `Probability1`, `BroadcastTextID2`, `Probability2`, `BroadcastTextID3`, `Probability3`, `BroadcastTextID4`, `Probability4`, `BroadcastTextID5`, `Probability5`, `BroadcastTextID6`, `Probability6`, `BroadcastTextID7`, `Probability7`) VALUES (8224, 11685, 1, 11686, 1, 11687, 1, 11688, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Events list for Lunar Festival Reveler
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15917;
