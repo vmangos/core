@@ -62,7 +62,28 @@ UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4326;
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4327;
 -- FIRE IN THE HOLE!
 UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=4137;
+-- Self-destruct sequence activated.
+UPDATE `broadcast_text` SET `chat_type`=1 WHERE `entry`=3927;
 
+-- Add missing emotes
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4050;
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4051;
+UPDATE `broadcast_text` SET `emote_id1`=5 WHERE `entry`=4052;
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4129;
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4130;
+UPDATE `broadcast_text` SET `emote_id1`=25 WHERE `entry`=4131;
+UPDATE `broadcast_text` SET `emote_id1`=5 WHERE `entry`=4132;
+UPDATE `broadcast_text` SET `emote_id1`=5 WHERE `entry`=4135;
+UPDATE `broadcast_text` SET `emote_id1`=5 WHERE `entry`=4136;
+UPDATE `broadcast_text` SET `emote_id1`=25 WHERE `entry`=4137;
+UPDATE `broadcast_text` SET `emote_id1`=4 WHERE `entry`=4206;
+UPDATE `broadcast_text` SET `emote_id1`=6 WHERE `entry`=4207;
+UPDATE `broadcast_text` SET `emote_id1`=25 WHERE `entry`=4208;
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4325;
+UPDATE `broadcast_text` SET `emote_id1`=5 WHERE `entry`=4326;
+UPDATE `broadcast_text` SET `emote_id1`=5 WHERE `entry`=4327;
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4329;
+UPDATE `broadcast_text` SET `emote_id1`=1 WHERE `entry`=4328;
 
 -- End of migration.
 END IF;
