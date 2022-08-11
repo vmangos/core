@@ -52,14 +52,8 @@ UPDATE `creature_template` SET `auras`='11959', `ai_name`='' WHERE  `entry`=1998
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (745001);
 DELETE FROM `creature_ai_events` WHERE `creature_id`=7450;
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES
-(74500, 'Winterspring - Ragged Owlbeast', 15848, 100, 1, 0, 0, 32, 0, 5, 3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(74500, 'Winterspring - Ragged Owlbeast', 15848, 100, 1, 0, 0, 32, 7, 21, 26, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 UPDATE `creature_template` SET `ai_name`='', `spell_list_id`=74500 WHERE `entry`=7450;
-
--- Events list for Crazed Owlbeast
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(745201, 0, 15, 15716, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crazed Owlbeast - Cast Spell ');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (745201, 7452, 0, 2, 0, 100, 1, 50, 0, 120000, 120000, 745201, 0, 0, 'Crazed Owlbeast - Cast Enrage at 50% HP');
-UPDATE `creature_template` SET `ai_name`='EventAI' WHERE `entry`=7452;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -109,36 +103,6 @@ UPDATE quest_template SET
 RequestItemsText = 'Please be brief.  There is much danger about and we cannot stand idle in conversation.'
 WHERE entry = 435;
 
--- text fix (Hints of a New Plague?)
-UPDATE quest_template SET
-RequestItemsText = 'The time for talk is done. Protect Kinelory if you care about the people of Hillsbrad at all.'
-WHERE entry = 660;
-
--- text fix (Sunken Treasure)
-UPDATE quest_template SET
-RequestItemsText = 'This is no time to talk! The goggles need to be charged with the power of the stone!'
-WHERE entry = 665;
-
--- text fix (Winterhoof Cleansing)
-UPDATE quest_template SET
-RequestItemsText = 'Do not delay, $N.  The Winterhoof Well''s taint must be removed!'
-WHERE entry = 754;
-
--- text fix (Thunderhorn Cleansing)
-UPDATE quest_template SET
-RequestItemsText = 'The Thunderhorn Water Well is still tainted, $N.  Please, you must perform the ritual!'
-WHERE entry = 758;
-
--- text fix (Wildmane Cleansing)
-UPDATE quest_template SET
-RequestItemsText = 'The last water well remains fetid and poisonous, $N.  You must not delay!'
-WHERE entry = 760;
-
--- text fix (The Forgotten Pools)
-UPDATE quest_template SET
-RequestItemsText = 'Have you been to the Forgotten Pools, $N?  Did you find anything?'
-WHERE entry = 870;
-
 -- text fix (Galen's Escape)
 UPDATE quest_template SET
 RequestItemsText = 'The keyhole of this strongbox is filled with black resin.  It is impossible to open.'
@@ -164,35 +128,15 @@ UPDATE quest_template SET
 OfferRewardText = 'You were sent by Carendin? $N, then.$b$bDo not think light of me because my sight is gone. I see things that lie behind now, with clarity I had never known. What I once thought a curse, is now a boon.'
 WHERE entry = 1472;
 
--- text fix (Tooga's Quest)
-UPDATE quest_template SET
-RequestItemsText = 'Where is Tooga?'
-WHERE entry = 1560;
-
 -- text fix (Beat Bartleby)
 UPDATE quest_template SET
 RequestItemsText = 'The only way you''ll get this mug is if you pry it from my cold, dead fingers...'
 WHERE entry = 1640;
 
--- text fix (The Tome of Valor)
-UPDATE quest_template SET
-RequestItemsText = 'We''ll make our stand at the house!'
-WHERE entry = 1651;
-
 -- text fix (The Rethban Gauntlet)
 UPDATE quest_template SET
 RequestItemsText = 'Time is wasting, $N.  If I were you, I''d get going...'
 WHERE entry = 1699;
-
--- text fix (The Affray)
-UPDATE quest_template SET
-RequestItemsText = 'Have you completed your challenge?'
-WHERE entry = 1719;
-
--- text fix (Scarlet Diversions)
-UPDATE quest_template SET
-RequestItemsText = 'A surprise raid on the Scarlet Crusade''s tenuous forward position will give us a buffer of time to be able to march on Andorhal.  I trust you are here to report success!$b$bOnce this is successfully executed, we will need to work diligently and quickly.  We do not have the materiel and manpower to fight both the Scourge and the Scarlet Crusade at the same time if they do not buy our little ruse.'
-WHERE entry = 5096;
 
 -- text fix (Lorax's Tale)
 UPDATE quest_template SET
@@ -211,32 +155,16 @@ OfferRewardText = 'Well, here you are, $n - the completed Skeleton Key.  I am ce
 RequestItemsText = NULL
 WHERE entry = 5511;
 
--- text fix (Mold Rhymes With...)
-UPDATE quest_template SET
-OfferRewardText = 'Arbington said you''d deliver the goods, and deliver you have! A deal is a deal; let me pack the fragments into the mold for you.$b$bDid Arbington imbue them already? Excellent... otherwise, it would have been a long trip back to the Chillwind Point for you.',
-RequestItemsText = 'Yeah, I know who you are, and I know why you''re here. Arbington sent word to me before you arrived. Let''s cut to deal at hand, now shall we?$b$bI''ve got a mold you can use for the skeleton key, but it will cost you - fifteen gold, up front, no negotiation. I''ll pack the skeletal fragments into the mold for you, and I''ll also teach you on how to forge the stem of the key without any knowledge of blacksmithing... all free of charge no less.$b$bWho says mercenaries don''t offer competitive deals!'
-WHERE entry = 5538;
-
 -- text fix (Rise and Be Recognized) Horde
 UPDATE quest_template SET
 OfferRewardText = 'This new insignia reflects your rank amongst the Frostwolf. Keep it on you at all times.$b$bAnd $c... Die with honor!',
 RequestItemsText = '<Warmaster Laggrond salutes you.>$b$bIt is your time, $N. You have done much for the Frostwolf Clan and in doing so, earned a place as not only a soldier of Frostwolf but also as a friend.$b$bWell done! Present your initiate''s insignia.'
 WHERE entry = 7163;
 
--- text fix (Rise and Be Recognized) Alliance
-UPDATE quest_template SET
-RequestItemsText = 'Most do not live long enough to rise above their own mediocrity. You have proven yourself to be an exemplary soldier, $c. The time has come.$b$bPresent your insignia.'
-WHERE entry = 7168;
-
 -- text fix (Honored Amongst the Clan) Horde
 UPDATE quest_template SET
 RequestItemsText = 'It is good to see you again, $c. I had not expected you to return. Alas, you have proven yourself a brave and honorable soldier of the Frostwolf.$b$bYour time has come again, $N. You have earned a new ranking and as such, a new insignia denoting this rise in stature.$b$bPresent your insignia.'
 WHERE entry = 7164;
-
--- text fix (Honored Amongst the Guard) Alliance
-UPDATE quest_template SET
-RequestItemsText = 'The base buzzes with news of your exploits in the Field of Strife! You have struck mighty blows against our enemy - crushing their morale! For this, you have earned a rank of honor among the Stormpike.$b$bPresent your insignia.'
-WHERE entry = 7169;
 
 -- text fix (Earned Reverence) Horde
 UPDATE quest_template SET
@@ -244,42 +172,20 @@ OfferRewardText = '<Warmaster Laggrond roars.>$b$bThey have already begun tellin
 RequestItemsText = 'So many slain. Blood drenches the fields. Yet... You live... You have persevered. You have led our armies to many victories. For this, then, soldier, you have earned a new rank.$b$bPresent your insignia.'
 WHERE entry = 7165;
 
--- text fix (Earned Reverence) Alliance
-UPDATE quest_template SET
-RequestItemsText = 'I must know, $N. When you look directly into the eyes of the enemy, do you see fear? Do they now cower in your presence? They must realize that they are defeated!$b$bYou have earned reverence among the Guard. Present your insignia!'
-WHERE entry = 7170;
-
 -- text fix (Legendary Heroes) Horde
 UPDATE quest_template SET
 RequestItemsText = 'Your radiate command and power, $c. Exalted in the eyes of Frostwolf - the enemy cowers at the mention of your name.$b$bRise, Hero of Frostwolf. Rise and be honored!$b$bPresent your insignia.'
 WHERE entry = 7166;
-
--- text fix (Legendary Heroes) Alliance
-UPDATE quest_template SET
-OfferRewardText = 'Surely it will be you who carries the Eye of Command!',
-RequestItemsText = 'Before me stands an exalted hero of the Alliance.$b$b<Lieutenant Haggerdin salutes.>$b$bFew have earned such a rank among the Stormpike. I have watched the enemy fall before you. I have seen their resolve crumble in your presence. When you enter the fray, you become the beacon of hope for our forces!$b$bPresent your insignia.'
-WHERE entry = 7171;
 
 -- text fix (The Eye of Command) Horde
 UPDATE quest_template SET
 RequestItemsText = 'Drek''Thar sings your praises. Kalimdor is abuzz with tales of your heroics. The Warchief glows - your stalwart defense of our clan has pleased him greatly.$b$bYou have earned the Eye of Command.$b$bPresent your insignia, Commander $N.'
 WHERE entry = 7167;
 
--- text fix (The Eye of Command) Alliance
-UPDATE quest_template SET
-OfferRewardText = 'It is you who must lead our troops to victory, Commander! The soldiers are under your command. They will follow your direct orders. Lead them.... Crush the Frostwolf.',
-RequestItemsText = 'Let them hear your voice, Commander $N! Let them know fear. Show them what power the Stormpike holds in their rank!$b$bPresent your insignia.'
-WHERE entry = 7172;
-
 -- text fix (A Gallon of Blood)
 UPDATE quest_template SET
 RequestItemsText = 'You have the option of offering larger quantities of the blood taken from our enemies. I will be glad to accept gallon sized offerings, $N.'
 WHERE entry = 7385;
-
--- text fix (Crystal Cluster)
-UPDATE quest_template SET
-RequestItemsText = 'There are times which you may be entrenched in battle for days or weeks on end. During those longer periods of activity you may end up collecting large clusters of the Frostwolf''s storm crystals.$b$bThe Circle accepts such offerings, $N.'
-WHERE entry = 7386;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -290,11 +196,6 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 
 UPDATE `quest_template` SET `StartScript` = 5252 WHERE `entry` = 5252;
 UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN(6505, 6506, 6507);
-
--- ------------------------------------------------------------------------------------------------------------------------------------------------------
-
--- Remove Empty Pool Template
-DELETE FROM `pool_template` WHERE `entry` = 1607;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -316,6 +217,7 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `priority`, `command`, `datalo
 (623103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2435, 2436, 2437, 2438, 0, 0, 0, 0, 0, 'Techbot - Talk');
 
 -- Add Missing Spell 10860 (NOTE: This spell seems to be broken, it should heal, instead it causes damage.)
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`, `inverseEffectMask`) VALUES (10860, 1, 7732, 0);
 REPLACE INTO `creature_spells` (`entry`, `name`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, `spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, `spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, `spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, `spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, `spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, `spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, `spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8`) VALUES (62310, 'Gnomeregan - Techbot', 10852, 100, 1, 0, 0, 32, 5, 5, 19, 19, 0, 10855, 100, 1, 0, 0, 32, 4, 8, 15, 25, 0, 10858, 100, 1, 0, 0, 0, 10, 10, 22, 22, 0, 10860, 100, 0, 0, 0, 0, 20, 30, 30, 60, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
 UPDATE `creature_template` SET `ai_name`='EventAI' WHERE  `entry`=6231 AND `patch`=0;
@@ -342,17 +244,17 @@ UPDATE `creature_template` SET `school_immune_mask` = 4 WHERE `entry` IN (
 -- Update Quest Script For Pristine Spider Silk
 DELETE FROM `quest_end_scripts` WHERE `id`=1940;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `priority`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(1940, 0, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc\\_flag questgiver removed'),
+(1940, 0, 0, 4, 147, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc_flag questgiver removed'),
 (1940, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2649, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 1'),
 (1940, 5, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Emote'),
 (1940, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2651, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 2'),
 (1940, 8, 0, 3, 0, 1800, 69, 1, 0, 0, 0, 0, 0, 0, 0, 0, -8964.6, 824.703, 109.447, 3.80513, 0, 'Pristine Spider Silk - Wynne Larson: Move point 1'),
 (1940, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2650, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 3'),
-(1940, 11, 0, 15, 9157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Cast spell \"Create Mage\'s Robe\"'),
+(1940, 11, 0, 15, 9157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Cast spell "Create Mage\'s Robe"'),
 (1940, 16, 0, 1, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Emote'),
 (1940, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2648, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: Say text 4'),
 (1940, 19, 0, 3, 0, 1800, 69, 1, 0, 0, 0, 0, 0, 0, 0, 0, -8963, 822.517, 109.447, 3.846, 0, 'Pristine Spider Silk - Wynne Larson: Move point 1'),
-(1940, 19, 0, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc\\_flag questgiver added');
+(1940, 19, 0, 4, 147, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Pristine Spider Silk - Wynne Larson: npc_flag questgiver added');
 
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------
 
