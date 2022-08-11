@@ -461,10 +461,9 @@ class Spell
         void SetClientStarted(bool isClientStarted);
         bool IsTriggered() const       { return m_IsTriggeredSpell; }
         bool IsTriggeredByAura() const { return m_triggeredByAuraSpell; }
-        bool IsCastByItem() const      { return m_IsCastByItem; }
+        bool IsCastByItem() const      { return m_CastItem; }
         void SetCastItem(Item* item)
         {
-            m_IsCastByItem = item ? true : false;
             m_CastItem = item;
         }
         bool ShouldRemoveStealthAuras();
@@ -649,7 +648,6 @@ class Spell
 
         Position m_castPosition;
         bool m_IsTriggeredSpell = false;
-        bool m_IsCastByItem = false;
 
         // if need this can be replaced by Aura copy
         // we can't store original aura link to prevent access to deleted auras

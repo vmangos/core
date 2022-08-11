@@ -5624,7 +5624,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         // Loatheb Corrupted Mind spell failed
-        if (!m_IsCastByItem && !m_IsTriggeredSpell)
+        if (!m_CastItem && !m_IsTriggeredSpell)
         {
             Unit::AuraList const& auraClassScripts = m_casterUnit->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
             for (const auto auraClassScript : auraClassScripts)
@@ -6087,7 +6087,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             m_spellInfo->EffectImplicitTargetB[j] == TARGET_UNIT_SCRIPT_NEAR_CASTER)
                         {
                             // Fixes Toss Fuel on Bonfire (28806) and Dominion of Soul (16053)
-                            if (m_IsCastByItem)
+                            if (m_CastItem)
                                 m_targets.setUnitTarget(creatureScriptTarget);
 
                             AddUnitTarget(creatureScriptTarget, SpellEffectIndex(j));                            
