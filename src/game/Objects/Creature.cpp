@@ -692,12 +692,12 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 // Call AI respawn virtual function
                 if (AI())
                 {
-                    AI()->JustRespawned();
-
                     // If the creature AI needs to be re-initialized after respawn, do it now
                     // Useful for swapping AIs on mobs that change entry on respawn
                     if (HasCreatureState(CSTATE_INIT_AI_ON_RESPAWN))
                         AIM_Initialize();
+
+                    AI()->JustRespawned();
                 }
 
                 if (m_zoneScript)
