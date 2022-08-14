@@ -3044,7 +3044,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (27904, 2040, 1, -1297.31, 2950.38, 120.484, 1.6057, 0, 0, 0.719339, 0.694659, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 27892 at 71.135857 yards.
 (13215, 2040, 1, -1170.37, 2974.11, 64.7407, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7160 at 86.688736 yards.
 (13216, 2040, 1, -1523.36, 2828.88, 144.781, 6.03884, 0, 0, -0.121869, 0.992546, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7178 at 47.382816 yards.
-(13264, 2040, 1, -1313.19, 2791.93, 127.485, 0.575957, 0, 0, 0.284015, 0.95882, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7071 at 32.460232 yards.
+(387717, 2040, 1, -1313.19, 2791.93, 127.485, 0.575957, 0, 0, 0.284015, 0.95882, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7071 at 32.460232 yards.
 (34199, 2040, 1, -2277.12, 2508.5, 75.3471, 2.47837, 0, 0, 0.945518, 0.325568, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 34177 at 106.332176 yards.
 (13607, 2040, 1, -2008.28, 2777.47, 67.2456, 3.15906, 0, 0, -0.999962, 0.00873464, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7187 at 126.849228 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
@@ -3056,7 +3056,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (27904, 1146, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Desolace 37 objects total
 (13215, 1146, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Desolace 37 objects total
 (13216, 1146, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Desolace 37 objects total
-(13264, 1146, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Desolace 37 objects total
+(387717, 1146, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Desolace 37 objects total
 (34199, 1146, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Desolace 37 objects total
 (13607, 1146, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Desolace 37 objects total
 
