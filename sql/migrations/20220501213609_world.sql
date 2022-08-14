@@ -2729,7 +2729,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (13601, 2040, 0, -11864.1, -3352.51, 17.5933, 2.60054, 0, 0, 0.96363, 0.267241, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7279 at 78.059967 yards.
 (13602, 2040, 0, -11542.7, -2919.17, 14.5303, 4.11898, 0, 0, -0.882947, 0.469473, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7059 at 13.104739 yards.
 (13638, 2040, 0, -11303.6, -3203.56, 30.4578, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7273 at 105.229286 yards.
-(13646, 2040, 0, -11733.5, -3170.78, -7.08996, 5.25344, 0, 0, -0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7268 at 40.513371 yards.
+(387400, 2040, 0, -11733.5, -3170.78, -7.08996, 5.25344, 0, 0, -0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7268 at 40.513371 yards.
 (13647, 2040, 0, -11180.9, -2909.93, 39.0139, 4.41568, 0, 0, -0.803857, 0.594823, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7291 at 171.562546 yards.
 (42464, 2040, 0, -11252, -3575.26, 9.13002, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 42461 at 101.033363 yards.
 (14206, 150079, 0, -10678, -3063.91, 19.3301, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10),
@@ -2748,7 +2748,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (13601, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (13602, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (13638, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(13646, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387400, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (13647, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (42464, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (14206, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
