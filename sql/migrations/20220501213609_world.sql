@@ -2971,7 +2971,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 -- Missing Mithril Deposit spawns in Searing Gorge.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (13117, 2040, 0, -7040.85, -1749.85, 259.663, 0.104719, 0, 0, 0.0523357, 0.99863, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7166 at 163.650208 yards.
-(13265, 2040, 0, -6865.97, -1191.79, 182.557, 0.383971, 0, 0, 0.190808, 0.981627, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10060 at 78.754944 yards.
+(387426, 2040, 0, -6865.97, -1191.79, 182.557, 0.383971, 0, 0, 0.190808, 0.981627, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10060 at 78.754944 yards.
 (13266, 2040, 0, -7325.74, -1755.42, 267.655, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10004 at 165.556549 yards.
 (13273, 2040, 0, -6869.47, -1410.38, 172.377, 3.50812, 0, 0, -0.983254, 0.182238, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7240 at 79.882164 yards.
 (13274, 2040, 0, -6580.63, -1837.71, 244.947, 2.42601, 0, 0, 0.936672, 0.350207, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10070 at 198.824753 yards.
@@ -2991,7 +2991,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (13639, 2040, 0, -6555.58, -1572.64, 310.16, 4.76475, 0, 0, -0.688354, 0.725374, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 10070 at 125.093620 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (13117, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13265, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387426, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
 (13266, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
 (13273, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
 (13274, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
