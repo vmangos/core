@@ -2768,13 +2768,13 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (13579, 2040, 0, -10307.9, -3859.91, -15.8641, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7137 at 650.661255 yards.
 (31024, 2040, 0, -10068.9, -3040.34, 33.9087, 2.28638, 0, 0, 0.909961, 0.414694, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 31015 at 169.368057 yards.
-(13644, 2040, 0, -10950.3, -3693.78, 26.4363, 4.20625, 0, 0, -0.861629, 0.507539, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7137 at 1016.679077 yards.
-(13645, 2040, 0, -10890, -3619.06, 15.7217, 5.8294, 0, 0, -0.224951, 0.97437, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7137 at 932.201538 yards.
+(387415, 2040, 0, -10950.3, -3693.78, 26.4363, 4.20625, 0, 0, -0.861629, 0.507539, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7137 at 1016.679077 yards.
+(387416, 2040, 0, -10890, -3619.06, 15.7217, 5.8294, 0, 0, -0.224951, 0.97437, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7137 at 932.201538 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (13579, 1315, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Swamp of Sorrows (2) 17 objects total
 (31024, 1315, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Swamp of Sorrows (2) 17 objects total
-(13644, 1315, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Swamp of Sorrows (2) 17 objects total
-(13645, 1315, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Swamp of Sorrows (2) 17 objects total
+(387415, 1315, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Swamp of Sorrows (2) 17 objects total
+(387416, 1315, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Swamp of Sorrows (2) 17 objects total
 
 -- Missing Mithril Deposit spawns in Dustwallow Marsh.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
