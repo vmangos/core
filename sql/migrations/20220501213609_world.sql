@@ -2913,7 +2913,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 -- Missing Mithril Deposit spawns in The Hinterlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (46438, 2040, 0, 453.572, -3309.84, 123.93, 3.05433, 0, 0, 0.999048, 0.0436193, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 46426 at 66.245422 yards.
-(13267, 2040, 0, 423.703, -3795.01, 101.592, 0.191985, 0, 0, 0.0958452, 0.995396, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7259 at 79.069214 yards.
+(387425, 2040, 0, 423.703, -3795.01, 101.592, 0.191985, 0, 0, 0.0958452, 0.995396, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7259 at 79.069214 yards.
 (46270, 2040, 0, -19.1472, -3913.21, 163.854, 3.21142, 0, 0, -0.999391, 0.0349061, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 46269 at 180.135071 yards.
 (13587, 2040, 0, -93.0135, -2774.19, 127.279, 0.558504, 0, 0, 0.275637, 0.961262, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7102 at 36.237217 yards.
 (46439, 2040, 0, 172.95, -4770.56, -5.95633, 2.07694, 0, 0, 0.861629, 0.507539, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 46431 at 382.297485 yards.
@@ -2941,7 +2941,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (46271, 2040, 0, -199.741, -4044.66, 175.941, 6.10865, 0, 0, -0.0871553, 0.996195, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 46269 at 71.724648 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (46438, 1255, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Hinterlands 24 objects total
-(13267, 1255, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Hinterlands 24 objects total
+(387425, 1255, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Hinterlands 24 objects total
 (46270, 1255, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Hinterlands 24 objects total
 (13587, 1255, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Hinterlands 24 objects total
 (46439, 1255, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Hinterlands 24 objects total
