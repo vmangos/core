@@ -2859,9 +2859,9 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (13573, 2040, 0, -2307.24, -1790.67, -22.6112, 0.453785, 0, 0, 0.224951, 0.97437, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7133 at 83.500183 yards.
 (13575, 2040, 0, -2182, -1665.24, -35.4133, 0.59341, 0, 0, 0.292371, 0.956305, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7133 at 114.926666 yards.
 (13576, 2040, 0, -2241.04, -1835.02, -20.1633, 0.418879, 0, 0, 0.207911, 0.978148, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7296 at 74.767525 yards.
-(13643, 2040, 0, -1657.74, -2215.52, 23.8297, 5.55015, 0, 0, -0.358368, 0.93358, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7209 at 61.236763 yards.
-(13648, 2040, 0, -1819.15, -2011.03, 66.5258, 2.02458, 0, 0, 0.848047, 0.529921, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7188 at 46.037064 yards.
-(13651, 2040, 0, -1848.64, -1760.39, 67.3599, 5.88176, 0, 0, -0.199368, 0.979925, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7222 at 5.241910 yards.
+(387422, 2040, 0, -1657.74, -2215.52, 23.8297, 5.55015, 0, 0, -0.358368, 0.93358, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7209 at 61.236763 yards.
+(387423, 2040, 0, -1819.15, -2011.03, 66.5258, 2.02458, 0, 0, 0.848047, 0.529921, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7188 at 46.037064 yards.
+(387424, 2040, 0, -1848.64, -1760.39, 67.3599, 5.88176, 0, 0, -0.199368, 0.979925, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7222 at 5.241910 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (13114, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (13115, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
@@ -2876,9 +2876,9 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (13573, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (13575, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (13576, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
-(13643, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
-(13648, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
-(13651, 1188, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Arathi 48 objects total
+(387422, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
+(387423, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
+(387424, 1188, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Arathi 48 objects total
 
 -- Missing Mithril Deposit spawns in Burning Steppes.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
