@@ -1468,10 +1468,13 @@ struct npc_riggle_bassbaitAI : ScriptedAI
     {
         m_uiTimer = 0;
 
-        auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
+        auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_PREV_WIN_TIME);
         if (time(nullptr) - prevWinTime > DAY)
         {
-            sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 0, true);
+            // reset all after 1 day
+            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1, true);
+            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0, true);
+            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_HAS_WINNER, 0, true);
         }
         npc_riggle_bassbaitAI::Reset();
     }
@@ -1491,19 +1494,21 @@ struct npc_riggle_bassbaitAI : ScriptedAI
         {
             if (!m_creature->IsQuestGiver())
             {
-                auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
+                auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_PREV_WIN_TIME);
 
                 if (time(nullptr) - prevWinTime > DAY)
                 {
                     m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
-                    auto startedAlready = sObjectMgr.GetSavedVariable(VAR_TOURN_GOES);
+                    auto announceBegin = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN);
 
-                    if (startedAlready) return;
+                    if (!announceBegin) return;
 
                     m_creature->MonsterYellToZone(YELL_BEGIN);
-                    sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 1, true);
-                    sObjectMgr.SetSavedVariable(VAR_TOURN_OVER, 0, true);
+                    // store announce begin done
+                    sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0, true);
+                    // store enable over annoucement
+                    sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1, true);
                 }
             }
         }
@@ -1512,15 +1517,15 @@ struct npc_riggle_bassbaitAI : ScriptedAI
             if (m_creature->IsQuestGiver())
             {
                 m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
             }
 
-            auto isOver = sObjectMgr.GetSavedVariable(VAR_TOURN_OVER);
+            auto announceOver = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN);
 
-            if (isOver) return;
+            if (!announceOver) return;
 
             m_creature->MonsterYellToZone(YELL_OVER);
-            sObjectMgr.SetSavedVariable(VAR_TOURN_OVER, 1, true);
+            // store announce over done
+            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0, true);
         }
     }
 
@@ -1547,9 +1552,8 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, Que
 {
     if (pQuest->GetQuestId() == QUEST_MASTER_ANGLER)
     {
-        sObjectMgr.SetSavedVariable(VAR_TOURNAMENT, time(nullptr), true);
-        sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
-        sObjectMgr.SetSavedVariable(VAR_TOURN_WINNER, 1, true);
+        sObjectMgr.SetSavedVariable(VAR_STV_FISHING_PREV_WIN_TIME, time(nullptr), true);
+        sObjectMgr.SetSavedVariable(VAR_STV_FISHING_HAS_WINNER, 1, true);
         pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         pCreature->MonsterYellToZone(YELL_WINNER, 0, pPlayer);
     }
