@@ -3435,52 +3435,52 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Missing Silver Vein spawns in The Barrens.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(13653, 1733, 1, 16.4664, -1378.21, 100.787, 1.41372, 0, 0, 0.649447, 0.760406, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 512.348755 yards.
-(13654, 1733, 1, 1024.2, -3380.53, 97.7864, 0.383971, 0, 0, 0.190808, 0.981627, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 2010.238525 yards.
-(13658, 1733, 1, -2062.71, -1949.56, 91.6667, 1.71042, 0, 0, 0.754709, 0.656059, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 530.699097 yards.
-(13659, 1733, 1, 521.879, -3235.76, 118.281, 2.84488, 0, 0, 0.989016, 0.147811, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 1609.261597 yards.
-(16681, 1733, 1, 797.905, -1798.65, 92.4391, 1.65806, 0, 0, 0.737277, 0.675591, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 15704 at 526.434509 yards.
-(13660, 1733, 1, -3025.72, -2184.11, 102.403, 0.331611, 0, 0, 0.165047, 0.986286, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 1371.216064 yards.
-(13664, 1733, 1, -3576.01, -1793.37, 96.8127, 1.65806, 0, 0, 0.737277, 0.675591, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 1981.325928 yards.
-(13665, 1733, 1, -1425.03, -2045.83, 83.8641, 5.86431, 0, 0, -0.207911, 0.978148, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 341.087646 yards.
-(13666, 1733, 1, -1729.69, -3879.37, 25.8715, 3.17653, 0, 0, -0.999847, 0.0174693, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 1588.125977 yards.
-(13668, 1733, 1, -2266.12, -2536.62, 92.2936, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 653.824402 yards.
-(13693, 1733, 1, -395.093, -1589.36, 101.445, 3.4383, 0, 0, -0.989016, 0.147811, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 276.274414 yards.
-(13694, 1733, 1, -1086.76, -2178, 65.2551, 0.0349062, 0, 0, 0.0174522, 0.999848, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 584.287354 yards.
-(13696, 1733, 1, -1645.21, -2619.43, 86.5365, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 325.722443 yards.
-(14278, 105569, 1, -4133.86, -2145.77, 51.8004, 2.25147, 0, 0, 0.902585, 0.430512, 300, 300, 1, 100, 0, 10),
-(14279, 105569, 1, -4224.98, -2266.66, 52.3942, 0.95993, 0, 0, 0.461748, 0.887011, 300, 300, 1, 100, 0, 10);
+(387733, 1733, 1, 16.4664, -1378.21, 100.787, 1.41372, 0, 0, 0.649447, 0.760406, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 512.348755 yards.
+(387734, 1733, 1, 1024.2, -3380.53, 97.7864, 0.383971, 0, 0, 0.190808, 0.981627, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 2010.238525 yards.
+(387735, 1733, 1, -2062.71, -1949.56, 91.6667, 1.71042, 0, 0, 0.754709, 0.656059, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 530.699097 yards.
+(387736, 1733, 1, 521.879, -3235.76, 118.281, 2.84488, 0, 0, 0.989016, 0.147811, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 1609.261597 yards.
+(387737, 1733, 1, 797.905, -1798.65, 92.4391, 1.65806, 0, 0, 0.737277, 0.675591, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 15704 at 526.434509 yards.
+(387738, 1733, 1, -3025.72, -2184.11, 102.403, 0.331611, 0, 0, 0.165047, 0.986286, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 1371.216064 yards.
+(387739, 1733, 1, -3576.01, -1793.37, 96.8127, 1.65806, 0, 0, 0.737277, 0.675591, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 1981.325928 yards.
+(387740, 1733, 1, -1425.03, -2045.83, 83.8641, 5.86431, 0, 0, -0.207911, 0.978148, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 341.087646 yards.
+(387741, 1733, 1, -1729.69, -3879.37, 25.8715, 3.17653, 0, 0, -0.999847, 0.0174693, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 1588.125977 yards.
+(387742, 1733, 1, -2266.12, -2536.62, 92.2936, 0.663223, 0, 0, 0.325567, 0.945519, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 653.824402 yards.
+(387743, 1733, 1, -395.093, -1589.36, 101.445, 3.4383, 0, 0, -0.989016, 0.147811, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5759 at 276.274414 yards.
+(387744, 1733, 1, -1086.76, -2178, 65.2551, 0.0349062, 0, 0, 0.0174522, 0.999848, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 584.287354 yards.
+(387745, 1733, 1, -1645.21, -2619.43, 86.5365, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5686 at 325.722443 yards.
+(387746, 105569, 1, -4133.86, -2145.77, 51.8004, 2.25147, 0, 0, 0.902585, 0.430512, 300, 300, 1, 100, 0, 10),
+(387747, 105569, 1, -4224.98, -2266.66, 52.3942, 0.95993, 0, 0, 0.461748, 0.887011, 300, 300, 1, 100, 0, 10);
 
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(13653, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13654, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13658, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13659, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(16681, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13660, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13664, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13665, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13666, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13668, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13693, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13694, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(13696, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(14278, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
-(14279, 1035, 0, 'Silver Vein', 0, 10); -- Silver Veins in Barrens 5 objects total
+(387733, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387734, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387735, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387736, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387737, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387738, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387739, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387740, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387741, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387742, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387743, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387744, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387745, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387746, 1035, 0, 'Silver Vein', 0, 10), -- Silver Veins in Barrens 5 objects total
+(387747, 1035, 0, 'Silver Vein', 0, 10); -- Silver Veins in Barrens 5 objects total
 
 -- Missing Silver Vein spawns in Ashenvale.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(13661, 1733, 1, 3496.51, 160.563, 11.7161, 5.46288, 0, 0, -0.398748, 0.91706, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5732 at 161.218887 yards.
-(13662, 1733, 1, 2855.24, -2027.55, 169.05, 0.785397, 0, 0, 0.382683, 0.92388, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5716 at 417.083496 yards.
-(13677, 1733, 1, 2331.05, -3524.71, 53.3985, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5696 at 367.203735 yards.
-(13682, 1733, 1, 2535.7, -3647.75, 64.2268, 5.25344, 0, 0, -0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5696 at 602.645752 yards.
-(13695, 1733, 1, 3278.94, 381.677, 10.9858, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 5735 at 75.294785 yards.
+(387748, 1733, 1, 3496.51, 160.563, 11.7161, 5.46288, 0, 0, -0.398748, 0.91706, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5732 at 161.218887 yards.
+(387749, 1733, 1, 2855.24, -2027.55, 169.05, 0.785397, 0, 0, 0.382683, 0.92388, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5716 at 417.083496 yards.
+(387750, 1733, 1, 2331.05, -3524.71, 53.3985, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5696 at 367.203735 yards.
+(387751, 1733, 1, 2535.7, -3647.75, 64.2268, 5.25344, 0, 0, -0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 5696 at 602.645752 yards.
+(387752, 1733, 1, 3278.94, 381.677, 10.9858, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 5735 at 75.294785 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(13661, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
-(13662, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
-(13677, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
-(13682, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
-(13695, 1080, 0, 'Silver Vein', 0, 10); -- Silver Veins in Ashenvale 58 objects total
+(387748, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
+(387749, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
+(387750, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
+(387751, 1080, 0, 'Silver Vein', 0, 10), -- Silver Veins in Ashenvale 58 objects total
+(387752, 1080, 0, 'Silver Vein', 0, 10); -- Silver Veins in Ashenvale 58 objects total
 
 -- Missing Silver Vein spawns in Desolace.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (321, 3, 'Silver Veins in Desolace');
