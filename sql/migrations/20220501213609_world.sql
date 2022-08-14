@@ -2972,43 +2972,43 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (13117, 2040, 0, -7040.85, -1749.85, 259.663, 0.104719, 0, 0, 0.0523357, 0.99863, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7166 at 163.650208 yards.
 (387426, 2040, 0, -6865.97, -1191.79, 182.557, 0.383971, 0, 0, 0.190808, 0.981627, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10060 at 78.754944 yards.
-(13266, 2040, 0, -7325.74, -1755.42, 267.655, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10004 at 165.556549 yards.
-(13273, 2040, 0, -6869.47, -1410.38, 172.377, 3.50812, 0, 0, -0.983254, 0.182238, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7240 at 79.882164 yards.
-(13274, 2040, 0, -6580.63, -1837.71, 244.947, 2.42601, 0, 0, 0.936672, 0.350207, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10070 at 198.824753 yards.
-(13275, 2040, 0, -6736.55, -1686.12, 219.236, 4.03171, 0, 0, -0.902585, 0.430512, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7079 at 185.786804 yards.
-(13487, 2040, 0, -7079.49, -998.117, 243.831, 3.49067, 0, 0, -0.984807, 0.173652, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10058 at 183.178543 yards.
-(13488, 2040, 0, -6782.98, -1169.51, 243.777, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7310 at 168.142151 yards.
-(13489, 2040, 0, -6473.71, -1195.53, 183.154, 1.29154, 0, 0, 0.601814, 0.798636, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 13219 at 79.913109 yards.
-(13490, 2040, 0, -6654.58, -721.022, 242.777, 5.74214, 0, 0, -0.267238, 0.963631, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7234 at 163.789703 yards.
-(13539, 2040, 0, -6835.71, -1484.15, 208.595, 1.58825, 0, 0, 0.71325, 0.70091, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7240 at 9.977887 yards.
-(13598, 2040, 0, -6989.5, -1754.34, 234.098, 4.93928, 0, 0, -0.622514, 0.782609, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7166 at 197.890228 yards.
-(13620, 2040, 0, -6712.46, -1592, 192.912, 1.0821, 0, 0, 0.515038, 0.857168, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7079 at 162.665680 yards.
-(13624, 2040, 0, -6754.19, -1363.81, 196.629, 1.90241, 0, 0, 0.814116, 0.580703, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7211 at 37.590443 yards.
-(13625, 2040, 0, -6811, -1356.96, 169.573, 0.087266, 0, 0, 0.0436192, 0.999048, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7211 at 93.027458 yards.
-(13626, 2040, 0, -6657.98, -1272.72, 252.689, 4.71239, 0, 0, -0.707107, 0.707107, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7310 at 6.604876 yards.
-(13629, 2040, 0, -6683.49, -1230.45, 181.85, 2.1293, 0, 0, 0.874619, 0.48481, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7310 at 87.340279 yards.
-(13637, 2040, 0, -7260.88, -1141.82, 283.953, 0.523598, 0, 0, 0.258819, 0.965926, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10058 at 108.547043 yards.
-(13639, 2040, 0, -6555.58, -1572.64, 310.16, 4.76475, 0, 0, -0.688354, 0.725374, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 10070 at 125.093620 yards.
+(387700, 2040, 0, -7325.74, -1755.42, 267.655, 2.33874, 0, 0, 0.920505, 0.390732, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10004 at 165.556549 yards.
+(387701, 2040, 0, -6869.47, -1410.38, 172.377, 3.50812, 0, 0, -0.983254, 0.182238, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7240 at 79.882164 yards.
+(387702, 2040, 0, -6580.63, -1837.71, 244.947, 2.42601, 0, 0, 0.936672, 0.350207, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10070 at 198.824753 yards.
+(387703, 2040, 0, -6736.55, -1686.12, 219.236, 4.03171, 0, 0, -0.902585, 0.430512, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7079 at 185.786804 yards.
+(387704, 2040, 0, -7079.49, -998.117, 243.831, 3.49067, 0, 0, -0.984807, 0.173652, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10058 at 183.178543 yards.
+(387705, 2040, 0, -6782.98, -1169.51, 243.777, 5.18363, 0, 0, -0.522498, 0.85264, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7310 at 168.142151 yards.
+(387706, 2040, 0, -6473.71, -1195.53, 183.154, 1.29154, 0, 0, 0.601814, 0.798636, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 13219 at 79.913109 yards.
+(387707, 2040, 0, -6654.58, -721.022, 242.777, 5.74214, 0, 0, -0.267238, 0.963631, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7234 at 163.789703 yards.
+(387708, 2040, 0, -6835.71, -1484.15, 208.595, 1.58825, 0, 0, 0.71325, 0.70091, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7240 at 9.977887 yards.
+(387709, 2040, 0, -6989.5, -1754.34, 234.098, 4.93928, 0, 0, -0.622514, 0.782609, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7166 at 197.890228 yards.
+(387710, 2040, 0, -6712.46, -1592, 192.912, 1.0821, 0, 0, 0.515038, 0.857168, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7079 at 162.665680 yards.
+(387711, 2040, 0, -6754.19, -1363.81, 196.629, 1.90241, 0, 0, 0.814116, 0.580703, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7211 at 37.590443 yards.
+(387712, 2040, 0, -6811, -1356.96, 169.573, 0.087266, 0, 0, 0.0436192, 0.999048, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7211 at 93.027458 yards.
+(387713, 2040, 0, -6657.98, -1272.72, 252.689, 4.71239, 0, 0, -0.707107, 0.707107, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7310 at 6.604876 yards.
+(387714, 2040, 0, -6683.49, -1230.45, 181.85, 2.1293, 0, 0, 0.874619, 0.48481, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7310 at 87.340279 yards.
+(387715, 2040, 0, -7260.88, -1141.82, 283.953, 0.523598, 0, 0, 0.258819, 0.965926, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 10058 at 108.547043 yards.
+(387716, 2040, 0, -6555.58, -1572.64, 310.16, 4.76475, 0, 0, -0.688354, 0.725374, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 10070 at 125.093620 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (13117, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
 (387426, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13266, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13273, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13274, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13275, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13487, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13488, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13489, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13490, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13539, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13598, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13620, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13624, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13625, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13626, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13629, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13637, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
-(13639, 1293, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Searing Gorge 21 objects total
+(387700, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387701, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387702, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387703, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387704, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387705, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387706, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387707, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387708, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387709, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387710, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387711, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387712, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387713, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387714, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387715, 1293, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Searing Gorge 21 objects total
+(387716, 1293, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Searing Gorge 21 objects total
 
 -- Missing Mithril Deposit spawns in Feralas.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
