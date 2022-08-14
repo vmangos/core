@@ -2829,20 +2829,20 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 -- Missing Mithril Deposit spawns in Stranglethorn Vale.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
 (40021, 2040, 0, -11447.4, -845.448, 15.4786, 6.14356, 0, 0, -0.0697556, 0.997564, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 40013 at 928.257751 yards.
-(13649, 2040, 0, -12788.7, 222.431, 18.9157, 1.23918, 0, 0, 0.580703, 0.814116, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7176 at 77.611160 yards.
-(13652, 2040, 0, -13249.5, -519.636, 18.0377, 5.70723, 0, 0, -0.284015, 0.95882, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 11696 at 29.353403 yards.
+(387417, 2040, 0, -12788.7, 222.431, 18.9157, 1.23918, 0, 0, 0.580703, 0.814116, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7176 at 77.611160 yards.
+(387418, 2040, 0, -13249.5, -519.636, 18.0377, 5.70723, 0, 0, -0.284015, 0.95882, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 11696 at 29.353403 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (40021, 1177, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Stranglethorn 19 objects total
-(13649, 1177, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Stranglethorn 19 objects total
-(13652, 1177, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Stranglethorn 19 objects total
+(387417, 1177, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Stranglethorn 19 objects total
+(387418, 1177, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Stranglethorn 19 objects total
 
 -- Missing Mithril Deposit spawns in Alterac Mountains.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(13334, 2040, 0, 631.671, -730.556, 155.593, 5.70723, 0, 0, -0.284015, 0.95882, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7262 at 36.489506 yards.
-(13595, 2040, 0, 892.592, -278.629, 152.45, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7167 at 93.144279 yards.
+(387419, 2040, 0, 631.671, -730.556, 155.593, 5.70723, 0, 0, -0.284015, 0.95882, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7262 at 36.489506 yards.
+(387420, 2040, 0, 892.592, -278.629, 152.45, 1.06465, 0, 0, 0.507538, 0.861629, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7167 at 93.144279 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(13334, 1069, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Alterac 37 objects total
-(13595, 1069, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Alterac 37 objects total
+(387419, 1069, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Alterac 37 objects total
+(387420, 1069, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Alterac 37 objects total
 
 -- Missing Mithril Deposit spawns in Arathi Highlands.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
