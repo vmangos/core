@@ -2730,39 +2730,39 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (13602, 2040, 0, -11542.7, -2919.17, 14.5303, 4.11898, 0, 0, -0.882947, 0.469473, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7059 at 13.104739 yards.
 (13638, 2040, 0, -11303.6, -3203.56, 30.4578, 1.25664, 0, 0, 0.587785, 0.809017, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7273 at 105.229286 yards.
 (387400, 2040, 0, -11733.5, -3170.78, -7.08996, 5.25344, 0, 0, -0.492423, 0.870356, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7268 at 40.513371 yards.
-(13647, 2040, 0, -11180.9, -2909.93, 39.0139, 4.41568, 0, 0, -0.803857, 0.594823, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7291 at 171.562546 yards.
-(42464, 2040, 0, -11252, -3575.26, 9.13002, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 42461 at 101.033363 yards.
-(14206, 150079, 0, -10678, -3063.91, 19.3301, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10),
-(14207, 150079, 0, -10857.4, -3167.36, 47.1372, 0.331611, 0, 0, 0.165047, 0.986286, 300, 300, 1, 100, 0, 10),
-(14208, 150079, 0, -10554.8, -3591.63, -13.6239, 3.03684, 0, 0, 0.998629, 0.0523532, 300, 300, 1, 100, 0, 10),
-(14209, 150079, 0, -10603.2, -3214.84, -2.70033, 2.87979, 0, 0, 0.991445, 0.130528, 300, 300, 1, 100, 0, 10),
-(14210, 150079, 0, -10494.9, -3214.97, -1.79457, 1.46608, 0, 0, 0.66913, 0.743145, 300, 300, 1, 100, 0, 10),
-(14212, 150079, 0, -10497.4, -3329.15, -4.38601, 1.01229, 0, 0, 0.484809, 0.87462, 300, 300, 1, 100, 0, 10),
-(14213, 150079, 0, -10625, -3655, -15.6897, 3.64774, 0, 0, -0.968147, 0.250381, 300, 300, 1, 100, 0, 10),
-(14214, 150079, 0, -10481.5, -3269.82, -4.87173, 0.0523589, 0, 0, 0.0261765, 0.999657, 300, 300, 1, 100, 0, 10),
-(14215, 150079, 0, -10741.1, -3678.92, -10.5593, 3.71755, 0, 0, -0.958819, 0.284016, 300, 300, 1, 100, 0, 10),
-(14216, 150079, 0, -10503.3, -3453.36, -14.0034, 4.62512, 0, 0, -0.737277, 0.675591, 300, 300, 1, 100, 0, 10),
-(14217, 150079, 0, -10530.1, -3547.74, -9.48959, 3.00195, 0, 0, 0.997563, 0.0697661, 300, 300, 1, 100, 0, 10),
-(14218, 150079, 0, -10801.7, -3064.23, 45.8933, 0.802851, 0, 0, 0.390731, 0.920505, 300, 300, 1, 100, 0, 10);
+(387401, 2040, 0, -11180.9, -2909.93, 39.0139, 4.41568, 0, 0, -0.803857, 0.594823, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7291 at 171.562546 yards.
+(387402, 2040, 0, -11252, -3575.26, 9.13002, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 42461 at 101.033363 yards.
+(387403, 150079, 0, -10678, -3063.91, 19.3301, 1.16937, 0, 0, 0.551936, 0.833886, 300, 300, 1, 100, 0, 10),
+(387404, 150079, 0, -10857.4, -3167.36, 47.1372, 0.331611, 0, 0, 0.165047, 0.986286, 300, 300, 1, 100, 0, 10),
+(387405, 150079, 0, -10554.8, -3591.63, -13.6239, 3.03684, 0, 0, 0.998629, 0.0523532, 300, 300, 1, 100, 0, 10),
+(387406, 150079, 0, -10603.2, -3214.84, -2.70033, 2.87979, 0, 0, 0.991445, 0.130528, 300, 300, 1, 100, 0, 10),
+(387407, 150079, 0, -10494.9, -3214.97, -1.79457, 1.46608, 0, 0, 0.66913, 0.743145, 300, 300, 1, 100, 0, 10),
+(387408, 150079, 0, -10497.4, -3329.15, -4.38601, 1.01229, 0, 0, 0.484809, 0.87462, 300, 300, 1, 100, 0, 10),
+(387409, 150079, 0, -10625, -3655, -15.6897, 3.64774, 0, 0, -0.968147, 0.250381, 300, 300, 1, 100, 0, 10),
+(387410, 150079, 0, -10481.5, -3269.82, -4.87173, 0.0523589, 0, 0, 0.0261765, 0.999657, 300, 300, 1, 100, 0, 10),
+(387411, 150079, 0, -10741.1, -3678.92, -10.5593, 3.71755, 0, 0, -0.958819, 0.284016, 300, 300, 1, 100, 0, 10),
+(387412, 150079, 0, -10503.3, -3453.36, -14.0034, 4.62512, 0, 0, -0.737277, 0.675591, 300, 300, 1, 100, 0, 10),
+(387413, 150079, 0, -10530.1, -3547.74, -9.48959, 3.00195, 0, 0, 0.997563, 0.0697661, 300, 300, 1, 100, 0, 10),
+(387414, 150079, 0, -10801.7, -3064.23, 45.8933, 0.802851, 0, 0, 0.390731, 0.920505, 300, 300, 1, 100, 0, 10);
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
 (13601, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (13602, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (13638, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
 (387400, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(13647, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(42464, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14206, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14207, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14208, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14209, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14210, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14212, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14213, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14214, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14215, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14216, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14217, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
-(14218, 1279, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Blasted Lands 37 objects total
+(387401, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387402, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387403, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387404, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387405, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387406, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387407, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387408, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387409, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387410, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387411, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387412, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387413, 1279, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Blasted Lands 37 objects total
+(387414, 1279, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Blasted Lands 37 objects total
 
 -- Missing Mithril Deposit spawns in Swamp of Sorrows.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
