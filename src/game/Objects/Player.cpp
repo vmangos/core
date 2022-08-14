@@ -5268,7 +5268,7 @@ void Player::RepopAtGraveyard()
     if (IsAlive())
     {
         if (ClosestGrave)
-            TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, 0, std::move(recover));
+            TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover));
     }
     else
     {
@@ -5282,7 +5282,7 @@ void Player::RepopAtGraveyard()
                 GetTransport()->RemovePassenger(this);
                 ResurrectPlayer(1.0f);
             }
-            TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, 0, std::move(recover));
+            TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, orientation, TELE_TO_NOT_UNSUMMON_PET, std::move(recover));
         }
 
         // Fix invisible spirit healer if you die close to graveyard.
