@@ -3062,37 +3062,37 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 
 -- Missing Mithril Deposit spawns in Tanaris.
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `state`, `animprogress`, `patch_min`, `patch_max`) VALUES
-(13268, 2040, 1, -8409.17, -3354.81, 17.3865, 0.575957, 0, 0, 0.284015, 0.95882, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7277 at 284.889191 yards.
-(13269, 2040, 1, -9013.94, -4161.08, 8.55525, 3.3685, 0, 0, -0.993571, 0.113208, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7308 at 51.802792 yards.
-(13270, 2040, 1, -9032.32, -4171.35, -29.587, 3.64774, 0, 0, -0.968147, 0.250381, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7308 at 22.657204 yards.
-(13271, 2040, 1, -9183.13, -4206.48, -44.1234, 3.56047, 0, 0, -0.978148, 0.207912, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7158 at 69.006104 yards.
-(17480, 2040, 1, -9568.28, -2611.01, 31.4629, 0.488691, 0, 0, 0.241921, 0.970296, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17477 at 113.288643 yards.
-(13276, 2040, 1, -8237.67, -2772.79, 30.5581, 4.11898, 0, 0, -0.882947, 0.469473, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7328 at 317.338440 yards.
-(13277, 2040, 1, -8103.43, -2419.51, -45.8249, 1.309, 0, 0, 0.608761, 0.793354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7253 at 113.272545 yards.
-(13290, 2040, 1, -8066.52, -2266.52, 15.7821, 3.90954, 0, 0, -0.927183, 0.374608, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7253 at 155.858536 yards.
-(13343, 2040, 1, -7106.94, -2582.7, 13.6203, 4.50295, 0, 0, -0.777145, 0.629321, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7184 at 197.752853 yards.
-(13344, 2040, 1, -7242.14, -3437.92, 13.3299, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7181 at 258.301453 yards.
-(17492, 2040, 1, -8349.22, -4346.75, 15.8852, 4.13643, 0, 0, -0.878817, 0.47716, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17484 at 480.471069 yards.
-(17493, 2040, 1, -9196.5, -3915.01, -31.9711, 4.04917, 0, 0, -0.898793, 0.438373, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17481 at 171.523590 yards.
-(13599, 2040, 1, -7866.98, -2659.8, -55.7798, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7192 at 53.099216 yards.
-(17494, 2040, 1, -7987.72, -2537.27, -45.9242, 2.87979, 0, 0, 0.991445, 0.130528, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17489 at 27.231962 yards.
-(13650, 2040, 1, -7728.64, -2599.35, -58.1333, 0.261798, 0, 0, 0.130526, 0.991445, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7152 at 11.318727 yards.
+(387718, 2040, 1, -8409.17, -3354.81, 17.3865, 0.575957, 0, 0, 0.284015, 0.95882, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7277 at 284.889191 yards.
+(387719, 2040, 1, -9013.94, -4161.08, 8.55525, 3.3685, 0, 0, -0.993571, 0.113208, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7308 at 51.802792 yards.
+(387720, 2040, 1, -9032.32, -4171.35, -29.587, 3.64774, 0, 0, -0.968147, 0.250381, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7308 at 22.657204 yards.
+(387721, 2040, 1, -9183.13, -4206.48, -44.1234, 3.56047, 0, 0, -0.978148, 0.207912, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7158 at 69.006104 yards.
+(387722, 2040, 1, -9568.28, -2611.01, 31.4629, 0.488691, 0, 0, 0.241921, 0.970296, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17477 at 113.288643 yards.
+(387723, 2040, 1, -8237.67, -2772.79, 30.5581, 4.11898, 0, 0, -0.882947, 0.469473, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7328 at 317.338440 yards.
+(387724, 2040, 1, -8103.43, -2419.51, -45.8249, 1.309, 0, 0, 0.608761, 0.793354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7253 at 113.272545 yards.
+(387725, 2040, 1, -8066.52, -2266.52, 15.7821, 3.90954, 0, 0, -0.927183, 0.374608, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7253 at 155.858536 yards.
+(387726, 2040, 1, -7106.94, -2582.7, 13.6203, 4.50295, 0, 0, -0.777145, 0.629321, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7184 at 197.752853 yards.
+(387727, 2040, 1, -7242.14, -3437.92, 13.3299, 1.0472, 0, 0, 0.5, 0.866025, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7181 at 258.301453 yards.
+(387728, 2040, 1, -8349.22, -4346.75, 15.8852, 4.13643, 0, 0, -0.878817, 0.47716, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17484 at 480.471069 yards.
+(387729, 2040, 1, -9196.5, -3915.01, -31.9711, 4.04917, 0, 0, -0.898793, 0.438373, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17481 at 171.523590 yards.
+(387730, 2040, 1, -7866.98, -2659.8, -55.7798, 0.645772, 0, 0, 0.317305, 0.948324, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7192 at 53.099216 yards.
+(387731, 2040, 1, -7987.72, -2537.27, -45.9242, 2.87979, 0, 0, 0.991445, 0.130528, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 17489 at 27.231962 yards.
+(387732, 2040, 1, -7728.64, -2599.35, -58.1333, 0.261798, 0, 0, 0.130526, 0.991445, 300, 300, 1, 100, 0, 10); -- Closest existing guid is 7152 at 11.318727 yards.
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `patch_min`, `patch_max`) VALUES
-(13268, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13269, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13270, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13271, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(17480, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13276, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13277, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13290, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13343, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13344, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(17492, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(17493, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13599, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(17494, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
-(13650, 1203, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Tanaris 37 objects total
+(387718, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387719, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387720, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387721, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387722, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387723, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387724, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387725, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387726, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387727, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387728, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387729, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387730, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387731, 1203, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Tanaris 37 objects total
+(387732, 1203, 0, 'Mithril Deposit', 0, 10); -- Mithril Deposits in Tanaris 37 objects total
 
 -- Missing Mithril Deposit spawns in Un'Goro Crater.
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (299, 6, 'Mithril Deposits in Ungoro');
