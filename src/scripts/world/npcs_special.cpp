@@ -1490,27 +1490,21 @@ struct npc_riggle_bassbaitAI : ScriptedAI
     {
         // complex system to keep things safe in case of crashes/restarts during the event
         // yells should not be repeatable, quest credit should go to a single person per week
-        if (sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT))
+        if (sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT) && !sObjectMgr.GetSavedVariable(VAR_STV_FISHING_HAS_WINNER))
         {
             if (!m_creature->IsQuestGiver())
             {
-                auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_PREV_WIN_TIME);
-
-                if (time(nullptr) - prevWinTime > DAY)
-                {
-                    m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-
-                    auto announceBegin = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN);
-
-                    if (!announceBegin) return;
-
-                    m_creature->MonsterYellToZone(YELL_BEGIN);
-                    // store announce begin done
-                    sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0, true);
-                    // store enable over annoucement
-                    sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1, true);
-                }
+                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             }
+            auto announceBegin = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN);
+
+            if (!announceBegin) return;
+
+            m_creature->MonsterYellToZone(YELL_BEGIN);
+            // store announce begin done
+            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0, true);
+            // store enable over annoucement
+            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1, true);
         }
         else
         {
