@@ -2852,7 +2852,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (13120, 2040, 0, -1729.78, -3290.1, 13.5406, 4.13643, 0, 0, -0.878817, 0.47716, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7157 at 49.592442 yards.
 (13121, 2040, 0, -2065.41, -3307.87, 67.9717, 5.34071, 0, 0, -0.45399, 0.891007, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7177 at 38.281921 yards.
 (13249, 2040, 0, -1755.99, -1427.99, 63.643, 1.78023, 0, 0, 0.777145, 0.629321, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7062 at 27.683750 yards.
-(13272, 2040, 0, -1674.69, -1442.03, 45.8495, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7062 at 61.522541 yards.
+(387421, 2040, 0, -1674.69, -1442.03, 45.8495, 5.41052, 0, 0, -0.422618, 0.906308, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7062 at 61.522541 yards.
 (13336, 2040, 0, -1827.82, -2643.53, 59.8704, 6.23083, 0, 0, -0.0261765, 0.999657, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 7073 at 9.815951 yards.
 (32316, 2040, 0, -1851.72, -1538.44, 66.9113, 2.19911, 0, 0, 0.891006, 0.453991, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32175 at 97.605049 yards.
 (32317, 2040, 0, -1854.6, -1493.8, 49.2701, 4.7822, 0, 0, -0.681998, 0.731354, 300, 300, 1, 100, 0, 10), -- Closest existing guid is 32175 at 56.454361 yards.
@@ -2869,7 +2869,7 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`, `p
 (13120, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (13121, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (13249, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
-(13272, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
+(387421, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (13336, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (32316, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
 (32317, 1188, 0, 'Mithril Deposit', 0, 10), -- Mithril Deposits in Arathi 48 objects total
