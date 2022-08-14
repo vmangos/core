@@ -1513,6 +1513,9 @@ struct npc_riggle_bassbaitAI : ScriptedAI
                 m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             }
 
+            // only progress to announce over when pools have been despawned
+            if (sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT)) return;
+
             auto announceOver = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN);
 
             if (!announceOver) return;
