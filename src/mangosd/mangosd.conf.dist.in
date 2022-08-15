@@ -2453,6 +2453,13 @@ Visibility.ForceActiveObjects      = 1
 #         Modifies the speed of player ghosts, removed upon reviving, not permanent/saved, in non-BG and BG maps
 #         Default: 1.0 (normal speed)
 #
+#    PvP.PoolSizePerFaction
+#         Defines the size of the active PvP pools of players per faction that's used to calculate standing on each
+#         honor maintenance restart. It's mathematically impossible to reach Rank 14 in low population servers, hence
+#         the need to "fake" the PvP pool.
+#         Default: 0 (the real pool size will be used)
+#                  X (the real pool size will be overriden with X)
+#
 ###################################################################################################################
 
 Rate.Health = 1
@@ -2525,6 +2532,7 @@ Death.Ghost.RunSpeed.World = 1.0
 Death.Ghost.RunSpeed.Battleground = 1.0
 Rate.WarEffortResourceComplete = 0.0
 WarEffortResourceCompletePeriod = 86400
+PvP.PoolSizePerFaction = 0
 
 ###################################################################################################################
 # BATTLEGROUND CONFIG

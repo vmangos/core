@@ -263,6 +263,7 @@ void Player::ExecuteTeleportNear()
     // send MSG_MOVE_TELEPORT to observers around both old and new position
     WorldLocation const& dest = GetTeleportDest();
     MovementPacketSender::SendTeleportToObservers(this, dest.x, dest.y, dest.z, dest.o);
+    m_movementInfo.UpdateTime(WorldTimer::getMSTime());
     TeleportPositionRelocation(dest);
     MovementPacketSender::SendTeleportToObservers(this, dest.x, dest.y, dest.z, dest.o);
 

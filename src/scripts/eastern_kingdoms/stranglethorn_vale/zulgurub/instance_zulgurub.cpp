@@ -501,7 +501,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     case TABLET_HAZZARAH1:
     case TABLET_HAZZARAH2:
             if (randomBoss == BOSS_HAZZARAH)
-                pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(7671, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7670, pGo->GetGUID());
             break;
@@ -515,7 +515,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     case TABLET_WUSHOOLAY1:
     case TABLET_WUSHOOLAY2:
             if (randomBoss == BOSS_WUSHOOLAY)
-                pPlayer->SEND_GOSSIP_MENU(7682, pGo->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(7675, pGo->GetGUID());
             else
                 pPlayer->SEND_GOSSIP_MENU(7674, pGo->GetGUID());
             break;

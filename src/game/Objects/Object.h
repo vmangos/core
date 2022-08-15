@@ -188,6 +188,17 @@ class MovementInfo
         void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
         void UpdateTime(uint32 _time) { stime = _time; }
+        void SetAsServerSide()
+        { 
+            uint32 const oldTime = stime;
+            stime = WorldTimer::getMSTime();
+
+            // Preserve order of server side packets.
+            if (oldTime >= stime)
+                stime = oldTime + 1;
+
+            ctime = 0; // Not a client packet. Pauses extrapolation.
+        }
 
         struct JumpInfo
         {

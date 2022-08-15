@@ -2864,7 +2864,7 @@ SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pS
 
     if ((result == SPELL_FAILED_MOVING ||
         result == SPELL_CAST_OK) &&
-        (pSpellEntry->GetCastTime() > 0) &&
+        (pSpellEntry->GetCastTime(me) > 0) &&
         (me->IsMoving() || !me->IsStopped()))
         me->StopMoving();
 

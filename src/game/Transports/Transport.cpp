@@ -180,6 +180,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                 // The client still shows the correct loading screen when one is needed (Grom'Gol-Undercity)
                 if (newMapid == player->GetMapId())
                 {
+                    player->m_movementInfo.SetAsServerSide();
                     player->TeleportPositionRelocation(destX, destY, destZ, destO);
                     if (newInstanceId != player->GetInstanceId())
                         sMapMgr.ScheduleInstanceSwitch(player, newInstanceId);
