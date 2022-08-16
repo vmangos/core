@@ -1467,7 +1467,6 @@ struct npc_riggle_bassbaitAI : ScriptedAI
     explicit npc_riggle_bassbaitAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_uiTimer = 0;
-
         auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_PREV_WIN_TIME);
         if (time(nullptr) - prevWinTime > DAY)
         {
@@ -1496,15 +1495,14 @@ struct npc_riggle_bassbaitAI : ScriptedAI
             {
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             }
-            auto announceBegin = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN);
-
-            if (!announceBegin) return;
-
-            m_creature->MonsterYellToZone(YELL_BEGIN);
-            // store announce begin done
-            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0, true);
-            // store enable over annoucement
-            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1, true);
+            if (sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN))
+            {
+                m_creature->MonsterYellToZone(YELL_BEGIN);
+                // store announce begin done
+                sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0, true);
+                // store enable over annoucement
+                sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1, true);
+            }
         }
         else
         {
@@ -1512,17 +1510,13 @@ struct npc_riggle_bassbaitAI : ScriptedAI
             {
                 m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             }
-
-            // only progress to announce over when pools have been despawned
-            if (sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT)) return;
-
-            auto announceOver = sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN);
-
-            if (!announceOver) return;
-
-            m_creature->MonsterYellToZone(YELL_OVER);
-            // store announce over done
-            sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0, true);
+            // only progress to announce over when pools have been despawned (EVENT_TOURNAMENT is over)
+            if (!sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT) && sObjectMgr.GetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN))
+            {
+                m_creature->MonsterYellToZone(YELL_OVER);
+                // store announce over done
+                sObjectMgr.SetSavedVariable(VAR_STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0, true);
+            }
         }
     }
 
