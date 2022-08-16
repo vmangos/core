@@ -804,6 +804,15 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     }
                     *data << m_uint32Values[index];
                 }
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+                else if (index == UNIT_MOD_CAST_SPEED)
+                {
+                    if (m_floatValues[index] < 0.001f)
+                        *data << float(0.0f);
+                    else
+                        *data << m_floatValues[index];
+                }
+#endif
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)
