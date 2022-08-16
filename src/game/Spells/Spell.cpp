@@ -1721,7 +1721,9 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
 
             // for delayed spells ignore not visible explicit target
             if (m_delayed && unit == m_targets.getUnitTarget() &&
-               !unit->IsVisibleForOrDetect(m_caster, m_caster, false))
+               !unit->IsVisibleForOrDetect(m_caster, m_caster, false) &&
+                // dead creatures don't see alive players, but spells should still hit
+                !(unit->IsPlayer() && unit->IsAlive() && m_caster->IsCreature() && m_casterUnit->IsDead()))
             {
                 pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 ResetEffectDamageAndHeal();
