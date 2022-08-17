@@ -2438,14 +2438,21 @@ void Creature::ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data)
 {
     if (!IsInWorld())
         return;
+
     // Only affects continents
     if (GetMapId() > 1)
         return;
 
+    // Only affects normal spawns
+    if (GetSubtype() != CREATURE_SUBTYPE_GENERIC)
+        return;
+
     // Only affects rares and above with the forced flag
-    if (GetCreatureInfo()->rank > CREATURE_ELITE_ELITE)
+    if (GetCreatureInfo()->rank >= CREATURE_ELITE_ELITE)
+    {
         if (!data || !(data->spawn_flags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE))
             return;
+    }
 
     if (GetLevel() > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW))
         return;
