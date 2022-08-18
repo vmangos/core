@@ -1174,7 +1174,7 @@ bool ChatHandler::HandlePartyBotControlMarkCommand(char* args)
     auto itrMark = raidTargetIcons.find(mark);
     if (itrMark == raidTargetIcons.end())
     {
-        SendSysMessage("Unknown target mark. Valid names are: star, circle, diamond, triangle, moon, square, cross, skill");
+        SendSysMessage("Unknown target mark. Valid names are: star, circle, diamond, triangle, moon, square, cross, skull");
         SetSentErrorMessage(true);
         return false;
     }
@@ -1233,7 +1233,7 @@ bool ChatHandler::HandlePartyBotFocusMarkCommand(char* args)
     auto itrMark = raidTargetIcons.find(mark);
     if (itrMark == raidTargetIcons.end())
     {
-        SendSysMessage("Unknown target mark. Valid names are: star, circle, diamond, triangle, moon, square, cross, skill");
+        SendSysMessage("Unknown target mark. Valid names are: star, circle, diamond, triangle, moon, square, cross, skull");
         SetSentErrorMessage(true);
         return false;
     }
