@@ -5714,28 +5714,28 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     if (!defence && IsShapeShifted())
         return; 
 
-    uint32 playerLevel      = GetLevel();
-    uint32 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
-    uint32 currentSkillMax  = 5 * playerLevel;
+    uint8 playerLevel        = GetLevel();
+    uint16 currentSkillMax   = 5 * playerLevel;
+    uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
 
     // Max skill reached for level.
     // Can in some cases be less than 0: having max skill and then .level -1 as example.
     if (currentSkillMax <= currentSkillValue)
         return;
 
-    uint32 skillDiff = currentSkillMax - currentSkillValue;
+    int32 skillDiff = currentSkillMax - currentSkillValue;
 
     // Calculate base chance to increase
     float chance = 0.0f;
     if (defence) // TODO: more research needed. Seems to increase slower than weapon skill. Using old formula:
     {
-        uint32 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
-        uint32 mobLevel = pVictim->GetLevelForTarget(this);
+        uint8 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
+        uint8 mobLevel  = pVictim->GetLevelForTarget(this);
 
         if (mobLevel > playerLevel + 5)
             mobLevel = playerLevel + 5;
 
-        int32 lvldif = mobLevel - greylevel;
+        int16 lvldif = mobLevel - greylevel;
         if (lvldif < 3)
             lvldif = 3;
 
