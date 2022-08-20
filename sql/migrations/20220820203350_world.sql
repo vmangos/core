@@ -11,8 +11,10 @@ INSERT INTO `migrations` VALUES ('20220820203350');
 -- Correct respawn times of existing chests (source: CMangos)
 UPDATE `gameobject` SET `spawntimesecsmin`=300, `spawntimesecsmax`=900 WHERE `guid` IN (1397,1454,26749,26756,34797,34798,45106,45110,49528,49529);
 
--- Insert missing spawn location for Battered Chest (id: 2843)
+-- Battered Chest should contain some coins (PTR test) TODO: this seem to have no effect ingame!
+UPDATE `gameobject_template` SET `mingold`=10, `maxgold`=50 WHERE `entry`=2843;
 
+-- Insert missing spawn location for Battered Chest (id: 2843)
 -- Elwynn Forest
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (18186,2843,0,-9060.95,-463.424,72.5782,1.53589,0,0,0.694658,0.71934,300,900,100,1,0,0,0,10),
@@ -39,9 +41,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (18212,2843,0,1965.06,1617.98,88.2024,4.92183,0,0,-0.62932,0.777146,300,900,100,1,0,0,0,10),
 (18214,2843,0,2019.49,1853.65,102.669,4.18879,0,0,-0.866025,0.500001,300,900,100,1,0,0,0,10),
 (18215,2843,0,2041.63,1935.11,106.99,4.67748,0,0,-0.719339,0.694659,300,900,100,1,0,0,0,10);
-
--- Battered Chest should contain some coins (PTR test)
-UPDATE `gameobject_template` SET `mingold`=10, `maxgold`=50 WHERE `entry`=2843;
 
 -- Tirisfal Glades pooling
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`, `flags`, `instance`, `patch_min`, `patch_max`) VALUES
