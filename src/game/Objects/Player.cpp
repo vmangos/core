@@ -5729,13 +5729,13 @@ void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool de
     float chance = 0.0f;
     if (defence) // TODO: more research needed. Seems to increase slower than weapon skill. Using old formula:
     {
-        uint8 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
-        uint8 mobLevel  = pVictim->GetLevelForTarget(this);
+        uint16 greylevel = MaNGOS::XP::GetGrayLevel(playerLevel);
+        uint16 mobLevel  = pVictim->GetLevelForTarget(this);
 
         if (mobLevel > playerLevel + 5)
             mobLevel = playerLevel + 5;
 
-        int16 lvldif = mobLevel - greylevel;
+        int32 lvldif = mobLevel - greylevel;
         if (lvldif < 3)
             lvldif = 3;
 
