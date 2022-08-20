@@ -675,8 +675,9 @@ void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
             BarGoLink bar(1);
             bar.step();
 
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 cached player data ...");
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
+            sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded 0 cached player data ...");
+        }
         return;
     }
 
@@ -704,7 +705,7 @@ void ObjectMgr::LoadPlayerCacheData(uint32 lowGuid)
     if (!lowGuid)
     {
         sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "");
-        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u players in cache.", total_count);
+        sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, ">> Loaded %u players in cache.", totalCount);
     }
 }
 

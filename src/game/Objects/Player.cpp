@@ -20957,7 +20957,7 @@ bool Player::ChangeRace(uint8 newRace)
 {
     if (IsSavingDisabled() || IsBot())
     {
-        sLog.outError("Cannot change race of bot or temporary character!");
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "Cannot change race of bot or temporary character!");
         return false;
     }
 

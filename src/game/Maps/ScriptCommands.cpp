@@ -2411,7 +2411,7 @@ bool Map::ScriptCommand_PlayCustomAnim(ScriptInfo const& script, WorldObject* so
 
     if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
     {
-        sLog.outError("SCRIPT_COMMAND_PLAY_CUSTOM_ANIM (script id %u) call for a nullptr gameobject, skipping.", script.id);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "SCRIPT_COMMAND_PLAY_CUSTOM_ANIM (script id %u) call for a nullptr gameobject, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 

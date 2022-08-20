@@ -360,7 +360,7 @@ bool PlayerBotMgr::AddBot(uint32 playerGUID, bool chatBot, PlayerBotAI* pAI)
 
     if (sWorld.FindSession(accountId))
     {
-        sLog.outError("[PlayerBotMgr] Account %u is already online!", accountId);
+        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "[PlayerBotMgr] Account %u is already online!", accountId);
         return false;
     }
 

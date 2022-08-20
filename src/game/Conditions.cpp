@@ -1238,12 +1238,12 @@ bool ConditionEntry::IsValid()
         {
             if (m_value1 < 0 || m_value1 > 2)
             {
-                sLog.outErrorDb("CONDITION_NEARBY_PLAYER (entry %u, type %u) has invalid value1 %u, skipped", m_entry, m_condition, m_value1);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CONDITION_NEARBY_PLAYER (entry %u, type %u) has invalid value1 %u, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
             if (m_value2 <= 0)
             {
-                sLog.outErrorDb("CONDITION_NEARBY_PLAYER (entry %u, type %d) does not have max distance set in value2, skipped", m_entry, m_condition);
+                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CONDITION_NEARBY_PLAYER (entry %u, type %d) does not have max distance set in value2, skipped", m_entry, m_condition);
                 return false;
             }
             break;
