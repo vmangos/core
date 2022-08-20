@@ -1489,7 +1489,7 @@ void BattleGroundMgr::LoadBattleMastersEntry()
         uint32 bgTypeId  = fields[1].GetUInt32();
         if (bgTypeId >= MAX_BATTLEGROUND_TYPE_ID)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `battlemaster_entry` contain entry %u for nonexistent battleground type %u, ignored.", entry, bgTypeId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `battlemaster_entry` contain entry %u for nonexistent battleground type %u, ignored.", entry, bgTypeId);
             continue;
         }
 
