@@ -104,7 +104,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                 ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(temp.condition_id);
                 if (!condition)
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "CreatureEventAI: Creature %u has condition_id %u that does not exist in `conditions`, ignoring", temp.creature_id, temp.condition_id);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "CreatureEventAI: Creature %u has condition_id %u that does not exist in `conditions`, ignoring", temp.creature_id, temp.condition_id);
                     temp.condition_id = 0;
                 }
             }          

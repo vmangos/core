@@ -123,16 +123,16 @@ void LootStore::LoadLootTable()
 
             if (maxcount > std::numeric_limits<uint8>::max())
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table '%s' entry %d item %d: maxcount value (%u) to large. must be less %u - skipped", GetName(), entry, item, maxcount, std::numeric_limits<uint8>::max());
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table '%s' entry %d item %d: maxcount value (%u) to large. must be less %u - skipped", GetName(), entry, item, maxcount, std::numeric_limits<uint8>::max());
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
                 continue;                                   // error already printed to log/console.
             }
 
             if (mincountOrRef < 0 && conditionId)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table '%s' entry %u mincountOrRef %i < 0 and not allowed has condition, skipped",
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table '%s' entry %u mincountOrRef %i < 0 and not allowed has condition, skipped",
                                 GetName(), entry, mincountOrRef);
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM %s WHERE entry=%u AND condition_id=%u AND mincountOrRef=%i;", GetName(), entry, conditionId, mincountOrRef);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM %s WHERE entry=%u AND condition_id=%u AND mincountOrRef=%i;", GetName(), entry, conditionId, mincountOrRef);
                 continue;
             }
 
@@ -141,15 +141,15 @@ void LootStore::LoadLootTable()
                 ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId);
                 if (!condition)
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `%s` for entry %u, item %u has condition_id %u that does not exist in `conditions`, ignoring", GetName(), entry, item, conditionId);
-                    sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `%s` for entry %u, item %u has condition_id %u that does not exist in `conditions`, ignoring", GetName(), entry, item, conditionId);
+                    sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
                     continue;
                 }
 
                 if (mincountOrRef < 0 && !ConditionEntry::CanBeUsedWithoutPlayer(conditionId))
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table '%s' entry %u mincountOrRef %i < 0 and has condition %u that requires a player and is not supported, skipped", GetName(), entry, mincountOrRef, conditionId);
-                    sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table '%s' entry %u mincountOrRef %i < 0 and has condition %u that requires a player and is not supported, skipped", GetName(), entry, mincountOrRef, conditionId);
+                    sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
                     continue;
                 }
             }
@@ -158,7 +158,7 @@ void LootStore::LoadLootTable()
 
             if (!storeitem.IsValid(*this, entry))           // Validity checks
             {
-                sLog.Out(LOG_DBERRFIX, LOG_LVL_MINIMAL, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
+                sLog.Out(LOG_DBERRFIX, LOG_LVL_ERROR, "DELETE FROM %s WHERE entry=%u AND item=%u;", GetName(), entry, item);
                 continue;
             }
 

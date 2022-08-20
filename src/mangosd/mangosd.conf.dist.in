@@ -592,13 +592,6 @@ DebuffLimit = 0
 #                     in form Logname_#ID_YYYY-MM-DD_HH-MM-SS.Ext
 #                     or form Logname_#ID.Ext
 #
-#    LogColors
-#        Color for messages (format "normal_color details_color debug_color error_color")
-#        Colors: 0 - BLACK, 1 - RED, 2 - GREEN,  3 - BROWN, 4 - BLUE, 5 - MAGENTA, 6 -  CYAN, 7 - GREY,
-#                8 - YELLOW, 9 - LRED, 10 - LGREEN, 11 - LBLUE, 12 - LMAGENTA, 13 - LCYAN, 14 - WHITE
-#        Default: "" - none colors
-#        Example: "13 7 11 9"
-#
 #    LogMoneyThreshold
 #        Log all trades where money exceeds the specified value in copper
 #        Default: 10000
@@ -667,7 +660,6 @@ LogMoneyTreshold = 10000
 CharLogDump = 0
 
 GmLogPerAccount = 0
-LogColors = ""
 
 LogsDB.Chat                 = 0
 LogsDB.Characters           = 0

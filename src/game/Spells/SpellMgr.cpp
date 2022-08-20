@@ -83,20 +83,20 @@ void SpellMgr::LoadSpellTargetPositions()
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(st.mapId);
         if (!mapEntry)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell (ID:%u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, st.mapId);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell (ID:%u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, st.mapId);
             continue;
         }
 
         if (st.x == 0 && st.y == 0 && st.z == 0)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell (ID:%u) target coordinates not provided.", Spell_ID);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell (ID:%u) target coordinates not provided.", Spell_ID);
             continue;
         }
 
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(Spell_ID);
         if (!spellInfo)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell (ID:%u) listed in `spell_target_position` does not exist.", Spell_ID);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell (ID:%u) listed in `spell_target_position` does not exist.", Spell_ID);
             continue;
         }
 
@@ -111,7 +111,7 @@ void SpellMgr::LoadSpellTargetPositions()
         }
         if (!found)
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell (Id: %u) listed in `spell_target_position` does not have target TARGET_LOCATION_DATABASE (17).", Spell_ID);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell (Id: %u) listed in `spell_target_position` does not have target TARGET_LOCATION_DATABASE (17).", Spell_ID);
             continue;
         }
 
@@ -2280,7 +2280,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
                         if (pl)
                             ChatHandler(pl).PSendSysMessage("Craft spell %u create item (Entry: %u) but item does not exist in item_template.", spellInfo->Id, spellInfo->EffectItemType[i]);
                         else
-                            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Craft spell %u create item (Entry: %u) but item does not exist in item_template.", spellInfo->Id, spellInfo->EffectItemType[i]);
+                            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Craft spell %u create item (Entry: %u) but item does not exist in item_template.", spellInfo->Id, spellInfo->EffectItemType[i]);
                     }
                     return false;
                 }
@@ -2298,7 +2298,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
                         if (pl)
                             ChatHandler(pl).PSendSysMessage("Spell %u learn to broken spell %u, and then...", spellInfo->Id, spellInfo->EffectTriggerSpell[i]);
                         else
-                            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Spell %u learn to invalid spell %u, and then...", spellInfo->Id, spellInfo->EffectTriggerSpell[i]);
+                            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Spell %u learn to invalid spell %u, and then...", spellInfo->Id, spellInfo->EffectTriggerSpell[i]);
                     }
                     return false;
                 }
@@ -2318,7 +2318,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
                     if (pl)
                         ChatHandler(pl).PSendSysMessage("Craft spell %u requires reagent item (Entry: %u) but item does not exist in item_template.", spellInfo->Id, j);
                     else
-                        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Craft spell %u requires reagent item (Entry: %u) but item does not exist in item_template.", spellInfo->Id, j);
+                        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Craft spell %u requires reagent item (Entry: %u) but item does not exist in item_template.", spellInfo->Id, j);
                 }
                 return false;
             }

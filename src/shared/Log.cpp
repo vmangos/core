@@ -35,10 +35,36 @@
 
 INSTANTIATE_SINGLETON_1(Log);
 
-static constexpr Color logColors[] = { RED, LRED, BLACK, YELLOW, BLUE };
+static constexpr Color logColors[] = {
+    RED,    // error
+    RESET,  // minimal
+    RESET,  // basic
+    YELLOW, // detail
+    BLUE    // debug
+};
+
+namespace
+{
+uint16 GetConsoleColor()
+{
+#if PLATFORM == PLATFORM_WINDOWS
+    // Capture initial text color for using as a default
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info))
+    {
+        // default to white on error
+        return FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
+    }
+
+    return info.wAttributes & 0xF;
+#else
+    return 0;
+#endif
+}
+}
 
 Log::Log() :
-    m_includeTime(false), m_logsTimestamp(GetTimestampStr())
+    m_includeTime(false), m_logsTimestamp(GetTimestampStr()), m_defaultColor(GetConsoleColor())
 {
     for (int i = 0; i < LOG_TYPE_MAX; ++i)
     {
@@ -155,10 +181,17 @@ void Log::InitSmartlogGuids(std::string const& str)
 
 void Log::SetColor(FILE* where, Color color) const
 {
+    if (color == RESET)
+    {
+        ResetColor(where);
+        return;
+    }
+
 #if PLATFORM == PLATFORM_WINDOWS
 
     static constexpr WORD WinColorFG[] =
     {
+        0,                                                  // RESET, unused
         0,                                                  // BLACK
         FOREGROUND_RED,                                     // RED
         FOREGROUND_GREEN,                                   // GREEN
@@ -236,9 +269,9 @@ void Log::ResetColor(FILE* where) const
 {
 #if PLATFORM == PLATFORM_WINDOWS
     HANDLE hConsole = GetStdHandle(where == stdout ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+    SetConsoleTextAttribute(hConsole, m_defaultColor);
 #else
-    fprintf(where, "\x1b[0m");
+    fprintf(where, "\x1b[%dm", m_defaultColor);
 #endif
 }
 

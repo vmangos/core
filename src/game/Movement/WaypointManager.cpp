@@ -98,7 +98,7 @@ void WaypointManager::Load()
             {
                 if (sCreatureMovementScripts.find(script_id) == sCreatureMovementScripts.end())
                 {
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table creature_movement for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, script_id);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table creature_movement for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, script_id);
                     continue;
                 }
 
@@ -110,7 +110,7 @@ void WaypointManager::Load()
             if (!cData)
             {
                 if (!sObjectMgr.IsExistingCreatureGuid(id))
-                    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table creature_movement contain path for creature guid %u, but this creature guid does not exist. Skipping.", id);
+                    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table creature_movement contain path for creature guid %u, but this creature guid does not exist. Skipping.", id);
                 continue;
             }
 

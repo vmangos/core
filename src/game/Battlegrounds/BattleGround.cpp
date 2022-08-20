@@ -750,7 +750,7 @@ void BattleGround::RewardItem(Player* pPlayer, uint32 itemId, uint32 count)
 
     if (msg == EQUIP_ERR_ITEM_NOT_FOUND)
     {
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Battleground reward item (Entry %u) not exist in `item_template`.", itemId);
+        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Battleground reward item (Entry %u) not exist in `item_template`.", itemId);
         return;
     }
 

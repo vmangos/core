@@ -299,19 +299,19 @@ void GameEventMgr::LoadFromDB()
 
             if (event_id == 0)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_creature` game event id (%i) not allowed", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_creature` game event id (%i) not allowed", event_id);
                 continue;
             }
 
             if (!IsValidEvent(std::abs(event_id)))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_creature` game event id (%i) not exist in `game_event`", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_creature` game event id (%i) not exist in `game_event`", event_id);
                 continue;
             }
 
             if (!sObjectMgr.IsExistingCreatureGuid(guid))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_creature` game event id (%i) contains non-existent creature guid (%u)", event_id, guid);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_creature` game event id (%i) contains non-existent creature guid (%u)", event_id, guid);
                 continue;
             }
 
@@ -384,13 +384,13 @@ void GameEventMgr::LoadFromDB()
 
             if (event_id == 0)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_gameobject` game event id (%i) not allowed", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_gameobject` game event id (%i) not allowed", event_id);
                 continue;
             }
 
             if (!IsValidEvent(std::abs(event_id)))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_gameobject` game event id (%i) not exist in `game_event`", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_gameobject` game event id (%i) not exist in `game_event`", event_id);
                 continue;
             }
 
@@ -410,7 +410,7 @@ void GameEventMgr::LoadFromDB()
                     if (eventRef != 0)
                     {
                         if (eventRef != event_id)
-                            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_gameobject` have gameobject (GUID: %u) for event %i from pool or subpool of pool (ID: %u) but pool have already content from event %i. Pool don't must have content for different events!", guid, event_id, topPoolId, eventRef);
+                            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_gameobject` have gameobject (GUID: %u) for event %i from pool or subpool of pool (ID: %u) but pool have already content from event %i. Pool don't must have content for different events!", guid, event_id, topPoolId, eventRef);
                     }
                     else
                     {
@@ -471,19 +471,19 @@ void GameEventMgr::LoadFromDB()
 
             if (event_id == 0)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_creature_data` game event id (%i) is reserved and can't be used." , event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_creature_data` game event id (%i) is reserved and can't be used." , event_id);
                 continue;
             }
 
             if (!IsValidEvent(event_id))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_creature_data` game event id (%u) not exist in `game_event`", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_creature_data` game event id (%u) not exist in `game_event`", event_id);
                 continue;
             }
 
             if (!sObjectMgr.IsExistingCreatureGuid(guid))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_creature_data` game event id (%u) contains non-existent creature guid (%u)", event_id, guid);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_creature_data` game event id (%u) contains non-existent creature guid (%u)", event_id, guid);
                 continue;
             }
 
@@ -561,13 +561,13 @@ void GameEventMgr::LoadFromDB()
 
             if (event_id == 0)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_quest` game event id (%i) is reserved and can't be used.", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_quest` game event id (%i) is reserved and can't be used.", event_id);
                 continue;
             }
 
             if (!IsValidEvent(event_id))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_quest` game event id (%u) not exist in `game_event`", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_quest` game event id (%u) not exist in `game_event`", event_id);
                 continue;
             }
 
@@ -575,7 +575,7 @@ void GameEventMgr::LoadFromDB()
 
             if (!pQuest)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_quest` contain entry for quest %u (event %u) but this quest does not exist. Skipping.", quest, event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_quest` contain entry for quest %u (event %u) but this quest does not exist. Skipping.", quest, event_id);
                 continue;
             }
 
@@ -627,13 +627,13 @@ void GameEventMgr::LoadFromDB()
 
             if (event_id == 0)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_mail` game event id (%i) not allowed", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_mail` game event id (%i) not allowed", event_id);
                 continue;
             }
 
             if (!IsValidEvent(event_id))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "`game_event_mail` game event id (%u) not exist in `game_event`", event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "`game_event_mail` game event id (%u) not exist in `game_event`", event_id);
                 continue;
             }
 
@@ -641,25 +641,25 @@ void GameEventMgr::LoadFromDB()
 
             if (!(mail.raceMask & RACEMASK_ALL_PLAYABLE))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_mail` have raceMask (%u) requirement for game event %i that not include any player races, ignoring.", mail.raceMask, event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_mail` have raceMask (%u) requirement for game event %i that not include any player races, ignoring.", mail.raceMask, event_id);
                 continue;
             }
 
             if (mail.questId && !sObjectMgr.GetQuestTemplate(mail.questId))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_mail` have nonexistent quest (%u) requirement for game event %i, ignoring.", mail.questId, event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_mail` have nonexistent quest (%u) requirement for game event %i, ignoring.", mail.questId, event_id);
                 continue;
             }
 
             if (!sMailTemplateStorage.LookupEntry<MailTemplateEntry>(mail.mailTemplateId))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_mail` have invalid mailTemplateId (%u) for game event %i that invalid not include any player races, ignoring.", mail.mailTemplateId, event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_mail` have invalid mailTemplateId (%u) for game event %i that invalid not include any player races, ignoring.", mail.mailTemplateId, event_id);
                 continue;
             }
 
             if (!ObjectMgr::GetCreatureTemplate(mail.senderEntry))
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `game_event_mail` have nonexistent sender creature entry (%u) for game event %i that invalid not include any player races, ignoring.", mail.senderEntry, event_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `game_event_mail` have nonexistent sender creature entry (%u) for game event %i that invalid not include any player races, ignoring.", mail.senderEntry, event_id);
                 continue;
             }
 

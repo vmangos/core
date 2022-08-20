@@ -96,6 +96,7 @@ static_assert(sizeof(logFilterData) / sizeof(logFilterData[0]) == LOG_FILTER_COU
 
 enum Color
 {
+    RESET,
     BLACK,
     RED,
     GREEN,
@@ -199,6 +200,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, std::m
         // log/console control
         LogLevel m_consoleLevel;
         LogLevel m_fileLevel;
+        const uint16 m_defaultColor;
 
         // include timestamp in console output
         bool m_includeTime;

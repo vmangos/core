@@ -4158,7 +4158,7 @@ void ObjectMgr::LoadItemRequiredTarget()
         if (!pItemProto)
         {
             if (!IsExistingItemId(uiItemId))
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `item_required_target`: Entry %u listed for TargetEntry %u does not exist in `item_template`.", uiItemId, uiTargetEntry);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `item_required_target`: Entry %u listed for TargetEntry %u does not exist in `item_template`.", uiItemId, uiTargetEntry);
             continue;
         }
 
@@ -7516,12 +7516,12 @@ inline void CheckGOLinkedTrapId(GameObjectInfo const* goInfo, uint32 dataN, uint
     if (GameObjectInfo const* trapInfo = sGOStorage.LookupEntry<GameObjectInfo>(dataN))
     {
         if (trapInfo->type != GAMEOBJECT_TYPE_TRAP)
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data%d=%u but GO (Entry %u) have not GAMEOBJECT_TYPE_TRAP (%u) type.",
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but GO (Entry %u) have not GAMEOBJECT_TYPE_TRAP (%u) type.",
                             goInfo->id, goInfo->type, N, dataN, dataN, GAMEOBJECT_TYPE_TRAP);
     }
     else
         // too many error reports about nonexistent trap templates
-        sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data%d=%u but trap GO (Entry %u) not exist in `gameobject_template`.",
+        sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but trap GO (Entry %u) not exist in `gameobject_template`.",
                             goInfo->id, goInfo->type, N, dataN, dataN);
 }
 
@@ -7530,7 +7530,7 @@ inline void CheckGOSpellId(GameObjectInfo const* goInfo, uint32 dataN, uint32 N)
     if (sSpellMgr.GetSpellEntry(dataN))
         return;
 
-    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data%d=%u but Spell (Entry %u) not exist.",
+    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but Spell (Entry %u) not exist.",
                     goInfo->id, goInfo->type, N, dataN, dataN);
 }
 
@@ -7539,7 +7539,7 @@ inline void CheckAndFixGOChairHeightId(GameObjectInfo const* goInfo, uint32 cons
     if (dataN <= (UNIT_STAND_STATE_SIT_HIGH_CHAIR - UNIT_STAND_STATE_SIT_LOW_CHAIR))
         return;
 
-    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data%d=%u but correct chair height in range 0..%i.",
+    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but correct chair height in range 0..%i.",
                     goInfo->id, goInfo->type, N, dataN, UNIT_STAND_STATE_SIT_HIGH_CHAIR - UNIT_STAND_STATE_SIT_LOW_CHAIR);
 
     // prevent client and server unexpected work
@@ -7552,7 +7552,7 @@ inline void CheckGONoDamageImmuneId(GameObjectInfo const* goInfo, uint32 dataN, 
     if (dataN <= 1)
         return;
 
-    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) noDamageImmune field value.",
+    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) noDamageImmune field value.",
                     goInfo->id, goInfo->type, N, dataN);
 }
 
@@ -7562,7 +7562,7 @@ inline void CheckGOConsumable(GameObjectInfo const* goInfo, uint32 dataN, uint32
     if (dataN <= 1)
         return;
 
-    sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) consumable field value.",
+    sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Gameobject (Entry: %u GoType: %u) have data%d=%u but expected boolean (0/1) consumable field value.",
                     goInfo->id, goInfo->type, N, dataN);
 }
 
@@ -8696,22 +8696,22 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
         if (!sTaxiPathStore.LookupEntry(inPath))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `taxi_path_transitions`: inPath %u does not exist", inPath);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `taxi_path_transitions`: inPath %u does not exist", inPath);
             continue;
         }
         if (!sTaxiPathStore.LookupEntry(outPath))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `taxi_path_transitions`: outPath %u does not exist", outPath);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `taxi_path_transitions`: outPath %u does not exist", outPath);
             continue;
         }
         if (inNode >= sTaxiPathNodesByPath[inPath].size())
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `taxi_path_transitions`: inNode %u does not exist in inPath %u", inNode, inPath);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `taxi_path_transitions`: inNode %u does not exist in inPath %u", inNode, inPath);
             continue;
         }
         if (outNode >= sTaxiPathNodesByPath[outPath].size())
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `taxi_path_transitions`: outNode %u does not exist in outPath %u", outNode, outPath);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `taxi_path_transitions`: outNode %u does not exist in outPath %u", outNode, outPath);
             continue;
         }
 
@@ -8720,7 +8720,7 @@ void ObjectMgr::LoadTaxiPathTransitions()
         {
             if (it->second.outPath == outPath)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table `taxi_path_transitions`: duplicate of (inPath %u, outPath %u)", inPath, outPath);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table `taxi_path_transitions`: duplicate of (inPath %u, outPath %u)", inPath, outPath);
                 continue;
             }
         }
@@ -10265,7 +10265,7 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
 
         if (!GetNpcText(gMenu.text_id))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table gossip_menu entry %u are using non-existing text_id %u", gMenu.entry, gMenu.text_id);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table gossip_menu entry %u are using non-existing text_id %u", gMenu.entry, gMenu.text_id);
             continue;
         }
 
@@ -10273,7 +10273,7 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
         {
             if (sGossipScripts.find(gMenu.script_id) == sGossipScripts.end())
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table gossip_menu for menu %u, text-id %u have script_id %u that does not exist in `gossip_scripts`, ignoring", gMenu.entry, gMenu.text_id, gMenu.script_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table gossip_menu for menu %u, text-id %u have script_id %u that does not exist in `gossip_scripts`, ignoring", gMenu.entry, gMenu.text_id, gMenu.script_id);
                 continue;
             }
 
@@ -10286,7 +10286,7 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
             ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenu.condition_id);
             if (!condition)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table gossip_menu for menu %u, text-id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenu.entry, gMenu.text_id, gMenu.condition_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table gossip_menu for menu %u, text-id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenu.entry, gMenu.text_id, gMenu.condition_id);
                 gMenu.condition_id = 0;
             }
         }
@@ -10461,12 +10461,12 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
             }
 
             if (found_menu_uses && !found_flags_uses)
-                sLog.Out(LOG_BASIC, LOG_LVL_DETAIL, "Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding `npc_flags`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
+                sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding `npc_flags`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
         }
 
         if (gMenuItem.action_poi_id && !GetPointOfInterest(gMenuItem.action_poi_id))
         {
-            sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table gossip_menu_option for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_poi_id);
+            sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table gossip_menu_option for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_poi_id);
             gMenuItem.action_poi_id = 0;
         }
 
@@ -10474,7 +10474,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
         {
             if (sGossipScripts.find(gMenuItem.action_script_id) == sGossipScripts.end())
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table gossip_menu_option for menu %u, id %u have action_script_id %u that does not exist in `gossip_scripts`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_script_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table gossip_menu_option for menu %u, id %u have action_script_id %u that does not exist in `gossip_scripts`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_script_id);
                 continue;
             }
 
@@ -10486,7 +10486,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
             ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenuItem.condition_id);
             if (!condition)
             {
-                sLog.Out(LOG_DBERROR, LOG_LVL_MINIMAL, "Table gossip_menu_option for menu %u, id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.condition_id);
+                sLog.Out(LOG_DBERROR, LOG_LVL_ERROR, "Table gossip_menu_option for menu %u, id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.condition_id);
                 gMenuItem.condition_id = 0;
             }
         }
